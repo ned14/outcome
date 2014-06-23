@@ -537,9 +537,9 @@ namespace boost
     {
         return intel_tsx_transaction<T>(lockable);
     }
-#define BOOST_BEGIN_MEMORY_TRANSACTION(lockable) { auto __tsx_transaction(boost::afio::detail::make_intel_tsx_transaction(lockable)); {
+#define BOOST_BEGIN_MEMORY_TRANSACTION(lockable) { auto __tsx_transaction(boost::memory_transactions::make_intel_tsx_transaction(lockable)); {
 #define BOOST_END_MEMORY_TRANSACTION(lockable) } __tsx_transaction.commit(); }
-#define BOOST_BEGIN_NESTED_MEMORY_TRANSACTION(N) { auto __tsx_transaction##N(boost::afio::detail::make_intel_tsx_transaction(__tsx_transaction)); {
+#define BOOST_BEGIN_NESTED_MEMORY_TRANSACTION(N) { auto __tsx_transaction##N(boost::memory_transactions::make_intel_tsx_transaction(__tsx_transaction)); {
 #define BOOST_END_NESTED_MEMORY_TRANSACTION(N) } __tsx_transaction##N.commit(); }
 
 #endif // BOOST_USING_INTEL_TSX

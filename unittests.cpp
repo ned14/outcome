@@ -29,6 +29,9 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include "memory_transactions.hpp"
+#include "timing.h"
+
+#include <stdio.h>
 
 #ifndef BOOST_MEMORY_TRANSACTIONS_DISABLE_CATCH
 #define CATCH_CONFIG_RUNNER
@@ -42,12 +45,75 @@ TEST_CASE("spinlock/works", "Tests that the spinlock works as intended")
 {
   boost::memory_transactions::spinlock<bool> lock;
   REQUIRE(lock.try_lock());
+  REQUIRE(!lock.try_lock());
   lock.unlock();
   
   lock_guard<decltype(lock)> h(lock);
   REQUIRE(!lock.try_lock());
 }
 
+#ifdef _OPENMP
+TEST_CASE("spinlock/works_threaded", "Tests that the spinlock works as intended under threads")
+{
+  boost::memory_transactions::spinlock<bool> lock;
+  size_t locked=0;
+#pragma omp parallel for reduction(+:locked)
+  for(int n=0; n<4; n++)
+  {
+    locked+=lock.try_lock();
+  }
+  REQUIRE(locked==1);
+}
+
+static double CalculatePerformance()
+{
+  boost::memory_transactions::spinlock<bool> lock;
+  boost::memory_transactions::atomic<size_t> gate(0);
+  size_t count=0;
+  usCount start, end;
+#pragma omp parallel
+  {
+    ++gate;
+  }
+  printf("There are %u threads in this CPU\n", (unsigned) gate);
+  start=GetUsCount();
+#pragma omp parallel
+  {
+    //volatile size_t a=0;
+    //for(size_t n=0; n<10000000; n++)
+    //  a++;
+    --gate;
+    while(gate);
+    for(size_t n=0; n<10000000; n++)
+    {
+      BOOST_BEGIN_MEMORY_TRANSACTION(lock)
+      {
+        ++count;
+      }
+      BOOST_END_MEMORY_TRANSACTION(lock)
+    }
+  }
+  end=GetUsCount();
+  REQUIRE((count % 10000000) == 0);
+  return count/((end-start)/1000000000000.0);
+}
+
+TEST_CASE("transaction/performance", "Tests the performance of memory transactions")
+{
+  printf("This CPU %s support Intel TSX memory transactions.\n", boost::memory_transactions::intel_stuff::have_intel_tsx_support() ? "DOES" : "does NOT");
+  printf("1. Achieved %lf memory transactions per second\n", CalculatePerformance());
+  printf("2. Achieved %lf memory transactions per second\n", CalculatePerformance());
+  printf("3. Achieved %lf memory transactions per second\n", CalculatePerformance());
+  if(boost::memory_transactions::intel_stuff::have_intel_tsx_support())
+  {
+    printf("\nForcing Intel TSX support off ...\n");
+    boost::memory_transactions::intel_stuff::have_intel_tsx_support_result=1;
+    printf("1. Achieved %lf memory transactions per second\n", CalculatePerformance());
+    printf("2. Achieved %lf memory transactions per second\n", CalculatePerformance());
+    printf("3. Achieved %lf memory transactions per second\n", CalculatePerformance());
+  }
+}
+#endif
 
 #ifndef BOOST_MEMORY_TRANSACTIONS_DISABLE_CATCH
 int main(int argc, char *argv[])
