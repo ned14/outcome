@@ -69,15 +69,22 @@ static double CalculatePerformance()
 {
   boost::memory_transactions::spinlock<bool> lock;
   boost::memory_transactions::atomic<size_t> gate(0);
-  size_t count=0;
+  struct
+  {
+    size_t value;
+    char padding[64-sizeof(size_t)];
+  } count[64];
+  memset(&count, 0, sizeof(count));
   usCount start, end;
 #pragma omp parallel
   {
     ++gate;
   }
-  printf("There are %u threads in this CPU\n", (unsigned) gate);
+  size_t threads=gate;
+  //printf("There are %u threads in this CPU\n", (unsigned) threads);
   start=GetUsCount();
-#pragma omp parallel
+#pragma omp parallel for
+  for(int thread=0; thread<threads; thread++)
   {
     //volatile size_t a=0;
     //for(size_t n=0; n<10000000; n++)
@@ -88,14 +95,19 @@ static double CalculatePerformance()
     {
       BOOST_BEGIN_MEMORY_TRANSACTION(lock)
       {
-        ++count;
+        ++count[thread].value;
       }
       BOOST_END_MEMORY_TRANSACTION(lock)
     }
   }
   end=GetUsCount();
-  REQUIRE((count % 10000000) == 0);
-  return count/((end-start)/1000000000000.0);
+  size_t increments=0;
+  for(size_t thread=0; thread<threads; thread++)
+  {
+    REQUIRE(count[thread].value == 10000000);
+    increments+=count[thread].value;
+  }
+  return increments/((end-start)/1000000000000.0);
 }
 
 TEST_CASE("transaction/performance", "Tests the performance of memory transactions")
