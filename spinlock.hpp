@@ -1,5 +1,5 @@
-/* memory_transactions.hpp
-Provides yet another mechanism for serialising memory
+/* spinlock.hpp
+Provides yet another spinlock
 (C) 2013-2014 Niall Douglas http://www.nedprod.com/
 File Created: Sept 2013
 
@@ -29,22 +29,22 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef BOOST_MEMORY_TRANSACTIONS_HPP
-#define BOOST_MEMORY_TRANSACTIONS_HPP
+#ifndef BOOST_SPINLOCK_HPP
+#define BOOST_SPINLOCK_HPP
 
-#if !defined(BOOST_MEMORY_TRANSACTIONS_USE_BOOST_ATOMIC) && defined(BOOST_NO_CXX11_HDR_ATOMIC)
-# define BOOST_MEMORY_TRANSACTIONS_USE_BOOST_ATOMIC
+#if !defined(BOOST_SPINLOCK_USE_BOOST_ATOMIC) && defined(BOOST_NO_CXX11_HDR_ATOMIC)
+# define BOOST_SPINLOCK_USE_BOOST_ATOMIC
 #endif
-#if !defined(BOOST_MEMORY_TRANSACTIONS_USE_BOOST_THREAD) && defined(BOOST_NO_CXX11_HDR_THREAD)
-# define BOOST_MEMORY_TRANSACTIONS_USE_BOOST_THREAD
+#if !defined(BOOST_SPINLOCK_USE_BOOST_THREAD) && defined(BOOST_NO_CXX11_HDR_THREAD)
+# define BOOST_SPINLOCK_USE_BOOST_THREAD
 #endif
 
-#ifdef BOOST_MEMORY_TRANSACTIONS_USE_BOOST_ATOMIC
+#ifdef BOOST_SPINLOCK_USE_BOOST_ATOMIC
 # include <boost/atomic.hpp>
 #else
 # include <atomic>
 #endif
-#ifdef BOOST_MEMORY_TRANSACTIONS_USE_BOOST_THREAD
+#ifdef BOOST_SPINLOCK_USE_BOOST_THREAD
 # include <boost/thread.hpp>
 #else
 # include <thread>
@@ -109,12 +109,12 @@ extern "C" void _mm_pause();
 
 namespace boost
 {
-  namespace memory_transactions
+  namespace spinlock
   {
     // Map in an atomic implementation
     template <class T>
     class atomic
-#ifdef BOOST_MEMORY_TRANSACTIONS_USE_BOOST_ATOMIC
+#ifdef BOOST_SPINLOCK_USE_BOOST_ATOMIC
       : public boost::atomic<T>
     {
       typedef boost::atomic<T> Base;
@@ -136,7 +136,7 @@ namespace boost
 #endif
     };//end boost::afio::atomic
     // Map in a this_thread implementation
-#ifdef BOOST_MEMORY_TRANSACTIONS_USE_BOOST_THREAD
+#ifdef BOOST_SPINLOCK_USE_BOOST_THREAD
     namespace this_thread=boost::this_thread;
     namespace chrono { using boost::chrono::milliseconds; }
 #else
@@ -255,12 +255,68 @@ namespace boost
       }
     };
 
-#ifndef BOOST_BEGIN_MEMORY_TRANSACTION
+    //! \brief Determines if a lockable is locked. Type specialise this for performance if your lockable allows examination.
+    template<class T> inline bool is_lockable_locked(T &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    {
+      if(lockable.try_lock())
+      {
+        lockable.unlock();
+        return true;
+      }
+      return false;
+    }
+    // For when used with a spinlock
+    template<class T, template<class> class spinpolicy1, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline bool is_lockable_locked(spinlock<T, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    {
+      return 1==lockable.v.load();
+    }
+
+#if defined(BOOST_USING_INTEL_TSX)
+    // Adapted from http://software.intel.com/en-us/articles/how-to-detect-new-instruction-support-in-the-4th-generation-intel-core-processor-family
+    namespace intel_stuff
+    {
+      inline void run_cpuid(uint32_t eax, uint32_t ecx, uint32_t* abcd) BOOST_NOEXCEPT_OR_NOTHROW
+      {
+#if defined(_MSC_VER)
+          __cpuidex((int *) abcd, eax, ecx);
+#else
+          uint32_t ebx=0, edx=0;
+# if defined( __i386__ ) && defined ( __PIC__ )
+          /* in case of PIC under 32-bit EBX cannot be clobbered */
+          __asm__("movl %%ebx, %%edi \n\t cpuid \n\t xchgl %%ebx, %%edi" : "=D" (ebx),
+# else
+          __asm__("cpuid" : "+b" (ebx),
+# endif
+          "+a" (eax), "+c" (ecx), "=d" (edx));
+          abcd[0] = eax; abcd[1] = ebx; abcd[2] = ecx; abcd[3] = edx;
+#endif
+      }
+      static int have_intel_tsx_support_result; // public only for benchmarking
+      inline bool have_intel_tsx_support() BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        if(have_intel_tsx_support_result) return have_intel_tsx_support_result==2;
+
+        uint32_t abcd[4];
+        uint32_t rtm_mask = (1 << 11);
+
+        /*  CPUID.(EAX=07H, ECX=0H):EBX.RTM[bit 11]==1  */
+        run_cpuid(7, 0, abcd);
+        if((abcd[1] & rtm_mask) != rtm_mask)
+            have_intel_tsx_support_result=1;
+        else
+            have_intel_tsx_support_result=2;
+        return have_intel_tsx_support_result==2;
+      }
+    }
+#endif
+
+#ifndef BOOST_BEGIN_TRANSACT_LOCK
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
-#define BOOST_BEGIN_MEMORY_TRANSACTION(lockable) __transaction_relaxed
-#define BOOST_END_MEMORY_TRANSACTION(lockable)
-#define BOOST_BEGIN_NESTED_MEMORY_TRANSACTION(N) __transaction_relaxed
-#define BOOST_END_NESTED_MEMORY_TRANSACTION(N)
+#undef BOOST_USING_INTEL_TSX
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) __transaction_relaxed { (void) boost::spinlock::is_lockable_locked(lockable);
+#define BOOST_END_TRANSACT_LOCK(lockable) }
+#define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N) __transaction_relaxed
+#define BOOST_END_NESTED_TRANSACT_LOCK(N)
 #elif defined(BOOST_USING_INTEL_TSX)
 
 #define BOOST_MEMORY_TRANSACTIONS_XBEGIN_STARTED   (~0u)
@@ -313,43 +369,6 @@ namespace boost
 #define BOOST_MEMORY_TRANSACTIONS_XTEST(...) _xtest(__VA_ARGS__)
 #endif
 
-    // Adapted from http://software.intel.com/en-us/articles/how-to-detect-new-instruction-support-in-the-4th-generation-intel-core-processor-family
-    namespace intel_stuff
-    {
-      inline void run_cpuid(uint32_t eax, uint32_t ecx, uint32_t* abcd) BOOST_NOEXCEPT_OR_NOTHROW
-      {
-#if defined(_MSC_VER)
-          __cpuidex((int *) abcd, eax, ecx);
-#else
-          uint32_t ebx=0, edx=0;
-# if defined( __i386__ ) && defined ( __PIC__ )
-          /* in case of PIC under 32-bit EBX cannot be clobbered */
-          __asm__("movl %%ebx, %%edi \n\t cpuid \n\t xchgl %%ebx, %%edi" : "=D" (ebx),
-# else
-          __asm__("cpuid" : "+b" (ebx),
-# endif
-          "+a" (eax), "+c" (ecx), "=d" (edx));
-          abcd[0] = eax; abcd[1] = ebx; abcd[2] = ecx; abcd[3] = edx;
-#endif
-      }
-      static int have_intel_tsx_support_result; // public only for benchmarking
-      inline bool have_intel_tsx_support() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        if(have_intel_tsx_support_result) return have_intel_tsx_support_result==2;
-
-        uint32_t abcd[4];
-        uint32_t rtm_mask = (1 << 11);
-
-        /*  CPUID.(EAX=07H, ECX=0H):EBX.RTM[bit 11]==1  */
-        run_cpuid(7, 0, abcd);
-        if((abcd[1] & rtm_mask) != rtm_mask)
-            have_intel_tsx_support_result=1;
-        else
-            have_intel_tsx_support_result=2;
-        return have_intel_tsx_support_result==2;
-      }
-    }
-
     template<class T> struct get_spins_to_transact
     {
       static BOOST_CONSTEXPR_OR_CONST size_t value=4;
@@ -358,21 +377,6 @@ namespace boost
     {
       static BOOST_CONSTEXPR_OR_CONST size_t value=spinlock<T, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4>::spins_to_transact;
     };
-    // For when used with not a spinlock
-    template<class T> inline bool is_lockable_locked(T &lockable) BOOST_NOEXCEPT_OR_NOTHROW
-    {
-      if(lockable.try_lock())
-      {
-        lockable.unlock();
-        return true;
-      }
-      return false;
-    }
-    // For when used with a spinlock
-    template<class T, template<class> class spinpolicy1, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline bool is_lockable_locked(spinlock<T, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
-    {
-      return 1==lockable.v.load();
-    }
     template<class T> struct intel_tsx_transaction_impl
     {
     protected:
@@ -537,22 +541,22 @@ namespace boost
     {
         return intel_tsx_transaction<T>(lockable);
     }
-#define BOOST_BEGIN_MEMORY_TRANSACTION(lockable) { auto __tsx_transaction(boost::memory_transactions::make_intel_tsx_transaction(lockable)); {
-#define BOOST_END_MEMORY_TRANSACTION(lockable) } __tsx_transaction.commit(); }
-#define BOOST_BEGIN_NESTED_MEMORY_TRANSACTION(N) { auto __tsx_transaction##N(boost::memory_transactions::make_intel_tsx_transaction(__tsx_transaction)); {
-#define BOOST_END_NESTED_MEMORY_TRANSACTION(N) } __tsx_transaction##N.commit(); }
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { auto __tsx_transaction(boost::spinlock::make_intel_tsx_transaction(lockable)); {
+#define BOOST_END_TRANSACT_LOCK(lockable) } __tsx_transaction.commit(); }
+#define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N) { auto __tsx_transaction##N(boost::spinlock::make_intel_tsx_transaction(__tsx_transaction)); {
+#define BOOST_END_NESTED_TRANSACT_LOCK(N) } __tsx_transaction##N.commit(); }
 
 #endif // BOOST_USING_INTEL_TSX
-#endif // BOOST_BEGIN_MEMORY_TRANSACTION
+#endif // BOOST_BEGIN_TRANSACT_LOCK
 
-#ifndef BOOST_BEGIN_MEMORY_TRANSACTION
-#define BOOST_BEGIN_MEMORY_TRANSACTION(lockable) { boost::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
-#define BOOST_END_MEMORY_TRANSACTION(lockable) }
-#define BOOST_BEGIN_NESTED_MEMORY_TRANSACTION(N)
-#define BOOST_END_NESTED_MEMORY_TRANSACTION(N)
-#endif // BOOST_BEGIN_MEMORY_TRANSACTION
+#ifndef BOOST_BEGIN_TRANSACT_LOCK
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { boost::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
+#define BOOST_END_TRANSACT_LOCK(lockable) }
+#define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N)
+#define BOOST_END_NESTED_TRANSACT_LOCK(N)
+#endif // BOOST_BEGIN_TRANSACT_LOCK
 
   }
 }
 
-#endif // BOOST_MEMORY_TRANSACTIONS_HPP
+#endif // BOOST_SPINLOCK_HPP
