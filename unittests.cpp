@@ -179,6 +179,71 @@ TEST_CASE("transaction/performance", "Tests the performance of spinlock transact
 #endif
 }
 
+static double CalculateMallocPerformance(size_t size, bool use_transact)
+{
+  boost::spinlock::spinlock<bool> lock;
+  boost::spinlock::atomic<size_t> gate(0);
+  usCount start, end;
+#pragma omp parallel
+  {
+    ++gate;
+  }
+  size_t threads=gate;
+  //printf("There are %u threads in this CPU\n", (unsigned) threads);
+  start=GetUsCount();
+#pragma omp parallel for
+  for(int n=0; n<10000000*threads; n++)
+  {
+    void *p;
+    if(use_transact)
+    {
+      BOOST_BEGIN_TRANSACT_LOCK(lock)
+      {
+        p=malloc(size);
+      }
+      BOOST_END_TRANSACT_LOCK(lock)
+    }
+    else
+    {
+      std::lock_guard<decltype(lock)> g(lock);
+      p=malloc(size);
+    }
+    if(use_transact)
+    {
+      BOOST_BEGIN_TRANSACT_LOCK(lock)
+      {
+        free(p);
+      }
+      BOOST_END_TRANSACT_LOCK(lock)
+    }
+    else
+    {
+      std::lock_guard<decltype(lock)> g(lock);
+      free(p);
+    }
+  }
+  end=GetUsCount();
+  REQUIRE(true);
+//  printf("size=%u\n", (unsigned) map.size());
+  return threads*10000000/((end-start)/1000000000000.0);
+}
+
+TEST_CASE("malloc/performance/transact/small", "Tests the transact performance of multiple threads using small memory allocations")
+{
+  printf("\n=== Small malloc transact performance ===\n");
+  printf("1. Achieved %lf transactions per second\n", CalculateMallocPerformance(16, 1));
+  printf("2. Achieved %lf transactions per second\n", CalculateMallocPerformance(16, 1));
+  printf("3. Achieved %lf transactions per second\n", CalculateMallocPerformance(16, 1));
+}
+
+TEST_CASE("malloc/performance/transact/large", "Tests the transact performance of multiple threads using large memory allocations")
+{
+  printf("\n=== Large malloc transact performance ===\n");
+  printf("1. Achieved %lf transactions per second\n", CalculateMallocPerformance(65536, 1));
+  printf("2. Achieved %lf transactions per second\n", CalculateMallocPerformance(65536, 1));
+  printf("3. Achieved %lf transactions per second\n", CalculateMallocPerformance(65536, 1));
+}
+
 static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact)
 {
   boost::spinlock::spinlock<bool> lock;
