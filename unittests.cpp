@@ -151,7 +151,7 @@ static double CalculatePerformance(bool use_transact)
   return increments/((end-start)/1000000000000.0);
 }
 
-TEST_CASE("spinlock/performance", "Tests the performance of spinlocks")
+TEST_CASE("performance/spinlock", "Tests the performance of spinlocks")
 {
   printf("\n=== Spinlock performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculatePerformance(false));
@@ -159,7 +159,7 @@ TEST_CASE("spinlock/performance", "Tests the performance of spinlocks")
   printf("3. Achieved %lf transactions per second\n", CalculatePerformance(false));
 }
 
-TEST_CASE("transaction/performance", "Tests the performance of spinlock transactions")
+TEST_CASE("performance/transaction", "Tests the performance of spinlock transactions")
 {
   printf("\n=== Transacted spinlock performance ===\n");
   printf("This CPU %s support Intel TSX memory transactions.\n", boost::spinlock::intel_stuff::have_intel_tsx_support() ? "DOES" : "does NOT");
@@ -228,7 +228,7 @@ static double CalculateMallocPerformance(size_t size, bool use_transact)
   return threads*10000000/((end-start)/1000000000000.0);
 }
 
-TEST_CASE("malloc/performance/transact/small", "Tests the transact performance of multiple threads using small memory allocations")
+TEST_CASE("performance/malloc/transact/small", "Tests the transact performance of multiple threads using small memory allocations")
 {
   printf("\n=== Small malloc transact performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateMallocPerformance(16, 1));
@@ -236,7 +236,7 @@ TEST_CASE("malloc/performance/transact/small", "Tests the transact performance o
   printf("3. Achieved %lf transactions per second\n", CalculateMallocPerformance(16, 1));
 }
 
-TEST_CASE("malloc/performance/transact/large", "Tests the transact performance of multiple threads using large memory allocations")
+TEST_CASE("performance/malloc/transact/large", "Tests the transact performance of multiple threads using large memory allocations")
 {
   printf("\n=== Large malloc transact performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateMallocPerformance(65536, 1));
@@ -244,7 +244,7 @@ TEST_CASE("malloc/performance/transact/large", "Tests the transact performance o
   printf("3. Achieved %lf transactions per second\n", CalculateMallocPerformance(65536, 1));
 }
 
-static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact)
+static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact, bool readwrites)
 {
   boost::spinlock::spinlock<bool> lock;
   boost::spinlock::atomic<size_t> gate(0);
@@ -264,26 +264,60 @@ static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact
   //printf("There are %u threads in this CPU\n", (unsigned) threads);
   start=GetUsCount();
 #pragma omp parallel for
-  for(int n=0; n<10000000*threads; n++)
+  for(int thread=0; thread<threads; thread++)
+  for(int n=0; n<10000000; n++)
   {
-    if(use_transact)
+    if(readwrites)
     {
-      BOOST_BEGIN_TRANSACT_LOCK(lock)
+      // One thread always writes with lock, remaining threads read with transact
+      bool amMaster=(thread==0);
+      if(amMaster)
       {
+        bool doInsert=((n/threads) & 1)!=0;
+        std::lock_guard<decltype(lock)> g(lock);
+        if(doInsert)
+          map.insert(std::make_pair(n, n));
+        else if(!map.empty())
+          map.erase(map.begin());
+      }
+      else
+      {
+        if(use_transact)
+        {
+          BOOST_BEGIN_TRANSACT_LOCK(lock)
+          {
+            map.find(n-1);
+          }
+          BOOST_END_TRANSACT_LOCK(lock)
+        }
+        else
+        {
+          std::lock_guard<decltype(lock)> g(lock);
+          map.find(n-1);
+        }
+      }
+    }
+    else
+    {
+      if(use_transact)
+      {
+        BOOST_BEGIN_TRANSACT_LOCK(lock)
+        {
+          if((n & 255)<128)
+            map.insert(std::make_pair(n, n));
+          else if(!map.empty())
+            map.erase(map.begin());
+        }
+        BOOST_END_TRANSACT_LOCK(lock)
+      }
+      else
+      {
+        std::lock_guard<decltype(lock)> g(lock);
         if((n & 255)<128)
           map.insert(std::make_pair(n, n));
         else if(!map.empty())
           map.erase(map.begin());
       }
-      BOOST_END_TRANSACT_LOCK(lock)
-    }
-    else
-    {
-      std::lock_guard<decltype(lock)> g(lock);
-      if((n & 255)<128)
-        map.insert(std::make_pair(n, n));
-      else if(!map.empty())
-        map.erase(map.begin());
     }
   }
   end=GetUsCount();
@@ -292,39 +326,59 @@ static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact
   return threads*10000000/((end-start)/1000000000000.0);
 }
 
-TEST_CASE("unordered_map/performance/small", "Tests the performance of multiple threads using a small unordered_map")
+TEST_CASE("performance/unordered_map/small", "Tests the performance of multiple threads using a small unordered_map")
 {
   printf("\n=== Small unordered_map spinlock performance ===\n");
-  printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, 0));
-  printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, 0));
-  printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, 0));
+  printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, false, false));
+  printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, false, false));
+  printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, false, false));
 }
 
-TEST_CASE("unordered_map/performance/large", "Tests the performance of multiple threads using a large unordered_map")
+TEST_CASE("performance/unordered_map/large", "Tests the performance of multiple threads using a large unordered_map")
 {
   printf("\n=== Large unordered_map spinlock performance ===\n");
-  printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, 0));
-  printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, 0));
-  printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, 0));
+  printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, false));
+  printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, false));
+  printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, false));
 }
 
-TEST_CASE("unordered_map/performance/transact/small", "Tests the transact performance of multiple threads using a small unordered_map")
+TEST_CASE("performance/unordered_map2/large", "Tests the transact performance of multiple threads using a large unordered_map")
 {
-  printf("\n=== Small unordered_map transact performance ===\n");
-  printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, 1));
+  printf("\n=== Large unordered_map transact performance ===\n");
+  printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, true));
 #ifndef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
-  printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, 1));
-  printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, 1));
+  printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, true));
+  printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, true));
 #endif
 }
 
-TEST_CASE("unordered_map/performance/transact/large", "Tests the transact performance of multiple threads using a large unordered_map")
+TEST_CASE("performance/unordered_map/transact/small", "Tests the transact performance of multiple threads using a small unordered_map")
+{
+  printf("\n=== Small unordered_map transact performance ===\n");
+  printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, true, false));
+#ifndef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
+  printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, true, false));
+  printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, true, false));
+#endif
+}
+
+TEST_CASE("performance/unordered_map/transact/large", "Tests the transact performance of multiple threads using a large unordered_map")
 {
   printf("\n=== Large unordered_map transact performance ===\n");
-  printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, 1));
+  printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, true, false));
 #ifndef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
-  printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, 1));
-  printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, 1));
+  printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, true, false));
+  printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, true, false));
+#endif
+}
+
+TEST_CASE("performance/unordered_map2/transact/large", "Tests the transact performance of multiple threads using a large unordered_map")
+{
+  printf("\n=== Large unordered_map transact performance ===\n");
+  printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, true, true));
+#ifndef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
+  printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, true, true));
+  printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, true, true));
 #endif
 }
 #endif
