@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <stdio.h>
 #include <unordered_map>
+#include <vector>
 
 #ifndef BOOST_MEMORY_TRANSACTIONS_DISABLE_CATCH
 #define CATCH_CONFIG_RUNNER
@@ -40,6 +41,229 @@ DEALINGS IN THE SOFTWARE.
 #endif
 
 #include <mutex>
+
+namespace boost { namespace spinlock {
+  template<class Key, class T, class Hash=std::hash<Key>, class Pred=std::equal_to<Key>, class Alloc=std::allocator<std::pair<const Key, T>>> class concurrent_unordered_map
+  {
+  public:
+    typedef Key key_type;
+    typedef T mapped_type;
+    typedef std::pair<const key_type, mapped_type> value_type;
+    typedef Hash hasher;
+    typedef Pred key_equal;
+    typedef Alloc allocator_type;
+    
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+    typedef value_type* pointer;
+    typedef const value_type *const_pointer;
+    typedef std::size_t size_type;
+    typedef std::ptrdiff_t difference_type;
+  private:
+    std::atomic<size_type> _size;
+    mutable spinlock<bool> _rehash_lock; // will one day serialise rehashing
+    hasher _hasher;
+    key_equal _key_equal;
+    struct item_type
+    {
+      value_type value;
+      std::atomic<item_type *> next;
+      template<class P> item_type(P &&v) : value(std::forward<P>(v)), next(nullptr) { }
+    };
+    typedef typename allocator_type::template rebind<item_type>::other item_type_allocator_type;
+    item_type_allocator_type _allocator;
+    struct bucket_type
+    {
+      mutable spinlock<bool> lock;
+      std::atomic<item_type *> items;
+      bucket_type() : items(nullptr) { }
+      bucket_type(bucket_type &&o) : items(o.items.exchange(nullptr)) { }
+      template<class P> item_type *insert(item_type_allocator_type &allocator, P &&v)
+      {
+        item_type *ret=allocator.allocate(1);
+        try
+        {
+          allocator.construct(ret, std::forward<P>(v));
+          BOOST_BEGIN_TRANSACT_LOCK(lock)
+          {
+            ret->next=items.exchange(ret, std::memory_order_acq_rel);
+          }
+          BOOST_END_TRANSACT_LOCK(lock)
+          return ret;
+        }
+        catch(...)
+        {
+          allocator.deallocate(ret, sizeof(item_type));
+          throw;
+        }
+      }
+      // Returns item detached and item following
+      std::pair<item_type *, item_type *> detach_pointee(std::atomic<item_type *> *i)
+      {
+        std::pair<item_type *, item_type *> ret;
+        BOOST_BEGIN_TRANSACT_LOCK(lock)
+        {
+          ret.first=i->exchange(i->load()->next, std::memory_order_acq_rel);
+          ret.first->next.store(nullptr, std::memory_order_release);
+          ret.second=*i;
+        }
+        BOOST_END_TRANSACT_LOCK(lock)
+        return ret;
+      }
+      static void destroy_pointee(item_type_allocator_type &allocator, item_type *i) noexcept
+      {
+        allocator.destroy(i);
+        allocator.deallocate(i, sizeof(item_type));
+      }
+      void clear(item_type_allocator_type &allocator) noexcept
+      {
+        while(items)
+        {
+          auto ret=detach_pointee(&items);
+          destroy_pointee(allocator, ret.first);
+        }
+      }
+    };
+    std::vector<bucket_type> _buckets;
+    typename std::vector<bucket_type>::iterator _get_bucket(const key_type &k) noexcept
+    {
+      size_type i=_hasher(k) % _buckets.size();
+      return _buckets.begin()+i;
+    }
+    typename std::vector<bucket_type>::const_iterator _get_bucket(const key_type &k) const noexcept
+    {
+      size_type i=_hasher(k) % _buckets.size();
+      return _buckets.begin()+i;
+    }
+  public:
+    class iterator : public std::iterator<std::forward_iterator_tag, value_type, difference_type, pointer, reference>
+    {
+      concurrent_unordered_map *_parent;
+      typename std::vector<bucket_type>::iterator _itb;
+      item_type *_piti;
+      friend class concurrent_unordered_map;
+      iterator(concurrent_unordered_map *parent) : _parent(parent), _itb(parent->_buckets.begin()), _piti(parent->_buckets.front().items) { }
+      iterator(concurrent_unordered_map *parent, std::nullptr_t) : _parent(parent), _itb(parent->_buckets.end()), _piti(nullptr) { }
+    public:
+      iterator() : _parent(nullptr), _piti(nullptr) { }
+      iterator &operator++()
+      {
+        assert(_piti);
+        if(!_piti) abort();
+        _piti=_piti->next;
+        if(!_piti)
+        {
+          ++_itb;
+          if(_itb==_parent->_buckets.end())
+            _piti=nullptr;
+          else
+            _piti=_itb->items;
+        }
+        return *this;
+      }
+      iterator operator++(int) { iterator t(*this); operator++(); return t; }
+      value_type &operator*() { assert(_piti); if(!_piti) abort(); return _piti->value; }
+      value_type &operator*() const { assert(_piti); if(!_piti) abort(); return _piti->value; }
+    };
+    // local_iterator
+    // const_local_iterator
+    concurrent_unordered_map() : _size(0), _buckets(13) { }
+    concurrent_unordered_map(size_t n) : _size(0), _buckets(n>0 ? n : 1) { }
+    ~concurrent_unordered_map() { clear(); }
+    concurrent_unordered_map(const concurrent_unordered_map &);
+    concurrent_unordered_map(concurrent_unordered_map &&);
+    concurrent_unordered_map &operator=(const concurrent_unordered_map &);
+    concurrent_unordered_map &operator=(concurrent_unordered_map &&);
+    bool empty() const noexcept { return _size==0; }
+    size_type size() const noexcept { return _size; }
+    iterator begin() noexcept
+    {
+       return iterator(this);
+    }
+    //const_iterator begin() const noexcept
+    iterator end() noexcept
+    {
+      return iterator(this, nullptr);
+    }
+    //const_iterator end() const noexcept
+    iterator find(const key_type &k)
+    {
+      iterator ret=end();
+      auto itb=_get_bucket(k);
+      BOOST_BEGIN_TRANSACT_LOCK(itb->lock)
+      {
+        for(item_type *iti=itb->items; iti!=nullptr; iti=iti->next)
+          if(_key_equal(k, iti->value.first))
+          {
+            ret._itb=itb;
+            ret._piti=iti;
+            break;
+          }
+      }
+      BOOST_END_TRANSACT_LOCK(itb->lock)
+      return ret;
+    }
+    //const_iterator find(const keytype &k) const;
+    template<class P> std::pair<iterator, bool> insert(P &&v)
+    {
+      std::pair<iterator, bool> ret(end(), true);
+      auto itb=_get_bucket(v.first);
+      BOOST_BEGIN_TRANSACT_LOCK(itb->lock)
+      {
+        for(auto *iti=&itb->items; *iti!=nullptr; iti=&iti->load()->next)
+          if(_key_equal(v.first, iti->load()->value.first))
+          {
+            ret.first._itb=itb;
+            ret.first._piti=*iti;
+            ret.second=false;
+            break;
+          }
+      }
+      BOOST_END_TRANSACT_LOCK(itb->lock)
+      if(ret.second)
+      {
+        ret.first._itb=itb;
+        ret.first._piti=itb->insert(_allocator, std::forward<P>(v));
+      }
+      return ret;
+    }
+    iterator erase(/*const_*/iterator it)
+    {
+      iterator ret=it;
+      item_type *todestroy=nullptr;
+      BOOST_BEGIN_TRANSACT_LOCK(it._itb->lock)
+      {
+        for(auto *iti=&it._itb->items; *iti!=nullptr; iti=&iti->load()->next)
+          if(*iti==it._piti)
+          {
+            auto out=it._itb->detach_pointee(iti);
+            todestroy=out.first;
+            ret._piti=out.second;
+            break;
+          }
+      }
+      BOOST_END_TRANSACT_LOCK(it._itb->lock)
+      if(!ret._piti)
+        ++ret;
+      if(todestroy)
+        bucket_type::destroy_pointee(_allocator, todestroy);
+      else
+        ret=end();
+      return ret;
+    }
+    void clear() noexcept
+    {
+      for(auto &b : _buckets)
+        b.clear(_allocator);
+    }
+    void reserve(size_type n)
+    {
+      if(_size!=0) throw std::runtime_error("Cannot currently rehash existing content!");
+      _buckets.resize(n);
+    }
+  };
+} }
+
 using namespace std;
 
 TEST_CASE("spinlock/works", "Tests that the spinlock works as intended")
@@ -342,16 +566,6 @@ TEST_CASE("performance/unordered_map/large", "Tests the performance of multiple 
   printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, false));
 }
 
-TEST_CASE("performance/unordered_map2/large", "Tests the transact performance of multiple threads using a large unordered_map")
-{
-  printf("\n=== Large unordered_map transact performance ===\n");
-  printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, true));
-#ifndef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
-  printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, true));
-  printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, true));
-#endif
-}
-
 TEST_CASE("performance/unordered_map/transact/small", "Tests the transact performance of multiple threads using a small unordered_map")
 {
   printf("\n=== Small unordered_map transact performance ===\n");
@@ -372,15 +586,75 @@ TEST_CASE("performance/unordered_map/transact/large", "Tests the transact perfor
 #endif
 }
 
-TEST_CASE("performance/unordered_map2/transact/large", "Tests the transact performance of multiple threads using a large unordered_map")
+static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, bool readwrites)
 {
-  printf("\n=== Large unordered_map transact performance ===\n");
-  printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, true, true));
-#ifndef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
-  printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, true, true));
-  printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, true, true));
-#endif
+  boost::spinlock::atomic<size_t> gate(0);
+  boost::spinlock::concurrent_unordered_map<int, int> map;
+  usCount start, end;
+  if(reserve)
+  {
+    map.reserve(reserve);
+    for(size_t n=0; n<reserve/2; n++)
+      map.insert(std::make_pair(reserve+n, n));
+  }
+//#pragma omp parallel
+  {
+    ++gate;
+  }
+  size_t threads=gate;
+  //printf("There are %u threads in this CPU\n", (unsigned) threads);
+  start=GetUsCount();
+//#pragma omp parallel for
+  for(int thread=0; thread<threads; thread++)
+  for(int n=0; n<10000000; n++)
+  {
+    if(readwrites)
+    {
+      // One thread always writes with lock, remaining threads read with transact
+      bool amMaster=(thread==0);
+      if(amMaster)
+      {
+        bool doInsert=((n/threads) & 1)!=0;
+        if(doInsert)
+          map.insert(std::make_pair(n, n));
+        else if(!map.empty())
+          map.erase(map.begin());
+      }
+      else
+      {
+        map.find(n-1);
+      }
+    }
+    else
+    {
+      if((n & 255)<128)
+        map.insert(std::make_pair(n, n));
+      else if(!map.empty())
+        map.erase(map.begin());
+    }
+  }
+  end=GetUsCount();
+  REQUIRE(true);
+//  printf("size=%u\n", (unsigned) map.size());
+  return threads*10000000/((end-start)/1000000000000.0);
 }
+
+TEST_CASE("performance/concurrent_unordered_map/small", "Tests the performance of multiple threads using a small concurrent_unordered_map")
+{
+  printf("\n=== Small concurrent_unordered_map performance ===\n");
+  printf("1. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(0, false));
+  printf("2. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(0, false));
+  printf("3. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(0, false));
+}
+
+TEST_CASE("performance/concurrent_unordered_map/large", "Tests the performance of multiple threads using a large concurrent_unordered_map")
+{
+  printf("\n=== Large concurrent_unordered_map spinlock performance ===\n");
+  printf("1. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, false));
+  printf("2. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, false));
+  printf("3. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, false));
+}
+
 #endif
 
 #ifndef BOOST_MEMORY_TRANSACTIONS_DISABLE_CATCH
