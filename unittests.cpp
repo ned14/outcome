@@ -43,6 +43,22 @@ DEALINGS IN THE SOFTWARE.
 #include <mutex>
 
 namespace boost { namespace spinlock {
+  /* \class concurrent_unordered_map
+  \brief Provides an unordered_map which is thread safe and wait free to use and whose find, insert/emplace and erase functions are usually wait free.
+   
+  Notes:
+  * Rehashing isn't implemented at all, so what you reserve for buckets at the beginning is what you keep. As the tables
+  are tightly packed (16 bytes an entry) and linear, the performance hit from an excessive load factor is relatively low
+  assuming that inserts and erases aren't constantly hitting the same cache lines. Finds don't modify any cache lines at all.
+
+  * find, insert/emplace and erase all run completely wait free if in separate buckets which will be most
+  of the time. When they hit the same bucket, all run completely wait free except under the following circumstances:
+  
+    1. If they are operating on the same key, in which case they will be serialised in a first come first served fashion.
+
+    2. If there are insufficient empty slots in the table, a table resize is begun which will halt all new operations on that
+    bucket and wait until existing operations exit before resizing the bucket, after which execution resumes.
+  */
   template<class Key, class T, class Hash=std::hash<Key>, class Pred=std::equal_to<Key>, class Alloc=std::allocator<std::pair<const Key, T>>> class concurrent_unordered_map
   {
   public:
@@ -66,73 +82,199 @@ namespace boost { namespace spinlock {
     key_equal _key_equal;
     struct item_type
     {
-      value_type value;
-      std::atomic<item_type *> next;
-      template<class P> item_type(P &&v) : value(std::forward<P>(v)), next(nullptr) { }
+      spinlock<locked_ptr<value_type>> p;
+      size_t hash;
+      void set(value_type *ret, size_t _hash)
+      {
+        assert(is_lockable_locked(p)); // must be locked to maintain place
+        p.set(ret);
+        hash=_hash;
+      }
+      value_type *detach() BOOST_NOEXCEPT
+      {
+        spinlock<locked_ptr<value_type>> l(std::move(p)); // atomically detaches
+        value_type *i=l.get();
+        if(i)
+          hash=0;
+        return i;
+      }
     };
     typedef typename allocator_type::template rebind<item_type>::other item_type_allocator_type;
     item_type_allocator_type _allocator;
-    struct bucket_type
+    struct bucket_type // padded to 32 bytes each, so two per cache line
     {
-      mutable spinlock<bool> lock;
-      std::atomic<item_type *> items;
-      bucket_type() : items(nullptr) { }
-      bucket_type(bucket_type &&o) : items(o.items.exchange(nullptr)) { }
-      template<class P> item_type *insert(item_type_allocator_type &allocator, P &&v)
+    private:
+      mutable std::atomic<unsigned> entered, exited; // tracks how many threads are using this bucket
+      spinlock<bool> resize_lock; // halts new threads if we need to resize the bucket
+      std::atomic<size_t> count;
+      item_type *items;
+      char __pad[32-2*sizeof(entered)-sizeof(resize_lock)-sizeof(count)-sizeof(items)];
+    public:
+      bucket_type() : entered(0), exited(0), count(0), items(nullptr) { }
+      ~bucket_type() BOOST_NOEXCEPT
       {
-        item_type *ret=allocator.allocate(1);
+        clear();
+      }
+      void clear(item_type_allocator_type &allocator) BOOST_NOEXCEPT
+      {
+        // Exclude all new threads for this bucket
+        std::lock_guard<decltype(resize_lock)> g(resize_lock);
+        // Wait until present users have exited
+        while(entered!=exit)
+          this_thread::yield();
+        if(items)
+        {
+          item_type *i=items;
+          size_t _count=count;
+          for(size_t n=0; n<_count; n++, ++i)
+          {
+            i->destroy(allocator);
+          }
+          free(items);
+          items=nullptr;
+          count=0;
+        }
+      }
+      friend struct read_lock;
+      // Used to prevent resizes
+      struct using_
+      {
+        bucket_type &b;
+        using_(bucket_type *_b) : b(*_b)
+        {
+          b.++entered;
+          // If resizing is currently happening, wait until it's done
+          while(is_lockable_locked(b.resize_lock))
+          {
+            ++b.exited;
+            b.resize_lock.lock();
+            b.resize_lock.unlock();
+            b.++entered;
+          }
+        }
+        ~using_()
+        {
+          ++b.exited;
+        }
+      };
+      // Must be called with read lock. Returns a LOCKED item if hash found
+      item_type *find(item_type *start, size_t hash, size_t *empty==nullptr) BOOST_NOEXCEPT
+      {
+        item_type *ret=nullptr;
+        if(items)
+        {
+          item_type *i=start ? start : items, *end=items+count;
+          for(;;)
+          {
+            for(; i<end && i->hash!=hash; ++i)
+            {
+              if(empty && !i->p.get())
+              {
+                *empty=i-items;
+                empty=nullptr;
+              }
+            }
+            if(i==end)
+              break;
+            // Lock the item matching the hash
+            i->p.lock();
+            // Is the hash still matching and the item pointer valid?
+            if(i->hash==hash && i->p.get())
+            {
+              ret=i;
+              break;
+            }
+            i->p.unlock();
+          }
+        }
+        return ret;
+      }
+      template<class P> size_t insert(item_type_allocator_type &allocator, P &&v, size_t hash, size_t hint=0)
+      {
+        size_t offset=(size_t)-1;
+        do
+        {
+          size_t newsize;
+          {
+            using_ g(this); // prevent resizes
+            if(items)
+            {
+              item_type *i=items+hint, *end=items+count;
+              for(; i<end; i++)
+              {
+                if(!i->p.load() && i->p.try_lock())
+                {
+                  offset=i->items;
+                  break;
+                }
+              }
+            }
+            newsize=count;
+          }
+          newsize+=newsize/2;
+          resize(newsize);
+        } while(offset==(size_t)-1);
+        // Item slot is locked to prevent others taking it
+        // resizes may happen at any time during item construction
+        value_type *ret=nullptr;
         try
         {
+          value_type *ret=allocator.allocate(1);
           allocator.construct(ret, std::forward<P>(v));
-          BOOST_BEGIN_TRANSACT_LOCK(lock)
-          {
-            ret->next=items.exchange(ret, std::memory_order_acq_rel);
-          }
-          BOOST_END_TRANSACT_LOCK(lock)
-          return ret;
+          using_ g(this); // prevent resizes
+          item_type *i=items+offset;
+          i->set(ret, hash);
+          return offset;
         }
         catch(...)
         {
-          allocator.deallocate(ret, sizeof(item_type));
+          using_ g(this); // prevent resizes
+          item_type *i=items+offset;
+          i->p.unlock();
+          allocator.deallocate(ret, sizeof(value_type));
           throw;
         }
       }
-      // Returns item detached and item following
-      std::pair<item_type *, item_type *> detach_pointee(std::atomic<item_type *> *i)
+      void remove(item_type_allocator_type &allocator, size_t offset)
       {
-        std::pair<item_type *, item_type *> ret;
-        BOOST_BEGIN_TRANSACT_LOCK(lock)
+        value_type *v=nullptr;
         {
-          ret.first=i->exchange(i->load()->next, std::memory_order_acq_rel);
-          ret.first->next.store(nullptr, std::memory_order_release);
-          ret.second=*i;
+          using_ g(this);
+          item_type *i=items+offset;
+          i->p.lock();
+          v=i->detach();
         }
-        BOOST_END_TRANSACT_LOCK(lock)
-        return ret;
-      }
-      static void destroy_pointee(item_type_allocator_type &allocator, item_type *i) noexcept
-      {
-        allocator.destroy(i);
-        allocator.deallocate(i, sizeof(item_type));
-      }
-      void clear(item_type_allocator_type &allocator) noexcept
-      {
-        while(items)
+        if(v)
         {
-          auto ret=detach_pointee(&items);
-          destroy_pointee(allocator, ret.first);
+          allocator.destroy(v);
+          allocator.deallocate(v, sizeof(value_type));          
         }
+      }
+      void resize(size_t newsize)
+      {
+        // Exclude all new threads for this bucket
+        std::lock_guard<decltype(resize_lock)> g(resize_lock);
+        // Wait until present users have exited
+        while(entered!=exit)
+          this_thread::yield();
+        size_t oldbytes=count.load()*sizeof(item_type), newbytes=newsize*sizeof(item_type);
+        item_type *n=(items) ? realloc(items, newbytes) : malloc(newbytes);
+        if(!n) throw std::bad_alloc();
+        if(newbytes>oldbytes)
+          memset(n+count.load(), 0, newbytes-oldbytes);
+        items=n;
+        count.store(newsize);
       }
     };
     std::vector<bucket_type> _buckets;
-    typename std::vector<bucket_type>::iterator _get_bucket(const key_type &k) noexcept
+    typename std::vector<bucket_type>::iterator _get_bucket(size_t k) BOOST_NOEXCEPT
     {
-      size_type i=_hasher(k) % _buckets.size();
+      size_type i=k % _buckets.size();
       return _buckets.begin()+i;
     }
-    typename std::vector<bucket_type>::const_iterator _get_bucket(const key_type &k) const noexcept
+    typename std::vector<bucket_type>::const_iterator _get_bucket(size_t k) const BOOST_NOEXCEPT
     {
-      size_type i=_hasher(k) % _buckets.size();
+      size_type i=k % _buckets.size();
       return _buckets.begin()+i;
     }
   public:
@@ -140,30 +282,28 @@ namespace boost { namespace spinlock {
     {
       concurrent_unordered_map *_parent;
       typename std::vector<bucket_type>::iterator _itb;
-      item_type *_piti;
+      size_t _offset;
       friend class concurrent_unordered_map;
-      iterator(concurrent_unordered_map *parent) : _parent(parent), _itb(parent->_buckets.begin()), _piti(parent->_buckets.front().items) { }
-      iterator(concurrent_unordered_map *parent, std::nullptr_t) : _parent(parent), _itb(parent->_buckets.end()), _piti(nullptr) { }
+      iterator(concurrent_unordered_map *parent) : _parent(parent), _itb(parent->_buckets.begin()), _offset(0) { }
+      iterator(concurrent_unordered_map *parent, std::nullptr_t) : _parent(parent), _itb(parent->_buckets.end()), _offset(0) { }
     public:
-      iterator() : _parent(nullptr), _piti(nullptr) { }
+      iterator() : _parent(nullptr), _offset(0) { }
       iterator &operator++()
       {
-        assert(_piti);
-        if(!_piti) abort();
-        _piti=_piti->next;
-        if(!_piti)
+        if(_itb==_parent->_buckets.end())
+          return *this;
+        bucket_type &b=*_itb;
+        ++_offset;
+        if(_offset>=b.count)
         {
           ++_itb;
-          if(_itb==_parent->_buckets.end())
-            _piti=nullptr;
-          else
-            _piti=_itb->items;
+          _offset=0;
         }
         return *this;
       }
       iterator operator++(int) { iterator t(*this); operator++(); return t; }
-      value_type &operator*() { assert(_piti); if(!_piti) abort(); return _piti->value; }
-      value_type &operator*() const { assert(_piti); if(!_piti) abort(); return _piti->value; }
+      value_type &operator*() { assert(_itb!=_parent->_buckets.end()); if(_itb==_parent->_buckets.end()) abort(); return _itb->items[_offset]->p.get(); }
+      value_type &operator*() const { assert(_itb!=_parent->_buckets.end()); if(_itb==_parent->_buckets.end()) abort(); return _itb->items[_offset]->p.get(); }
     };
     // local_iterator
     // const_local_iterator
@@ -174,87 +314,84 @@ namespace boost { namespace spinlock {
     concurrent_unordered_map(concurrent_unordered_map &&);
     concurrent_unordered_map &operator=(const concurrent_unordered_map &);
     concurrent_unordered_map &operator=(concurrent_unordered_map &&);
-    bool empty() const noexcept { return _size==0; }
-    size_type size() const noexcept { return _size; }
-    iterator begin() noexcept
+    bool empty() const BOOST_NOEXCEPT { return _size==0; }
+    size_type size() const BOOST_NOEXCEPT { return _size; }
+    iterator begin() BOOST_NOEXCEPT
     {
        return iterator(this);
     }
-    //const_iterator begin() const noexcept
-    iterator end() noexcept
+    //const_iterator begin() const BOOST_NOEXCEPT
+    iterator end() BOOST_NOEXCEPT
     {
       return iterator(this, nullptr);
     }
-    //const_iterator end() const noexcept
+    //const_iterator end() const BOOST_NOEXCEPT
     iterator find(const key_type &k)
     {
       iterator ret=end();
-      auto itb=_get_bucket(k);
-      BOOST_BEGIN_TRANSACT_LOCK(itb->lock)
+      if(!_size) return ret;
+      size_t h=_hasher(k);
+      auto itb=_get_bucket(h);
+      item_type *i=nullptr;
+      bucket_type::using_ g(&(*itb)); // stop resizes during find
+      for(;;)
       {
-        for(item_type *iti=itb->items; iti!=nullptr; iti=iti->next)
-          if(_key_equal(k, iti->value.first))
-          {
-            ret._itb=itb;
-            ret._piti=iti;
-            break;
-          }
+        if(!(i=itb->find(i, h)))
+          break;
+        std::unique_lock<decltype(i->p)> g(i->p, std::adopt_lock);
+        if(_key_equal(k, i->p->first))
+        {
+          ret._itb=itb;
+          ret._offset=itb->to_offset(i);
+          break;
+        }
       }
-      BOOST_END_TRANSACT_LOCK(itb->lock)
       return ret;
     }
     //const_iterator find(const keytype &k) const;
     template<class P> std::pair<iterator, bool> insert(P &&v)
     {
       std::pair<iterator, bool> ret(end(), true);
-      auto itb=_get_bucket(v.first);
-      BOOST_BEGIN_TRANSACT_LOCK(itb->lock)
+      size_t h=_hasher(k);
+      auto itb=_get_bucket(h);
+      item_type *i=nullptr;
+      size_t emptyidx=0;
       {
-        for(auto *iti=&itb->items; *iti!=nullptr; iti=&iti->load()->next)
-          if(_key_equal(v.first, iti->load()->value.first))
+        bucket_type::using_ g(&(*itb)); // stop resizes during find
+        for(;;)
+        {
+          if(!(i=itb->find(i, h, !emptyidx ? &emptyidx : nullptr)))
+            break;
+          std::unique_lock<decltype(i->p)> g(i->p, std::adopt_lock);
+          if(_key_equal(k, i->p->first))
           {
             ret.first._itb=itb;
-            ret.first._piti=*iti;
+            ret.first._offset=itb->to_offset(i);
             ret.second=false;
             break;
           }
+        }
       }
-      BOOST_END_TRANSACT_LOCK(itb->lock)
       if(ret.second)
       {
         ret.first._itb=itb;
-        ret.first._piti=itb->insert(_allocator, std::forward<P>(v));
+        ret.first._offset=itb->insert(_allocator, std::forward<P>(v), hash, emptyidx);
+        ++_size;
       }
       return ret;
     }
     iterator erase(/*const_*/iterator it)
     {
       iterator ret=it;
-      item_type *todestroy=nullptr;
-      BOOST_BEGIN_TRANSACT_LOCK(it._itb->lock)
-      {
-        for(auto *iti=&it._itb->items; *iti!=nullptr; iti=&iti->load()->next)
-          if(*iti==it._piti)
-          {
-            auto out=it._itb->detach_pointee(iti);
-            todestroy=out.first;
-            ret._piti=out.second;
-            break;
-          }
-      }
-      BOOST_END_TRANSACT_LOCK(it._itb->lock)
-      if(!ret._piti)
-        ++ret;
-      if(todestroy)
-        bucket_type::destroy_pointee(_allocator, todestroy);
-      else
-        ret=end();
+      ret._itb->remove(allocator, ret._itb->_offset);
+      ++ret;
       return ret;
     }
-    void clear() noexcept
+    void clear() BOOST_NOEXCEPT
     {
       for(auto &b : _buckets)
         b.clear(_allocator);
+      _size=0;
     }
     void reserve(size_type n)
     {

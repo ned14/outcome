@@ -145,9 +145,46 @@ namespace boost
 #endif
 
 
+    /*! \struct lockable_ptr
+     * \brief Lets you use a pointer to memory as a spinlock :)
+     */
+    template<typename T> struct lockable_ptr : atomic<T *>
+    {
+      lockable_ptr(T *v=nullptr) : atomic<T *>(v) { }
+      //! Returns the memory pointer part of the atomic
+      T *get() BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        union
+        {
+          T *v;
+          size_t n;
+        } value;
+        value.v=atomic<T *>::load();
+        n&=~(size_t)1;
+        return value.v;
+      }
+      //! Returns the memory pointer part of the atomic
+      const T *get() const BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        union
+        {
+          T *v;
+          size_t n;
+        } value;
+        value.v=atomic<T *>::load();
+        n&=~(size_t)1;
+        return value.v;
+      }
+      T &operator*() BOOST_NOEXCEPT_OR_NOTHROW { return *get(); }
+      const T &operator*() const BOOST_NOEXCEPT_OR_NOTHROW { return *get(); }
+      T *operator->() BOOST_NOEXCEPT_OR_NOTHROW { return get(); }
+      const T *operator->() const BOOST_NOEXCEPT_OR_NOTHROW { return get(); }
+    };
     template<typename T> struct spinlockbase
     {
+    private:
       volatile atomic<T> v;
+    public:
       spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : v(0) { }
       bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
@@ -159,6 +196,66 @@ namespace boost
       void unlock() BOOST_NOEXCEPT_OR_NOTHROW
       {
         v.store(0);
+      }
+      bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
+    };
+    template<typename T> struct spinlockbase<lockable_ptr<T>>
+    {
+    private:
+      lockable_ptr<T> v;
+    public:
+      spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW { }
+      //! Atomically move constructs
+      spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        v.store(o.v.exchange(nullptr, std::memory_order_acq_rel));
+        return *this;
+      }
+      //! Returns the memory pointer part of the atomic
+      T *get() BOOST_NOEXCEPT_OR_NOTHROW { return v.get(); }
+      //! Sets the memory pointer part of the atomic preserving lockedness
+      void set(T *a) BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        union
+        {
+          T *v;
+          size_t n;
+        } value;
+        T *expected;
+        do
+        {
+          value.v=v.load();
+          expected=value.v;
+          bool locked=value.n&1;
+          value.v=a;
+          if(locked) value.n|=1;
+        } while(!v.compare_exchange_weak(expected, value.v));
+      }
+      bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        union
+        {
+          T *v;
+          size_t n;
+        } value;
+        value.v=v.load();
+        if(value.n&1) // Avoid unnecessary cache line invalidation traffic
+          return false;
+        T *expected=value.v;
+        value.n|=1;
+        return v.compare_exchange_weak(expected, value.v);
+      }
+      void unlock() BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        union
+        {
+          T *v;
+          size_t n;
+        } value;
+        value.v=v.load();
+        assert(value.n&1);
+        value.n&=~(size_t)1;
+        v.store(value.v);
       }
       bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
     };
@@ -226,6 +323,9 @@ namespace boost
       };
     };
     /*! \class spinlock
+    
+    Meets the requirements of BasicLockable and Lockable. Also provides a get() and set() for the
+    type used for the spin lock.
 
     So what's wrong with boost/smart_ptr/detail/spinlock.hpp then, and why
     reinvent the wheel?
@@ -237,8 +337,10 @@ namespace boost
     3. I don't much care for doing writes during the spin. It generates an
     unnecessary amount of cache line invalidation traffic. Better to spin-read
     and only write when the read suggests you might have a chance.
+    
+    4. This spin lock can use a pointer to memory as the spin lock. See locked_ptr<T>.
 
-    4. The other spin lock doesn't use Intel TSX yet.
+    5. The other spin lock doesn't use Intel TSX yet.
     */
     template<typename T, template<class> class spinpolicy1=spins_to_transact<5>::policy, template<class> class spinpolicy2=spins_to_loop<125>::policy, template<class> class spinpolicy3=spins_to_yield<250>::policy, template<class> class spinpolicy4=spins_to_sleep::policy> class spinlock : public spinpolicy4<spinpolicy3<spinpolicy2<spinpolicy1<spinlockbase<T>>>>>
     {
@@ -268,7 +370,7 @@ namespace boost
     // For when used with a spinlock
     template<class T, template<class> class spinpolicy1, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline bool is_lockable_locked(spinlock<T, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
     {
-      return 1==lockable.v.load();
+      return lockable.v.load()&1;
     }
 
 #if defined(BOOST_USING_INTEL_TSX)
