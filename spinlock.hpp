@@ -32,6 +32,8 @@ DEALINGS IN THE SOFTWARE.
 #ifndef BOOST_SPINLOCK_HPP
 #define BOOST_SPINLOCK_HPP
 
+#include <cassert>
+
 #if !defined(BOOST_SPINLOCK_USE_BOOST_ATOMIC) && defined(BOOST_NO_CXX11_HDR_ATOMIC)
 # define BOOST_SPINLOCK_USE_BOOST_ATOMIC
 #endif
@@ -135,6 +137,23 @@ namespace boost
       atomic(const Base &) = delete;
 #endif
     };//end boost::afio::atomic
+#ifdef BOOST_SPINLOCK_USE_BOOST_ATOMIC
+    using boost::memory_order;
+    using boost::memory_order_relaxed;
+    using boost::memory_order_consume;
+    using boost::memory_order_acquire;
+    using boost::memory_order_release;
+    using boost::memory_order_acq_rel;
+    using boost::memory_order_seq_cst;
+#else
+    using std::memory_order;
+    using std::memory_order_relaxed;
+    using std::memory_order_consume;
+    using std::memory_order_acquire;
+    using std::memory_order_release;
+    using std::memory_order_acq_rel;
+    using std::memory_order_seq_cst;
+#endif
     // Map in a this_thread implementation
 #ifdef BOOST_SPINLOCK_USE_BOOST_THREAD
     namespace this_thread=boost::this_thread;
@@ -160,7 +179,7 @@ namespace boost
           size_t n;
         } value;
         value.v=atomic<T *>::load();
-        n&=~(size_t)1;
+        value.n&=~(size_t)1;
         return value.v;
       }
       //! Returns the memory pointer part of the atomic
@@ -172,7 +191,7 @@ namespace boost
           size_t n;
         } value;
         value.v=atomic<T *>::load();
-        n&=~(size_t)1;
+        value.n&=~(size_t)1;
         return value.v;
       }
       T &operator*() BOOST_NOEXCEPT_OR_NOTHROW { return *get(); }
@@ -185,7 +204,12 @@ namespace boost
     private:
       volatile atomic<T> v;
     public:
+      typedef T value_type;
       spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : v(0) { }
+      //! Returns the raw atomic
+      T load(memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
+      //! Sets the raw atomic
+      void store(T a, memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { v.store(a, o); }
       bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
         if(v.load()) // Avoid unnecessary cache line invalidation traffic
@@ -204,15 +228,18 @@ namespace boost
     private:
       lockable_ptr<T> v;
     public:
+      typedef T *value_type;
       spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW { }
       //! Atomically move constructs
       spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW
       {
-        v.store(o.v.exchange(nullptr, std::memory_order_acq_rel));
-        return *this;
+        v.store(o.v.exchange(nullptr, memory_order_acq_rel));
       }
       //! Returns the memory pointer part of the atomic
       T *get() BOOST_NOEXCEPT_OR_NOTHROW { return v.get(); }
+      T *operator->() BOOST_NOEXCEPT_OR_NOTHROW { return get(); }
+      //! Returns the raw atomic
+      T *load(memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
       //! Sets the memory pointer part of the atomic preserving lockedness
       void set(T *a) BOOST_NOEXCEPT_OR_NOTHROW
       {
@@ -231,6 +258,8 @@ namespace boost
           if(locked) value.n|=1;
         } while(!v.compare_exchange_weak(expected, value.v));
       }
+      //! Sets the raw atomic
+      void store(T *a, memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { v.store(a, o); }
       bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
         union
@@ -370,7 +399,7 @@ namespace boost
     // For when used with a spinlock
     template<class T, template<class> class spinpolicy1, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline bool is_lockable_locked(spinlock<T, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
     {
-      return lockable.v.load()&1;
+      return ((size_t) lockable.load())&1;
     }
 
 #if defined(BOOST_USING_INTEL_TSX)
