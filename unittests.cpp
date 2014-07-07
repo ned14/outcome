@@ -95,6 +95,7 @@ namespace boost { namespace spinlock {
       {
         hash.store(0);
         spinlock<lockable_ptr<value_type>> l(std::move(p)); // atomically detaches
+        assert(!p.load());
         value_type *i=l.get();
         return i;
       }
@@ -225,7 +226,7 @@ namespace boost { namespace spinlock {
           for(;;)
           {
             size_t newsize=size.load();
-            if(newsize==count)
+            if(newsize==count.load())
             {
               newsize<<=1;
               if(newsize<1) newsize=1;
@@ -285,13 +286,16 @@ namespace boost { namespace spinlock {
       }
       void resize(size_t newsize)
       {
-        if(newsize==size.load()) return;
+        //assert(newsize<64);
+        size_t _size=size.load();
+        if(newsize==_size) return;
         // Exclude all new threads for this bucket
         std::lock_guard<decltype(resize_lock)> g(resize_lock);
+        _size=size.load();
+        if(newsize==_size) return;
         // Wait until present users have exited
         while(entered.load()!=exited.load())
           this_thread::yield();
-        size_t _size=size.load();
         size_t oldbytes=_size*sizeof(item_type), newbytes=newsize*sizeof(item_type);
         item_type *n=(item_type *)((items) ? realloc(items, newbytes) : malloc(newbytes));
         if(!n) throw std::bad_alloc();
@@ -299,20 +303,21 @@ namespace boost { namespace spinlock {
           memset(n+_size, 0, newbytes-oldbytes);
         items=n;
         size.store(newsize);
-        std::cout << "Bucket " << this << " resizes to " << newsize << " items count=" << count.load() << std::endl;
+        //std::cout << "Bucket " << this << " resizes to " << newsize << " items count=" << count.load() << std::endl;
       }
     };
     std::vector<bucket_type> _buckets;
     typename std::vector<bucket_type>::iterator _get_bucket(size_t k) BOOST_NOEXCEPT
     {
+      k ^= k + 0x9e3779b9 + (k<<6) + (k>>2);
       size_type i=k % _buckets.size();
       return _buckets.begin()+i;
     }
-    typename std::vector<bucket_type>::const_iterator _get_bucket(size_t k) const BOOST_NOEXCEPT
+    /*typename std::vector<bucket_type>::const_iterator _get_bucket(size_t k) const BOOST_NOEXCEPT
     {
       size_type i=k % _buckets.size();
       return _buckets.begin()+i;
-    }
+    }*/
   public:
     class iterator : public std::iterator<std::forward_iterator_tag, value_type, difference_type, pointer, reference>
     {
@@ -337,6 +342,7 @@ namespace boost { namespace spinlock {
           ++_itb;
           _offset=_itb->next_item(0);
         }
+        //std::cout << "Bucket " << (_itb-_parent->_buckets.begin()) << " offset " << _offset << std::endl;
         return *this;
       }
       iterator operator++(int) { iterator t(*this); operator++(); return t; }
@@ -478,6 +484,13 @@ namespace boost { namespace spinlock {
       if(_size!=0) throw std::runtime_error("Cannot currently rehash existing content!");
       _buckets.resize(n);
       _begin=end();
+    }
+    void dump_buckets(std::ostream &s) const
+    {
+      for(size_t n=0; n<_buckets.size(); n++)
+      {
+        s << "Bucket " << n << ": size=" << _buckets[n].size << " count=" << _buckets[n].count << std::endl;
+      }
     }
   };
 } }
@@ -821,7 +834,7 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, bool re
     ++gate;
   }
   size_t threads=gate;
-  //printf("There are %u threads in this CPU\n", (unsigned) threads);
+  printf("There are %u threads in this CPU\n", (unsigned) threads);
   start=GetUsCount();
 #pragma omp parallel for
   for(int thread=0; thread<threads; thread++)
@@ -855,6 +868,7 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, bool re
       std::cout << "Items now " << map.size() << std::endl;
   }
   end=GetUsCount();
+  map.dump_buckets(std::cout);
   REQUIRE(true);
 //  printf("size=%u\n", (unsigned) map.size());
   return threads*10000000/((end-start)/1000000000000.0);
