@@ -206,6 +206,7 @@ namespace boost
     public:
       typedef T value_type;
       spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : v(0) { }
+      spinlockbase(const spinlockbase &) = delete;
       //! Returns the raw atomic
       T load(memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
       //! Sets the raw atomic
@@ -230,6 +231,7 @@ namespace boost
     public:
       typedef T *value_type;
       spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW { }
+      spinlockbase(const spinlockbase &) = delete;
       //! Atomically move constructs
       spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW
       {
@@ -294,6 +296,9 @@ namespace boost
       template<class parenttype> struct policy : parenttype
       {
         static BOOST_CONSTEXPR_OR_CONST size_t spins_to_transact=spins;
+        policy() {}
+        policy(const policy &) = delete;
+        policy(policy &&o) : parenttype(std::move(o)) { }
       };
     };
     //! \brief How many spins to loop, optionally calling the SMT pause instruction on Intel
@@ -302,6 +307,9 @@ namespace boost
       template<class parenttype> struct policy : parenttype
       {
         static BOOST_CONSTEXPR_OR_CONST size_t spins_to_loop=spins;
+        policy() {}
+        policy(const policy &) = delete;
+        policy(policy &&o) : parenttype(std::move(o)) { }
         bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
         {
           if(parenttype::int_yield(n)) return true;
@@ -322,6 +330,9 @@ namespace boost
       template<class parenttype> struct policy : parenttype
       {
         static BOOST_CONSTEXPR_OR_CONST size_t spins_to_yield=spins;
+        policy() {}
+        policy(const policy &) = delete;
+        policy(policy &&o) : parenttype(std::move(o)) { }
         bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
         {
           if(parenttype::int_yield(n)) return true;
@@ -336,6 +347,9 @@ namespace boost
     {
       template<class parenttype> struct policy : parenttype
       {
+        policy() {}
+        policy(const policy &) = delete;
+        policy(policy &&o) : parenttype(std::move(o)) { }
         bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
         {
           if(parenttype::int_yield(n)) return true;
@@ -375,6 +389,9 @@ namespace boost
     {
       typedef spinpolicy4<spinpolicy3<spinpolicy2<spinpolicy1<spinlockbase<T>>>>> parenttype;
     public:
+      spinlock() { }
+      spinlock(const spinlock &) = delete;
+      spinlock(spinlock &&o) : parenttype(std::move(o)) { }
       void lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
         for(size_t n=0;; n++)

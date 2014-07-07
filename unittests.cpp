@@ -112,8 +112,10 @@ namespace boost { namespace spinlock {
     public:
       bucket_type() : count(0), size(0), entered(0), exited(0), items(nullptr)
       {
-        static_assert(sizeof(item_type)==16, "item_type is not 16 bytes long!");
-        static_assert(sizeof(bucket_type)==32, "bucket_type is not 32 bytes long!");
+        static_assert(sizeof(void *)!=4 || sizeof(item_type)==8, "item_type is not 8 bytes long!");
+        static_assert(sizeof(void *)!=4 || sizeof(bucket_type)==24, "bucket_type is not 32 bytes long!");
+        static_assert(sizeof(void *)!=8 || sizeof(item_type)==16, "item_type is not 16 bytes long!");
+        static_assert(sizeof(void *)!=8 || sizeof(bucket_type)==32, "bucket_type is not 32 bytes long!");
         //std::cout << sizeof(bucket_type);
       }
       bucket_type(bucket_type &&) BOOST_NOEXCEPT : count(0), size(0), entered(0), exited(0), items(nullptr) 
@@ -286,7 +288,6 @@ namespace boost { namespace spinlock {
       }
       void resize(size_t newsize)
       {
-        //assert(newsize<64);
         size_t _size=size.load();
         if(newsize==_size) return;
         // Exclude all new threads for this bucket
@@ -309,7 +310,7 @@ namespace boost { namespace spinlock {
     std::vector<bucket_type> _buckets;
     typename std::vector<bucket_type>::iterator _get_bucket(size_t k) BOOST_NOEXCEPT
     {
-      k ^= k + 0x9e3779b9 + (k<<6) + (k>>2);
+      k ^= k + 0x9e3779b9 + (k<<6) + (k>>2); // really need to avoid sequential keys tapping the same cache line
       size_type i=k % _buckets.size();
       return _buckets.begin()+i;
     }
@@ -340,7 +341,8 @@ namespace boost { namespace spinlock {
         while(_offset==(size_t)-1 && _itb!=_parent->_buckets.end())
         {
           ++_itb;
-          _offset=_itb->next_item(0);
+          if(_itb!=_parent->_buckets.end())
+            _offset=_itb->next_item(0);
         }
         //std::cout << "Bucket " << (_itb-_parent->_buckets.begin()) << " offset " << _offset << std::endl;
         return *this;
@@ -365,7 +367,7 @@ namespace boost { namespace spinlock {
     size_type size() const BOOST_NOEXCEPT { return _size; }
     iterator begin() BOOST_NOEXCEPT
     {
-      assert(_begin._offset<((size_t) 1<<60));
+      assert(_begin._offset<((size_t) 1<<30));
       return _size ? _begin : end();
     }
     //const_iterator begin() const BOOST_NOEXCEPT
@@ -392,6 +394,7 @@ namespace boost { namespace spinlock {
         {
           ret._itb=itb;
           ret._offset=offset;
+          i->unlock();
           break;
         }
         i->unlock();
@@ -406,6 +409,7 @@ namespace boost { namespace spinlock {
       auto itb=_get_bucket(h);
       spinlock<lockable_ptr<value_type>> *i=nullptr;
       size_t emptyidx=(size_t)-1, start=itb->size.load();
+#if 1
       // start search offset at some random point so inserts don't compete
       if(start) start=h % start;
       if(_size)
@@ -447,6 +451,7 @@ namespace boost { namespace spinlock {
           }
         }
       }
+#endif
       if(ret.second)
       {
         if(emptyidx==(size_t)-1) emptyidx=0;
@@ -770,11 +775,11 @@ static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact
         if((n & 255)<128)
           map.insert(std::make_pair(n, n));
         else if(!map.empty())
-          map.erase(map.begin());
+          map.erase(map.find(n-128));
       }
     }
-    if(!(n % 1000000))
-      std::cout << "Items now " << map.size() << std::endl;
+//    if(!(n % 1000000))
+//      std::cout << "Items now " << map.size() << std::endl;
   }
   end=GetUsCount();
   REQUIRE(true);
@@ -798,7 +803,7 @@ TEST_CASE("performance/unordered_map/large", "Tests the performance of multiple 
   printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, false));
 }
 
-TEST_CASE("performance/unordered_map/transact/small", "Tests the transact performance of multiple threads using a small unordered_map")
+/*TEST_CASE("performance/unordered_map/transact/small", "Tests the transact performance of multiple threads using a small unordered_map")
 {
   printf("\n=== Small unordered_map transact performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, true, false));
@@ -816,7 +821,7 @@ TEST_CASE("performance/unordered_map/transact/large", "Tests the transact perfor
   printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, true, false));
   printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, true, false));
 #endif
-}
+}*/
 
 static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, bool readwrites)
 {
@@ -862,13 +867,13 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, bool re
       if((n & 255)<128)
         map.insert(std::make_pair(n, n));
       else if(!map.empty())
-        map.erase(map.begin());
+        map.erase(map.find(n-128));
     }
-    if(!(n % 1000000))
-      std::cout << "Items now " << map.size() << std::endl;
+//    if(!(n % 1000000))
+//      std::cout << "Items now " << map.size() << std::endl;
   }
   end=GetUsCount();
-  map.dump_buckets(std::cout);
+  //map.dump_buckets(std::cout);
   REQUIRE(true);
 //  printf("size=%u\n", (unsigned) map.size());
   return threads*10000000/((end-start)/1000000000000.0);
