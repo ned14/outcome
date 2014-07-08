@@ -35,6 +35,14 @@ DEALINGS IN THE SOFTWARE.
 #include <unordered_map>
 #include <vector>
 
+#ifdef _MSC_VER
+//#define BOOST_HAVE_SYSTEM_CONCURRENT_UNORDERED_MAP
+#endif
+
+#ifdef BOOST_HAVE_SYSTEM_CONCURRENT_UNORDERED_MAP
+#include <concurrent_unordered_map.h>
+#endif
+
 #ifndef BOOST_MEMORY_TRANSACTIONS_DISABLE_CATCH
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
@@ -826,14 +834,20 @@ TEST_CASE("performance/unordered_map/transact/large", "Tests the transact perfor
 static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, bool readwrites)
 {
   boost::spinlock::atomic<size_t> gate(0);
+#ifdef BOOST_HAVE_SYSTEM_CONCURRENT_UNORDERED_MAP
+  concurrency::concurrent_unordered_map<int, int> map;
+#else
   boost::spinlock::concurrent_unordered_map<int, int> map;
+#endif
   usCount start, end;
+#ifndef BOOST_HAVE_SYSTEM_CONCURRENT_UNORDERED_MAP
   if(reserve)
   {
     map.reserve(reserve);
     for(size_t n=0; n<reserve/2; n++)
       map.insert(std::make_pair(reserve+n, n));
   }
+#endif
 #pragma omp parallel
   {
     ++gate;
@@ -845,6 +859,7 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, bool re
   for(int thread=0; thread<threads; thread++)
   for(int n=0; n<10000000; n++)
   {
+#if 0
     if(readwrites)
     {
       // One thread always writes with lock, remaining threads read with transact
@@ -863,11 +878,16 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, bool re
       }
     }
     else
+#endif
     {
       if((n & 255)<128)
         map.insert(std::make_pair(n, n));
       else if(!map.empty())
+#ifdef BOOST_HAVE_SYSTEM_CONCURRENT_UNORDERED_MAP
+        map.unsafe_erase(map.find(n-128));
+#else
         map.erase(map.find(n-128));
+#endif
     }
 //    if(!(n % 1000000))
 //      std::cout << "Items now " << map.size() << std::endl;
