@@ -90,6 +90,7 @@ namespace boost { namespace spinlock {
         return &_empty;
       }
       item_type() : hash(0) { }
+      item_type(const item_type &o) : value(o.value), hash(o.hash.load(memory_order_relaxed)) { }
       bool operator!=(const item_type &o) const BOOST_NOEXCEPT
       {
         return value!=o.value || hash.load(memory_order_relaxed)!=o.hash.load(memory_order_relaxed);
@@ -199,7 +200,7 @@ namespace boost { namespace spinlock {
         ++_offset;
         do
         {
-          while(!_itb->items)
+          while(!_itb->items || _offset>=_itb->items->size())
           {
             _offset=0;
             ++_itb;
@@ -208,7 +209,7 @@ namespace boost { namespace spinlock {
           }
           auto itemsh=_itb->items; // lock bucket
           auto &items=*itemsh;
-          while(!items[_offset].hash.load(memory_order_relaxed) && _offset<items.size())
+          while(_offset<items.size() && !items[_offset].hash.load(memory_order_relaxed))
             ++_offset;
           if(_offset==items.size())
           {
@@ -267,9 +268,13 @@ namespace boost { namespace spinlock {
         {
           if(_key_equal(k, i.value.first))
           {
-            ret._itb=itb;
-            ret._offset=offset;
-            break;
+            ret._value=i.value;
+            if(ret._value.second)
+            {
+              ret._itb=itb;
+              ret._offset=offset;
+              break;
+            }
           }
         }
       }
@@ -285,8 +290,9 @@ namespace boost { namespace spinlock {
     template<class P> std::pair<iterator, bool> insert(P &&v)
     {
       size_t h=_hasher(v.first);
-      std::pair<iterator, bool> ret(_find(h, v.first), true);
-      if(ret.first!=end()) return ret;
+      //std::pair<iterator, bool> ret(_find(h, v.first), true);
+      //if(ret.first!=end()) return ret;
+      std::pair<iterator, bool> ret(end(), true);
       auto itb=_alloc_bucket(h);
       auto itemsh=itb->items; // lock bucket
       // If a bucket resize is pending, wait till it's done
@@ -307,6 +313,7 @@ namespace boost { namespace spinlock {
           {
             ret.first._itb=itb;
             ret.first._offset=offset;
+            ret.first._value=i.value;
             ret.second=false;
             break;
           }
