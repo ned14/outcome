@@ -142,6 +142,7 @@ namespace boost { namespace spinlock {
     {
       size_type i=k % _buckets.size();
       bucket_type &b=_buckets[i];
+      if(b.items) return _buckets.begin()+i;
       auto items=b.items;
       if(items) return _buckets.begin()+i;
       auto newitems=std::make_shared<typename bucket_type::items_type>(1);
@@ -187,12 +188,13 @@ namespace boost { namespace spinlock {
       size_t _offset;
       //std::pair<key_type, mapped_type> _value;
       friend class concurrent_unordered_map;
-      iterator(concurrent_unordered_map *parent) : _parent(parent), _itb(parent->_buckets.begin()), _offset((size_t)-1) { ++(*this); }
+      iterator(concurrent_unordered_map *parent) : _parent(parent), _itb(parent->_buckets.begin()), _offset((size_t)-1) { /*++(*this);*/ }
       iterator(concurrent_unordered_map *parent, std::nullptr_t) : _parent(parent), _itb(parent->_buckets.end()), _offset((size_t)-1) { }
     public:
       iterator() : _parent(nullptr), _offset((size_t)-1) { }
       bool operator!=(const iterator &o) const BOOST_NOEXCEPT { return _itb!=o._itb || _offset!=o._offset; }
       bool operator==(const iterator &o) const BOOST_NOEXCEPT { return _itb==o._itb && _offset==o._offset; }
+#if 0
       iterator &operator++()
       {
         if(_itb==_parent->_buckets.end())
@@ -230,6 +232,7 @@ namespace boost { namespace spinlock {
       iterator operator++(int) { iterator t(*this); operator++(); return t; }
       //value_type &operator*() { assert(_itb!=_parent->_buckets.end()); if(_itb==_parent->_buckets.end()) abort(); return _value; }
       //value_type &operator*() const { assert(_itb!=_parent->_buckets.end()); if(_itb==_parent->_buckets.end()) abort(); return _value; }
+#endif
     };
   public:
     // local_iterator
@@ -265,7 +268,7 @@ namespace boost { namespace spinlock {
       for(size_t offset=0; offset<items.size(); offset++)
       {
         auto &i=items[offset];
-        if(h==i.hash)
+        if(h==i.hash.load(memory_order_relaxed))
         {
           if(_key_equal(k, i.value.first))
           {
@@ -349,7 +352,7 @@ namespace boost { namespace spinlock {
       /*if(ret._value.second!=*/items[ret._offset].reset()/*)
         abort()*/;
       --_size;
-      ++ret;
+      //++ret;
       return ret;
     }
     void clear() BOOST_NOEXCEPT
