@@ -185,7 +185,7 @@ namespace boost { namespace spinlock {
       concurrent_unordered_map *_parent;
       typename std::vector<bucket_type>::iterator _itb;
       size_t _offset;
-      std::pair<key_type, mapped_type> _value;
+      //std::pair<key_type, mapped_type> _value;
       friend class concurrent_unordered_map;
       iterator(concurrent_unordered_map *parent) : _parent(parent), _itb(parent->_buckets.begin()), _offset((size_t)-1) { ++(*this); }
       iterator(concurrent_unordered_map *parent, std::nullptr_t) : _parent(parent), _itb(parent->_buckets.end()), _offset((size_t)-1) { }
@@ -217,18 +217,19 @@ namespace boost { namespace spinlock {
             continue;
           }
           // Try to lock the value into the iterator
+/*
           _value=items[_offset].value;
           if(!_value.second)
           {
             ++_offset;
             continue;
-          }
+          }*/
         } while(false);
         return *this;
       }
       iterator operator++(int) { iterator t(*this); operator++(); return t; }
-      value_type &operator*() { assert(_itb!=_parent->_buckets.end()); if(_itb==_parent->_buckets.end()) abort(); return _value; }
-      value_type &operator*() const { assert(_itb!=_parent->_buckets.end()); if(_itb==_parent->_buckets.end()) abort(); return _value; }
+      //value_type &operator*() { assert(_itb!=_parent->_buckets.end()); if(_itb==_parent->_buckets.end()) abort(); return _value; }
+      //value_type &operator*() const { assert(_itb!=_parent->_buckets.end()); if(_itb==_parent->_buckets.end()) abort(); return _value; }
     };
   public:
     // local_iterator
@@ -268,8 +269,8 @@ namespace boost { namespace spinlock {
         {
           if(_key_equal(k, i.value.first))
           {
-            ret._value=i.value;
-            if(ret._value.second)
+            /*ret._value=i.value;
+            if(ret._value.second)*/
             {
               ret._itb=itb;
               ret._offset=offset;
@@ -313,7 +314,7 @@ namespace boost { namespace spinlock {
           {
             ret.first._itb=itb;
             ret.first._offset=offset;
-            ret.first._value=i.value;
+            //ret.first._value=i.value;
             ret.second=false;
             break;
           }
@@ -345,8 +346,8 @@ namespace boost { namespace spinlock {
       }
       auto &items=*itemsh;
       // He just removed an item different to the iterator, so abort as state is lost
-      if(ret._value.second!=items[ret._offset].reset())
-        abort();
+      /*if(ret._value.second!=*/items[ret._offset].reset()/*)
+        abort()*/;
       --_size;
       ++ret;
       return ret;
