@@ -95,6 +95,12 @@ namespace boost { namespace spinlock {
       item_type() : hash(0) { }
       item_type(value_type &&_p, size_t _hash) BOOST_NOEXCEPT : p(std::move(_p)), hash(_hash) { }
       item_type(item_type &&o) BOOST_NOEXCEPT : p(std::move(o.p)), hash(o.hash) { }
+      item_type &operator=(item_type &&o) BOOST_NOEXCEPT
+      {
+        p=std::move(o.p);
+        hash=std::move(o.hash);
+        return *this;
+      }
     };
     typedef typename allocator_type::template rebind<item_type>::other item_type_allocator_type;
     struct bucket_type
@@ -130,15 +136,19 @@ namespace boost { namespace spinlock {
         if(_itb==_parent->_buckets.end())
           return *this;
         bucket_type &b=*_itb;
-        _offset=_itb->next_item(_offset+1);
-        while(_offset==(size_t)-1 && _itb!=_parent->_buckets.end())
+        ++_offset;
+        std::lock_guard<decltype(b.lock)> g(b.lock);
+        for(;;)
         {
-          ++_itb;
-          if(_itb!=_parent->_buckets.end())
-            _offset=_itb->next_item(0);
+          for(; _offset<b.items.size(); _offset++)
+            if(b.items[_offset].hash)
+              return *this;
+          while(_offset==b.items.size() && _itb!=_parent->_buckets.end())
+          {
+            ++_itb;
+            _offset=0;
+          }
         }
-        //std::cout << "Bucket " << (_itb-_parent->_buckets.begin()) << " offset " << _offset << std::endl;
-        return *this;
       }
       iterator operator++(int) { iterator t(*this); operator++(); return t; }
       value_type &operator*() { assert(_itb!=_parent->_buckets.end() && _offset!=(size_t)-1); if(_itb==_parent->_buckets.end() || _offset==(size_t)-1) abort(); return _itb->items[_offset]->p.get(); }
@@ -248,7 +258,7 @@ namespace boost { namespace spinlock {
       std::lock_guard<decltype(b.lock)> g(b.lock);
       if(b.items[ret._offset].hash)
       {
-        b.items[ret._offset]=std::move(item_type());
+        b.items[ret._offset]=item_type();
         --b.count;
         --_size;
         if(ret._offset==b.items.size()-1)
