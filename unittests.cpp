@@ -197,7 +197,7 @@ namespace boost { namespace spinlock {
       std::pair<iterator, bool> ret(end(), true);
       size_t h=_hasher(v.first);
       auto itb=_get_bucket(h);
-      bucket &b=*itb;
+      bucket_type &b=*itb;
       size_t offset=0, emptyidx=(size_t)-1;
       std::lock_guard<decltype(b.lock)> g(b.lock);
       if(b.count)
@@ -248,7 +248,7 @@ namespace boost { namespace spinlock {
       std::lock_guard<decltype(b.lock)> g(b.lock);
       if(b.items[ret._offset].hash)
       {
-        b.items[ret._offset]=item_type();
+        b.items[ret._offset]=std::move(item_type());
         --b.count;
         --_size;
         if(ret._offset==b.items.size()-1)
