@@ -90,243 +90,28 @@ namespace boost { namespace spinlock {
     key_equal _key_equal;
     struct item_type
     {
-      spinlock<lockable_ptr<value_type>> p;
-      atomic<size_t> hash;
-      // Sets and UNLOCKS
-      void set(value_type *ret, size_t _hash)
-      {
-        assert(is_lockable_locked(p)); // must be locked to maintain place
-        p.store(ret);
-        hash.store(_hash);
-      }
-      value_type *detach() BOOST_NOEXCEPT
-      {
-        hash.store(0);
-        spinlock<lockable_ptr<value_type>> l(std::move(p)); // atomically detaches
-        assert(!p.load());
-        value_type *i=l.get();
-        return i;
-      }
+      value_type p;
+      size_t hash;
+      item_type() : hash(0) { }
+      item_type(value_type &&_p, size_t _hash) BOOST_NOEXCEPT : p(std::move(_p)), hash(_hash) { }
+      item_type(item_type &&o) BOOST_NOEXCEPT : p(std::move(o.p)), hash(o.hash) { }
     };
-    allocator_type _allocator;
-    struct bucket_type // padded to 32 bytes each, so two per cache line
+    typedef typename allocator_type::template rebind<item_type>::other item_type_allocator_type;
+    struct bucket_type
     {
-      atomic<unsigned> count, size; // count is items in there, size is space total
-    private:
-      mutable atomic<unsigned> entered, exited; // tracks how many threads are using this bucket
-      spinlock<bool> resize_lock;      // halts new threads if we need to resize the bucket
-      item_type *items;
-      //char __pad[32-2*sizeof(entered)-sizeof(resize_lock)-2*sizeof(count)-sizeof(items)];
-    public:
-      bucket_type() : count(0), size(0), entered(0), exited(0), items(nullptr)
-      {
-        static_assert(sizeof(void *)!=4 || sizeof(item_type)==8, "item_type is not 8 bytes long!");
-        static_assert(sizeof(void *)!=4 || sizeof(bucket_type)==24, "bucket_type is not 32 bytes long!");
-        static_assert(sizeof(void *)!=8 || sizeof(item_type)==16, "item_type is not 16 bytes long!");
-        static_assert(sizeof(void *)!=8 || sizeof(bucket_type)==32, "bucket_type is not 32 bytes long!");
-        //std::cout << sizeof(bucket_type);
-      }
-      bucket_type(bucket_type &&) BOOST_NOEXCEPT : count(0), size(0), entered(0), exited(0), items(nullptr) 
-      {
-        assert(!items);
-      }
-      ~bucket_type() BOOST_NOEXCEPT
-      {
-        assert(!items);
-      }
-      void clear(allocator_type &allocator) BOOST_NOEXCEPT
-      {
-        if(items)
-        {
-          // Exclude all new threads for this bucket
-          std::lock_guard<decltype(resize_lock)> g(resize_lock);
-          // Wait until present users have exited
-          while(entered.load()!=exited.load())
-            this_thread::yield();
-          while(count)
-            for(size_t n=0; n<size; n++)
-              remove(allocator, n, false);
-          free(items);
-          items=nullptr;
-          count.store(0);
-          size.store(0);
-        }
-      }
-      friend struct read_lock;
-      // Used to prevent resizes
-      struct using_
-      {
-        bucket_type *b;
-        using_(bucket_type *_b) : b(_b)
-        {
-          if(b)
-          {
-            ++b->entered;
-            // If resizing is currently happening, wait until it's done
-            while(is_lockable_locked(b->resize_lock))
-            {
-              ++b->exited;
-              b->resize_lock.lock();
-              b->resize_lock.unlock();
-              ++b->entered;
-            }
-          }
-        }
-        ~using_()
-        {
-          if(b)
-            ++b->exited;
-        }
-      };
-      // Must be called with read lock. Returns a LOCKED item if hash found
-      spinlock<lockable_ptr<value_type>> *find(size_t &offset, size_t hash, size_t *empty=nullptr, const int dir=1) BOOST_NOEXCEPT
-      {
-        spinlock<lockable_ptr<value_type>> *ret=nullptr;
-        if(items)
-        {
-          item_type *i=items+offset, *end=dir>0 ? items+size : items-1;
-          for(;;)
-          {
-            for(; (dir>0 ? i<end : i>end) && i->hash!=hash; dir>0 ? ++i : --i)
-            {
-              // If he asked for first empty slot, spot and return that
-              if(empty && !i->p.get())
-              {
-                *empty=i-items;
-                empty=nullptr;
-              }
-            }
-            if(i==end)
-              break;
-            // Lock the item matching the hash
-            i->p.lock();
-            // Is the hash still matching and the item pointer valid?
-            if(i->hash==hash && i->p.get())
-            {
-              ret=&i->p;
-              offset=i-items;
-              break;
-            }
-            i->p.unlock();
-          }
-        }
-        return ret;
-      }
-      size_t next_item(size_t offset) BOOST_NOEXCEPT
-      {
-        using_ g(this); // prevent resizes
-        if(items)
-        {
-          item_type *i=items+offset, *end=items+size;
-          for(; i<end; i++)
-          {
-            if(i->hash.load())
-              return i-items;
-          }
-        }
-        return (size_t)-1;
-      }
-      template<class P> size_t insert(allocator_type &allocator, P &&v, size_t hash, size_t hint)
-      {
-        value_type *ret=allocator.allocate(1);
-        try
-        {
-          allocator.construct(ret, std::forward<P>(v));
-          size_t offset=(size_t)-1;
-          for(;;)
-          {
-            size_t newsize=size.load();
-            if(newsize==count.load())
-            {
-              newsize<<=1;
-              if(newsize<1) newsize=1;
-              resize(newsize);
-            }
-            {
-              using_ g(this); // prevent resizes
-              if(items)
-              {
-                item_type *i=items+hint, *end=items+size;
-                for(; i<end; i++)
-                {
-                  if(!i->p.load(memory_order_relaxed) && i->p.try_lock())
-                  {
-                    // Definitely mine? i.e. empty and locked?
-                    if(1==(size_t)(void *)i->p.load())
-                    {
-                      i->set(ret, hash); // unlocks
-                      ++count;
-                      return i-items;
-                    }
-                    else i->p.unlock();
-                  }
-                }
-                hint=0;
-              }
-            }
-          }
-        }
-        catch(...)
-        {
-          allocator.deallocate(ret, sizeof(value_type));
-          throw;
-        }
-      }
-      bool remove(allocator_type &allocator, size_t offset, bool noresize=true)
-      {
-        value_type *v=nullptr;
-        if(items)
-        {
-          using_ g(noresize ? this : nullptr);
-          item_type *i=items+offset, *end=items+size;
-          if(i<end)
-          {
-            i->p.lock();
-            v=i->detach();
-          }
-        }
-        if(v)
-        {
-          --count;
-          allocator.destroy(v);
-          allocator.deallocate(v, sizeof(value_type));    
-          return true;
-        }
-        return false;
-      }
-      void resize(size_t newsize)
-      {
-        size_t _size=size.load();
-        if(newsize==_size) return;
-        // Exclude all new threads for this bucket
-        std::lock_guard<decltype(resize_lock)> g(resize_lock);
-        _size=size.load();
-        if(newsize==_size) return;
-        // Wait until present users have exited
-        while(entered.load()!=exited.load())
-          this_thread::yield();
-        size_t oldbytes=_size*sizeof(item_type), newbytes=newsize*sizeof(item_type);
-        item_type *n=(item_type *)((items) ? realloc(items, newbytes) : malloc(newbytes));
-        if(!n) throw std::bad_alloc();
-        if(newbytes>oldbytes)
-          memset(n+_size, 0, newbytes-oldbytes);
-        items=n;
-        size.store(newsize);
-        //std::cout << "Bucket " << this << " resizes to " << newsize << " items count=" << count.load() << std::endl;
-      }
+      spinlock<bool> lock;
+      unsigned count; // count is used items in there
+      std::vector<item_type, item_type_allocator_type> items;
+      bucket_type() : count(0) { }
+      bucket_type(bucket_type &&) BOOST_NOEXCEPT : count(0) { }
     };
     std::vector<bucket_type> _buckets;
     typename std::vector<bucket_type>::iterator _get_bucket(size_t k) BOOST_NOEXCEPT
     {
-      k ^= k + 0x9e3779b9 + (k<<6) + (k>>2); // really need to avoid sequential keys tapping the same cache line
+      //k ^= k + 0x9e3779b9 + (k<<6) + (k>>2); // really need to avoid sequential keys tapping the same cache line
       size_type i=k % _buckets.size();
       return _buckets.begin()+i;
     }
-    /*typename std::vector<bucket_type>::const_iterator _get_bucket(size_t k) const BOOST_NOEXCEPT
-    {
-      size_type i=k % _buckets.size();
-      return _buckets.begin()+i;
-    }*/
   public:
     class iterator : public std::iterator<std::forward_iterator_tag, value_type, difference_type, pointer, reference>
     {
@@ -373,11 +158,7 @@ namespace boost { namespace spinlock {
     concurrent_unordered_map &operator=(concurrent_unordered_map &&);
     bool empty() const BOOST_NOEXCEPT { return _size==0; }
     size_type size() const BOOST_NOEXCEPT { return _size; }
-    iterator begin() BOOST_NOEXCEPT
-    {
-      assert(_begin._offset<((size_t) 1<<30));
-      return _size ? _begin : end();
-    }
+    //iterator begin() BOOST_NOEXCEPT
     //const_iterator begin() const BOOST_NOEXCEPT
     iterator end() BOOST_NOEXCEPT
     {
@@ -390,22 +171,23 @@ namespace boost { namespace spinlock {
       if(!_size) return ret;
       size_t h=_hasher(k);
       auto itb=_get_bucket(h);
-      spinlock<lockable_ptr<value_type>> *i=nullptr;
+      bucket_type &b=*itb;
       size_t offset=0;
-      typename bucket_type::using_ g(&(*itb)); // stop resizes during find
-      for(;;)
+      std::lock_guard<decltype(b.lock)> g(b.lock);
+      if(b.count)
       {
-        // Always find starting from the beginning forwards
-        if(!(i=itb->find(offset, h)))
-          break;
-        if(_key_equal(k, (*i)->first))
+        for(;;)
         {
-          ret._itb=itb;
-          ret._offset=offset;
-          i->unlock();
-          break;
+          for(; offset<b.items.size() && b.items[offset].hash!=h; offset++);
+          if(offset==b.items.size())
+            break;
+          if(_key_equal(k, b.items[offset].p.first))
+          {
+            ret._itb=itb;
+            ret._offset=offset;
+            break;
+          }
         }
-        i->unlock();
       }
       return ret;
     }
@@ -415,58 +197,44 @@ namespace boost { namespace spinlock {
       std::pair<iterator, bool> ret(end(), true);
       size_t h=_hasher(v.first);
       auto itb=_get_bucket(h);
-      spinlock<lockable_ptr<value_type>> *i=nullptr;
-      size_t emptyidx=(size_t)-1, start=itb->size.load();
-#if 1
-      // start search offset at some random point so inserts don't compete
-      if(start) start=h % start;
-      if(_size)
+      bucket &b=*itb;
+      size_t offset=0, emptyidx=(size_t)-1;
+      std::lock_guard<decltype(b.lock)> g(b.lock);
+      if(b.count)
       {
-        typename bucket_type::using_ g(&(*itb)); // stop resizes during find
-        // Search low first
-        size_t offset=start;
         for(;;)
         {
-          if(!(i=itb->find(offset, h, (emptyidx==(size_t)-1) ? &emptyidx : nullptr, -1)))
+          for(; offset<b.items.size() && b.items[offset].hash!=h; offset++)
+            if(emptyidx==(size_t) -1 && !b.items[offset].hash)
+              emptyidx=offset;
+          if(offset==b.items.size())
             break;
-          if(_key_equal(v.first, (*i)->first))
+          if(_key_equal(k, b.items[offset].p.first))
           {
             ret.first._itb=itb;
             ret.first._offset=offset;
             ret.second=false;
-            i->unlock();
             break;
-          }
-          i->unlock();
-        }
-        if(ret.second)
-        {
-          // Search high
-          size_t offset=start+1;
-          for(;;)
-          {
-            if(!(i=itb->find(offset, h, (emptyidx==(size_t)-1) ? &emptyidx : nullptr, 1)))
-              break;
-            if(_key_equal(v.first, (*i)->first))
-            {
-              ret.first._itb=itb;
-              ret.first._offset=offset;
-              ret.second=false;
-              i->unlock();
-              break;
-            }
-            i->unlock();
           }
         }
       }
-#endif
       if(ret.second)
       {
-        if(emptyidx==(size_t)-1) emptyidx=0;
-        ret.first._itb=itb;
-        ret.first._offset=itb->insert(_allocator, std::forward<P>(v), h, emptyidx);
-        if(itb<_begin._itb || (itb==_begin._itb && ret.first._offset<_begin._offset))
-          _begin=ret.first;
+        if(emptyidx!=(size_t) -1)
+        {
+          ret.first._itb=itb;
+          ret.first._offset=emptyidx;
+          b.items[emptyidx]=item_type(std::forward<P>(v), h);
+        }
+        else
+        {
+          if(b.items.size()>=b.items.capacity())
+            b.items.reserve(b.items.capacity()*2); // **** NOTE TO SELF THIS ABORTS TRANSACTIONS
+          ret.first._itb=itb;
+          ret.first._offset=b.items.size();
+          b.items.push_back(item_type(std::forward<P>(v), h));
+        }
+        ++b.count;
         ++_size;
       }
       return ret;
@@ -476,12 +244,19 @@ namespace boost { namespace spinlock {
       iterator ret=it;
       assert(ret!=end());
       if(ret==end()) return end();
-      if(ret._itb->remove(_allocator, ret._offset))
+      bucket_type &b=*ret._itb;
+      std::lock_guard<decltype(b.lock)> g(b.lock);
+      if(b.items[ret._offset].hash)
       {
+        b.items[ret._offset]=item_type();
+        --b.count;
         --_size;
-        bool wasBegin=(ret==_begin);
+        if(ret._offset==b.items.size()-1)
+        {
+          while(!b.items.back().hash)
+            b.items.pop_back();
+        }
         ++ret;
-        if(wasBegin) _begin=ret;
         return ret;
       }
       return end();
@@ -489,7 +264,11 @@ namespace boost { namespace spinlock {
     void clear() BOOST_NOEXCEPT
     {
       for(auto &b : _buckets)
-        b.clear(_allocator);
+      {
+        std::lock_guard<decltype(b.lock)> g(b.lock);
+        b.items.clear();
+        b.count=0;
+      }
       _size.store(0);
     }
     void reserve(size_type n)
@@ -502,7 +281,7 @@ namespace boost { namespace spinlock {
     {
       for(size_t n=0; n<_buckets.size(); n++)
       {
-        s << "Bucket " << n << ": size=" << _buckets[n].size << " count=" << _buckets[n].count << std::endl;
+        s << "Bucket " << n << ": size=" << _buckets[n].items.size() << " count=" << _buckets[n].count << std::endl;
       }
     }
   };
