@@ -97,8 +97,8 @@ namespace boost { namespace spinlock {
       item_type(item_type &&o) BOOST_NOEXCEPT : p(std::move(o.p)), hash(o.hash) { }
       item_type &operator=(item_type &&o) BOOST_NOEXCEPT
       {
-        p=std::move(o.p);
-        hash=std::move(o.hash);
+        this->~item_type();
+        new (this) item_type(std::move(o));
         return *this;
       }
     };
@@ -219,7 +219,7 @@ namespace boost { namespace spinlock {
               emptyidx=offset;
           if(offset==b.items.size())
             break;
-          if(_key_equal(k, b.items[offset].p.first))
+          if(_key_equal(v.first, b.items[offset].p.first))
           {
             ret.first._itb=itb;
             ret.first._offset=offset;
