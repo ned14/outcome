@@ -94,7 +94,7 @@ namespace boost { namespace spinlock {
       size_t hash;
       item_type() : hash(0) { }
       item_type(value_type &&_p, size_t _hash) BOOST_NOEXCEPT : p(std::move(_p)), hash(_hash) { }
-      item_type(item_type &&o) BOOST_NOEXCEPT : p(std::move(o.p)), hash(o.hash) { }
+      item_type(item_type &&o) BOOST_NOEXCEPT : p(std::move(o.p)), hash(o.hash) { o.hash=0; }
       item_type &operator=(item_type &&o) BOOST_NOEXCEPT
       {
         this->~item_type();
@@ -106,7 +106,7 @@ namespace boost { namespace spinlock {
     struct bucket_type
     {
       spinlock<bool> lock;
-      unsigned count; // count is used items in there
+      atomic<unsigned> count; // count is used items in there
       std::vector<item_type, item_type_allocator_type> items;
       bucket_type() : count(0) { }
       bucket_type(bucket_type &&) BOOST_NOEXCEPT : count(0) { }
@@ -135,20 +135,21 @@ namespace boost { namespace spinlock {
       {
         if(_itb==_parent->_buckets.end())
           return *this;
-        bucket_type &b=*_itb;
         ++_offset;
-        std::lock_guard<decltype(b.lock)> g(b.lock);
-        for(;;)
+        do
         {
+          bucket_type &b=*_itb;
+          std::lock_guard<decltype(b.lock)> g(b.lock);
           for(; _offset<b.items.size(); _offset++)
             if(b.items[_offset].hash)
               return *this;
-          while(_offset==b.items.size() && _itb!=_parent->_buckets.end())
+          while(_offset>=b.items.size() && _itb!=_parent->_buckets.end())
           {
             ++_itb;
             _offset=0;
           }
-        }
+        } while(_itb!=_parent->_buckets.end());
+        return *this;
       }
       iterator operator++(int) { iterator t(*this); operator++(); return t; }
       value_type &operator*() { assert(_itb!=_parent->_buckets.end() && _offset!=(size_t)-1); if(_itb==_parent->_buckets.end() || _offset==(size_t)-1) abort(); return _itb->items[_offset]->p.get(); }
@@ -183,21 +184,25 @@ namespace boost { namespace spinlock {
       auto itb=_get_bucket(h);
       bucket_type &b=*itb;
       size_t offset=0;
-      std::lock_guard<decltype(b.lock)> g(b.lock);
-      if(b.count)
+      if(b.count.load())
       {
-        for(;;)
+        // Should run completely concurrently with other finds and inserts into existing slots
+        BOOST_BEGIN_TRANSACT_LOCK(b.lock)
         {
-          for(; offset<b.items.size() && b.items[offset].hash!=h; offset++);
-          if(offset==b.items.size())
-            break;
-          if(_key_equal(k, b.items[offset].p.first))
+          for(;;)
           {
-            ret._itb=itb;
-            ret._offset=offset;
-            break;
+            for(; offset<b.items.size() && b.items[offset].hash!=h; offset++);
+            if(offset==b.items.size())
+              break;
+            if(_key_equal(k, b.items[offset].p.first))
+            {
+              ret._itb=itb;
+              ret._offset=offset;
+              break;
+            }
           }
         }
+        BOOST_END_TRANSACT_LOCK(b.lock)
       }
       return ret;
     }
@@ -209,67 +214,94 @@ namespace boost { namespace spinlock {
       auto itb=_get_bucket(h);
       bucket_type &b=*itb;
       size_t offset=0, emptyidx=(size_t)-1;
-      std::lock_guard<decltype(b.lock)> g(b.lock);
-      if(b.count)
+      // load this now to prevent altering it causing aborts
+      size_t count=b.count.load();
+      // Transact if there is free capacity, otherwise always lock and abort all other transactions
+      // Accessing capacity is done without locks, and is therefore racy but safely so
+      auto dotransact=[&count, &b]{ return count<b.items.capacity(); }
+      BOOST_BEGIN_TRANSACT_LOCK(b.lock, dotransact);
       {
-        for(;;)
+        if(count==b.items.capacity())
+          b.items.reserve(b.items.capacity()*2); // Will abort all concurrency
+        // First search for equivalents and empties
+        if(count)
         {
-          for(; offset<b.items.size() && b.items[offset].hash!=h; offset++)
-            if(emptyidx==(size_t) -1 && !b.items[offset].hash)
-              emptyidx=offset;
-          if(offset==b.items.size())
-            break;
-          if(_key_equal(v.first, b.items[offset].p.first))
+          for(;;)
+          {
+            for(; offset<b.items.size() && b.items[offset].hash!=h; offset++)
+              if(emptyidx==(size_t) -1 && !b.items[offset].hash)
+                emptyidx=offset;
+            if(offset==b.items.size())
+              break;
+            if(_key_equal(v.first, b.items[offset].p.first))
+            {
+              ret.first._itb=itb;
+              ret.first._offset=offset;
+              ret.second=false;
+              break;
+            }
+          }
+        }
+        // No equivalent found?
+        if(ret.second)
+        {
+          // If we earlier found an empty use that
+          if(emptyidx!=(size_t) -1)
           {
             ret.first._itb=itb;
-            ret.first._offset=offset;
-            ret.second=false;
-            break;
+            ret.first._offset=emptyidx;
+            b.items[emptyidx]=item_type(std::forward<P>(v), h); // May abort concurrency if copying
+          }
+          else
+          {
+            assert(b.items.size()<=b.items.capacity());
+            if(b.items.size()==b.items.capacity()) abort();
+            ret.first._itb=itb;
+            ret.first._offset=b.items.size();
+            b.items.push_back(item_type(std::forward<P>(v), h)); // Will abort all concurrency
           }
         }
       }
+      BOOST_END_TRANSACT_LOCK(b.lock);
       if(ret.second)
       {
-        if(emptyidx!=(size_t) -1)
-        {
-          ret.first._itb=itb;
-          ret.first._offset=emptyidx;
-          b.items[emptyidx]=item_type(std::forward<P>(v), h);
-        }
-        else
-        {
-          if(b.items.size()>=b.items.capacity())
-            b.items.reserve(b.items.capacity()*2); // **** NOTE TO SELF THIS ABORTS TRANSACTIONS
-          ret.first._itb=itb;
-          ret.first._offset=b.items.size();
-          b.items.push_back(item_type(std::forward<P>(v), h));
-        }
         ++b.count;
         ++_size;
       }
       return ret;
     }
-    iterator erase(/*const_*/iterator it)
+    bool erase(/*const_*/iterator it)
     {
-      iterator ret=it;
+      bool ret=false;
       assert(ret!=end());
-      if(ret==end()) return end();
-      bucket_type &b=*ret._itb;
-      std::lock_guard<decltype(b.lock)> g(b.lock);
-      if(b.items[ret._offset].hash)
+      if(it==end()) return false;
+      bucket_type &b=*it._itb;
+      item_type former;
+      BOOST_BEGIN_TRANSACT_LOCK(b.lock)
       {
-        b.items[ret._offset]=item_type();
+        if(b.items[it._offset].hash)
+        {
+          former=std::move(b.items[it._offset]); // Move into former, hopefully avoiding a free()
+          if(it._offset==b.items.size()-1)
+          {
+            // Only shrink table if we aren't in a transaction
+            if(is_lockable_locked(b.lock))
+            {
+              // Shrink table to minimum
+              while(!b.items.empty() && !b.items.back().hash)
+                b.items.pop_back(); // Will abort all concurrency
+            }
+          }
+          ret=true;
+        }
+      }
+      BOOST_END_TRANSACT_LOCK(b.lock)
+      if(ret)
+      {
         --b.count;
         --_size;
-        if(ret._offset==b.items.size()-1)
-        {
-          while(!b.items.back().hash)
-            b.items.pop_back();
-        }
-        ++ret;
-        return ret;
       }
-      return end();
+      return ret;
     }
     void clear() BOOST_NOEXCEPT
     {
