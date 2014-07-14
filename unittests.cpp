@@ -219,7 +219,7 @@ namespace boost { namespace spinlock {
       // Transact if there is free capacity, otherwise always lock and abort all other transactions
       // Accessing capacity is done without locks, and is therefore racy but safely so
       auto dotransact=[&count, &b]{ return count<b.items.capacity(); }
-      BOOST_BEGIN_TRANSACT_LOCK(b.lock, dotransact);
+      BOOST_BEGIN_TRANSACT_LOCK(b.lock, dotransact)
       {
         if(count==b.items.capacity())
           b.items.reserve(b.items.capacity()*2); // Will abort all concurrency
@@ -273,7 +273,7 @@ namespace boost { namespace spinlock {
     bool erase(/*const_*/iterator it)
     {
       bool ret=false;
-      assert(ret!=end());
+      assert(it!=end());
       if(it==end()) return false;
       bucket_type &b=*it._itb;
       item_type former;
