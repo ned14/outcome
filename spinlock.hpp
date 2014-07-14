@@ -466,7 +466,7 @@ namespace boost
 #ifndef BOOST_BEGIN_TRANSACT_LOCK
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
 #undef BOOST_USING_INTEL_TSX
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable ...) __transaction_relaxed { (void) boost::spinlock::is_lockable_locked(lockable);
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable, ...) __transaction_relaxed { (void) boost::spinlock::is_lockable_locked(lockable);
 #define BOOST_END_TRANSACT_LOCK(lockable) }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N) __transaction_relaxed
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)
