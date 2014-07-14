@@ -218,11 +218,14 @@ namespace boost { namespace spinlock {
       size_t count=b.count.load();
       // Transact if there is free capacity, otherwise always lock and abort all other transactions
       // Accessing capacity is done without locks, and is therefore racy but safely so
-      auto dotransact=[&count, &b]{ return count<b.items.capacity(); }
+      auto dotransact=[&count, &b]{ return count<b.items.capacity(); };
       BOOST_BEGIN_TRANSACT_LOCK(b.lock, dotransact)
       {
         if(count==b.items.capacity())
-          b.items.reserve(b.items.capacity()*2); // Will abort all concurrency
+        {
+          size_t newcapacity=b.items.capacity()*2;
+          b.items.reserve(newcapacity ? newcapacity : 1); // Will abort all concurrency
+        }
         // First search for equivalents and empties
         if(count)
         {
@@ -242,6 +245,8 @@ namespace boost { namespace spinlock {
             }
           }
         }
+        else if(!b.items.empty())
+          emptyidx=0;
         // No equivalent found?
         if(ret.second)
         {
@@ -309,7 +314,7 @@ namespace boost { namespace spinlock {
       {
         std::lock_guard<decltype(b.lock)> g(b.lock);
         b.items.clear();
-        b.count=0;
+        b.count.store(0);
       }
       _size.store(0);
     }
