@@ -200,6 +200,7 @@ namespace boost { namespace spinlock {
               ret._offset=offset;
               break;
             }
+            else offset++;
           }
         }
         BOOST_END_TRANSACT_LOCK(b.lock)
@@ -218,7 +219,7 @@ namespace boost { namespace spinlock {
       size_t count;
       // Transact if there is free capacity, otherwise always lock and abort all other transactions
       // Accessing capacity is done without locks, and is therefore racy but safely so
-      auto dotransact=[&count, &b](size_t spin) { if(spin) std::cerr << "Abort\n";  count=b.count.load(); return count<b.items.capacity(); };
+      auto dotransact=[&count, &b](size_t spin) { if(spin==1) std::cerr << "A";  count=b.count.load(); return count<b.items.capacity(); };
       BOOST_BEGIN_TRANSACT_LOCK_IF(dotransact, b.lock)
       {
         if(count==b.items.capacity())
@@ -243,6 +244,7 @@ namespace boost { namespace spinlock {
               ret.second=false;
               break;
             }
+            else offset++;
           }
         }
         else if(!b.items.empty())
@@ -550,8 +552,8 @@ static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact
   if(reserve)
   {
     map.reserve(reserve);
-    for(size_t n=0; n<reserve/2; n++)
-      map.insert(std::make_pair(reserve+n, n));
+    for(int n=0; n<reserve/2; n++)
+      map.insert(std::make_pair(-n, n));
   }
 #pragma omp parallel
   {
@@ -598,22 +600,28 @@ static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact
     {
       if(use_transact)
       {
+        size_t v=n*10+thread;
         BOOST_BEGIN_TRANSACT_LOCK(lock)
         {
           if((n & 255)<128)
-            map.insert(std::make_pair(n, n));
+            map.insert(std::make_pair(v, n));
           else if(!map.empty())
-            map.erase(map.begin());
+            map.erase(map.find(v-128));
         }
         BOOST_END_TRANSACT_LOCK(lock)
       }
       else
       {
+        size_t v=n*10+thread;
         std::lock_guard<decltype(lock)> g(lock);
         if((n & 255)<128)
-          map.insert(std::make_pair(n, n));
+          map.insert(std::make_pair(v, n));
         else if(!map.empty())
-          map.erase(map.find(n-128));
+        {
+          auto it=map.find(v-1280);
+          if(it!=map.end())
+            map.erase(it);
+        }
       }
     }
 //    if(!(n % 1000000))
@@ -674,8 +682,8 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, bool re
   if(reserve)
   {
     map.reserve(reserve);
-    for(size_t n=0; n<reserve/2; n++)
-      map.insert(std::make_pair(reserve+n, n));
+    for(int n=0; n<reserve/2; n++)
+      map.insert(std::make_pair(-n, n));
   }
 #endif
 #pragma omp parallel
@@ -710,14 +718,19 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, bool re
     else
 #endif
     {
+      size_t v=n*10+thread;
       if((n & 255)<128)
-        map.insert(std::make_pair(n, n));
+        map.insert(std::make_pair(v, n));
       else if(!map.empty())
+      {
+        auto it=map.find(v-1280);
+        if(it!=map.end())
 #ifdef BOOST_HAVE_SYSTEM_CONCURRENT_UNORDERED_MAP
-        map.unsafe_erase(map.find(n-128));
+          map.unsafe_erase(it);
 #else
-        map.erase(map.find(n-128));
+          map.erase(it);
 #endif
+      }
     }
 //    if(!(n % 1000000))
 //      std::cout << "Items now " << map.size() << std::endl;
