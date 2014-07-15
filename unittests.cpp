@@ -215,11 +215,11 @@ namespace boost { namespace spinlock {
       bucket_type &b=*itb;
       size_t offset=0, emptyidx=(size_t)-1;
       // load this now to prevent altering it causing aborts
-      size_t count=b.count.load();
+      size_t count;
       // Transact if there is free capacity, otherwise always lock and abort all other transactions
       // Accessing capacity is done without locks, and is therefore racy but safely so
-      auto dotransact=[&count, &b]{ return count<b.items.capacity(); };
-      BOOST_BEGIN_TRANSACT_LOCK(b.lock, dotransact)
+      auto dotransact=[&count, &b](size_t spin) { if(spin) std::cerr << "Abort\n";  count=b.count.load(); return count<b.items.capacity(); };
+      BOOST_BEGIN_TRANSACT_LOCK_IF(dotransact, b.lock)
       {
         if(count==b.items.capacity())
         {
@@ -259,8 +259,12 @@ namespace boost { namespace spinlock {
           }
           else
           {
-            assert(b.items.size()<=b.items.capacity());
-            if(b.items.size()==b.items.capacity()) abort();
+            // Between count being read outside the lock and now, bucket may be full
+            if(b.items.size()==b.items.capacity())
+            {
+              size_t newcapacity=b.items.capacity()*2;
+              b.items.reserve(newcapacity ? newcapacity : 1); // Will abort all concurrency
+            }
             ret.first._itb=itb;
             ret.first._offset=b.items.size();
             b.items.push_back(item_type(std::forward<P>(v), h)); // Will abort all concurrency
@@ -278,13 +282,13 @@ namespace boost { namespace spinlock {
     bool erase(/*const_*/iterator it)
     {
       bool ret=false;
-      assert(it!=end());
+      //assert(it!=end());
       if(it==end()) return false;
       bucket_type &b=*it._itb;
       item_type former;
       BOOST_BEGIN_TRANSACT_LOCK(b.lock)
       {
-        if(b.items[it._offset].hash)
+        if(it._offset<b.items.size() && b.items[it._offset].hash)
         {
           former=std::move(b.items[it._offset]); // Move into former, hopefully avoiding a free()
           if(it._offset==b.items.size()-1)

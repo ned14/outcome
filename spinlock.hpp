@@ -466,7 +466,8 @@ namespace boost
 #ifndef BOOST_BEGIN_TRANSACT_LOCK
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
 #undef BOOST_USING_INTEL_TSX
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable, ...) __transaction_relaxed { (void) boost::spinlock::is_lockable_locked(lockable);
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) __transaction_relaxed { (void) boost::spinlock::is_lockable_locked(lockable);
+#define BOOST_BEGIN_TRANSACT_LOCK_IF(pred, lockable) pred(); __transaction_relaxed { (void) boost::spinlock::is_lockable_locked(lockable);
 #define BOOST_END_TRANSACT_LOCK(lockable) }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N) __transaction_relaxed
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)
@@ -553,10 +554,11 @@ namespace boost
       template<class Pred> explicit intel_tsx_transaction(T &_lockable, Pred &&pred) : Base(_lockable)
       {
         // Try only a certain number of times
-        size_t spins_to_transact=pred() ? get_spins_to_transact<T>::value : 0;
+        size_t spins_to_transact=get_spins_to_transact<T>::value;
         for(size_t n=0; n<spins_to_transact; n++)
         {
           unsigned state=BOOST_MEMORY_TRANSACTIONS_XABORT_CAPACITY;
+          if(!pred(n)) break;
 #ifndef BOOST_MEMORY_TRANSACTIONS_DISABLE_INTEL_TSX
           if(intel_stuff::have_intel_tsx_support())
             state=BOOST_MEMORY_TRANSACTIONS_XBEGIN(); // start transaction, or cope with abort
@@ -591,7 +593,7 @@ namespace boost
             switch(BOOST_MEMORY_TRANSACTIONS_XABORT_CODE(state))
             {
             case 0x78: // exception thrown
-              throw std::runtime_error("Unknown exception thrown inside Intel TSX memory transaction");
+              throw std::runtime_error("Unknown exit from Intel TSX memory transaction (exception, goto etc)");
             case 0x79: // my lock was held by someone else, so repeat
               break;
             default: // something else aborted. Best fall back to locks
@@ -692,13 +694,14 @@ namespace boost
     };
     template<class T> inline intel_tsx_transaction<T> make_intel_tsx_transaction(T &lockable) BOOST_NOEXCEPT_OR_NOTHROW
     {
-      return intel_tsx_transaction<T>(lockable, []{ return true; });
+      return intel_tsx_transaction<T>(lockable, [](size_t){ return true; });
     }
     template<class T, class Pred> inline intel_tsx_transaction<T> make_intel_tsx_transaction(T &lockable, Pred &&pred) BOOST_NOEXCEPT_OR_NOTHROW
     {
       return intel_tsx_transaction<T>(lockable, pred);
     }
-#define BOOST_BEGIN_TRANSACT_LOCK(...) { auto __tsx_transaction(boost::spinlock::make_intel_tsx_transaction(__VA_ARGS__)); {
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { auto __tsx_transaction(boost::spinlock::make_intel_tsx_transaction(lockable)); {
+#define BOOST_BEGIN_TRANSACT_LOCK_IF(pred, lockable) { auto __tsx_transaction(boost::spinlock::make_intel_tsx_transaction(lockable, pred)); {
 #define BOOST_END_TRANSACT_LOCK(lockable) } __tsx_transaction.commit(); }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N) { auto __tsx_transaction##N(boost::spinlock::make_intel_tsx_transaction(__tsx_transaction)); {
 #define BOOST_END_NESTED_TRANSACT_LOCK(N) } __tsx_transaction##N.commit(); }
@@ -707,7 +710,8 @@ namespace boost
 #endif // BOOST_BEGIN_TRANSACT_LOCK
 
 #ifndef BOOST_BEGIN_TRANSACT_LOCK
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable ...) { boost::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { boost::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
+#define BOOST_BEGIN_TRANSACT_LOCK_IF(pred, lockable) { pred(); boost::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
 #define BOOST_END_TRANSACT_LOCK(lockable) }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N)
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)
