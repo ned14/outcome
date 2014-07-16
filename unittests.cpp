@@ -105,16 +105,17 @@ namespace boost { namespace spinlock {
     typedef typename allocator_type::template rebind<item_type>::other item_type_allocator_type;
     struct bucket_type
     {
-      spinlock<bool> lock;
+      spinlock<bool, spins_to_transact<1>::policy> lock;
       atomic<unsigned> count; // count is used items in there
       std::vector<item_type, item_type_allocator_type> items;
-      bucket_type() : count(0) { }
-      bucket_type(bucket_type &&) BOOST_NOEXCEPT : count(0) { }
+      bucket_type() : count(0), items(8) { }
+      bucket_type(bucket_type &&) BOOST_NOEXCEPT : count(0), items(8) { }
     };
     std::vector<bucket_type> _buckets;
     typename std::vector<bucket_type>::iterator _get_bucket(size_t k) BOOST_NOEXCEPT
     {
       //k ^= k + 0x9e3779b9 + (k<<6) + (k>>2); // really need to avoid sequential keys tapping the same cache line
+      //k ^= k + 0x9e3779b9; // really need to avoid sequential keys tapping the same cache line
       size_type i=k % _buckets.size();
       return _buckets.begin()+i;
     }
@@ -214,12 +215,13 @@ namespace boost { namespace spinlock {
       size_t h=_hasher(v.first);
       auto itb=_get_bucket(h);
       bucket_type &b=*itb;
+      bool startlow=!((h/_buckets.size())&1); // sorta random
       size_t offset=0, emptyidx=(size_t)-1;
       // load this now to prevent altering it causing aborts
       size_t count;
       // Transact if there is free capacity, otherwise always lock and abort all other transactions
       // Accessing capacity is done without locks, and is therefore racy but safely so
-      auto dotransact=[&count, &b](size_t spin) { if(spin==1) std::cerr << "A";  count=b.count.load(); return count<b.items.capacity(); };
+      auto dotransact=[&count, &b](size_t spin) { /*if(spin==1) std::cerr << "A";*/  count=b.count.load(); return count<b.items.capacity(); };
       BOOST_BEGIN_TRANSACT_LOCK_IF(dotransact, b.lock)
       {
         if(count==b.items.capacity())
@@ -230,25 +232,47 @@ namespace boost { namespace spinlock {
         // First search for equivalents and empties
         if(count)
         {
-          for(;;)
+          if(startlow)
           {
-            for(; offset<b.items.size() && b.items[offset].hash!=h; offset++)
-              if(emptyidx==(size_t) -1 && !b.items[offset].hash)
-                emptyidx=offset;
-            if(offset==b.items.size())
-              break;
-            if(_key_equal(v.first, b.items[offset].p.first))
+            for(;;)
             {
-              ret.first._itb=itb;
-              ret.first._offset=offset;
-              ret.second=false;
-              break;
+              for(; offset<b.items.size() && b.items[offset].hash!=h; offset++)
+                if(emptyidx==(size_t) -1 && !b.items[offset].hash)
+                  emptyidx=offset;
+              if(offset==b.items.size())
+                break;
+              if(_key_equal(v.first, b.items[offset].p.first))
+              {
+                ret.first._itb=itb;
+                ret.first._offset=offset;
+                ret.second=false;
+                break;
+              }
+              else offset++;
             }
-            else offset++;
+          }
+          else
+          {
+            for(;;)
+            {
+              for(offset=b.items.size()-1; offset!=(size_t)-1 && b.items[offset].hash!=h; offset--)
+                if(emptyidx==(size_t) -1 && !b.items[offset].hash)
+                  emptyidx=offset;
+              if(offset==(size_t)-1)
+                break;
+              if(_key_equal(v.first, b.items[offset].p.first))
+              {
+                ret.first._itb=itb;
+                ret.first._offset=offset;
+                ret.second=false;
+                break;
+              }
+              else offset--;
+            }
           }
         }
         else if(!b.items.empty())
-          emptyidx=0;
+          emptyidx=startlow ? 0 : (b.items.size()-1);
         // No equivalent found?
         if(ret.second)
         {
@@ -296,13 +320,14 @@ namespace boost { namespace spinlock {
           if(it._offset==b.items.size()-1)
           {
             // Only shrink table if we aren't in a transaction
-            if(is_lockable_locked(b.lock))
+            /*if(is_lockable_locked(b.lock))
             {
               // Shrink table to minimum
               while(!b.items.empty() && !b.items.back().hash)
                 b.items.pop_back(); // Will abort all concurrency
-            }
+            }*/
           }
+          assert(b.items[it._offset].hash==0);
           ret=true;
         }
       }
@@ -669,7 +694,7 @@ TEST_CASE("performance/unordered_map/transact/large", "Tests the transact perfor
 #endif
 }*/
 
-static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, bool readwrites)
+static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, int type)
 {
   boost::spinlock::atomic<size_t> gate(0);
 #ifdef BOOST_HAVE_SYSTEM_CONCURRENT_UNORDERED_MAP
@@ -717,6 +742,7 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, bool re
     }
     else
 #endif
+    if(0==type)
     {
       size_t v=n*10+thread;
       if((n & 255)<128)
@@ -732,6 +758,15 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, bool re
 #endif
       }
     }
+    else if(1==type)
+    {
+      int v=-(int)(n % (reserve/2));
+      if(v)
+      {
+        auto it=map.find(v);
+        if(it==map.end()) std::cout << v;
+      }
+    }
 //    if(!(n % 1000000))
 //      std::cout << "Items now " << map.size() << std::endl;
   }
@@ -742,20 +777,61 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, bool re
   return threads*10000000/((end-start)/1000000000000.0);
 }
 
-TEST_CASE("performance/concurrent_unordered_map/small", "Tests the performance of multiple threads using a small concurrent_unordered_map")
+TEST_CASE("performance/concurrent_unordered_map/small", "Tests the performance of multiple threads writing a small concurrent_unordered_map")
 {
-  printf("\n=== Small concurrent_unordered_map performance ===\n");
+  printf("\n=== Small concurrent_unordered_map write performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(0, false));
   printf("2. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(0, false));
   printf("3. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(0, false));
+#ifdef BOOST_USING_INTEL_TSX
+  if(boost::spinlock::intel_stuff::have_intel_tsx_support())
+  {
+    printf("\nForcing Intel TSX support off ...\n");
+    boost::spinlock::intel_stuff::have_intel_tsx_support_result=1;
+    printf("1. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(0, false));
+    printf("2. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(0, false));
+    printf("3. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(0, false));
+    boost::spinlock::intel_stuff::have_intel_tsx_support_result=0;
+  }
+#endif
 }
 
-TEST_CASE("performance/concurrent_unordered_map/large", "Tests the performance of multiple threads using a large concurrent_unordered_map")
+TEST_CASE("performance/concurrent_unordered_map/large/write", "Tests the performance of multiple threads writing a large concurrent_unordered_map")
 {
-  printf("\n=== Large concurrent_unordered_map spinlock performance ===\n");
+  printf("\n=== Large concurrent_unordered_map write performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, false));
   printf("2. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, false));
   printf("3. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, false));
+#ifdef BOOST_USING_INTEL_TSX
+  if(boost::spinlock::intel_stuff::have_intel_tsx_support())
+  { 
+    printf("\nForcing Intel TSX support off ...\n");
+    boost::spinlock::intel_stuff::have_intel_tsx_support_result=1;
+    printf("1. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, false));
+    printf("2. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, false));
+    printf("3. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, false));
+    boost::spinlock::intel_stuff::have_intel_tsx_support_result=0;
+  } 
+#endif
+}
+
+TEST_CASE("performance/concurrent_unordered_map/large/read", "Tests the performance of multiple threads reading a large concurrent_unordered_map")
+{
+  printf("\n=== Large concurrent_unordered_map read performance ===\n");
+  printf("1. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, 1));
+  printf("2. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, 1));
+  printf("3. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, 1));
+#ifdef BOOST_USING_INTEL_TSX
+  if(boost::spinlock::intel_stuff::have_intel_tsx_support())
+  { 
+    printf("\nForcing Intel TSX support off ...\n");
+    boost::spinlock::intel_stuff::have_intel_tsx_support_result=1;
+    printf("1. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, 1));
+    printf("2. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, 1));
+    printf("3. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, 1));
+    boost::spinlock::intel_stuff::have_intel_tsx_support_result=0;
+  } 
+#endif
 }
 
 
