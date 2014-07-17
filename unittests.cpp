@@ -186,7 +186,7 @@ namespace boost { namespace spinlock {
       auto itb=_get_bucket(h);
       bucket_type &b=*itb;
       size_t offset=0;
-      if(b.count.load())
+      if(b.count.load(memory_order_acquire))
       {
         // Should run completely concurrently with other finds and inserts into existing slots
         BOOST_BEGIN_TRANSACT_LOCK(b.lock)
@@ -218,7 +218,7 @@ namespace boost { namespace spinlock {
       bucket_type &b=*itb;
       bool startlow=!((h/_buckets.size())&1); // sorta random
       // Load this outside the transaction
-      size_t count=b.count.load();
+      size_t count=b.count.load(memory_order_acquire);
       bool done=false;
       do
       {
@@ -278,7 +278,7 @@ namespace boost { namespace spinlock {
         
         // Transact if there is free capacity, otherwise always lock and abort all other transactions
         // Accessing capacity is done without locks, and is therefore racy but safely so
-        auto dotransact=[&count, &b](size_t spin) { /*if(spin==1) std::cerr << "A";*/  count=b.count.load(); return count<b.items.capacity(); };
+        auto dotransact=[&count, &b](size_t spin) { /*if(spin==1) std::cerr << "A";*/  count=b.count.load(memory_order_acquire); return count<b.items.capacity(); };
         BOOST_BEGIN_TRANSACT_LOCK_IF(dotransact, b.lock)
         {
           // If we earlier found an empty use that
@@ -309,8 +309,8 @@ namespace boost { namespace spinlock {
       } while(!done);
       if(ret.second)
       {
-        ++b.count;
-        ++_size;
+        b.count.fetch_add(1, memory_order_acquire);
+        _size.fetch_add(1, memory_order_acquire);
       }
       return ret;
     }
@@ -343,8 +343,8 @@ namespace boost { namespace spinlock {
       BOOST_END_TRANSACT_LOCK(b.lock)
       if(ret)
       {
-        --b.count;
-        --_size;
+        b.count.fetch_sub(1, memory_order_acquire);
+        _size.fetch_sub(1, memory_order_acquire);
       }
       return ret;
     }

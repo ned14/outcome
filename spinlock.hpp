@@ -226,7 +226,7 @@ namespace boost
       void store(T a, memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { v.store(a, o); }
       bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
-        if(v.load()) // Avoid unnecessary cache line invalidation traffic
+        if(v.load(memory_order_acquire)) // Avoid unnecessary cache line invalidation traffic
           return false;
         T expected=0;
         return v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_consume);
@@ -455,7 +455,7 @@ namespace boost
     // For when used with a spinlock
     template<class T, template<class> class spinpolicy1, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline bool is_lockable_locked(spinlock<T, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
     {
-      return ((size_t) lockable.load())&1;
+      return ((size_t) lockable.load(memory_order_acquire))&1;
     }
 
 #if defined(BOOST_USING_INTEL_TSX)
