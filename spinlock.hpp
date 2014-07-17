@@ -146,6 +146,7 @@ namespace boost
     using boost::memory_order_acq_rel;
     using boost::memory_order_seq_cst;
     using boost::__memory_order_hle_acquire;
+    using boost::__memory_order_hle_release;
 #else
     using std::memory_order;
     using std::memory_order_relaxed;
@@ -155,6 +156,7 @@ namespace boost
     using std::memory_order_acq_rel;
     using std::memory_order_seq_cst;
     using std::__memory_order_hle_acquire;
+    using std::__memory_order_hle_release;
 #endif
     // Map in a this_thread implementation
 #ifdef BOOST_SPINLOCK_USE_BOOST_THREAD
@@ -232,7 +234,11 @@ namespace boost
       }
       void unlock() BOOST_NOEXCEPT_OR_NOTHROW
       {
-        v.store(0);
+        v.store(0
+#if 1
+        , memory_order_release | __memory_order_hle_release
+#endif          
+        );
       }
       bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
     };
