@@ -133,7 +133,7 @@ namespace boost { namespace spinlock {
       iterator() : _parent(nullptr), _offset((size_t)-1) { }
       bool operator!=(const iterator &o) const BOOST_NOEXCEPT { return _itb!=o._itb || _offset!=o._offset; }
       bool operator==(const iterator &o) const BOOST_NOEXCEPT { return _itb==o._itb && _offset==o._offset; }
-      iterator &operator++()
+      /*iterator &operator++()
       {
         if(_itb==_parent->_buckets.end())
           return *this;
@@ -152,7 +152,7 @@ namespace boost { namespace spinlock {
           }
         } while(_itb!=_parent->_buckets.end());
         return *this;
-      }
+      }*/
       iterator operator++(int) { iterator t(*this); operator++(); return t; }
       value_type &operator*() { assert(_itb!=_parent->_buckets.end() && _offset!=(size_t)-1); if(_itb==_parent->_buckets.end() || _offset==(size_t)-1) abort(); return _itb->items[_offset]->p.get(); }
       value_type &operator*() const { assert(_itb!=_parent->_buckets.end() && _offset!=(size_t)-1); if(_itb==_parent->_buckets.end() || _offset==(size_t)-1) abort(); return _itb->items[_offset]->p.get(); }
@@ -329,12 +329,12 @@ namespace boost { namespace spinlock {
           if(it._offset==b.items.size()-1)
           {
             // Only shrink table if we aren't in a transaction
-            /*if(is_lockable_locked(b.lock))
+            if(is_lockable_locked(b.lock))
             {
               // Shrink table to minimum
               while(!b.items.empty() && !b.items.back().hash)
                 b.items.pop_back(); // Will abort all concurrency
-            }*/
+            }
           }
           assert(b.items[it._offset].hash==0);
           ret=true;
@@ -577,7 +577,7 @@ TEST_CASE("performance/malloc/transact/large", "Tests the transact performance o
   printf("3. Achieved %lf transactions per second\n", CalculateMallocPerformance(65536, 1));
 }
 
-static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact, bool readwrites)
+static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact, int type)
 {
   boost::spinlock::spinlock<bool> lock;
   boost::spinlock::atomic<size_t> gate(0);
@@ -600,7 +600,7 @@ static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact
   for(int thread=0; thread<threads; thread++)
   for(int n=0; n<10000000; n++)
   {
-    if(readwrites)
+    if(2==type)
     {
       // One thread always writes with lock, remaining threads read with transact
       bool amMaster=(thread==0);
@@ -630,6 +630,30 @@ static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact
         }
       }
     }
+    else if(1==type)
+    {
+      if(use_transact)
+      {
+        int v=-(int)(n % (reserve/2));
+        if(v)
+        {
+          BOOST_BEGIN_TRANSACT_LOCK(lock)
+          auto it=map.find(v);
+          if(it==map.end()) std::cout << v;
+          BOOST_END_TRANSACT_LOCK(lock)
+        }
+      }
+      else
+      {
+        int v=-(int)(n % (reserve/2));
+        if(v)
+        {
+          std::lock_guard<decltype(lock)> g(lock);
+          auto it=map.find(v);
+          if(it==map.end()) std::cout << v;
+        }
+      }
+    }    
     else
     {
       if(use_transact)
@@ -667,20 +691,28 @@ static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact
   return threads*10000000/((end-start)/1000000000000.0);
 }
 
-TEST_CASE("performance/unordered_map/small", "Tests the performance of multiple threads using a small unordered_map")
+TEST_CASE("performance/unordered_map/small/write", "Tests the performance of multiple threads writing a small unordered_map")
 {
-  printf("\n=== Small unordered_map spinlock performance ===\n");
+  printf("\n=== Small unordered_map spinlock write performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, false, false));
   printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, false, false));
   printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, false, false));
 }
 
-TEST_CASE("performance/unordered_map/large", "Tests the performance of multiple threads using a large unordered_map")
+TEST_CASE("performance/unordered_map/large/write", "Tests the performance of multiple threads writing a large unordered_map")
 {
-  printf("\n=== Large unordered_map spinlock performance ===\n");
+  printf("\n=== Large unordered_map spinlock write performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, false));
   printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, false));
   printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, false));
+}
+
+TEST_CASE("performance/unordered_map/large/read", "Tests the performance of multiple threads reading a large unordered_map")
+{
+  printf("\n=== Large unordered_map spinlock read performance ===\n");
+  printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, 1));
+  printf("2. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, 1));
+  printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, 1));
 }
 
 /*TEST_CASE("performance/unordered_map/transact/small", "Tests the transact performance of multiple threads using a small unordered_map")
