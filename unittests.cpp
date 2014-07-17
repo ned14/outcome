@@ -109,8 +109,8 @@ namespace boost { namespace spinlock {
       atomic<unsigned> count; // count is used items in there
       std::vector<item_type, item_type_allocator_type> items;
       char pad[64-sizeof(lock)-sizeof(count)-sizeof(items)];
-      bucket_type() : count(0), items(8) { }
-      bucket_type(bucket_type &&) BOOST_NOEXCEPT : count(0), items(8) { }
+      bucket_type() : count(0), items(0) { }
+      bucket_type(bucket_type &&) BOOST_NOEXCEPT : count(0), items(0) { }
     };
     std::vector<bucket_type> _buckets;
     typename std::vector<bucket_type>::iterator _get_bucket(size_t k) BOOST_NOEXCEPT
@@ -329,7 +329,7 @@ namespace boost { namespace spinlock {
           if(it._offset==b.items.size()-1)
           {
             // Only shrink table if we aren't in a transaction
-            if(is_lockable_locked(b.lock))
+            /*if(is_lockable_locked(b.lock))*/
             {
               // Shrink table to minimum
               while(!b.items.empty() && !b.items.back().hash)
