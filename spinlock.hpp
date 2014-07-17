@@ -507,6 +507,38 @@ namespace boost
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)
 #elif defined(BOOST_USING_INTEL_TSX)
 
+#if 1 // use HLE locks
+
+template<class T> struct intel_tsx_transaction_impl
+{
+protected:
+  T &lockable;
+  bool use_hle;
+public:
+  template<class Pred> intel_tsx_transaction_impl(T &_lockable, Pred &&pred) : lockable(_lockable), use_hle(true)
+  {
+    if(use_hle)
+      lockable.lock_hle();
+    else
+      lockable.lock();
+  }
+  ~intel_tsx_transaction_impl()
+  {
+    if(use_hle)
+      lockable.unlock_hle();
+    else
+      lockable.unlock();
+  }
+};
+
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { boost::spinlock::intel_tsx_transaction_impl<decltype(lockable)> __tsx_transaction(lockable, []{return true;});
+#define BOOST_BEGIN_TRANSACT_LOCK_IF(pred, lockable) { boost::spinlock::intel_tsx_transaction_impl<decltype(lockable)> __tsx_transaction(lockable, pred);
+#define BOOST_END_TRANSACT_LOCK(lockable) }
+#define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N)
+#define BOOST_END_NESTED_TRANSACT_LOCK(N)
+
+#else
+
 #define BOOST_MEMORY_TRANSACTIONS_XBEGIN_STARTED   (~0u)
 #define BOOST_MEMORY_TRANSACTIONS_XABORT_EXPLICIT  (1 << 0)
 #define BOOST_MEMORY_TRANSACTIONS_XABORT_RETRY     (1 << 1)
@@ -747,6 +779,8 @@ namespace boost
 #define BOOST_END_TRANSACT_LOCK(lockable) } __tsx_transaction.commit(); }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N) { auto __tsx_transaction##N(boost::spinlock::make_intel_tsx_transaction(__tsx_transaction)); {
 #define BOOST_END_NESTED_TRANSACT_LOCK(N) } __tsx_transaction##N.commit(); }
+
+#endif // using HLE locks
 
 #endif // BOOST_USING_INTEL_TSX
 #endif // BOOST_BEGIN_TRANSACT_LOCK
