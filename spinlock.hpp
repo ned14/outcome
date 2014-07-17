@@ -145,8 +145,10 @@ namespace boost
     using boost::memory_order_release;
     using boost::memory_order_acq_rel;
     using boost::memory_order_seq_cst;
+#ifdef BOOST_USING_INTEL_TSX
     using boost::__memory_order_hle_acquire;
     using boost::__memory_order_hle_release;
+#endif
 #else
     using std::memory_order;
     using std::memory_order_relaxed;
@@ -155,8 +157,10 @@ namespace boost
     using std::memory_order_release;
     using std::memory_order_acq_rel;
     using std::memory_order_seq_cst;
+#ifdef BOOST_USING_INTEL_TSX
     using std::__memory_order_hle_acquire;
     using std::__memory_order_hle_release;
+#endif
 #endif
     // Map in a this_thread implementation
 #ifdef BOOST_SPINLOCK_USE_BOOST_THREAD
@@ -220,28 +224,32 @@ namespace boost
       T load(memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
       //! Sets the raw atomic
       void store(T a, memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { v.store(a, o); }
-      bool try_lock(bool use_hle=false) BOOST_NOEXCEPT_OR_NOTHROW
+      bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
-#if 0
         if(v.load()) // Avoid unnecessary cache line invalidation traffic
           return false;
-#endif
         T expected=0;
-        return v.compare_exchange_weak(expected, 1
-#if 1
-        , memory_order_acquire | __memory_order_hle_acquire
-        , memory_order_consume
-#endif
-        );
+        return v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_consume);
       }
-      void unlock(bool use_hle=false) BOOST_NOEXCEPT_OR_NOTHROW
+      void unlock() BOOST_NOEXCEPT_OR_NOTHROW
       {
-        v.store(0
-#if 1
-        , memory_order_release | __memory_order_hle_release
-#endif          
+        v.store(0, memory_order_release);
+      }
+#ifdef BOOST_USING_INTEL_TSX
+      bool try_lock_hle() BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        T expected=0;
+        return v.compare_exchange_weak(expected, 1, memory_order_acquire
+        | __memory_order_hle_acquire
+        , memory_order_consume);
+      }
+      void unlock_hle() BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        v.store(0, memory_order_release
+        | __memory_order_hle_release
         );
       }
+#endif
       bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
     };
     template<typename T> struct spinlockbase<lockable_ptr<T>>
@@ -421,6 +429,17 @@ namespace boost
           parenttype::int_yield(n);
         }
       }
+#ifdef BOOST_USING_INTEL_TSX
+      void lock_hle() BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        for(size_t n=0;; n++)
+        {
+          if(parenttype::try_lock_hle())
+            return;
+          parenttype::int_yield(n);
+        }
+      }
+#endif
     };
 
     //! \brief Determines if a lockable is locked. Type specialise this for performance if your lockable allows examination.
@@ -618,7 +637,11 @@ namespace boost
           }
         }
         // If the loop exited, we're falling back onto traditional locks
+#ifdef BOOST_USING_INTEL_TSX
+        Base::lockable.lock_hle();
+#else
         Base::lockable.lock();
+#endif
         Base::dismissed=3;
       }
       ~intel_tsx_transaction() BOOST_NOEXCEPT_OR_NOTHROW
@@ -633,7 +656,11 @@ namespace boost
             //std::cerr << "TC" << std::endl;
           }
           else if(3==Base::dismissed)
+#ifdef BOOST_USING_INTEL_TSX
+            Base::lockable.unlock_hle();
+#else
             Base::lockable.unlock();
+#endif
         }
       }
       intel_tsx_transaction(intel_tsx_transaction &&o) BOOST_NOEXCEPT_OR_NOTHROW : Base(std::move(o)) { }
