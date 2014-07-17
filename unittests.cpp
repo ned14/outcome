@@ -105,7 +105,7 @@ namespace boost { namespace spinlock {
     typedef typename allocator_type::template rebind<item_type>::other item_type_allocator_type;
     struct bucket_type
     {
-      spinlock<bool, spins_to_transact<1>::policy> lock;
+      spinlock<bool/*, spins_to_transact<1>::policy*/> lock;
       atomic<unsigned> count; // count is used items in there
       std::vector<item_type, item_type_allocator_type> items;
       bucket_type() : count(0), items(8) { }
@@ -216,22 +216,19 @@ namespace boost { namespace spinlock {
       auto itb=_get_bucket(h);
       bucket_type &b=*itb;
       bool startlow=!((h/_buckets.size())&1); // sorta random
-      size_t offset=0, emptyidx=(size_t)-1;
-      // load this now to prevent altering it causing aborts
-      size_t count;
-      // Transact if there is free capacity, otherwise always lock and abort all other transactions
-      // Accessing capacity is done without locks, and is therefore racy but safely so
-      auto dotransact=[&count, &b](size_t spin) { /*if(spin==1) std::cerr << "A";*/  count=b.count.load(); return count<b.items.capacity(); };
-      BOOST_BEGIN_TRANSACT_LOCK_IF(dotransact, b.lock)
+      // Load this outside the transaction
+      size_t count=b.count.load();
+      bool done=false;
+      do
       {
-        if(count==b.items.capacity())
-        {
-          size_t newcapacity=b.items.capacity()*2;
-          b.items.reserve(newcapacity ? newcapacity : 1); // Will abort all concurrency
-        }
-        // First search for equivalents and empties
+        size_t offset=0, emptyidx=(size_t)-1;
+        // First search for equivalents and empties. The problem here is that we touch
+        // all of the cache lines in the bucket, so any other inserts will always abort.
+        // We work around this by doing the search in a separate transaction and starting
+        // randomly from either the top or bottom when searching for empties
         if(count)
         {
+          BOOST_BEGIN_TRANSACT_LOCK(b.lock)
           if(startlow)
           {
             for(;;)
@@ -246,6 +243,7 @@ namespace boost { namespace spinlock {
                 ret.first._itb=itb;
                 ret.first._offset=offset;
                 ret.second=false;
+                done=true;
                 break;
               }
               else offset++;
@@ -265,27 +263,36 @@ namespace boost { namespace spinlock {
                 ret.first._itb=itb;
                 ret.first._offset=offset;
                 ret.second=false;
+                done=true;
                 break;
               }
               else offset--;
             }
           }
+          BOOST_END_TRANSACT_LOCK(b.lock)
+          if(done) break;
         }
         else if(!b.items.empty())
           emptyidx=startlow ? 0 : (b.items.size()-1);
-        // No equivalent found?
-        if(ret.second)
+        
+        // Transact if there is free capacity, otherwise always lock and abort all other transactions
+        // Accessing capacity is done without locks, and is therefore racy but safely so
+        auto dotransact=[&count, &b](size_t spin) { /*if(spin==1) std::cerr << "A";*/  count=b.count.load(); return count<b.items.capacity(); };
+        BOOST_BEGIN_TRANSACT_LOCK_IF(dotransact, b.lock)
         {
           // If we earlier found an empty use that
           if(emptyidx!=(size_t) -1)
           {
-            ret.first._itb=itb;
-            ret.first._offset=emptyidx;
-            b.items[emptyidx]=item_type(std::forward<P>(v), h); // May abort concurrency if copying
+            if(!b.items[emptyidx].hash)
+            {
+              ret.first._itb=itb;
+              ret.first._offset=emptyidx;
+              b.items[emptyidx]=item_type(std::forward<P>(v), h); // May abort concurrency if copying
+              done=true;
+            }
           }
           else
           {
-            // Between count being read outside the lock and now, bucket may be full
             if(b.items.size()==b.items.capacity())
             {
               size_t newcapacity=b.items.capacity()*2;
@@ -294,10 +301,11 @@ namespace boost { namespace spinlock {
             ret.first._itb=itb;
             ret.first._offset=b.items.size();
             b.items.push_back(item_type(std::forward<P>(v), h)); // Will abort all concurrency
+            done=true;
           }
         }
-      }
-      BOOST_END_TRANSACT_LOCK(b.lock);
+        BOOST_END_TRANSACT_LOCK(b.lock);
+      } while(!done);
       if(ret.second)
       {
         ++b.count;
