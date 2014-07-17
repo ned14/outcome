@@ -220,10 +220,12 @@ namespace boost
       T load(memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
       //! Sets the raw atomic
       void store(T a, memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { v.store(a, o); }
-      bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
+      bool try_lock(bool use_hle=false) BOOST_NOEXCEPT_OR_NOTHROW
       {
+#if 0
         if(v.load()) // Avoid unnecessary cache line invalidation traffic
           return false;
+#endif
         T expected=0;
         return v.compare_exchange_weak(expected, 1
 #if 1
@@ -232,7 +234,7 @@ namespace boost
 #endif
         );
       }
-      void unlock() BOOST_NOEXCEPT_OR_NOTHROW
+      void unlock(bool use_hle=false) BOOST_NOEXCEPT_OR_NOTHROW
       {
         v.store(0
 #if 1
