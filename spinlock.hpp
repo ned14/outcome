@@ -226,10 +226,8 @@ namespace boost
       void store(T a, memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { v.store(a, o); }
       bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
-#if 0
         if(v.load()) // Avoid unnecessary cache line invalidation traffic
           return false;
-#endif
         T expected=0;
         return v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_consume);
       }
