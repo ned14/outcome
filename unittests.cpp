@@ -188,7 +188,7 @@ namespace boost { namespace spinlock {
       size_t offset=0;
       if(b.count.load(memory_order_acquire))
       {
-        // Should run completely concurrently with other finds and inserts into existing slots
+        // Should run completely concurrently with other finds
         BOOST_BEGIN_TRANSACT_LOCK(b.lock)
         {
           for(;;)
@@ -216,13 +216,11 @@ namespace boost { namespace spinlock {
       size_t h=_hasher(v.first);
       auto itb=_get_bucket(h);
       bucket_type &b=*itb;
-      bool done=false, startlow=!((h/_buckets.size())&1); // sorta random
+      bool startlow=!((h/_buckets.size())&1); // sorta random
       // Load this outside the transaction
-      size_t count=0; //b.count.load(memory_order_acquire);
-      // Transact if there is free capacity, otherwise always lock and abort all other transactions
-      // Accessing capacity is done without locks, and is therefore racy but safely so
-      auto dotransact=[&count, &b](size_t spin) { /*if(spin==1) std::cerr << "A";*/  count=b.count.load(memory_order_acquire); return count<b.items.capacity(); };
-      BOOST_BEGIN_TRANSACT_LOCK_IF(dotransact, b.lock)
+      size_t count=b.count.load(memory_order_acquire);
+      bool done=false;
+      do
       {
         size_t offset=0, emptyidx=(size_t)-1;
         // First search for equivalents and empties. The problem here is that we touch
@@ -231,6 +229,7 @@ namespace boost { namespace spinlock {
         // randomly from either the top or bottom when searching for empties
         if(count)
         {
+          BOOST_BEGIN_TRANSACT_LOCK(b.lock)
           if(startlow)
           {
             for(;;)
@@ -271,12 +270,14 @@ namespace boost { namespace spinlock {
               else offset--;
             }
           }
+          BOOST_END_TRANSACT_LOCK(b.lock)
         }
         else if(!b.items.empty())
           emptyidx=startlow ? 0 : (b.items.size()-1);
         
         if(!done)
         {
+          std::lock_guard<decltype(b.lock)> g(b.lock); // Will abort all concurrency
           // If we earlier found an empty use that
           if(emptyidx!=(size_t) -1)
           {
@@ -284,7 +285,7 @@ namespace boost { namespace spinlock {
             {
               ret.first._itb=itb;
               ret.first._offset=emptyidx;
-              b.items[emptyidx]=item_type(std::forward<P>(v), h); // May abort concurrency if copying
+              b.items[emptyidx]=item_type(std::forward<P>(v), h);
               done=true;
             }
           }
@@ -293,16 +294,15 @@ namespace boost { namespace spinlock {
             if(b.items.size()==b.items.capacity())
             {
               size_t newcapacity=b.items.capacity()*2;
-              b.items.reserve(newcapacity ? newcapacity : 1); // Will abort all concurrency
+              b.items.reserve(newcapacity ? newcapacity : 1);
             }
             ret.first._itb=itb;
             ret.first._offset=b.items.size();
-            b.items.push_back(item_type(std::forward<P>(v), h)); // Will abort all concurrency
+            b.items.push_back(item_type(std::forward<P>(v), h));
             done=true;
           }
         }
-      }
-      BOOST_END_TRANSACT_LOCK(b.lock)
+      } while(!done);
       if(ret.second)
       {
         b.count.fetch_add(1, memory_order_acquire);
@@ -317,8 +317,8 @@ namespace boost { namespace spinlock {
       if(it==end()) return false;
       bucket_type &b=*it._itb;
       item_type former;
-      BOOST_BEGIN_TRANSACT_LOCK(b.lock)
       {
+        std::lock_guard<decltype(b.lock)> g(b.lock);
         if(it._offset<b.items.size() && b.items[it._offset].hash)
         {
           former=std::move(b.items[it._offset]); // Move into former, hopefully avoiding a free()
@@ -336,7 +336,6 @@ namespace boost { namespace spinlock {
           ret=true;
         }
       }
-      BOOST_END_TRANSACT_LOCK(b.lock)
       if(ret)
       {
         b.count.fetch_sub(1, memory_order_acquire);
