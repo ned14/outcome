@@ -531,7 +531,7 @@ public:
   }
 };
 
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { boost::spinlock::intel_tsx_transaction_impl<decltype(lockable)> __tsx_transaction(lockable, []{return true;});
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { boost::spinlock::intel_tsx_transaction_impl<decltype(lockable)> __tsx_transaction(lockable, [](size_t){return true;});
 #define BOOST_BEGIN_TRANSACT_LOCK_IF(pred, lockable) { boost::spinlock::intel_tsx_transaction_impl<decltype(lockable)> __tsx_transaction(lockable, pred);
 #define BOOST_END_TRANSACT_LOCK(lockable) }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N)
