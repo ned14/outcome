@@ -108,6 +108,7 @@ namespace boost { namespace spinlock {
       spinlock<bool/*, spins_to_transact<1>::policy*/> lock;
       atomic<unsigned> count; // count is used items in there
       std::vector<item_type, item_type_allocator_type> items;
+      char pad[64-sizeof(lock)-sizeof(count)-sizeof(items)];
       bucket_type() : count(0), items(8) { }
       bucket_type(bucket_type &&) BOOST_NOEXCEPT : count(0), items(8) { }
     };
