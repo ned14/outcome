@@ -145,6 +145,7 @@ namespace boost
     using boost::memory_order_release;
     using boost::memory_order_acq_rel;
     using boost::memory_order_seq_cst;
+    using boost::__memory_order_hle_acquire;
 #else
     using std::memory_order;
     using std::memory_order_relaxed;
@@ -153,6 +154,7 @@ namespace boost
     using std::memory_order_release;
     using std::memory_order_acq_rel;
     using std::memory_order_seq_cst;
+    using std::__memory_order_hle_acquire;
 #endif
     // Map in a this_thread implementation
 #ifdef BOOST_SPINLOCK_USE_BOOST_THREAD
@@ -212,7 +214,7 @@ namespace boost
       {
         v.store(o.v.exchange(0, memory_order_acq_rel));
       }
-        //! Returns the raw atomic
+      //! Returns the raw atomic
       T load(memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
       //! Sets the raw atomic
       void store(T a, memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { v.store(a, o); }
@@ -221,7 +223,12 @@ namespace boost
         if(v.load()) // Avoid unnecessary cache line invalidation traffic
           return false;
         T expected=0;
-        return v.compare_exchange_weak(expected, 1);
+        return v.compare_exchange_weak(expected, 1
+#if 1
+        , memory_order_acquire | __memory_order_hle_acquire
+        , memory_order_consume
+#endif
+        );
       }
       void unlock() BOOST_NOEXCEPT_OR_NOTHROW
       {
