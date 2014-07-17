@@ -216,11 +216,13 @@ namespace boost { namespace spinlock {
       size_t h=_hasher(v.first);
       auto itb=_get_bucket(h);
       bucket_type &b=*itb;
-      bool startlow=!((h/_buckets.size())&1); // sorta random
+      bool done=false, startlow=!((h/_buckets.size())&1); // sorta random
       // Load this outside the transaction
-      size_t count=b.count.load(memory_order_acquire);
-      bool done=false;
-      do
+      size_t count=0; //b.count.load(memory_order_acquire);
+      // Transact if there is free capacity, otherwise always lock and abort all other transactions
+      // Accessing capacity is done without locks, and is therefore racy but safely so
+      auto dotransact=[&count, &b](size_t spin) { /*if(spin==1) std::cerr << "A";*/  count=b.count.load(memory_order_acquire); return count<b.items.capacity(); };
+      BOOST_BEGIN_TRANSACT_LOCK_IF(dotransact, b.lock)
       {
         size_t offset=0, emptyidx=(size_t)-1;
         // First search for equivalents and empties. The problem here is that we touch
@@ -229,7 +231,6 @@ namespace boost { namespace spinlock {
         // randomly from either the top or bottom when searching for empties
         if(count)
         {
-          BOOST_BEGIN_TRANSACT_LOCK(b.lock)
           if(startlow)
           {
             for(;;)
@@ -270,16 +271,11 @@ namespace boost { namespace spinlock {
               else offset--;
             }
           }
-          BOOST_END_TRANSACT_LOCK(b.lock)
-          if(done) break;
         }
         else if(!b.items.empty())
           emptyidx=startlow ? 0 : (b.items.size()-1);
         
-        // Transact if there is free capacity, otherwise always lock and abort all other transactions
-        // Accessing capacity is done without locks, and is therefore racy but safely so
-        auto dotransact=[&count, &b](size_t spin) { /*if(spin==1) std::cerr << "A";*/  count=b.count.load(memory_order_acquire); return count<b.items.capacity(); };
-        BOOST_BEGIN_TRANSACT_LOCK_IF(dotransact, b.lock)
+        if(!done)
         {
           // If we earlier found an empty use that
           if(emptyidx!=(size_t) -1)
@@ -305,8 +301,8 @@ namespace boost { namespace spinlock {
             done=true;
           }
         }
-        BOOST_END_TRANSACT_LOCK(b.lock);
-      } while(!done);
+      }
+      BOOST_END_TRANSACT_LOCK(b.lock)
       if(ret.second)
       {
         b.count.fetch_add(1, memory_order_acquire);

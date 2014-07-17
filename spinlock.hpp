@@ -515,7 +515,7 @@ protected:
   T &lockable;
   bool use_hle;
 public:
-  template<class Pred> intel_tsx_transaction_impl(T &_lockable, Pred &&pred) : lockable(_lockable), use_hle(pred((size_t)-1))
+  template<class Pred> intel_tsx_transaction_impl(T &_lockable, Pred &&pred) : lockable(_lockable), use_hle(pred((size_t)-1) && intel_stuff::have_intel_tsx_support())
   {
     if(use_hle)
       lockable.lock_hle();
