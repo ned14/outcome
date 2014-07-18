@@ -478,7 +478,8 @@ namespace boost
       bool lock_elided() BOOST_NOEXCEPT_OR_NOTHROW
       {
         unsigned waswaiting=parenttype::inc_waiting();
-        if(!waswaiting)
+        // If none was in transaction, and lock is not locked, use normal spin lock
+        if(!waswaiting && !parenttype::load(memory_order_acquire))
         {
           parenttype::dec_waiting();
           lock();
