@@ -108,7 +108,7 @@ namespace boost { namespace spinlock {
       spinlock<bool/*, spins_to_transact<1>::policy*/> lock;
       atomic<unsigned> count; // count is used items in there
       std::vector<item_type, item_type_allocator_type> items;
-      char pad[64-sizeof(lock)-sizeof(count)-sizeof(items)];
+      char pad[64-sizeof(spinlock<bool>)-sizeof(atomic<unsigned>)-sizeof(std::vector<item_type, item_type_allocator_type>)];
       bucket_type() : count(0), items(0) { }
       bucket_type(bucket_type &&) BOOST_NOEXCEPT : count(0), items(0) { }
     };
@@ -216,13 +216,13 @@ namespace boost { namespace spinlock {
       size_t h=_hasher(v.first);
       auto itb=_get_bucket(h);
       bucket_type &b=*itb;
-      bool startlow=!((h/_buckets.size())&1); // sorta random
+      bool startlow=false; // !((h/_buckets.size())&1); // sorta random
       // Load this outside the transaction
       size_t count=b.count.load(memory_order_acquire);
       bool done=false;
       do
       {
-        size_t offset=0, emptyidx=(size_t)-1;
+        size_t emptyidx=(size_t)-1;
         // First search for equivalents and empties. The problem here is that we touch
         // all of the cache lines in the bucket, so any other inserts will always abort.
         // We work around this by doing the search in a separate transaction and starting
@@ -232,7 +232,7 @@ namespace boost { namespace spinlock {
           BOOST_BEGIN_TRANSACT_LOCK(b.lock)
           if(startlow)
           {
-            for(;;)
+            for(size_t offset=0;;)
             {
               for(; offset<b.items.size() && b.items[offset].hash!=h; offset++)
                 if(emptyidx==(size_t) -1 && !b.items[offset].hash)
@@ -252,9 +252,9 @@ namespace boost { namespace spinlock {
           }
           else
           {
-            for(;;)
+            for(size_t offset=b.items.size()-1;;)
             {
-              for(offset=b.items.size()-1; offset!=(size_t)-1 && b.items[offset].hash!=h; offset--)
+              for(; offset!=(size_t)-1 && b.items[offset].hash!=h; offset--)
                 if(emptyidx==(size_t) -1 && !b.items[offset].hash)
                   emptyidx=offset;
               if(offset==(size_t)-1)
@@ -281,7 +281,7 @@ namespace boost { namespace spinlock {
           // If we earlier found an empty use that
           if(emptyidx!=(size_t) -1)
           {
-            if(!b.items[emptyidx].hash)
+            if(emptyidx<b.items.size() && !b.items[emptyidx].hash)
             {
               ret.first._itb=itb;
               ret.first._offset=emptyidx;
@@ -322,6 +322,7 @@ namespace boost { namespace spinlock {
         if(it._offset<b.items.size() && b.items[it._offset].hash)
         {
           former=std::move(b.items[it._offset]); // Move into former, hopefully avoiding a free()
+          assert(b.items[it._offset].hash==0);
           if(it._offset==b.items.size()-1)
           {
             // Only shrink table if we aren't in a transaction
@@ -332,7 +333,6 @@ namespace boost { namespace spinlock {
                 b.items.pop_back(); // Will abort all concurrency
             }
           }
-          assert(b.items[it._offset].hash==0);
           ret=true;
         }
       }
@@ -739,14 +739,14 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, int typ
   boost::spinlock::concurrent_unordered_map<int, int> map;
 #endif
   usCount start, end;
-#ifndef BOOST_HAVE_SYSTEM_CONCURRENT_UNORDERED_MAP
   if(reserve)
   {
+#ifndef BOOST_HAVE_SYSTEM_CONCURRENT_UNORDERED_MAP
     map.reserve(reserve);
+#endif
     for(int n=0; n<reserve/2; n++)
       map.insert(std::make_pair(-n, n));
   }
-#endif
 #pragma omp parallel
   {
     ++gate;

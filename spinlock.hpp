@@ -40,6 +40,9 @@ DEALINGS IN THE SOFTWARE.
 #if !defined(BOOST_SPINLOCK_USE_BOOST_THREAD) && defined(BOOST_NO_CXX11_HDR_THREAD)
 # define BOOST_SPINLOCK_USE_BOOST_THREAD
 #endif
+#ifndef _MSC_VER
+# define BOOST_SPINLOCK_USE_INTEL_HLE
+#endif
 
 #ifdef BOOST_SPINLOCK_USE_BOOST_ATOMIC
 # include <boost/atomic.hpp>
@@ -145,7 +148,7 @@ namespace boost
     using boost::memory_order_release;
     using boost::memory_order_acq_rel;
     using boost::memory_order_seq_cst;
-#ifdef BOOST_USING_INTEL_TSX
+#ifdef BOOST_SPINLOCK_USE_INTEL_HLE
     using boost::__memory_order_hle_acquire;
     using boost::__memory_order_hle_release;
 #endif
@@ -157,7 +160,7 @@ namespace boost
     using std::memory_order_release;
     using std::memory_order_acq_rel;
     using std::memory_order_seq_cst;
-#ifdef BOOST_USING_INTEL_TSX
+#ifdef BOOST_SPINLOCK_USE_INTEL_HLE
     using std::__memory_order_hle_acquire;
     using std::__memory_order_hle_release;
 #endif
@@ -235,7 +238,7 @@ namespace boost
       {
         v.store(0, memory_order_release);
       }
-#ifdef BOOST_USING_INTEL_TSX
+#ifdef BOOST_SPINLOCK_USE_INTEL_HLE
       bool try_lock_hle() BOOST_NOEXCEPT_OR_NOTHROW
       {
         T expected=0;
@@ -429,7 +432,7 @@ namespace boost
           parenttype::int_yield(n);
         }
       }
-#ifdef BOOST_USING_INTEL_TSX
+#ifdef BOOST_SPINLOCK_USE_INTEL_HLE
       void lock_hle() BOOST_NOEXCEPT_OR_NOTHROW
       {
         for(size_t n=0;; n++)
@@ -517,16 +520,20 @@ protected:
 public:
   template<class Pred> intel_tsx_transaction_impl(T &_lockable, Pred &&pred) : lockable(_lockable), use_hle(pred((size_t)-1) && intel_stuff::have_intel_tsx_support())
   {
+#ifdef BOOST_SPINLOCK_USE_INTEL_HLE
     if(use_hle)
       lockable.lock_hle();
     else
+#endif
       lockable.lock();
   }
   ~intel_tsx_transaction_impl()
   {
+#ifdef BOOST_SPINLOCK_USE_INTEL_HLE
     if(use_hle)
       lockable.unlock_hle();
     else
+#endif
       lockable.unlock();
   }
 };
