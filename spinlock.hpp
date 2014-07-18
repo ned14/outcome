@@ -266,11 +266,6 @@ namespace boost
         v.store(0, memory_order_release|__memory_order_hle_release);
         dec_waiting();
       }
-      void unlock() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        v.store(0, memory_order_release);
-        dec_waiting();
-      }
       unsigned inc_waiting() BOOST_NOEXCEPT_OR_NOTHROW
       {
         return waiting.fetch_add(1, memory_order_acquire);
@@ -483,10 +478,16 @@ namespace boost
       bool lock_elided() BOOST_NOEXCEPT_OR_NOTHROW
       {
         unsigned waswaiting=parenttype::inc_waiting();
+        if(!waswaiting)
+        {
+          parenttype::dec_waiting();
+          lock();
+          return false;
+        }
         for(size_t n=0;; n++)
         {
-          if(waswaiting ? parenttype::try_elided_lock() : parenttype::try_lock())
-            return waswaiting!=0;
+          if(parenttype::try_elided_lock())
+            return true;
           parenttype::int_yield(n);
         }
       }
