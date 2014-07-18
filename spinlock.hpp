@@ -212,11 +212,12 @@ namespace boost
     };
     template<typename T> struct spinlockbase
     {
-    private:
-      volatile atomic<T> v;
+    protected:
+      atomic<T> v;
     public:
       typedef T value_type;
-      spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : v(0) { }
+      spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : v(0)
+      { }
       spinlockbase(const spinlockbase &) = delete;
       //! Atomically move constructs
       spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW
@@ -238,23 +239,51 @@ namespace boost
       {
         v.store(0, memory_order_release);
       }
-#ifdef BOOST_SPINLOCK_USE_INTEL_HLE
-      bool try_lock_hle() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        T expected=0;
-        return v.compare_exchange_weak(expected, 1, memory_order_acquire
-        | __memory_order_hle_acquire
-        , memory_order_consume);
-      }
-      void unlock_hle() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        v.store(0, memory_order_release
-        | __memory_order_hle_release
-        );
-      }
-#endif
       bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
     };
+#ifdef BOOST_SPINLOCK_USE_INTEL_HLE
+    struct elidable_lock;
+    template<> struct spinlockbase<elidable_lock> : public spinlockbase<bool>
+    {
+    public:
+      atomic<unsigned> waiting;
+      spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : waiting(0)
+      {
+      }
+      spinlockbase(const spinlockbase &) = delete;
+      spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW : spinlockbase<bool>(std::move(o)), waiting(0)
+      {
+      }
+      bool try_elided_lock() BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        if(v.load(memory_order_acquire)) // Avoid unnecessary cache line invalidation traffic
+          return false;
+        bool expected=0;
+        return v.compare_exchange_weak(expected, 1, memory_order_acquire|__memory_order_hle_acquire, memory_order_consume);
+      }
+      void unlock_elided() BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        v.store(0, memory_order_release|__memory_order_hle_release);
+        dec_waiting();
+      }
+      void unlock() BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        v.store(0, memory_order_release);
+        dec_waiting();
+      }
+      unsigned inc_waiting() BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        return waiting.fetch_add(1, memory_order_acquire);
+      }
+      unsigned dec_waiting() BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        return waiting.fetch_sub(1, memory_order_release);
+      }
+      bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
+    };
+#else
+    typedef unsigned elidable_lock;
+#endif
     template<typename T> struct spinlockbase<lockable_ptr<T>>
     {
     private:
@@ -432,17 +461,35 @@ namespace boost
           parenttype::int_yield(n);
         }
       }
-#ifdef BOOST_SPINLOCK_USE_INTEL_HLE
-      void lock_hle() BOOST_NOEXCEPT_OR_NOTHROW
+    };
+    template<template<class> class spinpolicy1, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> class spinlock<elidable_lock, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4> : public spinpolicy4<spinpolicy3<spinpolicy2<spinpolicy1<spinlockbase<elidable_lock>>>>>
+    {
+      typedef spinpolicy4<spinpolicy3<spinpolicy2<spinpolicy1<spinlockbase<elidable_lock>>>>> parenttype;
+    public:
+      spinlock() { }
+      spinlock(const spinlock &) = delete;
+      spinlock(spinlock &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
+      void lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
+        unsigned waswaiting=parenttype::inc_waiting();
         for(size_t n=0;; n++)
         {
-          if(parenttype::try_lock_hle())
+          if(parenttype::try_lock())
             return;
           parenttype::int_yield(n);
         }
       }
-#endif
+      // Returns true if elided lock was used
+      bool lock_elided() BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        unsigned waswaiting=parenttype::inc_waiting();
+        for(size_t n=0;; n++)
+        {
+          if(waswaiting ? parenttype::try_elided_lock() : parenttype::try_lock())
+            return waswaiting!=0;
+          parenttype::int_yield(n);
+        }
+      }
     };
 
     //! \brief Determines if a lockable is locked. Type specialise this for performance if your lockable allows examination.
@@ -512,34 +559,45 @@ namespace boost
 
 #if 1 // use HLE locks
 
-template<class T> struct intel_tsx_transaction_impl
+template<class T> struct intel_tsx_transaction_
 {
 protected:
   T &lockable;
-  bool use_hle;
 public:
-  template<class Pred> intel_tsx_transaction_impl(T &_lockable, Pred &&pred) : lockable(_lockable), use_hle(pred((size_t)-1) && intel_stuff::have_intel_tsx_support())
+  template<class Pred> intel_tsx_transaction_(T &_lockable, Pred &&pred) : lockable(_lockable)
   {
-#ifdef BOOST_SPINLOCK_USE_INTEL_HLE
-    if(use_hle)
-      lockable.lock_hle();
+    pred((size_t)-1);
+    lockable.lock();
+  }
+  ~intel_tsx_transaction_()
+  {
+    lockable.unlock();
+  }
+};
+template<> struct intel_tsx_transaction_<spinlock<elidable_lock>>
+{
+protected:
+  spinlock<elidable_lock> &lockable;
+  bool use_elide;
+public:
+  template<class Pred> intel_tsx_transaction_(spinlock<elidable_lock> &_lockable, Pred &&pred) : lockable(_lockable), use_elide(pred((size_t)-1) && intel_stuff::have_intel_tsx_support())
+  {
+    if(use_elide)
+      use_elide=lockable.lock_elided();
     else
-#endif
       lockable.lock();
   }
-  ~intel_tsx_transaction_impl()
+  ~intel_tsx_transaction_()
   {
-#ifdef BOOST_SPINLOCK_USE_INTEL_HLE
-    if(use_hle)
-      lockable.unlock_hle();
+    if(use_elide)
+      lockable.unlock_elided();
     else
-#endif
       lockable.unlock();
   }
 };
 
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { boost::spinlock::intel_tsx_transaction_impl<decltype(lockable)> __tsx_transaction(lockable, [](size_t){return true;});
-#define BOOST_BEGIN_TRANSACT_LOCK_IF(pred, lockable) { boost::spinlock::intel_tsx_transaction_impl<decltype(lockable)> __tsx_transaction(lockable, pred);
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { boost::spinlock::intel_tsx_transaction_<decltype(lockable)> __tsx_transaction(lockable, [](size_t){return true;});
+#define BOOST_BEGIN_TRANSACT_LOCK_IF(pred, lockable) { boost::spinlock::intel_tsx_transaction_<decltype(lockable)> __tsx_transaction(lockable, pred);
 #define BOOST_END_TRANSACT_LOCK(lockable) }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N)
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)

@@ -105,10 +105,10 @@ namespace boost { namespace spinlock {
     typedef typename allocator_type::template rebind<item_type>::other item_type_allocator_type;
     struct bucket_type
     {
-      spinlock<bool/*, spins_to_transact<1>::policy*/> lock;
+      spinlock<elidable_lock> lock;
       atomic<unsigned> count; // count is used items in there
       std::vector<item_type, item_type_allocator_type> items;
-      char pad[64-sizeof(spinlock<bool>)-sizeof(atomic<unsigned>)-sizeof(std::vector<item_type, item_type_allocator_type>)];
+ //     char pad[64-sizeof(spinlock<hle_bool>)-sizeof(atomic<unsigned>)-sizeof(std::vector<item_type, item_type_allocator_type>)];
       bucket_type() : count(0), items(0) { }
       bucket_type(bucket_type &&) BOOST_NOEXCEPT : count(0), items(0) { }
     };
