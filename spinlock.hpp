@@ -40,9 +40,6 @@ DEALINGS IN THE SOFTWARE.
 #if !defined(BOOST_SPINLOCK_USE_BOOST_THREAD) && defined(BOOST_NO_CXX11_HDR_THREAD)
 # define BOOST_SPINLOCK_USE_BOOST_THREAD
 #endif
-#ifndef _MSC_VER
-# define BOOST_SPINLOCK_USE_INTEL_HLE
-#endif
 
 #ifdef BOOST_SPINLOCK_USE_BOOST_ATOMIC
 # include <boost/atomic.hpp>
@@ -58,13 +55,6 @@ DEALINGS IN THE SOFTWARE.
 
 // Turn this on if you have a compiler which understands __transaction_relaxed
 //#define BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
-
-#if !defined(BOOST_COMPILING_FOR_GCOV) && !defined(BOOST_AFIO_COMPILING_FOR_GCOV) // transaction support murders poor old gcov
-// Turn this on if you want to use Haswell TSX where available
-# if (defined(_MSC_VER) && _MSC_VER >= 1700 && ( defined(_M_IX86) || defined(_M_X64) )) || (defined(__GNUC__) && ( defined(__i386__) || defined(__x86_64__) ))
-#  define BOOST_USING_INTEL_TSX
-# endif
-#endif
 
 #ifndef BOOST_SMT_PAUSE
 # if defined(_MSC_VER) && _MSC_VER >= 1310 && ( defined(_M_IX86) || defined(_M_X64) )
@@ -148,10 +138,6 @@ namespace boost
     using boost::memory_order_release;
     using boost::memory_order_acq_rel;
     using boost::memory_order_seq_cst;
-#ifdef BOOST_SPINLOCK_USE_INTEL_HLE
-    using boost::__memory_order_hle_acquire;
-    using boost::__memory_order_hle_release;
-#endif
 #else
     using std::memory_order;
     using std::memory_order_relaxed;
@@ -160,10 +146,6 @@ namespace boost
     using std::memory_order_release;
     using std::memory_order_acq_rel;
     using std::memory_order_seq_cst;
-#ifdef BOOST_SPINLOCK_USE_INTEL_HLE
-    using std::__memory_order_hle_acquire;
-    using std::__memory_order_hle_release;
-#endif
 #endif
     // Map in a this_thread implementation
 #ifdef BOOST_SPINLOCK_USE_BOOST_THREAD
@@ -228,6 +210,7 @@ namespace boost
       T load(memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
       //! Sets the raw atomic
       void store(T a, memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { v.store(a, o); }
+      //! If atomic is zero, sets to 1 and returns true, else false.
       bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
         if(v.load(memory_order_acquire)) // Avoid unnecessary cache line invalidation traffic
@@ -235,50 +218,24 @@ namespace boost
         T expected=0;
         return v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_consume);
       }
+      //! If atomic equals expected, sets to 1 and returns true, else false with expected updated to actual value.
+      bool try_lock(T &expected) BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        T t;
+        if((t=v.load(memory_order_acquire))) // Avoid unnecessary cache line invalidation traffic
+        {
+          expected=t;
+          return false;
+        }
+        return v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_consume);
+      }
+      //! Sets the atomic to zero
       void unlock() BOOST_NOEXCEPT_OR_NOTHROW
       {
         v.store(0, memory_order_release);
       }
       bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
     };
-#ifdef BOOST_SPINLOCK_USE_INTEL_HLE
-    struct elidable_lock;
-    template<> struct spinlockbase<elidable_lock> : public spinlockbase<bool>
-    {
-    public:
-      atomic<unsigned> waiting;
-      spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : waiting(0)
-      {
-      }
-      spinlockbase(const spinlockbase &) = delete;
-      spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW : spinlockbase<bool>(std::move(o)), waiting(0)
-      {
-      }
-      bool try_elided_lock() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        if(v.load(memory_order_acquire)) // Avoid unnecessary cache line invalidation traffic
-          return false;
-        bool expected=0;
-        return v.compare_exchange_weak(expected, 1, memory_order_acquire|__memory_order_hle_acquire, memory_order_consume);
-      }
-      void unlock_elided() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        v.store(0, memory_order_release|__memory_order_hle_release);
-        dec_waiting();
-      }
-      unsigned inc_waiting() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        return waiting.fetch_add(1, memory_order_acquire);
-      }
-      unsigned dec_waiting() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        return waiting.fetch_sub(1, memory_order_release);
-      }
-      bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
-    };
-#else
-    typedef unsigned elidable_lock;
-#endif
     template<typename T> struct spinlockbase<lockable_ptr<T>>
     {
     private:
@@ -344,17 +301,6 @@ namespace boost
         v.store(value.v);
       }
       bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
-    };
-    //! \brief How many spins to try memory transactions
-    template<size_t spins> struct spins_to_transact
-    {
-      template<class parenttype> struct policy : parenttype
-      {
-        static BOOST_CONSTEXPR_OR_CONST size_t spins_to_transact=spins;
-        policy() {}
-        policy(const policy &) = delete;
-        policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-      };
     };
     //! \brief How many spins to loop, optionally calling the SMT pause instruction on Intel
     template<size_t spins, bool use_pause=true> struct spins_to_loop
@@ -437,12 +383,10 @@ namespace boost
     and only write when the read suggests you might have a chance.
     
     4. This spin lock can use a pointer to memory as the spin lock. See locked_ptr<T>.
-
-    5. The other spin lock doesn't use Intel TSX yet.
     */
-    template<typename T, template<class> class spinpolicy1=spins_to_transact<5>::policy, template<class> class spinpolicy2=spins_to_loop<125>::policy, template<class> class spinpolicy3=spins_to_yield<250>::policy, template<class> class spinpolicy4=spins_to_sleep::policy> class spinlock : public spinpolicy4<spinpolicy3<spinpolicy2<spinpolicy1<spinlockbase<T>>>>>
+    template<typename T, template<class> class spinpolicy2=spins_to_loop<125>::policy, template<class> class spinpolicy3=spins_to_yield<250>::policy, template<class> class spinpolicy4=spins_to_sleep::policy> class spinlock : public spinpolicy4<spinpolicy3<spinpolicy2<spinlockbase<T>>>>
     {
-      typedef spinpolicy4<spinpolicy3<spinpolicy2<spinpolicy1<spinlockbase<T>>>>> parenttype;
+      typedef spinpolicy4<spinpolicy3<spinpolicy2<spinlockbase<T>>>> parenttype;
     public:
       spinlock() { }
       spinlock(const spinlock &) = delete;
@@ -456,39 +400,16 @@ namespace boost
           parenttype::int_yield(n);
         }
       }
-    };
-    template<template<class> class spinpolicy1, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> class spinlock<elidable_lock, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4> : public spinpolicy4<spinpolicy3<spinpolicy2<spinpolicy1<spinlockbase<elidable_lock>>>>>
-    {
-      typedef spinpolicy4<spinpolicy3<spinpolicy2<spinpolicy1<spinlockbase<elidable_lock>>>>> parenttype;
-    public:
-      spinlock() { }
-      spinlock(const spinlock &) = delete;
-      spinlock(spinlock &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-      void lock() BOOST_NOEXCEPT_OR_NOTHROW
+      //! Locks if the atomic is not the supplied value, else returning false
+      bool lock(T only_if_not_this) BOOST_NOEXCEPT_OR_NOTHROW
       {
-        unsigned waswaiting=parenttype::inc_waiting();
         for(size_t n=0;; n++)
         {
-          if(parenttype::try_lock())
-            return;
-          parenttype::int_yield(n);
-        }
-      }
-      // Returns true if elided lock was used
-      bool lock_elided() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        unsigned waswaiting=parenttype::inc_waiting();
-        // If none was in transaction, and lock is not locked, use normal spin lock
-        if(!waswaiting && !parenttype::load(memory_order_acquire))
-        {
-          parenttype::dec_waiting();
-          lock();
-          return false;
-        }
-        for(size_t n=0;; n++)
-        {
-          if(parenttype::try_elided_lock())
+          T expected=0;
+          if(parenttype::try_lock(expected))
             return true;
+          if(expected==only_if_not_this)
+            return false;
           parenttype::int_yield(n);
         }
       }
@@ -505,356 +426,30 @@ namespace boost
       return false;
     }
     // For when used with a spinlock
-    template<class T, template<class> class spinpolicy1, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline bool is_lockable_locked(spinlock<T, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline T is_lockable_locked(spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    {
+      return lockable.load(memory_order_acquire);
+    }
+    // For when used with a locked_ptr
+    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline bool is_lockable_locked(spinlock<lockable_ptr<T>, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
     {
       return ((size_t) lockable.load(memory_order_acquire))&1;
     }
-
-#if defined(BOOST_USING_INTEL_TSX)
-    // Adapted from http://software.intel.com/en-us/articles/how-to-detect-new-instruction-support-in-the-4th-generation-intel-core-processor-family
-    namespace intel_stuff
-    {
-      inline void run_cpuid(uint32_t eax, uint32_t ecx, uint32_t* abcd) BOOST_NOEXCEPT_OR_NOTHROW
-      {
-#if defined(_MSC_VER)
-          __cpuidex((int *) abcd, eax, ecx);
-#else
-          uint32_t ebx=0, edx=0;
-# if defined( __i386__ ) && defined ( __PIC__ )
-          /* in case of PIC under 32-bit EBX cannot be clobbered */
-          __asm__("movl %%ebx, %%edi \n\t cpuid \n\t xchgl %%ebx, %%edi" : "=D" (ebx),
-# else
-          __asm__("cpuid" : "+b" (ebx),
-# endif
-          "+a" (eax), "+c" (ecx), "=d" (edx));
-          abcd[0] = eax; abcd[1] = ebx; abcd[2] = ecx; abcd[3] = edx;
-#endif
-      }
-      static int have_intel_tsx_support_result; // public only for benchmarking
-      inline bool have_intel_tsx_support() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        if(have_intel_tsx_support_result) return have_intel_tsx_support_result==2;
-
-        uint32_t abcd[4];
-        uint32_t rtm_mask = (1 << 11);
-
-        /*  CPUID.(EAX=07H, ECX=0H):EBX.RTM[bit 11]==1  */
-        run_cpuid(7, 0, abcd);
-        if((abcd[1] & rtm_mask) != rtm_mask)
-            have_intel_tsx_support_result=1;
-        else
-            have_intel_tsx_support_result=2;
-        return have_intel_tsx_support_result==2;
-      }
-    }
-#endif
 
 #ifndef BOOST_BEGIN_TRANSACT_LOCK
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
 #undef BOOST_USING_INTEL_TSX
 #define BOOST_BEGIN_TRANSACT_LOCK(lockable) __transaction_relaxed { (void) boost::spinlock::is_lockable_locked(lockable);
-#define BOOST_BEGIN_TRANSACT_LOCK_IF(pred, lockable) pred((size_t)-1); __transaction_relaxed { (void) boost::spinlock::is_lockable_locked(lockable);
+#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) __transaction_relaxed if((only_if_not_this)!=boost::spinlock::is_lockable_locked(lockable)) {
 #define BOOST_END_TRANSACT_LOCK(lockable) }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N) __transaction_relaxed
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)
-#elif defined(BOOST_USING_INTEL_TSX)
-
-#if 1 // use HLE locks
-
-template<class T> struct intel_tsx_transaction_
-{
-protected:
-  T &lockable;
-public:
-  template<class Pred> intel_tsx_transaction_(T &_lockable, Pred &&pred) : lockable(_lockable)
-  {
-    pred((size_t)-1);
-    lockable.lock();
-  }
-  ~intel_tsx_transaction_()
-  {
-    lockable.unlock();
-  }
-};
-template<> struct intel_tsx_transaction_<spinlock<elidable_lock>>
-{
-protected:
-  spinlock<elidable_lock> &lockable;
-  bool use_elide;
-public:
-  template<class Pred> intel_tsx_transaction_(spinlock<elidable_lock> &_lockable, Pred &&pred) : lockable(_lockable), use_elide(pred((size_t)-1) && intel_stuff::have_intel_tsx_support())
-  {
-    if(use_elide)
-      use_elide=lockable.lock_elided();
-    else
-      lockable.lock();
-  }
-  ~intel_tsx_transaction_()
-  {
-    if(use_elide)
-      lockable.unlock_elided();
-    else
-      lockable.unlock();
-  }
-};
-
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { boost::spinlock::intel_tsx_transaction_<decltype(lockable)> __tsx_transaction(lockable, [](size_t){return true;});
-#define BOOST_BEGIN_TRANSACT_LOCK_IF(pred, lockable) { boost::spinlock::intel_tsx_transaction_<decltype(lockable)> __tsx_transaction(lockable, pred);
-#define BOOST_END_TRANSACT_LOCK(lockable) }
-#define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N)
-#define BOOST_END_NESTED_TRANSACT_LOCK(N)
-
-#else
-
-#define BOOST_MEMORY_TRANSACTIONS_XBEGIN_STARTED   (~0u)
-#define BOOST_MEMORY_TRANSACTIONS_XABORT_EXPLICIT  (1 << 0)
-#define BOOST_MEMORY_TRANSACTIONS_XABORT_RETRY     (1 << 1)
-#define BOOST_MEMORY_TRANSACTIONS_XABORT_CONFLICT  (1 << 2)
-#define BOOST_MEMORY_TRANSACTIONS_XABORT_CAPACITY  (1 << 3)
-#define BOOST_MEMORY_TRANSACTIONS_XABORT_DEBUG     (1 << 4)
-#define BOOST_MEMORY_TRANSACTIONS_XABORT_NESTED    (1 << 5)
-#define BOOST_MEMORY_TRANSACTIONS_XABORT_CODE(x)   ((unsigned char)(((x) >> 24) & 0xFF))
-            
-#if defined(__has_feature)
-# if __has_feature(thread_sanitizer) // If this is being thread sanitised, never use memory transactions
-#  define BOOST_MEMORY_TRANSACTIONS_DISABLE_INTEL_TSX
-# endif
-#endif
-
-#if defined(_MSC_VER)
-    // Declare MSVC intrinsics
-    extern "C" unsigned int  _xbegin(void);
-    extern "C" void          _xend(void);
-    extern "C" void          _xabort(const unsigned int);
-    extern "C" unsigned char _xtest(void);
-#define BOOST_MEMORY_TRANSACTIONS_XBEGIN(...) _xbegin(__VA_ARGS__)
-#define BOOST_MEMORY_TRANSACTIONS_XEND(...) _xend(__VA_ARGS__)
-#define BOOST_MEMORY_TRANSACTIONS_XABORT(...) _xabort(__VA_ARGS__)
-#define BOOST_MEMORY_TRANSACTIONS_XTEST(...) _xtest(__VA_ARGS__)
-
-#elif defined(__GNUC__) && ( defined(__i386__) || defined(__x86_64__) )
-
-    // Hack the bytes codes in for older compilers to avoid needing to compile with -mrtm
-    namespace { // prevent any collisions with <immintrin.h>
-      static __attribute__((__always_inline__)) inline unsigned int _xbegin() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        unsigned int ret = BOOST_MEMORY_TRANSACTIONS_XBEGIN_STARTED;
-        asm volatile(".byte 0xc7,0xf8 ; .long 0" : "+a" (ret) :: "memory");
-        return ret;
-      }
-
-      static __attribute__((__always_inline__)) inline unsigned char _xtest() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        unsigned char out;
-        asm volatile(".byte 0x0f,0x01,0xd6 ; setnz %0" : "=r" (out) :: "memory");
-        return out;
-      }
-    }
-#define BOOST_MEMORY_TRANSACTIONS_XBEGIN(...) _xbegin(__VA_ARGS__)
-#define BOOST_MEMORY_TRANSACTIONS_XEND(...) asm volatile(".byte 0x0f,0x01,0xd5" ::: "memory")
-#define BOOST_MEMORY_TRANSACTIONS_XABORT(status) asm volatile(".byte 0xc6,0xf8,%P0" :: "i" (status) : "memory")
-#define BOOST_MEMORY_TRANSACTIONS_XTEST(...) _xtest(__VA_ARGS__)
-#endif
-
-    template<class T> struct get_spins_to_transact
-    {
-      static BOOST_CONSTEXPR_OR_CONST size_t value=4;
-    };
-    template<class T, template<class> class spinpolicy1, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> struct get_spins_to_transact<spinlock<T, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4>>
-    {
-      static BOOST_CONSTEXPR_OR_CONST size_t value=spinlock<T, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4>::spins_to_transact;
-    };
-    template<class T> struct intel_tsx_transaction_impl
-    {
-    protected:
-      T &lockable;
-      int dismissed; // 0=disabled, 1=abort on exception throw, 2=commit, 3=traditional locks
-      intel_tsx_transaction_impl(T &_lockable) : lockable(_lockable), dismissed(0) { }
-    public:
-      intel_tsx_transaction_impl(intel_tsx_transaction_impl &&o) BOOST_NOEXCEPT_OR_NOTHROW : lockable(o.lockable), dismissed(o.dismissed)
-      {
-        o.dismissed=0; // disable original
-      }
-      void commit() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        if(1==dismissed)
-          dismissed=2; // commit transaction
-      }
-    };
-    template<class T> struct intel_tsx_transaction : public intel_tsx_transaction_impl<T>
-    {
-      typedef intel_tsx_transaction_impl<T> Base;
-      template<class Pred> explicit intel_tsx_transaction(T &_lockable, Pred &&pred) : Base(_lockable)
-      {
-        // Try only a certain number of times
-        size_t spins_to_transact=get_spins_to_transact<T>::value;
-        for(size_t n=0; n<spins_to_transact; n++)
-        {
-          unsigned state=BOOST_MEMORY_TRANSACTIONS_XABORT_CAPACITY;
-          if(!pred(n)) break;
-#ifndef BOOST_MEMORY_TRANSACTIONS_DISABLE_INTEL_TSX
-          if(intel_stuff::have_intel_tsx_support())
-            state=BOOST_MEMORY_TRANSACTIONS_XBEGIN(); // start transaction, or cope with abort
-#endif
-          if(BOOST_MEMORY_TRANSACTIONS_XBEGIN_STARTED==state)
-          {
-            if(!is_lockable_locked(Base::lockable))
-            {
-              // Lock is free, so we can proceed with the transaction
-              Base::dismissed=1; // set to abort on exception throw
-              return;
-            }
-            // If lock is not free, we need to abort transaction as something else is running
-#if 1
-            BOOST_MEMORY_TRANSACTIONS_XABORT(0x79);
-#else
-            BOOST_MEMORY_TRANSACTIONS_XEND();
-#endif
-            continue;
-            // Never reaches this point
-          }
-          //std::cerr << "A=" << std::hex << state << std::endl;
-          // Transaction aborted due to too many locks or hard abort?
-          if((state & BOOST_MEMORY_TRANSACTIONS_XABORT_CAPACITY) || !(state & BOOST_MEMORY_TRANSACTIONS_XABORT_RETRY))
-          {
-            // Fall back onto pure locks
-            break;
-          }
-          // Was it me who aborted?
-          if((state & BOOST_MEMORY_TRANSACTIONS_XABORT_EXPLICIT) && !(state & BOOST_MEMORY_TRANSACTIONS_XABORT_NESTED))
-          {
-            switch(BOOST_MEMORY_TRANSACTIONS_XABORT_CODE(state))
-            {
-            case 0x78: // exception thrown
-              throw std::runtime_error("Unknown exit from Intel TSX memory transaction (exception, goto etc)");
-            case 0x79: // my lock was held by someone else, so repeat
-              break;
-            default: // something else aborted. Best fall back to locks
-              n=((size_t) 1<<(4*sizeof(n)))-1;
-              break;
-            }
-          }
-        }
-        // If the loop exited, we're falling back onto traditional locks
-#ifdef BOOST_USING_INTEL_TSX
-        Base::lockable.lock_hle();
-#else
-        Base::lockable.lock();
-#endif
-        Base::dismissed=3;
-      }
-      ~intel_tsx_transaction() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        if(Base::dismissed)
-        {
-          if(1==Base::dismissed)
-            BOOST_MEMORY_TRANSACTIONS_XABORT(0x78);
-          else if(2==Base::dismissed)
-          {
-            BOOST_MEMORY_TRANSACTIONS_XEND();
-            //std::cerr << "TC" << std::endl;
-          }
-          else if(3==Base::dismissed)
-#ifdef BOOST_USING_INTEL_TSX
-            Base::lockable.unlock_hle();
-#else
-            Base::lockable.unlock();
-#endif
-        }
-      }
-      intel_tsx_transaction(intel_tsx_transaction &&o) BOOST_NOEXCEPT_OR_NOTHROW : Base(std::move(o)) { }
-  private:
-      intel_tsx_transaction(const intel_tsx_transaction &)
-#ifndef BOOST_NO_CXX11_DELETED_FUNCTIONS
-      = delete
-#endif
-      ;
-    };
-    // For nested transactions
-    template<class T> struct intel_tsx_transaction<intel_tsx_transaction<T>> : public intel_tsx_transaction_impl<intel_tsx_transaction<T>>
-    {
-      typedef intel_tsx_transaction_impl<intel_tsx_transaction<T>> Base;
-      explicit intel_tsx_transaction(intel_tsx_transaction<T> &_lockable) : Base(_lockable)
-      {
-        // Try only a certain number of times
-        size_t spins_to_transact=get_spins_to_transact<T>::value;
-        for(size_t n=0; n<spins_to_transact; n++)
-        {
-          unsigned state=BOOST_MEMORY_TRANSACTIONS_XABORT_CAPACITY;
-          if(intel_stuff::have_intel_tsx_support())
-            state=BOOST_MEMORY_TRANSACTIONS_XBEGIN(); // start transaction, or cope with abort
-          if(BOOST_MEMORY_TRANSACTIONS_XBEGIN_STARTED==state)
-          {
-            Base::dismissed=1; // set to abort on exception throw
-            return;
-          }
-          //std::cerr << "A=" << std::hex << state << std::endl;
-          // Transaction aborted due to too many locks or hard abort?
-          if((state & BOOST_MEMORY_TRANSACTIONS_XABORT_CAPACITY) || !(state & BOOST_MEMORY_TRANSACTIONS_XABORT_RETRY))
-          {
-            // Fall back onto pure locks
-            break;
-          }
-          // Was it me who aborted?
-          if((state & BOOST_MEMORY_TRANSACTIONS_XABORT_EXPLICIT) && !(state & BOOST_MEMORY_TRANSACTIONS_XABORT_NESTED))
-          {
-            switch(BOOST_MEMORY_TRANSACTIONS_XABORT_CODE(state))
-            {
-            case 0x78: // exception thrown
-              throw std::runtime_error("Unknown exception thrown inside Intel TSX memory transaction");
-            case 0x79: // my lock was held by someone else, so repeat
-              break;
-            default: // something else aborted. Best fall back to locks
-              n=((size_t) 1<<(4*sizeof(n)))-1;
-              break;
-            }
-          }
-        }
-        Base::dismissed=3;
-      }
-      ~intel_tsx_transaction() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        if(Base::dismissed)
-        {
-          if(1==Base::dismissed)
-            BOOST_MEMORY_TRANSACTIONS_XABORT(0x78);
-          else if(2==Base::dismissed)
-          {
-            BOOST_MEMORY_TRANSACTIONS_XEND();
-            //std::cerr << "TC" << std::endl;
-          }
-        }
-      }
-      intel_tsx_transaction(intel_tsx_transaction &&o) BOOST_NOEXCEPT_OR_NOTHROW : Base(std::move(o)) { }
-  private:
-      intel_tsx_transaction(const intel_tsx_transaction &)
-#ifndef BOOST_NO_CXX11_DELETED_FUNCTIONS
-      = delete
-#endif
-      ;
-    };
-    template<class T> inline intel_tsx_transaction<T> make_intel_tsx_transaction(T &lockable) BOOST_NOEXCEPT_OR_NOTHROW
-    {
-      return intel_tsx_transaction<T>(lockable, [](size_t){ return true; });
-    }
-    template<class T, class Pred> inline intel_tsx_transaction<T> make_intel_tsx_transaction(T &lockable, Pred &&pred) BOOST_NOEXCEPT_OR_NOTHROW
-    {
-      return intel_tsx_transaction<T>(lockable, pred);
-    }
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { auto __tsx_transaction(boost::spinlock::make_intel_tsx_transaction(lockable)); {
-#define BOOST_BEGIN_TRANSACT_LOCK_IF(pred, lockable) { auto __tsx_transaction(boost::spinlock::make_intel_tsx_transaction(lockable, pred)); {
-#define BOOST_END_TRANSACT_LOCK(lockable) } __tsx_transaction.commit(); }
-#define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N) { auto __tsx_transaction##N(boost::spinlock::make_intel_tsx_transaction(__tsx_transaction)); {
-#define BOOST_END_NESTED_TRANSACT_LOCK(N) } __tsx_transaction##N.commit(); }
-
-#endif // using HLE locks
-
-#endif // BOOST_USING_INTEL_TSX
 #endif // BOOST_BEGIN_TRANSACT_LOCK
+#endif
 
 #ifndef BOOST_BEGIN_TRANSACT_LOCK
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { boost::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
-#define BOOST_BEGIN_TRANSACT_LOCK_IF(pred, lockable) { pred((size_t)-1); boost::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { std::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
+#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) if(lockable.lock(only_if_not_this)) { std::lock_guard<decltype(lockable)> __tsx_transaction(lockable, std::adopt_lock);
 #define BOOST_END_TRANSACT_LOCK(lockable) }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N)
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)
