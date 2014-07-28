@@ -122,7 +122,7 @@ namespace boost { namespace spinlock {
       iterator(concurrent_unordered_map *parent, std::nullptr_t) : _parent(parent), _bucket_data(parent->_buckets.data()), _itb(parent->_buckets.end()), _offset((size_t) -1), _pending_incr(0) { }
       void catch_up()
       {
-        while(pending_incr && _itb!=_parent->_buckets.end())
+        while(_pending_incr && _itb!=_parent->_buckets.end())
         {
           assert(_bucket_data==_parent->_buckets.data());
           if(_bucket_data!=_parent->_buckets.data())
@@ -132,8 +132,8 @@ namespace boost { namespace spinlock {
           {
             for(_offset++; _offset<b.items.size(); _offset++)
               if(b.items[_offset].hash)
-                if(!(--pending_incr)) break;
-            if(pending_incr)
+                if(!(--_pending_incr)) break;
+            if(_pending_incr)
             {
               while(_offset>=b.items.size() && _itb!=_parent->_buckets.end())
               {
@@ -146,7 +146,7 @@ namespace boost { namespace spinlock {
         }
       }
     public:
-      iterator() : _parent(nullptr), bucket_data(nullptr), _offset((size_t) -1), _pending_incr(0) { }
+      iterator() : _parent(nullptr), _bucket_data(nullptr), _offset((size_t) -1), _pending_incr(0) { }
       bool operator!=(const iterator &o) const BOOST_NOEXCEPT { return _itb!=o._itb || _offset!=o._offset || _pending_incr|=o._pending_incr; }
       bool operator==(const iterator &o) const BOOST_NOEXCEPT { return _itb==o._itb && _offset==o._offset && _pending_incr==o._pending_incr; }
       iterator &operator++()
