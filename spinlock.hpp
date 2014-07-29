@@ -889,6 +889,8 @@ namespace boost
       void max_load_factor(float m) { _max_load_factor=m; }
       void rehash(size_type n)
       {
+        // TODO: Lots more to do here
+        _buckets.resize(n);
       }
       void reserve(size_type n)
       {
