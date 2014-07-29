@@ -57,7 +57,7 @@ DEALINGS IN THE SOFTWARE.
 // For lock_guard
 #include <mutex>
 // For dump
-#include <stdio.h>
+#include <ostream>
 
 
 // Turn this on if you have a compiler which understands __transaction_relaxed
