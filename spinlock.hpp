@@ -54,6 +54,12 @@ DEALINGS IN THE SOFTWARE.
 # include <chrono>
 #endif
 
+// For lock_guard
+#include <mutex>
+// For dump
+#include <stdio.h>
+
+
 // Turn this on if you have a compiler which understands __transaction_relaxed
 //#define BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
 

@@ -31,7 +31,6 @@ DEALINGS IN THE SOFTWARE.
 #include "spinlock.hpp"
 #include "timing.h"
 
-#include <stdio.h>
 #include <unordered_map>
 
 #ifdef _MSC_VER
@@ -47,7 +46,6 @@ DEALINGS IN THE SOFTWARE.
 #include "catch.hpp"
 #endif
 
-#include <mutex>
 
 
 using namespace std;
