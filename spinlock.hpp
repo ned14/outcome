@@ -520,7 +520,7 @@ namespace boost
       std::vector<bucket_type> _buckets;
       typename std::vector<bucket_type>::iterator _get_bucket(size_t k) BOOST_NOEXCEPT
       {
-        //static_assert(sizeof(bucket_type)==64, "bucket_type is not 64 bytes long!");
+        static_assert(sizeof(bucket_type)==64, "bucket_type is not 64 bytes long!");
         //k ^= k + 0x9e3779b9 + (k<<6) + (k>>2); // really need to avoid sequential keys tapping the same cache line
         //k ^= k + 0x9e3779b9; // really need to avoid sequential keys tapping the same cache line
         size_type i=k % _buckets.size();
@@ -529,9 +529,11 @@ namespace boost
       static float _calc_max_load_factor() BOOST_NOEXCEPT
       {
         // We are intentionally very tolerant to load factor, so set to
-        // however many item_type's fit into 4Kb given L1 cache might be
+        // however many item_type's fit into 1Kb given L1 cache might be
         // 32Kb
-        return 4096/sizeof(item_type);
+        float ret=1024/sizeof(item_type);
+        if(ret<1) ret=0;
+        return ret;
       }
     public:
       class iterator : public std::iterator<std::forward_iterator_tag, value_type, difference_type, pointer, reference>
