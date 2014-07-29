@@ -529,8 +529,8 @@ namespace boost
       static float _calc_max_load_factor() BOOST_NOEXCEPT
       {
         // We are intentionally very tolerant to load factor, so set to
-        // however many item_type's fit into 256 bytes
-        float ret=256/sizeof(item_type);
+        // however many item_type's fit into 128 bytes
+        float ret=128/sizeof(item_type);
         if(ret<1) ret=0;
         return ret;
       }
