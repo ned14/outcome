@@ -682,7 +682,7 @@ namespace boost
       //size_type count(const key_type &k) const;
       //std::pair<iterator, iterator> equal_range(const key_type &k);
       //std::pair<const_iterator, const_iterator> equal_range(const key_type &k) const;
-      template<class Key, class Value> std::pair<iterator, bool> emplace(Key &&k, Value &&v)
+      template<class KeyType, class ValueType> std::pair<iterator, bool> emplace(KeyType &&k, ValueType &&v)
       {
         std::pair<iterator, bool> ret(end(), true);
         size_t h=_hasher(k);
@@ -731,7 +731,7 @@ namespace boost
               {
                 ret.first._itb=itb;
                 ret.first._offset=emptyidx;
-                b.items[emptyidx].p=std::make_pair(std::forward<Key>(k), std::forward<Value>(v));
+                b.items[emptyidx].p=std::make_pair(std::forward<KeyType>(k), std::forward<ValueType>(v));
                 b.items[emptyidx].hash=h;
                 b.count.fetch_add(1, memory_order_acquire);
                 done=true;
@@ -746,7 +746,7 @@ namespace boost
               }
               ret.first._itb=itb;
               ret.first._offset=b.items.size();
-              b.items.push_back(item_type(h, std::forward<Key>(k), std::forward<Value>(v)));
+              b.items.push_back(item_type(h, std::forward<KeyType>(k), std::forward<ValueType>(v)));
               b.count.fetch_add(1, memory_order_acquire);
               done=true;
             }
