@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cassert>
 #include <vector>
+#include <memory>
 
 #if !defined(BOOST_SPINLOCK_USE_BOOST_ATOMIC) && defined(BOOST_NO_CXX11_HDR_ATOMIC)
 # define BOOST_SPINLOCK_USE_BOOST_ATOMIC
@@ -465,6 +466,16 @@ namespace boost
     /* \class concurrent_unordered_map
     \brief Provides an unordered_map which is thread safe and wait free to use and whose find, insert/emplace and erase functions are usually wait free.
 
+    Some notes on this implementation:
+    * To help you make sane concurrent use of the map, insert/emplace and erase never invalidate iterators nor references. This implies that rehashing is manual.
+
+    * To very substantially improve concurrency, empty() and size() are non-trivial:
+      * empty() has average complexity O(bucket count/item count/2), worst case O(bucket count) when the map is empty.
+      * size() always has complexity O(bucket count). If you do rehash(size()) to make load factor to 1.0, remember this can become very slow for large
+        numbers of items. The map is deliberately more tolerant than most to collisions, it can cope with load factors of 8.0 or so without much slowdown.
+
+    * If you do wish to perform a manual rehash, you must manually call it at a time when the following conditions are true:
+      1. All iterators are not in use. That means an erase(find(value)) cannot be happening. Use erase(value) instead.
     */
     template<class Key, class T, class Hash=std::hash<Key>, class Pred=std::equal_to<Key>, class Alloc=std::allocator<std::pair<const Key, T>>> class concurrent_unordered_map
     {
@@ -484,36 +495,27 @@ namespace boost
       typedef std::ptrdiff_t difference_type;
     private:
       spinlock<bool> _rehash_lock;
-      struct non_zero_hasher
-      {
-        hasher _hasher;
-        size_t operator()(const key_type &k) const BOOST_NOEXCEPT
-        {
-          size_t ret=_hasher(k);
-          return ret==0 ? (size_t) -1 : ret;
-        }
-      } _hasher;
+      hasher _hasher;
       key_equal _key_equal;
+      allocator_type _allocator;
       float _max_load_factor;
       struct item_type
       {
-        std::pair<key_type, mapped_type> p;
-        size_t hash;  // never zero if in use
+        std::shared_ptr<value_type> p;
+        size_t hash;
         item_type() : hash(0) { }
-        item_type(size_t _hash, value_type &&_p) BOOST_NOEXCEPT : p(std::move(_p)), hash(_hash) { }
-        template<class... Args> item_type(size_t _hash, Args &&... args) BOOST_NOEXCEPT : p(std::forward<Args>(args)...), hash(_hash) { }
+        item_type(size_t _hash, std::shared_ptr<value_type> _p) BOOST_NOEXCEPT : p(std::move(_p)), hash(_hash) { }
         item_type(item_type &&o) BOOST_NOEXCEPT : p(std::move(o.p)), hash(o.hash) { o.hash=0; }
       };
-      typedef typename allocator_type::template rebind<item_type>::other item_type_allocator_type;
       struct bucket_type_impl
       {
         spinlock<unsigned char> lock;  // = 2 if you need to reload the bucket list
         atomic<unsigned> count; // count is used items in there
-        std::vector<item_type, item_type_allocator_type> items;
+        std::vector<item_type> items;
         bucket_type_impl() : count(0), items(0) { }
         bucket_type_impl(bucket_type_impl &&) BOOST_NOEXCEPT : count(0) { }
       };
-#if 0
+#if 1 // improves concurrent write performance
       struct bucket_type : bucket_type_impl
       {
         char pad[64-sizeof(bucket_type_impl)];
@@ -675,7 +677,7 @@ namespace boost
                 for(; offset<b.items.size() && b.items[offset].hash!=h; offset++);
                 if(offset==b.items.size())
                   break;
-                if(_key_equal(k, b.items[offset].p.first))
+                if(b.items[offset].p && _key_equal(k, b.items[offset].p->first))
                 {
                   ret._itb=itb;
                   ret._offset=offset;
@@ -699,9 +701,12 @@ namespace boost
       //size_type count(const key_type &k) const;
       //std::pair<iterator, iterator> equal_range(const key_type &k);
       //std::pair<const_iterator, const_iterator> equal_range(const key_type &k) const;
-      template<class KeyType, class ValueType> std::pair<iterator, bool> emplace(KeyType &&k, ValueType &&v)
+      //! If an exception throws, note that input is consumed no matter what.
+      template<class... Args> std::pair<iterator, bool> emplace(Args &&... args)
       {
         std::pair<iterator, bool> ret(end(), true);
+        std::shared_ptr<value_type> v=std::allocate_shared<value_type>(_allocator, std::forward<Args>(args)...);
+        const key_type &k=v->first;
         size_t h=_hasher(k);
         bool done=false;
         do
@@ -709,18 +714,19 @@ namespace boost
           auto itb=_get_bucket(h);
           bucket_type &b=*itb;
           size_t emptyidx=(size_t) -1;
-          // First search for equivalents and empties. Start from the top to avoid cache line sharing with find
+#if 0
+          // First search for equivalents and empties.
           if(b.count.load(memory_order_acquire))
           {
             BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(b.lock, 2)
-              for(size_t offset=b.items.size()-1;;)
+              for(size_t offset=0;;)
               {
-                for(; offset!=(size_t) -1 && b.items[offset].hash!=h; offset--)
-                  if(emptyidx==(size_t) -1 && !b.items[offset].hash)
+                for(; offset!=b.items.size() && b.items[offset].hash!=h; offset++)
+                  if(emptyidx==(size_t) -1 && !b.items[offset].p)
                     emptyidx=offset;
-                if(offset==(size_t) -1)
+                if(offset==b.items.size())
                   break;
-                if(_key_equal(k, b.items[offset].p.first))
+                if(b.items[offset].p && _key_equal(k, b.items[offset].p->first))
                 {
                   ret.first._itb=itb;
                   ret.first._offset=offset;
@@ -728,12 +734,13 @@ namespace boost
                   done=true;
                   break;
                 }
-                else offset--;
+                else offset++;
               }
             BOOST_END_TRANSACT_LOCK(b.lock)
           }
           else if(!b.items.empty())
             emptyidx=0;
+#endif
 
           if(!done)
           {
@@ -744,17 +751,17 @@ namespace boost
             // If we earlier found an empty use that
             if(emptyidx!=(size_t) -1)
             {
-              if(emptyidx<b.items.size() && !b.items[emptyidx].hash)
+              if(emptyidx<b.items.size() && !b.items[emptyidx].p)
               {
                 ret.first._itb=itb;
                 ret.first._offset=emptyidx;
-                b.items[emptyidx].p=std::make_pair(std::forward<KeyType>(k), std::forward<ValueType>(v));
+                b.items[emptyidx].p=std::move(v);
                 b.items[emptyidx].hash=h;
                 b.count.fetch_add(1, memory_order_acquire);
                 done=true;
               }
             }
-            else
+            if(!done)
             {
               if(b.items.size()==b.items.capacity())
               {
@@ -763,7 +770,7 @@ namespace boost
               }
               ret.first._itb=itb;
               ret.first._offset=b.items.size();
-              b.items.push_back(item_type(h, std::forward<KeyType>(k), std::forward<ValueType>(v)));
+              b.items.push_back(item_type(h, std::move(v)));
               b.count.fetch_add(1, memory_order_acquire);
               done=true;
             }
@@ -772,8 +779,8 @@ namespace boost
         return ret;
       }
       //template<class... Args> iterator emplace_hint(const_iterator position, Args &&... args);
-      std::pair<iterator, bool> insert(const value_type &v) { return emplace(v.first, v.second); }
-      template<class P> std::pair<iterator, bool> insert(P &&v) { return emplace(std::forward<typename P::first_type>(v.first), std::forward<typename P::second_type>(v.second)); }
+      std::pair<iterator, bool> insert(const value_type &v) { return emplace(v); }
+      template<class P> std::pair<iterator, bool> insert(P &&v) { return emplace(std::forward<P>(v)); }
       //iterator insert(const_iterator hint, const value_type &v);
       //template<class P> iterator insert(const_iterator hint, P &&v);
       //template<class InputIterator> void insert(InputIterator first, InputIterator last);
@@ -784,13 +791,13 @@ namespace boost
         //assert(it!=end());
         if(it==ret) return ret;
         bucket_type &b=*it._itb;
-        std::pair<const key_type, mapped_type> former;
+        std::shared_ptr<value_type> former;
         {
           // If the lock is other state we need to reload bucket list
           if(!b.lock.lock(2))
             abort();
           std::lock_guard<decltype(b.lock)> g(b.lock, std::adopt_lock); // Will abort all concurrency
-          if(it._offset<b.items.size() && b.items[it._offset].hash)
+          if(it._offset<b.items.size() && b.items[it._offset].p)
           {
             former=std::move(b.items[it._offset].p); // Move into former, hopefully avoiding a free()
             b.items[it._offset].hash=0;
@@ -812,7 +819,7 @@ namespace boost
         size_type ret=0;
         size_t h=_hasher(k);
         bool done=false;
-        std::pair<key_type, mapped_type> former;
+        std::shared_ptr<value_type> former;
         do
         {
           auto itb=_get_bucket(h);
@@ -830,14 +837,14 @@ namespace boost
                 for(; offset<b.items.size() && b.items[offset].hash!=h; offset++);
                 if(offset==b.items.size())
                   break;
-                if(_key_equal(k, b.items[offset].p.first))
+                if(b.items[offset].p && _key_equal(k, b.items[offset].p->first))
                 {
                   former=std::move(b.items[offset].p); // Move into former, hopefully avoiding a free()
                   b.items[offset].hash=0;
                   if(offset==b.items.size()-1)
                   {
                     // Shrink table to minimum
-                    while(!b.items.empty() && !b.items.back().hash)
+                    while(!b.items.empty() && !b.items.back().p)
                       b.items.pop_back(); // Will abort all concurrency
                   }
                   b.count.fetch_sub(1, memory_order_acquire);
@@ -857,6 +864,7 @@ namespace boost
       void clear() BOOST_NOEXCEPT
       {
         bool done;
+        //std::lock_guard<decltype(_rehash_lock)> g2(_rehash_lock); // Stop other rehashes
         do
         {
           done=true;
@@ -870,6 +878,7 @@ namespace boost
             }
             std::lock_guard<decltype(b.lock)> g(b.lock, std::adopt_lock); // Will abort all concurrency
             b.items.clear();
+            b.count.store(0, memory_order_release);
           }
         } while(!done);
       }
@@ -898,16 +907,69 @@ namespace boost
       void max_load_factor(float m) { _max_load_factor=m; }
       void rehash(size_type n)
       {
-        // TODO: Lots more to do here
-        _buckets.resize(n);
+        std::lock_guard<decltype(_rehash_lock)> g(_rehash_lock); // Stop other rehashes
+        if(n!=_buckets.size())
+        {
+          // Create a new buckets
+          std::vector<bucket_type> tempbuckets(n);
+          // Lock all new buckets
+          for(auto &b : tempbuckets)
+            b.lock.lock();
+          // Lock all existing buckets
+          for(auto &b : _buckets)
+            b.lock.lock();
+          // Swap old buckets with new buckets
+          _buckets.swap(tempbuckets);
+          // Tell all threads using old buckets to start reloading the bucket list
+          for(auto &b : tempbuckets)
+            b.lock.store(2);
+          try
+          {
+            // Relocate all old bucket contents into new buckets
+            for(auto &ob : tempbuckets)
+            {
+              if(ob.count.load(memory_order_acquire))
+              {
+                for(auto &i : ob.items)
+                {
+                  if(i.p)
+                  {
+                    auto itb=_get_bucket(i.hash);
+                    bucket_type &b=*itb;
+                    if(b.items.size()==b.items.capacity())
+                    {
+                      size_t newcapacity=b.items.capacity()*2;
+                      b.items.reserve(newcapacity ? newcapacity : 1);
+                    }
+                    b.items.push_back(i);
+                    b.count.fetch_add(1, memory_order_acquire);
+                  }
+                }
+              }
+            }
+          }
+          catch(...)
+          {
+            // If we saw an exception during relocation, simply restore
+            // the old list which is untouched.
+            _buckets.swap(tempbuckets);
+            // Unlock buckets
+            for(auto &b : _buckets)
+              b.lock.unlock();
+            throw;
+          }
+          // Unlock buckets
+          for(auto &b : _buckets)
+            b.lock.unlock();
+        }
       }
       void reserve(size_type n)
       {
         rehash((size_type)(n/_max_load_factor));
       }
-      hasher hash_function() const { return _hasher._hasher; }
+      hasher hash_function() const { return _hasher; }
       key_equal key_eq() const { return _key_equal; }
-      // allocator_type get_allocator() const BOOST_NOEXCEPT;
+      allocator_type get_allocator() const BOOST_NOEXCEPT { return _allocator; }
       void dump_buckets(std::ostream &s) const
       {
         for(size_t n=0; n<_buckets.size(); n++)
