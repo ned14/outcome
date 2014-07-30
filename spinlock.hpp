@@ -447,10 +447,10 @@ namespace boost
 #ifndef BOOST_BEGIN_TRANSACT_LOCK
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
 #undef BOOST_USING_INTEL_TSX
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable) __transaction_relaxed { (void) boost::spinlock::is_lockable_locked(lockable); {
-#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) __transaction_relaxed { if((only_if_not_this)!=boost::spinlock::is_lockable_locked(lockable)) {
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) __transaction_atomic { (void) boost::spinlock::is_lockable_locked(lockable); {
+#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) __transaction_atomic { if((only_if_not_this)!=boost::spinlock::is_lockable_locked(lockable)) {
 #define BOOST_END_TRANSACT_LOCK(lockable) } }
-#define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N) __transaction_relaxed
+#define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N) __transaction_atomic
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)
 #endif // BOOST_BEGIN_TRANSACT_LOCK
 #endif
@@ -675,11 +675,12 @@ namespace boost
       //! O(bucket count)
       size_type size() const BOOST_NOEXCEPT
       {
-        size_type ret=0;
+        size_type ret;
         bool done;
         do
         {
           done=true;
+          ret=0;
           for(auto &b : _buckets)
           {
             // If the lock is other state we need to reload bucket list
@@ -715,19 +716,20 @@ namespace boost
             // Should run completely concurrently with other finds
             BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(b.lock, 2)
             {
-              for(;;)
+              auto &items=b.items;
+              for(item_type *i=items.data()+offset, *e=items.data()+items.size();;)
               {
-                for(; offset<b.items.size() && b.items[offset].hash!=h; offset++);
-                if(offset==b.items.size())
+                for(; i<e && i->hash!=h; offset++, i++);
+                if(i==e)
                   break;
-                if(b.items[offset].p && _key_equal(k, b.items[offset].p->first))
+                if(i->p && _key_equal(k, i->p->first))
                 {
                   ret._itb=itb;
                   ret._offset=offset;
                   done=true;
                   break;
                 }
-                else offset++;
+                else offset++, i++;
               }
               done=true;
             }
@@ -761,15 +763,16 @@ namespace boost
           // First search for equivalents and empties.
           if(b.count.load(memory_order_acquire))
           {
+            size_t offset=0;
             BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(b.lock, 2)
-              for(size_t offset=0;;)
+              for(item_type *i=b.items.data(), *e=b.items.data()+b.items.size();;)
               {
-                for(; offset!=b.items.size() && b.items[offset].hash!=h; offset++)
-                  if(emptyidx==(size_t) -1 && !b.items[offset].p)
+                for(; i<e && i->hash!=h; offset++, i++)
+                  if(emptyidx==(size_t) -1 && !i->p)
                     emptyidx=offset;
-                if(offset==b.items.size())
+                if(i==e)
                   break;
-                if(b.items[offset].p && _key_equal(k, b.items[offset].p->first))
+                if(i->p && _key_equal(k, i->p->first))
                 {
                   ret.first._itb=itb;
                   ret.first._offset=offset;
@@ -777,7 +780,7 @@ namespace boost
                   done=true;
                   break;
                 }
-                else offset++;
+                else offset++, i++;
               }
             BOOST_END_TRANSACT_LOCK(b.lock)
           }
@@ -794,12 +797,13 @@ namespace boost
             // If we earlier found an empty use that
             if(emptyidx!=(size_t) -1)
             {
-              if(emptyidx<b.items.size() && !b.items[emptyidx].p)
+              item_type *i=b.items.data()+emptyidx;
+              if(emptyidx<b.items.size() && !i->p)
               {
                 ret.first._itb=itb;
                 ret.first._offset=emptyidx;
-                b.items[emptyidx].p=v.release();
-                b.items[emptyidx].hash=h;
+                i->p=v.release();
+                i->hash=h;
                 b.count.fetch_add(1, memory_order_acquire);
                 done=true;
               }
@@ -840,16 +844,18 @@ namespace boost
           if(!b.lock.lock(2))
             abort();
           std::lock_guard<decltype(b.lock)> g(b.lock, std::adopt_lock); // Will abort all concurrency
-          if(it._offset<b.items.size() && b.items[it._offset].p)
+          auto &items=b.items;
+          item_type *i=items.data()+it._offset;
+          if(it._offset<items.size() && i->p)
           {
-            former.p=b.items[it._offset].p;
-            b.items[it._offset].p=nullptr;
-            b.items[it._offset].hash=0;
-            if(it._offset==b.items.size()-1)
+            former.p=i->p;
+            i->p=nullptr;
+            i->hash=0;
+            if(it._offset==items.size()-1)
             {
               // Shrink table to minimum
-              while(!b.items.empty() && !b.items.back().hash)
-                b.items.pop_back(); // Will abort all concurrency
+              while(!items.empty() && !items.back().p)
+                items.pop_back(); // Will abort all concurrency
             }
             b.count.fetch_sub(1, memory_order_acquire);
             ret=it;
@@ -868,7 +874,7 @@ namespace boost
         {
           auto itb=_get_bucket(h);
           bucket_type &b=*itb;
-          size_t offset;
+          size_t offset=0;
           if(b.count.load(memory_order_acquire))
           {
             // If the lock is other state we need to reload bucket list
@@ -876,28 +882,29 @@ namespace boost
               continue;
             std::lock_guard<decltype(b.lock)> g(b.lock, std::adopt_lock); // Will abort all concurrency
             {
-              for(offset=b.items.size()-1;;)
+              auto &items=b.items;
+              for(item_type *i=items.data()+offset, *e=items.data()+items.size();;)
               {
-                for(; offset!=(size_t)-1 && b.items[offset].hash!=h; offset--);
-                if(offset==(size_t)-1)
+                for(; i<e && i->hash!=h; offset++, i++);
+                if(i==e)
                   break;
-                if(b.items[offset].p && _key_equal(k, b.items[offset].p->first))
+                if(i->p && _key_equal(k, i->p->first))
                 {
-                  former.p=b.items[offset].p;
-                  b.items[offset].p=nullptr;
-                  b.items[offset].hash=0;
-                  if(offset==b.items.size()-1)
+                  former.p=i->p;
+                  i->p=nullptr;
+                  i->hash=0;
+                  if(offset==items.size()-1)
                   {
                     // Shrink table to minimum
-                    while(!b.items.empty() && !b.items.back().p)
-                      b.items.pop_back(); // Will abort all concurrency
+                    while(!items.empty() && !items.back().p)
+                      items.pop_back(); // Will abort all concurrency
                   }
                   b.count.fetch_sub(1, memory_order_acquire);
                   ++ret;
                   done=true;
                   break;
                 }
-                else offset--;
+                else offset++, i++;
               }
               done=true;
             }
