@@ -506,6 +506,7 @@ namespace boost
         item_type() : hash(0) { }
         item_type(size_t _hash, std::shared_ptr<value_type> _p) BOOST_NOEXCEPT : p(std::move(_p)), hash(_hash) { }
         item_type(item_type &&o) BOOST_NOEXCEPT : p(std::move(o.p)), hash(o.hash) { o.hash=0; }
+        item_type(const item_type &o) : p(o.p), hash(o.hash) { }
       };
       struct bucket_type_impl
       {
