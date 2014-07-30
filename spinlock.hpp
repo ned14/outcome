@@ -757,7 +757,7 @@ namespace boost
           auto itb=_get_bucket(h);
           bucket_type &b=*itb;
           size_t emptyidx=(size_t) -1;
-#if 0
+#if 1
           // First search for equivalents and empties.
           if(b.count.load(memory_order_acquire))
           {
