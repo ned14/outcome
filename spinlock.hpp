@@ -868,7 +868,7 @@ namespace boost
         {
           auto itb=_get_bucket(h);
           bucket_type &b=*itb;
-          size_t offset=0;
+          size_t offset;
           if(b.count.load(memory_order_acquire))
           {
             // If the lock is other state we need to reload bucket list
@@ -876,10 +876,10 @@ namespace boost
               continue;
             std::lock_guard<decltype(b.lock)> g(b.lock, std::adopt_lock); // Will abort all concurrency
             {
-              for(;;)
+              for(offset=b.items.size()-1;;)
               {
-                for(; offset<b.items.size() && b.items[offset].hash!=h; offset++);
-                if(offset==b.items.size())
+                for(; offset!=(size_t)-1 && b.items[offset].hash!=h; offset--);
+                if(offset==(size_t)-1)
                   break;
                 if(b.items[offset].p && _key_equal(k, b.items[offset].p->first))
                 {
@@ -897,7 +897,7 @@ namespace boost
                   done=true;
                   break;
                 }
-                else offset++;
+                else offset--;
               }
               done=true;
             }
