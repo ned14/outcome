@@ -513,14 +513,21 @@ namespace boost
         bucket_type_impl() : count(0), items(0) { }
         bucket_type_impl(bucket_type_impl &&) BOOST_NOEXCEPT : count(0) { }
       };
+#if 0
       struct bucket_type : bucket_type_impl
       {
         char pad[64-sizeof(bucket_type_impl)];
+        bucket_type()
+        {
+          static_assert(sizeof(bucket_type)==64, "bucket_type is not 64 bytes long!");
+        }
       };
+#else
+      typedef bucket_type_impl bucket_type;
+#endif
       std::vector<bucket_type> _buckets;
       typename std::vector<bucket_type>::iterator _get_bucket(size_t k) BOOST_NOEXCEPT
       {
-        static_assert(sizeof(bucket_type)==64, "bucket_type is not 64 bytes long!");
         //k ^= k + 0x9e3779b9 + (k<<6) + (k>>2); // really need to avoid sequential keys tapping the same cache line
         //k ^= k + 0x9e3779b9; // really need to avoid sequential keys tapping the same cache line
         size_type i=k % _buckets.size();
