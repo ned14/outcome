@@ -499,14 +499,56 @@ namespace boost
       key_equal _key_equal;
       allocator_type _allocator;
       float _max_load_factor;
+      struct value_type_ptr
+      {
+        allocator_type &allocator;
+        value_type *p;
+        value_type_ptr(allocator_type &_allocator) : allocator(_allocator), p(nullptr) { }
+        template<class... Args> value_type_ptr(allocator_type &_allocator, Args... args) : allocator(_allocator), p(nullptr)
+        {
+          p=allocator.allocate(1);
+          try
+          {
+            allocator.construct(p, std::forward<Args>(args)...);
+          }
+          catch(...)
+          {
+            allocator.deallocate(p, 1);
+            throw;
+          }
+        }
+        value_type_ptr(value_type_ptr &&)=delete;
+        value_type_ptr(const value_type_ptr &)=delete;
+        value_type *operator->() { return p; }
+        value_type *release()
+        {
+          value_type *ret=p;
+          p=nullptr;
+          return ret;
+        }
+        ~value_type_ptr()
+        {
+          if(p)
+          {
+            allocator.destroy(p);
+            allocator.deallocate(p, 1);
+            p=nullptr;
+          }
+        }
+      };
       struct item_type
       {
-        std::shared_ptr<value_type> p;
+        value_type *p;
         size_t hash;
-        item_type() : hash(0) { }
-        item_type(size_t _hash, std::shared_ptr<value_type> _p) BOOST_NOEXCEPT : p(std::move(_p)), hash(_hash) { }
-        item_type(item_type &&o) BOOST_NOEXCEPT : p(std::move(o.p)), hash(o.hash) { o.hash=0; }
-        item_type(const item_type &o) : p(o.p), hash(o.hash) { }
+        item_type() : p(nullptr), hash(0) { }
+        item_type(size_t _hash, value_type *_p) BOOST_NOEXCEPT : p(_p), hash(_hash) { }
+        item_type(size_t _hash, value_type_ptr &_p) BOOST_NOEXCEPT : p(_p.release()), hash(_hash) { }
+        item_type(item_type &&o) BOOST_NOEXCEPT : p(std::move(o.p)), hash(o.hash) { o.p=nullptr; o.hash=0; }
+        item_type(const item_type &o);
+        ~item_type()
+        {
+          assert(!p);
+        }
       };
       struct bucket_type_impl
       {
@@ -539,7 +581,7 @@ namespace boost
       static float _calc_max_load_factor() BOOST_NOEXCEPT
       {
         return 1.0f;
-#if 0
+#if 1
         // We are intentionally very tolerant to load factor, so set to
         // however many item_type's fit into 128 bytes
         float ret=128/sizeof(item_type);
@@ -706,7 +748,7 @@ namespace boost
       template<class... Args> std::pair<iterator, bool> emplace(Args &&... args)
       {
         std::pair<iterator, bool> ret(end(), true);
-        std::shared_ptr<value_type> v=std::allocate_shared<value_type>(_allocator, std::forward<Args>(args)...);
+        value_type_ptr v(_allocator, std::forward<Args>(args)...);
         const key_type &k=v->first;
         size_t h=_hasher(k);
         bool done=false;
@@ -756,7 +798,7 @@ namespace boost
               {
                 ret.first._itb=itb;
                 ret.first._offset=emptyidx;
-                b.items[emptyidx].p=std::move(v);
+                b.items[emptyidx].p=v.release();
                 b.items[emptyidx].hash=h;
                 b.count.fetch_add(1, memory_order_acquire);
                 done=true;
@@ -771,7 +813,7 @@ namespace boost
               }
               ret.first._itb=itb;
               ret.first._offset=b.items.size();
-              b.items.push_back(item_type(h, std::move(v)));
+              b.items.push_back(item_type(h, v));
               b.count.fetch_add(1, memory_order_acquire);
               done=true;
             }
@@ -792,7 +834,7 @@ namespace boost
         //assert(it!=end());
         if(it==ret) return ret;
         bucket_type &b=*it._itb;
-        std::shared_ptr<value_type> former;
+        value_type_ptr former(_allocator);
         {
           // If the lock is other state we need to reload bucket list
           if(!b.lock.lock(2))
@@ -800,7 +842,8 @@ namespace boost
           std::lock_guard<decltype(b.lock)> g(b.lock, std::adopt_lock); // Will abort all concurrency
           if(it._offset<b.items.size() && b.items[it._offset].p)
           {
-            former=std::move(b.items[it._offset].p); // Move into former, hopefully avoiding a free()
+            former.p=b.items[it._offset].p;
+            b.items[it._offset].p=nullptr;
             b.items[it._offset].hash=0;
             if(it._offset==b.items.size()-1)
             {
@@ -820,7 +863,7 @@ namespace boost
         size_type ret=0;
         size_t h=_hasher(k);
         bool done=false;
-        std::shared_ptr<value_type> former;
+        value_type_ptr former(_allocator);
         do
         {
           auto itb=_get_bucket(h);
@@ -840,7 +883,8 @@ namespace boost
                   break;
                 if(b.items[offset].p && _key_equal(k, b.items[offset].p->first))
                 {
-                  former=std::move(b.items[offset].p); // Move into former, hopefully avoiding a free()
+                  former.p=b.items[offset].p;
+                  b.items[offset].p=nullptr;
                   b.items[offset].hash=0;
                   if(offset==b.items.size()-1)
                   {
@@ -862,6 +906,7 @@ namespace boost
         return ret;
       }
       // iterator erase(const_iterator first, const_iterator last);
+
       void clear() BOOST_NOEXCEPT
       {
         bool done;
@@ -878,6 +923,12 @@ namespace boost
               break;
             }
             std::lock_guard<decltype(b.lock)> g(b.lock, std::adopt_lock); // Will abort all concurrency
+            for(auto &i : b.items)
+            {
+              value_type_ptr former(_allocator);
+              former.p=i.p;
+              i.p=nullptr;
+            }
             b.items.clear();
             b.count.store(0, memory_order_release);
           }
@@ -906,6 +957,18 @@ namespace boost
       float load_factor() const BOOST_NOEXCEPT { return (float) size()/bucket_count(); }
       float max_load_factor() const BOOST_NOEXCEPT { return _max_load_factor; }
       void max_load_factor(float m) { _max_load_factor=m; }
+    private:
+      static void _reset_buckets(std::vector<bucket_type> &buckets) BOOST_NOEXCEPT
+      {
+        for(auto &b : buckets)
+        {
+          for(auto &i : b.items)
+            i.p=nullptr;
+          b.items.clear();
+          b.count.store(0, memory_order_release);
+        }
+      }
+    public:
       void rehash(size_type n)
       {
         std::lock_guard<decltype(_rehash_lock)> g(_rehash_lock); // Stop other rehashes
@@ -927,7 +990,7 @@ namespace boost
           try
           {
             // Relocate all old bucket contents into new buckets
-            for(auto &ob : tempbuckets)
+            for(const auto &ob : tempbuckets)
             {
               if(ob.count.load(memory_order_acquire))
               {
@@ -942,7 +1005,7 @@ namespace boost
                       size_t newcapacity=b.items.capacity()*2;
                       b.items.reserve(newcapacity ? newcapacity : 1);
                     }
-                    b.items.push_back(i);
+                    b.items.push_back(item_type(i.hash, i.p));
                     b.count.fetch_add(1, memory_order_acquire);
                   }
                 }
@@ -954,11 +1017,15 @@ namespace boost
             // If we saw an exception during relocation, simply restore
             // the old list which is untouched.
             _buckets.swap(tempbuckets);
+            // Stop it deleting stuff
+            _reset_buckets(tempbuckets);
             // Unlock buckets
             for(auto &b : _buckets)
               b.lock.unlock();
             throw;
           }
+          // Stop old buckets deleting stuff
+          _reset_buckets(tempbuckets);
           // Unlock buckets
           for(auto &b : _buckets)
             b.lock.unlock();
