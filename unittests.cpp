@@ -302,7 +302,7 @@ static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact
         {
           BOOST_BEGIN_TRANSACT_LOCK(lock)
           auto it=map.find(v);
-          if(it==map.end()) std::cout << v;
+          //if(it==map.end()) std::cout << v;
           BOOST_END_TRANSACT_LOCK(lock)
         }
       }
