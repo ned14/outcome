@@ -210,9 +210,9 @@ namespace boost
       { }
       spinlockbase(const spinlockbase &) = delete;
       //! Atomically move constructs
-      spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW
+      spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW : v(0)
       {
-        v.store(o.v.exchange(0, memory_order_acq_rel));
+        //v.store(o.v.exchange(0, memory_order_acq_rel));
       }
       //! Returns the raw atomic
       T load(memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
