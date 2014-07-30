@@ -321,6 +321,7 @@ static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact
     {
       if(use_transact)
       {
+#if 0
         size_t v=n*10+thread;
         BOOST_BEGIN_TRANSACT_LOCK(lock)
         {
@@ -330,6 +331,7 @@ static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact
             map.erase(map.find(v-128));
         }
         BOOST_END_TRANSACT_LOCK(lock)
+#endif
       }
       else
       {
