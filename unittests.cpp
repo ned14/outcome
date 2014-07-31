@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <stdio.h>
 #include <unordered_map>
+#include <algorithm>
 
 #ifdef _MSC_VER
 //#define BOOST_HAVE_SYSTEM_CONCURRENT_UNORDERED_MAP
@@ -51,7 +52,7 @@ DEALINGS IN THE SOFTWARE.
 
 using namespace std;
 
-TEST_CASE("spinlock/works", "Tests that the spinlock works as intended")
+TEST_CASE("works/spinlock", "Tests that the spinlock works as intended")
 {
   boost::spinlock::spinlock<bool> lock;
   REQUIRE(lock.try_lock());
@@ -62,7 +63,7 @@ TEST_CASE("spinlock/works", "Tests that the spinlock works as intended")
   REQUIRE(!lock.try_lock());
 }
 
-TEST_CASE("spinlock/works_threaded", "Tests that the spinlock works as intended under threads")
+TEST_CASE("works/spinlock/threaded", "Tests that the spinlock works as intended under threads")
 {
   boost::spinlock::spinlock<bool> lock;
   boost::spinlock::atomic<size_t> gate(0);
@@ -87,7 +88,7 @@ TEST_CASE("spinlock/works_threaded", "Tests that the spinlock works as intended 
   }
 }
 
-TEST_CASE("spinlock/works_transacted", "Tests that the spinlock works as intended under transactions")
+TEST_CASE("works/spinlock/transacted", "Tests that the spinlock works as intended under transactions")
 {
   boost::spinlock::spinlock<bool> lock;
   boost::spinlock::atomic<size_t> gate(0);
@@ -239,6 +240,52 @@ TEST_CASE("performance/malloc/transact/large", "Tests the transact performance o
   printf("2. Achieved %lf transactions per second\n", CalculateMallocPerformance(65536, 1));
   printf("3. Achieved %lf transactions per second\n", CalculateMallocPerformance(65536, 1));
 }
+
+
+
+
+
+
+
+TEST_CASE("works/concurrent_unordered_map", "Tests that concurrent_unordered_map works as expected")
+{
+  boost::spinlock::concurrent_unordered_map<int, int> map1, map2;
+  map2.reserve(10);    // test dense map
+  map2.reserve(1000);  // test sparse map
+  CHECK(map1.empty());
+  CHECK(map2.empty());
+  CHECK(map1.size()==0);
+  CHECK(map2.size()==0);
+  for(int n=-200; n<=200; n+=2)
+  {
+    map1.emplace(n, n);
+    map2.emplace(n, n);
+  }
+  CHECK(!map1.empty());
+  CHECK(!map2.empty());
+  CHECK(map1.size()==201);
+  CHECK(map2.size()==201);
+  std::vector<std::pair<int, int>> contents1, contents2;
+  std::copy(map1.begin(), map1.end(), std::back_inserter(contents1));
+  std::copy(map2.begin(), map2.end(), std::back_inserter(contents2));
+  CHECK(contents1.size()==201);
+  CHECK(contents2.size()==201);
+  std::sort(contents1.begin(), contents1.end());
+  std::sort(contents2.begin(), contents2.end());
+  for(int n=-200; n<=200; n+=2)
+  {
+    CHECK(contents1[n/2+100].first==n);
+    CHECK(contents2[n/2+100].first==n);
+  }
+  map1.clear();
+  map2.clear();
+  CHECK(map1.empty());
+  CHECK(map2.empty());
+  CHECK(map1.size()==0);
+  CHECK(map2.size()==0);
+}
+
+
 
 static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact, int type)
 {

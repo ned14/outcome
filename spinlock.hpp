@@ -215,7 +215,7 @@ namespace boost
         //v.store(o.v.exchange(0, memory_order_acq_rel));
       }
       //! Returns the raw atomic
-      T load(memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
+      T load(memory_order o=memory_order_seq_cst) const BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
       //! Sets the raw atomic
       void store(T a, memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { v.store(a, o); }
       //! If atomic is zero, sets to 1 and returns true, else false.
@@ -604,7 +604,7 @@ namespace boost
         friend class concurrent_unordered_map;
         iterator(const concurrent_unordered_map *parent) : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(_parent->_buckets.data()), _itb(_parent->_buckets.begin()), _offset((size_t) -1), _pending_incr(1) { }
         iterator(const concurrent_unordered_map *parent, std::nullptr_t) : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(_parent->_buckets.data()), _itb(_parent->_buckets.end()), _offset((size_t) -1), _pending_incr(0) { }
-        void catch_up()
+        void _catch_up()
         {
           while(_pending_incr && _itb!=_parent->_buckets.end())
           {
@@ -614,25 +614,28 @@ namespace boost
             bucket_type &b=*_itb;
             BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(b.lock, 2)
             {
-              for(_offset++; _offset<b.items.size(); _offset++)
-                if(b.items[_offset].hash)
+              auto &items=b.items;
+              _offset++;
+              for(item_type *i=items.data()+_offset, *e=items.data()+items.size(); i<e; _offset++, i++)
+                if(i->p)
                   if(!(--_pending_incr)) break;
-              if(_pending_incr)
-              {
-                while(_offset>=b.items.size() && _itb!=_parent->_buckets.end())
-                {
-                  ++_itb;
-                  _offset=(size_t) -1;
-                }
-              }
             }
             BOOST_END_TRANSACT_LOCK(b.lock)
+            if(_pending_incr)
+            {
+              do
+              {
+                ++_itb;
+                _offset=(size_t) -1;
+              } while(_itb!=_parent->_buckets.end() && !_itb->count.load(memory_order_acquire));
+            }
           }
         }
+        void _catch_up() const { const_cast<iterator *>(this)->_catch_up(); }
       public:
         iterator() : _parent(nullptr), _bucket_data(nullptr), _offset((size_t) -1), _pending_incr(0) { }
-        bool operator!=(const iterator &o) const BOOST_NOEXCEPT{ return _itb!=o._itb || _offset!=o._offset || _pending_incr|=o._pending_incr; }
-        bool operator==(const iterator &o) const BOOST_NOEXCEPT{ return _itb==o._itb && _offset==o._offset && _pending_incr==o._pending_incr; }
+        bool operator!=(const iterator &o) const BOOST_NOEXCEPT { _catch_up(); return _itb!=o._itb || _offset!=o._offset; }
+        bool operator==(const iterator &o) const BOOST_NOEXCEPT { _catch_up(); return _itb==o._itb && _offset==o._offset; }
         iterator &operator++()
         {
           if(_itb==_parent->_buckets.end())
@@ -641,14 +644,32 @@ namespace boost
           return *this;
         }
         iterator operator++(int) { iterator t(*this); operator++(); return t; }
-        value_type &operator*() { catch_up(); assert(_itb!=_parent->_buckets.end()); if(_itb==_parent->_buckets.end()) abort(); return _itb->items[_offset]->p.get(); }
+        value_type &operator*() { _catch_up(); assert(_itb!=_parent->_buckets.end()); if(_itb==_parent->_buckets.end()) abort(); return *_itb->items[_offset].p; }
       };
       typedef iterator const_iterator;
       // local_iterator
       // const_local_iterator
       concurrent_unordered_map() : _max_load_factor(_calc_max_load_factor()), _buckets(13) { }
       concurrent_unordered_map(size_t n) : _max_load_factor(_calc_max_load_factor()), _buckets(n>0 ? n : 1) { }
-      ~concurrent_unordered_map() { clear(); }
+      ~concurrent_unordered_map() {
+        // Raise the rehash lock and leave it raised
+        _rehash_lock.lock();
+        // Lock all existing buckets
+        for(auto &b : _buckets)
+          b.lock.lock();
+        for(auto &b : _buckets)
+        {
+          for(auto &i : b.items)
+          {
+            value_type_ptr former(_allocator);
+            former.p=i.p;
+            i.p=nullptr;
+          }
+          b.items.clear();
+          b.count.store(0, memory_order_release);
+        }
+        _buckets.clear();
+      }
     private:
       // Awaiting implementation
       concurrent_unordered_map(const concurrent_unordered_map &);
