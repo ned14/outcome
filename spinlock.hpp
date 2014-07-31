@@ -436,7 +436,12 @@ namespace boost
     // For when used with a spinlock
     template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline T is_lockable_locked(spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
     {
+#ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
+      // Annoyingly the atomic ops are marked as unsafe for atomic transactions, so ...
+      return *((volatile T *) &lockable);
+#else
       return lockable.load(memory_order_acquire);
+#endif
     }
     // For when used with a locked_ptr
     template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline bool is_lockable_locked(spinlock<lockable_ptr<T>, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
@@ -447,9 +452,9 @@ namespace boost
 #ifndef BOOST_BEGIN_TRANSACT_LOCK
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
 #undef BOOST_USING_INTEL_TSX
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable) __transaction_relaxed { (void) boost::spinlock::is_lockable_locked(lockable); { __transaction_atomic {
-#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) __transaction_relaxed { if((only_if_not_this)!=boost::spinlock::is_lockable_locked(lockable)) { __transaction_atomic {
-#define BOOST_END_TRANSACT_LOCK(lockable) } } }
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) __transaction_atomic { (void) boost::spinlock::is_lockable_locked(lockable); {
+#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) __transaction_atomic { if((only_if_not_this)!=boost::spinlock::is_lockable_locked(lockable)) {
+#define BOOST_END_TRANSACT_LOCK(lockable) } }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N) __transaction_atomic
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)
 #endif // BOOST_BEGIN_TRANSACT_LOCK
