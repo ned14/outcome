@@ -556,7 +556,7 @@ namespace boost
         node_ptr_type &operator=(node_ptr_type &&o)
         {
           this->~node_ptr_type();
-          new(this, std::move(o));
+          new(this) value_type(std::move(o));
           return *this;
         }
         node_ptr_type &operator=(const node_ptr_type &o)=delete;
@@ -586,7 +586,7 @@ namespace boost
         size_t hash;
         item_type() BOOST_NOEXCEPT : p(nullptr), hash(0) { }
         item_type(size_t _hash, value_type *_p) BOOST_NOEXCEPT : p(_p), hash(_hash) { }
-        item_type(size_t _hash, node_ptr_type &_p) BOOST_NOEXCEPT : p(_p.release()), hash(_hash) { }
+        item_type(size_t _hash, node_ptr_type &&_p) BOOST_NOEXCEPT : p(_p.release()), hash(_hash) { }
         item_type(item_type &&o) BOOST_NOEXCEPT : p(std::move(o.p)), hash(o.hash) { o.p=nullptr; o.hash=0; }
         item_type(const item_type &o);
         ~item_type() BOOST_NOEXCEPT
@@ -885,7 +885,7 @@ namespace boost
       */
       template<class InputIterator> std::vector<node_ptr_type> node_ptrs(InputIterator start, InputIterator finish, value_type **to_use=nullptr)
       {
-        static_assert(std::is_same<typename std::decay<typename InputIterator::value_type, value_type>::value>::type, "InputIterator type is not my value_type");
+        static_assert(std::is_same<typename std::decay<typename InputIterator::value_type>::type, value_type>::value, "InputIterator type is not my value_type");
         std::vector<node_ptr_type> ret;
         size_type len=std::distance(start, finish);
         ret.reserve(len);
@@ -902,10 +902,10 @@ namespace boost
         }
         return ret;
       }
-      std::pair<iterator, node_ptr_type> insert(node_ptr_type _v)
+      std::pair<iterator, bool> insert(node_ptr_type &&v)
       {
-        std::pair<iterator, node_ptr_type> ret(end(), std::move(_v));
-        const key_type &k=ret.second->first;
+        std::pair<iterator, bool> ret(end(), true);
+        const key_type &k=v->first;
         size_t h=_hasher(k);
         bool done=false;
         do
@@ -956,7 +956,7 @@ namespace boost
               {
                 ret.first._itb=itb;
                 ret.first._offset=emptyidx;
-                i->p=ret.second.release();
+                i->p=v.release();
                 i->hash=h;
                 b.count.fetch_add(1, memory_order_acquire);
                 done=true;
@@ -971,7 +971,7 @@ namespace boost
               }
               ret.first._itb=itb;
               ret.first._offset=b.items.size();
-              b.items.push_back(item_type(h, ret.second));
+              b.items.push_back(item_type(h, std::move(v)));
               b.count.fetch_add(1, memory_order_acquire);
               done=true;
             }
