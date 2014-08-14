@@ -472,15 +472,42 @@ namespace boost
     \brief Provides an unordered_map which is thread safe and wait free to use and whose find, insert/emplace and erase functions are usually wait free.
 
     Some notes on this implementation:
-    * To help you make sane concurrent use of the map, insert/emplace and erase never invalidate iterators nor references. This implies that rehashing is manual.
+    * Provides the N3645 (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3645.pdf) extensions node_ptr_type, extract() and merge() with
+      overload of insert(). Also added is a node_ptr() factory function with a rebind/realloc overload, and a node_ptrs() batch factory function for those
+      with a malloc capable of burst/batch allocation (e.g. Linux, OS X). Finally, merge() is now templatised and rebinds/reallocs node ptrs if necessary.
 
-    * To very substantially improve concurrency, empty() and size() are non-trivial:
+    * To help you make sane concurrent use of the map, insert/emplace and erase never invalidate iterators nor references. This implies that rehashing is
+      manual. If you perform a manual rehash which will invalidate all iterators, you must manually call it at a time when the following conditions are true:
+      
+      1. All iterators are not in use. That means an erase(find(value)) cannot be happening. Use erase(value) instead.
+
+    * Given the costs of rehashing, the design sacrifices low load factor performance for high load factor performance. Load factors of 16 or so are not
+      significantly slower than load factors of less than 1 if given a well distributed hash function.
+
+    * All operations will operate safely in concurrency with all other operations including rehash(). You may get unstable outcomes of course,
+      especially if you are inserting and deleting the same key from multiple threads, and no locking is provided per key-value pair, so if you delete it
+      from one thread while other threads have references to it you enter undefined behaviour, and probable memory corruption. Strongly consider the use
+      of shared_ptr<> as the mapped type if this is a problem for you.
+
+    * All operations may operate concurrently with all other operations except rehash(). If they hit the same bucket they are serialised for obvious reasons. Also
+      for obvious reasons a rehash() must halt all concurrency, it is the only operation which does this.
+
+    * To very substantially improve concurrency, the following deviations from std::unordered_map<> behaviour have been made:
       * empty() has average complexity O(bucket count/item count/2), worst case O(bucket count) when the map is empty.
       * size() always has complexity O(bucket count). If you do rehash(size()) to make load factor to 1.0, remember this can become very slow for large
         numbers of items. The map is deliberately more tolerant than most to collisions, it can cope with load factors of 8.0 or so without much slowdown.
+      * emplace() consumes its rvalue referenced items even when an exception is thrown i.e. the "has no effect" rule
+        is violated. The map itself is untouched however. Chances are real world code will never notice this.
 
-    * If you do wish to perform a manual rehash, you must manually call it at a time when the following conditions are true:
-      1. All iterators are not in use. That means an erase(find(value)) cannot be happening. Use erase(value) instead.
+    * clear() and merge() both are safe concurrent with all other operations, however inserting items concurrently to a clear() or merge()
+      has a possibility of losing and failing to merge some of those newly inserted items. erase() is safe however.
+
+    * Not everything is fully implemented and is marked as FIXME hopefully for some future GSoC student. In particular:
+      * C++ 03 support
+      * const iterators are typedefed to be normal iterators as const iterators haven't been implemented yet
+      * All const member functions are const_casted to their non-const forms
+      * Local iterators
+      * Copy and move construction plus copy and move assignment
     */
     template<class Key, class T, class Hash=std::hash<Key>, class Pred=std::equal_to<Key>, class Alloc=std::allocator<std::pair<const Key, T>>> class concurrent_unordered_map
     {
@@ -504,12 +531,14 @@ namespace boost
       key_equal _key_equal;
       allocator_type _allocator;
       float _max_load_factor;
-      struct value_type_ptr
+    public:
+      struct node_ptr_type
       {
+        typedef allocator_type container_allocator_type;
         allocator_type &allocator;
         value_type *p;
-        value_type_ptr(allocator_type &_allocator) : allocator(_allocator), p(nullptr) { }
-        template<class... Args> value_type_ptr(allocator_type &_allocator, Args... args) : allocator(_allocator), p(nullptr)
+        node_ptr_type(allocator_type &_allocator) : allocator(_allocator), p(nullptr) { }
+        template<class... Args> node_ptr_type(allocator_type &_allocator, Args... args) : allocator(_allocator), p(nullptr)
         {
           p=allocator.allocate(1);
           try
@@ -522,16 +551,25 @@ namespace boost
             throw;
           }
         }
-        value_type_ptr(value_type_ptr &&)=delete;
-        value_type_ptr(const value_type_ptr &)=delete;
-        value_type *operator->() { return p; }
-        value_type *release()
+        node_ptr_type(node_ptr_type &&o) BOOST_NOEXCEPT : allocator(o.allocator), p(o.p) { o.p=nullptr; }
+        node_ptr_type(const node_ptr_type &)=delete;
+        node_ptr_type &operator=(node_ptr_type &&o)
+        {
+          this->~node_ptr_type();
+          new(this, std::move(o));
+          return *this;
+        }
+        node_ptr_type &operator=(const node_ptr_type &o)=delete;
+        explicit operator bool() const BOOST_NOEXCEPT{ return p!=nullptr; }
+        value_type &operator*() BOOST_NOEXCEPT{ return *p; }
+        value_type *operator->() BOOST_NOEXCEPT{ return p; }
+        value_type *release() BOOST_NOEXCEPT
         {
           value_type *ret=p;
           p=nullptr;
           return ret;
         }
-        ~value_type_ptr()
+        ~node_ptr_type() BOOST_NOEXCEPT
         {
           if(p)
           {
@@ -541,16 +579,17 @@ namespace boost
           }
         }
       };
+    private:
       struct item_type
       {
         value_type *p;
         size_t hash;
-        item_type() : p(nullptr), hash(0) { }
+        item_type() BOOST_NOEXCEPT : p(nullptr), hash(0) { }
         item_type(size_t _hash, value_type *_p) BOOST_NOEXCEPT : p(_p), hash(_hash) { }
-        item_type(size_t _hash, value_type_ptr &_p) BOOST_NOEXCEPT : p(_p.release()), hash(_hash) { }
+        item_type(size_t _hash, node_ptr_type &_p) BOOST_NOEXCEPT : p(_p.release()), hash(_hash) { }
         item_type(item_type &&o) BOOST_NOEXCEPT : p(std::move(o.p)), hash(o.hash) { o.p=nullptr; o.hash=0; }
         item_type(const item_type &o);
-        ~item_type()
+        ~item_type() BOOST_NOEXCEPT
         {
           assert(!p);
         }
@@ -646,12 +685,13 @@ namespace boost
         iterator operator++(int) { iterator t(*this); operator++(); return t; }
         value_type &operator*() { _catch_up(); assert(_itb!=_parent->_buckets.end()); if(_itb==_parent->_buckets.end()) abort(); return *_itb->items[_offset].p; }
       };
-      typedef iterator const_iterator;
+      typedef iterator const_iterator; // FIXME
       // local_iterator
       // const_local_iterator
       concurrent_unordered_map() : _max_load_factor(_calc_max_load_factor()), _buckets(13) { }
       concurrent_unordered_map(size_t n) : _max_load_factor(_calc_max_load_factor()), _buckets(n>0 ? n : 1) { }
-      ~concurrent_unordered_map() {
+      ~concurrent_unordered_map()
+      {
         // Raise the rehash lock and leave it raised
         _rehash_lock.lock();
         // Lock all existing buckets
@@ -661,7 +701,7 @@ namespace boost
         {
           for(auto &i : b.items)
           {
-            value_type_ptr former(_allocator);
+            node_ptr_type former(_allocator);
             former.p=i.p;
             i.p=nullptr;
           }
@@ -671,7 +711,7 @@ namespace boost
         _buckets.clear();
       }
     private:
-      // Awaiting implementation
+      // FIXME Awaiting implementation
       concurrent_unordered_map(const concurrent_unordered_map &);
       concurrent_unordered_map(concurrent_unordered_map &&);
       concurrent_unordered_map &operator=(const concurrent_unordered_map &);
@@ -764,20 +804,108 @@ namespace boost
         } while(!done);
         return ret;
       }
-      //const_iterator find(const keytype &k) const;
-      //mapped_type &at(const key_type &k);
-      //const mapped_type &at(const key_type &k) const;
-      //mapped_type &operator[](const key_type &k);
-      //mapped_type &operator[](key_type &&k);
-      //size_type count(const key_type &k) const;
-      //std::pair<iterator, iterator> equal_range(const key_type &k);
-      //std::pair<const_iterator, const_iterator> equal_range(const key_type &k) const;
-      //! If an exception throws, note that input is consumed no matter what.
-      template<class... Args> std::pair<iterator, bool> emplace(Args &&... args)
+      const_iterator find(const key_type &k) const { return const_cast<concurrent_unordered_map *>(this)->find(k); } // FIXME
+      mapped_type &at(const key_type &k)
       {
-        std::pair<iterator, bool> ret(end(), true);
-        value_type_ptr v(_allocator, std::forward<Args>(args)...);
-        const key_type &k=v->first;
+        iterator it=find(k);
+        if(it==end()) throw std::out_of_range("Key not found");
+        return it->second;
+      }
+      const mapped_type &at(const key_type &k) const { return const_cast<concurrent_unordered_map *>(this)->at(k); } // FIXME
+      mapped_type &operator[](const key_type &k)
+      {
+        do
+        {
+          iterator it=find(k);
+          if(it==end())
+          {
+            value_type v;
+            v.first=k;
+            auto ret=insert(std::move(v));
+            if(!ret.second)
+              continue;
+            else
+              it=ret.first;
+          }
+          return it->second;
+        } while(false);
+      }
+      mapped_type &operator[](key_type &&k)
+      {
+        node_ptr_type e=node_ptr_type(value_type(std::move(k), mapped_type()));
+        do
+        {
+          iterator it=find(e->first);
+          if(it==end())
+          {
+            auto ret=insert(e);
+            if(!ret.second)
+              continue;
+            else
+              it=ret.first;
+          }
+          return it->second;
+        } while(false);
+      }
+      size_type count(const key_type &k) const { return end()!=find(k) ? 1 : 0; }
+      std::pair<iterator, iterator> equal_range(const key_type &k)
+      {
+        iterator it=find(k);
+        return std::make_pair(it, it);
+      }
+      std::pair<const_iterator, const_iterator> equal_range(const key_type &k) const
+      {
+        const_iterator it=find(k);
+        return std::make_pair(it, it);
+      }
+
+      //! \brief Factory function for a node_ptr_type.
+      template<class... Args> node_ptr_type node_ptr(Args&&... args)
+      {
+        return node_ptr_type(_allocator, std::forward<Args>(args)...);
+      }
+      /*! \brief Lets you rebind a node_ptr_type from another map into this map. If allocators are
+      dissimilar or the supplied type is not moveable, performs a new allocation using the container allocator.
+      */
+      template<class U> node_ptr_type node_ptr(typename U::node_ptr_type &&p)
+      {
+        // If not the same allocator or not moveable, need to reallocate
+        bool needToRealloc=!std::is_same<Alloc, typename U::node_ptr_type::container_allocator_type>::value
+          || !std::is_rvalue_reference<typename U::node_ptr_type>::value;
+        if(!needToRealloc)
+        {
+          node_ptr_type ret(_allocator);
+          ret.p=p.release();
+          return ret;
+        }
+        return node_ptr_type(_allocator, std::forward<typename U::value_type>(*p));
+      }
+      /*! \brief Factory function for many node_ptr_types, optionally using an array of preexisting
+      memory allocations which must be deallocatable by this container's allocator.
+      */
+      template<class InputIterator> std::vector<node_ptr_type> node_ptrs(InputIterator start, InputIterator finish, value_type **to_use=nullptr)
+      {
+        static_assert(std::is_same<typename std::decay<typename InputIterator::value_type, value_type>::value>::type, "InputIterator type is not my value_type");
+        std::vector<node_ptr_type> ret;
+        size_type len=std::distance(start, finish);
+        ret.reserve(len);
+        for(; start!=finish; ++start, to_use ? ++to_use : to_use)
+        {
+          if(to_use)
+          {
+            ret.push_back(node_ptr_type(_allocator));
+            _allocator.construct(to_use, std::forward<typename InputIterator::value_type>(*start));
+            ret.back().p=to_use;
+          }
+          else
+            ret.push_back(node_ptr_type(_allocator, std::forward<typename InputIterator::value_type>(*start)));
+        }
+        return ret;
+      }
+      std::pair<iterator, node_ptr_type> insert(node_ptr_type _v)
+      {
+        std::pair<iterator, node_ptr_type> ret(end(), std::move(_v));
+        const key_type &k=ret.second->first;
         size_t h=_hasher(k);
         bool done=false;
         do
@@ -793,20 +921,20 @@ namespace boost
             BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(b.lock, 2)
               for(item_type *i=b.items.data(), *e=b.items.data()+b.items.size();;)
               {
-                for(; i<e && i->hash!=h; offset++, i++)
-                  if(emptyidx==(size_t) -1 && !i->p)
-                    emptyidx=offset;
-                if(i==e)
-                  break;
-                if(i->p && _key_equal(k, i->p->first))
-                {
-                  ret.first._itb=itb;
-                  ret.first._offset=offset;
-                  ret.second=false;
-                  done=true;
-                  break;
-                }
-                else offset++, i++;
+              for(; i<e && i->hash!=h; offset++, i++)
+                if(emptyidx==(size_t) -1 && !i->p)
+                  emptyidx=offset;
+              if(i==e)
+                break;
+              if(i->p && _key_equal(k, i->p->first))
+              {
+                ret.first._itb=itb;
+                ret.first._offset=offset;
+                ret.second=false;
+                done=true;
+                break;
+              }
+              else offset++, i++;
               }
             BOOST_END_TRANSACT_LOCK(b.lock)
           }
@@ -828,7 +956,7 @@ namespace boost
               {
                 ret.first._itb=itb;
                 ret.first._offset=emptyidx;
-                i->p=v.release();
+                i->p=ret.second.release();
                 i->hash=h;
                 b.count.fetch_add(1, memory_order_acquire);
                 done=true;
@@ -843,28 +971,37 @@ namespace boost
               }
               ret.first._itb=itb;
               ret.first._offset=b.items.size();
-              b.items.push_back(item_type(h, v));
+              b.items.push_back(item_type(h, ret.second));
               b.count.fetch_add(1, memory_order_acquire);
               done=true;
             }
           }
         } while(!done);
-        return ret;
       }
-      //template<class... Args> iterator emplace_hint(const_iterator position, Args &&... args);
+
+      //! If an exception throws, note that input is consumed no matter what.
+      template<class... Args> std::pair<iterator, bool> emplace(Args &&... args)
+      {
+        auto ret=insert(node_ptr(std::forward<Args>(args)...));
+        return std::make_pair(ret.first, !ret.second);
+      }
+      template<class... Args> iterator emplace_hint(const_iterator position, Args &&... args) { return emplace(std::forward<Args>(args)...); }
       std::pair<iterator, bool> insert(const value_type &v) { return emplace(v); }
       template<class P> std::pair<iterator, bool> insert(P &&v) { return emplace(std::forward<P>(v)); }
-      //iterator insert(const_iterator hint, const value_type &v);
-      //template<class P> iterator insert(const_iterator hint, P &&v);
-      //template<class InputIterator> void insert(InputIterator first, InputIterator last);
-      //void insert(std::initializer_list<value_type> i);
-      iterator erase(const_iterator it)
+      iterator insert(const_iterator hint, const value_type &v) { return insert(v); }
+      template<class P> iterator insert(const_iterator hint, P &&v) { return insert(std::forward<P>(v)); }
+      template<class InputIterator> void insert(InputIterator first, InputIterator last)
       {
-        iterator ret(end());
+        for(; first!=last; ++first)
+          emplace(*first);
+      }
+      void insert(std::initializer_list<value_type> i) { insert(std::make_move_iterator(i.begin()), std::make_move_iterator(i.end())); }
+      node_ptr_type extract(const_iterator it)
+      {
         //assert(it!=end());
-        if(it==ret) return ret;
+        if(it==end) return node_ptr_type();
         bucket_type &b=*it._itb;
-        value_type_ptr former(_allocator);
+        node_ptr_type former(_allocator);
         {
           // If the lock is other state we need to reload bucket list
           if(!b.lock.lock(2))
@@ -884,18 +1021,15 @@ namespace boost
                 items.pop_back(); // Will abort all concurrency
             }
             b.count.fetch_sub(1, memory_order_acquire);
-            ret=it;
-            ++ret;
           }
         }
-        return ret;
+        return former;
       }
-      size_type erase(const key_type &k)
+      node_ptr_type extract(const key_type &k)
       {
-        size_type ret=0;
         size_t h=_hasher(k);
         bool done=false;
-        value_type_ptr former(_allocator);
+        node_ptr_type former(_allocator);
         do
         {
           auto itb=_get_bucket(h);
@@ -926,7 +1060,6 @@ namespace boost
                       items.pop_back(); // Will abort all concurrency
                   }
                   b.count.fetch_sub(1, memory_order_acquire);
-                  ++ret;
                   done=true;
                   break;
                 }
@@ -936,9 +1069,26 @@ namespace boost
             }
           }
         } while(!done);
-        return ret;
+        return former;
       }
-      // iterator erase(const_iterator first, const_iterator last);
+      iterator erase(const_iterator it)
+      {
+        iterator ret(it);
+        ++ret;
+        node_ptr_type e=extract(it);
+        return e ? ret : end();
+      }
+      size_type erase(const key_type &k)
+      {
+        node_ptr_type e=extract(k);
+        return e ? 1 : 0;
+      }
+      iterator erase(const_iterator first, const_iterator last)
+      {
+        for(; first!=last; ++first)
+          erase(first);
+        return last;
+      }
 
       void clear() BOOST_NOEXCEPT
       {
@@ -958,7 +1108,7 @@ namespace boost
             std::lock_guard<decltype(b.lock)> g(b.lock, std::adopt_lock); // Will abort all concurrency
             for(auto &i : b.items)
             {
-              value_type_ptr former(_allocator);
+              node_ptr_type former(_allocator);
               former.p=i.p;
               i.p=nullptr;
             }
@@ -976,7 +1126,43 @@ namespace boost
         std::swap(_key_equal, o._key_equal);
         _buckets.swap(o._buckets);
       }
-      size_type bucket_count() const BOOST_NOEXCEPT { return _buckets.size(); }
+      template<class _Hash, class _Pred, class _Alloc> void merge(concurrent_unordered_map<Key, T, _Hash, _Pred, _Alloc> &o)
+      {
+        typedef concurrent_unordered_map<Key, T, _Hash, _Pred, _Alloc> other_map_type;
+        bool done;
+        do
+        {
+          done=true;
+          for(auto &b : o._buckets)
+          {
+            // If the lock is other state we need to reload bucket list
+            if(!b.lock.lock(2))
+            {
+              done=false;
+              break;
+            }
+            std::lock_guard<decltype(b.lock)> g(b.lock, std::adopt_lock); // Will abort all concurrency
+            for(auto &i : b.items)
+            {
+              typename other_map_type::node_ptr_type former(o._allocator);
+              former.p=i.p;
+              i.p=nullptr;
+              insert(node_ptr_type(std::move(former))); // Will reallocate only if necessary
+            }
+            b.items.clear();
+            b.count.store(0, memory_order_release);
+          }
+        } while(!done);
+      }
+      template<class U> void merge(U &o)
+      {
+        for(typename U::iterator it=o.begin(); it!=o.end(); it=o.begin())
+        {
+          typename U::node_ptr_type e=o.extract(it);
+          insert(node_ptr_type(e));
+        }
+      }
+      size_type bucket_count() const BOOST_NOEXCEPT{ return _buckets.size(); }
       size_type max_bucket_count() const BOOST_NOEXCEPT { return _buckets.max_size(); }
       size_type bucket_size(size_type n) const
       {
