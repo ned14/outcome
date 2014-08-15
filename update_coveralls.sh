@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 # Adapted from https://github.com/purpleKarrot/Karrot/blob/develop/test/coveralls.in
 # which itself was adapted from https://github.com/berenm/cmake-extra/blob/master/coveralls-upload.in
 
@@ -15,13 +15,13 @@ fi
 gcov-4.8 --source-prefix $1 --preserve-paths --relative-only $(find -iname *.gcda) 1>/dev/null || exit 0
 
 #env
+#  "service_pull_request", "",
 cat >coverage.json <<EOF
 {
   "service_name": "jenkins",
   "service_number": "${BUILD_NUMBER}",
   "service_build_url": "${BUILD_URL}",
   "service_branch": "${GIT_BRANCH}",
-#  "service_pull_request", "",
   "repo_token": "${COVERALLS_REPO_TOKEN}",
   "run_at": "$(date --iso-8601=s)",
   "source_files": [
@@ -44,7 +44,7 @@ mv coverage.json coverage.json.tmp
 cat >coverage.json <(head -n -1 coverage.json.tmp) <(echo -e "    }\n  ]\n}")
 rm *.gcov coverage.json.tmp
 
-head coverage.json
+#head coverage.json
 #echo
 curl -F json_file=@coverage.json https://coveralls.io/api/v1/jobs
 #head coverage.json
