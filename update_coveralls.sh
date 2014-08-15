@@ -12,7 +12,7 @@ then
   exit 0
 fi
 
-gcov-4.9 --source-prefix $1 --preserve-paths --relative-only $(find -iname *.gcda) 1>/dev/null || exit 0
+gcov-4.8 --source-prefix $1 --preserve-paths --relative-only $(find -iname *.gcda) 1>/dev/null || exit 0
 
 #env
 #  "service_pull_request", "",
