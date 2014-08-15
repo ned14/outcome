@@ -561,7 +561,7 @@ namespace boost
         }
       public:
         BOOST_CONSTEXPR node_ptr_type() BOOST_NOEXCEPT : p(nullptr) {}
-        BOOST_CONSTEXPR node_ptr_type(nullptr_t) BOOST_NOEXCEPT : p(nullptr) {}
+        BOOST_CONSTEXPR node_ptr_type(std::nullptr_t) BOOST_NOEXCEPT : p(nullptr) {}
         node_ptr_type(node_ptr_type &&o) BOOST_NOEXCEPT : allocator(std::move(o.allocator)), p(o.p) { o.p=nullptr; }
         node_ptr_type(const node_ptr_type &)=delete;
         node_ptr_type &operator=(node_ptr_type &&o) BOOST_NOEXCEPT // noexcept should depend on value_type noexceptness
@@ -570,7 +570,7 @@ namespace boost
           new(this) value_type(std::move(o));
           return *this;
         }
-        node_ptr_type &operator=(nullptr_t) BOOST_NOEXCEPT
+        node_ptr_type &operator=(std::nullptr_t) BOOST_NOEXCEPT
         {
           reset();
           return *this;
