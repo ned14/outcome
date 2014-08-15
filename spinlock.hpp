@@ -473,7 +473,7 @@ namespace boost
 
     Some notes on this implementation:
     * Provides the N3645 (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3645.pdf) extensions node_ptr_type, extract() and merge() with
-      overload of insert(). Also added is a node_ptr() factory function with a rebind/realloc overload, and a node_ptrs() batch factory function for those
+      overload of insert(). Also added is a make_node_ptr() factory function with a rebind/realloc overload, and a make_node_ptrs() batch factory function for those
       with a malloc capable of burst/batch allocation (e.g. Linux, OS X). Finally, merge() is now templatised and rebinds/reallocs node ptrs if necessary.
 
     * To help you make sane concurrent use of the map, insert/emplace and erase never invalidate iterators nor references. This implies that rehashing is
@@ -532,10 +532,18 @@ namespace boost
       allocator_type _allocator;
       float _max_load_factor;
     public:
-      struct node_ptr_type
+      class node_ptr_type
       {
-        typedef allocator_type container_allocator_type;
-        allocator_type &allocator;
+        friend class concurrent_unordered_map;
+        typedef concurrent_unordered_map container;
+      public:
+        typedef typename container::value_type value_type;
+        typedef typename container::allocator_type allocator_type;
+        typedef typename container::reference reference;
+        typedef typename container::pointer pointer;
+      private:
+        typedef value_type container_node_type;
+        allocator_type allocator;
         value_type *p;
         node_ptr_type(allocator_type &_allocator) : allocator(_allocator), p(nullptr) { }
         template<class... Args> node_ptr_type(allocator_type &_allocator, Args... args) : allocator(_allocator), p(nullptr)
@@ -551,25 +559,39 @@ namespace boost
             throw;
           }
         }
-        node_ptr_type(node_ptr_type &&o) BOOST_NOEXCEPT : allocator(o.allocator), p(o.p) { o.p=nullptr; }
+      public:
+        BOOST_CONSTEXPR node_ptr_type() BOOST_NOEXCEPT : p(nullptr) {}
+        BOOST_CONSTEXPR node_ptr_type(nullptr_t) BOOST_NOEXCEPT : p(nullptr) {}
+        node_ptr_type(node_ptr_type &&o) BOOST_NOEXCEPT : allocator(std::move(o.allocator)), p(o.p) { o.p=nullptr; }
         node_ptr_type(const node_ptr_type &)=delete;
-        node_ptr_type &operator=(node_ptr_type &&o)
+        node_ptr_type &operator=(node_ptr_type &&o) BOOST_NOEXCEPT // noexcept should depend on value_type noexceptness
         {
           this->~node_ptr_type();
           new(this) value_type(std::move(o));
           return *this;
         }
+        node_ptr_type &operator=(nullptr_t) BOOST_NOEXCEPT
+        {
+          reset();
+          return *this;
+        }
         node_ptr_type &operator=(const node_ptr_type &o)=delete;
-        explicit operator bool() const BOOST_NOEXCEPT{ return p!=nullptr; }
-        value_type &operator*() BOOST_NOEXCEPT{ return *p; }
-        value_type *operator->() BOOST_NOEXCEPT{ return p; }
-        value_type *release() BOOST_NOEXCEPT
+        ~node_ptr_type() BOOST_NOEXCEPT
+        {
+          reset();
+        }
+        pointer get() const BOOST_NOEXCEPT { return p; }
+        reference operator*() BOOST_NOEXCEPT { return *p; }
+        pointer operator->() BOOST_NOEXCEPT { return p; }
+        allocator_type get_allocator() const BOOST_NOEXCEPT { return allocator; }
+        explicit operator bool() const BOOST_NOEXCEPT { return p!=nullptr; }
+        pointer release() BOOST_NOEXCEPT
         {
           value_type *ret=p;
           p=nullptr;
           return ret;
         }
-        ~node_ptr_type() BOOST_NOEXCEPT
+        void reset() BOOST_NOEXCEPT
         {
           if(p)
           {
@@ -577,6 +599,13 @@ namespace boost
             allocator.deallocate(p, 1);
             p=nullptr;
           }
+        }
+        void reset(std::nullptr_t) BOOST_NOEXCEPT { reset(); }
+        void swap(node_ptr_type &o) BOOST_NOEXCEPT
+        {
+          node_ptr_type temp(std::move(*this));
+          *this=std::move(o);
+          o=std::move(temp);
         }
       };
     private:
@@ -860,17 +889,17 @@ namespace boost
       }
 
       //! \brief Factory function for a node_ptr_type.
-      template<class... Args> node_ptr_type node_ptr(Args&&... args)
+      template<class... Args> node_ptr_type make_node_ptr(Args&&... args)
       {
         return node_ptr_type(_allocator, std::forward<Args>(args)...);
       }
       /*! \brief Lets you rebind a node_ptr_type from another map into this map. If allocators are
       dissimilar or the supplied type is not moveable, performs a new allocation using the container allocator.
       */
-      template<class U> node_ptr_type node_ptr(typename U::node_ptr_type &&p)
+      template<class U> node_ptr_type rebind_node_ptr(typename U::node_ptr_type &&p)
       {
         // If not the same allocator or not moveable, need to reallocate
-        bool needToRealloc=!std::is_same<Alloc, typename U::node_ptr_type::container_allocator_type>::value
+        bool needToRealloc=!std::is_same<Alloc, typename U::node_ptr_type::allocator_type>::value
           || !std::is_rvalue_reference<typename U::node_ptr_type>::value;
         if(!needToRealloc)
         {
@@ -883,7 +912,7 @@ namespace boost
       /*! \brief Factory function for many node_ptr_types, optionally using an array of preexisting
       memory allocations which must be deallocatable by this container's allocator.
       */
-      template<class InputIterator> std::vector<node_ptr_type> node_ptrs(InputIterator start, InputIterator finish, value_type **to_use=nullptr)
+      template<class InputIterator> std::vector<node_ptr_type> make_node_ptrs(InputIterator start, InputIterator finish, value_type **to_use=nullptr)
       {
         static_assert(std::is_same<typename std::decay<typename InputIterator::value_type>::type, value_type>::value, "InputIterator type is not my value_type");
         std::vector<node_ptr_type> ret;
@@ -901,6 +930,9 @@ namespace boost
             ret.push_back(node_ptr_type(_allocator, std::forward<typename InputIterator::value_type>(*start)));
         }
         return ret;
+      }
+      std::pair<iterator, bool> insert_ct(node_ptr_type &&v)
+      {
       }
       std::pair<iterator, bool> insert(node_ptr_type &&v)
       {
@@ -977,12 +1009,13 @@ namespace boost
             }
           }
         } while(!done);
+        return ret;
       }
 
       //! If an exception throws, note that input is consumed no matter what.
       template<class... Args> std::pair<iterator, bool> emplace(Args &&... args)
       {
-        auto ret=insert(node_ptr(std::forward<Args>(args)...));
+        auto ret=insert(make_node_ptr(std::forward<Args>(args)...));
         return std::make_pair(ret.first, !ret.second);
       }
       template<class... Args> iterator emplace_hint(const_iterator position, Args &&... args) { return emplace(std::forward<Args>(args)...); }
@@ -1159,7 +1192,7 @@ namespace boost
         for(typename U::iterator it=o.begin(); it!=o.end(); it=o.begin())
         {
           typename U::node_ptr_type e=o.extract(it);
-          insert(node_ptr_type(e));
+          insert(rebind_node_ptr(e));
         }
       }
       size_type bucket_count() const BOOST_NOEXCEPT{ return _buckets.size(); }
