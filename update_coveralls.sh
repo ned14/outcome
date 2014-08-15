@@ -21,7 +21,7 @@ cat >coverage.json <<EOF
   "service_name": "jenkins",
   "service_number": "${BUILD_NUMBER}",
   "service_build_url": "${BUILD_URL}",
-  "service_branch": "${GIT_BRANCH}",
+  "service_branch": "${GIT_BRANCH##origin/}",
   "repo_token": "${COVERALLS_REPO_TOKEN}",
   "run_at": "$(date --iso-8601=s)",
   "source_files": [
