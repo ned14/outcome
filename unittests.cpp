@@ -247,10 +247,11 @@ TEST_CASE("performance/malloc/transact/large", "Tests the transact performance o
 
 
 
-TEST_CASE("works/concurrent_unordered_map", "Tests that concurrent_unordered_map works as expected")
+TEST_CASE("works/concurrent_unordered_map/basic", "Tests that concurrent_unordered_map works as expected")
 {
+  printf("\n=== concurrent_unordered_map basic ===\n");
   boost::spinlock::concurrent_unordered_map<int, int> map1, map2;
-  map2.reserve(10);    // test dense map
+  map1.reserve(10);    // test dense map
   map2.reserve(1000);  // test sparse map
   CHECK(map1.empty());
   CHECK(map2.empty());
@@ -265,6 +266,8 @@ TEST_CASE("works/concurrent_unordered_map", "Tests that concurrent_unordered_map
   CHECK(!map2.empty());
   CHECK(map1.size()==201);
   CHECK(map2.size()==201);
+  printf("Load factor for map1 is %f\n", map1.load_factor());
+  printf("Load factor for map2 is %f\n", map2.load_factor());
   std::vector<std::pair<int, int>> contents1, contents2;
   std::copy(map1.begin(), map1.end(), std::back_inserter(contents1));
   std::copy(map2.begin(), map2.end(), std::back_inserter(contents2));
@@ -285,7 +288,61 @@ TEST_CASE("works/concurrent_unordered_map", "Tests that concurrent_unordered_map
   CHECK(map2.size()==0);
 }
 
+TEST_CASE("works/concurrent_unordered_map/rehash", "Tests that concurrent_unordered_map rehash works as expected")
+{
+  printf("\n=== concurrent_unordered_map rehash ===\n");
+  boost::spinlock::concurrent_unordered_map<int, int> map1, map2;
+  map1.reserve(10);    // test dense map
+  map2.reserve(1000);  // test sparse map
+  for(int n=-200; n<=200; n+=2)
+  {
+    map1.emplace(n, n);
+    map2.emplace(n, n);
+  }
+  map1.reserve(1000);
+  map2.reserve(10);
+  std::vector<std::pair<int, int>> contents1, contents2;
+  std::copy(map1.begin(), map1.end(), std::back_inserter(contents1));
+  std::copy(map2.begin(), map2.end(), std::back_inserter(contents2));
+  CHECK(contents1.size()==201);
+  CHECK(contents2.size()==201);
+  std::sort(contents1.begin(), contents1.end());
+  std::sort(contents2.begin(), contents2.end());
+  for(int n=-200; n<=200; n+=2)
+  {
+    CHECK(contents1[n/2+100].first==n);
+    CHECK(contents2[n/2+100].first==n);
+  }
+}
 
+TEST_CASE("works/concurrent_unordered_map/merge", "Tests that concurrent_unordered_map merge works as expected")
+{
+  printf("\n=== concurrent_unordered_map merge ===\n");
+  boost::spinlock::concurrent_unordered_map<int, int> map1, map2({0});
+  CHECK(map1.size()==0);
+  CHECK(map2.size()==1);
+  map1.reserve(10);    // test dense map
+  map2.reserve(1000);  // test sparse map
+  for(int n=-200; n<=200; n+=2)
+  {
+    map1.emplace(n, n);
+    map2.emplace(n+1, n);
+  }
+  CHECK(map1.size()==201);
+  CHECK(map2.size()==202);
+  map1.merge(map2); // should merge all but 0
+  std::vector<std::pair<int, int>> contents1, contents2;
+  std::copy(map1.begin(), map1.end(), std::back_inserter(contents1));
+  std::copy(map2.begin(), map2.end(), std::back_inserter(contents2));
+  CHECK(contents1.size()==402);
+  REQUIRE(contents2.size()==1);
+  std::sort(contents1.begin(), contents1.end());
+  CHECK(contents2[0].first==0);
+  for(int n=-200; n<=201; n++)
+  {
+    CHECK(contents1[n+200].first==n);
+  }
+}
 
 static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact, int type)
 {

@@ -718,7 +718,18 @@ namespace boost
       // local_iterator
       // const_local_iterator
       concurrent_unordered_map() : _max_load_factor(_calc_max_load_factor()), _buckets(13) { }
-      concurrent_unordered_map(size_t n) : _max_load_factor(_calc_max_load_factor()), _buckets(n>0 ? n : 1) { }
+      explicit concurrent_unordered_map(size_type n, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : _hasher(h), _key_equal(ke), _allocator(al), _max_load_factor(_calc_max_load_factor()), _buckets(n>0 ? n : 13) { }
+      explicit concurrent_unordered_map(const allocator_type &al) : _allocator(al), _max_load_factor(_calc_max_load_factor()), _buckets(13) { }
+      concurrent_unordered_map(size_type n, const allocator_type &al) : _allocator(al), _max_load_factor(_calc_max_load_factor()), _buckets(n>0 ? n : 13) { }
+      concurrent_unordered_map(size_type n, const hasher &h, const allocator_type &al) : _hasher(h), _allocator(al), _max_load_factor(_calc_max_load_factor()), _buckets(n>0 ? n : 13) { }
+
+      template<class InputIterator> concurrent_unordered_map(InputIterator first, InputIterator last, size_type n=0, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : _hasher(h), _key_equal(ke), _allocator(al), _max_load_factor(_calc_max_load_factor()), _buckets(n>0 ? n : 13) { insert(first, last); }
+      template<class InputIterator> concurrent_unordered_map(InputIterator first, InputIterator last, size_type n, const allocator_type &al) : _allocator(al), _max_load_factor(_calc_max_load_factor()), _buckets(n>0 ? n : 13) { insert(first, last); }
+      template<class InputIterator> concurrent_unordered_map(InputIterator first, InputIterator last, size_type n, const hasher &h, const allocator_type &al) : _hasher(h), _allocator(al), _max_load_factor(_calc_max_load_factor()), _buckets(n>0 ? n : 13) { insert(first, last); }
+      
+      concurrent_unordered_map(std::initializer_list<value_type> il, size_type n=0, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : _hasher(h), _key_equal(ke), _allocator(al), _max_load_factor(_calc_max_load_factor()), _buckets(n>0 ? n : 13) { insert(std::move(il)); }
+      concurrent_unordered_map(std::initializer_list<value_type> il, size_type n, const allocator_type &al) : _allocator(al), _max_load_factor(_calc_max_load_factor()), _buckets(n>0 ? n : 13) { insert(std::move(il)); }
+      concurrent_unordered_map(std::initializer_list<value_type> il, size_type n, const hasher &h, const allocator_type &al) : _hasher(h), _allocator(al), _max_load_factor(_calc_max_load_factor()), _buckets(n>0 ? n : 13) { insert(std::move(il)); }
       ~concurrent_unordered_map()
       {
         // Raise the rehash lock and leave it raised
