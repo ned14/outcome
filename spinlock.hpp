@@ -916,8 +916,13 @@ namespace boost
       {
         static_assert(std::is_same<typename std::decay<typename InputIterator::value_type>::type, value_type>::value, "InputIterator type is not my value_type");
         std::vector<node_ptr_type> ret;
-        size_type len=std::distance(start, finish);
-        ret.reserve(len);
+        // If the iterator is capable of random access, reserve the vector
+        if(std::is_constructible<std::random_access_iterator_tag,
+          typename std::iterator_traits<InputIterator>::iterator_category>::value)
+        {
+          size_type len=std::distance(start, finish);
+          ret.reserve(len);
+        }
         for(; start!=finish; ++start, to_use ? ++to_use : to_use)
         {
           if(to_use)
@@ -931,10 +936,8 @@ namespace boost
         }
         return ret;
       }
-      std::pair<iterator, bool> insert_ct(node_ptr_type &&v)
-      {
-      }
-      std::pair<iterator, bool> insert(node_ptr_type &&v)
+    private:
+      template<class C> std::pair<iterator, bool> _insert(node_ptr_type &&v, C &&extend)
       {
         std::pair<iterator, bool> ret(end(), true);
         const key_type &k=v->first;
@@ -995,21 +998,32 @@ namespace boost
               }
             }
             if(!done)
-            {
-              if(b.items.size()==b.items.capacity())
-              {
-                size_t newcapacity=b.items.capacity()*2;
-                b.items.reserve(newcapacity ? newcapacity : 1);
-              }
-              ret.first._itb=itb;
-              ret.first._offset=b.items.size();
-              b.items.push_back(item_type(h, std::move(v)));
-              b.count.fetch_add(1, memory_order_acquire);
-              done=true;
-            }
+              done=extend(ret, itb, h, std::move(v));
           }
         } while(!done);
         return ret;
+      }
+    public:
+      std::pair<iterator, bool> insert_ct(node_ptr_type &&v)
+      {
+        return _insert(std::move(v), [](std::pair<iterator, bool> &ret, typename std::vector<bucket_type>::iterator &itb, size_t h, node_ptr_type &&v){ return false; });
+      }
+      std::pair<iterator, bool> insert(node_ptr_type &&v)
+      {
+        return _insert(std::move(v), [](std::pair<iterator, bool> &ret, typename std::vector<bucket_type>::iterator &itb, size_t h, node_ptr_type &&v)
+        {
+          bucket_type &b=*itb;
+          if(b.items.size()==b.items.capacity())
+          {
+            size_t newcapacity=b.items.capacity()*2;
+            b.items.reserve(newcapacity ? newcapacity : 1);
+          }
+          ret.first._itb=itb;
+          ret.first._offset=b.items.size();
+          b.items.push_back(item_type(h, std::move(v)));
+          b.count.fetch_add(1, memory_order_acquire);
+          return true;
+        });
       }
 
       //! If an exception throws, note that input is consumed no matter what.
