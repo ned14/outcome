@@ -318,7 +318,7 @@ TEST_CASE("works/concurrent_unordered_map/rehash", "Tests that concurrent_unorde
 TEST_CASE("works/concurrent_unordered_map/merge", "Tests that concurrent_unordered_map merge works as expected")
 {
   printf("\n=== concurrent_unordered_map merge ===\n");
-  boost::spinlock::concurrent_unordered_map<int, int> map1, map2({0});
+  boost::spinlock::concurrent_unordered_map<int, int> map1, map2={ { 0, 0 } };
   CHECK(map1.size()==0);
   CHECK(map2.size()==1);
   map1.reserve(10);    // test dense map

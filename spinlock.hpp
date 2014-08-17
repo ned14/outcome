@@ -508,6 +508,7 @@ namespace boost
       * All const member functions are const_casted to their non-const forms
       * Local iterators
       * Copy and move construction plus copy and move assignment
+      * noexcept is always on in many places it should be conditional. We are blocked on MSVC for this.
     */
     template<class Key, class T, class Hash=std::hash<Key>, class Pred=std::equal_to<Key>, class Alloc=std::allocator<std::pair<const Key, T>>> class concurrent_unordered_map
     {
@@ -564,7 +565,7 @@ namespace boost
         BOOST_CONSTEXPR node_ptr_type(std::nullptr_t) BOOST_NOEXCEPT : p(nullptr) {}
         node_ptr_type(node_ptr_type &&o) BOOST_NOEXCEPT : allocator(std::move(o.allocator)), p(o.p) { o.p=nullptr; }
         node_ptr_type(const node_ptr_type &)=delete;
-        node_ptr_type &operator=(node_ptr_type &&o) BOOST_NOEXCEPT // noexcept should depend on value_type noexceptness
+        node_ptr_type &operator=(node_ptr_type &&o) BOOST_NOEXCEPT // FIXME noexcept should depend on value_type noexceptness
         {
           this->~node_ptr_type();
           new(this) value_type(std::move(o));
@@ -1053,7 +1054,7 @@ namespace boost
         for(; first!=last; ++first)
           emplace(*first);
       }
-      void insert(std::initializer_list<value_type> i) { insert(std::make_move_iterator(i.begin()), std::make_move_iterator(i.end())); }
+      void insert(std::initializer_list<value_type> i) { insert(i.begin(), i.end()); }
       node_ptr_type extract(const_iterator it)
       {
         //assert(it!=end());
@@ -1200,15 +1201,31 @@ namespace boost
               break;
             }
             std::lock_guard<decltype(b.lock)> g(b.lock, std::adopt_lock); // Will abort all concurrency
-            for(auto &i : b.items)
+            auto &items=b.items;
+            size_t failed=0;
+            for(auto &i : items)
             {
               typename other_map_type::node_ptr_type former(o._allocator);
               former.p=i.p;
               i.p=nullptr;
-              insert(node_ptr_type(std::move(former))); // Will reallocate only if necessary
+              node_ptr_type n(rebind_node_ptr<other_map_type>(std::move(former))); // Will reallocate only if necessary
+              if(!insert(std::move(n)).second)
+              {
+                // Insertion failed, put it back
+                // FIXME If allocators are different it could throw here during rebind, thus losing the value
+                typename other_map_type::node_ptr_type former2(o.rebind_node_ptr<concurrent_unordered_map>(std::move(n)));
+                i.p=former2.release();
+                failed++;
+              }
             }
-            b.items.clear();
-            b.count.store(0, memory_order_release);
+            b.count.store(failed, memory_order_release);
+            if(!failed)
+              items.clear();
+            else
+            {
+              while(!items.empty() && !items.back().p)
+                items.pop_back(); // Will abort all concurrency
+            }
           }
         } while(!done);
       }
