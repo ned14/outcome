@@ -496,8 +496,8 @@ namespace boost
       * empty() has average complexity O(bucket count/item count/2), worst case O(bucket count) when the map is empty.
       * size() always has complexity O(bucket count). If you do rehash(size()) to make load factor to 1.0, remember this can become very slow for large
         numbers of items. The map is deliberately more tolerant than most to collisions, it can cope with load factors of 8.0 or so without much slowdown.
-      * emplace() consumes its rvalue referenced items even when an exception is thrown i.e. the "has no effect" rule
-        is violated. The map itself is untouched however. Chances are real world code will never notice this.
+      * emplace() consumes its rvalue referenced items even when an exception is thrown i.e. the "has no effect" rule is violated. The map itself is untouched
+        however. Chances are real world code will never notice this, but if you do, insert() correctly does not consume arguments if exceptions are thrown.
 
     * clear() and merge() both are safe concurrent with all other operations, however inserting items concurrently to a clear() or merge()
       has a possibility of losing and failing to merge some of those newly inserted items. erase() is safe however.
@@ -609,6 +609,11 @@ namespace boost
           o=std::move(temp);
         }
       };
+      template<class U> class noalloc : public U
+      {
+      public:
+        explicit noalloc(U &&o) : U(std::move(o)) { }
+      };
     private:
       struct item_type
       {
@@ -618,7 +623,7 @@ namespace boost
         item_type(size_t _hash, value_type *_p) BOOST_NOEXCEPT : p(_p), hash(_hash) { }
         item_type(size_t _hash, node_ptr_type &&_p) BOOST_NOEXCEPT : p(_p.release()), hash(_hash) { }
         item_type(item_type &&o) BOOST_NOEXCEPT : p(std::move(o.p)), hash(o.hash) { o.p=nullptr; o.hash=0; }
-        item_type(const item_type &o);
+        item_type(const item_type &o) = delete;
         ~item_type() BOOST_NOEXCEPT
         {
           assert(!p);
@@ -714,6 +719,7 @@ namespace boost
         }
         iterator operator++(int) { iterator t(*this); operator++(); return t; }
         value_type &operator*() { _catch_up(); assert(_itb!=_parent->_buckets.end()); if(_itb==_parent->_buckets.end()) abort(); return *_itb->items[_offset].p; }
+        value_type *operator->() { _catch_up(); assert(_itb!=_parent->_buckets.end()); if(_itb==_parent->_buckets.end()) abort(); return _itb->items[_offset].p; }
       };
       typedef iterator const_iterator; // FIXME
       // local_iterator
@@ -860,8 +866,7 @@ namespace boost
           iterator it=find(k);
           if(it==end())
           {
-            value_type v;
-            v.first=k;
+            value_type v(k, mapped_type());
             auto ret=insert(std::move(v));
             if(!ret.second)
               continue;
@@ -873,20 +878,28 @@ namespace boost
       }
       mapped_type &operator[](key_type &&k)
       {
-        node_ptr_type e=node_ptr_type(value_type(std::move(k), mapped_type()));
-        do
+        node_ptr_type e=make_node_ptr(value_type(std::move(k), mapped_type()));
+        try
         {
-          iterator it=find(e->first);
-          if(it==end())
+          do
           {
-            auto ret=insert(e);
-            if(!ret.second)
-              continue;
-            else
-              it=ret.first;
-          }
-          return it->second;
-        } while(false);
+            iterator it=find(e->first);
+            if(it==end())
+            {
+              auto ret=insert(std::move(e));
+              if(!ret.second)
+                continue;
+              else
+                it=ret.first;
+            }
+            return it->second;
+          } while(false);
+        }
+        catch(...)
+        {
+          k=std::move(e->first);
+          throw;
+        }
       }
       size_type count(const key_type &k) const { return end()!=find(k) ? 1 : 0; }
       std::pair<iterator, iterator> equal_range(const key_type &k)
@@ -1016,7 +1029,7 @@ namespace boost
         return ret;
       }
     public:
-      std::pair<iterator, bool> insert_ct(node_ptr_type &&v)
+      std::pair<iterator, bool> insert(noalloc<node_ptr_type> &&v)
       {
         return _insert(std::move(v), [](std::pair<iterator, bool> &ret, typename std::vector<bucket_type>::iterator &itb, size_t h, node_ptr_type &&v){ return false; });
       }
@@ -1038,21 +1051,43 @@ namespace boost
         });
       }
 
-      //! If an exception throws, note that input is consumed no matter what.
       template<class... Args> std::pair<iterator, bool> emplace(Args &&... args)
       {
-        auto ret=insert(make_node_ptr(std::forward<Args>(args)...));
-        return std::make_pair(ret.first, !ret.second);
+        node_ptr_type n(make_node_ptr(std::forward<Args>(args)...));
+        try
+        {
+          auto ret=insert(std::move(n));
+          return ret;
+        }
+        catch(...)
+        {
+          // FIXME Need to restore args out of node_ptr_type.
+          throw;
+        }
       }
       template<class... Args> iterator emplace_hint(const_iterator position, Args &&... args) { return emplace(std::forward<Args>(args)...); }
       std::pair<iterator, bool> insert(const value_type &v) { return emplace(v); }
-      template<class P> std::pair<iterator, bool> insert(P &&v) { return emplace(std::forward<P>(v)); }
+      std::pair<iterator, bool> insert(value_type &&v)
+      {
+        node_ptr_type n(make_node_ptr(std::move(v)));
+        try
+        {
+          auto ret=insert(std::move(n));
+          return ret;
+        }
+        catch(...)
+        {
+          v.~value_type();
+          new(&v) value_type(std::move(*n));
+          throw;
+        }
+      }
       iterator insert(const_iterator hint, const value_type &v) { return insert(v); }
-      template<class P> iterator insert(const_iterator hint, P &&v) { return insert(std::forward<P>(v)); }
+      iterator insert(const_iterator hint, value_type &&v) { return insert(std::move(v)); }
       template<class InputIterator> void insert(InputIterator first, InputIterator last)
       {
         for(; first!=last; ++first)
-          emplace(*first);
+          insert(*first);
       }
       void insert(std::initializer_list<value_type> i) { insert(i.begin(), i.end()); }
       node_ptr_type extract(const_iterator it)

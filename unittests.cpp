@@ -344,6 +344,26 @@ TEST_CASE("works/concurrent_unordered_map/merge", "Tests that concurrent_unorder
   }
 }
 
+TEST_CASE("works/concurrent_unordered_map/operator[]", "Tests that concurrent_unordered_map operator[] works as expected")
+{
+  printf("\n=== concurrent_unordered_map operator[] ===\n");
+  boost::spinlock::concurrent_unordered_map<std::string, int> map;
+  std::string key("niall");
+  // const lvalue ref
+  map[key]=4;
+  CHECK(map.size()==1);
+  CHECK(key=="niall");
+  CHECK(map[key]==4);
+  CHECK(map.size()==1);
+  CHECK(key=="niall");
+  // rvalue ref
+  map[std::move(key)]=5;
+  CHECK(map.size()==1);
+  CHECK(key=="");
+  CHECK(map["niall"]==5);
+  CHECK(map.size()==1);
+}
+
 static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact, int type)
 {
   boost::spinlock::spinlock<bool> lock;
