@@ -824,7 +824,9 @@ namespace boost
           auto itb=_get_bucket(h);
           bucket_type &b=*itb;
           size_t offset=0;
-          if(b.count.load(memory_order_acquire))
+          if(!b.count.load(memory_order_acquire))
+            done=true;
+          else
           {
             // Should run completely concurrently with other finds
             BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(b.lock, 2)
@@ -875,6 +877,7 @@ namespace boost
           }
           return it->second;
         } while(false);
+        abort();
       }
       mapped_type &operator[](key_type &&k)
       {
@@ -900,6 +903,7 @@ namespace boost
           k=std::move(e->first);
           throw;
         }
+        abort();
       }
       size_type count(const key_type &k) const { return end()!=find(k) ? 1 : 0; }
       std::pair<iterator, iterator> equal_range(const key_type &k)
