@@ -362,6 +362,21 @@ TEST_CASE("works/concurrent_unordered_map/operator[]", "Tests that concurrent_un
   CHECK(key=="");
   CHECK(map["niall"]==5);
   CHECK(map.size()==1);
+  // collision
+  auto n=map.extract("niall");
+  CHECK(map.size()==0);
+  map["niall"]=4;
+  CHECK(map.size()==1);
+  CHECK(map["niall"]==4);
+  auto outcome=map.insert(std::move(n));
+  CHECK(outcome.second==false);
+  CHECK(n);
+  map.erase("niall");
+  CHECK(map.size()==0);
+  outcome=map.insert(std::move(n));
+  CHECK(outcome.second==true);
+  CHECK(!n);
+  CHECK(map["niall"]==5);
 }
 
 static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact, int type)
