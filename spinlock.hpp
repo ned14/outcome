@@ -568,7 +568,7 @@ namespace boost
         node_ptr_type &operator=(node_ptr_type &&o) BOOST_NOEXCEPT // FIXME noexcept should depend on value_type noexceptness
         {
           this->~node_ptr_type();
-          new(this) value_type(std::move(o));
+          new(this) node_ptr_type(std::move(o));
           return *this;
         }
         node_ptr_type &operator=(std::nullptr_t) BOOST_NOEXCEPT
@@ -608,11 +608,6 @@ namespace boost
           *this=std::move(o);
           o=std::move(temp);
         }
-      };
-      template<class U> class noalloc : public U
-      {
-      public:
-        explicit noalloc(U &&o) : U(std::move(o)) { }
       };
     private:
       struct item_type
@@ -861,7 +856,7 @@ namespace boost
         return it->second;
       }
       const mapped_type &at(const key_type &k) const { return const_cast<concurrent_unordered_map *>(this)->at(k); } // FIXME
-      mapped_type &operator[](const key_type &k)
+      mapped_type &operator[](const key_type &k) // FIXME This implementation should not use iterators
       {
         do
         {
@@ -879,7 +874,7 @@ namespace boost
         } while(false);
         abort();
       }
-      mapped_type &operator[](key_type &&k)
+      mapped_type &operator[](key_type &&k) // FIXME This implementation should not use iterators
       {
         node_ptr_type e=make_node_ptr(value_type(std::move(k), mapped_type()));
         try
@@ -968,7 +963,7 @@ namespace boost
     private:
       template<class C> std::pair<iterator, bool> _insert(node_ptr_type &&v, C &&extend)
       {
-        std::pair<iterator, bool> ret(end(), true);
+        std::pair<iterator, bool> ret(end(), false);
         const key_type &k=v->first;
         size_t h=_hasher(k);
         bool done=false;
@@ -994,7 +989,6 @@ namespace boost
               {
                 ret.first._itb=itb;
                 ret.first._offset=offset;
-                ret.second=false;
                 done=true;
                 break;
               }
@@ -1020,6 +1014,7 @@ namespace boost
               {
                 ret.first._itb=itb;
                 ret.first._offset=emptyidx;
+                ret.second=true;
                 i->p=v.release();
                 i->hash=h;
                 b.count.fetch_add(1, memory_order_acquire);
@@ -1033,9 +1028,9 @@ namespace boost
         return ret;
       }
     public:
-      std::pair<iterator, bool> insert(noalloc<node_ptr_type> &&v)
+      std::pair<iterator, bool> insert_noalloc(node_ptr_type &&v)
       {
-        return _insert(std::move(v), [](std::pair<iterator, bool> &ret, typename std::vector<bucket_type>::iterator &itb, size_t h, node_ptr_type &&v){ return false; });
+        return _insert(std::move(v), [](std::pair<iterator, bool> &ret, typename std::vector<bucket_type>::iterator &itb, size_t h, node_ptr_type &&v){ return true; });
       }
       std::pair<iterator, bool> insert(node_ptr_type &&v)
       {
@@ -1049,6 +1044,7 @@ namespace boost
           }
           ret.first._itb=itb;
           ret.first._offset=b.items.size();
+          ret.second=true;
           b.items.push_back(item_type(h, std::move(v)));
           b.count.fetch_add(1, memory_order_acquire);
           return true;
@@ -1070,7 +1066,23 @@ namespace boost
         }
       }
       template<class... Args> iterator emplace_hint(const_iterator position, Args &&... args) { return emplace(std::forward<Args>(args)...); }
-      std::pair<iterator, bool> insert(const value_type &v) { return emplace(v); }
+      std::pair<iterator, bool> insert_noalloc(const value_type &v) { return insert_noalloc(value_type(v)); }
+      std::pair<iterator, bool> insert(const value_type &v) { return insert(value_type(v)); }
+      std::pair<iterator, bool> insert_noalloc(value_type &&v)
+      {
+        node_ptr_type n(make_node_ptr(std::move(v)));
+        try
+        {
+          auto ret=insert_noalloc(std::move(n));
+          return ret;
+        }
+        catch(...)
+        {
+          v.~value_type();
+          new(&v) value_type(std::move(*n));
+          throw;
+        }
+      }
       std::pair<iterator, bool> insert(value_type &&v)
       {
         node_ptr_type n(make_node_ptr(std::move(v)));
@@ -1086,8 +1098,8 @@ namespace boost
           throw;
         }
       }
-      iterator insert(const_iterator hint, const value_type &v) { return insert(v); }
-      iterator insert(const_iterator hint, value_type &&v) { return insert(std::move(v)); }
+      iterator insert(const_iterator hint, const value_type &v) { return insert(v).first; }
+      iterator insert(const_iterator hint, value_type &&v) { return insert(std::move(v)).first; }
       template<class InputIterator> void insert(InputIterator first, InputIterator last)
       {
         for(; first!=last; ++first)

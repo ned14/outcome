@@ -379,6 +379,34 @@ TEST_CASE("works/concurrent_unordered_map/operator[]", "Tests that concurrent_un
   CHECK(map["niall"]==5);
 }
 
+TEST_CASE("works/concurrent_unordered_map/noalloc", "Tests that concurrent_unordered_map noalloc works as expected")
+{
+  printf("\n=== concurrent_unordered_map noalloc ===\n");
+  boost::spinlock::concurrent_unordered_map<std::string, int> map(1); // no buckets
+  // with node ptrs
+  auto n=map.make_node_ptr(std::make_pair("niall", 4));
+  auto outcome=map.insert_noalloc(std::move(n)); // fails
+  CHECK(outcome.second==false);
+  CHECK(map.size()==0);
+  outcome=map.insert(std::move(n)); // succeeds
+  CHECK(outcome.second==true);
+  CHECK(map.size()==1);
+
+  // with values
+  outcome=map.insert_noalloc(std::make_pair("hello", 0));
+  CHECK(outcome.second==false);
+  CHECK(map.size()==1);
+
+  // make an empty slot first  
+  map.emplace("niall2", 5); // allocates
+  CHECK(map.size()==2);
+  map.erase("niall"); // leaves empty slot, so a non-allocating insert should succeed now
+  CHECK(map.size()==1);
+  outcome=map.insert_noalloc(std::make_pair("foo", 0));
+  CHECK(outcome.second==true);
+  CHECK(map.size()==2);
+}
+
 static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact, int type)
 {
   boost::spinlock::spinlock<bool> lock;
