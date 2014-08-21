@@ -48,6 +48,8 @@ DEALINGS IN THE SOFTWARE.
 #include "catch.hpp"
 #endif
 
+#include "allocator_testing.hpp"
+
 
 
 using namespace std;
@@ -405,6 +407,53 @@ TEST_CASE("works/concurrent_unordered_map/noalloc", "Tests that concurrent_unord
   outcome=map.insert_noalloc(std::make_pair("foo", 0));
   CHECK(outcome.second==true);
   CHECK(map.size()==2);
+}
+
+TEST_CASE("works/concurrent_unordered_map/exceptionsafety", "Tests that concurrent_unordered_map exception safety works as expected")
+{
+  printf("\n=== concurrent_unordered_map exception safety ===\n");
+  auto &config=boost::allocator_testing::get_config();
+  boost::spinlock::concurrent_unordered_map<std::string, int, std::hash<std::string>, std::equal_to<std::string>, boost::allocator_testing::allocator<std::pair<const std::string, int>, std::allocator<std::pair<const std::string, int>>>> map(1); // no buckets
+  // fail first allocation
+  config.fail_from=(size_t) config.count;
+  CHECK_THROWS_AS(map.insert(std::make_pair("niall", 4)), std::bad_alloc);
+  
+  auto v=std::make_pair("niall", 4);
+  // failed insert doesn't destroy value
+  config.fail_from=(size_t) config.count+1;
+  CHECK_THROWS_AS(map.insert(v), std::bad_alloc);
+  CHECK(v.first=="niall");
+  config.fail_from=(size_t) config.count+1;
+  CHECK_THROWS_AS(map.insert(std::move(v)), std::bad_alloc);
+  CHECK(v.first=="niall");
+  config.fail_from=(size_t) config.count+1;
+  CHECK_NOTHROW(map.insert_noalloc(v));
+  CHECK(v.first=="niall");
+  config.fail_from=(size_t) config.count+1;
+  CHECK_NOTHROW(map.insert_noalloc(std::move(v)));
+  CHECK(v.first=="niall");
+  // failed operator[] doesn't destroy value
+  config.fail_from=(size_t) config.count+1;
+  CHECK_THROWS_AS(map[v.first], std::bad_alloc);
+  CHECK(v.first=="niall");
+  config.fail_from=(size_t) config.count+1;
+  CHECK_THROWS_AS(map[std::move(v.first)], std::bad_alloc);
+  CHECK(v.first=="niall");
+  // failed emplace doesn't destroy value
+  config.fail_from=(size_t) config.count+1;
+  CHECK_THROWS_AS(map.emplace(v), std::bad_alloc);
+  CHECK(v.first=="niall");
+  config.fail_from=(size_t) config.count+1;
+  CHECK_THROWS_AS(map.emplace(std::move(v)), std::bad_alloc);
+  CHECK(v.first=="niall");
+  
+  config.fail_from=(size_t) config.count+1;
+  auto n=map.make_node_ptr(std::move(v));
+  // failed insert doesn't destroy value
+  CHECK_THROWS_AS(map.insert(std::move(n)), std::bad_alloc);
+  CHECK(n);
+  CHECK_NOTHROW(map.insert_noalloc(std::move(n)));
+  CHECK(n);
 }
 
 static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact, int type)

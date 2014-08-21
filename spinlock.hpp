@@ -36,18 +36,14 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 #include <memory>
 
-#if !defined(BOOST_SPINLOCK_USE_BOOST_ATOMIC) && defined(BOOST_NO_CXX11_HDR_ATOMIC)
-# define BOOST_SPINLOCK_USE_BOOST_ATOMIC
-#endif
+#define BOOST_ATOMIC_MAP_START_NAMESPACE namespace boost { namespace spinlock {
+#define BOOST_ATOMIC_MAP_END_NAMESPACE } }
+#include "cpp11_or_boost_map/atomic"
+
 #if !defined(BOOST_SPINLOCK_USE_BOOST_THREAD) && defined(BOOST_NO_CXX11_HDR_THREAD)
 # define BOOST_SPINLOCK_USE_BOOST_THREAD
 #endif
 
-#ifdef BOOST_SPINLOCK_USE_BOOST_ATOMIC
-# include <boost/atomic.hpp>
-#else
-# include <atomic>
-#endif
 #ifdef BOOST_SPINLOCK_USE_BOOST_THREAD
 # include <boost/thread.hpp>
 #else
@@ -64,107 +60,19 @@ DEALINGS IN THE SOFTWARE.
 // Turn this on if you have a compiler which understands __transaction_relaxed
 //#define BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
 
-#ifndef BOOST_SMT_PAUSE
-# if defined(_MSC_VER) && _MSC_VER >= 1310 && ( defined(_M_IX86) || defined(_M_X64) )
-extern "C" void _mm_pause();
-#  pragma intrinsic( _mm_pause )
-#  define BOOST_SMT_PAUSE _mm_pause();
-# elif defined(__GNUC__) && ( defined(__i386__) || defined(__x86_64__) )
-#  define BOOST_SMT_PAUSE __asm__ __volatile__( "rep; nop" : : : "memory" );
-# endif
-#endif
-
-#ifndef BOOST_NOEXCEPT
-# if !defined(_MSC_VER) || _MSC_VER >= 1900
-#  define BOOST_NOEXCEPT noexcept
-# endif
-#endif
-#ifndef BOOST_NOEXCEPT
-# define BOOST_NOEXCEPT
-#endif
-
-#ifndef BOOST_NOEXCEPT_OR_NOTHROW
-# if !defined(_MSC_VER) || _MSC_VER >= 1900
-#  define BOOST_NOEXCEPT_OR_NOTHROW noexcept
-# endif
-#endif
-#ifndef BOOST_NOEXCEPT_OR_NOTHROW
-# define BOOST_NOEXCEPT_OR_NOTHROW throw()
-#endif
-
-#ifndef BOOST_CONSTEXPR
-# if !defined(_MSC_VER) || _MSC_VER >= 1900
-#  define BOOST_CONSTEXPR constexpr
-# endif
-#endif
-#ifndef BOOST_CONSTEXPR
-# define BOOST_CONSTEXPR
-#endif
-
-#ifndef BOOST_CONSTEXPR_OR_CONST
-# if !defined(_MSC_VER) || _MSC_VER >= 1900
-#  define BOOST_CONSTEXPR_OR_CONST constexpr
-# endif
-#endif
-#ifndef BOOST_CONSTEXPR_OR_CONST
-# define BOOST_CONSTEXPR_OR_CONST const
-#endif
-
 namespace boost
 {
+  // Map in a this_thread implementation
+#ifdef BOOST_SPINLOCK_USE_BOOST_THREAD
+  namespace this_thread=boost::this_thread;
+  namespace chrono { using boost::chrono::milliseconds; }
+#else
+  namespace this_thread=std::this_thread;
+  namespace chrono { using std::chrono::milliseconds; }
+#endif
+
   namespace spinlock
   {
-    // Map in an atomic implementation
-    template <class T>
-    class atomic
-#ifdef BOOST_SPINLOCK_USE_BOOST_ATOMIC
-      : public boost::atomic<T>
-    {
-      typedef boost::atomic<T> Base;
-#else
-      : public std::atomic<T>
-    {
-      typedef std::atomic<T> Base;
-#endif
-
-    public:
-      atomic() : Base() {}
-      BOOST_CONSTEXPR atomic(T v) BOOST_NOEXCEPT : Base(std::forward<T>(v)) {}
-
-#ifdef BOOST_NO_CXX11_DELETED_FUNCTIONS
-      //private:
-      atomic(const Base &) /* =delete */;
-#else
-      atomic(const Base &) = delete;
-#endif
-    };//end boost::afio::atomic
-#ifdef BOOST_SPINLOCK_USE_BOOST_ATOMIC
-    using boost::memory_order;
-    using boost::memory_order_relaxed;
-    using boost::memory_order_consume;
-    using boost::memory_order_acquire;
-    using boost::memory_order_release;
-    using boost::memory_order_acq_rel;
-    using boost::memory_order_seq_cst;
-#else
-    using std::memory_order;
-    using std::memory_order_relaxed;
-    using std::memory_order_consume;
-    using std::memory_order_acquire;
-    using std::memory_order_release;
-    using std::memory_order_acq_rel;
-    using std::memory_order_seq_cst;
-#endif
-    // Map in a this_thread implementation
-#ifdef BOOST_SPINLOCK_USE_BOOST_THREAD
-    namespace this_thread=boost::this_thread;
-    namespace chrono { using boost::chrono::milliseconds; }
-#else
-    namespace this_thread=std::this_thread;
-    namespace chrono { using std::chrono::milliseconds; }
-#endif
-
-
     /*! \struct lockable_ptr
      * \brief Lets you use a pointer to memory as a spinlock :)
      */
