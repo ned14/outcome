@@ -440,6 +440,14 @@ namespace boost
       key_equal _key_equal;
       allocator_type _allocator;
       float _max_load_factor;
+      template<class U> struct undoer_t
+      {
+        U callable;
+        bool dismissed;
+        undoer_t(U c) : callable(std::move(c)), dismissed(false) { }
+        ~undoer_t() { if(!dismissed) callable(); }
+      };
+      template<class U> undoer_t<U> undoer(U c) { return undoer_t<U>(std::move(c)); }
     public:
       class node_ptr_type
       {
@@ -964,16 +972,10 @@ namespace boost
       template<class... Args> std::pair<iterator, bool> emplace(Args &&... args)
       {
         node_ptr_type n(make_node_ptr(std::forward<Args>(args)...));
-        try
-        {
-          auto ret=insert(std::move(n));
-          return ret;
-        }
-        catch(...)
-        {
-          // FIXME Need to restore args out of node_ptr_type.
-          throw;
-        }
+        auto u=undoer([&]{}); // FIXME Need to restore args out of node_ptr_type.
+        auto ret=insert(std::move(n));
+        u.dismissed=ret.second;
+        return ret;
       }
       template<class... Args> iterator emplace_hint(const_iterator position, Args &&... args) { return emplace(std::forward<Args>(args)...); }
       std::pair<iterator, bool> insert_noalloc(const value_type &v) { return insert_noalloc(value_type(v)); }
@@ -981,32 +983,24 @@ namespace boost
       std::pair<iterator, bool> insert_noalloc(value_type &&v)
       {
         node_ptr_type n(make_node_ptr(std::move(v)));
-        try
-        {
-          auto ret=insert_noalloc(std::move(n));
-          return ret;
-        }
-        catch(...)
-        {
+        auto u=undoer([&]{
           v.~value_type();
           new(&v) value_type(std::move(*n));
-          throw;
-        }
+        });
+        auto ret=insert_noalloc(std::move(n));
+        u.dismissed=ret.second;
+        return ret;
       }
       std::pair<iterator, bool> insert(value_type &&v)
       {
         node_ptr_type n(make_node_ptr(std::move(v)));
-        try
-        {
-          auto ret=insert(std::move(n));
-          return ret;
-        }
-        catch(...)
-        {
+        auto u=undoer([&]{
           v.~value_type();
           new(&v) value_type(std::move(*n));
-          throw;
-        }
+        });
+        auto ret=insert(std::move(n));
+        u.dismissed=ret.second;
+        return ret;
       }
       iterator insert(const_iterator hint, const value_type &v) { return insert(v).first; }
       iterator insert(const_iterator hint, value_type &&v) { return insert(std::move(v)).first; }

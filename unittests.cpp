@@ -413,53 +413,70 @@ TEST_CASE("works/concurrent_unordered_map/exceptionsafety", "Tests that concurre
 {
   printf("\n=== concurrent_unordered_map exception safety ===\n");
   auto &config=boost::allocator_testing::get_config();
-  boost::spinlock::concurrent_unordered_map<std::string, int, std::hash<std::string>, std::equal_to<std::string>, boost::allocator_testing::allocator<std::pair<const std::string, int>, std::allocator<std::pair<const std::string, int>>>> map(1); // no buckets
+  typedef boost::spinlock::concurrent_unordered_map<std::string, std::string, std::hash<std::string>, std::equal_to<std::string>, boost::allocator_testing::allocator<std::pair<const std::string, std::string>, std::allocator<std::pair<const std::string, std::string>>>> map_type;
+  map_type map(1); // no buckets
   // fail first allocation
   config.fail_from=(size_t) config.count;
-  CHECK_THROWS_AS(map.insert(std::make_pair("niall", 4)), std::bad_alloc);
-  
-  auto v=std::make_pair("niall", 4);
+  CHECK_THROWS_AS(map.insert(std::make_pair("niall", "niall")), std::bad_alloc);
+
   // failed insert doesn't destroy value
-  config.fail_from=(size_t) config.count+2;
-  CHECK_THROWS_AS(map.insert(v), std::bad_alloc);
-  CHECK(config.fail_from==config.count);
-  CHECK(v.first=="niall");
-  config.fail_from=(size_t) config.count+2;
-  CHECK_THROWS_AS(map.insert(std::move(v)), std::bad_alloc);
-  CHECK(config.fail_from==config.count);
-  CHECK(v.first=="niall");
-  config.fail_from=(size_t) config.count+2;
-  CHECK_NOTHROW(map.insert_noalloc(v));
-  CHECK(config.fail_from==config.count+1);
-  CHECK(v.first=="niall");
-  config.fail_from=(size_t) config.count+2;
-  CHECK_NOTHROW(map.insert_noalloc(std::move(v)));
-  CHECK(config.fail_from==config.count+1);
-  CHECK(v.first=="niall");
+  {
+    map_type::value_type v=std::make_pair("niall", "niall");
+    config.fail_from=(size_t) config.count+2;
+    CHECK_THROWS_AS(map.insert(v), std::bad_alloc);
+    CHECK(config.fail_from==config.count);
+    CHECK(v.first=="niall");
+    CHECK(v.second=="niall");
+    config.fail_from=(size_t) config.count+2;
+    CHECK_THROWS_AS(map.insert(std::move(v)), std::bad_alloc);
+    CHECK(config.fail_from==config.count);
+    CHECK(v.first=="niall");
+    CHECK(v.second=="niall");
+    config.fail_from=(size_t) config.count+2;
+    CHECK_NOTHROW(map.insert_noalloc(v));
+    CHECK(config.fail_from==config.count+1);
+    CHECK(v.first=="niall");
+    CHECK(v.second=="niall");
+    config.fail_from=(size_t) config.count+2;
+    CHECK_NOTHROW(map.insert_noalloc(std::move(v)));
+    CHECK(config.fail_from==config.count+1);
+    CHECK(v.first=="niall");
+    CHECK(v.second=="niall");
+  }
 
   // failed operator[] doesn't destroy value
-  config.fail_from=(size_t) config.count+2;
-  CHECK_THROWS_AS(map[v.first], std::bad_alloc);
-  CHECK(config.fail_from==config.count);
-  CHECK(v.first=="niall");
-  config.fail_from=(size_t) config.count+2;
-  CHECK_THROWS_AS(map[std::move(v.first)], std::bad_alloc);
-  CHECK(config.fail_from==config.count);
-  CHECK(v.first=="niall");
+  {
+    map_type::value_type v=std::make_pair("niall", "niall");
+    config.fail_from=(size_t) config.count+2;
+    CHECK_THROWS_AS(map[v.first], std::bad_alloc);
+    CHECK(config.fail_from==config.count);
+    CHECK(v.first=="niall");
+    CHECK(v.second=="niall");
+    config.fail_from=(size_t) config.count+2;
+    CHECK_THROWS_AS(map[std::move(v.first)], std::bad_alloc);
+    CHECK(config.fail_from==config.count);
+    CHECK(v.first=="niall");
+    CHECK(v.second=="niall");
+  }
 
   // failed emplace doesn't destroy value
+  {
+    map_type::value_type v=std::make_pair("niall", "niall");
+    config.fail_from=(size_t) config.count+2;
+    CHECK_THROWS_AS(map.emplace(v), std::bad_alloc);
+    CHECK(config.fail_from==config.count);
+    CHECK(v.first=="niall");
+    CHECK(v.second=="niall");
+    config.fail_from=(size_t) config.count+2;
+    CHECK_THROWS_AS(map.emplace(std::move(v)), std::bad_alloc);
+    CHECK(config.fail_from==config.count);
+    CHECK(v.first=="niall");
+    CHECK(v.second=="niall"); // FIXME Known problem with implementation, awaiting fix.
+  }
+
+  // failed node ptr insert doesn't destroy value
   config.fail_from=(size_t) config.count+2;
-  CHECK_THROWS_AS(map.emplace(v), std::bad_alloc);
-  CHECK(config.fail_from==config.count);
-  CHECK(v.first=="niall");
-  config.fail_from=(size_t) config.count+2;
-  CHECK_THROWS_AS(map.emplace(std::move(v)), std::bad_alloc);
-  CHECK(config.fail_from==config.count);
-  CHECK(v.first=="niall");
-  
-  config.fail_from=(size_t) config.count+2;
-  auto n=map.make_node_ptr(std::move(v));
-  // failed insert doesn't destroy value
+  auto n=map.make_node_ptr("niall", "niall");
   CHECK_THROWS_AS(map.insert(std::move(n)), std::bad_alloc);
   CHECK(config.fail_from==config.count);
   CHECK(n);
