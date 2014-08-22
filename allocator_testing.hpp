@@ -52,13 +52,14 @@ static config &get_config()
   
 template<class T, class A=std::allocator<T>> struct allocator : public A
 {
+  template<class U> struct rebind { typedef allocator<U> other; };
   allocator() {}
   allocator(const allocator &o) : A(o) { }
   template<class U> allocator(const allocator<U> &o) : A(o) { }
   typename A::pointer allocate(typename A::size_type n, typename std::allocator<void>::const_pointer hint=0)
   {
     config &c=get_config();
-    size_t count=c.count++;
+    size_t count=++c.count;
     if(count>=c.fail_from || count==c.fail_at)
       throw std::bad_alloc();
     return A::allocate(n, hint);

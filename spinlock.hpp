@@ -455,7 +455,7 @@ namespace boost
         allocator_type allocator;
         value_type *p;
         node_ptr_type(allocator_type &_allocator) : allocator(_allocator), p(nullptr) { }
-        template<class... Args> node_ptr_type(allocator_type &_allocator, Args... args) : allocator(_allocator), p(nullptr)
+        template<class... Args> node_ptr_type(allocator_type &_allocator, Args &&... args) : allocator(_allocator), p(nullptr)
         {
           p=allocator.allocate(1);
           try
@@ -532,11 +532,12 @@ namespace boost
           assert(!p);
         }
       };
+      typedef typename allocator_type::template rebind<item_type>::other item_type_allocator;
       struct bucket_type_impl
       {
         spinlock<unsigned char> lock;  // = 2 if you need to reload the bucket list
         atomic<unsigned> count; // count is used items in there
-        std::vector<item_type> items;
+        std::vector<item_type, item_type_allocator> items;
         bucket_type_impl() : count(0), items(0) { }
         bucket_type_impl(bucket_type_impl &&) BOOST_NOEXCEPT : count(0) { }
       };
@@ -552,7 +553,8 @@ namespace boost
 #else
       typedef bucket_type_impl bucket_type;
 #endif
-      std::vector<bucket_type> _buckets;
+      typedef typename allocator_type::template rebind<bucket_type>::other bucket_type_allocator;
+      std::vector<bucket_type, bucket_type_allocator> _buckets;
       typename std::vector<bucket_type>::iterator _get_bucket(size_t k) BOOST_NOEXCEPT
       {
         //k ^= k + 0x9e3779b9 + (k<<6) + (k>>2); // really need to avoid sequential keys tapping the same cache line

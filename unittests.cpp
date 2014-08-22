@@ -420,39 +420,51 @@ TEST_CASE("works/concurrent_unordered_map/exceptionsafety", "Tests that concurre
   
   auto v=std::make_pair("niall", 4);
   // failed insert doesn't destroy value
-  config.fail_from=(size_t) config.count+1;
+  config.fail_from=(size_t) config.count+2;
   CHECK_THROWS_AS(map.insert(v), std::bad_alloc);
+  CHECK(config.fail_from==config.count);
   CHECK(v.first=="niall");
-  config.fail_from=(size_t) config.count+1;
+  config.fail_from=(size_t) config.count+2;
   CHECK_THROWS_AS(map.insert(std::move(v)), std::bad_alloc);
+  CHECK(config.fail_from==config.count);
   CHECK(v.first=="niall");
-  config.fail_from=(size_t) config.count+1;
+  config.fail_from=(size_t) config.count+2;
   CHECK_NOTHROW(map.insert_noalloc(v));
+  CHECK(config.fail_from==config.count+1);
   CHECK(v.first=="niall");
-  config.fail_from=(size_t) config.count+1;
+  config.fail_from=(size_t) config.count+2;
   CHECK_NOTHROW(map.insert_noalloc(std::move(v)));
+  CHECK(config.fail_from==config.count+1);
   CHECK(v.first=="niall");
+
   // failed operator[] doesn't destroy value
-  config.fail_from=(size_t) config.count+1;
+  config.fail_from=(size_t) config.count+2;
   CHECK_THROWS_AS(map[v.first], std::bad_alloc);
+  CHECK(config.fail_from==config.count);
   CHECK(v.first=="niall");
-  config.fail_from=(size_t) config.count+1;
+  config.fail_from=(size_t) config.count+2;
   CHECK_THROWS_AS(map[std::move(v.first)], std::bad_alloc);
+  CHECK(config.fail_from==config.count);
   CHECK(v.first=="niall");
+
   // failed emplace doesn't destroy value
-  config.fail_from=(size_t) config.count+1;
+  config.fail_from=(size_t) config.count+2;
   CHECK_THROWS_AS(map.emplace(v), std::bad_alloc);
+  CHECK(config.fail_from==config.count);
   CHECK(v.first=="niall");
-  config.fail_from=(size_t) config.count+1;
+  config.fail_from=(size_t) config.count+2;
   CHECK_THROWS_AS(map.emplace(std::move(v)), std::bad_alloc);
+  CHECK(config.fail_from==config.count);
   CHECK(v.first=="niall");
   
-  config.fail_from=(size_t) config.count+1;
+  config.fail_from=(size_t) config.count+2;
   auto n=map.make_node_ptr(std::move(v));
   // failed insert doesn't destroy value
   CHECK_THROWS_AS(map.insert(std::move(n)), std::bad_alloc);
+  CHECK(config.fail_from==config.count);
   CHECK(n);
   CHECK_NOTHROW(map.insert_noalloc(std::move(n)));
+  CHECK(config.fail_from==config.count);
   CHECK(n);
 }
 
