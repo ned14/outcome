@@ -578,7 +578,7 @@ namespace boost
       {
         concurrent_unordered_map *_parent;
         bucket_type *_bucket_data; // used for sanity check that he hasn't rehashed
-        typename std::vector<bucket_type, bucket_type_iterator>::iterator _itb;
+        typename std::vector<bucket_type, bucket_type_allocator>::iterator _itb;
         size_t _offset, _pending_incr; // used to avoid erase() doing a costly increment unless necessary
         friend class concurrent_unordered_map;
         iterator(const concurrent_unordered_map *parent) : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(_parent->_buckets.data()), _itb(_parent->_buckets.begin()), _offset((size_t) -1), _pending_incr(1) { }
