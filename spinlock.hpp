@@ -555,7 +555,7 @@ namespace boost
 #endif
       typedef typename allocator_type::template rebind<bucket_type>::other bucket_type_allocator;
       std::vector<bucket_type, bucket_type_allocator> _buckets;
-      typename std::vector<bucket_type>::iterator _get_bucket(size_t k) BOOST_NOEXCEPT
+      typename std::vector<bucket_type, bucket_type_allocator>::iterator _get_bucket(size_t k) BOOST_NOEXCEPT
       {
         //k ^= k + 0x9e3779b9 + (k<<6) + (k>>2); // really need to avoid sequential keys tapping the same cache line
         //k ^= k + 0x9e3779b9; // really need to avoid sequential keys tapping the same cache line
@@ -940,11 +940,11 @@ namespace boost
     public:
       std::pair<iterator, bool> insert_noalloc(node_ptr_type &&v)
       {
-        return _insert(std::move(v), [](std::pair<iterator, bool> &ret, typename std::vector<bucket_type>::iterator &itb, size_t h, node_ptr_type &&v){ return true; });
+        return _insert(std::move(v), [](std::pair<iterator, bool> &ret, typename std::vector<bucket_type, bucket_type_allocator>::iterator &itb, size_t h, node_ptr_type &&v){ return true; });
       }
       std::pair<iterator, bool> insert(node_ptr_type &&v)
       {
-        return _insert(std::move(v), [](std::pair<iterator, bool> &ret, typename std::vector<bucket_type>::iterator &itb, size_t h, node_ptr_type &&v)
+        return _insert(std::move(v), [](std::pair<iterator, bool> &ret, typename std::vector<bucket_type, bucket_type_allocator>::iterator &itb, size_t h, node_ptr_type &&v)
         {
           bucket_type &b=*itb;
           if(b.items.size()==b.items.capacity())
