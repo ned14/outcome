@@ -70,6 +70,7 @@ public:
   atomic(const Base &) = delete;
 #endif
   using Base::operator=;
+  bool operator==(const T &o) const BOOST_NOEXCEPT { return Base::load()==o; }
 };//end boost::afio::atomic
 #ifdef BOOST_SPINLOCK_USE_BOOST_ATOMIC
 using boost::memory_order;
