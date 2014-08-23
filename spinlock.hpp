@@ -413,7 +413,7 @@ namespace boost
         however. Chances are real world code will never notice this, but if you do, insert() correctly does not consume arguments if exceptions are thrown.
 
     * clear() and merge() both are safe concurrent with all other operations, however inserting items concurrently to a clear() or merge()
-      has a possibility of losing and failing to merge some of those newly inserted items. erase() is safe however.
+      has a possibility of failing to clear or merge some of those newly inserted items. erase() is safe however.
 
     * Not everything is fully implemented and is marked as FIXME hopefully for some future GSoC student. In particular:
       * C++ 03 support
@@ -874,8 +874,7 @@ namespace boost
         static_assert(std::is_same<typename std::decay<typename InputIterator::value_type>::type, value_type>::value, "InputIterator type is not my value_type");
         std::vector<node_ptr_type> ret;
         // If the iterator is capable of random access, reserve the vector
-        if(std::is_constructible<std::random_access_iterator_tag,
-          typename std::iterator_traits<InputIterator>::iterator_category>::value)
+        if(std::is_constructible<std::random_access_iterator_tag, typename std::iterator_traits<InputIterator>::iterator_category>::value)
         {
           size_type len=std::distance(start, finish);
           ret.reserve(len);
@@ -885,8 +884,8 @@ namespace boost
           if(to_use)
           {
             ret.push_back(node_ptr_type(_allocator));
-            _allocator.construct(to_use, std::forward<typename InputIterator::value_type>(*start));
-            ret.back().p=to_use;
+            _allocator.construct(*to_use, std::forward<typename InputIterator::value_type>(*start));
+            ret.back().p=*to_use;
           }
           else
             ret.push_back(node_ptr_type(_allocator, std::forward<typename InputIterator::value_type>(*start)));
@@ -1028,7 +1027,7 @@ namespace boost
       node_ptr_type extract(const_iterator it)
       {
         //assert(it!=end());
-        if(it==end) return node_ptr_type();
+        if(it==end()) return node_ptr_type();
         bucket_type &b=*it._itb;
         node_ptr_type former(_allocator);
         {
@@ -1100,6 +1099,13 @@ namespace boost
         } while(!done);
         return former;
       }
+      std::vector<node_ptr_type> extract(const_iterator first, const_iterator last)
+      {
+        std::vector<node_ptr_type> ret;
+        for(; first!=last; ++first)
+          ret.push_back(extract(first));
+        return ret;
+      }
       iterator erase(const_iterator it)
       {
         iterator ret(it);
@@ -1114,8 +1120,8 @@ namespace boost
       }
       iterator erase(const_iterator first, const_iterator last)
       {
-        for(; first!=last; ++first)
-          erase(first);
+        while(first!=last)
+          first=erase(first);
         return last;
       }
 

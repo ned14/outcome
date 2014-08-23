@@ -409,6 +409,48 @@ TEST_CASE("works/concurrent_unordered_map/noalloc", "Tests that concurrent_unord
   CHECK(map.size()==2);
 }
 
+TEST_CASE("works/concurrent_unordered_map/make_node_ptrs", "Tests that concurrent_unordered_map make_node_ptrs works as expected")
+{
+  printf("\n=== concurrent_unordered_map make_node_ptrs ===\n");
+  typedef boost::spinlock::concurrent_unordered_map<int, std::string> map_type;
+  map_type map;
+  std::vector<map_type::value_type> items;
+  for(size_t n=0; n<100; n++)
+    items.emplace_back(n, std::to_string(n));
+  std::vector<map_type::node_ptr_type> n=map.make_node_ptrs(std::make_move_iterator(items.begin()), std::make_move_iterator(items.end()));
+  for(auto &i : items)
+  {
+    CHECK(i.second=="");
+  }
+  for(auto &i : n)
+  {
+    CHECK(i);
+    CHECK(i->second!="");
+  }
+  map.insert(std::make_move_iterator(n.begin()), std::make_move_iterator(n.end()));
+  for(auto &i : n)
+  {
+    CHECK(!i);
+  }
+  for(size_t n=0; n<100; n++)
+    CHECK(map[n]==std::to_string(n));
+  n=map.extract(map.begin(), map.end());
+  CHECK(map.empty());
+  std::vector<map_type::value_type *> rawptrs;
+  for(auto &i : n)
+  {
+    map_type::value_type *p=i.release();
+    map.get_allocator().destroy(p);
+    rawptrs.push_back(p);
+  }
+  items.clear();
+  CHECK(rawptrs.size()==100);
+  for(size_t n=0; n<100; n++)
+    items.emplace_back(n, std::to_string(n));
+  n=map.make_node_ptrs(std::make_move_iterator(items.begin()), std::make_move_iterator(items.end()), rawptrs.data());
+  map.insert(std::make_move_iterator(n.begin()), std::make_move_iterator(n.end()));
+}
+
 TEST_CASE("works/concurrent_unordered_map/exceptionsafety", "Tests that concurrent_unordered_map exception safety works as expected")
 {
   printf("\n=== concurrent_unordered_map exception safety ===\n");
