@@ -379,6 +379,8 @@ TEST_CASE("works/concurrent_unordered_map/operator[]", "Tests that concurrent_un
   CHECK(outcome.second==true);
   CHECK(!n);
   CHECK(map["niall"]==5);
+  CHECK(map.at("niall")==5);
+  CHECK_THROWS_AS(map.at("foo"), std::out_of_range);
 }
 
 TEST_CASE("works/concurrent_unordered_map/noalloc", "Tests that concurrent_unordered_map noalloc works as expected")
