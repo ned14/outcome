@@ -998,8 +998,12 @@ namespace boost
       {
         node_ptr_type n(make_node_ptr(std::move(v)));
         auto u=undoer([&]{
+#if 1
+          v.second=std::move(n->second);
+#else
           v.~value_type();
           new(&v) value_type(std::move(*n));
+#endif
         });
         auto ret=insert_noalloc(std::move(n));
         u.dismissed=ret.second;
@@ -1009,8 +1013,12 @@ namespace boost
       {
         node_ptr_type n(make_node_ptr(std::move(v)));
         auto u=undoer([&]{
+#if 1
+          v.second=std::move(n->second);
+#else
           v.~value_type();
           new(&v) value_type(std::move(*n));
+#endif
         });
         auto ret=insert(std::move(n));
         u.dismissed=ret.second;
