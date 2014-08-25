@@ -529,6 +529,54 @@ TEST_CASE("works/concurrent_unordered_map/exceptionsafety", "Tests that concurre
   CHECK(n);
 }
 
+#ifdef _OPENMP
+TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concurrent_unordered_map concurrent rehash works as expected")
+{
+  printf("\n=== concurrent_unordered_map concurrent rehash ===\n");
+  auto &config=boost::allocator_testing::get_config();
+  typedef boost::spinlock::concurrent_unordered_map<size_t, std::string, std::hash<size_t>, std::equal_to<size_t>, boost::allocator_testing::allocator<std::pair<const size_t, std::string>, std::allocator<std::pair<const size_t, std::string>>>> map_type;
+  map_type map;
+  boost::spinlock::atomic<size_t> gate(0);
+#pragma omp parallel
+  {
+    ++gate;
+  }
+  size_t threads=gate, rehashes=0;
+#pragma omp parallel for
+  for(int thread=0; thread<threads; thread++)
+  {
+    bool amMaster=(thread==0);
+    --gate;
+    while(gate);
+    if(amMaster)
+    {
+      for(size_t n=100; !gate; n++)
+      {
+        //printf("Rehashing to %u ...\n", (unsigned) n);
+        map.rehash(n);
+        boost::spinlock::this_thread::sleep_for(boost::spinlock::chrono::milliseconds(1));
+        ++rehashes;
+      }
+    }
+    else
+    {
+      std::string foo("n");
+      for(size_t n=0; n<1000000; n++)
+      {
+        size_t v=n*10+thread;
+        //printf("%u:%u, ", (unsigned) thread, (unsigned) n);
+        if((n & 255)<128)
+          map.insert(std::make_pair(v, foo));
+        else
+          map.erase(v-1280);
+      }
+      ++gate;
+    }
+  }
+  printf("Achieved %u rehashes\n", (unsigned) rehashes);
+}
+#endif
+
 static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact, int type)
 {
   boost::spinlock::spinlock<bool> lock;

@@ -62,6 +62,8 @@ DEALINGS IN THE SOFTWARE.
 
 namespace boost
 {
+  namespace spinlock
+  {
   // Map in a this_thread implementation
 #ifdef BOOST_SPINLOCK_USE_BOOST_THREAD
   namespace this_thread=boost::this_thread;
@@ -71,8 +73,6 @@ namespace boost
   namespace chrono { using std::chrono::milliseconds; }
 #endif
 
-  namespace spinlock
-  {
     /*! \struct lockable_ptr
      * \brief Lets you use a pointer to memory as a spinlock :)
      */
@@ -1254,7 +1254,7 @@ namespace boost
       size_t min_bucket_capacity() const BOOST_NOEXCEPT { return _min_bucket_capacity; }
       void min_bucket_capacity(size_t n) { _min_bucket_capacity=n; }
     private:
-      static void _reset_buckets(std::vector<bucket_type> &buckets) BOOST_NOEXCEPT
+      static void _reset_buckets(std::vector<bucket_type, bucket_type_allocator> &buckets) BOOST_NOEXCEPT
       {
         for(auto &b : buckets)
         {
@@ -1271,7 +1271,7 @@ namespace boost
         if(n!=_buckets.size())
         {
           // Create a new buckets
-          std::vector<bucket_type> tempbuckets(n);
+          std::vector<bucket_type, bucket_type_allocator> tempbuckets(n);
           // Lock all new buckets
           for(auto &b : tempbuckets)
           {
