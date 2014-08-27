@@ -554,14 +554,14 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
       {
         //printf("Rehashing to %u ...\n", (unsigned) n);
         map.rehash(n);
-        boost::spinlock::this_thread::sleep_for(boost::spinlock::chrono::milliseconds(1));
+        boost::spinlock::this_thread::sleep_for(boost::spinlock::chrono::milliseconds(100));
         ++rehashes;
       }
     }
     else
     {
       std::string foo("n");
-      for(size_t n=0; n<1000000; n++)
+      for(size_t n=0; n<100000000; n++)
       {
         size_t v=n*10+thread;
         //printf("%u:%u, ", (unsigned) thread, (unsigned) n);
