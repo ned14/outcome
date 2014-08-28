@@ -554,7 +554,7 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
       {
         //printf("Rehashing to %u ...\n", (unsigned) n);
         map.rehash(n);
-        boost::spinlock::this_thread::sleep_for(boost::spinlock::chrono::milliseconds(100));
+        boost::spinlock::this_thread::sleep_for(boost::spinlock::chrono::milliseconds(50));
         ++rehashes;
       }
     }
@@ -749,6 +749,7 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, int typ
   if(reserve)
   {
 #ifndef BOOST_HAVE_SYSTEM_CONCURRENT_UNORDERED_MAP
+    map.min_bucket_capacity(1);
     map.reserve(reserve);
 #endif
     for(int n=0; n<reserve/2; n++)
