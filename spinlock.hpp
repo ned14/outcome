@@ -41,6 +41,10 @@ DEALINGS IN THE SOFTWARE.
 \brief Provides boost.spinlock
 */
 
+/*! \mainpage
+This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing interesting spinlock related things.
+*/
+
 #define BOOST_ATOMIC_MAP_START_NAMESPACE namespace boost { namespace spinlock {
 #define BOOST_ATOMIC_MAP_END_NAMESPACE } }
 #include "cpp11_or_boost_map/atomic"
@@ -381,6 +385,7 @@ namespace boost
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)
 #endif // BOOST_BEGIN_TRANSACT_LOCK
 
+
     /*! \class concurrent_unordered_map
     \brief Provides an unordered_map never slower than std::unordered_map which is thread safe and wait free and optionally no-malloc to use and whose find, insert/emplace
     and erase functions are usually wait free.
@@ -391,38 +396,17 @@ namespace boost
       overload of insert(). Also added is a make_node_ptr() factory function with a rebind/realloc overload, and a make_node_ptrs() batch factory function for those
       with a malloc capable of burst/batch allocation (e.g. Linux, OS X). Finally, merge() is now templatised and rebinds/reallocs node ptrs if necessary.
 
-    - To help you make sane concurrent use of the map, insert/emplace and erase never invalidate iterators nor references. This implies that rehashing is
-      manual. If you perform a manual rehash which will invalidate all iterators, you must manually call it at a time when the following conditions are true:
-      
-      1. All iterators are not in use in other threads. That means calls such as erase(find(value)) cannot be happening. Use erase(value) instead.
-      2. No call which consumes iterators is happening in other threads.
-      3. All calls which return iterators must never use that returned iterator, and must throw it away without using it. Use at() or operator[] if you
-         need to safely access a just inserted new value.
-      4. All the following calls which use iterators internally are not happening in other threads:
-         - merge() where input container is not a concurrent_unordered_map.
-
-    - Given the costs of rehashing, the design sacrifices low load factor performance for high load factor performance. Load factors of 16 or so are not
+    - Given the high costs of rehashing (see below), the design sacrifices low load factor performance for high load factor performance. Load factors of 16 or so are not
       significantly slower than load factors of less than 1 if given a well distributed hash function.
 
     - All operations may operate concurrently with all other operations except rehash() and swap(). If they hit the same bucket they are serialised for obvious reasons. Also
       for obvious reasons a rehash() and swap() must halt all concurrency, these are the only operations which do this.
 
-    - All operations will operate safely in concurrency with all other operations excluding rehash(), see below. You may get unstable outcomes of course,
+    - All operations will operate safely in concurrency with all other operations excluding rehash() and swap(), see below. You may get unstable outcomes of course,
       especially if you are inserting and deleting the same key from multiple threads, and no locking is provided per key-value pair, so if you delete it
       from one thread while other threads have references to it you enter undefined behaviour, and probable memory corruption. Strongly consider the use
       of shared_ptr<> as the mapped type if this is a problem for you.
       
-      rehash() _can_ operate safely in concurrency with all other operations, but with this major restriction: **YOU MUST NOT CALL REHASH TOO FREQUENTLY**.
-      This is because rehash() is safe concurrent by keeping around many old bucket lists but marked to tell threads using them to reload the bucket list.
-      Therefore if you call rehash() many times in quick succession and push a bucket list still in use off the end of the ring buffer, you end up deleting
-      that bucket list possibly before threads have had a chance to notice that they must reload the bucket list, and you will have a race and probable
-      memory corruption.
-      
-      As much as this might sound terrible because this concurrent_unordered_map implementation cannot GUARANTEE thread safety, such are the costs of
-      rehashing on concurrency that anyone using this class will only rarely rehash. We suggest that you run a rehash no more than once per second
-      (putting rehash on a timer is an excellent idea), the unit test suite tests 10 times per second and sees no segfaults, so a margin of tenfold
-      should be sufficient for production code.
-
     - To very substantially improve concurrency, the following deviations from std::unordered_map<> behaviour have been made:
       - empty() has average complexity O(bucket count/item count/2), worst case O(bucket count) when the map is empty.
       - size() always has complexity O(bucket count). If you do rehash(size()) to make load factor to 1.0, remember this can become very slow for large
@@ -437,6 +421,8 @@ namespace boost
       Iterators inside the map being merged into are safe. Note that inserting items into the merging map concurrently has a possibility of failing to merge
       some of those newly inserted items.
 
+    # Awaiting implementation #
+    
     - Not everything is fully implemented and is marked as FIXME hopefully for some future GSoC student. In particular:
 
       - C++ 03 support
@@ -446,6 +432,42 @@ namespace boost
       - Local iterators
       - Copy and move construction plus copy and move assignment
       - noexcept is always on in many places it should be conditional. We are blocked on MSVC for this.
+
+    # swap() thread safety #
+    
+    swap() is _probably_ safe to use concurrent to all other operations. I say probably because it swaps the hasher, key comparer, max_load_factor and
+    min_bucket_capacity individually and without serialisation. If any of those race state, you are in trouble, however for 99% of uses of this class
+    this won't occur because the default hasher and key comparer carry no state, and max_load_factor and min_bucket_capacity are only ever used by
+    rehash(), which cannot happen during a swap.
+    
+    swap() is serialised with respect to itself and rehash(), so you are safe to swap and rehash concurrently.
+    
+    # rehash() thread safety #
+    
+    To help you make sane concurrent use of the map, insert/emplace and erase never invalidate iterators nor references. This implies that rehashing is
+    manual. If you perform a manual rehash which will invalidate all iterators, you must manually call it at a time when the following conditions are true:
+      
+      1. All iterators are not in use in other threads. That means calls such as erase(find(value)) cannot be happening. Use erase(value) instead.
+      2. No call which consumes iterators is happening in other threads.
+      3. All calls which return iterators must never use that returned iterator, and must throw it away without using it. Use at() or operator[] if you
+         need to safely access a found value concurrent to a rehash.
+      4. All the following calls which use iterators internally are not happening in other threads:
+         - count()
+         - merge() where input container is not a concurrent_unordered_map.
+
+    There is more bad news unfortunately. rehash() is concurrent safe if and only if you **YOU DO NOT CALL REHASH TOO FREQUENTLY**.
+    This is because rehash() is made safe concurrent by keeping around many old bucket lists but marked to tell threads using them to reload the bucket list,
+    this allows all other operations to skip locking the buckets and vastly improves performance.
+    Therefore if you call rehash() many times in quick succession and push a bucket list still in use off the end of the ring buffer which is currently
+    eight buckets long, you end up deleting that bucket list possibly before threads have had a chance to notice that they must reload the bucket list,
+    and you will have a race and probable memory corruption.
+      
+    As much as this might sound terrible because this concurrent_unordered_map implementation cannot GUARANTEE thread safety, such are the costs of
+    rehashing on concurrency that anyone using this class will only rarely rehash, especially as size() is slow. We suggest that you run a rehash
+    no more than once per second
+    (putting rehash on a timer is an excellent idea), the unit test suite tests 10 rehashes per second and sees no segfaults, so a margin of tenfold
+    should be sufficient for production code. If you are super paranoid, never rehash more than once per minute, the chances of a thread taking
+    that long between taking a copy of the location of the bucket list and examining its bucket lock are extraordinarily remote.
     */
     template<class Key, class T, class Hash=std::hash<Key>, class Pred=std::equal_to<Key>, class Alloc=std::allocator<std::pair<const Key, T>>> class concurrent_unordered_map
     {
@@ -479,6 +501,7 @@ namespace boost
       };
       template<class U> undoer_t<U> undoer(U c) { return undoer_t<U>(std::move(c)); }
     public:
+      //! The N3645 extension of a unique_ptr like smart pointer to an allocated value_type
       class node_ptr_type
       {
         friend class concurrent_unordered_map;
@@ -596,16 +619,17 @@ namespace boost
 #endif
       typedef typename allocator_type::template rebind<bucket_type>::other bucket_type_allocator;
       typedef std::vector<bucket_type, bucket_type_allocator> buckets_type;
-      buckets_type _buckets;
-      typedef std::array<buckets_type, 8> old_buckets_type;
+      std::atomic<buckets_type *> _buckets;
+      typedef std::array<buckets_type *, 8> old_buckets_type;
       old_buckets_type _oldbuckets;
       typename old_buckets_type::iterator _oldbucketit;
       typename buckets_type::iterator _get_bucket(size_t k) BOOST_NOEXCEPT
       {
         //k ^= k + 0x9e3779b9 + (k<<6) + (k>>2); // really need to avoid sequential keys tapping the same cache line
         //k ^= k + 0x9e3779b9; // really need to avoid sequential keys tapping the same cache line
-        size_type i=k % _buckets.size();
-        return _buckets.begin()+i;
+        buckets_type &buckets=*_buckets.load(memory_order_acquire);
+        size_type i=k % buckets.size();
+        return buckets.begin()+i;
       }
       static float _calc_max_load_factor() BOOST_NOEXCEPT
       {
@@ -619,6 +643,7 @@ namespace boost
 #endif
       }
     public:
+      //! The iterator. Will call abort() if you try to dereference it after its map has been rehashed.
       class iterator : public std::iterator<std::forward_iterator_tag, value_type, difference_type, pointer, reference>
       {
         concurrent_unordered_map *_parent;
@@ -626,14 +651,15 @@ namespace boost
         typename buckets_type::iterator _itb;
         size_t _offset, _pending_incr; // used to avoid erase() doing a costly increment unless necessary
         friend class concurrent_unordered_map;
-        iterator(const concurrent_unordered_map *parent) : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(_parent->_buckets.data()), _itb(_parent->_buckets.begin()), _offset((size_t) -1), _pending_incr(1) { }
-        iterator(const concurrent_unordered_map *parent, std::nullptr_t) : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(_parent->_buckets.data()), _itb(_parent->_buckets.end()), _offset((size_t) -1), _pending_incr(0) { }
+        iterator(const concurrent_unordered_map *parent) : _parent(const_cast<concurrent_unordered_map *>(parent)), _offset((size_t) -1), _pending_incr(1) { buckets_type &buckets=*_parent->_buckets.load(memory_order_acquire); _bucket_data=buckets.data(); _itb=buckets.begin(); }
+        iterator(const concurrent_unordered_map *parent, std::nullptr_t) : _parent(const_cast<concurrent_unordered_map *>(parent)), _offset((size_t) -1), _pending_incr(0) { buckets_type &buckets=*_parent->_buckets.load(memory_order_acquire); _bucket_data=buckets.data(); _itb=buckets.end(); }
         void _catch_up()
         {
-          while(_pending_incr && _itb!=_parent->_buckets.end())
+          buckets_type &buckets=*_parent->_buckets.load(memory_order_acquire);
+          while(_pending_incr && _itb!=buckets.end())
           {
-            assert(_bucket_data==_parent->_buckets.data());
-            if(_bucket_data!=_parent->_buckets.data())
+            assert(_bucket_data==buckets.data());
+            if(_bucket_data!=buckets.data())
               abort(); // stale iterator
             bucket_type &b=*_itb;
             BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(b.lock, 2)
@@ -651,7 +677,7 @@ namespace boost
               {
                 ++_itb;
                 _offset=(size_t) -1;
-              } while(_itb!=_parent->_buckets.end() && !_itb->count.load(memory_order_acquire));
+              } while(_itb!=buckets.end() && !_itb->count.load(memory_order_acquire));
             }
           }
         }
@@ -662,39 +688,41 @@ namespace boost
         bool operator==(const iterator &o) const BOOST_NOEXCEPT { _catch_up(); return _itb==o._itb && _offset==o._offset; }
         iterator &operator++()
         {
-          if(_itb==_parent->_buckets.end())
+          buckets_type &buckets=*_parent->_buckets.load(memory_order_acquire);
+          if(_itb==buckets.end())
             return *this;
           ++_pending_incr;
           return *this;
         }
         iterator operator++(int) { iterator t(*this); operator++(); return t; }
-        value_type &operator*() { _catch_up(); assert(_itb!=_parent->_buckets.end()); if(_itb==_parent->_buckets.end()) abort(); return *_itb->items[_offset].p; }
-        value_type *operator->() { _catch_up(); assert(_itb!=_parent->_buckets.end()); if(_itb==_parent->_buckets.end()) abort(); return _itb->items[_offset].p; }
+        value_type &operator*() { _catch_up(); buckets_type &buckets=*_parent->_buckets.load(memory_order_acquire); assert(_itb!=buckets.end()); if(_itb==buckets.end()) abort(); return *_itb->items[_offset].p; }
+        value_type *operator->() { _catch_up(); buckets_type &buckets=*_parent->_buckets.load(memory_order_acquire); assert(_itb!=buckets.end()); if(_itb==buckets.end()) abort(); return _itb->items[_offset].p; }
       };
       typedef iterator const_iterator; // FIXME
       // local_iterator
       // const_local_iterator
-      concurrent_unordered_map() : _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(13), _oldbucketit(_oldbuckets.begin()) { }
-      explicit concurrent_unordered_map(size_type n, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : _hasher(h), _key_equal(ke), _allocator(al), _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(n>0 ? n : 13), _oldbucketit(_oldbuckets.begin()) { }
-      explicit concurrent_unordered_map(const allocator_type &al) : _allocator(al), _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(13), _oldbucketit(_oldbuckets.begin()) { }
-      concurrent_unordered_map(size_type n, const allocator_type &al) : _allocator(al), _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(n>0 ? n : 13), _oldbucketit(_oldbuckets.begin()) { }
-      concurrent_unordered_map(size_type n, const hasher &h, const allocator_type &al) : _hasher(h), _allocator(al), _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(n>0 ? n : 13), _oldbucketit(_oldbuckets.begin()) { }
+      concurrent_unordered_map() : concurrent_unordered_map(0) { }
+      explicit concurrent_unordered_map(size_type n, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : _hasher(h), _key_equal(ke), _allocator(al), _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(new buckets_type(n>0 ? n : 13)), _oldbucketit(_oldbuckets.begin()) { }
+      explicit concurrent_unordered_map(const allocator_type &al) : concurrent_unordered_map(0, hasher(), key_equal(), al) { }
+      concurrent_unordered_map(size_type n, const allocator_type &al) : concurrent_unordered_map(n, hasher(), key_equal(), al) { }
+      concurrent_unordered_map(size_type n, const hasher &h, const allocator_type &al) : concurrent_unordered_map(n, h, key_equal(), al) { }
 
-      template<class InputIterator> concurrent_unordered_map(InputIterator first, InputIterator last, size_type n=0, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : _hasher(h), _key_equal(ke), _allocator(al), _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(n>0 ? n : 13), _oldbucketit(_oldbuckets.begin()) { insert(first, last); }
-      template<class InputIterator> concurrent_unordered_map(InputIterator first, InputIterator last, size_type n, const allocator_type &al) : _allocator(al), _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(n>0 ? n : 13), _oldbucketit(_oldbuckets.begin()) { insert(first, last); }
-      template<class InputIterator> concurrent_unordered_map(InputIterator first, InputIterator last, size_type n, const hasher &h, const allocator_type &al) : _hasher(h), _allocator(al), _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(n>0 ? n : 13), _oldbucketit(_oldbuckets.begin()) { insert(first, last); }
+      template<class InputIterator> concurrent_unordered_map(InputIterator first, InputIterator last, size_type n=0, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : concurrent_unordered_map(n, h, ke, al) { insert(first, last); }
+      template<class InputIterator> concurrent_unordered_map(InputIterator first, InputIterator last, size_type n, const allocator_type &al) : concurrent_unordered_map(n, al) { insert(first, last); }
+      template<class InputIterator> concurrent_unordered_map(InputIterator first, InputIterator last, size_type n, const hasher &h, const allocator_type &al) : concurrent_unordered_map(n, h, al) { insert(first, last); }
       
-      concurrent_unordered_map(std::initializer_list<value_type> il, size_type n=0, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : _hasher(h), _key_equal(ke), _allocator(al), _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(n>0 ? n : 13), _oldbucketit(_oldbuckets.begin()) { insert(std::move(il)); }
-      concurrent_unordered_map(std::initializer_list<value_type> il, size_type n, const allocator_type &al) : _allocator(al), _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(n>0 ? n : 13), _oldbucketit(_oldbuckets.begin()) { insert(std::move(il)); }
-      concurrent_unordered_map(std::initializer_list<value_type> il, size_type n, const hasher &h, const allocator_type &al) : _hasher(h), _allocator(al), _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(n>0 ? n : 13), _oldbucketit(_oldbuckets.begin()) { insert(std::move(il)); }
+      concurrent_unordered_map(std::initializer_list<value_type> il, size_type n=0, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : concurrent_unordered_map(n, h, ke, al) { insert(std::move(il)); }
+      concurrent_unordered_map(std::initializer_list<value_type> il, size_type n, const allocator_type &al) : concurrent_unordered_map(n, al) { insert(std::move(il)); }
+      concurrent_unordered_map(std::initializer_list<value_type> il, size_type n, const hasher &h, const allocator_type &al) : concurrent_unordered_map(n, h, al) { insert(std::move(il)); }
       ~concurrent_unordered_map()
       {
+        buckets_type &buckets=*_buckets.load(memory_order_acquire);
         // Raise the rehash lock and leave it raised
         _rehash_lock.lock();
         // Lock all existing buckets
-        for(auto &b : _buckets)
+        for(auto &b : buckets)
           b.lock.lock();
-        for(auto &b : _buckets)
+        for(auto &b : buckets)
         {
           for(auto &i : b.items)
           {
@@ -705,7 +733,11 @@ namespace boost
           b.items.clear();
           b.count.store(0, memory_order_release);
         }
-        _buckets.clear();
+        buckets.clear();
+        delete _buckets;
+        for(auto &i : _oldbuckets)
+          delete i;
+        _buckets.store(nullptr, memory_order_release);
       }
     private:
       // FIXME Awaiting implementation
@@ -714,14 +746,15 @@ namespace boost
       concurrent_unordered_map &operator=(const concurrent_unordered_map &);
       concurrent_unordered_map &operator=(concurrent_unordered_map &&);
     public:
-      //! O(bucket count/item count/2)
+      //! Slow call returning if a map is empty. Average time is O(bucket count/item count/2)
       bool empty() const BOOST_NOEXCEPT
       {
         bool done;
         do
         {
+          buckets_type &buckets=*_buckets.load(memory_order_acquire);
           done=true;
-          for(auto &b : _buckets)
+          for(auto &b : buckets)
           {
             // If the lock is other state we need to reload bucket list
             if(b.lock.load(memory_order_acquire)==2)
@@ -735,16 +768,17 @@ namespace boost
         } while(!done);
         return true;
       }
-      //! O(bucket count)
+      //! Even slower call returning the number of items in the map. Average time is O(bucket count)
       size_type size() const BOOST_NOEXCEPT
       {
         size_type ret;
         bool done;
         do
         {
+          buckets_type &buckets=*_buckets.load(memory_order_acquire);
           done=true;
           ret=0;
-          for(auto &b : _buckets)
+          for(auto &b : buckets)
           {
             // If the lock is other state we need to reload bucket list
             if(b.lock.load(memory_order_acquire)==2)
@@ -812,6 +846,7 @@ namespace boost
         return ret;
       }
       const_iterator find(const key_type &k) const { return const_cast<concurrent_unordered_map *>(this)->find(k); } // FIXME
+      //! Rehash safe way of concurrently accessing a mapped type
       mapped_type &at(const key_type &k)
       {
         mapped_type *ret=nullptr;
@@ -822,7 +857,9 @@ namespace boost
         if(!ret) throw std::out_of_range("Key not found");
         return *ret;
       }
+      //! Rehash safe way of concurrently accessing a mapped type
       const mapped_type &at(const key_type &k) const { return const_cast<concurrent_unordered_map *>(this)->at(k); } // FIXME
+      //! Rehash safe way of concurrently creating and accessing a mapped type
       mapped_type &operator[](const key_type &k)
       {
         mapped_type *ret=nullptr;
@@ -837,6 +874,7 @@ namespace boost
         } while(!ret);
         return *ret;
       }
+      //! Rehash safe way of concurrently creating and accessing a mapped type
       mapped_type &operator[](key_type &&k)
       {
         mapped_type *ret=nullptr;
@@ -864,6 +902,7 @@ namespace boost
         }
         return *ret;
       }
+      //! NOT rehash safe
       size_type count(const key_type &k) const { return end()!=find(k) ? 1 : 0; }
       std::pair<iterator, iterator> equal_range(const key_type &k)
       {
@@ -991,6 +1030,7 @@ namespace boost
         return ret;
       }
     public:
+      //! Inserts a node ptr if it is possible without allocating memory. Useful for low latency. If iterator is valid, didn't insert due to key collision.
       std::pair<iterator, bool> insert_noalloc(node_ptr_type &&v)
       {
         return _insert(std::move(v), [](std::pair<iterator, bool> &ret, typename buckets_type::iterator &itb, size_t h, node_ptr_type &&v){ return true; });
@@ -1014,6 +1054,7 @@ namespace boost
         });
       }
 
+      //! Note this function consumes args if passed by rvalue ref if an exception throws. Use insert() instead if you don't want this.
       template<class... Args> std::pair<iterator, bool> emplace(Args &&... args)
       {
         node_ptr_type n(make_node_ptr(std::forward<Args>(args)...));
@@ -1023,8 +1064,10 @@ namespace boost
         return ret;
       }
       template<class... Args> iterator emplace_hint(const_iterator position, Args &&... args) { return emplace(std::forward<Args>(args)...); }
+      //! Inserts a value if it is possible without allocating memory. Useful for low latency. If iterator is valid, didn't insert due to key collision.
       std::pair<iterator, bool> insert_noalloc(const value_type &v) { return insert_noalloc(value_type(v)); }
       std::pair<iterator, bool> insert(const value_type &v) { return insert(value_type(v)); }
+      //! Move inserts a value if it is possible without allocating memory. Useful for low latency. If iterator is valid, didn't insert due to key collision.
       std::pair<iterator, bool> insert_noalloc(value_type &&v)
       {
         node_ptr_type n(make_node_ptr(std::move(v)));
@@ -1063,6 +1106,7 @@ namespace boost
           insert(*first);
       }
       void insert(std::initializer_list<value_type> i) { insert(i.begin(), i.end()); }
+      //! Extract a value into its node ptr for later insertion into something else
       node_ptr_type extract(const_iterator it)
       {
         //assert(it!=end());
@@ -1092,6 +1136,7 @@ namespace boost
         }
         return former;
       }
+      //! Extract a value into its node ptr for later insertion into something else
       node_ptr_type extract(const key_type &k)
       {
         size_t h=_hasher(k);
@@ -1138,6 +1183,7 @@ namespace boost
         } while(!done);
         return former;
       }
+      //! Extract many values as node ptrs for later insertion into something else
       std::vector<node_ptr_type> extract(const_iterator first, const_iterator last)
       {
         std::vector<node_ptr_type> ret;
@@ -1167,11 +1213,11 @@ namespace boost
       void clear() BOOST_NOEXCEPT
       {
         bool done;
-        //std::lock_guard<decltype(_rehash_lock)> g2(_rehash_lock); // Stop other rehashes
         do
         {
+          buckets_type &buckets=*_buckets.load(memory_order_acquire);
           done=true;
-          for(auto &b : _buckets)
+          for(auto &b : buckets)
           {
             // If the lock is other state we need to reload bucket list
             if(!b.lock.lock(2))
@@ -1191,38 +1237,28 @@ namespace boost
           }
         } while(!done);
       }
-      void swap(concurrent_unordered_map &o)
+      void swap(concurrent_unordered_map &o) BOOST_NOEXCEPT
       {
         std::lock(_rehash_lock, o._rehash_lock);
         std::lock_guard<decltype(_rehash_lock)> g1(_rehash_lock, std::adopt_lock);
         std::lock_guard<decltype(o._rehash_lock)> g2(o._rehash_lock, std::adopt_lock);
-        // Halt all concurrency
-        for(auto &b : _buckets)
-          b.lock.lock();
-        for(auto &b : o._buckets)
-          b.lock.lock();
-        // Tell all threads to start reloading the bucket list
-        for(auto &b : _buckets)
-          b.lock.store(2);
-        for(auto &b : o._buckets)
-          b.lock.store(2);
         std::swap(_hasher, o._hasher);
         std::swap(_key_equal, o._key_equal);
         std::swap(_max_load_factor, o._max_load_factor);
         std::swap(_min_bucket_capacity, o._min_bucket_capacity);
-        _buckets.swap(o._buckets);
-        // Clone the buckets, leaving the old buckets with the instruction to reload
-        try { _buckets._rehash(_buckets.size()); } catch(const std::bad_alloc &) { }
-        try { o._buckets._rehash(o._buckets.size()); } catch(const std::bad_alloc &) { }
+        _buckets.store(o._buckets.exchange(_buckets.load(memory_order_acquire), memory_order_acq_rel), memory_order_release);
+        // intentionally leave old_buckets as-is
       }
+      //! Merges all the values from the source map into the destination map in a highly efficient way. Rehash safe.
       template<class _Hash, class _Pred, class _Alloc> void merge(concurrent_unordered_map<Key, T, _Hash, _Pred, _Alloc> &o)
       {
         typedef concurrent_unordered_map<Key, T, _Hash, _Pred, _Alloc> other_map_type;
         bool done;
         do
         {
+          buckets_type &obuckets=*o._buckets.load(memory_order_acquire);
           done=true;
-          for(auto &b : o._buckets)
+          for(auto &b : obuckets)
           {
             // If the lock is other state we need to reload bucket list
             if(!b.lock.lock(2))
@@ -1259,6 +1295,7 @@ namespace boost
           }
         } while(!done);
       }
+      //! Merges all the values from the source map into the destination map in a highly efficient way. Not rehash safe.
       template<class U> void merge(U &o)
       {
         for(typename U::iterator it=o.begin(); it!=o.end(); it=o.begin())
@@ -1267,21 +1304,25 @@ namespace boost
           insert(rebind_node_ptr(e));
         }
       }
-      size_type bucket_count() const BOOST_NOEXCEPT{ return _buckets.size(); }
-      size_type max_bucket_count() const BOOST_NOEXCEPT { return _buckets.max_size(); }
+      size_type bucket_count() const BOOST_NOEXCEPT{ return _buckets.load(memory_order_acquire)->size(); }
+      size_type max_bucket_count() const BOOST_NOEXCEPT { return _buckets.load(memory_order_acquire)->max_size(); }
       size_type bucket_size(size_type n) const
       {
-        bucket_type &b=_buckets[n];
+        buckets_type &buckets=*_buckets.load(memory_order_acquire);
+        bucket_type &b=buckets[n];
         return b.items.count.load(memory_order_acquire);
       }
       size_type bucket(const key_type &k) const
       {
-        return _hasher(k) % _buckets.size();
+        buckets_type &buckets=*_buckets.load(memory_order_acquire);
+        return _hasher(k) % buckets.size();
       }
       float load_factor() const BOOST_NOEXCEPT { return (float) size()/bucket_count(); }
       float max_load_factor() const BOOST_NOEXCEPT { return _max_load_factor; }
       void max_load_factor(float m) { _max_load_factor=m; }
+      //! The minimum number of empty spaces in a bucket, thus avoiding an allocation on first insert. You need to rehash after setting this.
       size_t min_bucket_capacity() const BOOST_NOEXCEPT { return _min_bucket_capacity; }
+      //! The minimum number of empty spaces in a bucket, thus avoiding an allocation on first insert. You need to rehash after setting this.
       void min_bucket_capacity(size_t n) { _min_bucket_capacity=n; }
     private:
       static void _reset_buckets(buckets_type &buckets) BOOST_NOEXCEPT
@@ -1291,6 +1332,7 @@ namespace boost
           for(auto &i : b.items)
             i.p=nullptr;
           b.items.clear();
+          b.items.shrink_to_fit();
           b.count.store(0, memory_order_release);
         }
       }
@@ -1298,24 +1340,25 @@ namespace boost
       void _rehash(size_type n)
       {
         // Create a new buckets
-        buckets_type tempbuckets(n);
+        buckets_type *tempbuckets=new buckets_type(n);
+        auto untempbuckets=undoer([&tempbuckets]{ delete tempbuckets; });
         // Lock all new buckets
-        for(auto &b : tempbuckets)
+        for(auto &b : *tempbuckets)
         {
           b.lock.lock();
           if(_min_bucket_capacity)
             b.items.reserve(_min_bucket_capacity);
         }
         // Swap old buckets with new buckets
-        _buckets.swap(tempbuckets);
+        tempbuckets=_buckets.exchange(tempbuckets, memory_order_acq_rel);
         // Tell all threads using old buckets to start reloading the bucket list
-        for(auto &b : tempbuckets)
+        for(auto &b : *tempbuckets)
           b.lock.store(2);
         // If it's a simple buckets cycle, simply move over all items as it's noexcept
-        if(_buckets.size()==tempbuckets.size())
+        if(_buckets.load(memory_order_acquire)->size()==tempbuckets->size())
         {
           // Simply move the old buckets into new buckets as-is
-          for(auto obit=tempbuckets.begin(), bit=_buckets.begin(); obit!=tempbuckets.end(); ++obit, ++bit)
+          for(auto obit=tempbuckets->begin(), bit=_buckets.load(memory_order_acquire)->begin(); obit!=tempbuckets->end(); ++obit, ++bit)
           {
             auto &ob=*obit;
             auto &b=*bit;
@@ -1332,7 +1375,7 @@ namespace boost
           try
           {
             // Relocate all old bucket contents into new buckets
-            for(const auto &ob : tempbuckets)
+            for(const auto &ob : *tempbuckets)
             {
               if(ob.count.load(memory_order_acquire))
               {
@@ -1358,38 +1401,43 @@ namespace boost
           {
             // If we saw an exception during relocation, simply restore
             // the old list which is untouched.
-            _buckets.swap(tempbuckets);
+            tempbuckets=_buckets.exchange(tempbuckets, memory_order_acq_rel);
             // Stop it deleting stuff
-            _reset_buckets(tempbuckets);
+            _reset_buckets(*tempbuckets);
             // Unlock buckets
-            for(auto &b : _buckets)
+            for(auto &b : *_buckets)
               b.lock.unlock();
             throw;
           }
         }
         // Stop old buckets deleting stuff
-        _reset_buckets(tempbuckets);
+        _reset_buckets(*tempbuckets);
         // Hold onto old buckets for a while
         typename old_buckets_type::iterator myoldbucket=_oldbucketit++;
         if(_oldbucketit==_oldbuckets.end()) _oldbucketit=_oldbuckets.begin();
-        myoldbucket->clear();
-        *myoldbucket=std::move(tempbuckets);
+        delete *myoldbucket;
+        *myoldbucket=tempbuckets;
+        tempbuckets=nullptr;
+        untempbuckets.dismissed=true;
         // Unlock buckets
-        for(auto &b : _buckets)
+        for(auto &b : *_buckets)
           b.lock.unlock();
       }
     public:
+      //! Rehashes the map to use n buckets. Comes with a ton of caveats, see detailed description.
       void rehash(size_type n)
       {
         std::lock_guard<decltype(_rehash_lock)> g(_rehash_lock); // Stop other rehashes
-        if(n!=_buckets.size())
+        buckets_type &buckets=*_buckets.load(memory_order_acquire);
+        if(n!=buckets.size())
         {
           // Lock all existing buckets
-          for(auto &b : _buckets)
+          for(auto &b : buckets)
             b.lock.lock();
           _rehash(n);
         }
       }
+      //! Rehashes the map to use n divided by max_load_factor buckets. Comes with a ton of caveats, see detailed description.
       void reserve(size_type n)
       {
         rehash((size_type)(n/_max_load_factor));
@@ -1406,7 +1454,8 @@ namespace boost
           while(toclear--)
           {
             if(++it==_oldbuckets.end()) it=_oldbuckets.begin();
-            it->clear();
+            delete *it;
+            *it=nullptr;
           }
         }
       }
@@ -1415,15 +1464,17 @@ namespace boost
       allocator_type get_allocator() const BOOST_NOEXCEPT { return _allocator; }
       void dump_buckets(std::ostream &s) const
       {
-        for(size_t n=0; n<_buckets.size(); n++)
+        buckets_type &buckets=*_buckets.load(memory_order_acquire);
+        for(size_t n=0; n<buckets.size(); n++)
         {
-          s << "Bucket " << n << ": size=" << _buckets[n].items.size() << " count=" << _buckets[n].count << std::endl;
+          s << "Bucket " << n << ": size=" << buckets[n].items.size() << " count=" << buckets[n].count << std::endl;
         }
       }
     }; // concurrent_unordered_map
   }
 }
 
+#if 0
 namespace std
 {
   template <class Key, class T, class Hash, class Pred, class Alloc>
@@ -1432,4 +1483,6 @@ namespace std
     lhs.swap(rhs);
   }
 }
+#endif
+
 #endif // BOOST_SPINLOCK_HPP
