@@ -734,9 +734,12 @@ namespace boost
           b.count.store(0, memory_order_release);
         }
         buckets.clear();
-        delete _buckets;
+        delete _buckets.exchange(nullptr, memory_order_acq_rel);
         for(auto &i : _oldbuckets)
+        {
           delete i;
+          i=nullptr;
+        }
         _buckets.store(nullptr, memory_order_release);
       }
     private:
