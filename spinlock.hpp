@@ -461,7 +461,7 @@ namespace boost
       - Copy and move construction plus copy and move assignment
       - noexcept is always on in many places it should be conditional. We are blocked on MSVC for this.
 
-    # swap() thread safety #
+    ### swap() thread safety ###
     
     swap() is _probably_ safe to use concurrent to all other operations. I say probably because it swaps the hasher, key comparer, max_load_factor and
     min_bucket_capacity individually and without serialisation. If any of those race state, you are in trouble, however for 99% of uses of this class
@@ -470,7 +470,7 @@ namespace boost
     
     swap() is serialised with respect to itself and rehash(), so you are safe to swap and rehash concurrently.
     
-    # rehash() thread safety #
+    ### rehash() thread safety ###
     
     To help you make sane concurrent use of the map, insert/emplace and erase never invalidate iterators nor references. This implies that rehashing is
     manual. If you perform a manual rehash which will invalidate all iterators, you must manually call it at a time when the following conditions are true:
