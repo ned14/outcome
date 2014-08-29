@@ -543,37 +543,41 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
     ++gate;
   }
   size_t threads=gate, rehashes=0;
-#pragma omp parallel for
-  for(int thread=0; thread<threads; thread++)
+  std::vector<std::thread> _threads;
+  for(size_t thread=0; thread<threads; thread++)
   {
-    bool amMaster=(thread==0);
-    --gate;
-    while(gate);
-    if(amMaster)
-    {
-      for(size_t n=100; !gate; n++)
+    _threads.push_back(std::thread([&, thread]{
+      bool amMaster=(thread==0);
+      --gate;
+      while(gate);
+      if(amMaster)
       {
-        //printf("Rehashing to %u ...\n", (unsigned) n);
-        map.rehash(n);
-        boost::spinlock::this_thread::sleep_for(boost::spinlock::chrono::milliseconds(100));
-        ++rehashes;
+        for(size_t n=100; !gate; n++)
+        {
+          //printf("Rehashing to %u ...\n", (unsigned) n);
+          map.rehash(n);
+          boost::spinlock::this_thread::sleep_for(boost::spinlock::chrono::milliseconds(100));
+          ++rehashes;
+        }
       }
-    }
-    else
-    {
-      std::string foo("n");
-      for(size_t n=0; n<100000000; n++)
+      else
       {
-        size_t v=n*10+thread;
-        //printf("%u:%u, ", (unsigned) thread, (unsigned) n);
-        if((n & 255)<128)
-          map.insert(std::make_pair(v, foo));
-        else
-          map.erase(v-1280);
+        std::string foo("n");
+        for(size_t n=0; n<100000000; n++)
+        {
+          size_t v=n*10+thread;
+          //printf("%u:%u, ", (unsigned) thread, (unsigned) n);
+          if((n & 255)<128)
+            map.insert(std::make_pair(v, foo));
+          else
+            map.erase(v-1280);
+        }
+        ++gate;
       }
-      ++gate;
-    }
+    }));
   }
+  for(auto &i : _threads)
+    i.join();
   printf("Achieved %u rehashes\n", (unsigned) rehashes);
 }
 #endif

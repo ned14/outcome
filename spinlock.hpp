@@ -37,6 +37,8 @@ DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <array>
 
+#include "valgrind/helgrind.h"
+
 /*! \file spinlock.hpp
 \brief Provides boost.spinlock
 */
@@ -291,6 +293,7 @@ namespace boost
       {
       };
     };
+    template<class T> inline bool is_lockable_locked(T &lockable) BOOST_NOEXCEPT_OR_NOTHROW;
     /*! \class spinlock
     
     Meets the requirements of BasicLockable and Lockable. Also provides a get() and set() for the
@@ -313,15 +316,32 @@ namespace boost
     {
       typedef spinpolicy4<spinpolicy3<spinpolicy2<spinlockbase<T>>>> parenttype;
     public:
-      spinlock() { }
+      spinlock()
+      {
+        ANNOTATE_RWLOCK_CREATE(this);
+      }
+      ~spinlock()
+      {
+        if(is_lockable_locked(*this))
+        {
+          ANNOTATE_RWLOCK_RELEASED(this, true);
+        }
+        ANNOTATE_RWLOCK_DESTROY(this);
+      }
       spinlock(const spinlock &) = delete;
-      spinlock(spinlock &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
+      spinlock(spinlock &&o) BOOST_NOEXCEPT : parenttype(std::move(o))
+      {
+        ANNOTATE_RWLOCK_CREATE(this);        
+      }
       void lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
         for(size_t n=0;; n++)
         {
           if(parenttype::try_lock())
+          {
+            ANNOTATE_RWLOCK_ACQUIRED(this, true);
             return;
+          }
           parenttype::int_yield(n);
         }
       }
@@ -332,11 +352,19 @@ namespace boost
         {
           T expected=0;
           if(parenttype::try_lock(expected))
+          {
+            ANNOTATE_RWLOCK_ACQUIRED(this, true);
             return true;
+          }
           if(expected==only_if_not_this)
             return false;
           parenttype::int_yield(n);
         }
+      }
+      void unlock() BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        ANNOTATE_RWLOCK_RELEASED(this, true);
+        parenttype::unlock();
       }
     };
 
@@ -465,9 +493,12 @@ namespace boost
     As much as this might sound terrible because this concurrent_unordered_map implementation cannot GUARANTEE thread safety, such are the costs of
     rehashing on concurrency that anyone using this class will only rarely rehash, especially as size() is slow. We suggest that you run a rehash
     no more than once per second
-    (putting rehash on a timer is an excellent idea), the unit test suite tests 10 rehashes per second and sees no segfaults, so a margin of tenfold
+    (putting rehash on a timer is an excellent idea), the unit test suite tests 1000 rehashes per second and sees no segfaults [1], so a margin of one thousand
     should be sufficient for production code. If you are super paranoid, never rehash more than once per minute, the chances of a thread taking
     that long between taking a copy of the location of the bucket list and examining its bucket lock are extraordinarily remote.
+    
+    [1]: With 1000 rehashes per second, valgrind spots just two reads of uninitialised data out of 800m inserts and deletes and ?k rehashes. Which
+    is quite rare.
     */
     template<class Key, class T, class Hash=std::hash<Key>, class Pred=std::equal_to<Key>, class Alloc=std::allocator<std::pair<const Key, T>>> class concurrent_unordered_map
     {
@@ -497,6 +528,8 @@ namespace boost
         U callable;
         bool dismissed;
         undoer_t(U c) : callable(std::move(c)), dismissed(false) { }
+        undoer_t(const undoer_t &) = delete;
+        undoer_t(undoer_t &&o) : callable(std::move(o.callable)), dismissed(o.dismissed) { o.dismissed=true; }
         ~undoer_t() { if(!dismissed) callable(); }
       };
       template<class U> undoer_t<U> undoer(U c) { return undoer_t<U>(std::move(c)); }
@@ -647,19 +680,23 @@ namespace boost
       class iterator : public std::iterator<std::forward_iterator_tag, value_type, difference_type, pointer, reference>
       {
         concurrent_unordered_map *_parent;
-        bucket_type *_bucket_data; // used for sanity check that he hasn't rehashed
+        buckets_type *_bucket_data; // used for sanity check that he hasn't rehashed
         typename buckets_type::iterator _itb;
         size_t _offset, _pending_incr; // used to avoid erase() doing a costly increment unless necessary
         friend class concurrent_unordered_map;
-        iterator(const concurrent_unordered_map *parent) : _parent(const_cast<concurrent_unordered_map *>(parent)), _offset((size_t) -1), _pending_incr(1) { buckets_type &buckets=*_parent->_buckets.load(memory_order_acquire); _bucket_data=buckets.data(); _itb=buckets.begin(); }
-        iterator(const concurrent_unordered_map *parent, std::nullptr_t) : _parent(const_cast<concurrent_unordered_map *>(parent)), _offset((size_t) -1), _pending_incr(0) { buckets_type &buckets=*_parent->_buckets.load(memory_order_acquire); _bucket_data=buckets.data(); _itb=buckets.end(); }
+        static typename buckets_type::iterator dead() { static typename buckets_type::iterator it; return it; }
+        iterator(const concurrent_unordered_map *parent) : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_acquire)), _offset((size_t) -1), _pending_incr(1) { buckets_type &buckets=*_parent->_buckets.load(memory_order_acquire); _itb=buckets.begin(); }
+        iterator(const concurrent_unordered_map *parent, std::nullptr_t) : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_acquire)), _itb(dead()), _offset((size_t) -1), _pending_incr(0) { }
         void _catch_up()
         {
+          assert(_itb!=dead());
+          if(_itb==dead())
+            abort();
           buckets_type &buckets=*_parent->_buckets.load(memory_order_acquire);
           while(_pending_incr && _itb!=buckets.end())
           {
-            assert(_bucket_data==buckets.data());
-            if(_bucket_data!=buckets.data())
+            assert(_bucket_data==_parent->_buckets.load(memory_order_acquire));
+            if(_bucket_data!=_parent->_buckets.load(memory_order_acquire))
               abort(); // stale iterator
             bucket_type &b=*_itb;
             BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(b.lock, 2)
@@ -680,29 +717,30 @@ namespace boost
               } while(_itb!=buckets.end() && !_itb->count.load(memory_order_acquire));
             }
           }
+          if(_itb==buckets.end())
+            _itb=dead();
         }
         void _catch_up() const { const_cast<iterator *>(this)->_catch_up(); }
       public:
-        iterator() : _parent(nullptr), _bucket_data(nullptr), _offset((size_t) -1), _pending_incr(0) { }
+        iterator() : _parent(nullptr), _bucket_data(nullptr), _itb(dead()), _offset((size_t) -1), _pending_incr(0) { }
         bool operator!=(const iterator &o) const BOOST_NOEXCEPT { _catch_up(); return _itb!=o._itb || _offset!=o._offset; }
         bool operator==(const iterator &o) const BOOST_NOEXCEPT { _catch_up(); return _itb==o._itb && _offset==o._offset; }
         iterator &operator++()
         {
-          buckets_type &buckets=*_parent->_buckets.load(memory_order_acquire);
-          if(_itb==buckets.end())
+          if(_itb==dead())
             return *this;
           ++_pending_incr;
           return *this;
         }
         iterator operator++(int) { iterator t(*this); operator++(); return t; }
-        value_type &operator*() { _catch_up(); buckets_type &buckets=*_parent->_buckets.load(memory_order_acquire); assert(_itb!=buckets.end()); if(_itb==buckets.end()) abort(); return *_itb->items[_offset].p; }
-        value_type *operator->() { _catch_up(); buckets_type &buckets=*_parent->_buckets.load(memory_order_acquire); assert(_itb!=buckets.end()); if(_itb==buckets.end()) abort(); return _itb->items[_offset].p; }
+        value_type &operator*() { _catch_up(); return *_itb->items[_offset].p; }
+        value_type *operator->() { _catch_up(); return _itb->items[_offset].p; }
       };
       typedef iterator const_iterator; // FIXME
       // local_iterator
       // const_local_iterator
       concurrent_unordered_map() : concurrent_unordered_map(0) { }
-      explicit concurrent_unordered_map(size_type n, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : _hasher(h), _key_equal(ke), _allocator(al), _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(new buckets_type(n>0 ? n : 13)), _oldbucketit(_oldbuckets.begin()) { }
+      explicit concurrent_unordered_map(size_type n, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : _hasher(h), _key_equal(ke), _allocator(al), _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(new buckets_type(n>0 ? n : 13)), _oldbucketit(_oldbuckets.begin()) { _oldbuckets.fill(nullptr);}
       explicit concurrent_unordered_map(const allocator_type &al) : concurrent_unordered_map(0, hasher(), key_equal(), al) { }
       concurrent_unordered_map(size_type n, const allocator_type &al) : concurrent_unordered_map(n, hasher(), key_equal(), al) { }
       concurrent_unordered_map(size_type n, const hasher &h, const allocator_type &al) : concurrent_unordered_map(n, h, key_equal(), al) { }
@@ -1001,8 +1039,7 @@ namespace boost
               }
             BOOST_END_TRANSACT_LOCK(b.lock)
           }
-          else if(!b.items.empty())
-            emptyidx=0;
+          else emptyidx=0;
 #endif
 
           if(!done)
