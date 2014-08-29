@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cassert>
 #include <vector>
 #include <memory>
+#include <array>
 
 #define BOOST_ATOMIC_MAP_START_NAMESPACE namespace boost { namespace spinlock {
 #define BOOST_ATOMIC_MAP_END_NAMESPACE } }
@@ -571,6 +572,7 @@ namespace boost
         std::vector<item_type, item_type_allocator> items;
         bucket_type_impl() : count(0), items(0) { }
         bucket_type_impl(bucket_type_impl &&) BOOST_NOEXCEPT : count(0) { }
+        bucket_type_impl(const bucket_type_impl &) = delete;
       };
 #if 1 // improves concurrent write performance
       struct bucket_type : bucket_type_impl
@@ -580,6 +582,8 @@ namespace boost
         {
           static_assert(sizeof(bucket_type)==64, "bucket_type is not 64 bytes long!");
         }
+        bucket_type(bucket_type &&o) BOOST_NOEXCEPT : bucket_type_impl(std::move(o)) { }
+        bucket_type(const bucket_type &) = delete;
       };
 #else
       typedef bucket_type_impl bucket_type;

@@ -44,9 +44,15 @@ struct config
   config() : count(0), fail_from((size_t)-1), fail_at((size_t)-1) { }
 };
 
-static config &get_config()
+static config &get_config(bool reset=false)
 {
   static config c;
+  if(reset)
+  {
+    c.count=0;
+    c.fail_from=(size_t) -1;
+    c.fail_at=(size_t) -1;
+  }
   return c;
 }
   

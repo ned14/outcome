@@ -456,7 +456,7 @@ TEST_CASE("works/concurrent_unordered_map/make_node_ptrs", "Tests that concurren
 TEST_CASE("works/concurrent_unordered_map/exceptionsafety", "Tests that concurrent_unordered_map exception safety works as expected")
 {
   printf("\n=== concurrent_unordered_map exception safety ===\n");
-  auto &config=boost::allocator_testing::get_config();
+  auto &config=boost::allocator_testing::get_config(true);
   typedef boost::spinlock::concurrent_unordered_map<std::string, std::string, std::hash<std::string>, std::equal_to<std::string>, boost::allocator_testing::allocator<std::pair<const std::string, std::string>, std::allocator<std::pair<const std::string, std::string>>>> map_type;
   map_type map(1); // no buckets
   // fail first allocation
@@ -533,8 +533,9 @@ TEST_CASE("works/concurrent_unordered_map/exceptionsafety", "Tests that concurre
 TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concurrent_unordered_map concurrent rehash works as expected")
 {
   printf("\n=== concurrent_unordered_map concurrent rehash ===\n");
-  auto &config=boost::allocator_testing::get_config();
-  typedef boost::spinlock::concurrent_unordered_map<size_t, std::string, std::hash<size_t>, std::equal_to<size_t>, boost::allocator_testing::allocator<std::pair<const size_t, std::string>, std::allocator<std::pair<const size_t, std::string>>>> map_type;
+  //auto &config=boost::allocator_testing::get_config(true);
+  //typedef boost::spinlock::concurrent_unordered_map<size_t, std::string, std::hash<size_t>, std::equal_to<size_t>, boost::allocator_testing::allocator<std::pair<const size_t, std::string>, std::allocator<std::pair<const size_t, std::string>>>> map_type;
+  typedef boost::spinlock::concurrent_unordered_map<size_t, std::string> map_type;
   map_type map;
   boost::spinlock::atomic<size_t> gate(0);
 #pragma omp parallel
@@ -554,7 +555,7 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
       {
         //printf("Rehashing to %u ...\n", (unsigned) n);
         map.rehash(n);
-        boost::spinlock::this_thread::sleep_for(boost::spinlock::chrono::milliseconds(50));
+        boost::spinlock::this_thread::sleep_for(boost::spinlock::chrono::milliseconds(5));
         ++rehashes;
       }
     }
@@ -889,6 +890,10 @@ int main(int argc, char *argv[])
   printf("These unit tests have been compiled using a transactional compiler. I will use __transaction_relaxed.\n");
 #else
   printf("These unit tests have not been compiled using a transactional compiler.\n");
+#endif
+#if 0
+  printf("Please attach debugger now ...\n");
+  getchar();
 #endif
   int result=Catch::Session().run(argc, argv);
   return result;
