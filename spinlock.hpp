@@ -419,8 +419,8 @@ namespace boost
       memory corruption.
       
       As much as this might sound terrible because this concurrent_unordered_map implementation cannot GUARANTEE thread safety, such are the costs of
-      rehashing on concurrency that anyone using this class will only rarely rehash. We suggest that you run a rehash no more than ten times per second
-      (putting rehash on a timer is an excellent idea), the unit test suite tests 100 times per second and sees no segfaults, so a margin of tenfold
+      rehashing on concurrency that anyone using this class will only rarely rehash. We suggest that you run a rehash no more than once per second
+      (putting rehash on a timer is an excellent idea), the unit test suite tests 10 times per second and sees no segfaults, so a margin of tenfold
       should be sufficient for production code.
 
     - To very substantially improve concurrency, the following deviations from std::unordered_map<> behaviour have been made:
