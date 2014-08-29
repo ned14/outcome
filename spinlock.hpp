@@ -37,6 +37,10 @@ DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <array>
 
+/*! \file spinlock.hpp
+\brief Provides boost.spinlock
+*/
+
 #define BOOST_ATOMIC_MAP_START_NAMESPACE namespace boost { namespace spinlock {
 #define BOOST_ATOMIC_MAP_END_NAMESPACE } }
 #include "cpp11_or_boost_map/atomic"
@@ -377,16 +381,17 @@ namespace boost
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)
 #endif // BOOST_BEGIN_TRANSACT_LOCK
 
-    /* \class concurrent_unordered_map
+    /*! \class concurrent_unordered_map
     \brief Provides an unordered_map never slower than std::unordered_map which is thread safe and wait free and optionally no-malloc to use and whose find, insert/emplace
     and erase functions are usually wait free.
 
     Some notes on this implementation:
-    * Provides the N3645 (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3645.pdf) low latency no-malloc extensions node_ptr_type, extract() and merge() with
+
+    - Provides the N3645 (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3645.pdf) low latency no-malloc extensions node_ptr_type, extract() and merge() with
       overload of insert(). Also added is a make_node_ptr() factory function with a rebind/realloc overload, and a make_node_ptrs() batch factory function for those
       with a malloc capable of burst/batch allocation (e.g. Linux, OS X). Finally, merge() is now templatised and rebinds/reallocs node ptrs if necessary.
 
-    * To help you make sane concurrent use of the map, insert/emplace and erase never invalidate iterators nor references. This implies that rehashing is
+    - To help you make sane concurrent use of the map, insert/emplace and erase never invalidate iterators nor references. This implies that rehashing is
       manual. If you perform a manual rehash which will invalidate all iterators, you must manually call it at a time when the following conditions are true:
       
       1. All iterators are not in use in other threads. That means calls such as erase(find(value)) cannot be happening. Use erase(value) instead.
@@ -394,20 +399,20 @@ namespace boost
       3. All calls which return iterators must never use that returned iterator, and must throw it away without using it. Use at() or operator[] if you
          need to safely access a just inserted new value.
       4. All the following calls which use iterators internally are not happening in other threads:
-         * merge() where input container is not a concurrent_unordered_map.
+         - merge() where input container is not a concurrent_unordered_map.
 
-    * Given the costs of rehashing, the design sacrifices low load factor performance for high load factor performance. Load factors of 16 or so are not
+    - Given the costs of rehashing, the design sacrifices low load factor performance for high load factor performance. Load factors of 16 or so are not
       significantly slower than load factors of less than 1 if given a well distributed hash function.
 
-    * All operations may operate concurrently with all other operations except rehash() and swap(). If they hit the same bucket they are serialised for obvious reasons. Also
+    - All operations may operate concurrently with all other operations except rehash() and swap(). If they hit the same bucket they are serialised for obvious reasons. Also
       for obvious reasons a rehash() and swap() must halt all concurrency, these are the only operations which do this.
 
-    * All operations will operate safely in concurrency with all other operations excluding rehash(), see below. You may get unstable outcomes of course,
+    - All operations will operate safely in concurrency with all other operations excluding rehash(), see below. You may get unstable outcomes of course,
       especially if you are inserting and deleting the same key from multiple threads, and no locking is provided per key-value pair, so if you delete it
       from one thread while other threads have references to it you enter undefined behaviour, and probable memory corruption. Strongly consider the use
       of shared_ptr<> as the mapped type if this is a problem for you.
       
-      rehash() /can/ operate safely in concurrency with all other operations, but with this major restriction: YOU MUST NOT CALL REHASH TOO FREQUENTLY.
+      rehash() _can_ operate safely in concurrency with all other operations, but with this major restriction: **YOU MUST NOT CALL REHASH TOO FREQUENTLY**.
       This is because rehash() is safe concurrent by keeping around many old bucket lists but marked to tell threads using them to reload the bucket list.
       Therefore if you call rehash() many times in quick succession and push a bucket list still in use off the end of the ring buffer, you end up deleting
       that bucket list possibly before threads have had a chance to notice that they must reload the bucket list, and you will have a race and probable
@@ -418,28 +423,29 @@ namespace boost
       (putting rehash on a timer is an excellent idea), the unit test suite tests 100 times per second and sees no segfaults, so a margin of tenfold
       should be sufficient for production code.
 
-    * To very substantially improve concurrency, the following deviations from std::unordered_map<> behaviour have been made:
-      * empty() has average complexity O(bucket count/item count/2), worst case O(bucket count) when the map is empty.
-      * size() always has complexity O(bucket count). If you do rehash(size()) to make load factor to 1.0, remember this can become very slow for large
+    - To very substantially improve concurrency, the following deviations from std::unordered_map<> behaviour have been made:
+      - empty() has average complexity O(bucket count/item count/2), worst case O(bucket count) when the map is empty.
+      - size() always has complexity O(bucket count). If you do rehash(size()) to make load factor to 1.0, remember this can become very slow for large
         numbers of items. The map is deliberately more tolerant than most to collisions, it can cope with load factors of 8.0 or so without much slowdown.
-      * emplace() consumes its rvalue referenced items even when an exception is thrown i.e. the "has no effect" rule is violated. The map itself is untouched
+      - emplace() consumes its rvalue referenced items even when an exception is thrown i.e. the "has no effect" rule is violated. The map itself is untouched
         however. Chances are real world code will never notice this, but if you do, insert() correctly does not consume arguments if exceptions are thrown.
 
-    * clear() is safe concurrent with all other operations with the obvious caveat that any item you are using may be asynchronously deleted. Note that inserting
+    - clear() is safe concurrent with all other operations with the obvious caveat that any item you are using may be asynchronously deleted. Note that inserting
       items concurrently to a clear() has a possibility of failing to clear some of those newly inserted items. erase(key) is safe however.
       
-    * merge() is safe concurrent with all other operations with the obvious caveat that any iterators inside the map being merged out of will invalidate.
+    - merge() is safe concurrent with all other operations with the obvious caveat that any iterators inside the map being merged out of will invalidate.
       Iterators inside the map being merged into are safe. Note that inserting items into the merging map concurrently has a possibility of failing to merge
       some of those newly inserted items.
 
-    * Not everything is fully implemented and is marked as FIXME hopefully for some future GSoC student. In particular:
-      * C++ 03 support
-      * const iterators are typedefed to be normal iterators as const iterators haven't been implemented yet. I explicitly left this for GSoC students to
+    - Not everything is fully implemented and is marked as FIXME hopefully for some future GSoC student. In particular:
+
+      - C++ 03 support
+      - const iterators are typedefed to be normal iterators as const iterators haven't been implemented yet. I explicitly left this for GSoC students to
         do as part of their entrance exam.
-      * All const member functions are const_casted to their non-const forms
-      * Local iterators
-      * Copy and move construction plus copy and move assignment
-      * noexcept is always on in many places it should be conditional. We are blocked on MSVC for this.
+      - All const member functions are const_casted to their non-const forms
+      - Local iterators
+      - Copy and move construction plus copy and move assignment
+      - noexcept is always on in many places it should be conditional. We are blocked on MSVC for this.
     */
     template<class Key, class T, class Hash=std::hash<Key>, class Pred=std::equal_to<Key>, class Alloc=std::allocator<std::pair<const Key, T>>> class concurrent_unordered_map
     {

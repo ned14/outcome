@@ -555,7 +555,7 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
       {
         //printf("Rehashing to %u ...\n", (unsigned) n);
         map.rehash(n);
-        boost::spinlock::this_thread::sleep_for(boost::spinlock::chrono::milliseconds(10));
+        boost::spinlock::this_thread::sleep_for(boost::spinlock::chrono::milliseconds(50));
         ++rehashes;
       }
     }
