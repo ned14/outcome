@@ -529,7 +529,6 @@ TEST_CASE("works/concurrent_unordered_map/exceptionsafety", "Tests that concurre
   CHECK(n);
 }
 
-#ifdef _OPENMP
 TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concurrent_unordered_map concurrent rehash works as expected")
 {
   printf("\n=== concurrent_unordered_map concurrent rehash ===\n");
@@ -538,10 +537,7 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
   typedef boost::spinlock::concurrent_unordered_map<size_t, std::string> map_type;
   map_type map;
   boost::spinlock::atomic<size_t> gate(0);
-#pragma omp parallel
-  {
-    ++gate;
-  }
+  gate=boost::spinlock::thread::hardware_concurrency();
   size_t threads=gate, rehashes=0;
   std::vector<std::thread> _threads;
   for(size_t thread=0; thread<threads; thread++)
@@ -580,7 +576,6 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
     i.join();
   printf("Achieved %u rehashes\n", (unsigned) rehashes);
 }
-#endif
 
 static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact, int type)
 {

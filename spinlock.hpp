@@ -78,9 +78,11 @@ namespace boost
   // Map in a this_thread implementation
 #ifdef BOOST_SPINLOCK_USE_BOOST_THREAD
   namespace this_thread=boost::this_thread;
+  namespace thread=boost::thread;
   namespace chrono { using boost::chrono::milliseconds; }
 #else
   namespace this_thread=std::this_thread;
+  namespace thread=std::thread;
   namespace chrono { using std::chrono::milliseconds; }
 #endif
 
@@ -1319,7 +1321,7 @@ namespace boost
               {
                 // Insertion failed, put it back
                 // FIXME If allocators are different it could throw here during rebind, thus losing the value
-                typename other_map_type::node_ptr_type former2(o.rebind_node_ptr<concurrent_unordered_map>(std::move(n)));
+                typename other_map_type::node_ptr_type former2(o.template rebind_node_ptr<concurrent_unordered_map>(std::move(n)));
                 i.p=former2.release();
                 failed++;
               }
