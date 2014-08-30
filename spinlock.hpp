@@ -78,11 +78,11 @@ namespace boost
   // Map in a this_thread implementation
 #ifdef BOOST_SPINLOCK_USE_BOOST_THREAD
   namespace this_thread=boost::this_thread;
-  namespace thread=boost::thread;
+  using boost::thread;
   namespace chrono { using boost::chrono::milliseconds; }
 #else
   namespace this_thread=std::this_thread;
-  namespace thread=std::thread;
+  using std::thread;
   namespace chrono { using std::chrono::milliseconds; }
 #endif
 
