@@ -743,7 +743,7 @@ namespace boost
               {
                 ++_itb;
                 _offset=(size_t) -1;
-              } while(_itb!=buckets.end() && !_itb->count.load(memory_order_acquire));
+              } while(_itb!=buckets.end() && !_itb->count.load(memory_order_consume));
             }
           }
           if(_itb==buckets.end())
@@ -832,7 +832,7 @@ namespace boost
               done=false;
               break;
             }
-            if(b.count.load(memory_order_acquire))
+            if(b.count.load(memory_order_consume))
               return false;
           }
         } while(!done);
@@ -856,7 +856,7 @@ namespace boost
               done=false;
               break;
             }
-            ret+=b.count.load(memory_order_acquire);
+            ret+=b.count.load(memory_order_consume);
           }
         } while(!done);
         return ret;
@@ -878,7 +878,7 @@ namespace boost
           auto itb=_get_bucket(h);
           bucket_type &b=*itb;
           size_t offset=0;
-          if(!b.count.load(memory_order_acquire))
+          if(!b.count.load(memory_order_consume))
             done=true;
           else
           {
@@ -1046,7 +1046,7 @@ namespace boost
           size_t emptyidx=(size_t) -1;
 #if 1
           // First search for equivalents and empties.
-          if(b.count.load(memory_order_acquire))
+          if(b.count.load(memory_order_consume))
           {
             size_t offset=0;
             BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(b.lock, 2)
@@ -1088,7 +1088,7 @@ namespace boost
                 ret.second=true;
                 i->p=v.release();
                 i->hash=h;
-                b.count.fetch_add(1, memory_order_acquire);
+                b.count.fetch_add(1, memory_order_release);
                 done=true;
               }
             }
@@ -1118,7 +1118,7 @@ namespace boost
           ret.first._offset=b.items.size();
           ret.second=true;
           b.items.push_back(item_type(h, std::move(v)));
-          b.count.fetch_add(1, memory_order_acquire);
+          b.count.fetch_add(1, memory_order_release);
           return true;
         });
       }
@@ -1200,7 +1200,7 @@ namespace boost
               while(!items.empty() && !items.back().p)
                 items.pop_back(); // Will abort all concurrency
             }
-            b.count.fetch_sub(1, memory_order_acquire);
+            b.count.fetch_sub(1, memory_order_release);
           }
         }
         return former;
@@ -1216,7 +1216,7 @@ namespace boost
           auto itb=_get_bucket(h);
           bucket_type &b=*itb;
           size_t offset=0;
-          if(b.count.load(memory_order_acquire))
+          if(b.count.load(memory_order_consume))
           {
             // If the lock is other state we need to reload bucket list
             if(!b.lock.lock(2))
@@ -1240,7 +1240,7 @@ namespace boost
                     while(!items.empty() && !items.back().p)
                       items.pop_back(); // Will abort all concurrency
                   }
-                  b.count.fetch_sub(1, memory_order_acquire);
+                  b.count.fetch_sub(1, memory_order_release);
                   done=true;
                   break;
                 }
@@ -1379,7 +1379,7 @@ namespace boost
       {
         buckets_type &buckets=*_buckets.load(memory_order_acquire);
         bucket_type &b=buckets[n];
-        return b.items.count.load(memory_order_acquire);
+        return b.items.count.load(memory_order_consume);
       }
       size_type bucket(const key_type &k) const
       {
@@ -1446,7 +1446,7 @@ namespace boost
             // Relocate all old bucket contents into new buckets
             for(const auto &ob : *tempbuckets)
             {
-              if(ob.count.load(memory_order_acquire))
+              if(ob.count.load(memory_order_consume))
               {
                 for(auto &i : ob.items)
                 {
@@ -1460,7 +1460,7 @@ namespace boost
                       b.items.reserve(newcapacity ? newcapacity : 1);
                     }
                     b.items.push_back(item_type(i.hash, i.p));
-                    b.count.fetch_add(1, memory_order_acquire);
+                    b.count.fetch_add(1, memory_order_release);
                   }
                 }
               }
