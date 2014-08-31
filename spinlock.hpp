@@ -38,12 +38,16 @@ DEALINGS IN THE SOFTWARE.
 #include <array>
 
 #ifdef BOOST_SPINLOCK_ENABLE_VALGRIND
-#include "valgrind/helgrind.h"
+#include "valgrind/drd.h"
 #else
 #define ANNOTATE_RWLOCK_CREATE(p)
 #define ANNOTATE_RWLOCK_DESTROY(p)
 #define ANNOTATE_RWLOCK_ACQUIRED(p, s)
 #define ANNOTATE_RWLOCK_RELEASED(p, s)
+#define ANNOTATE_IGNORE_READS_BEGIN()
+#define ANNOTATE_IGNORE_READS_END()
+#define ANNOTATE_IGNORE_WRITES_BEGIN()
+#define ANNOTATE_IGNORE_WRITES_END()
 #define RUNNING_ON_VALGRIND (0)
 #endif
 
@@ -680,7 +684,9 @@ namespace boost
         //k ^= k + 0x9e3779b9 + (k<<6) + (k>>2); // really need to avoid sequential keys tapping the same cache line
         //k ^= k + 0x9e3779b9; // really need to avoid sequential keys tapping the same cache line
         buckets_type &buckets=*_buckets.load(memory_order_acquire);
+        ANNOTATE_IGNORE_READS_BEGIN();
         size_type i=k % buckets.size();
+        ANNOTATE_IGNORE_READS_END();
         return buckets.begin()+i;
       }
       static float _calc_max_load_factor() BOOST_NOEXCEPT
