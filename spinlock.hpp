@@ -657,9 +657,9 @@ namespace boost
         spinlock<unsigned char> lock;  // = 2 if you need to reload the bucket list
         atomic<unsigned> count; // count is used items in there
         std::vector<item_type, item_type_allocator> items;
-        bucket_type_impl() : count(0), items(0) { DRD_IGNORE_VAR(count); }
+        bucket_type_impl() : count(0), items(0) { DRD_IGNORE_VAR(count); count.store(0, memory_order_release); }
         ~bucket_type_impl() { DRD_STOP_IGNORING_VAR(count); }
-        bucket_type_impl(bucket_type_impl &&) BOOST_NOEXCEPT : count(0) { DRD_IGNORE_VAR(count); }
+        bucket_type_impl(bucket_type_impl &&) BOOST_NOEXCEPT : count(0) { DRD_IGNORE_VAR(count); count.store(0, memory_order_release); }
         bucket_type_impl(const bucket_type_impl &) = delete;
       };
 #if 1 // improves concurrent write performance
