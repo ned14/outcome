@@ -539,6 +539,8 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
   boost::spinlock::atomic<size_t> gate(0);
   gate=boost::spinlock::thread::hardware_concurrency();
   size_t threads=gate, rehashes=0;
+  ANNOTATE_IGNORE_READS_BEGIN();
+  ANNOTATE_IGNORE_WRITES_BEGIN();
   std::vector<std::thread> _threads;
   for(size_t thread=0; thread<threads; thread++)
   {
@@ -550,7 +552,7 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
       {
         for(size_t n=100; !gate; n++)
         {
-          //printf("Rehashing to %u ...\n", (unsigned) n);
+          printf("Rehashing to %u ...\n", (unsigned) n);
           map.rehash(n);
           boost::spinlock::this_thread::sleep_for(boost::spinlock::chrono::milliseconds(100));
           ++rehashes;
@@ -559,7 +561,7 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
       else
       {
         std::string foo("n");
-        size_t iters=RUNNING_ON_VALGRIND ? 100 : 100000000;
+        size_t iters=RUNNING_ON_VALGRIND ? 10 : 100000000;
         for(size_t n=0; n<iters; n++)
         {
           size_t v=n*10+thread;
@@ -575,6 +577,8 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
   }
   for(auto &i : _threads)
     i.join();
+  ANNOTATE_IGNORE_READS_END();
+  ANNOTATE_IGNORE_WRITES_END();
   printf("Achieved %u rehashes\n", (unsigned) rehashes);
 }
 
