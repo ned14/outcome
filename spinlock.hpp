@@ -37,7 +37,15 @@ DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <array>
 
+#ifdef BOOST_SPINLOCK_ENABLE_VALGRIND
 #include "valgrind/helgrind.h"
+#else
+#define ANNOTATE_RWLOCK_CREATE(p)
+#define ANNOTATE_RWLOCK_DESTROY(p)
+#define ANNOTATE_RWLOCK_ACQUIRED(p, s)
+#define ANNOTATE_RWLOCK_RELEASED(p, s)
+#define RUNNING_ON_VALGRIND (0)
+#endif
 
 /*! \file spinlock.hpp
 \brief Provides boost.spinlock
@@ -128,12 +136,25 @@ namespace boost
     public:
       typedef T value_type;
       spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : v(0)
-      { }
+      {
+        ANNOTATE_RWLOCK_CREATE(this);
+      }
       spinlockbase(const spinlockbase &) = delete;
       //! Atomically move constructs
       spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW : v(0)
       {
+        ANNOTATE_RWLOCK_CREATE(this);
         //v.store(o.v.exchange(0, memory_order_acq_rel));
+      }
+      ~spinlockbase()
+      {
+#ifdef BOOST_SPINLOCK_ENABLE_VALGRIND
+        if(v.load(memory_order_acquire))
+        {
+          ANNOTATE_RWLOCK_RELEASED(this, true);
+        }
+#endif
+        ANNOTATE_RWLOCK_DESTROY(this);
       }
       //! Returns the raw atomic
       T load(memory_order o=memory_order_seq_cst) const BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
@@ -145,7 +166,13 @@ namespace boost
         if(v.load(memory_order_acquire)) // Avoid unnecessary cache line invalidation traffic
           return false;
         T expected=0;
-        return v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_consume);
+        bool ret=v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_consume);
+        if(ret)
+        {
+          ANNOTATE_RWLOCK_ACQUIRED(this, true);
+          return true;
+        }
+        else return false;
       }
       //! If atomic equals expected, sets to 1 and returns true, else false with expected updated to actual value.
       bool try_lock(T &expected) BOOST_NOEXCEPT_OR_NOTHROW
@@ -156,11 +183,18 @@ namespace boost
           expected=t;
           return false;
         }
-        return v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_consume);
+        bool ret=v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_consume);
+        if(ret)
+        {
+          ANNOTATE_RWLOCK_ACQUIRED(this, true);
+          return true;
+        }
+        else return false;
       }
       //! Sets the atomic to zero
       void unlock() BOOST_NOEXCEPT_OR_NOTHROW
       {
+        ANNOTATE_RWLOCK_RELEASED(this, true);
         v.store(0, memory_order_release);
       }
       bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
@@ -318,32 +352,15 @@ namespace boost
     {
       typedef spinpolicy4<spinpolicy3<spinpolicy2<spinlockbase<T>>>> parenttype;
     public:
-      spinlock()
-      {
-        ANNOTATE_RWLOCK_CREATE(this);
-      }
-      ~spinlock()
-      {
-        if(is_lockable_locked(*this))
-        {
-          ANNOTATE_RWLOCK_RELEASED(this, true);
-        }
-        ANNOTATE_RWLOCK_DESTROY(this);
-      }
+      spinlock() { }
       spinlock(const spinlock &) = delete;
-      spinlock(spinlock &&o) BOOST_NOEXCEPT : parenttype(std::move(o))
-      {
-        ANNOTATE_RWLOCK_CREATE(this);        
-      }
+      spinlock(spinlock &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
       void lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
         for(size_t n=0;; n++)
         {
           if(parenttype::try_lock())
-          {
-            ANNOTATE_RWLOCK_ACQUIRED(this, true);
             return;
-          }
           parenttype::int_yield(n);
         }
       }
@@ -354,19 +371,11 @@ namespace boost
         {
           T expected=0;
           if(parenttype::try_lock(expected))
-          {
-            ANNOTATE_RWLOCK_ACQUIRED(this, true);
             return true;
-          }
           if(expected==only_if_not_this)
             return false;
           parenttype::int_yield(n);
         }
-      }
-      void unlock() BOOST_NOEXCEPT_OR_NOTHROW
-      {
-        ANNOTATE_RWLOCK_RELEASED(this, true);
-        parenttype::unlock();
       }
     };
 
@@ -501,6 +510,14 @@ namespace boost
     
     [1]: With 1000 rehashes per second, valgrind spots just two reads of uninitialised data out of 800m inserts and deletes and ?k rehashes. Which
     is quite rare.
+
+    ## Race detecting tools ##
+
+    The ThreadSanitizer gets confused by tri-state spinlocks, until that gets fixed you will see a lot of false positives.
+
+    valgrind helgrind runs so slowly as to be pretty much useless.
+
+    valgrind drd is actually quite useful, and it's what the automated unit testing CI uses.
     */
     template<class Key, class T, class Hash=std::hash<Key>, class Pred=std::equal_to<Key>, class Alloc=std::allocator<std::pair<const Key, T>>> class concurrent_unordered_map
     {
@@ -1025,19 +1042,19 @@ namespace boost
             BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(b.lock, 2)
               for(item_type *i=b.items.data(), *e=b.items.data()+b.items.size();;)
               {
-              for(; i<e && i->hash!=h; offset++, i++)
-                if(emptyidx==(size_t) -1 && !i->p)
-                  emptyidx=offset;
-              if(i==e)
-                break;
-              if(i->p && _key_equal(k, i->p->first))
-              {
-                ret.first._itb=itb;
-                ret.first._offset=offset;
-                done=true;
-                break;
-              }
-              else offset++, i++;
+                for(; i<e && i->hash!=h; offset++, i++)
+                  if(emptyidx==(size_t) -1 && !i->p)
+                    emptyidx=offset;
+                if(i==e)
+                  break;
+                if(i->p && _key_equal(k, i->p->first))
+                {
+                  ret.first._itb=itb;
+                  ret.first._offset=offset;
+                  done=true;
+                  break;
+                }
+                else offset++, i++;
               }
             BOOST_END_TRANSACT_LOCK(b.lock)
           }
