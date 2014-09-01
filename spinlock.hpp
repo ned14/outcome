@@ -439,7 +439,16 @@ namespace boost
     \brief Provides an unordered_map never slower than std::unordered_map which is thread safe and wait free and optionally no-malloc to use and whose find, insert/emplace
     and erase functions are usually wait free.
 
-    Some notes on this implementation:
+    Performance of this STL container, with a recent C++ 11 compiler whose optimiser understands memory ordering [1], is:
+
+    - Within 10% of single threaded performance of a spinlocked std::unordered_map for inserts and removes, and within 33% for finds.
+    - For a four core machine with eight threads, performance at full concurrency is 3.6x for inserts and removes, and 3.48x for finds.
+    - With Transactional GCC running on Intel TSX capable hardware, performance at full concurrency is 4.07x over single threaded.
+
+    [1]: Currently Microsoft's compiler treats all atomic operations as memory_order_seq_cst irrespective of what they ask for.
+
+
+    ## Some notes on this implementation: ##
 
     - Provides the N3645 (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3645.pdf) low latency no-malloc extensions node_ptr_type, extract() and merge() with
       overload of insert(). Also added is a make_node_ptr() factory function with a rebind/realloc overload, and a make_node_ptrs() batch factory function for those
@@ -523,11 +532,10 @@ namespace boost
 
     ## Race detecting tools ##
 
-    The ThreadSanitizer gets confused by tri-state spinlocks, until that gets fixed you will see a lot of false positives.
+    The ThreadSanitizer runs at a reasonable speed, and it's what the automated unit testing CI uses.
 
-    valgrind helgrind runs so slowly as to be pretty much useless.
-
-    valgrind drd is actually quite useful, and it's what the automated unit testing CI uses.
+    valgrind helgrind runs so slowly as to be pretty much useless. valgrind drd is much better, but still very slow. Define BOOST_SPINLOCK_ENABLE_VALGRIND
+    to build in valgrind race detection instrumentation.
     */
     template<class Key, class T, class Hash=std::hash<Key>, class Pred=std::equal_to<Key>, class Alloc=std::allocator<std::pair<const Key, T>>> class concurrent_unordered_map
     {
