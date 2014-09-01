@@ -1,0 +1,5 @@
+# Stuff from libstdc++ not understood by tsan
+race:include/c++/*/bits/shared_ptr_base.h
+race:std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_add_ref_lock()
+race:std::string::_Rep::_M_refdata()
+

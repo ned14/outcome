@@ -552,9 +552,9 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
       {
         for(size_t n=100; !gate; n++)
         {
-          printf("Rehashing to %u ...\n", (unsigned) n);
+          //printf("Rehashing to %u ...\n", (unsigned) n);
           map.rehash(n);
-          boost::spinlock::this_thread::sleep_for(boost::spinlock::chrono::milliseconds(100));
+          boost::spinlock::this_thread::sleep_for(boost::spinlock::chrono::milliseconds(10));
           ++rehashes;
         }
       }
