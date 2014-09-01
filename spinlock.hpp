@@ -50,7 +50,9 @@ DEALINGS IN THE SOFTWARE.
 #define ANNOTATE_IGNORE_WRITES_END()
 #define DRD_IGNORE_VAR(x)
 #define DRD_STOP_IGNORING_VAR(x)
+#ifndef RUNNING_ON_VALGRIND
 #define RUNNING_ON_VALGRIND (0)
+#endif
 #endif
 
 /*! \file spinlock.hpp
@@ -144,6 +146,7 @@ namespace boost
       spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : v(0)
       {
         ANNOTATE_RWLOCK_CREATE(this);
+        v.store(0, memory_order_release);
       }
       spinlockbase(const spinlockbase &) = delete;
       //! Atomically move constructs
@@ -151,6 +154,7 @@ namespace boost
       {
         ANNOTATE_RWLOCK_CREATE(this);
         //v.store(o.v.exchange(0, memory_order_acq_rel));
+        v.store(0, memory_order_release);
       }
       ~spinlockbase()
       {
@@ -169,7 +173,7 @@ namespace boost
       //! If atomic is zero, sets to 1 and returns true, else false.
       bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
-        if(v.load(memory_order_acquire)) // Avoid unnecessary cache line invalidation traffic
+        if(v.load(memory_order_consume)) // Avoid unnecessary cache line invalidation traffic
           return false;
         T expected=0;
         bool ret=v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_consume);
@@ -184,7 +188,7 @@ namespace boost
       bool try_lock(T &expected) BOOST_NOEXCEPT_OR_NOTHROW
       {
         T t;
-        if((t=v.load(memory_order_acquire))) // Avoid unnecessary cache line invalidation traffic
+        if((t=v.load(memory_order_consume))) // Avoid unnecessary cache line invalidation traffic
         {
           expected=t;
           return false;
@@ -216,7 +220,7 @@ namespace boost
       //! Atomically move constructs
       spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW
       {
-        v.store(o.v.exchange(nullptr, memory_order_acq_rel));
+        v.store(o.v.exchange(nullptr, memory_order_acq_rel), memory_order_release);
       }
       //! Returns the memory pointer part of the atomic
       T *get() BOOST_NOEXCEPT_OR_NOTHROW { return v.get(); }
@@ -402,13 +406,13 @@ namespace boost
       // Annoyingly the atomic ops are marked as unsafe for atomic transactions, so ...
       return *((volatile T *) &lockable);
 #else
-      return lockable.load(memory_order_acquire);
+      return lockable.load(memory_order_consume);
 #endif
     }
     // For when used with a locked_ptr
     template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline bool is_lockable_locked(spinlock<lockable_ptr<T>, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
     {
-      return ((size_t) lockable.load(memory_order_acquire))&1;
+      return ((size_t) lockable.load(memory_order_consume))&1;
     }
 
 #ifndef BOOST_BEGIN_TRANSACT_LOCK
@@ -686,7 +690,7 @@ namespace boost
       {
         //k ^= k + 0x9e3779b9 + (k<<6) + (k>>2); // really need to avoid sequential keys tapping the same cache line
         //k ^= k + 0x9e3779b9; // really need to avoid sequential keys tapping the same cache line
-        buckets_type &buckets=*_buckets.load(memory_order_acquire);
+        buckets_type &buckets=*_buckets.load(memory_order_consume);
         ANNOTATE_IGNORE_READS_BEGIN(); // doesn't realise that buckets never changes, so lack of lock between write and read not important
         size_type i=k % buckets.size();
         typename buckets_type::iterator ret=buckets.begin()+i;
@@ -714,18 +718,19 @@ namespace boost
         size_t _offset, _pending_incr; // used to avoid erase() doing a costly increment unless necessary
         friend class concurrent_unordered_map;
         static typename buckets_type::iterator dead() { static typename buckets_type::iterator it; return it; }
-        iterator(const concurrent_unordered_map *parent) : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_acquire)), _offset((size_t) -1), _pending_incr(1) { buckets_type &buckets=*_parent->_buckets.load(memory_order_acquire); _itb=buckets.begin(); }
-        iterator(const concurrent_unordered_map *parent, std::nullptr_t) : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_acquire)), _itb(dead()), _offset((size_t) -1), _pending_incr(0) { }
+        iterator(const concurrent_unordered_map *parent) : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_consume)), _offset((size_t) -1), _pending_incr(1) { buckets_type &buckets=*_bucket_data; _itb=buckets.begin(); }
+        iterator(const concurrent_unordered_map *parent, std::nullptr_t) : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_consume)), _itb(dead()), _offset((size_t) -1), _pending_incr(0) { }
         void _catch_up()
         {
           assert(_itb!=dead());
           if(_itb==dead())
             abort();
-          buckets_type &buckets=*_parent->_buckets.load(memory_order_acquire);
+          buckets_type &buckets=*_parent->_buckets.load(memory_order_consume);
           while(_pending_incr && _itb!=buckets.end())
           {
-            assert(_bucket_data==_parent->_buckets.load(memory_order_acquire));
-            if(_bucket_data!=_parent->_buckets.load(memory_order_acquire))
+            // Check for staleness
+            assert(_bucket_data==_parent->_buckets.load(memory_order_consume));
+            if(_bucket_data!=_parent->_buckets.load(memory_order_consume))
               abort(); // stale iterator
             bucket_type &b=*_itb;
             BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(b.lock, 2)
@@ -783,7 +788,7 @@ namespace boost
       concurrent_unordered_map(std::initializer_list<value_type> il, size_type n, const hasher &h, const allocator_type &al) : concurrent_unordered_map(n, h, al) { insert(std::move(il)); }
       ~concurrent_unordered_map()
       {
-        buckets_type &buckets=*_buckets.load(memory_order_acquire);
+        buckets_type &buckets=*_buckets.load(memory_order_consume);
         // Raise the rehash lock and leave it raised
         _rehash_lock.lock();
         // Lock all existing buckets
@@ -807,7 +812,6 @@ namespace boost
           delete i;
           i=nullptr;
         }
-        _buckets.store(nullptr, memory_order_release);
       }
     private:
       // FIXME Awaiting implementation
@@ -822,12 +826,12 @@ namespace boost
         bool done;
         do
         {
-          buckets_type &buckets=*_buckets.load(memory_order_acquire);
+          buckets_type &buckets=*_buckets.load(memory_order_consume);
           done=true;
           for(auto &b : buckets)
           {
             // If the lock is other state we need to reload bucket list
-            if(b.lock.load(memory_order_acquire)==2)
+            if(b.lock.load(memory_order_consume)==2)
             {
               done=false;
               break;
@@ -845,13 +849,13 @@ namespace boost
         bool done;
         do
         {
-          buckets_type &buckets=*_buckets.load(memory_order_acquire);
+          buckets_type &buckets=*_buckets.load(memory_order_consume);
           done=true;
           ret=0;
           for(auto &b : buckets)
           {
             // If the lock is other state we need to reload bucket list
-            if(b.lock.load(memory_order_acquire)==2)
+            if(b.lock.load(memory_order_consume)==2)
             {
               done=false;
               break;
@@ -1284,7 +1288,7 @@ namespace boost
         bool done;
         do
         {
-          buckets_type &buckets=*_buckets.load(memory_order_acquire);
+          buckets_type &buckets=*_buckets.load(memory_order_consume);
           done=true;
           for(auto &b : buckets)
           {
@@ -1315,7 +1319,7 @@ namespace boost
         std::swap(_key_equal, o._key_equal);
         std::swap(_max_load_factor, o._max_load_factor);
         std::swap(_min_bucket_capacity, o._min_bucket_capacity);
-        _buckets.store(o._buckets.exchange(_buckets.load(memory_order_acquire), memory_order_acq_rel), memory_order_release);
+        _buckets.store(o._buckets.exchange(_buckets.load(memory_order_consume), memory_order_acq_rel), memory_order_release);
         // intentionally leave old_buckets as-is
       }
       //! Merges all the values from the source map into the destination map in a highly efficient way. Rehash safe.
@@ -1325,7 +1329,7 @@ namespace boost
         bool done;
         do
         {
-          buckets_type &obuckets=*o._buckets.load(memory_order_acquire);
+          buckets_type &obuckets=*o._buckets.load(memory_order_consume);
           done=true;
           for(auto &b : obuckets)
           {
@@ -1373,17 +1377,17 @@ namespace boost
           insert(rebind_node_ptr(e));
         }
       }
-      size_type bucket_count() const BOOST_NOEXCEPT{ return _buckets.load(memory_order_acquire)->size(); }
-      size_type max_bucket_count() const BOOST_NOEXCEPT { return _buckets.load(memory_order_acquire)->max_size(); }
+      size_type bucket_count() const BOOST_NOEXCEPT{ return _buckets.load(memory_order_consume)->size(); }
+      size_type max_bucket_count() const BOOST_NOEXCEPT { return _buckets.load(memory_order_consume)->max_size(); }
       size_type bucket_size(size_type n) const
       {
-        buckets_type &buckets=*_buckets.load(memory_order_acquire);
+        buckets_type &buckets=*_buckets.load(memory_order_consume);
         bucket_type &b=buckets[n];
         return b.items.count.load(memory_order_consume);
       }
       size_type bucket(const key_type &k) const
       {
-        buckets_type &buckets=*_buckets.load(memory_order_acquire);
+        buckets_type &buckets=*_buckets.load(memory_order_consume);
         return _hasher(k) % buckets.size();
       }
       float load_factor() const BOOST_NOEXCEPT { return (float) size()/bucket_count(); }
@@ -1424,17 +1428,17 @@ namespace boost
         for(auto &b : *tempbuckets)
           b.lock.store(2);
         // If it's a simple buckets cycle, simply move over all items as it's noexcept
-        if(_buckets.load(memory_order_acquire)->size()==tempbuckets->size())
+        if(_buckets.load(memory_order_consume)->size()==tempbuckets->size())
         {
           // Simply move the old buckets into new buckets as-is
-          for(auto obit=tempbuckets->begin(), bit=_buckets.load(memory_order_acquire)->begin(); obit!=tempbuckets->end(); ++obit, ++bit)
+          for(auto obit=tempbuckets->begin(), bit=_buckets.load(memory_order_consume)->begin(); obit!=tempbuckets->end(); ++obit, ++bit)
           {
             auto &ob=*obit;
             auto &b=*bit;
-            if(ob.count.load(memory_order_acquire))
+            if(ob.count.load(memory_order_consume))
             {
               b.items=std::move(ob.items);
-              b.count.store(ob.count.load(memory_order_acquire), memory_order_release);
+              b.count.store(ob.count.load(memory_order_consume), memory_order_release);
               ob.count.store(0, memory_order_release);
             }
           }
@@ -1497,7 +1501,7 @@ namespace boost
       void rehash(size_type n)
       {
         std::lock_guard<decltype(_rehash_lock)> g(_rehash_lock); // Stop other rehashes
-        buckets_type &buckets=*_buckets.load(memory_order_acquire);
+        buckets_type &buckets=*_buckets.load(memory_order_consume);
         if(n!=buckets.size())
         {
           // Lock all existing buckets
@@ -1533,7 +1537,7 @@ namespace boost
       allocator_type get_allocator() const BOOST_NOEXCEPT { return _allocator; }
       void dump_buckets(std::ostream &s) const
       {
-        buckets_type &buckets=*_buckets.load(memory_order_acquire);
+        buckets_type &buckets=*_buckets.load(memory_order_consume);
         for(size_t n=0; n<buckets.size(); n++)
         {
           s << "Bucket " << n << ": size=" << buckets[n].items.size() << " count=" << buckets[n].count << std::endl;

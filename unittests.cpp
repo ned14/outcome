@@ -561,7 +561,7 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
       else
       {
         std::string foo("n");
-        size_t iters=RUNNING_ON_VALGRIND ? 10 : 100000000;
+        size_t iters=RUNNING_ON_VALGRIND ? 1000000 : 100000000;
         for(size_t n=0; n<iters; n++)
         {
           size_t v=n*10+thread;
