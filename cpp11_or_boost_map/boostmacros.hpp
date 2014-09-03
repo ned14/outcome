@@ -61,7 +61,7 @@ extern "C" void _mm_pause();
 #endif
 
 #ifndef BOOST_CONSTEXPR
-# if !defined(_MSC_VER) || _MSC_VER >= 1900
+# if !defined(_MSC_VER) || _MSC_VER >= 2000
 #  define BOOST_CONSTEXPR constexpr
 # endif
 #endif
