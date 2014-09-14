@@ -447,6 +447,8 @@ namespace boost
 
     [1]: Currently Microsoft's compiler treats all atomic operations as memory_order_seq_cst irrespective of what they ask for.
 
+    \image html scaling.png
+    \image html gcc_vs_vs2013.png
 
     ## Some notes on this implementation: ##
 
