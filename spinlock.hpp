@@ -63,23 +63,15 @@ DEALINGS IN THE SOFTWARE.
 This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing interesting spinlock related things.
 */
 
-#define BOOST_ATOMIC_MAP_START_NAMESPACE namespace boost { namespace spinlock {
-#define BOOST_ATOMIC_MAP_END_NAMESPACE } }
-#include "cpp11_or_boost_map/atomic"
+#define BOOST_STL11_MAP_START_NAMESPACE namespace boost { namespace spinlock {
+#define BOOST_STL11_MAP_END_NAMESPACE } }
+#include "stl11-as-boost/include/atomic"
+#include "stl11-as-boost/include/chrono"
+#include "stl11-as-boost/include/mutex"
+#include "stl11-as-boost/include/thread"
+#undef BOOST_STL11_MAP_START_NAMESPACE
+#undef BOOST_STL11_MAP_END_NAMESPACE
 
-#if !defined(BOOST_SPINLOCK_USE_BOOST_THREAD) && defined(BOOST_NO_CXX11_HDR_THREAD)
-# define BOOST_SPINLOCK_USE_BOOST_THREAD
-#endif
-
-#ifdef BOOST_SPINLOCK_USE_BOOST_THREAD
-# include <boost/thread.hpp>
-#else
-# include <thread>
-# include <chrono>
-#endif
-
-// For lock_guard
-#include <mutex>
 // For dump
 #include <ostream>
 

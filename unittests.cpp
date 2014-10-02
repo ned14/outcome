@@ -900,11 +900,13 @@ int main(int argc, char *argv[])
   printf("Please attach debugger now ...\n");
   getchar();
 #endif
+#if 0
   cpu_set_t *cpuset=CPU_ALLOC(2);
   CPU_ZERO_S(CPU_ALLOC_SIZE(2), cpuset);
   CPU_SET_S(0, 2, cpuset);
   CPU_SET_S(1, 2, cpuset);
   pthread_setaffinity_np(pthread_self(), CPU_ALLOC_SIZE(2), cpuset);
+#endif
   int result=Catch::Session().run(argc, argv);
   return result;
 }

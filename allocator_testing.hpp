@@ -32,9 +32,11 @@ DEALINGS IN THE SOFTWARE.
 #ifndef BOOST_ALLOCATOR_TESTING_HPP
 #define BOOST_ALLOCATOR_TESTING_HPP
 
-#define BOOST_ATOMIC_MAP_START_NAMESPACE namespace boost { namespace allocator_testing {
-#define BOOST_ATOMIC_MAP_END_NAMESPACE } }
-#include "cpp11_or_boost_map/atomic"
+#define BOOST_STL11_MAP_START_NAMESPACE namespace boost { namespace allocator_testing {
+#define BOOST_STL11_MAP_END_NAMESPACE } }
+#include "stl11-as-boost/include/atomic"
+#undef BOOST_STL11_MAP_START_NAMESPACE
+#undef BOOST_STL11_MAP_END_NAMESPACE
 
 namespace boost { namespace allocator_testing {
 
