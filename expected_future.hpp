@@ -35,24 +35,65 @@ DEALINGS IN THE SOFTWARE.
 #include "spinlock.hpp"
 #include "expected/include/boost/expected/expected.hpp"
 
+#define BOOST_STL11_MAP_BEGIN_NAMESPACE namespace boost { namespace expected_future { inline namespace stl11 {
+#define BOOST_STL11_MAP_END_NAMESPACE } } }
+#include "local-bind-cpp-library/include/stl11/future"
+#undef BOOST_STL11_MAP_BEGIN_NAMESPACE
+#undef BOOST_STL11_MAP_END_NAMESPACE
+#define BOOST_STL11_MAP_BEGIN_NAMESPACE namespace boost { namespace expected_future { inline namespace stl11 { namespace chrono {
+#define BOOST_STL11_MAP_END_NAMESPACE } } } }
+#include "local-bind-cpp-library/include/stl11/chrono"
+#undef BOOST_STL11_MAP_BEGIN_NAMESPACE
+#undef BOOST_STL11_MAP_END_NAMESPACE
+
 namespace boost
 {
   namespace expected_future
   {
     template<class T, class... Args> class basic_promise;
     template<class T, class E> class basic_shared_future;
-    template<class T, class E> class basic_future : expected<T, E>
+    template<class T, class E> class basic_future : protected expected<T, E>
     {
     public:
-      BOOST_CONSTEXPR basic_future() BOOST_NOEXCEPT_IF(std::is_nothrow_default_constructible<expected<T, E>>::value) { }
-      BOOST_CONSTEXPR basic_future(basic_future &&o) BOOST_NOEXCEPT_IF(std::is_nothrow_move_constructible<expected<T, E>>::value)
-        : expected<T, E>(std::move(o)) { }
+      BOOST_CONSTEXPR basic_future() BOOST_NOEXCEPT_IF(is_nothrow_default_constructible<expected<T, E>>::value) { }
+      BOOST_CONSTEXPR basic_future(basic_future &&o) BOOST_NOEXCEPT_IF(is_nothrow_move_constructible<expected<T, E>>::value)
+        : expected<T, E>(move(o)) { }
       basic_future(const basic_future &o) = delete;
-      BOOST_CONSTEXPR ~basic_future() BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<expected<T, E>>::value) { }
-      BOOST_CONSTEXPR basic_future &operator=(basic_future &&o) BOOST_NOEXCEPT_IF(std::is_nothrow_move_assignable<expected<T, E>>::value);
+      BOOST_CONSTEXPR ~basic_future() BOOST_NOEXCEPT_IF(is_nothrow_destructible<expected<T, E>>::value) { }
+      BOOST_CONSTEXPR basic_future &operator=(basic_future &&o) BOOST_NOEXCEPT_IF(is_nothrow_move_assignable<expected<T, E>>::value);
       basic_future &operator=(const basic_future &o) = delete;
       BOOST_CONSTEXPR basic_shared_future<T, E> share();
+      BOOST_CONSTEXPR T get()
+      {
+        wait();
+      }
+      BOOST_CONSTEXPR bool valid() const BOOST_NOEXCEPT;
+      BOOST_CONSTEXPR void wait() const
+      {
+        if(!valid()) throw future_error(future_errc::no_state);
+      }
+      template<class Rep, class Period>
+      future_status wait_for(const chrono::duration<Rep,Period> &timeout_duration) const;
+      template<class Clock, class Duration>
+      future_status wait_until(const chrono::time_point<Clock,Duration> &timeout_time) const;
     };
+    template<class T, class E> class basic_promise<basic_future<T, E>>
+    {
+     public:
+       BOOST_CONSTEXPR basic_promise();
+       BOOST_CONSTEXPR basic_promise(basic_promise &&o) BOOST_NOEXCEPT;
+       basic_promise(const basic_promise &) = delete;
+       BOOST_CONSTEXPR ~basic_promise();
+       BOOST_CONSTEXPR basic_promise &operator=(basic_promise &&o) BOOST_NOEXCEPT;
+       basic_promise &operator=(const basic_promise &) = delete;
+       BOOST_CONSTEXPR void swap(basic_promise &o) BOOST_NOEXCEPT;
+       BOOST_CONSTEXPR basic_future<T, E> get_future() BOOST_NOEXCEPT_IF(is_nothrow_default_constructible<basic_future<T, E>>::value && is_nothrow_move_constructible<basic_future<T, E>>::value);
+       BOOST_CONSTEXPR set_value(const T &v) BOOST_NOEXCEPT_IF(is_nothrow_copy_constructible<T>::value);
+       BOOST_CONSTEXPR set_value(T &&v) BOOST_NOEXCEPT_IF(is_nothrow_move_constructible<T>::value);
+       BOOST_CONSTEXPR set_exception(const E &v) BOOST_NOEXCEPT_IF(is_nothrow_copy_constructible<E>::value);
+       BOOST_CONSTEXPR set_exception(E &&v) BOOST_NOEXCEPT_IF(is_nothrow_move_constructible<E>::value);
+    };
+#if 0
     template<class T, class E> class basic_shared_future
     {
     };
@@ -60,15 +101,10 @@ namespace boost
     template<class T, class E> class basic_promise<T, E>
     {
     };
-    // constexpr promise
-    template<template<class, class> future_type, class T, class E,
-      class _=std::enable_if<std::is_trivially_constructible<basic_future<T, E>, future_type>::value>
-      class basic_promise<future_type<T, E>>
-    {
-    };
-    template<class T, class E=std::exception_ptr> using promise = basic_promise<T, E>;
-    template<class T, class E=std::exception_ptr> using future = basic_future<T, E>;
-    template<class T, class E=std::exception_ptr> using shared_future = basic_shared_future<T, E>;
+    template<class T, class E=exception_ptr> using promise = basic_promise<T, E>;
+    template<class T, class E=exception_ptr> using future = basic_future<T, E>;
+    template<class T, class E=exception_ptr> using shared_future = basic_shared_future<T, E>;
+#endif
 
   } // namespace expected_future
 } // namespace boost
