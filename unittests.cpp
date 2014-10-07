@@ -30,6 +30,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include "spinlock.hpp"
 #include "timing.h"
+#include "expected_future.hpp"
 
 #include <stdio.h>
 #include <unordered_map>

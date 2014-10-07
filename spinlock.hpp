@@ -63,13 +63,18 @@ DEALINGS IN THE SOFTWARE.
 This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing interesting spinlock related things.
 */
 
-#define BOOST_STL11_MAP_START_NAMESPACE namespace boost { namespace spinlock {
-#define BOOST_STL11_MAP_END_NAMESPACE } }
-#include "stl11-as-boost/include/atomic"
-#include "stl11-as-boost/include/chrono"
-#include "stl11-as-boost/include/mutex"
-#include "stl11-as-boost/include/thread"
-#undef BOOST_STL11_MAP_START_NAMESPACE
+#include "local-bind-cpp-library/include/boost/config.hpp"
+#define BOOST_STL11_MAP_BEGIN_NAMESPACE namespace boost { namespace spinlock { inline namespace stl11 {
+#define BOOST_STL11_MAP_END_NAMESPACE } } }
+#include "local-bind-cpp-library/include/stl11/atomic"
+#include "local-bind-cpp-library/include/stl11/mutex"
+#include "local-bind-cpp-library/include/stl11/thread"
+#undef BOOST_STL11_MAP_BEGIN_NAMESPACE
+#undef BOOST_STL11_MAP_END_NAMESPACE
+#define BOOST_STL11_MAP_BEGIN_NAMESPACE namespace boost { namespace spinlock { inline namespace stl11 { namespace chrono {
+#define BOOST_STL11_MAP_END_NAMESPACE } } } }
+#include "local-bind-cpp-library/include/stl11/chrono"
+#undef BOOST_STL11_MAP_BEGIN_NAMESPACE
 #undef BOOST_STL11_MAP_END_NAMESPACE
 
 // For dump
@@ -83,17 +88,6 @@ namespace boost
 {
   namespace spinlock
   {
-  // Map in a this_thread implementation
-#ifdef BOOST_SPINLOCK_USE_BOOST_THREAD
-  namespace this_thread=boost::this_thread;
-  using boost::thread;
-  namespace chrono { using boost::chrono::milliseconds; }
-#else
-  namespace this_thread=std::this_thread;
-  using std::thread;
-  namespace chrono { using std::chrono::milliseconds; }
-#endif
-
     /*! \struct lockable_ptr
      * \brief Lets you use a pointer to memory as a spinlock :)
      */

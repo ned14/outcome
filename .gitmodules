@@ -1,6 +1,6 @@
 [submodule "expected"]
 	path = expected
 	url = https://github.com/ned14/Boost.Expected.git
-[submodule "stl11-as-boost"]
-	path = stl11-as-boost
-	url = https://github.com/ned14/stl11-as-boost.git
+[submodule "local-bind-cpp-library"]
+	path = local-bind-cpp-library
+	url = https://github.com/ned14/local-bind-cpp-library.git
