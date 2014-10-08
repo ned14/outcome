@@ -35,78 +35,94 @@ DEALINGS IN THE SOFTWARE.
 #include "spinlock.hpp"
 #include "expected/include/boost/expected/expected.hpp"
 
-#define BOOST_STL11_MAP_BEGIN_NAMESPACE namespace boost { namespace expected_future { inline namespace stl11 {
-#define BOOST_STL11_MAP_END_NAMESPACE } } }
+#define BOOST_EXPECTED_FUTURE_NAMESPACE boost::expected_future
+#define BOOST_EXPECTED_FUTURE_NAMESPACE_BEGIN namespace boost { namespace expected_future { inline namespace v1
+#define BOOST_EXPECTED_FUTURE_NAMESPACE_END } }
+
+#define BOOST_STL11_MAP_BEGIN_NAMESPACE BOOST_EXPECTED_FUTURE_NAMESPACE_BEGIN { inline namespace stl11 {
+#define BOOST_STL11_MAP_END_NAMESPACE } } BOOST_EXPECTED_FUTURE_NAMESPACE_END
 #include "local-bind-cpp-library/include/stl11/future"
 #undef BOOST_STL11_MAP_BEGIN_NAMESPACE
 #undef BOOST_STL11_MAP_END_NAMESPACE
-#define BOOST_STL11_MAP_BEGIN_NAMESPACE namespace boost { namespace expected_future { inline namespace stl11 { namespace chrono {
-#define BOOST_STL11_MAP_END_NAMESPACE } } } }
+#define BOOST_STL11_MAP_BEGIN_NAMESPACE BOOST_EXPECTED_FUTURE_NAMESPACE_BEGIN { inline namespace stl11 { namespace chrono {
+#define BOOST_STL11_MAP_END_NAMESPACE } } } BOOST_EXPECTED_FUTURE_NAMESPACE_END
 #include "local-bind-cpp-library/include/stl11/chrono"
 #undef BOOST_STL11_MAP_BEGIN_NAMESPACE
 #undef BOOST_STL11_MAP_END_NAMESPACE
 
-namespace boost
+BOOST_EXPECTED_FUTURE_NAMESPACE_BEGIN
 {
-  namespace expected_future
+  template<class T, class... Args> class basic_promise;
+  template<class T, class E> class basic_shared_future;
+  template<class T, class E> class basic_future : protected expected<T, E>
   {
-    template<class T, class... Args> class basic_promise;
-    template<class T, class E> class basic_shared_future;
-    template<class T, class E> class basic_future : protected expected<T, E>
+  public:
+    BOOST_CONSTEXPR basic_future() BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<expected<T, E>>::value)) { }
+    BOOST_CONSTEXPR basic_future(basic_future &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_move_constructible<expected<T, E>>::value))
+      : expected<T, E>(move(o)) { }
+    basic_future(const basic_future &o) = delete;
+    ~basic_future() BOOST_NOEXCEPT_IF((std::is_nothrow_destructible<expected<T, E>>::value)) { }
+    BOOST_CONSTEXPR basic_future &operator=(basic_future &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_move_assignable<expected<T, E>>::value));
+    basic_future &operator=(const basic_future &o) = delete;
+    BOOST_CONSTEXPR basic_shared_future<T, E> share();
+    BOOST_CONSTEXPR T get()
     {
+      wait();
+    }
+    BOOST_CONSTEXPR bool valid() const BOOST_NOEXCEPT;
+    BOOST_CONSTEXPR void wait() const
+    {
+      if(!valid()) throw future_error(future_errc::no_state);
+    }
+    template<class Rep, class Period>
+    future_status wait_for(const chrono::duration<Rep,Period> &timeout_duration) const;
+    template<class Clock, class Duration>
+    future_status wait_until(const chrono::time_point<Clock,Duration> &timeout_time) const;
+  };
+  template<class T, class E> class basic_promise<basic_future<T, E>>
+  {
     public:
-      BOOST_CONSTEXPR basic_future() BOOST_NOEXCEPT_IF(is_nothrow_default_constructible<expected<T, E>>::value) { }
-      BOOST_CONSTEXPR basic_future(basic_future &&o) BOOST_NOEXCEPT_IF(is_nothrow_move_constructible<expected<T, E>>::value)
-        : expected<T, E>(move(o)) { }
-      basic_future(const basic_future &o) = delete;
-      BOOST_CONSTEXPR ~basic_future() BOOST_NOEXCEPT_IF(is_nothrow_destructible<expected<T, E>>::value) { }
-      BOOST_CONSTEXPR basic_future &operator=(basic_future &&o) BOOST_NOEXCEPT_IF(is_nothrow_move_assignable<expected<T, E>>::value);
-      basic_future &operator=(const basic_future &o) = delete;
-      BOOST_CONSTEXPR basic_shared_future<T, E> share();
-      BOOST_CONSTEXPR T get()
+      BOOST_CONSTEXPR basic_promise()
       {
-        wait();
+        static_assert(!std::uses_allocator<basic_promise, std::allocator<T>>::value, "Non-allocating future-promise cannot make use of allocators");
+        static_assert(!std::uses_allocator<basic_promise, std::allocator<E>>::value, "Non-allocating future-promise cannot make use of allocators");
       }
-      BOOST_CONSTEXPR bool valid() const BOOST_NOEXCEPT;
-      BOOST_CONSTEXPR void wait() const
-      {
-        if(!valid()) throw future_error(future_errc::no_state);
-      }
-      template<class Rep, class Period>
-      future_status wait_for(const chrono::duration<Rep,Period> &timeout_duration) const;
-      template<class Clock, class Duration>
-      future_status wait_until(const chrono::time_point<Clock,Duration> &timeout_time) const;
-    };
-    template<class T, class E> class basic_promise<basic_future<T, E>>
-    {
-     public:
-       BOOST_CONSTEXPR basic_promise();
-       BOOST_CONSTEXPR basic_promise(basic_promise &&o) BOOST_NOEXCEPT;
-       basic_promise(const basic_promise &) = delete;
-       BOOST_CONSTEXPR ~basic_promise();
-       BOOST_CONSTEXPR basic_promise &operator=(basic_promise &&o) BOOST_NOEXCEPT;
-       basic_promise &operator=(const basic_promise &) = delete;
-       BOOST_CONSTEXPR void swap(basic_promise &o) BOOST_NOEXCEPT;
-       BOOST_CONSTEXPR basic_future<T, E> get_future() BOOST_NOEXCEPT_IF(is_nothrow_default_constructible<basic_future<T, E>>::value && is_nothrow_move_constructible<basic_future<T, E>>::value);
-       BOOST_CONSTEXPR set_value(const T &v) BOOST_NOEXCEPT_IF(is_nothrow_copy_constructible<T>::value);
-       BOOST_CONSTEXPR set_value(T &&v) BOOST_NOEXCEPT_IF(is_nothrow_move_constructible<T>::value);
-       BOOST_CONSTEXPR set_exception(const E &v) BOOST_NOEXCEPT_IF(is_nothrow_copy_constructible<E>::value);
-       BOOST_CONSTEXPR set_exception(E &&v) BOOST_NOEXCEPT_IF(is_nothrow_move_constructible<E>::value);
-    };
+      BOOST_CONSTEXPR basic_promise(basic_promise &&o) BOOST_NOEXCEPT;
+      basic_promise(const basic_promise &) = delete;
+      ~basic_promise();
+      BOOST_CONSTEXPR basic_promise &operator=(basic_promise &&o) BOOST_NOEXCEPT;
+      basic_promise &operator=(const basic_promise &) = delete;
+      BOOST_CONSTEXPR void swap(basic_promise &o) BOOST_NOEXCEPT;
+      BOOST_CONSTEXPR basic_future<T, E> get_future() BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<basic_future<T, E>>::value && std::is_nothrow_move_constructible<basic_future<T, E>>::value));
+      BOOST_CONSTEXPR void set_value(const T &v) BOOST_NOEXCEPT_IF((std::is_nothrow_copy_constructible<T>::value));
+      BOOST_CONSTEXPR void set_value(T &&v) BOOST_NOEXCEPT_IF((std::is_nothrow_move_constructible<T>::value));
+      // set_value_at_thread_exit() not possible with this design
+      BOOST_CONSTEXPR void set_exception(const E &v) BOOST_NOEXCEPT_IF((std::is_nothrow_copy_constructible<E>::value));
+      BOOST_CONSTEXPR void set_exception(E &&v) BOOST_NOEXCEPT_IF((std::is_nothrow_move_constructible<E>::value));
+      // set_exception_at_thread_exit() not possible with this design
+  };
 #if 0
-    template<class T, class E> class basic_shared_future
-    {
-    };
-    // non-constexpr promise, must vector through a virtual function to set value
-    template<class T, class E> class basic_promise<T, E>
-    {
-    };
-    template<class T, class E=exception_ptr> using promise = basic_promise<T, E>;
-    template<class T, class E=exception_ptr> using future = basic_future<T, E>;
-    template<class T, class E=exception_ptr> using shared_future = basic_shared_future<T, E>;
+  template<class T, class E> class basic_shared_future
+  {
+  };
+  // non-constexpr promise, must vector through a virtual function to set value
+  template<class T, class E> class basic_promise<T, E>
+  {
+  };
+  template<class T, class E=exception_ptr> using promise = basic_promise<T, E>;
+  template<class T, class E=exception_ptr> using future = basic_future<T, E>;
+  template<class T, class E=exception_ptr> using shared_future = basic_shared_future<T, E>;
 #endif
 
-  } // namespace expected_future
-} // namespace boost
+} // namespace
+BOOST_EXPECTED_FUTURE_NAMESPACE_END
+
+namespace std
+{
+  template<class T, class E> void swap(BOOST_EXPECTED_FUTURE_NAMESPACE::basic_promise<T, E> &a, BOOST_EXPECTED_FUTURE_NAMESPACE::basic_promise<T, E> &b) BOOST_NOEXCEPT
+  {
+    a.swap(b);
+  }
+}
 
 #endif
