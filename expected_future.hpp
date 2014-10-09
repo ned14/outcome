@@ -35,23 +35,25 @@ DEALINGS IN THE SOFTWARE.
 #include "spinlock.hpp"
 #include "expected/include/boost/expected/expected.hpp"
 
-#define BOOST_EXPECTED_FUTURE_NAMESPACE boost::expected_future
-#define BOOST_EXPECTED_FUTURE_NAMESPACE_BEGIN namespace boost { namespace expected_future { inline namespace v1
-#define BOOST_EXPECTED_FUTURE_NAMESPACE_END } }
+#include "local-bind-cpp-library/include/import.hpp"
+#define BOOST_EXPECTED_FUTURE_V1 (boost), (expected_future), (v1, inline)
+#define BOOST_EXPECTED_FUTURE_V1_NAMESPACE       BOOST_LOCAL_BIND_NAMESPACE      (BOOST_EXPECTED_FUTURE_V1)
+#define BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_EXPECTED_FUTURE_V1)
+#define BOOST_EXPECTED_FUTURE_V1_NAMESPACE_END   BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_EXPECTED_FUTURE_V1)
 
-#define BOOST_STL11_MAP_BEGIN_NAMESPACE BOOST_EXPECTED_FUTURE_NAMESPACE_BEGIN { inline namespace stl11 {
-#define BOOST_STL11_MAP_END_NAMESPACE } } BOOST_EXPECTED_FUTURE_NAMESPACE_END
-#include "local-bind-cpp-library/include/stl11/future"
+#define BOOST_STL11_MAP_BEGIN_NAMESPACE        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_EXPECTED_FUTURE_V1, (stl11, inline))
+#define BOOST_STL11_MAP_END_NAMESPACE          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_EXPECTED_FUTURE_V1, (stl11, inline))
+#include "local-bind-cpp-library/bind/stl11/future"
 #undef BOOST_STL11_MAP_BEGIN_NAMESPACE
 #undef BOOST_STL11_MAP_END_NAMESPACE
-#define BOOST_STL11_MAP_BEGIN_NAMESPACE BOOST_EXPECTED_FUTURE_NAMESPACE_BEGIN { inline namespace stl11 { namespace chrono {
-#define BOOST_STL11_MAP_END_NAMESPACE } } } BOOST_EXPECTED_FUTURE_NAMESPACE_END
-#include "local-bind-cpp-library/include/stl11/chrono"
+#define BOOST_STL11_MAP_BEGIN_NAMESPACE        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_EXPECTED_FUTURE_V1, (stl11, inline), (chrono))
+#define BOOST_STL11_MAP_END_NAMESPACE          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_EXPECTED_FUTURE_V1, (stl11, inline), (chrono))
+#include "local-bind-cpp-library/bind/stl11/chrono"
 #undef BOOST_STL11_MAP_BEGIN_NAMESPACE
 #undef BOOST_STL11_MAP_END_NAMESPACE
 
-BOOST_EXPECTED_FUTURE_NAMESPACE_BEGIN
-{
+BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
+
   template<class T, class... Args> class basic_promise;
   template<class T, class E> class basic_shared_future;
   template<class T, class E> class basic_future : protected expected<T, E>
@@ -114,15 +116,25 @@ BOOST_EXPECTED_FUTURE_NAMESPACE_BEGIN
   template<class T, class E=exception_ptr> using shared_future = basic_shared_future<T, E>;
 #endif
 
-} // namespace
-BOOST_EXPECTED_FUTURE_NAMESPACE_END
+BOOST_EXPECTED_FUTURE_V1_NAMESPACE_END
 
 namespace std
 {
-  template<class T, class E> void swap(BOOST_EXPECTED_FUTURE_NAMESPACE::basic_promise<T, E> &a, BOOST_EXPECTED_FUTURE_NAMESPACE::basic_promise<T, E> &b) BOOST_NOEXCEPT
+  template<class T, class E> void swap(BOOST_EXPECTED_FUTURE_V1_NAMESPACE::basic_promise<T, E> &a, BOOST_EXPECTED_FUTURE_V1_NAMESPACE::basic_promise<T, E> &b) BOOST_NOEXCEPT
   {
     a.swap(b);
   }
 }
+
+#endif
+
+// Do local namespace binding
+#ifdef BOOST_EXPECTED_FUTURE_V1_MAP_NAMESPACE_BEGIN
+
+BOOST_EXPECTED_FUTURE_V1_MAP_NAMESPACE_BEGIN
+template<class T, class... Args> using basic_promise = BOOST_EXPECTED_FUTURE_V1_NAMESPACE::basic_promise<T, Args...>;
+template<class T, class E> class basic_shared_future = BOOST_EXPECTED_FUTURE_V1_NAMESPACE::basic_shared_future<T, E>;
+template<class T, class E> class basic_future = BOOST_EXPECTED_FUTURE_V1_NAMESPACE::basic_future<T, E>;
+BOOST_EXPECTED_FUTURE_V1_MAP_NAMESPACE_END
 
 #endif

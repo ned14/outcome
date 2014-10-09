@@ -64,18 +64,26 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 */
 
 #include "local-bind-cpp-library/include/boost/config.hpp"
-#define BOOST_STL11_MAP_BEGIN_NAMESPACE namespace boost { namespace spinlock { inline namespace stl11 {
-#define BOOST_STL11_MAP_END_NAMESPACE } } }
-#include "local-bind-cpp-library/include/stl11/atomic"
-#include "local-bind-cpp-library/include/stl11/mutex"
-#include "local-bind-cpp-library/include/stl11/thread"
+
+#include "local-bind-cpp-library/include/import.hpp"
+#define BOOST_SPINLOCK_V1 (boost), (spinlock), (v1, inline)
+#define BOOST_SPINLOCK_V1_NAMESPACE       BOOST_LOCAL_BIND_NAMESPACE      (BOOST_SPINLOCK_V1)
+#define BOOST_SPINLOCK_V1_NAMESPACE_BEGIN BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1)
+#define BOOST_SPINLOCK_V1_NAMESPACE_END   BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_SPINLOCK_V1)
+
+#define BOOST_STL11_MAP_BEGIN_NAMESPACE        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline))
+#define BOOST_STL11_MAP_END_NAMESPACE          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline))
+#include "local-bind-cpp-library/bind/stl11/atomic"
+#include "local-bind-cpp-library/bind/stl11/mutex"
+#include "local-bind-cpp-library/bind/stl11/thread"
 #undef BOOST_STL11_MAP_BEGIN_NAMESPACE
 #undef BOOST_STL11_MAP_END_NAMESPACE
-#define BOOST_STL11_MAP_BEGIN_NAMESPACE namespace boost { namespace spinlock { inline namespace stl11 { namespace chrono {
-#define BOOST_STL11_MAP_END_NAMESPACE } } } }
-#include "local-bind-cpp-library/include/stl11/chrono"
+#define BOOST_STL11_MAP_BEGIN_NAMESPACE        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline), (chrono))
+#define BOOST_STL11_MAP_END_NAMESPACE          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline), (chrono))
+#include "local-bind-cpp-library/bind/stl11/chrono"
 #undef BOOST_STL11_MAP_BEGIN_NAMESPACE
 #undef BOOST_STL11_MAP_END_NAMESPACE
+
 
 // For dump
 #include <ostream>
@@ -84,10 +92,7 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 // Turn this on if you have a compiler which understands __transaction_relaxed
 //#define BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
 
-namespace boost
-{
-  namespace spinlock
-  {
+BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
     /*! \struct lockable_ptr
      * \brief Lets you use a pointer to memory as a spinlock :)
      */
@@ -1540,8 +1545,8 @@ namespace boost
         }
       }
     }; // concurrent_unordered_map
-  }
-}
+
+BOOST_SPINLOCK_V1_NAMESPACE_END
 
 #if 0
 namespace std

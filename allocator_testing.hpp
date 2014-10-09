@@ -35,7 +35,7 @@ DEALINGS IN THE SOFTWARE.
 #include "local-bind-cpp-library/include/boost/config.hpp"
 #define BOOST_STL11_MAP_BEGIN_NAMESPACE namespace boost { namespace allocator_testing { inline namespace stl11 {
 #define BOOST_STL11_MAP_END_NAMESPACE } } }
-#include "local-bind-cpp-library/include/stl11/atomic"
+#include "local-bind-cpp-library/bind/stl11/atomic"
 #undef BOOST_STL11_MAP_BEGIN_NAMESPACE
 #undef BOOST_STL11_MAP_END_NAMESPACE
 
