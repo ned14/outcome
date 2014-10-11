@@ -533,6 +533,12 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 
     valgrind helgrind runs so slowly as to be pretty much useless. valgrind drd is much better, but still very slow. Define BOOST_SPINLOCK_ENABLE_VALGRIND
     to build in valgrind race detection instrumentation.
+    
+    ## Acknowledgements: ##
+    I'd like to thank Howard Hinnant and Jonathan Wakely for helping me embrace and extend N3645.
+    
+    I'd like to thank Hans Boehm for working through the atomic memory order semantics I used and
+    telling me where I could relax things.
     */
     template<class Key, class T, class Hash=std::hash<Key>, class Pred=std::equal_to<Key>, class Alloc=std::allocator<std::pair<const Key, T>>> class concurrent_unordered_map
     {
@@ -837,12 +843,12 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           for(auto &b : buckets)
           {
             // If the lock is other state we need to reload bucket list
-            if(b.lock.load(memory_order_consume)==2)
+            if(b.lock.load(memory_order_relaxed)==2)
             {
               done=false;
               break;
             }
-            if(b.count.load(memory_order_consume))
+            if(b.count.load(memory_order_relaxed))
               return false;
           }
         } while(!done);
@@ -861,12 +867,12 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           for(auto &b : buckets)
           {
             // If the lock is other state we need to reload bucket list
-            if(b.lock.load(memory_order_consume)==2)
+            if(b.lock.load(memory_order_relaxed)==2)
             {
               done=false;
               break;
             }
-            ret+=b.count.load(memory_order_consume);
+            ret+=b.count.load(memory_order_relaxed);
           }
         } while(!done);
         return ret;
@@ -888,7 +894,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           auto itb=_get_bucket(h);
           bucket_type &b=*itb;
           size_t offset=0;
-          if(!b.count.load(memory_order_consume))
+          if(!b.count.load(memory_order_relaxed))
             done=true;
           else
           {
@@ -1058,7 +1064,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           size_t emptyidx=(size_t) -1;
 #if 1
           // First search for equivalents and empties.
-          if(b.count.load(memory_order_consume))
+          if(b.count.load(memory_order_relaxed))
           {
             size_t offset=0;
             BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(b.lock, 2)
@@ -1100,7 +1106,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
                 ret.second=true;
                 i->p=v.release();
                 i->hash=h;
-                b.count.fetch_add(1, memory_order_release);
+                b.count.fetch_add(1, memory_order_relaxed);
                 done=true;
               }
             }
@@ -1130,7 +1136,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           ret.first._offset=b.items.size();
           ret.second=true;
           b.items.push_back(item_type(h, std::move(v)));
-          b.count.fetch_add(1, memory_order_release);
+          b.count.fetch_add(1, memory_order_relaxed);
           return true;
         });
       }
@@ -1212,7 +1218,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
               while(!items.empty() && !items.back().p)
                 items.pop_back(); // Will abort all concurrency
             }
-            b.count.fetch_sub(1, memory_order_release);
+            b.count.fetch_sub(1, memory_order_relaxed);
           }
         }
         return former;
@@ -1228,7 +1234,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           auto itb=_get_bucket(h);
           bucket_type &b=*itb;
           size_t offset=0;
-          if(b.count.load(memory_order_consume))
+          if(b.count.load(memory_order_relaxed))
           {
             // If the lock is other state we need to reload bucket list
             if(!b.lock.lock(2))
@@ -1252,7 +1258,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
                     while(!items.empty() && !items.back().p)
                       items.pop_back(); // Will abort all concurrency
                   }
-                  b.count.fetch_sub(1, memory_order_release);
+                  b.count.fetch_sub(1, memory_order_relaxed);
                   done=true;
                   break;
                 }
@@ -1314,7 +1320,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
               i.p=nullptr;
             }
             b.items.clear();
-            b.count.store(0, memory_order_release);
+            b.count.store(0, memory_order_relaxed);
           }
         } while(!done);
       }
@@ -1365,7 +1371,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
                 failed++;
               }
             }
-            b.count.store(failed, memory_order_release);
+            b.count.store(failed, memory_order_relaxed);
             if(!failed)
               items.clear();
             else
@@ -1391,7 +1397,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       {
         buckets_type &buckets=*_buckets.load(memory_order_consume);
         bucket_type &b=buckets[n];
-        return b.items.count.load(memory_order_consume);
+        return b.items.count.load(memory_order_relaxed);
       }
       size_type bucket(const key_type &k) const BOOST_NOEXCEPT
       {
@@ -1414,7 +1420,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
             i.p=nullptr;
           b.items.clear();
           b.items.shrink_to_fit();
-          b.count.store(0, memory_order_release);
+          b.count.store(0, memory_order_relaxed);
         }
       }
       // buckets must be locked on entry!
@@ -1436,14 +1442,14 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         for(auto &b : *tempbuckets)
           b.lock.store(2);
         // If it's a simple buckets cycle, simply move over all items as it's noexcept
-        if(_buckets.load(memory_order_consume)->size()==tempbuckets->size())
+        if(_buckets.load(memory_order_relaxed)->size()==tempbuckets->size())
         {
           // Simply move the old buckets into new buckets as-is
           for(auto obit=tempbuckets->begin(), bit=_buckets.load(memory_order_consume)->begin(); obit!=tempbuckets->end(); ++obit, ++bit)
           {
             auto &ob=*obit;
             auto &b=*bit;
-            if(ob.count.load(memory_order_consume))
+            if(ob.count.load(memory_order_relaxed))
             {
               b.items=std::move(ob.items);
               b.count.store(ob.count.load(memory_order_consume), memory_order_release);
@@ -1458,7 +1464,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
             // Relocate all old bucket contents into new buckets
             for(const auto &ob : *tempbuckets)
             {
-              if(ob.count.load(memory_order_consume))
+              if(ob.count.load(memory_order_relaxed))
               {
                 for(auto &i : ob.items)
                 {
@@ -1472,7 +1478,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
                       b.items.reserve(newcapacity ? newcapacity : 1);
                     }
                     b.items.push_back(item_type(i.hash, i.p));
-                    b.count.fetch_add(1, memory_order_release);
+                    b.count.fetch_add(1, memory_order_relaxed);
                   }
                 }
               }
