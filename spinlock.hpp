@@ -67,23 +67,25 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 
 #include "local-bind-cpp-library/include/import.hpp"
 #define BOOST_SPINLOCK_V1 (boost), (spinlock), (v1, inline)
+#ifndef BOOST_SPINLOCK_V1_STL11_IMPL
+#define BOOST_SPINLOCK_V1_STL11_IMPL std
+#endif
 #define BOOST_SPINLOCK_V1_NAMESPACE       BOOST_LOCAL_BIND_NAMESPACE      (BOOST_SPINLOCK_V1)
 #define BOOST_SPINLOCK_V1_NAMESPACE_BEGIN BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1)
 #define BOOST_SPINLOCK_V1_NAMESPACE_END   BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_SPINLOCK_V1)
 
-#define BOOST_STL11_MAP_BEGIN_NAMESPACE        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline))
-#define BOOST_STL11_MAP_END_NAMESPACE          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline))
-#include "local-bind-cpp-library/bind/stl11/atomic"
-#include "local-bind-cpp-library/bind/stl11/mutex"
-#include "local-bind-cpp-library/bind/stl11/thread"
-#undef BOOST_STL11_MAP_BEGIN_NAMESPACE
-#undef BOOST_STL11_MAP_END_NAMESPACE
-#define BOOST_STL11_MAP_BEGIN_NAMESPACE        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline), (chrono))
-#define BOOST_STL11_MAP_END_NAMESPACE          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline), (chrono))
-#include "local-bind-cpp-library/bind/stl11/chrono"
-#undef BOOST_STL11_MAP_BEGIN_NAMESPACE
-#undef BOOST_STL11_MAP_END_NAMESPACE
-
+#define BOOST_STL11_ATOMIC_MAP_NAMESPACE_BEGIN        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline))
+#define BOOST_STL11_ATOMIC_MAP_NAMESPACE_END          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline))
+#define BOOST_STL11_CHRONO_MAP_NAMESPACE_BEGIN        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline), (chrono))
+#define BOOST_STL11_CHRONO_MAP_NAMESPACE_END          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline), (chrono))
+#define BOOST_STL11_MUTEX_MAP_NAMESPACE_BEGIN         BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline))
+#define BOOST_STL11_MUTEX_MAP_NAMESPACE_END           BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline))
+#define BOOST_STL11_THREAD_MAP_NAMESPACE_BEGIN        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline))
+#define BOOST_STL11_THREAD_MAP_NAMESPACE_END          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline))
+#include BOOST_LOCAL_BIND_INCLUDE_STL11(BOOST_SPINLOCK_V1_STL11_IMPL, atomic)
+#include BOOST_LOCAL_BIND_INCLUDE_STL11(BOOST_SPINLOCK_V1_STL11_IMPL, chrono)
+#include BOOST_LOCAL_BIND_INCLUDE_STL11(BOOST_SPINLOCK_V1_STL11_IMPL, mutex)
+#include BOOST_LOCAL_BIND_INCLUDE_STL11(BOOST_SPINLOCK_V1_STL11_IMPL, thread)
 
 // For dump
 #include <ostream>
@@ -93,6 +95,9 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 //#define BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
 
 BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
+
+    BOOST_LOCAL_BIND_DECLARE(BOOST_SPINLOCK_V1)
+
     /*! \struct lockable_ptr
      * \brief Lets you use a pointer to memory as a spinlock :)
      */
@@ -1560,3 +1565,7 @@ namespace std
 #endif
 
 #endif // BOOST_SPINLOCK_HPP
+
+#ifdef BOOST_SPINLOCK_MAP_NAMESPACE_BEGIN
+#include "spinlock.bind.hpp"
+#endif
