@@ -539,6 +539,7 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
   map_type map;
   boost::spinlock::atomic<size_t> gate(0);
   gate=boost::spinlock::thread::hardware_concurrency();
+  if(gate<2) gate=2;
   size_t threads=gate, rehashes=0;
   ANNOTATE_IGNORE_READS_BEGIN();
   ANNOTATE_IGNORE_WRITES_BEGIN();
