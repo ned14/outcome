@@ -37,7 +37,9 @@ DEALINGS IN THE SOFTWARE.
 
 #include "local-bind-cpp-library/include/import.hpp"
 #define BOOST_EXPECTED_FUTURE_V1 (boost), (expected_future), (v1, inline)
+#ifndef BOOST_EXPECTED_FUTURE_V1_STL11_IMPL
 #define BOOST_EXPECTED_FUTURE_V1_STL11_IMPL std
+#endif
 #define BOOST_EXPECTED_FUTURE_V1_NAMESPACE       BOOST_LOCAL_BIND_NAMESPACE      (BOOST_EXPECTED_FUTURE_V1)
 #define BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_EXPECTED_FUTURE_V1)
 #define BOOST_EXPECTED_FUTURE_V1_NAMESPACE_END   BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_EXPECTED_FUTURE_V1)
@@ -51,6 +53,7 @@ DEALINGS IN THE SOFTWARE.
 
 BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
 
+  BOOST_LOCAL_BIND_DECLARE(BOOST_EXPECTED_FUTURE_V1)
   template<class T, class... Args> class basic_promise;
   template<class T, class E> class basic_shared_future;
   template<class T, class E> class basic_future : protected expected<T, E>

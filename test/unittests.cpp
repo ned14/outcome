@@ -28,9 +28,9 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "spinlock.hpp"
+#include "../include/spinlock.hpp"
 #include "timing.h"
-#include "expected_future.hpp"
+#include "../include/expected_future.hpp"
 
 #include <stdio.h>
 #include <unordered_map>

@@ -63,7 +63,7 @@ DEALINGS IN THE SOFTWARE.
 This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing interesting spinlock related things.
 */
 
-#include "local-bind-cpp-library/include/boost/config.hpp"
+#include "boost/config.hpp"
 
 #include "local-bind-cpp-library/include/import.hpp"
 #define BOOST_SPINLOCK_V1 (boost), (spinlock), (v1, inline)
