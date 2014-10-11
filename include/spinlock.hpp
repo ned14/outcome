@@ -584,7 +584,8 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         allocator_type allocator;
         value_type *p;
         node_ptr_type(allocator_type &_allocator) : allocator(_allocator), p(nullptr) { }
-        template<class... Args> node_ptr_type(allocator_type &_allocator, Args &&... args) : allocator(_allocator), p(nullptr)
+        template<class... Args> node_ptr_type(allocator_type &_allocator, Args &&... args)
+          : allocator(_allocator), p(nullptr)
         {
           p=allocator.allocate(1);
           try
@@ -602,19 +603,19 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         BOOST_CONSTEXPR node_ptr_type(std::nullptr_t) BOOST_NOEXCEPT : p(nullptr) {}
         node_ptr_type(node_ptr_type &&o) BOOST_NOEXCEPT : allocator(std::move(o.allocator)), p(o.p) { o.p=nullptr; }
         node_ptr_type(const node_ptr_type &)=delete;
-        node_ptr_type &operator=(node_ptr_type &&o) BOOST_NOEXCEPT // FIXME noexcept should depend on value_type noexceptness
+        node_ptr_type &operator=(node_ptr_type &&o) BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<value_type>::value)
         {
           this->~node_ptr_type();
           new(this) node_ptr_type(std::move(o));
           return *this;
         }
-        node_ptr_type &operator=(std::nullptr_t) BOOST_NOEXCEPT
+        node_ptr_type &operator=(std::nullptr_t) BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<value_type>::value)
         {
           reset();
           return *this;
         }
         node_ptr_type &operator=(const node_ptr_type &o)=delete;
-        ~node_ptr_type() BOOST_NOEXCEPT
+        ~node_ptr_type() BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<value_type>::value)
         {
           reset();
         }
@@ -629,7 +630,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           p=nullptr;
           return ret;
         }
-        void reset() BOOST_NOEXCEPT
+        void reset() BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<value_type>::value)
         {
           if(p)
           {
@@ -638,7 +639,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
             p=nullptr;
           }
         }
-        void reset(std::nullptr_t) BOOST_NOEXCEPT { reset(); }
+        void reset(std::nullptr_t) BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<value_type>::value) { reset(); }
         void swap(node_ptr_type &o) BOOST_NOEXCEPT
         {
           node_ptr_type temp(std::move(*this));
@@ -668,7 +669,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         atomic<unsigned> count; // count is used items in there
         std::vector<item_type, item_type_allocator> items;
         bucket_type_impl() : count(0), items(0) { DRD_IGNORE_VAR(count); count.store(0, memory_order_release); }
-        ~bucket_type_impl() { DRD_STOP_IGNORING_VAR(count); }
+        ~bucket_type_impl() BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<decltype(items)>::value) { DRD_STOP_IGNORING_VAR(count); }
         bucket_type_impl(bucket_type_impl &&) BOOST_NOEXCEPT : count(0) { DRD_IGNORE_VAR(count); count.store(0, memory_order_release); }
         bucket_type_impl(const bucket_type_impl &) = delete;
       };

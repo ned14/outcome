@@ -765,7 +765,7 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, int typ
   {
     ++gate;
   }
-  gate=4;
+  //gate=4;
   size_t threads=gate;
   printf("There are %u threads in this CPU\n", (unsigned) threads);
   start=GetUsCount();
