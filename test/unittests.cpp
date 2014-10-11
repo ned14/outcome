@@ -747,6 +747,7 @@ TEST_CASE("performance/unordered_map/transact/large", "Tests the transact perfor
 static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, int type)
 {
   boost::spinlock::atomic<size_t> gate(0);
+  gate.store(0);
 #ifdef BOOST_HAVE_SYSTEM_CONCURRENT_UNORDERED_MAP
   concurrency::concurrent_unordered_map<int, int> map;
 #else
@@ -769,10 +770,11 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, int typ
   //gate=4;
   size_t threads=gate;
   printf("There are %u threads in this CPU\n", (unsigned) threads);
+  size_t iters=RUNNING_ON_VALGRIND ? 100000 : 10000000;
   start=GetUsCount();
 #pragma omp parallel for
   for(int thread=0; thread<threads; thread++)
-  for(int n=0; n<10000000; n++)
+  for(int n=0; n<iters; n++)
   {
 #if 0
     if(readwrites)
