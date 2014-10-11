@@ -487,7 +487,6 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       - All const member functions are const_casted to their non-const forms
       - Local iterators
       - Copy and move construction plus copy and move assignment
-      - noexcept is always on in many places it should be conditional. We are blocked on MSVC for this.
 
     ## swap() thread safety ##
     
@@ -725,9 +724,9 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         size_t _offset, _pending_incr; // used to avoid erase() doing a costly increment unless necessary
         friend class concurrent_unordered_map;
         static typename buckets_type::iterator dead() { static typename buckets_type::iterator it; return it; }
-        iterator(const concurrent_unordered_map *parent) : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_consume)), _offset((size_t) -1), _pending_incr(1) { buckets_type &buckets=*_bucket_data; _itb=buckets.begin(); }
-        iterator(const concurrent_unordered_map *parent, std::nullptr_t) : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_consume)), _itb(dead()), _offset((size_t) -1), _pending_incr(0) { }
-        void _catch_up()
+        iterator(const concurrent_unordered_map *parent) BOOST_NOEXCEPT : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_consume)), _offset((size_t) -1), _pending_incr(1) { buckets_type &buckets=*_bucket_data; _itb=buckets.begin(); }
+        iterator(const concurrent_unordered_map *parent, std::nullptr_t) BOOST_NOEXCEPT : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_consume)), _itb(dead()), _offset((size_t) -1), _pending_incr(0) { }
+        void _catch_up() BOOST_NOEXCEPT
         {
           assert(_itb!=dead());
           if(_itb==dead())
@@ -761,21 +760,21 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           if(_itb==buckets.end())
             _itb=dead();
         }
-        void _catch_up() const { const_cast<iterator *>(this)->_catch_up(); }
+        void _catch_up() const BOOST_NOEXCEPT { const_cast<iterator *>(this)->_catch_up(); }
       public:
-        iterator() : _parent(nullptr), _bucket_data(nullptr), _itb(dead()), _offset((size_t) -1), _pending_incr(0) { }
+        iterator() BOOST_NOEXCEPT : _parent(nullptr), _bucket_data(nullptr), _itb(dead()), _offset((size_t) -1), _pending_incr(0) { }
         bool operator!=(const iterator &o) const BOOST_NOEXCEPT { _catch_up(); return _itb!=o._itb || _offset!=o._offset; }
         bool operator==(const iterator &o) const BOOST_NOEXCEPT { _catch_up(); return _itb==o._itb && _offset==o._offset; }
-        iterator &operator++()
+        iterator &operator++() BOOST_NOEXCEPT
         {
           if(_itb==dead())
             return *this;
           ++_pending_incr;
           return *this;
         }
-        iterator operator++(int) { iterator t(*this); operator++(); return t; }
-        value_type &operator*() { _catch_up(); return *_itb->items[_offset].p; }
-        value_type *operator->() { _catch_up(); return _itb->items[_offset].p; }
+        iterator operator++(int) BOOST_NOEXCEPT { iterator t(*this); operator++(); return t; }
+        value_type &operator*() BOOST_NOEXCEPT { _catch_up(); return *_itb->items[_offset].p; }
+        value_type *operator->() BOOST_NOEXCEPT { _catch_up(); return _itb->items[_offset].p; }
       };
       typedef iterator const_iterator; // FIXME
       // local_iterator
@@ -793,7 +792,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       concurrent_unordered_map(std::initializer_list<value_type> il, size_type n=0, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : concurrent_unordered_map(n, h, ke, al) { insert(std::move(il)); }
       concurrent_unordered_map(std::initializer_list<value_type> il, size_type n, const allocator_type &al) : concurrent_unordered_map(n, al) { insert(std::move(il)); }
       concurrent_unordered_map(std::initializer_list<value_type> il, size_type n, const hasher &h, const allocator_type &al) : concurrent_unordered_map(n, h, al) { insert(std::move(il)); }
-      ~concurrent_unordered_map()
+      ~concurrent_unordered_map() BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<decltype(_buckets)>::value)
       {
         buckets_type &buckets=*_buckets.load(memory_order_consume);
         // Raise the rehash lock and leave it raised
@@ -823,9 +822,9 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
     private:
       // FIXME Awaiting implementation
       concurrent_unordered_map(const concurrent_unordered_map &);
-      concurrent_unordered_map(concurrent_unordered_map &&);
+      concurrent_unordered_map(concurrent_unordered_map &&) BOOST_NOEXCEPT;
       concurrent_unordered_map &operator=(const concurrent_unordered_map &);
-      concurrent_unordered_map &operator=(concurrent_unordered_map &&);
+      concurrent_unordered_map &operator=(concurrent_unordered_map &&) BOOST_NOEXCEPT;
     public:
       //! Slow call returning if a map is empty. Average time is O(bucket count/item count/2)
       bool empty() const BOOST_NOEXCEPT
@@ -880,7 +879,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       const_iterator end() const BOOST_NOEXCEPT { return const_iterator(this, nullptr); }
       const_iterator cend() const BOOST_NOEXCEPT { return const_iterator(this, nullptr); }
     private:
-      template<class C> void _find(const key_type &k, C &&c)
+      template<class C> void _find(const key_type &k, C &&c) BOOST_NOEXCEPT
       {
         size_t h=_hasher(k);
         bool done=false;
@@ -916,7 +915,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         } while(!done);
       }
     public:
-      iterator find(const key_type &k)
+      iterator find(const key_type &k) BOOST_NOEXCEPT
       {
         iterator ret=end();
         _find(k, [&](typename buckets_type::iterator &itb, size_t offset, item_type *i){
@@ -926,7 +925,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         });
         return ret;
       }
-      const_iterator find(const key_type &k) const { return const_cast<concurrent_unordered_map *>(this)->find(k); } // FIXME
+      const_iterator find(const key_type &k) const BOOST_NOEXCEPT { return const_cast<concurrent_unordered_map *>(this)->find(k); } // FIXME
       //! Rehash safe way of concurrently accessing a mapped type
       mapped_type &at(const key_type &k)
       {
@@ -984,13 +983,13 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         return *ret;
       }
       //! NOT rehash safe
-      size_type count(const key_type &k) const { return end()!=find(k) ? 1 : 0; }
-      std::pair<iterator, iterator> equal_range(const key_type &k)
+      size_type count(const key_type &k) const BOOST_NOEXCEPT { return end()!=find(k) ? 1 : 0; }
+      std::pair<iterator, iterator> equal_range(const key_type &k) BOOST_NOEXCEPT
       {
         iterator it=find(k);
         return std::make_pair(it, it);
       }
-      std::pair<const_iterator, const_iterator> equal_range(const key_type &k) const
+      std::pair<const_iterator, const_iterator> equal_range(const key_type &k) const BOOST_NOEXCEPT
       {
         const_iterator it=find(k);
         return std::make_pair(it, it);
@@ -1005,6 +1004,8 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       dissimilar or the supplied type is not moveable, performs a new allocation using the container allocator.
       */
       template<class U> node_ptr_type rebind_node_ptr(typename U::node_ptr_type &&p)
+        BOOST_NOEXCEPT_IF(!(!std::is_same<Alloc, typename U::node_ptr_type::allocator_type>::value
+          || !std::is_rvalue_reference<typename U::node_ptr_type>::value))
       {
         // If not the same allocator or not moveable, need to reallocate
         bool needToRealloc=!std::is_same<Alloc, typename U::node_ptr_type::allocator_type>::value
@@ -1111,7 +1112,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       }
     public:
       //! Inserts a node ptr if it is possible without allocating memory. Useful for low latency. If iterator is valid, didn't insert due to key collision.
-      std::pair<iterator, bool> insert_noalloc(node_ptr_type &&v)
+      std::pair<iterator, bool> insert_noalloc(node_ptr_type &&v) BOOST_NOEXCEPT
       {
         return _insert(std::move(v), [](std::pair<iterator, bool> &ret, typename buckets_type::iterator &itb, size_t h, node_ptr_type &&v){ return true; });
       }
@@ -1145,10 +1146,10 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       }
       template<class... Args> iterator emplace_hint(const_iterator position, Args &&... args) { return emplace(std::forward<Args>(args)...); }
       //! Inserts a value if it is possible without allocating memory. Useful for low latency. If iterator is valid, didn't insert due to key collision.
-      std::pair<iterator, bool> insert_noalloc(const value_type &v) { return insert_noalloc(value_type(v)); }
+      std::pair<iterator, bool> insert_noalloc(const value_type &v) BOOST_NOEXCEPT { return insert_noalloc(value_type(v)); }
       std::pair<iterator, bool> insert(const value_type &v) { return insert(value_type(v)); }
       //! Move inserts a value if it is possible without allocating memory. Useful for low latency. If iterator is valid, didn't insert due to key collision.
-      std::pair<iterator, bool> insert_noalloc(value_type &&v)
+      std::pair<iterator, bool> insert_noalloc(value_type &&v) BOOST_NOEXCEPT
       {
         node_ptr_type n(make_node_ptr(std::move(v)));
         auto u=undoer([&]{
@@ -1187,7 +1188,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       }
       void insert(std::initializer_list<value_type> i) { insert(i.begin(), i.end()); }
       //! Extract a value into its node ptr for later insertion into something else
-      node_ptr_type extract(const_iterator it)
+      node_ptr_type extract(const_iterator it) BOOST_NOEXCEPT
       {
         //assert(it!=end());
         if(it==end()) return node_ptr_type();
@@ -1217,7 +1218,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         return former;
       }
       //! Extract a value into its node ptr for later insertion into something else
-      node_ptr_type extract(const key_type &k)
+      node_ptr_type extract(const key_type &k) BOOST_NOEXCEPT
       {
         size_t h=_hasher(k);
         bool done=false;
@@ -1264,26 +1265,26 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         return former;
       }
       //! Extract many values as node ptrs for later insertion into something else
-      std::vector<node_ptr_type> extract(const_iterator first, const_iterator last)
+      std::vector<node_ptr_type> extract(const_iterator first, const_iterator last) BOOST_NOEXCEPT
       {
         std::vector<node_ptr_type> ret;
         for(; first!=last; ++first)
           ret.push_back(extract(first));
         return ret;
       }
-      iterator erase(const_iterator it)
+      iterator erase(const_iterator it) BOOST_NOEXCEPT
       {
         iterator ret(it);
         ++ret;
         node_ptr_type e=extract(it);
         return e ? ret : end();
       }
-      size_type erase(const key_type &k)
+      size_type erase(const key_type &k) BOOST_NOEXCEPT
       {
         node_ptr_type e=extract(k);
         return e ? 1 : 0;
       }
-      iterator erase(const_iterator first, const_iterator last)
+      iterator erase(const_iterator first, const_iterator last) BOOST_NOEXCEPT
       {
         while(first!=last)
           first=erase(first);
@@ -1384,22 +1385,22 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           insert(rebind_node_ptr(e));
         }
       }
-      size_type bucket_count() const BOOST_NOEXCEPT{ return _buckets.load(memory_order_consume)->size(); }
+      size_type bucket_count() const BOOST_NOEXCEPT { return _buckets.load(memory_order_consume)->size(); }
       size_type max_bucket_count() const BOOST_NOEXCEPT { return _buckets.load(memory_order_consume)->max_size(); }
-      size_type bucket_size(size_type n) const
+      size_type bucket_size(size_type n) const BOOST_NOEXCEPT
       {
         buckets_type &buckets=*_buckets.load(memory_order_consume);
         bucket_type &b=buckets[n];
         return b.items.count.load(memory_order_consume);
       }
-      size_type bucket(const key_type &k) const
+      size_type bucket(const key_type &k) const BOOST_NOEXCEPT
       {
         buckets_type &buckets=*_buckets.load(memory_order_consume);
         return _hasher(k) % buckets.size();
       }
       float load_factor() const BOOST_NOEXCEPT { return (float) size()/bucket_count(); }
       float max_load_factor() const BOOST_NOEXCEPT { return _max_load_factor; }
-      void max_load_factor(float m) { _max_load_factor=m; }
+      void max_load_factor(float m) BOOST_NOEXCEPT { _max_load_factor=m; }
       //! The minimum number of empty spaces in a bucket, thus avoiding an allocation on first insert. You need to rehash after setting this.
       size_t min_bucket_capacity() const BOOST_NOEXCEPT { return _min_bucket_capacity; }
       //! The minimum number of empty spaces in a bucket, thus avoiding an allocation on first insert. You need to rehash after setting this.
