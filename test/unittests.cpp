@@ -584,6 +584,25 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
   printf("Achieved %u rehashes\n", (unsigned) rehashes);
 }
 
+TEST_CASE("works/expected_future/basic", "Test that no-alloc future-promise works at all")
+{
+  using namespace BOOST_EXPECTED_FUTURE_V1_NAMESPACE;
+  promise<int> p;
+  future<int> f(p.get_future()), f2;
+  CHECK(f2.valid()==false);
+  CHECK_THROWS_AS(f2.get(), future_error);
+  CHECK(f.valid()==true);
+  p.set_value(5);
+  CHECK(f.get()==5);
+  CHECK(f.valid()==false);
+  CHECK_THROWS_AS(f.get(), future_error);
+}
+
+
+
+
+
+
 static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact, int type)
 {
   boost::spinlock::spinlock<bool> lock;
