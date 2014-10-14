@@ -1576,7 +1576,3 @@ namespace std
 #endif
 
 #endif // BOOST_SPINLOCK_HPP
-
-#ifdef BOOST_SPINLOCK_MAP_NAMESPACE_BEGIN
-#include "spinlock.bind.hpp"
-#endif
