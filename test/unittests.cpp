@@ -53,8 +53,6 @@ DEALINGS IN THE SOFTWARE.
 
 
 
-using namespace std;
-
 TEST_CASE("works/spinlock", "Tests that the spinlock works as intended")
 {
   boost::spinlock::spinlock<bool> lock;
@@ -62,7 +60,7 @@ TEST_CASE("works/spinlock", "Tests that the spinlock works as intended")
   REQUIRE(!lock.try_lock());
   lock.unlock();
   
-  lock_guard<decltype(lock)> h(lock);
+  std::lock_guard<decltype(lock)> h(lock);
   REQUIRE(!lock.try_lock());
 }
 
@@ -584,6 +582,14 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
   printf("Achieved %u rehashes\n", (unsigned) rehashes);
 }
 
+int works_expected_future_constexpr()
+{
+  using namespace BOOST_EXPECTED_FUTURE_V1_NAMESPACE;
+  promise<int, double> p;
+  future<int, double> f(p.get_future());
+  p.set_value(5);
+  return f.get();
+}
 TEST_CASE("works/expected_future/basic", "Test that no-alloc future-promise works at all")
 {
   using namespace BOOST_EXPECTED_FUTURE_V1_NAMESPACE;
@@ -596,6 +602,7 @@ TEST_CASE("works/expected_future/basic", "Test that no-alloc future-promise work
   CHECK(f.get()==5);
   CHECK(f.valid()==false);
   CHECK_THROWS_AS(f.get(), future_error);
+  CHECK(works_expected_future_constexpr()==5);
 }
 
 

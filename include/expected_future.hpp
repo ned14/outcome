@@ -39,8 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #ifndef BOOST_EXPECTED_FUTURE_V1_STL11_IMPL
 #define BOOST_EXPECTED_FUTURE_V1_STL11_IMPL std
 #endif
-#define BOOST_EXPECTED_FUTURE_V1_STL11_IMPL_VER v1_##BOOST_EXPECTED_FUTURE_V1_STL11_IMPL
-#define BOOST_EXPECTED_FUTURE_V1 (boost), (expected_future), (BOOST_EXPECTED_FUTURE_V1_STL11_IMPL_VER, inline)
+#define BOOST_EXPECTED_FUTURE_V1 (boost), (expected_future), (BOOST_LOCAL_BIND_NAMESPACE_VERSION(v1, BOOST_EXPECTED_FUTURE_V1_STL11_IMPL), inline)
 #define BOOST_EXPECTED_FUTURE_V1_NAMESPACE       BOOST_LOCAL_BIND_NAMESPACE      (BOOST_EXPECTED_FUTURE_V1)
 #define BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_EXPECTED_FUTURE_V1)
 #define BOOST_EXPECTED_FUTURE_V1_NAMESPACE_END   BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_EXPECTED_FUTURE_V1)
@@ -49,6 +48,8 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_STL11_ATOMIC_MAP_NAMESPACE_END          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_EXPECTED_FUTURE_V1, (stl11, inline))
 #define BOOST_STL11_FUTURE_MAP_NAMESPACE_BEGIN        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_EXPECTED_FUTURE_V1, (stl11, inline))
 #define BOOST_STL11_FUTURE_MAP_NAMESPACE_END          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_EXPECTED_FUTURE_V1, (stl11, inline))
+#define BOOST_STL11_FUTURE_MAP_NO_FUTURE
+#define BOOST_STL11_FUTURE_MAP_NO_PROMISE
 #define BOOST_STL11_THREAD_MAP_NAMESPACE_BEGIN        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_EXPECTED_FUTURE_V1, (stl11, inline))
 #define BOOST_STL11_THREAD_MAP_NAMESPACE_END          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_EXPECTED_FUTURE_V1, (stl11, inline))
 #define BOOST_STL11_CHRONO_MAP_NAMESPACE_BEGIN        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_EXPECTED_FUTURE_V1, (stl11, inline), (chrono))
@@ -58,13 +59,19 @@ DEALINGS IN THE SOFTWARE.
 #include BOOST_LOCAL_BIND_INCLUDE_STL11(BOOST_EXPECTED_FUTURE_V1_STL11_IMPL, thread)
 #include BOOST_LOCAL_BIND_INCLUDE_STL11(BOOST_EXPECTED_FUTURE_V1_STL11_IMPL, chrono)
 
-#define BOOST_SPINLOCK_MAP_NAMESPACE_BEGIN BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_EXPECTED_FUTURE_V1, (spinlock, inline))
-#define BOOST_SPINLOCK_MAP_NAMESPACE_END   BOOST_LOCAL_BIND_NAMESPACE_END(BOOST_EXPECTED_FUTURE_V1, (spinlock, inline))
+#define BOOST_SPINLOCK_MAP_NAMESPACE_BEGIN BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_EXPECTED_FUTURE_V1, (expected_spinlock, inline))
+#define BOOST_SPINLOCK_MAP_NAMESPACE_END   BOOST_LOCAL_BIND_NAMESPACE_END(BOOST_EXPECTED_FUTURE_V1, (expected_spinlock, inline))
 #include "spinlock.bind.hpp"
+
+// Bind exception_ptr
+BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_EXPECTED_FUTURE_V1, (stl11, inline))
+  using BOOST_EXPECTED_FUTURE_V1_STL11_IMPL::exception_ptr;
+BOOST_LOCAL_BIND_NAMESPACE_END(BOOST_EXPECTED_FUTURE_V1, (stl11, inline))
 
 BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
 
   BOOST_LOCAL_BIND_DECLARE(BOOST_EXPECTED_FUTURE_V1)
+  
   template<bool consuming, class ContainerType, class... Continuations> class basic_future;
   template<class FutureType> class basic_promise;
   namespace detail
@@ -75,20 +82,30 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
       other_type *other;
       decltype(me_type::_lock) *me_lock;
       decltype(other_type::_lock) *other_lock;
-      future_promise_unlocker(me_type *f, other_type *p) : me(f), other(p), me_lock(f ? &f->_lock : nullptr), other_lock(p ? &p->lock : nullptr) { }
-      future_promise_unlocker(future_promise_unlocker &&o) : me(o.me), other(o.other), me_lock(o.me_lock), other_lock(o.other_lock) { me_lock=nullptr; other_lock=nullptr; }
+      BOOST_CONSTEXPR future_promise_unlocker(me_type *f, other_type *p) BOOST_NOEXCEPT : me(f), other(p), me_lock(f ? &f->_lock : nullptr), other_lock(p ? &p->_lock : nullptr) { }
+      future_promise_unlocker(future_promise_unlocker &&o) BOOST_NOEXCEPT : me(o.me), other(o.other), me_lock(o.me_lock), other_lock(o.other_lock) { me_lock=nullptr; other_lock=nullptr; }
       future_promise_unlocker(const future_promise_unlocker &) = delete;
       future_promise_unlocker &operator=(const future_promise_unlocker &) = delete;
       future_promise_unlocker &operator=(future_promise_unlocker &&) = delete;
-      ~future_promise_unlocker()
+      ~future_promise_unlocker() BOOST_NOEXCEPT
+      {
+        unlock();
+      }
+      void unlock() BOOST_NOEXCEPT
       {
         if(me_lock)
+        {
           me_lock->unlock();
+          me_lock=nullptr;
+        }
         if(other_lock)
+        {
           other_lock->unlock();
+          other_lock=nullptr;
+        }
       }
     };
-    template<class S, class D=typename S::other_type> future_promise_unlocker<S, D> lock_future_promise(S *me)
+    template<class S, class D=typename S::other_type> future_promise_unlocker<S, D> lock_future_promise(S *me) BOOST_NOEXCEPT
     {
       for(size_t count=0;;count++)
       {
@@ -108,17 +125,19 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
   }
   template<bool consuming, class T, class E> class basic_future<consuming, expected<T, E>> : protected expected<T, E>
   {
+    template<class me_type, class other_type> friend struct detail::future_promise_unlocker;
+    template<class S, class D> friend detail::future_promise_unlocker<S, D> detail::lock_future_promise(S *) BOOST_NOEXCEPT;
     friend class basic_promise<basic_future>;
   public:
     typedef basic_future<consuming, expected<T, E>> future_type;
     typedef basic_promise<future_type> promise_type;
     typedef promise_type other_type;
   private:
-    static BOOST_CONSTEXPR_OR_CONST bool consumes=consuming;
-    spinlock<bool> _lock, _ready; // _ready is INVERTED
+    spinlock<bool> _lock;
+    mutable spinlock<bool> _ready; // _ready is INVERTED
     atomic<bool> _abandoned;
     promise_type *_other;
-    BOOST_CONSTEXPR void _detach() BOOST_NOEXCEPT
+    void _detach() BOOST_NOEXCEPT
     {
       if(_other)
       {
@@ -126,61 +145,74 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
         _other=nullptr;
       }
     }
-    BOOST_CONSTEXPR inline void _abandon() BOOST_NOEXCEPT
+    inline void _abandon() BOOST_NOEXCEPT
     {
       _abandoned=true;
       _detach();
     }
-    template<class U> BOOST_CONSTEXPR void _set(U &&v)
+    template<class U> void _set(U &&v)
     {
       expected<T, E>::operator=(std::forward<U>(v));
       _ready.unlock();
     }
-    BOOST_CONSTEXPR basic_future(promise_type *p, bool ready, expected<T, E> &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<expected<T, E>>::value)) : _abandoned(false), _other(p), expected<T, E>(std::move(o)) { if(!ready) _ready.lock(); }
+    BOOST_RELAXED_CONSTEXPR basic_future(promise_type *p, bool ready, expected<T, E> &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<expected<T, E>>::value)) : _abandoned(false), _other(p), expected<T, E>(std::move(o)) { if(!ready) _ready.lock(); }
   public:
-    BOOST_CONSTEXPR basic_future() BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<expected<T, E>>::value)) : _abandoned(false), _other(nullptr) { _ready.lock(); }
-    BOOST_CONSTEXPR basic_future(basic_future &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_move_assignable<expected<T, E>>::value && std::is_nothrow_default_constructible<expected<T, E>>::value)) : basic_future() { this->operator=(std::move(o)); }
+    BOOST_RELAXED_CONSTEXPR basic_future() BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<expected<T, E>>::value)) : _abandoned(false), _other(nullptr) { _ready.lock(); }
+    basic_future(basic_future &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_move_assignable<expected<T, E>>::value && std::is_nothrow_default_constructible<expected<T, E>>::value)) : basic_future() { this->operator=(std::move(o)); }
     basic_future(const basic_future &o) = delete;
     ~basic_future() BOOST_NOEXCEPT_IF((std::is_nothrow_destructible<expected<T, E>>::value))
     {
-      auto lock=lock_future_promise(this);
+      auto lock=detail::lock_future_promise(this);
       _detach();
     }
-    BOOST_CONSTEXPR basic_future &operator=(basic_future &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_move_assignable<expected<T, E>>::value))
+    basic_future &operator=(basic_future &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_move_assignable<expected<T, E>>::value))
     {
       // First lock myself and detach myself from any promise of mine
-      auto lock1=lock_future_promise(this);
+      auto lock1=detail::lock_future_promise(this);
       _detach();
       // Lock source and his promise
-      auto lock2=lock_future_promise(&o);
-      _ready=std::move(o._ready);
-      _abandoned=std::move(o._abandoned);
-      _other=std::move(o._other);
+      auto lock2=detail::lock_future_promise(&o);
+      _ready.unlock();
+      if(!o.is_ready()) _ready.lock();
+      _abandoned.store(o._abandoned.load(memory_order_relaxed), memory_order_relaxed);
+      _other=o._other;
       expected<T, E>::operator=(std::move(o));
       _other->_other=this;
-      o._abandoned=false;
+      if(o.is_ready()) _ready.lock();
+      o._abandoned.store(false, memory_order_relaxed);
       o._other=nullptr;
       return *this;
     }
     basic_future &operator=(const basic_future &o) = delete;
-    BOOST_CONSTEXPR basic_shared_future<T, E> share();
-    BOOST_CONSTEXPR T get()
+    //BOOST_CONSTEXPR basic_shared_future<T, E> share();
+    T get()
     {
       wait();
-      return value();
+      if(consuming)
+      {
+        T ret(std::move(expected<T, E>::value()));
+        // As we are consuming, destroy the relationship with my promise now
+        {
+          auto lock=detail::lock_future_promise(this);
+          _detach();
+        }
+        return ret;
+      }
+      else
+        return expected<T, E>::value();
     }
-    BOOST_CONSTEXPR bool valid() const BOOST_NOEXCEPT { return _promise; }
+    BOOST_CONSTEXPR bool valid() const BOOST_NOEXCEPT { return _other!=nullptr; }
     BOOST_CONSTEXPR bool is_consuming() const BOOST_NOEXCEPT { return consuming; }
-    BOOST_CONSTEXPR bool is_ready() const BOOST_NOEXCEPT { return !_ready.get(); }
-    BOOST_CONSTEXPR bool is_abandoned() const BOOST_NOEXCEPT { return _abandoned.get(); }
-    BOOST_CONSTEXPR bool has_exception() const BOOST_NOEXCEPT { return ready() && !expected<T, E>::valid(); }
-    BOOST_CONSTEXPR bool has_value() const BOOST_NOEXCEPT { return ready() && expected<T, E>::valid(); }
-    BOOST_CONSTEXPR void wait() const
+    BOOST_CONSTEXPR bool is_ready() const BOOST_NOEXCEPT { return !is_lockable_locked(_ready); }
+    BOOST_CONSTEXPR bool is_abandoned() const BOOST_NOEXCEPT { return _abandoned; }
+    BOOST_CONSTEXPR bool has_exception() const BOOST_NOEXCEPT { return is_ready() && !expected<T, E>::valid(); }
+    BOOST_CONSTEXPR bool has_value() const BOOST_NOEXCEPT { return is_ready() && expected<T, E>::valid(); }
+    void wait() const
     {
       if(!valid()) throw future_error(future_errc::no_state);
       if(is_abandoned()) throw future_error(future_errc::broken_promise);
       // TODO: Use a permit object here instead of a spinlock
-      if(!ready())
+      if(!is_ready())
       {
         _ready.lock();
         _ready.unlock();
@@ -192,33 +224,34 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
     future_status wait_until(const chrono::time_point<Clock,Duration> &timeout_time) const;
   };
 
-  template<class T, class E> class basic_promise<basic_future<expected<T, E>>> : protected expected<T, E>
+  template<bool consuming, class T, class E> class basic_promise<basic_future<consuming, expected<T, E>>> : protected expected<T, E>
   {
-    friend class basic_future<expected<T, E>>;
+    template<class me_type, class other_type> friend struct detail::future_promise_unlocker;
+    template<class S, class D> friend detail::future_promise_unlocker<S, D> detail::lock_future_promise(S *) BOOST_NOEXCEPT;
+    friend class basic_future<consuming, expected<T, E>>;
   public:
-    typedef basic_future<expected<T, E>> future_type;
+    typedef basic_future<consuming, expected<T, E>> future_type;
     typedef basic_promise<future_type> promise_type;
     typedef future_type other_type;
   private:
-    static BOOST_CONSTEXPR_OR_CONST bool consumes=future_type::consumes;
     spinlock<bool> _lock;
     atomic<bool> _ready, _retrieved;
     future_type *_other;
-    BOOST_CONSTEXPR void _abandon() BOOST_NOEXCEPT
+    void _abandon() BOOST_NOEXCEPT
     {
       if(_other)
       {
-         if(!_other->ready())
+         if(!_other->is_ready())
            _other->_abandon();
          else
            _other->_detach();
       }
     }
-    template<class U> BOOST_CONSTEXPR void _set(U &&v)
+    template<class U> void _set(U &&v)
     {
       if(_ready)
         throw future_error(future_errc::promise_already_satisfied);
-      auto lock=lock_future_promise(this);
+      auto lock=detail::lock_future_promise(this);
       // If no future exists yet, set myself to the value and we'll set the future on creation
       if(!_other)
         expected<T, E>::operator=(std::forward<U>(v));
@@ -232,57 +265,73 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
       static_assert(!std::uses_allocator<basic_promise, std::allocator<T>>::value, "Non-allocating future-promise cannot make use of allocators");
       static_assert(!std::uses_allocator<basic_promise, std::allocator<E>>::value, "Non-allocating future-promise cannot make use of allocators");
     }
-    BOOST_CONSTEXPR basic_promise(basic_promise &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_move_assignable<expected<T, E>>::value)) : basic_promise() { this->operator=(std::move(o)); }
+    basic_promise(basic_promise &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_move_assignable<expected<T, E>>::value)) : basic_promise() { this->operator=(std::move(o)); }
     basic_promise(const basic_promise &) = delete;
     ~basic_promise()
     {
-      auto lock=lock_future_promise(this);
+      auto lock=detail::lock_future_promise(this);
       _abandon();
     }
-    BOOST_CONSTEXPR basic_promise &operator=(basic_promise &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_move_assignable<expected<T, E>>::value))
+    basic_promise &operator=(basic_promise &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_move_assignable<expected<T, E>>::value))
     {
       // First lock myself and detach/abandon any future of mine
-      auto lock1=lock_future_promise(this);
+      auto lock1=detail::lock_future_promise(this);
       _abandon();
       // Lock source and his future
-      auto lock2=lock_future_promise(&o);
-      _ready=std::move(o._ready);
-      _retrieved=std::move(o._retrieved);
-      _other=std::move(o._other);
+      auto lock2=detail::lock_future_promise(&o);
+      _ready.store(o._ready.load(memory_order_relaxed), memory_order_relaxed);
+      _retrieved.store(o._retrieved.load(memory_order_relaxed), memory_order_relaxed);
+      _other=o._other;
       expected<T, E>::operator=(std::move(o));
       _other->_other=this;
-      o._ready=false;
-      o._retrieved=false;
+      o._ready.store(false, memory_order_relaxed);
+      o._retrieved.store(false, memory_order_relaxed);
       o._other=nullptr;
       return *this;
     }
     basic_promise &operator=(const basic_promise &) = delete;
-    BOOST_CONSTEXPR void swap(basic_promise &o) BOOST_NOEXCEPT;
-    BOOST_CONSTEXPR future_type get_future() BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<future_type>::value && std::is_nothrow_move_constructible<future_type>::value))
+    void swap(basic_promise &o) BOOST_NOEXCEPT;
+    future_type get_future() BOOST_NOEXCEPT_IF((!consuming && std::is_nothrow_default_constructible<future_type>::value && std::is_nothrow_move_constructible<future_type>::value))
     {
-      if(consumes && _retrieved)
+      if(consuming && _retrieved)
         throw future_error(future_errc::future_already_retrieved);
-      auto lock1=lock_future_promise(this);
-      if(consumes && _retrieved)
+      auto lock1=detail::lock_future_promise(this);
+      if(consuming && _retrieved)
         throw future_error(future_errc::future_already_retrieved);
-      future_type ret(this, _ready, _ready ? std::move(*this) : expected<T, E>());
-      _other=&ret;
-      return ret;
+      bool ready=_ready.load(memory_order_relaxed);
+      if(consuming)
+        _retrieved.store(true, memory_order_relaxed);
+      if(ready)
+      {
+        future_type ret(this, ready, std::move(*this));
+        _other=&ret;
+        // The move constructor will try to lock me, so preempt
+        lock1.unlock();
+        return ret;
+      }
+      else
+      {
+        future_type ret(this, ready, expected<T, E>());
+        _other=&ret;
+        // The move constructor will try to lock me, so preempt
+        lock1.unlock();
+        return ret;
+      }
     }
-    BOOST_CONSTEXPR void set_value(const T &v)
+    void set_value(const T &v)
     {
       _set(v);
     }
-    BOOST_CONSTEXPR void set_value(T &&v)
+    void set_value(T &&v)
     {
       _set(std::move(v));
     }
     // set_value_at_thread_exit() not possible with this design
-    BOOST_CONSTEXPR void set_exception(const E &v)
+    void set_exception(const E &v)
     {
       _set(make_unexpected(v));
     }
-    BOOST_CONSTEXPR void set_exception(E &&v)
+    void set_exception(E &&v)
     {
       _set(make_unexpected(std::move(v)));
     }
@@ -297,7 +346,7 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
   {
   };
 #endif
-  template<class T, class E=exception_ptr> using future = basic_future<expected<T, E>>;
+  template<class T, class E=exception_ptr> using future = basic_future<true, expected<T, E>>;
   template<class T, class E=exception_ptr> using promise = basic_promise<future<T, E>>;
   //template<class T, class E=exception_ptr> using shared_future = basic_shared_future<T, E>;
 
@@ -305,7 +354,11 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_END
 
 namespace std
 {
-  template<class T, class E> void swap(BOOST_EXPECTED_FUTURE_V1_NAMESPACE::basic_promise<T, E> &a, BOOST_EXPECTED_FUTURE_V1_NAMESPACE::basic_promise<T, E> &b) BOOST_NOEXCEPT
+  template<bool consuming, class ContainerType, class... Continuations> void swap(BOOST_EXPECTED_FUTURE_V1_NAMESPACE::basic_future<consuming, ContainerType, Continuations...> &a, BOOST_EXPECTED_FUTURE_V1_NAMESPACE::basic_future<consuming, ContainerType, Continuations...> &b) BOOST_NOEXCEPT
+  {
+    a.swap(b);
+  }
+  template<class FutureType> void swap(BOOST_EXPECTED_FUTURE_V1_NAMESPACE::basic_promise<FutureType> &a, BOOST_EXPECTED_FUTURE_V1_NAMESPACE::basic_promise<FutureType> &b) BOOST_NOEXCEPT
   {
     a.swap(b);
   }

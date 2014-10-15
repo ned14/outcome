@@ -65,11 +65,24 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 
 #include "boost/config.hpp"
 
+#if ! defined BOOST_RELAXED_CONSTEXPR
+# if defined __has_extension
+#  if __has_extension(cxx_relaxed_constexpr)
+#   define BOOST_RELAXED_CONSTEXPR constexpr
+#  endif
+# endif
+#endif
+#ifndef BOOST_RELAXED_CONSTEXPR
+#define BOOST_RELAXED_CONSTEXPR
+#define BOOST_SPINLOCK_NO_RELAXED_CONSTEXPR 1
+#endif
+
+
 #include "local-bind-cpp-library/include/import.hpp"
-#define BOOST_SPINLOCK_V1 (boost), (spinlock), (v1, inline)
 #ifndef BOOST_SPINLOCK_V1_STL11_IMPL
 #define BOOST_SPINLOCK_V1_STL11_IMPL std
 #endif
+#define BOOST_SPINLOCK_V1 (boost), (spinlock), (BOOST_LOCAL_BIND_NAMESPACE_VERSION(v1, BOOST_SPINLOCK_V1_STL11_IMPL), inline)
 #define BOOST_SPINLOCK_V1_NAMESPACE       BOOST_LOCAL_BIND_NAMESPACE      (BOOST_SPINLOCK_V1)
 #define BOOST_SPINLOCK_V1_NAMESPACE_BEGIN BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1)
 #define BOOST_SPINLOCK_V1_NAMESPACE_END   BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_SPINLOCK_V1)
@@ -103,7 +116,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
      */
     template<typename T> struct lockable_ptr : atomic<T *>
     {
-      lockable_ptr(T *v=nullptr) : atomic<T *>(v) { }
+      BOOST_CONSTEXPR lockable_ptr(T *v=nullptr) : atomic<T *>(v) { }
       //! Returns the memory pointer part of the atomic
       T *get() BOOST_NOEXCEPT_OR_NOTHROW
       {
@@ -139,14 +152,14 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       atomic<T> v;
     public:
       typedef T value_type;
-      spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : v(0)
+      BOOST_RELAXED_CONSTEXPR spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : v(0)
       {
         ANNOTATE_RWLOCK_CREATE(this);
         v.store(0, memory_order_release);
       }
       spinlockbase(const spinlockbase &) = delete;
       //! Atomically move constructs
-      spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW : v(0)
+      BOOST_RELAXED_CONSTEXPR spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW : v(0)
       {
         ANNOTATE_RWLOCK_CREATE(this);
         //v.store(o.v.exchange(0, memory_order_acq_rel));
@@ -163,7 +176,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         ANNOTATE_RWLOCK_DESTROY(this);
       }
       //! Returns the raw atomic
-      T load(memory_order o=memory_order_seq_cst) const BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
+      BOOST_CONSTEXPR T load(memory_order o=memory_order_seq_cst) const BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
       //! Sets the raw atomic
       void store(T a, memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { v.store(a, o); }
       //! If atomic is zero, sets to 1 and returns true, else false.
@@ -180,10 +193,17 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         }
         else return false;
       }
+      BOOST_CONSTEXPR bool try_lock() const BOOST_NOEXCEPT_OR_NOTHROW
+      {
+        if(v.load(memory_order_consume)) // Avoid unnecessary cache line invalidation traffic
+          return false;
+        else
+          return true;
+      }
       //! If atomic equals expected, sets to 1 and returns true, else false with expected updated to actual value.
       bool try_lock(T &expected) BOOST_NOEXCEPT_OR_NOTHROW
       {
-        T t;
+        T t(0);
         if((t=v.load(memory_order_consume))) // Avoid unnecessary cache line invalidation traffic
         {
           expected=t;
@@ -203,7 +223,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         ANNOTATE_RWLOCK_RELEASED(this, true);
         v.store(0, memory_order_release);
       }
-      bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
+      BOOST_CONSTEXPR bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
     };
     template<typename T> struct spinlockbase<lockable_ptr<T>>
     {
@@ -271,25 +291,32 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       }
       bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
     };
+    namespace detail
+    {
+      template<bool use_pause> void smt_pause() BOOST_NOEXCEPT
+      {
+      };
+      template<> void smt_pause<true>() BOOST_NOEXCEPT
+      {
+#ifdef BOOST_SMT_PAUSE
+        BOOST_SMT_PAUSE;
+#endif
+      };
+    }
     //! \brief How many spins to loop, optionally calling the SMT pause instruction on Intel
     template<size_t spins, bool use_pause=true> struct spins_to_loop
     {
       template<class parenttype> struct policy : parenttype
       {
         static BOOST_CONSTEXPR_OR_CONST size_t spins_to_loop=spins;
-        policy() {}
+        BOOST_CONSTEXPR policy() {}
         policy(const policy &) = delete;
-        policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-        bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
+        BOOST_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
+        BOOST_CONSTEXPR inline bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
         {
           if(parenttype::int_yield(n)) return true;
           if(n>=spins) return false;
-          if(use_pause)
-          {
-#ifdef BOOST_SMT_PAUSE
-            BOOST_SMT_PAUSE;
-#endif
-          }
+          detail::smt_pause<use_pause>();
           return true;
         }
       };
@@ -300,10 +327,10 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       template<class parenttype> struct policy : parenttype
       {
         static BOOST_CONSTEXPR_OR_CONST size_t spins_to_yield=spins;
-        policy() {}
+        BOOST_CONSTEXPR policy() {}
         policy(const policy &) = delete;
-        policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-        bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
+        BOOST_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
+        BOOST_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
         {
           if(parenttype::int_yield(n)) return true;
           if(n>=spins) return false;
@@ -317,10 +344,10 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
     {
       template<class parenttype> struct policy : parenttype
       {
-        policy() {}
+        BOOST_CONSTEXPR policy() {}
         policy(const policy &) = delete;
-        policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-        bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
+        BOOST_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
+        BOOST_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
         {
           if(parenttype::int_yield(n)) return true;
           this_thread::sleep_for(chrono::milliseconds(1));
@@ -358,9 +385,9 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
     {
       typedef spinpolicy4<spinpolicy3<spinpolicy2<spinlockbase<T>>>> parenttype;
     public:
-      spinlock() { }
+      BOOST_CONSTEXPR spinlock() { }
       spinlock(const spinlock &) = delete;
-      spinlock(spinlock &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
+      BOOST_CONSTEXPR spinlock(spinlock &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
       void lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
         for(size_t n=0;; n++)
@@ -396,7 +423,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       return false;
     }
     // For when used with a spinlock
-    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline T is_lockable_locked(spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_CONSTEXPR inline T is_lockable_locked(const spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
     {
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
       // Annoyingly the atomic ops are marked as unsafe for atomic transactions, so ...
@@ -406,7 +433,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 #endif
     }
     // For when used with a locked_ptr
-    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline bool is_lockable_locked(spinlock<lockable_ptr<T>, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_CONSTEXPR inline bool is_lockable_locked(spinlock<lockable_ptr<T>, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
     {
       return ((size_t) lockable.load(memory_order_consume))&1;
     }
@@ -1328,9 +1355,11 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       }
       void swap(concurrent_unordered_map &o) BOOST_NOEXCEPT
       {
+        typedef decltype(_rehash_lock) rehash_lock_t;
+        typedef decltype(o._rehash_lock) o_rehash_lock_t;
         std::lock(_rehash_lock, o._rehash_lock);
-        std::lock_guard<decltype(_rehash_lock)> g1(_rehash_lock, std::adopt_lock);
-        std::lock_guard<decltype(o._rehash_lock)> g2(o._rehash_lock, std::adopt_lock);
+        std::lock_guard<rehash_lock_t> g1(_rehash_lock, std::adopt_lock);
+        std::lock_guard<o_rehash_lock_t> g2(o._rehash_lock, std::adopt_lock);
         std::swap(_hasher, o._hasher);
         std::swap(_key_equal, o._key_equal);
         std::swap(_max_load_factor, o._max_load_factor);
@@ -1517,7 +1546,8 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       //! Rehashes the map to use n buckets. Comes with a ton of caveats, see detailed description.
       void rehash(size_type n)
       {
-        std::lock_guard<decltype(_rehash_lock)> g(_rehash_lock); // Stop other rehashes
+        typedef decltype(_rehash_lock) rehash_lock_t;
+        std::lock_guard<rehash_lock_t> g(_rehash_lock); // Stop other rehashes
         buckets_type &buckets=*_buckets.load(memory_order_consume);
         if(n!=buckets.size())
         {
@@ -1539,7 +1569,8 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         size_type toclear=(_oldbuckets.size()>remaining) ? _oldbuckets.size()-remaining : 0;
         if(toclear)
         {
-          std::lock_guard<decltype(_rehash_lock)> g(_rehash_lock); // Stop other rehashes
+          typedef decltype(_rehash_lock) rehash_lock_t;
+          std::lock_guard<rehash_lock_t> g(_rehash_lock); // Stop other rehashes
           typename old_buckets_type::iterator it=_oldbucketit;
           while(toclear--)
           {
