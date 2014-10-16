@@ -49,6 +49,7 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_STL11_FUTURE_MAP_NAMESPACE_BEGIN        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_EXPECTED_FUTURE_V1, (stl11, inline))
 #define BOOST_STL11_FUTURE_MAP_NAMESPACE_END          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_EXPECTED_FUTURE_V1, (stl11, inline))
 #define BOOST_STL11_FUTURE_MAP_NO_FUTURE
+#define BOOST_STL11_FUTURE_MAP_NO_SHARED_FUTURE
 #define BOOST_STL11_FUTURE_MAP_NO_PROMISE
 #define BOOST_STL11_THREAD_MAP_NAMESPACE_BEGIN        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_EXPECTED_FUTURE_V1, (stl11, inline))
 #define BOOST_STL11_THREAD_MAP_NAMESPACE_END          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_EXPECTED_FUTURE_V1, (stl11, inline))
@@ -72,7 +73,27 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
 
   BOOST_LOCAL_BIND_DECLARE(BOOST_EXPECTED_FUTURE_V1)
   
-  template<bool consuming, class ContainerType, class... Continuations> class basic_future;
+  /*! \class basic_future
+   * \brief Provides a source of an instance of some type FutureType at some future point
+   * 
+   * \tparam consuming Whether the basic_future provides consuming semantics (see below).
+   * \tparam FutureType The type provided by the future in some time from now. This must match the FutureType concept (see below).
+   * 
+   * \todo Any basic_future not used expected<T, E> as FutureType
+   * \todo future<T&>
+   * \todo future<void>
+   *
+   * Consuming semantics are:
+   *  - future.get() move constructs the value, thus destroying the future's copy of it. Non-consuming returns a const lvalue ref.
+   *  - promise.get_future() never returns a future more than once. Non-consuming it will return a new future if no future is
+   *    currently associated with the promise. Note that racing on promise.get_future() with non-consuming semantics is a bad idea,
+   *    it may fatal exit the process.
+   * 
+   * The FutureType concept is:
+   *  - Needs to provide a value() member function returning a reference to the type
+   */
+  template<bool consuming, class FutureType, class... Continuations> class basic_future;
+  template<class BasicFutureType, class PtrType=std::shared_ptr<BasicFutureType>> class basic_future_ref;
   template<class FutureType> class basic_promise;
   namespace detail
   {
@@ -122,6 +143,21 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
           this_thread::yield();        
       }      
     }
+    template<class value_type, bool consuming> struct get_impl
+    {
+      auto operator()(value_type &&me) -> typename std::decay<decltype(me.value())>::type
+      {
+        auto ret(std::move(me.value()));
+        return ret;
+      }
+    };
+    template<class value_type> struct get_impl<value_type, false>
+    {
+      auto operator()(value_type &&me) -> typename std::decay<decltype(me.value())>::type const&
+      {
+        return me.value();
+      }
+    };
   }
   template<bool consuming, class T, class E> class basic_future<consuming, expected<T, E>> : protected expected<T, E>
   {
@@ -132,6 +168,10 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
     typedef basic_future<consuming, expected<T, E>> future_type;
     typedef basic_promise<future_type> promise_type;
     typedef promise_type other_type;
+    typedef expected<T, E> value_type;
+    static BOOST_CONSTEXPR_OR_CONST bool get_consumes=consuming;
+    typedef T gettable_type;
+    typedef E exception_type;
   private:
     spinlock<bool> _lock;
     mutable spinlock<bool> _ready; // _ready is INVERTED
@@ -155,6 +195,7 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
       expected<T, E>::operator=(std::forward<U>(v));
       _ready.unlock();
     }
+      
     BOOST_RELAXED_CONSTEXPR basic_future(promise_type *p, bool ready, expected<T, E> &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<expected<T, E>>::value)) : _abandoned(false), _other(p), expected<T, E>(std::move(o)) { if(!ready) _ready.lock(); }
   public:
     BOOST_RELAXED_CONSTEXPR basic_future() BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<expected<T, E>>::value)) : _abandoned(false), _other(nullptr) { _ready.lock(); }
@@ -184,22 +225,17 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
       return *this;
     }
     basic_future &operator=(const basic_future &o) = delete;
-    //BOOST_CONSTEXPR basic_shared_future<T, E> share();
-    T get()
+    inline basic_future_ref<basic_future> share();
+    decltype(detail::get_impl<value_type, consuming>()(value_type())) get()
     {
       wait();
+      // If we are consuming, destroy the relationship with my promise now
       if(consuming)
       {
-        T ret(std::move(expected<T, E>::value()));
-        // As we are consuming, destroy the relationship with my promise now
-        {
-          auto lock=detail::lock_future_promise(this);
-          _detach();
-        }
-        return ret;
+        auto lock=detail::lock_future_promise(this);
+        _detach();
       }
-      else
-        return expected<T, E>::value();
+      return detail::get_impl<value_type, consuming>()(std::move(*this));
     }
     BOOST_CONSTEXPR bool valid() const BOOST_NOEXCEPT { return _other!=nullptr; }
     BOOST_CONSTEXPR bool is_consuming() const BOOST_NOEXCEPT { return consuming; }
@@ -223,7 +259,65 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
     template<class Clock, class Duration>
     future_status wait_until(const chrono::time_point<Clock,Duration> &timeout_time) const;
   };
+  
+  /*! \class basic_future_ref
+   * \brief A reference to a basic_future managed by a PtrType. Typically used to implement shared_future.
+   */
+  template<class BasicFutureType> class basic_future_ref<BasicFutureType, std::shared_ptr<BasicFutureType>>
+  {
+  public:
+    typedef BasicFutureType future_type;
+    typedef typename BasicFutureType::promise_type promise_type;
+    typedef promise_type other_type;
+    typedef typename BasicFutureType::value_type value_type;
+    static BOOST_CONSTEXPR_OR_CONST bool get_consumes=BasicFutureType::get_consumes;
+    typedef typename BasicFutureType::gettable_type gettable_type;
+    typedef typename BasicFutureType::exception_type exception_type;
+    typedef std::shared_ptr<BasicFutureType> managing_type;
+  private:
+    managing_type _p;
+    BasicFutureType *__p()
+    {
+      if(!_p)
+        throw future_error(future_errc::no_state);
+      return _p.get();
+    }
+    BOOST_CONSTEXPR BasicFutureType *__p() const
+    {
+      if(!_p)
+        throw future_error(future_errc::no_state);
+      return _p.get();
+    }
+  public:    
+    BOOST_CONSTEXPR basic_future_ref() BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<managing_type>::value)) { }
+    BOOST_CONSTEXPR basic_future_ref(BasicFutureType &&o) : _p(std::make_shared<BasicFutureType>(std::move(o))) { }
+    basic_future_ref(basic_future_ref &&) = default;
+    basic_future_ref(const basic_future_ref &) = default;
+    decltype(detail::get_impl<value_type, get_consumes>()(value_type())) get()
+    {
+      typedef decltype(detail::get_impl<value_type, get_consumes>()(value_type())) rettype;
+      return std::forward<rettype>(__p()->get());
+    }
+    BOOST_CONSTEXPR bool valid() const BOOST_NOEXCEPT { return _p && __p()->valid(); }
+    BOOST_CONSTEXPR bool is_consuming() const BOOST_NOEXCEPT { return __p()->is_consuming(); }
+    BOOST_CONSTEXPR bool is_ready() const BOOST_NOEXCEPT { return __p()->is_ready(); }
+    BOOST_CONSTEXPR bool is_abandoned() const BOOST_NOEXCEPT { return __p()->is_abandoned(); }
+    BOOST_CONSTEXPR bool has_exception() const BOOST_NOEXCEPT { return __p()->has_exception(); }
+    BOOST_CONSTEXPR bool has_value() const BOOST_NOEXCEPT { return __p()->has_value(); }
+    void wait() const { return __p()->wait(); }
+    template<class Rep, class Period>
+    future_status wait_for(const chrono::duration<Rep,Period> &timeout_duration) const;
+    template<class Clock, class Duration>
+    future_status wait_until(const chrono::time_point<Clock,Duration> &timeout_time) const;
+  };
+  template<bool consuming, class T, class E> inline basic_future_ref<basic_future<consuming, expected<T, E>>> basic_future<consuming, expected<T, E>>::share()
+  {
+    return basic_future_ref<basic_future<consuming, expected<T, E>>>(std::move(*this));
+  }
 
+  /*! \class basic_promise
+   * \brief Provides a sink of an instance of some type FutureType
+   */
   template<bool consuming, class T, class E> class basic_promise<basic_future<consuming, expected<T, E>>> : protected expected<T, E>
   {
     template<class me_type, class other_type> friend struct detail::future_promise_unlocker;
@@ -290,14 +384,19 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
       return *this;
     }
     basic_promise &operator=(const basic_promise &) = delete;
+    BOOST_CONSTEXPR bool is_ready() const BOOST_NOEXCEPT { return _ready; }
+    BOOST_CONSTEXPR bool is_future_retrieved() const BOOST_NOEXCEPT { return _retrieved || _other; }
     void swap(basic_promise &o) BOOST_NOEXCEPT;
     future_type get_future() BOOST_NOEXCEPT_IF((!consuming && std::is_nothrow_default_constructible<future_type>::value && std::is_nothrow_move_constructible<future_type>::value))
     {
+      // If I am consuming semantics, never allow a new future after the first is fetched
       if(consuming && _retrieved)
         throw future_error(future_errc::future_already_retrieved);
       auto lock1=detail::lock_future_promise(this);
-      if(consuming && _retrieved)
-        throw future_error(future_errc::future_already_retrieved);
+      // If I am non-consuming semantics, there can be only one future associated with this promise at a time
+      // As basic_shared_future<> will never fetch a future twice, this will terminate the process if get_future() is noexcept
+      if((consuming && _retrieved) || _other)
+        throw future_error(future_errc::future_already_retrieved);      
       bool ready=_ready.load(memory_order_relaxed);
       if(consuming)
         _retrieved.store(true, memory_order_relaxed);
@@ -337,18 +436,9 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
     }
     // set_exception_at_thread_exit() not possible with this design
   };
-#if 0
-  template<class T, class E> class basic_shared_future
-  {
-  };
-  // non-constexpr promise, must vector through a virtual function to set value
-  template<class T, class E> class basic_promise<T, E>
-  {
-  };
-#endif
   template<class T, class E=exception_ptr> using future = basic_future<true, expected<T, E>>;
   template<class T, class E=exception_ptr> using promise = basic_promise<future<T, E>>;
-  //template<class T, class E=exception_ptr> using shared_future = basic_shared_future<T, E>;
+  template<class T, class E=exception_ptr> using shared_future = basic_future_ref<basic_future<false, expected<T, E>>>;
 
 BOOST_EXPECTED_FUTURE_V1_NAMESPACE_END
 

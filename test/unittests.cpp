@@ -582,27 +582,39 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
   printf("Achieved %u rehashes\n", (unsigned) rehashes);
 }
 
-int works_expected_future_constexpr()
-{
-  using namespace BOOST_EXPECTED_FUTURE_V1_NAMESPACE;
-  promise<int, double> p;
-  future<int, double> f(p.get_future());
-  p.set_value(5);
-  return f.get();
-}
 TEST_CASE("works/expected_future/basic", "Test that no-alloc future-promise works at all")
 {
   using namespace BOOST_EXPECTED_FUTURE_V1_NAMESPACE;
-  promise<int> p;
-  future<int> f(p.get_future()), f2;
-  CHECK(f2.valid()==false);
-  CHECK_THROWS_AS(f2.get(), future_error);
-  CHECK(f.valid()==true);
-  p.set_value(5);
-  CHECK(f.get()==5);
-  CHECK(f.valid()==false);
-  CHECK_THROWS_AS(f.get(), future_error);
-  CHECK(works_expected_future_constexpr()==5);
+  printf("Testing future<int> ...\n");
+  {
+    promise<int> p;
+    future<int> f(p.get_future()), f2;
+    CHECK(f2.valid()==false);
+    CHECK_THROWS_AS(f2.get(), future_error);
+    CHECK(f.valid()==true);
+    p.set_value(5);
+    CHECK(f.get()==5);
+    CHECK(f.valid()==false);
+    CHECK_THROWS_AS(f.get(), future_error);
+  }
+  printf("Testing shared_future<int> ...\n");
+  {
+#if 0 // FIXME
+    promise<int> p;
+#else
+    basic_promise<shared_future<int>::future_type> p;
+#endif
+    shared_future<int> f(p.get_future()), f2;
+    CHECK(f2.valid()==false);
+    CHECK_THROWS_AS(f2.get(), future_error);
+    CHECK(f.valid()==true);
+    p.set_value(5);
+    CHECK(f.get()==5);
+    CHECK(f.valid()==true);
+    CHECK(f.get()==5);
+    const_cast<int &>(f.get())=6;
+    CHECK(f.get()==6);
+  }
 }
 
 
