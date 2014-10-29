@@ -78,7 +78,7 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 #endif
 
 
-#include "boost.bindlib/include/import.hpp"
+#include "bindlib/include/import.hpp"
 #ifndef BOOST_SPINLOCK_V1_STL11_IMPL
 #define BOOST_SPINLOCK_V1_STL11_IMPL std
 #endif
@@ -95,10 +95,10 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 #define BOOST_STL11_MUTEX_MAP_NAMESPACE_END           BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline))
 #define BOOST_STL11_THREAD_MAP_NAMESPACE_BEGIN        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline))
 #define BOOST_STL11_THREAD_MAP_NAMESPACE_END          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline))
-#include BOOST_LOCAL_BIND_INCLUDE_STL11(boost.bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, atomic)
-#include BOOST_LOCAL_BIND_INCLUDE_STL11(boost.bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, chrono)
-#include BOOST_LOCAL_BIND_INCLUDE_STL11(boost.bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, mutex)
-#include BOOST_LOCAL_BIND_INCLUDE_STL11(boost.bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, thread)
+#include BOOST_LOCAL_BIND_INCLUDE_STL11(bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, atomic)
+#include BOOST_LOCAL_BIND_INCLUDE_STL11(bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, chrono)
+#include BOOST_LOCAL_BIND_INCLUDE_STL11(bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, mutex)
+#include BOOST_LOCAL_BIND_INCLUDE_STL11(bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, thread)
 
 // For dump
 #include <ostream>

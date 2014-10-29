@@ -1,5 +1,5 @@
 rm -rf unittests_* *.gcda *.gcno
-INCLUDE="-I.. -I../local-bind-cpp-library/include -I../expected/include"
+INCLUDE="-I.. -I../include/boost/spinlock/expected/include"
 if [ -n "$BUILD_EXTRA" ]; then
   echo Building unittests_coverage ...
   g++-4.8 -std=c++0x -O1 -DNDEBUG -DRUNNING_ON_VALGRIND=1 -g -gdwarf-2 -o unittests_coverage unittests.cpp -lrt -fprofile-arcs -ftest-coverage -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-elide-constructors -fno-inline $INCLUDE
