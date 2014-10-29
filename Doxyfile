@@ -763,8 +763,9 @@ WARN_LOGFILE           = doxy_warnings.txt
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = include/spinlock.hpp \
-                         include/expected_future.hpp
+INPUT                  = include/boost/spinlock/spinlock.hpp \
+                         include/boost/spinlock/concurrent_unordered_map.hpp \
+                         include/boost/spinlock/expected_future.hpp
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

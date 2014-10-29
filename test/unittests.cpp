@@ -28,9 +28,10 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "../include/spinlock.hpp"
+#include "../include/boost/spinlock/spinlock.hpp"
 #include "timing.h"
-#include "../include/expected_future.hpp"
+#include "../include/boost/spinlock/concurrent_unordered_map.hpp"
+#include "../include/boost/spinlock/expected_future.hpp"
 
 #include <stdio.h>
 #include <unordered_map>

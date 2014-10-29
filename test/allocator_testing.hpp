@@ -33,7 +33,7 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_ALLOCATOR_TESTING_HPP
 
 #include "boost/config.hpp"
-#include "local-bind-cpp-library/include/import.hpp"
+#include "boost.bindlib/include/import.hpp"
 #define BOOST_ALLOCATOR_TESTING (boost), (allocator_testing)
 #ifndef BOOST_ALLOCATOR_TESTING_STL11_IMPL
 #define BOOST_ALLOCATOR_TESTING_STL11_IMPL std
@@ -41,7 +41,7 @@ DEALINGS IN THE SOFTWARE.
 
 #define BOOST_STL11_ATOMIC_MAP_NAMESPACE_BEGIN        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_ALLOCATOR_TESTING, (stl11, inline))
 #define BOOST_STL11_ATOMIC_MAP_NAMESPACE_END          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_ALLOCATOR_TESTING, (stl11, inline))
-#include BOOST_LOCAL_BIND_INCLUDE_STL11(BOOST_ALLOCATOR_TESTING_STL11_IMPL, atomic)
+#include BOOST_LOCAL_BIND_INCLUDE_STL11(boost.bindlib, BOOST_ALLOCATOR_TESTING_STL11_IMPL, atomic)
 
 namespace boost { namespace allocator_testing {
 
