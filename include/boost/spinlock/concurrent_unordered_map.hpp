@@ -282,9 +282,9 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         spinlock<unsigned char> lock;  // = 2 if you need to reload the bucket list
         atomic<unsigned> count; // count is used items in there
         std::vector<item_type, item_type_allocator> items;
-        bucket_type_impl() : count(0), items(0) { DRD_IGNORE_VAR(count); count.store(0, memory_order_relaxed); }
-        ~bucket_type_impl() BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<decltype(items)>::value) { DRD_STOP_IGNORING_VAR(count); }
-        bucket_type_impl(bucket_type_impl &&) BOOST_NOEXCEPT : count(0) { DRD_IGNORE_VAR(count); count.store(0, memory_order_relaxed); }
+        bucket_type_impl() : count(0), items(0) { BOOST_SPINLOCK_DRD_IGNORE_VAR(count); count.store(0, memory_order_relaxed); }
+        ~bucket_type_impl() BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<decltype(items)>::value) { BOOST_SPINLOCK_DRD_STOP_IGNORING_VAR(count); }
+        bucket_type_impl(bucket_type_impl &&) BOOST_NOEXCEPT : count(0) { BOOST_SPINLOCK_DRD_IGNORE_VAR(count); count.store(0, memory_order_relaxed); }
         bucket_type_impl(const bucket_type_impl &) = delete;
         bucket_type_impl &operator=(bucket_type_impl &&) = delete;
         bucket_type_impl &operator=(const bucket_type_impl &) = delete;
@@ -314,10 +314,10 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         //k ^= k + 0x9e3779b9 + (k<<6) + (k>>2); // really need to avoid sequential keys tapping the same cache line
         //k ^= k + 0x9e3779b9; // really need to avoid sequential keys tapping the same cache line
         buckets_type &buckets=*_buckets.load(memory_order_consume);
-        ANNOTATE_IGNORE_READS_BEGIN(); // doesn't realise that buckets never changes, so lack of lock between write and read not important
+        BOOST_SPINLOCK_ANNOTATE_IGNORE_READS_BEGIN(); // doesn't realise that buckets never changes, so lack of lock between write and read not important
         size_type i=k % buckets.size();
         typename buckets_type::iterator ret=buckets.begin()+i;
-        ANNOTATE_IGNORE_READS_END();
+        BOOST_SPINLOCK_ANNOTATE_IGNORE_READS_END();
         return ret;
       }
       static float _calc_max_load_factor() BOOST_NOEXCEPT

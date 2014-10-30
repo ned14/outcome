@@ -39,17 +39,27 @@ DEALINGS IN THE SOFTWARE.
 
 #ifdef BOOST_SPINLOCK_ENABLE_VALGRIND
 #include "valgrind/drd.h"
+#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_CREATE(p) ANNOTATE_RWLOCK_CREATE(p)
+#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_DESTROY(p) ANNOTATE_RWLOCK_DESTROY(p)
+#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_ACQUIRED(p, s) ANNOTATE_RWLOCK_ACQUIRED(p, s)
+#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_RELEASED(p, s) ANNOTATE_RWLOCK_RELEASED(p, s)
+#define BOOST_SPINLOCK_ANNOTATE_IGNORE_READS_BEGIN() ANNOTATE_IGNORE_READS_BEGIN()
+#define BOOST_SPINLOCK_ANNOTATE_IGNORE_READS_END() ANNOTATE_IGNORE_READS_END()
+#define BOOST_SPINLOCK_ANNOTATE_IGNORE_WRITES_BEGIN() ANNOTATE_IGNORE_WRITES_BEGIN()
+#define BOOST_SPINLOCK_ANNOTATE_IGNORE_WRITES_END() ANNOTATE_IGNORE_WRITES_END()
+#define BOOST_SPINLOCK_DRD_IGNORE_VAR(x) DRD_IGNORE_VAR(x)
+#define BOOST_SPINLOCK_DRD_STOP_IGNORING_VAR(x) DRD_STOP_IGNORING_VAR(x)
 #else
-#define ANNOTATE_RWLOCK_CREATE(p)
-#define ANNOTATE_RWLOCK_DESTROY(p)
-#define ANNOTATE_RWLOCK_ACQUIRED(p, s)
-#define ANNOTATE_RWLOCK_RELEASED(p, s)
-#define ANNOTATE_IGNORE_READS_BEGIN()
-#define ANNOTATE_IGNORE_READS_END()
-#define ANNOTATE_IGNORE_WRITES_BEGIN()
-#define ANNOTATE_IGNORE_WRITES_END()
-#define DRD_IGNORE_VAR(x)
-#define DRD_STOP_IGNORING_VAR(x)
+#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_CREATE(p)
+#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_DESTROY(p)
+#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_ACQUIRED(p, s)
+#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_RELEASED(p, s)
+#define BOOST_SPINLOCK_ANNOTATE_IGNORE_READS_BEGIN()
+#define BOOST_SPINLOCK_ANNOTATE_IGNORE_READS_END()
+#define BOOST_SPINLOCK_ANNOTATE_IGNORE_WRITES_BEGIN()
+#define BOOST_SPINLOCK_ANNOTATE_IGNORE_WRITES_END()
+#define BOOST_SPINLOCK_DRD_IGNORE_VAR(x)
+#define BOOST_SPINLOCK_DRD_STOP_IGNORING_VAR(x)
 #ifndef RUNNING_ON_VALGRIND
 #define RUNNING_ON_VALGRIND (0)
 #endif
@@ -154,14 +164,14 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       typedef T value_type;
       BOOST_RELAXED_CONSTEXPR spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : v(0)
       {
-        ANNOTATE_RWLOCK_CREATE(this);
+        BOOST_SPINLOCK_ANNOTATE_RWLOCK_CREATE(this);
         v.store(0, memory_order_release);
       }
       spinlockbase(const spinlockbase &) = delete;
       //! Atomically move constructs
       BOOST_RELAXED_CONSTEXPR spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW : v(0)
       {
-        ANNOTATE_RWLOCK_CREATE(this);
+        BOOST_SPINLOCK_ANNOTATE_RWLOCK_CREATE(this);
         //v.store(o.v.exchange(0, memory_order_acq_rel));
         v.store(0, memory_order_release);
       }
@@ -170,10 +180,10 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 #ifdef BOOST_SPINLOCK_ENABLE_VALGRIND
         if(v.load(memory_order_acquire))
         {
-          ANNOTATE_RWLOCK_RELEASED(this, true);
+          BOOST_SPINLOCK_ANNOTATE_RWLOCK_RELEASED(this, true);
         }
 #endif
-        ANNOTATE_RWLOCK_DESTROY(this);
+        BOOST_SPINLOCK_ANNOTATE_RWLOCK_DESTROY(this);
       }
       //! Returns the raw atomic
       BOOST_CONSTEXPR T load(memory_order o=memory_order_seq_cst) const BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
@@ -188,7 +198,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         bool ret=v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_consume);
         if(ret)
         {
-          ANNOTATE_RWLOCK_ACQUIRED(this, true);
+          BOOST_SPINLOCK_ANNOTATE_RWLOCK_ACQUIRED(this, true);
           return true;
         }
         else return false;
@@ -212,7 +222,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         bool ret=v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_consume);
         if(ret)
         {
-          ANNOTATE_RWLOCK_ACQUIRED(this, true);
+          BOOST_SPINLOCK_ANNOTATE_RWLOCK_ACQUIRED(this, true);
           return true;
         }
         else return false;
@@ -220,7 +230,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       //! Sets the atomic to zero
       void unlock() BOOST_NOEXCEPT_OR_NOTHROW
       {
-        ANNOTATE_RWLOCK_RELEASED(this, true);
+        BOOST_SPINLOCK_ANNOTATE_RWLOCK_RELEASED(this, true);
         v.store(0, memory_order_release);
       }
       BOOST_CONSTEXPR bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }

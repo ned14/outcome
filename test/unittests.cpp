@@ -540,8 +540,8 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
   gate=boost::spinlock::thread::hardware_concurrency();
   if(gate<2) gate=2;
   size_t threads=gate, rehashes=0;
-  ANNOTATE_IGNORE_READS_BEGIN();
-  ANNOTATE_IGNORE_WRITES_BEGIN();
+  BOOST_SPINLOCK_ANNOTATE_IGNORE_READS_BEGIN();
+  BOOST_SPINLOCK_ANNOTATE_IGNORE_WRITES_BEGIN();
   std::vector<std::thread> _threads;
   for(size_t thread=0; thread<threads; thread++)
   {
@@ -578,8 +578,8 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
   }
   for(auto &i : _threads)
     i.join();
-  ANNOTATE_IGNORE_READS_END();
-  ANNOTATE_IGNORE_WRITES_END();
+  BOOST_SPINLOCK_ANNOTATE_IGNORE_READS_END();
+  BOOST_SPINLOCK_ANNOTATE_IGNORE_WRITES_END();
   printf("Achieved %u rehashes\n", (unsigned) rehashes);
 }
 
