@@ -562,7 +562,7 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
       else
       {
         std::string foo("n");
-        size_t iters=RUNNING_ON_VALGRIND ? 1000000 : 100000000;
+        size_t iters=BOOST_SPINLOCK_RUNNING_ON_VALGRIND ? 1000000 : 100000000;
         for(size_t n=0; n<iters; n++)
         {
           size_t v=n*10+thread;
@@ -809,7 +809,7 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, int typ
   //gate=4;
   size_t threads=gate;
   printf("There are %u threads in this CPU\n", (unsigned) threads);
-  size_t iters=RUNNING_ON_VALGRIND ? 100000 : 10000000;
+  size_t iters=BOOST_SPINLOCK_RUNNING_ON_VALGRIND ? 100000 : 10000000;
   start=GetUsCount();
 #pragma omp parallel for
   for(int thread=0; thread<threads; thread++)
