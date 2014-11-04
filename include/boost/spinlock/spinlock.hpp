@@ -72,7 +72,11 @@ DEALINGS IN THE SOFTWARE.
 This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing interesting spinlock related things.
 */
 
+#if SPINLOCK_STANDALONE 
+#include "bindlib/include/boost/config.hpp"
+#else
 #include "boost/config.hpp"
+#endif
 
 #if ! defined BOOST_RELAXED_CONSTEXPR
 # if defined __has_extension
@@ -98,6 +102,8 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 
 #define BOOST_STL11_ATOMIC_MAP_NAMESPACE_BEGIN        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline))
 #define BOOST_STL11_ATOMIC_MAP_NAMESPACE_END          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline))
+#define BOOST_STL11_ATOMIC_MAP_NO_ATOMIC_CHAR32_T // missing VS14
+#define BOOST_STL11_ATOMIC_MAP_NO_ATOMIC_CHAR16_T // missing VS14
 #define BOOST_STL11_CHRONO_MAP_NAMESPACE_BEGIN        BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline), (chrono))
 #define BOOST_STL11_CHRONO_MAP_NAMESPACE_END          BOOST_LOCAL_BIND_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline), (chrono))
 #define BOOST_STL11_MUTEX_MAP_NAMESPACE_BEGIN         BOOST_LOCAL_BIND_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline))
