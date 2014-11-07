@@ -308,10 +308,10 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
     };
     namespace detail
     {
-      template<bool use_pause> void smt_pause() BOOST_NOEXCEPT
+      template<bool use_pause> inline void smt_pause() BOOST_NOEXCEPT
       {
       };
-      template<> void smt_pause<true>() BOOST_NOEXCEPT
+      template<> inline void smt_pause<true>() BOOST_NOEXCEPT
       {
 #ifdef BOOST_SMT_PAUSE
         BOOST_SMT_PAUSE;
