@@ -583,6 +583,7 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
   printf("Achieved %u rehashes\n", (unsigned) rehashes);
 }
 
+#if defined(_MSC_VER) && _MSC_VER >= 1900 // VS2015
 TEST_CASE("works/expected_future/basic", "Test that no-alloc future-promise works at all")
 {
   using namespace BOOST_EXPECTED_FUTURE_V1_NAMESPACE;
@@ -617,7 +618,7 @@ TEST_CASE("works/expected_future/basic", "Test that no-alloc future-promise work
     CHECK(f.get()==6);
   }
 }
-
+#endif
 
 
 

@@ -291,7 +291,9 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
   public:    
     BOOST_CONSTEXPR basic_future_ref() BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<managing_type>::value)) { }
     BOOST_CONSTEXPR basic_future_ref(BasicFutureType &&o) : _p(std::make_shared<BasicFutureType>(std::move(o))) { }
+#if defined(_MSC_VER) && _MSC_VER >= 1900  // >= VS2015
     basic_future_ref(basic_future_ref &&) = default;
+#endif
     basic_future_ref(const basic_future_ref &) = default;
     decltype(detail::get_impl<value_type, get_consumes>()(value_type())) get()
     {
