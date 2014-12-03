@@ -195,8 +195,15 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       //! If atomic is zero, sets to 1 and returns true, else false.
       bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
+#ifdef _MSC_VER
+        // MSVC's atomics always seq_cst, so use volatile read to create a true acquire
+        volatile T *_v=(volatile T *) &v;
+        if(*_v) // Avoid unnecessary cache line invalidation traffic
+          return false;
+#else
         if(v.load(memory_order_consume)) // Avoid unnecessary cache line invalidation traffic
           return false;
+#endif
         T expected=0;
         bool ret=v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_consume);
         if(ret)
@@ -217,7 +224,13 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       bool try_lock(T &expected) BOOST_NOEXCEPT_OR_NOTHROW
       {
         T t(0);
+#ifdef _MSC_VER
+        // MSVC's atomics always seq_cst, so use volatile read to create a true acquire
+        volatile T *_v = (volatile T *)&v;
+        if((t=*_v)) // Avoid unnecessary cache line invalidation traffic
+#else
         if((t=v.load(memory_order_consume))) // Avoid unnecessary cache line invalidation traffic
+#endif
         {
           expected=t;
           return false;
