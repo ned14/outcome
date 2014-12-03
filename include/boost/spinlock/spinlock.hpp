@@ -195,7 +195,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       //! If atomic is zero, sets to 1 and returns true, else false.
       bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
-#ifdef _MSC_VER
+#ifdef BOOST_SPINLOCK_USE_VOLATILE_READ_FOR_AVOIDING_CMPXCHG
         // MSVC's atomics always seq_cst, so use volatile read to create a true acquire
         volatile T *_v=(volatile T *) &v;
         if(*_v) // Avoid unnecessary cache line invalidation traffic
@@ -224,7 +224,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       bool try_lock(T &expected) BOOST_NOEXCEPT_OR_NOTHROW
       {
         T t(0);
-#ifdef _MSC_VER
+#ifdef BOOST_SPINLOCK_USE_VOLATILE_READ_FOR_AVOIDING_CMPXCHG
         // MSVC's atomics always seq_cst, so use volatile read to create a true acquire
         volatile T *_v = (volatile T *)&v;
         if((t=*_v)) // Avoid unnecessary cache line invalidation traffic
