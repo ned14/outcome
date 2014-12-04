@@ -201,12 +201,11 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         if(*_v) // Avoid unnecessary cache line invalidation traffic
           return false;
 #else
-        if(v.load(memory_order_consume)) // Avoid unnecessary cache line invalidation traffic
+        if(v.load(memory_order_relaxed)) // Avoid unnecessary cache line invalidation traffic
           return false;
 #endif
-        T expected=0;
-        bool ret=v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_consume);
-        if(ret)
+        T ret=v.exchange(1, memory_order_acquire);
+        if(!ret)
         {
           BOOST_SPINLOCK_ANNOTATE_RWLOCK_ACQUIRED(this, true);
           return true;
@@ -229,13 +228,13 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         volatile T *_v = (volatile T *)&v;
         if((t=*_v)) // Avoid unnecessary cache line invalidation traffic
 #else
-        if((t=v.load(memory_order_consume))) // Avoid unnecessary cache line invalidation traffic
+        if((t=v.load(memory_order_relaxed))) // Avoid unnecessary cache line invalidation traffic
 #endif
         {
           expected=t;
           return false;
         }
-        bool ret=v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_consume);
+        bool ret=v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_relaxed);
         if(ret)
         {
           BOOST_SPINLOCK_ANNOTATE_RWLOCK_ACQUIRED(this, true);
