@@ -195,8 +195,6 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       //! If atomic is zero, sets to 1 and returns true, else false.
       bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
-        // Skip precheck on ARM, whose relaxed architecture makes it unnecessary
-#if !(defined(__arm__) || defined(__thumb__) || defined(_M_ARM))
 #ifdef BOOST_SPINLOCK_USE_VOLATILE_READ_FOR_AVOIDING_CMPXCHG
         // MSVC's atomics always seq_cst, so use volatile read to create a true acquire
         volatile T *_v=(volatile T *) &v;
@@ -205,7 +203,6 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 #else
         if(v.load(memory_order_relaxed)) // Avoid unnecessary cache line invalidation traffic
           return false;
-#endif
 #endif
 #if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
         // Intel is a lot quicker if you use XCHG instead of CMPXCHG. ARM is definitely not!
