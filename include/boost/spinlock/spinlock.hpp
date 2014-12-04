@@ -204,8 +204,15 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         if(v.load(memory_order_relaxed)) // Avoid unnecessary cache line invalidation traffic
           return false;
 #endif
+#if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
+        // Intel is a lot quicker if you use XCHG instead of CMPXCHG. ARM is definitely not!
         T ret=v.exchange(1, memory_order_acquire);
         if(!ret)
+#else
+        T expected=0;
+        bool ret=v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_relaxed);
+        if(ret)
+#endif
         {
           BOOST_SPINLOCK_ANNOTATE_RWLOCK_ACQUIRED(this, true);
           return true;
