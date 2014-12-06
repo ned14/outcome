@@ -38,22 +38,22 @@ DEALINGS IN THE SOFTWARE.
 \brief Provides boost.spinlock
 */
 
-#if defined(BOOST_GCC) && BOOST_GCC < 40800
-# if !SPINLOCK_STANDALONE 
-#  include "boost/type_traits.hpp"
-# endif
-#endif
+//#if defined(BOOST_GCC) && BOOST_GCC < 40800
+//# if !SPINLOCK_STANDALONE 
+//#  include "boost/type_traits.hpp"
+//# endif
+//#endif
 
 BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 
     namespace detail
     {
 #if defined(BOOST_GCC) && BOOST_GCC < 40800
-# if SPINLOCK_STANDALONE 
+//# if SPINLOCK_STANDALONE 
       template<class T> struct is_nothrow_destructible : std::false_type { };
-# else
-      template<class T> using is_nothrow_destructible = boost::is_nothrow_destructible<T>;
-# endif
+//# else
+//      template<class T> using is_nothrow_destructible = boost::is_nothrow_destructible<T>;
+//# endif
 #else
       template<class T> using is_nothrow_destructible = std::is_nothrow_destructible<T>;
 #endif
