@@ -103,7 +103,7 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
       other_type *other;
       decltype(me_type::_lock) *me_lock;
       decltype(other_type::_lock) *other_lock;
-      BOOST_CONSTEXPR future_promise_unlocker(me_type *f, other_type *p) BOOST_NOEXCEPT : me(f), other(p), me_lock(f ? &f->_lock : nullptr), other_lock(p ? &p->_lock : nullptr) { }
+      BOOST_SPINLOCK_CONSTEXPR future_promise_unlocker(me_type *f, other_type *p) BOOST_NOEXCEPT : me(f), other(p), me_lock(f ? &f->_lock : nullptr), other_lock(p ? &p->_lock : nullptr) { }
       future_promise_unlocker(future_promise_unlocker &&o) BOOST_NOEXCEPT : me(o.me), other(o.other), me_lock(o.me_lock), other_lock(o.other_lock) { me_lock=nullptr; other_lock=nullptr; }
       future_promise_unlocker(const future_promise_unlocker &) = delete;
       future_promise_unlocker &operator=(const future_promise_unlocker &) = delete;
@@ -237,12 +237,12 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
       }
       return detail::get_impl<value_type, consuming>()(std::move(*this));
     }
-    BOOST_CONSTEXPR bool valid() const BOOST_NOEXCEPT { return _other!=nullptr; }
-    BOOST_CONSTEXPR bool is_consuming() const BOOST_NOEXCEPT { return consuming; }
-    BOOST_CONSTEXPR bool is_ready() const BOOST_NOEXCEPT { return !is_lockable_locked(_ready); }
-    BOOST_CONSTEXPR bool is_abandoned() const BOOST_NOEXCEPT { return _abandoned; }
-    BOOST_CONSTEXPR bool has_exception() const BOOST_NOEXCEPT { return is_ready() && !expected<T, E>::valid(); }
-    BOOST_CONSTEXPR bool has_value() const BOOST_NOEXCEPT { return is_ready() && expected<T, E>::valid(); }
+    BOOST_SPINLOCK_CONSTEXPR bool valid() const BOOST_NOEXCEPT { return _other!=nullptr; }
+    BOOST_SPINLOCK_CONSTEXPR bool is_consuming() const BOOST_NOEXCEPT { return consuming; }
+    BOOST_SPINLOCK_CONSTEXPR bool is_ready() const BOOST_NOEXCEPT { return !is_lockable_locked(_ready); }
+    BOOST_SPINLOCK_CONSTEXPR bool is_abandoned() const BOOST_NOEXCEPT { return _abandoned; }
+    BOOST_SPINLOCK_CONSTEXPR bool has_exception() const BOOST_NOEXCEPT { return is_ready() && !expected<T, E>::valid(); }
+    BOOST_SPINLOCK_CONSTEXPR bool has_value() const BOOST_NOEXCEPT { return is_ready() && expected<T, E>::valid(); }
     void wait() const
     {
       if(!valid()) throw future_error(future_errc::no_state);
@@ -282,15 +282,15 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
         throw future_error(future_errc::no_state);
       return _p.get();
     }
-    BOOST_CONSTEXPR BasicFutureType *__p() const
+    BOOST_SPINLOCK_CONSTEXPR BasicFutureType *__p() const
     {
       if(!_p)
         throw future_error(future_errc::no_state);
       return _p.get();
     }
   public:    
-    BOOST_CONSTEXPR basic_future_ref() BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<managing_type>::value)) { }
-    BOOST_CONSTEXPR basic_future_ref(BasicFutureType &&o) : _p(std::make_shared<BasicFutureType>(std::move(o))) { }
+    BOOST_SPINLOCK_CONSTEXPR basic_future_ref() BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<managing_type>::value)) { }
+    BOOST_SPINLOCK_CONSTEXPR basic_future_ref(BasicFutureType &&o) : _p(std::make_shared<BasicFutureType>(std::move(o))) { }
 #if defined(_MSC_VER) && _MSC_VER >= 1900  // >= VS2015
     basic_future_ref(basic_future_ref &&) = default;
 #endif
@@ -300,12 +300,12 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
       typedef decltype(detail::get_impl<value_type, get_consumes>()(value_type())) rettype;
       return std::forward<rettype>(__p()->get());
     }
-    BOOST_CONSTEXPR bool valid() const BOOST_NOEXCEPT { return _p && __p()->valid(); }
-    BOOST_CONSTEXPR bool is_consuming() const BOOST_NOEXCEPT { return __p()->is_consuming(); }
-    BOOST_CONSTEXPR bool is_ready() const BOOST_NOEXCEPT { return __p()->is_ready(); }
-    BOOST_CONSTEXPR bool is_abandoned() const BOOST_NOEXCEPT { return __p()->is_abandoned(); }
-    BOOST_CONSTEXPR bool has_exception() const BOOST_NOEXCEPT { return __p()->has_exception(); }
-    BOOST_CONSTEXPR bool has_value() const BOOST_NOEXCEPT { return __p()->has_value(); }
+    BOOST_SPINLOCK_CONSTEXPR bool valid() const BOOST_NOEXCEPT { return _p && __p()->valid(); }
+    BOOST_SPINLOCK_CONSTEXPR bool is_consuming() const BOOST_NOEXCEPT { return __p()->is_consuming(); }
+    BOOST_SPINLOCK_CONSTEXPR bool is_ready() const BOOST_NOEXCEPT { return __p()->is_ready(); }
+    BOOST_SPINLOCK_CONSTEXPR bool is_abandoned() const BOOST_NOEXCEPT { return __p()->is_abandoned(); }
+    BOOST_SPINLOCK_CONSTEXPR bool has_exception() const BOOST_NOEXCEPT { return __p()->has_exception(); }
+    BOOST_SPINLOCK_CONSTEXPR bool has_value() const BOOST_NOEXCEPT { return __p()->has_value(); }
     void wait() const { return __p()->wait(); }
     template<class Rep, class Period>
     future_status wait_for(const chrono::duration<Rep,Period> &timeout_duration) const;
@@ -356,7 +356,7 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
       _ready=true;
     }
   public:
-    BOOST_CONSTEXPR basic_promise() BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<expected<T, E>>::value)) : _ready(false), _retrieved(false), _other(nullptr)
+    BOOST_SPINLOCK_CONSTEXPR basic_promise() BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<expected<T, E>>::value)) : _ready(false), _retrieved(false), _other(nullptr)
     {
       static_assert(!std::uses_allocator<basic_promise, std::allocator<T>>::value, "Non-allocating future-promise cannot make use of allocators");
       static_assert(!std::uses_allocator<basic_promise, std::allocator<E>>::value, "Non-allocating future-promise cannot make use of allocators");
@@ -386,8 +386,8 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
       return *this;
     }
     basic_promise &operator=(const basic_promise &) = delete;
-    BOOST_CONSTEXPR bool is_ready() const BOOST_NOEXCEPT { return _ready; }
-    BOOST_CONSTEXPR bool is_future_retrieved() const BOOST_NOEXCEPT { return _retrieved || _other; }
+    BOOST_SPINLOCK_CONSTEXPR bool is_ready() const BOOST_NOEXCEPT { return _ready; }
+    BOOST_SPINLOCK_CONSTEXPR bool is_future_retrieved() const BOOST_NOEXCEPT { return _retrieved || _other; }
     void swap(basic_promise &o) BOOST_NOEXCEPT;
     future_type get_future() BOOST_NOEXCEPT_IF((!consuming && std::is_nothrow_default_constructible<future_type>::value && std::is_nothrow_move_constructible<future_type>::value))
     {

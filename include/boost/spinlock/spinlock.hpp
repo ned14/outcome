@@ -80,13 +80,25 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 
 #include "bindlib/include/import.h"
 
-#if ! defined BOOST_RELAXED_CONSTEXPR
-# ifdef __cpp_relaxed_constexpr
-#  define BOOST_RELAXED_CONSTEXPR constexpr
+#if ! defined BOOST_SPINLOCK_CONSTEXPR
+# ifdef __cpp_constexpr
+// clang 3.2 and earlier has buggy constexpr support
+#  if !defined(__clang__) || (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__) >= 30300
+#   define BOOST_SPINLOCK_CONSTEXPR constexpr
+#  endif
 # endif
 #endif
-#ifndef BOOST_RELAXED_CONSTEXPR
-#define BOOST_RELAXED_CONSTEXPR
+#ifndef BOOST_SPINLOCK_CONSTEXPR
+# define BOOST_SPINLOCK_CONSTEXPR
+#endif
+
+#if ! defined BOOST_SPINLOCK_RELAXED_CONSTEXPR
+# ifdef __cpp_relaxed_constexpr
+#  define BOOST_SPINLOCK_RELAXED_CONSTEXPR constexpr
+# endif
+#endif
+#ifndef BOOST_SPINLOCK_RELAXED_CONSTEXPR
+# define BOOST_SPINLOCK_RELAXED_CONSTEXPR
 #endif
 
 
@@ -129,7 +141,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
      */
     template<typename T> struct lockable_ptr : atomic<T *>
     {
-      BOOST_CONSTEXPR lockable_ptr(T *v=nullptr) : atomic<T *>(v) { }
+      BOOST_SPINLOCK_CONSTEXPR lockable_ptr(T *v=nullptr) : atomic<T *>(v) { }
       //! Returns the memory pointer part of the atomic
       T *get() BOOST_NOEXCEPT_OR_NOTHROW
       {
@@ -165,14 +177,14 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       atomic<T> v;
     public:
       typedef T value_type;
-      BOOST_RELAXED_CONSTEXPR spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : v(0)
+      BOOST_SPINLOCK_RELAXED_CONSTEXPR spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : v(0)
       {
         BOOST_SPINLOCK_ANNOTATE_RWLOCK_CREATE(this);
         v.store(0, memory_order_release);
       }
       spinlockbase(const spinlockbase &) = delete;
       //! Atomically move constructs
-      BOOST_RELAXED_CONSTEXPR spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW : v(0)
+      BOOST_SPINLOCK_RELAXED_CONSTEXPR spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW : v(0)
       {
         BOOST_SPINLOCK_ANNOTATE_RWLOCK_CREATE(this);
         //v.store(o.v.exchange(0, memory_order_acq_rel));
@@ -189,7 +201,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         BOOST_SPINLOCK_ANNOTATE_RWLOCK_DESTROY(this);
       }
       //! Returns the raw atomic
-      BOOST_CONSTEXPR T load(memory_order o=memory_order_seq_cst) const BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
+      BOOST_SPINLOCK_CONSTEXPR T load(memory_order o=memory_order_seq_cst) const BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
       //! Sets the raw atomic
       void store(T a, memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { v.store(a, o); }
       //! If atomic is zero, sets to 1 and returns true, else false.
@@ -219,7 +231,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         }
         else return false;
       }
-      BOOST_CONSTEXPR bool try_lock() const BOOST_NOEXCEPT_OR_NOTHROW
+      BOOST_SPINLOCK_CONSTEXPR bool try_lock() const BOOST_NOEXCEPT_OR_NOTHROW
       {
         if(v.load(memory_order_consume)) // Avoid unnecessary cache line invalidation traffic
           return false;
@@ -255,7 +267,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         BOOST_SPINLOCK_ANNOTATE_RWLOCK_RELEASED(this, true);
         v.store(0, memory_order_release);
       }
-      BOOST_CONSTEXPR bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
+      BOOST_SPINLOCK_CONSTEXPR bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
     };
     template<typename T> struct spinlockbase<lockable_ptr<T>>
     {
@@ -341,10 +353,10 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       template<class parenttype> struct policy : parenttype
       {
         static BOOST_CONSTEXPR_OR_CONST size_t spins_to_loop=spins;
-        BOOST_CONSTEXPR policy() {}
+        BOOST_SPINLOCK_CONSTEXPR policy() {}
         policy(const policy &) = delete;
-        BOOST_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-        BOOST_CONSTEXPR inline bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
+        BOOST_SPINLOCK_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
+        BOOST_SPINLOCK_CONSTEXPR inline bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
         {
           if(parenttype::int_yield(n)) return true;
           if(n>=spins) return false;
@@ -359,10 +371,10 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       template<class parenttype> struct policy : parenttype
       {
         static BOOST_CONSTEXPR_OR_CONST size_t spins_to_yield=spins;
-        BOOST_CONSTEXPR policy() {}
+        BOOST_SPINLOCK_CONSTEXPR policy() {}
         policy(const policy &) = delete;
-        BOOST_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-        BOOST_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
+        BOOST_SPINLOCK_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
+        BOOST_SPINLOCK_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
         {
           if(parenttype::int_yield(n)) return true;
           if(n>=spins) return false;
@@ -376,10 +388,10 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
     {
       template<class parenttype> struct policy : parenttype
       {
-        BOOST_CONSTEXPR policy() {}
+        BOOST_SPINLOCK_CONSTEXPR policy() {}
         policy(const policy &) = delete;
-        BOOST_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-        BOOST_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
+        BOOST_SPINLOCK_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
+        BOOST_SPINLOCK_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
         {
           if(parenttype::int_yield(n)) return true;
           this_thread::sleep_for(chrono::milliseconds(1));
@@ -417,9 +429,9 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
     {
       typedef spinpolicy4<spinpolicy3<spinpolicy2<spinlockbase<T>>>> parenttype;
     public:
-      BOOST_CONSTEXPR spinlock() { }
+      BOOST_SPINLOCK_CONSTEXPR spinlock() { }
       spinlock(const spinlock &) = delete;
-      BOOST_CONSTEXPR spinlock(spinlock &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
+      BOOST_SPINLOCK_CONSTEXPR spinlock(spinlock &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
       void lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
         for(size_t n=0;; n++)
@@ -455,7 +467,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       return false;
     }
     // For when used with a spinlock
-    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_CONSTEXPR inline T is_lockable_locked(const spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_SPINLOCK_CONSTEXPR inline T is_lockable_locked(const spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
     {
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
       // Annoyingly the atomic ops are marked as unsafe for atomic transactions, so ...
@@ -465,7 +477,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 #endif
     }
     // For when used with a locked_ptr
-    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_CONSTEXPR inline bool is_lockable_locked(spinlock<lockable_ptr<T>, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_SPINLOCK_CONSTEXPR inline bool is_lockable_locked(spinlock<lockable_ptr<T>, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
     {
       return ((size_t) lockable.load(memory_order_consume))&1;
     }
