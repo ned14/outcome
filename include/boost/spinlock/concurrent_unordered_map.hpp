@@ -40,6 +40,15 @@ DEALINGS IN THE SOFTWARE.
 
 BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 
+    namespace detail
+    {
+#if defined(BOOST_GCC) && BOOST_GCC <= 40700
+      template<class T> struct is_nothrow_destructible : std::false_type { };
+#else
+      template<class T> using is_nothrow_destructible = std::is_nothrow_destructible<T>;
+#endif
+    }
+
     /*! \class concurrent_unordered_map
     \brief Provides an unordered_map never slower than std::unordered_map which is thread safe and wait free and optionally no-malloc to use and whose find, insert/emplace
     and erase functions are usually wait free.
@@ -217,19 +226,19 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         BOOST_CONSTEXPR node_ptr_type(std::nullptr_t) BOOST_NOEXCEPT : p(nullptr) {}
         node_ptr_type(node_ptr_type &&o) BOOST_NOEXCEPT : allocator(std::move(o.allocator)), p(o.p) { o.p=nullptr; }
         node_ptr_type(const node_ptr_type &)=delete;
-        node_ptr_type &operator=(node_ptr_type &&o) BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<value_type>::value)
+        node_ptr_type &operator=(node_ptr_type &&o) BOOST_NOEXCEPT_IF(detail::is_nothrow_destructible<value_type>::value)
         {
           this->~node_ptr_type();
           new(this) node_ptr_type(std::move(o));
           return *this;
         }
-        node_ptr_type &operator=(std::nullptr_t) BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<value_type>::value)
+        node_ptr_type &operator=(std::nullptr_t) BOOST_NOEXCEPT_IF(detail::is_nothrow_destructible<value_type>::value)
         {
           reset();
           return *this;
         }
         node_ptr_type &operator=(const node_ptr_type &o)=delete;
-        ~node_ptr_type() BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<value_type>::value)
+        ~node_ptr_type() BOOST_NOEXCEPT_IF(detail::is_nothrow_destructible<value_type>::value)
         {
           reset();
         }
@@ -244,7 +253,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           p=nullptr;
           return ret;
         }
-        void reset() BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<value_type>::value)
+        void reset() BOOST_NOEXCEPT_IF(detail::is_nothrow_destructible<value_type>::value)
         {
           if(p)
           {
@@ -253,7 +262,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
             p=nullptr;
           }
         }
-        void reset(std::nullptr_t) BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<value_type>::value) { reset(); }
+        void reset(std::nullptr_t) BOOST_NOEXCEPT_IF(detail::is_nothrow_destructible<value_type>::value) { reset(); }
         void swap(node_ptr_type &o) BOOST_NOEXCEPT
         {
           node_ptr_type temp(std::move(*this));
@@ -283,7 +292,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         atomic<unsigned> count; // count is used items in there
         std::vector<item_type, item_type_allocator> items;
         bucket_type_impl() : count(0), items(0) { BOOST_SPINLOCK_DRD_IGNORE_VAR(count); count.store(0, memory_order_relaxed); }
-        ~bucket_type_impl() BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<decltype(items)>::value) { BOOST_SPINLOCK_DRD_STOP_IGNORING_VAR(count); }
+        ~bucket_type_impl() BOOST_NOEXCEPT_IF(detail::is_nothrow_destructible<decltype(items)>::value) { BOOST_SPINLOCK_DRD_STOP_IGNORING_VAR(count); }
         bucket_type_impl(bucket_type_impl &&) BOOST_NOEXCEPT : count(0) { BOOST_SPINLOCK_DRD_IGNORE_VAR(count); count.store(0, memory_order_relaxed); }
         bucket_type_impl(const bucket_type_impl &) = delete;
         bucket_type_impl &operator=(bucket_type_impl &&) = delete;
@@ -409,7 +418,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       concurrent_unordered_map(std::initializer_list<value_type> il, size_type n=0, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : concurrent_unordered_map(n, h, ke, al) { insert(std::move(il)); }
       concurrent_unordered_map(std::initializer_list<value_type> il, size_type n, const allocator_type &al) : concurrent_unordered_map(n, al) { insert(std::move(il)); }
       concurrent_unordered_map(std::initializer_list<value_type> il, size_type n, const hasher &h, const allocator_type &al) : concurrent_unordered_map(n, h, al) { insert(std::move(il)); }
-      ~concurrent_unordered_map() BOOST_NOEXCEPT_IF(std::is_nothrow_destructible<decltype(_buckets)>::value)
+      ~concurrent_unordered_map() BOOST_NOEXCEPT_IF(detail::is_nothrow_destructible<decltype(_buckets)>::value)
       {
         buckets_type &buckets=*_buckets.load(memory_order_consume);
         // Raise the rehash lock and leave it raised
