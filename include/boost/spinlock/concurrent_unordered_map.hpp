@@ -42,8 +42,14 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 
     namespace detail
     {
-#if defined(BOOST_GCC) && BOOST_GCC <= 40700
+#if defined(__GNUC__) && (__GNUC__ * 10000 \
+                        + __GNUC_MINOR__ * 100 \
+                        + __GNUC_PATCHLEVEL__) <= 40700
+#if SPINLOCK_STANDALONE 
       template<class T> struct is_nothrow_destructible : std::false_type { };
+#else
+      template<class T> using is_nothrow_destructible = boost::is_nothrow_destructible<T>;
+#endif
 #else
       template<class T> using is_nothrow_destructible = std::is_nothrow_destructible<T>;
 #endif
