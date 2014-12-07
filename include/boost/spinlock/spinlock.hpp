@@ -485,8 +485,8 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 #ifndef BOOST_BEGIN_TRANSACT_LOCK
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
 #undef BOOST_USING_INTEL_TSX
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable) __transaction_relaxed { (void) boost::spinlock::is_lockable_locked(lockable); {
-#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) __transaction_relaxed { if((only_if_not_this)!=boost::spinlock::is_lockable_locked(lockable)) {
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) __transaction_relaxed { (void) BOOST_SPINLOCK_V1_NAMESPACE::is_lockable_locked(lockable); {
+#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) __transaction_relaxed { if((only_if_not_this)!=BOOST_SPINLOCK_V1_NAMESPACE::is_lockable_locked(lockable)) {
 #define BOOST_END_TRANSACT_LOCK(lockable) } }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N) __transaction_relaxed
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)
@@ -494,8 +494,8 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 #endif
 
 #ifndef BOOST_BEGIN_TRANSACT_LOCK
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { std::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
-#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) if(lockable.lock(only_if_not_this)) { std::lock_guard<decltype(lockable)> __tsx_transaction(lockable, std::adopt_lock);
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { BOOST_SPINLOCK_V1_NAMESPACE::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
+#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) if(lockable.lock(only_if_not_this)) { BOOST_SPINLOCK_V1_NAMESPACE::lock_guard<decltype(lockable)> __tsx_transaction(lockable, BOOST_SPINLOCK_V1_NAMESPACE::adopt_lock_t());
 #define BOOST_END_TRANSACT_LOCK(lockable) }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N)
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)

@@ -324,7 +324,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 #endif
       typedef typename allocator_type::template rebind<bucket_type>::other bucket_type_allocator;
       typedef std::vector<bucket_type, bucket_type_allocator> buckets_type;
-      std::atomic<buckets_type *> _buckets;
+      atomic<buckets_type *> _buckets;
       typedef std::array<buckets_type *, 8> old_buckets_type;
       old_buckets_type _oldbuckets;
       typename old_buckets_type::iterator _oldbucketit;
@@ -724,7 +724,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
             // If the lock is other state we need to reload bucket list
             if(!b.lock.lock(2))
               continue;
-            std::lock_guard<decltype(b.lock)> g(b.lock, std::adopt_lock); // Will abort all concurrency
+            lock_guard<decltype(b.lock)> g(b.lock, adopt_lock_t()); // Will abort all concurrency
             // If we earlier found an empty use that
             if(emptyidx!=(size_t) -1)
             {
@@ -834,7 +834,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           // If the lock is other state we need to reload bucket list
           if(!b.lock.lock(2))
             abort();
-          std::lock_guard<decltype(b.lock)> g(b.lock, std::adopt_lock); // Will abort all concurrency
+          lock_guard<decltype(b.lock)> g(b.lock, adopt_lock_t()); // Will abort all concurrency
           auto &items=b.items;
           item_type *i=items.data()+it._offset;
           if(it._offset<items.size() && i->p)
@@ -869,7 +869,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
             // If the lock is other state we need to reload bucket list
             if(!b.lock.lock(2))
               continue;
-            std::lock_guard<decltype(b.lock)> g(b.lock, std::adopt_lock); // Will abort all concurrency
+            lock_guard<decltype(b.lock)> g(b.lock, adopt_lock_t()); // Will abort all concurrency
             {
               auto &items=b.items;
               for(item_type *i=items.data()+offset, *e=items.data()+items.size();;)
@@ -942,7 +942,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
               done=false;
               break;
             }
-            std::lock_guard<decltype(b.lock)> g(b.lock, std::adopt_lock); // Will abort all concurrency
+            lock_guard<decltype(b.lock)> g(b.lock, adopt_lock_t()); // Will abort all concurrency
             for(auto &i : b.items)
             {
               node_ptr_type former(_allocator);
@@ -958,9 +958,9 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       {
         typedef decltype(_rehash_lock) rehash_lock_t;
         typedef decltype(o._rehash_lock) o_rehash_lock_t;
-        std::lock(_rehash_lock, o._rehash_lock);
-        std::lock_guard<rehash_lock_t> g1(_rehash_lock, std::adopt_lock);
-        std::lock_guard<o_rehash_lock_t> g2(o._rehash_lock, std::adopt_lock);
+        lock(_rehash_lock, o._rehash_lock);
+        lock_guard<rehash_lock_t> g1(_rehash_lock, adopt_lock_t());
+        lock_guard<o_rehash_lock_t> g2(o._rehash_lock, adopt_lock_t());
         std::swap(_hasher, o._hasher);
         std::swap(_key_equal, o._key_equal);
         std::swap(_max_load_factor, o._max_load_factor);
@@ -985,7 +985,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
               done=false;
               break;
             }
-            std::lock_guard<decltype(b.lock)> g(b.lock, std::adopt_lock); // Will abort all concurrency
+            lock_guard<decltype(b.lock)> g(b.lock, adopt_lock_t()); // Will abort all concurrency
             auto &items=b.items;
             size_t failed=0;
             for(auto &i : items)
@@ -1148,7 +1148,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       void rehash(size_type n)
       {
         typedef decltype(_rehash_lock) rehash_lock_t;
-        std::lock_guard<rehash_lock_t> g(_rehash_lock); // Stop other rehashes
+        lock_guard<rehash_lock_t> g(_rehash_lock); // Stop other rehashes
         buckets_type &buckets=*_buckets.load(memory_order_consume);
         if(n!=buckets.size())
         {
@@ -1171,7 +1171,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         if(toclear)
         {
           typedef decltype(_rehash_lock) rehash_lock_t;
-          std::lock_guard<rehash_lock_t> g(_rehash_lock); // Stop other rehashes
+          lock_guard<rehash_lock_t> g(_rehash_lock); // Stop other rehashes
           typename old_buckets_type::iterator it=_oldbucketit;
           while(toclear--)
           {
