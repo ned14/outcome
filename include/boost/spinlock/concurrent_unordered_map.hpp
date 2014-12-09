@@ -399,8 +399,20 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         void _catch_up() const BOOST_NOEXCEPT { const_cast<iterator *>(this)->_catch_up(); }
       public:
         iterator() BOOST_NOEXCEPT : _parent(nullptr), _bucket_data(nullptr), _itb(dead()), _offset((size_t) -1), _pending_incr(0) { }
-        bool operator!=(const iterator &o) const BOOST_NOEXCEPT { _catch_up(); return _itb!=o._itb || _offset!=o._offset; }
-        bool operator==(const iterator &o) const BOOST_NOEXCEPT { _catch_up(); return _itb==o._itb && _offset==o._offset; }
+        bool operator!=(const iterator &o) const BOOST_NOEXCEPT
+        {
+          if(_itb==dead() && o._itb==dead()) return false;
+          if(_itb!=dead()) _catch_up();
+          if(o._itb!=dead()) o._catch_up();
+          return _itb!=o._itb || _offset!=o._offset;
+        }
+        bool operator==(const iterator &o) const BOOST_NOEXCEPT
+        {
+          if(_itb==dead() && o._itb==dead()) return true;
+          if(_itb!=dead()) _catch_up();
+          if(o._itb!=dead()) o._catch_up();
+          return _itb==o._itb && _offset==o._offset;
+        }
         iterator &operator++() BOOST_NOEXCEPT
         {
           if(_itb==dead())
@@ -629,6 +641,17 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       {
         const_iterator it=find(k);
         return std::make_pair(it, it);
+      }
+      //! Visits each matching item with a callable. Callable is invoked with bucket lock held.
+      template<class U> size_type visit(const key_type &k, U &&callable)
+      {
+        size_type ret=0;
+        _find(k, [&](typename buckets_type::iterator &itb, size_t offset, item_type *i){
+          callable(*i->p);
+          ++ret;
+          return true;
+        });
+        return ret;
       }
 
       //! \brief Factory function for a node_ptr_type.
