@@ -168,7 +168,17 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
     I'd like to thank Hans Boehm for working through the atomic memory order semantics I used and
     telling me where I could relax things.
     */
-    template<class Key, class T, class Hash=std::hash<Key>, class Pred=std::equal_to<Key>, class Alloc=std::allocator<std::pair<const Key, T>>> class concurrent_unordered_map
+    template<class T> using default_concurrent_unordered_map_spinlock=spinlock<T,
+      spins_to_loop<100>::policy,
+      spins_to_yield<500>::policy,
+      spins_to_sleep::policy>;
+    template<class Key,
+             class T,
+             class Hash=std::hash<Key>,
+             class Pred=std::equal_to<Key>,
+             class Alloc=std::allocator<std::pair<const Key, T>>,
+             template<class> class Spinlock=default_concurrent_unordered_map_spinlock
+             > class concurrent_unordered_map
     {
     public:
       typedef Key key_type;
@@ -184,8 +194,10 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       typedef const value_type *const_pointer;
       typedef std::size_t size_type;
       typedef std::ptrdiff_t difference_type;
+      
+      template<class U> using spinlock_type=Spinlock<U>;
     private:
-      spinlock<bool> _rehash_lock;
+      spinlock_type<bool> _rehash_lock;
       hasher _hasher;
       key_equal _key_equal;
       allocator_type _allocator;
@@ -298,7 +310,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       typedef typename allocator_type::template rebind<item_type>::other item_type_allocator;
       struct bucket_type_impl
       {
-        spinlock<unsigned char> lock;  // = 2 if you need to reload the bucket list
+        spinlock_type<unsigned char> lock;  // = 2 if you need to reload the bucket list
         atomic<unsigned> count; // count is used items in there
         std::vector<item_type, item_type_allocator> items;
         bucket_type_impl() : count(0), items(0) { BOOST_SPINLOCK_DRD_IGNORE_VAR(count); count.store(0, memory_order_relaxed); }
@@ -440,7 +452,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       concurrent_unordered_map(std::initializer_list<value_type> il, size_type n=0, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : concurrent_unordered_map(n, h, ke, al) { insert(std::move(il)); }
       concurrent_unordered_map(std::initializer_list<value_type> il, size_type n, const allocator_type &al) : concurrent_unordered_map(n, al) { insert(std::move(il)); }
       concurrent_unordered_map(std::initializer_list<value_type> il, size_type n, const hasher &h, const allocator_type &al) : concurrent_unordered_map(n, h, al) { insert(std::move(il)); }
-      ~concurrent_unordered_map() BOOST_NOEXCEPT_IF(detail::is_nothrow_destructible<decltype(_buckets)>::value)
+      ~concurrent_unordered_map() //BOOST_NOEXCEPT_IF(detail::is_nothrow_destructible<decltype(_buckets)>::value)
       {
         buckets_type &buckets=*_buckets.load(memory_order_consume);
         // Raise the rehash lock and leave it raised
