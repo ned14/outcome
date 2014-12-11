@@ -791,6 +791,7 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, int typ
 #ifdef BOOST_HAVE_SYSTEM_CONCURRENT_UNORDERED_MAP
   concurrency::concurrent_unordered_map<int, int> map;
 #else
+  // todo fnv1a_hash
   boost::spinlock::concurrent_unordered_map<int, int> map;
 #endif
   usCount start, end;

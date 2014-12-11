@@ -196,9 +196,9 @@ BOOST_EXPECTED_FUTURE_V1_NAMESPACE_BEGIN
       _ready.unlock();
     }
       
-    BOOST_RELAXED_CONSTEXPR basic_future(promise_type *p, bool ready, expected<T, E> &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<expected<T, E>>::value)) : _abandoned(false), _other(p), expected<T, E>(std::move(o)) { if(!ready) _ready.lock(); }
+    BOOST_SPINLOCK_RELAXED_CONSTEXPR basic_future(promise_type *p, bool ready, expected<T, E> &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<expected<T, E>>::value)) : _abandoned(false), _other(p), expected<T, E>(std::move(o)) { if(!ready) _ready.lock(); }
   public:
-    BOOST_RELAXED_CONSTEXPR basic_future() BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<expected<T, E>>::value)) : _abandoned(false), _other(nullptr) { _ready.lock(); }
+    BOOST_SPINLOCK_RELAXED_CONSTEXPR basic_future() BOOST_NOEXCEPT_IF((std::is_nothrow_default_constructible<expected<T, E>>::value)) : _abandoned(false), _other(nullptr) { _ready.lock(); }
     basic_future(basic_future &&o) BOOST_NOEXCEPT_IF((std::is_nothrow_move_assignable<expected<T, E>>::value && std::is_nothrow_default_constructible<expected<T, E>>::value)) : basic_future() { this->operator=(std::move(o)); }
     basic_future(const basic_future &o) = delete;
     ~basic_future() BOOST_NOEXCEPT_IF((std::is_nothrow_destructible<expected<T, E>>::value))

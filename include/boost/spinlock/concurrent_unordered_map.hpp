@@ -58,18 +58,38 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       template<class T> using is_nothrow_destructible = std::is_nothrow_destructible<T>;
 #endif
     }
+    
+    template<class T> struct fnv1a_hash
+    {
+      size_t operator()(T v) const
+      {
+#if defined(__x86_64__) || defined(_M_X64) || defined(__aarch64__) || defined(__ia64__) || defined(_M_IA64) || defined(__ppc64__)
+        static BOOST_CONSTEXPR_OR_CONST size_t basis=14695981039346656037ULL, prime=1099511628211ULL;
+        static_assert(sizeof(size_t)==8, "size_t is not 64 bit");
+#else
+        static BOOST_CONSTEXPR_OR_CONST size_t basis=2166136261U, prime=16777619U;
+        static_assert(sizeof(size_t)==4, "size_t is not 32 bit");
+#endif
+        const unsigned char *_v=(const unsigned char *)&v;
+        size_t ret=basis;
+        for(size_t n=0; n<sizeof(T); n++)
+        {
+          ret^=(size_t)_v[n];
+          ret*=prime;
+        }
+        return ret;
+      }
+    };
 
     /*! \class concurrent_unordered_map
     \brief Provides an unordered_map never slower than std::unordered_map which is thread safe and wait free and optionally no-malloc to use and whose find, insert/emplace
     and erase functions are usually wait free.
 
-    Performance of this STL container, with a recent C++ 11 compiler whose optimiser understands memory ordering [1], is:
+    Performance of this STL container, with a recent C++ 11 compiler, is:
 
     - Within 10% of single threaded performance of a spinlocked std::unordered_map for inserts and removes, and within 33% for finds.
     - For a four core machine with eight threads, performance at full concurrency is 3.6x for inserts and removes, and 3.48x for finds.
     - With Transactional GCC running on Intel TSX capable hardware, performance at full concurrency is 4.07x over single threaded.
-
-    [1]: Currently Microsoft's compiler treats all atomic operations as memory_order_seq_cst irrespective of what they ask for.
 
     \image html scaling.png
     \image html gcc_vs_vs2013.png
@@ -79,6 +99,8 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
     - Provides the N3645 (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3645.pdf) low latency no-malloc extensions node_ptr_type, extract() and merge() with
       overload of insert(). Also added is a make_node_ptr() factory function with a rebind/realloc overload, and a make_node_ptrs() batch factory function for those
       with a malloc capable of burst/batch allocation (e.g. Linux, OS X). Finally, merge() is now templatised and rebinds/reallocs node ptrs if necessary.
+      
+    - Provides the ability to assume that all keys will always be unique. This lets insert() early out of fully checking for key existence.
 
     - Given the high costs of rehashing (see below), the design sacrifices low load factor performance for high load factor performance. Load factors of 16 or so are not
       significantly slower than load factors of less than 1 if given a well distributed hash function.
@@ -177,7 +199,8 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
              class Hash=std::hash<Key>,
              class Pred=std::equal_to<Key>,
              class Alloc=std::allocator<std::pair<const Key, T>>,
-             template<class> class Spinlock=default_concurrent_unordered_map_spinlock
+             template<class> class Spinlock=default_concurrent_unordered_map_spinlock,
+             bool assume_unique_keys=false
              > class concurrent_unordered_map
     {
     public:
@@ -196,6 +219,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       typedef std::ptrdiff_t difference_type;
       
       template<class U> using spinlock_type=Spinlock<U>;
+      static BOOST_CONSTEXPR_OR_CONST bool unique_keys_assumed=assume_unique_keys;
     private:
       spinlock_type<bool> _rehash_lock;
       hasher _hasher;
@@ -320,7 +344,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         bucket_type_impl &operator=(bucket_type_impl &&) = delete;
         bucket_type_impl &operator=(const bucket_type_impl &) = delete;
       };
-#if 1 // improves concurrent write performance
+#if 0 // improves concurrent write performance
       struct bucket_type : bucket_type_impl
       {
         char pad[64-sizeof(bucket_type_impl)];
@@ -332,7 +356,16 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         bucket_type(const bucket_type &) = delete;
       };
 #else
-      typedef bucket_type_impl bucket_type;
+      struct bucket_type : bucket_type_impl
+      {
+        char pad[32-sizeof(bucket_type_impl)];
+        bucket_type()
+        {
+          static_assert(sizeof(bucket_type)==32, "bucket_type is not 32 bytes long!");
+        }
+        bucket_type(bucket_type &&o) BOOST_NOEXCEPT : bucket_type_impl(std::move(o)) { }
+        bucket_type(const bucket_type &) = delete;
+      };
 #endif
       typedef typename allocator_type::template rebind<bucket_type>::other bucket_type_allocator;
       typedef std::vector<bucket_type, bucket_type_allocator> buckets_type;
@@ -727,32 +760,33 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           auto itb=_get_bucket(h);
           bucket_type &b=*itb;
           size_t emptyidx=(size_t) -1;
-#if 1
-          // First search for equivalents and empties.
-          if(b.count.load(memory_order_relaxed))
+          if(!unique_keys_assumed)
           {
-            size_t offset=0;
-            BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(b.lock, 2)
-              for(item_type *i=b.items.data(), *e=b.items.data()+b.items.size();;)
-              {
-                for(; i<e && i->hash!=h; offset++, i++)
-                  if(emptyidx==(size_t) -1 && !i->p)
-                    emptyidx=offset;
-                if(i==e)
-                  break;
-                if(i->p && _key_equal(k, i->p->first))
+            // First search for equivalents and empties.
+            if(b.count.load(memory_order_relaxed))
+            {
+              size_t offset=0;
+              BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(b.lock, 2)
+                for(item_type *i=b.items.data(), *e=b.items.data()+b.items.size();;)
                 {
-                  ret.first._itb=itb;
-                  ret.first._offset=offset;
-                  done=true;
-                  break;
+                  for(; i<e && i->hash!=h; offset++, i++)
+                    if(emptyidx==(size_t) -1 && !i->p)
+                      emptyidx=offset;
+                  if(i==e)
+                    break;
+                  if(i->p && _key_equal(k, i->p->first))
+                  {
+                    ret.first._itb=itb;
+                    ret.first._offset=offset;
+                    done=true;
+                    break;
+                  }
+                  else offset++, i++;
                 }
-                else offset++, i++;
-              }
-            BOOST_END_TRANSACT_LOCK(b.lock)
+              BOOST_END_TRANSACT_LOCK(b.lock)
+            }
+            else emptyidx=0;
           }
-          else emptyidx=0;
-#endif
 
           if(!done)
           {
