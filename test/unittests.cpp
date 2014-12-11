@@ -28,7 +28,9 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#define BOOST_CATCH_CUSTOM_MAIN_DEFINED
 #include "../include/boost/spinlock/spinlock.hpp"
+#include "../include/boost/spinlock/bindlib/include/boost/test/unit_test.hpp"
 #include "timing.h"
 #include "../include/boost/spinlock/concurrent_unordered_map.hpp"
 #include "../include/boost/spinlock/expected_future.hpp"
@@ -45,27 +47,22 @@ DEALINGS IN THE SOFTWARE.
 #include <concurrent_unordered_map.h>
 #endif
 
-#ifndef BOOST_MEMORY_TRANSACTIONS_DISABLE_CATCH
-#define CATCH_CONFIG_RUNNER
-#include "catch.hpp"
-#endif
-
 #include "allocator_testing.hpp"
 
+BOOST_AUTO_TEST_SUITE(all)
 
-
-TEST_CASE("works/spinlock", "Tests that the spinlock works as intended")
+BOOST_AUTO_TEST_CASE(works/spinlock, "Tests that the spinlock works as intended")
 {
   boost::spinlock::spinlock<bool> lock;
-  REQUIRE(lock.try_lock());
-  REQUIRE(!lock.try_lock());
+  BOOST_REQUIRE(lock.try_lock());
+  BOOST_REQUIRE(!lock.try_lock());
   lock.unlock();
   
   std::lock_guard<decltype(lock)> h(lock);
-  REQUIRE(!lock.try_lock());
+  BOOST_REQUIRE(!lock.try_lock());
 }
 
-TEST_CASE("works/spinlock/threaded", "Tests that the spinlock works as intended under threads")
+BOOST_AUTO_TEST_CASE(works/spinlock/threaded, "Tests that the spinlock works as intended under threads")
 {
   boost::spinlock::spinlock<bool> lock;
   boost::spinlock::atomic<size_t> gate(0);
@@ -85,12 +82,12 @@ TEST_CASE("works/spinlock/threaded", "Tests that the spinlock works as intended 
       while(gate);
       locked+=lock.try_lock();
     }
-    REQUIRE(locked==1);
+    BOOST_REQUIRE(locked==1);
     lock.unlock();
   }
 }
 
-TEST_CASE("works/spinlock/transacted", "Tests that the spinlock works as intended under transactions")
+BOOST_AUTO_TEST_CASE(works/spinlock/transacted, "Tests that the spinlock works as intended under transactions")
 {
   boost::spinlock::spinlock<bool> lock;
   boost::spinlock::atomic<size_t> gate(0);
@@ -109,7 +106,7 @@ TEST_CASE("works/spinlock/transacted", "Tests that the spinlock works as intende
     }
     BOOST_END_TRANSACT_LOCK(lock)
   }
-  REQUIRE(locked==1000*threads);
+  BOOST_REQUIRE(locked==1000*threads);
 }
 
 static double CalculatePerformance(bool use_transact)
@@ -156,13 +153,13 @@ static double CalculatePerformance(bool use_transact)
   size_t increments=0;
   for(size_t thread=0; thread<threads; thread++)
   {
-    REQUIRE(count[thread].value == 10000000);
+    BOOST_REQUIRE(count[thread].value == 10000000);
     increments+=count[thread].value;
   }
   return increments/((end-start)/1000000000000.0);
 }
 
-TEST_CASE("performance/spinlock", "Tests the performance of spinlocks")
+BOOST_AUTO_TEST_CASE(performance/spinlock, "Tests the performance of spinlocks")
 {
   printf("\n=== Spinlock performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculatePerformance(false));
@@ -170,7 +167,7 @@ TEST_CASE("performance/spinlock", "Tests the performance of spinlocks")
   printf("3. Achieved %lf transactions per second\n", CalculatePerformance(false));
 }
 
-TEST_CASE("performance/transaction", "Tests the performance of spinlock transactions")
+BOOST_AUTO_TEST_CASE(performance/transaction, "Tests the performance of spinlock transactions")
 {
   printf("\n=== Transacted spinlock performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculatePerformance(true));
@@ -222,12 +219,12 @@ static double CalculateMallocPerformance(size_t size, bool use_transact)
     }
   }
   end=GetUsCount();
-  REQUIRE(true);
+  BOOST_REQUIRE(true);
 //  printf("size=%u\n", (unsigned) map.size());
   return threads*10000000/((end-start)/1000000000000.0);
 }
 
-TEST_CASE("performance/malloc/transact/small", "Tests the transact performance of multiple threads using small memory allocations")
+BOOST_AUTO_TEST_CASE(performance/malloc/transact/small, "Tests the transact performance of multiple threads using small memory allocations")
 {
   printf("\n=== Small malloc transact performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateMallocPerformance(16, 1));
@@ -235,7 +232,7 @@ TEST_CASE("performance/malloc/transact/small", "Tests the transact performance o
   printf("3. Achieved %lf transactions per second\n", CalculateMallocPerformance(16, 1));
 }
 
-TEST_CASE("performance/malloc/transact/large", "Tests the transact performance of multiple threads using large memory allocations")
+BOOST_AUTO_TEST_CASE(performance/malloc/transact/large, "Tests the transact performance of multiple threads using large memory allocations")
 {
   printf("\n=== Large malloc transact performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateMallocPerformance(65536, 1));
@@ -249,48 +246,48 @@ TEST_CASE("performance/malloc/transact/large", "Tests the transact performance o
 
 
 
-TEST_CASE("works/concurrent_unordered_map/basic", "Tests that concurrent_unordered_map works as expected")
+BOOST_AUTO_TEST_CASE(works/concurrent_unordered_map/basic, "Tests that concurrent_unordered_map works as expected")
 {
   printf("\n=== concurrent_unordered_map basic ===\n");
   boost::spinlock::concurrent_unordered_map<int, int> map1, map2;
   map1.reserve(10);    // test dense map
   map2.reserve(1000);  // test sparse map
-  CHECK(map1.empty());
-  CHECK(map2.empty());
-  CHECK(map1.size()==0);
-  CHECK(map2.size()==0);
+  BOOST_CHECK(map1.empty());
+  BOOST_CHECK(map2.empty());
+  BOOST_CHECK(map1.size()==0);
+  BOOST_CHECK(map2.size()==0);
   for(int n=-200; n<=200; n+=2)
   {
     map1.emplace(n, n);
     map2.emplace(n, n);
   }
-  CHECK(!map1.empty());
-  CHECK(!map2.empty());
-  CHECK(map1.size()==201);
-  CHECK(map2.size()==201);
+  BOOST_CHECK(!map1.empty());
+  BOOST_CHECK(!map2.empty());
+  BOOST_CHECK(map1.size()==201);
+  BOOST_CHECK(map2.size()==201);
   printf("Load factor for map1 is %f\n", map1.load_factor());
   printf("Load factor for map2 is %f\n", map2.load_factor());
   std::vector<std::pair<int, int>> contents1, contents2;
   std::copy(map1.begin(), map1.end(), std::back_inserter(contents1));
   std::copy(map2.begin(), map2.end(), std::back_inserter(contents2));
-  CHECK(contents1.size()==201);
-  CHECK(contents2.size()==201);
+  BOOST_CHECK(contents1.size()==201);
+  BOOST_CHECK(contents2.size()==201);
   std::sort(contents1.begin(), contents1.end());
   std::sort(contents2.begin(), contents2.end());
   for(int n=-200; n<=200; n+=2)
   {
-    CHECK(contents1[n/2+100].first==n);
-    CHECK(contents2[n/2+100].first==n);
+    BOOST_CHECK(contents1[n/2+100].first==n);
+    BOOST_CHECK(contents2[n/2+100].first==n);
   }
   map1.clear();
   map2.clear();
-  CHECK(map1.empty());
-  CHECK(map2.empty());
-  CHECK(map1.size()==0);
-  CHECK(map2.size()==0);
+  BOOST_CHECK(map1.empty());
+  BOOST_CHECK(map2.empty());
+  BOOST_CHECK(map1.size()==0);
+  BOOST_CHECK(map2.size()==0);
 }
 
-TEST_CASE("works/concurrent_unordered_map/rehash", "Tests that concurrent_unordered_map rehash works as expected")
+BOOST_AUTO_TEST_CASE(works/concurrent_unordered_map/rehash, "Tests that concurrent_unordered_map rehash works as expected")
 {
   printf("\n=== concurrent_unordered_map rehash ===\n");
   boost::spinlock::concurrent_unordered_map<int, int> map1, map2;
@@ -306,23 +303,23 @@ TEST_CASE("works/concurrent_unordered_map/rehash", "Tests that concurrent_unorde
   std::vector<std::pair<int, int>> contents1, contents2;
   std::copy(map1.begin(), map1.end(), std::back_inserter(contents1));
   std::copy(map2.begin(), map2.end(), std::back_inserter(contents2));
-  CHECK(contents1.size()==201);
-  CHECK(contents2.size()==201);
+  BOOST_CHECK(contents1.size()==201);
+  BOOST_CHECK(contents2.size()==201);
   std::sort(contents1.begin(), contents1.end());
   std::sort(contents2.begin(), contents2.end());
   for(int n=-200; n<=200; n+=2)
   {
-    CHECK(contents1[n/2+100].first==n);
-    CHECK(contents2[n/2+100].first==n);
+    BOOST_CHECK(contents1[n/2+100].first==n);
+    BOOST_CHECK(contents2[n/2+100].first==n);
   }
 }
 
-TEST_CASE("works/concurrent_unordered_map/merge", "Tests that concurrent_unordered_map merge works as expected")
+BOOST_AUTO_TEST_CASE(works/concurrent_unordered_map/merge, "Tests that concurrent_unordered_map merge works as expected")
 {
   printf("\n=== concurrent_unordered_map merge ===\n");
   boost::spinlock::concurrent_unordered_map<int, int> map1, map2={ { 0, 0 } };
-  CHECK(map1.size()==0);
-  CHECK(map2.size()==1);
+  BOOST_CHECK(map1.size()==0);
+  BOOST_CHECK(map2.size()==1);
   map1.reserve(10);    // test dense map
   map2.reserve(1000);  // test sparse map
   for(int n=-200; n<=200; n+=2)
@@ -330,88 +327,88 @@ TEST_CASE("works/concurrent_unordered_map/merge", "Tests that concurrent_unorder
     map1.emplace(n, n);
     map2.emplace(n+1, n);
   }
-  CHECK(map1.size()==201);
-  CHECK(map2.size()==202);
+  BOOST_CHECK(map1.size()==201);
+  BOOST_CHECK(map2.size()==202);
   map1.merge(map2); // should merge all but 0
   std::vector<std::pair<int, int>> contents1, contents2;
   std::copy(map1.begin(), map1.end(), std::back_inserter(contents1));
   std::copy(map2.begin(), map2.end(), std::back_inserter(contents2));
-  CHECK(contents1.size()==402);
-  REQUIRE(contents2.size()==1);
+  BOOST_CHECK(contents1.size()==402);
+  BOOST_REQUIRE(contents2.size()==1);
   std::sort(contents1.begin(), contents1.end());
-  CHECK(contents2[0].first==0);
+  BOOST_CHECK(contents2[0].first==0);
   for(int n=-200; n<=201; n++)
   {
-    CHECK(contents1[n+200].first==n);
+    BOOST_CHECK(contents1[n+200].first==n);
   }
 }
 
-TEST_CASE("works/concurrent_unordered_map/operator[]", "Tests that concurrent_unordered_map operator[] works as expected")
+BOOST_AUTO_TEST_CASE(works/concurrent_unordered_map/operator[], "Tests that concurrent_unordered_map operator[] works as expected")
 {
   printf("\n=== concurrent_unordered_map operator[] ===\n");
   boost::spinlock::concurrent_unordered_map<std::string, int> map;
   std::string key("niall");
   // const lvalue ref
   map[key]=4;
-  CHECK(map.size()==1);
-  CHECK(key=="niall");
-  CHECK(map[key]==4);
-  CHECK(map.size()==1);
-  CHECK(key=="niall");
+  BOOST_CHECK(map.size()==1);
+  BOOST_CHECK(key=="niall");
+  BOOST_CHECK(map[key]==4);
+  BOOST_CHECK(map.size()==1);
+  BOOST_CHECK(key=="niall");
   // rvalue ref
   map[std::move(key)]=5;
-  CHECK(map.size()==1);
-  CHECK(key=="");
-  CHECK(map["niall"]==5);
-  CHECK(map.size()==1);
+  BOOST_CHECK(map.size()==1);
+  BOOST_CHECK(key=="");
+  BOOST_CHECK(map["niall"]==5);
+  BOOST_CHECK(map.size()==1);
   // collision
   auto n=map.extract("niall");
-  CHECK(map.size()==0);
+  BOOST_CHECK(map.size()==0);
   map["niall"]=4;
-  CHECK(map.size()==1);
-  CHECK(map["niall"]==4);
+  BOOST_CHECK(map.size()==1);
+  BOOST_CHECK(map["niall"]==4);
   auto outcome=map.insert(std::move(n));
-  CHECK(outcome.second==false);
-  CHECK(n);
+  BOOST_CHECK(outcome.second==false);
+  BOOST_CHECK(n);
   map.erase("niall");
-  CHECK(map.size()==0);
+  BOOST_CHECK(map.size()==0);
   outcome=map.insert(std::move(n));
-  CHECK(outcome.second==true);
-  CHECK(!n);
-  CHECK(map["niall"]==5);
-  CHECK(map.at("niall")==5);
-  CHECK_THROWS_AS(map.at("foo"), std::out_of_range);
+  BOOST_CHECK(outcome.second==true);
+  BOOST_CHECK(!n);
+  BOOST_CHECK(map["niall"]==5);
+  BOOST_CHECK(map.at("niall")==5);
+  BOOST_CHECK_THROW(map.at("foo"), std::out_of_range);
 }
 
-TEST_CASE("works/concurrent_unordered_map/noalloc", "Tests that concurrent_unordered_map noalloc works as expected")
+BOOST_AUTO_TEST_CASE(works/concurrent_unordered_map/noalloc, "Tests that concurrent_unordered_map noalloc works as expected")
 {
   printf("\n=== concurrent_unordered_map noalloc ===\n");
   boost::spinlock::concurrent_unordered_map<std::string, int> map(1); // no buckets
   // with node ptrs
   auto n=map.make_node_ptr(std::make_pair("niall", 4));
   auto outcome=map.insert_noalloc(std::move(n)); // fails
-  CHECK(outcome.second==false);
-  CHECK(map.size()==0);
+  BOOST_CHECK(outcome.second==false);
+  BOOST_CHECK(map.size()==0);
   outcome=map.insert(std::move(n)); // succeeds
-  CHECK(outcome.second==true);
-  CHECK(map.size()==1);
+  BOOST_CHECK(outcome.second==true);
+  BOOST_CHECK(map.size()==1);
 
   // with values
   outcome=map.insert_noalloc(std::make_pair("hello", 0));
-  CHECK(outcome.second==false);
-  CHECK(map.size()==1);
+  BOOST_CHECK(outcome.second==false);
+  BOOST_CHECK(map.size()==1);
 
   // make an empty slot first  
   map.emplace("niall2", 5); // allocates
-  CHECK(map.size()==2);
+  BOOST_CHECK(map.size()==2);
   map.erase("niall"); // leaves empty slot, so a non-allocating insert should succeed now
-  CHECK(map.size()==1);
+  BOOST_CHECK(map.size()==1);
   outcome=map.insert_noalloc(std::make_pair("foo", 0));
-  CHECK(outcome.second==true);
-  CHECK(map.size()==2);
+  BOOST_CHECK(outcome.second==true);
+  BOOST_CHECK(map.size()==2);
 }
 
-TEST_CASE("works/concurrent_unordered_map/make_node_ptrs", "Tests that concurrent_unordered_map make_node_ptrs works as expected")
+BOOST_AUTO_TEST_CASE(works/concurrent_unordered_map/make_node_ptrs, "Tests that concurrent_unordered_map make_node_ptrs works as expected")
 {
   printf("\n=== concurrent_unordered_map make_node_ptrs ===\n");
   typedef boost::spinlock::concurrent_unordered_map<int, std::string> map_type;
@@ -422,22 +419,22 @@ TEST_CASE("works/concurrent_unordered_map/make_node_ptrs", "Tests that concurren
   std::vector<map_type::node_ptr_type> n=map.make_node_ptrs(std::make_move_iterator(items.begin()), std::make_move_iterator(items.end()));
   for(auto &i : items)
   {
-    CHECK(i.second=="");
+    BOOST_CHECK(i.second=="");
   }
   for(auto &i : n)
   {
-    CHECK(i);
-    CHECK(i->second!="");
+    BOOST_CHECK(i);
+    BOOST_CHECK(i->second!="");
   }
   map.insert(std::make_move_iterator(n.begin()), std::make_move_iterator(n.end()));
   for(auto &i : n)
   {
-    CHECK(!i);
+    BOOST_CHECK(!i);
   }
   for(size_t n=0; n<100; n++)
-    CHECK(map[n]==std::to_string(n));
+    BOOST_CHECK(map[n]==std::to_string(n));
   n=map.extract(map.begin(), map.end());
-  CHECK(map.empty());
+  BOOST_CHECK(map.empty());
   std::vector<map_type::value_type *> rawptrs;
   for(auto &i : n)
   {
@@ -446,14 +443,14 @@ TEST_CASE("works/concurrent_unordered_map/make_node_ptrs", "Tests that concurren
     rawptrs.push_back(p);
   }
   items.clear();
-  CHECK(rawptrs.size()==100);
+  BOOST_CHECK(rawptrs.size()==100);
   for(size_t n=0; n<100; n++)
     items.emplace_back(n, std::to_string(n));
   n=map.make_node_ptrs(std::make_move_iterator(items.begin()), std::make_move_iterator(items.end()), rawptrs.data());
   map.insert(std::make_move_iterator(n.begin()), std::make_move_iterator(n.end()));
 }
 
-TEST_CASE("works/concurrent_unordered_map/exceptionsafety", "Tests that concurrent_unordered_map exception safety works as expected")
+BOOST_AUTO_TEST_CASE(works/concurrent_unordered_map/exceptionsafety, "Tests that concurrent_unordered_map exception safety works as expected")
 {
   printf("\n=== concurrent_unordered_map exception safety ===\n");
   auto &config=boost::allocator_testing::get_config(true);
@@ -461,75 +458,75 @@ TEST_CASE("works/concurrent_unordered_map/exceptionsafety", "Tests that concurre
   map_type map(1); // no buckets
   // fail first allocation
   config.fail_from=(size_t) config.count;
-  CHECK_THROWS_AS(map.insert(std::make_pair("niall", "niall")), std::bad_alloc);
+  BOOST_CHECK_THROW(map.insert(std::make_pair("niall", "niall")), std::bad_alloc);
 
   // failed insert doesn't destroy value
   {
     map_type::value_type v=std::make_pair("niall", "niall");
     config.fail_from=(size_t) config.count+2;
-    CHECK_THROWS_AS(map.insert(v), std::bad_alloc);
-    CHECK(config.fail_from==config.count);
-    CHECK(v.first=="niall");
-    CHECK(v.second=="niall");
+    BOOST_CHECK_THROW(map.insert(v), std::bad_alloc);
+    BOOST_CHECK(config.fail_from==config.count);
+    BOOST_CHECK(v.first=="niall");
+    BOOST_CHECK(v.second=="niall");
     config.fail_from=(size_t) config.count+2;
-    CHECK_THROWS_AS(map.insert(std::move(v)), std::bad_alloc);
-    CHECK(config.fail_from==config.count);
-    CHECK(v.first=="niall");
-    CHECK(v.second=="niall");
+    BOOST_CHECK_THROW(map.insert(std::move(v)), std::bad_alloc);
+    BOOST_CHECK(config.fail_from==config.count);
+    BOOST_CHECK(v.first=="niall");
+    BOOST_CHECK(v.second=="niall");
     config.fail_from=(size_t) config.count+2;
-    CHECK_NOTHROW(map.insert_noalloc(v));
-    CHECK(config.fail_from==config.count+1);
-    CHECK(v.first=="niall");
-    CHECK(v.second=="niall");
+    BOOST_CHECK_NO_THROW(map.insert_noalloc(v));
+    BOOST_CHECK(config.fail_from==config.count+1);
+    BOOST_CHECK(v.first=="niall");
+    BOOST_CHECK(v.second=="niall");
     config.fail_from=(size_t) config.count+2;
-    CHECK_NOTHROW(map.insert_noalloc(std::move(v)));
-    CHECK(config.fail_from==config.count+1);
-    CHECK(v.first=="niall");
-    CHECK(v.second=="niall");
+    BOOST_CHECK_NO_THROW(map.insert_noalloc(std::move(v)));
+    BOOST_CHECK(config.fail_from==config.count+1);
+    BOOST_CHECK(v.first=="niall");
+    BOOST_CHECK(v.second=="niall");
   }
 
   // failed operator[] doesn't destroy value
   {
     map_type::value_type v=std::make_pair("niall", "niall");
     config.fail_from=(size_t) config.count+2;
-    CHECK_THROWS_AS(map[v.first], std::bad_alloc);
-    CHECK(config.fail_from==config.count);
-    CHECK(v.first=="niall");
-    CHECK(v.second=="niall");
+    BOOST_CHECK_THROW(map[v.first], std::bad_alloc);
+    BOOST_CHECK(config.fail_from==config.count);
+    BOOST_CHECK(v.first=="niall");
+    BOOST_CHECK(v.second=="niall");
     config.fail_from=(size_t) config.count+2;
-    CHECK_THROWS_AS(map[std::move(v.first)], std::bad_alloc);
-    CHECK(config.fail_from==config.count);
-    CHECK(v.first=="niall");
-    CHECK(v.second=="niall");
+    BOOST_CHECK_THROW(map[std::move(v.first)], std::bad_alloc);
+    BOOST_CHECK(config.fail_from==config.count);
+    BOOST_CHECK(v.first=="niall");
+    BOOST_CHECK(v.second=="niall");
   }
 
   // failed emplace doesn't destroy value
   {
     map_type::value_type v=std::make_pair("niall", "niall");
     config.fail_from=(size_t) config.count+2;
-    CHECK_THROWS_AS(map.emplace(v), std::bad_alloc);
-    CHECK(config.fail_from==config.count);
-    CHECK(v.first=="niall");
-    CHECK(v.second=="niall");
+    BOOST_CHECK_THROW(map.emplace(v), std::bad_alloc);
+    BOOST_CHECK(config.fail_from==config.count);
+    BOOST_CHECK(v.first=="niall");
+    BOOST_CHECK(v.second=="niall");
     config.fail_from=(size_t) config.count+2;
-    CHECK_THROWS_AS(map.emplace(std::move(v)), std::bad_alloc);
-    CHECK(config.fail_from==config.count);
-    CHECK(v.first=="niall");
-    //CHECK(v.second=="niall"); // FIXME Known problem with implementation, awaiting fix.
+    BOOST_CHECK_THROW(map.emplace(std::move(v)), std::bad_alloc);
+    BOOST_CHECK(config.fail_from==config.count);
+    BOOST_CHECK(v.first=="niall");
+    //BOOST_CHECK(v.second=="niall"); // FIXME Known problem with implementation, awaiting fix.
   }
 
   // failed node ptr insert doesn't destroy value
   config.fail_from=(size_t) config.count+2;
   auto n=map.make_node_ptr("niall", "niall");
-  CHECK_THROWS_AS(map.insert(std::move(n)), std::bad_alloc);
-  CHECK(config.fail_from==config.count);
-  CHECK(n);
-  CHECK_NOTHROW(map.insert_noalloc(std::move(n)));
-  CHECK(config.fail_from==config.count);
-  CHECK(n);
+  BOOST_CHECK_THROW(map.insert(std::move(n)), std::bad_alloc);
+  BOOST_CHECK(config.fail_from==config.count);
+  BOOST_CHECK(n);
+  BOOST_CHECK_NO_THROW(map.insert_noalloc(std::move(n)));
+  BOOST_CHECK(config.fail_from==config.count);
+  BOOST_CHECK(n);
 }
 
-TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concurrent_unordered_map concurrent rehash works as expected")
+BOOST_AUTO_TEST_CASE(works/concurrent_unordered_map/rehash/concurrent, "Tests that concurrent_unordered_map concurrent rehash works as expected")
 {
   printf("\n=== concurrent_unordered_map concurrent rehash ===\n");
   //auto &config=boost::allocator_testing::get_config(true);
@@ -584,20 +581,20 @@ TEST_CASE("works/concurrent_unordered_map/rehash/concurrent", "Tests that concur
 }
 
 #if defined(_MSC_VER) && _MSC_VER >= 1900 // VS2015
-TEST_CASE("works/expected_future/basic", "Test that no-alloc future-promise works at all")
+BOOST_AUTO_TEST_CASE(works/expected_future/basic, "Test that no-alloc future-promise works at all")
 {
   using namespace BOOST_EXPECTED_FUTURE_V1_NAMESPACE;
   printf("Testing future<int> ...\n");
   {
     promise<int> p;
     future<int> f(p.get_future()), f2;
-    CHECK(f2.valid()==false);
-    CHECK_THROWS_AS(f2.get(), future_error);
-    CHECK(f.valid()==true);
+    BOOST_CHECK(f2.valid()==false);
+    BOOST_CHECK_THROW(f2.get(), future_error);
+    BOOST_CHECK(f.valid()==true);
     p.set_value(5);
-    CHECK(f.get()==5);
-    CHECK(f.valid()==false);
-    CHECK_THROWS_AS(f.get(), future_error);
+    BOOST_CHECK(f.get()==5);
+    BOOST_CHECK(f.valid()==false);
+    BOOST_CHECK_THROW(f.get(), future_error);
   }
   printf("Testing shared_future<int> ...\n");
   {
@@ -607,15 +604,15 @@ TEST_CASE("works/expected_future/basic", "Test that no-alloc future-promise work
     basic_promise<shared_future<int>::future_type> p;
 #endif
     shared_future<int> f(p.get_future()), f2;
-    CHECK(f2.valid()==false);
-    CHECK_THROWS_AS(f2.get(), future_error);
-    CHECK(f.valid()==true);
+    BOOST_CHECK(f2.valid()==false);
+    BOOST_CHECK_THROW(f2.get(), future_error);
+    BOOST_CHECK(f.valid()==true);
     p.set_value(5);
-    CHECK(f.get()==5);
-    CHECK(f.valid()==true);
-    CHECK(f.get()==5);
+    BOOST_CHECK(f.get()==5);
+    BOOST_CHECK(f.valid()==true);
+    BOOST_CHECK(f.get()==5);
     const_cast<int &>(f.get())=6;
-    CHECK(f.get()==6);
+    BOOST_CHECK(f.get()==6);
   }
 }
 #endif
@@ -735,12 +732,12 @@ static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact
 //      std::cout << "Items now " << map.size() << std::endl;
   }
   end=GetUsCount();
-  REQUIRE(true);
+  BOOST_REQUIRE(true);
 //  printf("size=%u\n", (unsigned) map.size());
   return threads*10000000/((end-start)/1000000000000.0);
 }
 
-TEST_CASE("performance/unordered_map/small/write", "Tests the performance of multiple threads writing a small unordered_map")
+BOOST_AUTO_TEST_CASE(performance/unordered_map/small/write, "Tests the performance of multiple threads writing a small unordered_map")
 {
   printf("\n=== Small unordered_map spinlock write performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, false, false));
@@ -748,7 +745,7 @@ TEST_CASE("performance/unordered_map/small/write", "Tests the performance of mul
   printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, false, false));
 }
 
-TEST_CASE("performance/unordered_map/large/write", "Tests the performance of multiple threads writing a large unordered_map")
+BOOST_AUTO_TEST_CASE(performance/unordered_map/large/write, "Tests the performance of multiple threads writing a large unordered_map")
 {
   printf("\n=== Large unordered_map spinlock write performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, false));
@@ -756,7 +753,7 @@ TEST_CASE("performance/unordered_map/large/write", "Tests the performance of mul
   printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, false));
 }
 
-TEST_CASE("performance/unordered_map/large/read", "Tests the performance of multiple threads reading a large unordered_map")
+BOOST_AUTO_TEST_CASE(performance/unordered_map/large/read, "Tests the performance of multiple threads reading a large unordered_map")
 {
   printf("\n=== Large unordered_map spinlock read performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, 1));
@@ -764,7 +761,7 @@ TEST_CASE("performance/unordered_map/large/read", "Tests the performance of mult
   printf("3. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, false, 1));
 }
 
-/*TEST_CASE("performance/unordered_map/transact/small", "Tests the transact performance of multiple threads using a small unordered_map")
+/*BOOST_AUTO_TEST_CASE(performance/unordered_map/transact/small, "Tests the transact performance of multiple threads using a small unordered_map")
 {
   printf("\n=== Small unordered_map transact performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(0, true, false));
@@ -774,7 +771,7 @@ TEST_CASE("performance/unordered_map/large/read", "Tests the performance of mult
 #endif
 }
 
-TEST_CASE("performance/unordered_map/transact/large", "Tests the transact performance of multiple threads using a large unordered_map")
+BOOST_AUTO_TEST_CASE(performance/unordered_map/transact/large, "Tests the transact performance of multiple threads using a large unordered_map")
 {
   printf("\n=== Large unordered_map transact performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateUnorderedMapPerformance(10000, true, false));
@@ -865,12 +862,12 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, int typ
   }
   end=GetUsCount();
   //map.dump_buckets(std::cout);
-  REQUIRE(true);
+  BOOST_REQUIRE(true);
 //  printf("size=%u\n", (unsigned) map.size());
   return threads*10000000/((end-start)/1000000000000.0);
 }
 
-TEST_CASE("performance/concurrent_unordered_map/small", "Tests the performance of multiple threads writing a small concurrent_unordered_map")
+BOOST_AUTO_TEST_CASE(performance/concurrent_unordered_map/small, "Tests the performance of multiple threads writing a small concurrent_unordered_map")
 {
   printf("\n=== Small concurrent_unordered_map write performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(0, false));
@@ -889,7 +886,7 @@ TEST_CASE("performance/concurrent_unordered_map/small", "Tests the performance o
 #endif
 }
 
-TEST_CASE("performance/concurrent_unordered_map/large/write", "Tests the performance of multiple threads writing a large concurrent_unordered_map")
+BOOST_AUTO_TEST_CASE(performance/concurrent_unordered_map/large/write, "Tests the performance of multiple threads writing a large concurrent_unordered_map")
 {
   printf("\n=== Large concurrent_unordered_map write performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, false));
@@ -908,7 +905,7 @@ TEST_CASE("performance/concurrent_unordered_map/large/write", "Tests the perform
 #endif
 }
 
-TEST_CASE("performance/concurrent_unordered_map/large/read", "Tests the performance of multiple threads reading a large concurrent_unordered_map")
+BOOST_AUTO_TEST_CASE(performance/concurrent_unordered_map/large/read, "Tests the performance of multiple threads reading a large concurrent_unordered_map")
 {
   printf("\n=== Large concurrent_unordered_map read performance ===\n");
   printf("1. Achieved %lf transactions per second\n", CalculateConcurrentUnorderedMapPerformance(10000, 1));
@@ -927,6 +924,7 @@ TEST_CASE("performance/concurrent_unordered_map/large/read", "Tests the performa
 #endif
 }
 
+BOOST_AUTO_TEST_SUITE_END()
 
 #ifndef BOOST_MEMORY_TRANSACTIONS_DISABLE_CATCH
 int main(int argc, char *argv[])
