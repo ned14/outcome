@@ -625,7 +625,7 @@ static double CalculateUnorderedMapPerformance(size_t reserve, bool use_transact
 {
   boost::spinlock::spinlock<bool> lock;
   boost::spinlock::atomic<size_t> gate(0);
-  std::unordered_map<int, int> map;
+  std::unordered_map<int, int, boost::spinlock::fnv1a_hash<int>> map;
   usCount start, end;
   if(reserve)
   {
@@ -786,10 +786,9 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, int typ
   boost::spinlock::atomic<size_t> gate(0);
   gate.store(0);
 #ifdef BOOST_HAVE_SYSTEM_CONCURRENT_UNORDERED_MAP
-  concurrency::concurrent_unordered_map<int, int> map;
+  concurrency::concurrent_unordered_map<int, int, boost::spinlock::fnv1a_hash<int>> map;
 #else
-  // todo fnv1a_hash
-  boost::spinlock::concurrent_unordered_map<int, int> map;
+  boost::spinlock::concurrent_unordered_map<int, int, boost::spinlock::fnv1a_hash<int>> map;
 #endif
   usCount start, end;
   if(reserve)
