@@ -355,6 +355,8 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         bucket_type(bucket_type &&o) BOOST_NOEXCEPT : bucket_type_impl(std::move(o)) { }
         bucket_type(const bucket_type &) = delete;
       };
+#elif 1
+      typedef bucket_type_impl bucket_type;
 #else
       struct bucket_type : bucket_type_impl
       {
