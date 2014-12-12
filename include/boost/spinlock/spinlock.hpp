@@ -150,7 +150,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           T *v;
           size_t n;
         } value;
-        value.v=atomic<T *>::load();
+        value.v=atomic<T *>::load(memory_order_relaxed);
         value.n&=~(size_t)1;
         return value.v;
       }
@@ -162,7 +162,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           T *v;
           size_t n;
         } value;
-        value.v=atomic<T *>::load();
+        value.v=atomic<T *>::load(memory_order_relaxed);
         value.n&=~(size_t)1;
         return value.v;
       }
@@ -287,6 +287,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       T *operator->() BOOST_NOEXCEPT_OR_NOTHROW { return get(); }
       //! Returns the raw atomic
       T *load(memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
+#if 0 // Forces cmpxchng on everything else, so avoid if at all possible.
       //! Sets the memory pointer part of the atomic preserving lockedness
       void set(T *a) BOOST_NOEXCEPT_OR_NOTHROW
       {
@@ -298,13 +299,14 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         T *expected;
         do
         {
-          value.v=v.load();
+          value.v=v.load(memory_order_relaxed);
           expected=value.v;
           bool locked=value.n&1;
           value.v=a;
           if(locked) value.n|=1;
-        } while(!v.compare_exchange_weak(expected, value.v));
+        } while(!v.compare_exchange_weak(expected, value.v, memory_order_acquire, memory_order_relaxed));
       }
+#endif
       //! Sets the raw atomic
       void store(T *a, memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { v.store(a, o); }
       bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
@@ -314,12 +316,12 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           T *v;
           size_t n;
         } value;
-        value.v=v.load();
+        value.v=v.load(memory_order_relaxed);
         if(value.n&1) // Avoid unnecessary cache line invalidation traffic
           return false;
         T *expected=value.v;
         value.n|=1;
-        return v.compare_exchange_weak(expected, value.v);
+        return v.compare_exchange_weak(expected, value.v, memory_order_acquire, memory_order_relaxed);
       }
       void unlock() BOOST_NOEXCEPT_OR_NOTHROW
       {
@@ -328,12 +330,12 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           T *v;
           size_t n;
         } value;
-        value.v=v.load();
+        value.v=v.load(memory_order_relaxed);
         assert(value.n&1);
         value.n&=~(size_t)1;
-        v.store(value.v);
+        v.store(value.v, memory_order_release);
       }
-      bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
+      BOOST_SPINLOCK_CONSTEXPR bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
     };
     namespace detail
     {

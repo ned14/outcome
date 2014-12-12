@@ -109,9 +109,12 @@ BOOST_AUTO_TEST_CASE(works/spinlock/transacted, "Tests that the spinlock works a
   BOOST_REQUIRE(locked==1000*threads);
 }
 
-static double CalculatePerformance(bool use_transact)
+template<bool tristate, class T> struct do_lock { void operator()(T &lock) { lock.lock(); } };
+template<class T> struct do_lock<true, T> { void operator()(T &lock) { int e=0; lock.lock(e); } };
+
+template<class locktype> double CalculatePerformance(bool use_transact)
 {
-  boost::spinlock::spinlock<bool> lock;
+  locktype lock;
   boost::spinlock::atomic<size_t> gate(0);
   struct
   {
@@ -144,8 +147,9 @@ static double CalculatePerformance(bool use_transact)
       }
       else
       {
-        std::lock_guard<decltype(lock)> g(lock);
-        ++count[thread].value;      
+        do_lock<std::is_same<typename locktype::value_type, int>::value, locktype>()(lock);
+        ++count[thread].value;
+        lock.unlock();
       }
     }
   }
@@ -159,20 +163,58 @@ static double CalculatePerformance(bool use_transact)
   return increments/((end-start)/1000000000000.0);
 }
 
-BOOST_AUTO_TEST_CASE(performance/spinlock, "Tests the performance of spinlocks")
+BOOST_AUTO_TEST_CASE(performance/spinlock/binary, "Tests the performance of binary spinlocks")
 {
-  printf("\n=== Spinlock performance ===\n");
-  printf("1. Achieved %lf transactions per second\n", CalculatePerformance(false));
-  printf("2. Achieved %lf transactions per second\n", CalculatePerformance(false));
-  printf("3. Achieved %lf transactions per second\n", CalculatePerformance(false));
+  printf("\n=== Binary spinlock performance ===\n");
+  typedef boost::spinlock::spinlock<bool> locktype;
+  printf("1. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
+  printf("2. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
+  printf("3. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
 }
 
-BOOST_AUTO_TEST_CASE(performance/transaction, "Tests the performance of spinlock transactions")
+BOOST_AUTO_TEST_CASE(performance/spinlock/binary/transaction, "Tests the performance of binary spinlock transactions")
 {
-  printf("\n=== Transacted spinlock performance ===\n");
-  printf("1. Achieved %lf transactions per second\n", CalculatePerformance(true));
-  printf("2. Achieved %lf transactions per second\n", CalculatePerformance(true));
-  printf("3. Achieved %lf transactions per second\n", CalculatePerformance(true));
+  printf("\n=== Transacted binary spinlock performance ===\n");
+  typedef boost::spinlock::spinlock<bool> locktype;
+  printf("1. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
+  printf("2. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
+  printf("3. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
+}
+
+BOOST_AUTO_TEST_CASE(performance/spinlock/tristate, "Tests the performance of tristate spinlocks")
+{
+  printf("\n=== Tristate spinlock performance ===\n");
+  typedef boost::spinlock::spinlock<int> locktype;
+  printf("1. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
+  printf("2. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
+  printf("3. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
+}
+
+BOOST_AUTO_TEST_CASE(performance/spinlock/tristate/transaction, "Tests the performance of tristate spinlock transactions")
+{
+  printf("\n=== Transacted tristate spinlock performance ===\n");
+  typedef boost::spinlock::spinlock<int> locktype;
+  printf("1. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
+  printf("2. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
+  printf("3. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
+}
+
+BOOST_AUTO_TEST_CASE(performance/spinlock/pointer, "Tests the performance of pointer spinlocks")
+{
+  printf("\n=== Pointer spinlock performance ===\n");
+  typedef boost::spinlock::spinlock<boost::spinlock::lockable_ptr<int>> locktype;
+  printf("1. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
+  printf("2. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
+  printf("3. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
+}
+
+BOOST_AUTO_TEST_CASE(performance/spinlock/pointer/transaction, "Tests the performance of pointer spinlock transactions")
+{
+  printf("\n=== Transacted pointer spinlock performance ===\n");
+  typedef boost::spinlock::spinlock<boost::spinlock::lockable_ptr<int>> locktype;
+  printf("1. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
+  printf("2. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
+  printf("3. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
 }
 
 static double CalculateMallocPerformance(size_t size, bool use_transact)
