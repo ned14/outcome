@@ -406,7 +406,11 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         typename buckets_type::iterator _itb;
         size_t _offset, _pending_incr; // used to avoid erase() doing a costly increment unless necessary
         friend class concurrent_unordered_map;
+#if _ITERATOR_DEBUG_LEVEL
+        typename buckets_type::iterator dead() const { buckets_type &buckets = *_bucket_data; return buckets.end(); }
+#else
         static typename buckets_type::iterator dead() { static typename buckets_type::iterator it; return it; }
+#endif
         iterator(const concurrent_unordered_map *parent) BOOST_NOEXCEPT : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_consume)), _offset((size_t) -1), _pending_incr(1) { buckets_type &buckets=*_bucket_data; _itb=buckets.begin(); }
         iterator(const concurrent_unordered_map *parent, std::nullptr_t) BOOST_NOEXCEPT : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_consume)), _itb(dead()), _offset((size_t) -1), _pending_incr(0) { }
         void _catch_up() BOOST_NOEXCEPT
