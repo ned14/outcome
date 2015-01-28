@@ -33,7 +33,6 @@ DEALINGS IN THE SOFTWARE.
 #include "../include/boost/spinlock/bindlib/include/boost/test/unit_test.hpp"
 #include "timing.h"
 #include "../include/boost/spinlock/concurrent_unordered_map.hpp"
-#include "../include/boost/spinlock/expected_future.hpp"
 
 #include <stdio.h>
 #include <unordered_map>
@@ -622,42 +621,6 @@ BOOST_AUTO_TEST_CASE(works/concurrent_unordered_map/rehash/concurrent, "Tests th
   printf("Achieved %u rehashes\n", (unsigned) rehashes);
 }
 
-#if defined(_MSC_VER) && _MSC_VER >= 1900 // VS2015
-BOOST_AUTO_TEST_CASE(works/expected_future/basic, "Test that no-alloc future-promise works at all")
-{
-  using namespace BOOST_EXPECTED_FUTURE_V1_NAMESPACE;
-  printf("Testing future<int> ...\n");
-  {
-    promise<int> p;
-    future<int> f(p.get_future()), f2;
-    BOOST_CHECK(f2.valid()==false);
-    BOOST_CHECK_THROW(f2.get(), future_error);
-    BOOST_CHECK(f.valid()==true);
-    p.set_value(5);
-    BOOST_CHECK(f.get()==5);
-    BOOST_CHECK(f.valid()==false);
-    BOOST_CHECK_THROW(f.get(), future_error);
-  }
-  printf("Testing shared_future<int> ...\n");
-  {
-#if 0 // FIXME
-    promise<int> p;
-#else
-    basic_promise<shared_future<int>::future_type> p;
-#endif
-    shared_future<int> f(p.get_future()), f2;
-    BOOST_CHECK(f2.valid()==false);
-    BOOST_CHECK_THROW(f2.get(), future_error);
-    BOOST_CHECK(f.valid()==true);
-    p.set_value(5);
-    BOOST_CHECK(f.get()==5);
-    BOOST_CHECK(f.valid()==true);
-    BOOST_CHECK(f.get()==5);
-    const_cast<int &>(f.get())=6;
-    BOOST_CHECK(f.get()==6);
-  }
-}
-#endif
 
 
 
