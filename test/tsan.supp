@@ -3,8 +3,3 @@ race:include/c++/*/bits/shared_ptr_base.h
 race:std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_add_ref_lock()
 race:std::string::_Rep::_M_refdata()
 
-# tsan consistently complains that I am reading bucket.count without synchronisation
-# after constructing a new set of buckets in rehash.
-# bucket.count has memory_order_relaxed semantics, it's a pure early out optimisation
-# speculately used to avoid an acquire lock. It adds about 7% to benchmarks.
-race:boost::spinlock::v1_std::concurrent_unordered_map<unsigned long, std::string, std::hash<unsigned long>, std::equal_to<unsigned long>, std::allocator<std::pair<unsigned long const, std::string> >, boost::spinlock::v1_std::default_concurrent_unordered_map_spinlock, false>::_rehash(unsigned long)

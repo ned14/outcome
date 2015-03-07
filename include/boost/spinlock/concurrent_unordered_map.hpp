@@ -479,7 +479,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       // local_iterator
       // const_local_iterator
       concurrent_unordered_map() : concurrent_unordered_map(0) { }
-      explicit concurrent_unordered_map(size_type n, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : _hasher(h), _key_equal(ke), _allocator(al), _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(new buckets_type(n>0 ? n : 13)), _oldbucketit(_oldbuckets.begin()) { _oldbuckets.fill(nullptr);}
+      explicit concurrent_unordered_map(size_type n, const hasher &h=hasher(), const key_equal &ke=key_equal(), const allocator_type &al=allocator_type()) : _hasher(h), _key_equal(ke), _allocator(al), _max_load_factor(_calc_max_load_factor()), _min_bucket_capacity(0), _buckets(nullptr), _oldbucketit(_oldbuckets.begin()) { _oldbuckets.fill(nullptr); _rehash((n>0) ? n : 13); }
       explicit concurrent_unordered_map(const allocator_type &al) : concurrent_unordered_map(0, hasher(), key_equal(), al) { }
       concurrent_unordered_map(size_type n, const allocator_type &al) : concurrent_unordered_map(n, hasher(), key_equal(), al) { }
       concurrent_unordered_map(size_type n, const hasher &h, const allocator_type &al) : concurrent_unordered_map(n, h, key_equal(), al) { }
@@ -769,7 +769,11 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           if(!unique_keys_assumed)
           {
             // First search for equivalents and empties.
+#if ! BOOST_SPINLOCK_IN_THREAD_SANITIZER  // no early outs for the sanitizer
             if(b.count.load(memory_order_relaxed))
+#else
+            if(true)
+#endif
             {
               size_t offset=0;
               BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(b.lock, 2)
@@ -939,7 +943,9 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           auto itb=_get_bucket(h);
           bucket_type &b=*itb;
           size_t offset=0;
+#if ! BOOST_SPINLOCK_IN_THREAD_SANITIZER  // no early outs for the sanitizer
           if(b.count.load(memory_order_relaxed))
+#endif
           {
             // If the lock is other state we need to reload bucket list
             if(!b.lock.lock(2))
@@ -1136,83 +1142,91 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         // Create a new buckets
         buckets_type *tempbuckets=new buckets_type(n);
         auto untempbuckets=undoer([&tempbuckets]{ delete tempbuckets; });
+        //printf("%p-%p\n", &tempbuckets->front(), &tempbuckets->back());
         // Lock all new buckets
         for(auto &b : *tempbuckets)
         {
-          b.lock.lock();
-          b.count.store(0, memory_order_relaxed); // Shut up thread sanitiser
+          //b.lock.lock();
+          //printf("%p\n", &b.lock);
+          b.lock.store(1);  // Shut up thread sanitiser
+          b.count.store(0); // Shut up thread sanitiser
           if(_min_bucket_capacity)
             b.items.reserve(_min_bucket_capacity);
         }
+        // Force out all non-atomic writes by std::vector etc
+        atomic_thread_fence(memory_order_seq_cst);
         // Swap old buckets with new buckets
-        tempbuckets=_buckets.exchange(tempbuckets, memory_order_acq_rel);
-        // Tell all threads using old buckets to start reloading the bucket list
-        for(auto &b : *tempbuckets)
-          b.lock.store(2);
-        // If it's a simple buckets cycle, simply move over all items as it's noexcept
-        if(_buckets.load(memory_order_relaxed)->size()==tempbuckets->size())
+        tempbuckets=_buckets.exchange(tempbuckets, memory_order_seq_cst);
+        if(tempbuckets)
         {
-          // Simply move the old buckets into new buckets as-is
-          for(auto obit=tempbuckets->begin(), bit=_buckets.load(memory_order_consume)->begin(); obit!=tempbuckets->end(); ++obit, ++bit)
+          // Tell all threads using old buckets to start reloading the bucket list
+          for(auto &b : *tempbuckets)
+            b.lock.store(2);
+          // If it's a simple buckets cycle, simply move over all items as it's noexcept
+          if(_buckets.load(memory_order_relaxed)->size()==tempbuckets->size())
           {
-            auto &ob=*obit;
-            auto &b=*bit;
-            if(ob.count.load(memory_order_relaxed))
+            // Simply move the old buckets into new buckets as-is
+            for(auto obit=tempbuckets->begin(), bit=_buckets.load(memory_order_consume)->begin(); obit!=tempbuckets->end(); ++obit, ++bit)
             {
-              b.items=std::move(ob.items);
-              b.count.store(ob.count.load(memory_order_consume), memory_order_release);
-              ob.count.store(0, memory_order_release);
-            }
-          }
-        }
-        else
-        {
-          try
-          {
-            // Relocate all old bucket contents into new buckets
-            for(const auto &ob : *tempbuckets)
-            {
+              auto &ob=*obit;
+              auto &b=*bit;
               if(ob.count.load(memory_order_relaxed))
               {
-                for(auto &i : ob.items)
+                b.items=std::move(ob.items);
+                b.count.store(ob.count.load(memory_order_consume), memory_order_release);
+                ob.count.store(0, memory_order_release);
+              }
+            }
+          }
+          else
+          {
+            try
+            {
+              // Relocate all old bucket contents into new buckets
+              for(const auto &ob : *tempbuckets)
+              {
+                if(ob.count.load(memory_order_relaxed))
                 {
-                  if(i.p)
+                  for(auto &i : ob.items)
                   {
-                    auto itb=_get_bucket(i.hash);
-                    bucket_type &b=*itb;
-                    if(b.items.size()==b.items.capacity())
+                    if(i.p)
                     {
-                      size_t newcapacity=b.items.capacity()*2;
-                      b.items.reserve(newcapacity ? newcapacity : 1);
+                      auto itb=_get_bucket(i.hash);
+                      bucket_type &b=*itb;
+                      if(b.items.size()==b.items.capacity())
+                      {
+                        size_t newcapacity=b.items.capacity()*2;
+                        b.items.reserve(newcapacity ? newcapacity : 1);
+                      }
+                      b.items.push_back(item_type(i.hash, i.p));
+                      b.count.fetch_add(1, memory_order_relaxed);
                     }
-                    b.items.push_back(item_type(i.hash, i.p));
-                    b.count.fetch_add(1, memory_order_relaxed);
                   }
                 }
               }
             }
+            catch(...)
+            {
+              // If we saw an exception during relocation, simply restore
+              // the old list which is untouched.
+              tempbuckets=_buckets.exchange(tempbuckets, memory_order_acq_rel);
+              // Stop it deleting stuff
+              _reset_buckets(*tempbuckets);
+              // Unlock buckets
+              for(auto &b : *_buckets)
+                b.lock.unlock();
+              throw;
+            }
           }
-          catch(...)
-          {
-            // If we saw an exception during relocation, simply restore
-            // the old list which is untouched.
-            tempbuckets=_buckets.exchange(tempbuckets, memory_order_acq_rel);
-            // Stop it deleting stuff
-            _reset_buckets(*tempbuckets);
-            // Unlock buckets
-            for(auto &b : *_buckets)
-              b.lock.unlock();
-            throw;
-          }
+          // Stop old buckets deleting stuff
+          _reset_buckets(*tempbuckets);
+          // Hold onto old buckets for a while
+          typename old_buckets_type::iterator myoldbucket=_oldbucketit++;
+          if(_oldbucketit==_oldbuckets.end()) _oldbucketit=_oldbuckets.begin();
+          delete *myoldbucket;
+          *myoldbucket=tempbuckets;
+          tempbuckets=nullptr;
         }
-        // Stop old buckets deleting stuff
-        _reset_buckets(*tempbuckets);
-        // Hold onto old buckets for a while
-        typename old_buckets_type::iterator myoldbucket=_oldbucketit++;
-        if(_oldbucketit==_oldbuckets.end()) _oldbucketit=_oldbuckets.begin();
-        delete *myoldbucket;
-        *myoldbucket=tempbuckets;
-        tempbuckets=nullptr;
         untempbuckets.dismissed=true;
         // Unlock buckets
         for(auto &b : *_buckets)

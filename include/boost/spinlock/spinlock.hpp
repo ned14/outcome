@@ -101,6 +101,18 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 # define BOOST_SPINLOCK_RELAXED_CONSTEXPR
 #endif
 
+#ifndef BOOST_SPINLOCK_IN_THREAD_SANITIZER
+# if defined(__has_feature)
+#  if __has_feature(thread_sanitizer)
+#   define BOOST_SPINLOCK_IN_THREAD_SANITIZER 1
+#  endif
+# elif defined(__SANITIZE_ADDRESS__)
+#  define BOOST_SPINLOCK_IN_THREAD_SANITIZER 1
+# endif
+#endif
+#ifndef BOOST_SPINLOCK_IN_THREAD_SANITIZER
+# define BOOST_SPINLOCK_IN_THREAD_SANITIZER 0
+#endif
 
 #ifndef BOOST_SPINLOCK_V1_STL11_IMPL
 #define BOOST_SPINLOCK_V1_STL11_IMPL std
@@ -200,6 +212,8 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 #endif
         BOOST_SPINLOCK_ANNOTATE_RWLOCK_DESTROY(this);
       }
+      spinlockbase &operator=(const spinlockbase &) = delete;
+      spinlockbase &operator=(spinlockbase &&) = delete;
       //! Returns the raw atomic
       BOOST_SPINLOCK_CONSTEXPR T load(memory_order o=memory_order_seq_cst) const BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
       //! Sets the raw atomic
@@ -207,6 +221,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       //! If atomic is zero, sets to 1 and returns true, else false.
       bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
+#if ! BOOST_SPINLOCK_IN_THREAD_SANITIZER  // no early outs for the sanitizer
 #ifdef BOOST_SPINLOCK_USE_VOLATILE_READ_FOR_AVOIDING_CMPXCHG
         // MSVC's atomics always seq_cst, so use volatile read to create a true acquire
         volatile T *_v=(volatile T *) &v;
@@ -215,6 +230,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 #else
         if(v.load(memory_order_relaxed)) // Avoid unnecessary cache line invalidation traffic
           return false;
+#endif
 #endif
 #if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
         // Intel is a lot quicker if you use XCHG instead of CMPXCHG. ARM is definitely not!
@@ -242,6 +258,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       bool try_lock(T &expected) BOOST_NOEXCEPT_OR_NOTHROW
       {
         T t(0);
+#if ! BOOST_SPINLOCK_IN_THREAD_SANITIZER  // no early outs for the sanitizer
 #ifdef BOOST_SPINLOCK_USE_VOLATILE_READ_FOR_AVOIDING_CMPXCHG
         // MSVC's atomics always seq_cst, so use volatile read to create a true acquire
         volatile T *_v = (volatile T *)&v;
@@ -253,6 +270,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           expected=t;
           return false;
         }
+#endif
         bool ret=v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_relaxed);
         if(ret)
         {
@@ -282,6 +300,8 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       {
         v.store(o.v.exchange(nullptr, memory_order_acq_rel), memory_order_release);
       }
+      spinlockbase &operator=(const spinlockbase &) = delete;
+      spinlockbase &operator=(spinlockbase &&) = delete;
       //! Returns the memory pointer part of the atomic
       T *get() BOOST_NOEXCEPT_OR_NOTHROW { return v.get(); }
       T *operator->() BOOST_NOEXCEPT_OR_NOTHROW { return get(); }
