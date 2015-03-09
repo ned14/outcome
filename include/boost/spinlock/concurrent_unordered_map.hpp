@@ -379,7 +379,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       {
         //k ^= k + 0x9e3779b9 + (k<<6) + (k>>2); // really need to avoid sequential keys tapping the same cache line
         //k ^= k + 0x9e3779b9; // really need to avoid sequential keys tapping the same cache line
-        buckets_type &buckets=*_buckets.load(memory_order_consume);
+        buckets_type &buckets=*_buckets.load(memory_order_acquire);
         BOOST_SPINLOCK_ANNOTATE_IGNORE_READS_BEGIN(); // doesn't realise that buckets never changes, so lack of lock between write and read not important
         size_type i=k % buckets.size();
         typename buckets_type::iterator ret=buckets.begin()+i;
@@ -511,6 +511,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           b.count.store(0, memory_order_release);
         }
         buckets.clear();
+        atomic_thread_fence(memory_order_release);
         delete _buckets.exchange(nullptr, memory_order_acq_rel);
         for(auto &i : _oldbuckets)
         {
@@ -846,6 +847,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           ret.second=true;
           b.items.push_back(item_type(h, std::move(v)));
           b.count.fetch_add(1, memory_order_relaxed);
+          atomic_thread_fence(memory_order_release);
           return true;
         });
       }
@@ -926,6 +928,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
               // Shrink table to minimum
               while(!items.empty() && !items.back().p)
                 items.pop_back(); // Will abort all concurrency
+              atomic_thread_fence(memory_order_release);
             }
             b.count.fetch_sub(1, memory_order_relaxed);
           }
@@ -968,6 +971,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
                     // Shrink table to minimum
                     while(!items.empty() && !items.back().p)
                       items.pop_back(); // Will abort all concurrency
+                    atomic_thread_fence(memory_order_release);
                   }
                   b.count.fetch_sub(1, memory_order_relaxed);
                   done=true;
@@ -1033,6 +1037,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
             b.items.clear();
             b.count.store(0, memory_order_relaxed);
           }
+          atomic_thread_fence(memory_order_release);
         } while(!done);
       }
       void swap(concurrent_unordered_map &o) BOOST_NOEXCEPT
@@ -1092,6 +1097,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
               while(!items.empty() && !items.back().p)
                 items.pop_back(); // Will abort all concurrency
             }
+            atomic_thread_fence(memory_order_release);
           }
         } while(!done);
       }
@@ -1131,10 +1137,12 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         {
           for(auto &i : b.items)
             i.p=nullptr;
+          //printf("reset_buckets=%p-%p\n", &b.items.front(), &b.items.back());
           b.items.clear();
           b.items.shrink_to_fit();
           b.count.store(0, memory_order_relaxed);
         }
+        atomic_thread_fence(memory_order_release);
       }
       // buckets must be locked on entry!
       void _rehash(size_type n)
@@ -1142,21 +1150,21 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         // Create a new buckets
         buckets_type *tempbuckets=new buckets_type(n);
         auto untempbuckets=undoer([&tempbuckets]{ delete tempbuckets; });
-        //printf("%p-%p\n", &tempbuckets->front(), &tempbuckets->back());
+        //printf("tempbuckets=%p-%p\n", &tempbuckets->front(), &tempbuckets->back());
         // Lock all new buckets
         for(auto &b : *tempbuckets)
         {
           //b.lock.lock();
           //printf("%p\n", &b.lock);
-          b.lock.store(1);  // Shut up thread sanitiser
-          b.count.store(0); // Shut up thread sanitiser
+          b.lock.store(1, memory_order_relaxed);  // Shut up thread sanitiser
+          b.count.store(0, memory_order_relaxed); // Shut up thread sanitiser
           if(_min_bucket_capacity)
             b.items.reserve(_min_bucket_capacity);
         }
         // Force out all non-atomic writes by std::vector etc
-        atomic_thread_fence(memory_order_seq_cst);
+        atomic_thread_fence(memory_order_release);
         // Swap old buckets with new buckets
-        tempbuckets=_buckets.exchange(tempbuckets, memory_order_seq_cst);
+        tempbuckets=_buckets.exchange(tempbuckets, memory_order_acq_rel);
         if(tempbuckets)
         {
           // Tell all threads using old buckets to start reloading the bucket list
@@ -1200,6 +1208,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
                       }
                       b.items.push_back(item_type(i.hash, i.p));
                       b.count.fetch_add(1, memory_order_relaxed);
+                      // atomic fence done in _reset_buckets
                     }
                   }
                 }
