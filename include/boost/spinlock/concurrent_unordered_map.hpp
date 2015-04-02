@@ -1,6 +1,6 @@
 /* concurrent_unordered_map.hpp
 Provides a superior concurrent_unordered_map
-(C) 2013-2014 Niall Douglas http://www.nedprod.com/
+(C) 2013-2015 Niall Douglas http://www.nedprod.com/
 File Created: Sept 2013
 
 
@@ -1144,11 +1144,25 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         }
         atomic_thread_fence(memory_order_release);
       }
-      // buckets must be locked on entry!
+      // buckets must be locked on entry! They are always unlocked on exit.
       void _rehash(size_type n)
       {
         // Create a new buckets
-        buckets_type *tempbuckets=new buckets_type(n);
+        buckets_type *tempbuckets=nullptr;
+        try
+        {
+          tempbuckets=new buckets_type(n);
+        }
+        catch(...)
+        {
+          if(_buckets.load())
+          {
+            // Unlock buckets
+            for(auto &b : *_buckets)
+              b.lock.unlock();
+          }
+          throw;
+        }
         auto untempbuckets=undoer([&tempbuckets]{ delete tempbuckets; });
         //printf("tempbuckets=%p-%p\n", &tempbuckets->front(), &tempbuckets->back());
         // Lock all new buckets
@@ -1171,7 +1185,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           for(auto &b : *tempbuckets)
             b.lock.store(2);
           // If it's a simple buckets cycle, simply move over all items as it's noexcept
-          if(_buckets.load(memory_order_relaxed)->size()==tempbuckets->size())
+          if(std::is_nothrow_move_assignable<decltype(tempbuckets->front().items)>::value && _buckets.load(memory_order_relaxed)->size()==tempbuckets->size())
           {
             // Simply move the old buckets into new buckets as-is
             for(auto obit=tempbuckets->begin(), bit=_buckets.load(memory_order_consume)->begin(); obit!=tempbuckets->end(); ++obit, ++bit)
@@ -1232,7 +1246,15 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
           // Hold onto old buckets for a while
           typename old_buckets_type::iterator myoldbucket=_oldbucketit++;
           if(_oldbucketit==_oldbuckets.end()) _oldbucketit=_oldbuckets.begin();
-          delete *myoldbucket;
+          try
+          {
+            delete *myoldbucket;
+          }
+          catch(...)
+          {
+            // should never happen as old buckets are always empty
+            abort();
+          }
           *myoldbucket=tempbuckets;
           tempbuckets=nullptr;
         }
