@@ -72,7 +72,7 @@ namespace detail
     {
       static_assert(std::is_move_constructible<R>::value, "Type must be move constructible to be used in a lightweight future-promise pair");
     }
-    value_storage(value_storage &&o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value) : type(o.type)
+    constexpr value_storage(value_storage &&o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value) : type(o.type)
     {
       switch(type)
       {
@@ -94,7 +94,7 @@ namespace detail
       }      
       o.type=storage_type::empty;
     }
-    value_storage &operator=(value_storage &&o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value)
+    constexpr value_storage &operator=(value_storage &&o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value)
     {
       // TODO FIXME: Only safe if both of these are noexcept
       this->~value_storage();
@@ -102,14 +102,14 @@ namespace detail
       return *this;
     }
     // Called by future to take ownership of storage
-    explicit value_storage(value_storage &&o, future<R> *f) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value) : value_storage(std::move(o))
+    explicit constexpr value_storage(value_storage &&o, future<R> *f) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value) : value_storage(std::move(o))
     {
       o.reset();
       o.future_=f;
       o.type=storage_type::future;
     }
     ~value_storage() noexcept(std::is_nothrow_destructible<R>::value && std::is_nothrow_destructible<exception_ptr>::value && std::is_nothrow_destructible<error_code>::value) { reset(); }
-    void swap(storage_type &o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value)
+    constexpr void swap(storage_type &o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value)
     {
       switch(type)
       {
@@ -129,7 +129,7 @@ namespace detail
           break;
       }      
     }
-    void reset() noexcept(std::is_nothrow_destructible<R>::value && std::is_nothrow_destructible<exception_ptr>::value && std::is_nothrow_destructible<error_code>::value)
+    constexpr void reset() noexcept(std::is_nothrow_destructible<R>::value && std::is_nothrow_destructible<exception_ptr>::value && std::is_nothrow_destructible<error_code>::value)
     {
       switch(type)
       {
@@ -182,9 +182,15 @@ namespace detail
     future<R>  *_f;
     lock_guard(const lock_guard &)=delete;
     lock_guard(lock_guard &&)=delete;
-    lock_guard(promise<R> *p) : _p(nullptr), _f(nullptr)
+    constexpr lock_guard(promise<R> *p) : _p(nullptr), _f(nullptr)
     {
-      for(;;)
+      if(!p->_need_locks)
+      {
+        _p=p;
+        if(p->_storage.type==value_storage<R>::storage_type::future)
+          _f=p->_storage.future_;
+      }
+      else for(;;)
       {
         p->_lock.lock();
         if(p->_storage.type==value_storage<R>::storage_type::future)
@@ -204,7 +210,7 @@ namespace detail
         p->_lock.unlock();
       }
     }
-    lock_guard(future<R> *f) : _p(nullptr), _f(nullptr)
+    constexpr lock_guard(future<R> *f) : _p(nullptr), _f(nullptr)
     {
       for(;;)
       {
@@ -230,17 +236,24 @@ namespace detail
     {
       unlock();
     }
-    void unlock()
+    constexpr void unlock()
     {
+      if(_p)
+      {
+        if(_p->_need_locks)
+          _p->_lock.unlock();
+        else
+        {
+          _p=nullptr;
+          _f=nullptr;
+          return;
+        }
+        _p=nullptr;
+      }
       if(_f)
       {
         _f->_lock.unlock();
         _f=nullptr;
-      }
-      if(_p)
-      {
-        _p->_lock.unlock();
-        _p=nullptr;
       }
     }
   };
@@ -255,21 +268,22 @@ public:
   typedef exception_ptr exception_type;
   typedef error_code error_type;
 private:
+  bool _need_locks;  // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
   spinlock<bool> _lock;
   typedef detail::value_storage<value_type> value_storage_type;
   value_storage_type _storage;
 public:
   //! \brief EXTENSION: constexpr capable constructor
-  constexpr promise() { }
+  constexpr promise() : _need_locks(false) { }
   // template<class Allocator> promise(allocator_arg_t, Allocator a); // cannot support
-  promise(promise &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value)
+  constexpr promise(promise &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _need_locks(o._need_locks)
   {
     detail::lock_guard<value_type> h(&o);
     _storage=std::move(o._storage);
     if(h._f)
       h._f->_promise=this;
   }
-  promise &operator=(promise &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value)
+  constexpr promise &operator=(promise &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value)
   {
     // TODO FIXME: Only safe if both of these are noexcept
     this->~promise();
