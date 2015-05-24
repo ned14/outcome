@@ -73,7 +73,7 @@ namespace detail
     {
       static_assert(std::is_move_constructible<R>::value, "Type must be move constructible to be used in a lightweight future-promise pair");
     }
-    BOOST_CONSTEXPR value_storage(value_storage &&o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value) : type(o.type)
+    BOOST_CXX14_CONSTEXPR value_storage(value_storage &&o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value) : type(o.type)
     {
       switch(type)
       {
@@ -280,7 +280,7 @@ public:
   //! \brief EXTENSION: constexpr capable constructor
   BOOST_CONSTEXPR promise() : _need_locks(false) { }
   // template<class Allocator> promise(allocator_arg_t, Allocator a); // cannot support
-  BOOST_CONSTEXPR promise(promise &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _need_locks(o._need_locks)
+  BOOST_CXX14_CONSTEXPR promise(promise &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _need_locks(o._need_locks)
   {
     detail::lock_guard<value_type> h(&o);
     _storage=std::move(o._storage);
@@ -405,7 +405,7 @@ protected:
   future(promise_type *p) : _storage(std::move(p->_storage), this), _promise(p) { new (&_lock()) spinlock<bool>(); }
 public:
   //! \brief EXTENSION: constexpr capable constructor
-  BOOST_CONSTEXPR future() : _promise(nullptr) { new (&_lock()) spinlock<bool>(); }
+  BOOST_CXX14_CONSTEXPR future() : _promise(nullptr) { new (&_lock()) spinlock<bool>(); }
   future(future &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value)
   {
     new (&_lock()) spinlock<bool>();
