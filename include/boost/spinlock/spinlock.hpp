@@ -101,6 +101,16 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 # define BOOST_SPINLOCK_RELAXED_CONSTEXPR
 #endif
 
+#if !defined BOOST_SPINLOCK_NOINLINE
+# ifdef _MSC_VER
+#  define BOOST_SPINLOCK_NOINLINE __declspec(noinline)
+# elif defined __GNUC__
+#  define BOOST_SPINLOCK_NOINLINE __attribute__((noinline))
+# else
+#  define BOOST_SPINLOCK_NOINLINE
+# endif
+#endif
+
 #ifndef BOOST_SPINLOCK_IN_THREAD_SANITIZER
 # if defined(__has_feature)
 #  if __has_feature(thread_sanitizer)
@@ -285,7 +295,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         BOOST_SPINLOCK_ANNOTATE_RWLOCK_RELEASED(this, true);
         v.store(0, memory_order_release);
       }
-      BOOST_SPINLOCK_CONSTEXPR bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
+      BOOST_SPINLOCK_RELAXED_CONSTEXPR bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
     };
     template<typename T> struct spinlockbase<lockable_ptr<T>>
     {
@@ -355,7 +365,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         value.n&=~(size_t)1;
         v.store(value.v, memory_order_release);
       }
-      BOOST_SPINLOCK_CONSTEXPR bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
+      BOOST_SPINLOCK_RELAXED_CONSTEXPR bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
     };
     namespace detail
     {
@@ -378,7 +388,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         BOOST_SPINLOCK_CONSTEXPR policy() {}
         policy(const policy &) = delete;
         BOOST_SPINLOCK_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-        BOOST_SPINLOCK_CONSTEXPR inline bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
+        BOOST_SPINLOCK_RELAXED_CONSTEXPR inline bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
         {
           if(parenttype::int_yield(n)) return true;
           if(n>=spins) return false;
@@ -396,7 +406,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         BOOST_SPINLOCK_CONSTEXPR policy() {}
         policy(const policy &) = delete;
         BOOST_SPINLOCK_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-        BOOST_SPINLOCK_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
+        BOOST_SPINLOCK_RELAXED_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
         {
           if(parenttype::int_yield(n)) return true;
           if(n>=spins) return false;
@@ -413,7 +423,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         BOOST_SPINLOCK_CONSTEXPR policy() {}
         policy(const policy &) = delete;
         BOOST_SPINLOCK_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-        BOOST_SPINLOCK_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
+        BOOST_SPINLOCK_RELAXED_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
         {
           if(parenttype::int_yield(n)) return true;
           this_thread::sleep_for(chrono::milliseconds(1));

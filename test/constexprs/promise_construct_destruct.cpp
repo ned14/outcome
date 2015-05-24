@@ -1,11 +1,11 @@
 #include "../../include/boost/spinlock/future.hpp"
 
-__attribute((noinline)) void test1()
+BOOST_SPINLOCK_NOINLINE void test1()
 {
   using namespace boost::spinlock::lightweight_futures;
   promise<int> p;  
 }
-__attribute((noinline)) void test2()
+BOOST_SPINLOCK_NOINLINE void test2()
 {
 }
 
