@@ -52,6 +52,15 @@ namespace detail
 {
   template<typename R> struct value_storage
   {
+#if 1 //ndef _MSC_VER
+    union
+    {
+      R value;
+      exception_ptr exception;
+      error_code error;
+      future<R> *future_;
+    };
+#else
     // Sadly unrestricted unions here did not work well on MSVC, so do it by hand.
     char _buffer[sizeof(R)>sizeof(error_code) ? sizeof(R) : sizeof(error_code)];
     
@@ -59,6 +68,11 @@ namespace detail
     exception_ptr &exception() { static_assert(sizeof(exception_ptr)<=sizeof(_buffer), "exception_ptr too big"); return *(exception_ptr *)_buffer; }
     error_code &error() { return *(error_code *)_buffer; }
     future<R> *&future_() { return *(future<R> **)_buffer; }
+#define value value()
+#define exception exception()
+#define error error()
+#define future_ future_()
+#endif
     
     enum class storage_type
     {
@@ -80,17 +94,17 @@ namespace detail
         case storage_type::empty:
           break;
         case storage_type::value:
-          new (&value()) R(std::move(o.value()));
+          new (&value) R(std::move(o.value));
           break;
         case storage_type::exception:
-          new (&exception()) exception_ptr(std::move(o.exception()));
+          new (&exception) exception_ptr(std::move(o.exception));
           break;
         case storage_type::error:
-          new (&error()) error_code(std::move(o.error()));
+          new (&error) error_code(std::move(o.error));
           break;
         case storage_type::future:
-          future_()=o.future_();
-          o.future_()=nullptr;
+          future_=o.future_;
+          o.future_=nullptr;
           break;
       }      
       o.type=storage_type::empty;
@@ -106,7 +120,7 @@ namespace detail
     explicit value_storage(value_storage &&o, future<R> *f) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value) : value_storage(std::move(o))
     {
       o.reset();
-      o.future_()=f;
+      o.future_=f;
       o.type=storage_type::future;
     }
     ~value_storage() noexcept(std::is_nothrow_destructible<R>::value && std::is_nothrow_destructible<exception_ptr>::value && std::is_nothrow_destructible<error_code>::value) { reset(); }
@@ -117,16 +131,16 @@ namespace detail
         case storage_type::empty:
           break;
         case storage_type::value:
-          std::swap(value(), o.value());
+          std::swap(value, o.value);
           break;
         case storage_type::exception:
-          std::swap(exception(), o.exception());
+          std::swap(exception, o.exception);
           break;
         case storage_type::error:
-          std::swap(error(), o.error());
+          std::swap(error, o.error);
           break;
         case storage_type::future:
-          std::swap(future_(), o.future_());
+          std::swap(future_, o.future_);
           break;
       }      
     }
@@ -137,19 +151,19 @@ namespace detail
         case storage_type::empty:
           break;
         case storage_type::value:
-          value().~R();
+          value.~R();
           type=storage_type::empty;
           break;
         case storage_type::exception:
-          exception().~exception_ptr();
+          exception.~exception_ptr();
           type=storage_type::empty;
           break;
         case storage_type::error:
-          error().~error_code();
+          error.~error_code();
           type=storage_type::empty;
           break;
         case storage_type::future:
-          future_()=nullptr;
+          future_=nullptr;
           type=storage_type::empty;
           break;
       }
@@ -158,21 +172,21 @@ namespace detail
     {
       if(type!=storage_type::empty)
         throw future_error(future_errc::promise_already_satisfied);
-      new (&value()) R(std::forward<U>(v));
+      new (&value) R(std::forward<U>(v));
       type=storage_type::value;
     }
     void set_exception(exception_ptr e)
     {
       if(type!=storage_type::empty)
         throw future_error(future_errc::promise_already_satisfied);
-      new (&exception()) exception_ptr(std::move(e));
+      new (&exception) exception_ptr(std::move(e));
       type=storage_type::exception;
     }
     void set_error(error_code e)
     {
       if(type!=storage_type::empty)
         throw future_error(future_errc::promise_already_satisfied);
-      new (&error()) error_code(std::move(e));
+      new (&error) error_code(std::move(e));
       type=storage_type::error;
     }
   };
@@ -190,7 +204,7 @@ namespace detail
       {
         _p=p;
         if(p->_storage.type==value_storage<R>::storage_type::future)
-          _f=p->_storage.future_();
+          _f=p->_storage.future_;
         return;
       }
       else for(;;)
@@ -198,10 +212,10 @@ namespace detail
         p->_lock().lock();
         if(p->_storage.type==value_storage<R>::storage_type::future)
         {
-          if(p->_storage.future_()->_lock().try_lock())
+          if(p->_storage.future_->_lock().try_lock())
           {
             _p=p;
-            _f=p->_storage.future_();
+            _f=p->_storage.future_;
             break;
           }
         }
@@ -426,7 +440,7 @@ public:
       _promise=o._promise;
       o._promise=nullptr;
       if(h._p)
-        h._p->_storage.future_()=this;
+        h._p->_storage.future_=this;
     }
   }
   future &operator=(future &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value)
@@ -452,9 +466,9 @@ public:
     detail::lock_guard<value_type> h1(this), h2(&o);
     _storage.swap(o._storage);
     if(h1._p)
-      h1._p->_storage.future_()=&o;
+      h1._p->_storage.future_=&o;
     if(h2._p)
-      h2._p->_storage.future_()=this;
+      h2._p->_storage.future_=this;
   }
   
   // shared_future<value_type> share();  // TODO
@@ -465,9 +479,9 @@ public:
     detail::lock_guard<value_type> h(this);
     exception_ptr e;
     if(has_error())
-      e=make_exception_ptr(system_error(_storage.error()));
+      e=make_exception_ptr(system_error(_storage.error));
     if(has_exception())
-      e=_storage.exception();
+      e=_storage.exception;
     if(e)
     {
       _storage.reset();
@@ -477,7 +491,7 @@ public:
         h._f->_promise=nullptr;
       rethrow_exception(e);
     }
-    value_type ret(std::move(_storage.value()));
+    value_type ret(std::move(_storage.value));
     _storage.reset();
     if(h._p)
       h._p->_storage.reset();
@@ -491,9 +505,9 @@ public:
     detail::lock_guard<value_type> h(this);
     exception_ptr e;
     if(has_error())
-      e=make_exception_ptr(system_error(_storage.error()));
+      e=make_exception_ptr(system_error(_storage.error));
     if(has_exception())
-      e=_storage.exception();
+      e=_storage.exception;
     if(!e)
       return e;
     _storage.reset();
@@ -509,7 +523,7 @@ public:
     detail::lock_guard<value_type> h(this);
     error_code e;
     if(has_error())
-      e=std::move(_storage.error());
+      e=std::move(_storage.error);
     if(!e)
       return e;
     _storage.reset();
@@ -553,6 +567,13 @@ public:
   // template<class R, class P> future_status wait_for(const std::chrono::duration<R, P> &rel_time) const;  // TODO
   // template<class C, class D> future_status wait_until(const std::chrono::time_point<C, D> &abs_time) const;  // TODO
 };
+
+#ifdef _MSC_VER
+#undef value
+#undef exception
+#undef error
+#undef future_
+#endif
 
 }
 BOOST_SPINLOCK_V1_NAMESPACE_END
