@@ -266,17 +266,12 @@ namespace detail
       {
         if(_p->_need_locks)
           _p->_lock().unlock();
-        else
-        {
-          _p=nullptr;
-          _f=nullptr;
-          return;
-        }
         _p=nullptr;
       }
       if(_f)
       {
-        _f->_lock().unlock();
+        if(_f->_need_locks)
+          _f->_lock().unlock();
         _f=nullptr;
       }
     }
