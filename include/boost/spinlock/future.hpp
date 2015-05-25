@@ -189,8 +189,8 @@ namespace detail
       if(!p->_need_locks)
       {
         _p=p;
-//        if(p->_storage.type==value_storage<R>::storage_type::future)
-//          _f=p->_storage.future_();
+        if(p->_storage.type==value_storage<R>::storage_type::future)
+          _f=p->_storage.future_();
         return;
       }
       else for(;;)
@@ -215,7 +215,14 @@ namespace detail
     }
     lock_guard(future<R> *f) : _p(nullptr), _f(nullptr)
     {
-      for(;;)
+      // constexpr fold
+      if(!f->_need_locks)
+      {
+        _p=f->_promise;
+        _f=f;
+        return;
+      }
+      else for(;;)
       {
         f->_lock().lock();
         if(f->_promise)
@@ -271,17 +278,18 @@ public:
   typedef exception_ptr exception_type;
   typedef error_code error_type;
 private:
+  typedef detail::value_storage<value_type> value_storage_type;
+  value_storage_type _storage;
   bool _need_locks;  // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
   char _lock_buffer[sizeof(spinlock<bool>)];
   spinlock<bool> &_lock() { return *(spinlock<bool> *)_lock_buffer; }
-  typedef detail::value_storage<value_type> value_storage_type;
-  value_storage_type _storage;
 public:
   //! \brief EXTENSION: constexpr capable constructor
   BOOST_CONSTEXPR promise() : _need_locks(false) { }
   // template<class Allocator> promise(allocator_arg_t, Allocator a); // cannot support
   BOOST_CXX14_CONSTEXPR promise(promise &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _need_locks(o._need_locks)
   {
+    if(_need_locks) new (&_lock()) spinlock<bool>();
     detail::lock_guard<value_type> h(&o);
     _storage=std::move(o._storage);
     if(h._f)
@@ -321,7 +329,8 @@ public:
   
   future<value_type> get_future()
   {
-    if(!_need_locks)
+    // If no value stored yet, I need locks on from now on
+    if(!_need_locks && _storage.type==value_storage_type::storage_type::empty)
     {
       _need_locks=true;
       new (&_lock()) spinlock<bool>();
@@ -396,19 +405,20 @@ public:
   typedef error_code error_type;
   typedef promise<value_type> promise_type;
 private:
-  char _lock_buffer[sizeof(spinlock<bool>)];
-  spinlock<bool> &_lock() { return *(spinlock<bool> *)_lock_buffer; }
   typedef detail::value_storage<value_type> value_storage_type;
   value_storage_type _storage;
+  bool _need_locks;  // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
+  char _lock_buffer[sizeof(spinlock<bool>)];
+  spinlock<bool> &_lock() { return *(spinlock<bool> *)_lock_buffer; }
   promise_type *_promise;
 protected:
-  future(promise_type *p) : _storage(std::move(p->_storage), this), _promise(p) { new (&_lock()) spinlock<bool>(); }
+  future(promise_type *p) : _storage(std::move(p->_storage), this), _need_locks(p->_need_locks), _promise(p) { if(_need_locks) new (&_lock()) spinlock<bool>(); }
 public:
   //! \brief EXTENSION: constexpr capable constructor
-  BOOST_CXX14_CONSTEXPR future() : _promise(nullptr) { new (&_lock()) spinlock<bool>(); }
-  future(future &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value)
+  BOOST_CXX14_CONSTEXPR future() : _need_locks(false), _promise(nullptr) { }
+  future(future &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _need_locks(o._need_locks)
   {
-    new (&_lock()) spinlock<bool>();
+    if(_need_locks) new (&_lock()) spinlock<bool>();
     detail::lock_guard<value_type> h(&o);
     _storage=std::move(o._storage);
     _promise=std::move(o._promise);

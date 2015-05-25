@@ -3,7 +3,7 @@
 extern BOOST_SPINLOCK_NOINLINE void test1()
 {
   using namespace boost::spinlock::lightweight_futures;
-  promise<int> p;  
+  future<int> p;  
 }
 extern BOOST_SPINLOCK_NOINLINE void test2()
 {
