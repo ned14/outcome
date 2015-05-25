@@ -412,11 +412,11 @@ private:
   spinlock<bool> &_lock() { return *(spinlock<bool> *)_lock_buffer; }
   promise_type *_promise;
 protected:
-  future(promise_type *p) : _storage(std::move(p->_storage), this), _need_locks(p->_need_locks), _promise(p) { if(_need_locks) new (&_lock()) spinlock<bool>(); }
+  BOOST_CXX14_CONSTEXPR future(promise_type *p) : _storage(std::move(p->_storage), this), _need_locks(p->_need_locks), _promise(p) { if(_need_locks) new (&_lock()) spinlock<bool>(); }
 public:
   //! \brief EXTENSION: constexpr capable constructor
-  BOOST_CXX14_CONSTEXPR future() : _need_locks(false), _promise(nullptr) { }
-  future(future &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _need_locks(o._need_locks)
+  BOOST_CONSTEXPR future() : _need_locks(false), _promise(nullptr) { }
+  BOOST_CXX14_CONSTEXPR future(future &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _need_locks(o._need_locks)
   {
     if(_need_locks) new (&_lock()) spinlock<bool>();
     detail::lock_guard<value_type> h(&o);
