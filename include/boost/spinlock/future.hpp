@@ -50,6 +50,7 @@ using std::system_error;
 
 namespace detail
 {
+  template<typename R> struct lock_guard;
   template<typename R> struct value_storage
   {
     // Sadly unrestricted unions here did not work well on MSVC, so do it by hand.
@@ -94,6 +95,26 @@ namespace detail
           break;
       }      
       o.type=storage_type::empty;
+    }
+    // Intrusive move constructor for promise::storage
+    explicit BOOST_CXX14_CONSTEXPR value_storage(promise<R> *newp, promise<R> *oldp, value_storage &&o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value)
+    {
+      lock_guard<R> h(oldp);
+      // Invoke the move constructor above now we are locked
+      new(this) value_storage(std::move(o));
+      if(h._f)
+        h._f->_promise=newp;
+    }
+    // Intrusive move constructor for future::storage
+    explicit BOOST_CXX14_CONSTEXPR value_storage(future<R> *newf, future<R> *oldf, value_storage &&o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value)
+    {
+      lock_guard<R> h(oldf);
+      // Invoke the move constructor above now we are locked
+      new(this) value_storage(std::move(o));
+      newf->_promise=oldf->_promise;
+      oldf->_promise=nullptr;
+      if(h._p)
+        h._p->_storage.future_()=newf;
     }
     value_storage &operator=(value_storage &&o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value)
     {
@@ -273,6 +294,7 @@ template<typename R> class promise
 {
   friend class future<R>;
   friend struct detail::lock_guard<R>;
+  friend struct detail::value_storage<R>;
 public:
   typedef R value_type;
   typedef exception_ptr exception_type;
@@ -287,13 +309,9 @@ public:
   //! \brief EXTENSION: constexpr capable constructor
   BOOST_CONSTEXPR promise() : _need_locks(false) { }
   // template<class Allocator> promise(allocator_arg_t, Allocator a); // cannot support
-  BOOST_CXX14_CONSTEXPR promise(promise &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _need_locks(o._need_locks)
+  BOOST_CXX14_CONSTEXPR promise(promise &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _storage(this, &o, std::move(o._storage)), _need_locks(o._need_locks)
   {
     if(_need_locks) new (&_lock()) spinlock<bool>();
-    detail::lock_guard<value_type> h(&o);
-    _storage=std::move(o._storage);
-    if(h._f)
-      h._f->_promise=this;
   }
   promise &operator=(promise &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value)
   {
@@ -399,6 +417,7 @@ template<typename R> class future
 {
   friend class promise<R>;
   friend struct detail::lock_guard<R>;
+  friend struct detail::value_storage<R>;
 public:
   typedef R value_type;
   typedef exception_ptr exception_type;
@@ -416,15 +435,9 @@ protected:
 public:
   //! \brief EXTENSION: constexpr capable constructor
   BOOST_CONSTEXPR future() : _need_locks(false), _promise(nullptr) { }
-  BOOST_CXX14_CONSTEXPR future(future &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _need_locks(o._need_locks)
+  BOOST_CXX14_CONSTEXPR future(future &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _storage(this, &o, std::move(o._storage)), _need_locks(o._need_locks)
   {
     if(_need_locks) new (&_lock()) spinlock<bool>();
-    detail::lock_guard<value_type> h(&o);
-    _storage=std::move(o._storage);
-    _promise=std::move(o._promise);
-    o._promise=nullptr;
-    if(h._p)
-      h._p->_storage.future_()=this;
   }
   future &operator=(future &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value)
   {
