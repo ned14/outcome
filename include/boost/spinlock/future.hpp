@@ -416,15 +416,18 @@ protected:
 public:
   //! \brief EXTENSION: constexpr capable constructor
   BOOST_CONSTEXPR future() : _need_locks(false), _promise(nullptr) { }
-  BOOST_CXX14_CONSTEXPR future(future &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _need_locks(o._need_locks)
+  BOOST_CXX14_CONSTEXPR future(future &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _need_locks(o._need_locks), _promise(nullptr)
   {
     if(_need_locks) new (&_lock()) spinlock<bool>();
     detail::lock_guard<value_type> h(&o);
     _storage=std::move(o._storage);
-    _promise=std::move(o._promise);
-    o._promise=nullptr;
-    if(h._p)
-      h._p->_storage.future_()=this;
+    if(o._promise)
+    {
+      _promise=o._promise;
+      o._promise=nullptr;
+      if(h._p)
+        h._p->_storage.future_()=this;
+    }
   }
   future &operator=(future &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value)
   {
