@@ -256,13 +256,13 @@ public:
   {
     if(!is_ready())
       throw future_error(future_errc::no_state);
-    exception_ptr e;
-    if(has_error())
-      e=make_exception_ptr(system_error(_storage.error));
-    if(has_exception())
-      e=_storage.exception;
-    if(e)
+    if(has_error() || has_exception())
     {
+      exception_ptr e;
+      if(has_error())
+        e=make_exception_ptr(system_error(_storage.error));
+      if(has_exception())
+        e=_storage.exception;
       if(is_consuming)
         _storage.reset();
       rethrow_exception(e);
@@ -287,11 +287,9 @@ public:
   {
     if(!is_ready())
       throw future_error(future_errc::no_state);
-    error_code e;
-    if(has_error())
-      e=std::move(_storage.error);
-    if(!e)
-      return e;
+    if(!has_error())
+      return error_type();
+    error_type e(std::move(_storage.error));
     if(is_consuming)
       _storage.reset();
     return e;
@@ -302,13 +300,13 @@ public:
   {
     if(!is_ready())
       throw future_error(future_errc::no_state);
-    exception_ptr e;
+    if(!has_error() && !has_exception())
+      return exception_type();
+    exception_type e;
     if(has_error())
       e=make_exception_ptr(system_error(_storage.error));
     if(has_exception())
       e=_storage.exception;
-    if(!e)
-      return e;
     if(is_consuming)
       _storage.reset();
     return e;
