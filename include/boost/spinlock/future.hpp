@@ -226,6 +226,7 @@ public:
   monad(const monad &)=default;
   monad &operator=(const monad &)=default;
   
+  BOOST_CONSTEXPR explicit operator bool() const noexcept { return has_value(); }
   BOOST_CONSTEXPR bool is_ready() const noexcept
   {
     return _storage.type!=value_storage_type::storage_type::empty;
@@ -252,7 +253,8 @@ public:
     _storage.reset();
   }
   
-  value_type get()
+  //value_type get() const &;  // TODO
+  value_type get() &&
   {
     if(!is_ready())
       throw future_error(future_errc::no_state);
@@ -294,6 +296,8 @@ public:
       _storage.reset();
     return e;
   }
+  // error_type get_error_or(const error_type &);  // TODO
+  // error_type get_error_or(error_type &&);  // TODO
   void set_error(const error_type &v) { _storage.reset(); _storage.set_error(v); }
   void set_error(error_type &&v) { _storage.reset(); _storage.set_error(v); }
   exception_type get_exception()
@@ -311,15 +315,32 @@ public:
       _storage.reset();
     return e;
   }
+  // exception_type get_exception_or(const exception_type &);  // TODO
+  // exception_type get_exception_or(exception_type &&);  // TODO
   void set_exception(const exception_type &v) { _storage.reset(); _storage.set_exception(v); }
   void set_exception(exception_type &&v) { _storage.reset(); _storage.set_exception(v); }
   template<typename E> void set_exception(E &&e)
   {
     set_exception(make_exception_ptr(std::forward<E>(e)));
   }
-      
-  // TODO Where F would return a future<future<...>>, we unwrap to a single future<R>
-  // template<class F> typename std::result_of<F(future)>::type then(F &&f);
+
+  //! \brief If I am a monad<monad<...>>, return monad<...>
+  // typename todo unwrap() const &;
+  // typename todo unwrap() &&;
+
+  //! \brief If I am a monad<monad<monad<monad<...>>>>, return monad<...>
+  // typename todo unwrap_all();
+  // typename todo unwrap_all() &&;
+
+  //! \brief Return monad(F(*this)).unwrap()
+  // TODO Only enable if F is of form F(monad<is_constructible<value_type>, c>)
+  // template<class F> typename std::result_of<F(monad<value_type>)>::type then(F &&f);
+  
+  //! \brief If bool(*this), return monad(F(*this)).unwrap(), else return monad<result_of<F(*this)>>(error).unwrap()
+  // template<class F> typename std::result_of<F(monad<value_type>)>::type bind(F &&f);
+  
+  //! \brief If bool(*this), return monad(F(*this)), else return monad<result_of<F(*this)>>(error)
+  // template<class F> typename std::result_of<F(monad<value_type>)>::type map(F &&f);
 };
 
 
@@ -536,6 +557,12 @@ public:
   // Not supported right now
   // void set_value_at_thread_exit(R v);
   // void set_exception_at_thread_exit(R v);
+
+  //! \brief Call F when the future signals, consuming the future. Only one of these may be set.
+  // template<class F> typename std::result_of<F(future<value_type>)>::type then(F &&f);
+
+  //! \brief Call F when the future signals, not consuming the future.
+  // template<class F> typename std::result_of<F(future<const value_type &>)>::type then(F &&f);
 };
 
 // TODO: promise<void>, promise<R&> specialisations
