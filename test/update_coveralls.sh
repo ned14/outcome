@@ -2,6 +2,7 @@
 # Adapted from https://github.com/purpleKarrot/Karrot/blob/develop/test/coveralls.in
 # which itself was adapted from https://github.com/berenm/cmake-extra/blob/master/coveralls-upload.in
 
+rm -rf coverage.json
 if [ "$1" = "" ]; then
   echo Your forgot the source directory parameter!
   exit 1
