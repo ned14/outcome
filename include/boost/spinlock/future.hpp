@@ -35,6 +35,17 @@ DEALINGS IN THE SOFTWARE.
 #include "spinlock.hpp"
 #include <future>
 
+// For some odd reason, VS2015 really hates to do much inlining unless forced
+#ifdef _MSC_VER
+# define BOOST_SPINLOCK_FUTURE_CONSTEXPR BOOST_SPINLOCK_FORCEINLINE
+# define BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR BOOST_SPINLOCK_FORCEINLINE
+# define BOOST_SPINLOCK_FUTURE_MSVC_HELP BOOST_SPINLOCK_FORCEINLINE
+#else
+# define BOOST_SPINLOCK_FUTURE_CONSTEXPR BOOST_CONSTEXPR
+# define BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR BOOST_CXX14_CONSTEXPR
+# define BOOST_SPINLOCK_FUTURE_MSVC_HELP 
+#endif
+
 BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 namespace lightweight_futures {
 
@@ -52,7 +63,10 @@ namespace detail
 {
   template<typename R> struct value_storage
   {
-#if 1 //ndef _MSC_VER
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4624)
+#endif
     union
     {
       R value;
@@ -60,20 +74,9 @@ namespace detail
       exception_ptr exception;
       future<R> *future_;
     };
-#else
-    // Sadly unrestricted unions here did not work well on MSVC, so do it by hand.
-    char _buffer[sizeof(R)>sizeof(error_code) ? sizeof(R) : sizeof(error_code)];
-    
-    R &value() { return *(R *)_buffer; }
-    exception_ptr &exception() { static_assert(sizeof(exception_ptr)<=sizeof(_buffer), "exception_ptr too big"); return *(exception_ptr *)_buffer; }
-    error_code &error() { return *(error_code *)_buffer; }
-    future<R> *&future_() { return *(future<R> **)_buffer; }
-#define value value()
-#define exception exception()
-#define error error()
-#define future_ future_()
+#ifdef _MSC_VER
+#pragma warning(pop)
 #endif
-    
     enum class storage_type
     {
       empty,
@@ -83,16 +86,16 @@ namespace detail
       future
     } type;
     
-    BOOST_CONSTEXPR value_storage() : type(storage_type::empty)
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage() : type(storage_type::empty)
     {
     }
-    BOOST_CONSTEXPR value_storage(const R &v) : value(v), type(storage_type::value) { }
-    BOOST_CONSTEXPR value_storage(const error_code &v) : error(v), type(storage_type::error) { }
-    BOOST_CONSTEXPR value_storage(const exception_ptr &v) : exception(v), type(storage_type::exception) { }
-    BOOST_CONSTEXPR value_storage(R &&v) : value(std::move(v)), type(storage_type::value) { }
-    BOOST_CONSTEXPR value_storage(error_code &&v) : error(std::move(v)), type(storage_type::error) { }
-    BOOST_CONSTEXPR value_storage(exception_ptr &&v) : exception(std::move(v)), type(storage_type::exception) { }
-    BOOST_CXX14_CONSTEXPR value_storage(value_storage &&o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value) : type(o.type)
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(const R &v) : value(v), type(storage_type::value) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(const error_code &v) : error(v), type(storage_type::error) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(const exception_ptr &v) : exception(v), type(storage_type::exception) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(R &&v) : value(std::move(v)), type(storage_type::value) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(error_code &&v) : error(std::move(v)), type(storage_type::error) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(exception_ptr &&v) : exception(std::move(v)), type(storage_type::exception) { }
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage(value_storage &&o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value) : type(o.type)
     {
       switch(type)
       {
@@ -114,15 +117,15 @@ namespace detail
       }      
       o.type=storage_type::empty;
     }
-    BOOST_CXX14_CONSTEXPR value_storage &operator=(value_storage &&o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage &operator=(value_storage &&o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value)
     {
       // TODO FIXME: Only safe if both of these are noexcept
       this->~value_storage();
       new (this) value_storage(std::move(o));
       return *this;
     }
-    ~value_storage() noexcept(std::is_nothrow_destructible<R>::value && std::is_nothrow_destructible<exception_ptr>::value && std::is_nothrow_destructible<error_code>::value) { reset(); }
-    BOOST_CXX14_CONSTEXPR void swap(storage_type &o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value)
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP ~value_storage() noexcept(std::is_nothrow_destructible<R>::value && std::is_nothrow_destructible<exception_ptr>::value && std::is_nothrow_destructible<error_code>::value) { reset(); }
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void swap(storage_type &o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value)
     {
       switch(type)
       {
@@ -142,7 +145,7 @@ namespace detail
           break;
       }      
     }
-    BOOST_CXX14_CONSTEXPR void reset() noexcept(std::is_nothrow_destructible<R>::value && std::is_nothrow_destructible<exception_ptr>::value && std::is_nothrow_destructible<error_code>::value)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void reset() noexcept(std::is_nothrow_destructible<R>::value && std::is_nothrow_destructible<exception_ptr>::value && std::is_nothrow_destructible<error_code>::value)
     {
       switch(type)
       {
@@ -166,7 +169,7 @@ namespace detail
           break;
       }
     }
-    template<class U> BOOST_CXX14_CONSTEXPR void set_value(U &&v)
+    template<class U> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_value(U &&v)
     {
       if(type!=storage_type::empty)
         throw future_error(future_errc::promise_already_satisfied);
@@ -188,7 +191,7 @@ namespace detail
       type=storage_type::error;
     }
     // Called by future to take ownership of storage from promise
-    BOOST_CXX14_CONSTEXPR void set_future(future<R> *f)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_future(future<R> *f)
     {
       // Always overwrites existing storage
       reset();
@@ -215,31 +218,31 @@ protected:
   monad(value_storage_type &&s) : _storage(std::move(s)) { }
 public:
   monad() = default;
-  BOOST_CONSTEXPR monad(const value_type &v) : _storage(v) { }
-  BOOST_CONSTEXPR monad(value_type &&v) : _storage(std::move(v)) { }
-  BOOST_CONSTEXPR monad(const error_type &v) : _storage(v) { }
-  BOOST_CONSTEXPR monad(error_type &&v) : _storage(std::move(v)) { }
-  BOOST_CONSTEXPR monad(const exception_type &v) : _storage(v) { }
-  BOOST_CONSTEXPR monad(exception_type &&v) : _storage(std::move(v)) { }
-  monad(monad &&) = default;
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const value_type &v) : _storage(v) { }
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(value_type &&v) : _storage(std::move(v)) { }
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const error_type &v) : _storage(v) { }
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(error_type &&v) : _storage(std::move(v)) { }
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const exception_type &v) : _storage(v) { }
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(exception_type &&v) : _storage(std::move(v)) { }
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(monad &&v) : _storage(std::move(v._storage)) { }
   monad &operator=(monad &&) = default;
-  monad(const monad &)=default;
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const monad &v) : _storage(v._storage) { }
   monad &operator=(const monad &)=default;
   
-  BOOST_CONSTEXPR explicit operator bool() const noexcept { return has_value(); }
-  BOOST_CONSTEXPR bool is_ready() const noexcept
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit operator bool() const noexcept { return has_value(); }
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR bool is_ready() const noexcept
   {
     return _storage.type!=value_storage_type::storage_type::empty;
   }
-  BOOST_CONSTEXPR bool has_exception() const noexcept
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_exception() const noexcept
   {
     return _storage.type==value_storage_type::storage_type::exception || _storage.type==value_storage_type::storage_type::error;
   }
-  BOOST_CONSTEXPR bool has_error() const noexcept
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_error() const noexcept
   {
     return _storage.type==value_storage_type::storage_type::error;
   }
-  BOOST_CONSTEXPR bool has_value() const noexcept
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_value() const noexcept
   {
     return _storage.type==value_storage_type::storage_type::value;
   }
@@ -254,7 +257,7 @@ public:
   }
   
   //value_type get() const &;  // TODO
-  value_type get() &&
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type get() &&
   {
     if(!is_ready())
       throw future_error(future_errc::no_state);
@@ -352,7 +355,7 @@ namespace detail
     future<R>  *_f;
     lock_guard(const lock_guard &)=delete;
     lock_guard(lock_guard &&)=delete;
-    lock_guard(promise<R> *p) : _p(nullptr), _f(nullptr)
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP lock_guard(promise<R> *p) : _p(nullptr), _f(nullptr)
     {
       // constexpr fold
       if(!p->_need_locks)
@@ -364,10 +367,10 @@ namespace detail
       }
       else for(;;)
       {
-        p->_lock().lock();
+        p->_lock.lock();
         if(p->_storage.type==value_storage<R>::storage_type::future)
         {
-          if(p->_storage.future_->_lock().try_lock())
+          if(p->_storage.future_->_lock.try_lock())
           {
             _p=p;
             _f=p->_storage.future_;
@@ -379,10 +382,10 @@ namespace detail
           _p=p;
           break;
         }
-        p->_lock().unlock();
+        p->_lock.unlock();
       }
     }
-    lock_guard(future<R> *f) : _p(nullptr), _f(nullptr)
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP lock_guard(future<R> *f) : _p(nullptr), _f(nullptr)
     {
       // constexpr fold
       if(!f->_need_locks)
@@ -393,10 +396,10 @@ namespace detail
       }
       else for(;;)
       {
-        f->_lock().lock();
+        f->_lock.lock();
         if(f->_promise)
         {
-          if(f->_promise->_lock().try_lock())
+          if(f->_promise->_lock.try_lock())
           {
             _p=f->_promise;
             _f=f;
@@ -408,10 +411,10 @@ namespace detail
           _f=f;
           break;
         }
-        f->_lock().unlock();
+        f->_lock.unlock();
       }
     }
-    ~lock_guard()
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP ~lock_guard()
     {
       unlock();
     }
@@ -420,13 +423,13 @@ namespace detail
       if(_p)
       {
         if(_p->_need_locks)
-          _p->_lock().unlock();
+          _p->_lock.unlock();
         _p=nullptr;
       }
       if(_f)
       {
         if(_f->_need_locks)
-          _f->_lock().unlock();
+          _f->_lock.unlock();
         _f=nullptr;
       }
     }
@@ -444,19 +447,25 @@ public:
 private:
   typedef detail::value_storage<value_type> value_storage_type;
   value_storage_type _storage;
-  bool _need_locks;  // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
-  char _lock_buffer[sizeof(spinlock<bool>)];
-  spinlock<bool> &_lock() { return *(spinlock<bool> *)_lock_buffer; }
+  bool _need_locks;                 // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4624)
+#endif
+  union { spinlock<bool> _lock; };  // Delay construction
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 public:
   //! \brief EXTENSION: constexpr capable constructor
-  BOOST_CONSTEXPR promise() : _need_locks(false)
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR promise() : _need_locks(false)
   {
     static_assert(std::is_move_constructible<value_type>::value, "Type must be move constructible to be used in a lightweight promise");    
   }
   // template<class Allocator> promise(allocator_arg_t, Allocator a); // cannot support
-  BOOST_CXX14_CONSTEXPR promise(promise &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _need_locks(o._need_locks)
+  BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR promise(promise &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _need_locks(o._need_locks)
   {
-    if(_need_locks) new (&_lock()) spinlock<bool>();
+    if(_need_locks) new (&_lock) spinlock<bool>();
     detail::lock_guard<value_type> h(&o);
     _storage=std::move(o._storage);
     if(h._f)
@@ -471,7 +480,7 @@ public:
   }
   promise(const promise &)=delete;
   promise &operator=(const promise &)=delete;
-  ~promise() noexcept(std::is_nothrow_destructible<value_storage_type>::value)
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP ~promise() noexcept(std::is_nothrow_destructible<value_storage_type>::value)
   {
     detail::lock_guard<value_type> h(this);
     if(h._f)
@@ -494,13 +503,13 @@ public:
       h2._f->_promise=this;
   }
   
-  future<value_type> get_future()
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP future<value_type> get_future()
   {
     // If no value stored yet, I need locks on from now on
     if(!_need_locks && _storage.type==value_storage_type::storage_type::empty)
     {
       _need_locks=true;
-      new (&_lock()) spinlock<bool>();
+      new (&_lock) spinlock<bool>();
     }
     detail::lock_guard<value_type> h(this);
     if(h._f)
@@ -516,7 +525,7 @@ public:
     return _storage.type==value_storage_type::storage_type::future;
   }
   
-  void set_value(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
   {
     detail::lock_guard<value_type> h(this);
     if(h._f)
@@ -524,7 +533,7 @@ public:
     else
       _storage.set_value(v);
   }
-  void set_value(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
   {
     detail::lock_guard<value_type> h(this);
     if(h._f)
@@ -585,26 +594,32 @@ public:
   BOOST_STATIC_CONSTEXPR bool is_consuming=monad_type::is_consuming;
   typedef promise<value_type> promise_type;
 private:
-  bool _need_locks;  // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
-  char _lock_buffer[sizeof(spinlock<bool>)];
-  spinlock<bool> &_lock() { return *(spinlock<bool> *)_lock_buffer; }
+  bool _need_locks;                 // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4624)
+#endif
+  union { spinlock<bool> _lock; };  // Delay construction
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
   promise_type *_promise;
 protected:
   // Called by promise::get_future(), so currently thread safe
-  BOOST_CXX14_CONSTEXPR future(promise_type *p) : monad_type(std::move(p->_storage)), _need_locks(p->_need_locks), _promise(p)
+  BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR future(promise_type *p) : monad_type(std::move(p->_storage)), _need_locks(p->_need_locks), _promise(p)
   {
-    if(_need_locks) new (&_lock()) spinlock<bool>();
+    if(_need_locks) new (&_lock) spinlock<bool>();
     p->_storage.set_future(this);
   }
 public:
   //! \brief EXTENSION: constexpr capable constructor
-  BOOST_CONSTEXPR future() : _need_locks(false), _promise(nullptr)
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR future() : _need_locks(false), _promise(nullptr)
   {
     static_assert(std::is_move_constructible<value_type>::value, "Type must be move constructible to be used in a lightweight future");    
   }
-  BOOST_CXX14_CONSTEXPR future(future &&o) noexcept(std::is_nothrow_move_constructible<monad_type>::value) : _need_locks(o._need_locks), _promise(nullptr)
+  BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR future(future &&o) noexcept(std::is_nothrow_move_constructible<monad_type>::value) : _need_locks(o._need_locks), _promise(nullptr)
   {
-    if(_need_locks) new (&_lock()) spinlock<bool>();
+    if(_need_locks) new (&_lock) spinlock<bool>();
     detail::lock_guard<value_type> h(&o);
     new(this) monad_type(std::move(o));
     if(o._promise)
@@ -624,7 +639,8 @@ public:
   }
   future(const future &)=delete;
   future &operator=(const future &)=delete;
-  ~future() noexcept(std::is_nothrow_destructible<monad_type>::value)
+  // MSVC needs the destructor force inlined to do the right thing for some reason
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP ~future() noexcept(std::is_nothrow_destructible<monad_type>::value)
   {
     detail::lock_guard<value_type> h(this);
     if(h._p)
@@ -645,11 +661,11 @@ public:
   
   // shared_future<value_type> share();  // TODO
   
-  value_type get()
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type get()
   {
     wait();
     detail::lock_guard<value_type> h(this);
-    value_type ret(monad_type::get());
+    value_type ret(static_cast<monad_type &&>(*this).get());
     if(h._p)
       h._p->_storage.reset();
     if(h._f)

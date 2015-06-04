@@ -1,10 +1,3 @@
-
-promise_future_reduce.o:     file format elf64-x86-64
-
-
-Disassembly of section .text:
-
-0000000000000000 <_Z5test1v>:
    0:	53                   	push   %rbx
    1:	48 83 ec 50          	sub    $0x50,%rsp
    5:	c7 44 24 40 00 00 00 	movl   $0x0,0x40(%rsp)
@@ -42,18 +35,3 @@ Disassembly of section .text:
   81:	66 66 66 66 66 66 2e 	data32 data32 data32 data32 data32 nopw %cs:0x0(%rax,%rax,1)
   88:	0f 1f 84 00 00 00 00 
   8f:	00 
-
-0000000000000090 <_Z5test2v>:
-  90:	c3                   	retq   
-  91:	66 66 66 66 66 66 2e 	data32 data32 data32 data32 data32 nopw %cs:0x0(%rax,%rax,1)
-  98:	0f 1f 84 00 00 00 00 
-  9f:	00 
-
-00000000000000a0 <main>:
-  a0:	50                   	push   %rax
-  a1:	e8 5a ff ff ff       	callq  0 <_Z5test1v>
-  a6:	83 f8 05             	cmp    $0x5,%eax
-  a9:	0f 95 c0             	setne  %al
-  ac:	0f b6 c0             	movzbl %al,%eax
-  af:	5a                   	pop    %rdx
-  b0:	c3                   	retq   
