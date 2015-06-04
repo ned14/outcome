@@ -450,6 +450,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
     };
     template<class T> inline bool is_lockable_locked(T &lockable) BOOST_NOEXCEPT_OR_NOTHROW;
     /*! \class spinlock
+    \brief A policy configurable spin lock meeting BasicLockable and Lockable.
     
     Meets the requirements of BasicLockable and Lockable. Also provides a get() and set() for the
     type used for the spin lock.

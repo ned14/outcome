@@ -202,62 +202,97 @@ namespace detail
 }
 
 /*! \brief class monad
-\brief Implements a monadic value transport
+\brief Implements a lightweight simple monadic value transport
+
+This monad can hold empty, a type R, an error_code or an exception_ptr.
+
+So long as you avoid the exception_ptr code paths, this implementation will be
+ideally reduced to as few assembler instructions as possible by most recent compilers [1]
+which can include exactly zero assembler instructions output. This monad is therefore
+identical in terms of runtime overhead to using the R type you specify directly.
+
+As soon as an exception_ptr \em could be created, you'll force out several thousand
+assembler instructions, of which only a very few will be actually executed (lots of
+branching as it jumps through the output though). This is because exception_ptr uses
+a shared_ptr internally, and a shared_ptr uses atomic increment and decrement which
+forces the compiler to affect memory as so specified.
+
+[1]: GCC 5.1 does a perfect job, VS2015 does a good job, clang 3.7 not so great.
 */
-template<typename R, bool _is_consuming> class monad
+template<typename R> class monad
 {
 public:
+  //! \brief The type potentially held by the monad
   typedef R value_type;
+  //! \brief The error code potentially held by the monad
   typedef error_code error_type;
+  //! \brief The exception ptr potentially held by the monad
   typedef exception_ptr exception_type;
-  BOOST_STATIC_CONSTEXPR bool is_consuming=_is_consuming;
 private:
   typedef detail::value_storage<value_type> value_storage_type;
   value_storage_type _storage;
 protected:
   monad(value_storage_type &&s) : _storage(std::move(s)) { }
 public:
+  //! \brief Default constructor, initialises to empty
   monad() = default;
+  //! \brief Implicit constructor from a value_type by copy
   BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const value_type &v) : _storage(v) { }
+  //! \brief Implicit constructor from a value_type by move
   BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(value_type &&v) : _storage(std::move(v)) { }
+  //! \brief Implicit constructor from a error_type by copy
   BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const error_type &v) : _storage(v) { }
+  //! \brief Implicit constructor from a error_type by move
   BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(error_type &&v) : _storage(std::move(v)) { }
+  //! \brief Implicit constructor from a exception_type by copy
   BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const exception_type &v) : _storage(v) { }
+  //! \brief Implicit constructor from a exception_type by move
   BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(exception_type &&v) : _storage(std::move(v)) { }
+  //! \brief Move constructor
   BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(monad &&v) : _storage(std::move(v._storage)) { }
+  //! \brief Move assignment
   monad &operator=(monad &&) = default;
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const monad &v) : _storage(v._storage) { }
+  //! \brief Copy constructor
+  monad(const monad &v) = default;
+  //! \brief Copy assignment
   monad &operator=(const monad &)=default;
-  
+
+  //! \brief True if monad contains a value_type
   BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit operator bool() const noexcept { return has_value(); }
+  //! \brief True if monad is not empty
   BOOST_SPINLOCK_FUTURE_CONSTEXPR bool is_ready() const noexcept
   {
     return _storage.type!=value_storage_type::storage_type::empty;
   }
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_exception() const noexcept
-  {
-    return _storage.type==value_storage_type::storage_type::exception || _storage.type==value_storage_type::storage_type::error;
-  }
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_error() const noexcept
-  {
-    return _storage.type==value_storage_type::storage_type::error;
-  }
+  //! \brief True if monad contains a value_type
   BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_value() const noexcept
   {
     return _storage.type==value_storage_type::storage_type::value;
   }
+  //! \brief True if monad contains an error_type
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_error() const noexcept
+  {
+    return _storage.type==value_storage_type::storage_type::error;
+  }
+  //! \brief True if monad contains an exception_type
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_exception() const noexcept
+  {
+    return _storage.type==value_storage_type::storage_type::exception || _storage.type==value_storage_type::storage_type::error;
+  }
 
+  //! \brief Swaps one monad for another
   void swap(monad &o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value)
   {
     _storage.swap(o._storage);
   }
+  //! \brief Destructs any state stored, resetting to empty
   void reset() noexcept(std::is_nothrow_destructible<value_storage_type>::value)
   {
     _storage.reset();
   }
-  
-  //value_type get() const &;  // TODO
-  BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type get() &&
+
+private:
+  void _get_value() const &&
   {
     if(!is_ready())
       throw future_error(future_errc::no_state);
@@ -268,42 +303,64 @@ public:
         e=make_exception_ptr(system_error(_storage.error));
       if(has_exception())
         e=_storage.exception;
-      if(is_consuming)
-        _storage.reset();
       rethrow_exception(e);
-    }
-    if(is_consuming)
-    {
-      value_type ret(std::move(_storage.value));
-      _storage.reset();
-      return std::move(ret);
-    }
-    else
-    {
-      value_type ret(_storage.value);
-      return std::move(ret);
-    }
+    }      
   }
-  // value_type get_or(const value_type &);  // TODO
-  // value_type get_or(value_type &&);  // TODO
+public:
+  //! \brief If contains a value_type, returns a lvalue reference to it, else throws an exception of future_error(no_state), system_error or the exception_ptr.
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &get() &
+  {
+      std::move(*this)._get_value();
+      return _storage.value;
+  }
+  //! \brief If contains a value_type, returns a const lvalue reference to it, else throws an exception of future_error(no_state), system_error or the exception_ptr.
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP const value_type &get() const &
+  {
+      std::move(*this)._get_value();
+      return _storage.value;
+  }
+  //! \brief If contains a value_type, returns a rvalue reference to it, else throws an exception of future_error(no_state), system_error or the exception_ptr.
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &&get() &&
+  {
+      std::move(*this)._get_value();
+      return std::move(_storage.value);
+  }
+  //! \brief If contains a value_type, return that value type, else return the supplied value_type
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR value_type &get_or(value_type &v) & noexcept
+  {
+    return has_value() ? _storage.value : v;
+  }
+  //! \brief If contains a value_type, return that value type, else return the supplied value_type
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR const value_type &get_or(const value_type &v) const & noexcept
+  {
+    return has_value() ? _storage.value : v;
+  }
+  //! \brief If contains a value_type, return that value type, else return the supplied value_type
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR value_type &&get_or(value_type &&v) && noexcept
+  {
+    return has_value() ? std::move(_storage.value) : std::move(v);
+  }
+  //! \brief Disposes of any existing state, setting the monad to a copy of the value_type
   void set_value(const value_type &v) { _storage.reset(); _storage.set_value(v); }
-  void set_value(value_type &&v) { _storage.reset(); _storage.set_value(v); }
-  error_type get_error()
+  //! \brief Disposes of any existing state, setting the monad to a move of the value_type
+  void set_value(value_type &&v) { _storage.reset(); _storage.set_value(std::move(v)); }
+  
+  //! \brief If contains an error_type, returns that error_type, else returns a null error_type. Can only throw the exception future_error(no_state) if empty.
+  error_type get_error() const
   {
     if(!is_ready())
       throw future_error(future_errc::no_state);
     if(!has_error())
       return error_type();
-    error_type e(std::move(_storage.error));
-    if(is_consuming)
-      _storage.reset();
-    return e;
+    return _storage.error;
   }
-  // error_type get_error_or(const error_type &);  // TODO
-  // error_type get_error_or(error_type &&);  // TODO
-  void set_error(const error_type &v) { _storage.reset(); _storage.set_error(v); }
-  void set_error(error_type &&v) { _storage.reset(); _storage.set_error(v); }
-  exception_type get_exception()
+  //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR error_type get_error_or(error_type e) const noexcept { return has_error() ? _storage.error : std::move(e); }
+  //! \brief Disposes of any existing state, setting the monad to the error_type
+  void set_error(error_type v) { _storage.reset(); _storage.set_error(std::move(v)); }
+  
+  //! \brief If contains an exception_ptr, returns that exception_ptr. If contains an error_code, returns system_error(error_code). If contains a value_type, returns a null exception_ptr. Can only throw the exception future_error(no_state) if empty.
+  exception_type get_exception() const
   {
     if(!is_ready())
       throw future_error(future_errc::no_state);
@@ -314,14 +371,13 @@ public:
       e=make_exception_ptr(system_error(_storage.error));
     if(has_exception())
       e=_storage.exception;
-    if(is_consuming)
-      _storage.reset();
-    return e;
+    return std::move(e);
   }
-  // exception_type get_exception_or(const exception_type &);  // TODO
-  // exception_type get_exception_or(exception_type &&);  // TODO
-  void set_exception(const exception_type &v) { _storage.reset(); _storage.set_exception(v); }
-  void set_exception(exception_type &&v) { _storage.reset(); _storage.set_exception(v); }
+  //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR exception_type get_exception_or(exception_type e) const noexcept { return has_exception() ? _storage.exception : std::move(e); }
+  //! \brief Disposes of any existing state, setting the monad to the exception_type
+  void set_exception(exception_type v) { _storage.reset(); _storage.set_exception(std::move(v)); }
+  //! \brief Disposes of any existing state, setting the monad to make_exception_ptr(forward<E>(e))
   template<typename E> void set_exception(E &&e)
   {
     set_exception(make_exception_ptr(std::forward<E>(e)));
@@ -582,16 +638,16 @@ public:
 
 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4399.html
 */
-template<typename R> class future : protected monad<R, true>
+template<typename R> class future : protected monad<R>
 {
-  typedef monad<R, true> monad_type;
+  typedef monad<R> monad_type;
   friend class promise<R>;
   friend struct detail::lock_guard<R>;
 public:
   typedef typename monad_type::value_type value_type;
   typedef typename monad_type::exception_type exception_type;
   typedef typename monad_type::error_type error_type;
-  BOOST_STATIC_CONSTEXPR bool is_consuming=monad_type::is_consuming;
+  BOOST_STATIC_CONSTEXPR bool is_consuming=true;
   typedef promise<value_type> promise_type;
 private:
   bool _need_locks;                 // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
@@ -666,6 +722,7 @@ public:
     wait();
     detail::lock_guard<value_type> h(this);
     value_type ret(static_cast<monad_type &&>(*this).get());
+    monad_type::reset();
     if(h._p)
       h._p->_storage.reset();
     if(h._f)
@@ -681,6 +738,7 @@ public:
     exception_ptr e(monad_type::get_exception());
     if(!e)
       return e;
+    monad_type::reset();
     if(h._p)
       h._p->_storage.reset();
     if(h._f)
@@ -696,6 +754,7 @@ public:
     error_code e(monad_type::error());
     if(!e)
       return e;
+    monad_type::reset();
     if(h._p)
       h._p->_storage.reset();
     if(h._f)
