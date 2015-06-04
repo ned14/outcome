@@ -79,5 +79,16 @@ with open(sys.argv[1]+'.test1.s', "wt") as oh:
     else:
         opcodes=functions['_Z5test1v']
     oh.write(opcodes)
-    print(str(opcodes.count('\n')))
+    # Count instructions
+    count=0
+    for line in opcodes.splitlines():
+        if isObjDump:
+            # If the line has two tab chars, it's an instruction
+            if line.count('\t')>1:
+                count+=1
+        if isDumpBin:
+            # If the line is two spaces and some zeros, it's an instruction
+            if line[:6]=='  0000':
+                count+=1
+    print(str(count))
     
