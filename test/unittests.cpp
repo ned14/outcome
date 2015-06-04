@@ -109,6 +109,7 @@ BOOST_AUTO_TEST_CASE(works/spinlock/transacted, "Tests that the spinlock works a
   BOOST_REQUIRE(locked==1000*threads);
 }
 
+#if 0
 template<bool tristate, class T> struct do_lock { void operator()(T &lock) { lock.lock(); } };
 template<class T> struct do_lock<true, T> { void operator()(T &lock) { int e=0; lock.lock(e); } };
 
@@ -281,7 +282,7 @@ BOOST_AUTO_TEST_CASE(performance/malloc/transact/large, "Tests the transact perf
   printf("2. Achieved %lf transactions per second\n", CalculateMallocPerformance(65536, 1));
   printf("3. Achieved %lf transactions per second\n", CalculateMallocPerformance(65536, 1));
 }
-
+#endif
 
 
 

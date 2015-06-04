@@ -43,7 +43,9 @@ do
     echo "    <failure message=\"Opcodes generated $CLANGVAL exceeds 5\"/>" >> results.xml
   fi
   echo "    <system-out>" >> results.xml
+  echo "<![CDATA[" >> results.xml
   cat $FILE.clang.S.test1.s >> results.xml
+  echo "]]>" >> results.xml
   echo "    </system-out>" >> results.xml
   echo "  </testcase>" >> results.xml
 done

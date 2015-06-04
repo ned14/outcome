@@ -19,7 +19,9 @@ for %%f in (*.cpp) do (
     echo     ^<failure message="Opcodes generated !LINE! exceeds 5"^> >> results.xml
   )
   echo     ^<system-out^> >> results.xml
+  echo ^<^^![CDATA[ >> results.xml
   type !FILE!.msvc.S.test1.s >> results.xml
+  echo ]]^> >> results.xml
   echo     ^</system-out^> >> results.xml
   echo   ^</testcase^> >> results.xml
 )
