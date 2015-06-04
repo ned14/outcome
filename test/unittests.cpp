@@ -287,7 +287,7 @@ BOOST_AUTO_TEST_CASE(performance/malloc/transact/large, "Tests the transact perf
 
 
 
-
+#if 0
 BOOST_AUTO_TEST_CASE(works/concurrent_unordered_map/basic, "Tests that concurrent_unordered_map works as expected")
 {
   printf("\n=== concurrent_unordered_map basic ===\n");
@@ -928,7 +928,7 @@ BOOST_AUTO_TEST_CASE(performance/concurrent_unordered_map/large/read, "Tests the
   } 
 #endif
 }
-
+#endif
 
 BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as intended")
 {
