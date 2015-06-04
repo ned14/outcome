@@ -32,7 +32,7 @@ DEALINGS IN THE SOFTWARE.
 #include "../include/boost/spinlock/spinlock.hpp"
 #include "../include/boost/spinlock/bindlib/include/boost/test/unit_test.hpp"
 #include "timing.h"
-#include "../include/boost/spinlock/concurrent_unordered_map.hpp"
+//#include "../include/boost/spinlock/concurrent_unordered_map.hpp"
 #include "../include/boost/spinlock/future.hpp"
 
 #include <stdio.h>
