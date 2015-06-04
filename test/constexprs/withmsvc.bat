@@ -2,7 +2,7 @@
 setlocal EnableDelayedExpansion
 set MSVCLINE=
 echo ^<?xml version="1.0" encoding="UTF-8"?^> > results.xml
-echo ^<testsuite^> >> results.xml
+echo ^<testsuite name="constexprs"^> >> results.xml
 for %%f in (*.cpp) do (
   set FILE=%%~nf
   cl /EHsc /c /O2 /GS- /GR /Gy /Zc:inline /DBOOST_SPINLOCK_STANDALONE=1 %%f /I..\..\include\boost\spinlock\bindlib\include

@@ -2,7 +2,7 @@
 GCCLINE=""
 CLANGLINE=""
 echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > results.xml
-echo "<testsuite>" >> results.xml
+echo "<testsuite name=\"constexprs\">" >> results.xml
 for f in *.cpp
 do
   FILE=${f%.cpp}

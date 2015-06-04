@@ -281,18 +281,18 @@ public:
   }
 
   //! \brief Swaps one monad for another
-  void swap(monad &o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value)
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP void swap(monad &o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value)
   {
     _storage.swap(o._storage);
   }
   //! \brief Destructs any state stored, resetting to empty
-  void reset() noexcept(std::is_nothrow_destructible<value_storage_type>::value)
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP void reset() noexcept(std::is_nothrow_destructible<value_storage_type>::value)
   {
     _storage.reset();
   }
 
 private:
-  void _get_value() const &&
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value() const &&
   {
     if(!is_ready())
       throw future_error(future_errc::no_state);
@@ -341,12 +341,12 @@ public:
     return has_value() ? std::move(_storage.value) : std::move(v);
   }
   //! \brief Disposes of any existing state, setting the monad to a copy of the value_type
-  void set_value(const value_type &v) { _storage.reset(); _storage.set_value(v); }
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v) { _storage.reset(); _storage.set_value(v); }
   //! \brief Disposes of any existing state, setting the monad to a move of the value_type
-  void set_value(value_type &&v) { _storage.reset(); _storage.set_value(std::move(v)); }
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(value_type &&v) { _storage.reset(); _storage.set_value(std::move(v)); }
   
   //! \brief If contains an error_type, returns that error_type, else returns a null error_type. Can only throw the exception future_error(no_state) if empty.
-  error_type get_error() const
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() const
   {
     if(!is_ready())
       throw future_error(future_errc::no_state);
@@ -355,12 +355,12 @@ public:
     return _storage.error;
   }
   //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR error_type get_error_or(error_type e) const noexcept { return has_error() ? _storage.error : std::move(e); }
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error_or(error_type e) const noexcept { return has_error() ? _storage.error : std::move(e); }
   //! \brief Disposes of any existing state, setting the monad to the error_type
-  void set_error(error_type v) { _storage.reset(); _storage.set_error(std::move(v)); }
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_error(error_type v) { _storage.reset(); _storage.set_error(std::move(v)); }
   
   //! \brief If contains an exception_ptr, returns that exception_ptr. If contains an error_code, returns system_error(error_code). If contains a value_type, returns a null exception_ptr. Can only throw the exception future_error(no_state) if empty.
-  exception_type get_exception() const
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() const
   {
     if(!is_ready())
       throw future_error(future_errc::no_state);
@@ -374,11 +374,11 @@ public:
     return std::move(e);
   }
   //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR exception_type get_exception_or(exception_type e) const noexcept { return has_exception() ? _storage.exception : std::move(e); }
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception_or(exception_type e) const noexcept { return has_exception() ? _storage.exception : std::move(e); }
   //! \brief Disposes of any existing state, setting the monad to the exception_type
-  void set_exception(exception_type v) { _storage.reset(); _storage.set_exception(std::move(v)); }
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_exception(exception_type v) { _storage.reset(); _storage.set_exception(std::move(v)); }
   //! \brief Disposes of any existing state, setting the monad to make_exception_ptr(forward<E>(e))
-  template<typename E> void set_exception(E &&e)
+  template<typename E> BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_exception(E &&e)
   {
     set_exception(make_exception_ptr(std::forward<E>(e)));
   }
