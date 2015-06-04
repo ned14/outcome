@@ -27,8 +27,7 @@ cat >coverage.json <<EOF
   "source_files": [
 EOF
 
-for file in $(find * -iname '*.gcov' -print | egrep 'spinlock' )
-#| egrep -v 'valgrind|SpookyV2')
+for file in $(find * -iname '*.gcov' -print | egrep '.*' | egrep -v 'valgrind|bindlib|test' )
 do
   cat >>coverage.json <<EOF
     {
