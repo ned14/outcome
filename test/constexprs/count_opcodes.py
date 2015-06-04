@@ -41,6 +41,8 @@ with open(sys.argv[1], 'rt') as ih:
             thisfunction=None
         else:
             thisfunctionopcodes+=line
+if thisfunction is not None:
+    functions[thisfunction]=thisfunctionopcodes
 
 done=False
 while not done:
