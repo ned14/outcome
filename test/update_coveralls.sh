@@ -32,7 +32,7 @@ for file in $(find * -iname '*.gcov' -print | egrep -v 'valgrind|bindlib|test' )
 do
   cat >>coverage.json <<EOF
     {
-      "name": "$(echo ${file} | sed -re 's%#%\/%g; s%.gcov$%%')",
+      "name": "$(echo ${file} | sed -re 's%\^#%%g; s%#%\/%g; s%.gcov$%%')",
       "source": $(tail -n +3 ${file} | cut -d ':' -f 3- | python json_encode.py),
       "coverage": [$(tail -n +3 ${file} | cut -d ':' -f 1 | sed -re 's%^ +%%g; s%-%null%g; s%^[#=]+$%0%;' | tr $'\n' ',' | sed -re 's%,$%%')]
     },
