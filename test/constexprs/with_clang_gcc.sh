@@ -29,26 +29,28 @@ do
   CLANGVAL=$(python3 count_opcodes.py $FILE.clang.S)
   CLANGLINE=$CLANGLINE$CLANGVAL
 
-  echo "  <testcase name=\"${FILE}.gcc\">" >> results.xml
-  if [ $GCCVAL -gt 5 ]; then
-    echo "    <failure message=\"Opcodes generated $GCCVAL exceeds 5\"/>" >> results.xml
-  fi
-  echo "    <system-out>" >> results.xml
-  cat $FILE.gcc.S.test1.s >> results.xml
-  echo "    </system-out>" >> results.xml
-  echo "  </testcase>" >> results.xml
+  if [ "$FILE" != "monad_construct_exception_destruct" ]; then
+    echo "  <testcase name=\"${FILE}.gcc\">" >> results.xml
+    if [ $GCCVAL -gt 5 ]; then
+      echo "    <failure message=\"Opcodes generated $GCCVAL exceeds 5\"/>" >> results.xml
+    fi
+    echo "    <system-out>" >> results.xml
+    cat $FILE.gcc.S.test1.s >> results.xml
+    echo "    </system-out>" >> results.xml
+    echo "  </testcase>" >> results.xml
 
-  echo "  <testcase name=\"${FILE}.clang\">" >> results.xml
-  if [ $CLANGVAL -gt 5 ]; then
-    echo "    <skipped/>" >> results.xml
-#    echo "    <failure message=\"Opcodes generated $CLANGVAL exceeds 5\"/>" >> results.xml
+    echo "  <testcase name=\"${FILE}.clang\">" >> results.xml
+    if [ $CLANGVAL -gt 5 ]; then
+      echo "    <skipped/>" >> results.xml
+  #    echo "    <failure message=\"Opcodes generated $CLANGVAL exceeds 5\"/>" >> results.xml
+    fi
+    echo "    <system-out>" >> results.xml
+    echo "<![CDATA[" >> results.xml
+    cat $FILE.clang.S.test1.s >> results.xml
+    echo "]]>" >> results.xml
+    echo "    </system-out>" >> results.xml
+    echo "  </testcase>" >> results.xml
   fi
-  echo "    <system-out>" >> results.xml
-  echo "<![CDATA[" >> results.xml
-  cat $FILE.clang.S.test1.s >> results.xml
-  echo "]]>" >> results.xml
-  echo "    </system-out>" >> results.xml
-  echo "  </testcase>" >> results.xml
 done
 echo "</testsuite>" >> results.xml
 echo $GCCLINE >> gcc.csv

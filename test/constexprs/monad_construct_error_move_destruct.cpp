@@ -3,8 +3,9 @@
 extern BOOST_SPINLOCK_NOINLINE std::error_code test1(std::error_code ec)
 {
   using namespace boost::spinlock::lightweight_futures;
-  monad<int> m(std::move(ec));
-  return m.get_error();
+  monad<int> m1(std::move(ec));
+  monad<int> m2(std::move(m1));
+  return m2.get_error();
 }
 extern BOOST_SPINLOCK_NOINLINE void test2()
 {

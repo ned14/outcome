@@ -72,12 +72,11 @@ while not done:
 #    print("Function "+function+" has "+str(opcodes.count('\n'))+" opcodes")
 
 with open(sys.argv[1]+'.test1.s', "wt") as oh:
-    if '?test1@@YAXXZ' in functions:
-        opcodes=functions['?test1@@YAXXZ']
-    elif '?test1@@YAHXZ' in functions:
-        opcodes=functions['?test1@@YAHXZ']
-    else:
-        opcodes=functions['_Z5test1v']
+    for function, opcodes in functions.items():
+        if function[:8]=='?test1@@':
+            break
+        if function=='_Z5test1v':
+            break
     oh.write(opcodes)
     # Count instructions
     count=0
