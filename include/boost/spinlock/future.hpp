@@ -248,7 +248,7 @@ though I see that on all compilers 16 bytes is always copied around instead of c
 eliding the copy.
 
 exception_ptr is also pretty good on anything but MSVC, though never zero assembler
-instructions. As soon as an exception_ptr \em could be created, you'll force out about forty
+instructions. As soon as an exception_ptr \em could be created, you'll force out about twenty
 instructions most of which won't be executed in practice. Unfortunately, MSVC churns out
 about 2000 assembler instructions as soon as you might touch an exception_ptr, I've raised
 this with Microsoft :(
