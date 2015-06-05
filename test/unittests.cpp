@@ -931,6 +931,114 @@ BOOST_AUTO_TEST_CASE(performance/concurrent_unordered_map/large/read, "Tests the
 }
 #endif
 
+BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
+{
+  using namespace boost::spinlock::lightweight_futures;
+  {
+    monad<int> m;
+    BOOST_CHECK(!m);
+    BOOST_CHECK(!m.is_ready());
+    BOOST_CHECK(!m.has_value());
+    BOOST_CHECK(!m.has_error());
+    BOOST_CHECK(!m.has_exception());
+    BOOST_CHECK_THROW(m.get(), future_error);
+    BOOST_CHECK_THROW(m.get_error(), future_error);
+    BOOST_CHECK_THROW(m.get_exception(), future_error);
+  }
+  {
+    monad<int> m(5);
+    BOOST_CHECK(m);
+    BOOST_CHECK(m.is_ready());
+    BOOST_CHECK(m.has_value());
+    BOOST_CHECK(!m.has_error());
+    BOOST_CHECK(!m.has_exception());
+    BOOST_CHECK(m.get()==5);
+    m.get()=6;
+    BOOST_CHECK(m.get()==6);
+    BOOST_CHECK(!m.get_error());
+    BOOST_CHECK(!m.get_exception());
+    m.clear();
+    BOOST_CHECK(!m);
+    BOOST_CHECK(!m.is_ready());
+    BOOST_CHECK(!m.has_value());
+    BOOST_CHECK(!m.has_error());
+    BOOST_CHECK(!m.has_exception());
+    BOOST_CHECK_THROW(m.get(), future_error);
+    BOOST_CHECK_THROW(m.get_error(), future_error);
+    BOOST_CHECK_THROW(m.get_exception(), future_error);
+  }
+  {
+    monad<std::string> m("niall");
+    BOOST_CHECK(m);
+    BOOST_CHECK(m.is_ready());
+    BOOST_CHECK(m.has_value());
+    BOOST_CHECK(!m.has_error());
+    BOOST_CHECK(!m.has_exception());
+    BOOST_CHECK(m.get()=="niall");
+    m.get()="NIALL";
+    BOOST_CHECK(m.get()=="NIALL");
+    auto temp(std::move(m).get());
+    BOOST_CHECK(temp=="NIALL");
+    BOOST_CHECK(m.get().empty());
+    BOOST_CHECK(!m.get_error());
+    BOOST_CHECK(!m.get_exception());
+    m.clear();
+    BOOST_CHECK(!m);
+  }
+  {
+    std::error_code ec(5, std::system_category());
+    auto e=std::make_exception_ptr(std::system_error(ec));
+    monad<int> m(ec);
+    BOOST_CHECK(!m);
+    BOOST_CHECK(m.is_ready());
+    BOOST_CHECK(!m.has_value());
+    BOOST_CHECK(m.has_error());
+    BOOST_CHECK(m.has_exception());
+    BOOST_CHECK_THROW(m.get(), std::system_error);
+    BOOST_CHECK(m.get_error()==ec);
+    BOOST_CHECK(m.get_exception());
+    try
+    {
+      std::rethrow_exception(m.get_exception());
+    }
+    catch(const std::system_error &ex)
+    {
+      BOOST_CHECK(ex.code()==ec);
+      BOOST_CHECK(ex.code().value()==5);
+    }
+  }
+  {
+    auto e=std::make_exception_ptr(5);
+    monad<int> m(e);
+    BOOST_CHECK(!m);
+    BOOST_CHECK(m.is_ready());
+    BOOST_CHECK(!m.has_value());
+    BOOST_CHECK(!m.has_error());
+    BOOST_CHECK(m.has_exception());
+    BOOST_CHECK_THROW(m.get(), int);
+    BOOST_CHECK(!m.get_error());
+    BOOST_CHECK(m.get_exception()==e);
+  }
+  {
+    typedef monad<int> type;
+    std::cout << "monad<int> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
+    std::cout << "monad<int> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
+    std::cout << "monad<int> is_nothrow_destructible="       << type::is_nothrow_destructible << std::endl;
+    BOOST_CHECK(type::is_nothrow_copy_constructible == std::is_nothrow_copy_constructible<type>::value);
+    BOOST_CHECK(type::is_nothrow_move_constructible == std::is_nothrow_move_constructible<type>::value);
+    BOOST_CHECK(type::is_nothrow_destructible       == std::is_nothrow_destructible<type>::value);
+  }
+  {
+    typedef monad<std::string> type;
+    std::cout << "monad<string> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
+    std::cout << "monad<string> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
+    std::cout << "monad<string> is_nothrow_destructible=" << type::is_nothrow_destructible << std::endl;
+    BOOST_CHECK(type::is_nothrow_copy_constructible == std::is_nothrow_copy_constructible<type>::value);
+    BOOST_CHECK(type::is_nothrow_move_constructible == std::is_nothrow_move_constructible<type>::value);
+    BOOST_CHECK(type::is_nothrow_destructible == std::is_nothrow_destructible<type>::value);
+  }
+}
+
 BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as intended")
 {
   using namespace boost::spinlock::lightweight_futures;

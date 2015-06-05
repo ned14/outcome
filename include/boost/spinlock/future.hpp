@@ -85,17 +85,38 @@ namespace detail
       exception,
       future
     } type;
+    BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_constructible=std::is_nothrow_copy_constructible<R>::value && std::is_nothrow_copy_constructible<exception_ptr>::value && std::is_nothrow_copy_constructible<error_code>::value;
+    BOOST_STATIC_CONSTEXPR bool is_nothrow_move_constructible=std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value;
+    BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible=std::is_nothrow_destructible<R>::value && std::is_nothrow_destructible<exception_ptr>::value && std::is_nothrow_destructible<error_code>::value;
     
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage() : type(storage_type::empty)
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage() noexcept : type(storage_type::empty) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(const R &v) noexcept(std::is_nothrow_copy_constructible<R>::value) : value(v), type(storage_type::value) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(const error_code &v) noexcept(std::is_nothrow_copy_constructible<error_code>::value) : error(v), type(storage_type::error) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(const exception_ptr &v) noexcept(std::is_nothrow_copy_constructible<exception_ptr>::value) : exception(v), type(storage_type::exception) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(R &&v) noexcept(std::is_nothrow_move_constructible<R>::value) : value(std::move(v)), type(storage_type::value) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(error_code &&v) noexcept(std::is_nothrow_move_constructible<error_code>::value) : error(std::move(v)), type(storage_type::error) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(exception_ptr &&v) noexcept(std::is_nothrow_move_constructible<exception_ptr>::value) : exception(std::move(v)), type(storage_type::exception) { }
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage(const value_storage &o) noexcept(is_nothrow_copy_constructible) : type(o.type)
     {
+      switch(type)
+      {
+        case storage_type::empty:
+          break;
+        case storage_type::value:
+          new (&value) R(o.value);
+          break;
+        case storage_type::error:
+          new (&error) error_code(o.error);
+          break;
+        case storage_type::exception:
+          new (&exception) exception_ptr(o.exception);
+          break;
+        case storage_type::future:
+          abort();
+          break;
+      }
     }
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(const R &v) : value(v), type(storage_type::value) { }
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(const error_code &v) : error(v), type(storage_type::error) { }
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(const exception_ptr &v) : exception(v), type(storage_type::exception) { }
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(R &&v) : value(std::move(v)), type(storage_type::value) { }
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(error_code &&v) : error(std::move(v)), type(storage_type::error) { }
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(exception_ptr &&v) : exception(std::move(v)), type(storage_type::exception) { }
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage(value_storage &&o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value) : type(o.type)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage(value_storage &&o) noexcept(is_nothrow_move_constructible) : type(o.type)
     {
       switch(type)
       {
@@ -114,18 +135,22 @@ namespace detail
           future_=o.future_;
           o.future_=nullptr;
           break;
-      }      
-      o.type=storage_type::empty;
+      }
     }
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage &operator=(value_storage &&o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage &operator=(const value_storage &o) noexcept(is_nothrow_copy_constructible)
     {
-      // TODO FIXME: Only safe if both of these are noexcept
-      this->~value_storage();
+      clear();
+      new (this) value_storage(o);
+      return *this;
+    }
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage &operator=(value_storage &&o) noexcept(is_nothrow_move_constructible)
+    {
+      clear();
       new (this) value_storage(std::move(o));
       return *this;
     }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP ~value_storage() noexcept(std::is_nothrow_destructible<R>::value && std::is_nothrow_destructible<exception_ptr>::value && std::is_nothrow_destructible<error_code>::value) { clear(); }
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void swap(storage_type &o) noexcept(std::is_nothrow_move_constructible<R>::value && std::is_nothrow_move_constructible<exception_ptr>::value && std::is_nothrow_move_constructible<error_code>::value)
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP ~value_storage() noexcept(is_nothrow_destructible) { clear(); }
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void swap(storage_type &o) noexcept(is_nothrow_move_constructible)
     {
       switch(type)
       {
@@ -145,7 +170,7 @@ namespace detail
           break;
       }      
     }
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void clear() noexcept(std::is_nothrow_destructible<R>::value && std::is_nothrow_destructible<exception_ptr>::value && std::is_nothrow_destructible<error_code>::value)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
     {
       switch(type)
       {
@@ -183,7 +208,7 @@ namespace detail
       new (&exception) exception_ptr(std::move(e));
       type=storage_type::exception;
     }
-    void set_error(error_code e)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_error(error_code e)
     {
       if(type!=storage_type::empty)
         throw future_error(future_errc::promise_already_satisfied);
@@ -191,7 +216,7 @@ namespace detail
       type=storage_type::error;
     }
     // Called by future to take ownership of storage from promise
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_future(future<R> *f)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_future(future<R> *f) noexcept(is_nothrow_destructible)
     {
       // Always overwrites existing storage
       clear();
@@ -216,21 +241,16 @@ get the monadic functionality totally free of execution overhead where possible.
 A similar thing applies to error_code which is a lightweight implementation on most
 systems. An exception is on VS2015 as the lvalue reference to system_category appears
 to be constructed via thread safe once routine called "Immortalize", so when you
-construct an error_code you'll force a memory synchronisation. error_codes are very
-cheap to pass around though as they are but an integer and a lvalue ref (sadly not
-with constexpr construction nor move construction in the standard yet though).
+construct an error_code on MSVC you'll force a memory synchronisation during the constructor
+only. error_codes are very cheap to pass around though as they are but an integer and a lvalue ref,
+though I see that on all compilers 16 bytes is always copied around instead of completely
+eliding the copy.
 
-The thing to avoid touching if you can is an exception_ptr.
-As soon as an exception_ptr \em could be created, you'll force out about two thousand
-assembler instructions, of which only a very few will be actually executed (lots of
-branching as it jumps through the output though). This is because exception_ptr uses
-a shared_ptr internally, and a shared_ptr uses atomic increment and decrement which
-forces the compiler to write all memory changes to memory before the atomic release.
-That means the contents of the internal variant store cannot be inferred by the compiler,
-and it actually must generate code to handle all possibilities of internal state.
-
-\todo Consider whether an even lighter weight monad incapable of exception_ptr would be
-useful
+exception_ptr is also pretty good on anything but MSVC, though never zero assembler
+instructions. As soon as an exception_ptr \em could be created, you'll force out about forty
+instructions most of which won't be executed in practice. Unfortunately, MSVC churns out
+about 2000 assembler instructions as soon as you might touch an exception_ptr, I've raised
+this with Microsoft :(
 
 [1]: GCC 5.1 does a perfect job, VS2015 does a good job, clang 3.7 not so great.
 */
@@ -249,6 +269,13 @@ private:
 protected:
   monad(value_storage_type &&s) : _storage(std::move(s)) { }
 public:
+  //! \brief This monad will never throw exceptions during copy construction
+  BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_constructible = value_storage_type::is_nothrow_copy_constructible;
+  //! \brief This monad will never throw exceptions during move construction
+  BOOST_STATIC_CONSTEXPR bool is_nothrow_move_constructible = value_storage_type::is_nothrow_move_constructible;
+  //! \brief This monad will never throw exceptions during destruction
+  BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
+
   //! \brief Default constructor, initialises to empty
   monad() = default;
   //! \brief Implicit constructor from a value_type by copy
@@ -296,12 +323,12 @@ public:
   }
 
   //! \brief Swaps one monad for another
-  BOOST_SPINLOCK_FUTURE_MSVC_HELP void swap(monad &o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value)
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP void swap(monad &o) noexcept(is_nothrow_move_constructible)
   {
     _storage.swap(o._storage);
   }
   //! \brief Destructs any state stored, resetting to empty
-  BOOST_SPINLOCK_FUTURE_MSVC_HELP void clear() noexcept(std::is_nothrow_destructible<value_storage_type>::value)
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP void clear() noexcept(is_nothrow_destructible)
   {
     _storage.clear();
   }
@@ -313,12 +340,10 @@ private:
       throw future_error(future_errc::no_state);
     if(has_error() || has_exception())
     {
-      exception_ptr e;
       if(has_error())
-        e=make_exception_ptr(system_error(_storage.error));
+        throw system_error(_storage.error);
       if(has_exception())
-        e=_storage.exception;
-      rethrow_exception(e);
+        rethrow_exception(_storage.exception);
     }      
   }
 public:
@@ -414,12 +439,11 @@ public:
       throw future_error(future_errc::no_state);
     if(!has_error() && !has_exception())
       return exception_type();
-    exception_type e;
     if(has_error())
-      e=make_exception_ptr(system_error(_storage.error));
+      return make_exception_ptr(system_error(_storage.error));
     if(has_exception())
-      e=_storage.exception;
-    return std::move(e);
+      return _storage.exception;
+    return exception_type();
   }
   //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
   BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception_or(exception_type e) const noexcept { return has_exception() ? _storage.exception : std::move(e); }
@@ -769,7 +793,7 @@ public:
   {
     wait();
     detail::lock_guard<value_type> h(this);
-    value_type ret(static_cast<monad_type &&>(*this).get());
+    value_type ret(std::move(*this).value());
     monad_type::clear();
     if(h._p)
       h._p->_storage.clear();
@@ -779,36 +803,36 @@ public:
   }
   // value_type get_or(const value_type &);  // TODO
   // value_type get_or(value_type &&);  // TODO
+  error_type get_error()
+  {
+    wait();
+    detail::lock_guard<value_type> h(this);
+    error_code e(monad_type::error());
+    if (!e)
+      return std::move(e);
+    monad_type::clear();
+    if (h._p)
+      h._p->_storage.clear();
+    if (h._f)
+      h._f->_promise = nullptr;
+    return std::move(e);
+  }
   exception_type get_exception()
   {
     wait();
     detail::lock_guard<value_type> h(this);
     exception_ptr e(monad_type::get_exception());
     if(!e)
-      return e;
+      return std::move(e);
     monad_type::clear();
     if(h._p)
       h._p->_storage.clear();
     if(h._f)
       h._f->_promise=nullptr;
-    return e;
+    return std::move(e);
   }
   // Compatibility with Boost.Thread
   exception_type get_exception_ptr() { return get_exception(); }
-  error_type get_error()
-  {
-    wait();
-    detail::lock_guard<value_type> h(this);
-    error_code e(monad_type::error());
-    if(!e)
-      return e;
-    monad_type::clear();
-    if(h._p)
-      h._p->_storage.clear();
-    if(h._f)
-      h._f->_promise=nullptr;
-    return e;
-  }
   
   bool valid() const noexcept
   {
