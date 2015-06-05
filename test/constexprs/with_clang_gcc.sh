@@ -29,9 +29,9 @@ do
   CLANGVAL=$(python3 count_opcodes.py $FILE.clang.S)
   CLANGLINE=$CLANGLINE$CLANGVAL
 
-  if [ "$FILE" != "monad_construct_exception_destruct" ] && [ "$FILE" != "monad_construct_error_move_destruct" ]; then
+  if [ "$FILE" != "monad_construct_exception_destruct" ]; then
     echo "  <testcase name=\"${FILE}.gcc\">" >> results.xml
-    if [ $GCCVAL -gt 5 ]; then
+    if ([ "$FILE" == "monad_construct_error_move_destruct" ] && [ $GCCVAL -gt 10 ]) || [ $GCCVAL -gt 5 ]; then
       echo "    <failure message=\"Opcodes generated $GCCVAL exceeds 5\"/>" >> results.xml
     fi
     echo "    <system-out>" >> results.xml
