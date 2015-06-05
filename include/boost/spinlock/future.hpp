@@ -208,7 +208,8 @@ namespace detail
       new (&exception) exception_ptr(std::move(e));
       type=storage_type::exception;
     }
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_error(error_code e)
+    // Note to self: this can't be BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR
+    void set_error(error_code e)
     {
       if(type!=storage_type::empty)
         throw future_error(future_errc::promise_already_satisfied);
