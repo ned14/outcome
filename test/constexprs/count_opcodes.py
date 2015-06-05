@@ -44,39 +44,45 @@ with open(sys.argv[1], 'rt') as ih:
 if thisfunction is not None:
     functions[thisfunction]=thisfunctionopcodes
 
+opcodes=None
+for function, _opcodes in functions.items():
+    if function[:8]=='?test1@@':
+        opcodes=_opcodes
+        break
+    if function[:8]=='_Z5test1':
+        opcodes=_opcodes
+        break
+if opcodes is None:
+    print("-1")
+    sys.exit(0)
+
 done=False
 while not done:
     done=True
-    for function, opcodes in functions.items():
-        #print("Function "+function+" has "+str(opcodes.count('\n'))+" lines")
-        callop=opcodes.find(" call " if isDumpBin else "\tcallq ")
-        while callop!=-1:
-            if isObjDump:
-                idx=opcodes.find('<', callop)
-                calltarget=opcodes[idx+1:opcodes.find('+', idx)]
-            if isDumpBin:
-                idx=opcodes.find('?', callop);
-                calltarget=opcodes[idx:opcodes.find('\n', idx)]
-            #print("   contains call to "+calltarget+" which has found="+str(calltarget in functions))
-            if calltarget != function and calltarget in functions:
-                done=False
-                expansion=functions[calltarget]
-                # Replace calltarget string
-                opcodes=opcodes[:idx]+"replaced\n"+expansion+opcodes[opcodes.find('\n', idx):]
-                
-            callop=opcodes.find(" call " if isDumpBin else "\tcallq ", callop+1)
-        functions[function]=opcodes
+    #print("Function "+function+" has "+str(opcodes.count('\n'))+" lines")
+    callop=opcodes.find(" call " if isDumpBin else "\tcallq ")
+    while callop!=-1:
+        if isObjDump:
+            idx=opcodes.find('<', callop)
+            calltarget=opcodes[idx+1:opcodes.find('+', idx)]
+        if isDumpBin:
+            idx=opcodes.find('?', callop);
+            calltarget=opcodes[idx:opcodes.find('\n', idx)]
+        #print("   contains call to "+calltarget+" which has found="+str(calltarget in functions))
+        if calltarget != function and calltarget in functions:
+            done=False
+            expansion=functions[calltarget]
+            # Replace calltarget string
+            opcodes=opcodes[:idx]+"replaced\n"+expansion+opcodes[opcodes.find('\n', idx):]
+            
+        callop=opcodes.find(" call " if isDumpBin else "\tcallq ", callop+1)
+    functions[function]=opcodes
 
 #print("\n\n")
 #for function, opcodes in functions.items():
 #    print("Function "+function+" has "+str(opcodes.count('\n'))+" opcodes")
 
 with open(sys.argv[1]+'.test1.s', "wt") as oh:
-    for function, opcodes in functions.items():
-        if function[:8]=='?test1@@':
-            break
-        if function=='_Z5test1v':
-            break
     oh.write(opcodes)
     # Count instructions
     count=0

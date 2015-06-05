@@ -10,11 +10,11 @@ do
   if [ 1 -eq 1 ]; then
     echo "Compiling ${FILE} with gcc ..."
     g++-5 -c -o $FILE.o -O3 -std=c++14 -fno-keep-inline-functions -DBOOST_SPINLOCK_STANDALONE=1 -I../../include/boost/spinlock/bindlib/include $f
-    objdump -d -j .text -S $FILE.o > $FILE.gcc.S
+    objdump -d -S $FILE.o > $FILE.gcc.S
 
     echo "Compiling ${FILE} with clang ..."
     clang++ -c -o $FILE.o -O3 -std=c++14 -DBOOST_CXX14_CONSTEXPR=constexpr -DBOOST_SPINLOCK_STANDALONE=1 -I../../include/boost/spinlock/bindlib/include $f
-    objdump -d -j .text -S $FILE.o > $FILE.clang.S
+    objdump -d -S $FILE.o > $FILE.clang.S
     rm $FILE.o
   fi
 
