@@ -264,13 +264,13 @@ public:
   //! \brief Implicit constructor from a exception_type by move
   BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(exception_type &&v) : _storage(std::move(v)) { }
   //! \brief Move constructor
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(monad &&v) : _storage(std::move(v._storage)) { }
+  monad(monad &&) = default;
   //! \brief Move assignment
   monad &operator=(monad &&) = default;
   //! \brief Copy constructor
   monad(const monad &v) = default;
   //! \brief Copy assignment
-  monad &operator=(const monad &)=default;
+  monad &operator=(const monad &) = default;
 
   //! \brief True if monad contains a value_type
   BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit operator bool() const noexcept { return has_value(); }
