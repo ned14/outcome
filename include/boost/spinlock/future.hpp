@@ -36,29 +36,31 @@ DEALINGS IN THE SOFTWARE.
 
 BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 namespace lightweight_futures {
+  
+template<typename R, class _error_type=std::error_code, class _exception_type=std::exception_ptr> class promise;
 
 namespace detail
 {
-  template<typename R> struct lock_guard
+  template<class promise_type, class future_type> struct lock_guard
   {
-    promise<R> *_p;
-    future<R>  *_f;
+    promise_type *_p;
+    future_type  *_f;
     lock_guard(const lock_guard &)=delete;
     lock_guard(lock_guard &&)=delete;
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP lock_guard(promise<R> *p) : _p(nullptr), _f(nullptr)
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP lock_guard(promise_type *p) : _p(nullptr), _f(nullptr)
     {
       // constexpr fold
       if(!p->_need_locks)
       {
         _p=p;
-        if(p->_storage.type==value_storage<R>::storage_type::future)
+        if(p->_storage.type==promise_type::value_storage_type::storage_type::future)
           _f=p->_storage.future_;
         return;
       }
       else for(;;)
       {
         p->_lock.lock();
-        if(p->_storage.type==value_storage<R>::storage_type::future)
+        if(p->_storage.type==promise_type::value_storage_type::storage_type::future)
         {
           if(p->_storage.future_->_lock.try_lock())
           {
@@ -75,7 +77,7 @@ namespace detail
         p->_lock.unlock();
       }
     }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP lock_guard(future<R> *f) : _p(nullptr), _f(nullptr)
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP lock_guard(future_type *f) : _p(nullptr), _f(nullptr)
     {
       // constexpr fold
       if(!f->_need_locks)
@@ -124,18 +126,35 @@ namespace detail
       }
     }
   };
+  
+  struct throw_future_promise_error
+  {
+    throw_future_promise_error(monad_errc ec)
+    {
+      switch(ec)
+      {
+        case monad_errc::already_set:
+          throw std::future_error(std::future_errc::promise_already_satisfied);
+        case monad_errc::no_state:
+          throw std::future_error(std::future_errc::no_state);
+        default:
+          abort();
+      }
+    }
+  };
 }
 
-template<typename R> class promise
+template<typename R, class _error_type, class _exception_type> class promise
 {
-  friend class future<R>;
-  friend struct detail::lock_guard<R>;
 public:
   typedef R value_type;
-  typedef exception_ptr exception_type;
-  typedef error_code error_type;
+  typedef _error_type error_type;
+  typedef _exception_type exception_type;
+  typedef future<value_type, error_type, exception_type> future_type;
+  friend class future<value_type, error_type, exception_type>;
+  friend struct detail::lock_guard<promise, future_type>;
 private:
-  typedef detail::value_storage<value_type> value_storage_type;
+  typedef detail::value_storage<value_type, error_type, exception_type, detail::throw_future_promise_error> value_storage_type;
   value_storage_type _storage;
   bool _need_locks;                 // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
 #ifdef _MSC_VER
@@ -156,7 +175,7 @@ public:
   BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR promise(promise &&o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value) : _need_locks(o._need_locks)
   {
     if(_need_locks) new (&_lock) spinlock<bool>();
-    detail::lock_guard<value_type> h(&o);
+    detail::lock_guard<promise, future_type> h(&o);
     _storage=std::move(o._storage);
     if(h._f)
       h._f->_promise=this;
@@ -172,11 +191,11 @@ public:
   promise &operator=(const promise &)=delete;
   BOOST_SPINLOCK_FUTURE_MSVC_HELP ~promise() noexcept(std::is_nothrow_destructible<value_storage_type>::value)
   {
-    detail::lock_guard<value_type> h(this);
+    detail::lock_guard<promise, future_type> h(this);
     if(h._f)
     {
       if(!h._f->is_ready())
-        h._f->set_exception(make_exception_ptr(future_error(future_errc::broken_promise)));
+        h._f->set_exception(make_exception_ptr(std::future_error(std::future_errc::broken_promise)));
       h._f->_promise=nullptr;
     }
     // Destroy myself before locks exit
@@ -185,7 +204,7 @@ public:
   
   void swap(promise &o) noexcept(std::is_nothrow_move_constructible<value_storage_type>::value)
   {
-    detail::lock_guard<value_type> h1(this), h2(&o);
+    detail::lock_guard<promise, future_type> h1(this), h2(&o);
     _storage.swap(o._storage);
     if(h1._f)
       h1._f->_promise=&o;
@@ -193,7 +212,7 @@ public:
       h2._f->_promise=this;
   }
   
-  BOOST_SPINLOCK_FUTURE_MSVC_HELP future<value_type> get_future()
+  BOOST_SPINLOCK_FUTURE_MSVC_HELP future_type get_future()
   {
     // If no value stored yet, I need locks on from now on
     if(!_need_locks && _storage.type==value_storage_type::storage_type::empty)
@@ -201,10 +220,10 @@ public:
       _need_locks=true;
       new (&_lock) spinlock<bool>();
     }
-    detail::lock_guard<value_type> h(this);
+    detail::lock_guard<promise, future_type> h(this);
     if(h._f)
-      throw future_error(future_errc::future_already_retrieved);
-    future<value_type> ret(this);
+      throw std::future_error(std::future_errc::future_already_retrieved);
+    future_type ret(this);
     h.unlock();
     return std::move(ret);
   }
@@ -217,7 +236,7 @@ public:
   
   BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
   {
-    detail::lock_guard<value_type> h(this);
+    detail::lock_guard<promise, future_type> h(this);
     if(h._f)
       h._f->set_value(v);
     else
@@ -225,7 +244,7 @@ public:
   }
   BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
   {
-    detail::lock_guard<value_type> h(this);
+    detail::lock_guard<promise, future_type> h(this);
     if(h._f)
       h._f->set_value(std::move(v));
     else
@@ -234,7 +253,7 @@ public:
   //! \brief EXTENSION: Set an error code (doesn't allocate)
   void set_error(error_type e) noexcept(std::is_nothrow_copy_constructible<error_type>::value)
   {
-    detail::lock_guard<value_type> h(this);
+    detail::lock_guard<promise, future_type> h(this);
     if(h._f)
       h._f->set_error(e);
     else
@@ -242,7 +261,7 @@ public:
   }
   void set_exception(exception_type e) noexcept(std::is_nothrow_copy_constructible<exception_type>::value)
   {
-    detail::lock_guard<value_type> h(this);
+    detail::lock_guard<promise, future_type> h(this);
     if(h._f)
       h._f->set_exception(e);
     else
@@ -272,17 +291,17 @@ public:
 
 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4399.html
 */
-template<typename R> class future : protected monad<R>
+template<typename R, class _error_type, class _exception_type> class future : protected monad<R, _error_type, _exception_type, detail::throw_future_promise_error>
 {
-  typedef monad<R> monad_type;
-  friend class promise<R>;
-  friend struct detail::lock_guard<R>;
+  typedef monad<R, _error_type, _exception_type, detail::throw_future_promise_error> monad_type;
 public:
   typedef typename monad_type::value_type value_type;
-  typedef typename monad_type::exception_type exception_type;
   typedef typename monad_type::error_type error_type;
+  typedef typename monad_type::exception_type exception_type;
   BOOST_STATIC_CONSTEXPR bool is_consuming=true;
-  typedef promise<value_type> promise_type;
+  typedef promise<value_type, error_type, exception_type> promise_type;
+  friend class promise<value_type, error_type, exception_type>;
+  friend struct detail::lock_guard<promise_type, future>;
 private:
   bool _need_locks;                 // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
 #ifdef _MSC_VER
@@ -310,7 +329,7 @@ public:
   BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR future(future &&o) noexcept(std::is_nothrow_move_constructible<monad_type>::value) : _need_locks(o._need_locks), _promise(nullptr)
   {
     if(_need_locks) new (&_lock) spinlock<bool>();
-    detail::lock_guard<value_type> h(&o);
+    detail::lock_guard<promise_type, future> h(&o);
     new(this) monad_type(std::move(o));
     if(o._promise)
     {
@@ -332,7 +351,7 @@ public:
   // MSVC needs the destructor force inlined to do the right thing for some reason
   BOOST_SPINLOCK_FUTURE_MSVC_HELP ~future() noexcept(std::is_nothrow_destructible<monad_type>::value)
   {
-    detail::lock_guard<value_type> h(this);
+    detail::lock_guard<promise_type, future> h(this);
     if(h._p)
       h._p->_storage.clear();
     // Destroy myself before locks exit
@@ -341,7 +360,7 @@ public:
   
   void swap(future &o) noexcept(std::is_nothrow_move_constructible<monad_type>::value)
   {
-    detail::lock_guard<value_type> h1(this), h2(&o);
+    detail::lock_guard<promise_type, future> h1(this), h2(&o);
     monad_type::swap(o._storage);
     if(h1._p)
       h1._p->_storage.future_=&o;
@@ -354,7 +373,7 @@ public:
   BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type get()
   {
     wait();
-    detail::lock_guard<value_type> h(this);
+    detail::lock_guard<promise_type, future> h(this);
     value_type ret(std::move(*this).value());
     monad_type::clear();
     if(h._p)
@@ -368,8 +387,8 @@ public:
   error_type get_error()
   {
     wait();
-    detail::lock_guard<value_type> h(this);
-    error_code e(monad_type::error());
+    detail::lock_guard<promise_type, future> h(this);
+    error_type e(monad_type::error());
     if (!e)
       return std::move(e);
     monad_type::clear();
@@ -382,8 +401,8 @@ public:
   exception_type get_exception()
   {
     wait();
-    detail::lock_guard<value_type> h(this);
-    exception_ptr e(monad_type::get_exception());
+    detail::lock_guard<promise_type, future> h(this);
+    exception_type e(monad_type::get_exception());
     if(!e)
       return std::move(e);
     monad_type::clear();
@@ -408,7 +427,7 @@ public:
   void wait() const
   {
     if(!valid())
-      throw future_error(future_errc::no_state);
+      throw std::future_error(std::future_errc::no_state);
     // TODO Actually sleep
     while(!monad_type::is_ready())
     {

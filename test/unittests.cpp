@@ -941,9 +941,9 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.get(), future_error);
-    BOOST_CHECK_THROW(m.get_error(), future_error);
-    BOOST_CHECK_THROW(m.get_exception(), future_error);
+    BOOST_CHECK_THROW(m.get(), monad_error);
+    BOOST_CHECK_THROW(m.get_error(), monad_error);
+    BOOST_CHECK_THROW(m.get_exception(), monad_error);
   }
   {
     monad<int> m(5);
@@ -963,9 +963,9 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.get(), future_error);
-    BOOST_CHECK_THROW(m.get_error(), future_error);
-    BOOST_CHECK_THROW(m.get_exception(), future_error);
+    BOOST_CHECK_THROW(m.get(), monad_error);
+    BOOST_CHECK_THROW(m.get_error(), monad_error);
+    BOOST_CHECK_THROW(m.get_exception(), monad_error);
   }
   {
     monad<std::string> m("niall");
@@ -1049,7 +1049,7 @@ BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as inten
       BOOST_CHECK(!f.is_ready());
       BOOST_CHECK(!f.has_exception());
       BOOST_CHECK(!f.has_value());
-      BOOST_CHECK_THROW(f.get(), future_error);
+      BOOST_CHECK_THROW(f.get(), std::future_error);
     }
     promise<int> p;
     future<int> f(p.get_future());
@@ -1069,7 +1069,7 @@ BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as inten
     BOOST_CHECK(!f.is_ready());
     BOOST_CHECK(!f.has_exception());
     BOOST_CHECK(!f.has_value());
-    BOOST_CHECK_THROW(f.get(), future_error);
+    BOOST_CHECK_THROW(f.get(), std::future_error);
   }
   {
     promise<int> p;
@@ -1085,7 +1085,7 @@ BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as inten
     BOOST_CHECK(!f.is_ready());
     BOOST_CHECK(!f.has_exception());
     BOOST_CHECK(!f.has_value());
-    BOOST_CHECK_THROW(f.get(), future_error);
+    BOOST_CHECK_THROW(f.get(), std::future_error);
   }
   {
     future<int> f;
@@ -1097,7 +1097,7 @@ BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as inten
     BOOST_CHECK(f.is_ready());
     BOOST_CHECK(f.has_exception());
     BOOST_CHECK(!f.has_value());
-    BOOST_CHECK_THROW(f.get(), future_error);
+    BOOST_CHECK_THROW(f.get(), std::future_error);
   }
 }
 

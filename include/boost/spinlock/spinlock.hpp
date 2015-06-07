@@ -102,23 +102,11 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 #endif
 
 #if !defined BOOST_SPINLOCK_NOINLINE
-# ifdef _MSC_VER
-#  define BOOST_SPINLOCK_NOINLINE __declspec(noinline)
-# elif defined __GNUC__
-#  define BOOST_SPINLOCK_NOINLINE __attribute__((noinline))
-# else
-#  define BOOST_SPINLOCK_NOINLINE
-# endif
+# define BOOST_SPINLOCK_NOINLINE BOOST_NOINLINE
 #endif
 
 #if !defined BOOST_SPINLOCK_FORCEINLINE
-# ifdef _MSC_VER
-#  define BOOST_SPINLOCK_FORCEINLINE __forceinline
-# elif defined __GNUC__
-#  define BOOST_SPINLOCK_FORCEINLINE __attribute__((always_inline))
-# else
-#  define BOOST_SPINLOCK_FORCEINLINE
-# endif
+# define BOOST_SPINLOCK_FORCEINLINE BOOST_FORCEINLINE
 #endif
 
 #ifndef BOOST_SPINLOCK_IN_THREAD_SANITIZER
