@@ -46,6 +46,10 @@ DEALINGS IN THE SOFTWARE.
 # define BOOST_SPINLOCK_FUTURE_MSVC_HELP 
 #endif
 
+/*! \file monad.hpp
+\brief Provides a lightweight simple monadic value transport
+*/
+
 BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 namespace lightweight_futures {
 
@@ -76,13 +80,13 @@ namespace detail
 /*! \brief Returns a reference to a monad error category. Note the address
 of one of these may not be constant throughout the process as per the ISO spec.
 */
-const detail::monad_category &monad_category()
+inline const detail::monad_category &monad_category()
 {
   static detail::monad_category c;
   return c;
 }
 
-// \brief A monad exception object
+//! \brief A monad exception object
 class BOOST_SYMBOL_VISIBLE monad_error : public std::logic_error
 {
   std::error_code _ec;
@@ -91,12 +95,12 @@ public:
   const std::error_code &code() const noexcept { return _ec; }
 };
 
-std::error_code make_error_code(monad_errc e)
+inline std::error_code make_error_code(monad_errc e)
 {
   return std::error_code(static_cast<int>(e), monad_category());
 }
 
-std::error_condition make_error_condition(monad_errc e)
+inline std::error_condition make_error_condition(monad_errc e)
 {
   return std::error_condition(static_cast<int>(e), monad_category());
 }
@@ -596,7 +600,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_END
 
 namespace std
 {
-  template<typename value_type, class error_type, class exception_type> void swap(BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::monad<value_type, error_type, exception_type> &a, BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::monad<value_type, error_type, exception_type> &b)
+  template<typename value_type, class error_type, class exception_type> inline void swap(BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::monad<value_type, error_type, exception_type> &a, BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::monad<value_type, error_type, exception_type> &b)
   {
     a.swap(b);
   }

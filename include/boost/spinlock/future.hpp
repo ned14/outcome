@@ -34,6 +34,10 @@ DEALINGS IN THE SOFTWARE.
 
 #include "monad.hpp"
 
+/*! \file future.hpp
+\brief Provides a lightweight next generation future with N4399 Concurrency TS extensions
+*/
+
 BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 namespace lightweight_futures {
   
@@ -440,15 +444,15 @@ public:
   // template<class F> typename std::result_of<F(future)>::type then(F &&f);
 };
 
-template<typename R> future<typename std::decay<R>::type> make_ready_future(R &&v)
+template<typename R> inline future<typename std::decay<R>::type> make_ready_future(R &&v)
 {
   return future<typename std::decay<R>::type>(std::forward<R>(v));
 }
-template<typename R> future<R> make_errored_future(std::error_code v)
+template<typename R> inline future<R> make_errored_future(std::error_code v)
 {
   return future<R>(v);
 }
-template<typename R> future<R> make_exceptional_future(std::exception_ptr v)
+template<typename R> inline future<R> make_exceptional_future(std::exception_ptr v)
 {
   return future<R>(v);
 }
@@ -474,11 +478,11 @@ BOOST_SPINLOCK_V1_NAMESPACE_END
 
 namespace std
 {
-  template<typename R> void swap(BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::promise<R> &a, BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::promise<R> &b)
+  template<typename R> inline void swap(BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::promise<R> &a, BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::promise<R> &b)
   {
     a.swap(b);
   }
-  template<typename R> void swap(BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::future<R> &a, BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::future<R> &b)
+  template<typename R> inline void swap(BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::future<R> &a, BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::future<R> &b)
   {
     a.swap(b);
   }

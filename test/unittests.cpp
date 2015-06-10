@@ -1039,6 +1039,20 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
   }
 }
 
+BOOST_AUTO_TEST_CASE(works/monad/udts, "Tests that the monad works as intended with user-defined types")
+{
+  using namespace boost::spinlock::lightweight_futures;
+  // Try out types missing default constructors, move constructors etc.
+  // Also try out types which throw during move/copy, destruct etc.
+}
+
+BOOST_AUTO_TEST_CASE(works/monad/containers, "Tests that the monad works as intended inside containers")
+{
+  using namespace boost::spinlock::lightweight_futures;
+  // Try out types missing default constructors, move constructors etc.
+  // Also try out types which throw during move/copy, destruct etc.
+}
+
 BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as intended")
 {
   using namespace boost::spinlock::lightweight_futures;
