@@ -105,11 +105,11 @@ with open(sys.argv[1]+'.test1.s', "wt") as oh:
     for line in opcodes.splitlines():
         if isObjDump:
             # If the line has two tab chars, it's an instruction
-            if line.count('\t')>1 and "data32" not in line:
+            if line.count('\t')>1 and "data32" not in line and "nopw" not in line and "retq" not in line:
                 count+=1
         if isDumpBin:
             # If the line is two spaces and some zeros, it's an instruction
-            if line[:6]=='  0000':
+            if line[:6]=='  0000' and "ret" not in line:
                 count+=1
     print(str(count))
     

@@ -31,7 +31,7 @@ do
 
   if [ "$FILE" != "monad_construct_exception_destruct" ]; then
     echo "  <testcase name=\"${FILE}.gcc\">" >> results.xml
-    if ([ "$FILE" == "monad_construct_error_move_destruct" ] && [ $GCCVAL -gt 10 ]) || [ $GCCVAL -gt 5 ]; then
+    if [ $GCCVAL -gt 5 ] && ([ "$FILE" != "monad_construct_error_move_destruct" ] || [ $GCCVAL -gt 10 ]); then
       echo "    <failure message=\"Opcodes generated $GCCVAL exceeds 5\"/>" >> results.xml
     fi
     echo "    <system-out>" >> results.xml
