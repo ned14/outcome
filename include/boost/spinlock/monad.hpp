@@ -317,7 +317,7 @@ namespace detail
 
   struct throw_monad_error
   {
-    throw_monad_error(monad_errc ec)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR throw_monad_error(monad_errc ec)
     {
       throw monad_error(ec);
     }

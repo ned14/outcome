@@ -75,9 +75,9 @@ while not done:
     callop=opcodes.find(" call " if isDumpBin else "\tcallq ")
     while callop!=-1:
         loops+=1
-        if loops > 100:
+        if loops > 1000:
             print(opcodes)
-            assert loops <= 100
+            assert loops <= 1000
         if isObjDump:
             idx=opcodes.find('<', callop)
             calltarget=int(opcodes[opcodes.find('+', idx)+3:opcodes.find('\n', idx)-1], 16)

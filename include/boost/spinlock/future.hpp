@@ -129,7 +129,7 @@ namespace detail
   
   struct throw_future_promise_error
   {
-    throw_future_promise_error(monad_errc ec)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR throw_future_promise_error(monad_errc ec)
     {
       switch(ec)
       {
