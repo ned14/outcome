@@ -343,7 +343,8 @@ So long as you avoid the exception_type code paths, this implementation will be
 ideally reduced to as few assembler instructions as possible by most recent compilers [1]
 which can include exactly zero assembler instructions output. This monad is therefore
 identical in terms of execution overhead to using the R type you specify directly - you
-get the monadic functionality totally free of execution overhead where possible.
+get the monadic functionality totally free of execution overhead where the compiler is able
+to reduce it to such.
 
 A similar thing applies to error_type which is a lightweight implementation on most
 systems. An exception is on VS2015 as the lvalue reference to system_category appears
@@ -472,7 +473,7 @@ public:
       std::move(*this)._get_value();
       return _storage.value;
   }
-  //| \overload
+  //! \brief If contains a value_type, returns a lvalue reference to it, else throws an exception of future_error(no_state), system_error or the exception_type.
   BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &value() &
   {
       std::move(*this)._get_value();
@@ -484,7 +485,7 @@ public:
       std::move(*this)._get_value();
       return _storage.value;
   }
-  //! \overload
+  //! \brief If contains a value_type, returns a const lvalue reference to it, else throws an exception of future_error(no_state), system_error or the exception_type.
   BOOST_SPINLOCK_FUTURE_MSVC_HELP const value_type &value() const &
   {
       std::move(*this)._get_value();
@@ -496,7 +497,7 @@ public:
       std::move(*this)._get_value();
       return std::move(_storage.value);
   }
-  //! \overload
+  //! \brief If contains a value_type, returns a rvalue reference to it, else throws an exception of future_error(no_state), system_error or the exception_type.
   BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &&value() &&
   {
       std::move(*this)._get_value();
@@ -507,7 +508,7 @@ public:
   {
     return has_value() ? _storage.value : v;
   }
-  //! \overload
+  //! \brief If contains a value_type, return that value type, else return the supplied value_type
   BOOST_SPINLOCK_FUTURE_CONSTEXPR value_type &value_or(value_type &v) & noexcept
   {
     return has_value() ? _storage.value : v;
@@ -517,7 +518,7 @@ public:
   {
     return has_value() ? _storage.value : v;
   }
-  //! \overload
+  //! \brief If contains a value_type, return that value type, else return the supplied value_type
   BOOST_SPINLOCK_FUTURE_CONSTEXPR const value_type &value_or(const value_type &v) const & noexcept
   {
     return has_value() ? _storage.value : v;
@@ -527,7 +528,7 @@ public:
   {
     return has_value() ? std::move(_storage.value) : std::move(v);
   }
-  //! \overload
+  //! \brief If contains a value_type, return that value type, else return the supplied value_type
   BOOST_SPINLOCK_FUTURE_CONSTEXPR value_type &&value_or(value_type &&v) && noexcept
   {
     return has_value() ? std::move(_storage.value) : std::move(v);
