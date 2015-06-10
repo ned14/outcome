@@ -324,9 +324,13 @@ namespace detail
   }; 
 }
 
-/*! \class class monad
-\tparam R The expected type
+/*! \class monad
 \brief Implements a lightweight simple monadic value transport with the same semantics and API as a future
+\tparam R The expected type
+\tparam _error_type The type matching the semantics of `std::error_code` to use
+\tparam _exception_type The type matching the semantics of `std::exception_ptr` to use
+\tparam throw_error A callable with specification void(monad_errc) to call when needing to throw an exception
+matching monad_errc
 
 This monad can hold empty, a type R, an error_type or an exception_type at a space cost of
 max(20, sizeof(R)+4).
@@ -342,14 +346,15 @@ systems. An exception is on VS2015 as the lvalue reference to system_category ap
 to be constructed via thread safe once routine called "Immortalize", so when you
 construct an error_type on MSVC you'll force a memory synchronisation during the constructor
 only. error_types are very cheap to pass around though as they are but an integer and a lvalue ref,
-though I see that on all compilers 16 bytes is always copied around instead of completely
+though I see that on GCC and clang 16 bytes is always copied around instead of completely
 eliding the copy.
 
 exception_type is also pretty good on anything but MSVC, though never zero assembler
 instructions. As soon as an exception_type \em could be created, you'll force out about twenty
 instructions most of which won't be executed in practice. Unfortunately, MSVC churns out
 about 2000 assembler instructions as soon as you might touch an exception_type, I've raised
-this with Microsoft :(
+this with Microsoft and it looks to be hard for them to fix due to backwards compatibility
+reasons.
 
 [1]: GCC 5.1 does a perfect job, VS2015 does a good job, clang 3.7 not so great.
 */
