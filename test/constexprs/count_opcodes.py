@@ -3,10 +3,16 @@
 # (C) 2015 Niall Douglas http://www.nedprod.com/
 # File created: June 2015
 
-import sys
+import sys, os
 
-# Map of function name to opcodes
+try:
+    os.remove(sys.argv[1]+'.test1.s')
+except:
+    pass
+
+# Map of function offset (objdump)/name (dumpbin) to opcodes
 functions={}
+namestooffset={}  # objdump only
 isObjDump=False
 isDumpBin=False
 
@@ -28,9 +34,11 @@ with open(sys.argv[1], 'rt') as ih:
         if thisfunction is None:
             if line[:4]=='0000':
                 isObjDump=True
-                thisfunction=line[18:-3]
+                thisfunctionname=line[18:-3]
+                thisfunction=int(line[0:16], 16)
+                namestooffset[thisfunctionname]=thisfunction
                 thisfunctionopcodes=""
-                #print("New objdump function "+thisfunction)
+                #print("New objdump function "+str(thisfunction)+" = "+thisfunctionname)
             elif line[0]=='?':
                 isDumpBin=True
                 thisfunction=line[:line.find(' ')]
@@ -45,30 +53,38 @@ if thisfunction is not None:
     functions[thisfunction]=thisfunctionopcodes
 
 opcodes=None
-for function, _opcodes in functions.items():
-    if function[:8]=='?test1@@':
-        opcodes=_opcodes
-        break
-    if function[:8]=='_Z5test1':
-        opcodes=_opcodes
-        break
+if isObjDump:
+    for function, offset in namestooffset.items():
+        if function[:8]=='_Z5test1':
+            opcodes=functions[offset]
+            break
+elif isDumpBin:
+    for function, _opcodes in functions.items():
+        if function[:8]=='?test1@@':
+            opcodes=_opcodes
+            break
 if opcodes is None:
     print("-1")
     sys.exit(0)
 
 done=False
+loops=0
 while not done:
     done=True
     #print("Function "+function+" has "+str(opcodes.count('\n'))+" lines")
     callop=opcodes.find(" call " if isDumpBin else "\tcallq ")
     while callop!=-1:
+        loops+=1
+        if loops > 100:
+            print(opcodes)
+            assert loops <= 100
         if isObjDump:
             idx=opcodes.find('<', callop)
-            calltarget=opcodes[idx+1:opcodes.find('+', idx)]
+            calltarget=int(opcodes[opcodes.find('+', idx)+3:opcodes.find('\n', idx)-1], 16)
         if isDumpBin:
             idx=opcodes.find('?', callop);
             calltarget=opcodes[idx:opcodes.find('\n', idx)]
-        #print("   contains call to "+calltarget+" which has found="+str(calltarget in functions))
+        #print("   contains call to "+str(calltarget)+" which has found="+str(calltarget in functions))
         if calltarget != function and calltarget in functions:
             done=False
             expansion=functions[calltarget]
@@ -89,7 +105,7 @@ with open(sys.argv[1]+'.test1.s', "wt") as oh:
     for line in opcodes.splitlines():
         if isObjDump:
             # If the line has two tab chars, it's an instruction
-            if line.count('\t')>1:
+            if line.count('\t')>1 and "data32" not in line:
                 count+=1
         if isDumpBin:
             # If the line is two spaces and some zeros, it's an instruction
