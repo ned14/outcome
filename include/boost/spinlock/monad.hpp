@@ -221,13 +221,13 @@ namespace detail
       }
       type=o.type;
     }
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage &operator=(const value_storage &o) noexcept(is_nothrow_copy_constructible)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage &operator=(const value_storage &o) noexcept(is_nothrow_destructible && is_nothrow_copy_constructible)
     {
       clear();
       new (this) value_storage(o);
       return *this;
     }
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage &operator=(value_storage &&o) noexcept(is_nothrow_move_constructible)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage &operator=(value_storage &&o) noexcept(is_nothrow_destructible && is_nothrow_move_constructible)
     {
       clear();
       new (this) value_storage(std::move(o));
@@ -419,9 +419,9 @@ public:
   //! \brief This monad will never throw exceptions during move construction
   BOOST_STATIC_CONSTEXPR bool is_nothrow_move_constructible = value_storage_type::is_nothrow_move_constructible;
   //! \brief This monad will never throw exceptions during copy assignment
-  BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_assignable = value_storage_type::is_nothrow_copy_assignable;
+  BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_copy_constructible;
   //! \brief This monad will never throw exceptions during move assignment
-  BOOST_STATIC_CONSTEXPR bool is_nothrow_move_assignable = value_storage_type::is_nothrow_move_assignable;
+  BOOST_STATIC_CONSTEXPR bool is_nothrow_move_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_move_constructible;
   //! \brief This monad will never throw exceptions during destruction
   BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
 
