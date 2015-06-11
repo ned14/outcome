@@ -374,7 +374,31 @@ about 2000 assembler instructions as soon as you might touch an exception_type, 
 this with Microsoft and it looks to be hard for them to fix due to backwards compatibility
 reasons.
 
-[1]: GCC 5.1 does a perfect job, VS2015 does a good job, clang 3.7 not so great.
+[1]: GCC 5.1 does a perfect job, VS2015 does a good job, clang 3.7 not so great. See next section.
+
+## Complexity guarantees ##
+
+These x64 opcode guarantees are empirically determined by the unit test suite, and the per-commit
+CI testing will fail if they suddenly are exceeded. The maximum is calculated by taking a monad
+in from a non-visible source where the compiler has to generate code paths to handle an unknown
+input state, whereas the minimum is calculated by setting a monad's state in view of the compiler's
+optimiser such that it can usually completely elide opcodes generated (though note that varies
+enormously by compiler to the extent that the known code generates more opcodes than the unknown code).
+
+<dl>
+ <dt>clang 3.7</dt>
+  <dd>59 opcodes <= Value transport <= 37 opcodes</dd>
+  <dd>7 opcodes <= Error transport <= 52 opcodes</dd>
+  <dd>38 opcodes <= Exception transport <= 39 opcodes</dd>  
+ <dt>GCC 5.1</dt>
+  <dd>1 opcodes <= Value transport <= 113 opcodes</dd>
+  <dd>8 opcodes <= Error transport <= 119 opcodes</dd>
+  <dd>22 opcodes <= Exception transport <= 214 opcodes</dd>
+ <dt>VS2015</dt>
+  <dd>4 opcodes <= Value transport <= 1881 opcodes</dd>
+  <dd>6 opcodes <= Error transport <= 164 opcodes</dd>
+  <dd>1946 opcodes <= Exception transport <= 1936 opcodes</dd>
+</dl>
 
 ## Examples ##
 

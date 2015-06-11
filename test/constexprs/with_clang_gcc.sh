@@ -39,7 +39,9 @@ do
       echo "    <failure message=\"Opcodes generated $GCCVAL exceeds limit\"/>" >> results.xml
     fi
     echo "    <system-out>" >> results.xml
+    echo "<![CDATA[" >> results.xml
     cat $FILE.gcc.S.test1.s >> results.xml
+    echo "]]>" >> results.xml
     echo "    </system-out>" >> results.xml
     echo "  </testcase>" >> results.xml
 
