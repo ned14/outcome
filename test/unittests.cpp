@@ -40,6 +40,13 @@ DEALINGS IN THE SOFTWARE.
 #include <algorithm>
 
 #ifdef _MSC_VER
+# define BOOST_SPINLOCK_POSIX_OPEN ::_open
+# include <io.h>
+#else
+# define BOOST_SPINLOCK_POSIX_OPEN ::open
+#endif
+
+#ifdef _MSC_VER
 //#define BOOST_HAVE_SYSTEM_CONCURRENT_UNORDERED_MAP
 #endif
 
@@ -1025,6 +1032,7 @@ BOOST_AUTO_TEST_CASE(works/monad/optional, "Tests that the monad acts as an opti
 {
   using namespace boost::spinlock::lightweight_futures;
 
+  //! [optional_example]
   auto maybe_getenv=[](const char* n) -> monad<const char *>
   {
       if(const char* x = std::getenv(n))
@@ -1039,6 +1047,46 @@ BOOST_AUTO_TEST_CASE(works/monad/optional, "Tests that the monad acts as an opti
   auto b=maybe_getenv("HOME");
   BOOST_CHECK(b);
   std::cout << "$HOME=" << b.value() << std::endl;
+  //! [optional_example]
+}
+
+BOOST_AUTO_TEST_CASE(works/monad/fileopen, "Tests that the monad semantically represents opening a file")
+{
+  using namespace boost::spinlock::lightweight_futures;
+
+  //! [monad_example]
+  auto openfile=[](std::string path) noexcept -> monad<int>
+  {
+    int fd;
+    while(-1==(fd=BOOST_SPINLOCK_POSIX_OPEN(path.c_str(), 0)) && EINTR==errno);
+    try
+    {
+      if(-1==fd)
+      {
+        int code=errno;
+        // If a temporary failure, this is an expected unexpected outcome
+        if(EBUSY==code || EISDIR==code || ELOOP==code || ENOENT==code || ENOTDIR==code || EPERM==code || EACCES==code)
+          return std::error_code(code, std::generic_category());
+
+        // If a non-temporary failure, this is an unexpected outcome
+        return std::make_exception_ptr(std::system_error(code, std::generic_category(), strerror(code)));
+      }
+      return fd;
+    }
+    catch(...)
+    {
+      // Any exception thrown is truly unexpected
+      return std::current_exception();
+    }
+  };
+  auto a=openfile("shouldneverexistnotever");
+  BOOST_CHECK(!a);
+  BOOST_CHECK(!a.empty());
+  BOOST_CHECK(!a.has_value());
+  BOOST_CHECK(a.has_exception());
+  BOOST_CHECK(a.has_error());
+  BOOST_CHECK(a.get_error()==std::error_code(ENOENT, std::generic_category()));
+  //! [monad_example]
 }
 
 BOOST_AUTO_TEST_CASE(works/monad/noexcept, "Tests that the monad correctly inherits noexcept from its type R")
