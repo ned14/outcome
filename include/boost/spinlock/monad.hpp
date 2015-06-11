@@ -349,8 +349,24 @@ namespace detail
 \tparam throw_error A callable with specification void(monad_errc) to call when needing to throw an exception
 matching monad_errc
 
-This monad can hold empty, a type R, an error_type or an exception_type at a space cost of
-max(20, sizeof(R)+4).
+This monad can hold a fixed variant list of empty, a type `R`, a lightweight `error_type` or a
+heavier `exception_type` at a space cost of `max(20, sizeof(R)+4)`. Features:
+
+* Very lightweight on build times and run times up to the point of zero execution cost and just a four
+byte space overhead. See below for benchmarks. Requires min clang 3.2, GCC 4.7 or VS2015.
+* Just enough monad, nothing more, nothing fancy. Replicates the future API, so if you know how to
+use a future you already know how to use this.
+* Enables convenient all-`noexcept` mathematically verifiable close semantic design, so
+why bother with Rust anymore?
+* Can replace most uses of `optional<T>`.
+* Deep integration with lightweight future-promise (i.e. async monadic programming) also in this library.
+* Comprehensive unit testing and validation suite.
+* Mirrors `noexcept` of type R.
+* Type R can have no default constructor, move nor copy.
+* Works inside a STL container, and type R can be a STL container.
+  * No comparison operations nor hashing is provided, deliberately to keep things simple.
+
+## Notes: ##
 
 So long as you avoid the exception_type code paths, this implementation will be
 ideally reduced to as few assembler instructions as possible by most recent compilers [1]
