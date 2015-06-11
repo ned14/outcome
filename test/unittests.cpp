@@ -1204,6 +1204,21 @@ BOOST_AUTO_TEST_CASE(works/monad/containers, "Tests that the monad works as inte
   BOOST_CHECK(vect[1].get().back()==4);
 }
 
+BOOST_AUTO_TEST_CASE(works/monad/swap, "Tests that the monad swaps as intended")
+{
+  using namespace boost::spinlock::lightweight_futures;
+  monad<std::string> a("niall"), b("douglas");
+  BOOST_CHECK(a.get()=="niall");
+  BOOST_CHECK(b.get()=="douglas");
+  std::swap(a, b);
+  BOOST_CHECK(a.get()=="douglas");
+  BOOST_CHECK(b.get()=="niall");
+  a.set_error(std::error_code());
+  std::swap(a, b);
+  BOOST_CHECK(a.get()=="niall");
+  BOOST_CHECK(b.get_error()==std::error_code());
+}
+
 BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as intended")
 {
   using namespace boost::spinlock::lightweight_futures;
