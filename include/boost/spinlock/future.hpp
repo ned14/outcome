@@ -36,6 +36,8 @@ DEALINGS IN THE SOFTWARE.
 
 /*! \file future.hpp
 \brief Provides a lightweight next generation future with N4399 Concurrency TS extensions
+
+\headerfile include/boost/spinlock/future.hpp ""
 */
 
 BOOST_SPINLOCK_V1_NAMESPACE_BEGIN

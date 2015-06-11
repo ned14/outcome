@@ -48,6 +48,8 @@ DEALINGS IN THE SOFTWARE.
 
 /*! \file monad.hpp
 \brief Provides a lightweight simple monadic value transport
+
+\headerfile include/boost/spinlock/monad.hpp ""
 */
 
 BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
@@ -376,10 +378,10 @@ reasons.
 [1]: GCC 5.1 does a perfect job, VS2015 does a good job, clang 3.7 not so great.
 
 
-## As an alternative to optional<T> ##
+### As an alternative to `optional<T>` ###
 
 Something not so obvious is that this monad can have an empty state, and therefore
-can stand in for optional<T> like this:
+can stand in for `optional<T>` like this:
 
 \code
   auto maybe_getenv=[](const char* n) -> monad<const char *>
@@ -398,10 +400,10 @@ can stand in for optional<T> like this:
   std::cout << "$HOME=" << b.value() << std::endl;
 \endcode
 
-The API is actually not too distant from optional<T>, so with a bit of regex find and replace
-you could use monad<T> instead.
+The API is actually not too distant from `optional<T>`, so with a bit of regex find and replace
+you could use `monad<T>` instead.
 
-The need for monad<T> to be able to be empty was to make exception throws  by T during copy and move
+The need for `monad<T>` to be able to be empty was to make exception throws by T during copy and move
 construction lightweight. If that happens, the monad always has empty state afterwards.
 */
 template<typename R, class _error_type=std::error_code, class _exception_type=std::exception_ptr, class throw_error=detail::throw_monad_error> class monad
