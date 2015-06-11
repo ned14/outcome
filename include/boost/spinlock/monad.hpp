@@ -375,7 +375,8 @@ reasons.
 
 [1]: GCC 5.1 does a perfect job, VS2015 does a good job, clang 3.7 not so great.
 
-\heading As an alternative to optional<T>
+
+## As an alternative to optional<T> ##
 
 Something not so obvious is that this monad can have an empty state, and therefore
 can stand in for optional<T> like this:
@@ -391,9 +392,10 @@ can stand in for optional<T> like this:
   auto a=maybe_getenv("SHOULDNEVEREXIST");
   BOOST_CHECK(!a);
   BOOST_CHECK_THROW(a.value(), monad_error);
+  BOOST_CHECK(a.value_or(nullptr)==nullptr);
   auto b=maybe_getenv("HOME");
   BOOST_CHECK(b);
-  std::cout << "$HOME=" << b.get() << std::endl;
+  std::cout << "$HOME=" << b.value() << std::endl;
 \endcode
 
 The API is actually not too distant from optional<T>, so with a bit of regex find and replace

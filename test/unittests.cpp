@@ -1034,10 +1034,11 @@ BOOST_AUTO_TEST_CASE(works/monad/optional, "Tests that the monad acts as an opti
   };
   auto a=maybe_getenv("SHOULDNEVEREXIST");
   BOOST_CHECK(!a);
-  BOOST_CHECK_THROW(a.get(), monad_error);
+  BOOST_CHECK_THROW(a.value(), monad_error);
+  BOOST_CHECK(a.value_or(nullptr)==nullptr);
   auto b=maybe_getenv("HOME");
   BOOST_CHECK(b);
-  std::cout << "$HOME=" << b.get() << std::endl;
+  std::cout << "$HOME=" << b.value() << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(works/monad/noexcept, "Tests that the monad correctly inherits noexcept from its type R")
