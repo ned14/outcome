@@ -379,14 +379,14 @@ reasons.
 
 ## Examples ##
 
-\snippet test/unittests.cpp monad_example
+\snippet unittests.cpp monad_example
 
 ### As an alternative to `optional<T>` ###
 
 Something not so obvious is that this monad can have an empty state, and therefore
 can stand in for `optional<T>` like this:
 
-\snippet test/unittests.cpp optional_example
+\snippet unittests.cpp optional_example
 
 The API is actually not too distant from `optional<T>`, so with a bit of regex find and replace
 you could use `monad<T>` instead.
