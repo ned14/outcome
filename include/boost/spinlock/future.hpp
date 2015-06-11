@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_SPINLOCK_FUTURE_HPP
 
 #include "monad.hpp"
+#include <future>
 
 /*! \file future.hpp
 \brief Provides a lightweight next generation future with N4399 Concurrency TS extensions

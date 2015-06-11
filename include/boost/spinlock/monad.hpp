@@ -33,7 +33,6 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_SPINLOCK_MONAD_HPP
 
 #include "spinlock.hpp"
-#include <future>
 
 // For some odd reason, VS2015 really hates to do much inlining unless forced
 #ifdef _MSC_VER
