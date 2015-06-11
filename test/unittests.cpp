@@ -1019,31 +1019,174 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.get_error());
     BOOST_CHECK(m.get_exception()==e);
   }
+}
+
+BOOST_AUTO_TEST_CASE(works/monad/noexcept, "Tests that the monad correctly inherits noexcept from its type R")
+{
+  using namespace boost::spinlock::lightweight_futures;
   {
     typedef monad<int> type;
     std::cout << "monad<int> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
     std::cout << "monad<int> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
+    std::cout << "monad<int> is_nothrow_copy_assignable="    << type::is_nothrow_copy_assignable << std::endl;
+    std::cout << "monad<int> is_nothrow_move_assignable="    << type::is_nothrow_move_assignable << std::endl;
     std::cout << "monad<int> is_nothrow_destructible="       << type::is_nothrow_destructible << std::endl;
     BOOST_CHECK(type::is_nothrow_copy_constructible == std::is_nothrow_copy_constructible<type>::value);
     BOOST_CHECK(type::is_nothrow_move_constructible == std::is_nothrow_move_constructible<type>::value);
+    BOOST_CHECK(type::is_nothrow_copy_assignable    == std::is_nothrow_copy_assignable<type>::value);
+    BOOST_CHECK(type::is_nothrow_move_assignable    == std::is_nothrow_move_assignable<type>::value);
     BOOST_CHECK(type::is_nothrow_destructible       == std::is_nothrow_destructible<type>::value);
+    BOOST_CHECK(true  == std::is_nothrow_copy_constructible<type>::value);
+    BOOST_CHECK(true  == std::is_nothrow_move_constructible<type>::value);
+    BOOST_CHECK(true  == std::is_nothrow_copy_assignable<type>::value);
+    BOOST_CHECK(true  == std::is_nothrow_move_assignable<type>::value);
+    BOOST_CHECK(true  == std::is_nothrow_destructible<type>::value);
   }
   {
     typedef monad<std::string> type;
     std::cout << "monad<string> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
     std::cout << "monad<string> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
-    std::cout << "monad<string> is_nothrow_destructible=" << type::is_nothrow_destructible << std::endl;
+    std::cout << "monad<string> is_nothrow_copy_assignable="    << type::is_nothrow_copy_assignable << std::endl;
+    std::cout << "monad<string> is_nothrow_move_assignable="    << type::is_nothrow_move_assignable << std::endl;
+    std::cout << "monad<string> is_nothrow_destructible="       << type::is_nothrow_destructible << std::endl;
     BOOST_CHECK(type::is_nothrow_copy_constructible == std::is_nothrow_copy_constructible<type>::value);
     BOOST_CHECK(type::is_nothrow_move_constructible == std::is_nothrow_move_constructible<type>::value);
-    BOOST_CHECK(type::is_nothrow_destructible == std::is_nothrow_destructible<type>::value);
+    BOOST_CHECK(type::is_nothrow_copy_assignable    == std::is_nothrow_copy_assignable<type>::value);
+    BOOST_CHECK(type::is_nothrow_move_assignable    == std::is_nothrow_move_assignable<type>::value);
+    BOOST_CHECK(type::is_nothrow_destructible       == std::is_nothrow_destructible<type>::value);
+    BOOST_CHECK(false == std::is_nothrow_copy_constructible<type>::value);
+    BOOST_CHECK(true  == std::is_nothrow_move_constructible<type>::value);
+    BOOST_CHECK(false == std::is_nothrow_copy_assignable<type>::value);
+    BOOST_CHECK(true  == std::is_nothrow_move_assignable<type>::value);
+    BOOST_CHECK(true  == std::is_nothrow_destructible<type>::value);
+  }
+  {
+    struct Except {
+      int n;
+      Except() = delete;
+      Except(const Except &) noexcept(false) {}
+      Except(Except &&) noexcept(false) {}
+      ~Except() noexcept(false) { }
+    };
+    typedef monad<Except> type;
+    std::cout << "monad<Except> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
+    std::cout << "monad<Except> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
+    std::cout << "monad<Except> is_nothrow_copy_assignable="    << type::is_nothrow_copy_assignable << std::endl;
+    std::cout << "monad<Except> is_nothrow_move_assignable="    << type::is_nothrow_move_assignable << std::endl;
+    std::cout << "monad<Except> is_nothrow_destructible="       << type::is_nothrow_destructible << std::endl;
+    BOOST_CHECK(type::is_nothrow_copy_constructible == std::is_nothrow_copy_constructible<type>::value);
+    BOOST_CHECK(type::is_nothrow_move_constructible == std::is_nothrow_move_constructible<type>::value);
+    BOOST_CHECK(type::is_nothrow_copy_assignable    == std::is_nothrow_copy_assignable<type>::value);
+    BOOST_CHECK(type::is_nothrow_move_assignable    == std::is_nothrow_move_assignable<type>::value);
+    BOOST_CHECK(type::is_nothrow_destructible       == std::is_nothrow_destructible<type>::value);
+    BOOST_CHECK(false == std::is_nothrow_copy_constructible<type>::value);
+    BOOST_CHECK(false == std::is_nothrow_move_constructible<type>::value);
+    BOOST_CHECK(false == std::is_nothrow_copy_assignable<type>::value);
+    BOOST_CHECK(false == std::is_nothrow_move_assignable<type>::value);
+    BOOST_CHECK(false == std::is_nothrow_destructible<type>::value);
   }
 }
 
 BOOST_AUTO_TEST_CASE(works/monad/udts, "Tests that the monad works as intended with user-defined types")
 {
   using namespace boost::spinlock::lightweight_futures;
-  // Try out types missing default constructors, move constructors etc.
-  // Also try out types which throw during move/copy, destruct etc.
+  // No default constructor, no copy/move, no assignment
+  {
+    struct udt
+    {
+      int a;
+      udt(int _a) : a(_a) { }
+      udt() = delete;
+      udt(const udt &) = delete;
+      udt(udt &&) = delete;
+      udt &operator=(const udt &) = delete;
+      udt &operator=(udt &&) = delete;
+    };
+    monad<udt> foo(5);
+    BOOST_CHECK(5==foo.get().a);
+  }
+  // Emplace construct, throws during move and copy
+  {
+    struct udt
+    {
+      std::string a;
+      udt(std::string _a) : a(_a) { }
+      udt() = delete;
+      udt(const udt &) { throw std::logic_error("copy"); }
+      udt(udt &&) { throw std::logic_error("move"); }
+      udt &operator=(const udt &) { throw std::logic_error("copy"); }
+      udt &operator=(udt &&) { throw std::logic_error("move"); }
+    };
+    // Emplace constructs
+    monad<udt> foo("niall");
+    BOOST_CHECK("niall"==foo.get().a);
+    try
+    {
+      auto foo2(foo);
+      BOOST_CHECK(false);
+    }
+    catch(const std::logic_error &e)
+    {
+      BOOST_CHECK(!strcmp(e.what(), "copy"));
+    }
+    catch(...)
+    {
+      BOOST_CHECK(false);
+    }
+    BOOST_CHECK("niall"==foo.get().a);
+    try
+    {
+      auto foo2(std::move(foo));
+      BOOST_CHECK(false);
+    }
+    catch(const std::logic_error &e)
+    {
+      BOOST_CHECK(!strcmp(e.what(), "move"));
+    }
+    catch(...)
+    {
+      BOOST_CHECK(false);
+    }
+    BOOST_CHECK("niall"==foo.get().a);
+    // Does throwing during copy assignment work?
+    {
+      monad<udt> foo2("douglas");
+      try
+      {
+        foo2=foo;
+        BOOST_CHECK(false);
+      }
+      catch(const std::logic_error &e)
+      {
+        BOOST_CHECK(!strcmp(e.what(), "copy"));
+        BOOST_CHECK(foo2.empty());
+      }
+      catch(...)
+      {
+        BOOST_CHECK(false);
+      }
+      BOOST_CHECK("niall"==foo.get().a);
+    }
+    // Does throwing during move assignment work?
+    {
+      monad<udt> foo2("douglas");
+      try
+      {
+        foo2=std::move(foo);
+        BOOST_CHECK(false);
+      }
+      catch(const std::logic_error &e)
+      {
+        BOOST_CHECK(!strcmp(e.what(), "move"));
+        BOOST_CHECK(foo2.empty());
+      }
+      catch(...)
+      {
+        BOOST_CHECK(false);
+      }
+      BOOST_CHECK("niall"==foo.get().a);
+    }
+  }
 }
 
 BOOST_AUTO_TEST_CASE(works/monad/containers, "Tests that the monad works as intended inside containers")

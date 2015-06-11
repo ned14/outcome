@@ -163,6 +163,8 @@ namespace detail
     
     BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_constructible=std::is_nothrow_copy_constructible<value_type>::value && std::is_nothrow_copy_constructible<exception_type>::value && std::is_nothrow_copy_constructible<error_type>::value;
     BOOST_STATIC_CONSTEXPR bool is_nothrow_move_constructible=std::is_nothrow_move_constructible<value_type>::value && std::is_nothrow_move_constructible<exception_type>::value && std::is_nothrow_move_constructible<error_type>::value;
+    BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_assignable=std::is_nothrow_copy_assignable<value_type>::value && std::is_nothrow_copy_assignable<exception_type>::value && std::is_nothrow_copy_assignable<error_type>::value;
+    BOOST_STATIC_CONSTEXPR bool is_nothrow_move_assignable=std::is_nothrow_move_assignable<value_type>::value && std::is_nothrow_move_assignable<exception_type>::value && std::is_nothrow_move_assignable<error_type>::value;
     BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible=std::is_nothrow_destructible<value_type>::value && std::is_nothrow_destructible<exception_type>::value && std::is_nothrow_destructible<error_type>::value;
     
     BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage() noexcept : type(storage_type::empty) { }
@@ -172,6 +174,9 @@ namespace detail
     BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : value(std::move(v)), type(storage_type::value) { }
     BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : error(std::move(v)), type(storage_type::error) { }
     BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : exception(std::move(v)), type(storage_type::exception) { }
+    struct emplace_t {};
+    template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit value_storage(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value) : value(std::forward<Args>(args)...), type(storage_type::value) { }
+
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage(const value_storage &o) noexcept(is_nothrow_copy_constructible) : type(storage_type::empty)
     {
       switch(o.type)
@@ -388,23 +393,31 @@ public:
   BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_constructible = value_storage_type::is_nothrow_copy_constructible;
   //! \brief This monad will never throw exceptions during move construction
   BOOST_STATIC_CONSTEXPR bool is_nothrow_move_constructible = value_storage_type::is_nothrow_move_constructible;
+  //! \brief This monad will never throw exceptions during copy assignment
+  BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_assignable = value_storage_type::is_nothrow_copy_assignable;
+  //! \brief This monad will never throw exceptions during move assignment
+  BOOST_STATIC_CONSTEXPR bool is_nothrow_move_assignable = value_storage_type::is_nothrow_move_assignable;
   //! \brief This monad will never throw exceptions during destruction
   BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
 
   //! \brief Default constructor, initialises to empty
   monad() = default;
+  //! \brief Implicit constructor of a value_type, also allows emplacement without any other means of construction
+  template<class Arg, class... Args, typename = typename std::enable_if<std::is_constructible<value_type, Arg, Args...>::value>::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value) : _storage(typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...) { }
+#if 0
   //! \brief Implicit constructor from a value_type by copy
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const value_type &v) : _storage(v) { }
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : _storage(v) { }
   //! \brief Implicit constructor from a value_type by move
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(value_type &&v) : _storage(std::move(v)) { }
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : _storage(std::move(v)) { }
+#endif
   //! \brief Implicit constructor from a error_type by copy
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const error_type &v) : _storage(v) { }
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : _storage(v) { }
   //! \brief Implicit constructor from a error_type by move
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(error_type &&v) : _storage(std::move(v)) { }
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : _storage(std::move(v)) { }
   //! \brief Implicit constructor from a exception_type by copy
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const exception_type &v) : _storage(v) { }
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : _storage(v) { }
   //! \brief Implicit constructor from a exception_type by move
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(exception_type &&v) : _storage(std::move(v)) { }
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : _storage(std::move(v)) { }
   //! \brief Move constructor
   monad(monad &&) = default;
   //! \brief Move assignment. Firstly clears any existing state, so exception throws during move will leave the monad empty.

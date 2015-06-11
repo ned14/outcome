@@ -32,7 +32,7 @@ DEALINGS IN THE SOFTWARE.
 #ifndef BOOST_SPINLOCK_HPP
 #define BOOST_SPINLOCK_HPP
 
-#include <cassert>
+#include <assert.h>
 #include <vector>
 #include <memory>
 #include <array>
