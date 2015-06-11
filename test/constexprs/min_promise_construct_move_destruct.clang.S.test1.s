@@ -1,22 +1,19 @@
    0:	41 56                	push   %r14
    2:	53                   	push   %rbx
    3:	48 83 ec 48          	sub    $0x48,%rsp
-   7:	c7 44 24 38 00 00 00 	movl   $0x0,0x38(%rsp)
-   e:	00 
-   f:	c6 44 24 40 00       	movb   $0x0,0x40(%rsp)
-  14:	48 8d 5c 24 08       	lea    0x8(%rsp),%rbx
-  19:	4c 8d 74 24 28       	lea    0x28(%rsp),%r14
-  1e:	48 89 df             	mov    %rbx,%rdi
-  21:	4c 89 f6             	mov    %r14,%rsi
-  24:	e8 00 00 00 00       	callq  29 <_Z5test1v+0x29>
-  29:	48 89 df             	mov    %rbx,%rdi
-  2c:	e8 00 00 00 00       	callq  31 <_Z5test1v+0x31>
-  31:	4c 89 f7             	mov    %r14,%rdi
-  34:	e8 00 00 00 00       	callq  39 <_Z5test1v+0x39>
-  39:	48 83 c4 48          	add    $0x48,%rsp
-  3d:	5b                   	pop    %rbx
-  3e:	41 5e                	pop    %r14
-  40:	c3                   	retq   
-  41:	66 66 66 66 66 66 2e 	data32 data32 data32 data32 data32 nopw %cs:0x0(%rax,%rax,1)
-  48:	0f 1f 84 00 00 00 00 
-  4f:	00 
+   7:	c6 44 24 38 00       	movb   $0x0,0x38(%rsp)
+   c:	c6 44 24 40 00       	movb   $0x0,0x40(%rsp)
+  11:	48 8d 5c 24 08       	lea    0x8(%rsp),%rbx
+  16:	4c 8d 74 24 28       	lea    0x28(%rsp),%r14
+  1b:	48 89 df             	mov    %rbx,%rdi
+  1e:	4c 89 f6             	mov    %r14,%rsi
+  21:	e8 00 00 00 00       	callq  26 <_Z5test1v+0x26>
+  26:	48 89 df             	mov    %rbx,%rdi
+  29:	e8 00 00 00 00       	callq  2e <_Z5test1v+0x2e>
+  2e:	4c 89 f7             	mov    %r14,%rdi
+  31:	e8 00 00 00 00       	callq  36 <_Z5test1v+0x36>
+  36:	48 83 c4 48          	add    $0x48,%rsp
+  3a:	5b                   	pop    %rbx
+  3b:	41 5e                	pop    %r14
+  3d:	c3                   	retq   
+  3e:	66 90                	xchg   %ax,%ax

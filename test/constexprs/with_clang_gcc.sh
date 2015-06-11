@@ -29,10 +29,14 @@ do
   CLANGVAL=$(python3 count_opcodes.py $FILE.clang.S)
   CLANGLINE=$CLANGLINE$CLANGVAL
 
-  if [ "$FILE" != "monad_construct_exception_destruct" ]; then
+  # We only care about the min_* tests
+  if [ "${FILE#min_}" != "$FILE" ]; then
     echo "  <testcase name=\"${FILE}.gcc\">" >> results.xml
-    if [ $GCCVAL -gt 5 ] && ([ "$FILE" != "monad_construct_error_move_destruct" ] || [ $GCCVAL -gt 10 ]); then
-      echo "    <failure message=\"Opcodes generated $GCCVAL exceeds 5\"/>" >> results.xml
+    if [ $GCCVAL -gt 5 ] \
+         && ([ "$FILE" != "min_monad_construct_error_move_destruct" ] || [ $GCCVAL -gt 10 ]) \
+         && ([ "$FILE" != "min_monad_construct_exception_destruct" ] || [ $GCCVAL -gt 30 ]) \
+      ; then
+      echo "    <failure message=\"Opcodes generated $GCCVAL exceeds limit\"/>" >> results.xml
     fi
     echo "    <system-out>" >> results.xml
     cat $FILE.gcc.S.test1.s >> results.xml
@@ -42,7 +46,7 @@ do
     echo "  <testcase name=\"${FILE}.clang\">" >> results.xml
     if [ $CLANGVAL -gt 5 ]; then
       echo "    <skipped/>" >> results.xml
-  #    echo "    <failure message=\"Opcodes generated $CLANGVAL exceeds 5\"/>" >> results.xml
+  #    echo "    <failure message=\"Opcodes generated $CLANGVAL exceeds limit\"/>" >> results.xml
     fi
     echo "    <system-out>" >> results.xml
     echo "<![CDATA[" >> results.xml
