@@ -1021,6 +1021,25 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
   }
 }
 
+BOOST_AUTO_TEST_CASE(works/monad/optional, "Tests that the monad acts as an optional R")
+{
+  using namespace boost::spinlock::lightweight_futures;
+
+  auto maybe_getenv=[](const char* n) -> monad<const char *>
+  {
+      if(const char* x = std::getenv(n))
+         return x;
+      else
+         return {};
+  };
+  auto a=maybe_getenv("SHOULDNEVEREXIST");
+  BOOST_CHECK(!a);
+  BOOST_CHECK_THROW(a.get(), monad_error);
+  auto b=maybe_getenv("HOME");
+  BOOST_CHECK(b);
+  std::cout << "$HOME=" << b.get() << std::endl;
+}
+
 BOOST_AUTO_TEST_CASE(works/monad/noexcept, "Tests that the monad correctly inherits noexcept from its type R")
 {
   using namespace boost::spinlock::lightweight_futures;
@@ -1118,7 +1137,9 @@ BOOST_AUTO_TEST_CASE(works/monad/udts, "Tests that the monad works as intended w
       udt &operator=(udt &&) { throw std::logic_error("move"); }
     };
     // Emplace constructs
-    monad<udt> foo("niall");
+    monad<udt> foo("douglas");
+    BOOST_CHECK("douglas"==foo.get().a);
+    foo.emplace("niall");
     BOOST_CHECK("niall"==foo.get().a);
     try
     {

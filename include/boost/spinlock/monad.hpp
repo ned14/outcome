@@ -299,6 +299,13 @@ namespace detail
       new (&value) value_type(std::forward<U>(v));
       type=storage_type::value;
     }
+    template<class... Args> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void emplace_value(Args &&... v)
+    {
+      if(type!=storage_type::empty)
+          throw_already_set();
+      new (&value) value_type(std::forward<Args>(v)...);
+      type=storage_type::value;
+    }
     void set_exception(exception_type e)
     {
       if(type!=storage_type::empty)
@@ -367,6 +374,33 @@ this with Microsoft and it looks to be hard for them to fix due to backwards com
 reasons.
 
 [1]: GCC 5.1 does a perfect job, VS2015 does a good job, clang 3.7 not so great.
+
+\heading As an alternative to optional<T>
+
+Something not so obvious is that this monad can have an empty state, and therefore
+can stand in for optional<T> like this:
+
+\code
+  auto maybe_getenv=[](const char* n) -> monad<const char *>
+  {
+      if(const char* x = std::getenv(n))
+         return x;
+      else
+         return {};
+  };
+  auto a=maybe_getenv("SHOULDNEVEREXIST");
+  BOOST_CHECK(!a);
+  BOOST_CHECK_THROW(a.value(), monad_error);
+  auto b=maybe_getenv("HOME");
+  BOOST_CHECK(b);
+  std::cout << "$HOME=" << b.get() << std::endl;
+\endcode
+
+The API is actually not too distant from optional<T>, so with a bit of regex find and replace
+you could use monad<T> instead.
+
+The need for monad<T> to be able to be empty was to make exception throws  by T during copy and move
+construction lightweight. If that happens, the monad always has empty state afterwards.
 */
 template<typename R, class _error_type=std::error_code, class _exception_type=std::exception_ptr, class throw_error=detail::throw_monad_error> class monad
 {
@@ -546,6 +580,8 @@ public:
   BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v) { _storage.clear(); _storage.set_value(v); }
   //! \brief Disposes of any existing state, setting the monad to a move of the value_type
   BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(value_type &&v) { _storage.clear(); _storage.set_value(std::move(v)); }
+  //! \brief Disposes of any existing state, setting the monad to an emplaced construction
+  template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR void emplace(Args &&... args) { _storage.clear(); _storage.emplace_value(std::forward<Args>(args)...); }
   
   //! \brief If contains an error_type, returns that error_type, else returns a null error_type. Can only throw the exception future_error(no_state) if empty.
   BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() const
