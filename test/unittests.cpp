@@ -44,6 +44,7 @@ DEALINGS IN THE SOFTWARE.
 # include <io.h>
 #else
 # define BOOST_SPINLOCK_POSIX_OPEN ::open
+# include <fcntl.h>
 #endif
 
 #ifdef _MSC_VER

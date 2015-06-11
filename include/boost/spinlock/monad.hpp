@@ -572,7 +572,7 @@ public:
   //! \brief Disposes of any existing state, setting the monad to a move of the value_type
   BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(value_type &&v) { _storage.clear(); _storage.set_value(std::move(v)); }
   //! \brief Disposes of any existing state, setting the monad to an emplaced construction
-  template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR void emplace(Args &&... args) { _storage.clear(); _storage.emplace_value(std::forward<Args>(args)...); }
+  template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP void emplace(Args &&... args) { _storage.clear(); _storage.emplace_value(std::forward<Args>(args)...); }
   
   //! \brief If contains an error_type, returns that error_type, else returns a null error_type. Can only throw the exception future_error(no_state) if empty.
   BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() const
