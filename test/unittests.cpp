@@ -1192,8 +1192,16 @@ BOOST_AUTO_TEST_CASE(works/monad/udts, "Tests that the monad works as intended w
 BOOST_AUTO_TEST_CASE(works/monad/containers, "Tests that the monad works as intended inside containers")
 {
   using namespace boost::spinlock::lightweight_futures;
-  // Try out types missing default constructors, move constructors etc.
-  // Also try out types which throw during move/copy, destruct etc.
+  std::vector<monad<std::vector<int>>> vect;
+  vect.push_back({5, 6, 7, 8});
+  vect.push_back({1, 2, 3, 4});
+  BOOST_REQUIRE(vect.size()==2);
+  BOOST_CHECK(vect[0].get().size()==4);
+  BOOST_CHECK(vect[1].get().size()==4);
+  BOOST_CHECK(vect[0].get().front()==5);
+  BOOST_CHECK(vect[0].get().back()==8);
+  BOOST_CHECK(vect[1].get().front()==1);
+  BOOST_CHECK(vect[1].get().back()==4);
 }
 
 BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as intended")

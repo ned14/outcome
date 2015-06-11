@@ -404,12 +404,8 @@ public:
   monad() = default;
   //! \brief Implicit constructor of a value_type, also allows emplacement without any other means of construction
   template<class Arg, class... Args, typename = typename std::enable_if<std::is_constructible<value_type, Arg, Args...>::value>::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value) : _storage(typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...) { }
-#if 0
-  //! \brief Implicit constructor from a value_type by copy
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : _storage(v) { }
-  //! \brief Implicit constructor from a value_type by move
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : _storage(std::move(v)) { }
-#endif
+  //! \brief Implicit constructor from an initializer list
+  template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(std::initializer_list<U> l) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>>::value) : _storage(typename value_storage_type::emplace_t(), std::move(l)) { }
   //! \brief Implicit constructor from a error_type by copy
   BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : _storage(v) { }
   //! \brief Implicit constructor from a error_type by move
