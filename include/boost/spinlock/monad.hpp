@@ -387,16 +387,16 @@ enormously by compiler to the extent that the known code generates more opcodes 
 
 <dl>
  <dt>clang 3.7</dt>
-  <dd>59 opcodes <= Value transport <= 37 opcodes</dd>
-  <dd>7 opcodes <= Error transport <= 52 opcodes</dd>
+  <dd>59 opcodes <= Value transport <= 37 opcodes<br></dd>
+  <dd>7 opcodes <= Error transport <= 52 opcodes<br></dd>
   <dd>38 opcodes <= Exception transport <= 39 opcodes</dd>  
  <dt>GCC 5.1</dt>
-  <dd>1 opcodes <= Value transport <= 113 opcodes</dd>
-  <dd>8 opcodes <= Error transport <= 119 opcodes</dd>
+  <dd>1 opcodes <= Value transport <= 113 opcodes<br></dd>
+  <dd>8 opcodes <= Error transport <= 119 opcodes<br></dd>
   <dd>22 opcodes <= Exception transport <= 214 opcodes</dd>
  <dt>VS2015</dt>
-  <dd>4 opcodes <= Value transport <= 1881 opcodes</dd>
-  <dd>6 opcodes <= Error transport <= 164 opcodes</dd>
+  <dd>4 opcodes <= Value transport <= 1881 opcodes<br></dd>
+  <dd>6 opcodes <= Error transport <= 164 opcodes<br></dd>
   <dd>1946 opcodes <= Exception transport <= 1936 opcodes</dd>
 </dl>
 
