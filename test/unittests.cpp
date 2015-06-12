@@ -28,6 +28,8 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#define _CRT_SECURE_NO_WARNINGS 1
+
 #define BOOST_CATCH_CUSTOM_MAIN_DEFINED
 #include "../include/boost/spinlock/spinlock.hpp"
 #include "../include/boost/spinlock/bindlib/include/boost/test/unit_test.hpp"
@@ -1319,22 +1321,43 @@ BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with then
   std::error_code ec;
   monad<std::string> a("niall"), b(ec);
   // Does auto unwrapping work?
-  auto c(a.then([](monad<std::string> &&v){return v;}));
+  auto c(a.then([](monad<std::string> v){return v;}));
   BOOST_CHECK(c.get()=="niall");
+  BOOST_CHECK(a.get()=="niall");
   // Does auto wrapping work?
   auto d(a.then([](monad<std::string> &&){return 5;}));
   BOOST_CHECK(d.get()==5);
+  BOOST_CHECK(a.get()=="niall");
 #ifdef __cpp_generic_lambdas
   // Do auto lambdas work?
   auto e(a.then([](auto v){return v;}));
   BOOST_CHECK(e.get()=="niall");
+  BOOST_CHECK(a.get()=="niall");
 #endif
 
   // Does bind work?
-  auto f(a.bind([](monad<std::string> &&v){return 5;}));
+  auto f(a.bind([](monad<std::string> &&){return 5;}));
   BOOST_CHECK(f.get()==5);
-  auto g(b.bind([](monad<std::string> &&v){return 5;}));
+  auto g(b.bind([](monad<std::string> &&){return 5;}));
   BOOST_CHECK(g.has_error());
+
+  // Does map work?
+  auto h(a.map([](monad<std::string> v){return v;}));
+  BOOST_CHECK(h.get().get()=="niall");
+  auto i(b.map([](monad<std::string> v){return v;}));
+  BOOST_CHECK(i.has_error());
+
+  // Does automatic move semantics work?
+  auto j(a.then([](monad<std::string> &&v){return std::move(v);}));
+  BOOST_CHECK(j.get()=="niall");
+  BOOST_CHECK(a.get().empty());
+#ifdef __cpp_generic_lambdas
+  // Does automatic move semantics with auto lambdas work?
+  a.emplace("niall");
+  auto k(a.then([](auto &&v){return std::move(v);}));
+  BOOST_CHECK(k.get()=="niall");
+  BOOST_CHECK(a.get().empty());
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as intended")
