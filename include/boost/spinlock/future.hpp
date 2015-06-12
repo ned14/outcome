@@ -232,7 +232,7 @@ public:
       throw std::future_error(std::future_errc::future_already_retrieved);
     future_type ret(this);
     h.unlock();
-    return std::move(ret);
+    return ret;
   }
   //! \brief EXTENSION: Does this promise have a future?
   bool has_future() const noexcept

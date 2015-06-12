@@ -204,7 +204,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       }
       spinlockbase(const spinlockbase &) = delete;
       //! Atomically move constructs
-      BOOST_SPINLOCK_RELAXED_CONSTEXPR spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW : v(0)
+      BOOST_SPINLOCK_RELAXED_CONSTEXPR spinlockbase(spinlockbase &&) BOOST_NOEXCEPT_OR_NOTHROW : v(0)
       {
         BOOST_SPINLOCK_ANNOTATE_RWLOCK_CREATE(this);
         //v.store(o.v.exchange(0, memory_order_acq_rel));
