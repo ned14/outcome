@@ -12,13 +12,13 @@ if [ -n "$BUILD_EXTRA" ]; then
   g++ -std=c++0x -pthread -O1 -DNDEBUG -DRUNNING_ON_VALGRIND=1 -g -gdwarf-2 -o unittests_coverage unittests.cpp -lrt -fprofile-arcs -ftest-coverage -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-elide-constructors -fno-inline $INCLUDE
 fi
 echo C++ 14 check
-clang++ -std=c++1y -pthread -O3 -DNDEBUG -g -gdwarf-2 -o unittests_1 unittests.cpp -lrt $INCLUDE
+clang++-3.7 -Wall -Wextra -std=c++14 -pthread -O3 -DNDEBUG -g -gdwarf-2 -o unittests_1 unittests.cpp -lrt $INCLUDE -Wno-unknown-pragmas -Wno-unused-function || true
 echo Building unittests_valgrind ...
 $CXX -std=c++11 -pthread -O1 -DNDEBUG -g -gdwarf-2 -o unittests_valgrind unittests.cpp -lrt -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-elide-constructors -fno-inline -DBOOST_SPINLOCK_ENABLE_VALGRIND $INCLUDE
 echo Building unittests_1 ...
-$CXX -Wall -Wextra -std=c++0x -pthread -O3 -DNDEBUG -g -gdwarf-2 -o unittests_1 unittests.cpp -lrt $INCLUDE
+$CXX -Wall -Wextra -std=c++0x -pthread -O3 -DNDEBUG -g -gdwarf-2 -o unittests_1 unittests.cpp -lrt $INCLUDE -Wno-unknown-pragmas -Wno-unused-function
 echo Building unittests_N ...
-$CXX -Wall -Wextra -std=c++0x -pthread -O3 -DNDEBUG -g -fopenmp -gdwarf-2 -o unittests_N unittests.cpp -lrt $INCLUDE
+$CXX -Wall -Wextra -std=c++0x -pthread -O3 -DNDEBUG -g -fopenmp -gdwarf-2 -o unittests_N unittests.cpp -lrt $INCLUDE -Wno-unused-function
 if [ -n "$BUILD_EXTRA" ]; then
 #  echo Building unittests_stm_1 ...
 #  $CXX -std=c++0x -O3 -DNDEBUG -g -fgnu-tm -DBOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER -o unittests_stm_1 unittests.cpp -lrt $INCLUDE

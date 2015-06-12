@@ -167,8 +167,16 @@ namespace detail
     BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_assignable=std::is_nothrow_copy_assignable<value_type>::value && std::is_nothrow_copy_assignable<exception_type>::value && std::is_nothrow_copy_assignable<error_type>::value;
     BOOST_STATIC_CONSTEXPR bool is_nothrow_move_assignable=std::is_nothrow_move_assignable<value_type>::value && std::is_nothrow_move_assignable<exception_type>::value && std::is_nothrow_move_assignable<error_type>::value;
     BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible=std::is_nothrow_destructible<value_type>::value && std::is_nothrow_destructible<exception_type>::value && std::is_nothrow_destructible<error_type>::value;
-    
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage() noexcept : type(storage_type::empty) { }
+
+#if !defined(__GNUC__) || defined(__clang__)
+    /* If enabled GCC pukes during unwrap() with:
+       /usr/include/c++/5/type_traits:2204:7: error: static assertion failed: declval() must not be used!
+          static_assert(__declval_protector<_Tp>::__stop,
+       Apparently it's a known problem in constexpr compilation, and has been for some years now.
+    */
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR
+#endif
+    value_storage() noexcept : type(storage_type::empty) { }
     BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : value(v), type(storage_type::value) { }
     BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : error(v), type(storage_type::error) { }
     BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : exception(v), type(storage_type::exception) { }
