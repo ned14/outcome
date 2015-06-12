@@ -51,7 +51,7 @@ struct config
   config() : count(0), fail_from((size_t)-1), fail_at((size_t)-1) { }
 };
 
-static config &get_config(bool reset=false)
+static inline config &get_config(bool reset=false)
 {
   static config c;
   if(reset)

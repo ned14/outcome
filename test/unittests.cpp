@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(works/spinlock/threaded, "Tests that the spinlock works as 
     gate.store(threads);
     size_t locked=0;
 #pragma omp parallel for reduction(+:locked)
-    for(int n=0; n<threads; n++)
+    for(int n=0; n<(int) threads; n++)
     {
       --gate;
       while(gate);
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(works/spinlock/transacted, "Tests that the spinlock works a
   }
   size_t threads=gate;
 #pragma omp parallel for
-  for(int i=0; i<1000*threads; i++)
+  for(int i=0; i<(int)(1000*threads); i++)
   {
     BOOST_BEGIN_TRANSACT_LOCK(lock)
     {
