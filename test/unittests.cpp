@@ -1290,6 +1290,29 @@ BOOST_AUTO_TEST_CASE(works/monad/swap, "Tests that the monad swaps as intended")
   BOOST_CHECK(b.get_error()==std::error_code());
 }
 
+BOOST_AUTO_TEST_CASE(works/monad/unwrap, "Tests that the monad unwraps as intended")
+{
+  using namespace boost::spinlock::lightweight_futures;
+  std::error_code ec;
+  monad<std::string> a("niall"), b(ec);
+  monad<monad<std::string>> c(std::move(a)), d(std::move(b));
+  monad<monad<monad<std::string>>> e(std::move(c)), f(std::move(d));
+  monad<monad<monad<monad<std::string>>>> g(std::move(e)), h(std::move(f));
+  auto i(g.unwrap()), j(h.unwrap());
+  BOOST_CHECK((std::is_same<decltype(a), decltype(i)>::value));
+  BOOST_CHECK((std::is_same<decltype(b), decltype(j)>::value));
+  BOOST_CHECK(i.get()=="niall");
+  BOOST_CHECK(j.get_error()==ec);
+  BOOST_CHECK(g.get().get().get().get()=="niall");
+  BOOST_CHECK(h.get().get().get().get_error()==ec);
+  auto k(std::move(g).unwrap()), l(std::move(h).unwrap());
+  BOOST_CHECK((std::is_same<decltype(a), decltype(k)>::value));
+  BOOST_CHECK((std::is_same<decltype(b), decltype(l)>::value));
+  BOOST_CHECK(k.get()=="niall");
+  BOOST_CHECK(l.get_error()==ec);
+  BOOST_CHECK(g.get().get().get().get().empty());
+}
+
 BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as intended")
 {
   using namespace boost::spinlock::lightweight_futures;

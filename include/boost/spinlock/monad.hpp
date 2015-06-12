@@ -341,6 +341,48 @@ namespace detail
   }; 
 }
 
+template<typename R, class _error_type=std::error_code, class _exception_type=std::exception_ptr, class throw_error=detail::throw_monad_error> class monad;
+
+namespace detail
+{
+  template<class M> struct do_unwrap;
+  template<class R, class _error_type, class _exception_type, class throw_error> struct do_unwrap<monad<R, _error_type, _exception_type, throw_error>>
+  {
+    typedef monad<R, _error_type, _exception_type, throw_error> input_type;
+    typedef input_type output_type;
+    output_type operator()(const input_type &v) { return v; }
+    output_type operator()(input_type &&v) { return std::move(v); }
+  };
+  template<class R, class _error_type, class _exception_type, class throw_error1, class throw_error2> struct do_unwrap<monad<monad<R, _error_type, _exception_type, throw_error1>, _error_type, _exception_type, throw_error2>>
+  {
+    typedef monad<monad<R, _error_type, _exception_type, throw_error1>, _error_type, _exception_type, throw_error2> input_type;
+    typedef typename input_type::value_type unwrapped_type;
+    typedef typename do_unwrap<unwrapped_type>::output_type output_type;
+    output_type operator()(const input_type &v)
+    {
+      if(v.has_exception())
+        return do_unwrap<unwrapped_type>()(v.get_exception());
+      else if(v.has_error())
+        return do_unwrap<unwrapped_type>()(v.get_error());
+      else if(v.has_value())
+        return do_unwrap<unwrapped_type>()(v.get());
+      else
+        return do_unwrap<unwrapped_type>()(unwrapped_type());
+    }
+    output_type operator()(input_type &&v)
+    {
+      if(v.has_exception())
+        return do_unwrap<unwrapped_type>()(std::move(v).get_exception());
+      else if(v.has_error())
+        return do_unwrap<unwrapped_type>()(std::move(v).get_error());
+      else if(v.has_value())
+        return do_unwrap<unwrapped_type>()(std::move(v).get());
+      else
+        return do_unwrap<unwrapped_type>()(unwrapped_type());
+    }
+  };
+}
+
 /*! \class monad
 \brief Implements a lightweight simple monadic value transport with the same semantics and API as a future
 \tparam R The expected type
@@ -357,7 +399,7 @@ byte space overhead. See below for benchmarks. Requires min clang 3.2, GCC 4.7 o
 - Just enough monad, nothing more, nothing fancy. Replicates the future API, so if you know how to
 use a future you already know how to use this.
 - Enables convenient all-`noexcept` mathematically verifiable close semantic design, so
-why bother with Rust anymore?
+why bother with Rust anymore? :)
 - Can replace most uses of `optional<T>`.
 - Deep integration with lightweight future-promise (i.e. async monadic programming) also in this library.
 - Comprehensive unit testing and validation suite.
@@ -367,6 +409,18 @@ why bother with Rust anymore?
   - No comparison operations nor hashing is provided, deliberately to keep things simple.
 
 ## Notes: ##
+
+Something which might surprise people is that:
+
+\code
+monad<std::string> a("niall");
+monad<std::string> b(std::move(a));
+BOOST_CHECK(a.has_value());  // true
+\endcode
+
+Moving a monad does a move of its underlying contents, so any contents remain at whatever
+the move constructor for that content leaves things. In other words, a moved from monad
+does not become empty, if you want that then call clear().
 
 So long as you avoid the exception_type code paths, this implementation will be
 ideally reduced to as few assembler instructions as possible by most recent compilers [1]
@@ -433,7 +487,7 @@ you could use `monad<T>` instead.
 The need for `monad<T>` to be able to be empty was to make exception throws by T during copy and move
 construction lightweight. If that happens, the monad always has empty state afterwards.
 */
-template<typename R, class _error_type=std::error_code, class _exception_type=std::exception_ptr, class throw_error=detail::throw_monad_error> class monad
+template<typename R, class _error_type, class _exception_type, class throw_error> class monad
 {
 public:
   //! \brief The type potentially held by the monad
@@ -467,6 +521,12 @@ public:
 
   //! \brief Default constructor, initialises to empty
   monad() = default;
+#if 0
+  //! \brief Implicit constructor from a value_type by copy
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : _storage(v) { }
+  //! \brief Implicit constructor from a value_type by move
+  BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : _storage(std::move(v)) { }
+#endif
   //! \brief Implicit constructor of a value_type, also allows emplacement without any other means of construction
   template<class Arg, class... Args, typename = typename std::enable_if<std::is_constructible<value_type, Arg, Args...>::value>::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value) : _storage(typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...) { }
   //! \brief Implicit constructor from an initializer list
@@ -651,13 +711,10 @@ public:
     set_exception(make_exception_type(std::forward<E>(e)));
   }
 
-  //! \brief If I am a monad<monad<...>>, return monad<...>
-  // typename todo unwrap() const &;
-  // typename todo unwrap() &&;
-
-  //! \brief If I am a monad<monad<monad<monad<...>>>>, return monad<...>
-  // typename todo unwrap_all();
-  // typename todo unwrap_all() &&;
+  //! \brief If I am a monad<monad<...>>, return copy of most nested monad<...>, else return copy of *this
+  typename detail::do_unwrap<monad>::output_type unwrap() const & { return detail::do_unwrap<monad>()(*this); }
+  //! \brief If I am a monad<monad<...>>, return move of most nested monad<...>, else return move of *this
+  typename detail::do_unwrap<monad>::output_type unwrap() && { return detail::do_unwrap<monad>()(std::move(*this)); }
 
   //! \brief Return monad(F(*this)).unwrap()
   // TODO Only enable if F is of form F(monad<is_constructible<value_type>, c>)
