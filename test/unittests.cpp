@@ -1313,6 +1313,30 @@ BOOST_AUTO_TEST_CASE(works/monad/unwrap, "Tests that the monad unwraps as intend
   BOOST_CHECK(g.get().get().get().get().empty());
 }
 
+BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with then() as intended")
+{
+  using namespace boost::spinlock::lightweight_futures;
+  std::error_code ec;
+  monad<std::string> a("niall"), b(ec);
+  // Does auto unwrapping work?
+  auto c(a.then([](monad<std::string> &&v){return v;}));
+  BOOST_CHECK(c.get()=="niall");
+  // Does auto wrapping work?
+  auto d(a.then([](monad<std::string> &&){return 5;}));
+  BOOST_CHECK(d.get()==5);
+#ifdef __cpp_generic_lambdas
+  // Do auto lambdas work?
+  auto e(a.then([](auto v){return v;}));
+  BOOST_CHECK(e.get()=="niall");
+#endif
+
+  // Does bind work?
+  auto f(a.bind([](monad<std::string> &&v){return 5;}));
+  BOOST_CHECK(f.get()==5);
+  auto g(b.bind([](monad<std::string> &&v){return 5;}));
+  BOOST_CHECK(g.has_error());
+}
+
 BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as intended")
 {
   using namespace boost::spinlock::lightweight_futures;

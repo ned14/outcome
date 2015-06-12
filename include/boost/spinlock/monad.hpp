@@ -358,36 +358,58 @@ namespace detail
   {
     typedef monad<R, _error_type, _exception_type, throw_error> input_type;
     typedef input_type output_type;
-    output_type operator()(const input_type &v) { return v; }
-    output_type operator()(input_type &&v) { return std::move(v); }
+    output_type operator()(const input_type &v) const { return v; }
+    output_type operator()(input_type &&v) const { return std::move(v); }
   };
   template<class R, class _error_type, class _exception_type, class throw_error1, class throw_error2> struct do_unwrap<monad<monad<R, _error_type, _exception_type, throw_error1>, _error_type, _exception_type, throw_error2>>
   {
     typedef monad<monad<R, _error_type, _exception_type, throw_error1>, _error_type, _exception_type, throw_error2> input_type;
     typedef typename input_type::value_type unwrapped_type;
     typedef typename do_unwrap<unwrapped_type>::output_type output_type;
-    output_type operator()(const input_type &v)
+    output_type operator()(const input_type &v) const
     {
-      if(v.has_exception())
-        return do_unwrap<unwrapped_type>()(v.get_exception());
-      else if(v.has_error())
+      if(v.has_error())
         return do_unwrap<unwrapped_type>()(v.get_error());
+      else if(v.has_exception())
+        return do_unwrap<unwrapped_type>()(v.get_exception());
       else if(v.has_value())
         return do_unwrap<unwrapped_type>()(v.get());
       else
         return do_unwrap<unwrapped_type>()(unwrapped_type());
     }
-    output_type operator()(input_type &&v)
+    output_type operator()(input_type &&v) const
     {
-      if(v.has_exception())
-        return do_unwrap<unwrapped_type>()(std::move(v).get_exception());
-      else if(v.has_error())
+      if(v.has_error())
         return do_unwrap<unwrapped_type>()(std::move(v).get_error());
+      else if(v.has_exception())
+        return do_unwrap<unwrapped_type>()(std::move(v).get_exception());
       else if(v.has_value())
         return do_unwrap<unwrapped_type>()(std::move(v).get());
       else
         return do_unwrap<unwrapped_type>()(unwrapped_type());
     }
+  };
+
+  template<class R, class C, class M> struct do_then;
+  // For when R is not a monad
+  template<class R, class C, class T, class _error_type, class _exception_type, class throw_error> struct do_then<R, C, monad<T, _error_type, _exception_type, throw_error>>
+  {
+    typedef C callable_type;
+    typedef monad<R, _error_type, _exception_type, throw_error> output_type;
+    callable_type _c;
+    do_then(const callable_type &c) : _c(c) { }
+    do_then(callable_type &&c) : _c(std::move(c)) { }
+    template<class U> output_type operator()(U &&v) const { return output_type(_c(std::forward<U>(v))); }
+  };
+  // For when R is a monad
+  template<class R, class _error_type1, class _exception_type1, class throw_error1, class C, class T, class _error_type2, class _exception_type2, class throw_error2> struct do_then<monad<R, _error_type1, _exception_type1, throw_error1>, C, monad<T, _error_type2, _exception_type2, throw_error2>>
+  {
+    typedef C callable_type;
+    typedef monad<R, _error_type1, _exception_type1, throw_error1> output_type;
+    callable_type _c;
+    do_then(const callable_type &c) : _c(c) { }
+    do_then(callable_type &&c) : _c(std::move(c)) { }
+    template<class U> output_type operator()(U &&v) const { return _c(std::forward<U>(v)); }
   };
 }
 
@@ -718,19 +740,62 @@ public:
   }
 
   //! \brief If I am a monad<monad<...>>, return copy of most nested monad<...>, else return copy of *this
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+  monad<...> unwrap() const &;
+#else
   typename detail::do_unwrap<monad>::output_type unwrap() const & { return detail::do_unwrap<monad>()(*this); }
+#endif
   //! \brief If I am a monad<monad<...>>, return move of most nested monad<...>, else return move of *this
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+  monad<...> unwrap() &&;
+#else
   typename detail::do_unwrap<monad>::output_type unwrap() && { return detail::do_unwrap<monad>()(std::move(*this)); }
+#endif
 
-  //! \brief Return monad(F(*this)).unwrap()
-  // TODO Only enable if F is of form F(monad<is_constructible<value_type>, c>)
-  // template<class F> typename std::result_of<F(monad<value_type>)>::type then(F &&f);
+  /*! \brief Return monad(F(*this)) or F(*this) if the latter returns a monad.
   
-  //! \brief If bool(*this), return monad(F(*this)).unwrap(), else return monad<result_of<F(*this)>>(error).unwrap()
-  // template<class F> typename std::result_of<F(monad<value_type>)>::type bind(F &&f);
+  The callable F needs to consume a monad obviously enough, however the callable is called with a monad &&
+  so if your callable takes a monad &&, you can move from the monad. Equally, you can avoid copies if your
+  callable takes a reference argument. The callable F can be a generic lambda if desired.
   
-  //! \brief If bool(*this), return monad(F(*this)), else return monad<result_of<F(*this)>>(error)
-  // template<class F> typename std::result_of<F(monad<value_type>)>::type map(F &&f);
+  If your callable does not return a monad, a monad will be constructed to hold the type it does return
+  inheriting the same error_code, exception_type etc of the originating monad. If your callable returns
+  a monad, that monad can be of any template parameter configuration and it will be returned from then(). This
+  allows a very easy way of converting between different configurations of monad cost free.
+  */
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+  template<class F> monad(F(*this)).unwrap() then(F &&f);
+#else
+  template<class F> typename detail::do_then<typename std::result_of<F(monad)>::type, F, monad>::output_type then(F &&f)
+  {
+    return detail::do_then<typename std::result_of<F(monad)>::type, F, monad>(std::forward<F>(f))(std::move(*this));
+  }
+#endif
+  
+  //! \brief If bool(*this), return monad(F(get())).unwrap(), else return monad<result_of<F(get())>>(error)
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+  template<class F> monad(F(get())).unwrap() bind(F &&f);
+#else
+  template<class F> typename detail::do_then<typename std::result_of<F(value_type)>::type, F, monad>::output_type bind(F &&f)
+  {
+    typedef typename detail::do_then<typename std::result_of<F(value_type)>::type, F, monad>::output_type type;
+    if(has_value())
+      return detail::do_then<typename std::result_of<F(value_type)>::type, F, monad>(std::forward<F>(f))(std::move(_storage.value));
+    else if(has_error())
+      return type(_storage.error);
+    else if(has_exception())
+      return type(_storage.exception);
+    else
+      return type();
+  }
+#endif
+  
+  //! \brief If bool(*this), return monad(F(get())), else return monad<result_of<F(get())>>(error)
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+  template<class F> monad(F(get())) map(F &&f);
+#else
+  template<class F> monad<typename detail::do_then<typename std::result_of<F(value_type)>::type, F, monad>::output_type> map(F &&f);
+#endif
 };
 
 // TODO FIXME monad<void> specialisation

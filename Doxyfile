@@ -2027,7 +2027,7 @@ INCLUDE_FILE_PATTERNS  =
 # recursively expanded use the := operator instead of the = operator.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-PREDEFINED             = \
+PREDEFINED             = DOXYGEN_IS_IN_THE_HOUSE=1 \
     BOOST_CONSTEXPR=constexpr \
     BOOST_CXX14_CONSTEXPR=constexpr \
     BOOST_STATIC_CONSTEXPR=static constexpr \
