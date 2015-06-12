@@ -521,12 +521,10 @@ public:
 
   //! \brief Default constructor, initialises to empty
   monad() = default;
-#if 0
   //! \brief Implicit constructor from a value_type by copy
   BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : _storage(v) { }
   //! \brief Implicit constructor from a value_type by move
   BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : _storage(std::move(v)) { }
-#endif
   //! \brief Implicit constructor of a value_type, also allows emplacement without any other means of construction
   template<class Arg, class... Args, typename = typename std::enable_if<std::is_constructible<value_type, Arg, Args...>::value>::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value) : _storage(typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...) { }
   //! \brief Implicit constructor from an initializer list
@@ -638,12 +636,12 @@ public:
       return std::move(_storage.value);
   }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR value_type &get_or(value_type &v) & noexcept
+  BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &get_or(value_type &v) & noexcept
   {
     return has_value() ? _storage.value : v;
   }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR value_type &value_or(value_type &v) & noexcept
+  BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &value_or(value_type &v) & noexcept
   {
     return has_value() ? _storage.value : v;
   }
@@ -658,12 +656,12 @@ public:
     return has_value() ? _storage.value : v;
   }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR value_type &&get_or(value_type &&v) && noexcept
+  BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &&get_or(value_type &&v) && noexcept
   {
     return has_value() ? std::move(_storage.value) : std::move(v);
   }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
-  BOOST_SPINLOCK_FUTURE_CONSTEXPR value_type &&value_or(value_type &&v) && noexcept
+  BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &&value_or(value_type &&v) && noexcept
   {
     return has_value() ? std::move(_storage.value) : std::move(v);
   }

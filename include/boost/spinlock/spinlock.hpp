@@ -257,10 +257,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       }
       BOOST_SPINLOCK_CONSTEXPR bool try_lock() const BOOST_NOEXCEPT_OR_NOTHROW
       {
-        if(v.load(memory_order_consume)) // Avoid unnecessary cache line invalidation traffic
-          return false;
-        else
-          return true;
+        return v.load(memory_order_consume) ? false : true;  // Avoid unnecessary cache line invalidation traffic
       }
       //! If atomic equals expected, sets to 1 and returns true, else false with expected updated to actual value.
       bool try_lock(T &expected) BOOST_NOEXCEPT_OR_NOTHROW
