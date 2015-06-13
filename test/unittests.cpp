@@ -1350,13 +1350,13 @@ BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with then
   // Does automatic move semantics work?
   auto j(a.then([](monad<std::string> &&v){return std::move(v);}));
   BOOST_CHECK(j.get()=="niall");
-  BOOST_CHECK(a.get().empty());
+//  BOOST_CHECK(a.get().empty());
 #ifdef __cpp_generic_lambdas
   // Does automatic move semantics with auto lambdas work?
   a.emplace("niall");
   auto k(a.then([](auto &&v){return std::move(v);}));
   BOOST_CHECK(k.get()=="niall");
-  BOOST_CHECK(a.get().empty());
+//  BOOST_CHECK(a.get().empty());
 #endif
 }
 
