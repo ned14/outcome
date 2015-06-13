@@ -785,6 +785,62 @@ namespace lightweight_futures {
       set_exception(make_exception_type(std::forward<E>(e)));
     }
 
+    /*! \name Monadic programming primitives unwrap(), then(), bind() and map()
+    
+    Classic monadic programming consists of a sequence of nested functional operations:
+    <dl>
+      <dt>JOIN (single): monad<monad<T>>.get() -> monad<T></dt>
+      <dt>JOIN (maximum): monad<monad<monad<monad<T>>>>.unwrap() -> monad<T></dt>
+        <dd>Whatever is the first monad containing a non-monad is returned.</dd>
+      <dt>MAP: monad<T>.map(R(T)) -> monad<R></dt>
+        <dd>If callable maps T to R, map() maps a monad<T> to a monad<R> if monad<T>
+        contains a T. If it contains an error or is empty, that is passed through.</dd>
+      <dt>BIND: monad<T>.bind(monad<R>(T)) -> monad<R></dt>
+      <dt>BIND: monad<T>.bind(R(T)) -> monad<R></dt>
+        <dd>If callable maps T to monad<R> and if monad<T> contains a T, then bind() maps
+        a monad<T> to a monad<R> else if callable maps T to R and if monad<T> contains a T,
+        bind() maps a monad<T> to a monad<R>. In other words, returning a monad from the
+        callable does not wrap it in another monad. If the originating monad did not
+        contain a T, that is passed through.</dd>
+    </dl>
+    We also support monad<T>.then(R(monad<T>)) for semantic equivalence to futures where the
+    callable is called with the originating monad. This
+    acts like bind(), so if the callable returns a monad it is not wrapped in another
+    monad. Unlike map() or bind(), then() always calls the callable no matter what the
+    monad contains, so it is up to you to interrogate the monad. Note that the originating
+    monad is passed by const lvalue ref unless the callable takes a rvalue ref to the monad.
+    
+    A quick use example:
+    \snippet unittests.cpp monad_bind_example
+    
+    You will note in the code example that the type of the callable for bind() and map()
+    determines what operation happens. Here are the rules:
+    - If the monad contains a T and the callable takes a T or an `auto`, then:
+      - If the callable takes a T or any reference to a T which isn't an rvalue reference,
+      the T is passed by const lvalue reference (i.e. copy semantics).
+      - If the callable takes a T by non-const rvalue reference, the T is passed by rvalue ref.
+      This lets you move from the value held by the originating monad if so desired.
+    If the monad doesn't contain a T, pass it through but into whatever new monad type
+    returned by the callable.
+    - If the monad contains an `error_type` and the callable takes an `error_type`, then
+    call the callable, else pass through the monad. For this reason, any callable taking
+    an `error_type` must always return the same monad type as the originating monad.
+    - If the monad contains an `error_type` or an `exception_type` and the callable takes
+    an `exception_type`, then call the callable, else pass through the monad. For this reason,
+    any callable taking an `exception_type` must always return the same monad type as the
+    originating monad.
+    - If the monad is empty and the callable takes no parameters, then call the callable,
+    else pass through the monad. For this reason, any callable with void parameters must
+    always return the same monad type as the originating monad.
+    
+    For maximum build performance, try to avoid bind() and map() as these use some hefty
+    metaprogramming to deduce what kind of bind and map you're doing based on the callables
+    passed. unwrap() is implemented using a recursively expanded structure which is probably
+    okay for low unwrap depths. then() is probably the least weighty of the monadic operators
+    as it's relatively dumb and the only metaprogramming is to determine whether to wrap
+    the return type with a monad or not. 
+    */
+    ///@{
     //! \brief If I am a monad<monad<...>>, return copy of most nested monad<...>, else return copy of *this
   #ifdef DOXYGEN_IS_IN_THE_HOUSE
     monad<...> unwrap() const &;
@@ -855,6 +911,7 @@ namespace lightweight_futures {
         return type();
     }
   #endif
+  ///@}
   };
 
   // TODO FIXME monad<void> specialisation
