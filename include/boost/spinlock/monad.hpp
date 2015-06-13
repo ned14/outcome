@@ -412,8 +412,7 @@ namespace lightweight_futures {
       // temporary copy which should be elided via RVO
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v) const
       {
-        BOOST_STATIC_CONSTEXPR bool moving = is_callable_moving<C, U>::value;
-        return moving
+        return is_callable_moving<C, U>::value
           ? output_type(_c(std::move(v)))
           : output_type(_c(U(v)));
       }
@@ -431,8 +430,7 @@ namespace lightweight_futures {
       // temporary copy which should be elided via RVO
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v) const
       {
-        BOOST_STATIC_CONSTEXPR bool moving = is_callable_moving<C, U>::value;
-        return moving
+        return is_callable_moving<C, U>::value
           ? output_type(_c(std::move(v)))
           : output_type(_c(U(v)));
       }
@@ -598,9 +596,9 @@ namespace lightweight_futures {
       typename = typename std::enable_if<
         std::is_constructible<value_type, Arg, Args...>::value
         && (sizeof...(Args)!=0 || 
-          !std::is_same<value_type, typename std::decay<Arg>::type>::value
+          (!std::is_same<value_type, typename std::decay<Arg>::type>::value
           && !std::is_same<error_type, typename std::decay<Arg>::type>::value
-          && !std::is_same<exception_type, typename std::decay<Arg>::type>::value)
+          && !std::is_same<exception_type, typename std::decay<Arg>::type>::value))
       >::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit monad(Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value) : _storage(typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...) { }
   #endif
     //! \brief Implicit constructor from an initializer list
