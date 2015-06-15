@@ -947,10 +947,10 @@ BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
   {
     int foo;
     // Capturing lambdas
-    auto a = [foo](int) {};
-    auto b = [foo](int&&) {};
-    auto c = [foo](const int&) {};
-    auto d = [foo](int&) {};
+    auto a = [foo](int) { (void) foo; };
+    auto b = [foo](int&&) { (void) foo; };
+    auto c = [foo](const int&) { (void) foo; };
+    auto d = [foo](int&) { (void) foo; };
     // std function (class with call operator)
     auto e = std::function<void(int)>();
     auto f = std::function<void(int&&)>();
@@ -975,10 +975,10 @@ BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
   {
     int foo;
     // Capturing lambdas with templated call functions
-    auto a = [foo](auto) {};
-    auto b = [foo](auto&&) {};
-    auto c = [foo](const auto&) {};
-    auto d = [foo](auto&) {};
+    auto a = [foo](auto) { (void) foo; };
+    auto b = [foo](auto&&) { (void) foo; };
+    auto c = [foo](const auto&) { (void) foo; };
+    auto d = [foo](auto&) { (void) foo; };
     static_assert(!argument_is_rvalue<decltype(a), int&&>::value, "non-rvalue not recognised");
     static_assert( argument_is_rvalue<decltype(b), int&&>::value, "rvalue not recognised");
     static_assert(!argument_is_rvalue<decltype(c), int&&>::value, "non-rvalue not recognised");

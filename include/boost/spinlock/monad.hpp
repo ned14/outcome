@@ -124,11 +124,8 @@ namespace traits
 
       using result = decltype(test(&F::operator(), rank<20>()));
 
-      //! \brief Is the arg a non-const rvalue?
       BOOST_STATIC_CONSTEXPR bool value = result::is_rvalue;
-      //! \brief Is the arg a templated arg?
       BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
-      //! \brief If the arg is not a templated arg, it is this type
       using real_arg_type = typename result::non_auto_type;
     };
 
@@ -150,11 +147,8 @@ namespace traits
 
       using result = decltype(test(F(), rank<10>()));
 
-      //! \brief Is the arg a non-const rvalue?
       BOOST_STATIC_CONSTEXPR bool value = result::is_rvalue;
-      //! \brief Is the arg a templated arg?
       BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
-      //! \brief If the arg is not a templated arg, it is this type
       using real_arg_type = typename result::non_auto_type;
     };
 
@@ -180,8 +174,12 @@ namespace traits
     template<bool enable, class F, class A> struct argument_is_rvalue
     {
       static_assert(enable, "The call of callable F with argument A is not well formed");
+      //! \brief Is the arg a non-const rvalue?
       BOOST_STATIC_CONSTEXPR bool value = false;
+      //! \brief Is the arg a templated arg?
       BOOST_STATIC_CONSTEXPR bool is_auto = false;
+      //! \brief If the arg is not a templated arg, it is this type
+      using real_arg_type = void;
     };
     template<class F, class A> struct argument_is_rvalue<true, F, A>
       : public std::conditional<!std::is_function<F>::value && has_call_operator<std::is_class<F>::value, F, A>::value,
@@ -541,7 +539,6 @@ namespace lightweight_futures {
       // temporary copy which should be elided via RVO
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v) const
       {
-        bool is_rvalue = traits::argument_is_rvalue<C, U>::value;
         return traits::argument_is_rvalue<C, U>::value
           ? output_type(_c(std::move(v)))
           : output_type(_c(U(v)));
@@ -560,7 +557,6 @@ namespace lightweight_futures {
       // temporary copy which should be elided via RVO
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v) const
       {
-        bool is_rvalue = traits::argument_is_rvalue<C, U>::value;
         return traits::argument_is_rvalue<C, U>::value
           ? output_type(_c(std::move(v)))
           : output_type(_c(U(v)));
