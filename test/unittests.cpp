@@ -945,7 +945,7 @@ BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
 {
   using namespace boost::spinlock::traits;
   {
-    int foo;
+    int foo=1;
     // Capturing lambdas
     auto a = [foo](int) { (void) foo; };
     auto b = [foo](int&&) { (void) foo; };
@@ -973,7 +973,7 @@ BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
   }
 #ifdef __cpp_generic_lambdas
   {
-    int foo;
+    int foo=1;
     // Capturing lambdas with templated call functions
     auto a = [foo](auto) { (void) foo; };
     auto b = [foo](auto&&) { (void) foo; };
