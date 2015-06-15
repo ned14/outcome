@@ -74,11 +74,9 @@ namespace traits
 
       template<typename U, U> struct Check;
 
-      typedef char ArrayOfOne[1];
-      typedef char ArrayOfTwo[2];
+      typedef char ArrayOfOne[1], ArrayOfTwo[2];
 
       template<typename U> static ArrayOfOne & func(Check<int Fallback::*, &U::operator()> *);
-
       template<typename U> static ArrayOfTwo & func(...);
 
     public:
@@ -111,18 +109,14 @@ namespace traits
       static arg_form<true , true> test(return_type(F::*)(arg_type&&)      const, rank<7>);
       static arg_form<false, true> test(return_type(F::*)(arg_type)        const, rank<8>);
 
-      template<class T> static arg_form<false, false, T> test(return_type(F::*)(const T&)      , rank<11>);
-      template<class T> static arg_form<false, false, T> test(return_type(F::*)(T&)            , rank<12>);
-      template<class T> static arg_form<true , false, T> test(return_type(F::*)(T&&)           , rank<13>);
-      template<class T, typename = typename std::enable_if<!std::is_reference<T>::value>::type>
-                        static arg_form<false, false, T> test(return_type(F::*)(T)             , rank<14>);
-      template<class T> static arg_form<false, false, T> test(return_type(F::*)(const T&) const, rank<15>);
-      template<class T> static arg_form<false, false, T> test(return_type(F::*)(T&)       const, rank<16>);
-      template<class T> static arg_form<true , false, T> test(return_type(F::*)(T&&)      const, rank<17>);
-      template<class T, typename = typename std::enable_if<!std::is_reference<T>::value>::type>
-                        static arg_form<false, false, T> test(return_type(F::*)(T)        const, rank<18>);
+      template<class T> static arg_form<false, false, T> test(return_type(F::*)(T)             , rank<9>);
+      template<class T> static arg_form<false, false, T> test(return_type(F::*)(T&)            , rank<10>);
+      template<class T> static arg_form<true , false, T> test(return_type(F::*)(T&&)           , rank<11>);
+      template<class T> static arg_form<false, false, T> test(return_type(F::*)(T)        const, rank<12>);
+      template<class T> static arg_form<false, false, T> test(return_type(F::*)(T&)       const, rank<13>);
+      template<class T> static arg_form<true , false, T> test(return_type(F::*)(T&&)      const, rank<14>);
 
-      using result = decltype(test(&F::operator(), rank<20>()));
+      using result = decltype(test(&F::operator(), rank<15>()));
 
       BOOST_STATIC_CONSTEXPR bool value = result::is_rvalue;
       BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
