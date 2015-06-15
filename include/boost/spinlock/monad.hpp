@@ -133,11 +133,9 @@ namespace traits
       static arg_form<true , true> test(return_type(*)(arg_type&&)           , rank<3>);
       static arg_form<false, true> test(return_type(*)(arg_type)             , rank<4>);
 
-      template<class T> static arg_form<false, false, T> test(return_type(*)(const T&)      , rank<5>);
+      template<class T> static arg_form<false, false, T> test(return_type(*)(T)             , rank<5>);
       template<class T> static arg_form<false, false, T> test(return_type(*)(T&)            , rank<6>);
       template<class T> static arg_form<true , false, T> test(return_type(*)(T&&)           , rank<7>);
-      template<class T, typename = typename std::enable_if<!std::is_reference<T>::value>::type>
-                        static arg_form<false, false, T> test(return_type(*)(T)             , rank<8>);
 
       using result = decltype(test(F(), rank<10>()));
 
