@@ -1382,7 +1382,7 @@ BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with then
 #endif
 
   // Does bind work?
-  auto f(a.bind([](monad<std::string> &&) -> monad<int> {return 5;}));
+  auto f(a.bind([](std::string &&) -> monad<int> {return 5;}));
   BOOST_CHECK(f.get()==5);
   BOOST_CHECK(a.get() == "niall");
   auto g(b.bind([](std::string &&) -> monad<int> {return 5;}));

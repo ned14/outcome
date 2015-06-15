@@ -87,10 +87,11 @@ namespace traits
     template <bool enable, typename F, typename Arg> struct has_call_operator : public std::false_type {};
     template <typename F, typename Arg> struct has_call_operator<true, F, Arg> : public has_call_operator2<F, typename get_return_type<F, Arg>::type(Arg)>{};
 
-    template<bool _is_move, bool _is_auto> struct arg_form
+    template<bool _is_move, bool _is_auto, typename T=void> struct arg_form
     {
       BOOST_STATIC_CONSTEXPR bool is_rvalue = _is_move;
       BOOST_STATIC_CONSTEXPR bool is_auto = _is_auto;
+      using non_auto_type = T;
     };
 
     template<int R> struct rank : rank<R - 1> { static_assert(R > 0, ""); };
@@ -110,16 +111,16 @@ namespace traits
       static arg_form<true , true> test(return_type(F::*)(arg_type&&)      const, rank<7>);
       static arg_form<false, true> test(return_type(F::*)(arg_type)        const, rank<8>);
 
-      template<class T> static arg_form<false, false> test(return_type(F::*)(const T&)      , rank<11>);
-      template<class T> static arg_form<false, false> test(return_type(F::*)(T&)            , rank<12>);
-      template<class T> static arg_form<true , false> test(return_type(F::*)(T&&)           , rank<13>);
+      template<class T> static arg_form<false, false, T> test(return_type(F::*)(const T&)      , rank<11>);
+      template<class T> static arg_form<false, false, T> test(return_type(F::*)(T&)            , rank<12>);
+      template<class T> static arg_form<true , false, T> test(return_type(F::*)(T&&)           , rank<13>);
       template<class T, typename = typename std::enable_if<!std::is_reference<T>::value>::type>
-                        static arg_form<false, false> test(return_type(F::*)(T)             , rank<14>);
-      template<class T> static arg_form<false, false> test(return_type(F::*)(const T&) const, rank<15>);
-      template<class T> static arg_form<false, false> test(return_type(F::*)(T&)       const, rank<16>);
-      template<class T> static arg_form<true , false> test(return_type(F::*)(T&&)      const, rank<17>);
+                        static arg_form<false, false, T> test(return_type(F::*)(T)             , rank<14>);
+      template<class T> static arg_form<false, false, T> test(return_type(F::*)(const T&) const, rank<15>);
+      template<class T> static arg_form<false, false, T> test(return_type(F::*)(T&)       const, rank<16>);
+      template<class T> static arg_form<true , false, T> test(return_type(F::*)(T&&)      const, rank<17>);
       template<class T, typename = typename std::enable_if<!std::is_reference<T>::value>::type>
-                        static arg_form<false, false> test(return_type(F::*)(T)        const, rank<18>);
+                        static arg_form<false, false, T> test(return_type(F::*)(T)        const, rank<18>);
 
       using result = decltype(test(&F::operator(), rank<20>()));
 
@@ -127,6 +128,8 @@ namespace traits
       BOOST_STATIC_CONSTEXPR bool value = result::is_rvalue;
       //! \brief Is the arg a templated arg?
       BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
+      //! \brief If the arg is not a templated arg, it is this type
+      using real_arg_type = typename result::non_auto_type;
     };
 
     template<class F, class A> struct function_argument_form
@@ -139,11 +142,11 @@ namespace traits
       static arg_form<true , true> test(return_type(*)(arg_type&&)           , rank<3>);
       static arg_form<false, true> test(return_type(*)(arg_type)             , rank<4>);
 
-      template<class T> static arg_form<false, false> test(return_type(*)(const T&)      , rank<5>);
-      template<class T> static arg_form<false, false> test(return_type(*)(T&)            , rank<6>);
-      template<class T> static arg_form<true , false> test(return_type(*)(T&&)           , rank<7>);
+      template<class T> static arg_form<false, false, T> test(return_type(*)(const T&)      , rank<5>);
+      template<class T> static arg_form<false, false, T> test(return_type(*)(T&)            , rank<6>);
+      template<class T> static arg_form<true , false, T> test(return_type(*)(T&&)           , rank<7>);
       template<class T, typename = typename std::enable_if<!std::is_reference<T>::value>::type>
-                        static arg_form<false, false> test(return_type(*)(T)             , rank<8>);
+                        static arg_form<false, false, T> test(return_type(*)(T)             , rank<8>);
 
       using result = decltype(test(F(), rank<10>()));
 
@@ -151,6 +154,8 @@ namespace traits
       BOOST_STATIC_CONSTEXPR bool value = result::is_rvalue;
       //! \brief Is the arg a templated arg?
       BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
+      //! \brief If the arg is not a templated arg, it is this type
+      using real_arg_type = typename result::non_auto_type;
     };
 
   }
@@ -1012,8 +1017,9 @@ namespace lightweight_futures {
     template<class F> typename detail::do_then<typename traits::is_callable_is_well_formed<F, value_type>::type, F, monad>::output_type bind(F &&f)
     {
       typedef traits::is_callable_is_well_formed<F, value_type> f_traits;
-      static_assert(f_traits::value,
-        "The callable passed to bind() must take a value_type or a reference to it.");
+      typedef traits::argument_is_rvalue<F, value_type> f_takes_rvalue;
+      static_assert(f_traits::value && (f_takes_rvalue::is_auto || std::is_same<typename f_takes_rvalue::real_arg_type, value_type>::value),
+        "The callable passed to bind() must take an auto, a value_type or a reference to a value_type.");
       typedef typename detail::do_then<typename f_traits::type, F, monad>::output_type type;
       if(has_value())
         return detail::do_then<typename f_traits::type, F, monad>(std::forward<F>(f))(std::move(_storage.value));
@@ -1033,8 +1039,9 @@ namespace lightweight_futures {
     template<class F> monad<typename traits::is_callable_is_well_formed<F, value_type>::type> map(F &&f)
     {
       typedef traits::is_callable_is_well_formed<F, value_type> f_traits;
-      static_assert(f_traits::value,
-        "The callable passed to map() must take a value_type or a reference to it.");
+      typedef traits::argument_is_rvalue<F, value_type> f_takes_rvalue;
+      static_assert(f_traits::value && (f_takes_rvalue::is_auto || std::is_same<typename f_takes_rvalue::real_arg_type, value_type>::value),
+        "The callable passed to map() must take an auto, a value_type or a reference to a value_type.");
       typedef monad<typename f_traits::type> type;
       if(has_value())
         return traits::argument_is_rvalue<F, value_type>::value
