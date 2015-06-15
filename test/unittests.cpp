@@ -1,6 +1,6 @@
 /* unittests.cpp
 Unit testing for memory transactions
-(C) 2013-2014 Niall Douglas http://www.nedproductions.biz/
+(C) 2013-2015 Niall Douglas http://www.nedproductions.biz/
 
 
 Boost Software License - Version 1.0 - August 17th, 2003
@@ -1381,20 +1381,6 @@ BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with then
   BOOST_CHECK(a.get()=="niall");
 #endif
 
-  // Does bind work?
-  auto f(a.bind([](std::string &&) -> monad<int> {return 5;}));
-  BOOST_CHECK(f.get()==5);
-  BOOST_CHECK(a.get() == "niall");
-  auto g(b.bind([](std::string &&) -> monad<int> {return 5;}));
-  BOOST_CHECK(g.has_error());
-
-  // Does map work?
-  auto h(a.map([](std::string v) -> monad<std::string> {return v;}));
-  BOOST_CHECK(h.get().get()=="niall");
-  BOOST_CHECK(a.get() == "niall");
-  auto i(b.map([](std::string v) -> monad<std::string> {return v;}));
-  BOOST_CHECK(i.has_error());
-
   // Does automatic move semantics work?
   auto j(a.then([](monad<std::string> &&v){return std::move(v);}));
   BOOST_CHECK(j.get()=="niall");
@@ -1406,6 +1392,80 @@ BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with then
   BOOST_CHECK(k.get()=="niall");
   BOOST_CHECK(a.get().empty());
 #endif
+}
+
+BOOST_AUTO_TEST_CASE(works/monad/bind, "Tests that the monad continues with bind() as intended")
+{
+  using namespace boost::spinlock::lightweight_futures;
+  std::error_code ec;
+  {
+    monad<std::string> a("niall"), b(ec);
+    // Does bind work?
+    auto c(a.bind([](std::string &&) -> monad<int> {return 5;}));
+    BOOST_CHECK(c.get()==5);
+    BOOST_CHECK(a.get() == "niall");
+    auto d(b.bind([](std::string &&) -> monad<int> {return 5;}));
+    BOOST_CHECK(d.has_error());
+#ifdef __cpp_generic_lambdas
+    auto e(a.bind([](auto) -> monad<int> {return 5;}));
+    BOOST_CHECK(e.get()==5);
+    BOOST_CHECK(a.get() == "niall");
+    auto f(b.bind([](auto) -> monad<int> {return 5;}));
+    BOOST_CHECK(f.has_error());
+#endif
+    auto g(a.bind([](std::string &&v) {return v;}));
+    BOOST_CHECK(g.get()=="niall");
+    BOOST_CHECK(a.get().empty());
+    auto h(b.bind([](std::string &&v) {return v;}));
+    BOOST_CHECK(h.has_error());
+    a.emplace("niall");
+#ifdef __cpp_generic_lambdas
+    auto i(a.bind([](auto &&v) {return v;}));
+    BOOST_CHECK(i.get()=="niall");
+    BOOST_CHECK(a.get().empty());
+    auto j(b.bind([](auto &&v) {return v;}));
+    BOOST_CHECK(j.has_error());
+    a.emplace("niall");
+#endif
+
+    // Does bind work with chains of value, error, exception and empty?
+    auto x(
+      a.bind([ec](std::string){return ec;})
+       .bind([](std::error_code){return std::make_exception_ptr(5);})
+       .bind([](std::exception_ptr){return;})
+       .bind([]{return std::string("douglas");})
+    );
+    BOOST_CHECK(x.get()=="douglas");
+    auto y(
+      a.bind([ec](std::string) -> monad<int> {return ec;})
+       .bind([](std::error_code){return std::make_exception_ptr(5);})
+       .bind([](std::exception_ptr){return;})
+       .bind([]{return 5;})
+    );
+    BOOST_CHECK(y.get()==5);
+    auto z(
+      a.bind([](std::string &&v){ return v;})
+       .bind([](std::string &&v){ return v;})
+       .bind([](std::string &&v){ return v;})
+       .bind([](std::string &&v){ return v;})
+    );
+    BOOST_CHECK(z.get()=="niall");
+    BOOST_CHECK(a.get().empty());
+  }
+
+BOOST_AUTO_TEST_CASE(works/monad/map, "Tests that the monad continues with map() as intended")
+{
+  using namespace boost::spinlock::lightweight_futures;
+  std::error_code ec;
+  {
+    monad<std::string> a("niall"), b(ec);
+    // Does map work?
+    auto c(a.map([](std::string v) -> monad<std::string> {return v;}));
+    BOOST_CHECK(c.get().get()=="niall");
+    BOOST_CHECK(a.get() == "niall");
+    auto d(b.map([](std::string v) -> monad<std::string> {return v;}));
+    BOOST_CHECK(d.has_error());
+  }
 }
 
 BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as intended")

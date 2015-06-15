@@ -118,9 +118,9 @@ namespace traits
 
       using result = decltype(test(&F::operator(), rank<15>()));
 
-      BOOST_STATIC_CONSTEXPR bool value = result::is_rvalue;
+      BOOST_STATIC_CONSTEXPR bool is_rvalue = result::is_rvalue;
       BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
-      using real_arg_type = typename result::non_auto_type;
+      using type = typename result::non_auto_type;
     };
 
     template<class F, class A> struct function_argument_form
@@ -139,9 +139,9 @@ namespace traits
 
       using result = decltype(test(F(), rank<10>()));
 
-      BOOST_STATIC_CONSTEXPR bool value = result::is_rvalue;
+      BOOST_STATIC_CONSTEXPR bool is_rvalue = result::is_rvalue;
       BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
-      using real_arg_type = typename result::non_auto_type;
+      using type = typename result::non_auto_type;
     };
 
   }
@@ -163,28 +163,30 @@ namespace traits
 
   namespace detail
   {
-    template<bool enable, class F, class A> struct argument_is_rvalue
+    template<bool enable, class F, class A> struct callable_argument_traits
     {
-      static_assert(enable, "The call of callable F with argument A is not well formed");
-      //! \brief Is the arg a non-const rvalue?
-      BOOST_STATIC_CONSTEXPR bool value = false;
-      //! \brief Is the arg a templated arg?
+      //! \brief Is the callable F called with Arg well formed?
+      BOOST_STATIC_CONSTEXPR bool valid = false;
+	  //! \brief Is the arg a rvalue ref?
+	  BOOST_STATIC_CONSTEXPR bool is_rvalue = false;
+	  //! \brief Is the arg a templated arg?
       BOOST_STATIC_CONSTEXPR bool is_auto = false;
       //! \brief If the arg is not a templated arg, it is this type
-      using real_arg_type = void;
+      using type = void;
     };
-    template<class F, class A> struct argument_is_rvalue<true, F, A>
+    template<class F, class A> struct callable_argument_traits<true, F, A>
       : public std::conditional<!std::is_function<F>::value && has_call_operator<std::is_class<F>::value, F, A>::value,
         detail::call_operator_argument_form<F, A>,
         detail::function_argument_form<F, A>
       >::type
-    { };
+    {
+      BOOST_STATIC_CONSTEXPR bool valid = true;
+	};
   }
 
-  /*! \brief If callable F is called with A, does F take A as a rvalue? F(A) needs to be well formed, else
-  there will be a compile time error.
+  /*! \brief If callable F were to be called with A, tell me about the call.
   */
-  template<class F, class A> struct argument_is_rvalue
+  template<class F, class A> struct callable_argument_traits
     : public detail::argument_is_rvalue<is_callable_is_well_formed<F, A>::value, F, A>
   { };
 
@@ -526,14 +528,50 @@ namespace lightweight_futures {
       callable_type _c;
       BOOST_SPINLOCK_FUTURE_CONSTEXPR do_then(const callable_type &c) : _c(c) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR do_then(callable_type &&c) : _c(std::move(c)) { }
-      // This is always called with a rvalue ref, so examine the callable and if he
-      // takes a rvalue ref, pass in the original rvalue ref for moving, else pass a
-      // temporary copy which should be elided via RVO
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v) const
       {
-        return traits::argument_is_rvalue<C, U>::value
+        return traits::callable_argument_traits<C, U>::is_rvalue
           ? output_type(_c(std::move(v)))
           : output_type(_c(U(v)));
+      }
+    };
+    // For when R is an error_type
+    template<class C, class T, class _error_type, class _exception_type, class throw_error> struct do_then<_error_type, C, monad<T, _error_type, _exception_type, throw_error>>
+    {
+      typedef C callable_type;
+      typedef monad<T, _error_type, _exception_type, throw_error> output_type;
+      callable_type _c;
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_then(const callable_type &c) : _c(c) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_then(callable_type &&c) : _c(std::move(c)) { }
+      template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v) const
+      {
+        return output_type(_c(U(v)));
+      }
+    };
+    // For when R is an exception_type
+    template<class C, class T, class _error_type, class _exception_type, class throw_error> struct do_then<_exception_type, C, monad<T, _error_type, _exception_type, throw_error>>
+    {
+      typedef C callable_type;
+      typedef monad<T, _error_type, _exception_type, throw_error> output_type;
+      callable_type _c;
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_then(const callable_type &c) : _c(c) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_then(callable_type &&c) : _c(std::move(c)) { }
+      template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v) const
+      {
+        return output_type(_c(U(v)));
+      }
+    };
+    // For when R is a void
+    template<class C, class T, class _error_type, class _exception_type, class throw_error> struct do_then<void, C, monad<T, _error_type, _exception_type, throw_error>>
+    {
+      typedef C callable_type;
+      typedef monad<T, _error_type, _exception_type, throw_error> output_type;
+      callable_type _c;
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_then(const callable_type &c) : _c(c) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_then(callable_type &&c) : _c(std::move(c)) { }
+      template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v) const
+      {
+        return output_type(_c(U(v)));
       }
     };
     // For when R is a monad
@@ -544,12 +582,9 @@ namespace lightweight_futures {
       callable_type _c;
       BOOST_SPINLOCK_FUTURE_CONSTEXPR do_then(const callable_type &c) : _c(c) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR do_then(callable_type &&c) : _c(std::move(c)) { }
-      // This is always called with a rvalue ref, so examine the callable and if he
-      // takes a rvalue ref, pass in the original rvalue ref for moving, else pass a
-      // temporary copy which should be elided via RVO
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v) const
       {
-        return traits::argument_is_rvalue<C, U>::value
+        return traits::callable_argument_traits<C, U>::is_rvalue
           ? output_type(_c(std::move(v)))
           : output_type(_c(U(v)));
       }
@@ -1004,10 +1039,15 @@ namespace lightweight_futures {
   #else
     template<class F> typename detail::do_then<typename traits::is_callable_is_well_formed<F, value_type>::type, F, monad>::output_type bind(F &&f)
     {
-      typedef traits::is_callable_is_well_formed<F, value_type> f_traits;
-      typedef traits::argument_is_rvalue<F, value_type> f_takes_rvalue;
-      static_assert(f_traits::value && (f_takes_rvalue::is_auto || std::is_same<typename f_takes_rvalue::real_arg_type, value_type>::value),
-        "The callable passed to bind() must take an auto, a value_type or a reference to a value_type.");
+      typedef traits::callable_argument_traits<F, value_type> f_value_traits;
+	  typedef traits::callable_argument_traits<F, error_type> f_error_traits;
+	  typedef traits::callable_argument_traits<F, exception_type> f_exception_traits;
+	  typedef traits::callable_argument_traits<F, void> f_void_traits;
+      static_assert(((f_value_traits::valid && (f_value_traits::is_auto || std::is_base_of<value_type, typename f_value_traits::type>::value))
+		  || (!f_error_traits::is_auto && f_error_traits::value)
+		  || (!f_exception_traits::is_auto && f_exception_traits::valid)
+		  || (!f_void_traits::is_auto && f_void_traits::valid))
+		  , "The callable passed to bind() must take an auto, a value_type, an error_type, an exception_type or void.");
       typedef typename detail::do_then<typename f_traits::type, F, monad>::output_type type;
       if(has_value())
         return detail::do_then<typename f_traits::type, F, monad>(std::forward<F>(f))(std::move(_storage.value));
