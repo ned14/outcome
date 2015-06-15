@@ -838,7 +838,11 @@ namespace lightweight_futures {
     passed. unwrap() is implemented using a recursively expanded structure which is probably
     okay for low unwrap depths. then() is probably the least weighty of the monadic operators
     as it's relatively dumb and the only metaprogramming is to determine whether to wrap
-    the return type with a monad or not. 
+    the return type with a monad or not.
+    
+    ### Acknowledgements ###
+    To T.C. on Stack Overflow for answering my question at https://stackoverflow.com/questions/30802404/how-to-detect-whether-some-callable-takes-a-rvalue-reference
+    and without whose excellent answer the intelligent map() and bind() above could not work.
     */
     ///@{
     //! \brief If I am a monad<monad<...>>, return copy of most nested monad<...>, else return copy of *this
