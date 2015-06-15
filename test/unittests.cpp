@@ -941,6 +941,52 @@ BOOST_AUTO_TEST_CASE(performance/concurrent_unordered_map/large/read, "Tests the
 }
 #endif
 
+BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
+{
+  using namespace boost::spinlock::traits;
+  {
+    int foo;
+    // Capturing lambdas
+    auto a = [foo](int) {};
+    auto b = [foo](int&&) {};
+    auto c = [foo](const int&) {};
+    auto d = [foo](int&) {};
+    // std function (class with call operator)
+    auto e = std::function<void(int)>();
+    auto f = std::function<void(int&&)>();
+    // plain old functions
+    void(*g)(int) = [](int) {};
+    void(*h)(int&&) = [](int&&) {};
+    void(*i)(const int&) = [](const int&) {};
+    void(*j)(int&) = [](int&) {};
+
+    static_assert(!argument_is_rvalue<decltype(a), int&&>::value, "non-rvalue not recognised");
+    static_assert( argument_is_rvalue<decltype(b), int&&>::value, "rvalue not recognised");
+    static_assert(!argument_is_rvalue<decltype(c), int&&>::value, "non-rvalue not recognised");
+    static_assert(!argument_is_rvalue<decltype(d), int& >::value, "non-rvalue not recognised");
+    static_assert(!argument_is_rvalue<decltype(e), int&&>::value, "non-rvalue not recognised");
+    static_assert( argument_is_rvalue<decltype(f), int&&>::value, "rvalue not recognised");
+    static_assert(!argument_is_rvalue<decltype(g), int&&>::value, "non-rvalue not recognised");
+    static_assert( argument_is_rvalue<decltype(h), int&&>::value, "rvalue not recognised");
+    static_assert(!argument_is_rvalue<decltype(i), int&&>::value, "non-rvalue not recognised");
+    static_assert(!argument_is_rvalue<decltype(j), int& >::value, "non-rvalue not recognised");
+  }
+#ifdef __cpp_generic_lambdas
+  {
+    int foo;
+    // Capturing lambdas with templated call functions
+    auto a = [foo](auto) {};
+    auto b = [foo](auto&&) {};
+    auto c = [foo](const auto&) {};
+    auto d = [foo](auto&) {};
+    static_assert(!argument_is_rvalue<decltype(a), int&&>::value, "non-rvalue not recognised");
+    static_assert( argument_is_rvalue<decltype(b), int&&>::value, "rvalue not recognised");
+    static_assert(!argument_is_rvalue<decltype(c), int&&>::value, "non-rvalue not recognised");
+    static_assert(!argument_is_rvalue<decltype(d), int& >::value, "non-rvalue not recognised");
+  }
+#endif
+}
+
 BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
 {
   using namespace boost::spinlock::lightweight_futures;
@@ -1336,27 +1382,29 @@ BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with then
 #endif
 
   // Does bind work?
-  auto f(a.bind([](monad<std::string> &&){return 5;}));
+  auto f(a.bind([](monad<std::string> &&) -> monad<int> {return 5;}));
   BOOST_CHECK(f.get()==5);
-  auto g(b.bind([](monad<std::string> &&){return 5;}));
+  BOOST_CHECK(a.get() == "niall");
+  auto g(b.bind([](std::string &&) -> monad<int> {return 5;}));
   BOOST_CHECK(g.has_error());
 
   // Does map work?
-  auto h(a.map([](monad<std::string> v){return v;}));
+  auto h(a.map([](std::string v) -> monad<std::string> {return v;}));
   BOOST_CHECK(h.get().get()=="niall");
-  auto i(b.map([](monad<std::string> v){return v;}));
+  BOOST_CHECK(a.get() == "niall");
+  auto i(b.map([](std::string v) -> monad<std::string> {return v;}));
   BOOST_CHECK(i.has_error());
 
   // Does automatic move semantics work?
   auto j(a.then([](monad<std::string> &&v){return std::move(v);}));
   BOOST_CHECK(j.get()=="niall");
-//  BOOST_CHECK(a.get().empty());
+  BOOST_CHECK(a.get().empty());
 #ifdef __cpp_generic_lambdas
   // Does automatic move semantics with auto lambdas work?
   a.emplace("niall");
   auto k(a.then([](auto &&v){return std::move(v);}));
   BOOST_CHECK(k.get()=="niall");
-//  BOOST_CHECK(a.get().empty());
+  BOOST_CHECK(a.get().empty());
 #endif
 }
 

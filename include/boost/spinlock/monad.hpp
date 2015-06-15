@@ -52,59 +52,203 @@ DEALINGS IN THE SOFTWARE.
 */
 
 BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
-namespace lightweight_futures {
 
-//! \brief Enumeration of the ways in which a monad operation may fail
-enum class monad_errc {
-  already_set = 1,  //!< Attempt to store a value into the monad twice
-  no_state = 2      //!< Attempt to use without a state
-};
-
-namespace detail
+namespace traits
 {
-  class monad_category : public std::error_category
+  namespace detail
   {
-  public:
-    virtual const char *name() const noexcept { return "monad"; }
-    virtual std::string message(int c) const
+    // Gets the return type of F(A), returning a not_well_formed type if not well formed
+    template<class F, class A> struct get_return_type
     {
-      switch(c)
-      {
-        case 1: return "already_set";
-        case 2: return "no_state";
-        default: return "unknown";
-      }
-    }
+      struct not_well_formed {};
+      template<class _F, class _A> static not_well_formed test(...);
+      template<class _F, class _A> static auto test(_F &&f) -> decltype(f(std::declval<_A>()));
+      using type = decltype(test<F, A>(std::declval<F>()));
+    };
+
+    // Without Expression SFINAE (VS2015), I actually don't know of a better way :(
+    template<class T, class Arg> class has_call_operator2
+    {
+      struct Fallback { int operator()(Arg); };
+      struct Derived : T, Fallback { };
+
+      template<typename U, U> struct Check;
+
+      typedef char ArrayOfOne[1];
+      typedef char ArrayOfTwo[2];
+
+      template<typename U> static ArrayOfOne & func(Check<int Fallback::*, &U::operator()> *);
+
+      template<typename U> static ArrayOfTwo & func(...);
+
+    public:
+      BOOST_STATIC_CONSTEXPR bool value = sizeof(func<Derived>(0)) == 2;
+    };
+    template <bool enable, typename F, typename Arg> struct has_call_operator : public std::false_type {};
+    template <typename F, typename Arg> struct has_call_operator<true, F, Arg> : public has_call_operator2<F, typename get_return_type<F, Arg>::type(Arg)>{};
+
+    template<bool _is_move, bool _is_auto> struct arg_form
+    {
+      BOOST_STATIC_CONSTEXPR bool is_rvalue = _is_move;
+      BOOST_STATIC_CONSTEXPR bool is_auto = _is_auto;
+    };
+
+    template<int R> struct rank : rank<R - 1> { static_assert(R > 0, ""); };
+    template<> struct rank<0> {};
+
+    template<class F, class A> struct call_operator_argument_form
+    {
+      using return_type = typename get_return_type<F, A>::type;
+      using arg_type = typename std::decay<A>::type;
+
+      static arg_form<false, true> test(return_type(F::*)(const arg_type&)      , rank<1>);
+      static arg_form<false, true> test(return_type(F::*)(arg_type&)            , rank<2>);
+      static arg_form<true , true> test(return_type(F::*)(arg_type&&)           , rank<3>);
+      static arg_form<false, true> test(return_type(F::*)(arg_type)             , rank<4>);
+      static arg_form<false, true> test(return_type(F::*)(const arg_type&) const, rank<5>);
+      static arg_form<false, true> test(return_type(F::*)(arg_type&)       const, rank<6>);
+      static arg_form<true , true> test(return_type(F::*)(arg_type&&)      const, rank<7>);
+      static arg_form<false, true> test(return_type(F::*)(arg_type)        const, rank<8>);
+
+      template<class T> static arg_form<false, false> test(return_type(F::*)(const T&)      , rank<11>);
+      template<class T> static arg_form<false, false> test(return_type(F::*)(T&)            , rank<12>);
+      template<class T> static arg_form<true , false> test(return_type(F::*)(T&&)           , rank<13>);
+      template<class T, typename = typename std::enable_if<!std::is_reference<T>::value>::type>
+                        static arg_form<false, false> test(return_type(F::*)(T)             , rank<14>);
+      template<class T> static arg_form<false, false> test(return_type(F::*)(const T&) const, rank<15>);
+      template<class T> static arg_form<false, false> test(return_type(F::*)(T&)       const, rank<16>);
+      template<class T> static arg_form<true , false> test(return_type(F::*)(T&&)      const, rank<17>);
+      template<class T, typename = typename std::enable_if<!std::is_reference<T>::value>::type>
+                        static arg_form<false, false> test(return_type(F::*)(T)        const, rank<18>);
+
+      using result = decltype(test(&F::operator(), rank<20>()));
+
+      //! \brief Is the arg a non-const rvalue?
+      BOOST_STATIC_CONSTEXPR bool value = result::is_rvalue;
+      //! \brief Is the arg a templated arg?
+      BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
+    };
+
+    template<class F, class A> struct function_argument_form
+    {
+      using return_type = typename get_return_type<F, A>::type;
+      using arg_type = typename std::decay<A>::type;
+
+      static arg_form<false, true> test(return_type(*)(const arg_type&)      , rank<1>);
+      static arg_form<false, true> test(return_type(*)(arg_type&)            , rank<2>);
+      static arg_form<true , true> test(return_type(*)(arg_type&&)           , rank<3>);
+      static arg_form<false, true> test(return_type(*)(arg_type)             , rank<4>);
+
+      template<class T> static arg_form<false, false> test(return_type(*)(const T&)      , rank<5>);
+      template<class T> static arg_form<false, false> test(return_type(*)(T&)            , rank<6>);
+      template<class T> static arg_form<true , false> test(return_type(*)(T&&)           , rank<7>);
+      template<class T, typename = typename std::enable_if<!std::is_reference<T>::value>::type>
+                        static arg_form<false, false> test(return_type(*)(T)             , rank<8>);
+
+      using result = decltype(test(F(), rank<10>()));
+
+      //! \brief Is the arg a non-const rvalue?
+      BOOST_STATIC_CONSTEXPR bool value = result::is_rvalue;
+      //! \brief Is the arg a templated arg?
+      BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
+    };
+
+  }
+
+  //! \brief Is the callable F called with Arg well formed?
+  template<class F, class A> struct is_callable_is_well_formed
+  {
+    using return_type = detail::get_return_type<F, A>;
+    //! \brief The type returned by the callable F when called with Arg
+    using type = typename return_type::type;
+    //! \brief Whether the call with Arg is well formed
+    BOOST_STATIC_CONSTEXPR bool value = !std::is_same<type, typename return_type::not_well_formed>::value;
   };
+
+  //! \brief Is F a class type and does it have a call operator callable with Arg?
+  template<typename F, typename Arg> struct has_call_operator
+    : public detail::has_call_operator<std::is_class<F>::value, F, Arg>
+  { };
+
+  namespace detail
+  {
+    template<bool enable, class F, class A> struct argument_is_rvalue
+    {
+      static_assert(enable, "The call of callable F with argument A is not well formed");
+      BOOST_STATIC_CONSTEXPR bool value = false;
+      BOOST_STATIC_CONSTEXPR bool is_auto = false;
+    };
+    template<class F, class A> struct argument_is_rvalue<true, F, A>
+      : public std::conditional<!std::is_function<F>::value && has_call_operator<std::is_class<F>::value, F, A>::value,
+        detail::call_operator_argument_form<F, A>,
+        detail::function_argument_form<F, A>
+      >::type
+    { };
+  }
+
+  /*! \brief If callable F is called with A, does F take A as a rvalue? F(A) needs to be well formed, else
+  there will be a compile time error.
+  */
+  template<class F, class A> struct argument_is_rvalue
+    : public detail::argument_is_rvalue<is_callable_is_well_formed<F, A>::value, F, A>
+  { };
+
 }
 
-/*! \brief Returns a reference to a monad error category. Note the address
-of one of these may not be constant throughout the process as per the ISO spec.
-*/
-inline const detail::monad_category &monad_category()
+namespace lightweight_futures
 {
-  static detail::monad_category c;
-  return c;
-}
 
-//! \brief A monad exception object
-class BOOST_SYMBOL_VISIBLE monad_error : public std::logic_error
-{
-  std::error_code _ec;
-public:
-  monad_error(std::error_code ec) : std::logic_error(ec.message()), _ec(std::move(ec)) { }
-  const std::error_code &code() const noexcept { return _ec; }
-};
+  //! \brief Enumeration of the ways in which a monad operation may fail
+  enum class monad_errc {
+    already_set = 1,  //!< Attempt to store a value into the monad twice
+    no_state = 2      //!< Attempt to use without a state
+  };
 
-inline std::error_code make_error_code(monad_errc e)
-{
-  return std::error_code(static_cast<int>(e), monad_category());
-}
+  namespace detail
+  {
+    class monad_category : public std::error_category
+    {
+    public:
+      virtual const char *name() const noexcept { return "monad"; }
+      virtual std::string message(int c) const
+      {
+        switch(c)
+        {
+          case 1: return "already_set";
+          case 2: return "no_state";
+          default: return "unknown";
+        }
+      }
+    };
+  }
 
-inline std::error_condition make_error_condition(monad_errc e)
-{
-  return std::error_condition(static_cast<int>(e), monad_category());
-}
+  /*! \brief Returns a reference to a monad error category. Note the address
+  of one of these may not be constant throughout the process as per the ISO spec.
+  */
+  inline const detail::monad_category &monad_category()
+  {
+    static detail::monad_category c;
+    return c;
+  }
+
+  //! \brief A monad exception object
+  class BOOST_SYMBOL_VISIBLE monad_error : public std::logic_error
+  {
+    std::error_code _ec;
+  public:
+    monad_error(std::error_code ec) : std::logic_error(ec.message()), _ec(std::move(ec)) { }
+    const std::error_code &code() const noexcept { return _ec; }
+  };
+
+  inline std::error_code make_error_code(monad_errc e)
+  {
+    return std::error_code(static_cast<int>(e), monad_category());
+  }
+
+  inline std::error_condition make_error_condition(monad_errc e)
+  {
+    return std::error_condition(static_cast<int>(e), monad_category());
+  }
 
 }
 BOOST_SPINLOCK_V1_NAMESPACE_END
@@ -112,19 +256,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_END
 namespace std
 {
   template<> struct is_error_code_enum<BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::monad_errc> : std::true_type {};
-
   template<> struct is_error_condition_enum<BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::monad_errc> : std::true_type {};
-
-/*  std::error_code make_error_code(BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::monad_errc e)
-  {
-    return std::error_code(static_cast<int>(e), BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::monad_category());
-  }
-
-  std::error_condition make_error_condition(BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::monad_errc e)
-  {
-    return std::error_condition(static_cast<int>(e), BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::monad_category());
-  }
-*/
 }
 
 BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
@@ -390,14 +522,6 @@ namespace lightweight_futures {
       }
     };
     
-    // Does the callable when called with Arg move?
-    template<class F, class Arg> struct is_callable_moving
-    {
-      typedef typename std::decay<Arg>::type arg_type;
-      typedef typename std::function<F(arg_type)>::argument_type parameter_type;
-      BOOST_STATIC_CONSTEXPR bool value = std::is_rvalue_reference<parameter_type>::value;
-    };
-
     template<class R, class C, class M> struct do_then;
     // For when R is not a monad
     template<class R, class C, class T, class _error_type, class _exception_type, class throw_error> struct do_then<R, C, monad<T, _error_type, _exception_type, throw_error>>
@@ -412,7 +536,8 @@ namespace lightweight_futures {
       // temporary copy which should be elided via RVO
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v) const
       {
-        return is_callable_moving<C, U>::value
+        bool is_rvalue = traits::argument_is_rvalue<C, U>::value;
+        return traits::argument_is_rvalue<C, U>::value
           ? output_type(_c(std::move(v)))
           : output_type(_c(U(v)));
       }
@@ -430,7 +555,8 @@ namespace lightweight_futures {
       // temporary copy which should be elided via RVO
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v) const
       {
-        return is_callable_moving<C, U>::value
+        bool is_rvalue = traits::argument_is_rvalue<C, U>::value;
+        return traits::argument_is_rvalue<C, U>::value
           ? output_type(_c(std::move(v)))
           : output_type(_c(U(v)));
       }
@@ -858,8 +984,8 @@ namespace lightweight_futures {
 
     /*! \brief Return monad(F(*this)) or F(*this) if the latter returns a monad.
     
-    The callable F needs to consume a monad obviously enough, however the callable is called with a monad &&
-    so if your callable takes a monad &&, you can move from the monad. Equally, you can avoid copies if your
+    The callable F needs to consume a monad obviously enough, however if your callable takes a monad &&, you can move
+    from the monad. Equally, you can avoid copies if your
     callable takes a reference argument. The callable F can be a generic lambda if desired.
     
     If your callable does not return a monad, a monad will be constructed to hold the type it does return
@@ -870,9 +996,12 @@ namespace lightweight_futures {
   #ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> monad(F(*this)).unwrap() then(F &&f);
   #else
-    template<class F> typename detail::do_then<typename std::result_of<F(monad)>::type, F, monad>::output_type then(F &&f)
+    template<class F> typename detail::do_then<typename traits::is_callable_is_well_formed<F, monad>::type, F, monad>::output_type then(F &&f)
     {
-      return detail::do_then<typename std::result_of<F(monad)>::type, F, monad>(std::forward<F>(f))(std::move(*this));
+      typedef traits::is_callable_is_well_formed<F, monad> f_traits;
+      static_assert(f_traits::value,
+        "The callable passed to then() must take this monad type or a reference to it.");
+      return detail::do_then<typename f_traits::type, F, monad>(std::forward<F>(f))(std::move(*this));
     }
   #endif
     
@@ -880,11 +1009,14 @@ namespace lightweight_futures {
   #ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> monad(F(get())).unwrap() bind(F &&f);
   #else
-    template<class F> typename detail::do_then<typename std::result_of<F(value_type)>::type, F, monad>::output_type bind(F &&f)
+    template<class F> typename detail::do_then<typename traits::is_callable_is_well_formed<F, value_type>::type, F, monad>::output_type bind(F &&f)
     {
-      typedef typename detail::do_then<typename std::result_of<F(value_type)>::type, F, monad>::output_type type;
+      typedef traits::is_callable_is_well_formed<F, value_type> f_traits;
+      static_assert(f_traits::value,
+        "The callable passed to bind() must take a value_type or a reference to it.");
+      typedef typename detail::do_then<typename f_traits::type, F, monad>::output_type type;
       if(has_value())
-        return detail::do_then<typename std::result_of<F(value_type)>::type, F, monad>(std::forward<F>(f))(std::move(_storage.value));
+        return detail::do_then<typename f_traits::type, F, monad>(std::forward<F>(f))(std::move(_storage.value));
       else if(has_error())
         return type(_storage.error);
       else if(has_exception())
@@ -898,11 +1030,14 @@ namespace lightweight_futures {
   #ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> monad(F(get())) map(F &&f);
   #else
-    template<class F> monad<typename std::result_of<F(value_type)>::type> map(F &&f)
+    template<class F> monad<typename traits::is_callable_is_well_formed<F, value_type>::type> map(F &&f)
     {
-      typedef monad<typename std::result_of<F(value_type)>::type> type;
+      typedef traits::is_callable_is_well_formed<F, value_type> f_traits;
+      static_assert(f_traits::value,
+        "The callable passed to map() must take a value_type or a reference to it.");
+      typedef monad<typename f_traits::type> type;
       if(has_value())
-        return detail::is_callable_moving<F, value_type>::value
+        return traits::argument_is_rvalue<F, value_type>::value
           ? type(f(std::move(_storage.value)))
           : type(f(_storage.value));
       else if(has_error())
