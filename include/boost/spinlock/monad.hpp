@@ -521,13 +521,75 @@ namespace lightweight_futures {
           return do_unwrap<unwrapped_type>()(unwrapped_type());
       }
     };
+
+    template<class M> struct is_monad : std::false_type {};
+    template<class R, class _error_type, class _exception_type, class throw_error> struct is_monad<monad<R, _error_type, _exception_type, throw_error>> : std::true_type{};
+
+    // Is the monad M's contents directly constructible from an R, not allowing a monad<monad<int>> being constructible from an int
+    template<class M, class R> struct is_monad_constructible : public std::is_constructible<typename M::value_type, R> {};
+    template<class M> struct is_monad_constructible<M, typename M::error_type> : public std::true_type{};
+    template<class M> struct is_monad_constructible<M, typename M::exception_type> : public std::true_type{};
+    template<class M> struct is_monad_constructible<M, typename M::empty_type> : public std::true_type{};
+    template<class M, class _error_type1, class _exception_type1, class throw_error1, class _error_type2, class _exception_type2, class throw_error2> struct is_monad_constructible<monad<monad<M, _error_type2, _exception_type2, throw_error2>, _error_type1, _exception_type1, throw_error1>, M> : public std::false_type{};
+    template<class F, class M> struct bind_map_parameter_validation
+    {
+      // Figure out what the callable takes
+      typedef traits::callable_argument_traits<F, typename M::value_type> f_value_traits;
+      typedef traits::callable_argument_traits<F, typename M::error_type> f_error_traits;
+      typedef traits::callable_argument_traits<F, typename M::exception_type> f_exception_traits;
+      typedef traits::callable_argument_traits<F, typename M::empty_type> f_empty_traits;
+      BOOST_STATIC_CONSTEXPR bool callable_takes_anything=f_value_traits::is_auto;
+      BOOST_STATIC_CONSTEXPR bool callable_is_uncallable=!callable_takes_anything && !is_monad<typename M::value_type>::value && (f_value_traits::valid+f_error_traits::valid+f_exception_traits::valid+f_empty_traits::valid)==0;
+      BOOST_STATIC_CONSTEXPR bool callable_is_ambiguous=!callable_takes_anything && !is_monad<typename M::value_type>::value && (f_value_traits::valid+f_error_traits::valid+f_exception_traits::valid+f_empty_traits::valid)>1;
+      
+      // Error out common mistakes in the callable parameter
+      static_assert(!callable_is_uncallable,
+        "Callable does not have an auto nor templated parameter and is not well formed for none of a value_type, an error_type, an exception_type nor an empty_type. You probably need to adjust the parameter being taken by your callable");
+      static_assert(!callable_is_ambiguous,
+        "Callable does not have an auto nor templated parameter, yet is well formed for more than one of value_type, error_type, exception_type and empty_type. As cannot disambiguate meaning, stopping");
+      static_assert(!f_value_traits::valid || (callable_takes_anything || std::is_convertible<typename f_value_traits::type, typename M::value_type>::value),
+        "A value_type consuming callable must have a parameter type which can be implicitly converted to from a value_type, or be an auto or templated parameter");
+      static_assert(!f_error_traits::valid || callable_takes_anything || is_monad<typename M::value_type>::value || (!f_error_traits::is_rvalue && std::is_same<typename f_error_traits::type, typename M::error_type>::value),
+        "An error_type consuming callable must take an error_type by value");
+      static_assert(!f_exception_traits::valid || callable_takes_anything || is_monad<typename M::value_type>::value || (!f_exception_traits::is_rvalue && std::is_same<typename f_exception_traits::type, typename M::exception_type>::value),
+        "An exception_type consuming callable must take an exception_type by value");
+      static_assert(!f_empty_traits::valid || callable_takes_anything || is_monad<typename M::value_type>::value || (!f_empty_traits::is_rvalue && std::is_same<typename f_empty_traits::type, typename M::empty_type>::value),
+        "An empty_type consuming callable must take an empty_type by value");
+      
+      // Figure out what the callable returns
+      using return_type = typename std::conditional<f_value_traits::valid,
+        typename f_value_traits::return_type,
+        typename std::conditional<f_error_traits::valid,
+          typename f_error_traits::return_type,
+          typename std::conditional<f_exception_traits::valid,
+            typename f_exception_traits::return_type,
+            typename std::conditional<f_empty_traits::valid,
+              typename f_empty_traits::return_type,
+              void
+            >::type
+          >::type
+        >::type
+      >::type;
+
+      // Error out common mistakes in the return type
+      static_assert(!f_error_traits::valid || callable_takes_anything || std::is_same<void, return_type>::value || is_monad_constructible<M, return_type>::value,
+        "An error_type consuming callable must return a type convertible to the monad type");
+      static_assert(!f_exception_traits::valid || callable_takes_anything || std::is_same<void, return_type>::value || is_monad_constructible<M, return_type>::value,
+        "An exception_type consuming callable must return a type convertible to the monad type");
+      static_assert(!f_empty_traits::valid || callable_takes_anything || std::is_same<void, return_type>::value || is_monad_constructible<M, return_type>::value,
+        "An empty_type consuming callable must return a type convertible to the monad type");
+    };
     
     // Enable calling callable if is well formed and is either not auto or we're doing value_type
-    template<class C, class U, class value_type, bool additional=true> struct enable_if_callable_valid
+    template<class C, class U, class value_type, bool additional=true, class value_type2=void> struct enable_if_callable_valid
       : std::enable_if<additional && traits::callable_argument_traits<C, U>::valid
-        && (!traits::callable_argument_traits<C, U>::is_auto || std::is_same<U, value_type>::value)>
+        && (!traits::callable_argument_traits<C, U>::is_auto || std::is_same<U, value_type>::value || std::is_same<U, value_type2>::value)>
     {};
-    /* Invokes the callable passed to then() and bind() folding any monad return type    
+    template<class C, class U, class value_type, bool additional> struct enable_if_callable_valid<C, U, value_type, additional, void>
+      : std::enable_if<additional && traits::callable_argument_traits<C, U>::valid
+      && (!traits::callable_argument_traits<C, U>::is_auto || std::is_same<U, value_type>::value)>
+    {};
+    /* Invokes the callable passed to then() and bind() and map() optionally folding any monad return type
     R is the type returned by the callable
     C is the callable
     M is the monad
@@ -535,16 +597,19 @@ namespace lightweight_futures {
     Call operator is invoked with any of value, error, exception or empty. If not well
     formed, passes through input.
     */
-    template<class R, class C, class M> struct do_then;
-    // For when R is not a monad
-    template<class R, class C, class T, class _error_type, class _exception_type, class throw_error> struct do_then<R, C, monad<T, _error_type, _exception_type, throw_error>>
+    template<bool fold_monadic_return, class R, class C, class M> struct do_continuation;
+    // For when R is not a monad or map()
+    template<bool fold_monadic_return, class R, class C, class T, class _error_type, class _exception_type, class throw_error> struct do_continuation<fold_monadic_return, R, C, monad<T, _error_type, _exception_type, throw_error>>
     {
       typedef C callable_type;
       // If the return type is an error_type or exception_type or void, reuse T else use R
-      typedef monad<typename std::conditional<std::is_same<R, _error_type>::value || std::is_same<R, _exception_type>::value || std::is_same<R, void>::value, T, R>::type, _error_type, _exception_type, throw_error> output_type;
+      typedef monad<typename std::conditional<
+        std::is_same<R, _error_type>::value || std::is_same<R, _exception_type>::value || std::is_same<R, void>::value,
+        T, R
+      >::type, _error_type, _exception_type, throw_error> output_type;
       callable_type _c;
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_then(const callable_type &c) : _c(c) { }
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_then(callable_type &&c) : _c(std::move(c)) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_continuation(const callable_type &c) : _c(c) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_continuation(callable_type &&c) : _c(std::move(c)) { }
       template<class U,
         typename=typename enable_if_callable_valid<C, U, T, !std::is_same<R, void>::value>::type
       > BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<4>) const
@@ -565,16 +630,22 @@ namespace lightweight_futures {
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&, traits::detail::rank<1>) const { return output_type(); }
     };
     // For when R is a monad
-    template<class R, class _error_type1, class _exception_type1, class throw_error1, class C, class T, class _error_type2, class _exception_type2, class throw_error2> struct do_then<monad<R, _error_type1, _exception_type1, throw_error1>, C, monad<T, _error_type2, _exception_type2, throw_error2>>
+    template<class R, class _error_type1, class _exception_type1, class throw_error1,
+      class C,
+      class T, class _error_type2, class _exception_type2, class throw_error2> struct do_continuation<true,
+        monad<R, _error_type1, _exception_type1, throw_error1>,
+        C,
+        monad<T, _error_type2, _exception_type2, throw_error2>
+      >
     {
       typedef C callable_type;
       typedef monad<R, _error_type1, _exception_type1, throw_error1> output_type;
       typedef monad<T, _error_type2, _exception_type2, throw_error2> input_type;
       callable_type _c;
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_then(const callable_type &c) : _c(c) { }
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_then(callable_type &&c) : _c(std::move(c)) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_continuation(const callable_type &c) : _c(c) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_continuation(callable_type &&c) : _c(std::move(c)) { }
       template<class U,
-        typename = typename enable_if_callable_valid<C, U, input_type, !std::is_same<R, void>::value>::type
+        typename = typename enable_if_callable_valid<C, U, input_type, !std::is_same<R, void>::value, T>::type
       > BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<4>) const
       {
         return traits::callable_argument_traits<C, U>::is_rvalue
@@ -582,7 +653,7 @@ namespace lightweight_futures {
           : output_type(_c(U(v)));
       }
       template<class U,
-        typename = typename enable_if_callable_valid<C, U, input_type, std::is_same<R, void>::value>::type
+        typename = typename enable_if_callable_valid<C, U, input_type, std::is_same<R, void>::value, T>::type
       > BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<3>) const
       {
         return traits::callable_argument_traits<C, U>::is_rvalue
@@ -593,41 +664,10 @@ namespace lightweight_futures {
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&, traits::detail::rank<1>) const { return output_type(); }
     };
 
-    template<class M> struct is_monad : std::false_type {};
-    template<class R, class _error_type, class _exception_type, class throw_error> struct is_monad<monad<R, _error_type, _exception_type, throw_error>> : std::true_type {};
-
-    template<class F, class M> struct do_bind_map
-    {
-      // Figure out what the callable takes
-      typedef traits::callable_argument_traits<F, typename M::value_type> f_value_traits;
-      typedef traits::callable_argument_traits<F, typename M::error_type> f_error_traits;
-      typedef traits::callable_argument_traits<F, typename M::exception_type> f_exception_traits;
-      typedef traits::callable_argument_traits<F, typename M::empty_type> f_empty_traits;
-      BOOST_STATIC_CONSTEXPR bool callable_is_ambiguous=!f_value_traits::is_auto && (f_value_traits::valid+f_error_traits::valid+f_exception_traits::valid+f_empty_traits::valid)>1;
-      
-      // Error out common mistakes
-      static_assert(!callable_is_ambiguous, "Callable does not have an auto nor templated parameter, yet is well formed for more than one of value_type, error_type, exception_type and empty_type. As cannot disambiguate meaning, stopping");
-      static_assert(!f_value_traits::valid || (f_value_traits::is_auto || std::is_convertible<typename f_value_traits::type, typename M::value_type>::value), "A value_type consuming callable must have a parameter type which can be implicitly converted to from a value_type, or be an auto or templated parameter");
-      static_assert(!f_error_traits::valid || f_error_traits::is_auto || (!f_error_traits::is_rvalue && std::is_same<typename f_error_traits::type, typename M::error_type>::value), "An error_type consuming callable must take an error_type by value");
-      static_assert(!f_exception_traits::valid || f_exception_traits::is_auto || (!f_exception_traits::is_rvalue && std::is_same<typename f_exception_traits::type, typename M::exception_type>::value), "An exception_type consuming callable must take an exception_type by value");
-      static_assert(!f_empty_traits::valid || f_empty_traits::is_auto || (!f_empty_traits::is_rvalue && std::is_same<typename f_empty_traits::type, typename M::empty_type>::value), "An exception_type consuming callable must take an exception_type by value");
-      
-      // Figure out what the callable returns
-      using return_type = typename std::conditional<f_value_traits::valid,
-        typename f_value_traits::return_type,
-        typename std::conditional<f_error_traits::valid,
-          typename f_error_traits::return_type,
-          typename std::conditional<f_exception_traits::valid,
-            typename f_exception_traits::return_type,
-            typename std::conditional<f_empty_traits::valid,
-              typename f_empty_traits::return_type,
-              void
-            >::type
-          >::type
-        >::type
-      >::type;
-    };
-
+    // TODO FIXME: do_then should have specially reduced simple lightweight implementation
+    template<class R, class C, class M> using do_then = do_continuation<true,  R, C, M>;
+    template<class R, class C, class M> using do_bind = do_continuation<true,  R, C, M>;
+    template<class R, class C, class M> using do_map  = do_continuation<false, R, C, M>;
   }
 
   //! \brief True if the type passed is a monad or a reference to a monad
@@ -658,7 +698,7 @@ namespace lightweight_futures {
   - Works inside a STL container, and type R can be a STL container.
     - No comparison operations nor hashing is provided, deliberately to keep things simple.
 
-  ## Notes: ##
+## Notes: ##
 
   Something which might surprise people is that:
 
@@ -696,7 +736,7 @@ namespace lightweight_futures {
 
   [1]: GCC 5.1 does a perfect job, VS2015 does a good job, clang 3.7 not so great. See next section.
 
-  ## Complexity guarantees ##
+## Complexity guarantees ##
 
   These x64 opcode guarantees are empirically determined by the unit test suite, and the per-commit
   CI testing will fail if they suddenly are exceeded. The maximum is calculated by taking a monad
@@ -720,11 +760,11 @@ namespace lightweight_futures {
     <dd>1946 opcodes <= Exception transport <= 1936 opcodes</dd>
   </dl>
 
-  ## Examples ##
+## Examples ##
 
   \snippet unittests.cpp monad_example
 
-  ### As an alternative to `optional<T>` ###
+### As an alternative to `optional<T>` ###
 
   Something not so obvious is that this monad can have an empty state, and therefore
   can stand in for `optional<T>` like this:
@@ -751,6 +791,8 @@ namespace lightweight_futures {
     typedef _exception_type exception_type;
     //! \brief Tag type for an empty monad
     struct empty_type { typedef monad monad_type; };
+    //! \brief Rebind this monad type into a different value_type
+    template<typename U> using rebind = monad<U, _error_type, _exception_type, throw_error>;
   private:
     typedef detail::value_storage<value_type, error_type, exception_type, throw_error> value_storage_type;
     value_storage_type _storage;
@@ -783,22 +825,23 @@ namespace lightweight_futures {
     //! \brief Implicit constructor from a value_type by move
     BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : _storage(std::move(v)) { }
     /*! \brief Explicit constructor of a value_type allowing emplacement with no other means of construction. Only available
-    if value_type can be constructed from Args and if either there is more than one Arg or the Arg is not a value_type, an
-    error_type nor an exception_type.
+    if value_type which can't be a monad can be constructed from Args and if either there is more than one Arg or the Arg is not a value_type, an
+    error_type, an exception_type nor an empty_type.
     */
-  #ifdef DOXYGEN_IS_IN_THE_HOUSE
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit monad(Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value);
-  #else
+#else
     template<class Arg, class... Args,
       typename = typename std::enable_if<
-        std::is_constructible<value_type, Arg, Args...>::value
+        !is_monad<value_type>::value
+        && std::is_constructible<value_type, Arg, Args...>::value
         && (sizeof...(Args)!=0 || 
           (!std::is_same<value_type, typename std::decay<Arg>::type>::value
           && !std::is_same<error_type, typename std::decay<Arg>::type>::value
           && !std::is_same<exception_type, typename std::decay<Arg>::type>::value
           && !std::is_same<empty_type, typename std::decay<Arg>::type>::value))
       >::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit monad(Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value) : _storage(typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...) { }
-  #endif
+#endif
     //! \brief Implicit constructor from an initializer list
     template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR monad(std::initializer_list<U> l) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>>::value) : _storage(typename value_storage_type::emplace_t(), std::move(l)) { }
     //! \brief Implicit constructor from a error_type by copy
@@ -817,6 +860,8 @@ namespace lightweight_futures {
     monad(const monad &v) = default;
     //! \brief Copy assignment. Firstly clears any existing state, so exception throws during copy will leave the monad empty.
     monad &operator=(const monad &) = default;
+    // Work around weird MSVC bug where he doesn't always inherit noexcept from value_storage_type
+    ~monad() = default;
 
     //! \brief True if monad contains a value_type
     BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit operator bool() const noexcept { return has_value(); }
@@ -1028,6 +1073,10 @@ namespace lightweight_futures {
     - If the monad is empty and the callable takes an `empty_type`, then call the callable,
     else pass through the monad. For this reason, any callable with an `empty_type` parameter must
     always return the same monad type as the originating monad.
+
+    Note that for nested monads e.g. monad<monad<int>>, either or both of the inner or outer
+    monads can be with value or with error or empty. You should have your binds and maps
+    work appropriately.
     
     For maximum build performance, try to avoid bind() and map() as these use some hefty
     metaprogramming to deduce what kind of bind and map you're doing based on the callables
@@ -1036,23 +1085,23 @@ namespace lightweight_futures {
     as it's relatively dumb and the only metaprogramming is to determine whether to wrap
     the return type with a monad or not.
     
-    ### Acknowledgements ###
+  ### Acknowledgements ###
     To T.C. on Stack Overflow for answering my question at https://stackoverflow.com/questions/30802404/how-to-detect-whether-some-callable-takes-a-rvalue-reference
     and without whose excellent answer the intelligent map() and bind() above could not work.
     */
     ///@{
     //! \brief If I am a monad<monad<...>>, return copy of most nested monad<...>, else return copy of *this
-  #ifdef DOXYGEN_IS_IN_THE_HOUSE
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
     monad<...> unwrap() const &;
-  #else
+#else
     typename detail::do_unwrap<monad>::output_type unwrap() const & { return detail::do_unwrap<monad>()(*this); }
-  #endif
+#endif
     //! \brief If I am a monad<monad<...>>, return move of most nested monad<...>, else return move of *this
-  #ifdef DOXYGEN_IS_IN_THE_HOUSE
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
     monad<...> unwrap() &&;
-  #else
+#else
     typename detail::do_unwrap<monad>::output_type unwrap() && { return detail::do_unwrap<monad>()(std::move(*this)); }
-  #endif
+#endif
 
     /*! \brief Return monad(F(*this)) or F(*this) if the latter returns a monad.
     
@@ -1065,9 +1114,9 @@ namespace lightweight_futures {
     a monad, that monad can be of any template parameter configuration and it will be returned from then(). This
     allows a very easy way of converting between different configurations of monad cost free.
     */
-  #ifdef DOXYGEN_IS_IN_THE_HOUSE
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> monad(F(*this)).unwrap() then(F &&f);
-  #else
+#else
     template<class F> typename detail::do_then<typename traits::is_callable_is_well_formed<F, monad>::type, F, monad>::output_type then(F &&f)
     {
       typedef traits::callable_argument_traits<F, monad> f_traits;
@@ -1075,15 +1124,15 @@ namespace lightweight_futures {
         "The callable passed to then() must take this monad type or a reference to it.");
       return detail::do_then<typename f_traits::return_type, F, monad>(std::forward<F>(f))(std::move(*this), traits::detail::rank<5>());
     }
-  #endif
+#endif
     
     //! \brief If bool(*this), return monad(F(get())).unwrap(), else return monad<result_of<F(get())>>(error)
-  #ifdef DOXYGEN_IS_IN_THE_HOUSE
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> monad(F(get())).unwrap() bind(F &&f);
-  #else
-    template<class F> typename detail::do_then<typename detail::do_bind_map<F, monad>::return_type, F, monad>::output_type bind(F &&f)
+#else
+    template<class F> typename detail::do_bind<typename detail::bind_map_parameter_validation<F, monad>::return_type, F, monad>::output_type bind(F &&f)
     {
-      typedef detail::do_then<typename detail::do_bind_map<F, monad>::return_type, F, monad> impl;
+      typedef detail::do_bind<typename detail::bind_map_parameter_validation<F, monad>::return_type, F, monad> impl;
       if(has_value())
         return impl(std::forward<F>(f))(std::move(_storage.value), traits::detail::rank<5>());
       else if(has_error())
@@ -1093,31 +1142,25 @@ namespace lightweight_futures {
       else
         return impl(std::forward<F>(f))(empty_type(), traits::detail::rank<5>());
     }
-  #endif
+#endif
     
     //! \brief If bool(*this), return monad(F(get())), else return monad<result_of<F(get())>>(error)
-  #ifdef DOXYGEN_IS_IN_THE_HOUSE
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> monad(F(get())) map(F &&f);
-  #else
-    template<class F> monad<typename traits::is_callable_is_well_formed<F, value_type>::type> map(F &&f)
+#else
+    template<class F> typename detail::do_map<typename detail::bind_map_parameter_validation<F, monad>::return_type, F, monad>::output_type map(F &&f)
     {
-      typedef traits::is_callable_is_well_formed<F, value_type> f_traits;
-      typedef traits::callable_argument_traits<F, value_type> f_takes_rvalue;
-      static_assert(f_traits::value && (f_takes_rvalue::is_auto || std::is_same<typename f_takes_rvalue::type, value_type>::value),
-        "The callable passed to map() must take an auto, a value_type or a reference to a value_type.");
-      typedef monad<typename f_traits::type> type;
+      typedef detail::do_map<typename detail::bind_map_parameter_validation<F, monad>::return_type, F, monad> impl;
       if(has_value())
-        return f_takes_rvalue::is_rvalue
-          ? type(f(std::move(_storage.value)))
-          : type(f(_storage.value));
+        return impl(std::forward<F>(f))(std::move(_storage.value), traits::detail::rank<5>());
       else if(has_error())
-        return type(_storage.error);
+        return impl(std::forward<F>(f))(std::move(_storage.error), traits::detail::rank<5>());
       else if(has_exception())
-        return type(_storage.exception);
+        return impl(std::forward<F>(f))(std::move(_storage.exception), traits::detail::rank<5>());
       else
-        return type();
+        return impl(std::forward<F>(f))(empty_type(), traits::detail::rank<5>());
     }
-  #endif
+#endif
   ///@}
   };
 

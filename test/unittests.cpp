@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(works/spinlock/threaded, "Tests that the spinlock works as 
       while(gate);
       locked+=lock.try_lock();
     }
-    BOOST_REQUIRE(locked==1);
+    BOOST_REQUIRE(locked==1U);
     lock.unlock();
   }
 }
@@ -990,6 +990,13 @@ BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
 BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
 {
   using namespace boost::spinlock::lightweight_futures;
+  static_assert(std::is_constructible<monad<long>, int>::value, "Sanity check that monad can be constructed from a value_type");
+  static_assert(std::is_constructible<monad<monad<long>>, int>::value, "Sanity check that outer monad can be constructed from an inner monad's value_type");
+  static_assert(!std::is_constructible<monad<monad<monad<long>>>, int>::value, "Sanity check that outer monad can not be constructed from an inner inner monad's value_type");
+  static_assert(!std::is_constructible<monad<monad<monad<monad<long>>>>, int>::value, "Sanity check that outer monad can not be constructed from an inner inner monad's value_type");
+
+  static_assert(!std::is_constructible<monad<int>, monad<long>>::value, "Sanity check that different monads cannot be constructed from one another");
+  static_assert(!std::is_constructible<monad<monad<int>>, monad<long>>::value, "Sanity check that different monads cannot be constructed from one another");
   {
     monad<int> m;
     BOOST_CHECK(!m);
@@ -1314,9 +1321,9 @@ BOOST_AUTO_TEST_CASE(works/monad/containers, "Tests that the monad works as inte
   std::vector<monad<std::vector<int>>> vect;
   vect.push_back({5, 6, 7, 8});
   vect.push_back({1, 2, 3, 4});
-  BOOST_REQUIRE(vect.size()==2);
-  BOOST_CHECK(vect[0].get().size()==4);
-  BOOST_CHECK(vect[1].get().size()==4);
+  BOOST_REQUIRE(vect.size()==2U);
+  BOOST_CHECK(vect[0].get().size()==4U);
+  BOOST_CHECK(vect[1].get().size()==4U);
   BOOST_CHECK(vect[0].get().front()==5);
   BOOST_CHECK(vect[0].get().back()==8);
   BOOST_CHECK(vect[1].get().front()==1);
@@ -1404,29 +1411,37 @@ BOOST_AUTO_TEST_CASE(works/monad/bind, "Tests that the monad continues with bind
   {
     monad<std::string> a("niall"), b(ec);
     // Does bind work?
-    auto c(a.bind([](std::string &&) -> monad<int> {return 5;}));
+    auto c(a.bind([](std::string &&) {return 5;}));
+    auto c2(a.bind([](std::string &&) -> monad<int> {return 5;}));
     BOOST_CHECK(c.get()==5);
+    BOOST_CHECK(c2.get()==5);
     BOOST_CHECK(a.get() == "niall");
-    auto d(b.bind([](std::string &&) -> monad<int> {return 5;}));
+    auto d(b.bind([](std::string &&) {return 5;}));
+    auto d2(b.bind([](std::string &&) -> monad<int> {return 5;}));
     BOOST_CHECK(d.has_error());
+    BOOST_CHECK(d2.has_error());
 #ifdef __cpp_generic_lambdas
-    auto e(a.bind([](auto) -> monad<int> {return 5;}));
-//FIXME    BOOST_CHECK(e.get()==5);
+    auto e(a.bind([](auto) {return 5;}));
+    auto e2(a.bind([](auto) -> monad<int> {return 5; }));
+    BOOST_CHECK(e.get()==5);
+    BOOST_CHECK(e2.get() == 5);
     BOOST_CHECK(a.get() == "niall");
-    auto f(b.bind([](auto) -> monad<int> {return 5;}));
+    auto f(b.bind([](auto) {return 5;}));
+    auto f2(b.bind([](auto) -> monad<int> {return 5;}));
     BOOST_CHECK(f.has_error());
+    BOOST_CHECK(f2.has_error());
 #endif
-    auto g(a.bind([](std::string &&v) {return v;}));
+    auto g(a.bind([](std::string &&v) {return std::move(v);}));
     BOOST_CHECK(g.get()=="niall");
     BOOST_CHECK(a.get().empty());
-    auto h(b.bind([](std::string &&v) {return v;}));
+    auto h(b.bind([](std::string &&v) {return std::move(v);}));
     BOOST_CHECK(h.has_error());
     a.emplace("niall");
 #ifdef __cpp_generic_lambdas
-    auto i(a.bind([](auto &&v) {return v;}));
+    auto i(a.bind([](auto &&v) {return std::move(v);}));
     BOOST_CHECK(i.get()=="niall");
     BOOST_CHECK(a.get().empty());
-    auto j(b.bind([](auto &&v) {return v;}));
+    auto j(b.bind([](auto &&v) {return std::move(v);}));
     BOOST_CHECK(j.has_error());
     a.emplace("niall");
 #endif
@@ -1447,10 +1462,10 @@ BOOST_AUTO_TEST_CASE(works/monad/bind, "Tests that the monad continues with bind
     );
     BOOST_CHECK(y.get()==5);
     auto z(
-      a.bind([](std::string &&v){ return v;})
-       .bind([](std::string &&v){ return v;})
-       .bind([](std::string &&v){ return v;})
-       .bind([](std::string &&v){ return v;})
+      a.bind([](std::string &&v){ return std::move(v);})
+       .bind([](std::string &&v){ return std::move(v);})
+       .bind([](std::string &&v){ return std::move(v);})
+       .bind([](std::string &&v){ return std::move(v);})
     );
     BOOST_CHECK(z.get()=="niall");
     BOOST_CHECK(a.get().empty());
@@ -1464,11 +1479,77 @@ BOOST_AUTO_TEST_CASE(works/monad/map, "Tests that the monad continues with map()
   {
     monad<std::string> a("niall"), b(ec);
     // Does map work?
-    auto c(a.map([](std::string v) -> monad<std::string> {return v;}));
-    BOOST_CHECK(c.get().get()=="niall");
+    auto c(a.map([](std::string &&) {return 5; }));
+    auto c2(a.map([](std::string &&) -> monad<int> {return 5; }));
+    BOOST_CHECK(c.get() == 5);
+    BOOST_CHECK(c2.get().get() == 5);
     BOOST_CHECK(a.get() == "niall");
-    auto d(b.map([](std::string v) -> monad<std::string> {return v;}));
+    auto d(b.map([](std::string &&) {return 5; }));
+    auto d2(b.map([](std::string &&) -> monad<int> {return 5; }));
     BOOST_CHECK(d.has_error());
+    BOOST_CHECK(d2.has_error());
+#ifdef __cpp_generic_lambdas
+    auto e(a.map([](auto) {return 5; }));
+    auto e2(a.map([](auto) -> monad<int> {return 5; }));
+    BOOST_CHECK(e.get() == 5);
+    BOOST_CHECK(e2.get().get() == 5);
+    BOOST_CHECK(a.get() == "niall");
+    auto f(b.map([](auto) {return 5; }));
+    auto f2(b.map([](auto) -> monad<int> {return 5; }));
+    BOOST_CHECK(f.has_error());
+    BOOST_CHECK(f2.has_error());
+#endif
+    auto g(a.map([](std::string &&v) {return std::move(v); }));
+    BOOST_CHECK(g.get() == "niall");
+    BOOST_CHECK(a.get().empty());
+    auto h(b.map([](std::string &&v) {return std::move(v); }));
+    BOOST_CHECK(h.has_error());
+    a.emplace("niall");
+#ifdef __cpp_generic_lambdas
+    auto i(a.map([](auto &&v) {return std::move(v); }));
+    BOOST_CHECK(i.get() == "niall");
+    BOOST_CHECK(a.get().empty());
+    auto j(b.map([](auto &&v) {return std::move(v); }));
+    BOOST_CHECK(j.has_error());
+    a.emplace("niall");
+#endif
+
+    // Does map work with chains of value, error, exception and empty?
+    auto x(
+      a.map([ec](std::string) {return ec; })
+      .map([](std::error_code) {return std::make_exception_ptr(5); })
+      .map([](std::exception_ptr) {return; })
+      .map([](monad<std::string>::empty_type) {return std::string("douglas"); })
+      );
+    BOOST_CHECK(x.get() == "douglas");
+    auto y(
+      a.map([ec](std::string) -> monad<long> {return ec; })
+      // Type is now monad<monad<long>> where the inner monad is errored
+      .map([](std::error_code) {return std::make_exception_ptr(5); })
+      .map([](std::exception_ptr) {return; })
+      .map([](monad<monad<long>>::empty_type) -> monad<long> {return 5; })
+      // Type is now monad<monad<long>> where the inner monad is errored
+      );
+    // None of the above maps fire after the first as the first returns a monad<monad<int>>,
+    // so it's always un-erroroed.
+    BOOST_CHECK(y.has_value());
+    BOOST_CHECK(y.unwrap().has_error());
+    auto y2(
+      a.map([ec](std::string) -> monad<long> {return ec; })
+      // Type is now monad<monad<long>>
+      .map([](monad<long> v) { return v.map([](std::error_code) {return std::make_exception_ptr(5); }); })
+      .map([](monad<long> v) { return v.map([](std::exception_ptr) {return; }); })
+      .map([](monad<long> v) { return v.map([](monad<long>::empty_type) {return 5L; }); })
+      );
+    BOOST_CHECK(y2.unwrap().get()==5);
+    auto z(
+      a.map([](std::string &&v) { return std::move(v); })
+      .map([](std::string &&v) { return std::move(v); })
+      .map([](std::string &&v) { return std::move(v); })
+      .map([](std::string &&v) { return std::move(v); })
+      );
+    BOOST_CHECK(z.get() == "niall");
+    BOOST_CHECK(a.get().empty());
   }
 }
 
