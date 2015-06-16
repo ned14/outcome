@@ -21,10 +21,10 @@ for %%f in (*.cpp) do (
       if !LINE! GTR 7 (
         if "!FILE!" == "min_promise_future_reduce" (
           echo     ^<skipped/^> >> results.xml
+        ) else if "!FILE!" == "min_future_construct_move_destruct" (
+          echo     ^<skipped/^> >> results.xml
         ) else (
-          if "!FILE!" == "min_future_construct_move_destruct" (
-            echo     ^<failure message="Opcodes generated !LINE! exceeds 7"/^> >> results.xml
-          )
+          echo     ^<failure message="Opcodes generated !LINE! exceeds 7"/^> >> results.xml
         )
       )
       echo     ^<system-out^> >> results.xml
