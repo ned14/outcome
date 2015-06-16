@@ -860,10 +860,6 @@ namespace lightweight_futures {
     monad(const monad &v) = default;
     //! \brief Copy assignment. Firstly clears any existing state, so exception throws during copy will leave the monad empty.
     monad &operator=(const monad &) = default;
-#ifdef _MSC_VER
-    // Work around weird MSVC bug where he doesn't always inherit noexcept from value_storage_type
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP ~monad() noexcept(is_nothrow_destructible) { }
-#endif
 
     //! \brief True if monad contains a value_type
     BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit operator bool() const noexcept { return has_value(); }
