@@ -1067,6 +1067,13 @@ namespace lightweight_futures {
       This lets you move from the value held by the originating monad if so desired.
     If the monad doesn't contain a T, pass it through but into whatever new monad type
     returned by the callable.
+    \warning The current implementation requires you to specify a non-dependent return
+    type for all generic lambdas, else you'll get compile errors where the compiler tried
+    to insert `error_type`, `exception_type` etc when it was trying to figure out if the
+    return type is correct. A future implementation (once VS2015 has Expression SFINAE) may
+    remove this restriction, until then just hard specify your return types if your lambdas
+    take an `auto`, or use lambdas not taking `auto`.
+    
     - If the monad contains an `error_type` and the callable takes an `error_type`, then
     call the callable, else pass through the monad. For this reason, any callable taking
     an `error_type` must always return the same monad type as the originating monad.

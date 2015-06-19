@@ -6,15 +6,18 @@ using namespace boost::spinlock::lightweight_futures;
 template<class T> monad<T> do_test(monad<T> m)
 {
   std::cout << "The value of my input monad is ";
-  if(m) std::cout << m.get() << std::endl;
-  else std::cout << (m.has_error() ? "errored" : m.has_exception() ? "excepted" : "empty") << std::endl;
+  if(m)
+    std::cout << m.get() << std::endl;
+  else
+    std::cout << (m.has_error() ? "errored" : m.has_exception() ? "excepted" : "empty") << std::endl;
   
   std::cout << "  or via bind(), my value is ";
-  m.bind([](auto v) { std::cout << v; return v; })
-   .bind([](std::error_code e) { std::cout << "errored"; return e; })
-   .bind([](std::exception_ptr e) { std::cout << "excepted"; return e; })
-   .bind([](typename decltype(m)::empty_type) { std::cout << "empty"; });
+  auto o(m.bind([](T v) { std::cout << v; return v; })
+          .bind([](std::error_code e) { std::cout << "errored"; return e; })
+          .bind([](std::exception_ptr e) { std::cout << "excepted"; return e; })
+          .bind([](typename decltype(m)::empty_type) { std::cout << "empty"; }));
   std::cout << std::endl;
+  return o;
 }
 
 int main(void)

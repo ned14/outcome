@@ -10,6 +10,6 @@ Before monad<T> review:
  - [x] Implement then(), bind(), map(), unwrap()
  - [x] Get then(), bind(), map() and unwrap() being constexpr unit tested
  - [x] Add CI build step for publishing single drop in header files. Script needs to include only local includes, not system includes.
- - [ ] Add wandbox single click tryout https://github.com/krzysztof-jusiak/di/blob/cpp14/doc/tools/try_it_online.sh
+ - [x] Add wandbox single click tryout http://melpon.org/wandbox/permlink/cnZM5KRNpjErXrPH
  
 </center>
