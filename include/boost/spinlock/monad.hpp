@@ -1092,13 +1092,13 @@ namespace lightweight_futures {
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
     monad<...> unwrap() const &;
 #else
-    typename detail::do_unwrap<monad>::output_type unwrap() const & { return detail::do_unwrap<monad>()(*this); }
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_unwrap<monad>::output_type unwrap() const & { return detail::do_unwrap<monad>()(*this); }
 #endif
     //! \brief If I am a monad<monad<...>>, return move of most nested monad<...>, else return move of *this
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
     monad<...> unwrap() &&;
 #else
-    typename detail::do_unwrap<monad>::output_type unwrap() && { return detail::do_unwrap<monad>()(std::move(*this)); }
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_unwrap<monad>::output_type unwrap() && { return detail::do_unwrap<monad>()(std::move(*this)); }
 #endif
 
     /*! \brief Return monad(F(*this)) or F(*this) if the latter returns a monad.
@@ -1115,7 +1115,7 @@ namespace lightweight_futures {
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> monad(F(*this)).unwrap() then(F &&f);
 #else
-    template<class F> typename detail::do_then<typename traits::is_callable_is_well_formed<F, monad>::type, F, monad>::output_type then(F &&f)
+    template<class F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_then<typename traits::is_callable_is_well_formed<F, monad>::type, F, monad>::output_type then(F &&f)
     {
       typedef traits::callable_argument_traits<F, monad> f_traits;
       static_assert(f_traits::valid,
@@ -1128,7 +1128,7 @@ namespace lightweight_futures {
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> monad(F(get())).unwrap() bind(F &&f);
 #else
-    template<class F> typename detail::do_bind<typename detail::bind_map_parameter_validation<F, monad>::return_type, F, monad>::output_type bind(F &&f)
+    template<class F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_bind<typename detail::bind_map_parameter_validation<F, monad>::return_type, F, monad>::output_type bind(F &&f)
     {
       typedef detail::do_bind<typename detail::bind_map_parameter_validation<F, monad>::return_type, F, monad> impl;
       if(has_value())
@@ -1146,7 +1146,7 @@ namespace lightweight_futures {
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> monad(F(get())) map(F &&f);
 #else
-    template<class F> typename detail::do_map<typename detail::bind_map_parameter_validation<F, monad>::return_type, F, monad>::output_type map(F &&f)
+    template<class F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_map<typename detail::bind_map_parameter_validation<F, monad>::return_type, F, monad>::output_type map(F &&f)
     {
       typedef detail::do_map<typename detail::bind_map_parameter_validation<F, monad>::return_type, F, monad> impl;
       if(has_value())

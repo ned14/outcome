@@ -1,6 +1,18 @@
 @echo off
 setlocal EnableDelayedExpansion
 set MSVCLINE=
+if not exist msvc.csv (
+  for %%f in (*.cpp) do (
+    set FILE=%%~nf
+    if "!MSVCLINE!" == "" (
+      set MSVCLINE="!FILE!"
+    ) else (
+      set MSVCLINE=!MSVCLINE!,"!FILE!"
+    )
+  )
+  echo !MSVCLINE! >> msvc.csv
+)
+set MSVCLINE=
 echo ^<?xml version="1.0" encoding="UTF-8"?^> > results.xml
 echo ^<testsuite name="constexprs"^> >> results.xml
 for %%f in (*.cpp) do (
@@ -22,6 +34,8 @@ for %%f in (*.cpp) do (
         if "!FILE!" == "min_promise_future_reduce" (
           echo     ^<skipped/^> >> results.xml
         ) else if "!FILE!" == "min_future_construct_move_destruct" (
+          echo     ^<skipped/^> >> results.xml
+        ) else if "!FILE!" == "min_monad_then" (
           echo     ^<skipped/^> >> results.xml
         ) else (
           echo     ^<failure message="Opcodes generated !LINE! exceeds 7"/^> >> results.xml
