@@ -1173,6 +1173,14 @@ namespace lightweight_futures {
     static_assert(!std::is_same<_error_type, _error_type>::value, "monad<void> not implemented yet");
   };
 
+  //! \brief Makes a monad from the type passed
+  template<class T> monad<T> make_monad(T &&v) { return monad<T>(std::forward<T>(v)); }
+  //! \brief Makes an errored monad of type T
+  template<class T> monad<T> make_monad(std::error_code v) { return monad<T>(std::move(v)); }
+  //! \brief Makes an excepted monad of type T
+  template<class T> monad<T> make_monad(std::exception_ptr v) { return monad<T>(std::move(v)); }
+  //! \brief Makes an empty monad of type T
+  template<class T> monad<T> make_monad() { return monad<T>(); }
 }
 BOOST_SPINLOCK_V1_NAMESPACE_END
 
