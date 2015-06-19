@@ -3,6 +3,7 @@
 
 using namespace boost::spinlock::lightweight_futures;
 
+//! [monad_bind_example]
 template<class T> monad<T> do_test(monad<T> m)
 {
   std::cout << "The value of my input monad is ";
@@ -19,6 +20,7 @@ template<class T> monad<T> do_test(monad<T> m)
   std::cout << std::endl;
   return o;
 }
+//! [monad_bind_example]
 
 int main(void)
 {

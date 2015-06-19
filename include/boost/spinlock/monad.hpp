@@ -1056,7 +1056,7 @@ namespace lightweight_futures {
     monad is passed by const lvalue ref unless the callable takes a rvalue ref to the monad.
     
     A quick use example:
-    \snippet unittests.cpp monad_bind_example
+    \snippet monad_example.cpp monad_bind_example
     
     You will note in the code example that the type of the callable for bind() and map()
     determines what operation happens. Here are the rules:
