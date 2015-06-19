@@ -1,6 +1,23 @@
 #!/bin/bash -e
 GCCLINE=""
 CLANGLINE=""
+if [ ! -f gcc.csv ]; then
+  for f in *.cpp
+  do
+    FILE=${f%.cpp}
+    if [ "$GCCLINE" != "" ]; then
+      GCCLINE=$GCCLINE,\"$FILE\"
+      CLANGLINE=$CLANGLINE,\"$FILE\"
+    else
+      GCCLINE=\"$FILE\"
+      CLANGLINE=\"$FILE\"
+    fi
+  done
+  echo $GCCLINE >> gcc.csv
+  echo $CLANGLINE >> clang.csv
+fi
+GCCLINE=""
+CLANGLINE=""
 echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > results.xml
 echo "<testsuite name=\"constexprs\">" >> results.xml
 for f in *.cpp

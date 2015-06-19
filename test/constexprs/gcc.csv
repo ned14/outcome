@@ -1,0 +1,2 @@
+"max_monad_bind","max_monad_get_error","max_monad_get_exception","max_monad_get_value","max_monad_then","min_future_construct_destruct","min_future_construct_move_destruct","min_monad_bind","min_monad_construct_destruct","min_monad_construct_error_destruct","min_monad_construct_error_move_destruct","min_monad_construct_exception_destruct","min_monad_construct_value_destruct","min_monad_construct_value_move_destruct","min_monad_then","min_promise_construct_destruct","min_promise_construct_move_destruct","min_promise_future_reduce"
+44,119,214,113,154,0,0,5,0,2,8,21,1,1,4,0,0,1
