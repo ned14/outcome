@@ -743,21 +743,27 @@ namespace lightweight_futures {
   in from a non-visible source where the compiler has to generate code paths to handle an unknown
   input state, whereas the minimum is calculated by setting a monad's state in view of the compiler's
   optimiser such that it can usually completely elide opcodes generated (though note that varies
-  enormously by compiler to the extent that the known code generates more opcodes than the unknown code).
+  enormously by compiler to the extent that the known code generates more opcodes than the unknown code). All monads are `monad<int>`.
 
   <dl>
    <dt>clang 3.7</dt>
     <dd>59 opcodes <= Value transport <= 37 opcodes<br></dd>
     <dd>7 opcodes <= Error transport <= 52 opcodes<br></dd>
     <dd>38 opcodes <= Exception transport <= 39 opcodes</dd>  
+    <dd>62 opcodes <= then() <= 84 opcodes</dd>
+    <dd>5 opcodes <= bind() <= 44 opcodes</dd>
    <dt>GCC 5.1</dt>
     <dd>1 opcodes <= Value transport <= 113 opcodes<br></dd>
     <dd>8 opcodes <= Error transport <= 119 opcodes<br></dd>
     <dd>22 opcodes <= Exception transport <= 214 opcodes</dd>
+    <dd>4 opcodes <= then() <= 154 opcodes</dd>
+    <dd>5 opcodes <= bind() <= 44 opcodes</dd>
    <dt>VS2015</dt>
     <dd>4 opcodes <= Value transport <= 1881 opcodes<br></dd>
     <dd>6 opcodes <= Error transport <= 164 opcodes<br></dd>
     <dd>1946 opcodes <= Exception transport <= 1936 opcodes</dd>
+    <dd>2029 opcodes <= then() <= 2030 opcodes</dd>
+    <dd>155 opcodes <= bind() <= 156 opcodes</dd>
   </dl>
 
 ## Examples ##
