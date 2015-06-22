@@ -920,37 +920,37 @@ namespace lightweight_futures {
       }      
     }
   public:
-    //! \brief If contains a value_type, returns a lvalue reference to it, else throws an exception of future_error(no_state), system_error or the exception_type.
+    //! \brief If contains a value_type, returns a lvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &get() &
     {
         std::move(*this)._get_value();
         return _storage.value;
     }
-    //! \brief If contains a value_type, returns a lvalue reference to it, else throws an exception of future_error(no_state), system_error or the exception_type.
+    //! \brief If contains a value_type, returns a lvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &value() &
     {
         std::move(*this)._get_value();
         return _storage.value;
     }
-    //! \brief If contains a value_type, returns a const lvalue reference to it, else throws an exception of future_error(no_state), system_error or the exception_type.
+    //! \brief If contains a value_type, returns a const lvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP const value_type &get() const &
     {
         std::move(*this)._get_value();
         return _storage.value;
     }
-    //! \brief If contains a value_type, returns a const lvalue reference to it, else throws an exception of future_error(no_state), system_error or the exception_type.
+    //! \brief If contains a value_type, returns a const lvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP const value_type &value() const &
     {
         std::move(*this)._get_value();
         return _storage.value;
     }
-    //! \brief If contains a value_type, returns a rvalue reference to it, else throws an exception of future_error(no_state), system_error or the exception_type.
+    //! \brief If contains a value_type, returns a rvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &&get() &&
     {
         std::move(*this)._get_value();
         return std::move(_storage.value);
     }
-    //! \brief If contains a value_type, returns a rvalue reference to it, else throws an exception of future_error(no_state), system_error or the exception_type.
+    //! \brief If contains a value_type, returns a rvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &&value() &&
     {
         std::move(*this)._get_value();
@@ -993,7 +993,7 @@ namespace lightweight_futures {
     //! \brief Disposes of any existing state, setting the monad to an emplaced construction
     template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP void emplace(Args &&... args) { _storage.clear(); _storage.emplace_value(std::forward<Args>(args)...); }
     
-    //! \brief If contains an error_type, returns that error_type, else returns a null error_type. Can only throw the exception future_error(no_state) if empty.
+    //! \brief If contains an error_type, returns that error_type, else returns a null error_type. Can only throw the exception monad_error(no_state) if empty.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() const
     {
       if(!is_ready())
@@ -1007,7 +1007,7 @@ namespace lightweight_futures {
     //! \brief Disposes of any existing state, setting the monad to the error_type
     BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_error(error_type v) { _storage.clear(); _storage.set_error(std::move(v)); }
     
-    //! \brief If contains an exception_type, returns that exception_type. If contains an error_type, returns system_error(error_type). If contains a value_type, returns a null exception_type. Can only throw the exception future_error(no_state) if empty.
+    //! \brief If contains an exception_type, returns that exception_type. If contains an error_type, returns system_error(error_type). If contains a value_type, returns a null exception_type. Can only throw the exception monad_error(no_state) if empty.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() const
     {
       if(!is_ready())

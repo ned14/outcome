@@ -5,11 +5,10 @@ Linux: [![Build Status](https://ci.nedprod.com/job/Boost.Spinlock%20Test%20Linux
 
 Documentation: https://ci.nedprod.com/job/Boost.Spinlock%20Test%20Linux%20GCC%204.8/doxygen/annotated.html
 
-Before monad<T> review:
- - [x] Add max opcodes constexpr unit testing
- - [x] Implement then(), bind(), map(), unwrap()
- - [x] Get then(), bind(), map() and unwrap() being constexpr unit tested
- - [x] Add CI build step for publishing single drop in header files. Script needs to include only local includes, not system includes.
- - [x] Add wandbox single click tryout http://melpon.org/wandbox/permlink/cnZM5KRNpjErXrPH
+Boost review feedback work items:
+ - [ ] Add template aliases for different configurations of monad<T> (one of maybe, result, holder, value, retval, potential, likely). Add two additional aliases, one for a monad without exception_ptr, and another for a monad with neither error_code nor exception_ptr (option<T>?).
+ - [ ] Make how error_type is converted into exception_type configurable.
+ - [ ] As .then() is defined in a future as executing the callable when the value is set, and monad<T>.then() executes immediately and does not execute when the value is next changed, does this make monad<T>.then() deceptively named? (I think yes). Perhaps next() is a better name for then()? What about simply operator() i.e. make the monad callable?
+ - [ ] Add match() function which visits a callable on the contents.
  
 </center>
