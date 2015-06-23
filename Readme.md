@@ -7,7 +7,7 @@ Documentation: https://ci.nedprod.com/job/Boost.Spinlock%20Test%20Linux%20GCC%20
 
 Boost review feedback work items:
  - [x] Documentation incorrectly says exceptions thrown are future_error when they are in fact monad_error.
- - [ ] Add a tribool, and have monad return that instead of bool.
+ - [x] Add a tribool, and have monad return that instead of bool.
  - [ ] Expose detail::value_storage such that it can be specialised for optimal space e.g. for bool.
  - [ ] Add null_exception_ptr, null_error_code.
  - [ ] Make how error_type is converted into exception_type configurable.

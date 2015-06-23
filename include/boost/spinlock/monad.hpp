@@ -32,7 +32,7 @@ DEALINGS IN THE SOFTWARE.
 #ifndef BOOST_SPINLOCK_MONAD_HPP
 #define BOOST_SPINLOCK_MONAD_HPP
 
-#include "spinlock.hpp"
+#include "tribool.hpp"
 
 // For some odd reason, VS2015 really hates to do much inlining unless forced
 #ifdef _MSC_VER
@@ -682,7 +682,8 @@ namespace lightweight_futures {
   matching monad_errc
 
   This monad can hold a fixed variant list of empty, a type `R`, a lightweight `error_type` or a
-  heavier `exception_type` at a space cost of `max(20, sizeof(R)+4)`. Features:
+  heavier `exception_type` at a space cost of `max(20, sizeof(R)+4)`. This corresponds to `tribool::false_`,
+  `tribool::true_`, `tribool::unknown` and `tribool::unknown` respectively. Features:
 
   - Very lightweight on build times and run times up to the point of zero execution cost and just a four
   byte space overhead. See below for benchmarks. Requires min clang 3.2, GCC 4.7 or VS2015.
@@ -867,8 +868,10 @@ namespace lightweight_futures {
     //! \brief Copy assignment. Firstly clears any existing state, so exception throws during copy will leave the monad empty.
     monad &operator=(const monad &) = default;
 
-    //! \brief True if monad contains a value_type
+    //! \brief Same as `true_(tribool(*this))`
     BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit operator bool() const noexcept { return has_value(); }
+    //! \brief True if monad contains a value_type, false if monad is empty, else unknown.
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR operator tribool::tribool() const noexcept { return has_value() ? tribool::tribool::true_ : empty() ? tribool::tribool::false_ : tribool::tribool::unknown; }
     //! \brief True if monad is not empty
     BOOST_SPINLOCK_FUTURE_CONSTEXPR bool is_ready() const noexcept
     {

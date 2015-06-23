@@ -944,7 +944,7 @@ BOOST_AUTO_TEST_CASE(performance/concurrent_unordered_map/large/read, "Tests the
 
 BOOST_AUTO_TEST_CASE(works/tribool, "Tests that the tribool works as intended")
 {
-  using namespace boost::spinlock::tribool;
+  using boost::spinlock::tribool::tribool;
   auto t(tribool::true_), f(tribool::false_), o(tribool::other), u(tribool::unknown);
   BOOST_CHECK(true_(t));
   BOOST_CHECK(false_(f));
@@ -1026,6 +1026,9 @@ BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
 
 BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
 {
+  using boost::spinlock::tribool::true_;
+  using boost::spinlock::tribool::false_;
+  using boost::spinlock::tribool::other;
   using namespace boost::spinlock::lightweight_futures;
   static_assert(std::is_constructible<monad<long>, int>::value, "Sanity check that monad can be constructed from a value_type");
   static_assert(std::is_constructible<monad<monad<long>>, int>::value, "Sanity check that outer monad can be constructed from an inner monad's value_type");
@@ -1037,6 +1040,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
   {
     monad<int> m;
     BOOST_CHECK(!m);
+    BOOST_CHECK(false_(m));
     BOOST_CHECK(!m.is_ready());
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
@@ -1048,6 +1052,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
   {
     monad<int> m(5);
     BOOST_CHECK(m);
+    BOOST_CHECK(true_(m));
     BOOST_CHECK(m.is_ready());
     BOOST_CHECK(m.has_value());
     BOOST_CHECK(!m.has_error());
@@ -1090,6 +1095,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
     auto e=std::make_exception_ptr(std::system_error(ec));
     monad<int> m(ec);
     BOOST_CHECK(!m);
+    BOOST_CHECK(other(m));
     BOOST_CHECK(m.is_ready());
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
@@ -1111,6 +1117,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
     auto e=std::make_exception_ptr(5);
     monad<int> m(e);
     BOOST_CHECK(!m);
+    BOOST_CHECK(other(m));
     BOOST_CHECK(m.is_ready());
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
