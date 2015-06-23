@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include "timing.h"
 //#include "../include/boost/spinlock/concurrent_unordered_map.hpp"
 #include "../include/boost/spinlock/future.hpp"
+#include "../include/boost/spinlock/tribool.hpp"
 
 #include <stdio.h>
 #include <unordered_map>
@@ -940,6 +941,42 @@ BOOST_AUTO_TEST_CASE(performance/concurrent_unordered_map/large/read, "Tests the
 #endif
 }
 #endif
+
+BOOST_AUTO_TEST_CASE(works/tribool, "Tests that the tribool works as intended")
+{
+  using namespace boost::spinlock::tribool;
+  auto t(tribool::true_), f(tribool::false_), o(tribool::other), u(tribool::unknown);
+  BOOST_CHECK(true_(t));
+  BOOST_CHECK(false_(f));
+  BOOST_CHECK(other(o));
+  BOOST_CHECK(t!=f);
+  BOOST_CHECK(t!=o);
+  BOOST_CHECK(f!=o);
+  BOOST_CHECK(o==u);
+  BOOST_CHECK(~t==f);
+  BOOST_CHECK(~f==t);
+  BOOST_CHECK(~u==u);
+  BOOST_CHECK((f&f)==f);
+  BOOST_CHECK((f&t)==f);
+  BOOST_CHECK((f&u)==f);
+  BOOST_CHECK((u&u)==u);
+  BOOST_CHECK((u&t)==u);
+  BOOST_CHECK((t&t)==t);
+  BOOST_CHECK((f|f)==f);
+  BOOST_CHECK((f|u)==u);
+  BOOST_CHECK((f|t)==t);
+  BOOST_CHECK((u|u)==u);
+  BOOST_CHECK((u|t)==t);
+  BOOST_CHECK((t|t)==t);
+  BOOST_CHECK(std::min(f, u)==f);
+  BOOST_CHECK(std::min(f, t)==f);
+  BOOST_CHECK(std::min(u, t)==u);
+  BOOST_CHECK(std::min(t, t)==t);
+  BOOST_CHECK(std::max(f, u)==u);
+  BOOST_CHECK(std::max(f, t)==t);
+  std::cout << "bool false is " << false << ", bool true is " << true << std::endl;
+  std::cout << "tribool false is " << f << ", tribool unknown is " << u << ", tribool true is " << t << std::endl;
+}
 
 BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
 {

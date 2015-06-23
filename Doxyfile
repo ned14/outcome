@@ -766,7 +766,8 @@ WARN_LOGFILE           = doxy_warnings.txt
 INPUT                  = \
                          include/boost/spinlock/future.hpp \
                          include/boost/spinlock/monad.hpp \
-                         include/boost/spinlock/spinlock.hpp
+                         include/boost/spinlock/spinlock.hpp \
+                         include/boost/spinlock/tribool.hpp
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
