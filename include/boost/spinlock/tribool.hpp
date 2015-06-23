@@ -44,11 +44,17 @@ DEALINGS IN THE SOFTWARE.
 BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 namespace tribool
 {  
-  /*! \brief A constexpr C++ 11 tribool
+  /*! \enum tribool
+  \brief A constexpr C++ 11 tribool
   
-  This tries to be compatible with Boost.Tribool, except it's written in C++ 11 and is 100%
+  This tries to be mostly compatible with Boost.Tribool, except it's written in C++ 11 and is 100%
   constexpr throughout by being a strongly typed enum. Note that `other` state is aliased to
   `indeterminate` for Boost.Tribool compatibility. It is also aliased to unknown.
+  
+  Unlike Boost.Tribool this deliberately does not provide automatic conversion to bool. It was
+  always questionable if code coped well with `operator!` != `!operator bool` anyway. Use the
+  free functions true_(), false_(), other(), indeterminate() and unknown() to test the contents
+  of this tribool.
   
   For sorting, false < unknown < true. Same for max/min. STL functions operators << and >>
   for iostream are defined.
