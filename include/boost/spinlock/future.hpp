@@ -45,6 +45,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 namespace lightweight_futures {
   
 template<typename R, class _error_type=std::error_code, class _exception_type=std::exception_ptr> class promise;
+template<typename R, class _error_type=std::error_code, class _exception_type=std::exception_ptr> class future;
 
 namespace detail
 {
@@ -151,6 +152,7 @@ namespace detail
   };
 }
 
+
 template<typename R, class _error_type, class _exception_type> class promise
 {
 public:
@@ -161,7 +163,7 @@ public:
   friend class future<value_type, error_type, exception_type>;
   friend struct detail::lock_guard<promise, future_type>;
 private:
-  typedef detail::value_storage<value_type, error_type, exception_type, detail::throw_future_promise_error> value_storage_type;
+  typedef value_storage<promise> value_storage_type;
   value_storage_type _storage;
   bool _need_locks;                 // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
 #ifdef _MSC_VER
@@ -298,13 +300,13 @@ public:
 
 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4399.html
 */
-template<typename R, class _error_type, class _exception_type> class future : protected monad<R, _error_type, _exception_type, detail::throw_future_promise_error>
+template<typename R, class _error_type, class _exception_type> class future : protected basic_monad<future<R, _error_type, _exception_type>>
 {
-  typedef monad<R, _error_type, _exception_type, detail::throw_future_promise_error> monad_type;
+  typedef basic_monad<future<R, _error_type, _exception_type>> monad_type;
 public:
-  typedef typename monad_type::value_type value_type;
-  typedef typename monad_type::error_type error_type;
-  typedef typename monad_type::exception_type exception_type;
+  typedef R value_type;
+  typedef _error_type error_type;
+  typedef _exception_type exception_type;
   BOOST_STATIC_CONSTEXPR bool is_consuming=true;
   typedef promise<value_type, error_type, exception_type> promise_type;
   friend class promise<value_type, error_type, exception_type>;
