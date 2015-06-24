@@ -1429,7 +1429,6 @@ BOOST_AUTO_TEST_CASE(works/monad/swap, "Tests that the monad swaps as intended")
   BOOST_CHECK(b.get_error()==std::error_code());
 }
 
-#if 0
 BOOST_AUTO_TEST_CASE(works/monad/unwrap, "Tests that the monad unwraps as intended")
 {
   using namespace boost::spinlock::lightweight_futures;
@@ -1453,6 +1452,7 @@ BOOST_AUTO_TEST_CASE(works/monad/unwrap, "Tests that the monad unwraps as intend
   BOOST_CHECK(g.get().get().get().get().empty());
 }
 
+#if 0
 BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with then() as intended")
 {
   using namespace boost::spinlock::lightweight_futures;

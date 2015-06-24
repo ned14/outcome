@@ -491,19 +491,26 @@ namespace lightweight_futures {
   {
     template<class M> struct is_monad : std::false_type {};
     template<class Impl> struct is_monad<basic_monad<Impl>> : std::true_type{};
-
-#if 0
-    template<class M> struct do_unwrap;
-    template<class Impl> struct do_unwrap<basic_monad<Impl>>
+    
+    // Does the monad contain a monad?
+    template<class> struct is_monad_monad;
+    template<class Policy> struct is_monad_monad<basic_monad<Policy>>
     {
-      typedef basic_monad<Impl> input_type;
+      BOOST_STATIC_CONSTEXPR bool value=is_monad<typename basic_monad<Policy>::value_type>::value;
+    };
+
+    template<bool is_monad_monad, class M> struct do_unwrap2;
+    template<class M> using do_unwrap = do_unwrap2<is_monad_monad<M>::value, M>;
+    template<bool is_monad_monad, class M> struct do_unwrap2
+    {
+      typedef M input_type;
       typedef input_type output_type;
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR output_type operator()(const input_type &v) const { return v; }
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR output_type operator()(input_type &&v) const { return std::move(v); }
     };
-    template<class Impl> struct do_unwrap<basic_monad<monad<R, _error_type, _exception_type, throw_error1>, _error_type, _exception_type, throw_error2>>
+    template<class M> struct do_unwrap2<true, M>
     {
-      typedef monad<monad<R, _error_type, _exception_type, throw_error1>, _error_type, _exception_type, throw_error2> input_type;
+      typedef M input_type;
       typedef typename input_type::value_type unwrapped_type;
       typedef typename do_unwrap<unwrapped_type>::output_type output_type;
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR output_type operator()(const input_type &v) const
@@ -530,6 +537,7 @@ namespace lightweight_futures {
       }
     };
 
+#if 0
     // Is the monad M's contents directly constructible from an R, not allowing a monad<monad<int>> being constructible from an int
     template<class M, class R> struct is_monad_constructible : public std::is_constructible<typename M::value_type, R> {};
     template<class M> struct is_monad_constructible<M, typename M::error_type> : public std::true_type{};
@@ -1105,7 +1113,6 @@ TODO
       set_exception(make_exception_type(std::forward<E>(e)));
     }
 
-#if 0
     /*! \name Monadic programming primitives unwrap(), then(), bind() and map()
     
     Classic monadic programming consists of a sequence of nested functional operations:
@@ -1190,6 +1197,7 @@ TODO
     BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_unwrap<basic_monad>::output_type unwrap() && { return detail::do_unwrap<basic_monad>()(std::move(*this)); }
 #endif
 
+#if 0
     /*! \brief Return monad(F(*this)) or F(*this) if the latter returns a monad.
     
     The callable F needs to consume a monad obviously enough, however if your callable takes a monad &&, you can move
