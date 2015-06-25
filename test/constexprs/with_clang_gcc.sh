@@ -51,7 +51,7 @@ do
     echo "  <testcase name=\"${FILE}.gcc\">" >> results.xml
     if [ $GCCVAL -gt 5 ] \
          && ([ "$FILE" != "min_monad_construct_error_move_destruct" ] || [ $GCCVAL -gt 10 ]) \
-         && ([ "$FILE" != "min_monad_construct_exception_destruct" ] || [ $GCCVAL -gt 30 ]) \
+         && ([ "$FILE" != "min_monad_construct_exception_move_destruct" ] || [ $GCCVAL -gt 30 ]) \
       ; then
       echo "    <failure message=\"Opcodes generated $GCCVAL exceeds limit\"/>" >> results.xml
     fi
