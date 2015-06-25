@@ -80,16 +80,21 @@ while not done:
             assert loops <= 1000
         if isObjDump:
             idx=opcodes.find('<', callop)
-            calltarget=int(opcodes[opcodes.find('+', idx)+3:opcodes.find('\n', idx)-1], 16)
+            if opcodes.find('+', idx)!=-1:
+                calltarget=int(opcodes[opcodes.find('+', idx)+3:opcodes.find('\n', idx)-1], 16)
+            else:
+                calltarget=0
         if isDumpBin:
             idx=opcodes.find('?', callop);
             calltarget=opcodes[idx:opcodes.find('\n', idx)]
-        #print("   contains call to "+str(calltarget)+" which has found="+str(calltarget in functions))
-        if calltarget != function and calltarget in functions:
-            done=False
-            expansion=functions[calltarget]
-            # Replace calltarget string
-            opcodes=opcodes[:idx]+"replaced\n"+expansion+opcodes[opcodes.find('\n', idx):]
+        if idx!=-1:
+            #print("   contains call to "+str(calltarget)+" which has found="+str(calltarget in functions))
+            if calltarget != function and calltarget in functions:
+                done=False
+                expansion=functions[calltarget]
+                # Replace calltarget string
+                opcodes=opcodes[:idx]+"replaced\n"+expansion+opcodes[opcodes.find('\n', idx):]
+                #print(opcodes)
             
         callop=opcodes.find(" call " if isDumpBin else "\tcallq ", callop+1)
     functions[function]=opcodes
