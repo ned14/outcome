@@ -1452,7 +1452,6 @@ BOOST_AUTO_TEST_CASE(works/monad/unwrap, "Tests that the monad unwraps as intend
   BOOST_CHECK(g.get().get().get().get().empty());
 }
 
-#if 0
 BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with then() as intended")
 {
   using namespace boost::spinlock::lightweight_futures;
@@ -1699,7 +1698,6 @@ BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as inten
     BOOST_CHECK_THROW(f.get(), std::future_error);
   }
 }
-#endif
 
 
 BOOST_AUTO_TEST_SUITE_END()
