@@ -1165,6 +1165,28 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
 BOOST_AUTO_TEST_CASE(works/monad/optional, "Tests that the monad acts as an optional R")
 {
   using namespace boost::spinlock::lightweight_futures;
+  using boost::spinlock::tribool::tribool;
+  std::cout << "sizeof(monad<bool>) = " << sizeof(monad<bool>) << std::endl;
+  std::cout << "sizeof(result<bool>) = " << sizeof(result<bool>) << std::endl;
+  std::cout << "sizeof(option<bool>) = " << sizeof(option<bool>) << std::endl;
+  //std::cout << "sizeof(value_storage<bool>) = " << sizeof(value_storage<detail::option_policy<bool>>) << std::endl;
+  std::cout << "sizeof(option<tribool>) = " << sizeof(option<tribool>) << std::endl;
+
+  std::cout << "sizeof(monad<bool>[2]) = " << sizeof(monad<bool>[2]) << std::endl;
+  std::cout << "sizeof(result<bool>[2]) = " << sizeof(result<bool>[2]) << std::endl;
+  std::cout << "sizeof(option<bool>[2]) = " << sizeof(option<bool>[2]) << std::endl;
+  std::cout << "sizeof(option<tribool>[2]) = " << sizeof(option<tribool>[2]) << std::endl;
+
+  std::cout << "sizeof(option<void>) = " << sizeof(option<void>) << std::endl;
+  std::cout << "sizeof(option<void>[2]) = " << sizeof(option<void>[2]) << std::endl;
+
+  // TODO FIXME Get option<void> and option<bool> and option<tribool> storage down to 1 byte
+  BOOST_CHECK(sizeof(option<void>)<=2);
+  BOOST_CHECK(sizeof(option<bool>)<=2);
+  BOOST_CHECK(sizeof(option<tribool>)<=2);
+  BOOST_CHECK(sizeof(option<void>[2])<=4);
+  BOOST_CHECK(sizeof(option<bool>[2])<=4);
+  BOOST_CHECK(sizeof(option<tribool>[2])<=4);
 
   //! [optional_example]
   auto maybe_getenv=[](const char* n) -> option<const char *>
@@ -1640,6 +1662,8 @@ BOOST_AUTO_TEST_CASE(works/monad/map, "Tests that the monad continues with map()
 BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as intended")
 {
   using namespace boost::spinlock::lightweight_futures;
+  std::cout << "sizeof(promise<bool>) = " << sizeof(promise<bool>) << std::endl;
+  std::cout << "sizeof(future<bool>) = " << sizeof(future<bool>) << std::endl;
   {
     {
       future<int> f;

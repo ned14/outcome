@@ -270,11 +270,7 @@ namespace lightweight_futures {
   This fixed variant list of empty, a type `R`, a lightweight `error_type` or a
   heavier `exception_type` typically has a space cost of `max(20, sizeof(R)+4)`.
   
-  Specialisations are provided for value_storage<bool> and value_storage<tribool> which can reduce the
-  total storage to 1 byte. You can also specialise value_storage for your own custom
-  types to have monad's and promise-future's space overhead become substantially reduced.
-  
-  \todo Specialisations for value_storage<bool> and value_storage<tribool>
+  \todo Small space specialisations for value_storage<void> and value_storage<bool> and value_storage<tribool>
   */
   template<class implementation_policy> class value_storage
   {
@@ -283,22 +279,18 @@ namespace lightweight_futures {
     struct no_value_type {};
     struct no_error_type {};
     struct no_exception_type {};
+    struct no_pointer_type { no_pointer_type(std::nullptr_t) { } };
     template<class U, class V> using devoid = typename std::conditional<!std::is_void<U>::value, U, V>::type;
   public:
-    //! \brief This monad has a value_type
     BOOST_STATIC_CONSTEXPR bool has_value_type = !std::is_void<typename implementation_policy::value_type>::value;
-    //! \brief This monad has an error_type
     BOOST_STATIC_CONSTEXPR bool has_error_type = !std::is_void<typename implementation_policy::error_type>::value;
-    //! \brief This monad has an exception_type
     BOOST_STATIC_CONSTEXPR bool has_exception_type = !std::is_void<typename implementation_policy::exception_type>::value;
-    //! \brief The final implementation type
+    BOOST_STATIC_CONSTEXPR bool has_pointer_type = !std::is_void<typename implementation_policy::pointer_type>::value;
     typedef typename implementation_policy::implementation_type implementation_type;
-    //! \brief The type potentially held by the monad
     typedef devoid<typename implementation_policy::value_type, no_value_type> value_type;
-    //! \brief The error code potentially held by the monad
     typedef devoid<typename implementation_policy::error_type, no_error_type> error_type;
-    //! \brief The exception ptr potentially held by the monad
     typedef devoid<typename implementation_policy::exception_type, no_exception_type> exception_type;
+    typedef devoid<typename implementation_policy::pointer_type, no_pointer_type> pointer_type;
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4624)
@@ -308,7 +300,7 @@ namespace lightweight_futures {
       value_type value;
       error_type error;              // Often 16 bytes surprisingly
       exception_type exception;      // Typically 8 bytes
-      implementation_type *pointer_; // Typically 8 bytes
+      pointer_type pointer_;         // Typically 8 bytes
     };
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -493,7 +485,7 @@ namespace lightweight_futures {
       type = storage_type::error;
     }
     // Called by future to take ownership of storage from promise
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_pointer(implementation_type *f) noexcept(is_nothrow_destructible)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_pointer(pointer_type f) noexcept(is_nothrow_destructible)
     {
       // Always overwrites existing storage
       clear();
@@ -1273,6 +1265,8 @@ TODO
       typedef std::error_code error_type;
       // The exception pointer type to use. Can be void to disable.
       typedef std::exception_ptr exception_type;
+      // Used by basic_future only, otherwise leave as void.
+      typedef void pointer_type;
       // The type which basic_monad::rebind<U> should return
       template<typename U> using rebind = basic_monad<monad_policy<U>>;
       // Must handle error situation ec. Can return false to cancel the calling operation.
@@ -1307,6 +1301,7 @@ TODO
       typedef R value_type;
       typedef std::error_code error_type;
       typedef void exception_type;
+      typedef void pointer_type;
       template<typename U> using rebind = basic_monad<result_policy<U>>;
       static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
       {
@@ -1328,6 +1323,7 @@ TODO
       typedef R value_type;
       typedef void error_type;
       typedef void exception_type;
+      typedef void pointer_type;
       template<typename U> using rebind = basic_monad<option_policy<U>>;
       static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
       {

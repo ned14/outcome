@@ -463,6 +463,7 @@ template<typename R> inline basic_future<R> make_exceptional_future(std::excepti
       typedef R value_type;
       typedef std::error_code error_type;
       typedef std::exception_ptr exception_type;
+      typedef basic_future<future_policy> *pointer_type;
       template<typename U> using rebind = basic_future<future_policy<U>>;
       static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
       {
