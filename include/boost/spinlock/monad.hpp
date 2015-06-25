@@ -95,7 +95,10 @@ namespace traits
     template<int R> struct rank : rank<R - 1> { static_assert(R > 0, ""); };
     template<> struct rank<0> {};
 
-    template<class F, class A> struct call_operator_argument_form
+    template<bool is_class, class F, class A> struct call_operator_argument_form
+    {
+    };
+    template<class F, class A> struct call_operator_argument_form<true, F, A>
     {
       using return_type = typename get_return_type<F, A>::type;
       using arg_type = typename std::decay<A>::type;
@@ -123,7 +126,10 @@ namespace traits
       using type = typename result::non_auto_type;
     };
 
-    template<class F, class A> struct function_argument_form
+    template<bool is_function, class F, class A> struct function_argument_form
+    {
+    };
+    template<class F, class A> struct function_argument_form<true, F, A>
     {
       using return_type = typename get_return_type<F, A>::type;
       using arg_type = typename std::decay<A>::type;
@@ -176,12 +182,12 @@ namespace traits
     };
     template<class F, class A> struct callable_argument_traits<true, F, A>
       : public std::conditional<!std::is_function<F>::value && has_call_operator<std::is_class<F>::value, F, A>::value,
-        detail::call_operator_argument_form<F, A>,
-        detail::function_argument_form<F, A>
+        detail::call_operator_argument_form<true, F, A>,
+        detail::function_argument_form<true, F, A>
       >::type
     {
       BOOST_STATIC_CONSTEXPR bool valid = true;
-  };
+    };
   }
 
   /*! \brief If callable F were to be called with A, tell me about the call.
@@ -552,8 +558,9 @@ namespace lightweight_futures {
     template<class M, bool is_monad_monad> struct is_monad_constructible<M, typename M::exception_type, is_monad_monad> : public std::true_type{};
     template<class M, bool is_monad_monad> struct is_monad_constructible<M, typename M::empty_type, is_monad_monad> : public std::true_type{};
     template<class M> struct is_monad_constructible<M, typename M::value_type::value_type, true> : public std::false_type{};
-    template<class F, class M> struct bind_map_parameter_validation
+    template<class _F, class M> struct bind_map_parameter_validation
     {
+      typedef typename std::decay<_F>::type F;
       // Figure out what the callable takes
       typedef traits::callable_argument_traits<F, typename M::value_type> f_value_traits;
       typedef traits::callable_argument_traits<F, typename M::error_type> f_error_traits;
@@ -622,7 +629,7 @@ namespace lightweight_futures {
     // For when R is not a monad or map()
     template<bool fold_monadic_return, class R, class C, class Policy> struct do_continuation<fold_monadic_return, R, C, basic_monad<Policy>>
     {
-      typedef C callable_type;
+      typedef typename std::decay<C>::type callable_type;
       // If the return type is an error_type or exception_type or void, reuse monad else rebind monad to R
       typedef typename std::conditional<std::is_same<R, typename basic_monad<Policy>::error_type>::value
           || std::is_same<R, typename basic_monad<Policy>::exception_type>::value
@@ -632,20 +639,21 @@ namespace lightweight_futures {
       >::type output_type;
       callable_type _c;
       BOOST_SPINLOCK_FUTURE_CONSTEXPR do_continuation(const callable_type &c) : _c(c) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_continuation(callable_type &c) : _c(c) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR do_continuation(callable_type &&c) : _c(std::move(c)) { }
       template<class U,
-        typename=typename enable_if_callable_valid<C, U, typename basic_monad<Policy>::value_type, !std::is_void<R>::value>::type
+        typename=typename enable_if_callable_valid<callable_type, U, typename basic_monad<Policy>::value_type, !std::is_void<R>::value>::type
       > BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<4>) const
       {
-        return traits::callable_argument_traits<C, U>::is_rvalue
+        return traits::callable_argument_traits<callable_type, U>::is_rvalue
           ? output_type(_c(std::move(v)))
           : output_type(_c(U(v)));
       }
       template<class U,
-        typename = typename enable_if_callable_valid<C, U, typename basic_monad<Policy>::value_type, std::is_void<R>::value>::type
+        typename = typename enable_if_callable_valid<callable_type, U, typename basic_monad<Policy>::value_type, std::is_void<R>::value>::type
       > BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<3>) const
       {
-        return traits::callable_argument_traits<C, U>::is_rvalue
+        return traits::callable_argument_traits<callable_type, U>::is_rvalue
           ? (_c(std::move(v)), output_type())
           : (_c(U(v)), output_type());
       }
@@ -661,25 +669,26 @@ namespace lightweight_futures {
         basic_monad<Policy2>
       >
     {
-      typedef C callable_type;
+      typedef typename std::decay<C>::type callable_type;
       typedef basic_monad<Policy1> output_type;
       typedef basic_monad<Policy2> input_type;
       callable_type _c;
       BOOST_SPINLOCK_FUTURE_CONSTEXPR do_continuation(const callable_type &c) : _c(c) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR do_continuation(callable_type &c) : _c(c) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR do_continuation(callable_type &&c) : _c(std::move(c)) { }
       template<class U,
-        typename = typename enable_if_callable_valid<C, U, input_type, !std::is_void<typename output_type::value_type>::value, typename input_type::value_type>::type
+        typename = typename enable_if_callable_valid<callable_type, U, input_type, !std::is_void<typename output_type::value_type>::value, typename input_type::value_type>::type
       > BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<4>) const
       {
-        return traits::callable_argument_traits<C, U>::is_rvalue
+        return traits::callable_argument_traits<callable_type, U>::is_rvalue
           ? output_type(_c(std::move(v)))
           : output_type(_c(U(v)));
       }
       template<class U,
-        typename = typename enable_if_callable_valid<C, U, input_type, std::is_void<typename output_type::value_type>::value, typename input_type::value_type>::type
+        typename = typename enable_if_callable_valid<callable_type, U, input_type, std::is_void<typename output_type::value_type>::value, typename input_type::value_type>::type
       > BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<3>) const
       {
-        return traits::callable_argument_traits<C, U>::is_rvalue
+        return traits::callable_argument_traits<callable_type, U>::is_rvalue
           ? (_c(std::move(v)), output_type())
           : (_c(U(v)), output_type());
       }
@@ -1052,7 +1061,7 @@ TODO
       return has_value() ? std::move(v) : std::move(_storage.value);
     }
     //! \brief If contains a value_type, invoke the call operator on that type. Return type must be default constructible.
-    template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP auto operator()(Args &&... args) const -> decltype(get()(std::forward<Args>(args)...))
+    template<class... Args, typename = typename std::result_of<value_type(Args...)>::type> BOOST_SPINLOCK_FUTURE_MSVC_HELP auto operator()(Args &&... args) const -> decltype(this->get()(std::forward<Args>(args)...))
     {
       typedef decltype(get()(std::forward<Args>(args)...)) rettype;
       return has_value() ? get()(std::forward<Args>(args)...) : rettype();
@@ -1140,6 +1149,7 @@ TODO
     
     A quick use example:
     \snippet monad_example.cpp monad_bind_example
+    \snippet monad_example.cpp monad_match_example
     
     You will note in the code example that the type of the callable for bind() and map()
     determines what operation happens. Here are the rules:
@@ -1217,8 +1227,9 @@ TODO
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> basic_monad(F(*this)).unwrap() next(F &&f);
 #else
-    template<class F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_next<typename traits::is_callable_is_well_formed<F, basic_monad>::type, F, basic_monad>::output_type next(F &&f)
+    template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_monad>::type, typename std::decay<_F>::type, basic_monad>::output_type next(_F &&f)
     {
+      typedef typename std::decay<_F>::type F;
       typedef traits::callable_argument_traits<F, basic_monad> f_traits;
       static_assert(f_traits::valid,
         "The callable passed to next() must take this monad type or a reference to it.");
@@ -1230,8 +1241,9 @@ TODO
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> basic_monad(F(get())).unwrap() bind(F &&f);
 #else
-    template<class F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_bind<typename detail::bind_map_parameter_validation<F, basic_monad>::return_type, F, basic_monad>::output_type bind(F &&f)
+    template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_bind<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type bind(_F &&f)
     {
+      typedef typename std::decay<_F>::type F;
       typedef detail::do_bind<typename detail::bind_map_parameter_validation<F, basic_monad>::return_type, F, basic_monad> impl;
       if(has_value())
         return impl(std::forward<F>(f))(std::move(_storage.value), traits::detail::rank<5>());
@@ -1248,8 +1260,9 @@ TODO
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> basic_monad(F(get())) map(F &&f);
 #else
-    template<class F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_map<typename detail::bind_map_parameter_validation<F, basic_monad>::return_type, F, basic_monad>::output_type map(F &&f)
+    template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_map<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type map(_F &&f)
     {
+      typedef typename std::decay<_F>::type F;
       typedef detail::do_map<typename detail::bind_map_parameter_validation<F, basic_monad>::return_type, F, basic_monad> impl;
       if(has_value())
         return impl(std::forward<F>(f))(std::move(_storage.value), traits::detail::rank<5>());
@@ -1259,6 +1272,40 @@ TODO
         return impl(std::forward<F>(f))(std::move(_storage.exception), traits::detail::rank<5>());
       else
         return impl(std::forward<F>(f))(empty_type(), traits::detail::rank<5>());
+    }
+#endif
+
+    //! \brief Call callable F with the current contents of the monad. Whatever the callable returns for when it is called with value_type is the type of the resulting monad.
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+    template<class F> basic_monad(F(contents)).unwrap() match(F &&f);
+#else
+    template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, value_type>::type, typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, value_type>::type(basic_monad &&), basic_monad>::output_type match(_F &&f)
+    {
+      typedef typename std::decay<_F>::type F;
+      typedef traits::callable_argument_traits<F, value_type> f_traits_value;
+      static_assert(f_traits_value::valid, "Callable is not well formed when called with value_type");
+      auto invoke_f=[
+#ifdef __cpp_init_captures
+        f=std::forward<F>(f)
+#else
+        f
+#endif
+      ](basic_monad &&m)
+      {
+        return f_traits_value::is_rvalue ?
+          (
+            m.has_value() ? f(std::move(m).get()) :
+            m.has_error() ? f(std::move(m).get_error()) :
+            m.has_exception() ? f(std::move(m).get_exception()) :
+            f(empty_type())
+          ) : (
+            m.has_value() ? f(m.get()) :
+            m.has_error() ? f(m.get_error()) :
+            m.has_exception() ? f(m.get_exception()) :
+            f(empty_type())
+          );
+      };
+      return next(std::move(invoke_f));
     }
 #endif
   ///@}

@@ -984,42 +984,80 @@ BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
   {
     int foo=1;
     // Capturing lambdas
-    auto a = [foo](int) { (void) foo; };
-    auto b = [foo](int&&) { (void) foo; };
-    auto c = [foo](const int&) { (void) foo; };
-    auto d = [foo](int&) { (void) foo; };
+    auto a = [foo](int) -> int { return foo; };
+    auto b = [foo](int&&) -> int { return foo; };
+    auto c = [foo](const int&) -> int { return foo; };
+    auto d = [foo](int&) -> int { return foo; };
     // std function (class with call operator)
-    auto e = std::function<void(int)>();
-    auto f = std::function<void(int&&)>();
+    auto e = std::function<int(int)>();
+    auto f = std::function<int(int&&)>();
     // plain old functions
-    void(*g)(int) = [](int) {};
-    void(*h)(int&&) = [](int&&) {};
-    void(*i)(const int&) = [](const int&) {};
-    void(*j)(int&) = [](int&) {};
+    int(*g)(int) = [](int) -> int { return 5; };
+    int(*h)(int&&) = [](int&&) -> int { return 5; };
+    int(*i)(const int&) = [](const int&) -> int { return 5; };
+    int(*j)(int&) = [](int&) -> int { return 5; };
 
-    static_assert(!callable_argument_traits<decltype(a), int&&>::is_rvalue, "non-rvalue not recognised");
+    static_assert(callable_argument_traits<decltype(a), int  >::valid, "callable not recognised as valid");
+    static_assert(callable_argument_traits<decltype(b), int&&>::valid, "callable not recognised as valid");
+    static_assert(callable_argument_traits<decltype(c), const int&>::valid, "callable not recognised as valid");
+    static_assert(callable_argument_traits<decltype(d), int& >::valid, "callable not recognised as valid");
+    static_assert(callable_argument_traits<decltype(e), int  >::valid, "callable not recognised as valid");
+    static_assert(callable_argument_traits<decltype(f), int&&>::valid, "callable not recognised as valid");
+    static_assert(callable_argument_traits<decltype(g), int  >::valid, "callable not recognised as valid");
+    static_assert(callable_argument_traits<decltype(h), int&&>::valid, "callable not recognised as valid");
+    static_assert(callable_argument_traits<decltype(i), const int&>::valid, "callable not recognised as valid");
+    static_assert(callable_argument_traits<decltype(j), int& >::valid, "callable not recognised as valid");
+
+    static_assert(!callable_argument_traits<decltype(a), int  >::is_rvalue, "non-rvalue not recognised");
     static_assert( callable_argument_traits<decltype(b), int&&>::is_rvalue, "rvalue not recognised");
-    static_assert(!callable_argument_traits<decltype(c), int&&>::is_rvalue, "non-rvalue not recognised");
+    static_assert(!callable_argument_traits<decltype(c), const int&>::is_rvalue, "non-rvalue not recognised");
     static_assert(!callable_argument_traits<decltype(d), int& >::is_rvalue, "non-rvalue not recognised");
-    static_assert(!callable_argument_traits<decltype(e), int&&>::is_rvalue, "non-rvalue not recognised");
+    static_assert(!callable_argument_traits<decltype(e), int  >::is_rvalue, "non-rvalue not recognised");
     static_assert( callable_argument_traits<decltype(f), int&&>::is_rvalue, "rvalue not recognised");
-    static_assert(!callable_argument_traits<decltype(g), int&&>::is_rvalue, "non-rvalue not recognised");
+    static_assert(!callable_argument_traits<decltype(g), int  >::is_rvalue, "non-rvalue not recognised");
     static_assert( callable_argument_traits<decltype(h), int&&>::is_rvalue, "rvalue not recognised");
-    static_assert(!callable_argument_traits<decltype(i), int&&>::is_rvalue, "non-rvalue not recognised");
+    static_assert(!callable_argument_traits<decltype(i), const int&>::is_rvalue, "non-rvalue not recognised");
     static_assert(!callable_argument_traits<decltype(j), int& >::is_rvalue, "non-rvalue not recognised");
+
+    static_assert(std::is_same<callable_argument_traits<decltype(a), int  >::return_type, int>::value, "return type not deduced");
+    static_assert(std::is_same<callable_argument_traits<decltype(b), int&&>::return_type, int>::value, "return type not deduced");
+    static_assert(std::is_same<callable_argument_traits<decltype(c), const int&>::return_type, int>::value, "return type not deduced");
+    static_assert(std::is_same<callable_argument_traits<decltype(d), int& >::return_type, int>::value, "return type not deduced");
+    static_assert(std::is_same<callable_argument_traits<decltype(e), int  >::return_type, int>::value, "return type not deduced");
+    static_assert(std::is_same<callable_argument_traits<decltype(f), int&&>::return_type, int>::value, "return type not deduced");
+    static_assert(std::is_same<callable_argument_traits<decltype(g), int  >::return_type, int>::value, "return type not deduced");
+    static_assert(std::is_same<callable_argument_traits<decltype(h), int&&>::return_type, int>::value, "return type not deduced");
+    static_assert(std::is_same<callable_argument_traits<decltype(i), const int&>::return_type, int>::value, "return type not deduced");
+    static_assert(std::is_same<callable_argument_traits<decltype(j), int& >::return_type, int>::value, "return type not deduced");
   }
 #ifdef __cpp_generic_lambdas
   {
     int foo=1;
     // Capturing lambdas with templated call functions
-    auto a = [foo](auto) { (void) foo; };
-    auto b = [foo](auto&&) { (void) foo; };
-    auto c = [foo](const auto&) { (void) foo; };
-    auto d = [foo](auto&) { (void) foo; };
-    static_assert(!callable_argument_traits<decltype(a), int&&>::is_rvalue, "non-rvalue not recognised");
+    auto a = [foo](auto) { return foo; };
+    auto b = [foo](auto&&) { return foo; };
+    auto c = [foo](const auto&) { return foo; };
+    auto d = [foo](auto&) { return foo; };
+
+    static_assert(callable_argument_traits<decltype(a), int  >::valid, "callable not recognised as valid");
+    static_assert(callable_argument_traits<decltype(b), int&&>::valid, "callable not recognised as valid");
+    static_assert(callable_argument_traits<decltype(c), const int&>::valid, "callable not recognised as valid");
+    static_assert(callable_argument_traits<decltype(d), int& >::valid, "callable not recognised as valid");
+
+    static_assert(!callable_argument_traits<decltype(a), int  >::is_rvalue, "non-rvalue not recognised");
     static_assert( callable_argument_traits<decltype(b), int&&>::is_rvalue, "rvalue not recognised");
-    static_assert(!callable_argument_traits<decltype(c), int&&>::is_rvalue, "non-rvalue not recognised");
+    static_assert(!callable_argument_traits<decltype(c), const int&>::is_rvalue, "non-rvalue not recognised");
     static_assert(!callable_argument_traits<decltype(d), int& >::is_rvalue, "non-rvalue not recognised");
+
+    static_assert(callable_argument_traits<decltype(a), int  >::is_auto, "auto type not deduced");
+    static_assert(callable_argument_traits<decltype(b), int&&>::is_auto, "auto type not deduced");
+    static_assert(callable_argument_traits<decltype(c), const int&>::is_auto, "auto type not deduced");
+    static_assert(callable_argument_traits<decltype(d), int& >::is_auto, "auto type not deduced");
+
+    static_assert(std::is_same<callable_argument_traits<decltype(a), int  >::return_type, int>::value, "return type not deduced");
+    static_assert(std::is_same<callable_argument_traits<decltype(b), int&&>::return_type, int>::value, "return type not deduced");
+    static_assert(std::is_same<callable_argument_traits<decltype(c), const int&>::return_type, int>::value, "return type not deduced");
+    static_assert(std::is_same<callable_argument_traits<decltype(d), int& >::return_type, int>::value, "return type not deduced");
   }
 #endif
 }
@@ -1670,6 +1708,30 @@ BOOST_AUTO_TEST_CASE(works/monad/map, "Tests that the monad continues with map()
     BOOST_CHECK(z.get() == "niall");
     BOOST_CHECK(a.get().empty());
   }
+}
+
+BOOST_AUTO_TEST_CASE(works/monad/match, "Tests that the monad matches as intended")
+{
+  using namespace boost::spinlock::lightweight_futures;
+  //! [monad_match_example]
+  struct o_type
+  {
+    int expected;
+    // monad.match() will call an overload for each possible content it might have
+    void operator()(int) const { BOOST_CHECK(expected==1); }
+    void operator()(std::error_code) const { BOOST_CHECK(expected==2); }
+    void operator()(std::exception_ptr) const { BOOST_CHECK(expected==3); }
+    void operator()(monad<int>::empty_type) const { BOOST_CHECK(expected==4); }
+    o_type() : expected(0) { }
+  } o;
+  std::error_code ec;
+  std::exception_ptr e;
+  monad<int> a(5);
+  o.expected=1; a.match(o);
+  o.expected=2; a=ec; a.match(o);
+  o.expected=3; a=e; a.match(o);
+  o.expected=4; a.clear(); a.match(o);
+  //! [monad_match_example]
 }
 
 BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as intended")
