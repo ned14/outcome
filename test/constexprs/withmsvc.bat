@@ -28,10 +28,11 @@ for %%f in (*.cpp) do (
     set MSVCLINE=!MSVCLINE!,!LINE!
   )
   if not "!FILE:min_=!" == "!FILE!" (
-    if not "!FILE!" == "min_monad_construct_exception_destruct" (
       echo   ^<testcase name="!FILE!.msvc"^> >> results.xml
       if !LINE! GTR 7 (
-        if "!FILE!" == "min_promise_future_reduce" (
+        if "!FILE!" == "min_monad_construct_exception_move_destruct" (
+          echo     ^<skipped/^> >> results.xml
+        ) else if "!FILE!" == "min_promise_future_reduce" (
           echo     ^<skipped/^> >> results.xml
         ) else if "!FILE!" == "min_future_construct_move_destruct" (
           echo     ^<skipped/^> >> results.xml
