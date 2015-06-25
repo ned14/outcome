@@ -1489,6 +1489,7 @@ BOOST_AUTO_TEST_CASE(works/monad/swap, "Tests that the monad swaps as intended")
   BOOST_CHECK(b.get_error()==std::error_code());
 }
 
+#ifdef BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS
 BOOST_AUTO_TEST_CASE(works/monad/callable, "Tests that the monad works as intended holding callables")
 {
   using namespace boost::spinlock::lightweight_futures;
@@ -1733,6 +1734,56 @@ BOOST_AUTO_TEST_CASE(works/monad/match, "Tests that the monad matches as intende
   o.expected=4; a.clear(); a.match(o);
   //! [monad_match_example]
 }
+
+BOOST_AUTO_TEST_CASE(works/monad/operators, "Tests that the monad custom operators work as intended")
+{
+  using namespace boost::spinlock::lightweight_futures;
+  //! [monad_operators_example]
+  {
+    std::error_code ec;
+    monad<int> a(5);
+    monad<int> b(a & 6);   // a has a value, so become 6
+    monad<int> c(b | 4);   // b has a value, so remain at 6
+    monad<int> d(a & ec);  // a has a value, so become errored
+    monad<int> e(d & 2);   // d does not have a value, so remain errored
+    monad<int> f(d | 2);   // d does not have a value, so become 2
+    BOOST_CHECK(b.get()==6);
+    BOOST_CHECK(c.get()==6);
+    BOOST_CHECK(d.has_error());
+    BOOST_CHECK(e.has_error());
+    BOOST_CHECK(f.get()==2);
+  }
+
+  std::error_code ec;
+  {
+    monad<std::string> a("niall");
+    // Does bind work with chains of value, error, exception and empty?
+    auto x(
+      a >> [ec](std::string){return ec;}
+        >> [](std::error_code){return std::make_exception_ptr(5);}
+        >> [](std::exception_ptr){return;}
+        >> [](monad<std::string>::empty_type){return std::string("douglas");}
+    );
+    BOOST_CHECK(x.get()=="douglas");
+    auto y(
+      a >> [ec](std::string) -> monad<int> {return ec;}
+        >> [](std::error_code){return std::make_exception_ptr(5);}
+        >> [](std::exception_ptr){return;}
+        >> [](monad<int>::empty_type){return 5;}
+    );
+    BOOST_CHECK(y.get()==5);
+    auto z(
+      a >> [](std::string &&v){ return std::move(v);}
+        >> [](std::string &&v){ return std::move(v);}
+        >> [](std::string &&v){ return std::move(v);}
+        >> [](std::string &&v){ return std::move(v);}
+    );
+    BOOST_CHECK(z.get()=="niall");
+    BOOST_CHECK(a.get().empty());
+  }
+  //! [monad_operators_example]
+}
+#endif
 
 BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as intended")
 {

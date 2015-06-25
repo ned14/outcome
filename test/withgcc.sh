@@ -11,12 +11,14 @@ if [ -n "$BUILD_EXTRA" ]; then
   echo Building unittests_coverage ...
   g++ -std=c++0x -pthread -O1 -DNDEBUG -DRUNNING_ON_VALGRIND=1 -g -gdwarf-2 -o unittests_coverage unittests.cpp -lrt -fprofile-arcs -ftest-coverage -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-elide-constructors -fno-inline $INCLUDE
 fi
-echo C++ 11 check
-clang++-3.7 -Wall -Wextra -std=c++11 -pthread -O3 -DNDEBUG -g -gdwarf-2 -o unittests_1 unittests.cpp -lrt $INCLUDE -Wno-unknown-pragmas -Wno-unused-function || true
 echo C++ 14 check
-clang++-3.7 -Wall -Wextra -std=c++14 -pthread -O3 -DNDEBUG -g -gdwarf-2 -o unittests_1 unittests.cpp -lrt $INCLUDE -Wno-unknown-pragmas -Wno-unused-function || true
+clang++-3.7 -Wall -Wextra -std=c++14 -pthread -O3 -DNDEBUG -DBOOST_SPINLOCK_MONAD_ENABLE_OPERATORS=1 -g -gdwarf-2 -o unittests_1 unittests.cpp -lrt $INCLUDE -Wno-unknown-pragmas -Wno-unused-function || true
+echo C++ 11 check
+time clang++-3.7 -Wall -Wextra -std=c++11 -pthread -O3 -DNDEBUG -DBOOST_SPINLOCK_MONAD_ENABLE_OPERATORS=1 -g -gdwarf-2 -o unittests_1 unittests.cpp -lrt $INCLUDE -Wno-unknown-pragmas -Wno-unused-function || true
+echo No operators check
+time clang++-3.7 -Wall -Wextra -std=c++11 -pthread -O3 -DNDEBUG -g -gdwarf-2 -o unittests_nooperators unittests.cpp -lrt $INCLUDE -Wno-unknown-pragmas -Wno-unused-function || true
 echo Building unittests_valgrind ...
-$CXX -std=c++14 -pthread -O1 -DNDEBUG -g -gdwarf-2 -o unittests_valgrind unittests.cpp -lrt -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-elide-constructors -fno-inline -DBOOST_SPINLOCK_ENABLE_VALGRIND $INCLUDE
+$CXX -std=c++14 -pthread -O1 -DNDEBUG -DBOOST_SPINLOCK_MONAD_ENABLE_OPERATORS=1 -g -gdwarf-2 -o unittests_valgrind unittests.cpp -lrt -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-elide-constructors -fno-inline -DBOOST_SPINLOCK_ENABLE_VALGRIND $INCLUDE
 echo Building unittests_1 ...
 $CXX -Wall -Wextra -std=c++14 -pthread -O3 -DNDEBUG -g -gdwarf-2 -o unittests_1 unittests.cpp -lrt $INCLUDE -Wno-unknown-pragmas -Wno-unused-function
 echo Building unittests_N ...

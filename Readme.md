@@ -17,7 +17,6 @@ Boost review feedback work items:
  - [x] If monad type is a callable, let the monad be callable.
  - [x] Rename .then() to .next().
  - [x] Add match() function which visits a callable on the contents.
-
- - [ ] Look into member operator overloads for bind() and map() e.g. monad<int> &m; auto r = m >> [](int a){return a;}; Can't use operator >>=() from Haskell as has same precedence to operator=().
+ - [x] Look into member operator overloads for bind() and map() e.g. monad<int> &m; auto r = m >> [](int a){return a;}; Can't use operator >>=() from Haskell as has same precedence to operator=().
  
 </center>

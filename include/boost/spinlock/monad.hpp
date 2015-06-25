@@ -514,6 +514,7 @@ namespace lightweight_futures {
       BOOST_STATIC_CONSTEXPR bool value=is_monad<typename basic_monad<Policy>::value_type>::value;
     };
 
+#ifdef BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS
     template<bool is_monad_monad, class M> struct do_unwrap2;
     template<class M> using do_unwrap = do_unwrap2<is_monad_monad<M>::value, M>;
     template<bool is_monad_monad, class M> struct do_unwrap2
@@ -700,6 +701,7 @@ namespace lightweight_futures {
     template<class R, class C, class M> using do_next = do_continuation<true,  R, C, M>;
     template<class R, class C, class M> using do_bind = do_continuation<true,  R, C, M>;
     template<class R, class C, class M> using do_map  = do_continuation<false, R, C, M>;
+#endif
   }
 
   //! \brief True if the type passed is a monad or a reference to a monad
@@ -1060,12 +1062,6 @@ TODO
     {
       return has_value() ? std::move(v) : std::move(_storage.value);
     }
-    //! \brief If contains a value_type, invoke the call operator on that type. Return type must be default constructible.
-    template<class... Args, typename = typename std::result_of<value_type(Args...)>::type> BOOST_SPINLOCK_FUTURE_MSVC_HELP auto operator()(Args &&... args) const -> decltype(this->get()(std::forward<Args>(args)...))
-    {
-      typedef decltype(get()(std::forward<Args>(args)...)) rettype;
-      return has_value() ? get()(std::forward<Args>(args)...) : rettype();
-    }
     //! \brief Disposes of any existing state, setting the monad to a copy of the value_type
     BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v) { _storage.clear(); _storage.set_value(v); }
     //! \brief Disposes of any existing state, setting the monad to a move of the value_type
@@ -1122,7 +1118,11 @@ TODO
       set_exception(make_exception_type(std::forward<E>(e)));
     }
 
-    /*! \name Monadic programming primitives unwrap(), next(), bind() and map()
+#ifdef BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS
+    /*! \name Functional programming extensions (optional)
+    
+    \info All code in this section can be enabled by defining BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS.
+    This prevents you writing code which impacts build times.
     
     Classic monadic programming consists of a sequence of nested functional operations:
     <dl>
@@ -1255,6 +1255,15 @@ TODO
         return impl(std::forward<F>(f))(empty_type(), traits::detail::rank<5>());
     }
 #endif
+    //! \brief If bool(*this), return basic_monad(F(get())).unwrap(), else return basic_monad<result_of<F(get())>>(error)
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+    template<class F> basic_monad(F(get())).unwrap() operator>>(F &&f);
+#else
+    template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_bind<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type operator>>(_F &&f)
+    {
+      return bind(std::forward<_F>(f));
+    }
+#endif
     
     //! \brief If bool(*this), return basic_monad(F(get())), else return basic_monad<result_of<F(get())>>(error)
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
@@ -1307,8 +1316,49 @@ TODO
       };
       return next(std::move(invoke_f));
     }
+
+    //! \brief If contains a value_type, invoke the call operator on that type. Return type must be default constructible.
+    template<class... Args, typename = typename std::result_of<value_type(Args...)>::type> BOOST_SPINLOCK_FUTURE_MSVC_HELP auto operator()(Args &&... args) const -> decltype(this->get()(std::forward<Args>(args)...))
+    {
+      typedef decltype(get()(std::forward<Args>(args)...)) rettype;
+      return has_value() ? get()(std::forward<Args>(args)...) : rettype();
+    }
+
+    //! \brief If contains a value_type, return that value type, else return the supplied type
+    template<class U, typename=typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_monad operator|(U &&v) &
+    {
+      return has_value() ? *this : basic_monad(std::forward<U>(v));
+    }
+    //! \brief If contains a value_type, return that value type, else return the supplied type
+    template<class U, typename=typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_monad operator|(U &&v) const &
+    {
+      return has_value() ? *this : basic_monad(std::forward<U>(v));
+    }
+    //! \brief If contains a value_type, return that value type, else return the supplied type
+    template<class U, typename=typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_monad operator|(U &&v) &&
+    {
+      return has_value() ? std::move(*this) : basic_monad(std::forward<U>(v));
+    }
+    //! \brief If contains a value_type, return the supplied type else the value_type
+    template<class U, typename=typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_monad operator&(U &&v) &
+    {
+      return has_value() ? basic_monad(std::forward<U>(v)) : *this;
+    }
+    //! \brief If contains a value_type, return the supplied type else the value_type
+    template<class U, typename=typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_monad operator&(U &&v) const &
+    {
+      return has_value() ? basic_monad(std::forward<U>(v)) : *this;
+    }
+    //! \brief If contains a value_type, return the supplied type else the value_type
+    template<class U, typename=typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_monad operator&(U &&v) &&
+    {
+      return has_value() ? basic_monad(std::forward<U>(v)) : std::move(*this);
+    }
+    
+    
 #endif
   ///@}
+#endif
   };
   
   namespace detail
