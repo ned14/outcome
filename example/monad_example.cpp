@@ -13,10 +13,10 @@ template<class T> monad<T> do_test(monad<T> m)
     std::cout << (m.has_error() ? "errored" : m.has_exception() ? "excepted" : "empty") << std::endl;
   
   std::cout << "  or via bind(), my value is ";
-  auto o(m.bind([](T v) { std::cout << v; return v; })
-          .bind([](std::error_code e) { std::cout << "errored"; return e; })
-          .bind([](std::exception_ptr e) { std::cout << "excepted"; return e; })
-          .bind([](typename decltype(m)::empty_type) { std::cout << "empty"; }));
+  auto o(m >> [](T v) { std::cout << v; return v; }
+           >> [](std::error_code e) { std::cout << "errored"; return e; }
+           >> [](std::exception_ptr e) { std::cout << "excepted"; return e; }
+           >> [](typename decltype(m)::empty_type) { std::cout << "empty"; });
   std::cout << std::endl;
   return o;
 }

@@ -1121,7 +1121,7 @@ TODO
 #ifdef BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS
     /*! \name Functional programming extensions (optional)
     
-    \info All code in this section can be enabled by defining BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS.
+    \note All code in this section can be enabled by defining BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS.
     This prevents you writing code which impacts build times.
     
     Classic monadic programming consists of a sequence of nested functional operations:
@@ -1149,7 +1149,7 @@ TODO
     
     A quick use example:
     \snippet monad_example.cpp monad_bind_example
-    \snippet monad_example.cpp monad_match_example
+    \snippet unittests.cpp monad_match_example
     
     You will note in the code example that the type of the callable for bind() and map()
     determines what operation happens. Here are the rules:
@@ -1225,7 +1225,7 @@ TODO
     allows a very easy way of converting between different configurations of monad cost free.
     */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-    template<class F> basic_monad(F(*this)).unwrap() next(F &&f);
+    template<class F> monad<...> next(F &&f);
 #else
     template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_monad>::type, typename std::decay<_F>::type, basic_monad>::output_type next(_F &&f)
     {
@@ -1237,9 +1237,9 @@ TODO
     }
 #endif
     
-    //! \brief If bool(*this), return basic_monad(F(get())).unwrap(), else return basic_monad<result_of<F(get())>>(error)
+    //! \brief If bool(*this), return basic_monad(F(get())).unwrap, else return basic_monad<result_of<F(get())>>(error)
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-    template<class F> basic_monad(F(get())).unwrap() bind(F &&f);
+    template<class F> monad<...> bind(F &&f);
 #else
     template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_bind<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type bind(_F &&f)
     {
@@ -1255,9 +1255,9 @@ TODO
         return impl(std::forward<F>(f))(empty_type(), traits::detail::rank<5>());
     }
 #endif
-    //! \brief If bool(*this), return basic_monad(F(get())).unwrap(), else return basic_monad<result_of<F(get())>>(error)
+    //! \brief If bool(*this), return basic_monad(F(get())).unwrap, else return basic_monad<result_of<F(get())>>(error)
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-    template<class F> basic_monad(F(get())).unwrap() operator>>(F &&f);
+    template<class F> monad<...> operator>>(F &&f);
 #else
     template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_bind<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type operator>>(_F &&f)
     {
@@ -1267,7 +1267,7 @@ TODO
     
     //! \brief If bool(*this), return basic_monad(F(get())), else return basic_monad<result_of<F(get())>>(error)
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-    template<class F> basic_monad(F(get())) map(F &&f);
+    template<class F> monad<...> map(F &&f);
 #else
     template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_map<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type map(_F &&f)
     {

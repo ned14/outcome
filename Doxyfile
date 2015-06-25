@@ -2035,7 +2035,8 @@ PREDEFINED             = DOXYGEN_IS_IN_THE_HOUSE=1 \
     BOOST_NOEXCEPT=noexcept \
     BOOST_NOEXCEPT_IF(a)=noexcept(a) \
     BOOST_SPINLOCK_V1_NAMESPACE_BEGIN="namespace boost { namespace spinlock {" \
-    BOOST_SPINLOCK_V1_NAMESPACE_END="} }"
+    BOOST_SPINLOCK_V1_NAMESPACE_END="} }" \
+    BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
