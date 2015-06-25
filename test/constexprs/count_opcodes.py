@@ -55,7 +55,7 @@ if thisfunction is not None:
 opcodes=None
 if isObjDump:
     for function, offset in namestooffset.items():
-        if function[:8]=='_Z5test1':
+        if function[:8]=='_Z5test1' and not '-0x' in function:
             opcodes=functions[offset]
             break
 elif isDumpBin:

@@ -792,30 +792,41 @@ Features:
 ### `monad<R>`: ###
   <dl>
    <dt>clang 3.7</dt>
-    <dd>59 opcodes <= Value transport <= 37 opcodes<br></dd>
-    <dd>7 opcodes <= Error transport <= 52 opcodes<br></dd>
-    <dd>38 opcodes <= Exception transport <= 39 opcodes<br></dd>  
-    <dd>62 opcodes <= next() <= 84 opcodes<br></dd>
-    <dd>5 opcodes <= bind() <= 44 opcodes</dd>
+    <dd>51 opcodes <= Value transport <= 32 opcodes<br></dd>
+    <dd>6 opcodes <= Error transport <= 50 opcodes<br></dd>
+    <dd>54 opcodes <= Exception transport <= 35 opcodes<br></dd>  
+    <dd>55 opcodes <= next() <= 76 opcodes<br></dd>
+    <dd>4 opcodes <= bind() <= 42 opcodes</dd>
    <dt>GCC 5.1</dt>
-    <dd>1 opcodes <= Value transport <= 113 opcodes<br></dd>
-    <dd>8 opcodes <= Error transport <= 119 opcodes<br></dd>
-    <dd>22 opcodes <= Exception transport <= 214 opcodes<br></dd>
-    <dd>4 opcodes <= next() <= 154 opcodes<br></dd>
+    <dd>1 opcodes <= Value transport <= 50 opcodes<br></dd>
+    <dd>8 opcodes <= Error transport <= 37 opcodes<br></dd>
+    <dd>27 opcodes <= Exception transport <= 151 opcodes<br></dd>
+    <dd>4 opcodes <= next() <= 89 opcodes<br></dd>
     <dd>5 opcodes <= bind() <= 44 opcodes</dd>
    <dt>VS2015</dt>
-    <dd>4 opcodes <= Value transport <= 1881 opcodes<br></dd>
-    <dd>6 opcodes <= Error transport <= 164 opcodes<br></dd>
-    <dd>1946 opcodes <= Exception transport <= 1936 opcodes<br></dd>
-    <dd>2029 opcodes <= next() <= 2030 opcodes<br></dd>
-    <dd>155 opcodes <= bind() <= 156 opcodes</dd>
   </dl>
 
 ### `result<R>`: ###
-TODO
+  <dl>
+   <dt>clang 3.7</dt>
+    <dd>2 opcodes <= Value transport <= 49 opcodes<br></dd>
+    <dd>4 opcodes <= next() <= 56 opcodes<br></dd>
+   <dt>GCC 5.1</dt>
+    <dd>1 opcodes <= Value transport <= 32 opcodes<br></dd>
+    <dd>4 opcodes <= next() <= 52 opcodes<br></dd>
+   <dt>VS2015</dt>
+  </dl>
 
 ### `option<R>`: ###
-TODO
+  <dl>
+   <dt>clang 3.7</dt>
+    <dd>2 opcodes <= Value transport <= 26 opcodes<br></dd>
+    <dd>55 opcodes <= next() <= 37 opcodes<br></dd>
+   <dt>GCC 5.1</dt>
+    <dd>1 opcodes <= Value transport <= 9 opcodes<br></dd>
+    <dd>4 opcodes <= next() <= 27 opcodes<br></dd>
+   <dt>VS2015</dt>
+  </dl>
 
 ## Examples ##
 
