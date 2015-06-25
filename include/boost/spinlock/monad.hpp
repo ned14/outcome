@@ -610,7 +610,7 @@ namespace lightweight_futures {
       : std::enable_if<additional && traits::callable_argument_traits<C, U>::valid
       && (!traits::callable_argument_traits<C, U>::is_auto || std::is_same<U, value_type>::value)>
     {};
-    /* Invokes the callable passed to then() and bind() and map() optionally folding any monad return type
+    /* Invokes the callable passed to next() and bind() and map() optionally folding any monad return type
     R is the type returned by the callable
     C is the callable
     M is the monad
@@ -687,8 +687,8 @@ namespace lightweight_futures {
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&, traits::detail::rank<1>) const { return output_type(); }
     };
 
-    // TODO FIXME: do_then should have specially reduced simple lightweight implementation
-    template<class R, class C, class M> using do_then = do_continuation<true,  R, C, M>;
+    // TODO FIXME: do_next should have specially reduced simple lightweight implementation
+    template<class R, class C, class M> using do_next = do_continuation<true,  R, C, M>;
     template<class R, class C, class M> using do_bind = do_continuation<true,  R, C, M>;
     template<class R, class C, class M> using do_map  = do_continuation<false, R, C, M>;
   }
@@ -784,19 +784,19 @@ Features:
     <dd>59 opcodes <= Value transport <= 37 opcodes<br></dd>
     <dd>7 opcodes <= Error transport <= 52 opcodes<br></dd>
     <dd>38 opcodes <= Exception transport <= 39 opcodes<br></dd>  
-    <dd>62 opcodes <= then() <= 84 opcodes<br></dd>
+    <dd>62 opcodes <= next() <= 84 opcodes<br></dd>
     <dd>5 opcodes <= bind() <= 44 opcodes</dd>
    <dt>GCC 5.1</dt>
     <dd>1 opcodes <= Value transport <= 113 opcodes<br></dd>
     <dd>8 opcodes <= Error transport <= 119 opcodes<br></dd>
     <dd>22 opcodes <= Exception transport <= 214 opcodes<br></dd>
-    <dd>4 opcodes <= then() <= 154 opcodes<br></dd>
+    <dd>4 opcodes <= next() <= 154 opcodes<br></dd>
     <dd>5 opcodes <= bind() <= 44 opcodes</dd>
    <dt>VS2015</dt>
     <dd>4 opcodes <= Value transport <= 1881 opcodes<br></dd>
     <dd>6 opcodes <= Error transport <= 164 opcodes<br></dd>
     <dd>1946 opcodes <= Exception transport <= 1936 opcodes<br></dd>
-    <dd>2029 opcodes <= then() <= 2030 opcodes<br></dd>
+    <dd>2029 opcodes <= next() <= 2030 opcodes<br></dd>
     <dd>155 opcodes <= bind() <= 156 opcodes</dd>
   </dl>
 
@@ -1051,6 +1051,12 @@ TODO
     {
       return has_value() ? std::move(v) : std::move(_storage.value);
     }
+    //! \brief If contains a value_type, invoke the call operator on that type. Return type must be default constructible.
+    template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP auto operator()(Args &&... args) const -> decltype(get()(std::forward<Args>(args)...))
+    {
+      typedef decltype(get()(std::forward<Args>(args)...)) rettype;
+      return has_value() ? get()(std::forward<Args>(args)...) : rettype();
+    }
     //! \brief Disposes of any existing state, setting the monad to a copy of the value_type
     BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v) { _storage.clear(); _storage.set_value(v); }
     //! \brief Disposes of any existing state, setting the monad to a move of the value_type
@@ -1107,7 +1113,7 @@ TODO
       set_exception(make_exception_type(std::forward<E>(e)));
     }
 
-    /*! \name Monadic programming primitives unwrap(), then(), bind() and map()
+    /*! \name Monadic programming primitives unwrap(), next(), bind() and map()
     
     Classic monadic programming consists of a sequence of nested functional operations:
     <dl>
@@ -1125,10 +1131,10 @@ TODO
         callable does not wrap it in another monad. If the originating monad did not
         contain a T, that is passed through.</dd>
     </dl>
-    We also support monad<T>.then(R(monad<T>)) for semantic equivalence to futures where the
+    We also support monad<T>.next(R(monad<T>)) for semantic equivalence to futures where the
     callable is called with the originating monad. This
     acts like bind(), so if the callable returns a monad it is not wrapped in another
-    monad. Unlike map() or bind(), then() always calls the callable no matter what the
+    monad. Unlike map() or bind(), next() always calls the callable no matter what the
     monad contains, so it is up to you to interrogate the monad. Note that the originating
     monad is passed by const lvalue ref unless the callable takes a rvalue ref to the monad.
     
@@ -1142,8 +1148,14 @@ TODO
       the T is passed by const lvalue reference (i.e. copy semantics).
       - If the callable takes a T by non-const rvalue reference, the T is passed by rvalue ref.
       This lets you move from the value held by the originating monad if so desired.
-    If the monad doesn't contain a T, pass it through but into whatever new monad type
-    returned by the callable.
+      - If the callable takes the originating monad or any reference to such which isn't a
+      rvalue reference, then the originating monad is passed by const lvalue reference.
+      - If the callable takes the originating monad by non-const rvalue reference, the
+      originating monad is passed by rvalue reference.
+    The ability to take the originating monad makes bind() identical to next() though much
+    harder on build times. Note that these options let you rebind the type of the monad,
+    so if your callable returns a different type from the originating monad then the resulting
+    monad is based on that different return type.
     \warning The current implementation requires you to specify a non-dependent return
     type for all generic lambdas, else you'll get compile errors where the compiler tried
     to insert `error_type`, `exception_type` etc when it was trying to figure out if the
@@ -1169,7 +1181,7 @@ TODO
     For maximum build performance, try to avoid bind() and map() as these use some hefty
     metaprogramming to deduce what kind of bind and map you're doing based on the callables
     passed. unwrap() is implemented using a recursively expanded structure which is probably
-    okay for low unwrap depths. then() is probably the least weighty of the monadic operators
+    okay for low unwrap depths. next() is probably the least weighty of the monadic operators
     as it's relatively dumb and the only metaprogramming is to determine whether to wrap
     the return type with a monad or not.
     
@@ -1199,18 +1211,18 @@ TODO
     
     If your callable does not return a monad, a monad will be constructed to hold the type it does return
     inheriting the same error_code, exception_type etc of the originating monad. If your callable returns
-    a monad, that monad can be of any template parameter configuration and it will be returned from then(). This
+    a monad, that monad can be of any template parameter configuration and it will be returned from next(). This
     allows a very easy way of converting between different configurations of monad cost free.
     */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-    template<class F> basic_monad(F(*this)).unwrap() then(F &&f);
+    template<class F> basic_monad(F(*this)).unwrap() next(F &&f);
 #else
-    template<class F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_then<typename traits::is_callable_is_well_formed<F, basic_monad>::type, F, basic_monad>::output_type then(F &&f)
+    template<class F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_next<typename traits::is_callable_is_well_formed<F, basic_monad>::type, F, basic_monad>::output_type next(F &&f)
     {
       typedef traits::callable_argument_traits<F, basic_monad> f_traits;
       static_assert(f_traits::valid,
-        "The callable passed to then() must take this monad type or a reference to it.");
-      return detail::do_then<typename f_traits::return_type, F, basic_monad>(std::forward<F>(f))(std::move(*this), traits::detail::rank<5>());
+        "The callable passed to next() must take this monad type or a reference to it.");
+      return detail::do_next<typename f_traits::return_type, F, basic_monad>(std::forward<F>(f))(std::move(*this), traits::detail::rank<5>());
     }
 #endif
     

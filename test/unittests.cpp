@@ -1451,6 +1451,19 @@ BOOST_AUTO_TEST_CASE(works/monad/swap, "Tests that the monad swaps as intended")
   BOOST_CHECK(b.get_error()==std::error_code());
 }
 
+BOOST_AUTO_TEST_CASE(works/monad/callable, "Tests that the monad works as intended holding callables")
+{
+  using namespace boost::spinlock::lightweight_futures;
+  auto a=make_monad([](int a){return 5+a;});
+  BOOST_CHECK(a.get()(1)==6);
+  BOOST_CHECK(a(2)==7);
+#ifdef __cpp_generic_lambdas
+  auto b=make_monad([](auto a){return 5+a;});
+  BOOST_CHECK(b.get()(1)==6);
+  BOOST_CHECK(b(2)==7);
+#endif
+}
+
 BOOST_AUTO_TEST_CASE(works/monad/unwrap, "Tests that the monad unwraps as intended")
 {
   using namespace boost::spinlock::lightweight_futures;
@@ -1474,37 +1487,37 @@ BOOST_AUTO_TEST_CASE(works/monad/unwrap, "Tests that the monad unwraps as intend
   BOOST_CHECK(g.get().get().get().get().empty());
 }
 
-BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with then() as intended")
+BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with next() as intended")
 {
   using namespace boost::spinlock::lightweight_futures;
   std::error_code ec;
   monad<std::string> a("niall"), b(ec);
   // Does auto unwrapping work?
-  auto c(a.then([](monad<std::string> v){return v;}));
+  auto c(a.next([](monad<std::string> v){return v;}));
   BOOST_CHECK(c.get()=="niall");
   BOOST_CHECK(a.get()=="niall");
   // Does auto wrapping work?
-  auto d(a.then([](monad<std::string> &&){return 5;}));
+  auto d(a.next([](monad<std::string> &&){return 5;}));
   BOOST_CHECK(d.get()==5);
   BOOST_CHECK(a.get()=="niall");
 #ifdef __cpp_generic_lambdas
   // Do auto lambdas work?
-  auto e(a.then([](auto v){return v;}));
+  auto e(a.next([](auto v){return v;}));
   BOOST_CHECK(e.get()=="niall");
   BOOST_CHECK(a.get()=="niall");
 #endif
   // Does error propagation work?
-  auto f(b.then([](monad<std::string> v) {return v;}));
+  auto f(b.next([](monad<std::string> v) {return v;}));
   BOOST_CHECK(f.has_error());
 
   // Does automatic move semantics work?
-  auto j(a.then([](monad<std::string> &&v){return std::move(v);}));
+  auto j(a.next([](monad<std::string> &&v){return std::move(v);}));
   BOOST_CHECK(j.get()=="niall");
   BOOST_CHECK(a.get().empty());
 #ifdef __cpp_generic_lambdas
   // Does automatic move semantics with auto lambdas work?
   a.emplace("niall");
-  auto k(a.then([](auto &&v){return std::move(v);}));
+  auto k(a.next([](auto &&v){return std::move(v);}));
   BOOST_CHECK(k.get()=="niall");
   BOOST_CHECK(a.get().empty());
 #endif

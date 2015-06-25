@@ -14,7 +14,9 @@ Boost review feedback work items:
  - [x] Make how error_type is converted into exception_type configurable.
  - [x] Add monad<void>.
  - [x] Add template aliases for different configurations of monad<T> (one of maybe, result, holder, value, retval, potential, likely). Add two additional aliases, one for a monad without exception_ptr, and another for a monad with neither error_code nor exception_ptr (option<T>?).
- - [ ] As .then() is defined in a future as executing the callable when the value is set, and monad<T>.then() executes immediately and does not execute when the value is next changed, does this make monad<T>.then() deceptively named? (I think yes). Perhaps and() is a better name for then()? What about simply operator() i.e. make the monad callable? What about operator[]?
+ - [x] If monad type is a callable, let the monad be callable.
+ - [x] Rename .then() to .next().
+ 
  - [ ] Add match() function which visits a callable on the contents.
  - [ ] Look into member operator overloads for bind() and map() e.g. monad<int> &m; auto r = m >> [](int a){return a;}; Can't use operator >>=() from Haskell as has same precedence to operator=().
  
