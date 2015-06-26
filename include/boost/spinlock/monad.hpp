@@ -804,6 +804,11 @@ Features:
     <dd>4 opcodes <= next() <= 89 opcodes<br></dd>
     <dd>5 opcodes <= bind() <= 44 opcodes</dd>
    <dt>VS2015</dt>
+    <dd>4 opcodes <= Value transport <= 1879 opcodes<br></dd>
+    <dd>6 opcodes <= Error transport <= 159 opcodes<br></dd>
+    <dd>1973 opcodes <= Exception transport <= 1940 opcodes<br></dd>
+    <dd>1981 opcodes <= next() <= 1982 opcodes<br></dd>
+    <dd>103 opcodes <= bind() <= 104 opcodes</dd>
   </dl>
 
 ### `result<R>`: ###
@@ -815,17 +820,21 @@ Features:
     <dd>1 opcodes <= Value transport <= 32 opcodes<br></dd>
     <dd>4 opcodes <= next() <= 52 opcodes<br></dd>
    <dt>VS2015</dt>
+    <dd>4 opcodes <= Value transport <= 1848 opcodes<br></dd>
+    <dd>1918 opcodes <= next() <= 1919 opcodes<br></dd>
   </dl>
 
 ### `option<R>`: ###
   <dl>
    <dt>clang 3.7</dt>
     <dd>2 opcodes <= Value transport <= 26 opcodes<br></dd>
-    <dd>55 opcodes <= next() <= 37 opcodes<br></dd>
+    <dd>5 opcodes <= next() <= 37 opcodes<br></dd>
    <dt>GCC 5.1</dt>
     <dd>1 opcodes <= Value transport <= 9 opcodes<br></dd>
     <dd>4 opcodes <= next() <= 27 opcodes<br></dd>
    <dt>VS2015</dt>
+    <dd>4 opcodes <= Value transport <= 117 opcodes<br></dd>
+    <dd>185 opcodes <= next() <= 186 opcodes<br></dd>
   </dl>
 
 ## Examples ##
