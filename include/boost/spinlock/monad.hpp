@@ -1161,6 +1161,7 @@ Features:
     A quick use example:
     \snippet monad_example.cpp monad_bind_example
     \snippet unittests.cpp monad_match_example
+    \snippet unittests.cpp monad_operators_example
     
     You will note in the code example that the type of the callable for bind() and map()
     determines what operation happens. Here are the rules:
