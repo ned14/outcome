@@ -17,11 +17,9 @@ echo ^<?xml version="1.0" encoding="UTF-8"?^> > results.xml
 echo ^<testsuite name="constexprs"^> >> results.xml
 for %%f in (*.cpp) do (
   set FILE=%%~nf
-  rem cl /EHsc /FAs /c /O2 /GS- /GR /Gy /Zc:inline /DBOOST_SPINLOCK_MONAD_ENABLE_OPERATORS=1 /DBOOST_SPINLOCK_STANDALONE=1 %%f /I..\..\include\boost\spinlock\bindlib\include
-  rem cl /EHsc /c /O2 /GS- /GR /Gy /Zc:inline /DBOOST_SPINLOCK_MONAD_ENABLE_OPERATORS=1 /DBOOST_SPINLOCK_STANDALONE=1 %%f /I..\..\include\boost\spinlock\bindlib\include
-  cl /EHsc /Z7 /GL /O2 /GS- /GR /Gy /Zc:inline /DBOOST_SPINLOCK_MONAD_ENABLE_OPERATORS=1 /DBOOST_SPINLOCK_STANDALONE=1 %%f /I..\..\include\boost\spinlock\bindlib\include
-  dumpbin /disasm !FILE!.exe > !FILE!.msvc.S
-  del !FILE!.exe
+  cl /EHsc /c /O2 /GS- /GR /Gy /Zc:inline /DBOOST_SPINLOCK_MONAD_ENABLE_OPERATORS=1 /DBOOST_SPINLOCK_STANDALONE=1 %%f /I..\..\include\boost\spinlock\bindlib\include
+  dumpbin /disasm !FILE!.obj > !FILE!.msvc.S
+  del !FILE!.obj
   set LINE=
   for /f %%i in ('count_opcodes.py !FILE!.msvc.S') do set LINE=%%i
   if "!MSVCLINE!" == "" (
