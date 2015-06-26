@@ -1064,9 +1064,6 @@ BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
 
 BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
 {
-  using boost::spinlock::tribool::true_;
-  using boost::spinlock::tribool::false_;
-  using boost::spinlock::tribool::other;
   using namespace boost::spinlock::lightweight_futures;
   static_assert(std::is_constructible<monad<long>, int>::value, "Sanity check that monad can be constructed from a value_type");
   static_assert(std::is_constructible<monad<monad<long>>, int>::value, "Sanity check that outer monad can be constructed from an inner monad's value_type");
