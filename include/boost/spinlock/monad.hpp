@@ -466,33 +466,33 @@ namespace lightweight_futures {
     }
     template<class U> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_value(U &&v)
     {
-      assert(type != storage_type::empty);
+      assert(type == storage_type::empty);
       new (&value) value_type(std::forward<U>(v));
       type = storage_type::value;
     }
     template<class... Args> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void emplace_value(Args &&... v)
     {
-      assert(type != storage_type::empty);
+      assert(type == storage_type::empty);
       new (&value) value_type(std::forward<Args>(v)...);
       type = storage_type::value;
     }
     void set_exception(exception_type e)
     {
-      assert(type != storage_type::empty);
+      assert(type == storage_type::empty);
       new (&exception) exception_type(std::move(e));
       type = storage_type::exception;
     }
     // Note to self: this can't be BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR
     void set_error(error_type e)
     {
-      assert(type != storage_type::empty);
+      assert(type == storage_type::empty);
       new (&error) error_type(std::move(e));
       type = storage_type::error;
     }
     // Called by future to take ownership of storage from promise
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_pointer(pointer_type f) noexcept(is_nothrow_destructible)
     {
-      assert(type != storage_type::empty);
+      assert(type == storage_type::empty);
       pointer_ = f;
       type = storage_type::pointer;
     }
@@ -994,9 +994,9 @@ Features:
     }
 
 #define BOOST_SPINLOCK_MONAD_IMPL(name, qualifier) \
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP auto name() qualifier -> decltype(implementation_policy::_get_value(*detail::rebind_cast<implementation_type>(this))) \
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP auto name() qualifier -> decltype(implementation_policy::_get_value(detail::rebind_cast<implementation_type>(*this))) \
     { \
-      return implementation_policy::_get_value(*detail::rebind_cast<implementation_type>(this)); \
+      return implementation_policy::_get_value(detail::rebind_cast<implementation_type>(*this)); \
     }
     //! \brief If contains a value_type, returns a lvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
     BOOST_SPINLOCK_MONAD_IMPL(get, &)
@@ -1006,6 +1006,12 @@ Features:
     BOOST_SPINLOCK_MONAD_IMPL(get, const &)
     //! \brief If contains a value_type, returns a const lvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
     BOOST_SPINLOCK_MONAD_IMPL(value, const &)
+#undef BOOST_SPINLOCK_MONAD_IMPL
+#define BOOST_SPINLOCK_MONAD_IMPL(name, qualifier) \
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP auto name() qualifier -> decltype(implementation_policy::_get_value(std::move(detail::rebind_cast<implementation_type>(*this)))) \
+    { \
+      return implementation_policy::_get_value(std::move(detail::rebind_cast<implementation_type>(*this))); \
+    }
     //! \brief If contains a value_type, returns a rvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
     BOOST_SPINLOCK_MONAD_IMPL(get, &&)
     //! \brief If contains a value_type, returns a rvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
@@ -1465,7 +1471,7 @@ Features:
       typedef basic_monad<result_policy> implementation_type;
       typedef void value_type;
       typedef std::error_code error_type;
-      typedef std::exception_ptr exception_type;
+      typedef void exception_type;
       typedef void pointer_type;
       template<typename U> using rebind = basic_monad<result_policy<U>>;
       template<typename U> using rebind_policy = result_policy<U>;
@@ -1530,8 +1536,8 @@ Features:
     {
       typedef basic_monad<option_policy> implementation_type;
       typedef void value_type;
-      typedef std::error_code error_type;
-      typedef std::exception_ptr exception_type;
+      typedef void error_type;
+      typedef void exception_type;
       typedef void pointer_type;
       template<typename U> using rebind = basic_monad<option_policy<U>>;
       template<typename U> using rebind_policy = option_policy<U>;

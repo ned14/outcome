@@ -139,6 +139,11 @@ namespace lightweight_futures {
   /*! \class basic_promise
   \brief Implements the state setting side of basic_monad
   \tparam implementation_policy An implementation policy type
+  
+  \warning This lightweight promise is NOT thread safe up until the point you call `get_future()`, after which it becomes thread safe.
+  Therefore if you have multiple threads trying to set the promise value concurrently before you have called `get_future()`, you will race.
+  The chances of this being a problem in any well designed code should be non-existent, however please do contact the author if you find
+  a non-contrived situation where this could happen.
   */
   template<class implementation_policy> class basic_promise
   {
@@ -262,94 +267,39 @@ namespace lightweight_futures {
       return _storage.type==value_storage_type::storage_type::future;
     }
     
-    /*! \brief Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
-    */
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v)
-    {
-      detail::lock_guard<promise_type, future_type> h(this);
-      if(h._f)
-      {
-        if(!h._f->empty())
-          implementation_policy::_throw_error(monad_errc::already_set);
-        h._f->set_value(v);
-      }
-      else
-      {
-        if(_storage.type!=value_storage_type::storage_type::empty)
-          implementation_policy::_throw_error(monad_errc::already_set);
-        _storage.set_value(v);
-      }
+#define BOOST_SPINLOCK_FUTURE_IMPL(name, function) \
+    name \
+    { \
+      detail::lock_guard<promise_type, future_type> h(this); \
+      if(h._f) \
+      { \
+        if(!h._f->empty()) \
+          implementation_policy::_throw_error(monad_errc::already_set); \
+        h._f->function; \
+        h._f->_promise=nullptr; \
+        _storage.clear(); \
+      } \
+      else \
+      { \
+        if(_storage.type!=value_storage_type::storage_type::empty) \
+          implementation_policy::_throw_error(monad_errc::already_set); \
+        _storage.function; \
+      } \
     }
     /*! \brief Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
     */
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(value_type &&v)
-    {
-      detail::lock_guard<promise_type, future_type> h(this);
-      if(h._f)
-      {
-        if(!h._f->empty())
-          implementation_policy::_throw_error(monad_errc::already_set);
-        h._f->set_value(std::move(v));
-      }
-      else
-      {
-        if(_storage.type!=value_storage_type::storage_type::empty)
-          implementation_policy::_throw_error(monad_errc::already_set);
-        _storage.set_value(std::move(v));
-      }
-    }
+    BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v), set_value(v))
+    /*! \brief Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
+    */
+    BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(value_type &&v), set_value(std::move(v)))
     /*! \brief EXTENSION: Sets the value by emplacement to be returned by the associated future, releasing any waits occuring in other threads.
     */
-    template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP void emplace_value(Args &&... args)
-    {
-      detail::lock_guard<promise_type, future_type> h(this);
-      if(h._f)
-      {
-        if(!h._f->empty())
-          implementation_policy::_throw_error(monad_errc::already_set);
-        h._f->emplace_value(std::forward<Args>(args)...);
-      }
-      else
-      {
-        if(_storage.type!=value_storage_type::storage_type::empty)
-          implementation_policy::_throw_error(monad_errc::already_set);
-        _storage.emplace_value(std::forward<Args>(args)...);
-      }
-    }
+    BOOST_SPINLOCK_FUTURE_IMPL(template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP void emplace_value(Args &&... args), emplace_value(std::forward<Args>(args)...))
     //! \brief EXTENSION: Set an error code outcome (doesn't allocate)
-    void set_error(error_type e)
-    {
-      detail::lock_guard<promise_type, future_type> h(this);
-      if(h._f)
-      {
-        if(!h._f->empty())
-          implementation_policy::_throw_error(monad_errc::already_set);
-        h._f->set_error(e);
-      }
-      else
-      {
-        if(_storage.type!=value_storage_type::storage_type::empty)
-          implementation_policy::_throw_error(monad_errc::already_set);
-        _storage.set_error(e);
-      }
-    }
+    BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_error(error_type e), set_error(std::move(e)))
     //! \brief Sets an exception outcome
-    void set_exception(exception_type e)
-    {
-      detail::lock_guard<promise_type, future_type> h(this);
-      if(h._f)
-      {
-        if(!h._f->empty())
-          implementation_policy::_throw_error(monad_errc::already_set);
-        h._f->set_exception(e);
-      }
-      else
-      {
-        if(_storage.type!=value_storage_type::storage_type::empty)
-          implementation_policy::_throw_error(monad_errc::already_set);
-        _storage.set_exception(e);
-      }
-    }
+    BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_exception(exception_type e), set_exception(std::move(e)))
+#undef BOOST_SPINLOCK_FUTURE_IMPL
     template<typename E> void set_exception(E &&e)
     {
       set_exception(make_exception_ptr(std::forward<E>(e)));
@@ -373,6 +323,22 @@ namespace lightweight_futures {
   \brief Lightweight next generation future with N4399 Concurrency TS extensions
 
   http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4399.html
+  
+  In exchange for some minor limitations, this lightweight promise-future is more than 10x faster than
+  `std::promise` and `std::future` in the uncontended case. You also get deep integration with basic_monad and
+  lots of cool functional programming stuff. Those limitations are:
+  
+  - No memory allocation is done, so if your code overrides the STL allocator for promise-future it won't port.
+  - Consequently both promise and future must have sizeof greater than sizeof(T), so don't use multi-Kb sized T's
+  as they'll get copied and moved around.
+  - Your type T must implement either or both the copy and move constructors.
+  - Your type T cannot be an error_type nor an exception_type. If you really want to promise one of those, wrap
+  it in a wrapper type.
+  - Don't use any of the `monad_errc` nor `future_errc` error codes for the errored return, else expect misoperation.
+  - You can't set the future state at thread exit.
+  - promise is not thread safe until `get_future()` is first called. If you have multiple threads potentially
+  setting the promise concurrently before a future is retrieved you probably have a bad design. In exchange
+  your `make_ready_future()` has no atomic effects on memory, and can be completely elided by the compiler.
   */
   template<class implementation_policy> class basic_future : protected basic_monad<implementation_policy>
   {
@@ -413,6 +379,10 @@ namespace lightweight_futures {
     typedef basic_promise<implementation_policy> promise_type;
     //! \brief This future type
     typedef basic_future future_type;
+    //! \brief The future_errc type we use
+    typedef typename implementation_policy::future_errc future_errc;
+    //! \brief The future_error type we use
+    typedef typename implementation_policy::future_error future_error;
     
     friend class basic_promise<implementation_policy>;
     friend struct detail::lock_guard<promise_type, future_type>;
@@ -434,7 +404,11 @@ namespace lightweight_futures {
     {
       if(_need_locks) new (&_lock) spinlock<bool>();
       p->_storage.clear();
-      p->_storage.set_pointer(this);
+      // Do I already have a value? If so, detach, else set the promise to point to us
+      if(!empty())
+        _promise=nullptr;
+      else
+        p->_storage.set_pointer(this);
     }
     typedef detail::lock_guard<promise_type, future_type> lock_guard_type;
   public:
@@ -484,7 +458,18 @@ namespace lightweight_futures {
     //! \brief True if the state is set or a promise is attached
     bool valid() const noexcept
     {
-      return is_ready() || !!_promise;
+      if(!!_promise) return true;
+      if(is_ready())
+      {
+        if(has_error())
+        {
+          // If my value is a future_error, assume I'm invalid
+          if(monad_type::_storage.error.category()==implementation_policy::future_category())
+            return false;
+        }
+        return true;
+      }
+      return false;
     }
     
     //! \brief Swaps the future with another future
@@ -573,6 +558,7 @@ namespace lightweight_futures {
       BOOST_STATIC_CONSTEXPR bool is_consuming=true;
       typedef std::future_errc future_errc;
       typedef std::future_error future_error;
+      static const std::error_category &future_category() noexcept { return std::future_category(); }
 
       static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
       {
