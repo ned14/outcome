@@ -599,19 +599,19 @@ namespace lightweight_futures {
       static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(implementation_type &self)
       {
         self.wait();
-        typename implementation_type::lock_guard_type h(&self);
+        implementation_type::lock_guard_type h(&self);
         _pre_get_value(self);
       }
       static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(const implementation_type &self)
       {
         self.wait();
-        typename implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+        implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
         _pre_get_value(self);
       }
       static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(implementation_type &&self)
       {
         self.wait();
-        typename implementation_type::lock_guard_type h(&self);
+        implementation_type::lock_guard_type h(&self);
         _pre_get_value(self);
       }
       template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const U &self)
