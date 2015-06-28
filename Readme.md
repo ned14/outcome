@@ -14,7 +14,7 @@ basic_future<> first.
 
 # Benchmarks with early lightweight future-promise:
 
-All values are CPU cycles on a i7-3770K @ 3.9Ghz running Linux x64
+All values are CPU cycles on a i7-3770K @ 3.9Ghz.
 
 ## clang 3.7:
 ### libstdc++ 4.9 future promise:
@@ -26,7 +26,7 @@ Producer Consumer: 838
 
 ### lightweight future promise:
 Simple loop: 260
-Producer Consumer: 378
+Producer Consumer: 378 (2.22x faster)
   Creation and setting: 281
   Getting from future: 51
   Destruction of future: 46
@@ -41,7 +41,7 @@ Producer Consumer: 809
 
 ### lightweight future promise:
 Simple loop: 205
-Producer Consumer: 323
+Producer Consumer: 323 (2.50x faster)
   Creation and setting: 227
   Getting from future: 49
   Destruction of future: 48
@@ -52,5 +52,20 @@ Producer Consumer: 170
   Creation and setting: 102
   Getting from future: 37
   Destruction of future: 30
+
+## VS2015:
+### Dinkumware future promise:
+Simple loop: 596
+Producer Consumer: 1545
+  Creation and setting: 752
+  Getting from future: 311
+  Destruction of future: 482
+
+### lightweight future promise:
+Simple loop: 210
+Producer Consumer: 311 (4.97x faster)
+  Creation and setting: 236
+  Getting from future: 37
+  Destruction of future: 38
 
 </center>
