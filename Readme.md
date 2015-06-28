@@ -10,5 +10,47 @@ Lightweight promise-future:
 implementation policies such option can convert to result or monad and so on. This may be slightly tricky
 in the face of future => basic_monad conversion and vice versa. Really need to implement and finish
 basic_future<> first.
- 
+
+
+# Benchmarks with early lightweight future-promise:
+
+All values are CPU cycles on a i7-3770K @ 3.9Ghz running Linux x64
+
+## clang 3.7:
+### libstdc++ 4.9 future promise:
+Simple loop: 761
+Producer Consumer: 838
+  Creation and setting: 674
+  Getting from future: 160
+  Destruction of future: 4
+
+### lightweight future promise:
+Simple loop: 260
+Producer Consumer: 378
+  Creation and setting: 281
+  Getting from future: 51
+  Destruction of future: 46
+
+## GCC 5.1:
+### libstdc++ 5.1 future promise:
+Simple loop: 726
+Producer Consumer: 809
+  Creation and setting: 654
+  Getting from future: 150
+  Destruction of future: 4
+
+### lightweight future promise:
+Simple loop: 205
+Producer Consumer: 323
+  Creation and setting: 227
+  Getting from future: 49
+  Destruction of future: 48
+
+### lightweight future promise (set promise before getting future):
+Simple loop: 124
+Producer Consumer: 170
+  Creation and setting: 102
+  Getting from future: 37
+  Destruction of future: 30
+
 </center>

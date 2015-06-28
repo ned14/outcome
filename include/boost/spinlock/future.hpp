@@ -336,9 +336,13 @@ namespace lightweight_futures {
   it in a wrapper type.
   - Don't use any of the `monad_errc` nor `future_errc` error codes for the errored return, else expect misoperation.
   - You can't set the future state at thread exit.
-  - promise is not thread safe until `get_future()` is first called. If you have multiple threads potentially
-  setting the promise concurrently before a future is retrieved you probably have a bad design. In exchange
-  your `make_ready_future()` has no atomic effects on memory, and can be completely elided by the compiler.
+  - Neither promise nor future is thread safe until `get_future()` is first called and if and only if the state has not
+  yet been set. In other words, if you set the state and then call `get_future()`, neither is ever threadsafe, not ever.
+  This optimisation is safe as you will need some mechanism of sending the already ready future to another thread, and
+  that will synchronise memory for you, however if you write code where multiple threads attempt to get the state
+  concurrently, you will be in trouble. Note that if you call `get_future()` before setting the state, both promise and
+  future become thread safe from the `get_future()` onwards and remain thread safe for the remainder of their lifetimes,
+  so multiple threads can both set and/or get the state, with the usual exceptions being thrown if you try to do either twice.
   */
   template<class implementation_policy> class basic_future : protected basic_monad<implementation_policy>
   {
@@ -485,6 +489,7 @@ namespace lightweight_futures {
     
 //// shared_future<value_type> share();  // TODO
     
+    //! \brief See basic_monad<>::get()
     using monad_type::get;
     using monad_type::get_or;
     using monad_type::get_and;
@@ -494,7 +499,7 @@ namespace lightweight_futures {
     using monad_type::get_exception;
     using monad_type::get_exception_or;
     using monad_type::get_exception_and;
-    // Compatibility with Boost.Thread
+    //! Compatibility with Boost.Thread
     exception_type get_exception_ptr() { return this->get_exception(); }
     
     //! \brief Wait for the future to become ready
