@@ -6,10 +6,13 @@ Linux: [![Build Status](https://ci.nedprod.com/job/Boost.Spinlock%20Test%20Linux
 Documentation: https://ci.nedprod.com/job/Boost.Spinlock%20Test%20Linux%20GCC%204.8/doxygen/annotated.html
 
 Lightweight promise-future:
+ - [x] Have future-promise conformance suite also run for std::future.
+ - [ ] Replace doxygen docs with Sphinx docs.
+ - [ ] Write thread sanitising fuzz tester to monte carlo for race conditions.
+
  - [ ] Have basic_monad gain an explicit conversion constructor from other basic_monad with different
-implementation policies such option can convert to result or monad and so on. This may be slightly tricky
-in the face of future => basic_monad conversion and vice versa. Really need to implement and finish
-basic_future<> first.
+implementation policies such option can convert to result or monad and so on. Look into having the
+implementation policies themselves do the conversion, so some template alias e.g. convert<>().
 
 
 # Benchmarks with early lightweight future-promise:

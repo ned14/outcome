@@ -154,6 +154,7 @@ namespace lightweight_futures {
     value_storage_type _storage;
   private:
     bool _need_locks;                 // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
+    bool _detached;                   // Future has already been set and promise is now detached
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4624)
@@ -198,12 +199,12 @@ namespace lightweight_futures {
     static_assert(std::is_move_constructible<value_type>::value || std::is_copy_constructible<value_type>::value, "Type must be move or copy constructible to be used in a lightweight basic_promise");    
 
     //! \brief EXTENSION: constexpr capable constructor
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_promise() noexcept : _need_locks(false)
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_promise() noexcept : _need_locks(false), _detached(false)
     {
     }
 //// template<class Allocator> basic_promise(allocator_arg_t, Allocator a); // cannot support
     //! \brief Move constructor
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise(basic_promise &&o) noexcept(is_nothrow_move_constructible) : _need_locks(o._need_locks)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise(basic_promise &&o) noexcept(is_nothrow_move_constructible) : _need_locks(o._need_locks), _detached(o._detached)
     {
       if(_need_locks) new (&_lock) spinlock<bool>();
       detail::lock_guard<promise_type, future_type> h(&o);
@@ -254,7 +255,7 @@ namespace lightweight_futures {
         new (&_lock) spinlock<bool>();
       }
       detail::lock_guard<promise_type, future_type> h(this);
-      if(h._f)
+      if(h._f || _detached)
         throw future_error(future_errc::future_already_retrieved);
       future_type ret(this);
       h.unlock();
@@ -264,13 +265,15 @@ namespace lightweight_futures {
     BOOST_SPINLOCK_FUTURE_MSVC_HELP bool has_future() const noexcept
     {
       //detail::lock_guard<value_type> h(this);
-      return _storage.type==value_storage_type::storage_type::future;
+      return _storage.type==value_storage_type::storage_type::future || _detached;
     }
     
 #define BOOST_SPINLOCK_FUTURE_IMPL(name, function) \
     name \
     { \
       detail::lock_guard<promise_type, future_type> h(this); \
+      if(_detached) \
+        implementation_policy::_throw_error(monad_errc::already_set); \
       if(h._f) \
       { \
         if(!h._f->empty()) \
@@ -278,6 +281,7 @@ namespace lightweight_futures {
         h._f->function; \
         h._f->_promise=nullptr; \
         _storage.clear(); \
+        _detached=true; \
       } \
       else \
       { \
@@ -410,7 +414,10 @@ namespace lightweight_futures {
       p->_storage.clear();
       // Do I already have a value? If so, detach, else set the promise to point to us
       if(!empty())
+      {
+        p->_detached=true;
         _promise=nullptr;
+      }
       else
         p->_storage.set_pointer(this);
     }
@@ -465,12 +472,13 @@ namespace lightweight_futures {
       if(!!_promise) return true;
       if(is_ready())
       {
+        /* std::future returns valid()=true if state is broken promise
         if(has_error())
         {
           // If my value is a future_error, assume I'm invalid
           if(monad_type::_storage.error.category()==implementation_policy::future_category())
             return false;
-        }
+        }*/
         return true;
       }
       return false;
@@ -588,9 +596,25 @@ namespace lightweight_futures {
           auto _self=detail::rebind_cast<monad_type>(self);
           if(self.has_error())
           {
-            std::system_error e(std::move(_self._storage.error));
-            _self.clear();
-            throw e;
+            auto &category=_self._storage.error.category();
+            if(category==std::future_category())
+            {
+              std::future_error e(std::move(_self._storage.error));
+              _self.clear();
+              throw e;
+            }
+            /*else if(category==std::iostream_category())
+            {
+              std::ios_base::failure e(std::move(_self._storage.error));
+              _self.clear();
+              throw e;
+            }*/
+            else
+            {
+              std::system_error e(std::move(_self._storage.error));
+              _self.clear();
+              throw e;
+            }
           }
           if(self.has_exception())
           {

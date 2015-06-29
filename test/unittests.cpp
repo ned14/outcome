@@ -1784,68 +1784,80 @@ BOOST_AUTO_TEST_CASE(works/monad/operators, "Tests that the monad custom operato
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(works/future, "Tests that the future-promise works as intended")
+template<template<class> class F, template<class> class P> void FuturePromiseConformanceTest()
 {
+  {
+    {
+      F<int> f;
+      BOOST_CHECK(!f.valid());
+//      BOOST_CHECK(!f.is_ready());
+//      BOOST_CHECK(!f.has_exception());
+//      BOOST_CHECK(!f.has_value());
+      BOOST_CHECK_THROW(f.get(), std::future_error);
+    }
+    P<int> p;
+    F<int> f(p.get_future());
+    BOOST_CHECK_THROW(p.get_future(), std::future_error);
+    BOOST_CHECK(f.valid());
+//    BOOST_CHECK(!f.is_ready());
+//    BOOST_CHECK(!f.has_exception());
+//    BOOST_CHECK(!f.has_value());
+    p.set_value(5);
+    BOOST_CHECK_THROW(p.set_value(6), std::future_error);
+    BOOST_CHECK(f.valid());
+//    BOOST_CHECK(f.is_ready());
+//    BOOST_CHECK(!f.has_exception());
+//    BOOST_CHECK(f.has_value());
+    BOOST_CHECK(f.get()==5);  // destroys shared state, resetting to default constructed
+    BOOST_CHECK(!f.valid());
+//    BOOST_CHECK(!f.is_ready());
+//    BOOST_CHECK(!f.has_exception());
+//    BOOST_CHECK(!f.has_value());
+    BOOST_CHECK_THROW(f.get(), std::future_error);
+  }
+  {
+    P<int> p;
+    p.set_value(5);  // before future construction, should induce constexpr
+    F<int> f(p.get_future());
+    BOOST_CHECK_THROW(p.set_value(6), std::future_error);
+    BOOST_CHECK(f.valid());
+//    BOOST_CHECK(f.is_ready());
+//    BOOST_CHECK(!f.has_exception());
+//    BOOST_CHECK(f.has_value());
+    BOOST_CHECK(f.get()==5);  // destroys shared state, resetting to default constructed
+    BOOST_CHECK(!f.valid());
+//    BOOST_CHECK(!f.is_ready());
+//    BOOST_CHECK(!f.has_exception());
+//    BOOST_CHECK(!f.has_value());
+    BOOST_CHECK_THROW(f.get(), std::future_error);
+  }
+  {
+    F<int> f;
+    {
+      P<int> p;
+      f=p.get_future();
+    }
+    BOOST_CHECK(f.valid());
+//    BOOST_CHECK(f.is_ready());
+//    BOOST_CHECK(f.has_exception());
+//    BOOST_CHECK(!f.has_value());
+    BOOST_CHECK_THROW(f.get(), std::future_error);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(works/future/std, "Tests that std future-promise passes our conformance suite")
+{
+  std::cout << "\n=== Tests that std future-promise passes our conformance suite ===" << std::endl;
+  FuturePromiseConformanceTest<std::future, std::promise>();
+}
+
+BOOST_AUTO_TEST_CASE(works/future/lightweight, "Tests that our future-promise works as intended")
+{
+  std::cout << "\n=== Tests that our future-promise works as intended ===" << std::endl;
   using namespace boost::spinlock::lightweight_futures;
   std::cout << "sizeof(promise<bool>) = " << sizeof(promise<bool>) << std::endl;
   std::cout << "sizeof(future<bool>) = " << sizeof(future<bool>) << std::endl;
-  {
-    {
-      future<int> f;
-      BOOST_CHECK(!f.valid());
-      BOOST_CHECK(!f.is_ready());
-      BOOST_CHECK(!f.has_exception());
-      BOOST_CHECK(!f.has_value());
-      BOOST_CHECK_THROW(f.get(), std::future_error);
-    }
-    promise<int> p;
-    future<int> f(p.get_future());
-//    BOOST_CHECK_THROW(p.get_future(), future_error);
-    BOOST_CHECK(f.valid());
-    BOOST_CHECK(!f.is_ready());
-    BOOST_CHECK(!f.has_exception());
-    BOOST_CHECK(!f.has_value());
-    p.set_value(5);
-//    BOOST_CHECK_THROW(p.set_value(6), future_error);
-    BOOST_CHECK(f.valid());
-    BOOST_CHECK(f.is_ready());
-    BOOST_CHECK(!f.has_exception());
-    BOOST_CHECK(f.has_value());
-    BOOST_CHECK(f.get()==5);  // destroys shared state, resetting to default constructed
-    BOOST_CHECK(!f.valid());
-    BOOST_CHECK(!f.is_ready());
-    BOOST_CHECK(!f.has_exception());
-    BOOST_CHECK(!f.has_value());
-    BOOST_CHECK_THROW(f.get(), std::future_error);
-  }
-  {
-    promise<int> p;
-    p.set_value(5);  // before future construction, should induce constexpr
-    future<int> f(p.get_future());
-//    BOOST_CHECK_THROW(p.set_value(6), future_error);
-    BOOST_CHECK(f.valid());
-    BOOST_CHECK(f.is_ready());
-    BOOST_CHECK(!f.has_exception());
-    BOOST_CHECK(f.has_value());
-    BOOST_CHECK(f.get()==5);  // destroys shared state, resetting to default constructed
-    BOOST_CHECK(!f.valid());
-    BOOST_CHECK(!f.is_ready());
-    BOOST_CHECK(!f.has_exception());
-    BOOST_CHECK(!f.has_value());
-    BOOST_CHECK_THROW(f.get(), std::future_error);
-  }
-  {
-    future<int> f;
-    {
-      promise<int> p;
-      f=p.get_future();
-    }
-    BOOST_CHECK(!f.valid());
-    BOOST_CHECK(f.is_ready());
-    BOOST_CHECK(f.has_exception());
-    BOOST_CHECK(!f.has_value());
-    BOOST_CHECK_THROW(f.get(), std::future_error);
-  }
+  FuturePromiseConformanceTest<future, promise>();
 }
 
 template<template<class> class F, template<class> class P> double CalculateFuturePerformanceSimple(const char *desc)
