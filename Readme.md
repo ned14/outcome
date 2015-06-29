@@ -8,7 +8,7 @@ Documentation: https://ci.nedprod.com/job/Boost.Spinlock%20Test%20Linux%20GCC%20
 Lightweight promise-future:
  - [x] Map ternary true/false/other into namespace lightweight_futures.
  - [x] Have future-promise conformance suite also run for std::future.
- - [ ] Write thread sanitising fuzz tester to monte carlo for race conditions.
+ - [x] Write thread sanitising fuzz tester to monte carlo for race conditions.
 
  - [ ] Add monad_errc error code for when a move or copy constructor throws?
  - [ ] Add monad_errc error code for when get_error() sees an excepted state?

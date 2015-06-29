@@ -490,9 +490,9 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       if(lockable.try_lock())
       {
         lockable.unlock();
-        return true;
+        return false;
       }
-      return false;
+      return true;
     }
     // For when used with a spinlock
     template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_SPINLOCK_CONSTEXPR inline T is_lockable_locked(spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW

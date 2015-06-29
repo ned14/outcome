@@ -42,9 +42,13 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #if BOOST_SPINLOCK_IN_THREAD_SANITIZER
+#define BOOST_SPINLOCK_FUTURE_MUTEX_TYPE std::mutex
+#define BOOST_SPINLOCK_FUTURE_MUTEX_TYPE_DESTRUCTOR mutex
 #define BOOST_SPINLOCK_FUTURE_NO_SANITIZE_LOAD(v) ((std::atomic<decltype(v)> *)(&v))->load(std::memory_order::memory_order_relaxed)
 #define BOOST_SPINLOCK_FUTURE_NO_SANITIZE_STORE(v, x) ((std::atomic<decltype(v)> *)(&v))->store((x), std::memory_order::memory_order_relaxed)
 #else
+#define BOOST_SPINLOCK_FUTURE_MUTEX_TYPE spinlock<bool>
+#define BOOST_SPINLOCK_FUTURE_MUTEX_TYPE_DESTRUCTOR spinlock<bool>
 #define BOOST_SPINLOCK_FUTURE_NO_SANITIZE_LOAD(v) (v)
 #define BOOST_SPINLOCK_FUTURE_NO_SANITIZE_STORE(v, x) ((v)=(x))
 #endif
@@ -66,7 +70,7 @@ namespace lightweight_futures {
       BOOST_SPINLOCK_FUTURE_MSVC_HELP lock_guard(promise_type *p) : _p(nullptr), _f(nullptr)
       {
         // constexpr fold
-        if(!BOOST_SPINLOCK_FUTURE_NO_SANITIZE_LOAD(p->_need_locks))
+        if(!p->_need_locks)
         {
           _p=p;
           if(p->_storage.type==promise_type::value_storage_type::storage_type::pointer)
@@ -96,7 +100,7 @@ namespace lightweight_futures {
       BOOST_SPINLOCK_FUTURE_MSVC_HELP lock_guard(future_type *f) : _p(nullptr), _f(nullptr)
       {
         // constexpr fold
-        if(!BOOST_SPINLOCK_FUTURE_NO_SANITIZE_LOAD(f->_need_locks))
+        if(!f->_need_locks)
         {
           _p=f->_promise;
           _f=f;
@@ -130,13 +134,13 @@ namespace lightweight_futures {
       {
         if(_p)
         {
-          if(BOOST_SPINLOCK_FUTURE_NO_SANITIZE_LOAD(_p->_need_locks))
+          if(_p->_need_locks)
             _p->_lock.unlock();
           _p=nullptr;
         }
         if(_f)
         {
-          if(BOOST_SPINLOCK_FUTURE_NO_SANITIZE_LOAD(_f->_need_locks))
+          if(_f->_need_locks)
             _f->_lock.unlock();
           _f=nullptr;
         }
@@ -167,7 +171,7 @@ namespace lightweight_futures {
 #pragma warning(push)
 #pragma warning(disable: 4624)
 #endif
-    union { spinlock<bool> _lock; };  // Delay construction
+    union { BOOST_SPINLOCK_FUTURE_MUTEX_TYPE _lock; };  // Delay construction
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
@@ -214,7 +218,7 @@ namespace lightweight_futures {
     //! \brief Move constructor
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise(basic_promise &&o) noexcept(is_nothrow_move_constructible) : _need_locks(o._need_locks), _detached(o._detached)
     {
-      if(BOOST_SPINLOCK_FUTURE_NO_SANITIZE_LOAD(_need_locks)) new (&_lock) spinlock<bool>();
+      if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
       detail::lock_guard<promise_type, future_type> h(&o);
       _storage=std::move(o._storage);
       if(h._f)
@@ -243,6 +247,7 @@ namespace lightweight_futures {
         // Destroy myself before locks exit
         _storage.clear();
       }
+      if(_need_locks) _lock.~BOOST_SPINLOCK_FUTURE_MUTEX_TYPE_DESTRUCTOR();
     }
     
     //! \brief Swap this promise for another
@@ -260,13 +265,13 @@ namespace lightweight_futures {
     BOOST_SPINLOCK_FUTURE_MSVC_HELP future_type get_future()
     {
       // If no value stored yet, I need locks on from now on
-      if(!BOOST_SPINLOCK_FUTURE_NO_SANITIZE_LOAD(_need_locks) && _storage.type==value_storage_type::storage_type::empty)
+      if(!_need_locks && _storage.type==value_storage_type::storage_type::empty)
       {
-        BOOST_SPINLOCK_FUTURE_NO_SANITIZE_STORE(_need_locks, true);
-        new (&_lock) spinlock<bool>();
+        _need_locks=true;
+        new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
       }
       detail::lock_guard<promise_type, future_type> h(this);
-      assert(!BOOST_SPINLOCK_FUTURE_NO_SANITIZE_LOAD(_need_locks) || is_lockable_locked(_lock));
+      assert(!_need_locks || is_lockable_locked(_lock));
       if(h._f || _detached)
         throw future_error(future_errc::future_already_retrieved);
       future_type ret(this);
@@ -284,11 +289,12 @@ namespace lightweight_futures {
     name \
     { \
       detail::lock_guard<promise_type, future_type> h(this); \
-      assert(!BOOST_SPINLOCK_FUTURE_NO_SANITIZE_LOAD(_need_locks) || is_lockable_locked(_lock)); \
+      assert(!_need_locks || is_lockable_locked(_lock)); \
       if(_detached) \
         implementation_policy::_throw_error(monad_errc::already_set); \
       if(h._f) \
       { \
+        assert(!_need_locks || is_lockable_locked(h._f->_lock)); \
         if(!h._f->empty()) \
           implementation_policy::_throw_error(monad_errc::already_set); \
         h._f->function; \
@@ -414,7 +420,7 @@ namespace lightweight_futures {
 #pragma warning(push)
 #pragma warning(disable: 4624)
 #endif
-    union { spinlock<bool> _lock; };  // Delay construction
+    union { BOOST_SPINLOCK_FUTURE_MUTEX_TYPE _lock; };  // Delay construction
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
@@ -423,7 +429,7 @@ namespace lightweight_futures {
     // Called by basic_promise::get_future(), so currently thread safe
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(promise_type *p) : monad_type(std::move(p->_storage)), _need_locks(p->_need_locks), _promise(p)
     {
-      if(BOOST_SPINLOCK_FUTURE_NO_SANITIZE_LOAD(_need_locks)) new (&_lock) spinlock<bool>();
+      if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
       p->_storage.clear();
       // Do I already have a value? If so, detach, else set the promise to point to us
       if(!empty())
@@ -443,7 +449,7 @@ namespace lightweight_futures {
     //! \brief Move constructor
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(basic_future &&o) noexcept(is_nothrow_move_constructible) : _need_locks(o._need_locks), _promise(nullptr)
     {
-      if(BOOST_SPINLOCK_FUTURE_NO_SANITIZE_LOAD(_need_locks)) new (&_lock) spinlock<bool>();
+      if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
       detail::lock_guard<promise_type, future_type> h(&o);
       new(this) monad_type(std::move(o));
       if(o._promise)
@@ -473,6 +479,7 @@ namespace lightweight_futures {
         // Destroy myself before locks exit
         monad_type::clear();
       }
+      if(_need_locks) _lock.~BOOST_SPINLOCK_FUTURE_MUTEX_TYPE_DESTRUCTOR();
     }
     
     using monad_type::operator bool;
@@ -701,7 +708,7 @@ namespace lightweight_futures {
         self.wait();
         typename implementation_type::lock_guard_type h(&self);
         impl::_pre_get_value(self);
-        assert(!BOOST_SPINLOCK_FUTURE_NO_SANITIZE_LOAD(self._need_locks) || is_lockable_locked(self._lock));
+        assert(!self._need_locks || is_lockable_locked(self._lock));
         value_type v(std::move(self._storage.value));
         self.clear();
         return v;

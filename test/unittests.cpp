@@ -1873,10 +1873,11 @@ template<template<class> class F, template<class> class P> double CalculateFutur
     end = GetUsCount();
   } while (begin == end);
   overhead = end - begin;
+  size_t loops=BOOST_SPINLOCK_RUNNING_ON_VALGRIND ? 10000 : 1000000;
   for(size_t m=0; m<5; m++)
   {
     begin = GetUsCount();
-    for(size_t n=0; n<1000000; n++)
+    for(size_t n=0; n<loops; n++)
     {
       P<int> p;
       F<int> f(p.get_future());
@@ -1884,7 +1885,7 @@ template<template<class> class F, template<class> class P> double CalculateFutur
       if(f.get()!=5) abort();
     }
     end = GetUsCount();
-    auto each = (end - begin-overhead) /1000000.0;
+    auto each = (double) (end - begin-overhead) /loops;
     std::cout << (m+1) << ". Picoseconds for " << desc << " promise-future round: " << each << std::endl;
     total+=each;
   }
@@ -1916,37 +1917,38 @@ template<template<class> class F, template<class> class P> std::tuple<double, do
     end = GetUsCount();
   } while (begin == end);
   overhead = end - begin;
-  std::vector<F<int>> futures(1000000);
+  size_t loops=BOOST_SPINLOCK_RUNNING_ON_VALGRIND ? 10000 : 1000000;
+  std::vector<F<int>> futures(loops);
   for(size_t m=0; m<5; m++)
   {
     futures.resize(0);
-    if(futures.capacity()<1000000) abort();
+    if(futures.capacity()<loops) abort();
     begin = GetUsCount();
-    for(size_t n=0; n<1000000; n++)
+    for(size_t n=0; n<loops; n++)
     {
       P<int> p;
       futures.push_back(p.get_future());
       p.set_value(5);
     }
     end = GetUsCount();
-    auto each = (end - begin-overhead) /1000000.0;
+    auto each = (double) (end - begin-overhead) /loops;
     std::cout << (m+1) << ". Picoseconds for " << desc << " creation and setting: " << each << std::endl;
     setting+=each;
     
     begin = GetUsCount();
-    for(size_t n=0; n<1000000; n++)
+    for(size_t n=0; n<loops; n++)
     {
       if(futures[n].get()!=5) abort();
     }
     end = GetUsCount();
-    each = (end - begin-overhead) /1000000.0;
+    each = (double) (end - begin-overhead) /loops;
     std::cout << (m+1) << ". Picoseconds for " << desc << " getting:              " << each << std::endl;
     getting+=each;
     
     begin = GetUsCount();
     futures.resize(0);
     end = GetUsCount();
-    each = (end - begin-overhead) /1000000.0;
+    each = (double) (end - begin-overhead) /loops;
     std::cout << (m+1) << ". Picoseconds for " << desc << " destruction:          " << each << std::endl;
     destruction+=each;
   }
@@ -1994,7 +1996,10 @@ template<template<class> class F, template<class> class P> std::tuple<double, do
       char pad1[64-sizeof(std::atomic<bool>)];
       F<size_t> second;
       char pad2[64-sizeof(F<size_t>)];
-      spaced_t() : first(false) { }
+      spaced_t() : first(false)
+      {
+      BOOST_SPINLOCK_DRD_IGNORE_VAR(first);
+      }
     };
     std::vector<spaced_t> futures;
     usCount construction, setting;
@@ -2005,10 +2010,12 @@ template<template<class> class F, template<class> class P> std::tuple<double, do
   } datas[THREADS];
   std::vector<std::thread> threads;
   std::atomic<size_t> done(THREADS+1);
+  size_t loops=BOOST_SPINLOCK_RUNNING_ON_VALGRIND ? 1000 : 100000;
+  std::cout << "Running " << THREADS << " threads of " << loops << " iterations" << std::endl;
   for(size_t n=0; n<THREADS; n++)
   {
-    threads.push_back(std::thread([&done, overhead](data_t &data){
-      std::vector<P<size_t>> promises(100000);
+    threads.push_back(std::thread([&done, overhead, loops](data_t &data){
+      std::vector<P<size_t>> promises(loops);
       --done;
       while(done)
         std::this_thread::yield();
@@ -2017,26 +2024,26 @@ template<template<class> class F, template<class> class P> std::tuple<double, do
         while(data.futures.back().first)
           std::this_thread::yield();
         auto begin=GetUsCount();
-        for(size_t n=0; n<100000; n++)
+        for(size_t n=0; n<loops; n++)
         {
           promises[n]=P<size_t>();
           data.futures[n].second=promises[n].get_future();
         }
         auto end=GetUsCount();
         data.construction+=end-begin-overhead;
-        data.construction_c+=100000;
+        data.construction_c+=loops;
 
-        for(size_t n=0; n<100000; n++)
+        for(size_t n=0; n<loops; n++)
           data.futures[n].first=true;
 
         begin=GetUsCount();
-        for(size_t n=0; n<100000; n++)
+        for(size_t n=0; n<loops; n++)
         {
           promises[n].set_value(n);
         }
         end=GetUsCount();
         data.setting+=end-begin-overhead;
-        data.setting_c+=100000;
+        data.setting_c+=loops;
       } while(!done);
     }, std::ref(datas[n])));
   }
@@ -2049,7 +2056,7 @@ template<template<class> class F, template<class> class P> std::tuple<double, do
   do
   {
 lastround:
-    for(size_t n=0; n<100000; n++)
+    for(size_t n=0; n<loops; n++)
     {
       for(size_t m=0; m<THREADS; m++)
       {
