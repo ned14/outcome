@@ -1848,6 +1848,8 @@ template<template<class> class F, template<class> class P> void FuturePromiseCon
 BOOST_AUTO_TEST_CASE(works/future/std, "Tests that std future-promise passes our conformance suite")
 {
   std::cout << "\n=== Tests that std future-promise passes our conformance suite ===" << std::endl;
+  std::cout << "sizeof(promise<bool>) = " << sizeof(std::promise<bool>) << std::endl;
+  std::cout << "sizeof(future<bool>) = " << sizeof(std::future<bool>) << std::endl;
   FuturePromiseConformanceTest<std::future, std::promise>();
 }
 
@@ -1989,9 +1991,9 @@ template<template<class> class F, template<class> class P> std::tuple<double, do
     struct spaced_t
     {
       std::atomic<bool> first;
-      char pad1[64-sizeof(first)];
+      char pad1[64-sizeof(std::atomic<bool>)];
       F<size_t> second;
-      char pad2[64-sizeof(second)];
+      char pad2[64-sizeof(F<size_t>)];
       spaced_t() : first(false) { }
     };
     std::vector<spaced_t> futures;

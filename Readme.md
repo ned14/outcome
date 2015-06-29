@@ -6,9 +6,13 @@ Linux: [![Build Status](https://ci.nedprod.com/job/Boost.Spinlock%20Test%20Linux
 Documentation: https://ci.nedprod.com/job/Boost.Spinlock%20Test%20Linux%20GCC%204.8/doxygen/annotated.html
 
 Lightweight promise-future:
+ - [x] Map ternary true/false/other into namespace lightweight_futures.
  - [x] Have future-promise conformance suite also run for std::future.
  - [ ] Write thread sanitising fuzz tester to monte carlo for race conditions.
 
+ - [ ] Add monad_errc error code for when a move or copy constructor throws?
+ - [ ] Add monad_errc error code for when get_error() sees an excepted state?
+ - [ ] Review all throws of exceptions and see if they can be replaced with an error_code set.
  - [ ] Have basic_monad gain an explicit conversion constructor from other basic_monad with different
 implementation policies such option can convert to result or monad and so on. Look into having the
 implementation policies themselves do the conversion, so some template alias e.g. convert<>().

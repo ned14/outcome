@@ -495,11 +495,21 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       return false;
     }
     // For when used with a spinlock
-    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_SPINLOCK_CONSTEXPR inline T is_lockable_locked(const spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_SPINLOCK_CONSTEXPR inline T is_lockable_locked(spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
     {
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
       // Annoyingly the atomic ops are marked as unsafe for atomic transactions, so ...
       return *((volatile T *) &lockable);
+#else
+      return lockable.load(memory_order_consume);
+#endif
+    }
+    // For when used with a spinlock
+    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_SPINLOCK_CONSTEXPR inline T is_lockable_locked(const spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    {
+#ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
+      // Annoyingly the atomic ops are marked as unsafe for atomic transactions, so ...
+      return *((volatile T *)&lockable);
 #else
       return lockable.load(memory_order_consume);
 #endif
