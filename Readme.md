@@ -7,7 +7,6 @@ Documentation: https://ci.nedprod.com/job/Boost.Spinlock%20Test%20Linux%20GCC%20
 
 Lightweight promise-future:
  - [x] Have future-promise conformance suite also run for std::future.
- - [ ] Replace doxygen docs with Sphinx docs.
  - [ ] Write thread sanitising fuzz tester to monte carlo for race conditions.
 
  - [ ] Have basic_monad gain an explicit conversion constructor from other basic_monad with different

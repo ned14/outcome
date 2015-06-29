@@ -1883,7 +1883,7 @@ template<template<class> class F, template<class> class P> double CalculateFutur
     }
     end = GetUsCount();
     auto each = (end - begin-overhead) /1000000.0;
-    std::cout << (m+1) << ". Nanoseconds for " << desc << " promise-future round: " << each << std::endl;
+    std::cout << (m+1) << ". Picoseconds for " << desc << " promise-future round: " << each << std::endl;
     total+=each;
   }
   return total/5;
@@ -1928,7 +1928,7 @@ template<template<class> class F, template<class> class P> std::tuple<double, do
     }
     end = GetUsCount();
     auto each = (end - begin-overhead) /1000000.0;
-    std::cout << (m+1) << ". Nanoseconds for " << desc << " creation and setting: " << each << std::endl;
+    std::cout << (m+1) << ". Picoseconds for " << desc << " creation and setting: " << each << std::endl;
     setting+=each;
     
     begin = GetUsCount();
@@ -1938,14 +1938,14 @@ template<template<class> class F, template<class> class P> std::tuple<double, do
     }
     end = GetUsCount();
     each = (end - begin-overhead) /1000000.0;
-    std::cout << (m+1) << ". Nanoseconds for " << desc << " getting:              " << each << std::endl;
+    std::cout << (m+1) << ". Picoseconds for " << desc << " getting:              " << each << std::endl;
     getting+=each;
     
     begin = GetUsCount();
     futures.resize(0);
     end = GetUsCount();
     each = (end - begin-overhead) /1000000.0;
-    std::cout << (m+1) << ". Nanoseconds for " << desc << " destruction:          " << each << std::endl;
+    std::cout << (m+1) << ". Picoseconds for " << desc << " destruction:          " << each << std::endl;
     destruction+=each;
   }
   return std::make_tuple(setting/5, getting/5, destruction/5);
@@ -1970,6 +1970,144 @@ BOOST_AUTO_TEST_CASE(performance/future/producerconsumer/lightweight, "Tests the
   std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per getting." << std::endl;
   std::cout << "Approximately " << (std::get<2>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per destruction." << std::endl;
   std::cout << "Total " <<((std::get<0>(result)+std::get<1>(result)+std::get<2>(result))/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round." << std::endl;
+}
+
+template<template<class> class F, template<class> class P> std::tuple<double, double, double, double> CalculateFuturePerformanceThreaded(const char *)
+{
+  const size_t THREADS=2;
+  auto begin = GetUsCount();
+  usCount overhead=0, end=begin=GetUsCount();
+  for(size_t n=0; n<100000; n++)
+  {
+    overhead+=GetUsCount();
+  }
+  end = GetUsCount();
+  if(overhead!=0)
+    overhead = (end - begin)/100000;
+  struct data_t
+  {
+    struct spaced_t
+    {
+      std::atomic<bool> first;
+      char pad1[64-sizeof(first)];
+      F<size_t> second;
+      char pad2[64-sizeof(second)];
+      spaced_t() : first(false) { }
+    };
+    std::vector<spaced_t> futures;
+    usCount construction, setting;
+    size_t construction_c, setting_c;
+    data_t() : futures(100000), construction(0), setting(0), construction_c(0), setting_c(0)
+    {
+    }
+  } datas[THREADS];
+  std::vector<std::thread> threads;
+  std::atomic<size_t> done(THREADS+1);
+  for(size_t n=0; n<THREADS; n++)
+  {
+    threads.push_back(std::thread([&done, overhead](data_t &data){
+      std::vector<P<size_t>> promises(100000);
+      --done;
+      while(done)
+        std::this_thread::yield();
+      do
+      {
+        while(data.futures.back().first)
+          std::this_thread::yield();
+        auto begin=GetUsCount();
+        for(size_t n=0; n<100000; n++)
+        {
+          promises[n]=P<size_t>();
+          data.futures[n].second=promises[n].get_future();
+        }
+        auto end=GetUsCount();
+        data.construction+=end-begin-overhead;
+        data.construction_c+=100000;
+
+        for(size_t n=0; n<100000; n++)
+          data.futures[n].first=true;
+
+        begin=GetUsCount();
+        for(size_t n=0; n<100000; n++)
+        {
+          promises[n].set_value(n);
+        }
+        end=GetUsCount();
+        data.setting+=end-begin-overhead;
+        data.setting_c+=100000;
+      } while(!done);
+    }, std::ref(datas[n])));
+  }
+  --done;
+  while(done)
+    std::this_thread::yield();
+  usCount _getting=0, _destruction=0;
+  size_t _getting_c=0, _destruction_c=0;
+  auto start=GetUsCount();
+  do
+  {
+lastround:
+    for(size_t n=0; n<100000; n++)
+    {
+      for(size_t m=0; m<THREADS; m++)
+      {
+        while(!datas[m].futures[n].first)
+          std::this_thread::yield();
+        begin=GetUsCount();
+        if(datas[m].futures[n].second.get()!=n) abort();
+        end=GetUsCount();
+        _getting+=end-begin-overhead;
+        _getting_c++;
+
+        begin=GetUsCount();
+        datas[m].futures[n].second=F<size_t>();
+        end=GetUsCount();
+        datas[m].futures[n].first=false;
+        _destruction+=end-begin-overhead;
+        _destruction_c++;
+      }
+      //std::cout << n << std::endl;
+    }
+    if(!done && GetUsCount()-start>=10000000000000ULL)
+    {
+      done=true;
+      goto lastround;
+    }
+  } while(!done);
+  for(auto &thread : threads)
+    thread.join();
+  double construction=0, setting=0, getting=0, destruction=0;
+  for(size_t n=0; n<THREADS; n++)
+  {
+    construction+=(double) datas[n].construction/datas[n].construction_c;
+    setting+=(double) datas[n].setting/datas[n].setting_c;
+  }
+  getting+=(double) _getting/_getting_c;
+  destruction+=(double) _destruction/_destruction_c;
+  return std::make_tuple(construction, setting, getting, destruction);
+}
+
+BOOST_AUTO_TEST_CASE(performance/future/threaded/std, "Tests the performance of std future-promise in a threaded producer consumer")
+{
+  std::cout << "\n=== Tests the performance of std future-promise in a threaded producer consumer ===" << std::endl;
+  auto result=CalculateFuturePerformanceThreaded<std::future, std::promise>("std");
+  std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation." << std::endl;
+  std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per setting." << std::endl;
+  std::cout << "Approximately " << (std::get<2>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per getting." << std::endl;
+  std::cout << "Approximately " << (std::get<3>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per destruction." << std::endl;
+  std::cout << "Total " <<((std::get<0>(result)+std::get<1>(result)+std::get<2>(result)+std::get<3>(result))/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round." << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(performance/future/threaded/lightweight, "Tests the performance of our future-promise in a threaded producer consumer")
+{
+  std::cout << "\n=== Tests the performance of our future-promise in a threaded producer consumer ===" << std::endl;
+  using namespace boost::spinlock::lightweight_futures;
+  auto result=CalculateFuturePerformanceThreaded<future, promise>("lightweight");
+  std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation." << std::endl;
+  std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per setting." << std::endl;
+  std::cout << "Approximately " << (std::get<2>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per getting." << std::endl;
+  std::cout << "Approximately " << (std::get<3>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per destruction." << std::endl;
+  std::cout << "Total " <<((std::get<0>(result)+std::get<1>(result)+std::get<2>(result)+std::get<3>(result))/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round." << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
