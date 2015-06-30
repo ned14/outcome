@@ -11,6 +11,9 @@ Lightweight promise-future:
  - [x] Write thread sanitising fuzz tester to monte carlo for race conditions.
  - [x] Add iostream overloads for basic_monad
  - [x] Return monad_errc::exception_present error code for when get_error() sees an excepted state.
+ - [x] Implement shared_future_policy and a conformance suite for shared_future.
+ - [ ] Implement shared_future_ptr which thunks a shared_future API through a shared_ptr to
+basic_future<shared_future_policy>.
 
  - [ ] Add monad_errc error code for when a move or copy constructor throws?
  - [ ] Review all throws of exceptions and see if they can be replaced with an error_code set.

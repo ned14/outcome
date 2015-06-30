@@ -1797,6 +1797,7 @@ BOOST_AUTO_TEST_CASE(works/monad/operators, "Tests that the monad custom operato
 
 template<template<class> class F, template<class> class P> void FuturePromiseConformanceTest()
 {
+  std::exception_ptr e(std::make_exception_ptr(std::runtime_error("hello")));
   {
     {
       F<int> f;
@@ -1824,6 +1825,15 @@ template<template<class> class F, template<class> class P> void FuturePromiseCon
 //    BOOST_CHECK(!f.is_ready());
 //    BOOST_CHECK(!f.has_exception());
 //    BOOST_CHECK(!f.has_value());
+    BOOST_CHECK_THROW(f.get(), std::future_error);
+  }
+  {
+    P<int> p;
+    F<int> f(p.get_future());
+    p.set_exception(e);
+    BOOST_CHECK(f.valid());
+    BOOST_CHECK_THROW(f.get(), std::runtime_error);  // destroys shared state, resetting to default constructed
+    BOOST_CHECK(!f.valid());
     BOOST_CHECK_THROW(f.get(), std::future_error);
   }
   {
@@ -1871,6 +1881,96 @@ BOOST_AUTO_TEST_CASE(works/future/lightweight, "Tests that our future-promise wo
   std::cout << "sizeof(promise<bool>) = " << sizeof(promise<bool>) << std::endl;
   std::cout << "sizeof(future<bool>) = " << sizeof(future<bool>) << std::endl;
   FuturePromiseConformanceTest<future, promise>();
+}
+
+template<template<class> class F, template<class> class P> void SharedFuturePromiseConformanceTest()
+{
+  std::exception_ptr e(std::make_exception_ptr(std::runtime_error("hello")));
+  {
+    {
+      F<int> f;
+      BOOST_CHECK(!f.valid());
+//      BOOST_CHECK(!f.is_ready());
+//      BOOST_CHECK(!f.has_exception());
+//      BOOST_CHECK(!f.has_value());
+      BOOST_CHECK_THROW(f.get(), std::future_error);
+    }
+    P<int> p;
+    F<int> f(p.get_future().share());
+    BOOST_CHECK_THROW(p.get_future(), std::future_error);
+    BOOST_CHECK(f.valid());
+//    BOOST_CHECK(!f.is_ready());
+//    BOOST_CHECK(!f.has_exception());
+//    BOOST_CHECK(!f.has_value());
+    p.set_value(5);
+    BOOST_CHECK_THROW(p.set_value(6), std::future_error);
+    BOOST_CHECK(f.valid());
+//    BOOST_CHECK(f.is_ready());
+//    BOOST_CHECK(!f.has_exception());
+//    BOOST_CHECK(f.has_value());
+    BOOST_CHECK(f.get()==5);
+    BOOST_CHECK(f.valid());
+    BOOST_CHECK(f.get()==5);
+    BOOST_CHECK(f.valid());
+//    BOOST_CHECK(f.is_ready());
+//    BOOST_CHECK(!f.has_exception());
+//    BOOST_CHECK(f.has_value());
+  }
+  {
+    P<int> p;
+    F<int> f(p.get_future().share());
+    p.set_exception(e);
+    BOOST_CHECK(f.valid());
+    BOOST_CHECK_THROW(f.get(), std::runtime_error);
+    BOOST_CHECK(f.valid());
+    BOOST_CHECK_THROW(f.get(), std::runtime_error);
+  }
+  {
+    P<int> p;
+    p.set_value(5);  // before future construction, should induce constexpr
+    F<int> f(p.get_future());  // Does the implicit constructor work?
+    BOOST_CHECK_THROW(p.set_value(6), std::future_error);
+    BOOST_CHECK(f.valid());
+//    BOOST_CHECK(f.is_ready());
+//    BOOST_CHECK(!f.has_exception());
+//    BOOST_CHECK(f.has_value());
+    BOOST_CHECK(f.get()==5);
+    BOOST_CHECK(f.valid());
+    BOOST_CHECK(f.get()==5);
+    BOOST_CHECK(f.valid());
+//    BOOST_CHECK(f.is_ready());
+//    BOOST_CHECK(!f.has_exception());
+//    BOOST_CHECK(f.has_value());
+  }
+  {
+    F<int> f;
+    {
+      P<int> p;
+      f=p.get_future();
+    }
+    BOOST_CHECK(f.valid());
+//    BOOST_CHECK(f.is_ready());
+//    BOOST_CHECK(f.has_exception());
+//    BOOST_CHECK(!f.has_value());
+    BOOST_CHECK_THROW(f.get(), std::future_error);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(works/shared_future/std, "Tests that std shared_future-promise passes our conformance suite")
+{
+  std::cout << "\n=== Tests that std shared_future-promise passes our conformance suite ===" << std::endl;
+  std::cout << "sizeof(promise<bool>) = " << sizeof(std::promise<bool>) << std::endl;
+  std::cout << "sizeof(shared_future<bool>) = " << sizeof(std::shared_future<bool>) << std::endl;
+  SharedFuturePromiseConformanceTest<std::shared_future, std::promise>();
+}
+
+BOOST_AUTO_TEST_CASE(works/shared_future/lightweight, "Tests that our shared_future-promise works as intended")
+{
+  std::cout << "\n=== Tests that our shared_future-promise works as intended ===" << std::endl;
+  using namespace boost::spinlock::lightweight_futures;
+  std::cout << "sizeof(promise<bool>) = " << sizeof(promise<bool>) << std::endl;
+  std::cout << "sizeof(shared_future<bool>) = " << sizeof(shared_future<bool>) << std::endl;
+  SharedFuturePromiseConformanceTest<shared_future, promise>();
 }
 
 template<template<class> class F, template<class> class P> double CalculateFuturePerformanceSimple(const char *desc)

@@ -366,6 +366,11 @@ namespace lightweight_futures {
   concurrently, you will be in trouble. Note that if you call `get_future()` before setting the state, both promise and
   future become thread safe from the `get_future()` onwards and remain thread safe for the remainder of their lifetimes,
   so multiple threads can both set and/or get the state, with the usual exceptions being thrown if you try to do either twice.
+
+  ## Supplying your own implementations of `basic_future<T>` ##
+  To do this, simply supply a policy type of the following form. Note that this is identical to basic_monad's policy,
+  except for the added members which are commented:
+  \snippet future.hpp future_policy
   */
   template<class implementation_policy> class basic_future : protected basic_monad<implementation_policy>
   {
@@ -430,6 +435,7 @@ namespace lightweight_futures {
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(promise_type *p) : monad_type(std::move(p->_storage)), _need_locks(p->_need_locks), _promise(p)
     {
       if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
+      // Clear the promise's storage, as we now have any state
       p->_storage.clear();
       // Do I already have a value? If so, detach, else set the promise to point to us
       if(!empty())
@@ -444,6 +450,11 @@ namespace lightweight_futures {
   public:
     //! \brief EXTENSION: constexpr capable constructor
     BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_future() : _need_locks(false), _promise(nullptr)
+    {
+    }
+    //! \brief If available for this kind of future, constructs this future type from some other future type
+    template<class U, typename=decltype(implementation_policy::_construct(std::declval<U>()))> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_future(U &&o)
+      : basic_future(implementation_policy::_construct(std::forward<U>(o)))
     {
     }
     //! \brief Move constructor
@@ -519,8 +530,14 @@ namespace lightweight_futures {
       if(h2._p)
         h2._p->_storage.pointer_=this;
     }
-    
-//// shared_future<value_type> share();  // TODO
+
+    //! \brief If available for this kind of future, converts this simple future into some policy determined shared future type
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP auto share() -> decltype(implementation_policy::_share(std::move(*this)))
+    {
+      if(!valid())
+        throw std::future_error(std::future_errc::no_state);
+      return implementation_policy::_share(std::move(*this));
+    }
     
     //! \brief See basic_monad<>::get()
     using monad_type::get;
@@ -582,21 +599,29 @@ namespace lightweight_futures {
 
   namespace detail
   {
+    //! [future_policy]
     template<typename R> struct future_policy;
+    template<typename R> struct shared_future_policy;
     template<> struct future_policy<void>
     {
       typedef basic_monad<future_policy> monad_type;
+      // In a monad policy, this is identical to monad_type. Not here.
       typedef basic_future<future_policy> implementation_type;
       typedef void value_type;
       typedef std::error_code error_type;
       typedef std::exception_ptr exception_type;
+      // This type is void for monad, here it points to our future type
       typedef basic_future<future_policy> *pointer_type;
       template<typename U> using rebind = basic_future<future_policy<U>>;
       template<typename U> using rebind_policy = future_policy<U>;
 
+      // Does getting this future's state consume it?
       BOOST_STATIC_CONSTEXPR bool is_consuming=true;
+      // The type of future_errc to use for issuing errors
       typedef std::future_errc future_errc;
+      // The type of future exception to use for issuing exceptions
       typedef std::future_error future_error;
+      // The category of error code to use
       static const std::error_category &future_category() noexcept { return std::future_category(); }
 
       static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
@@ -613,7 +638,7 @@ namespace lightweight_futures {
       }
     protected:
       // Common preamble to the below
-      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _pre_get_value(U &&self)
+      template<bool is_consuming, class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _pre_get_value(U &&self)
       {
         if(!self.valid())
           _throw_error(monad_errc::no_state);
@@ -623,65 +648,51 @@ namespace lightweight_futures {
           if(self.has_error())
           {
             auto &category=_self._storage.error.category();
+            // TODO Is there any way of making this user extensible? Seems daft this isn't in the STL :(
             if(category==std::future_category())
             {
-              std::future_error e(std::move(_self._storage.error));
-              _self.clear();
+              std::future_error e(_self._storage.error);
+              if(is_consuming) _self.clear();
               throw e;
             }
             /*else if(category==std::iostream_category())
             {
               std::ios_base::failure e(std::move(_self._storage.error));
-              _self.clear();
+              if(is_consuming) _self.clear();
               throw e;
             }*/
             else
             {
-              std::system_error e(std::move(_self._storage.error));
-              _self.clear();
+              std::system_error e(_self._storage.error);
+              if(is_consuming) _self.clear();
               throw e;
             }
           }
           if(self.has_exception())
           {
-            std::exception_ptr e(std::move(_self._storage.exception));
-            _self.clear();
+            std::exception_ptr e(_self._storage.exception);
+            if(is_consuming) _self.clear();
             std::rethrow_exception(e);
           }
         }      
       }
-    public:
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(implementation_type &self)
-      {
-        self.wait();
-        implementation_type::lock_guard_type h(&self);
-        _pre_get_value(self);
-      }
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(const implementation_type &self)
-      {
-        self.wait();
-        implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
-        _pre_get_value(self);
-      }
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(implementation_type &&self)
-      {
-        self.wait();
-        implementation_type::lock_guard_type h(&self);
-        _pre_get_value(self);
-      }
-      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const U &self)
+      template<bool is_consuming, class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error_impl(U &&self)
       {
         self.wait();
         typename implementation_type::lock_guard_type h(const_cast<U *>(&self));
         if(!self.valid())
           _throw_error(monad_errc::no_state);
         if(self.has_error())
-          return self._storage.error;
+        {
+          error_type ec(self._storage.error);
+          if(is_consuming) self.clear();
+          return ec;
+        }
         if(self.has_exception())
           return error_type((int) monad_errc::exception_present, monad_category());
         return error_type();
       }
-      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const U &self)
+      template<bool is_consuming, class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception_impl(U &&self)
       {
         self.wait();
         typename implementation_type::lock_guard_type h(const_cast<U *>(&self));
@@ -690,56 +701,200 @@ namespace lightweight_futures {
         if(!self.has_error() && !self.has_exception())
           return exception_type();
         if(self.has_error())
-          return std::make_exception_ptr(std::system_error(self._storage.error));
+        {
+          exception_type e(std::make_exception_ptr(std::system_error(self._storage.error)));
+          if(is_consuming) self.clear();
+          return e;
+        }
         if(self.has_exception())
-          return self._storage.exception;
+        {
+          exception_type e(self._storage.exception);
+          if(is_consuming) self.clear();
+          return e;
+        }
         return exception_type();
       }
+    public:
+      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(implementation_type &self)
+      {
+        self.wait();
+        implementation_type::lock_guard_type h(&self);
+        _pre_get_value<is_consuming>(self);
+        self.clear();
+      }
+      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(const implementation_type &self)
+      {
+        self.wait();
+        implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+        _pre_get_value<is_consuming>(self);
+        const_cast<implementation_type &>(self).clear();
+      }
+      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(implementation_type &&self)
+      {
+        self.wait();
+        implementation_type::lock_guard_type h(&self);
+        _pre_get_value<is_consuming>(self);
+        self.clear();
+      }
+      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const U &self)
+      {
+        return _get_error_impl<is_consuming>(self);
+      }
+      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const U &self)
+      {
+        return _get_exception_impl<is_consuming>(self);
+      }
+      // Makes share() available on this future. Defined out of line as need shared_future_policy defined first.
+      static inline BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<shared_future_policy<void>> _share(implementation_type &&self);
+    private:
+      // Disables implicit conversion from any other type of future
+      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP implementation_type _construct(basic_future<U> &&v);
     };
     template<typename R> struct future_policy : public future_policy<void>
     {
-      typedef basic_future<future_policy> implementation_type;
-      typedef R value_type;
-      typedef basic_future<future_policy> *pointer_type;
     protected:
       typedef future_policy<void> impl;
     public:
-      // Called by get() &
+      typedef basic_future<future_policy> implementation_type;
+      typedef R value_type;
+      typedef basic_future<future_policy> *pointer_type;
+      BOOST_STATIC_CONSTEXPR bool is_consuming=impl::is_consuming;
+
+      // Called by get() &. Note we always return value_type by value.
       static BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type _get_value(implementation_type &self)
       {
         self.wait();
         typename implementation_type::lock_guard_type h(&self);
-        impl::_pre_get_value(self);
-        assert(!self._need_locks || is_lockable_locked(self._lock));
+        impl::_pre_get_value<is_consuming>(self);
         value_type v(std::move(self._storage.value));
         self.clear();
         return v;
       }
-      // Called by get() const &
+      // Called by get() const &. Note we always return value_type by value.
       static BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type _get_value(const implementation_type &self)
       {
         self.wait();
         typename implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
-        impl::_pre_get_value(self);
+        impl::_pre_get_value<is_consuming>(self);
         value_type v(std::move(self._storage.value));
-        self.clear();
+        const_cast<implementation_type &>(self).clear();
         return v;
       }
-      // Called by get() &&
+      // Called by get() &&. Note we always return value_type by value.
       static BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type _get_value(implementation_type &&self)
       {
         self.wait();
         typename implementation_type::lock_guard_type h(&self);
-        impl::_pre_get_value(self);
+        impl::_pre_get_value<is_consuming>(self);
         value_type v(std::move(self._storage.value));
         self.clear();
         return v;
       }
+      static inline BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<shared_future_policy<R>> _share(implementation_type &&self);
     };
+    //! [future_policy]
+    
+    template<typename R> struct shared_future_policy;
+    template<> struct shared_future_policy<void> : public future_policy<void>
+    {
+    protected:
+      typedef future_policy<void> impl;
+    public:
+      typedef basic_monad<shared_future_policy> monad_type;
+      typedef basic_future<shared_future_policy> implementation_type;
+      typedef void value_type;
+      typedef basic_future<shared_future_policy> *pointer_type;
+      template<typename U> using rebind = basic_future<shared_future_policy<U>>;
+      template<typename U> using rebind_policy = shared_future_policy<U>;
+
+      BOOST_STATIC_CONSTEXPR bool is_consuming=false;
+
+      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(implementation_type &self)
+      {
+        self.wait();
+        implementation_type::lock_guard_type h(&self);
+        impl::_pre_get_value<is_consuming>(self);
+      }
+      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(const implementation_type &self)
+      {
+        self.wait();
+        implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+        impl::_pre_get_value<is_consuming>(self);
+      }
+      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(implementation_type &&self)
+      {
+        self.wait();
+        implementation_type::lock_guard_type h(&self);
+        impl::_pre_get_value<is_consuming>(self);
+      }
+      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const U &self)
+      {
+        return impl::_get_error_impl<is_consuming>(self);
+      }
+      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const U &self)
+      {
+        return impl::_get_exception_impl<is_consuming>(self);
+      }
+      static BOOST_SPINLOCK_FUTURE_MSVC_HELP implementation_type _construct(basic_future<future_policy<void>> &&v)
+      {
+        return implementation_type(reinterpret_cast<implementation_type &&>(v));
+      }
+      static inline BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<shared_future_policy<void>> _share(implementation_type &&self);
+    };
+    template<typename R> struct shared_future_policy : public shared_future_policy<void>
+    {
+    protected:
+      typedef shared_future_policy<void> impl;
+    public:
+      typedef basic_future<shared_future_policy> implementation_type;
+      typedef R value_type;
+      typedef basic_future<shared_future_policy> *pointer_type;
+      BOOST_STATIC_CONSTEXPR bool is_consuming=impl::is_consuming;
+
+      // Called by get() &. Note we always return value_type by const lvalue ref.
+      static BOOST_SPINLOCK_FUTURE_MSVC_HELP const value_type &_get_value(implementation_type &self)
+      {
+        self.wait();
+        typename implementation_type::lock_guard_type h(&self);
+        impl::_pre_get_value<is_consuming>(self);
+        return self._storage.value;
+      }
+      // Called by get() const &. Note we always return value_type by const lvalue ref.
+      static BOOST_SPINLOCK_FUTURE_MSVC_HELP const value_type &_get_value(const implementation_type &self)
+      {
+        self.wait();
+        typename implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+        impl::_pre_get_value<is_consuming>(self);
+        return self._storage.value;
+      }
+      // Called by get() &&. Note we always return value_type by const lvalue ref.
+      static BOOST_SPINLOCK_FUTURE_MSVC_HELP const value_type &_get_value(implementation_type &&self)
+      {
+        self.wait();
+        typename implementation_type::lock_guard_type h(&self);
+        impl::_pre_get_value<is_consuming>(self);
+        return self._storage.value;
+      }
+      static BOOST_SPINLOCK_FUTURE_MSVC_HELP implementation_type _construct(basic_future<future_policy<R>> &&v)
+      {
+        return implementation_type(reinterpret_cast<implementation_type &&>(v));
+      }
+      static inline BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<shared_future_policy<R>> _share(implementation_type &&self);
+    };
+    inline basic_future<shared_future_policy<void>> future_policy<void>::_share(typename future_policy<void>::implementation_type &&self)
+    {
+      return basic_future<shared_future_policy<void>>(reinterpret_cast<basic_future<shared_future_policy<void>> &&>(self));
+    }
+    template<typename R> inline basic_future<shared_future_policy<R>> future_policy<R>::_share(typename future_policy<R>::implementation_type &&self)
+    {
+      return basic_future<shared_future_policy<R>>(reinterpret_cast<basic_future<shared_future_policy<R>> &&>(self));
+    }
   }
+
   template<typename R> using promise = basic_promise<detail::future_policy<R>>;
   template<typename R> using future = basic_future<detail::future_policy<R>>;
-
+  // TEMPORARY
+  template<typename R> using shared_future = basic_future<detail::shared_future_policy<R>>;
 
 }
 BOOST_SPINLOCK_V1_NAMESPACE_END
