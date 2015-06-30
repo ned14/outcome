@@ -1066,11 +1066,11 @@ BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
 
 BOOST_AUTO_TEST_CASE(works/rebind_cast, "Tests that rebind_cast works as intended")
 {
+#ifdef __cpp_decltype_auto
   using namespace boost::spinlock::lightweight_futures::detail;
-  struct Foo {}; struct Boo {};
+  struct Foo {}; struct Boo { Boo() { } };
   Boo b, *b_ptr;
   const Boo const_b, *const_b_ptr;
-#ifdef __cpp_decltype_auto
   decltype(auto) const_lvalue_ref = rebind_cast<Foo>(const_b);
   decltype(auto) lvalue_ref = rebind_cast<Foo>(b);
   decltype(auto) rvalue_ref = rebind_cast<Foo>(std::move(b));
@@ -1855,11 +1855,7 @@ template<template<class> class F, template<class> class P> void FuturePromiseCon
     p.set_exception(e);
     BOOST_CHECK(f.valid());
     BOOST_CHECK_THROW(f.get(), std::runtime_error);
-#if 1
-    // exceptional throw does NOT destroy shared state
-    BOOST_CHECK(f.valid());
-    BOOST_CHECK_THROW(f.get(), std::runtime_error);
-#else
+#ifndef _MSC_VER  // VS2015 does NOT destroy shared state for an exceptional throw
     // exceptional throw DOES destroy shared state
     BOOST_CHECK(!f.valid());
     BOOST_CHECK_THROW(f.get(), std::future_error);

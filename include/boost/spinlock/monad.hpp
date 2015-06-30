@@ -519,7 +519,7 @@ namespace lightweight_futures {
     template<class R, class T> struct rebind_cast_type<R, T&> { typedef R& type; };
     template<class R, class T> struct rebind_cast_type<R, const T*> { typedef const R* type; };
     template<class R, class T> struct rebind_cast_type<R, T*> { typedef R* type; };
-    template<class R, class T> typename rebind_cast_type<R, T&&>::type rebind_cast(T &&v) { return reinterpret_cast<typename rebind_cast_type<R, T&&>::type>(std::move(v)); }
+    template<class R, class T> typename rebind_cast_type<R, T&&>::type rebind_cast(T &&v) { return reinterpret_cast<typename rebind_cast_type<R, T&&>::type>(v); }
     template<class R, class T> typename rebind_cast_type<R, T&>::type rebind_cast(T &v) { return reinterpret_cast<typename rebind_cast_type<R, T&>::type>(v); }
     template<class R, class T> typename rebind_cast_type<R, T*>::type rebind_cast(T *&&v) { return reinterpret_cast<typename rebind_cast_type<R, T*>::type>(v); }
     template<class R, class T> typename rebind_cast_type<R, T*>::type rebind_cast(T *&v) { return reinterpret_cast<typename rebind_cast_type<R, T*>::type>(v); }
