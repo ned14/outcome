@@ -108,17 +108,31 @@ Producer Consumer: 377 (2.03x faster)
 
 ## VS2015:
 ### Dinkumware future promise:
-Simple loop: 596
-Producer Consumer: 1545
-  Creation and setting: 752
-  Getting from future: 311
-  Destruction of future: 482
+Simple loop: 575
+Producer Consumer: 1583
+  Creation and setting: 870
+  Getting from future: 281
+  Destruction of future: 432
 
 ### lightweight future promise:
-Simple loop: 210
-Producer Consumer: 311 (4.97x faster)
-  Creation and setting: 236
-  Getting from future: 37
-  Destruction of future: 38
+Simple loop: 151
+Producer Consumer: 231 (6.85x faster)
+  Creation and setting: 179
+  Getting from future: 35
+  Destruction of future: 16
+
+### Dinkumware shared_future promise:
+Simple loop: 584
+Producer Consumer: 1433
+  Creation and setting: 706
+  Getting from future: 266
+  Destruction of future: 460
+
+### lightweight shared_future promise:
+Simple loop: 481
+Producer Consumer: 747 (1.92x faster)
+  Creation and setting: 403
+  Getting from future: 74
+  Destruction of future: 270
 
 </center>
