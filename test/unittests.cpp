@@ -1064,6 +1064,28 @@ BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
 #endif
 }
 
+BOOST_AUTO_TEST_CASE(works/rebind_cast, "Tests that rebind_cast works as intended")
+{
+  using namespace boost::spinlock::lightweight_futures::detail;
+  struct Foo {}; struct Boo {};
+  Boo b, *b_ptr;
+  const Boo const_b, *const_b_ptr;
+#ifdef __cpp_decltype_auto
+  decltype(auto) const_lvalue_ref = rebind_cast<Foo>(const_b);
+  decltype(auto) lvalue_ref = rebind_cast<Foo>(b);
+  decltype(auto) rvalue_ref = rebind_cast<Foo>(std::move(b));
+  decltype(auto) const_ptr_lvalue_ref = rebind_cast<Foo>(const_b_ptr);
+  decltype(auto) ptr_lvalue_ref = rebind_cast<Foo>(b_ptr);
+  decltype(auto) ptr_rvalue_ref = rebind_cast<Foo>(std::move(b_ptr));
+  static_assert(std::is_same<decltype(    const_lvalue_ref), const Foo &>::value, "rebind_cast not rebinding to the type expected");
+  static_assert(std::is_same<decltype(          lvalue_ref),       Foo &>::value, "rebind_cast not rebinding to the type expected");
+  static_assert(std::is_same<decltype(          rvalue_ref),       Foo&&>::value, "rebind_cast not rebinding to the type expected");
+  static_assert(std::is_same<decltype(const_ptr_lvalue_ref), const Foo* >::value, "rebind_cast not rebinding to the type expected");
+  static_assert(std::is_same<decltype(      ptr_lvalue_ref),       Foo* >::value, "rebind_cast not rebinding to the type expected");
+  static_assert(std::is_same<decltype(      ptr_rvalue_ref),       Foo* >::value, "rebind_cast not rebinding to the type expected");
+#endif
+}
+
 BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
 {
   using namespace boost::spinlock::lightweight_futures;
@@ -1832,9 +1854,16 @@ template<template<class> class F, template<class> class P> void FuturePromiseCon
     F<int> f(p.get_future());
     p.set_exception(e);
     BOOST_CHECK(f.valid());
-    BOOST_CHECK_THROW(f.get(), std::runtime_error);  // destroys shared state, resetting to default constructed
+    BOOST_CHECK_THROW(f.get(), std::runtime_error);
+#if 1
+    // exceptional throw does NOT destroy shared state
+    BOOST_CHECK(f.valid());
+    BOOST_CHECK_THROW(f.get(), std::runtime_error);
+#else
+    // exceptional throw DOES destroy shared state
     BOOST_CHECK(!f.valid());
     BOOST_CHECK_THROW(f.get(), std::future_error);
+#endif
   }
   {
     P<int> p;

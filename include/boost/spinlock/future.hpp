@@ -644,7 +644,10 @@ namespace lightweight_futures {
           _throw_error(monad_errc::no_state);
         if(self.has_error() || self.has_exception())
         {
-          auto _self=detail::rebind_cast<monad_type>(self);
+          // No decltype(auto) in C++ 11!
+          decltype(detail::rebind_cast<monad_type>(self)) _self=detail::rebind_cast<monad_type>(self);
+          typedef typename std::remove_const<typename std::decay<decltype(_self)>::type>::type &non_const_monad_type;
+          non_const_monad_type _self_nc = const_cast<non_const_monad_type>(_self);
           if(self.has_error())
           {
             auto &category=_self._storage.error.category();
@@ -652,26 +655,26 @@ namespace lightweight_futures {
             if(category==std::future_category())
             {
               std::future_error e(_self._storage.error);
-              if(is_consuming) _self.clear();
+              if(is_consuming) _self_nc.clear();
               throw e;
             }
             /*else if(category==std::iostream_category())
             {
               std::ios_base::failure e(std::move(_self._storage.error));
-              if(is_consuming) _self.clear();
+              if(is_consuming) _self_nc.clear();
               throw e;
             }*/
             else
             {
               std::system_error e(_self._storage.error);
-              if(is_consuming) _self.clear();
+              if(is_consuming) _self_nc.clear();
               throw e;
             }
           }
           if(self.has_exception())
           {
             std::exception_ptr e(_self._storage.exception);
-            if(is_consuming) _self.clear();
+            if(is_consuming) _self_nc.clear();
             std::rethrow_exception(e);
           }
         }      
@@ -881,7 +884,7 @@ namespace lightweight_futures {
       }
       static inline BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<shared_future_policy<R>> _share(implementation_type &&self);
     };
-    inline basic_future<shared_future_policy<void>> future_policy<void>::_share(typename future_policy<void>::implementation_type &&self)
+    inline basic_future<shared_future_policy<void>> future_policy<void>::_share(future_policy<void>::implementation_type &&self)
     {
       return basic_future<shared_future_policy<void>>(reinterpret_cast<basic_future<shared_future_policy<void>> &&>(self));
     }
