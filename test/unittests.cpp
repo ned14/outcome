@@ -1194,7 +1194,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(m.has_exception());
     BOOST_CHECK_THROW(m.get(), int);
-    BOOST_CHECK(!m.get_error());
+    BOOST_CHECK(m.get_error());
     BOOST_CHECK(m.get_exception()==e);
   }
 }

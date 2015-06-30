@@ -675,9 +675,11 @@ namespace lightweight_futures {
         typename implementation_type::lock_guard_type h(const_cast<U *>(&self));
         if(!self.valid())
           _throw_error(monad_errc::no_state);
-        if(!self.has_error())
-          return error_type();
-        return self._storage.error;
+        if(self.has_error())
+          return self._storage.error;
+        if(self.has_exception())
+          return error_type((int) monad_errc::exception_present, monad_category());
+        return error_type();
       }
       template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const U &self)
       {

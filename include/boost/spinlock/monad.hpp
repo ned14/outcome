@@ -221,9 +221,9 @@ namespace lightweight_futures
       {
         switch(c)
         {
-          case 1: return "already_set";
-          case 2: return "no_state";
-          case 3: return "exception_present";
+          case 1: return "already set";
+          case 2: return "no state";
+          case 3: return "exception present";
           default: return "unknown";
         }
       }
@@ -985,10 +985,13 @@ Features:
     {
       return _storage.type==value_storage_type::storage_type::error;
     }
-    //! \brief True if monad contains an exception_type or error_type
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_exception() const noexcept
+    /*! \brief True if monad contains an exception_type or error_type (any error_type is returned as an exception_ptr by get_exception()).
+    This needs to be true for both for compatibility with Boost.Thread's future. If you really want to test only for has exception only,
+    pass true as the argument.
+    */
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_exception(bool only_exception=false) const noexcept
     {
-      return _storage.type==value_storage_type::storage_type::exception || _storage.type==value_storage_type::storage_type::error;
+      return _storage.type==value_storage_type::storage_type::exception || (!only_exception && _storage.type==value_storage_type::storage_type::error);
     }
 
     //! \brief Swaps one monad for another
@@ -1095,7 +1098,7 @@ Features:
     //! \brief Disposes of any existing state, setting the monad to an emplaced construction
     template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP void emplace(Args &&... args) { _storage.clear(); _storage.emplace_value(std::forward<Args>(args)...); }
     
-    //! \brief If contains an error_type, returns that error_type, else returns a null error_type. Can only throw the exception monad_error(no_state) if empty.
+    //! \brief If contains an error_type, returns that error_type. If contains an error, returns an error code of `monad_errc::exception_present`. Otherwise returns a null error_type. Can only throw the exception monad_error(no_state) if empty.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP auto get_error() const -> decltype(implementation_policy::_get_error(*this))
     {
       return implementation_policy::_get_error(*this);
@@ -1423,9 +1426,11 @@ Features:
           if(!_throw_error(monad_errc::no_state))
             return error_type();
         }
-        if(!self.has_error())
-          return error_type();
-        return self._storage.error;
+        if(self.has_error())
+          return self._storage.error;
+        if(self.has_exception())
+          return error_type((int) monad_errc::exception_present, monad_category());
+        return error_type();
       }
       // Called by get_exception() const
       template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const U &self)
@@ -1623,12 +1628,12 @@ BOOST_SPINLOCK_V1_NAMESPACE_END
 
 namespace std
 {
-  //! \brief Specialise swap
+  //! \brief Specialise swap for basic_monad
   template<class Impl> inline void swap(BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::basic_monad<Impl> &a, BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::basic_monad<Impl> &b)
   {
     a.swap(b);
   }
-  //! \brief Deserialise a value_type (only value_type)
+  //! \brief Deserialise a value_storage value_type (only value_type)
   template<class Impl> inline istream &operator>>(istream &s, BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::value_storage<Impl> &v)
   {
     using namespace BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures;
@@ -1641,6 +1646,7 @@ namespace std
     }
     return s;
   }
+  //! \brief Serialise a value_storage. Mostly useful for debug printing.
   template<class Impl> inline ostream &operator<<(ostream &s, const BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::value_storage<Impl> &v)
   {
     using namespace BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures;
