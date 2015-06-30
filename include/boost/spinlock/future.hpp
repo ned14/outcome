@@ -176,6 +176,8 @@ namespace lightweight_futures {
 #pragma warning(pop)
 #endif
   public:
+    //! \brief The policy used to implement this basic_future
+    typedef implementation_policy policy;
     //! \brief This promise has a value_type
     BOOST_STATIC_CONSTEXPR bool has_value_type = value_storage_type::has_value_type;
     //! \brief This promise has an error_type
@@ -376,6 +378,8 @@ namespace lightweight_futures {
   {
     friend implementation_policy;
   public:
+    //! \brief The policy used to implement this basic_future
+    typedef implementation_policy policy;
     //! \brief The monad type associated with this basic_future
     typedef basic_monad<implementation_policy> monad_type;
 
@@ -572,21 +576,78 @@ namespace lightweight_futures {
 //// template<class F> typename std::result_of<F(basic_future)>::type then(F &&f);
   };
 
-  //! \brief Makes an already ready future
-  template<typename R> inline basic_future<typename std::decay<R>::type> make_ready_future(R &&v)
+  /*! \class shared_basic_future_ptr
+  \brief A shared pointer to a basic future. Lets you wrap up basic_future with STL shared_future semantics. Quite
+  literally a shared_ptr and a thin API thunk to the basic_future.
+  */
+  template<class _future_type> class shared_basic_future_ptr
   {
-    return basic_future<typename std::decay<R>::type>(std::forward<R>(v));
-  }
-  //! \brief EXTENSION: Makes an already ready future
-  template<typename R> inline basic_future<R> make_errored_future(std::error_code v)
-  {
-    return basic_future<R>(v);
-  }
-  //! \brief Makes an already ready future
-  template<typename R> inline basic_future<R> make_exceptional_future(std::exception_ptr v)
-  {
-    return basic_future<R>(v);
-  }
+  public:
+    //! The type of future this references
+    typedef _future_type base_future_type;
+  private:
+    std::shared_ptr<base_future_type> _future;
+    base_future_type *_check() const
+    {
+      if(!_future)
+      {
+        if(!base_future_type::policy::_throw_error(monad_errc::no_state))
+          abort();
+      }
+      return _future.get();
+    }
+  public:
+    //! Default constructor
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR shared_basic_future_ptr() : _future(std::make_shared<base_future_type>()) { }
+    //! Forwarding constructor
+    template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR shared_basic_future_ptr(U &&o) : _future(std::make_shared<base_future_type>(std::forward<U>(o))) { }
+    //! Forwards to operator bool
+    explicit operator bool() const { return _check()->operator bool(); }
+    //! Forwards to operator tribool
+    explicit operator tribool::tribool() const { return _check()->operator tribool::tribool(); }
+#define BOOST_SPINLOCK_FUTURE_IMPL(name) \
+    template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP auto name(Args &&... args) const noexcept(noexcept(_future->name(std::forward<Args>(args)...))) -> decltype(_future->name(std::forward<Args>(args)...)) \
+    { \
+      return _check()->name(std::forward<Args>(args)...); \
+    }
+    //! Forwards to is_ready()
+    BOOST_SPINLOCK_FUTURE_IMPL(is_ready)
+    //! Forwards to empty()
+    BOOST_SPINLOCK_FUTURE_IMPL(empty)
+    //! Forwards to has_value()
+    BOOST_SPINLOCK_FUTURE_IMPL(has_value)
+    //! Forwards to has_error()
+    BOOST_SPINLOCK_FUTURE_IMPL(has_error)
+    //! Forwards to has_exception()
+    BOOST_SPINLOCK_FUTURE_IMPL(has_exception)
+    //! Forwards to valid()
+    BOOST_SPINLOCK_FUTURE_IMPL(valid)
+
+    //! Forwards to get()
+    BOOST_SPINLOCK_FUTURE_IMPL(get)
+    //! Forwards to get_or()
+    BOOST_SPINLOCK_FUTURE_IMPL(get_or)
+    //! Forwards to get_and()
+    BOOST_SPINLOCK_FUTURE_IMPL(get_and)
+    //! Forwards to get_error()
+    BOOST_SPINLOCK_FUTURE_IMPL(get_error)
+    //! Forwards to get_error_or()
+    BOOST_SPINLOCK_FUTURE_IMPL(get_error_or)
+    //! Forwards to get_error_and()
+    BOOST_SPINLOCK_FUTURE_IMPL(get_error_and)
+    //! Forwards to get_exception()
+    BOOST_SPINLOCK_FUTURE_IMPL(get_exception)
+    //! Forwards to get_exception_or()
+    BOOST_SPINLOCK_FUTURE_IMPL(get_exception_or)
+    //! Forwards to get_exception_and()
+    BOOST_SPINLOCK_FUTURE_IMPL(get_exception_and)
+    //! Forwards to get_exception_ptr()
+    BOOST_SPINLOCK_FUTURE_IMPL(get_exception_ptr)
+
+    //! Forwards to wait()
+    BOOST_SPINLOCK_FUTURE_IMPL(wait)
+#undef BOOST_SPINLOCK_FUTURE_IMPL
+  };
 
   // TODO
   // template<class InputIterator> ? when_all(InputIterator first, InputIterator last);
@@ -893,11 +954,45 @@ namespace lightweight_futures {
       return basic_future<shared_future_policy<R>>(reinterpret_cast<basic_future<shared_future_policy<R>> &&>(self));
     }
   }
+  
 
+  //! \brief A STL compatible alias of basic_promise onto promise
   template<typename R> using promise = basic_promise<detail::future_policy<R>>;
+  //! \brief A STL compatible alias of basic_future onto future
   template<typename R> using future = basic_future<detail::future_policy<R>>;
-  // TEMPORARY
-  template<typename R> using shared_future = basic_future<detail::shared_future_policy<R>>;
+  //! \brief Makes an already ready future
+  template<typename R> inline future<typename std::decay<R>::type> make_ready_future(R &&v)
+  {
+    return future<typename std::decay<R>::type>(std::forward<R>(v));
+  }
+  //! \brief EXTENSION: Makes an already ready future
+  template<typename R> inline future<R> make_errored_future(std::error_code v)
+  {
+    return future<R>(std::move(v));
+  }
+  //! \brief Makes an already ready future
+  template<typename R> inline future<R> make_exceptional_future(std::exception_ptr v)
+  {
+    return future<R>(std::move(v));
+  }
+
+  //! \brief A STL compatible alias of basic_future onto shared_future
+  template<typename R> using shared_future = shared_basic_future_ptr<basic_future<detail::shared_future_policy<R>>>;
+  //! \brief Makes an already ready shared_future
+  template<typename R> inline shared_future<typename std::decay<R>::type> make_ready_shared_future(R &&v)
+  {
+    return shared_future<typename std::decay<R>::type>(std::forward<R>(v));
+  }
+  //! \brief EXTENSION: Makes an already ready future
+  template<typename R> inline shared_future<R> make_errored_shared_future(std::error_code v)
+  {
+    return shared_future<R>(std::move(v));
+  }
+  //! \brief Makes an already ready future
+  template<typename R> inline shared_future<R> make_exceptional_shared_future(std::exception_ptr v)
+  {
+    return shared_future<R>(std::move(v));
+  }
 
 }
 BOOST_SPINLOCK_V1_NAMESPACE_END

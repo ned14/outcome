@@ -2043,6 +2043,21 @@ BOOST_AUTO_TEST_CASE(performance/future/simple/lightweight, "Tests the performan
   std::cout << "Approximately " << (result/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round" << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(performance/shared_future/simple/std, "Tests the performance of std shared_future-promise in a simple loop")
+{
+  std::cout << "\n=== Tests the performance of std shared_future-promise in a simple loop ===" << std::endl;
+  auto result=CalculateFuturePerformanceSimple<std::shared_future, std::promise>("std");
+  std::cout << "Approximately " << (result/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round" << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(performance/shared_future/simple/lightweight, "Tests the performance of our shared_future-promise in a simple loop")
+{
+  std::cout << "\n=== Tests the performance of our shared_future-promise in a simple loop ===" << std::endl;
+  using namespace boost::spinlock::lightweight_futures;
+  auto result=CalculateFuturePerformanceSimple<shared_future, promise>("lightweight");
+  std::cout << "Approximately " << (result/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round" << std::endl;
+}
+
 template<template<class> class F, template<class> class P> std::tuple<double, double, double> CalculateFuturePerformanceProducerConsumer(const char *desc)
 {
   double setting=0, getting=0, destruction=0;
@@ -2106,6 +2121,27 @@ BOOST_AUTO_TEST_CASE(performance/future/producerconsumer/lightweight, "Tests the
   std::cout << "\n=== Tests the performance of our future-promise in a producer consumer ===" << std::endl;
   using namespace boost::spinlock::lightweight_futures;
   auto result=CalculateFuturePerformanceProducerConsumer<future, promise>("lightweight");
+  std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation and setting." << std::endl;
+  std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per getting." << std::endl;
+  std::cout << "Approximately " << (std::get<2>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per destruction." << std::endl;
+  std::cout << "Total " <<((std::get<0>(result)+std::get<1>(result)+std::get<2>(result))/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round." << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(performance/shared_future/producerconsumer/std, "Tests the performance of std shared_future-promise in a producer consumer")
+{
+  std::cout << "\n=== Tests the performance of std shared_future-promise in a producer consumer ===" << std::endl;
+  auto result=CalculateFuturePerformanceProducerConsumer<std::shared_future, std::promise>("std");
+  std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation and setting." << std::endl;
+  std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per getting." << std::endl;
+  std::cout << "Approximately " << (std::get<2>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per destruction." << std::endl;
+  std::cout << "Total " <<((std::get<0>(result)+std::get<1>(result)+std::get<2>(result))/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round." << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(performance/shared_future/producerconsumer/lightweight, "Tests the performance of our shared_future-promise in a producer consumer")
+{
+  std::cout << "\n=== Tests the performance of our shared_future-promise in a producer consumer ===" << std::endl;
+  using namespace boost::spinlock::lightweight_futures;
+  auto result=CalculateFuturePerformanceProducerConsumer<shared_future, promise>("lightweight");
   std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation and setting." << std::endl;
   std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per getting." << std::endl;
   std::cout << "Approximately " << (std::get<2>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per destruction." << std::endl;

@@ -12,7 +12,7 @@ Lightweight promise-future:
  - [x] Add iostream overloads for basic_monad
  - [x] Return monad_errc::exception_present error code for when get_error() sees an excepted state.
  - [x] Implement shared_future_policy and a conformance suite for shared_future.
- - [ ] Implement shared_future_ptr which thunks a shared_future API through a shared_ptr to
+ - [x] Implement shared_future_ptr which thunks a shared_future API through a shared_ptr to
 basic_future<shared_future_policy>.
 
  - [ ] Add monad_errc error code for when a move or copy constructor throws?
@@ -28,40 +28,83 @@ All values are CPU cycles on a i7-3770K @ 3.9Ghz.
 
 ## clang 3.7:
 ### libstdc++ 4.9 future promise:
-Simple loop: 761
-Producer Consumer: 838
-  Creation and setting: 674
-  Getting from future: 160
+Simple loop: 719
+Producer Consumer: 793
+  Creation and setting: 637
+  Getting from future: 153
   Destruction of future: 4
+Three threads MPSC: 2619
+  Creation: 1348
+  Setting: 1139
+  Getting from future: 98
+  Destruction of future: 34
 
 ### lightweight future promise:
+Simple loop: 178
+Producer Consumer: 264 (3.00x faster)
+  Creation and setting: 200
+  Getting from future: 51
+  Destruction of future: 13
+Three threads MPSC: 801 (3.27x faster)
+  Creation: 375
+  Setting: 226
+  Getting from future: 127
+  Destruction of future: 73
+
+### libstdc++ 4.9 shared_future promise:
+Simple loop: 699
+Producer Consumer: 769
+  Creation and setting: 612
+  Getting from future: 33
+  Destruction of future: 124
+
+### lightweight shared_future promise:
 Simple loop: 260
-Producer Consumer: 378 (2.22x faster)
+Producer Consumer: 378 (2.03x faster)
   Creation and setting: 281
   Getting from future: 51
   Destruction of future: 46
 
+
 ## GCC 5.1:
 ### libstdc++ 5.1 future promise:
-Simple loop: 726
-Producer Consumer: 809
-  Creation and setting: 654
-  Getting from future: 150
+Simple loop: 732
+Producer Consumer: 774
+  Creation and setting: 625
+  Getting from future: 145
   Destruction of future: 4
+Three threads MPSC: 1921
+  Creation: 819
+  Setting: 993
+  Getting from future: 79
+  Destruction of future: 30
 
 ### lightweight future promise:
-Simple loop: 205
-Producer Consumer: 323 (2.50x faster)
-  Creation and setting: 227
-  Getting from future: 49
-  Destruction of future: 48
+Simple loop: 141
+Producer Consumer: 262 (2.95x faster)
+  Creation and setting: 191
+  Getting from future: 53
+  Destruction of future: 18
+Three threads MPSC: 519 (3.70x faster)
+  Creation: 241
+  Setting: 189
+  Getting from future: 63
+  Destruction of future: 26
 
-### lightweight future promise (set promise before getting future):
-Simple loop: 124
-Producer Consumer: 170
-  Creation and setting: 102
-  Getting from future: 37
-  Destruction of future: 30
+### libstdc++ 5.1 shared_future promise:
+Simple loop: 788
+Producer Consumer: 767
+  Creation and setting: 614
+  Getting from future: 32
+  Destruction of future: 120
+
+### lightweight shared_future promise:
+Simple loop: 350
+Producer Consumer: 377 (2.03x faster)
+  Creation and setting: 238
+  Getting from future: 31
+  Destruction of future: 109
+
 
 ## VS2015:
 ### Dinkumware future promise:
