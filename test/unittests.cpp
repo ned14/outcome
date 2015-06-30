@@ -1488,6 +1488,17 @@ BOOST_AUTO_TEST_CASE(works/monad/swap, "Tests that the monad swaps as intended")
   BOOST_CHECK(b.get_error()==std::error_code());
 }
 
+BOOST_AUTO_TEST_CASE(works/monad/serialisation, "Tests that the monad serialises and deserialises as intended")
+{
+  using namespace boost::spinlock::lightweight_futures;
+  monad<std::string> a("niall"), b(std::error_code(5, std::generic_category())), c(std::make_exception_ptr(std::ios_base::failure("A test failure message")));
+  std::cout << "a contains " << a << " and b contains " << b << " and c contains " << c << std::endl;
+  std::string buffer("hello");
+  std::stringstream ss(buffer);
+  ss >> a;
+  BOOST_CHECK(a.get()=="hello");
+}
+
 #ifdef BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS
 BOOST_AUTO_TEST_CASE(works/monad/callable, "Tests that the monad works as intended holding callables")
 {

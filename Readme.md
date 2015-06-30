@@ -9,6 +9,7 @@ Lightweight promise-future:
  - [x] Map ternary true/false/other into namespace lightweight_futures.
  - [x] Have future-promise conformance suite also run for std::future.
  - [x] Write thread sanitising fuzz tester to monte carlo for race conditions.
+ - [x] Add iostream overloads for basic_monad
 
  - [ ] Add monad_errc error code for when a move or copy constructor throws?
  - [ ] Add monad_errc error code for when get_error() sees an excepted state?

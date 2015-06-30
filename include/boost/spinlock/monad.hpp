@@ -206,8 +206,9 @@ namespace lightweight_futures
 
   //! \brief Enumeration of the ways in which a monad operation may fail
   enum class monad_errc {
-    already_set = 1,  //!< Attempt to store a value into the monad twice
-    no_state = 2      //!< Attempt to use without a state
+    already_set = 1,        //!< Attempt to store a value into the monad twice
+    no_state = 2,           //!< Attempt to use without a state
+    exception_present = 3,  //!< Attempt to fetch an error state when the monad is in an exceptioned state
   };
 
   namespace detail
@@ -215,13 +216,14 @@ namespace lightweight_futures
     class monad_category : public std::error_category
     {
     public:
-      virtual const char *name() const noexcept { return "monad"; }
+      virtual const char *name() const noexcept { return "basic_monad"; }
       virtual std::string message(int c) const
       {
         switch(c)
         {
           case 1: return "already_set";
           case 2: return "no_state";
+          case 3: return "exception_present";
           default: return "unknown";
         }
       }
@@ -256,6 +258,7 @@ namespace lightweight_futures
     return std::error_condition(static_cast<int>(e), monad_category());
   }
 
+  template<class Impl> class basic_monad;
 }
 BOOST_SPINLOCK_V1_NAMESPACE_END
 
@@ -497,8 +500,6 @@ namespace lightweight_futures {
       type = storage_type::pointer;
     }
   };
-
-  template<class Impl> class basic_monad;
 
   namespace detail
   {
@@ -872,6 +873,14 @@ Features:
   {
     friend implementation_policy;
     friend typename implementation_policy::template rebind_policy<void>;
+    friend inline std::istream &operator>>(std::istream &s, basic_monad &v)
+    {
+      return s >> v._storage;
+    }
+    friend inline std::ostream &operator<<(std::ostream &s, const basic_monad &v)
+    {
+      return s << v._storage;
+    }
   protected:
     typedef value_storage<implementation_policy> value_storage_type;
     value_storage_type _storage;
@@ -1614,9 +1623,60 @@ BOOST_SPINLOCK_V1_NAMESPACE_END
 
 namespace std
 {
+  //! \brief Specialise swap
   template<class Impl> inline void swap(BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::basic_monad<Impl> &a, BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::basic_monad<Impl> &b)
   {
     a.swap(b);
+  }
+  //! \brief Deserialise a value_type (only value_type)
+  template<class Impl> inline istream &operator>>(istream &s, BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::value_storage<Impl> &v)
+  {
+    using namespace BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures;
+    switch (v.type)
+    {
+    case value_storage<Impl>::storage_type::value:
+      return s >> v.value;
+    default:
+      throw ios_base::failure("Set the type of lightweight_futures::value_storage to a value_type before deserialising into it");
+    }
+    return s;
+  }
+  template<class Impl> inline ostream &operator<<(ostream &s, const BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::value_storage<Impl> &v)
+  {
+    using namespace BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures;
+    switch (v.type)
+    {
+    case value_storage<Impl>::storage_type::empty:
+      return s << "(empty)";
+    case value_storage<Impl>::storage_type::value:
+      return s << v.value;
+    case value_storage<Impl>::storage_type::error:
+      return s << "(" << v.error.category().name() << " std::error_code " << v.error.value() << ": " << v.error.message() << ")";
+    case value_storage<Impl>::storage_type::exception:
+      try
+      {
+        rethrow_exception(v.exception);
+      }
+      catch(const system_error &e)
+      {
+        return s << "(std::system_error code " << e.code() << ": " << e.what() << ")";
+      }
+      /*catch(const future_error &e)
+      {
+        return s << "(std::future_error code " << e.code() << ": " << e.what() << ")";
+      }*/
+      catch(const exception &e)
+      {
+        return s << "(std::exception: " << e.what() << ")";
+      }
+      catch(...)
+      {
+        return s << "(unknown exception)";
+      }
+    default:
+      return s << "(unknown)";
+    }
+    return s;
   }
 }
 
