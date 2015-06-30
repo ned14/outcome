@@ -1069,8 +1069,8 @@ BOOST_AUTO_TEST_CASE(works/rebind_cast, "Tests that rebind_cast works as intende
 #ifdef __cpp_decltype_auto
   using namespace boost::spinlock::lightweight_futures::detail;
   struct Foo {}; struct Boo { Boo() { } };
-  Boo b, *b_ptr;
-  const Boo const_b, *const_b_ptr;
+  Boo b, *b_ptr=nullptr;
+  const Boo const_b, *const_b_ptr=nullptr;
   decltype(auto) const_lvalue_ref = rebind_cast<Foo>(const_b);
   decltype(auto) lvalue_ref = rebind_cast<Foo>(b);
   decltype(auto) rvalue_ref = rebind_cast<Foo>(std::move(b));
