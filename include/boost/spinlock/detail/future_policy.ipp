@@ -53,6 +53,7 @@ DEALINGS IN THE SOFTWARE.
 namespace detail
 {
   //! [future_policy]
+  //! \brief An implementation policy for basic_promise and basic_future
   template<typename R> struct BOOST_SPINLOCK_FUTURE_POLICY_NAME;
   template<typename R> struct BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME;
   template<> struct BOOST_SPINLOCK_FUTURE_POLICY_NAME<void>
@@ -272,6 +273,7 @@ namespace detail
   };
   //! [future_policy]
 
+  //! \brief An implementation policy for basic_promise and basic_future
   template<typename R> struct BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME;
   template<> struct BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<void> : public BOOST_SPINLOCK_FUTURE_POLICY_NAME<void>
   {

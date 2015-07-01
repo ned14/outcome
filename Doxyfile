@@ -2029,7 +2029,6 @@ INCLUDE_FILE_PATTERNS  =
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
 PREDEFINED             = DOXYGEN_IS_IN_THE_HOUSE=1 \
-    protected:=private: \
     BOOST_CONSTEXPR=constexpr \
     BOOST_CXX14_CONSTEXPR=constexpr \
     BOOST_STATIC_CONSTEXPR=static constexpr \

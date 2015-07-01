@@ -41,6 +41,63 @@ DEALINGS IN THE SOFTWARE.
 \headerfile include/boost/spinlock/future.hpp ""
 */
 
+/*! \defgroup future_promise Lightweight next generation STL compatible futures with N4399 C++ 1z Concurrency TS extensions
+
+C++ 1z Concurrency TS extensions N-paper used: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4399.html
+
+Promise-Futures supplied here:
+<dl>
+  <dt>`promise<T>`, `future<T>` and `shared_future<T>`</dt>
+    <dd>Based on `monad<T>`, these provide a STL dropin.</dd>
+  <dt>`promise_result<T>`, `future_result<T>` and `shared_future_result<T>`.</dt>
+    <dd>Based on `result<T>`, these provide T and error_code transport, no exception_ptr.</dd>
+  <dt>`promise_option<T>`, `future_option<T>` and `shared_future_option<T>`.</dt>
+    <dd>Based on `option<T>`, these provide T and nothing more, no error transport at all.</dd>
+</dl>
+
+All the above have make ready functions of the form `make_ready_NAME`, `make_errored_NAME` and `make_exceptional_NAME`
+as per N4399.
+
+In exchange for some minor limitations, this lightweight promise-future is 2x-3x faster than
+`std::promise` and `std::future` in the non-blocking case. You also get deep integration with basic_monad and
+lots of cool functional programming stuff.
+
+Known deviations from the ISO C++ standard specification:
+
+- No memory allocation is done, so if your code overrides the STL allocator for promise-future it will be ignored.
+- T must implement either or both the copy or move constructor, else it will static_assert.
+- T cannot be error_type nor exception_type, else it will static_assert.
+- set_value_at_thread_exit() and set_exception_at_thread_exit() are not implemented, nor probably ever will be.
+- promise's and future's move constructor and move assignment are guaranteed noexcept in the standard. This promise's
+and future's move constructor and assignment is noexcept only if type T's move constructor is noexcept.
+- Only the APIs marked "SYNC POINT" in both promise and future synchronise memory. Calling APIs not marked "SYNC POINT"
+can return stale information, so don't write code which has a problem with that (specifically, do NOT have multiple threads examining
+a future for state concurrently unless they are exclusively using SYNC POINT APIs to synchronise memory between them).
+
+ When might this be a problem in real world code? For example, valid() which is not a SYNC POINT API may return true when it is in
+fact false. If your code uses a synchronisation mechanism which is not a SYNC POINT API - most usually, this is "synchronised
+by time/sleep" - and then executes code which depends on valid() being correct as it would always be with STL future promise
+as valid() there synchronises memory, your code will be racy. The simplest solution is to call any SYNC POINT API before
+examining valid(), or issue a memory fence (std::atomic_thread_fence), or best of all refactor your code to not use synchronised
+by time/sleep in the first place. The thread sanitiser tsan reports any use of time to synchronise as a failure which is the
+correct thing to do - just don't do it in your code.
+
+Other things to consider:
+
+- As both promise and future must have sizeof greater than sizeof(T), don't use multi-Kb sized T's
+as they'll get copied and moved around.
+- Don't use any of the `monad_errc` nor `future_errc` error codes for the errored return, else expect misoperation.
+
+## Supplying your own implementations of `basic_future<T>` ##
+
+Just as with basic_monad, basic_promise and basic_future are highly customisable with any kind of semantics or error
+types you like.
+
+To do this, simply supply a policy type of the following form. Note that this is identical to basic_monad's policy,
+except for the added members which are commented:
+\snippet future_policy.ipp future_policy
+*/
+
 // Used by constexpr testing to make sure I haven't borked any constexpr fold paths
 //#define BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
 
@@ -164,11 +221,9 @@ namespace lightweight_futures {
   /*! \class basic_promise
   \brief Implements the state setting side of basic_monad
   \tparam implementation_policy An implementation policy type
+  \ingroup future_promise
   
-  \warning This lightweight promise is NOT thread safe up until the point you call `get_future()`, after which it becomes thread safe.
-  Therefore if you have multiple threads trying to set the promise value concurrently before you have called `get_future()`, you will race.
-  The chances of this being a problem in any well designed code should be non-existent, however please do contact the author if you find
-  a non-contrived situation where this could happen.
+  Read the docs at basic_future for this class.
   */
   template<class implementation_policy> class basic_promise
   {
@@ -240,7 +295,7 @@ namespace lightweight_futures {
     {
     }
 //// template<class Allocator> basic_promise(allocator_arg_t, Allocator a); // cannot support
-    //! \brief Move constructor
+    //! \brief SYNC POINT Move constructor
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise(basic_promise &&o) noexcept(is_nothrow_move_constructible) : 
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
     _need_locks(o._need_locks),
@@ -255,15 +310,17 @@ namespace lightweight_futures {
       if(h._f)
         h._f->_promise=this;
     }
-    //! \brief Move assignment. If throws during move, destination promise is left as if default constructed i.e. any previous promise contents are destroyed.
+    //! \brief SYNC POINT Move assignment. If throws during move, destination promise is left as if default constructed i.e. any previous promise contents are destroyed.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_promise &operator=(basic_promise &&o) noexcept(is_nothrow_move_constructible)
     {
+      //! \todo Race exists in basic_promise::operator= between destructor and move constructor
       this->~basic_promise();
       new (this) basic_promise(std::move(o));
       return *this;
     }
     basic_promise(const basic_promise &)=delete;
     basic_promise &operator=(const basic_promise &)=delete;
+    //! \brief SYNC POINT Destroys the promise.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP ~basic_promise() noexcept(is_nothrow_destructible)
     {
       if(!_detached)
@@ -283,7 +340,7 @@ namespace lightweight_futures {
 #endif
     }
     
-    //! \brief Swap this promise for another
+    //! \brief SYNC POINT Swap this promise for another
     BOOST_SPINLOCK_FUTURE_MSVC_HELP void swap(basic_promise &o) noexcept(is_nothrow_move_constructible)
     {
       detail::lock_guard<promise_type, future_type> h1(this), h2(&o);
@@ -294,7 +351,7 @@ namespace lightweight_futures {
         h2._f->_promise=this;
     }
     
-    //! \brief Create a future to be associated with this promise. Can be called exactly once, else throws a `future_already_retrieved`.
+    //! \brief SYNC POINT Create a future to be associated with this promise. Can be called exactly once, else throws a `future_already_retrieved`.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP future_type get_future()
     {
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
@@ -341,20 +398,21 @@ namespace lightweight_futures {
         _storage.function; \
       } \
     }
-    /*! \brief Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
+    /*! \brief SYNC POINT Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
     */
     BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v), set_value(v))
-    /*! \brief Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
+    /*! \brief SYNC POINT Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
     */
     BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(value_type &&v), set_value(std::move(v)))
-    /*! \brief EXTENSION: Sets the value by emplacement to be returned by the associated future, releasing any waits occuring in other threads.
+    /*! \brief SYNC POINT EXTENSION: Sets the value by emplacement to be returned by the associated future, releasing any waits occuring in other threads.
     */
     BOOST_SPINLOCK_FUTURE_IMPL(template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP void emplace_value(Args &&... args), emplace_value(std::forward<Args>(args)...))
-    //! \brief EXTENSION: Set an error code outcome (doesn't allocate)
+    //! \brief SYNC POINT EXTENSION: Set an error code outcome (doesn't allocate)
     BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_error(error_type e), set_error(std::move(e)))
-    //! \brief Sets an exception outcome
+    //! \brief SYNC POINT Sets an exception outcome
     BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_exception(exception_type e), set_exception(std::move(e)))
 #undef BOOST_SPINLOCK_FUTURE_IMPL
+    //! \brief SYNC POINT EXTENSION: Equal to set_exception(make_exception_ptr(forward<E>(e)))
     template<typename E> void set_exception(E &&e)
     {
       set_exception(make_exception_ptr(std::forward<E>(e)));
@@ -377,33 +435,7 @@ namespace lightweight_futures {
 
   /*! \class basic_future
   \brief Lightweight next generation future with N4399 Concurrency TS extensions
-
-  http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4399.html
-  
-  In exchange for some minor limitations, this lightweight promise-future is more than 3x-10x faster than
-  `std::promise` and `std::future` in the non-blocking case. You also get deep integration with basic_monad and
-  lots of cool functional programming stuff. 
-  
-  Known deviations from the ISO C++ standard specification:
-  
-  - No memory allocation is done, so if your code overrides the STL allocator for promise-future it will be ignored.
-  - T must implement either or both the copy or move constructor, else it will static_assert.
-  - T cannot be error_type nor exception_type, else it will static_assert.
-  - Neither future nor promise are ever thread safe if promise.set_value() is done before promise.get_future().
-  - set_value_at_thread_exit() and set_exception_at_thread_exit() are not implemented, nor probably ever will be.
-  - promise's and future's move constructor and move assignment are guaranteed noexcept in the standard. This promise's
-  and future's move constructor and assignment is noexcept only if type T's move constructor is noexcept.
-
-  Other things to consider:
-
-  - As both promise and future must have sizeof greater than sizeof(T), don't use multi-Kb sized T's
-  as they'll get copied and moved around.
-  - Don't use any of the `monad_errc` nor `future_errc` error codes for the errored return, else expect misoperation.
-
-  ## Supplying your own implementations of `basic_future<T>` ##
-  To do this, simply supply a policy type of the following form. Note that this is identical to basic_monad's policy,
-  except for the added members which are commented:
-  \snippet future_policy.ipp future_policy
+  \ingroup future_promise
   */
   template<class implementation_policy> class basic_future : protected basic_monad<implementation_policy>
   {
@@ -517,7 +549,7 @@ namespace lightweight_futures {
       : basic_future(implementation_policy::_construct(std::forward<U>(o)))
     {
     }
-    //! \brief Move constructor
+    //! \brief SYNC POINT Move constructor
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(basic_future &&o) noexcept(is_nothrow_move_constructible) :
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
     _need_locks(o._need_locks),
@@ -537,15 +569,17 @@ namespace lightweight_futures {
           h._p->_storage.pointer_=this;
       }
     }
-    //! \brief Move assignment. If it throws during the move, the future is left as if default constructed.
+    //! \brief SYNC POINT Move assignment. If it throws during the move, the future is left as if default constructed.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future &operator=(basic_future &&o) noexcept(is_nothrow_move_assignable)
     {
+      //! \todo Race exists in basic_future::operator= between destructor and move constructor
       this->~basic_future();
       new (this) basic_future(std::move(o));
       return *this;
     }
     basic_future(const basic_future &)=delete;
     basic_future &operator=(const basic_future &)=delete;
+    //! \brief SYNC POINT Destructs the future.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP ~basic_future() noexcept(is_nothrow_destructible)
     {
       if(valid())
@@ -564,6 +598,25 @@ namespace lightweight_futures {
 #endif
     }
     
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+    //! \brief Same as `true_(tribool(*this))`
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit operator bool() const noexcept;
+    //! \brief True if monad contains a value_type, false if monad is empty, else unknown.
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR operator tribool::tribool() const noexcept;
+    //! \brief True if monad is not empty
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR bool is_ready() const noexcept;
+    //! \brief True if monad is empty
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR bool empty() const noexcept;
+    //! \brief True if monad contains a value_type
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_value() const noexcept;
+    //! \brief True if monad contains an error_type
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_error() const noexcept;
+    /*! \brief True if monad contains an exception_type or error_type (any error_type is returned as an exception_ptr by get_exception()).
+    This needs to be true for both for compatibility with Boost.Thread's future. If you really want to test only for has exception only,
+    pass true as the argument.
+    */
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_exception(bool only_exception = false) const noexcept;
+#else
     using monad_type::operator bool;
     using monad_type::operator tribool::tribool;
     using monad_type::is_ready;
@@ -571,13 +624,14 @@ namespace lightweight_futures {
     using monad_type::has_value;
     using monad_type::has_error;
     using monad_type::has_exception;
+#endif
     //! \brief True if the state is set or a promise is attached
     bool valid() const noexcept
     {
       return !!_promise || is_ready() || _broken_promise;
     }
     
-    //! \brief Swaps the future with another future
+    //! \brief SYNC POINT Swaps the future with another future
     void swap(basic_future &o) noexcept(is_nothrow_move_constructible)
     {
       detail::lock_guard<promise_type, future_type> h1(this), h2(&o);
@@ -600,7 +654,34 @@ namespace lightweight_futures {
       return implementation_policy::_share(std::move(*this));
     }
     
-    //! \brief See basic_monad<>::get()
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+    //! \brief SYNC POINT Return any value held by this future, waiting if needed for a state to become available and rethrowing any error or exceptional state.
+    value_type get();
+    //! \brief If contains a value_type, return that value type, else return the supplied value_type
+    value_type &get_or(value_type &v) & noexcept;
+    //! \brief If contains a value_type, return that value type, else return the supplied value_type
+    const value_type &get_or(const value_type &v) const & noexcept;
+    //! \brief If contains a value_type, return that value type, else return the supplied value_type
+    value_type &&get_or(value_type &&v) && noexcept;
+    //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
+    value_type &get_and(value_type &v) & noexcept;
+    //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
+    const value_type &get_and(const value_type &v) const & noexcept;
+    //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
+    value_type &&get_and(value_type &&v) && noexcept;
+    //! \brief SYNC POINT Return any error held by this future, waiting if needed for a state to become available.
+    error_type get_error() const;
+    //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
+    error_type get_error_or(error_type e) const noexcept;
+    //! \brief If contains an error_type, return the supplied error_type else return the contained error_type
+    error_type get_error_and(error_type e) const noexcept;
+    //! \brief SYNC POINT Return any exception held by this future, waiting if needed for a state to become available.
+    exception_type get_exception() const;
+    //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
+    exception_type get_exception_or(exception_type e) const noexcept;
+    //! \brief If contains an exception_type, return the supplied exception_type else return the contained exception_type
+    exception_type get_exception_and(exception_type e) const noexcept;
+#else
     using monad_type::get;
     using monad_type::get_or;
     using monad_type::get_and;
@@ -610,19 +691,23 @@ namespace lightweight_futures {
     using monad_type::get_exception;
     using monad_type::get_exception_or;
     using monad_type::get_exception_and;
-    //! Compatibility with Boost.Thread
+#endif
+    //! \brief SYNC POINT Compatibility with Boost.Thread
     exception_type get_exception_ptr() { return this->get_exception(); }
     
-    //! \brief Wait for the future to become ready
+    //! \brief SYNC POINT Wait for the future to become ready
     void wait() const
     {
       if(is_ready())
         return;
+      detail::lock_guard<promise_type, future_type> h(this);
       _check_validity();
       // TODO Actually sleep
       while(!monad_type::is_ready())
       {
+        h.unlock();
         std::this_thread::yield();
+        h=detail::lock_guard<promise_type, future_type>(this);
       }
     }
 //// template<class R, class P> future_status wait_for(const std::chrono::duration<R, P> &rel_time) const;  // TODO
@@ -635,6 +720,7 @@ namespace lightweight_futures {
   /*! \class shared_basic_future_ptr
   \brief A shared pointer to a basic future. Lets you wrap up basic_future with STL shared_future semantics. Quite
   literally a shared_ptr and a thin API thunk to the basic_future.
+  \ingroup future_promise
   */
   template<class _future_type> class shared_basic_future_ptr
   {

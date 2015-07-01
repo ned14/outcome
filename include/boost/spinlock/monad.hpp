@@ -1376,6 +1376,7 @@ Features:
   namespace detail
   {
     //! [monad_policy]
+    //! \brief An implementation policy for basic_monad
     template<typename R> struct monad_policy;
     template<> struct monad_policy<void>
     {
@@ -1481,6 +1482,7 @@ Features:
     };
     //! [monad_policy]
     
+    //! \brief An implementation policy for basic_monad
     template<typename R> struct result_policy;
     template<> struct result_policy<void>
     {
@@ -1547,6 +1549,7 @@ Features:
       }
     };
 
+    //! \brief An implementation policy for basic_monad
     template<typename R> struct option_policy;
     template<> struct option_policy<void>
     {

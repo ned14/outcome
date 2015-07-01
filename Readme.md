@@ -14,8 +14,8 @@ Lightweight promise-future:
  - [x] Implement shared_future_policy and a conformance suite for shared_future.
  - [x] Implement shared_future_ptr which thunks a shared_future API through a shared_ptr to
 basic_future<shared_future_policy>.
- - [ ] Document synchronisation APIs in promise future.
- - [ ] Audit all unlocked state reads with writes for raciness.
+ - [x] Document synchronisation APIs in promise future.
+ - [x] Audit all unlocked state reads with writes for raciness.
  - [ ] Implement N4399 continuations.
  - [ ] wait() should sleep the thread as necessary.
  - [ ] Implement wait_for()/wait_until().
