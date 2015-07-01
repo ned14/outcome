@@ -1,3 +1,5 @@
+#define BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+
 #include "../../include/boost/spinlock/future.hpp"
 
 extern BOOST_SPINLOCK_NOINLINE int test1()

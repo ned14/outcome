@@ -41,6 +41,9 @@ DEALINGS IN THE SOFTWARE.
 \headerfile include/boost/spinlock/future.hpp ""
 */
 
+// Used by constexpr testing to make sure I haven't borked any constexpr fold paths
+//#define BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+
 #if BOOST_SPINLOCK_IN_THREAD_SANITIZER
 #define BOOST_SPINLOCK_FUTURE_MUTEX_TYPE std::mutex
 #define BOOST_SPINLOCK_FUTURE_MUTEX_TYPE_DESTRUCTOR mutex
@@ -69,6 +72,7 @@ namespace lightweight_futures {
       lock_guard(lock_guard &&)=delete;
       BOOST_SPINLOCK_FUTURE_MSVC_HELP lock_guard(promise_type *p) : _p(nullptr), _f(nullptr)
       {
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         // constexpr fold
         if(!p->_need_locks)
         {
@@ -77,7 +81,9 @@ namespace lightweight_futures {
             _f=p->_storage.pointer_;
           return;
         }
-        else for(;;)
+        else
+#endif
+        for(;;)
         {
           p->_lock.lock();
           if(p->_storage.type==promise_type::value_storage_type::storage_type::pointer)
@@ -99,6 +105,7 @@ namespace lightweight_futures {
       }
       BOOST_SPINLOCK_FUTURE_MSVC_HELP lock_guard(future_type *f) : _p(nullptr), _f(nullptr)
       {
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         // constexpr fold
         if(!f->_need_locks)
         {
@@ -106,7 +113,9 @@ namespace lightweight_futures {
           _f=f;
           return;
         }
-        else for(;;)
+        else
+#endif
+        for(;;)
         {
           f->_lock.lock();
           if(f->_promise)
@@ -134,13 +143,17 @@ namespace lightweight_futures {
       {
         if(_p)
         {
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
           if(_p->_need_locks)
+#endif
             _p->_lock.unlock();
           _p=nullptr;
         }
         if(_f)
         {
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
           if(_f->_need_locks)
+#endif
             _f->_lock.unlock();
           _f=nullptr;
         }
@@ -165,13 +178,20 @@ namespace lightweight_futures {
     typedef value_storage<implementation_policy> value_storage_type;
     value_storage_type _storage;
   private:
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
     bool _need_locks;                 // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
+#endif
     bool _detached;                   // Future has already been set and promise is now detached
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4624)
 #endif
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
     union { BOOST_SPINLOCK_FUTURE_MUTEX_TYPE _lock; };  // Delay construction
+#else
+    BOOST_SPINLOCK_FUTURE_MUTEX_TYPE _lock;
+#endif
+    
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
@@ -213,14 +233,24 @@ namespace lightweight_futures {
     static_assert(std::is_move_constructible<value_type>::value || std::is_copy_constructible<value_type>::value, "Type must be move or copy constructible to be used in a lightweight basic_promise");    
 
     //! \brief EXTENSION: constexpr capable constructor
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_promise() noexcept : _need_locks(false), _detached(false)
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_promise() noexcept : 
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+    _need_locks(false),
+#endif
+    _detached(false)
     {
     }
 //// template<class Allocator> basic_promise(allocator_arg_t, Allocator a); // cannot support
     //! \brief Move constructor
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise(basic_promise &&o) noexcept(is_nothrow_move_constructible) : _need_locks(o._need_locks), _detached(o._detached)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise(basic_promise &&o) noexcept(is_nothrow_move_constructible) : 
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+    _need_locks(o._need_locks),
+#endif
+    _detached(o._detached)
     {
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
+#endif
       detail::lock_guard<promise_type, future_type> h(&o);
       _storage=std::move(o._storage);
       if(h._f)
@@ -249,7 +279,9 @@ namespace lightweight_futures {
         // Destroy myself before locks exit
         _storage.clear();
       }
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       if(_need_locks) _lock.~BOOST_SPINLOCK_FUTURE_MUTEX_TYPE_DESTRUCTOR();
+#endif
     }
     
     //! \brief Swap this promise for another
@@ -266,14 +298,15 @@ namespace lightweight_futures {
     //! \brief Create a future to be associated with this promise. Can be called exactly once, else throws a `future_already_retrieved`.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP future_type get_future()
     {
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       // If no value stored yet, I need locks on from now on
       if(!_need_locks && _storage.type==value_storage_type::storage_type::empty)
       {
         _need_locks=true;
         new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
       }
+#endif
       detail::lock_guard<promise_type, future_type> h(this);
-      assert(!_need_locks || is_lockable_locked(_lock));
       if(h._f || _detached)
         throw future_error(future_errc::future_already_retrieved);
       future_type ret(this);
@@ -291,12 +324,10 @@ namespace lightweight_futures {
     name \
     { \
       detail::lock_guard<promise_type, future_type> h(this); \
-      assert(!_need_locks || is_lockable_locked(_lock)); \
       if(_detached) \
         implementation_policy::_throw_error(monad_errc::already_set); \
       if(h._f) \
       { \
-        assert(!_need_locks || is_lockable_locked(h._f->_lock)); \
         if(!h._f->empty()) \
           implementation_policy::_throw_error(monad_errc::already_set); \
         h._f->function; \
@@ -377,6 +408,7 @@ namespace lightweight_futures {
   template<class implementation_policy> class basic_future : protected basic_monad<implementation_policy>
   {
     friend implementation_policy;
+    friend typename implementation_policy::impl;
   public:
     //! \brief The policy used to implement this basic_future
     typedef implementation_policy policy;
@@ -424,22 +456,34 @@ namespace lightweight_futures {
     friend struct detail::lock_guard<promise_type, future_type>;
     static_assert(std::is_move_constructible<value_type>::value || std::is_copy_constructible<value_type>::value, "Type must be move or copy constructible to be used in a lightweight basic_future");    
   private:
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
     bool _need_locks;                 // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
+#endif
     bool _broken_promise;             // Promise was destroyed before setting a value
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4624)
 #endif
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
     union { BOOST_SPINLOCK_FUTURE_MUTEX_TYPE _lock; };  // Delay construction
+#else
+    BOOST_SPINLOCK_FUTURE_MUTEX_TYPE _lock;
+#endif
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
     promise_type *_promise;
   protected:
     // Called by basic_promise::get_future(), so currently thread safe
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(promise_type *p) : monad_type(std::move(p->_storage)), _need_locks(p->_need_locks), _broken_promise(false), _promise(p)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(promise_type *p) : monad_type(std::move(p->_storage)),
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+    _need_locks(p->_need_locks),
+#endif
+    _broken_promise(false), _promise(p)
     {
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
+#endif
       // Clear the promise's storage, as we now have any state
       p->_storage.clear();
       // Do I already have a value? If so, detach, else set the promise to point to us
@@ -461,7 +505,11 @@ namespace lightweight_futures {
     }
   public:
     //! \brief EXTENSION: constexpr capable constructor
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_future() : _need_locks(false), _broken_promise(false), _promise(nullptr)
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_future() : 
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+    _need_locks(false),
+#endif
+    _broken_promise(false), _promise(nullptr)
     {
     }
     //! \brief If available for this kind of future, constructs this future type from some other future type
@@ -470,9 +518,15 @@ namespace lightweight_futures {
     {
     }
     //! \brief Move constructor
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(basic_future &&o) noexcept(is_nothrow_move_constructible) : _need_locks(o._need_locks), _broken_promise(o._broken_promise), _promise(nullptr)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(basic_future &&o) noexcept(is_nothrow_move_constructible) :
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+    _need_locks(o._need_locks),
+#endif
+    _broken_promise(o._broken_promise), _promise(nullptr)
     {
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
+#endif
       detail::lock_guard<promise_type, future_type> h(&o);
       new(this) monad_type(std::move(o));
       if(o._promise)
@@ -502,7 +556,9 @@ namespace lightweight_futures {
         // Destroy myself before locks exit
         monad_type::clear();
       }
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       if(_need_locks) _lock.~BOOST_SPINLOCK_FUTURE_MUTEX_TYPE_DESTRUCTOR();
+#endif
     }
     
     using monad_type::operator bool;
@@ -523,7 +579,9 @@ namespace lightweight_futures {
     {
       detail::lock_guard<promise_type, future_type> h1(this), h2(&o);
       monad_type::swap(o._storage);
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       std::swap(_need_locks, o._need_locks);
+#endif
       std::swap(_broken_promise, o._broken_promise);
       std::swap(_promise, o._promise);
       if(h1._p)

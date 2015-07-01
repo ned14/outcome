@@ -46,3 +46,4 @@
   88:	48 89 d8             	mov    %rbx,%rax
   8b:	5b                   	pop    %rbx
   8c:	c3                   	retq   
+  8d:	0f 1f 00             	nopl   (%rax)

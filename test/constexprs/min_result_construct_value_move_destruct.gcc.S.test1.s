@@ -1,2 +1,4 @@
-   2:	b8 05 00 00 00       	mov    $0x5,%eax
-   7:	c3                   	retq   
+   0:	b8 05 00 00 00       	mov    $0x5,%eax
+   5:	c3                   	retq   
+   6:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
+   d:	00 00 00 

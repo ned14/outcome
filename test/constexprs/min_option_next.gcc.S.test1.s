@@ -1,5 +1,6 @@
-   2:	8d 14 76             	lea    (%rsi,%rsi,2),%edx
-   5:	48 89 f8             	mov    %rdi,%rax
-   8:	c6 47 10 01          	movb   $0x1,0x10(%rdi)
-   c:	89 17                	mov    %edx,(%rdi)
-   e:	c3                   	retq   
+   0:	8d 14 76             	lea    (%rsi,%rsi,2),%edx
+   3:	48 89 f8             	mov    %rdi,%rax
+   6:	c6 47 04 01          	movb   $0x1,0x4(%rdi)
+   a:	89 17                	mov    %edx,(%rdi)
+   c:	c3                   	retq   
+   d:	0f 1f 00             	nopl   (%rax)

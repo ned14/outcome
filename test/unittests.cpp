@@ -1817,6 +1817,9 @@ BOOST_AUTO_TEST_CASE(works/monad/operators, "Tests that the monad custom operato
 }
 #endif
 
+
+
+
 template<template<class> class F, template<class> class P> void FuturePromiseConformanceTest()
 {
   std::exception_ptr e(std::make_exception_ptr(std::runtime_error("hello")));
@@ -1998,21 +2001,33 @@ BOOST_AUTO_TEST_CASE(works/shared_future/lightweight, "Tests that our shared_fut
   SharedFuturePromiseConformanceTest<shared_future, promise>();
 }
 
+
+static usCount overhead;
+BOOST_AUTO_TEST_CASE(performance/overhead, "Calculate the timing overhead and warm up the CPU")
+{
+  std::cout << "Calculating timing overhead ..." << std::endl;
+  auto begin = GetUsCount();
+  while ((GetUsCount() - begin) < 3000000000000ULL);
+
+  begin = GetUsCount();
+  usCount end=begin=GetUsCount();
+  for(size_t n=0; n<1000000; n++)
+  {
+    overhead+=GetUsCount();
+  }
+  end = GetUsCount();
+  if(overhead!=0)
+    overhead = (end - begin)/1000000;
+}
+
+
 template<template<class> class F, template<class> class P> double CalculateFuturePerformanceSimple(const char *desc)
 {
   double total=0;
-  auto begin = GetUsCount();
-  while ((GetUsCount() - begin) < 3000000000000ULL);
-  usCount overhead, end=begin=GetUsCount();
-  do
-  {
-    end = GetUsCount();
-  } while (begin == end);
-  overhead = end - begin;
   size_t loops=BOOST_SPINLOCK_RUNNING_ON_VALGRIND ? 10000 : 1000000;
   for(size_t m=0; m<5; m++)
   {
-    begin = GetUsCount();
+    auto begin = GetUsCount();
     for(size_t n=0; n<loops; n++)
     {
       P<int> p;
@@ -2020,7 +2035,7 @@ template<template<class> class F, template<class> class P> double CalculateFutur
       p.set_value(5);
       if(f.get()!=5) abort();
     }
-    end = GetUsCount();
+    auto end = GetUsCount();
     auto each = (double) (end - begin-overhead) /loops;
     std::cout << (m+1) << ". Picoseconds for " << desc << " promise-future round: " << each << std::endl;
     total+=each;
@@ -2047,6 +2062,8 @@ BOOST_AUTO_TEST_CASE(performance/future_option/simple, "Tests the performance of
 {
   std::cout << "\n=== Tests the performance of our future_option in a simple loop ===" << std::endl;
   using namespace boost::spinlock::lightweight_futures;
+  std::cout << "sizeof(promise_option<bool>) = " << sizeof(promise_option<bool>) << std::endl;
+  std::cout << "sizeof(future_option<bool>) = " << sizeof(future_option<bool>) << std::endl;
   auto result=CalculateFuturePerformanceSimple<future_option, promise_option>("lightweight");
   std::cout << "Approximately " << (result/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round" << std::endl;
 }
@@ -2069,27 +2086,20 @@ BOOST_AUTO_TEST_CASE(performance/shared_future/simple/lightweight, "Tests the pe
 template<template<class> class F, template<class> class P> std::tuple<double, double, double> CalculateFuturePerformanceProducerConsumer(const char *desc)
 {
   double setting=0, getting=0, destruction=0;
-  auto begin = GetUsCount();
-  usCount overhead, end=begin=GetUsCount();
-  do
-  {
-    end = GetUsCount();
-  } while (begin == end);
-  overhead = end - begin;
   size_t loops=BOOST_SPINLOCK_RUNNING_ON_VALGRIND ? 10000 : 1000000;
   std::vector<F<int>> futures(loops);
   for(size_t m=0; m<5; m++)
   {
     futures.resize(0);
     if(futures.capacity()<loops) abort();
-    begin = GetUsCount();
+    auto begin = GetUsCount();
     for(size_t n=0; n<loops; n++)
     {
       P<int> p;
       futures.push_back(p.get_future());
       p.set_value(5);
     }
-    end = GetUsCount();
+    auto end = GetUsCount();
     auto each = (double) (end - begin-overhead) /loops;
     std::cout << (m+1) << ". Picoseconds for " << desc << " creation and setting: " << each << std::endl;
     setting+=each;
@@ -2170,15 +2180,6 @@ BOOST_AUTO_TEST_CASE(performance/shared_future/producerconsumer/lightweight, "Te
 template<template<class> class F, template<class> class P> std::tuple<double, double, double, double> CalculateFuturePerformanceThreaded(const char *)
 {
   const size_t THREADS=2;
-  auto begin = GetUsCount();
-  usCount overhead=0, end=begin=GetUsCount();
-  for(size_t n=0; n<100000; n++)
-  {
-    overhead+=GetUsCount();
-  }
-  end = GetUsCount();
-  if(overhead!=0)
-    overhead = (end - begin)/100000;
   struct data_t
   {
     struct spaced_t
@@ -2205,7 +2206,7 @@ template<template<class> class F, template<class> class P> std::tuple<double, do
   std::cout << "Running " << THREADS << " threads of " << loops << " iterations" << std::endl;
   for(size_t n=0; n<THREADS; n++)
   {
-    threads.push_back(std::thread([&done, overhead, loops](data_t &data){
+    threads.push_back(std::thread([&done, loops](data_t &data){
       std::vector<P<size_t>> promises(loops);
       --done;
       while(done)
@@ -2253,9 +2254,9 @@ lastround:
       {
         while(!datas[m].futures[n].first)
           std::this_thread::yield();
-        begin=GetUsCount();
+        auto begin=GetUsCount();
         if(datas[m].futures[n].second.get()!=n) abort();
-        end=GetUsCount();
+        auto end=GetUsCount();
         _getting+=end-begin-overhead;
         _getting_c++;
 

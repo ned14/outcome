@@ -1,3 +1,11 @@
 "max_monad_bind","max_monad_get_error","max_monad_get_exception","max_monad_get_value","max_monad_next","max_option_get_value","max_option_next","max_result_get_value","max_result_next","min_future_construct_destruct","min_future_construct_move_destruct","min_monad_bind","min_monad_construct_destruct","min_monad_construct_error_move_destruct","min_monad_construct_exception_move_destruct","min_monad_construct_value_move_destruct","min_monad_next","min_option_construct_value_move_destruct","min_option_next","min_promise_construct_destruct","min_promise_construct_move_destruct","min_promise_future_reduce","min_result_construct_value_move_destruct","min_result_next"
 42,50,35,32,76,26,37,49,56,7,18,4,1,6,54,51,55,2,55,7,18,31,2,4
 42,50,35,32,76,26,37,49,56,7,18,4,1,6,54,51,55,2,55,7,18,31,2,4
+37,55,59,33,75,27,38,31,50,57,8,20,5,0,24,32,52,54,1,5,7,18,31,1,5
+37,55,59,33,75,27,38,31,50,57,8,20,5,0,24,32,52,54,1,5,7,18,31,1,5
+37,55,59,33,75,27,38,31,31,50,57,8,20,5,0,24,32,52,54,1,5,7,18,31,1,5
+37,55,59,33,75,27,38,31,31,50,57,8,20,5,0,24,32,52,54,1,5,7,18,31,1,5
+37,55,59,33,75,27,38,31,31,50,57,8,68,5,0,24,32,52,54,1,5,7,18,31,1,5
+37,55,59,33,75,27,38,31,31,50,57,8,20,5,0,24,32,52,54,1,5,7,18,31,1,5
+37,55,59,33,75,27,38,31,31,50,57,8,20,5,0,24,32,52,54,1,5,7,18,31,1,5
+37,55,59,33,75,27,38,31,31,50,57,8,20,5,0,24,32,52,54,1,5,7,18,31,1,5
