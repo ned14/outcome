@@ -176,12 +176,12 @@ namespace lightweight_futures {
     friend implementation_policy;
   protected:
     typedef value_storage<implementation_policy> value_storage_type;
-    value_storage_type _storage;
+    value_storage_type _storage;      // Offset +0
   private:
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
     bool _need_locks;                 // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
 #endif
-    bool _detached;                   // Future has already been set and promise is now detached
+    bool _detached;                   // Offset +5/+9 Future has already been set and promise is now detached
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4624)
@@ -189,9 +189,8 @@ namespace lightweight_futures {
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
     union { BOOST_SPINLOCK_FUTURE_MUTEX_TYPE _lock; };  // Delay construction
 #else
-    BOOST_SPINLOCK_FUTURE_MUTEX_TYPE _lock;
+    BOOST_SPINLOCK_FUTURE_MUTEX_TYPE _lock;  // Offset +6/+10
 #endif
-    
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
@@ -460,7 +459,7 @@ namespace lightweight_futures {
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
     bool _need_locks;                 // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
 #endif
-    bool _broken_promise;             // Promise was destroyed before setting a value
+    bool _broken_promise;             // Offset +5/+9 Promise was destroyed before setting a value
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4624)
@@ -468,12 +467,12 @@ namespace lightweight_futures {
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
     union { BOOST_SPINLOCK_FUTURE_MUTEX_TYPE _lock; };  // Delay construction
 #else
-    BOOST_SPINLOCK_FUTURE_MUTEX_TYPE _lock;
+    BOOST_SPINLOCK_FUTURE_MUTEX_TYPE _lock;  // Offset +6/+10
 #endif
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-    promise_type *_promise;
+    promise_type *_promise;                  // Offset +8/+16
   protected:
     // Called by basic_promise::get_future(), so currently thread safe
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(promise_type *p) : monad_type(std::move(p->_storage)),
@@ -553,7 +552,10 @@ namespace lightweight_futures {
       {
         detail::lock_guard<promise_type, future_type> h(this);
         if(h._p)
+        {
           h._p->_storage.clear();
+          h._p->_detached=true;
+        }
         // Destroy myself before locks exit
         monad_type::clear();
       }

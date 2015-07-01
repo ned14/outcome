@@ -1225,10 +1225,10 @@ BOOST_AUTO_TEST_CASE(works/monad/optional, "Tests that the monad acts as an opti
 {
   using namespace boost::spinlock::lightweight_futures;
   using boost::spinlock::tribool::tribool;
+  std::cout << "sizeof(value_storage<bool>) = " << sizeof(value_storage<detail::monad_policy<bool>>) << std::endl;
   std::cout << "sizeof(monad<bool>) = " << sizeof(monad<bool>) << std::endl;
   std::cout << "sizeof(result<bool>) = " << sizeof(result<bool>) << std::endl;
   std::cout << "sizeof(option<bool>) = " << sizeof(option<bool>) << std::endl;
-  //std::cout << "sizeof(value_storage<bool>) = " << sizeof(value_storage<detail::option_policy<bool>>) << std::endl;
   std::cout << "sizeof(option<tribool>) = " << sizeof(option<tribool>) << std::endl;
 
   std::cout << "sizeof(monad<bool>[2]) = " << sizeof(monad<bool>[2]) << std::endl;
@@ -1240,6 +1240,7 @@ BOOST_AUTO_TEST_CASE(works/monad/optional, "Tests that the monad acts as an opti
   std::cout << "sizeof(option<void>[2]) = " << sizeof(option<void>[2]) << std::endl;
 
   // TODO FIXME Get option<void> and option<bool> and option<tribool> storage down to 1 byte
+  BOOST_CHECK(!(sizeof(monad<bool>) & 3));
   BOOST_CHECK(sizeof(option<void>)<=2);
   BOOST_CHECK(sizeof(option<bool>)<=2);
   BOOST_CHECK(sizeof(option<tribool>)<=2);
@@ -1852,6 +1853,7 @@ template<template<class> class F, template<class> class P> void FuturePromiseCon
 //    BOOST_CHECK(!f.has_value());
     BOOST_CHECK_THROW(f.get(), std::future_error);
   }
+  // Make sure that exceptional rethrow is single shot
   {
     P<int> p;
     F<int> f(p.get_future());
@@ -1863,6 +1865,14 @@ template<template<class> class F, template<class> class P> void FuturePromiseCon
     BOOST_CHECK(!f.valid());
     BOOST_CHECK_THROW(f.get(), std::future_error);
 #endif
+  }
+  // Make sure future already retrieved survives a future construct destruct cycle
+  {
+    P<int> p;
+    F<int> f(p.get_future());
+    BOOST_CHECK_THROW(p.get_future(), std::future_error);
+    f = F<int>();
+    BOOST_CHECK_THROW(p.get_future(), std::future_error);
   }
   {
     P<int> p;
@@ -1908,6 +1918,10 @@ BOOST_AUTO_TEST_CASE(works/future/lightweight, "Tests that our future-promise wo
   using namespace boost::spinlock::lightweight_futures;
   std::cout << "sizeof(promise<bool>) = " << sizeof(promise<bool>) << std::endl;
   std::cout << "sizeof(future<bool>) = " << sizeof(future<bool>) << std::endl;
+  std::cout << "sizeof(promise<bool>[2]) = " << sizeof(promise<bool>[2]) << std::endl;
+  std::cout << "sizeof(future<bool>[2]) = " << sizeof(future<bool>[2]) << std::endl;
+  BOOST_CHECK(!(sizeof(promise<bool>) & 3));
+  BOOST_CHECK(!(sizeof(future<bool>) & 3));
   FuturePromiseConformanceTest<future, promise>();
 }
 
@@ -2064,6 +2078,10 @@ BOOST_AUTO_TEST_CASE(performance/future_option/simple, "Tests the performance of
   using namespace boost::spinlock::lightweight_futures;
   std::cout << "sizeof(promise_option<bool>) = " << sizeof(promise_option<bool>) << std::endl;
   std::cout << "sizeof(future_option<bool>) = " << sizeof(future_option<bool>) << std::endl;
+  std::cout << "sizeof(promise_option<bool>[2]) = " << sizeof(promise_option<bool>[2]) << std::endl;
+  std::cout << "sizeof(future_option<bool>[2]) = " << sizeof(future_option<bool>[2]) << std::endl;
+  BOOST_CHECK(!(sizeof(promise_option<bool>) & 3));
+  BOOST_CHECK(!(sizeof(future_option<bool>) & 3));
   auto result=CalculateFuturePerformanceSimple<future_option, promise_option>("lightweight");
   std::cout << "Approximately " << (result/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round" << std::endl;
 }

@@ -30,6 +30,7 @@ implementation policies themselves do the conversion, so some template alias e.g
 far more efficient implementation. Maybe try relocating AFIO's enqueued_task into a lightweight
 packaged_task design?
  - [ ] option<bool> et al should really be 1 byte storage, not 2 bytes.
+ - [ ] Use of reinterpret_cast to implement future => shared_future is naughty and should be done properly.
 
 
 # Benchmarks with early lightweight future-promise:
@@ -118,31 +119,41 @@ Producer Consumer: 377 (2.03x faster)
 
 ## VS2015:
 ### Dinkumware future promise:
-Simple loop: 575
-Producer Consumer: 1583
-  Creation and setting: 870
-  Getting from future: 281
-  Destruction of future: 432
+Simple loop: 545
+Producer Consumer: 1084
+  Creation and setting: 587
+  Getting from future: 215
+  Destruction of future: 281
+Three threads MPSC: 1772
+  Creation: 888
+  Setting: 534
+  Getting from future: 300
+  Destruction of future: 51
 
 ### lightweight future promise:
-Simple loop: 151
-Producer Consumer: 231 (6.85x faster)
-  Creation and setting: 179
-  Getting from future: 35
-  Destruction of future: 16
+Simple loop: 131
+Producer Consumer: 215 (5.04x faster)
+  Creation and setting: 168
+  Getting from future: 33
+  Destruction of future: 14
+Three threads MPSC: 742 (2.39x faster)
+  Creation: 360
+  Setting: 234
+  Getting from future: 83
+  Destruction of future: 66
 
 ### Dinkumware shared_future promise:
-Simple loop: 584
-Producer Consumer: 1433
-  Creation and setting: 706
-  Getting from future: 266
-  Destruction of future: 460
+Simple loop: 543
+Producer Consumer: 1092
+  Creation and setting: 600
+  Getting from future: 208
+  Destruction of future: 284
 
 ### lightweight shared_future promise:
-Simple loop: 481
-Producer Consumer: 747 (1.92x faster)
-  Creation and setting: 403
-  Getting from future: 74
-  Destruction of future: 270
+Simple loop: 427
+Producer Consumer: 586 (1.86x faster)
+  Creation and setting: 332
+  Getting from future: 61
+  Destruction of future: 194
 
 </center>

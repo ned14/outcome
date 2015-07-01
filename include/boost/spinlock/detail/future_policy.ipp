@@ -325,17 +325,18 @@ namespace detail
   template<typename R> struct BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME : public BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<void>
   {
     typedef BOOST_SPINLOCK_FUTURE_POLICY_NAME<void> impl;
+    typedef BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<void> shared_impl;
     typedef basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME> implementation_type;
     typedef R value_type;
     typedef basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME> *pointer_type;
-    BOOST_STATIC_CONSTEXPR bool is_consuming=impl::is_consuming;
+    BOOST_STATIC_CONSTEXPR bool is_consuming=shared_impl::is_consuming;
 
     // Called by get() &. Note we always return value_type by const lvalue ref.
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP const value_type &_get_value(implementation_type &self)
     {
       self.wait();
       typename implementation_type::lock_guard_type h(&self);
-      impl::_pre_get_value<is_consuming>(self);
+      shared_impl::_pre_get_value<is_consuming>(self);
       return self._storage.value;
     }
     // Called by get() const &. Note we always return value_type by const lvalue ref.
@@ -343,7 +344,7 @@ namespace detail
     {
       self.wait();
       typename implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
-      impl::_pre_get_value<is_consuming>(self);
+      shared_impl::_pre_get_value<is_consuming>(self);
       return self._storage.value;
     }
     // Called by get() &&. Note we always return value_type by const lvalue ref.
@@ -351,7 +352,7 @@ namespace detail
     {
       self.wait();
       typename implementation_type::lock_guard_type h(&self);
-      impl::_pre_get_value<is_consuming>(self);
+      shared_impl::_pre_get_value<is_consuming>(self);
       return self._storage.value;
     }
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP implementation_type _construct(basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<R>> &&v)
