@@ -14,12 +14,22 @@ Lightweight promise-future:
  - [x] Implement shared_future_policy and a conformance suite for shared_future.
  - [x] Implement shared_future_ptr which thunks a shared_future API through a shared_ptr to
 basic_future<shared_future_policy>.
+ - [ ] Document synchronisation APIs in promise future.
+ - [ ] Audit all unlocked state reads with writes for raciness.
+ - [ ] Implement N4399 continuations.
+ - [ ] wait() should sleep the thread as necessary.
+ - [ ] Implement wait_for()/wait_until().
+ - [ ] when_any/when_all composure.
 
- - [ ] Add monad_errc error code for when a move or copy constructor throws?
- - [ ] Review all throws of exceptions and see if they can be replaced with an error_code set.
+Later:
+ - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
  - [ ] Have basic_monad gain an explicit conversion constructor from other basic_monad with different
 implementation policies such option can convert to result or monad and so on. Look into having the
 implementation policies themselves do the conversion, so some template alias e.g. convert<>().
+ - [ ] Lightweight packaged_task? I think an intrusive design like AFIO's enqueued_task makes for a
+far more efficient implementation. Maybe try relocating AFIO's enqueued_task into a lightweight
+packaged_task design?
+ - [ ] option<bool> et al should really be 1 byte storage, not 2 bytes.
 
 
 # Benchmarks with early lightweight future-promise:

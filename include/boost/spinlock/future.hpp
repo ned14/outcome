@@ -374,6 +374,7 @@ namespace lightweight_futures {
 
   // TODO: basic_promise<void>, basic_promise<R&> specialisations
   // TODO: basic_future<void>, basic_future<R&> specialisations
+  //! \todo basic_promise<R&> and basic_future<R&> specialisations
 
   /*! \class basic_future
   \brief Lightweight next generation future with N4399 Concurrency TS extensions
@@ -403,7 +404,7 @@ namespace lightweight_futures {
   ## Supplying your own implementations of `basic_future<T>` ##
   To do this, simply supply a policy type of the following form. Note that this is identical to basic_monad's policy,
   except for the added members which are commented:
-  \snippet future.hpp future_policy
+  \snippet future_policy.ipp future_policy
   */
   template<class implementation_policy> class basic_future : protected basic_monad<implementation_policy>
   {
