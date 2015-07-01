@@ -349,25 +349,25 @@ namespace lightweight_futures {
 
   http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4399.html
   
-  In exchange for some minor limitations, this lightweight promise-future is more than 10x faster than
-  `std::promise` and `std::future` in the uncontended case. You also get deep integration with basic_monad and
-  lots of cool functional programming stuff. Those limitations are:
+  In exchange for some minor limitations, this lightweight promise-future is more than 3x-10x faster than
+  `std::promise` and `std::future` in the non-blocking case. You also get deep integration with basic_monad and
+  lots of cool functional programming stuff. 
   
-  - No memory allocation is done, so if your code overrides the STL allocator for promise-future it won't port.
-  - Consequently both promise and future must have sizeof greater than sizeof(T), so don't use multi-Kb sized T's
+  Known deviations from the ISO C++ standard specification:
+  
+  - No memory allocation is done, so if your code overrides the STL allocator for promise-future it will be ignored.
+  - T must implement either or both the copy or move constructor, else it will static_assert.
+  - T cannot be error_type nor exception_type, else it will static_assert.
+  - Neither future nor promise are ever thread safe if promise.set_value() is done before promise.get_future().
+  - set_value_at_thread_exit() and set_exception_at_thread_exit() are not implemented, nor probably ever will be.
+  - promise's and future's move constructor and move assignment are guaranteed noexcept in the standard. This promise's
+  and future's move constructor and assignment is noexcept only if type T's move constructor is noexcept.
+
+  Other things to consider:
+
+  - As both promise and future must have sizeof greater than sizeof(T), don't use multi-Kb sized T's
   as they'll get copied and moved around.
-  - Your type T must implement either or both the copy and move constructors.
-  - Your type T cannot be an error_type nor an exception_type. If you really want to promise one of those, wrap
-  it in a wrapper type.
   - Don't use any of the `monad_errc` nor `future_errc` error codes for the errored return, else expect misoperation.
-  - You can't set the future state at thread exit.
-  - Neither promise nor future is thread safe until `get_future()` is first called and if and only if the state has not
-  yet been set. In other words, if you set the state and then call `get_future()`, neither is ever threadsafe, not ever.
-  This optimisation is safe as you will need some mechanism of sending the already ready future to another thread, and
-  that will synchronise memory for you, however if you write code where multiple threads attempt to get the state
-  concurrently, you will be in trouble. Note that if you call `get_future()` before setting the state, both promise and
-  future become thread safe from the `get_future()` onwards and remain thread safe for the remainder of their lifetimes,
-  so multiple threads can both set and/or get the state, with the usual exceptions being thrown if you try to do either twice.
 
   ## Supplying your own implementations of `basic_future<T>` ##
   To do this, simply supply a policy type of the following form. Note that this is identical to basic_monad's policy,
