@@ -1123,9 +1123,9 @@ namespace lightweight_futures {
     template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP void emplace(Args &&... args) { _storage.clear(); _storage.emplace_value(std::forward<Args>(args)...); }
     
     //! \brief If contains an error_type, returns that error_type. If contains an error, returns an error code of `monad_errc::exception_present`. Otherwise returns a null error_type. Can only throw the exception monad_error(no_state) if empty.
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP auto get_error() const -> decltype(implementation_policy::_get_error(*this))
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP auto get_error() const -> decltype(implementation_policy::_get_error(detail::rebind_cast<implementation_type>(*this)))
     {
-      return implementation_policy::_get_error(*this);
+      return implementation_policy::_get_error(detail::rebind_cast<implementation_type>(*this));
     }
     //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
     BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error_or(error_type e) const noexcept { return has_error() ? _storage.error : std::move(e); }
@@ -1135,9 +1135,9 @@ namespace lightweight_futures {
     BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_error(error_type v) { _storage.clear(); _storage.set_error(std::move(v)); }
     
     //! \brief If contains an exception_type, returns that exception_type. If contains an error_type, returns system_error(error_type). If contains a value_type, returns a null exception_type. Can only throw the exception monad_error(no_state) if empty.
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP auto get_exception() const -> decltype(implementation_policy::_get_exception(*this))
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP auto get_exception() const -> decltype(implementation_policy::_get_exception(detail::rebind_cast<implementation_type>(*this)))
     {
-      return implementation_policy::_get_exception(*this);
+      return implementation_policy::_get_exception(detail::rebind_cast<implementation_type>(*this));
     }
     //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
     BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception_or(exception_type e) const noexcept { return has_exception() ? _storage.exception : std::move(e); }

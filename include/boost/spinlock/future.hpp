@@ -553,8 +553,16 @@ namespace lightweight_futures {
     {
     }
     //! \brief If available for this kind of future, constructs this future type from some other future type
-    template<class U, typename=decltype(implementation_policy::_construct(std::declval<U>()))> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_future(U &&o)
-      : basic_future(implementation_policy::_construct(std::forward<U>(o)))
+    template<class Impl, typename=decltype(implementation_policy::_construct(std::declval<basic_future<Impl>>()))> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_future(basic_future<Impl> &&o)
+      : basic_future(implementation_policy::_construct(std::forward<basic_future<Impl>>(o)))
+    {
+    }
+    //! \brief Explicit construction of a ready/errored/excepted future from any of the types supported by the underlying monad. Alternative to make_ready_XXX.
+    template<class U, typename=typename std::enable_if<std::is_constructible<monad_type, U>::value>::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit basic_future(U &&v) : monad_type(std::forward<U>(v)),
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+      _need_locks(true),
+#endif
+      _broken_promise(false), _promise(nullptr)
     {
     }
     //! \brief SYNC POINT Move constructor

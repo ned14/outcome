@@ -148,10 +148,8 @@ namespace detail
 #endif
     }
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
-    template<bool is_consuming, class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error_impl(U &&self)
+    template<bool is_consuming, class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error_impl(U &self)
     {
-      self.wait();
-      typename implementation_type::lock_guard_type h(const_cast<U *>(&self));
       self._check_validity();
       if(self.has_error())
       {
@@ -165,10 +163,8 @@ namespace detail
     }
 #endif
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-    template<bool is_consuming, class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception_impl(U &&self)
+    template<bool is_consuming, class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception_impl(U &self)
     {
-      self.wait();
-      typename implementation_type::lock_guard_type h(const_cast<U *>(&self));
       self._check_validity();
       if(!self.has_error() && !self.has_exception())
         return exception_type();
@@ -210,20 +206,24 @@ namespace detail
       self.clear();
     }
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
-    template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const U &self)
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const implementation_type &self)
     {
-      return _get_error_impl<is_consuming>(self);
+      self.wait();
+      implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+      return _get_error_impl<is_consuming>(const_cast<implementation_type &>(self));
     }
 #else
-    template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const U &self);
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const implementation_type &self);
 #endif
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-    template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const U &self)
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const implementation_type &self)
     {
-      return _get_exception_impl<is_consuming>(self);
+      self.wait();
+      implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+      return _get_exception_impl<is_consuming>(const_cast<implementation_type &>(self));
     }
 #else
-    template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const U &self);
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const implementation_type &self);
 #endif
     // Makes share() available on this future. Defined out of line as need shared_future_policy defined first.
     static inline BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<void>> _share(implementation_type &&self);
@@ -269,6 +269,26 @@ namespace detail
       self.clear();
       return v;
     }
+#ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const implementation_type &self)
+    {
+      self.wait();
+      implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+      return _get_error_impl<is_consuming>(const_cast<implementation_type &>(self));
+    }
+#else
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const implementation_type &self);
+#endif
+#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const implementation_type &self)
+    {
+      self.wait();
+      implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+      return _get_exception_impl<is_consuming>(const_cast<implementation_type &>(self));
+    }
+#else
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const implementation_type &self);
+#endif
     static inline BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<R>> _share(implementation_type &&self);
   };
   //! [future_policy]
@@ -306,16 +326,24 @@ namespace detail
       impl::_pre_get_value<is_consuming>(self);
     }
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
-    template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const U &self)
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const implementation_type &self)
     {
-      return impl::_get_error_impl<is_consuming>(self);
+      self.wait();
+      implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+      return _get_error_impl<is_consuming>(const_cast<implementation_type &>(self));
     }
+#else
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const implementation_type &self);
 #endif
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-    template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const U &self)
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const implementation_type &self)
     {
-      return impl::_get_exception_impl<is_consuming>(self);
+      self.wait();
+      implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+      return _get_exception_impl<is_consuming>(const_cast<implementation_type &>(self));
     }
+#else
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const implementation_type &self);
 #endif
     //! \todo Do not use reinterpret_cast to convert between consuming and non-consuming futures.
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP implementation_type _construct(basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<void>> &&v)
@@ -357,6 +385,26 @@ namespace detail
       shared_impl::_pre_get_value<is_consuming>(self);
       return self._storage.value;
     }
+#ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const implementation_type &self)
+    {
+      self.wait();
+      implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+      return _get_error_impl<is_consuming>(const_cast<implementation_type &>(self));
+    }
+#else
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const implementation_type &self);
+#endif
+#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const implementation_type &self)
+    {
+      self.wait();
+      implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+      return _get_exception_impl<is_consuming>(const_cast<implementation_type &>(self));
+    }
+#else
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const implementation_type &self);
+#endif
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP implementation_type _construct(basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<R>> &&v)
     {
       return implementation_type(reinterpret_cast<implementation_type &&>(v));
@@ -378,52 +426,60 @@ template<typename R> using BOOST_SPINLOCK_PROMISE_NAME = basic_promise<detail::B
 //! \brief A predefined future convenience type \ingroup future_promise
 template<typename R> using BOOST_SPINLOCK_FUTURE_NAME = basic_future<detail::BOOST_SPINLOCK_FUTURE_POLICY_NAME<R>>;
 
-#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME make_ready_ ## BOOST_SPINLOCK_FUTURE_NAME
+#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME BOOST_SPINLOCK_GLUE(make_ready_, BOOST_SPINLOCK_FUTURE_NAME)
 //! \brief A predefined make ready future convenience function \ingroup future_promise
 template<typename R> inline BOOST_SPINLOCK_FUTURE_NAME<typename std::decay<R>::type> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(R &&v)
 {
   return BOOST_SPINLOCK_FUTURE_NAME<typename std::decay<R>::type>(std::forward<R>(v));
 }
 #undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
-#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME make_errored_ ## BOOST_SPINLOCK_FUTURE_NAME
+#ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
+#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME BOOST_SPINLOCK_GLUE(make_errored_, BOOST_SPINLOCK_FUTURE_NAME)
 //! \brief A predefined make errored future convenience function \ingroup future_promise
-template<typename R> inline BOOST_SPINLOCK_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(std::error_code v)
+template<typename R> inline BOOST_SPINLOCK_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE v)
 {
   return BOOST_SPINLOCK_FUTURE_NAME<R>(std::move(v));
 }
 #undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
-#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME make_exceptional_ ## BOOST_SPINLOCK_FUTURE_NAME
+#endif
+#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
+#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME BOOST_SPINLOCK_GLUE(make_exceptional_, BOOST_SPINLOCK_FUTURE_NAME)
 //! \brief A predefined make excepted future convenience function \ingroup future_promise
-template<typename R> inline BOOST_SPINLOCK_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(std::exception_ptr v)
+template<typename R> inline BOOST_SPINLOCK_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE v)
 {
   return BOOST_SPINLOCK_FUTURE_NAME<R>(std::move(v));
 }
 #undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
+#endif
 
 //! \brief A predefined shared future convenience type \ingroup future_promise
 template<typename R> using BOOST_SPINLOCK_SHARED_FUTURE_NAME = shared_basic_future_ptr<basic_future<detail::BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<R>>>;
 
-#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME make_ready_ ## BOOST_SPINLOCK_SHARED_FUTURE_NAME
+#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME BOOST_SPINLOCK_GLUE(make_ready_, BOOST_SPINLOCK_SHARED_FUTURE_NAME)
 //! \brief A predefined make ready shared future convenience function \ingroup future_promise
 template<typename R> inline BOOST_SPINLOCK_SHARED_FUTURE_NAME<typename std::decay<R>::type> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(R &&v)
 {
   return BOOST_SPINLOCK_SHARED_FUTURE_NAME<typename std::decay<R>::type>(std::forward<R>(v));
 }
 #undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
-#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME make_errored_ ## BOOST_SPINLOCK_SHARED_FUTURE_NAME
+#ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
+#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME BOOST_SPINLOCK_GLUE(make_errored_, BOOST_SPINLOCK_SHARED_FUTURE_NAME)
 //! \brief A predefined make errored shared future convenience function \ingroup future_promise
-template<typename R> inline BOOST_SPINLOCK_SHARED_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(std::error_code v)
+template<typename R> inline BOOST_SPINLOCK_SHARED_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE v)
 {
   return BOOST_SPINLOCK_SHARED_FUTURE_NAME<R>(std::move(v));
 }
 #undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
-#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME make_exceptional_ ## BOOST_SPINLOCK_SHARED_FUTURE_NAME
+#endif
+#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
+#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME BOOST_SPINLOCK_GLUE(make_exceptional_, BOOST_SPINLOCK_SHARED_FUTURE_NAME)
 //! \brief A predefined make excepted shared future convenience function \ingroup future_promise
-template<typename R> inline BOOST_SPINLOCK_SHARED_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(std::exception_ptr v)
+template<typename R> inline BOOST_SPINLOCK_SHARED_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE v)
 {
   return BOOST_SPINLOCK_SHARED_FUTURE_NAME<R>(std::move(v));
 }
 #undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
+#endif
 
 #undef BOOST_SPINLOCK_FUTURE_NAME_POSTFIX
 #undef BOOST_SPINLOCK_GLUE

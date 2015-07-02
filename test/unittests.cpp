@@ -1923,6 +1923,14 @@ BOOST_AUTO_TEST_CASE(works/future/lightweight, "Tests that our future-promise wo
   BOOST_CHECK(!(sizeof(promise<bool>) & 3));
   BOOST_CHECK(!(sizeof(future<bool>) & 3));
   FuturePromiseConformanceTest<future, promise>();
+
+  auto e(std::make_exception_ptr(5));
+  future<int> f1(make_ready_future(5));
+  future<int> f2(make_errored_future<int>(std::make_error_code((std::errc) 5)));
+  future<int> f3(make_exceptional_future<int>(e));
+  BOOST_CHECK(f1.get() == 5);
+  BOOST_CHECK(f2.get_error() == std::make_error_code((std::errc) 5));
+  BOOST_CHECK(f3.get_exception() == e);
 }
 
 template<template<class> class F, template<class> class P> void SharedFuturePromiseConformanceTest()
