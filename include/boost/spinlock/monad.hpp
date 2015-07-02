@@ -475,6 +475,22 @@ namespace lightweight_futures {
     typedef devoid<typename implementation_policy::error_type, no_error_type> error_type;
     typedef devoid<typename implementation_policy::exception_type, no_exception_type> exception_type;
     typedef devoid<typename implementation_policy::pointer_type, no_pointer_type> pointer_type;
+    struct Pointer_t
+    {
+      pointer_type pointer;        // Typically 8 bytes
+      std::unique_ptr<std::function<void(pointer_type)>> callable;  // Typically 8 bytes
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR Pointer_t(pointer_type p) : pointer(p) { }
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR Pointer_t(Pointer_t &&o) noexcept : pointer(std::move(o.pointer)), callable(std::move(o.callable)) { o.pointer = nullptr; }
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR Pointer_t &operator=(Pointer_t &&o) noexcept
+      {
+        pointer = std::move(o.pointer);
+        callable = std::move(o.callable);
+        o.pointer = nullptr;
+        return *this;
+      }
+      ~Pointer_t() { pointer = nullptr; }
+    };
+    typedef typename std::conditional<!std::is_void<typename implementation_policy::pointer_type>::value, Pointer_t, no_pointer_type>::type Pointer;
 
     static_assert(!std::is_same<value_type, error_type>::value, "R and error_type cannot be the same type");
     static_assert(!std::is_same<value_type, exception_type>::value, "R and exception_type cannot be the same type");
@@ -489,7 +505,7 @@ namespace lightweight_futures {
       value_type value;
       error_type error;              // Often 16 bytes surprisingly
       exception_type exception;      // Typically 8 bytes
-      pointer_type pointer_;         // Typically 8 bytes
+      Pointer pointer_;
     };
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -564,8 +580,7 @@ namespace lightweight_futures {
         new (&exception) exception_type(std::move(o.exception));
         break;
       case storage_type::pointer:
-        pointer_ = o.pointer_;
-        o.pointer_ = nullptr;
+        new (&pointer_) Pointer(std::move(o.pointer_));
         break;
       }
       type = o.type;
@@ -631,7 +646,7 @@ namespace lightweight_futures {
         type = storage_type::empty;
         break;
       case storage_type::pointer:
-        pointer_ = nullptr;
+        pointer_.~Pointer();
         type = storage_type::empty;
         break;
       }
@@ -662,11 +677,17 @@ namespace lightweight_futures {
       type = storage_type::error;
     }
     // Called by future to take ownership of storage from promise
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_pointer(pointer_type f) noexcept(is_nothrow_destructible)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_pointer(pointer_type f)
     {
       assert(type == storage_type::empty);
-      pointer_ = f;
+      new (&pointer_) Pointer(std::move(f));
       type = storage_type::pointer;
+    }
+    // Called by future to set a continuation
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_continuation(std::unique_ptr<std::function<void(pointer_type)>> c)
+    {
+      assert(type == storage_type::pointer);
+      pointer_.callable = std::move(c);
     }
   };
 

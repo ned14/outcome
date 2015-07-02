@@ -147,7 +147,7 @@ namespace lightweight_futures {
         {
           _p=p;
           if(p->_storage.type==promise_type::value_storage_type::storage_type::pointer)
-            _f=p->_storage.pointer_;
+            _f=p->_storage.pointer_.pointer;
           return;
         }
         else
@@ -157,10 +157,10 @@ namespace lightweight_futures {
           p->_lock.lock();
           if(p->_storage.type==promise_type::value_storage_type::storage_type::pointer)
           {
-            if(p->_storage.pointer_->_lock.try_lock())
+            if(p->_storage.pointer_.pointer->_lock.try_lock())
             {
               _p=p;
-              _f=p->_storage.pointer_;
+              _f=p->_storage.pointer_.pointer;
               break;
             }
           }
@@ -257,6 +257,10 @@ namespace lightweight_futures {
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
+    void _wake_waiters()
+    {
+      // todo, need to get policy to set waiter type first
+    }
   public:
     //! \brief The policy used to implement this basic_future
     typedef implementation_policy policy;
@@ -383,7 +387,7 @@ namespace lightweight_futures {
       //detail::lock_guard<value_type> h(this);
       return _storage.type==value_storage_type::storage_type::future || _detached;
     }
-    
+
 #define BOOST_SPINLOCK_FUTURE_IMPL(name, function) \
     name \
     { \
@@ -395,9 +399,15 @@ namespace lightweight_futures {
         if(!h._f->empty()) \
           implementation_policy::_throw_error(monad_errc::already_set); \
         h._f->function; \
+        auto callable(std::move(_storage.pointer_.callable)); \
+        future_type *f=h._f; \
         h._f->_promise=nullptr; \
         _storage.clear(); \
         _detached=true; \
+        h.unlock(); \
+        if(callable) \
+          (*callable)(f); \
+        _wake_waiters(); \
       } \
       else \
       { \
@@ -433,6 +443,7 @@ namespace lightweight_futures {
     //! \brief Call F when the future signals, consuming the future. Only one of these may be set.
     // template<class F> typename std::result_of<F(basic_future<value_type>)>::type then(F &&f);
 
+    // future<result_of_t<decay_t<F>(future<R>)>>
     //! \brief Call F when the future signals, not consuming the future.
     // template<class F> typename std::result_of<F(basic_future<const value_type &>)>::type then(F &&f);
   };
@@ -582,7 +593,7 @@ namespace lightweight_futures {
         _promise=o._promise;
         o._promise=nullptr;
         if(h._p)
-          h._p->_storage.pointer_=this;
+          h._p->_storage.pointer_.pointer=this;
       }
     }
     //! \brief SYNC POINT Move assignment. If it throws during the move, the future is left as if default constructed.
@@ -658,9 +669,9 @@ namespace lightweight_futures {
       std::swap(_broken_promise, o._broken_promise);
       std::swap(_promise, o._promise);
       if(h1._p)
-        h1._p->_storage.pointer_=&o;
+        h1._p->_storage.pointer_.pointer=&o;
       if(h2._p)
-        h2._p->_storage.pointer_=this;
+        h2._p->_storage.pointer_.pointer=this;
     }
 
     //! \brief If available for this kind of future, converts this simple future into some policy determined shared future type
