@@ -219,7 +219,7 @@ namespace lightweight_futures {
   }
 
   /*! \class basic_promise
-  \brief Implements the state setting side of basic_monad
+  \brief Implements the state setting side of basic_future
   \tparam implementation_policy An implementation policy type
   \ingroup future_promise
   

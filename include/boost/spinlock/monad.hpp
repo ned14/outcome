@@ -53,6 +53,167 @@ DEALINGS IN THE SOFTWARE.
 \headerfile include/boost/spinlock/monad.hpp ""
 */
 
+/*! \defgroup monad Configurable lightweight simple monadic value transport with the same semantics and API as a future
+\ingroup future_promise
+
+Predefined basic_monad implementations:
+<dl>
+  <dt>`monad<R>`</dt>
+    <dd>Can hold a fixed variant list of empty, a type `R`, a lightweight `std::error_code` or a
+heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::false_`,
+`tribool::true_`, `tribool::unknown` and `tribool::unknown` respectively.</dd>
+  <dt>`result<R>`</dt>
+    <dd>Can hold a fixed variant list of empty, a type `R` or a lightweight `std::error_code` at a
+space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::false_`, `tribool::true_` and
+`tribool::unknown` respectively. This specialisation looks deliberately like Rust's `Result<T>`.</dd>
+  <dt>`option<R>`</dt>
+    <dd>Can hold a fixed variant list of empty or a type `R` at a space cost of `sizeof(value_storage<R>)`
+which is usually `sizeof(R)+8`, but may be smaller if `value_storage<R>` is specialised e.g.
+`sizeof(option<char>)` is just two bytes. This corresponds to `tribool::false_` and `tribool::true_`
+respectively. This specialisation looks deliberately like Rust's `Option<T>`.</dd>
+</dl>
+
+Features:
+
+- Very lightweight on build times and run times up to the point of zero execution cost and just an eight
+byte space overhead. See below for benchmarks. Requires min clang 3.2, GCC 4.8 or VS2015.
+- Just enough monad, nothing more, nothing fancy. Replicates the future API, so if you know how to
+use a future you already know how to use this.
+- Enables convenient and easy all-`noexcept` coding and design, giving you powerful error handling facilities
+with automatic exception safety.
+- Can replace most uses of `optional<T>`.
+- Deep integration with lightweight future-promise (i.e. async monadic programming) also in this library which
+subclasses these monads. See \ref future_promise.
+- Comprehensive unit testing and validation suite.
+- Mirrors `noexcept` of type R.
+- Type R can have no default constructor, move nor copy.
+- Works inside a STL container, and type R can be a STL container.
+  - No comparison operations nor hashing is provided, deliberately to keep things simple.
+
+## Notes: ##
+
+As `monad<R>`, `result<R>` and `option<R>` are all just `basic_monad` with different implementation
+policies, wherever we refer to `monad<R>` we mean those three specialisations as well.
+
+Something which might surprise people is that:
+
+\code
+monad<std::string> a("niall");
+monad<std::string> b(std::move(a));
+BOOST_CHECK(a.has_value());  // true
+\endcode
+
+Moving a monad does a move of its underlying contents, so any contents remain at whatever
+the move constructor for that content leaves things. In other words, a moved from monad
+does not become empty, if you want that then call clear().
+
+So long as you avoid the exception_type code paths (`result<R>`, `option<R>`), this implementation will be
+ideally reduced to as few assembler instructions as possible by most recent compilers [1]
+which can include exactly zero assembler instructions output. This monad is therefore
+identical in terms of execution overhead to using the R type you specify directly - you
+get the monadic functionality totally free of execution overhead where the compiler is able
+to reduce it to such.
+
+A similar thing applies to error_type which is a lightweight implementation on most
+systems. An exception is on VS2015 as the lvalue reference to system_category appears
+to be constructed via thread safe once routine called "Immortalize", so when you
+construct an error_type on MSVC you'll force a memory synchronisation during the constructor
+only. error_types are very cheap to pass around though as they are but an integer and a lvalue ref,
+though I see that on GCC and clang 16 bytes is always copied around instead of completely
+eliding the copy.
+
+exception_type is also pretty good on anything but MSVC, though never zero assembler
+instructions. As soon as an exception_type \em could be created, you'll force out about twenty
+instructions most of which won't be executed in practice. Unfortunately, MSVC churns out
+about 2000 assembler instructions as soon as you might touch an exception_type, I've raised
+this with Microsoft and it looks to be hard for them to fix due to backwards compatibility
+reasons.
+
+[1]: GCC 5.1 does a perfect job, VS2015 does a good job, clang 3.7 not so great. See next section.
+
+## Complexity guarantees ##
+
+These x64 opcode guarantees are empirically determined by the unit test suite, and the per-commit
+CI testing will fail if they suddenly are exceeded. The maximum is calculated by taking a monad
+in from a non-visible source where the compiler has to generate code paths to handle an unknown
+input state, whereas the minimum is calculated by setting a monad's state in view of the compiler's
+optimiser such that it can usually completely elide opcodes generated (though note that varies
+enormously by compiler to the extent that the known code generates more opcodes than the unknown code). All monads are `monad<int>`.
+
+### `monad<R>`: ###
+<dl>
+ <dt>clang 3.7</dt>
+  <dd>51 opcodes <= Value transport <= 32 opcodes<br></dd>
+  <dd>6 opcodes <= Error transport <= 50 opcodes<br></dd>
+  <dd>54 opcodes <= Exception transport <= 35 opcodes<br></dd>  
+  <dd>55 opcodes <= next() <= 76 opcodes<br></dd>
+  <dd>4 opcodes <= bind() <= 42 opcodes</dd>
+ <dt>GCC 5.1</dt>
+  <dd>1 opcodes <= Value transport <= 50 opcodes<br></dd>
+  <dd>8 opcodes <= Error transport <= 37 opcodes<br></dd>
+  <dd>27 opcodes <= Exception transport <= 151 opcodes<br></dd>
+  <dd>4 opcodes <= next() <= 89 opcodes<br></dd>
+  <dd>5 opcodes <= bind() <= 44 opcodes</dd>
+ <dt>VS2015</dt>
+  <dd>4 opcodes <= Value transport <= 1879 opcodes<br></dd>
+  <dd>6 opcodes <= Error transport <= 159 opcodes<br></dd>
+  <dd>1973 opcodes <= Exception transport <= 1940 opcodes<br></dd>
+  <dd>1981 opcodes <= next() <= 1982 opcodes<br></dd>
+  <dd>103 opcodes <= bind() <= 104 opcodes</dd>
+</dl>
+
+### `result<R>`: ###
+<dl>
+ <dt>clang 3.7</dt>
+  <dd>2 opcodes <= Value transport <= 49 opcodes<br></dd>
+  <dd>4 opcodes <= next() <= 56 opcodes<br></dd>
+ <dt>GCC 5.1</dt>
+  <dd>1 opcodes <= Value transport <= 32 opcodes<br></dd>
+  <dd>4 opcodes <= next() <= 52 opcodes<br></dd>
+ <dt>VS2015</dt>
+  <dd>4 opcodes <= Value transport <= 1848 opcodes<br></dd>
+  <dd>1918 opcodes <= next() <= 1919 opcodes<br></dd>
+</dl>
+
+### `option<R>`: ###
+<dl>
+ <dt>clang 3.7</dt>
+  <dd>2 opcodes <= Value transport <= 26 opcodes<br></dd>
+  <dd>5 opcodes <= next() <= 37 opcodes<br></dd>
+ <dt>GCC 5.1</dt>
+  <dd>1 opcodes <= Value transport <= 9 opcodes<br></dd>
+  <dd>4 opcodes <= next() <= 27 opcodes<br></dd>
+ <dt>VS2015</dt>
+  <dd>4 opcodes <= Value transport <= 117 opcodes<br></dd>
+  <dd>185 opcodes <= next() <= 186 opcodes<br></dd>
+</dl>
+
+Despite the opcode spillage, performance is \b excellent on all compilers. Modern optimisers do a really
+great job at reaching tens of CPU cycle overhead with this monad design.
+
+## Examples ##
+
+\snippet unittests.cpp monad_example
+
+### As an alternative to `optional<T>` ###
+
+Something not so obvious is that this monad can have an empty state, and therefore
+can stand in for `optional<T>` like this:
+
+\snippet unittests.cpp optional_example
+
+The API is actually not too distant from `optional<T>`, so with a bit of regex find and replace
+you could use `option<T>` instead.
+
+The need for `monad<T>` to be able to be empty was to make exception throws by T during copy and move
+construction lightweight. If that happens, the monad always has empty state afterwards.
+
+## Supplying your own implementations of `basic_monad<T>` ##
+To do this, simply supply a policy type of the following form:
+\snippet monad.hpp monad_policy
+*/
+
+
 BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 
 namespace traits
@@ -206,7 +367,7 @@ namespace traits
 namespace lightweight_futures
 {
 
-  //! \brief Enumeration of the ways in which a monad operation may fail
+  //! \brief Enumeration of the ways in which a monad operation may fail \ingroup monad
   enum class monad_errc {
     already_set = 1,        //!< Attempt to store a value into the monad twice
     no_state = 2,           //!< Attempt to use without a state
@@ -234,6 +395,7 @@ namespace lightweight_futures
 
   /*! \brief Returns a reference to a monad error category. Note the address
   of one of these may not be constant throughout the process as per the ISO spec.
+  \ingroup monad
   */
   inline const detail::monad_category &monad_category()
   {
@@ -241,7 +403,7 @@ namespace lightweight_futures
     return c;
   }
 
-  //! \brief A monad exception object
+  //! \brief A monad exception object \ingroup monad
   class BOOST_SYMBOL_VISIBLE monad_error : public std::logic_error
   {
     std::error_code _ec;
@@ -250,11 +412,13 @@ namespace lightweight_futures
     const std::error_code &code() const noexcept { return _ec; }
   };
 
+  //! \brief ADL looked up by the STL to convert a monad_errc into an error_code. \ingroup monad
   inline std::error_code make_error_code(monad_errc e)
   {
     return std::error_code(static_cast<int>(e), monad_category());
   }
 
+  //! \brief ADL looked up by the STL to convert a monad_errc into an error_condition. \ingroup monad
   inline std::error_condition make_error_condition(monad_errc e)
   {
     return std::error_condition(static_cast<int>(e), monad_category());
@@ -266,7 +430,9 @@ BOOST_SPINLOCK_V1_NAMESPACE_END
 
 namespace std
 {
+  //! \brief Tells the STL this is an error code enum \ingroup monad
   template<> struct is_error_code_enum<BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::monad_errc> : std::true_type {};
+  //! \brief Tells the STL this is an error condition enum \ingroup monad
   template<> struct is_error_condition_enum<BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::monad_errc> : std::true_type {};
 }
 
@@ -283,6 +449,7 @@ namespace lightweight_futures {
   \tparam implementation_policy A policy type providing a `value_type`, an `error_type`, an `exception_type`, an
   `implementation_type` and a function called `bool _throw_error(monad_errc)`.
   \brief A fixed lightweight variant store for monad.
+  \ingroup monad
   
   This fixed variant list of empty, a type `R`, a lightweight `error_type` or a
   heavier `exception_type` typically has a space cost of `max(24, sizeof(R)+4)`.
@@ -723,153 +890,8 @@ namespace lightweight_futures {
   /*! \class basic_monad
   \brief Implements a configurable lightweight simple monadic value transport with the same semantics and API as a future
   \tparam implementation_policy An implementation policy type
+  \ingroup monad
   
-  Predefined basic_monad implementations:
-  - `monad<R>` can hold a fixed variant list of empty, a type `R`, a lightweight `std::error_code` or a
-  heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+4)`. This corresponds to `tribool::false_`,
-  `tribool::true_`, `tribool::unknown` and `tribool::unknown` respectively. 
-  - `result<R>` can hold a fixed variant list of empty, a type `R` or a lightweight `std::error_code` at a
-  space cost of `max(24, sizeof(R)+4)`. This corresponds to `tribool::false_`, `tribool::true_` and
-  `tribool::unknown` respectively. This specialisation looks deliberately like Rust's `Result<T>`.
-  - `option<R>` can hold a fixed variant list of empty or a type `R` at a space cost of `sizeof(value_storage<R>)`
-  which is usually `sizeof(R)+4`, but may be smaller if `value_storage<R>` is specialised. This
-  corresponds to `tribool::false_` and `tribool::true_` respectively. This specialisation looks deliberately
-  like Rust's `Option<T>`.
-
-Features:
-
-  - Very lightweight on build times and run times up to the point of zero execution cost and just a four
-  byte space overhead. See below for benchmarks. Requires min clang 3.2, GCC 4.7 or VS2015.
-  - Just enough monad, nothing more, nothing fancy. Replicates the future API, so if you know how to
-  use a future you already know how to use this.
-  - Enables convenient all-`noexcept` mathematically verifiable close semantic design, so
-  why bother with Rust anymore? :)
-  - Can replace most uses of `optional<T>`.
-  - Deep integration with lightweight future-promise (i.e. async monadic programming) also in this library.
-  - Comprehensive unit testing and validation suite.
-  - Mirrors `noexcept` of type R.
-  - Type R can have no default constructor, move nor copy.
-  - Works inside a STL container, and type R can be a STL container.
-    - No comparison operations nor hashing is provided, deliberately to keep things simple.
-
-## Notes: ##
-
-  As `monad<R>`, `result<R>` and `option<R>` are all just `basic_monad` with different implementation
-  policies, wherever we refer to `monad<R>` we mean those three specialisations as well.
-
-  Something which might surprise people is that:
-
-  \code
-  monad<std::string> a("niall");
-  monad<std::string> b(std::move(a));
-  BOOST_CHECK(a.has_value());  // true
-  \endcode
-
-  Moving a monad does a move of its underlying contents, so any contents remain at whatever
-  the move constructor for that content leaves things. In other words, a moved from monad
-  does not become empty, if you want that then call clear().
-
-  So long as you avoid the exception_type code paths (`result<R>`, `option<R>`), this implementation will be
-  ideally reduced to as few assembler instructions as possible by most recent compilers [1]
-  which can include exactly zero assembler instructions output. This monad is therefore
-  identical in terms of execution overhead to using the R type you specify directly - you
-  get the monadic functionality totally free of execution overhead where the compiler is able
-  to reduce it to such.
-
-  A similar thing applies to error_type which is a lightweight implementation on most
-  systems. An exception is on VS2015 as the lvalue reference to system_category appears
-  to be constructed via thread safe once routine called "Immortalize", so when you
-  construct an error_type on MSVC you'll force a memory synchronisation during the constructor
-  only. error_types are very cheap to pass around though as they are but an integer and a lvalue ref,
-  though I see that on GCC and clang 16 bytes is always copied around instead of completely
-  eliding the copy.
-
-  exception_type is also pretty good on anything but MSVC, though never zero assembler
-  instructions. As soon as an exception_type \em could be created, you'll force out about twenty
-  instructions most of which won't be executed in practice. Unfortunately, MSVC churns out
-  about 2000 assembler instructions as soon as you might touch an exception_type, I've raised
-  this with Microsoft and it looks to be hard for them to fix due to backwards compatibility
-  reasons.
-
-  [1]: GCC 5.1 does a perfect job, VS2015 does a good job, clang 3.7 not so great. See next section.
-
-## Complexity guarantees ##
-
-  These x64 opcode guarantees are empirically determined by the unit test suite, and the per-commit
-  CI testing will fail if they suddenly are exceeded. The maximum is calculated by taking a monad
-  in from a non-visible source where the compiler has to generate code paths to handle an unknown
-  input state, whereas the minimum is calculated by setting a monad's state in view of the compiler's
-  optimiser such that it can usually completely elide opcodes generated (though note that varies
-  enormously by compiler to the extent that the known code generates more opcodes than the unknown code). All monads are `monad<int>`.
-
-### `monad<R>`: ###
-  <dl>
-   <dt>clang 3.7</dt>
-    <dd>51 opcodes <= Value transport <= 32 opcodes<br></dd>
-    <dd>6 opcodes <= Error transport <= 50 opcodes<br></dd>
-    <dd>54 opcodes <= Exception transport <= 35 opcodes<br></dd>  
-    <dd>55 opcodes <= next() <= 76 opcodes<br></dd>
-    <dd>4 opcodes <= bind() <= 42 opcodes</dd>
-   <dt>GCC 5.1</dt>
-    <dd>1 opcodes <= Value transport <= 50 opcodes<br></dd>
-    <dd>8 opcodes <= Error transport <= 37 opcodes<br></dd>
-    <dd>27 opcodes <= Exception transport <= 151 opcodes<br></dd>
-    <dd>4 opcodes <= next() <= 89 opcodes<br></dd>
-    <dd>5 opcodes <= bind() <= 44 opcodes</dd>
-   <dt>VS2015</dt>
-    <dd>4 opcodes <= Value transport <= 1879 opcodes<br></dd>
-    <dd>6 opcodes <= Error transport <= 159 opcodes<br></dd>
-    <dd>1973 opcodes <= Exception transport <= 1940 opcodes<br></dd>
-    <dd>1981 opcodes <= next() <= 1982 opcodes<br></dd>
-    <dd>103 opcodes <= bind() <= 104 opcodes</dd>
-  </dl>
-
-### `result<R>`: ###
-  <dl>
-   <dt>clang 3.7</dt>
-    <dd>2 opcodes <= Value transport <= 49 opcodes<br></dd>
-    <dd>4 opcodes <= next() <= 56 opcodes<br></dd>
-   <dt>GCC 5.1</dt>
-    <dd>1 opcodes <= Value transport <= 32 opcodes<br></dd>
-    <dd>4 opcodes <= next() <= 52 opcodes<br></dd>
-   <dt>VS2015</dt>
-    <dd>4 opcodes <= Value transport <= 1848 opcodes<br></dd>
-    <dd>1918 opcodes <= next() <= 1919 opcodes<br></dd>
-  </dl>
-
-### `option<R>`: ###
-  <dl>
-   <dt>clang 3.7</dt>
-    <dd>2 opcodes <= Value transport <= 26 opcodes<br></dd>
-    <dd>5 opcodes <= next() <= 37 opcodes<br></dd>
-   <dt>GCC 5.1</dt>
-    <dd>1 opcodes <= Value transport <= 9 opcodes<br></dd>
-    <dd>4 opcodes <= next() <= 27 opcodes<br></dd>
-   <dt>VS2015</dt>
-    <dd>4 opcodes <= Value transport <= 117 opcodes<br></dd>
-    <dd>185 opcodes <= next() <= 186 opcodes<br></dd>
-  </dl>
-
-## Examples ##
-
-  \snippet unittests.cpp monad_example
-
-### As an alternative to `optional<T>` ###
-
-  Something not so obvious is that this monad can have an empty state, and therefore
-  can stand in for `optional<T>` like this:
-
-  \snippet unittests.cpp optional_example
-
-  The API is actually not too distant from `optional<T>`, so with a bit of regex find and replace
-  you could use `option<T>` instead.
-
-  The need for `monad<T>` to be able to be empty was to make exception throws by T during copy and move
-  construction lightweight. If that happens, the monad always has empty state afterwards.
-  
-## Supplying your own implementations of `basic_monad<T>` ##
-  To do this, simply supply a policy type of the following form:
-  \snippet monad.hpp monad_policy
   */
   template<class implementation_policy> class basic_monad
   {
@@ -1131,6 +1153,7 @@ Features:
 
 #ifdef BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS
     /*! \name Functional programming extensions (optional)
+    \ingroup monad
     
     \note All code in this section can be enabled by defining BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS.
     This prevents you writing code which impacts build times.
@@ -1376,7 +1399,7 @@ Features:
   namespace detail
   {
     //! [monad_policy]
-    //! \brief An implementation policy for basic_monad
+    //! \brief An implementation policy for basic_monad \ingroup monad
     template<typename R> struct monad_policy;
     template<> struct monad_policy<void>
     {
@@ -1482,7 +1505,7 @@ Features:
     };
     //! [monad_policy]
     
-    //! \brief An implementation policy for basic_monad
+    //! \brief An implementation policy for basic_monad \ingroup monad
     template<typename R> struct result_policy;
     template<> struct result_policy<void>
     {
@@ -1549,7 +1572,7 @@ Features:
       }
     };
 
-    //! \brief An implementation policy for basic_monad
+    //! \brief An implementation policy for basic_monad \ingroup monad
     template<typename R> struct option_policy;
     template<> struct option_policy<void>
     {
@@ -1604,41 +1627,41 @@ Features:
   }
 
   /*! \brief `monad<R>` can hold a fixed variant list of empty, a type `R`, a lightweight `std::error_code` or a
-  heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+4)`. This corresponds to `tribool::false_`,
-  `tribool::true_`, `tribool::unknown` and `tribool::unknown` respectively.
+  heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::false_`,
+  `tribool::true_`, `tribool::unknown` and `tribool::unknown` respectively. \ingroup monad
   */
   template<typename R> using monad = basic_monad<detail::monad_policy<R>>;
   /*! \brief `result<R>` can hold a fixed variant list of empty, a type `R` or a lightweight `std::error_code` at a
-  space cost of `max(24, sizeof(R)+4)`. This corresponds to `tribool::false_`, `tribool::true_` and
-  `tribool::unknown` respectively. This specialisation looks deliberately like Rust's `Result<T>`.
+  space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::false_`, `tribool::true_` and
+  `tribool::unknown` respectively. This specialisation looks deliberately like Rust's `Result<T>`. \ingroup monad
   */
   template<typename R> using result = basic_monad<detail::result_policy<R>>;
   /*! \brief `option<R>` can hold a fixed variant list of empty or a type `R` at a space cost of `sizeof(value_storage<R>)`
-  which is usually `sizeof(R)+4`, but may be smaller if `value_storage<R>` is specialised. This
+  which is usually `sizeof(R)+8`, but may be smaller if `value_storage<R>` is specialised. This
   corresponds to `tribool::false_` and `tribool::true_` respectively. This specialisation looks deliberately
-  like Rust's `Option<T>`.
+  like Rust's `Option<T>`. \ingroup monad
   */
   template<typename R> using option = basic_monad<detail::option_policy<R>>;
 
-  //! \brief Makes a monad from the type passed
+  //! \brief Makes a monad from the type passed \ingroup monad
   template<class T> monad<T> make_monad(T &&v) { return monad<T>(std::forward<T>(v)); }
-  //! \brief Makes an errored monad of type T
+  //! \brief Makes an errored monad of type T \ingroup monad
   template<class T> monad<T> make_monad(std::error_code v) { return monad<T>(std::move(v)); }
-  //! \brief Makes an excepted monad of type T
+  //! \brief Makes an excepted monad of type T \ingroup monad
   template<class T> monad<T> make_monad(std::exception_ptr v) { return monad<T>(std::move(v)); }
-  //! \brief Makes an empty monad of type T
+  //! \brief Makes an empty monad of type T \ingroup monad
   template<class T> monad<T> make_monad() { return monad<T>(); }
 }
 BOOST_SPINLOCK_V1_NAMESPACE_END
 
 namespace std
 {
-  //! \brief Specialise swap for basic_monad
+  //! \brief Specialise swap for basic_monad \ingroup monad
   template<class Impl> inline void swap(BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::basic_monad<Impl> &a, BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::basic_monad<Impl> &b)
   {
     a.swap(b);
   }
-  //! \brief Deserialise a value_storage value_type (only value_type)
+  //! \brief Deserialise a value_storage value_type (only value_type) \ingroup monad
   template<class Impl> inline istream &operator>>(istream &s, BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::value_storage<Impl> &v)
   {
     using namespace BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures;
@@ -1651,7 +1674,7 @@ namespace std
     }
     return s;
   }
-  //! \brief Serialise a value_storage. Mostly useful for debug printing.
+  //! \brief Serialise a value_storage. Mostly useful for debug printing. \ingroup monad
   template<class Impl> inline ostream &operator<<(ostream &s, const BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::value_storage<Impl> &v)
   {
     using namespace BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures;

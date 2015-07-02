@@ -373,52 +373,52 @@ namespace detail
   }
 }
 
-//! \ingroup future_promise
+//! \brief A predefined promise convenience type \ingroup future_promise
 template<typename R> using BOOST_SPINLOCK_PROMISE_NAME = basic_promise<detail::BOOST_SPINLOCK_FUTURE_POLICY_NAME<R>>;
-//! \ingroup future_promise
+//! \brief A predefined future convenience type \ingroup future_promise
 template<typename R> using BOOST_SPINLOCK_FUTURE_NAME = basic_future<detail::BOOST_SPINLOCK_FUTURE_POLICY_NAME<R>>;
 
 #define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME make_ready_ ## BOOST_SPINLOCK_FUTURE_NAME
-//! \ingroup future_promise
+//! \brief A predefined make ready future convenience function \ingroup future_promise
 template<typename R> inline BOOST_SPINLOCK_FUTURE_NAME<typename std::decay<R>::type> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(R &&v)
 {
   return BOOST_SPINLOCK_FUTURE_NAME<typename std::decay<R>::type>(std::forward<R>(v));
 }
 #undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
 #define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME make_errored_ ## BOOST_SPINLOCK_FUTURE_NAME
-//! \ingroup future_promise
+//! \brief A predefined make errored future convenience function \ingroup future_promise
 template<typename R> inline BOOST_SPINLOCK_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(std::error_code v)
 {
   return BOOST_SPINLOCK_FUTURE_NAME<R>(std::move(v));
 }
 #undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
 #define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME make_exceptional_ ## BOOST_SPINLOCK_FUTURE_NAME
-//! \ingroup future_promise
+//! \brief A predefined make excepted future convenience function \ingroup future_promise
 template<typename R> inline BOOST_SPINLOCK_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(std::exception_ptr v)
 {
   return BOOST_SPINLOCK_FUTURE_NAME<R>(std::move(v));
 }
 #undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
 
-//! \ingroup future_promise
+//! \brief A predefined shared future convenience type \ingroup future_promise
 template<typename R> using BOOST_SPINLOCK_SHARED_FUTURE_NAME = shared_basic_future_ptr<basic_future<detail::BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<R>>>;
 
 #define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME make_ready_ ## BOOST_SPINLOCK_SHARED_FUTURE_NAME
-//! \ingroup future_promise
+//! \brief A predefined make ready shared future convenience function \ingroup future_promise
 template<typename R> inline BOOST_SPINLOCK_SHARED_FUTURE_NAME<typename std::decay<R>::type> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(R &&v)
 {
   return BOOST_SPINLOCK_SHARED_FUTURE_NAME<typename std::decay<R>::type>(std::forward<R>(v));
 }
 #undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
 #define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME make_errored_ ## BOOST_SPINLOCK_SHARED_FUTURE_NAME
-//! \ingroup future_promise
+//! \brief A predefined make errored shared future convenience function \ingroup future_promise
 template<typename R> inline BOOST_SPINLOCK_SHARED_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(std::error_code v)
 {
   return BOOST_SPINLOCK_SHARED_FUTURE_NAME<R>(std::move(v));
 }
 #undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
 #define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME make_exceptional_ ## BOOST_SPINLOCK_SHARED_FUTURE_NAME
-//! \ingroup future_promise
+//! \brief A predefined make excepted shared future convenience function \ingroup future_promise
 template<typename R> inline BOOST_SPINLOCK_SHARED_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(std::exception_ptr v)
 {
   return BOOST_SPINLOCK_SHARED_FUTURE_NAME<R>(std::move(v));
