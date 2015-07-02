@@ -440,18 +440,16 @@ namespace lightweight_futures {
 //// void set_value_at_thread_exit(R v);
 //// void set_exception_at_thread_exit(R v);
 
-    //! \brief Call F when the future signals, consuming the future. Only one of these may be set.
-    // template<class F> typename std::result_of<F(basic_future<value_type>)>::type then(F &&f);
-
-    // future<result_of_t<decay_t<F>(future<R>)>>
-    //! \brief Call F when the future signals, not consuming the future.
-    // template<class F> typename std::result_of<F(basic_future<const value_type &>)>::type then(F &&f);
   };
 
   // TODO: basic_promise<void>, basic_promise<R&> specialisations
   // TODO: basic_future<void>, basic_future<R&> specialisations
   //! \todo basic_promise<R&> and basic_future<R&> specialisations
 
+  namespace detail
+  {
+  }
+ 
   /*! \class basic_future
   \brief Lightweight next generation future with N4399 Concurrency TS extensions
   \ingroup future_promise
@@ -740,8 +738,17 @@ namespace lightweight_futures {
 //// template<class R, class P> future_status wait_for(const std::chrono::duration<R, P> &rel_time) const;  // TODO
 //// template<class C, class D> future_status wait_until(const std::chrono::time_point<C, D> &abs_time) const;  // TODO
     
-    // TODO Where F would return a basic_future<basic_future<...>>, we unwrap to a single basic_future<R>
-//// template<class F> typename std::result_of<F(basic_future)>::type then(F &&f);
+    //! \brief Call F when the future signals, consuming the future. Only one of these may be set.
+ //   template<class F> typename detail::do_then<F>::return_type then(F &&f);
+
+    // future<result_of_t<decay_t<F>(future<R>)>>
+    //! \brief Call F when the future signals, not consuming the future.
+    // template<class F> typename std::result_of<F(basic_future<const value_type &>)>::type then(F &&f);
+
+//    template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP auto name(Args &&... args) const noexcept(noexcept(_future->name(std::forward<Args>(args)...))) -> decltype(_future->name(std::forward<Args>(args)...)) \
+//    { \
+//      return _check()->name(std::forward<Args>(args)...); \
+//    }
   };
 
   /*! \class shared_basic_future_ptr

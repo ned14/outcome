@@ -715,6 +715,67 @@ namespace lightweight_futures {
     template<class R, class T> typename rebind_cast_type<R, T*>::type rebind_cast(T *&&v) { return reinterpret_cast<typename rebind_cast_type<R, T*>::type>(v); }
     template<class R, class T> typename rebind_cast_type<R, T*>::type rebind_cast(T *&v) { return reinterpret_cast<typename rebind_cast_type<R, T*>::type>(v); }
 
+    /* Invokes the callable passed to next() folding any monad return type
+    R is the type returned by the callable
+    C is the callable
+    M is the monad
+    
+    Call operator is always invoked with basic_monad.
+    */
+    template<class R, class C, class M> struct do_next;
+    // For when R is not a monad and not void
+    template<class R, class C, class Policy> struct do_next<R, C, basic_monad<Policy>>
+    {
+      typedef typename std::decay<C>::type callable_type;
+      // If the return type is an error_type or exception_type or void, reuse monad else rebind monad to R
+      typedef typename std::conditional<std::is_same<R, typename basic_monad<Policy>::error_type>::value
+          || std::is_same<R, typename basic_monad<Policy>::exception_type>::value
+          || std::is_void<R>::value,
+        basic_monad<Policy>,
+        typename basic_monad<Policy>::template rebind<R> 
+      >::type output_type;
+      typedef basic_monad<Policy> input_type;
+      callable_type _c;
+      template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR do_next(U &&c) : _c(std::forward<U>(c)) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(input_type &&v) const
+      {
+        return traits::callable_argument_traits<callable_type, input_type>::is_rvalue
+          ? output_type(_c(std::move(v)))
+          : output_type(_c(input_type(v)));
+      }
+    };
+    // For when R is void
+    template<class C, class Policy> struct do_next<void, C, basic_monad<Policy>>
+    {
+      typedef typename std::decay<C>::type callable_type;
+      // If the return type is an error_type or exception_type or void, reuse monad else rebind monad to R
+      typedef typename basic_monad<Policy>::template rebind<void> output_type;
+      typedef basic_monad<Policy> input_type;
+      callable_type _c;
+      template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR do_next(U &&c) : _c(std::forward<U>(c)) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(input_type &&v) const
+      {
+        return traits::callable_argument_traits<callable_type, input_type>::is_rvalue
+          ? (_c(std::move(v)), output_type())
+          : (_c(input_type(v)), output_type());
+      }
+    };
+    // For when R is a monad
+    template<class Policy1, class C, class Policy2> struct do_next<basic_monad<Policy1>, C, basic_monad<Policy2>>
+    {
+      typedef typename std::decay<C>::type callable_type;
+      typedef basic_monad<Policy1> output_type;
+      typedef basic_monad<Policy2> input_type;
+      callable_type _c;
+      template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR do_next(U &&c) : _c(std::forward<U>(c)) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(input_type &&v) const
+      {
+        return traits::callable_argument_traits<callable_type, input_type>::is_rvalue
+          ? output_type(_c(std::move(v)))
+          : output_type(_c(input_type(v)));
+      }
+    };
+
 #ifdef BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS
     template<bool is_monad_monad, class M> struct do_unwrap2;
     template<class M> using do_unwrap = do_unwrap2<is_monad_monad<M>::value, M>;
@@ -898,8 +959,6 @@ namespace lightweight_futures {
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&, traits::detail::rank<1>) const { return output_type(); }
     };
 
-    // TODO FIXME: do_next should have specially reduced simple lightweight implementation
-    template<class R, class C, class M> using do_next = do_continuation<true,  R, C, M>;
     template<class R, class C, class M> using do_bind = do_continuation<true,  R, C, M>;
     template<class R, class C, class M> using do_map  = do_continuation<false, R, C, M>;
 #endif
@@ -1172,12 +1231,11 @@ namespace lightweight_futures {
       set_exception(make_exception_type(std::forward<E>(e)));
     }
 
-#ifdef BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS
     /*! \name Functional programming extensions (optional)
     \ingroup monad
     
     \note All code in this section can be enabled by defining BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS.
-    This prevents you writing code which impacts build times.
+    By default only next() is available. This prevents you writing code which impacts build times.
     
     Classic monadic programming consists of a sequence of nested functional operations:
     <dl>
@@ -1256,19 +1314,6 @@ namespace lightweight_futures {
     and without whose excellent answer the intelligent map() and bind() above could not work.
     */
     ///@{
-    //! \brief If I am a monad<monad<...>>, return copy of most nested monad<...>, else return copy of *this
-#ifdef DOXYGEN_IS_IN_THE_HOUSE
-    monad<...> unwrap() const &;
-#else
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_unwrap<basic_monad>::output_type unwrap() const & { return detail::do_unwrap<basic_monad>()(*this); }
-#endif
-    //! \brief If I am a monad<monad<...>>, return move of most nested monad<...>, else return move of *this
-#ifdef DOXYGEN_IS_IN_THE_HOUSE
-    monad<...> unwrap() &&;
-#else
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_unwrap<basic_monad>::output_type unwrap() && { return detail::do_unwrap<basic_monad>()(std::move(*this)); }
-#endif
-
     /*! \brief Return basic_monad(F(*this)) or F(*this) if the latter returns a monad.
     
     The callable F needs to consume a monad obviously enough, however if your callable takes a monad &&, you can move
@@ -1289,10 +1334,24 @@ namespace lightweight_futures {
       typedef traits::callable_argument_traits<F, basic_monad> f_traits;
       static_assert(f_traits::valid,
         "The callable passed to next() must take this monad type or a reference to it.");
-      return detail::do_next<typename f_traits::return_type, F, basic_monad>(std::forward<F>(f))(std::move(*this), traits::detail::rank<5>());
+      return detail::do_next<typename f_traits::return_type, F, basic_monad>(std::forward<F>(f))(std::move(*this));
     }
 #endif
     
+#ifdef BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS
+    //! \brief If I am a monad<monad<...>>, return copy of most nested monad<...>, else return copy of *this
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+    monad<...> unwrap() const &;
+#else
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_unwrap<basic_monad>::output_type unwrap() const & { return detail::do_unwrap<basic_monad>()(*this); }
+#endif
+    //! \brief If I am a monad<monad<...>>, return move of most nested monad<...>, else return move of *this
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+    monad<...> unwrap() &&;
+#else
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_unwrap<basic_monad>::output_type unwrap() && { return detail::do_unwrap<basic_monad>()(std::move(*this)); }
+#endif
+
     //! \brief If bool(*this), return basic_monad(F(get())).unwrap, else return basic_monad<result_of<F(get())>>(error)
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> monad<...> bind(F &&f);

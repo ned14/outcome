@@ -1522,6 +1522,42 @@ BOOST_AUTO_TEST_CASE(works/monad/serialisation, "Tests that the monad serialises
   BOOST_CHECK(a.get()=="hello");
 }
 
+BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with next() as intended")
+{
+  using namespace boost::spinlock::lightweight_futures;
+  std::error_code ec;
+  monad<std::string> a("niall"), b(ec);
+  // Does auto unwrapping work?
+  auto c(a.next([](monad<std::string> v) {return v; }));
+  BOOST_CHECK(c.get() == "niall");
+  BOOST_CHECK(a.get() == "niall");
+  // Does auto wrapping work?
+  auto d(a.next([](monad<std::string> &&) {return 5; }));
+  BOOST_CHECK(d.get() == 5);
+  BOOST_CHECK(a.get() == "niall");
+#ifdef __cpp_generic_lambdas
+  // Do auto lambdas work?
+  auto e(a.next([](auto v) {return v; }));
+  BOOST_CHECK(e.get() == "niall");
+  BOOST_CHECK(a.get() == "niall");
+#endif
+  // Does error propagation work?
+  auto f(b.next([](monad<std::string> v) {return v; }));
+  BOOST_CHECK(f.has_error());
+
+  // Does automatic move semantics work?
+  auto j(a.next([](monad<std::string> &&v) {return std::move(v); }));
+  BOOST_CHECK(j.get() == "niall");
+  BOOST_CHECK(a.get().empty());
+#ifdef __cpp_generic_lambdas
+  // Does automatic move semantics with auto lambdas work?
+  a.emplace("niall");
+  auto k(a.next([](auto &&v) {return std::move(v); }));
+  BOOST_CHECK(k.get() == "niall");
+  BOOST_CHECK(a.get().empty());
+#endif
+}
+
 #ifdef BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS
 BOOST_AUTO_TEST_CASE(works/monad/callable, "Tests that the monad works as intended holding callables")
 {
@@ -1557,42 +1593,6 @@ BOOST_AUTO_TEST_CASE(works/monad/unwrap, "Tests that the monad unwraps as intend
   BOOST_CHECK(k.get()=="niall");
   BOOST_CHECK(l.get_error()==ec);
   BOOST_CHECK(g.get().get().get().get().empty());
-}
-
-BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with next() as intended")
-{
-  using namespace boost::spinlock::lightweight_futures;
-  std::error_code ec;
-  monad<std::string> a("niall"), b(ec);
-  // Does auto unwrapping work?
-  auto c(a.next([](monad<std::string> v){return v;}));
-  BOOST_CHECK(c.get()=="niall");
-  BOOST_CHECK(a.get()=="niall");
-  // Does auto wrapping work?
-  auto d(a.next([](monad<std::string> &&){return 5;}));
-  BOOST_CHECK(d.get()==5);
-  BOOST_CHECK(a.get()=="niall");
-#ifdef __cpp_generic_lambdas
-  // Do auto lambdas work?
-  auto e(a.next([](auto v){return v;}));
-  BOOST_CHECK(e.get()=="niall");
-  BOOST_CHECK(a.get()=="niall");
-#endif
-  // Does error propagation work?
-  auto f(b.next([](monad<std::string> v) {return v;}));
-  BOOST_CHECK(f.has_error());
-
-  // Does automatic move semantics work?
-  auto j(a.next([](monad<std::string> &&v){return std::move(v);}));
-  BOOST_CHECK(j.get()=="niall");
-  BOOST_CHECK(a.get().empty());
-#ifdef __cpp_generic_lambdas
-  // Does automatic move semantics with auto lambdas work?
-  a.emplace("niall");
-  auto k(a.next([](auto &&v){return std::move(v);}));
-  BOOST_CHECK(k.get()=="niall");
-  BOOST_CHECK(a.get().empty());
-#endif
 }
 
 BOOST_AUTO_TEST_CASE(works/monad/bind, "Tests that the monad continues with bind() as intended")
