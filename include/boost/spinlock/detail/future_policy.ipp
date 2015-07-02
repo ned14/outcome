@@ -273,7 +273,7 @@ namespace detail
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const implementation_type &self)
     {
       self.wait();
-      implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+      typename implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
       return _get_error_impl<is_consuming>(const_cast<implementation_type &>(self));
     }
 #else
@@ -283,7 +283,7 @@ namespace detail
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const implementation_type &self)
     {
       self.wait();
-      implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+      typename implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
       return _get_exception_impl<is_consuming>(const_cast<implementation_type &>(self));
     }
 #else
@@ -389,7 +389,7 @@ namespace detail
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const implementation_type &self)
     {
       self.wait();
-      implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+      typename implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
       return _get_error_impl<is_consuming>(const_cast<implementation_type &>(self));
     }
 #else
@@ -399,7 +399,7 @@ namespace detail
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const implementation_type &self)
     {
       self.wait();
-      implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
+      typename implementation_type::lock_guard_type h(const_cast<implementation_type *>(&self));
       return _get_exception_impl<is_consuming>(const_cast<implementation_type &>(self));
     }
 #else
