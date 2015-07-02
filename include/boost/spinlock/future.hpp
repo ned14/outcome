@@ -129,6 +129,18 @@ namespace lightweight_futures {
       lock_guard(lock_guard &&)=delete;
       BOOST_SPINLOCK_FUTURE_MSVC_HELP lock_guard(promise_type *p) : _p(nullptr), _f(nullptr)
       {
+        relock(p);
+      }
+      BOOST_SPINLOCK_FUTURE_MSVC_HELP lock_guard(future_type *f) : _p(nullptr), _f(nullptr)
+      {
+        relock(f);
+      }
+      BOOST_SPINLOCK_FUTURE_MSVC_HELP ~lock_guard()
+      {
+        unlock();
+      }
+      BOOST_SPINLOCK_FUTURE_MSVC_HELP void relock(promise_type *p)
+      {
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         // constexpr fold
         if(!p->_need_locks)
@@ -160,7 +172,7 @@ namespace lightweight_futures {
           p->_lock.unlock();
         }
       }
-      BOOST_SPINLOCK_FUTURE_MSVC_HELP lock_guard(future_type *f) : _p(nullptr), _f(nullptr)
+      BOOST_SPINLOCK_FUTURE_MSVC_HELP void relock(future_type *f)
       {
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         // constexpr fold
@@ -191,10 +203,6 @@ namespace lightweight_futures {
           }
           f->_lock.unlock();
         }
-      }
-      BOOST_SPINLOCK_FUTURE_MSVC_HELP ~lock_guard()
-      {
-        unlock();
       }
       void unlock()
       {
@@ -700,14 +708,14 @@ namespace lightweight_futures {
     {
       if(is_ready())
         return;
-      detail::lock_guard<promise_type, future_type> h(this);
+      detail::lock_guard<promise_type, future_type> h(const_cast<basic_future *>(this));
       _check_validity();
       // TODO Actually sleep
       while(!monad_type::is_ready())
       {
         h.unlock();
         std::this_thread::yield();
-        h=detail::lock_guard<promise_type, future_type>(this);
+        h.relock(const_cast<basic_future *>(this));
       }
     }
 //// template<class R, class P> future_status wait_for(const std::chrono::duration<R, P> &rel_time) const;  // TODO
