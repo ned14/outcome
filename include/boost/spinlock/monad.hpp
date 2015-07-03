@@ -225,8 +225,9 @@ namespace traits
     {
       struct not_well_formed {};
       template<class _F, class _A> static not_well_formed test(...);
-      template<class _F, class _A> static auto test(_F &&f) -> decltype(f(std::declval<_A>()));
+      template<class _F, class _A> static auto test(_F &&f) noexcept(noexcept(f(std::declval<_A>()))) -> decltype(f(std::declval<_A>()));
       using type = decltype(test<F, A>(std::declval<F>()));
+      BOOST_STATIC_CONSTEXPR bool is_noexcept = noexcept(test<F, A>(std::declval<F>()));
     };
 
     // Without Expression SFINAE (VS2015), I actually don't know of a better way :(
@@ -248,9 +249,10 @@ namespace traits
     template <bool enable, typename F, typename Arg> struct has_call_operator : public std::false_type {};
     template <typename F, typename Arg> struct has_call_operator<true, F, Arg> : public has_call_operator2<F, typename get_return_type<F, Arg>::type(Arg)>{};
 
-    template<bool _is_move, bool _is_auto, typename T=void> struct arg_form
+    template<bool _is_move, bool _is_lvalue, bool _is_auto, typename T=void> struct arg_form
     {
       BOOST_STATIC_CONSTEXPR bool is_rvalue = _is_move;
+      BOOST_STATIC_CONSTEXPR bool is_lvalue = _is_lvalue;
       BOOST_STATIC_CONSTEXPR bool is_auto = _is_auto;
       using non_auto_type = T;
     };
@@ -266,25 +268,26 @@ namespace traits
       using return_type = typename get_return_type<F, A>::type;
       using arg_type = typename std::decay<A>::type;
 
-      static arg_form<false, true> test(return_type(F::*)(const arg_type&)      , rank<1>);
-      static arg_form<false, true> test(return_type(F::*)(arg_type&)            , rank<2>);
-      static arg_form<true , true> test(return_type(F::*)(arg_type&&)           , rank<3>);
-      static arg_form<false, true> test(return_type(F::*)(arg_type)             , rank<4>);
-      static arg_form<false, true> test(return_type(F::*)(const arg_type&) const, rank<5>);
-      static arg_form<false, true> test(return_type(F::*)(arg_type&)       const, rank<6>);
-      static arg_form<true , true> test(return_type(F::*)(arg_type&&)      const, rank<7>);
-      static arg_form<false, true> test(return_type(F::*)(arg_type)        const, rank<8>);
+      static arg_form<false, true , true> test(return_type(F::*)(const arg_type&)      , rank<1>);
+      static arg_form<false, true , true> test(return_type(F::*)(arg_type&)            , rank<2>);
+      static arg_form<true , false, true> test(return_type(F::*)(arg_type&&)           , rank<3>);
+      static arg_form<false, false, true> test(return_type(F::*)(arg_type)             , rank<4>);
+      static arg_form<false, true , true> test(return_type(F::*)(const arg_type&) const, rank<5>);
+      static arg_form<false, true , true> test(return_type(F::*)(arg_type&)       const, rank<6>);
+      static arg_form<true , false, true> test(return_type(F::*)(arg_type&&)      const, rank<7>);
+      static arg_form<false, false, true> test(return_type(F::*)(arg_type)        const, rank<8>);
 
-      template<class T> static arg_form<false, false, T> test(return_type(F::*)(T)             , rank<9>);
-      template<class T> static arg_form<false, false, T> test(return_type(F::*)(T&)            , rank<10>);
-      template<class T> static arg_form<true , false, T> test(return_type(F::*)(T&&)           , rank<11>);
-      template<class T> static arg_form<false, false, T> test(return_type(F::*)(T)        const, rank<12>);
-      template<class T> static arg_form<false, false, T> test(return_type(F::*)(T&)       const, rank<13>);
-      template<class T> static arg_form<true , false, T> test(return_type(F::*)(T&&)      const, rank<14>);
+      template<class T> static arg_form<false, false, false, T> test(return_type(F::*)(T)             , rank<9>);
+      template<class T> static arg_form<false, true , false, T> test(return_type(F::*)(T&)            , rank<10>);
+      template<class T> static arg_form<true , false, false, T> test(return_type(F::*)(T&&)           , rank<11>);
+      template<class T> static arg_form<false, false, false, T> test(return_type(F::*)(T)        const, rank<12>);
+      template<class T> static arg_form<false, true , false, T> test(return_type(F::*)(T&)       const, rank<13>);
+      template<class T> static arg_form<true , false, false, T> test(return_type(F::*)(T&&)      const, rank<14>);
 
       using result = decltype(test(&F::operator(), rank<15>()));
 
       BOOST_STATIC_CONSTEXPR bool is_rvalue = result::is_rvalue;
+      BOOST_STATIC_CONSTEXPR bool is_lvalue = result::is_lvalue;
       BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
       using type = typename result::non_auto_type;
     };
@@ -297,18 +300,19 @@ namespace traits
       using return_type = typename get_return_type<F, A>::type;
       using arg_type = typename std::decay<A>::type;
 
-      static arg_form<false, true> test(return_type(*)(const arg_type&)      , rank<1>);
-      static arg_form<false, true> test(return_type(*)(arg_type&)            , rank<2>);
-      static arg_form<true , true> test(return_type(*)(arg_type&&)           , rank<3>);
-      static arg_form<false, true> test(return_type(*)(arg_type)             , rank<4>);
+      static arg_form<false, true , true> test(return_type(*)(const arg_type&)      , rank<1>);
+      static arg_form<false, true , true> test(return_type(*)(arg_type&)            , rank<2>);
+      static arg_form<true , false, true> test(return_type(*)(arg_type&&)           , rank<3>);
+      static arg_form<false, false, true> test(return_type(*)(arg_type)             , rank<4>);
 
-      template<class T> static arg_form<false, false, T> test(return_type(*)(T)             , rank<5>);
-      template<class T> static arg_form<false, false, T> test(return_type(*)(T&)            , rank<6>);
-      template<class T> static arg_form<true , false, T> test(return_type(*)(T&&)           , rank<7>);
+      template<class T> static arg_form<false, false, false, T> test(return_type(*)(T)             , rank<5>);
+      template<class T> static arg_form<false, true , false, T> test(return_type(*)(T&)            , rank<6>);
+      template<class T> static arg_form<true , false, false, T> test(return_type(*)(T&&)           , rank<7>);
 
       using result = decltype(test(F(), rank<10>()));
 
       BOOST_STATIC_CONSTEXPR bool is_rvalue = result::is_rvalue;
+      BOOST_STATIC_CONSTEXPR bool is_lvalue = result::is_lvalue;
       BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
       using type = typename result::non_auto_type;
     };
@@ -323,6 +327,8 @@ namespace traits
     using type = typename return_type::type;
     //! \brief Whether the call with Arg is well formed
     BOOST_STATIC_CONSTEXPR bool value = !std::is_same<type, typename return_type::not_well_formed>::value;
+    //! \brief Whether the call with Arg is noexcept
+    BOOST_STATIC_CONSTEXPR bool is_noexcept = return_type::is_noexcept;
   };
 
   //! \brief Is F a class type and does it have a call operator callable with Arg?
@@ -338,6 +344,8 @@ namespace traits
       BOOST_STATIC_CONSTEXPR bool valid = false;
       //! \brief Is the arg a rvalue ref?
       BOOST_STATIC_CONSTEXPR bool is_rvalue = false;
+      //! \brief Is the arg a lvalue ref?
+      BOOST_STATIC_CONSTEXPR bool is_lvalue = false;
       //! \brief Is the arg a templated arg?
       BOOST_STATIC_CONSTEXPR bool is_auto = false;
       //! \brief If the arg is not a templated arg, it is this type
@@ -597,6 +605,11 @@ namespace lightweight_futures {
       new (this) value_storage(std::move(o));
       return *this;
     }
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_state(value_storage &&o) noexcept(is_nothrow_destructible && is_nothrow_move_constructible)
+    {
+      clear();
+      new (this) value_storage(std::move(o));
+    }
     BOOST_SPINLOCK_FUTURE_MSVC_HELP ~value_storage() noexcept(is_nothrow_destructible) { clear(); }
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void swap(value_storage &o) noexcept(is_nothrow_move_constructible)
     {
@@ -718,25 +731,25 @@ namespace lightweight_futures {
     /* Invokes the callable passed to next() folding any monad return type
     R is the type returned by the callable
     C is the callable
-    M is the monad
+    Monad is the monad
+    Policy is the implementation policy
     
     Call operator is always invoked with basic_monad.
     */
-    template<class R, class C, class M> struct do_next;
     // For when R is not a monad and not void
-    template<class R, class C, class Policy> struct do_next<R, C, basic_monad<Policy>>
+    template<class R, class C, template<class> class Monad, class Policy> struct do_simple_continuation
     {
       typedef typename std::decay<C>::type callable_type;
       // If the return type is an error_type or exception_type or void, reuse monad else rebind monad to R
-      typedef typename std::conditional<std::is_same<R, typename basic_monad<Policy>::error_type>::value
-          || std::is_same<R, typename basic_monad<Policy>::exception_type>::value
+      typedef typename std::conditional<std::is_same<R, typename Monad<Policy>::error_type>::value
+          || std::is_same<R, typename Monad<Policy>::exception_type>::value
           || std::is_void<R>::value,
-        basic_monad<Policy>,
-        typename basic_monad<Policy>::template rebind<R> 
+        Monad<Policy>,
+        typename Monad<Policy>::template rebind<R>
       >::type output_type;
-      typedef basic_monad<Policy> input_type;
+      typedef Monad<Policy> input_type;
       callable_type _c;
-      template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR do_next(U &&c) : _c(std::forward<U>(c)) { }
+      template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR do_simple_continuation(U &&c) : _c(std::forward<U>(c)) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(input_type &&v) const
       {
         return traits::callable_argument_traits<callable_type, input_type>::is_rvalue
@@ -745,14 +758,14 @@ namespace lightweight_futures {
       }
     };
     // For when R is void
-    template<class C, class Policy> struct do_next<void, C, basic_monad<Policy>>
+    template<class C, template<class> class Monad, class Policy> struct do_simple_continuation<void, C, Monad, Policy>
     {
       typedef typename std::decay<C>::type callable_type;
       // If the return type is an error_type or exception_type or void, reuse monad else rebind monad to R
-      typedef typename basic_monad<Policy>::template rebind<void> output_type;
-      typedef basic_monad<Policy> input_type;
+      typedef typename Monad<Policy>::template rebind<void> output_type;
+      typedef Monad<Policy> input_type;
       callable_type _c;
-      template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR do_next(U &&c) : _c(std::forward<U>(c)) { }
+      template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR do_simple_continuation(U &&c) : _c(std::forward<U>(c)) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(input_type &&v) const
       {
         return traits::callable_argument_traits<callable_type, input_type>::is_rvalue
@@ -761,13 +774,13 @@ namespace lightweight_futures {
       }
     };
     // For when R is a monad
-    template<class Policy1, class C, class Policy2> struct do_next<basic_monad<Policy1>, C, basic_monad<Policy2>>
+    template<class Policy1, class C, template<class> class Monad, class Policy2> struct do_simple_continuation<Monad<Policy1>, C, Monad, Policy2>
     {
       typedef typename std::decay<C>::type callable_type;
-      typedef basic_monad<Policy1> output_type;
-      typedef basic_monad<Policy2> input_type;
+      typedef Monad<Policy1> output_type;
+      typedef Monad<Policy2> input_type;
       callable_type _c;
-      template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR do_next(U &&c) : _c(std::forward<U>(c)) { }
+      template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR do_simple_continuation(U &&c) : _c(std::forward<U>(c)) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(input_type &&v) const
       {
         return traits::callable_argument_traits<callable_type, input_type>::is_rvalue
@@ -775,6 +788,7 @@ namespace lightweight_futures {
           : output_type(_c(input_type(v)));
       }
     };
+    template<class R, class C, class Policy> using do_next = do_simple_continuation<R, C, basic_monad, Policy>;
 
 #ifdef BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS
     template<bool is_monad_monad, class M> struct do_unwrap2;
@@ -975,7 +989,9 @@ namespace lightweight_futures {
   */
   template<class implementation_policy> class basic_monad
   {
+    // Allow my policy unfettered acces
     friend implementation_policy;
+    // Allow my policy specialised with void unfettered access
     friend typename implementation_policy::template rebind_policy<void>;
     friend inline std::istream &operator>>(std::istream &s, basic_monad &v)
     {
@@ -1193,6 +1209,8 @@ namespace lightweight_futures {
     {
       return has_value() ? std::move(v) : std::move(_storage.value);
     }
+    //! \brief Disposes of any existing state, setting the monad to the value storage
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_state(value_storage_type &&v) { _storage.clear(); _storage.set_state(std::move(v)); }
     //! \brief Disposes of any existing state, setting the monad to a copy of the value_type
     BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v) { _storage.clear(); _storage.set_value(v); }
     //! \brief Disposes of any existing state, setting the monad to a move of the value_type
@@ -1328,13 +1346,13 @@ namespace lightweight_futures {
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> monad<...> next(F &&f);
 #else
-    template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_monad>::type, typename std::decay<_F>::type, basic_monad>::output_type next(_F &&f)
+    template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_monad>::type, typename std::decay<_F>::type, implementation_policy>::output_type next(_F &&f)
     {
       typedef typename std::decay<_F>::type F;
       typedef traits::callable_argument_traits<F, basic_monad> f_traits;
       static_assert(f_traits::valid,
         "The callable passed to next() must take this monad type or a reference to it.");
-      return detail::do_next<typename f_traits::return_type, F, basic_monad>(std::forward<F>(f))(std::move(*this));
+      return detail::do_next<typename f_traits::return_type, F, implementation_policy>(std::forward<F>(f))(std::move(*this));
     }
 #endif
     
@@ -1403,7 +1421,7 @@ namespace lightweight_futures {
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> basic_monad(F(contents)).unwrap() match(F &&f);
 #else
-    template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, value_type>::type, typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, value_type>::type(basic_monad &&), basic_monad>::output_type match(_F &&f)
+    template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, value_type>::type, typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, value_type>::type(basic_monad &&), implementation_policy>::output_type match(_F &&f)
     {
       typedef typename std::decay<_F>::type F;
       typedef traits::callable_argument_traits<F, value_type> f_traits_value;

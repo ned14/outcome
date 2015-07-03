@@ -2023,6 +2023,23 @@ BOOST_AUTO_TEST_CASE(works/shared_future/lightweight, "Tests that our shared_fut
   SharedFuturePromiseConformanceTest<shared_future, promise>();
 }
 
+BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our future-promise continuations works as intended")
+{
+  std::cout << "\n=== Tests that our future-promise continuations works as intended ===" << std::endl;
+  using namespace boost::spinlock::lightweight_futures;
+  int test = 0;
+  promise<void> p;
+  future<void> f(p.get_future());
+  future<int> f2(f.then([&test](future<void> &&f) { test = 1; return 5; }));
+  BOOST_CHECK(f.valid());
+  BOOST_CHECK(f2.valid());
+  p.set_value();
+  BOOST_CHECK(test == 1);
+  BOOST_CHECK(!f.valid());  // consuming continuation, therefore f is consumed
+  BOOST_CHECK(f2.valid());
+  BOOST_CHECK(f2.get() == 5);
+}
+
 
 static usCount overhead;
 BOOST_AUTO_TEST_CASE(performance/overhead, "Calculate the timing overhead and warm up the CPU")

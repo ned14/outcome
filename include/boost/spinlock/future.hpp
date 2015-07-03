@@ -416,7 +416,13 @@ namespace lightweight_futures {
         _storage.function; \
       } \
     }
-    /*! \brief SYNC POINT Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
+    /*! \brief SYNC POINT EXTENSION Sets the state to be returned by the associated future to be the same as the value storage, releasing any waits occuring in other threads.
+    */
+    BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_state(value_storage<implementation_policy> &&v), set_state(std::move(v)))
+      /*! \brief SYNC POINT Sets the value to be returned by the associated future to be a default constructed value_type, releasing any waits occuring in other threads.
+    */
+    BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(), set_value(value_type()))
+      /*! \brief SYNC POINT Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
     */
     BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v), set_value(v))
     /*! \brief SYNC POINT Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
@@ -448,6 +454,7 @@ namespace lightweight_futures {
 
   namespace detail
   {
+    template<class R, class C, class Policy> using do_then = do_simple_continuation<R, C, basic_future, Policy>;
   }
  
   /*! \class basic_future
@@ -458,6 +465,7 @@ namespace lightweight_futures {
   {
     friend implementation_policy;
     friend typename implementation_policy::impl;
+    template<class> friend class basic_future;
   public:
     //! \brief The policy used to implement this basic_future
     typedef implementation_policy policy;
@@ -738,8 +746,68 @@ namespace lightweight_futures {
 //// template<class R, class P> future_status wait_for(const std::chrono::duration<R, P> &rel_time) const;  // TODO
 //// template<class C, class D> future_status wait_until(const std::chrono::time_point<C, D> &abs_time) const;  // TODO
     
-    //! \brief Call F when the future signals, consuming the future. Only one of these may be set.
- //   template<class F> typename detail::do_then<F>::return_type then(F &&f);
+    /*! \brief SYNC POINT Call F when the future signals.
+    \param f Some callable. Must be noexcept if this future cannot transport an exception_type, else will static assert.
+    
+    If F takes the future by rvalue reference (like in the Concurrency TS)
+    or by value, this MUST be the first continuation set onto the future as the callable will consume the future. As an extension, if F takes
+    the future by lvalue reference and therefore does not consume it, you may add as many of these as you desire, noting that
+    if you modify state you may cause misoperation for continuations yet to be called. NOTE that continations are called in the
+    REVERSE order of their addition because they are stored as a simple forward linked list for maximum performance.
+    */
+    template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_then<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_future>::type, typename std::decay<_F>::type, implementation_policy>::output_type then(_F &&f)
+    {
+      typedef typename std::decay<_F>::type F;
+      typedef traits::callable_argument_traits<F, basic_future> f_traits;
+      static_assert(f_traits::valid,
+        "The callable passed to then() must take this future type or a reference to it.");
+      typedef typename detail::do_then<typename f_traits::return_type, F, implementation_policy>::output_type output_type;
+      BOOST_STATIC_CONSTEXPR bool is_f_noexcept = traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_future>::is_noexcept;
+      static_assert(is_f_noexcept || output_type::has_exception_type, "If the future type returned by the callable cannot transport exceptions, the callable must be noexcept.");
+      detail::lock_guard<promise_type, future_type> h(this);
+      // If we are already signalled, execute immediately as if monad.next()
+      if(is_ready())
+      {
+        h.unlock();
+        return detail::do_then<typename f_traits::return_type, F, implementation_policy>(std::forward<F>(f))(std::move(*this));
+      }
+      _check_validity();
+      // Make a delayed invocation of simple_continuation, same as monad.next()
+      assert(h._p);
+      // If there is already a continuation, this continuation cannot consume the future
+      if (!f_traits::is_lvalue && h._p->_storage.pointer_.callable)
+        throw std::invalid_argument("You cannot supply a future consuming continuation except as the very first continuation added to a future");
+      // Create a lambda to chain this continuation. As std::function can throw and the lambda capture destroys
+      // state on exception unwind, we break unique_ptr uniqueness temporarily
+      std::function<void(future_type *)> *prevcallable=h._p->_storage.pointer_.callable.get();
+      typename output_type::promise_type p;
+      output_type ret(p.get_future());
+      std::unique_ptr<std::function<void(future_type *)>> callable(new std::function<void(future_type *)>([
+#ifdef __cpp_init_captures
+        p = std::move(p), f = std::forward<F>(f), prevcallable = std::move(prevcallable)
+#else
+        p, f, prevcallable
+#endif
+      ] (future_type *self) mutable {
+          // Immediately adopt the captured raw pointer
+          std::unique_ptr<std::function<void(future_type *)>> callable(prevcallable);
+          // Execute the continuation
+          try
+          {
+            p.set_state(detail::do_then<typename f_traits::return_type, F, implementation_policy>(std::move(f))(std::move(*self))._storage);
+          }
+          catch (...)
+          {
+            p.set_exception(std::current_exception());
+          }
+          if(callable)
+            (*callable)(self);
+        }));
+      // Swap out any existing continuation with the new one
+      h._p->_storage.pointer_.callable.release();
+      h._p->_storage.pointer_.callable = std::move(callable);
+      return ret;
+    }
 
     // future<result_of_t<decay_t<F>(future<R>)>>
     //! \brief Call F when the future signals, not consuming the future.
