@@ -60,16 +60,16 @@ Predefined basic_monad implementations:
 <dl>
   <dt>`monad<R>`</dt>
     <dd>Can hold a fixed variant list of empty, a type `R`, a lightweight `std::error_code` or a
-heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::false_`,
-`tribool::true_`, `tribool::unknown` and `tribool::unknown` respectively.</dd>
+heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`,
+`tribool::true_`, `tribool::false_` and `tribool::false_` respectively.</dd>
   <dt>`result<R>`</dt>
     <dd>Can hold a fixed variant list of empty, a type `R` or a lightweight `std::error_code` at a
-space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::false_`, `tribool::true_` and
-`tribool::unknown` respectively. This specialisation looks deliberately like Rust's `Result<T>`.</dd>
+space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `tribool::true_` and
+`tribool::false_` respectively. This specialisation looks deliberately like Rust's `Result<T>`.</dd>
   <dt>`option<R>`</dt>
     <dd>Can hold a fixed variant list of empty or a type `R` at a space cost of `sizeof(value_storage<R>)`
 which is usually `sizeof(R)+8`, but may be smaller if `value_storage<R>` is specialised e.g.
-`sizeof(option<char>)` is just two bytes. This corresponds to `tribool::false_` and `tribool::true_`
+`sizeof(option<char>)` is just two bytes. This corresponds to `tribool::unknown` and `tribool::true_`
 respectively. This specialisation looks deliberately like Rust's `Option<T>`.</dd>
 </dl>
 
@@ -1067,8 +1067,8 @@ namespace lightweight_futures {
 
     //! \brief Same as `true_(tribool(*this))`
     BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit operator bool() const noexcept { return has_value(); }
-    //! \brief True if monad contains a value_type, false if monad is empty, else unknown.
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR operator tribool::tribool() const noexcept { return has_value() ? tribool::tribool::true_ : empty() ? tribool::tribool::false_ : tribool::tribool::unknown; }
+    //! \brief True if monad contains a value_type, unknown if monad is empty, else false if monad is errored/excepted.
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR operator tribool::tribool() const noexcept { return has_value() ? tribool::tribool::true_ : empty() ? tribool::tribool::unknown : tribool::tribool::false_; }
     //! \brief True if monad is not empty
     BOOST_SPINLOCK_FUTURE_CONSTEXPR bool is_ready() const noexcept
     {
@@ -1707,18 +1707,18 @@ namespace lightweight_futures {
   }
 
   /*! \brief `monad<R>` can hold a fixed variant list of empty, a type `R`, a lightweight `std::error_code` or a
-  heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::false_`,
-  `tribool::true_`, `tribool::unknown` and `tribool::unknown` respectively. \ingroup monad
+  heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`,
+  `tribool::true_`, `tribool::false_` and `tribool::false_` respectively. \ingroup monad
   */
   template<typename R> using monad = basic_monad<detail::monad_policy<R>>;
   /*! \brief `result<R>` can hold a fixed variant list of empty, a type `R` or a lightweight `std::error_code` at a
-  space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::false_`, `tribool::true_` and
-  `tribool::unknown` respectively. This specialisation looks deliberately like Rust's `Result<T>`. \ingroup monad
+  space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `tribool::true_` and
+  `tribool::false_` respectively. This specialisation looks deliberately like Rust's `Result<T>`. \ingroup monad
   */
   template<typename R> using result = basic_monad<detail::result_policy<R>>;
   /*! \brief `option<R>` can hold a fixed variant list of empty or a type `R` at a space cost of `sizeof(value_storage<R>)`
   which is usually `sizeof(R)+8`, but may be smaller if `value_storage<R>` is specialised. This
-  corresponds to `tribool::false_` and `tribool::true_` respectively. This specialisation looks deliberately
+  corresponds to `tribool::unknown` and `tribool::true_` respectively. This specialisation looks deliberately
   like Rust's `Option<T>`. \ingroup monad
   */
   template<typename R> using option = basic_monad<detail::option_policy<R>>;

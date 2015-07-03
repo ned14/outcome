@@ -1099,7 +1099,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
   {
     monad<int> m;
     BOOST_CHECK(!m);
-    BOOST_CHECK(false_(m));
+    BOOST_CHECK(unknown(m));
     BOOST_CHECK(!m.is_ready());
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
@@ -1111,7 +1111,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
   {
     monad<void> m;
     BOOST_CHECK(!m);
-    BOOST_CHECK(false_(m));
+    BOOST_CHECK(unknown(m));
     BOOST_CHECK(!m.is_ready());
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
@@ -1188,7 +1188,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
     auto e=std::make_exception_ptr(std::system_error(ec));
     monad<int> m(ec);
     BOOST_CHECK(!m);
-    BOOST_CHECK(other(m));
+    BOOST_CHECK(false_(m));
     BOOST_CHECK(m.is_ready());
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
@@ -1210,7 +1210,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
     auto e=std::make_exception_ptr(5);
     monad<int> m(e);
     BOOST_CHECK(!m);
-    BOOST_CHECK(other(m));
+    BOOST_CHECK(false_(m));
     BOOST_CHECK(m.is_ready());
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());

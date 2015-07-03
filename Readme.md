@@ -16,6 +16,7 @@ Lightweight promise-future:
 basic_future<shared_future_policy>.
  - [x] Document synchronisation APIs in promise future.
  - [x] Audit all unlocked state reads with writes for raciness.
+ - [x] Refactor the tribool logic mapping such that empty => unknown.
  - [ ] Implement N4399 continuations.
  - [ ] wait() should sleep the thread as necessary.
  - [ ] Implement wait_for()/wait_until().
@@ -30,6 +31,7 @@ implementation policies themselves do the conversion, so some template alias e.g
 far more efficient implementation. Maybe try relocating AFIO's enqueued_task into a lightweight
 packaged_task design?
  - [ ] option<bool> et al should really be 1 byte storage, not 2 bytes.
+ - [ ] Add tribool logic programming operator overloads
  - [ ] Use of reinterpret_cast to implement future => shared_future is naughty and should be done properly.
 
 
