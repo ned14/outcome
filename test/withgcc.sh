@@ -9,7 +9,7 @@ rm -rf unittests_* *.gcda *.gcno
 INCLUDE="-I../include/boost/spinlock/bindlib/include -I../include/boost/spinlock/expected/include"
 if [ -n "$BUILD_EXTRA" ]; then
   echo Building unittests_coverage ...
-  g++ -std=c++0x -pthread -O1 -DNDEBUG -DRUNNING_ON_VALGRIND=1 -g -gdwarf-2 -o unittests_coverage unittests.cpp -lrt -fprofile-arcs -ftest-coverage -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-elide-constructors -fno-inline $INCLUDE
+  #g++ -std=c++0x -pthread -O1 -DNDEBUG -DRUNNING_ON_VALGRIND=1 -g -gdwarf-2 -o unittests_coverage unittests.cpp -lrt -fprofile-arcs -ftest-coverage -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-elide-constructors -fno-inline $INCLUDE
 fi
 echo C++ 14 check
 time clang++-3.7 -Wall -Wextra -std=c++14 -pthread -O3 -DNDEBUG -DBOOST_SPINLOCK_MONAD_ENABLE_OPERATORS=1 -g -gdwarf-2 -o unittests_1 unittests.cpp -lrt $INCLUDE -Wno-unknown-pragmas -Wno-unused-function || true

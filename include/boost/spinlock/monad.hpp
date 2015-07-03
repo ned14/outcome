@@ -467,7 +467,7 @@ namespace lightweight_futures {
       template<class U> struct function_ptr_storage_impl : public function_ptr_storage
       {
         U c;
-        template<class V> BOOST_SPINLOCK_FUTURE_CONSTEXPR function_ptr_storage_impl(V &&_c) : c(std::forward<V>(_c)) { }
+        BOOST_SPINLOCK_FUTURE_CONSTEXPR function_ptr_storage_impl(U &&_c) : c(std::move(_c)) { }
         virtual R operator()(Args &&... args) override final { return c(std::move(args)...); }
       };
       function_ptr_storage *ptr;
