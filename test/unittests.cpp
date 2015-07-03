@@ -2030,7 +2030,7 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
   int test = 0;
   promise<void> p;
   future<void> f(p.get_future());
-  future<int> f2(f.then([&test](future<void> &&f) { test = 1; return 5; }));
+  future<int> f2(f.then([&test](future<void> &&) { test = 1; return 5; }));
   BOOST_CHECK(f.valid());
   BOOST_CHECK(f2.valid());
   BOOST_CHECK(test == 0);
@@ -2048,7 +2048,7 @@ BOOST_AUTO_TEST_CASE(works/shared_future/continuations/lightweight, "Tests that 
   int test = 0;
   promise<void> p;
   shared_future<void> f(p.get_future());
-  shared_future<int> f2(f.then([&test](const shared_future<void> &f) { test = 1; return 5; }));
+  shared_future<int> f2(f.then([&test](const shared_future<void> &) { test = 1; return 5; }));
   BOOST_CHECK(f.valid());
   BOOST_CHECK(f2.valid());
   BOOST_CHECK(test == 0);
