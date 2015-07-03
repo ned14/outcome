@@ -472,7 +472,7 @@ namespace lightweight_futures {
       };
       function_ptr_storage *ptr;
       template<class U> explicit function_ptr(U &&f, std::nullptr_t) : ptr(new function_ptr_storage_impl<typename std::decay<U>::type>(std::forward<U>(f))) { }
-      template<class R, class U> friend inline function_ptr<R> make_function_ptr(U &&f);
+      template<class U, class V> friend inline function_ptr<U> make_function_ptr(V &&f);
     public:
       BOOST_SPINLOCK_FUTURE_CONSTEXPR function_ptr() noexcept : ptr(nullptr) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR function_ptr(function_ptr_storage *p) noexcept : ptr(p) { }
