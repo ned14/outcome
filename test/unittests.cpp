@@ -2033,9 +2033,28 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
   future<int> f2(f.then([&test](future<void> &&f) { test = 1; return 5; }));
   BOOST_CHECK(f.valid());
   BOOST_CHECK(f2.valid());
+  BOOST_CHECK(test == 0);
   p.set_value();
   BOOST_CHECK(test == 1);
   BOOST_CHECK(!f.valid());  // consuming continuation, therefore f is consumed
+  BOOST_CHECK(f2.valid());
+  BOOST_CHECK(f2.get() == 5);
+}
+
+BOOST_AUTO_TEST_CASE(works/shared_future/continuations/lightweight, "Tests that our shared_future-promise continuations works as intended")
+{
+  std::cout << "\n=== Tests that our shared_future-promise continuations works as intended ===" << std::endl;
+  using namespace boost::spinlock::lightweight_futures;
+  int test = 0;
+  promise<void> p;
+  shared_future<void> f(p.get_future());
+  shared_future<int> f2(f.then([&test](const shared_future<void> &f) { test = 1; return 5; }));
+  BOOST_CHECK(f.valid());
+  BOOST_CHECK(f2.valid());
+  BOOST_CHECK(test == 0);
+  p.set_value();
+  BOOST_CHECK(test == 1);
+  BOOST_CHECK(f.valid());  // non-consuming continuation, therefore f is not consumed
   BOOST_CHECK(f2.valid());
   BOOST_CHECK(f2.get() == 5);
 }

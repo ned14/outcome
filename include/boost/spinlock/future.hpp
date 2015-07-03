@@ -321,6 +321,7 @@ namespace lightweight_futures {
       _storage=std::move(o._storage);
       if(h._f)
         h._f->_promise=this;
+      o._storage.clear();
     }
     //! \brief SYNC POINT Move assignment. If throws during move, destination promise is left as if default constructed i.e. any previous promise contents are destroyed.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_promise &operator=(basic_promise &&o) noexcept(is_nothrow_move_constructible)
@@ -406,7 +407,7 @@ namespace lightweight_futures {
         _detached=true; \
         h.unlock(); \
         if(callable) \
-          (*callable)(f); \
+          callable(f); \
         _wake_waiters(); \
       } \
       else \
@@ -749,10 +750,14 @@ namespace lightweight_futures {
     /*! \brief SYNC POINT Call F when the future signals.
     \param f Some callable. Must be noexcept if this future cannot transport an exception_type, else will static assert.
     
+    Unlike the Concurrency TS, as an extension lightweight futures do not prevent you from passing a rvalue consuming continuation
+    to non-consuming futures, nor from passing a lvalue consuming continuation to consuming futures. If the future is consuming,
+    in order to maintain standards conformance the state will be emptied after the first rvalue consuming continuation has executed.
+
     If F takes the future by rvalue reference (like in the Concurrency TS)
-    or by value, this MUST be the first continuation set onto the future as the callable will consume the future. As an extension, if F takes
+    or by value, this MUST be the first continuation set onto the future as the callable will consume the future. If F takes
     the future by lvalue reference and therefore does not consume it, you may add as many of these as you desire, noting that
-    if you modify state you may cause misoperation for continuations yet to be called. NOTE that continations are called in the
+    if you modify state you may cause misoperation for continuations yet to be called. NOTE that continuations are called in the
     REVERSE order of their addition because they are stored as a simple forward linked list for maximum performance.
     */
     template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_then<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_future>::type, typename std::decay<_F>::type, implementation_policy>::output_type then(_F &&f)
@@ -777,12 +782,12 @@ namespace lightweight_futures {
       // If there is already a continuation, this continuation cannot consume the future
       if (!f_traits::is_lvalue && h._p->_storage.pointer_.callable)
         throw std::invalid_argument("You cannot supply a future consuming continuation except as the very first continuation added to a future");
-      // Create a lambda to chain this continuation. As std::function can throw and the lambda capture destroys
-      // state on exception unwind, we break unique_ptr uniqueness temporarily
-      std::function<void(future_type *)> *prevcallable=h._p->_storage.pointer_.callable.get();
+      // Create a lambda to chain this continuation. As function_ptr can throw and the lambda capture destroys
+      // state on exception unwind, we break function_ptr uniqueness temporarily
+      auto prevcallable=h._p->_storage.pointer_.callable.get();
       typename output_type::promise_type p;
       output_type ret(p.get_future());
-      std::unique_ptr<std::function<void(future_type *)>> callable(new std::function<void(future_type *)>([
+      auto callable=detail::make_function_ptr<void(future_type *)>([
 #ifdef __cpp_init_captures
         p = std::move(p), f = std::forward<F>(f), prevcallable = std::move(prevcallable)
 #else
@@ -790,19 +795,24 @@ namespace lightweight_futures {
 #endif
       ] (future_type *self) mutable {
           // Immediately adopt the captured raw pointer
-          std::unique_ptr<std::function<void(future_type *)>> callable(prevcallable);
+          detail::function_ptr<void(future_type *)> callable(prevcallable);
           // Execute the continuation
           try
           {
             p.set_state(detail::do_then<typename f_traits::return_type, F, implementation_policy>(std::move(f))(std::move(*self))._storage);
+            if(is_consuming && f_traits::is_rvalue)
+            {
+              // Concurrency TS requires us to zap storage after a consuming move
+              self->clear();
+            }
           }
           catch (...)
           {
             p.set_exception(std::current_exception());
           }
           if(callable)
-            (*callable)(self);
-        }));
+            callable(self);
+        });
       // Swap out any existing continuation with the new one
       h._p->_storage.pointer_.callable.release();
       h._p->_storage.pointer_.callable = std::move(callable);
@@ -890,6 +900,8 @@ namespace lightweight_futures {
 
     //! Forwards to wait()
     BOOST_SPINLOCK_FUTURE_IMPL(wait)
+    //! Forwards to then()
+    BOOST_SPINLOCK_FUTURE_IMPL(then)
 #undef BOOST_SPINLOCK_FUTURE_IMPL
   };
 

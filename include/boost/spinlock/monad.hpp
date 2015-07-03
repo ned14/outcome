@@ -453,6 +453,45 @@ namespace lightweight_futures {
   using tribool::indeterminate;
   using tribool::unknown;  
 
+  namespace detail
+  {
+    // A move only capable lightweight std::function, as std::function can't handle move only callables
+    template<class F> class function_ptr;
+    template<class R, class... Args> class function_ptr<R(Args...)>
+    {
+      struct function_ptr_storage
+      {
+        virtual ~function_ptr_storage() { }
+        virtual R operator()(Args&&... args) = 0;
+      };
+      template<class U> struct function_ptr_storage_impl : public function_ptr_storage
+      {
+        U c;
+        BOOST_SPINLOCK_FUTURE_CONSTEXPR function_ptr_storage_impl(U &&_c) : c(std::move(_c)) { }
+        virtual R operator()(Args &&... args) override final { return c(std::move(args)...); }
+      };
+      function_ptr_storage *ptr;
+      template<class U> explicit function_ptr(U &&f, std::nullptr_t) : ptr(new function_ptr_storage_impl<typename std::decay<U>::type>(std::forward<U>(f))) { }
+      template<class R, class U> friend inline function_ptr<R> make_function_ptr(U &&f);
+    public:
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR function_ptr() noexcept : ptr(nullptr) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR function_ptr(function_ptr_storage *p) noexcept : ptr(p) { }
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR function_ptr(function_ptr &&o) noexcept : ptr(o.ptr) { o.ptr = nullptr; }
+      function_ptr &operator=(function_ptr &&o) { delete ptr; ptr = o.ptr; o.ptr = nullptr; return *this; }
+      function_ptr(const function_ptr &) = delete;
+      function_ptr &operator=(const function_ptr &) = delete;
+      ~function_ptr() { delete ptr; }
+      explicit BOOST_SPINLOCK_FUTURE_CONSTEXPR operator bool() const noexcept { return !!ptr; }
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR R operator()(Args... args) const
+      {
+        return (*ptr)(std::move(args)...);
+      }
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR function_ptr_storage *get() noexcept { return ptr; }
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR function_ptr_storage *release() noexcept { auto p = ptr; ptr = nullptr; return p; }
+    };
+    template<class R, class U> inline function_ptr<R> make_function_ptr(U &&f) { return function_ptr<R>(std::forward<U>(f), nullptr); }
+  }
+
   /*! \class value_storage
   \tparam implementation_policy A policy type providing a `value_type`, an `error_type`, an `exception_type`, an
   `implementation_type` and a function called `bool _throw_error(monad_errc)`.
@@ -486,7 +525,7 @@ namespace lightweight_futures {
     struct Pointer_t
     {
       pointer_type pointer;        // Typically 8 bytes
-      std::unique_ptr<std::function<void(pointer_type)>> callable;  // Typically 8 bytes
+      detail::function_ptr<void(pointer_type)> callable;  // Typically 8 bytes
       BOOST_SPINLOCK_FUTURE_CONSTEXPR Pointer_t(pointer_type p) : pointer(p) { }
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR Pointer_t(Pointer_t &&o) noexcept : pointer(std::move(o.pointer)), callable(std::move(o.callable)) { o.pointer = nullptr; }
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR Pointer_t &operator=(Pointer_t &&o) noexcept
@@ -697,7 +736,7 @@ namespace lightweight_futures {
       type = storage_type::pointer;
     }
     // Called by future to set a continuation
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_continuation(std::unique_ptr<std::function<void(pointer_type)>> c)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_continuation(detail::function_ptr<void(pointer_type)> c)
     {
       assert(type == storage_type::pointer);
       pointer_.callable = std::move(c);
