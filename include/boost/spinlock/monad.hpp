@@ -767,6 +767,15 @@ namespace lightweight_futures {
     template<class R, class T> typename rebind_cast_type<R, T*>::type rebind_cast(T *&&v) { return reinterpret_cast<typename rebind_cast_type<R, T*>::type>(v); }
     template<class R, class T> typename rebind_cast_type<R, T*>::type rebind_cast(T *&v) { return reinterpret_cast<typename rebind_cast_type<R, T*>::type>(v); }
 
+    // Call C with A either by rvalue or lvalue ref
+    template<bool with_rvalue> struct do_invoke
+    {
+      template<class C, class A> BOOST_SPINLOCK_FUTURE_CONSTEXPR auto operator()(C &&c, A &&a) const -> decltype(c(a)) { return c(a); }
+    };
+    template<> struct do_invoke<true>
+    {
+      template<class C, class A> BOOST_SPINLOCK_FUTURE_CONSTEXPR auto operator()(C &&c, A &&a) const -> decltype(c(std::move(a))) { return c(std::move(a)); }
+    };
     /* Invokes the callable passed to next() folding any monad return type
     R is the type returned by the callable
     C is the callable
@@ -791,9 +800,7 @@ namespace lightweight_futures {
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR do_simple_continuation(U &&c) : _c(std::forward<U>(c)) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(input_type &&v) const
       {
-        return traits::callable_argument_traits<callable_type, input_type>::is_rvalue
-          ? output_type(_c(std::move(v)))
-          : output_type(_c(input_type(v)));
+        return output_type(do_invoke<traits::callable_argument_traits<callable_type, input_type>::is_rvalue>()(_c, std::move(v)));
       }
     };
     // For when R is void
@@ -807,9 +814,7 @@ namespace lightweight_futures {
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR do_simple_continuation(U &&c) : _c(std::forward<U>(c)) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(input_type &&v) const
       {
-        return traits::callable_argument_traits<callable_type, input_type>::is_rvalue
-          ? (_c(std::move(v)), output_type())
-          : (_c(input_type(v)), output_type());
+        return do_invoke<traits::callable_argument_traits<callable_type, input_type>::is_rvalue>()(_c, std::move(v)), output_type();
       }
     };
     // For when R is a monad
@@ -822,9 +827,7 @@ namespace lightweight_futures {
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR do_simple_continuation(U &&c) : _c(std::forward<U>(c)) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(input_type &&v) const
       {
-        return traits::callable_argument_traits<callable_type, input_type>::is_rvalue
-          ? output_type(_c(std::move(v)))
-          : output_type(_c(input_type(v)));
+        return output_type(do_invoke<traits::callable_argument_traits<callable_type, input_type>::is_rvalue>()(_c, std::move(v)));
       }
     };
     template<class R, class C, class Policy> using do_next = do_simple_continuation<R, C, basic_monad, Policy>;
@@ -961,17 +964,13 @@ namespace lightweight_futures {
         typename=typename enable_if_callable_valid<callable_type, U, typename basic_monad<Policy>::value_type, !std::is_void<R>::value>::type
       > BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<4>) const
       {
-        return traits::callable_argument_traits<callable_type, U>::is_rvalue
-          ? output_type(_c(std::move(v)))
-          : output_type(_c(U(v)));
+        return output_type(do_invoke<traits::callable_argument_traits<callable_type, U>::is_rvalue>()(_c, std::move(v)));
       }
       template<class U,
         typename = typename enable_if_callable_valid<callable_type, U, typename basic_monad<Policy>::value_type, std::is_void<R>::value>::type
       > BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<3>) const
       {
-        return traits::callable_argument_traits<callable_type, U>::is_rvalue
-          ? (_c(std::move(v)), output_type())
-          : (_c(U(v)), output_type());
+        return do_invoke<traits::callable_argument_traits<callable_type, U>::is_rvalue>()(_c, std::move(v)), output_type();
       }
       template<class U, typename=typename std::enable_if<std::is_constructible<output_type, U>::value>::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<2>) const { return output_type(std::forward<U>(v)); }
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&, traits::detail::rank<1>) const { return output_type(); }
@@ -996,17 +995,13 @@ namespace lightweight_futures {
         typename = typename enable_if_callable_valid<callable_type, U, input_type, !std::is_void<typename output_type::value_type>::value, typename input_type::value_type>::type
       > BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<4>) const
       {
-        return traits::callable_argument_traits<callable_type, U>::is_rvalue
-          ? output_type(_c(std::move(v)))
-          : output_type(_c(U(v)));
+        return output_type(do_invoke<traits::callable_argument_traits<callable_type, U>::is_rvalue>()(_c, std::move(v)));
       }
       template<class U,
         typename = typename enable_if_callable_valid<callable_type, U, input_type, std::is_void<typename output_type::value_type>::value, typename input_type::value_type>::type
       > BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<3>) const
       {
-        return traits::callable_argument_traits<callable_type, U>::is_rvalue
-          ? (_c(std::move(v)), output_type())
-          : (_c(U(v)), output_type());
+        return do_invoke<traits::callable_argument_traits<callable_type, U>::is_rvalue>()(_c, std::move(v)), output_type();
       }
       template<class U, typename=typename std::enable_if<std::is_constructible<output_type, U>::value>::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<2>) const { return output_type(std::forward<U>(v)); }
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(U &&, traits::detail::rank<1>) const { return output_type(); }
