@@ -767,10 +767,12 @@ namespace lightweight_futures {
     template<class R, class T> typename rebind_cast_type<R, T*>::type rebind_cast(T *&&v) { return reinterpret_cast<typename rebind_cast_type<R, T*>::type>(v); }
     template<class R, class T> typename rebind_cast_type<R, T*>::type rebind_cast(T *&v) { return reinterpret_cast<typename rebind_cast_type<R, T*>::type>(v); }
 
+    // Convert any input type into a lvalue ref
+    template<class T> struct to_lvalue_ref : public std::add_lvalue_reference<typename std::decay<T>::type> {};
     // Call C with A either by rvalue or lvalue ref
     template<bool with_rvalue> struct do_invoke
     {
-      template<class C, class A> BOOST_SPINLOCK_FUTURE_CONSTEXPR auto operator()(C &&c, A &&a) const -> decltype(c(a)) { return c(a); }
+      template<class C, class A> BOOST_SPINLOCK_FUTURE_CONSTEXPR auto operator()(C &&c, A &&a) const -> decltype(c(static_cast<typename to_lvalue_ref<A>::type>(a))) { return c(static_cast<typename to_lvalue_ref<A>::type>(a)); }
     };
     template<> struct do_invoke<true>
     {

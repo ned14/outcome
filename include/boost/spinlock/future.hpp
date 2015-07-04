@@ -764,8 +764,7 @@ namespace lightweight_futures {
     {
       typedef typename std::decay<_F>::type F;
       typedef traits::callable_argument_traits<F, basic_future> f_traits;
-      static_assert(f_traits::valid,
-        "The callable passed to then() must take this future type or a reference to it.");
+      static_assert(f_traits::valid, "The callable passed to then() must take this future type or a reference to it.");
       typedef typename detail::do_then<typename f_traits::return_type, F, implementation_policy>::output_type output_type;
       BOOST_STATIC_CONSTEXPR bool is_f_noexcept = traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_future>::is_noexcept;
       static_assert(is_f_noexcept || output_type::has_exception_type, "If the future type returned by the callable cannot transport exceptions, the callable must be noexcept.");
@@ -787,13 +786,17 @@ namespace lightweight_futures {
       auto prevcallable=h._p->_storage.pointer_.callable.get();
       typename output_type::promise_type p;
       output_type ret(p.get_future());
-      auto callable=detail::make_function_ptr<void(future_type *)>([
 #ifdef __cpp_init_captures
+      auto callable=detail::make_function_ptr<void(future_type *)>([
         p = std::move(p), f = std::forward<F>(f), prevcallable = std::move(prevcallable)
-#else
-        p, f, prevcallable
-#endif
       ] (future_type *self) mutable {
+#else
+      auto p_(std::make_shared<typename output_type::promise_type>(std::move(p)));
+      auto callable = detail::make_function_ptr<void(future_type *)>([
+        p_, f, prevcallable
+      ] (future_type *self) mutable {
+          typename output_type::promise_type p(std::move(*p_));
+#endif
           // Immediately adopt the captured raw pointer
           detail::function_ptr<void(future_type *)> callable(prevcallable);
           // Execute the continuation

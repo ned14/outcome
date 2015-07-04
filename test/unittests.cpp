@@ -2027,20 +2027,47 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
 {
   std::cout << "\n=== Tests that our future-promise continuations works as intended ===" << std::endl;
   using namespace boost::spinlock::lightweight_futures;
-  int test = 0;
-  promise<void> p;
-  future<void> f(p.get_future());
-  future<int> f2(f.then([&test](future<void> &&) { test = 1; return 5; }));
-  BOOST_CHECK(f.valid());
-  BOOST_CHECK(f2.valid());
-  BOOST_CHECK(test == 0);
-  p.set_value();
-  BOOST_CHECK(test == 1);
-  BOOST_CHECK(!f.valid());  // consuming continuation, therefore f is consumed
-  BOOST_CHECK(f2.valid());
-  BOOST_CHECK(f2.get() == 5);
+  // Check basic Concurrency TS conformance
+  {
+    int test = 0;
+    promise<double> p;
+    future<double> f(p.get_future());
+    future<int> f2(f.then([&test](future<double> &&f) { BOOST_CHECK(f.get() == 78.0); test = 1; return 5; }));
+    future<int> f3(f2.then([&test](future<int> &&f) { BOOST_CHECK(f.get() == 5); test = 2; return make_ready_future(2); }));
+    BOOST_CHECK(f.valid());
+    BOOST_CHECK(f2.valid());
+    BOOST_CHECK(f3.valid());
+    BOOST_CHECK(test == 0);
+    p.set_value(78.0);
+    BOOST_CHECK(test == 2);
+    BOOST_CHECK(!f.valid());  // consuming continuation, therefore f is consumed
+    BOOST_CHECK(!f2.valid()); // ditto
+    BOOST_CHECK(f3.get() == 2);
+    BOOST_CHECK(!f3.valid());
+  }
+  // Check our extensions
+  {
+    int test = 0;
+    promise<int> p;
+    future<int> f(p.get_future());
+    future<int> f2(f.then([&test](future<int> &&f) { BOOST_CHECK(f.get() == 5); BOOST_CHECK(test == 2); test++; return 3; }));
+    future<int> f3(f.then([&test](future<int> f) { BOOST_CHECK(f.valid()); BOOST_CHECK(test == 1); test++; return 8; }));
+    future<int> f4(f.then([&test](future<int> &f) { BOOST_CHECK(f.valid()); BOOST_CHECK(test == 0); test++; return 2; }));
+    BOOST_CHECK(f.valid());
+    BOOST_CHECK(f2.valid());
+    BOOST_CHECK(f3.valid());
+    BOOST_CHECK(f4.valid());
+    BOOST_CHECK(test == 0);
+    p.set_value(5);
+    BOOST_CHECK(test == 3);
+    BOOST_CHECK(!f.valid());
+    BOOST_CHECK(f2.get() == 3);
+    BOOST_CHECK(f3.get() == 8);
+    BOOST_CHECK(f4.get() == 2);
+  }
 }
 
+#if 0
 BOOST_AUTO_TEST_CASE(works/shared_future/continuations/lightweight, "Tests that our shared_future-promise continuations works as intended")
 {
   std::cout << "\n=== Tests that our shared_future-promise continuations works as intended ===" << std::endl;
@@ -2058,6 +2085,7 @@ BOOST_AUTO_TEST_CASE(works/shared_future/continuations/lightweight, "Tests that 
   BOOST_CHECK(f2.valid());
   BOOST_CHECK(f2.get() == 5);
 }
+#endif
 
 
 static usCount overhead;
