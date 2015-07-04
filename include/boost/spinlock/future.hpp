@@ -862,7 +862,7 @@ namespace lightweight_futures {
     //! Default copy assignment
     shared_basic_future_ptr &operator=(const shared_basic_future_ptr &) = default;
     //! Forwarding constructor
-    template<class U, typename=typename std::enable_if<!std::is_same<shared_basic_future_ptr, typename std::decay<U>::type>::value>::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR shared_basic_future_ptr(U &&o) : _future(std::make_shared<base_future_type>(std::forward<U>(o))) { }
+    template<class U, typename=typename std::enable_if<std::is_constructible<base_future_type, U>::value>::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR shared_basic_future_ptr(U &&o) : _future(std::make_shared<base_future_type>(std::forward<U>(o))) { }
     //! Forwards to operator bool
     explicit operator bool() const { return _check()->operator bool(); }
     //! Forwards to operator tribool
