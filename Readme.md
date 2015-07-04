@@ -17,19 +17,18 @@ basic_future<shared_future_policy>.
  - [x] Document synchronisation APIs in promise future.
  - [x] Audit all unlocked state reads with writes for raciness.
  - [x] Refactor the tribool logic mapping such that empty => unknown.
- - [ ] Implement N4399 continuations.
+ - [x] Implement N4399 continuations.
+ - [ ] Add set_state() and get_state() to convert future into monad. Allow future to construct from monad.
  - [ ] wait() should sleep the thread as necessary.
  - [ ] Implement wait_for()/wait_until().
  - [ ] when_any/when_all composure.
+ - [ ] Port AFIO's intrusive enqueued_task into a lightweight packaged_task design.
 
 Later:
  - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
  - [ ] Have basic_monad gain an explicit conversion constructor from other basic_monad with different
 implementation policies such option can convert to result or monad and so on. Look into having the
 implementation policies themselves do the conversion, so some template alias e.g. convert<>().
- - [ ] Lightweight packaged_task? I think an intrusive design like AFIO's enqueued_task makes for a
-far more efficient implementation. Maybe try relocating AFIO's enqueued_task into a lightweight
-packaged_task design?
  - [ ] option<bool> et al should really be 1 byte storage, not 2 bytes.
  - [ ] Add tribool logic programming operator overloads
  - [ ] Use of reinterpret_cast to implement future => shared_future is naughty and should be done properly.

@@ -61,11 +61,11 @@ as per N4399. As an extension, you can also simply construct the future directly
 In exchange for some minor limitations, this lightweight promise-future is 2x-3x faster than
 `std::promise` and `std::future` in the non-blocking case. You also get deep integration with basic_monad and
 lots of cool functional programming stuff. Unless you use continuations, they allocate no memory whatsoever and
-entirely rely on your compiler's optimiser to do the right thing (we have unit testing to make sure they (with some
-compiler-version-specific exception) do do the right thing). Extreme care was taken throughout this code base to ensure
+entirely rely on your compiler's optimiser to do the right thing (we have unit testing to make sure they []with some
+compiler-version-specific exceptions] do do the right thing). Extreme care was taken throughout this code base to ensure
 an absolute minimum impact on build times *if not optimising*, unlike almost all other monad implementations out there.
-If you are optimising however, because of the care taken to hint to the compiler to eliminate as much code as possible,
-these futures and monads are very hard on the compiler indeed, and for optimised builds they add very significantly to
+If you *are* optimising however, because of the care taken to hint to the compiler to eliminate as much code as possible,
+these futures and monads are very hard on the compiler indeed, and for optimised builds they will add very significantly to
 compilation times. Even the simple unit test conformance suite for this library goes from about three seconds compilation time
 unoptimised to nearly thirty optimised.
 
@@ -97,9 +97,11 @@ as they'll get copied and moved around.
 
 Extensions to the ISO C++ standard specification (and Concurrency TS):
 
-- We match the API of Boost.Thread's future-promises, this should guarantee very close conformance to future ISO C++ standard
+- We match the greatly extended API of Boost.Thread's future-promises, this should guarantee very close conformance to future ISO C++ standard
 enhancements to `std::future`. Boost.Thread's API extensions are all very useful, and make your life a lot easier.
 - All our futures inherit from corresponding monads, they are just an asynchronously set monad.
+- As a result our futures can transport an error_code as well as an exception_ptr. The latter allocates memory and is profoundly slow
+on some platforms, so avoiding it completely can add 10-15% to some use cases.
 - You can add as many continuations to future as you like so long as only the first added continuation takes an rvalue reference.
 
 ## Supplying your own implementations of `basic_future<T>` ##
@@ -781,6 +783,9 @@ namespace lightweight_futures {
     Passing a generic lambda works, but you must qualify the auto parameter as a rvalue or const lvalue ref, otherwise it will static
     assert.
     */
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+    template<class F> future<...> then(F &&f);
+#else
     template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_then<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_future>::type, typename std::decay<_F>::type, implementation_policy>::output_type then(_F &&f)
     {
       typedef typename std::decay<_F>::type F;
@@ -844,7 +849,7 @@ namespace lightweight_futures {
       h._p->_storage.pointer_.callable = std::move(callable);
       return ret;
     }
-
+#endif
   };
 
   /*! \class shared_basic_future_ptr
