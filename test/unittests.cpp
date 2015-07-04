@@ -2032,7 +2032,9 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
     int test = 0;
     promise<double> p;
     future<double> f(p.get_future());
+    // Type permutation
     future<int> f2(f.then([&test](future<double> &&f) { BOOST_CHECK(f.get() == 78.0); test = 1; return 5; }));
+    // Automatic unwrapping of future<future<T>>
     future<int> f3(f2.then([&test](future<int> &&f) { BOOST_CHECK(f.get() == 5); test = 2; return make_ready_future(2); }));
     BOOST_CHECK(f.valid());
     BOOST_CHECK(f2.valid());
@@ -2045,14 +2047,65 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
     BOOST_CHECK(f3.get() == 2);
     BOOST_CHECK(!f3.valid());
   }
-  // Check our extensions
+  {
+    int test = 0;
+    promise<double> p;
+    future<double> f(p.get_future());
+    p.set_value(78.0);
+    future<int> f2(f.then([&test](future<double> &&f) { BOOST_CHECK(f.get() == 78.0); test = 1; return 5; }));
+    future<int> f3(f2.then([&test](future<int> &&f) { BOOST_CHECK(f.get() == 5); test = 2; return make_ready_future(2); }));
+    BOOST_CHECK(test == 2);
+    BOOST_CHECK(!f.valid());  // consuming continuation, therefore f is consumed
+    BOOST_CHECK(!f2.valid()); // ditto
+    BOOST_CHECK(f3.get() == 2);
+    BOOST_CHECK(!f3.valid());
+  }
+
+  // EXTENSIONS
+  // Check that a const lvalue taking continuation does NOT consume the future
+  {
+    promise<int> p;
+    future<int> f(p.get_future());
+    future<int> f2(f.then([](const future<int> &f) { return 3; }));
+    BOOST_CHECK(f.valid());
+    BOOST_CHECK(f2.valid());
+    p.set_value(5);
+    BOOST_CHECK(f.valid());
+    BOOST_CHECK(f.get() == 5);
+    BOOST_CHECK(f2.get() == 3);
+  }
+  {
+    promise<int> p;
+    future<int> f(p.get_future());
+    p.set_value(5);
+    future<int> f2(f.then([](const future<int> &f) { return 3; }));
+    BOOST_CHECK(f.valid());
+    BOOST_CHECK(f2.valid());
+    BOOST_CHECK(f.get() == 5);
+    BOOST_CHECK(f2.get() == 3);
+  }
+  // Check that continuation chaining works as designed, and with auto lambdas
   {
     int test = 0;
     promise<int> p;
     future<int> f(p.get_future());
-    future<int> f2(f.then([&test](future<int> &&f) { BOOST_CHECK(f.get() == 5); BOOST_CHECK(test == 2); test++; return 3; }));
-    future<int> f3(f.then([&test](future<int> f) { BOOST_CHECK(f.valid()); BOOST_CHECK(test == 1); test++; return 8; }));
-    future<int> f4(f.then([&test](future<int> &f) { BOOST_CHECK(f.valid()); BOOST_CHECK(test == 0); test++; return 2; }));
+    future<int> f2(f.then([&test](
+#ifdef __cpp_generic_lambdas
+      auto
+#else
+      future<int> &&
+#endif
+      f) { BOOST_CHECK(f.get() == 5); BOOST_CHECK(test == 2); test++; return 3; }));
+    future<int> f3(f.then([&test](
+#ifdef __cpp_generic_lambdas
+      auto
+#else
+      const future<int> &
+#endif
+      f) { BOOST_CHECK(f.valid()); BOOST_CHECK(test == 1); test++; return 8; }));
+    future<int> f4(f.then([&test](const future<int> &f) { BOOST_CHECK(f.valid()); BOOST_CHECK(test == 0); test++; return 2; }));
+    // Trying to add a consuming continuation before non-consuming continuations must fail.
+    BOOST_CHECK_THROW(f.then([&test](future<int> &&f) { BOOST_CHECK(f.valid()); BOOST_CHECK(test == 0); test++; return 2; }), std::invalid_argument);
     BOOST_CHECK(f.valid());
     BOOST_CHECK(f2.valid());
     BOOST_CHECK(f3.valid());

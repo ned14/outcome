@@ -754,17 +754,19 @@ namespace lightweight_futures {
     to non-consuming futures, nor from passing a lvalue consuming continuation to consuming futures. If the future is consuming,
     in order to maintain standards conformance the state will be emptied after the first rvalue consuming continuation has executed.
 
-    If F takes the future by rvalue reference (like in the Concurrency TS)
-    or by value, this MUST be the first continuation set onto the future as the callable will consume the future. If F takes
-    the future by lvalue reference and therefore does not consume it, you may add as many of these as you desire, noting that
-    if you modify state you may cause misoperation for continuations yet to be called. NOTE that continuations are called in the
+    If F takes the future by rvalue reference (like in the Concurrency TS), this MUST be the first continuation set onto the future
+    as the callable is assumed to consume the future. If F takes
+    the future by const lvalue reference and therefore does not consume it, you may add as many of these as you desire, noting that
+    if you modify state via const_cast you may cause misoperation for continuations yet to be called. NOTE that continuations are called in the
     REVERSE order of their addition because they are stored as a simple forward linked list for maximum performance.
     */
     template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_then<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_future>::type, typename std::decay<_F>::type, implementation_policy>::output_type then(_F &&f)
     {
       typedef typename std::decay<_F>::type F;
       typedef traits::callable_argument_traits<F, basic_future> f_traits;
-      static_assert(f_traits::valid, "The callable passed to then() must take this future type or a reference to it.");
+      static_assert(f_traits::valid
+        && (f_traits::is_auto || f_traits::is_rvalue || (f_traits::is_lvalue && std::is_const<typename f_traits::type>::value)),
+        "The callable passed to then() must take either a const lvalue reference to this future type, or a rvalue reference.");
       typedef typename detail::do_then<typename f_traits::return_type, F, implementation_policy>::output_type output_type;
       BOOST_STATIC_CONSTEXPR bool is_f_noexcept = traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_future>::is_noexcept;
       static_assert(is_f_noexcept || output_type::has_exception_type, "If the future type returned by the callable cannot transport exceptions, the callable must be noexcept.");
