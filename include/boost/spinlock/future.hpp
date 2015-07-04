@@ -56,11 +56,18 @@ Promise-Futures supplied here:
 </dl>
 
 All the above have make ready functions of the form `make_ready_NAME`, `make_errored_NAME` and `make_exceptional_NAME`
-as per N4399.
+as per N4399. As an extension, you can also simply construct the future directly.
 
 In exchange for some minor limitations, this lightweight promise-future is 2x-3x faster than
 `std::promise` and `std::future` in the non-blocking case. You also get deep integration with basic_monad and
-lots of cool functional programming stuff.
+lots of cool functional programming stuff. Unless you use continuations, they allocate no memory whatsoever and
+entirely rely on your compiler's optimiser to do the right thing (we have unit testing to make sure they (with some
+compiler-version-specific exception) do do the right thing). Extreme care was taken throughout this code base to ensure
+an absolute minimum impact on build times *if not optimising*, unlike almost all other monad implementations out there.
+If you are optimising however, because of the care taken to hint to the compiler to eliminate as much code as possible,
+these futures and monads are very hard on the compiler indeed, and for optimised builds they add very significantly to
+compilation times. Even the simple unit test conformance suite for this library goes from about three seconds compilation time
+unoptimised to nearly thirty optimised.
 
 Known deviations from the ISO C++ standard specification:
 
@@ -87,6 +94,13 @@ Other things to consider:
 - As both promise and future must have sizeof greater than sizeof(T), don't use multi-Kb sized T's
 as they'll get copied and moved around.
 - Don't use any of the `monad_errc` nor `future_errc` error codes for the errored return, else expect misoperation.
+
+Extensions to the ISO C++ standard specification (and Concurrency TS):
+
+- We match the API of Boost.Thread's future-promises, this should guarantee very close conformance to future ISO C++ standard
+enhancements to `std::future`. Boost.Thread's API extensions are all very useful, and make your life a lot easier.
+- All our futures inherit from corresponding monads, they are just an asynchronously set monad.
+- You can add as many continuations to future as you like so long as only the first added continuation takes an rvalue reference.
 
 ## Supplying your own implementations of `basic_future<T>` ##
 
@@ -750,6 +764,10 @@ namespace lightweight_futures {
     /*! \brief SYNC POINT Call F when the future signals.
     \param f Some callable. Must be noexcept if this future cannot transport an exception_type, else will static assert.
     
+    This is one of the very few APIs to allocate memory. This is because the continuation must be type erased for internal storage.
+    This is also one of the very few APIs which is significantly faster in C++ 14 because init capturing lambdas can be used to
+    avoid a shared_ptr per promise transport.
+
     Unlike the Concurrency TS, as an extension lightweight futures do not prevent you from passing a rvalue consuming continuation
     to non-consuming futures, nor from passing a lvalue consuming continuation to consuming futures. If the future is consuming,
     in order to maintain standards conformance the state will be emptied after the first rvalue consuming continuation has executed.
@@ -759,6 +777,9 @@ namespace lightweight_futures {
     the future by const lvalue reference and therefore does not consume it, you may add as many of these as you desire, noting that
     if you modify state via const_cast you may cause misoperation for continuations yet to be called. NOTE that continuations are called in the
     REVERSE order of their addition because they are stored as a simple forward linked list for maximum performance.
+
+    Passing a generic lambda works, but you must qualify the auto parameter as a rvalue or const lvalue ref, otherwise it will static
+    assert.
     */
     template<class _F> BOOST_SPINLOCK_FUTURE_MSVC_HELP typename detail::do_then<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_future>::type, typename std::decay<_F>::type, implementation_policy>::output_type then(_F &&f)
     {
@@ -771,18 +792,18 @@ namespace lightweight_futures {
       BOOST_STATIC_CONSTEXPR bool is_f_noexcept = traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_future>::is_noexcept;
       static_assert(is_f_noexcept || output_type::has_exception_type, "If the future type returned by the callable cannot transport exceptions, the callable must be noexcept.");
       detail::lock_guard<promise_type, future_type> h(this);
-      _check_validity();
-      // Make a delayed invocation of simple_continuation, same as monad.next()
-      assert(h._p);
-      // If there is already a continuation, this continuation cannot consume the future
-      if (!f_traits::is_lvalue && h._p->_storage.pointer_.callable)
-        throw std::invalid_argument("You cannot supply a future consuming continuation except as the very first continuation added to a future");
       // If we are already signalled, execute immediately as if monad.next()
       if(is_ready())
       {
         h.unlock();
         return detail::do_then<typename f_traits::return_type, F, implementation_policy>(std::forward<F>(f))(std::move(*this));
       }
+      _check_validity();
+      // Make a delayed invocation of simple_continuation, same as monad.next()
+      assert(h._p);
+      // If there is already a continuation, this continuation cannot consume the future
+      if (!f_traits::is_lvalue && h._p->_storage.pointer_.callable)
+        throw std::invalid_argument("You cannot supply a future consuming continuation except as the very first continuation added to a future");
       // Create a lambda to chain this continuation. As function_ptr can throw and the lambda capture destroys
       // state on exception unwind, we break function_ptr uniqueness temporarily
       auto prevcallable=h._p->_storage.pointer_.callable.get();
@@ -824,14 +845,6 @@ namespace lightweight_futures {
       return ret;
     }
 
-    // future<result_of_t<decay_t<F>(future<R>)>>
-    //! \brief Call F when the future signals, not consuming the future.
-    // template<class F> typename std::result_of<F(basic_future<const value_type &>)>::type then(F &&f);
-
-//    template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP auto name(Args &&... args) const noexcept(noexcept(_future->name(std::forward<Args>(args)...))) -> decltype(_future->name(std::forward<Args>(args)...)) \
-//    { \
-//      return _check()->name(std::forward<Args>(args)...); \
-//    }
   };
 
   /*! \class shared_basic_future_ptr

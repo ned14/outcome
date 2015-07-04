@@ -2086,24 +2086,39 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
   }
   // Check that continuation chaining works as designed, and with auto lambdas
   {
-    int test = 0;
+    int test = 0, fail=0;
     promise<int> p;
     future<int> f(p.get_future());
-    future<int> f2(f.then([&test](
+    future<int> f2(f.then([&test, &fail](
 #ifdef __cpp_generic_lambdas
       auto &&
 #else
       future<int> &&
 #endif
-      f) { BOOST_CHECK(f.get() == 5); BOOST_CHECK(test == 2); test++; return 3; }));
-    future<int> f3(f.then([&test](
+      f) {
+      if(f.get() != 5) fail++;
+      if(test != 2) fail++;
+      test++;
+      return 3;
+    }));
+    future<int> f3(f.then([&test, &fail](
 #ifdef __cpp_generic_lambdas
       const auto &
 #else
       const future<int> &
 #endif
-      f) { BOOST_CHECK(f.valid()); BOOST_CHECK(test == 1); test++; return 8; }));
-    future<int> f4(f.then([&test](const future<int> &f) { BOOST_CHECK(f.valid()); BOOST_CHECK(test == 0); test++; return 2; }));
+      f) {
+      if(!f.valid()) fail++;
+      if(test != 1) fail++;
+      test++;
+      return 8;
+    }));
+    future<int> f4(f.then([&test, &fail](const future<int> &f) {
+      if(!f.valid()) fail++;
+      if(test != 0) fail++;
+      test++;
+      return 2;
+    }));
     // Trying to add a consuming continuation before non-consuming continuations must fail.
     BOOST_CHECK_THROW(f.then([&test](future<int> &&f) { BOOST_CHECK(f.valid()); BOOST_CHECK(test == 0); test++; return 2; }), std::invalid_argument);
     BOOST_CHECK(f.valid());
@@ -2113,6 +2128,7 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
     BOOST_CHECK(test == 0);
     p.set_value(5);
     BOOST_CHECK(test == 3);
+    BOOST_CHECK(fail == 0);
     BOOST_CHECK(!f.valid());
     BOOST_CHECK(f2.get() == 3);
     BOOST_CHECK(f3.get() == 8);
