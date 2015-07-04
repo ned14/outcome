@@ -2066,7 +2066,7 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
   {
     promise<int> p;
     future<int> f(p.get_future());
-    future<int> f2(f.then([](const future<int> &f) { return 3; }));
+    future<int> f2(f.then([](const future<int> &) { return 3; }));
     BOOST_CHECK(f.valid());
     BOOST_CHECK(f2.valid());
     p.set_value(5);
@@ -2078,7 +2078,7 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
     promise<int> p;
     future<int> f(p.get_future());
     p.set_value(5);
-    future<int> f2(f.then([](const future<int> &f) { return 3; }));
+    future<int> f2(f.then([](const future<int> &) { return 3; }));
     BOOST_CHECK(f.valid());
     BOOST_CHECK(f2.valid());
     BOOST_CHECK(f.get() == 5);
@@ -2091,14 +2091,14 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
     future<int> f(p.get_future());
     future<int> f2(f.then([&test](
 #ifdef __cpp_generic_lambdas
-      auto
+      auto &&
 #else
       future<int> &&
 #endif
       f) { BOOST_CHECK(f.get() == 5); BOOST_CHECK(test == 2); test++; return 3; }));
     future<int> f3(f.then([&test](
 #ifdef __cpp_generic_lambdas
-      auto
+      const auto &
 #else
       const future<int> &
 #endif

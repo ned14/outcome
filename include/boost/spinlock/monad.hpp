@@ -249,8 +249,9 @@ namespace traits
     template <bool enable, typename F, typename Arg> struct has_call_operator : public std::false_type {};
     template <typename F, typename Arg> struct has_call_operator<true, F, Arg> : public has_call_operator2<F, typename get_return_type<F, Arg>::type(Arg)>{};
 
-    template<bool _is_move, bool _is_lvalue, bool _is_auto, typename T=void> struct arg_form
+    template<bool _is_const, bool _is_move, bool _is_lvalue, bool _is_auto, typename T=void> struct arg_form
     {
+      BOOST_STATIC_CONSTEXPR bool is_const = _is_const;
       BOOST_STATIC_CONSTEXPR bool is_rvalue = _is_move;
       BOOST_STATIC_CONSTEXPR bool is_lvalue = _is_lvalue;
       BOOST_STATIC_CONSTEXPR bool is_auto = _is_auto;
@@ -268,21 +269,21 @@ namespace traits
       using return_type = typename get_return_type<F, A>::type;
       using arg_type = typename std::decay<A>::type;
 
-      static arg_form<false, true , true> test(return_type(F::*)(const arg_type&)      , rank<1>);
-      static arg_form<false, true , true> test(return_type(F::*)(arg_type&)            , rank<2>);
-      static arg_form<true , false, true> test(return_type(F::*)(arg_type&&)           , rank<3>);
-      static arg_form<false, false, true> test(return_type(F::*)(arg_type)             , rank<4>);
-      static arg_form<false, true , true> test(return_type(F::*)(const arg_type&) const, rank<5>);
-      static arg_form<false, true , true> test(return_type(F::*)(arg_type&)       const, rank<6>);
-      static arg_form<true , false, true> test(return_type(F::*)(arg_type&&)      const, rank<7>);
-      static arg_form<false, false, true> test(return_type(F::*)(arg_type)        const, rank<8>);
+      static arg_form<true , false, true , true> test(return_type(F::*)(const arg_type&)      , rank<1>);
+      static arg_form<false, false, true , true> test(return_type(F::*)(arg_type&)            , rank<2>);
+      static arg_form<false, true , false, true> test(return_type(F::*)(arg_type&&)           , rank<3>);
+      static arg_form<false, false, false, true> test(return_type(F::*)(arg_type)             , rank<4>);
+      static arg_form<true , false, true , true> test(return_type(F::*)(const arg_type&) const, rank<5>);
+      static arg_form<false, false, true , true> test(return_type(F::*)(arg_type&)       const, rank<6>);
+      static arg_form<false, true , false, true> test(return_type(F::*)(arg_type&&)      const, rank<7>);
+      static arg_form<false, false, false, true> test(return_type(F::*)(arg_type)        const, rank<8>);
 
-      template<class T> static arg_form<false, false, false, T> test(return_type(F::*)(T)             , rank<9>);
-      template<class T> static arg_form<false, true , false, T> test(return_type(F::*)(T&)            , rank<10>);
-      template<class T> static arg_form<true , false, false, T> test(return_type(F::*)(T&&)           , rank<11>);
-      template<class T> static arg_form<false, false, false, T> test(return_type(F::*)(T)        const, rank<12>);
-      template<class T> static arg_form<false, true , false, T> test(return_type(F::*)(T&)       const, rank<13>);
-      template<class T> static arg_form<true , false, false, T> test(return_type(F::*)(T&&)      const, rank<14>);
+      template<class T> static arg_form<false, false, false, false, T> test(return_type(F::*)(T)             , rank<9>);
+      template<class T> static arg_form<false, false, true , false, T> test(return_type(F::*)(T&)            , rank<10>);
+      template<class T> static arg_form<false, true , false, false, T> test(return_type(F::*)(T&&)           , rank<11>);
+      template<class T> static arg_form<false, false, false, false, T> test(return_type(F::*)(T)        const, rank<12>);
+      template<class T> static arg_form<false, false, true , false, T> test(return_type(F::*)(T&)       const, rank<13>);
+      template<class T> static arg_form<false, true , false, false, T> test(return_type(F::*)(T&&)      const, rank<14>);
 
       using result = decltype(test(&F::operator(), rank<15>()));
 
@@ -290,6 +291,7 @@ namespace traits
       BOOST_STATIC_CONSTEXPR bool is_lvalue = result::is_lvalue;
       BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
       using type = typename result::non_auto_type;
+      BOOST_STATIC_CONSTEXPR bool is_const = result::is_auto ? result::is_const : std::is_const<type>::value;
     };
 
     template<bool is_function, class F, class A> struct function_argument_form
@@ -300,14 +302,14 @@ namespace traits
       using return_type = typename get_return_type<F, A>::type;
       using arg_type = typename std::decay<A>::type;
 
-      static arg_form<false, true , true> test(return_type(*)(const arg_type&)      , rank<1>);
-      static arg_form<false, true , true> test(return_type(*)(arg_type&)            , rank<2>);
-      static arg_form<true , false, true> test(return_type(*)(arg_type&&)           , rank<3>);
-      static arg_form<false, false, true> test(return_type(*)(arg_type)             , rank<4>);
+      static arg_form<true , false, true , true> test(return_type(*)(const arg_type&)      , rank<1>);
+      static arg_form<false, false, true , true> test(return_type(*)(arg_type&)            , rank<2>);
+      static arg_form<false, true , false, true> test(return_type(*)(arg_type&&)           , rank<3>);
+      static arg_form<false, false, false, true> test(return_type(*)(arg_type)             , rank<4>);
 
-      template<class T> static arg_form<false, false, false, T> test(return_type(*)(T)             , rank<5>);
-      template<class T> static arg_form<false, true , false, T> test(return_type(*)(T&)            , rank<6>);
-      template<class T> static arg_form<true , false, false, T> test(return_type(*)(T&&)           , rank<7>);
+      template<class T> static arg_form<false, false, false, false, T> test(return_type(*)(T)             , rank<5>);
+      template<class T> static arg_form<false, false, true , false, T> test(return_type(*)(T&)            , rank<6>);
+      template<class T> static arg_form<false, true , false, false, T> test(return_type(*)(T&&)           , rank<7>);
 
       using result = decltype(test(F(), rank<10>()));
 
@@ -315,6 +317,7 @@ namespace traits
       BOOST_STATIC_CONSTEXPR bool is_lvalue = result::is_lvalue;
       BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
       using type = typename result::non_auto_type;
+      BOOST_STATIC_CONSTEXPR bool is_const = result::is_auto ? result::is_const : std::is_const<type>::value;
     };
 
   }
@@ -342,6 +345,8 @@ namespace traits
     {
       //! \brief Is the callable F called with Arg well formed?
       BOOST_STATIC_CONSTEXPR bool valid = false;
+      //! \brief Is the arg const?
+      BOOST_STATIC_CONSTEXPR bool is_const = false;
       //! \brief Is the arg a rvalue ref?
       BOOST_STATIC_CONSTEXPR bool is_rvalue = false;
       //! \brief Is the arg a lvalue ref?

@@ -765,24 +765,24 @@ namespace lightweight_futures {
       typedef typename std::decay<_F>::type F;
       typedef traits::callable_argument_traits<F, basic_future> f_traits;
       static_assert(f_traits::valid
-        && (f_traits::is_auto || f_traits::is_rvalue || (f_traits::is_lvalue && std::is_const<typename f_traits::type>::value)),
-        "The callable passed to then() must take either a const lvalue reference to this future type, or a rvalue reference.");
+        && (f_traits::is_rvalue || (f_traits::is_lvalue && f_traits::is_const)),
+        "The callable passed to then() must take either a const lvalue reference to this future type, or a rvalue reference. If you are passing a templated function, make sure its auto parameter is rvalue or const lvalue reference qualified.");
       typedef typename detail::do_then<typename f_traits::return_type, F, implementation_policy>::output_type output_type;
       BOOST_STATIC_CONSTEXPR bool is_f_noexcept = traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_future>::is_noexcept;
       static_assert(is_f_noexcept || output_type::has_exception_type, "If the future type returned by the callable cannot transport exceptions, the callable must be noexcept.");
       detail::lock_guard<promise_type, future_type> h(this);
-      // If we are already signalled, execute immediately as if monad.next()
-      if(is_ready())
-      {
-        h.unlock();
-        return detail::do_then<typename f_traits::return_type, F, implementation_policy>(std::forward<F>(f))(std::move(*this));
-      }
       _check_validity();
       // Make a delayed invocation of simple_continuation, same as monad.next()
       assert(h._p);
       // If there is already a continuation, this continuation cannot consume the future
       if (!f_traits::is_lvalue && h._p->_storage.pointer_.callable)
         throw std::invalid_argument("You cannot supply a future consuming continuation except as the very first continuation added to a future");
+      // If we are already signalled, execute immediately as if monad.next()
+      if(is_ready())
+      {
+        h.unlock();
+        return detail::do_then<typename f_traits::return_type, F, implementation_policy>(std::forward<F>(f))(std::move(*this));
+      }
       // Create a lambda to chain this continuation. As function_ptr can throw and the lambda capture destroys
       // state on exception unwind, we break function_ptr uniqueness temporarily
       auto prevcallable=h._p->_storage.pointer_.callable.get();
