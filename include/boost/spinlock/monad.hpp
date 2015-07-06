@@ -495,6 +495,21 @@ namespace lightweight_futures {
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR function_ptr_storage *release() noexcept { auto p = ptr; ptr = nullptr; return p; }
     };
     template<class R, class U> inline function_ptr<R> make_function_ptr(U &&f) { return function_ptr<R>(std::forward<U>(f), nullptr); }
+
+    template<bool enable, class U, class V> struct move_construct_if_impl
+    {
+      void operator()(U *v, V &&o) const
+      {
+        new (v) U(std::move(o));
+      }
+    };
+    template<class U, class V> struct move_construct_if_impl<false, U, V>
+    {
+      void operator()(U *v, V &&o) const
+      {
+      }
+    };
+    template<bool enable, class U, class V> void move_construct(U *v, V &&o) { move_construct_if_impl<enable, U, V>()(v, std::move(o)); }
   }
 
   /*! \class value_storage
@@ -606,19 +621,19 @@ namespace lightweight_futures {
         type = storage_type::empty;
         break;
       case value_storage<Policy>::storage_type::value:
-        new (&value) value_type(std::move(o.value));
+        detail::move_construct_if<has_value_type>(&value, std::move(o.value));
         type = storage_type::value;
         break;
       case value_storage<Policy>::storage_type::error:
-        new (&error) error_type(std::move(o.error));
+        detail::move_construct_if<has_error_type>(&error, std::move(o.error));
         type = storage_type::error;
         break;
       case value_storage<Policy>::storage_type::exception:
-        new (&exception) exception_type(std::move(o.exception));
+        detail::move_construct_if<has_exception_type>(&exception, std::move(o.exception));
         type = storage_type::exception;
         break;
       case value_storage<Policy>::storage_type::pointer:
-        new (&pointer_) Pointer(std::move(o.pointer_));
+        detail::move_construct_if<has_pointer_type>(&pointer_, std::move(o.pointer_));
         type = storage_type::pointer;
         break;
       }
