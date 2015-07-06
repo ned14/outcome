@@ -633,8 +633,9 @@ namespace lightweight_futures {
         type = storage_type::exception;
         break;
       case value_storage<Policy>::storage_type::pointer:
-        detail::move_construct_if<has_pointer_type>(&pointer_, std::move(o.pointer_));
-        type = storage_type::pointer;
+        set_pointer(o.pointer_.pointer);
+        o.pointer_.pointer=nullptr;
+        pointer_.callable = std::move(o.pointer_.callable);
         break;
       }
     }
