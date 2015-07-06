@@ -86,6 +86,8 @@ namespace detail
     typedef std::future_error future_error;
     // The category of error code to use
     static const std::error_category &future_category() noexcept { return std::future_category(); }
+	// The STL future type to use for waits and timed waits
+	typedef std::pair<std::promise<void>, std::future<void>> wait_future_type;
 
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
     {

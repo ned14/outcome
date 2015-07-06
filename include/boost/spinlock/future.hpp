@@ -273,10 +273,6 @@ namespace lightweight_futures {
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-    void _wake_waiters()
-    {
-      // todo, need to get policy to set waiter type first
-    }
   public:
     //! \brief The policy used to implement this basic_future
     typedef implementation_policy policy;
@@ -310,16 +306,23 @@ namespace lightweight_futures {
     typedef typename implementation_policy::future_errc future_errc;
     //! \brief The future_error type we use
     typedef typename implementation_policy::future_error future_error;
-
+  private:
     friend struct detail::lock_guard<basic_promise, future_type>;
     static_assert(std::is_move_constructible<value_type>::value || std::is_copy_constructible<value_type>::value, "Type must be move or copy constructible to be used in a lightweight basic_promise");    
-
+    future_type *_continuation_future;  // Points to future storage used during continuations
+    std::shared_ptr<typename implementation_policy::wait_future_type> _sleeping_waiters;
+    void _wake_waiters()
+    {
+      if (_sleeping_waiters)
+        _sleeping_waiters->first.set_value();
+    }
+  public:
     //! \brief EXTENSION: constexpr capable constructor
     BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_promise() noexcept : 
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
     _need_locks(false),
 #endif
-    _detached(false)
+    _detached(false), _continuation_future(nullptr)
     {
     }
 //// template<class Allocator> basic_promise(allocator_arg_t, Allocator a); // cannot support
@@ -328,7 +331,7 @@ namespace lightweight_futures {
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
     _need_locks(o._need_locks),
 #endif
-    _detached(o._detached)
+    _detached(o._detached), _continuation_future(std::move(o._continuation_future)), _sleeping_waiters(std::move(o._sleeping_waiters))
     {
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
@@ -374,6 +377,9 @@ namespace lightweight_futures {
     {
       detail::lock_guard<promise_type, future_type> h1(this), h2(&o);
       _storage.swap(o._storage);
+      _detached.swap(o._detached);
+      _continuation_future.swap(o._continuation_future);
+      _sleeping_waiters.swap(o._sleeping_waiters);
       if(h1._f)
         h1._f->_promise=&o;
       if(h2._f)
@@ -417,7 +423,10 @@ namespace lightweight_futures {
           implementation_policy::_throw_error(monad_errc::already_set); \
         h._f->function; \
         auto callable(std::move(_storage.pointer_.callable)); \
-        future_type *f=h._f; \
+        /* Move state into continuation future now before locks drop, else pass through this future */ \
+        if(callable) \
+          _continuation_future->set_state(std::move(h._f->_storage)); \
+        future_type *f=callable ? _continuation_future : h._f; \
         h._f->_promise=nullptr; \
         _storage.clear(); \
         _detached=true; \
@@ -471,6 +480,40 @@ namespace lightweight_futures {
 
   namespace detail
   {
+    template<bool reserve_future_storage, class f_traits, class implementation_policy, class base_future_type, class promise_type, class callable_type> struct continuation
+    {
+      promise_type p;
+      callable_type f;
+      detail::function_ptr<void(base_future_type *)> prevcallable;
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR continuation(promise_type &&_p, callable_type &&_f, detail::function_ptr<void(base_future_type *)> &&_prev)
+        : p(std::move(_p)), f(std::move(_f)), prevcallable(std::move(_prev)) { }
+      void operator()(base_future_type *self)
+      {
+        // Execute the continuation
+        try
+        {
+          p.set_state(detail::do_then<typename f_traits::return_type, callable_type, implementation_policy>(std::move(f))(std::move(*self))._storage);
+          if (implementation_policy::is_consuming && f_traits::is_rvalue)
+          {
+            // Concurrency TS requires us to zap storage after a consuming move
+            self->clear();
+          }
+        }
+        catch (...)
+        {
+          p.set_exception(std::current_exception());
+        }
+        if (prevcallable)
+          prevcallable(self);
+      }
+    };
+    template<class f_traits, class implementation_policy, class base_future_type, class promise_type, class callable_type> struct continuation<true, f_traits, implementation_policy, base_future_type, promise_type, callable_type>
+      : public continuation<false, f_traits, implementation_policy, base_future_type, promise_type, callable_type>
+    {
+      base_future_type continuation_future;
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR continuation(base_future_type *&_continuation_future, promise_type &&_p, callable_type &&_f, detail::function_ptr<void(base_future_type *)> &&_prev)
+        : continuation<false, f_traits, implementation_policy, base_future_type, promise_type, callable_type>(std::move(_p), std::move(_f), std::move(_prev)) { _continuation_future=&continuation_future; }
+    };
     template<class R, class C, class Policy> using do_then = do_simple_continuation<R, C, basic_future, Policy>;
   }
  
@@ -483,6 +526,7 @@ namespace lightweight_futures {
     friend implementation_policy;
     friend typename implementation_policy::impl;
     template<class> friend class basic_future;
+    template<bool reserve_future_storage, class f_traits, class implementation_policy, class base_future_type, class promise_type, class callable_type> friend struct detail::continuation;
   public:
     //! \brief The policy used to implement this basic_future
     typedef implementation_policy policy;
@@ -547,6 +591,8 @@ namespace lightweight_futures {
 #pragma warning(pop)
 #endif
     promise_type *_promise;                  // Offset +8/+16
+    // NOTE TO SELF:
+    // DO NOT ADD NEW STORAGE HERE UNLESS IT IS REINTERPRET CAST SAFE
   protected:
     // Called by basic_promise::get_future(), so currently thread safe
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(promise_type *p) : monad_type(std::move(p->_storage)),
@@ -752,11 +798,33 @@ namespace lightweight_futures {
         return;
       detail::lock_guard<promise_type, future_type> h(const_cast<basic_future *>(this));
       _check_validity();
-      // TODO Actually sleep
-      while(!monad_type::is_ready())
+      auto waiter(h._p->_sleeping_waiters);
+      for (size_t count = 0; !monad_type::is_ready(); ++count)
       {
+        while (!waiter && count >= 1000)
+        {
+          // Don't exclude during this lengthy sequence
+          h.unlock();
+          typename implementation_policy::wait_future_type ft;
+          ft.second = ft.first.get_future();
+          waiter = std::make_shared<typename implementation_policy::wait_future_type>(std::move(ft));
+          h.relock(const_cast<basic_future *>(this));
+          if (!h._p->_sleeping_waiters)
+          {
+            h._p->_sleeping_waiters = waiter;
+            break;
+          }
+          // If another thread already created a wait object, dispose of ours
+          h.unlock();
+          waiter.reset();
+          h.relock(const_cast<basic_future *>(this));
+          waiter = h._p->_sleeping_waiters;
+        }
         h.unlock();
-        std::this_thread::yield();
+        if (waiter)
+          waiter->second.wait();
+        else
+          std::this_thread::yield();
         h.relock(const_cast<basic_future *>(this));
       }
     }
@@ -809,43 +877,17 @@ namespace lightweight_futures {
       // If there is already a continuation, this continuation cannot consume the future
       if (!f_traits::is_lvalue && h._p->_storage.pointer_.callable)
         throw std::invalid_argument("You cannot supply a future consuming continuation except as the very first continuation added to a future");
-      // Create a lambda to chain this continuation. As function_ptr can throw and the lambda capture destroys
-      // state on exception unwind, we break function_ptr uniqueness temporarily
-      auto prevcallable=h._p->_storage.pointer_.callable.get();
+
+      /* Create a lambda to chain this continuation. If consuming, the very first created lambda reserves storage
+      for a later move of this future into the last executed lambda, this avoids requiring to hold locks on the future
+      as continuations execute.
+      */
       typename output_type::promise_type p;
       output_type ret(p.get_future());
-#ifdef __cpp_init_captures
-      auto callable=detail::make_function_ptr<void(future_type *)>([
-        p = std::move(p), f = std::forward<F>(f), prevcallable = std::move(prevcallable)
-      ] (future_type *self) mutable {
-#else
-      auto p_(std::make_shared<typename output_type::promise_type>(std::move(p)));
-      auto callable = detail::make_function_ptr<void(future_type *)>([
-        p_, f, prevcallable
-      ] (future_type *self) mutable {
-          typename output_type::promise_type p(std::move(*p_));
-#endif
-          // Immediately adopt the captured raw pointer
-          detail::function_ptr<void(future_type *)> callable(prevcallable);
-          // Execute the continuation
-          try
-          {
-            p.set_state(detail::do_then<typename f_traits::return_type, F, implementation_policy>(std::move(f))(std::move(*self))._storage);
-            if(is_consuming && f_traits::is_rvalue)
-            {
-              // Concurrency TS requires us to zap storage after a consuming move
-              self->clear();
-            }
-          }
-          catch (...)
-          {
-            p.set_exception(std::current_exception());
-          }
-          if(callable)
-            callable(self);
-        });
+      auto callable = (is_consuming && !h._p->_storage.pointer_.callable)
+        ? detail::make_function_ptr<void(future_type *)>(detail::continuation<true , f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>(h._p->_continuation_future, std::move(p), std::forward<F>(f), std::move(h._p->_storage.pointer_.callable)))
+        : detail::make_function_ptr<void(future_type *)>(detail::continuation<false, f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>(std::move(p), std::forward<F>(f), std::move(h._p->_storage.pointer_.callable)));
       // Swap out any existing continuation with the new one
-      h._p->_storage.pointer_.callable.release();
       h._p->_storage.pointer_.callable = std::move(callable);
       return ret;
     }
