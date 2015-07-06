@@ -594,6 +594,38 @@ namespace lightweight_futures {
     BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : exception(std::move(v)), type(storage_type::exception) { }
     struct emplace_t {};
     template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit value_storage(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value) : value(std::forward<Args>(args)...), type(storage_type::value) { }
+    template<class Policy, typename=typename std::enable_if<
+      std::is_constructible<value_type, typename Policy::value_type>::value
+      && std::is_constructible<error_type, typename Policy::error_type>::value
+      && std::is_constructible<exception_type, typename Policy::exception_type>::value
+    >::type> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR explicit value_storage(value_storage<Policy> &&o) noexcept(
+      std::is_nothrow_constructible<value_type, typename Policy::value_type>::value
+      && std::is_nothrow_constructible<error_type, typename Policy::error_type>::value
+      && std::is_nothrow_constructible<exception_type, typename Policy::exception_type>::value)
+    {
+      switch (o.type)
+      {
+      case value_storage<Policy>::storage_type::empty:
+        type = storage_type::empty;
+        break;
+      case value_storage<Policy>::storage_type::value:
+        new (&value) value_type(std::move(o.value));
+        type = storage_type::value;
+        break;
+      case value_storage<Policy>::storage_type::error:
+        new (&error) error_type(std::move(o.error));
+        type = storage_type::error;
+        break;
+      case value_storage<Policy>::storage_type::exception:
+        new (&exception) exception_type(std::move(o.exception));
+        type = storage_type::exception;
+        break;
+      case value_storage<Policy>::storage_type::pointer:
+        new (&pointer_) Pointer(std::move(o.pointer_));
+        type = storage_type::pointer;
+        break;
+      }
+    }
 
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage(const value_storage &o) noexcept(is_nothrow_copy_constructible) : type(storage_type::empty)
     {
@@ -1034,6 +1066,8 @@ namespace lightweight_futures {
     friend implementation_policy;
     // Allow my policy specialised with void unfettered access
     friend typename implementation_policy::template rebind_policy<void>;
+    // Allow other implementations of myself unfettered access
+    template<class U> friend class basic_monad;
     friend inline std::istream &operator>>(std::istream &s, basic_monad &v)
     {
       return s >> v._storage;
@@ -1113,6 +1147,12 @@ namespace lightweight_futures {
     BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : _storage(v) { }
     //! \brief Implicit constructor from a exception_type by move
     BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : _storage(std::move(v)) { }
+    //! \brief Explicit constructor from a different implementation of basic_monad
+    template<class Policy, typename = typename std::enable_if<
+      std::is_constructible<value_type, typename Policy::value_type>::value
+      && std::is_constructible<error_type, typename Policy::error_type>::value
+      && std::is_constructible<exception_type, typename Policy::exception_type>::value
+    >::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit basic_monad(basic_monad<Policy> &&o) : _storage(std::move(o._storage)) { }
     //! \brief Move constructor
     basic_monad(basic_monad &&) = default;
     //! \brief Move assignment. Firstly clears any existing state, so exception throws during move will leave the monad empty.

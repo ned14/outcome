@@ -424,7 +424,7 @@ namespace lightweight_futures {
         h._f->function; \
         auto callable(std::move(_storage.pointer_.callable)); \
         /* Move state into continuation future now before locks drop, else pass through this future */ \
-        if(callable) \
+        if(callable && _continuation_future!=h._f) \
           _continuation_future->set_state(std::move(h._f->_storage)); \
         future_type *f=callable ? _continuation_future : h._f; \
         h._f->_promise=nullptr; \
@@ -512,16 +512,25 @@ namespace lightweight_futures {
     {
       base_future_type continuation_future;
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR continuation(base_future_type *&_continuation_future, promise_type &&_p, callable_type &&_f, detail::function_ptr<void(base_future_type *)> &&_prev)
-        : continuation<false, f_traits, implementation_policy, base_future_type, promise_type, callable_type>(std::move(_p), std::move(_f), std::move(_prev)) { _continuation_future=&continuation_future; }
+        : continuation<false, f_traits, implementation_policy, base_future_type, promise_type, callable_type>(std::move(_p), std::move(_f), std::move(_prev))
+      {
+        _continuation_future=&continuation_future;
+      }
     };
     template<class R, class C, class Policy> using do_then = do_simple_continuation<R, C, basic_future, Policy>;
+    struct future_not_shared {};
   }
  
   /*! \class basic_future
   \brief Lightweight next generation future with N4399 Concurrency TS extensions
   \ingroup future_promise
   */
-  template<class implementation_policy> class basic_future : protected basic_monad<implementation_policy>
+  template<class implementation_policy> class basic_future
+    : protected basic_monad<implementation_policy>,
+      public std::conditional<implementation_policy::is_shared,
+        std::enable_shared_from_this<basic_future<implementation_policy>>,
+        detail::future_not_shared
+      >::type
   {
     friend implementation_policy;
     friend typename implementation_policy::impl;
@@ -561,6 +570,8 @@ namespace lightweight_futures {
 
     //! \brief Whether fetching value/error/exception is single shot
     BOOST_STATIC_CONSTEXPR bool is_consuming=implementation_policy::is_consuming;
+    //! \brief Whether this future is managed by shared_basic_future_ptr
+    BOOST_STATIC_CONSTEXPR bool is_shared = implementation_policy::is_shared;
     //! \brief The promise type matching this future type
     typedef basic_promise<implementation_policy> promise_type;
     //! \brief This future type
@@ -591,8 +602,6 @@ namespace lightweight_futures {
 #pragma warning(pop)
 #endif
     promise_type *_promise;                  // Offset +8/+16
-    // NOTE TO SELF:
-    // DO NOT ADD NEW STORAGE HERE UNLESS IT IS REINTERPRET CAST SAFE
   protected:
     // Called by basic_promise::get_future(), so currently thread safe
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(promise_type *p) : monad_type(std::move(p->_storage)),
@@ -645,6 +654,23 @@ namespace lightweight_futures {
       _broken_promise(false), _promise(nullptr)
     {
     }
+  protected:
+    template<class U> void _move(U &&o)
+    {
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+      if (_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
+#endif
+      typename U::lock_guard_type h(&o);
+      new(this) monad_type(typename U::monad_type(std::move(o)));
+      if (o._promise)
+      {
+        _promise = reinterpret_cast<promise_type *>(o._promise);
+        o._promise = nullptr;
+        if (_promise)
+          _promise->_storage.pointer_.pointer = this;
+      }
+    }
+  public:
     //! \brief SYNC POINT Move constructor
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(basic_future &&o) noexcept(is_nothrow_move_constructible) :
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
@@ -652,18 +678,7 @@ namespace lightweight_futures {
 #endif
     _broken_promise(o._broken_promise), _promise(nullptr)
     {
-#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
-      if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
-#endif
-      detail::lock_guard<promise_type, future_type> h(&o);
-      new(this) monad_type(std::move(o));
-      if(o._promise)
-      {
-        _promise=o._promise;
-        o._promise=nullptr;
-        if(h._p)
-          h._p->_storage.pointer_.pointer=this;
-      }
+      _move(std::move(o));
     }
     //! \brief SYNC POINT Move assignment. If it throws during the move, the future is left as if default constructed.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future &operator=(basic_future &&o) noexcept(is_nothrow_move_assignable)
@@ -878,15 +893,20 @@ namespace lightweight_futures {
       if (!f_traits::is_lvalue && h._p->_storage.pointer_.callable)
         throw std::invalid_argument("You cannot supply a future consuming continuation except as the very first continuation added to a future");
 
-      /* Create a lambda to chain this continuation. If consuming, the very first created lambda reserves storage
+      /* Create a lambda to chain this continuation. If not shared, the very first created lambda reserves storage
       for a later move of this future into the last executed lambda, this avoids requiring to hold locks on the future
       as continuations execute.
       */
       typename output_type::promise_type p;
       output_type ret(p.get_future());
-      auto callable = (is_consuming && !h._p->_storage.pointer_.callable)
+      auto callable = (!is_shared && !h._p->_storage.pointer_.callable)
         ? detail::make_function_ptr<void(future_type *)>(detail::continuation<true , f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>(h._p->_continuation_future, std::move(p), std::forward<F>(f), std::move(h._p->_storage.pointer_.callable)))
         : detail::make_function_ptr<void(future_type *)>(detail::continuation<false, f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>(std::move(p), std::forward<F>(f), std::move(h._p->_storage.pointer_.callable)));
+      if (is_shared && !h._p->_storage.pointer_.callable)
+      {
+        // Set myself (the shared state) as the continuations storage
+        h._p->_continuation_future = this;
+      }
       // Swap out any existing continuation with the new one
       h._p->_storage.pointer_.callable = std::move(callable);
       return ret;

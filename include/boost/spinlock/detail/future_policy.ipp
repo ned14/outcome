@@ -80,6 +80,8 @@ namespace detail
 
     // Does getting this future's state consume it?
     BOOST_STATIC_CONSTEXPR bool is_consuming=true;
+	// Is this future managed by shared_basic_future_ptr?
+	BOOST_STATIC_CONSTEXPR bool is_shared=false;
     // The type of future_errc to use for issuing errors
     typedef std::future_errc future_errc;
     // The type of future exception to use for issuing exceptions
@@ -308,6 +310,7 @@ namespace detail
     template<typename U> using rebind_policy = BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<U>;
 
     BOOST_STATIC_CONSTEXPR bool is_consuming=false;
+	BOOST_STATIC_CONSTEXPR bool is_shared=true;
 
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(implementation_type &self)
     {
@@ -347,10 +350,11 @@ namespace detail
 #else
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const implementation_type &self);
 #endif
-    //! \todo Do not use reinterpret_cast to convert between consuming and non-consuming futures.
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP implementation_type _construct(basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<void>> &&v)
     {
-      return implementation_type(reinterpret_cast<implementation_type &&>(v));
+	  implementation_type ret;
+	  ret._move(std::move(v));
+      return ret;
     }
     static inline BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<void>> _share(implementation_type &&self);
   };
@@ -409,17 +413,19 @@ namespace detail
 #endif
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP implementation_type _construct(basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<R>> &&v)
     {
-      return implementation_type(reinterpret_cast<implementation_type &&>(v));
+	  implementation_type ret;
+	  ret._move(std::move(v));
+      return ret;
     }
     static inline BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<R>> _share(implementation_type &&self);
   };
   inline basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<void>> BOOST_SPINLOCK_FUTURE_POLICY_NAME<void>::_share(BOOST_SPINLOCK_FUTURE_POLICY_NAME<void>::implementation_type &&self)
   {
-    return basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<void>>(reinterpret_cast<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<void>> &&>(self));
+    return basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<void>>(std::move(self));
   }
   template<typename R> inline basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<R>> BOOST_SPINLOCK_FUTURE_POLICY_NAME<R>::_share(typename BOOST_SPINLOCK_FUTURE_POLICY_NAME<R>::implementation_type &&self)
   {
-    return basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<R>>(reinterpret_cast<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<R>> &&>(self));
+    return basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<R>>(std::move(self));
   }
 }
 

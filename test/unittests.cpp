@@ -1094,8 +1094,9 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
   static_assert(!std::is_constructible<monad<monad<monad<long>>>, int>::value, "Sanity check that outer monad can not be constructed from an inner inner monad's value_type");
   static_assert(!std::is_constructible<monad<monad<monad<monad<long>>>>, int>::value, "Sanity check that outer monad can not be constructed from an inner inner monad's value_type");
 
-  static_assert(!std::is_constructible<monad<int>, monad<long>>::value, "Sanity check that different monads cannot be constructed from one another");
-  static_assert(!std::is_constructible<monad<monad<int>>, monad<long>>::value, "Sanity check that different monads cannot be constructed from one another");
+  static_assert(std::is_constructible<monad<int>, monad<long>>::value, "Sanity check that compatible monads can be constructed from one another");
+  static_assert(!std::is_constructible<monad<std::string>, monad<int>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
+  //static_assert(!std::is_constructible<monad<monad<int>>, monad<long>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
   {
     monad<int> m;
     BOOST_CHECK(!m);
