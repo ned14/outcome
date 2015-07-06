@@ -505,11 +505,11 @@ namespace lightweight_futures {
     };
     template<class U, class V> struct move_construct_if_impl<false, U, V>
     {
-      void operator()(U *v, V &&o) const
+      void operator()(U *, V &&) const
       {
       }
     };
-    template<bool enable, class U, class V> void move_construct(U *v, V &&o) { move_construct_if_impl<enable, U, V>()(v, std::move(o)); }
+    template<bool enable, class U, class V> inline void move_construct_if(U *v, V &&o) { move_construct_if_impl<enable, U, V>()(v, std::move(o)); }
   }
 
   /*! \class value_storage
