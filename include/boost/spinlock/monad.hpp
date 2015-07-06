@@ -633,9 +633,9 @@ namespace lightweight_futures {
         type = storage_type::exception;
         break;
       case value_storage<Policy>::storage_type::pointer:
-        set_pointer(o.pointer_.pointer);
+        set_pointer(reinterpret_cast<pointer_type>(o.pointer_.pointer));
         o.pointer_.pointer=nullptr;
-        pointer_.callable = std::move(o.pointer_.callable);
+        pointer_.callable = reinterpret_cast<detail::function_ptr<void(pointer_type)> &&>(std::move(o.pointer_.callable));
         break;
       }
     }
