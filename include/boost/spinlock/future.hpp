@@ -378,7 +378,7 @@ namespace lightweight_futures {
       detail::lock_guard<promise_type, future_type> h1(this), h2(&o);
       _storage.swap(o._storage);
       _detached=o._detached;
-      _continuation_future.swap(o._continuation_future);
+      _continuation_future=o._continuation_future;
       _sleeping_waiters.swap(o._sleeping_waiters);
       if(h1._f)
         h1._f->_promise=&o;
