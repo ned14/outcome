@@ -496,6 +496,18 @@ namespace lightweight_futures {
     };
     template<class R, class U> inline function_ptr<R> make_function_ptr(U &&f) { return function_ptr<R>(std::forward<U>(f), nullptr); }
 
+    // Rebinds any input type to an output type preserving qualifiers
+    template<class R, class T> struct rebind_cast_type { typedef R&& type; };
+    template<class R, class T> struct rebind_cast_type<R, const T&> { typedef const R& type; };
+    template<class R, class T> struct rebind_cast_type<R, T&> { typedef R& type; };
+    template<class R, class T> struct rebind_cast_type<R, const T*> { typedef const R* type; };
+    template<class R, class T> struct rebind_cast_type<R, T*> { typedef R* type; };
+    template<class R, class T> typename rebind_cast_type<R, T&&>::type rebind_cast(T &&v) { return reinterpret_cast<typename rebind_cast_type<R, T&&>::type>(v); }
+    // GCC <= 4.8 doesn't like this overload
+    //template<class R, class T> typename rebind_cast_type<R, T&>::type rebind_cast(T &v) { return reinterpret_cast<typename rebind_cast_type<R, T&>::type>(v); }
+    template<class R, class T> typename rebind_cast_type<R, T*>::type rebind_cast(T *&&v) { return reinterpret_cast<typename rebind_cast_type<R, T*>::type>(v); }
+    template<class R, class T> typename rebind_cast_type<R, T*>::type rebind_cast(T *&v) { return reinterpret_cast<typename rebind_cast_type<R, T*>::type>(v); }
+
     template<bool enable, class U, class V> struct move_construct_if_impl
     {
       void operator()(U *v, V &&o) const
@@ -609,11 +621,11 @@ namespace lightweight_futures {
     BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : exception(std::move(v)), type(storage_type::exception) { }
     struct emplace_t {};
     template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit value_storage(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value) : value(std::forward<Args>(args)...), type(storage_type::value) { }
-    template<class Policy, typename=typename std::enable_if<
-      (std::is_constructible<typename implementation_policy::value_type, typename Policy::value_type>::value || (std::is_void<typename implementation_policy::value_type>::value && std::is_void<typename Policy::value_type>::value))
-      && std::is_constructible<typename implementation_policy::error_type, typename Policy::error_type>::value
-      && std::is_constructible<typename implementation_policy::exception_type, typename Policy::exception_type>::value
-    >::type> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR explicit value_storage(value_storage<Policy> &&o)
+    template<class Policy,
+      typename = typename std::enable_if<std::is_same<typename implementation_policy::value_type,     typename Policy::value_type    >::value || std::is_constructible<typename implementation_policy::value_type,     typename Policy::value_type    >::value>::type,
+      typename = typename std::enable_if<std::is_same<typename implementation_policy::error_type,     typename Policy::error_type    >::value || std::is_constructible<typename implementation_policy::error_type,     typename Policy::error_type    >::value>::type,
+      typename = typename std::enable_if<std::is_same<typename implementation_policy::exception_type, typename Policy::exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename Policy::exception_type>::value>::type
+    > BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR explicit value_storage(value_storage<Policy> &&o)
     {
       switch (o.type)
       {
@@ -633,9 +645,7 @@ namespace lightweight_futures {
         type = storage_type::exception;
         break;
       case value_storage<Policy>::storage_type::pointer:
-        set_pointer(reinterpret_cast<pointer_type>(o.pointer_.pointer));
-        o.pointer_.pointer=nullptr;
-        pointer_.callable = reinterpret_cast<detail::function_ptr<void(pointer_type)> &&>(std::move(o.pointer_.callable));
+        detail::move_construct_if<has_pointer_type>(&pointer_, detail::rebind_cast<Pointer>(std::move(o.pointer_)));
         break;
       }
     }
@@ -805,18 +815,6 @@ namespace lightweight_futures {
       BOOST_STATIC_CONSTEXPR bool value=is_monad<typename basic_monad<Policy>::value_type>::value;
     };
     
-    // Rebinds any input type to an output type preserving qualifiers
-    template<class R, class T> struct rebind_cast_type { typedef R&& type; };
-    template<class R, class T> struct rebind_cast_type<R, const T&> { typedef const R& type; };
-    template<class R, class T> struct rebind_cast_type<R, T&> { typedef R& type; };
-    template<class R, class T> struct rebind_cast_type<R, const T*> { typedef const R* type; };
-    template<class R, class T> struct rebind_cast_type<R, T*> { typedef R* type; };
-    template<class R, class T> typename rebind_cast_type<R, T&&>::type rebind_cast(T &&v) { return reinterpret_cast<typename rebind_cast_type<R, T&&>::type>(v); }
-    // GCC <= 4.8 doesn't like this overload
-    //template<class R, class T> typename rebind_cast_type<R, T&>::type rebind_cast(T &v) { return reinterpret_cast<typename rebind_cast_type<R, T&>::type>(v); }
-    template<class R, class T> typename rebind_cast_type<R, T*>::type rebind_cast(T *&&v) { return reinterpret_cast<typename rebind_cast_type<R, T*>::type>(v); }
-    template<class R, class T> typename rebind_cast_type<R, T*>::type rebind_cast(T *&v) { return reinterpret_cast<typename rebind_cast_type<R, T*>::type>(v); }
-
     // Convert any input type into a lvalue ref
     template<class T> struct to_lvalue_ref : public std::add_lvalue_reference<typename std::decay<T>::type> {};
     // Call C with A either by rvalue or lvalue ref
@@ -1161,11 +1159,11 @@ namespace lightweight_futures {
     //! \brief Implicit constructor from a exception_type by move
     BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : _storage(std::move(v)) { }
     //! \brief Explicit constructor from a different implementation of basic_monad
-    template<class Policy, typename = typename std::enable_if<
-      (std::is_constructible<typename implementation_policy::value_type, typename Policy::value_type>::value || (std::is_void<typename implementation_policy::value_type>::value && std::is_void<typename Policy::value_type>::value))
-      && std::is_constructible<typename implementation_policy::error_type, typename Policy::error_type>::value
-      && std::is_constructible<typename implementation_policy::exception_type, typename Policy::exception_type>::value
-    >::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit basic_monad(basic_monad<Policy> &&o) : _storage(std::move(o._storage)) { }
+    template<class Policy,
+      typename = typename std::enable_if<std::is_same<typename implementation_policy::value_type,     typename Policy::value_type    >::value || std::is_constructible<typename implementation_policy::value_type,     typename Policy::value_type    >::value>::type,
+      typename = typename std::enable_if<std::is_same<typename implementation_policy::error_type,     typename Policy::error_type    >::value || std::is_constructible<typename implementation_policy::error_type,     typename Policy::error_type    >::value>::type,
+      typename = typename std::enable_if<std::is_same<typename implementation_policy::exception_type, typename Policy::exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename Policy::exception_type>::value>::type
+    > BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit basic_monad(basic_monad<Policy> &&o) : _storage(std::move(o._storage)) { }
     //! \brief Move constructor
     basic_monad(basic_monad &&) = default;
     //! \brief Move assignment. Firstly clears any existing state, so exception throws during move will leave the monad empty.
