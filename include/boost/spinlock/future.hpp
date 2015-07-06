@@ -377,7 +377,7 @@ namespace lightweight_futures {
     {
       detail::lock_guard<promise_type, future_type> h1(this), h2(&o);
       _storage.swap(o._storage);
-      _detached.swap(o._detached);
+      _detached=o._detached;
       _continuation_future.swap(o._continuation_future);
       _sleeping_waiters.swap(o._sleeping_waiters);
       if(h1._f)
@@ -480,6 +480,9 @@ namespace lightweight_futures {
 
   namespace detail
   {
+    template<class R, class C, class Policy> using do_then = do_simple_continuation<R, C, basic_future, Policy>;
+    struct future_not_shared {};
+
     template<bool reserve_future_storage, class f_traits, class implementation_policy, class base_future_type, class promise_type, class callable_type> struct continuation
     {
       promise_type p;
@@ -517,8 +520,6 @@ namespace lightweight_futures {
         _continuation_future=&continuation_future;
       }
     };
-    template<class R, class C, class Policy> using do_then = do_simple_continuation<R, C, basic_future, Policy>;
-    struct future_not_shared {};
   }
  
   /*! \class basic_future
@@ -535,7 +536,7 @@ namespace lightweight_futures {
     friend implementation_policy;
     friend typename implementation_policy::impl;
     template<class> friend class basic_future;
-    template<bool reserve_future_storage, class f_traits, class implementation_policy, class base_future_type, class promise_type, class callable_type> friend struct detail::continuation;
+    template<bool reserve_future_storage, class f_traits, class _implementation_policy, class base_future_type, class promise_type, class callable_type> friend struct detail::continuation;
   public:
     //! \brief The policy used to implement this basic_future
     typedef implementation_policy policy;
