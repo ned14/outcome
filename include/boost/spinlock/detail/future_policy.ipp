@@ -350,10 +350,10 @@ namespace detail
 #else
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const implementation_type &self);
 #endif
-    static BOOST_SPINLOCK_FUTURE_MSVC_HELP implementation_type _construct(basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<void>> &&v)
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP implementation_type _construct(basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<void>> &&o)
     {
-	  implementation_type ret;
-	  ret._move(std::move(v));
+      implementation_type ret;
+      ret._move(std::move(o));
       return ret;
     }
     static inline BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<void>> _share(implementation_type &&self);
@@ -411,10 +411,10 @@ namespace detail
 #else
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const implementation_type &self);
 #endif
-    static BOOST_SPINLOCK_FUTURE_MSVC_HELP implementation_type _construct(basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<R>> &&v)
+    static BOOST_SPINLOCK_FUTURE_MSVC_HELP implementation_type _construct(basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<R>> &&o)
     {
-	  implementation_type ret;
-	  ret._move(std::move(v));
+      implementation_type ret;
+      ret._move(std::move(o));
       return ret;
     }
     static inline BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<R>> _share(implementation_type &&self);
