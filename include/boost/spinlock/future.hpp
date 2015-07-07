@@ -373,7 +373,7 @@ namespace lightweight_futures {
     virtual void _set_future_ptr(basic_future_base *f) noexcept override final
     {
       assert(_storage.type==value_storage_type::storage_type::pointer);
-      _storage.pointer_.pointer=static_cast<future_type *>(f);
+      _storage.pointer_.pointer=f;
     }
     typedef detail::lock_guard lock_guard_type;
     static_assert(std::is_move_constructible<value_type>::value || std::is_copy_constructible<value_type>::value, "Type must be move or copy constructible to be used in a lightweight basic_promise");    
@@ -574,6 +574,7 @@ namespace lightweight_futures {
         _continuation_future=&continuation_future;
       }
     };
+    template<class Policy, class implementation_type, class error_type=void, class exception_type=void> struct common_future_policy_code;
   }
  
   /*! \class basic_future
@@ -581,16 +582,11 @@ namespace lightweight_futures {
   \ingroup future_promise
   */
   template<class implementation_policy> class basic_future
-    : protected basic_monad<implementation_policy>,
-      protected basic_future_base,
-      public std::conditional<implementation_policy::is_shared,
-        std::enable_shared_from_this<basic_future<implementation_policy>>,
-        detail::future_not_shared
-      >::type
+    : protected basic_monad<implementation_policy>
   {
     friend implementation_policy;
-    friend typename implementation_policy::impl;
     template<class> friend class basic_future;
+    template<class Policy, class _implementation_type, class _error_type, class _exception_type> friend struct detail::common_future_policy_code;
     template<bool reserve_future_storage, class f_traits, class _implementation_policy, class base_future_type, class promise_type, class callable_type> friend struct detail::continuation;
     typedef typename std::conditional<implementation_policy::is_shared,
         std::enable_shared_from_this<basic_future<implementation_policy>>,
@@ -662,7 +658,7 @@ namespace lightweight_futures {
     promise_type *_promise() const noexcept { return static_cast<promise_type *>(basic_future_base::_promise); }
     void _check_validity() const
     {
-      if(_broken_promise)
+      if(monad_type::_broken_promise)
         throw future_error(future_errc::broken_promise);
       if(!valid())
         throw future_error(future_errc::no_state);
@@ -682,6 +678,7 @@ namespace lightweight_futures {
     {
     }
   protected:
+    // Called by policy _construct() to do the move from future U into shared_future this
     template<class U> BOOST_SPINLOCK_FUTURE_MSVC_HELP void _move(U &&o)
     {
       typename U::lock_guard_type h(&o);
@@ -753,7 +750,7 @@ namespace lightweight_futures {
     //! \brief True if the state is set or a promise is attached
     bool valid() const noexcept
     {
-      return !!_promise() || is_ready() || _broken_promise;
+      return !!_promise() || is_ready() || monad_type::_broken_promise;
     }
     
     //! \brief SYNC POINT Swaps the future with another future
@@ -1018,6 +1015,33 @@ namespace lightweight_futures {
 
   // TODO packaged_task
 
+namespace detail
+{
+  // Policy base class base, adds in an enable_shared_from_this when needed
+  template<class implementation_policy, bool is_shared> struct _basic_future_base : public basic_future_base
+  {
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR _basic_future_base() { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR _basic_future_base(basic_promise_base *p) : basic_future_base(p) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR _basic_future_base(_basic_future_base &&o) : basic_future_base(std::move(o)) { }
+    void swap(_basic_future_base &o) noexcept
+    {
+      basic_future_base::swap(o);
+    }
+  };
+  template<class implementation_policy> struct _basic_future_base<implementation_policy, true> : public basic_future_base, public std::enable_shared_from_this<typename implementation_policy::implementation_type>
+  {
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR _basic_future_base() { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR _basic_future_base(basic_promise_base *p) : basic_future_base(p) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR _basic_future_base(_basic_future_base &&o) : basic_future_base(std::move(o)) { }
+    void swap(_basic_future_base &o) noexcept
+    {
+      basic_future_base::swap(o);
+      std::enable_shared_from_this<typename implementation_policy::implementation_type>::swap(o);
+    }
+  };
+  // Storage for a basic_future
+  template<class implementation_policy, bool is_shared> using basic_future_storage = basic_monad_storage<implementation_policy, _basic_future_base<implementation_policy, is_shared>>;
+}
 #define BOOST_SPINLOCK_FUTURE_NAME_POSTFIX 
 #define BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE std::error_code
 #define BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE std::exception_ptr

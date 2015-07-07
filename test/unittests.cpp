@@ -1064,28 +1064,6 @@ BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
 #endif
 }
 
-BOOST_AUTO_TEST_CASE(works/rebind_cast, "Tests that rebind_cast works as intended")
-{
-#ifdef __cpp_decltype_auto
-  using namespace boost::spinlock::lightweight_futures::detail;
-  struct Foo {}; struct Boo { Boo() { } };
-  Boo b, *b_ptr=nullptr;
-  const Boo const_b, *const_b_ptr=nullptr;
-  decltype(auto) const_lvalue_ref = rebind_cast<Foo>(const_b);
-  decltype(auto) lvalue_ref = rebind_cast<Foo>(b);
-  decltype(auto) rvalue_ref = rebind_cast<Foo>(std::move(b));
-  decltype(auto) const_ptr_lvalue_ref = rebind_cast<Foo>(const_b_ptr);
-  decltype(auto) ptr_lvalue_ref = rebind_cast<Foo>(b_ptr);
-  decltype(auto) ptr_rvalue_ref = rebind_cast<Foo>(std::move(b_ptr));
-  static_assert(std::is_same<decltype(    const_lvalue_ref), const Foo &>::value, "rebind_cast not rebinding to the type expected");
-  static_assert(std::is_same<decltype(          lvalue_ref),       Foo &>::value, "rebind_cast not rebinding to the type expected");
-  static_assert(std::is_same<decltype(          rvalue_ref),       Foo&&>::value, "rebind_cast not rebinding to the type expected");
-  static_assert(std::is_same<decltype(const_ptr_lvalue_ref), const Foo* >::value, "rebind_cast not rebinding to the type expected");
-  static_assert(std::is_same<decltype(      ptr_lvalue_ref),       Foo* >::value, "rebind_cast not rebinding to the type expected");
-  static_assert(std::is_same<decltype(      ptr_rvalue_ref),       Foo* >::value, "rebind_cast not rebinding to the type expected");
-#endif
-}
-
 BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
 {
   using namespace boost::spinlock::lightweight_futures;
@@ -1821,7 +1799,7 @@ BOOST_AUTO_TEST_CASE(works/monad/operators, "Tests that the monad custom operato
 
 
 
-
+#if 0
 template<template<class> class F, template<class> class P> void FuturePromiseConformanceTest()
 {
   std::exception_ptr e(std::make_exception_ptr(std::runtime_error("hello")));
@@ -2482,6 +2460,7 @@ BOOST_AUTO_TEST_CASE(performance/future_option/threaded, "Tests the performance 
   std::cout << "Approximately " << (std::get<3>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per destruction." << std::endl;
   std::cout << "Total " <<((std::get<0>(result)+std::get<1>(result)+std::get<2>(result)+std::get<3>(result))/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round." << std::endl;
 }
+#endif  // futures
 
 BOOST_AUTO_TEST_SUITE_END()
 

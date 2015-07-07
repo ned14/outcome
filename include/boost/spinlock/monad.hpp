@@ -496,18 +496,6 @@ namespace lightweight_futures {
     };
     template<class R, class U> inline function_ptr<R> make_function_ptr(U &&f) { return function_ptr<R>(std::forward<U>(f), nullptr); }
 
-    // Rebinds any input type to an output type preserving qualifiers
-    template<class R, class T> struct rebind_cast_type { typedef R&& type; };
-    template<class R, class T> struct rebind_cast_type<R, const T&> { typedef const R& type; };
-    template<class R, class T> struct rebind_cast_type<R, T&> { typedef R& type; };
-    template<class R, class T> struct rebind_cast_type<R, const T*> { typedef const R* type; };
-    template<class R, class T> struct rebind_cast_type<R, T*> { typedef R* type; };
-    template<class R, class T> typename rebind_cast_type<R, T&&>::type rebind_cast(T &&v) { return reinterpret_cast<typename rebind_cast_type<R, T&&>::type>(v); }
-    // GCC <= 4.8 doesn't like this overload
-    //template<class R, class T> typename rebind_cast_type<R, T&>::type rebind_cast(T &v) { return reinterpret_cast<typename rebind_cast_type<R, T&>::type>(v); }
-    template<class R, class T> typename rebind_cast_type<R, T*>::type rebind_cast(T *&&v) { return reinterpret_cast<typename rebind_cast_type<R, T*>::type>(v); }
-    template<class R, class T> typename rebind_cast_type<R, T*>::type rebind_cast(T *&v) { return reinterpret_cast<typename rebind_cast_type<R, T*>::type>(v); }
-
     template<bool enable, class U, class V> struct move_construct_if_impl
     {
       void operator()(U *v, V &&o) const
@@ -645,8 +633,7 @@ namespace lightweight_futures {
         type = storage_type::exception;
         break;
       case value_storage<Policy>::storage_type::pointer:
-        detail::move_construct_if<has_pointer_type>(&pointer_, detail::rebind_cast<Pointer>(std::move(o.pointer_)));
-        break;
+        throw std::invalid_argument("Converting value_storage between compatible variants cannot permit Pointer storage");
       }
     }
 
@@ -666,8 +653,7 @@ namespace lightweight_futures {
         new (&exception) exception_type(o.exception);
         break;
       case storage_type::pointer:
-        abort();  // Pointer storage only ever has move semantics
-        break;
+        throw std::invalid_argument("Pointer storage only has move semantics, and therefore cannot be copied");
       }
       type = o.type;
     }
@@ -710,6 +696,7 @@ namespace lightweight_futures {
       new (this) value_storage(std::move(o));
     }
     BOOST_SPINLOCK_FUTURE_MSVC_HELP ~value_storage() noexcept(is_nothrow_destructible) { clear(); }
+
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void swap(value_storage &o) noexcept(is_nothrow_move_constructible)
     {
       if (type == o.type)
@@ -1071,7 +1058,7 @@ namespace lightweight_futures {
   \ingroup monad
   
   */
-  template<class implementation_policy> class basic_monad
+  template<class implementation_policy> class basic_monad : public implementation_policy::base
   {
     // Allow my policy unfettered acces
     friend implementation_policy;
@@ -1089,8 +1076,7 @@ namespace lightweight_futures {
     }
   protected:
     typedef value_storage<implementation_policy> value_storage_type;
-    value_storage_type _storage;
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(value_storage_type &&s) : _storage(std::move(s)) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(value_storage_type &&s) : implementation_policy::base(std::move(s)) { }
   public:
     //! \brief This monad has a value_type
     BOOST_STATIC_CONSTEXPR bool has_value_type = value_storage_type::has_value_type;
@@ -1127,9 +1113,9 @@ namespace lightweight_futures {
     //! \brief Implicit constructor of an empty monad
     BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(empty_type) : basic_monad() { }
     //! \brief Implicit constructor from a value_type by copy
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : _storage(v) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : implementation_policy::base(v) { }
     //! \brief Implicit constructor from a value_type by move
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : _storage(std::move(v)) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : implementation_policy::base(std::move(v)) { }
     /*! \brief Explicit constructor of a value_type allowing emplacement with no other means of construction. Only available
     if value_type which can't be a monad can be constructed from Args and if either there is more than one Arg or the Arg is not a value_type, an
     error_type, an exception_type nor an empty_type.
@@ -1146,24 +1132,24 @@ namespace lightweight_futures {
           && !std::is_same<error_type, typename std::decay<Arg>::type>::value
           && !std::is_same<exception_type, typename std::decay<Arg>::type>::value
           && !std::is_same<empty_type, typename std::decay<Arg>::type>::value))
-      >::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit basic_monad(Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value) : _storage(typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...) { }
+      >::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit basic_monad(Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value) : implementation_policy::base(typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...) { }
 #endif
     //! \brief Implicit constructor from an initializer list
-    template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(std::initializer_list<U> l) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>>::value) : _storage(typename value_storage_type::emplace_t(), std::move(l)) { }
+    template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(std::initializer_list<U> l) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>>::value) : implementation_policy::base(typename value_storage_type::emplace_t(), std::move(l)) { }
     //! \brief Implicit constructor from a error_type by copy
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : _storage(v) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : implementation_policy::base(v) { }
     //! \brief Implicit constructor from a error_type by move
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : _storage(std::move(v)) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : implementation_policy::base(std::move(v)) { }
     //! \brief Implicit constructor from a exception_type by copy
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : _storage(v) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : implementation_policy::base(v) { }
     //! \brief Implicit constructor from a exception_type by move
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : _storage(std::move(v)) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : implementation_policy::base(std::move(v)) { }
     //! \brief Explicit constructor from a different implementation of basic_monad
     template<class Policy,
       typename = typename std::enable_if<std::is_same<typename implementation_policy::value_type,     typename Policy::value_type    >::value || std::is_constructible<typename implementation_policy::value_type,     typename Policy::value_type    >::value>::type,
       typename = typename std::enable_if<std::is_same<typename implementation_policy::error_type,     typename Policy::error_type    >::value || std::is_constructible<typename implementation_policy::error_type,     typename Policy::error_type    >::value>::type,
       typename = typename std::enable_if<std::is_same<typename implementation_policy::exception_type, typename Policy::exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename Policy::exception_type>::value>::type
-    > BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit basic_monad(basic_monad<Policy> &&o) : _storage(std::move(o._storage)) { }
+    > BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit basic_monad(basic_monad<Policy> &&o) : implementation_policy::base(std::move(o)) { }
     //! \brief Move constructor
     basic_monad(basic_monad &&) = default;
     //! \brief Move assignment. Firstly clears any existing state, so exception throws during move will leave the monad empty.
@@ -1173,173 +1159,24 @@ namespace lightweight_futures {
     //! \brief Copy assignment. Firstly clears any existing state, so exception throws during copy will leave the monad empty.
     basic_monad &operator=(const basic_monad &) = default;
 
-    //! \brief Same as `true_(tribool(*this))`
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit operator bool() const noexcept { return has_value(); }
-    //! \brief True if monad contains a value_type, unknown if monad is empty, else false if monad is errored/excepted.
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR operator tribool::tribool() const noexcept { return has_value() ? tribool::tribool::true_ : empty() ? tribool::tribool::unknown : tribool::tribool::false_; }
-    //! \brief True if monad is not empty
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR bool is_ready() const noexcept
-    {
-      return _storage.type!=value_storage_type::storage_type::empty;
-    }
-    //! \brief True if monad is empty
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR bool empty() const noexcept
-    {
-      return _storage.type==value_storage_type::storage_type::empty;
-    }
-    //! \brief True if monad contains a value_type
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_value() const noexcept
-    {
-      return _storage.type==value_storage_type::storage_type::value;
-    }
-    //! \brief True if monad contains an error_type
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_error() const noexcept
-    {
-      return _storage.type==value_storage_type::storage_type::error;
-    }
-    /*! \brief True if monad contains an exception_type or error_type (any error_type is returned as an exception_ptr by get_exception()).
-    This needs to be true for both for compatibility with Boost.Thread's future. If you really want to test only for has exception only,
-    pass true as the argument.
-    */
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_exception(bool only_exception=false) const noexcept
-    {
-      return _storage.type==value_storage_type::storage_type::exception || (!only_exception && _storage.type==value_storage_type::storage_type::error);
-    }
-
     //! \brief Swaps one monad for another
     BOOST_SPINLOCK_FUTURE_MSVC_HELP void swap(basic_monad &o) noexcept(is_nothrow_move_constructible)
     {
-      _storage.swap(o._storage);
+      implementation_policy::base::_storage.swap(o._storage);
     }
     //! \brief Destructs any state stored, resetting to empty
     BOOST_SPINLOCK_FUTURE_MSVC_HELP void clear() noexcept(is_nothrow_destructible)
     {
-      _storage.clear();
+      implementation_policy::base::_storage.clear();
     }
 
-#define BOOST_SPINLOCK_MONAD_IMPL(name, qualifier) \
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP auto name() qualifier -> decltype(implementation_policy::_get_value(detail::rebind_cast<implementation_type>(*this))) \
-    { \
-      return implementation_policy::_get_value(detail::rebind_cast<implementation_type>(*this)); \
-    }
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
     //! \brief If contains a value_type, returns a lvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
-    BOOST_SPINLOCK_MONAD_IMPL(get, &)
-    //! \brief If contains a value_type, returns a lvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
-    BOOST_SPINLOCK_MONAD_IMPL(value, &)
     //! \brief If contains a value_type, returns a const lvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
-    BOOST_SPINLOCK_MONAD_IMPL(get, const &)
-    //! \brief If contains a value_type, returns a const lvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
-    BOOST_SPINLOCK_MONAD_IMPL(value, const &)
-#undef BOOST_SPINLOCK_MONAD_IMPL
-#define BOOST_SPINLOCK_MONAD_IMPL(name, qualifier) \
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP auto name() qualifier -> decltype(implementation_policy::_get_value(std::move(detail::rebind_cast<implementation_type>(*this)))) \
-    { \
-      return implementation_policy::_get_value(std::move(detail::rebind_cast<implementation_type>(*this))); \
-    }
     //! \brief If contains a value_type, returns a rvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
-    BOOST_SPINLOCK_MONAD_IMPL(get, &&)
-    //! \brief If contains a value_type, returns a rvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
-    BOOST_SPINLOCK_MONAD_IMPL(value, &&)
-#undef BOOST_SPINLOCK_MONAD_IMPL
-    //! \brief If contains a value_type, return that value type, else return the supplied value_type
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &get_or(value_type &v) & noexcept
-    {
-      return has_value() ? _storage.value : v;
-    }
-    //! \brief If contains a value_type, return that value type, else return the supplied value_type
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &value_or(value_type &v) & noexcept
-    {
-      return has_value() ? _storage.value : v;
-    }
-    //! \brief If contains a value_type, return that value type, else return the supplied value_type
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR const value_type &get_or(const value_type &v) const & noexcept
-    {
-      return has_value() ? _storage.value : v;
-    }
-    //! \brief If contains a value_type, return that value type, else return the supplied value_type
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR const value_type &value_or(const value_type &v) const & noexcept
-    {
-      return has_value() ? _storage.value : v;
-    }
-    //! \brief If contains a value_type, return that value type, else return the supplied value_type
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &&get_or(value_type &&v) && noexcept
-    {
-      return has_value() ? std::move(_storage.value) : std::move(v);
-    }
-    //! \brief If contains a value_type, return that value type, else return the supplied value_type
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &&value_or(value_type &&v) && noexcept
-    {
-      return has_value() ? std::move(_storage.value) : std::move(v);
-    }
-    //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &get_and(value_type &v) & noexcept
-    {
-      return has_value() ? v: _storage.value;
-    }
-    //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &value_and(value_type &v) & noexcept
-    {
-      return has_value() ? v : _storage.value;
-    }
-    //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR const value_type &get_and(const value_type &v) const & noexcept
-    {
-      return has_value() ? v: _storage.value;
-    }
-    //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR const value_type &value_and(const value_type &v) const & noexcept
-    {
-      return has_value() ? v: _storage.value;
-    }
-    //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &&get_and(value_type &&v) && noexcept
-    {
-      return has_value() ? std::move(v) : std::move(_storage.value);
-    }
-    //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &&value_and(value_type &&v) && noexcept
-    {
-      return has_value() ? std::move(v) : std::move(_storage.value);
-    }
-    //! \brief Disposes of any existing state, setting the monad to the value storage
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_state(value_storage_type &&v) { _storage.clear(); _storage.set_state(std::move(v)); }
-    //! \brief Disposes of any existing state, setting the monad to a copy of the value_type
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v) { _storage.clear(); _storage.set_value(v); }
-    //! \brief Disposes of any existing state, setting the monad to a move of the value_type
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(value_type &&v) { _storage.clear(); _storage.set_value(std::move(v)); }
-    //! \brief Disposes of any existing state, setting the monad to a default value
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value() { _storage.clear(); _storage.set_value(value_type()); }
-    //! \brief Disposes of any existing state, setting the monad to an emplaced construction
-    template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP void emplace(Args &&... args) { _storage.clear(); _storage.emplace_value(std::forward<Args>(args)...); }
-    
     //! \brief If contains an error_type, returns that error_type. If contains an error, returns an error code of `monad_errc::exception_present`. Otherwise returns a null error_type. Can only throw the exception monad_error(no_state) if empty.
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP auto get_error() const -> decltype(implementation_policy::_get_error(detail::rebind_cast<implementation_type>(*this)))
-    {
-      return implementation_policy::_get_error(detail::rebind_cast<implementation_type>(*this));
-    }
-    //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error_or(error_type e) const noexcept { return has_error() ? _storage.error : std::move(e); }
-    //! \brief If contains an error_type, return the supplied error_type else return the contained error_type
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error_and(error_type e) const noexcept { return has_error() ? std::move(e) : _storage.error; }
-    //! \brief Disposes of any existing state, setting the monad to the error_type
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_error(error_type v) { _storage.clear(); _storage.set_error(std::move(v)); }
-    
     //! \brief If contains an exception_type, returns that exception_type. If contains an error_type, returns system_error(error_type). If contains a value_type, returns a null exception_type. Can only throw the exception monad_error(no_state) if empty.
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP auto get_exception() const -> decltype(implementation_policy::_get_exception(detail::rebind_cast<implementation_type>(*this)))
-    {
-      return implementation_policy::_get_exception(detail::rebind_cast<implementation_type>(*this));
-    }
-    //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception_or(exception_type e) const noexcept { return has_exception() ? _storage.exception : std::move(e); }
-    //! \brief If contains an exception_type, return the supplied exception_type else return the contained exception_type
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception_and(exception_type e) const noexcept { return has_exception() ? std::move(e) : _storage.exception; }
-    //! \brief Disposes of any existing state, setting the monad to the exception_type
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_exception(exception_type v) { _storage.clear(); _storage.set_exception(std::move(v)); }
-    //! \brief Disposes of any existing state, setting the monad to make_exception_type(forward<E>(e))
-    template<typename E> BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_exception(E &&e)
-    {
-      set_exception(make_exception_type(std::forward<E>(e)));
-    }
+#endif
 
     /*! \name Functional programming extensions (optional)
     \ingroup monad
@@ -1471,11 +1308,11 @@ namespace lightweight_futures {
       typedef typename std::decay<_F>::type F;
       typedef detail::do_bind<typename detail::bind_map_parameter_validation<F, basic_monad>::return_type, F, basic_monad> impl;
       if(has_value())
-        return impl(std::forward<F>(f))(std::move(_storage.value), traits::detail::rank<5>());
+        return impl(std::forward<F>(f))(std::move(implementation_policy::base::_storage.value), traits::detail::rank<5>());
       else if(has_error())
-        return impl(std::forward<F>(f))(std::move(_storage.error), traits::detail::rank<5>());
+        return impl(std::forward<F>(f))(std::move(implementation_policy::base::_storage.error), traits::detail::rank<5>());
       else if(has_exception())
-        return impl(std::forward<F>(f))(std::move(_storage.exception), traits::detail::rank<5>());
+        return impl(std::forward<F>(f))(std::move(implementation_policy::base::_storage.exception), traits::detail::rank<5>());
       else
         return impl(std::forward<F>(f))(empty_type(), traits::detail::rank<5>());
     }
@@ -1499,11 +1336,11 @@ namespace lightweight_futures {
       typedef typename std::decay<_F>::type F;
       typedef detail::do_map<typename detail::bind_map_parameter_validation<F, basic_monad>::return_type, F, basic_monad> impl;
       if(has_value())
-        return impl(std::forward<F>(f))(std::move(_storage.value), traits::detail::rank<5>());
+        return impl(std::forward<F>(f))(std::move(implementation_policy::base::_storage.value), traits::detail::rank<5>());
       else if(has_error())
-        return impl(std::forward<F>(f))(std::move(_storage.error), traits::detail::rank<5>());
+        return impl(std::forward<F>(f))(std::move(implementation_policy::base::_storage.error), traits::detail::rank<5>());
       else if(has_exception())
-        return impl(std::forward<F>(f))(std::move(_storage.exception), traits::detail::rank<5>());
+        return impl(std::forward<F>(f))(std::move(implementation_policy::base::_storage.exception), traits::detail::rank<5>());
       else
         return impl(std::forward<F>(f))(empty_type(), traits::detail::rank<5>());
     }
@@ -1589,232 +1426,169 @@ namespace lightweight_futures {
   namespace detail
   {
     //! [monad_policy]
-    //! \brief An implementation policy for basic_monad \ingroup monad
-    template<typename R> struct monad_policy;
-    template<> struct monad_policy<void>
+    struct basic_monad_storage_empty { };
+    // The struct is at the base of the inheritance hierarchy, and simply keeps some storage for the monad
+    template<class _implementation_policy, class base_class=basic_monad_storage_empty> struct basic_monad_storage : public base_class
     {
-      // The final resulting implementation type
-      typedef basic_monad<monad_policy> implementation_type;
-      // The value type to use. Can be void to disable.
-      typedef void value_type;
-      // The error code type to use. Can be void to disable.
-      typedef std::error_code error_type;
-      // The exception pointer type to use. Can be void to disable.
-      typedef std::exception_ptr exception_type;
-      // Used by basic_future only, otherwise leave as void.
-      typedef void pointer_type;
-      // The type which basic_monad::rebind<U> should return
-      template<typename U> using rebind = basic_monad<monad_policy<U>>;
-      // The type which rebinding myself produces
-      template<typename U> using rebind_policy = monad_policy<U>;
-      // Must handle error situation ec. Can return false to cancel the calling operation.
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
-      {
-        throw monad_error(ec);
-      }
+      template<class P, class B> friend struct basic_monad_storage;
     protected:
-      // Common preamble to the below
-      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _pre_get_value(U &&self)
-      {
-        if(!self.is_ready())
-          _throw_error(monad_errc::no_state);
-        if(self.has_error() || self.has_exception())
-        {
-          if(self.has_error())
-            throw std::system_error(self._storage.error);
-          if(self.has_exception())
-            std::rethrow_exception(self._storage.exception);
-        }      
-      }
+      typedef _implementation_policy implementation_policy;
+      typedef value_storage<implementation_policy> value_storage_type;
+      value_storage_type _storage;
     public:
-      // As we are void, we return only void
-      // Called by get() &
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(implementation_type &self) { _pre_get_value(self); }
-      // Called by get() const &
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(const implementation_type &self) {_pre_get_value(self); }
-      // Called by get() &&
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(implementation_type &&self) {_pre_get_value(self); }
-      // Called by get_error() const
-      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const U &self)
-      {
-        if(!self.is_ready())
-        {
-          if(!_throw_error(monad_errc::no_state))
-            return error_type();
-        }
-        if(self.has_error())
-          return self._storage.error;
-        if(self.has_exception())
-          return error_type((int) monad_errc::exception_present, monad_category());
-        return error_type();
-      }
-      // Called by get_exception() const
-      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const U &self)
-      {
-        if(!self.is_ready())
-        {
-          if(!_throw_error(monad_errc::no_state))
-            return exception_type();
-        }
-        if(!self.has_error() && !self.has_exception())
-          return exception_type();
-        if(self.has_error())
-          return std::make_exception_ptr(std::system_error(self._storage.error));
-        if(self.has_exception())
-          return self._storage.exception;
-        return exception_type();
-      }
-    };
-    template<typename R> struct monad_policy : public monad_policy<void>
-    {
-      // The final resulting implementation type
-      typedef basic_monad<monad_policy> implementation_type;
-      // The value type to use. Can be void to disable.
-      typedef R value_type;
-    protected:
-      typedef monad_policy<void> impl;
-    public:
-      // Called by get() &
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &_get_value(implementation_type &self)
-      {
-        impl::_pre_get_value(self);
-        return self._storage.value;
-      }
-      // Called by get() const &
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP const value_type &_get_value(const implementation_type &self)
-      {
-        impl::_pre_get_value(self);
-        return self._storage.value;
-      }
-      // Called by get() &&
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &&_get_value(implementation_type &&self)
-      {
-        impl::_pre_get_value(self);
-        return std::move(self._storage.value);
-      }
-    };
-    //! [monad_policy]
-    
-    //! \brief An implementation policy for basic_monad \ingroup monad
-    template<typename R> struct result_policy;
-    template<> struct result_policy<void>
-    {
-      typedef basic_monad<result_policy> implementation_type;
-      typedef void value_type;
-      typedef std::error_code error_type;
-      typedef void exception_type;
-      typedef void pointer_type;
-      template<typename U> using rebind = basic_monad<result_policy<U>>;
-      template<typename U> using rebind_policy = result_policy<U>;
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
-      {
-        throw monad_error(ec);
-      }
-    protected:
-      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _pre_get_value(U &&self)
-      {
-        if(!self.is_ready())
-          _throw_error(monad_errc::no_state);
-        if(self.has_error() || self.has_exception())
-        {
-          if(self.has_error())
-            throw std::system_error(self._storage.error);
-        }      
-      }
-    public:
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(implementation_type &self) { _pre_get_value(self); }
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(const implementation_type &self) {_pre_get_value(self); }
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(implementation_type &&self) {_pre_get_value(self); }
-      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const U &self)
-      {
-        if(!self.is_ready())
-        {
-          if(!_throw_error(monad_errc::no_state))
-            return error_type();
-        }
-        if(!self.has_error())
-          return error_type();
-        return self._storage.error;
-      }
-      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const U &self);
-    };
-    template<typename R> struct result_policy : public result_policy<void>
-    {
-      typedef basic_monad<result_policy> implementation_type;
-      typedef R value_type;
-    protected:
-      typedef result_policy<void> impl;
-    public:
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &_get_value(implementation_type &self)
-      {
-        impl::_pre_get_value(self);
-        return self._storage.value;
-      }
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP const value_type &_get_value(const implementation_type &self)
-      {
-        impl::_pre_get_value(self);
-        return self._storage.value;
-      }
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &&_get_value(implementation_type &&self)
-      {
-        impl::_pre_get_value(self);
-        return std::move(self._storage.value);
-      }
-    };
+      //! \brief The final implementation type
+      typedef typename value_storage_type::implementation_type implementation_type;
+      //! \brief The type potentially held by the monad
+      typedef typename value_storage_type::value_type value_type;
+      //! \brief The error code potentially held by the monad
+      typedef typename value_storage_type::error_type error_type;
+      //! \brief The exception ptr potentially held by the monad
+      typedef typename value_storage_type::exception_type exception_type;
 
-    //! \brief An implementation policy for basic_monad \ingroup monad
-    template<typename R> struct option_policy;
-    template<> struct option_policy<void>
-    {
-      typedef basic_monad<option_policy> implementation_type;
-      typedef void value_type;
-      typedef void error_type;
-      typedef void exception_type;
-      typedef void pointer_type;
-      template<typename U> using rebind = basic_monad<option_policy<U>>;
-      template<typename U> using rebind_policy = option_policy<U>;
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
+      basic_monad_storage() = default;
+      template<class Policy, class _> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(basic_monad_storage<Policy, _> &&o) : _storage(std::move(o._storage)) { }
+      template<class Policy, class _> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(const basic_monad_storage<Policy, _> &o) : _storage(o._storage) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(const value_type &v) : _storage(v) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(value_type &&v) : _storage(std::move(v)) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(const error_type &v) : _storage(v) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(error_type &&v) : _storage(std::move(v)) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(const exception_type &v) : _storage(v) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(exception_type &&v) : _storage(std::move(v)) { }
+      template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(typename value_storage_type::emplace_t _, Args &&...args) : _storage(_, std::forward<Args>(args)...) { }
+      //! \brief Same as `true_(tribool(*this))`
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit operator bool() const noexcept { return has_value(); }
+      //! \brief True if monad contains a value_type, unknown if monad is empty, else false if monad is errored/excepted.
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR operator tribool::tribool() const noexcept { return has_value() ? tribool::tribool::true_ : empty() ? tribool::tribool::unknown : tribool::tribool::false_; }
+      //! \brief True if monad is not empty
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR bool is_ready() const noexcept
       {
-        throw monad_error(ec);
+        return _storage.type!=value_storage_type::storage_type::empty;
       }
-    protected:
-      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _pre_get_value(U &&self)
+      //! \brief True if monad is empty
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR bool empty() const noexcept
       {
-        if(!self.is_ready())
-          _throw_error(monad_errc::no_state);
+        return _storage.type==value_storage_type::storage_type::empty;
       }
-    public:
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(implementation_type &self) { _pre_get_value(self); }
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(const implementation_type &self) {_pre_get_value(self); }
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP void _get_value(implementation_type &&self) {_pre_get_value(self); }
-      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type _get_error(const U &self);
-      template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type _get_exception(const U &self);
-    };
-    template<typename R> struct option_policy : public option_policy<void>
-    {
-      typedef basic_monad<option_policy> implementation_type;
-      typedef R value_type;
-    protected:
-      typedef option_policy<void> impl;
-    public:
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &_get_value(implementation_type &self)
+      //! \brief True if monad contains a value_type
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_value() const noexcept
       {
-        impl::_pre_get_value(self);
-        return self._storage.value;
+        return _storage.type==value_storage_type::storage_type::value;
       }
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP const value_type &_get_value(const implementation_type &self)
+      //! \brief True if monad contains an error_type
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_error() const noexcept
       {
-        impl::_pre_get_value(self);
-        return self._storage.value;
+        return _storage.type==value_storage_type::storage_type::error;
       }
-      static BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &&_get_value(implementation_type &&self)
+      /*! \brief True if monad contains an exception_type or error_type (any error_type is returned as an exception_ptr by get_exception()).
+      This needs to be true for both for compatibility with Boost.Thread's future. If you really want to test only for has exception only,
+      pass true as the argument.
+      */
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_exception(bool only_exception=false) const noexcept
       {
-        impl::_pre_get_value(self);
-        return std::move(self._storage.value);
+        return _storage.type==value_storage_type::storage_type::exception || (!only_exception && _storage.type==value_storage_type::storage_type::error);
       }
-    };
 
+      //! \brief If contains a value_type, return that value type, else return the supplied value_type
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &get_or(value_type &v) & noexcept
+      {
+        return has_value() ? _storage.value : v;
+      }
+      //! \brief If contains a value_type, return that value type, else return the supplied value_type
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &value_or(value_type &v) & noexcept
+      {
+        return has_value() ? _storage.value : v;
+      }
+      //! \brief If contains a value_type, return that value type, else return the supplied value_type
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR const value_type &get_or(const value_type &v) const & noexcept
+      {
+        return has_value() ? _storage.value : v;
+      }
+      //! \brief If contains a value_type, return that value type, else return the supplied value_type
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR const value_type &value_or(const value_type &v) const & noexcept
+      {
+        return has_value() ? _storage.value : v;
+      }
+      //! \brief If contains a value_type, return that value type, else return the supplied value_type
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &&get_or(value_type &&v) && noexcept
+      {
+        return has_value() ? std::move(_storage.value) : std::move(v);
+      }
+      //! \brief If contains a value_type, return that value type, else return the supplied value_type
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &&value_or(value_type &&v) && noexcept
+      {
+        return has_value() ? std::move(_storage.value) : std::move(v);
+      }
+      //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &get_and(value_type &v) & noexcept
+      {
+        return has_value() ? v: _storage.value;
+      }
+      //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &value_and(value_type &v) & noexcept
+      {
+        return has_value() ? v : _storage.value;
+      }
+      //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR const value_type &get_and(const value_type &v) const & noexcept
+      {
+        return has_value() ? v: _storage.value;
+      }
+      //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR const value_type &value_and(const value_type &v) const & noexcept
+      {
+        return has_value() ? v: _storage.value;
+      }
+      //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &&get_and(value_type &&v) && noexcept
+      {
+        return has_value() ? std::move(v) : std::move(_storage.value);
+      }
+      //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &&value_and(value_type &&v) && noexcept
+      {
+        return has_value() ? std::move(v) : std::move(_storage.value);
+      }
+      //! \brief Disposes of any existing state, setting the monad to the value storage
+      BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_state(value_storage_type &&v) { _storage.clear(); _storage.set_state(std::move(v)); }
+      //! \brief Disposes of any existing state, setting the monad to a copy of the value_type
+      BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v) { _storage.clear(); _storage.set_value(v); }
+      //! \brief Disposes of any existing state, setting the monad to a move of the value_type
+      BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(value_type &&v) { _storage.clear(); _storage.set_value(std::move(v)); }
+      //! \brief Disposes of any existing state, setting the monad to a default value
+      BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value() { _storage.clear(); _storage.set_value(value_type()); }
+      //! \brief Disposes of any existing state, setting the monad to an emplaced construction
+      template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP void emplace(Args &&... args) { _storage.clear(); _storage.emplace_value(std::forward<Args>(args)...); }
+      
+      //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
+      BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error_or(error_type e) const noexcept { return has_error() ? _storage.error : std::move(e); }
+      //! \brief If contains an error_type, return the supplied error_type else return the contained error_type
+      BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error_and(error_type e) const noexcept { return has_error() ? std::move(e) : _storage.error; }
+      //! \brief Disposes of any existing state, setting the monad to the error_type
+      BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_error(error_type v) { _storage.clear(); _storage.set_error(std::move(v)); }
+      
+      //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
+      BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception_or(exception_type e) const noexcept { return has_exception() ? _storage.exception : std::move(e); }
+      //! \brief If contains an exception_type, return the supplied exception_type else return the contained exception_type
+      BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception_and(exception_type e) const noexcept { return has_exception() ? std::move(e) : _storage.exception; }
+      //! \brief Disposes of any existing state, setting the monad to the exception_type
+      BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_exception(exception_type v) { _storage.clear(); _storage.set_exception(std::move(v)); }
+      //! \brief Disposes of any existing state, setting the monad to make_exception_type(forward<E>(e))
+      template<typename E> BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_exception(E &&e)
+      {
+        set_exception(make_exception_type(std::forward<E>(e)));
+      }
+
+    };
   }
+#define BOOST_SPINLOCK_MONAD_NAME monad
+#define BOOST_SPINLOCK_MONAD_POLICY_ERROR_TYPE std::error_code
+#define BOOST_SPINLOCK_MONAD_POLICY_EXCEPTION_TYPE std::exception_ptr
+#include "detail/monad_policy.ipp"
+#define BOOST_SPINLOCK_MONAD_NAME result
+#define BOOST_SPINLOCK_MONAD_POLICY_ERROR_TYPE std::error_code
+#include "detail/monad_policy.ipp"
+#define BOOST_SPINLOCK_MONAD_NAME option
+#include "detail/monad_policy.ipp"
 
   /*! \brief `monad<R>` can hold a fixed variant list of empty, a type `R`, a lightweight `std::error_code` or a
   heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`,
