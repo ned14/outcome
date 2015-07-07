@@ -1799,7 +1799,7 @@ BOOST_AUTO_TEST_CASE(works/monad/operators, "Tests that the monad custom operato
 
 
 
-#if 0
+#if 1  // futures
 template<template<class> class F, template<class> class P> void FuturePromiseConformanceTest()
 {
   std::exception_ptr e(std::make_exception_ptr(std::runtime_error("hello")));

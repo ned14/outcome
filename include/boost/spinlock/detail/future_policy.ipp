@@ -86,9 +86,9 @@ namespace detail
     // Note we always return value_type by value.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type get()
     {
-      implementation_type::wait();
+      static_cast<implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(this);
-      implementation_type::_check_validity();
+      static_cast<implementation_type *>(this)->_check_validity();
 #if defined(BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE) || defined(BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE)
       if(future_storage::has_error() || future_storage::has_exception())
       {
@@ -136,9 +136,9 @@ namespace detail
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
     BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error()
     {
-      implementation_type::wait();
+      static_cast<implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(this);
-      implementation_type::_check_validity();
+      static_cast<implementation_type *>(this)->_check_validity();
       if(future_storage::has_error())
       {
         error_type ec(future_storage::_storage.error);
@@ -151,13 +151,15 @@ namespace detail
 #endif
       return error_type();
     }
+#else
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error();
 #endif
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
     BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception()
     {
-      implementation_type::wait();
+      static_cast<implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(this);
-      future_storage::_check_validity();
+      static_cast<implementation_type *>(this)->_check_validity();
       if(!future_storage::has_error() && !future_storage::has_exception())
         return exception_type();
       if(future_storage::has_error())
@@ -174,9 +176,14 @@ namespace detail
       }
       return exception_type();
     }
+#else
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception();
 #endif
-    // Makes share() available on this future. Defined out of line as need shared_future_policy defined first.
-    static inline BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>> _share(implementation_type &&self);
+    // Makes share() available on this future.
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>> share()
+    {
+      return basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>>::_convert(std::move(*this));
+    }
   private:
     // Disables implicit conversion from any other type of future
     template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP implementation_type _construct(basic_future<U> &&v);
@@ -203,9 +210,9 @@ namespace detail
     // Note we always return value_type by value.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type get() const
     {
-      implementation_type::wait();
+      static_cast<const implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(const_cast<implementation_type *>(this));
-      implementation_type::_check_validity();
+      static_cast<const implementation_type *>(this)->_check_validity();
 #if defined(BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE) || defined(BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE)
       if(future_storage::has_error() || future_storage::has_exception())
       {
@@ -251,9 +258,9 @@ namespace detail
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
     BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() const
     {
-      implementation_type::wait();
+      static_cast<const implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(const_cast<implementation_type *>(this));
-      implementation_type::_check_validity();
+      static_cast<const implementation_type *>(this)->_check_validity();
       if(future_storage::has_error())
       {
         error_type ec(future_storage::_storage.error);
@@ -266,13 +273,15 @@ namespace detail
 #endif
       return error_type();
     }
+#else
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() const;
 #endif
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
     BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() const
     {
-      implementation_type::wait();
+      static_cast<const implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(const_cast<implementation_type *>(this));
-      future_storage::_check_validity();
+      static_cast<const implementation_type *>(this)->_check_validity();
       if(!future_storage::has_error() && !future_storage::has_exception())
         return exception_type();
       if(future_storage::has_error())
@@ -289,12 +298,18 @@ namespace detail
       }
       return exception_type();
     }
+#else
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() const;
 #endif
-    // Makes share() available on this future. Defined out of line as need shared_future_policy defined first.
-    static inline BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<void>> _share(implementation_type &&self);
-  private:
-    // Disables implicit conversion from any other type of future
-    template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP implementation_type _construct(basic_future<U> &&v);
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>> share();
+    template<class U> static BOOST_SPINLOCK_FUTURE_MSVC_HELP implementation_type _construct(basic_future<U> &&o)
+    {
+      //! \todo Avoid default construction in future to shared_future conversion
+      implementation_type ret;
+      typename basic_future<U>::lock_guard_type h(&o);
+      ret._move(std::move(o));
+      return ret;
+    }
   };
 
   template<typename R> struct BOOST_SPINLOCK_FUTURE_POLICY_NAME
@@ -324,6 +339,12 @@ namespace detail
     BOOST_STATIC_CONSTEXPR bool is_consuming=true;
     // Is this future managed by shared_basic_future_ptr?
     BOOST_STATIC_CONSTEXPR bool is_shared=false;
+    // The type of future_errc to use for issuing errors
+    typedef std::future_errc future_errc;
+    // The type of future exception to use for issuing exceptions
+    typedef std::future_error future_error;
+    // The category of error code to use
+    static const std::error_category &future_category() noexcept { return std::future_category(); }
     // The STL future type to use for waits and timed waits
     typedef std::pair<std::promise<void>, std::future<void>> wait_future_type;
   };
@@ -354,6 +375,12 @@ namespace detail
     BOOST_STATIC_CONSTEXPR bool is_consuming=false;
     // Is this future managed by shared_basic_future_ptr?
     BOOST_STATIC_CONSTEXPR bool is_shared=true;
+    // The type of future_errc to use for issuing errors
+    typedef std::future_errc future_errc;
+    // The type of future exception to use for issuing exceptions
+    typedef std::future_error future_error;
+    // The category of error code to use
+    static const std::error_category &future_category() noexcept { return std::future_category(); }
     // The STL future type to use for waits and timed waits
     typedef std::pair<std::promise<void>, std::future<void>> wait_future_type;
   };

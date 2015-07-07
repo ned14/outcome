@@ -1487,6 +1487,12 @@ namespace lightweight_futures {
       {
         return _storage.type==value_storage_type::storage_type::exception || (!only_exception && _storage.type==value_storage_type::storage_type::error);
       }
+      
+      //! \brief Clears the storage
+      void clear()
+      {
+        _storage.clear();
+      }
 
       //! \brief If contains a value_type, return that value type, else return the supplied value_type
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_type &get_or(value_type &v) & noexcept

@@ -471,7 +471,7 @@ namespace lightweight_futures {
     { \
       lock_guard_type h(this); \
       if(_detached) \
-        implementation_policy::_throw_error(monad_errc::already_set); \
+        future_type::_throw_error(monad_errc::already_set); \
       if(h._f) \
       { \
         future_type *f=static_cast<future_type *>(h._f); \
@@ -492,7 +492,7 @@ namespace lightweight_futures {
       else \
       { \
         if(_storage.type!=value_storage_type::storage_type::empty) \
-          implementation_policy::_throw_error(monad_errc::already_set); \
+          future_type::_throw_error(monad_errc::already_set); \
         _storage.function; \
       } \
     }
@@ -585,6 +585,7 @@ namespace lightweight_futures {
     : protected basic_monad<implementation_policy>
   {
     friend implementation_policy;
+    friend typename implementation_policy::base;
     template<class> friend class basic_future;
     template<class Policy, class _implementation_type, class _error_type, class _exception_type> friend struct detail::common_future_policy_code;
     template<bool reserve_future_storage, class f_traits, class _implementation_policy, class base_future_type, class promise_type, class callable_type> friend struct detail::continuation;
@@ -669,8 +670,8 @@ namespace lightweight_futures {
     {
     }
     //! \brief If available for this kind of future, constructs this future type from some other future type
-    template<class Impl, typename=decltype(implementation_policy::_construct(std::declval<basic_future<Impl>>()))> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_future(basic_future<Impl> &&o)
-      : basic_future(implementation_policy::_construct(std::forward<basic_future<Impl>>(o)))
+    template<class Impl, typename=decltype(monad_type::_construct(std::declval<basic_future<Impl>>()))> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_future(basic_future<Impl> &&o)
+      : basic_future(monad_type::_construct(std::forward<basic_future<Impl>>(o)))
     {
     }
     //! \brief Explicit construction of a ready/errored/excepted future from any of the types supported by the underlying monad. Alternative to make_ready_XXX.
@@ -682,16 +683,14 @@ namespace lightweight_futures {
     template<class U> BOOST_SPINLOCK_FUTURE_MSVC_HELP void _move(U &&o)
     {
       typename U::lock_guard_type h(&o);
-      new(this) basic_future_base(std::move(o));
       new(this) monad_type(std::move(o));
-      detail::move_construct_if<U::is_shared>(this, std::move(o));
     }
   public:
     //! \brief SYNC POINT Move constructor
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(basic_future &&o) noexcept(is_nothrow_move_constructible) : enable_shared_from_this(std::move(o))
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(basic_future &&o) noexcept(is_nothrow_move_constructible)
     {
+      //! \todo Try and get the basic_future move constructor to skip default constructing
       lock_guard_type h(&o);
-      new(this) basic_future_base(std::move(o));
       new(this) monad_type(std::move(o));
     }
     //! \brief SYNC POINT Move assignment. If it throws during the move, the future is left as if default constructed.
@@ -766,13 +765,6 @@ namespace lightweight_futures {
         h2._p->_set_future_ptr(this);
     }
 
-    //! \brief If available for this kind of future, converts this simple future into some policy determined shared future type
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP auto share() -> decltype(implementation_policy::_share(std::move(*this)))
-    {
-      _check_validity();
-      return implementation_policy::_share(std::move(*this));
-    }
-    
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
     //! \brief SYNC POINT Return any value held by this future, waiting if needed for a state to become available and rethrowing any error or exceptional state.
     value_type get();
@@ -810,10 +802,12 @@ namespace lightweight_futures {
     using monad_type::get_exception;
     using monad_type::get_exception_or;
     using monad_type::get_exception_and;
+    using monad_type::share;
 #endif
     //! \brief SYNC POINT Compatibility with Boost.Thread
     exception_type get_exception_ptr() { return this->get_exception(); }
     
+
     //! \brief SYNC POINT Wait for the future to become ready
     void wait() const
     {
