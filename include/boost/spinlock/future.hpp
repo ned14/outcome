@@ -134,6 +134,7 @@ namespace lightweight_futures {
   
   template<typename R> class basic_promise;
   template<typename R> class basic_future;
+  template<class _future_type> class shared_basic_future_ptr;
   
   //! \brief The abstract base class for all basic_promises and basic_futures
   struct basic_promise_future_base
@@ -190,7 +191,6 @@ namespace lightweight_futures {
     bool _broken_promise;             // Promise was destroyed before setting a value
     basic_promise_base *_promise;
     BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_future_base() : _broken_promise(false), _promise(nullptr) { }
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future_base(basic_promise_base *p) : basic_promise_future_base(std::move(*p)), _broken_promise(false), _promise(p) { }
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future_base(basic_future_base &&o) : basic_promise_future_base(std::move(o)), _broken_promise(o._broken_promise), _promise(o._promise)
     {
       o._promise=nullptr;
@@ -205,6 +205,7 @@ namespace lightweight_futures {
       std::swap(_broken_promise, o._broken_promise);
       std::swap(_promise, o._promise);
     }
+    virtual void set_state(void *state) { }
   };
 
   namespace detail
@@ -357,8 +358,6 @@ namespace lightweight_futures {
 
     //! \brief This promise type
     typedef basic_promise promise_type;
-    //! \brief The future type associated with this promise type
-    typedef basic_future<implementation_policy> future_type;
     //! \brief The future_errc type we use
     typedef typename implementation_policy::future_errc future_errc;
     //! \brief The future_error type we use
@@ -376,24 +375,17 @@ namespace lightweight_futures {
       _storage.pointer_.pointer=f;
     }
     typedef detail::lock_guard lock_guard_type;
-    static_assert(std::is_move_constructible<value_type>::value || std::is_copy_constructible<value_type>::value, "Type must be move or copy constructible to be used in a lightweight basic_promise");    
-    future_type *_continuation_future;  // Points to future storage used during continuations
-    std::shared_ptr<typename implementation_policy::wait_future_type> _sleeping_waiters;
-    void _wake_waiters()
-    {
-      if (_sleeping_waiters)
-        _sleeping_waiters->first.set_value();
-    }
+    static_assert(std::is_move_constructible<value_type>::value || std::is_copy_constructible<value_type>::value, "Type must be move or copy constructible to be used in a lightweight basic_promise");
   public:
     //! \brief EXTENSION: constexpr capable constructor
     BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_promise() noexcept : 
-    _detached(false), _continuation_future(nullptr)
+    _detached(false)
     {
     }
 //// template<class Allocator> basic_promise(allocator_arg_t, Allocator a); // cannot support
     //! \brief SYNC POINT Move constructor
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise(basic_promise &&o) noexcept(is_nothrow_move_constructible) : 
-    basic_promise_base(std::move(o)), _detached(o._detached), _continuation_future(std::move(o._continuation_future)), _sleeping_waiters(std::move(o._sleeping_waiters))
+    basic_promise_base(std::move(o)), _detached(o._detached)
     {
       lock_guard_type h(&o);
       _storage=std::move(o._storage);
@@ -433,8 +425,6 @@ namespace lightweight_futures {
       lock_guard_type h1(this), h2(&o);
       _storage.swap(o._storage);
       _detached=o._detached;
-      _continuation_future=o._continuation_future;
-      _sleeping_waiters.swap(o._sleeping_waiters);
       if(h1._f)
         h1._f->_promise=&o;
       if(h2._f)
@@ -442,7 +432,7 @@ namespace lightweight_futures {
     }
     
     //! \brief SYNC POINT Create a future to be associated with this promise. Can be called exactly once, else throws a `future_already_retrieved`.
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP future_type get_future()
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future<implementation_policy> get_future()
     {
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       // If no value stored yet, I need locks on from now on
@@ -455,7 +445,7 @@ namespace lightweight_futures {
       lock_guard_type h(this);
       if(h._f || _detached)
         throw future_error(future_errc::future_already_retrieved);
-      future_type ret(this);
+      basic_future<implementation_policy> ret(this);
       h.unlock();
       return ret;
     }
@@ -466,56 +456,50 @@ namespace lightweight_futures {
       return _storage.type==value_storage_type::storage_type::future || _detached;
     }
 
-#define BOOST_SPINLOCK_FUTURE_IMPL(name, function) \
-    name \
-    { \
-      lock_guard_type h(this); \
-      if(_detached) \
-        future_type::_throw_error(monad_errc::already_set); \
-      if(h._f) \
-      { \
-        future_type *f=static_cast<future_type *>(h._f); \
-        f->function; \
-        auto callable(std::move(_storage.pointer_.callable)); \
-        /* Move state into continuation future now before locks drop, else pass through this future */ \
-        if(callable && _continuation_future!=h._f) \
-          _continuation_future->set_state(std::move(f->_storage)); \
-        future_type *cf=callable ? static_cast<future_type *>(_continuation_future) : f; \
-        h._f->_promise=nullptr; \
-        _storage.clear(); \
-        _detached=true; \
-        h.unlock(); \
-        if(callable) \
-          callable(cf); \
-        _wake_waiters(); \
-      } \
-      else \
-      { \
-        if(_storage.type!=value_storage_type::storage_type::empty) \
-          future_type::_throw_error(monad_errc::already_set); \
-        _storage.function; \
-      } \
-    }
     /*! \brief SYNC POINT EXTENSION Sets the state to be returned by the associated future to be the same as the value storage, releasing any waits occuring in other threads.
     */
-    BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_state(value_storage<implementation_policy> &&v), set_state(std::move(v)))
-      /*! \brief SYNC POINT Sets the value to be returned by the associated future to be a default constructed value_type, releasing any waits occuring in other threads.
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_state(value_storage<implementation_policy> &&v)
+    {
+      lock_guard_type h(this);
+      if(_detached)
+        basic_future<implementation_policy>::_throw_error(monad_errc::already_set);
+      if(h._f)
+      {
+        // Need to keep future unmoveable until we can set its state, so prevent
+        // future from being unlocked
+        basic_future_base *f=h._f;
+        h._f=nullptr;
+        // Detach me from the future and the future from me
+        f->_promise=nullptr;
+        _storage.clear();
+        _detached=true;
+        // Unlock just myself
+        h.unlock();
+        f->set_state(&v);
+      }
+      else
+      {
+        if(_storage.type!=value_storage_type::storage_type::empty)
+          basic_future<implementation_policy>::_throw_error(monad_errc::already_set);
+        _storage.set_state(std::move(v));
+      }
+    }
+    /*! \brief SYNC POINT Sets the value to be returned by the associated future to be a default constructed value_type, releasing any waits occuring in other threads.
     */
-    BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(), set_value(value_type()))
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value() { set_state(value_storage<implementation_policy>(value_type())); }
       /*! \brief SYNC POINT Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
     */
-    BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v), set_value(v))
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v) { set_state(value_storage<implementation_policy>(v)); }
     /*! \brief SYNC POINT Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
     */
-    BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(value_type &&v), set_value(std::move(v)))
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(value_type &&v) { set_state(value_storage<implementation_policy>(std::move(v))); }
     /*! \brief SYNC POINT EXTENSION: Sets the value by emplacement to be returned by the associated future, releasing any waits occuring in other threads.
     */
-    BOOST_SPINLOCK_FUTURE_IMPL(template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP void emplace_value(Args &&... args), emplace_value(std::forward<Args>(args)...))
+    template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP void emplace_value(Args &&... args) { set_state(value_storage<implementation_policy>(std::forward<Args>(args)...)); }
     //! \brief SYNC POINT EXTENSION: Set an error code outcome (doesn't allocate)
-    BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_error(error_type e), set_error(std::move(e)))
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_error(error_type e) { set_state(value_storage<implementation_policy>(std::move(e))); }
     //! \brief SYNC POINT Sets an exception outcome
-    BOOST_SPINLOCK_FUTURE_IMPL(BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_exception(exception_type e), set_exception(std::move(e)))
-#undef BOOST_SPINLOCK_FUTURE_IMPL
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_exception(exception_type e) { set_state(value_storage<implementation_policy>(std::move(e))); }
     //! \brief SYNC POINT EXTENSION: Equal to set_exception(make_exception_ptr(forward<E>(e)))
     template<typename E> void set_exception(E &&e)
     {
@@ -586,13 +570,10 @@ namespace lightweight_futures {
   {
     friend implementation_policy;
     friend typename implementation_policy::base;
+    friend typename implementation_policy::other_base;
     template<class> friend class basic_future;
-    template<class Policy, class _implementation_type, class _error_type, class _exception_type> friend struct detail::common_future_policy_code;
+    template<class _future_type> friend class shared_basic_future_ptr;
     template<bool reserve_future_storage, class f_traits, class _implementation_policy, class base_future_type, class promise_type, class callable_type> friend struct detail::continuation;
-    typedef typename std::conditional<implementation_policy::is_shared,
-        std::enable_shared_from_this<basic_future<implementation_policy>>,
-        detail::future_not_shared
-      >::type enable_shared_from_this;
   public:
     //! \brief The policy used to implement this basic_future
     typedef implementation_policy policy;
@@ -643,8 +624,9 @@ namespace lightweight_futures {
     static_assert(std::is_move_constructible<value_type>::value || std::is_copy_constructible<value_type>::value, "Type must be move or copy constructible to be used in a lightweight basic_future");    
   protected:
     // Called by basic_promise::get_future(), so currently thread safe
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(promise_type *p) : basic_future_base(p), monad_type(std::move(p->_storage))
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(promise_type *p) : monad_type(std::move(p->_storage)), _continuation_future(nullptr)
     {
+      monad_type::_promise=p;
       // Clear the promise's storage, as we now have a state
       p->_storage.clear();
       // Do I already have a value? If so, detach, else set the promise to point to us
@@ -664,34 +646,50 @@ namespace lightweight_futures {
       if(!valid())
         throw future_error(future_errc::no_state);
     }
+    // Called to convert from one type of future into this one. Lock of source is already held.
+    template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_future(std::nullptr_t, basic_future<U> &&o) : monad_type(typename basic_future<U>::monad_type(std::move(o))), _continuation_future(nullptr) { }
+    
+    basic_future *_continuation_future;  // Points to future storage used during continuations
+    detail::function_ptr<void(basic_future *)> _continuation;
+    mutable std::shared_ptr<typename implementation_policy::wait_future_type> _sleeping_waiters;
+    // NOTE called with my lock set and promise detached by promise.set_state()
+    virtual void set_state(void *state) override final
+    {
+      auto sleeping_waiters(_sleeping_waiters);
+      try
+      {
+        value_storage<implementation_policy> *s=(value_storage<implementation_policy> *) state;
+        if(_continuation)
+          _continuation_future->_storage=std::move(*s);
+        else
+          monad_type::_storage=std::move(*s);
+        monad_type::_lock.unlock();
+      }
+      catch(...)
+      {
+        monad_type::_lock.unlock();
+        throw;
+      }
+      if (sleeping_waiters)
+        sleeping_waiters->first.set_value();
+    }
   public:
     //! \brief EXTENSION: constexpr capable constructor
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_future()
-    {
-    }
-    //! \brief If available for this kind of future, constructs this future type from some other future type
-    template<class Impl, typename=decltype(monad_type::_construct(std::declval<basic_future<Impl>>()))> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_future(basic_future<Impl> &&o)
-      : basic_future(monad_type::_construct(std::forward<basic_future<Impl>>(o)))
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_future() : _continuation_future(nullptr)
     {
     }
     //! \brief Explicit construction of a ready/errored/excepted future from any of the types supported by the underlying monad. Alternative to make_ready_XXX.
-    template<class U, typename=typename std::enable_if<std::is_constructible<monad_type, U>::value>::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit basic_future(U &&v) : monad_type(std::forward<U>(v))
+    template<class U, typename=typename std::enable_if<std::is_constructible<monad_type, U>::value>::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit basic_future(U &&v) : monad_type(std::forward<U>(v)), _continuation_future(nullptr)
     {
     }
-  protected:
-    // Called by policy _construct() to do the move from future U into shared_future this
-    template<class U> BOOST_SPINLOCK_FUTURE_MSVC_HELP void _move(U &&o)
-    {
-      typename U::lock_guard_type h(&o);
-      new(this) monad_type(std::move(o));
-    }
-  public:
     //! \brief SYNC POINT Move constructor
     BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(basic_future &&o) noexcept(is_nothrow_move_constructible)
     {
       //! \todo Try and get the basic_future move constructor to skip default constructing
       lock_guard_type h(&o);
       new(this) monad_type(std::move(o));
+      _continuation_future=o._continuation_future;
+      _continuation=std::move(o._continuation);
     }
     //! \brief SYNC POINT Move assignment. If it throws during the move, the future is left as if default constructed.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future &operator=(basic_future &&o) noexcept(is_nothrow_move_assignable)
@@ -758,7 +756,6 @@ namespace lightweight_futures {
       lock_guard_type h1(this), h2(&o);
       basic_future_base::swap(o);
       monad_type::swap(o);
-      enable_shared_from_this::swap(o);
       if(h1._p)
         h1._p->_set_future_ptr(&o);
       if(h2._p)
@@ -815,7 +812,7 @@ namespace lightweight_futures {
         return;
       lock_guard_type h(const_cast<basic_future *>(this));
       _check_validity();
-      auto waiter(_promise()->_sleeping_waiters);
+      auto waiter(_sleeping_waiters);
       for (size_t count = 0; !monad_type::is_ready(); ++count)
       {
         while (!waiter && count >= 1000)
@@ -826,16 +823,16 @@ namespace lightweight_futures {
           ft.second = ft.first.get_future();
           waiter = std::make_shared<typename implementation_policy::wait_future_type>(std::move(ft));
           h.relock(const_cast<basic_future *>(this));
-          if (!_promise()->_sleeping_waiters)
+          if (!_sleeping_waiters)
           {
-            _promise()->_sleeping_waiters = waiter;
+            _sleeping_waiters = waiter;
             break;
           }
           // If another thread already created a wait object, dispose of ours
           h.unlock();
           waiter.reset();
           h.relock(const_cast<basic_future *>(this));
-          waiter = _promise()->_sleeping_waiters;
+          waiter = _sleeping_waiters;
         }
         h.unlock();
         if (waiter)
@@ -901,16 +898,16 @@ namespace lightweight_futures {
       */
       typename output_type::promise_type p;
       output_type ret(p.get_future());
-      auto callable = (!is_shared && !_promise()->_storage.pointer_.callable)
-        ? detail::make_function_ptr<void(future_type *)>(detail::continuation<true , f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>(_promise()->_continuation_future, std::move(p), std::forward<F>(f), std::move(_promise()->_storage.pointer_.callable)))
+      auto callable = (!is_shared && !_continuation)
+        ? detail::make_function_ptr<void(future_type *)>(detail::continuation<true , f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>(_continuation_future, std::move(p), std::forward<F>(f), std::move(_promise()->_storage.pointer_.callable)))
         : detail::make_function_ptr<void(future_type *)>(detail::continuation<false, f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>(std::move(p), std::forward<F>(f), std::move(_promise()->_storage.pointer_.callable)));
-      if (is_shared && !_promise()->_storage.pointer_.callable)
+      if (is_shared && !_continuation)
       {
         // Set myself (the shared state) as the continuations storage
-        _promise()->_continuation_future = this;
+        _continuation_future = this;
       }
       // Swap out any existing continuation with the new one
-      _promise()->_storage.pointer_.callable = std::move(callable);
+      _continuation = std::move(callable);
       return ret;
     }
 #endif
@@ -924,7 +921,7 @@ namespace lightweight_futures {
   template<class _future_type> class shared_basic_future_ptr
   {
   public:
-    //! The type of future this references
+    //! \brief The type of future this references
     typedef _future_type base_future_type;
   private:
     std::shared_ptr<base_future_type> _future;
@@ -932,70 +929,79 @@ namespace lightweight_futures {
     {
       if(!_future)
       {
-        if(!base_future_type::policy::_throw_error(monad_errc::no_state))
+        if(!base_future_type::_throw_error(monad_errc::no_state))
           abort();
       }
       return _future.get();
     }
   public:
-    //! Default constructor
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR shared_basic_future_ptr() : _future(std::make_shared<base_future_type>()) { }
-    //! Default copy constructor
+    //! \brief Explicit constructor from shared_ptr
+    explicit shared_basic_future_ptr(std::shared_ptr<base_future_type> &&p) : _future(std::move(p)) { }
+    //! \brief Default constructor
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR shared_basic_future_ptr() : shared_basic_future_ptr(base_future_type().share()) { }
+    //! \brief Default copy constructor
     shared_basic_future_ptr(shared_basic_future_ptr &&) = default;
-    //! Default move constructor
+    //! \brief Default move constructor
     shared_basic_future_ptr(const shared_basic_future_ptr &) = default;
-    //! Default move assignment
+    //! \brief Default move assignment
     shared_basic_future_ptr &operator=(shared_basic_future_ptr &&) = default;
-    //! Default copy assignment
+    //! \brief Default copy assignment
     shared_basic_future_ptr &operator=(const shared_basic_future_ptr &) = default;
-    //! Forwarding constructor
-    template<class U, typename=typename std::enable_if<std::is_constructible<base_future_type, U>::value>::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR shared_basic_future_ptr(U &&o) : _future(std::make_shared<base_future_type>(std::forward<U>(o))) { }
-    //! Forwards to operator bool
+    //! \brief Adopting constructor
+    shared_basic_future_ptr(base_future_type &&o) : shared_basic_future_ptr(o.share()) { }
+    //! \brief Adopting assignment
+    shared_basic_future_ptr &operator=(base_future_type &&o) { _future=std::move(o); return *this; }
+    //! \brief Calls share() on the supplied future
+    template<class Impl, typename=decltype(std::declval<basic_future<Impl>>().share())> shared_basic_future_ptr(basic_future<Impl> &&o)
+      : shared_basic_future_ptr(std::forward<basic_future<Impl>>(o).share()) { }
+    //! \brief Forwarding constructor
+    template<class U, typename=typename std::enable_if<std::is_constructible<base_future_type, U>::value>::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR shared_basic_future_ptr(U &&o) : shared_basic_future_ptr(base_future_type(std::forward<U>(o)).share()) { }
+    //! \brief Forwards to operator bool
     explicit operator bool() const { return _check()->operator bool(); }
-    //! Forwards to operator tribool
+    //! \brief Forwards to operator tribool
     explicit operator tribool::tribool() const { return _check()->operator tribool::tribool(); }
 #define BOOST_SPINLOCK_FUTURE_IMPL(name) \
     template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP auto name(Args &&... args) const noexcept(noexcept(_future->name(std::forward<Args>(args)...))) -> decltype(_future->name(std::forward<Args>(args)...)) \
     { \
       return _check()->name(std::forward<Args>(args)...); \
     }
-    //! Forwards to is_ready()
+    //! \brief Forwards to is_ready()
     BOOST_SPINLOCK_FUTURE_IMPL(is_ready)
-    //! Forwards to empty()
+    //! \brief Forwards to empty()
     BOOST_SPINLOCK_FUTURE_IMPL(empty)
-    //! Forwards to has_value()
+    //! \brief Forwards to has_value()
     BOOST_SPINLOCK_FUTURE_IMPL(has_value)
-    //! Forwards to has_error()
+    //! \brief Forwards to has_error()
     BOOST_SPINLOCK_FUTURE_IMPL(has_error)
-    //! Forwards to has_exception()
+    //! \brief Forwards to has_exception()
     BOOST_SPINLOCK_FUTURE_IMPL(has_exception)
-    //! Forwards to valid()
+    //! \brief Forwards to valid()
     BOOST_SPINLOCK_FUTURE_IMPL(valid)
 
-    //! Forwards to get()
+    //! \brief Forwards to get()
     BOOST_SPINLOCK_FUTURE_IMPL(get)
-    //! Forwards to get_or()
+    //! \brief Forwards to get_or()
     BOOST_SPINLOCK_FUTURE_IMPL(get_or)
-    //! Forwards to get_and()
+    //! \brief Forwards to get_and()
     BOOST_SPINLOCK_FUTURE_IMPL(get_and)
-    //! Forwards to get_error()
+    //! \brief Forwards to get_error()
     BOOST_SPINLOCK_FUTURE_IMPL(get_error)
-    //! Forwards to get_error_or()
+    //! \brief Forwards to get_error_or()
     BOOST_SPINLOCK_FUTURE_IMPL(get_error_or)
-    //! Forwards to get_error_and()
+    //! \brief Forwards to get_error_and()
     BOOST_SPINLOCK_FUTURE_IMPL(get_error_and)
-    //! Forwards to get_exception()
+    //! \brief Forwards to get_exception()
     BOOST_SPINLOCK_FUTURE_IMPL(get_exception)
-    //! Forwards to get_exception_or()
+    //! \brief Forwards to get_exception_or()
     BOOST_SPINLOCK_FUTURE_IMPL(get_exception_or)
-    //! Forwards to get_exception_and()
+    //! \brief Forwards to get_exception_and()
     BOOST_SPINLOCK_FUTURE_IMPL(get_exception_and)
-    //! Forwards to get_exception_ptr()
+    //! \brief Forwards to get_exception_ptr()
     BOOST_SPINLOCK_FUTURE_IMPL(get_exception_ptr)
 
-    //! Forwards to wait()
+    //! \brief Forwards to wait()
     BOOST_SPINLOCK_FUTURE_IMPL(wait)
-    //! Forwards to then()
+    //! \brief Forwards to then()
     BOOST_SPINLOCK_FUTURE_IMPL(then)
 #undef BOOST_SPINLOCK_FUTURE_IMPL
   };
@@ -1015,7 +1021,6 @@ namespace detail
   template<class implementation_policy, bool is_shared> struct _basic_future_base : public basic_future_base
   {
     BOOST_SPINLOCK_FUTURE_CONSTEXPR _basic_future_base() { }
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR _basic_future_base(basic_promise_base *p) : basic_future_base(p) { }
     BOOST_SPINLOCK_FUTURE_CONSTEXPR _basic_future_base(_basic_future_base &&o) : basic_future_base(std::move(o)) { }
     void swap(_basic_future_base &o) noexcept
     {
@@ -1025,12 +1030,12 @@ namespace detail
   template<class implementation_policy> struct _basic_future_base<implementation_policy, true> : public basic_future_base, public std::enable_shared_from_this<typename implementation_policy::implementation_type>
   {
     BOOST_SPINLOCK_FUTURE_CONSTEXPR _basic_future_base() { }
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR _basic_future_base(basic_promise_base *p) : basic_future_base(p) { }
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR _basic_future_base(_basic_future_base &&o) : basic_future_base(std::move(o)) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR _basic_future_base(_basic_future_base &&o) : basic_future_base(std::move(o)), std::enable_shared_from_this<typename implementation_policy::implementation_type>(std::move(o)) { }
+    // Called when converting from non shared to shared
+    template<class I, bool s> BOOST_SPINLOCK_FUTURE_CONSTEXPR _basic_future_base(_basic_future_base<I, s> &&o);
     void swap(_basic_future_base &o) noexcept
     {
-      basic_future_base::swap(o);
-      std::enable_shared_from_this<typename implementation_policy::implementation_type>::swap(o);
+      throw std::invalid_argument("It is not possible to swap a shared future");
     }
   };
   // Storage for a basic_future

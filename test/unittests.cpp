@@ -1999,9 +1999,12 @@ BOOST_AUTO_TEST_CASE(works/shared_future/lightweight, "Tests that our shared_fut
   using namespace boost::spinlock::lightweight_futures;
   std::cout << "sizeof(promise<bool>) = " << sizeof(promise<bool>) << std::endl;
   std::cout << "sizeof(shared_future<bool>) = " << sizeof(shared_future<bool>) << std::endl;
+  promise<bool> p;
+  basic_future<detail::shared_future_policy<bool>> f(p.get_future());
   SharedFuturePromiseConformanceTest<shared_future, promise>();
 }
 
+#if 0
 BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our future-promise continuations works as intended")
 {
   std::cout << "\n=== Tests that our future-promise continuations works as intended ===" << std::endl;
@@ -2114,6 +2117,7 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
     BOOST_CHECK(f4.get() == 2);
   }
 }
+#endif
 
 #if 0
 BOOST_AUTO_TEST_CASE(works/shared_future/continuations/lightweight, "Tests that our shared_future-promise continuations works as intended")
@@ -2325,7 +2329,7 @@ template<template<class> class F, template<class> class P> std::tuple<double, do
       std::atomic<bool> first;
       char pad1[64-sizeof(std::atomic<bool>)];
       F<size_t> second;
-      char pad2[64-sizeof(F<size_t>)];
+      char pad2[128-sizeof(F<size_t>)];
       spaced_t() : first(false)
       {
       BOOST_SPINLOCK_DRD_IGNORE_VAR(first);

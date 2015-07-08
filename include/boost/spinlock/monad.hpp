@@ -545,13 +545,11 @@ namespace lightweight_futures {
     struct Pointer_t
     {
       pointer_type pointer;        // Typically 8 bytes
-      detail::function_ptr<void(pointer_type)> callable;  // Typically 8 bytes
       BOOST_SPINLOCK_FUTURE_CONSTEXPR Pointer_t(pointer_type p) : pointer(p) { }
-      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR Pointer_t(Pointer_t &&o) noexcept : pointer(std::move(o.pointer)), callable(std::move(o.callable)) { o.pointer = nullptr; }
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR Pointer_t(Pointer_t &&o) noexcept : pointer(std::move(o.pointer)) { o.pointer = nullptr; }
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR Pointer_t &operator=(Pointer_t &&o) noexcept
       {
         pointer = std::move(o.pointer);
-        callable = std::move(o.callable);
         o.pointer = nullptr;
         return *this;
       }
@@ -1446,8 +1444,9 @@ namespace lightweight_futures {
       typedef typename value_storage_type::exception_type exception_type;
 
       basic_monad_storage() = default;
-      template<class Policy, class _> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(basic_monad_storage<Policy, _> &&o) : _storage(std::move(o._storage)) { }
-      template<class Policy, class _> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(const basic_monad_storage<Policy, _> &o) : _storage(o._storage) { }
+      template<class Policy, class _> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(basic_monad_storage<Policy, _> &&o) : _storage(std::move(o._storage)), base_class(std::move(o)) { }
+      template<class Policy, class _> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(const basic_monad_storage<Policy, _> &o) : _storage(o._storage), base_class(std::move(o)) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit basic_monad_storage(value_storage_type &&v) : _storage(std::move(v)) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(const value_type &v) : _storage(v) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(value_type &&v) : _storage(std::move(v)) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(const error_type &v) : _storage(v) { }
