@@ -22,6 +22,20 @@ basic_future<shared_future_policy>.
  - [x] Have basic_monad gain an explicit conversion constructor from other basic_monad with different
 implementation policies such that compatible monads can convert into one another.
  - [x] wait() should sleep the thread as necessary.
+ - [x] Split implementation policy for value_storage into separate policy (allows value_storage
+to convert without considering future-promise type).
+ - [x] Get value_storage<bool> and value_storage<void> to consume 1 byte, not 2 bytes.
+ - [ ] Fix operator= and move constructor being racy by placing a locker type at the top of the hierarchy
+and an unlocker type at the bottom of the hierarchy.
+ - [ ] Move value_storage into basic_promise_future_base and separate pointer into a union.
+ - [ ] typedef basic_future_base and basic_promise_base to a basic_promise_future_base.
+ - [ ] Now value_storage for both promise and future is visible to both, eliminate vptr.
+ - [ ] Merge continuation_future * into continuation * (gets future into 64 bytes) and relocate
+into basic_promise_future_base so future can build it and promise can execute it. Also relocate
+sleeping_waiters.
+ - [ ] Relocate enable_shared_from_this into basic_future. This should be safe now no type slicing
+is done.
+ 
  - [ ] Implement N4399 continuations for shared_future.
  - [ ] Implement wait_for()/wait_until().
  - [ ] when_any/when_all composure.

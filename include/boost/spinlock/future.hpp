@@ -329,7 +329,7 @@ namespace lightweight_futures {
     friend implementation_policy;
     bool _detached;                   // Future has already been set and promise is now detached
   protected:
-    typedef value_storage<implementation_policy> value_storage_type;
+    typedef value_storage<typename implementation_policy::value_type, typename implementation_policy::error_type, typename implementation_policy::exception_type> value_storage_type;
     value_storage_type _storage;
   public:
     //! \brief The policy used to implement this basic_future
@@ -384,7 +384,7 @@ namespace lightweight_futures {
     }
 //// template<class Allocator> basic_promise(allocator_arg_t, Allocator a); // cannot support
     //! \brief SYNC POINT Move constructor
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise(basic_promise &&o) noexcept(is_nothrow_move_constructible) : 
+    basic_promise(basic_promise &&o) noexcept(is_nothrow_move_constructible) : 
     basic_promise_base(std::move(o)), _detached(o._detached)
     {
       lock_guard_type h(&o);
@@ -458,7 +458,7 @@ namespace lightweight_futures {
 
     /*! \brief SYNC POINT EXTENSION Sets the state to be returned by the associated future to be the same as the value storage, releasing any waits occuring in other threads.
     */
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_state(value_storage<implementation_policy> &&v)
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_state(value_storage_type &&v)
     {
       lock_guard_type h(this);
       if(_detached)
@@ -486,20 +486,20 @@ namespace lightweight_futures {
     }
     /*! \brief SYNC POINT Sets the value to be returned by the associated future to be a default constructed value_type, releasing any waits occuring in other threads.
     */
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value() { set_state(value_storage<implementation_policy>(value_type())); }
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value() { set_state(value_storage_type(value_type())); }
       /*! \brief SYNC POINT Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
     */
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v) { set_state(value_storage<implementation_policy>(v)); }
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(const value_type &v) { set_state(value_storage_type(v)); }
     /*! \brief SYNC POINT Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
     */
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(value_type &&v) { set_state(value_storage<implementation_policy>(std::move(v))); }
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_value(value_type &&v) { set_state(value_storage_type(std::move(v))); }
     /*! \brief SYNC POINT EXTENSION: Sets the value by emplacement to be returned by the associated future, releasing any waits occuring in other threads.
     */
-    template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP void emplace_value(Args &&... args) { set_state(value_storage<implementation_policy>(std::forward<Args>(args)...)); }
+    template<class... Args> BOOST_SPINLOCK_FUTURE_MSVC_HELP void emplace_value(Args &&... args) { set_state(value_storage_type(std::forward<Args>(args)...)); }
     //! \brief SYNC POINT EXTENSION: Set an error code outcome (doesn't allocate)
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_error(error_type e) { set_state(value_storage<implementation_policy>(std::move(e))); }
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_error(error_type e) { set_state(value_storage_type(std::move(e))); }
     //! \brief SYNC POINT Sets an exception outcome
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_exception(exception_type e) { set_state(value_storage<implementation_policy>(std::move(e))); }
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_exception(exception_type e) { set_state(value_storage_type(std::move(e))); }
     //! \brief SYNC POINT EXTENSION: Equal to set_exception(make_exception_ptr(forward<E>(e)))
     template<typename E> void set_exception(E &&e)
     {
@@ -658,7 +658,7 @@ namespace lightweight_futures {
       auto sleeping_waiters(_sleeping_waiters);
       try
       {
-        value_storage<implementation_policy> *s=(value_storage<implementation_policy> *) state;
+        typename monad_type::value_storage_type *s=(typename monad_type::value_storage_type *) state;
         if(_continuation)
           _continuation_future->_storage=std::move(*s);
         else
@@ -683,7 +683,7 @@ namespace lightweight_futures {
     {
     }
     //! \brief SYNC POINT Move constructor
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(basic_future &&o) noexcept(is_nothrow_move_constructible)
+     basic_future(basic_future &&o) noexcept(is_nothrow_move_constructible)
     {
       //! \todo Try and get the basic_future move constructor to skip default constructing
       lock_guard_type h(&o);

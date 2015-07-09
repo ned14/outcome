@@ -1204,7 +1204,6 @@ BOOST_AUTO_TEST_CASE(works/monad/optional, "Tests that the monad acts as an opti
 {
   using namespace boost::spinlock::lightweight_futures;
   using boost::spinlock::tribool::tribool;
-  std::cout << "sizeof(value_storage<bool>) = " << sizeof(value_storage<detail::monad_policy<bool>>) << std::endl;
   std::cout << "sizeof(monad<bool>) = " << sizeof(monad<bool>) << std::endl;
   std::cout << "sizeof(result<bool>) = " << sizeof(result<bool>) << std::endl;
   std::cout << "sizeof(option<bool>) = " << sizeof(option<bool>) << std::endl;
@@ -1218,14 +1217,17 @@ BOOST_AUTO_TEST_CASE(works/monad/optional, "Tests that the monad acts as an opti
   std::cout << "sizeof(option<void>) = " << sizeof(option<void>) << std::endl;
   std::cout << "sizeof(option<void>[2]) = " << sizeof(option<void>[2]) << std::endl;
 
-  // TODO FIXME Get option<void> and option<bool> and option<tribool> storage down to 1 byte
   BOOST_CHECK(!(sizeof(monad<bool>) & 3));
-  BOOST_CHECK(sizeof(option<void>)<=2);
-  BOOST_CHECK(sizeof(option<bool>)<=2);
+  BOOST_CHECK(sizeof(option<void>)<=1);
+  BOOST_CHECK(sizeof(option<bool>)<=1);
   BOOST_CHECK(sizeof(option<tribool>)<=2);
-  BOOST_CHECK(sizeof(option<void>[2])<=4);
-  BOOST_CHECK(sizeof(option<bool>[2])<=4);
+  BOOST_CHECK(sizeof(option<void>[2])<=2);
+  BOOST_CHECK(sizeof(option<bool>[2])<=2);
   BOOST_CHECK(sizeof(option<tribool>[2])<=4);
+  
+  // Make sure the special compact bool storage works
+  BOOST_CHECK(option<bool>(false).get()==false);
+  BOOST_CHECK(option<bool>(true).get()==true);
 
   //! [optional_example]
   auto maybe_getenv=[](const char* n) -> option<const char *>
@@ -1799,7 +1801,7 @@ BOOST_AUTO_TEST_CASE(works/monad/operators, "Tests that the monad custom operato
 
 
 
-#if 1  // futures
+#if 0  // futures
 template<template<class> class F, template<class> class P> void FuturePromiseConformanceTest()
 {
   std::exception_ptr e(std::make_exception_ptr(std::runtime_error("hello")));

@@ -73,13 +73,17 @@ namespace detail
       }
 #endif
     }
+    // If storage is packed into a byte, it cannot be referenced
+    using lvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, value_type &, value_type>::type;
+    using const_lvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, const value_type &, value_type>::type;
+    using rvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, value_type &&, value_type>::type;
   public:
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &get()   & { _pre_get_value(); return monad_storage::_storage.value; }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &value() & { _pre_get_value(); return monad_storage::_storage.value; }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP const value_type &get()   const & { _pre_get_value(); return monad_storage::_storage.value; }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP const value_type &value() const & { _pre_get_value(); return monad_storage::_storage.value; }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &&get()   && { _pre_get_value(); return std::move(monad_storage::_storage.value); }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type &&value() && { _pre_get_value(); return std::move(monad_storage::_storage.value); }
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP lvalue_type get()   & { _pre_get_value(); return monad_storage::_storage.value; }
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP lvalue_type value() & { _pre_get_value(); return monad_storage::_storage.value; }
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP const_lvalue_type get()   const & { _pre_get_value(); return monad_storage::_storage.value; }
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP const_lvalue_type value() const & { _pre_get_value(); return monad_storage::_storage.value; }
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP rvalue_type get()   && { _pre_get_value(); return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value); }
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP rvalue_type value() && { _pre_get_value(); return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value); }
 #ifdef BOOST_SPINLOCK_MONAD_POLICY_ERROR_TYPE
     BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() const
     {
