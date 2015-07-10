@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash 
 GCCLINE=""
 CLANGLINE=""
 if [ ! -f gcc.csv ]; then

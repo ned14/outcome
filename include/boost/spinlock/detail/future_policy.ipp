@@ -315,9 +315,11 @@ namespace detail
 #else
     using exception_type = void;
 #endif
+    // The wait implementation to use for waits and timed waits
+    using wait_implementation = detail::stl_wait_implementation<std::promise<void>, std::future<void>>;
     // Future.get() locks, so define our own monad base type.
-    using base = BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type>, value_type, error_type, exception_type>;
-    using other_base = BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type>, value_type, error_type, exception_type>;
+    using base = BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
+    using other_base = BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
     template<typename U> using rebind = basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<U>>;
     template<typename U> using rebind_policy = BOOST_SPINLOCK_FUTURE_POLICY_NAME<U>;
 
@@ -331,8 +333,8 @@ namespace detail
     using future_error = std::future_error;
     // The category of error code to use
     static const std::error_category &future_category() noexcept { return std::future_category(); }
-    // The STL future type to use for waits and timed waits
-    using wait_future_type = std::pair<std::promise<void>, std::future<void>>;
+    // How many spins of yield to do waiting to be signalled before allocating a wait_implementation
+    BOOST_STATIC_CONSTEXPR size_t wait_spin_count = 1000;
   };
   template<typename R> struct BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME
   {
@@ -350,9 +352,11 @@ namespace detail
 #else
     using exception_type = void;
 #endif
+    // The wait implementation to use for waits and timed waits
+    using wait_implementation = detail::stl_wait_implementation<std::promise<void>, std::future<void>>;
     // Future.get() locks, so define our own monad base type.
-    using base = BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type>, value_type, error_type, exception_type>;
-    using other_base = BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type>, value_type, error_type, exception_type>;
+    using base = BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
+    using other_base = BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
     template<typename U> using rebind = basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<U>>;
     template<typename U> using rebind_policy = BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<U>;
 
@@ -366,8 +370,8 @@ namespace detail
     using future_error = std::future_error;
     // The category of error code to use
     static const std::error_category &future_category() noexcept { return std::future_category(); }
-    // The STL future type to use for waits and timed waits
-    using wait_future_type = std::pair<std::promise<void>, std::future<void>>;
+    // How many spins of yield to do waiting to be signalled before allocating a wait_implementation
+    BOOST_STATIC_CONSTEXPR size_t wait_spin_count = 1000;
   };
 
 }

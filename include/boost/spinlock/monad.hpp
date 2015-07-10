@@ -985,12 +985,12 @@ namespace lightweight_futures {
     //! \brief Swaps one monad for another
     BOOST_SPINLOCK_FUTURE_MSVC_HELP void swap(basic_monad &o) noexcept(is_nothrow_move_constructible)
     {
-      implementation_policy::base::implementation_policy::base::_storage.swap(o._storage);
+      implementation_policy::base::_storage.swap(o._storage);
     }
     //! \brief Destructs any state stored, resetting to empty
     BOOST_SPINLOCK_FUTURE_MSVC_HELP void clear() noexcept(is_nothrow_destructible)
     {
-      implementation_policy::base::implementation_policy::base::_storage.clear();
+      implementation_policy::base::_storage.clear();
     }
 
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
@@ -1203,7 +1203,7 @@ namespace lightweight_futures {
     }
 
     //! \brief If contains a value_type, invoke the call operator on that type. Return type must be default constructible.
-    template<class... Args, typename = typename std::result_of<value_type(Args...)>::type> BOOST_SPINLOCK_FUTURE_MSVC_HELP auto operator()(Args &&... args) const -> decltype(this->get()(std::forward<Args>(args)...))
+    template<class... Args, typename = typename std::result_of<value_type(Args...)>::type> BOOST_SPINLOCK_FUTURE_MSVC_HELP auto operator()(Args &&... args) -> decltype(this->get()(std::forward<Args>(args)...))
     {
       typedef decltype(this->get()(std::forward<Args>(args)...)) rettype;
       return has_value() ? this->get()(std::forward<Args>(args)...) : rettype();

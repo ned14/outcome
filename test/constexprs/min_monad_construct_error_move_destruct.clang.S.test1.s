@@ -8,20 +8,22 @@
   1a:	0f 29 04 24          	movaps %xmm0,(%rsp)
   1e:	8b 1c 24             	mov    (%rsp),%ebx
   21:	4c 8b 74 24 08       	mov    0x8(%rsp),%r14
-  26:	8a 44 24 30          	mov    0x30(%rsp),%al
-  2a:	fe c8                	dec    %al
-  2c:	0f b6 c0             	movzbl %al,%eax
-  2f:	83 f8 03             	cmp    $0x3,%eax
-  32:	77 16                	ja     4a <_Z5test1St10error_code+0x4a>
-  34:	ff 24 c5 00 00 00 00 	jmpq   *0x0(,%rax,8)
-  3b:	48 8d 7c 24 20       	lea    0x20(%rsp),%rdi
-  40:	e8 00 00 00 00       	callq  45 <_Z5test1St10error_code+0x45>
-  45:	c6 44 24 30 00       	movb   $0x0,0x30(%rsp)
-  4a:	89 d8                	mov    %ebx,%eax
-  4c:	4c 89 f2             	mov    %r14,%rdx
-  4f:	48 83 c4 38          	add    $0x38,%rsp
-  53:	5b                   	pop    %rbx
-  54:	41 5e                	pop    %r14
-  56:	c3                   	retq   
-  57:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
-  5e:	00 00 
+  26:	0f b6 44 24 30       	movzbl 0x30(%rsp),%eax
+  2b:	83 f8 03             	cmp    $0x3,%eax
+  2e:	74 0c                	je     3c <_Z5test1St10error_code+0x3c>
+  30:	83 f8 02             	cmp    $0x2,%eax
+  33:	74 11                	je     46 <_Z5test1St10error_code+0x46>
+  35:	83 f8 01             	cmp    $0x1,%eax
+  38:	74 0c                	je     46 <_Z5test1St10error_code+0x46>
+  3a:	eb 0f                	jmp    4b <_Z5test1St10error_code+0x4b>
+  3c:	48 8d 7c 24 20       	lea    0x20(%rsp),%rdi
+  41:	e8 00 00 00 00       	callq  46 <_Z5test1St10error_code+0x46>
+  46:	c6 44 24 30 00       	movb   $0x0,0x30(%rsp)
+  4b:	89 d8                	mov    %ebx,%eax
+  4d:	4c 89 f2             	mov    %r14,%rdx
+  50:	48 83 c4 38          	add    $0x38,%rsp
+  54:	5b                   	pop    %rbx
+  55:	41 5e                	pop    %r14
+  57:	c3                   	retq   
+  58:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+  5f:	00 

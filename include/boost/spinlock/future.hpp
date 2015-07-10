@@ -138,15 +138,14 @@ namespace lightweight_futures {
   
   namespace detail
   {
-    template<class _value_type, class _error_type, class _exception_type> struct basic_promise_future_storage;
-    template<class _value_type, class _error_type, class _exception_type> struct basic_promise_base;
-    template<class _value_type, class _error_type, class _exception_type> using basic_future_base = basic_promise_future_storage<_value_type, _error_type, _exception_type>;
-    template<class _value_type, class _error_type, class _exception_type> using basic_future_storage = basic_promise_future_storage<_value_type, _error_type, _exception_type>;
+    template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct basic_promise_future_storage;
+    template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct basic_promise_storage;
+    template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> using basic_future_storage = basic_promise_future_storage<_value_type, _error_type, _exception_type, _wait_implementation>;
     
-    template<class _value_type, class _error_type, class _exception_type> struct lock_guard
+    template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct lock_guard
     {
-      using promise_base_type = basic_promise_base<_value_type, _error_type, _exception_type>;
-      using future_base_type = basic_future_base<_value_type, _error_type, _exception_type>;
+      using promise_base_type = basic_promise_storage<_value_type, _error_type, _exception_type, _wait_implementation>;
+      using future_base_type = basic_future_storage<_value_type, _error_type, _exception_type, _wait_implementation>;
       promise_base_type *_p;
       future_base_type *_f;
       lock_guard(const lock_guard &)=delete;
@@ -256,24 +255,24 @@ namespace lightweight_futures {
     };
 
     // Stop source being moved without a lock
-    template<class _value_type, class _error_type, class _exception_type> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_promise_future_storage<_value_type, _error_type, _exception_type> &&locking_basic_promise_future_storage_mover(basic_promise_future_storage<_value_type, _error_type, _exception_type> &&v)
+    template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> BOOST_SPINLOCK_FUTURE_CONSTEXPR void locking_basic_promise_future_storage_mover(basic_promise_future_storage<_value_type, _error_type, _exception_type, _wait_implementation> *v)
     {
-      typename basic_promise_future_storage<_value_type, _error_type, _exception_type>::lock_guard_type h(&v);
+      typename basic_promise_future_storage<_value_type, _error_type, _exception_type, _wait_implementation>::lock_guard_type h(v);
       h.release();
-      return std::move(v);
     }
     // The base class for all basic_promises and basic_futures
-    template<class _value_type, class _error_type, class _exception_type> struct basic_promise_future_storage
+    template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct basic_promise_future_storage
     {
-      using value_type = _value_type;
-      using error_type = _error_type;
-      using exception_type = _exception_type;
-      using value_storage_type = value_storage<value_type, error_type, exception_type>;
-      using lock_guard_type = lock_guard<value_type, error_type, exception_type>;
-      using promise_base_type = basic_promise_base<value_type, error_type, exception_type>;
-      using future_base_type = basic_future_base<value_type, error_type, exception_type>;
+      using lock_guard_type = lock_guard<_value_type, _error_type, _exception_type, _wait_implementation>;
+      using promise_base_type = basic_promise_storage<_value_type, _error_type, _exception_type, _wait_implementation>;
+      using future_base_type = basic_future_storage<_value_type, _error_type, _exception_type, _wait_implementation>;
+      using value_storage_type = value_storage<_value_type, _error_type, _exception_type>;
+      using value_type = typename value_storage_type::value_type;
+      using error_type = typename value_storage_type::error_type;
+      using exception_type = typename value_storage_type::exception_type;
       value_storage_type _storage;
 
+      //! \todo Could eliminate 16 bytes of storage by packing basic_promise_future_storage bools into value_storage_type
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       bool _need_locks;                 // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
 #endif
@@ -303,9 +302,16 @@ namespace lightweight_futures {
 #endif
         _broken_promise(false), _promise(nullptr)
       {}
+      
+      BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_constructible = value_storage_type::is_nothrow_copy_constructible;
+      BOOST_STATIC_CONSTEXPR bool is_nothrow_move_constructible = value_storage_type::is_nothrow_move_constructible;
+      BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_copy_constructible;
+      BOOST_STATIC_CONSTEXPR bool is_nothrow_move_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_move_constructible;
+      BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
+
       // WARNING: Exits with lock on source held!
-      template<class _value_type2, class _error_type2, class _exception_type2> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(basic_promise_future_storage<_value_type2, _error_type2, _exception_type2> &&o)
-        : _storage(locking_basic_promise_future_storage_mover(std::move(o)))
+      template<class _value_type2, class _error_type2, class _exception_type2, class _wait_implementation2> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(basic_promise_future_storage<_value_type2, _error_type2, _exception_type2, _wait_implementation2> &&o) noexcept(is_nothrow_move_constructible && basic_promise_future_storage<_value_type2, _error_type2, _exception_type2, _wait_implementation2>::is_nothrow_move_constructible)
+        : _storage((locking_basic_promise_future_storage_mover(&o), std::move(o._storage)))
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(o._need_locks)
 #endif
@@ -405,7 +411,27 @@ namespace lightweight_futures {
         if(_need_locks) _lock.~BOOST_SPINLOCK_FUTURE_MUTEX_TYPE_DESTRUCTOR();
 #endif
       }
-      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void swap(basic_promise_future_storage &o) noexcept
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR bool is_ready() const noexcept
+      {
+        return _storage.type!=value_storage_type::storage_type::empty;
+      }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR bool empty() const noexcept
+      {
+        return _storage.type==value_storage_type::storage_type::empty;
+      }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_value() const noexcept
+      {
+        return _storage.type==value_storage_type::storage_type::value;
+      }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_error() const noexcept
+      {
+        return _storage.type==value_storage_type::storage_type::error;
+      }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR bool has_exception(bool only_exception=false) const noexcept
+      {
+        return _storage.type==value_storage_type::storage_type::exception || (!only_exception && _storage.type==value_storage_type::storage_type::error);
+      }
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void swap(basic_promise_future_storage &o) noexcept(is_nothrow_move_constructible)
       {
         _storage.swap(o._storage);
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
@@ -414,25 +440,28 @@ namespace lightweight_futures {
         std::swap(_broken_promise, o._broken_promise);
         std::swap(_promise, o._promise);
       }
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
+      {
+        _storage.clear();
+      }
     };
 
-    template<class _value_type, class _error_type, class _exception_type> struct basic_promise_base : public basic_promise_future_storage<_value_type, _error_type, _exception_type>
+    template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct basic_promise_storage : public basic_promise_future_storage<_value_type, _error_type, _exception_type, _wait_implementation>
     {
-      using base = basic_promise_future_storage<_value_type, _error_type, _exception_type>;
-      using promise_base_type = basic_promise_base;
+      using base = basic_promise_future_storage<_value_type, _error_type, _exception_type, _wait_implementation>;
+      using promise_base_type = basic_promise_storage;
       using future_base_type = typename base::future_base_type;
       struct set_state_info_t
       {
         future_base_type *continuation_future;
         detail::function_ptr<void(future_base_type *)> continuation;
-        detail::function_ptr<void(future_base_type *)> sleeping_waiters;
+        std::shared_ptr<_wait_implementation> sleeping_waiters;
         set_state_info_t() : continuation_future(nullptr) { }
       } _set_state_info;
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_promise_base() noexcept { }
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_promise_base(basic_promise_base &&o) noexcept
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_promise_storage() noexcept { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_promise_storage(basic_promise_storage &&o) noexcept
         : base(std::move(o)), _set_state_info(std::move(o._set_state_info)) { }
-      template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_promise_base(Args &&... args) : base(std::forward<Args>(args)...) { }
-      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void swap(basic_promise_base &o) noexcept
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void swap(basic_promise_storage &o) noexcept
       {
         base::swap(o);
         std::swap(_set_state_info.continuation_future, o._set_state_info.continuation_future);
@@ -449,10 +478,10 @@ namespace lightweight_futures {
   
   Read the docs at basic_future for this class.
   */
-  template<class implementation_policy> class basic_promise : protected detail::basic_promise_base<typename implementation_policy::value_type, typename implementation_policy::error_type, typename implementation_policy::exception_type>
+  template<class implementation_policy> class basic_promise : protected detail::basic_promise_storage<typename implementation_policy::value_type, typename implementation_policy::error_type, typename implementation_policy::exception_type, typename implementation_policy::wait_implementation>
   {
     friend implementation_policy;
-    using base = detail::basic_promise_base<typename implementation_policy::value_type, typename implementation_policy::error_type, typename implementation_policy::exception_type>;
+    using base = detail::basic_promise_storage<typename implementation_policy::value_type, typename implementation_policy::error_type, typename implementation_policy::exception_type, typename implementation_policy::wait_implementation>;
   public:
     //! \brief The policy used to implement this basic_future
     using policy = implementation_policy;
@@ -465,7 +494,7 @@ namespace lightweight_futures {
     //! \brief This promise has an exception_type
     BOOST_STATIC_CONSTEXPR bool has_exception_type = value_storage_type::has_exception_type;
     //! \brief The final implementation type
-    using implementation_type = typename value_storage_type::implementation_type;
+    using implementation_type = typename implementation_policy::implementation_type;
     //! \brief The type potentially held by the promise
     using value_type = typename value_storage_type::value_type;
     //! \brief The error code potentially held by the promise
@@ -496,12 +525,42 @@ namespace lightweight_futures {
     BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_promise() noexcept { }
 //// template<class Allocator> basic_promise(allocator_arg_t, Allocator a); // cannot support
     //! \brief SYNC POINT Move constructor
-    basic_promise(basic_promise &&o) = default;
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise(basic_promise &&o) noexcept(is_nothrow_move_constructible) : base(std::move(o))
+    {
+      // base of promise inheritance tree returns with lock held on o and his (now my) future
+      // so as the final layer we need to unlock both
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+      if(this->_need_locks)
+#endif
+      {
+        o._lock.unlock();
+        if(this->_future)
+          this->_future->_lock.unlock();
+      }
+    }
     //! \brief SYNC POINT Move assignment. If throws during move, destination promise is left as if default constructed i.e. any previous promise contents are destroyed.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_promise &operator=(basic_promise &&o) noexcept(is_nothrow_move_constructible)
     {
       typename base::lock_guard_type h1(this), h2(&o);
-      base::operator=(std::move(o));
+      if(!this->_detached)
+      {
+        if(h1._f)
+        {
+          h1._f->_broken_promise=true;
+          h1._f->_promise=nullptr;
+        }
+        this->_future=nullptr;
+        this->_storage.clear();
+        this->_detached=true;
+      }
+      if(!o._detached)
+      {
+        this->_storage=std::move(o._storage);
+        this->_future=o._future;
+        o._future=nullptr;
+        if(this->_future)
+          this->_future->_promise=this;
+      }
       return *this;
     }
     basic_promise(const basic_promise &)=delete;
@@ -544,14 +603,19 @@ namespace lightweight_futures {
       lock_guard_type h(this);
       if(h._f || this->_detached)
         throw future_error(future_errc::future_already_retrieved);
-      bool am_ready=(this->type!=value_storage_type::storage_type::empty);
-      basic_future<implementation_policy> ret(std::move(this->_storage));
-      if(am_ready)
+      basic_future<implementation_policy> ret;
+      if(this->_storage.type!=value_storage_type::storage_type::empty)
+      {
+        ret._storage=std::move(this->_storage);
         this->_detached=true;
+      }
       else
       {
         this->_future=&ret;
-        ret->_promise=this;
+        ret._promise=this;
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+        ret._need_locks=this->_need_locks;
+#endif
       }
       h.unlock();
       return ret;
@@ -574,8 +638,8 @@ namespace lightweight_futures {
         if(h._f->_storage.type!=value_storage_type::storage_type::empty)
           basic_future<implementation_policy>::_throw_error(monad_errc::already_set);
         // If there are continuations, set the state there instead of to my future
-        if(this->_state_info.continuation_future)
-          c(this->_state_info.continuation_future);
+        if(this->_set_state_info.continuation_future)
+          c(this->_set_state_info.continuation_future);
         else
           c(this);
         // Move locally my continuation and sleep wake info before release locks
@@ -587,10 +651,10 @@ namespace lightweight_futures {
         h.unlock();
         // Fire any continuations
         if(state_info.continuation)
-          state_info_continuation(state_info.continuation_future);
+          state_info.continuation(state_info.continuation_future);
         // Wake any waiters
         if(state_info.sleeping_waiters)
-          state_info.sleeping_waiters(state_info.continuation_future);
+          state_info.sleeping_waiters->set_value();
       }
       else
       {
@@ -638,7 +702,7 @@ namespace lightweight_futures {
     //! \brief SYNC POINT Sets an exception outcome
     BOOST_SPINLOCK_FUTURE_MSVC_HELP void set_exception(exception_type e)
     {
-      _set_state([&e](future_base_type *self){ self->_storage.set_error(std::move(e));});
+      _set_state([&e](future_base_type *self){ self->_storage.set_exception(std::move(e));});
     }
     //! \brief SYNC POINT EXTENSION: Equal to set_exception(make_exception_ptr(forward<E>(e)))
     template<typename E> void set_exception(E &&e)
@@ -652,32 +716,6 @@ namespace lightweight_futures {
 
   };
   
-  /*! \class basic_promise_final
-  \brief Implements finality on a basic_promise implementation
-  \tparam implementation_policy An implementation policy type
-  \ingroup future_promise
-  
-  Read the docs at basic_future for this class.
-  */
-  template<class implementation_policy> class basic_promise_final : public basic_promise<implementation_policy>
-  {
-    using base = basic_promise<implementation_policy>;
-  public:
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_final(basic_promise_final &&o) noexcept(base::is_nothrow_move_constructible)
-    {
-      // base of promise inheritance tree returns with lock held on o and his (now my) future
-      // so as the final layer we need to unlock both
-#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
-      if(base::_need_locks)
-#endif
-      {
-        o._lock.unlock();
-        if(base::_future)
-          base::_future->_lock.unlock();
-      }
-    }
-  };
-
   //! \todo basic_promise<R&> and basic_future<R&> specialisations
 
   namespace detail
@@ -815,12 +853,41 @@ namespace lightweight_futures {
     {
     }
     //! \brief SYNC POINT Move constructor
-    basic_future(basic_future &&o) = default;
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(basic_future &&o) noexcept(is_nothrow_move_constructible) : monad_type(std::move(o))
+    {
+      // base of future inheritance tree returns with lock held on o and his (now my) promise
+      // so as the final layer we need to unlock both
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+      if(this->_need_locks)
+#endif
+      {
+        o._lock.unlock();
+        if(this->_promise)
+          this->_promise->_lock.unlock();
+      }
+    }
     //! \brief SYNC POINT Move assignment. If it throws during the move, the future is left as if default constructed.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP basic_future &operator=(basic_future &&o) noexcept(is_nothrow_move_assignable)
     {
       lock_guard_type h1(this), h2(&o);
-      monad_type::operator=(std::move(o));
+      if(valid())
+      {
+        if(this->_promise)
+        {
+          this->_promise->_future=nullptr;
+          this->_promise->_detached=true;
+          this->_promise=nullptr;
+        }
+        this->clear();
+      }
+      if(o.valid())
+      {
+        this->_storage=std::move(o._storage);
+        this->_promise=o._promise;
+        o._promise=nullptr;
+        if(this->_promise)
+          this->_promise->_future=this;          
+      }
       return *this;
     }
     basic_future(const basic_future &)=delete;
@@ -932,31 +999,35 @@ namespace lightweight_futures {
         return;
       lock_guard_type h(const_cast<basic_future *>(this));
       _check_validity();
-      auto waiter(this->_sleeping_waiters);
+      auto waiter(this->_promise->_set_state_info.sleeping_waiters);
       for (size_t count = 0; !this->is_ready(); ++count)
       {
         while (!waiter && count >= implementation_policy::wait_spin_count)
         {
           // Don't exclude during this lengthy sequence
           h.unlock();
-          typename implementation_policy::wait_future_type ft;
-          ft.second = ft.first.get_future();
-          waiter = std::make_shared<typename implementation_policy::wait_future_type>(std::move(ft));
+          waiter = std::make_shared<typename implementation_policy::wait_implementation>();
           h.relock(const_cast<basic_future *>(this));
-          if (!this->_sleeping_waiters)
+          if(this->is_ready())
+            return;
+          _check_validity();
+          if (!this->_promise->_set_state_info.sleeping_waiters)
           {
-            this->_sleeping_waiters = waiter;
+            this->_promise->_set_state_info.sleeping_waiters = waiter;
             break;
           }
           // If another thread already created a wait object, dispose of ours
           h.unlock();
           waiter.reset();
           h.relock(const_cast<basic_future *>(this));
-          waiter = this->_sleeping_waiters;
+          if(this->is_ready())
+            return;
+          _check_validity();
+          waiter = this->_promise->_set_state_info.sleeping_waiters;
         }
         h.unlock();
         if (waiter)
-          waiter->second.wait();
+          waiter->wait();
         else
           std::this_thread::yield();
         h.relock(const_cast<basic_future *>(this));
@@ -1135,6 +1206,14 @@ namespace lightweight_futures {
   // template<class... Futures> ? when_any(Futures &&... futures);
 
   // TODO packaged_task
+  
+  namespace detail
+  {
+    template<class promise_type, class future_type> struct stl_wait_implementation : public promise_type, public future_type
+    {
+      stl_wait_implementation() : future_type(this->get_future()) { }
+    };
+  }
 
 #define BOOST_SPINLOCK_FUTURE_NAME_POSTFIX 
 #define BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE std::error_code
