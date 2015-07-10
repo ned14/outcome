@@ -209,8 +209,6 @@ namespace detail
 #else
     typedef void exception_type;
 #endif
-    // Used by basic_future only, otherwise leave as void.
-    typedef void pointer_type;
     // The base class to use to store state
     typedef BOOST_SPINLOCK_MONAD_POLICY_BASE_NAME<basic_monad_storage<BOOST_SPINLOCK_MONAD_POLICY_NAME>, value_type, error_type, exception_type> base;
     
@@ -237,8 +235,6 @@ namespace detail
 #else
     typedef void exception_type;
 #endif
-    // Used by basic_future only, otherwise leave as void.
-    typedef void pointer_type;
     // The base class to use to store state
     typedef BOOST_SPINLOCK_MONAD_POLICY_BASE_NAME<basic_monad_storage<BOOST_SPINLOCK_MONAD_POLICY_NAME>, value_type, error_type, exception_type> base;
 

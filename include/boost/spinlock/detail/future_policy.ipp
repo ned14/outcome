@@ -69,7 +69,7 @@ namespace detail
   {
     template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME(Args &&... args) : future_storage(std::forward<Args>(args)...) { }
   protected:
-    typedef basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<value_type>> implementation_type;
+    using implementation_type = basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<value_type>>;
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
     {
       switch(ec)
@@ -90,47 +90,47 @@ namespace detail
       typename implementation_type::lock_guard_type h(this);
       static_cast<implementation_type *>(this)->_check_validity();
 #if defined(BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE) || defined(BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE)
-      if(future_storage::has_error() || future_storage::has_exception())
+      if(this->has_error() || this->has_exception())
       {
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
-        if(future_storage::has_error())
+        if(this->has_error())
         {
-          auto &category=future_storage::_storage.error.category();
+          auto &category=this->_storage.error.category();
           //! \todo Is there any way of making which exception type to throw from an error_category user extensible? Seems daft this isn't in the STL :(
           if(category==std::future_category())
           {
-            std::future_error e(future_storage::_storage.error);
-            future_storage::clear();
+            std::future_error e(this->_storage.error);
+            this->clear();
             throw e;
           }
           /*else if(category==std::iostream_category())
           {
-            std::ios_base::failure e(std::move(future_storage::_storage.error));
-            future_storage::clear();
+            std::ios_base::failure e(std::move(this->_storage.error));
+            this->clear();
             throw e;
           }*/
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
           else
           {
-            std::system_error e(future_storage::_storage.error);
-            future_storage::clear();
+            std::system_error e(this->_storage.error);
+            this->clear();
             throw e;
           }
 #endif
         }
 #endif
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-        if(future_storage::has_exception())
+        if(this->has_exception())
         {
-          std::exception_ptr e(future_storage::_storage.exception);
-          future_storage::clear();
+          std::exception_ptr e(this->_storage.exception);
+          this->clear();
           std::rethrow_exception(e);
         }
 #endif
       }
 #endif
-      value_type v(std::move(future_storage::_storage.value));
-      future_storage::clear();
+      value_type v(std::move(this->_storage.value));
+      this->clear();
       return v;
     }
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
@@ -139,14 +139,14 @@ namespace detail
       static_cast<implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(this);
       static_cast<implementation_type *>(this)->_check_validity();
-      if(future_storage::has_error())
+      if(this->has_error())
       {
-        error_type ec(future_storage::_storage.error);
-        future_storage::clear();
+        error_type ec(this->_storage.error);
+        this->clear();
         return ec;
       }
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-      if(future_storage::has_exception())
+      if(this->has_exception())
         return error_type((int) monad_errc::exception_present, monad_category());
 #endif
       return error_type();
@@ -160,18 +160,18 @@ namespace detail
       static_cast<implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(this);
       static_cast<implementation_type *>(this)->_check_validity();
-      if(!future_storage::has_error() && !future_storage::has_exception())
+      if(!this->has_error() && !this->has_exception())
         return exception_type();
-      if(future_storage::has_error())
+      if(this->has_error())
       {
-        exception_type e(std::make_exception_ptr(std::system_error(future_storage::_storage.error)));
-        future_storage::clear();
+        exception_type e(std::make_exception_ptr(std::system_error(this->_storage.error)));
+        this->clear();
         return e;
       }
-      if(future_storage::has_exception())
+      if(this->has_exception())
       {
-        exception_type e(future_storage::_storage.exception);
-        future_storage::clear();
+        exception_type e(this->_storage.exception);
+        this->clear();
         return e;
       }
       return exception_type();
@@ -213,46 +213,42 @@ namespace detail
       typename implementation_type::lock_guard_type h(const_cast<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME *>(this));
       static_cast<const implementation_type *>(this)->_check_validity();
 #if defined(BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE) || defined(BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE)
-      if(future_storage::has_error() || future_storage::has_exception())
+      if(this->has_error() || this->has_exception())
       {
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
-        if(future_storage::has_error())
+        if(this->has_error())
         {
-          auto &category=future_storage::_storage.error.category();
+          auto &category=this->_storage.error.category();
           //! \todo Is there any way of making which exception type to throw from an error_category user extensible? Seems daft this isn't in the STL :(
           if(category==std::future_category())
           {
-            std::future_error e(future_storage::_storage.error);
-            //future_storage::clear();
+            std::future_error e(this->_storage.error);
             throw e;
           }
           /*else if(category==std::iostream_category())
           {
-            std::ios_base::failure e(std::move(future_storage::_storage.error));
-            //future_storage::clear();
+            std::ios_base::failure e(std::move(this->_storage.error));
             throw e;
           }*/
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
           else
           {
-            std::system_error e(future_storage::_storage.error);
-            //future_storage::clear();
+            std::system_error e(this->_storage.error);
             throw e;
           }
 #endif
         }
 #endif
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-        if(future_storage::has_exception())
+        if(this->has_exception())
         {
-          std::exception_ptr e(future_storage::_storage.exception);
-          //future_storage::clear();
+          std::exception_ptr e(this->_storage.exception);
           std::rethrow_exception(e);
         }
 #endif
       }
 #endif
-      return future_storage::_storage.value;
+      return this->_storage.value;
     }
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
     BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() const
@@ -260,14 +256,13 @@ namespace detail
       static_cast<const implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(const_cast<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME *>(this));
       static_cast<const implementation_type *>(this)->_check_validity();
-      if(future_storage::has_error())
+      if(this->has_error())
       {
-        error_type ec(future_storage::_storage.error);
-        //future_storage::clear();
+        error_type ec(this->_storage.error);
         return ec;
       }
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-      if(future_storage::has_exception())
+      if(this->has_exception())
         return error_type((int) monad_errc::exception_present, monad_category());
 #endif
       return error_type();
@@ -281,18 +276,16 @@ namespace detail
       static_cast<const implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(const_cast<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME *>(this));
       static_cast<const implementation_type *>(this)->_check_validity();
-      if(!future_storage::has_error() && !future_storage::has_exception())
+      if(!this->has_error() && !this->has_exception())
         return exception_type();
-      if(future_storage::has_error())
+      if(this->has_error())
       {
-        exception_type e(std::make_exception_ptr(std::system_error(future_storage::_storage.error)));
-        //future_storage::clear();
+        exception_type e(std::make_exception_ptr(std::system_error(this->_storage.error)));
         return e;
       }
-      if(future_storage::has_exception())
+      if(this->has_exception())
       {
-        exception_type e(future_storage::_storage.exception);
-        //future_storage::clear();
+        exception_type e(this->_storage.exception);
         return e;
       }
       return exception_type();
@@ -302,31 +295,29 @@ namespace detail
 #endif
     BOOST_SPINLOCK_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>>> share()
     {
-      return shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>>>(future_storage::shared_from_this());
+      return shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>>>(static_cast<implementation_type *>(this)->shared_from_this());
     }
   };
 
   template<typename R> struct BOOST_SPINLOCK_FUTURE_POLICY_NAME
   {
-    typedef basic_monad<BOOST_SPINLOCK_FUTURE_POLICY_NAME> monad_type;
+    using monad_type = basic_monad<BOOST_SPINLOCK_FUTURE_POLICY_NAME>;
     // In a monad policy, this is identical to monad_type. Not here.
-    typedef basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME> implementation_type;
-    typedef R value_type;
+    using implementation_type = basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME>;
+    using value_type = R;
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
-    typedef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE error_type;
+    using error_type = BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE;
 #else
-    typedef void error_type;
+    using error_type = void;
 #endif
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-    typedef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE exception_type;
+    using exception_type = BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE;
 #else
-    typedef void exception_type;
+    using exception_type = void;
 #endif
-    // This type is void for monad, here it points to our future type
-    typedef basic_future_base *pointer_type;
     // Future.get() locks, so define our own monad base type.
-    typedef BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME<basic_future_storage<BOOST_SPINLOCK_FUTURE_POLICY_NAME, false>, value_type, error_type, exception_type> base;
-    typedef BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>, true>, value_type, error_type, exception_type> other_base;
+    using base = BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type>, value_type, error_type, exception_type>;
+    using other_base = BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type>, value_type, error_type, exception_type>;
     template<typename U> using rebind = basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<U>>;
     template<typename U> using rebind_policy = BOOST_SPINLOCK_FUTURE_POLICY_NAME<U>;
 
@@ -335,35 +326,33 @@ namespace detail
     // Is this future managed by shared_basic_future_ptr?
     BOOST_STATIC_CONSTEXPR bool is_shared=false;
     // The type of future_errc to use for issuing errors
-    typedef std::future_errc future_errc;
+    using future_errc = std::future_errc;
     // The type of future exception to use for issuing exceptions
-    typedef std::future_error future_error;
+    using future_error = std::future_error;
     // The category of error code to use
     static const std::error_category &future_category() noexcept { return std::future_category(); }
     // The STL future type to use for waits and timed waits
-    typedef std::pair<std::promise<void>, std::future<void>> wait_future_type;
+    using wait_future_type = std::pair<std::promise<void>, std::future<void>>;
   };
   template<typename R> struct BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME
   {
-    typedef basic_monad<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME> monad_type;
+    using monad_type = basic_monad<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME>;
     // In a monad policy, this is identical to monad_type. Not here.
-    typedef basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME> implementation_type;
-    typedef R value_type;
+    using implementation_type = basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME>;
+    using value_type = R;
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
-    typedef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE error_type;
+    using error_type = BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE;
 #else
-    typedef void error_type;
+    using error_type = void;
 #endif
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-    typedef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE exception_type;
+    using exception_type = BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE;
 #else
-    typedef void exception_type;
+    using exception_type = void;
 #endif
-    // This type is void for monad, here it points to our future type
-    typedef basic_future_base *pointer_type;
     // Future.get() locks, so define our own monad base type.
-    typedef BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME, true>, value_type, error_type, exception_type> base;
-    typedef BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME<basic_future_storage<BOOST_SPINLOCK_FUTURE_POLICY_NAME<value_type>, false>, value_type, error_type, exception_type> other_base;
+    using base = BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type>, value_type, error_type, exception_type>;
+    using other_base = BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type>, value_type, error_type, exception_type>;
     template<typename U> using rebind = basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<U>>;
     template<typename U> using rebind_policy = BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<U>;
 
@@ -372,13 +361,13 @@ namespace detail
     // Is this future managed by shared_basic_future_ptr?
     BOOST_STATIC_CONSTEXPR bool is_shared=true;
     // The type of future_errc to use for issuing errors
-    typedef std::future_errc future_errc;
+    using future_errc = std::future_errc;
     // The type of future exception to use for issuing exceptions
-    typedef std::future_error future_error;
+    using future_error = std::future_error;
     // The category of error code to use
     static const std::error_category &future_category() noexcept { return std::future_category(); }
     // The STL future type to use for waits and timed waits
-    typedef std::pair<std::promise<void>, std::future<void>> wait_future_type;
+    using wait_future_type = std::pair<std::promise<void>, std::future<void>>;
   };
 
 }

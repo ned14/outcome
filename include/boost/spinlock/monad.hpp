@@ -1248,11 +1248,10 @@ namespace lightweight_futures {
   
   namespace detail
   {
-    struct basic_monad_storage_empty { };
     // The struct is at the base of the inheritance hierarchy, and simply keeps some storage for the monad
-    template<class _implementation_policy, class base_class=basic_monad_storage_empty> struct basic_monad_storage : public base_class
+    template<class _implementation_policy> struct basic_monad_storage
     {
-      template<class P, class B> friend struct basic_monad_storage;
+      template<class P> friend struct basic_monad_storage;
     protected:
       typedef _implementation_policy implementation_policy;
       typedef value_storage<typename implementation_policy::value_type, typename implementation_policy::error_type, typename implementation_policy::exception_type> value_storage_type;
@@ -1268,8 +1267,8 @@ namespace lightweight_futures {
       typedef typename value_storage_type::exception_type exception_type;
 
       basic_monad_storage() = default;
-      template<class Policy, class _> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(basic_monad_storage<Policy, _> &&o) : _storage(std::move(o._storage)), base_class(std::move(o)) { }
-      template<class Policy, class _> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(const basic_monad_storage<Policy, _> &o) : _storage(o._storage), base_class(std::move(o)) { }
+      template<class Policy> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(basic_monad_storage<Policy> &&o) : _storage(std::move(o._storage)) { }
+      template<class Policy> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(const basic_monad_storage<Policy> &o) : _storage(o._storage) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit basic_monad_storage(value_storage_type &&v) : _storage(std::move(v)) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(const value_type &v) : _storage(v) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad_storage(value_type &&v) : _storage(std::move(v)) { }
