@@ -111,7 +111,11 @@ namespace lightweight_futures {
       BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : error(std::move(v)), type(storage_type::error) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : exception(std::move(v)), type(storage_type::exception) { }
       struct emplace_t {};
-      template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit value_storage_impl(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value) : value(std::forward<Args>(args)...), type(storage_type::value) { }
+      template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit value_storage_impl(emplace_t, Args &&... args)
+#if !defined(_MSC_VER) || _MSC_VER > 190022816
+        noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+#endif
+        : value(std::forward<Args>(args)...), type(storage_type::value) { }
       BOOST_SPINLOCK_FUTURE_MSVC_HELP ~value_storage_impl() noexcept(is_nothrow_destructible) { clear(); }
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
       {
@@ -264,7 +268,11 @@ namespace lightweight_futures {
     BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : base(std::move(v)) { }
     BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : base(std::move(v)) { }
     using emplace_t = typename base::emplace_t;
-    template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit value_storage(emplace_t _, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value) : base(_, std::forward<Args>(args)...) { }
+    template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit value_storage(emplace_t _, Args &&... args)
+#if !defined(_MSC_VER) || _MSC_VER > 190022816
+      noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+#endif
+      : base(_, std::forward<Args>(args)...) { }
     template<class _value_type2, class _error_type2, class _exception_type2,
       typename = typename std::enable_if<std::is_same<_value_type,     _value_type2    >::value || std::is_constructible<_value_type,     _value_type2    >::value>::type,
       typename = typename std::enable_if<std::is_same<_error_type,     _error_type2    >::value || std::is_constructible<_error_type,     _error_type2    >::value>::type,

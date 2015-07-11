@@ -832,7 +832,11 @@ namespace lightweight_futures {
           && !std::is_same<error_type, typename std::decay<Arg>::type>::value
           && !std::is_same<exception_type, typename std::decay<Arg>::type>::value
           && !std::is_same<empty_type, typename std::decay<Arg>::type>::value))
-      >::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit basic_monad(Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value) : implementation_policy::base(typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...) { }
+      >::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit basic_monad(Arg &&arg, Args &&... args)
+#if !defined(_MSC_VER) || _MSC_VER > 190022816
+      noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value)
+#endif
+      : implementation_policy::base(typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...) { }
 #endif
     //! \brief Implicit constructor from an initializer list
     template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(std::initializer_list<U> l) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>>::value) : implementation_policy::base(typename value_storage_type::emplace_t(), std::move(l)) { }
