@@ -325,7 +325,7 @@ namespace lightweight_futures {
       basic_promise_future_storage(const basic_promise_future_storage &)=delete;
       basic_promise_future_storage &operator=(basic_promise_future_storage &&)=delete;
       basic_promise_future_storage &operator=(const basic_promise_future_storage &)=delete;
-      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR explicit basic_promise_future_storage(value_storage_type &&v) : _storage(std::move(v))
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR explicit basic_promise_future_storage(value_storage_type &&v) noexcept(is_nothrow_move_constructible) : _storage(std::move(v))
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(true)
 #endif
@@ -335,7 +335,7 @@ namespace lightweight_futures {
         if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
 #endif
       }
-      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(const value_type &v) : _storage(v)
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : _storage(v)
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(true)
 #endif
@@ -345,7 +345,7 @@ namespace lightweight_futures {
         if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
 #endif
       }
-      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(value_type &&v) : _storage(std::move(v))
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : _storage(std::move(v))
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(true)
 #endif
@@ -355,7 +355,7 @@ namespace lightweight_futures {
         if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
 #endif
       }
-      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(const error_type &v) : _storage(v)
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : _storage(v)
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(true)
 #endif
@@ -365,7 +365,7 @@ namespace lightweight_futures {
         if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
 #endif
       }
-      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(error_type &&v) : _storage(std::move(v))
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : _storage(std::move(v))
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(true)
 #endif
@@ -375,7 +375,7 @@ namespace lightweight_futures {
         if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
 #endif
       }
-      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(const exception_type &v) : _storage(v)
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : _storage(v)
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(true)
 #endif
@@ -385,7 +385,7 @@ namespace lightweight_futures {
         if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
 #endif
       }
-      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(exception_type &&v) : _storage(std::move(v))
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : _storage(std::move(v))
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(true)
 #endif
@@ -405,7 +405,7 @@ namespace lightweight_futures {
         if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
 #endif
       }
-      virtual ~basic_promise_future_storage()
+      ~basic_promise_future_storage() noexcept(is_nothrow_destructible)
       {
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         if(_need_locks) _lock.~BOOST_SPINLOCK_FUTURE_MUTEX_TYPE_DESTRUCTOR();
