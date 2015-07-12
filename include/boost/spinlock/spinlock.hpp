@@ -122,6 +122,18 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 # define BOOST_SPINLOCK_IN_THREAD_SANITIZER 0
 #endif
 
+#ifndef BOOST_SPINLOCK_ALIGN
+# ifdef __cpp_alignas
+#  define BOOST_SPINLOCK_ALIGN(n) alignas(n)
+# elif defined(__GNUC__)
+#  define BOOST_SPINLOCK_ALIGN(n) __attribute__((aligned(n)))
+# elif defined(_MSC_VER)
+#  define BOOST_SPINLOCK_ALIGN(n) __declspec(align(n))
+# else
+#  define BOOST_SPINLOCK_ALIGN(n)
+# endif
+#endif
+
 #ifndef BOOST_SPINLOCK_V1_STL11_IMPL
 #define BOOST_SPINLOCK_V1_STL11_IMPL std
 #endif

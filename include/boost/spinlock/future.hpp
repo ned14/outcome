@@ -260,8 +260,8 @@ namespace lightweight_futures {
       typename basic_promise_future_storage<_value_type, _error_type, _exception_type, _wait_implementation>::lock_guard_type h(v);
       h.release();
     }
-    // The base class for all basic_promises and basic_futures
-    template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct basic_promise_future_storage
+    // The base class for all basic_promises and basic_futures, aligned to 64 bytes to make one per cache line
+    template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct /*BOOST_SPINLOCK_ALIGN(64)*/ basic_promise_future_storage
     {
       using lock_guard_type = lock_guard<_value_type, _error_type, _exception_type, _wait_implementation>;
       using promise_base_type = basic_promise_storage<_value_type, _error_type, _exception_type, _wait_implementation>;
@@ -270,9 +270,9 @@ namespace lightweight_futures {
       using value_type = typename value_storage_type::value_type;
       using error_type = typename value_storage_type::error_type;
       using exception_type = typename value_storage_type::exception_type;
-      value_storage_type _storage;
+      value_storage_type _storage;      // 24 bytes
 
-      //! \todo Could eliminate 16 bytes of storage by packing basic_promise_future_storage bools into value_storage_type
+      //! \todo Could eliminate 8 bytes of storage by packing basic_promise_future_storage bools into value_storage_type
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       bool _need_locks;                 // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
 #endif
@@ -291,11 +291,11 @@ namespace lightweight_futures {
       union {
         bool _detached;                   // Only used by promise
         bool _broken_promise;             // Only used by future
-      };
+      };                                  // 32 bytes
       union {
         promise_base_type *_promise;
         future_base_type *_future;
-      };
+      };                                  // 40 bytes
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage() noexcept :
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         _need_locks(false),
@@ -639,6 +639,18 @@ namespace lightweight_futures {
     }
 
   private:
+    // Kept separate to prevent GCC optimiser penalising _set_state
+    void _wake_waiters(typename base::set_state_info_t &state_info)
+    {
+      // Fire any continuations. This needs to be outside the lock, as continuations
+      // may consume the future if it's a consuming future (in which case
+      // continuation_future points to not this, and therefore waking waiters early
+      // is fine)
+      if(state_info.continuation)
+        state_info.continuation(state_info.continuation_future);
+      if(state_info.sleeping_waiters)
+        state_info.sleeping_waiters.get()->get()->set_value();
+    }
     template<class U> BOOST_SPINLOCK_FUTURE_MSVC_HELP void _set_state(U &&c)
     {
       lock_guard_type h(this);
@@ -660,15 +672,9 @@ namespace lightweight_futures {
         this->_future=nullptr;
         this->_detached=true;
         h.unlock();
-        // Fire any continuations. This needs to be outside the lock, as continuations
-        // may consume the future if it's a consuming future (in which case
-        // continuation_future points to not this, and therefore waking waiters early
-        // is fine)
-        if(state_info.continuation)
-          state_info.continuation(state_info.continuation_future);
         // Wake any waiters
-        if(state_info.sleeping_waiters)
-          state_info.sleeping_waiters.get()->get()->set_value();
+        if(state_info.continuation || state_info.sleeping_waiters)
+          _wake_waiters(state_info);
       }
       else
       {
@@ -745,15 +751,16 @@ namespace lightweight_futures {
 
     template<bool reserve_future_storage, class f_traits, class implementation_policy, class future_type, class promise_type, class callable_type> struct continuation
     {
-      using future_base_type = typename promise_type::future_base_type;
-      using promise_base_type = typename promise_type::promise_base_type;
+      using future_base_type = typename future_type::future_base_type;
+      using promise_base_type = typename future_type::promise_base_type;
       promise_type p;
       callable_type f;
       detail::function_ptr<void(future_base_type *)> prevcallable;
       BOOST_SPINLOCK_FUTURE_CONSTEXPR continuation(promise_type &&_p, callable_type &&_f, detail::function_ptr<void(future_base_type *)> &&_prev)
         : p(std::move(_p)), f(std::move(_f)), prevcallable(std::move(_prev)) { }
-      void operator()(future_base_type *self)
+      void operator()(future_base_type *_self)
       {
+        future_type *self=static_cast<future_type *>(_self);
         // Execute the continuation
         try
         {
@@ -775,10 +782,10 @@ namespace lightweight_futures {
     template<class f_traits, class implementation_policy, class future_type, class promise_type, class callable_type> struct continuation<true, f_traits, implementation_policy, future_type, promise_type, callable_type>
       : public continuation<false, f_traits, implementation_policy, future_type, promise_type, callable_type>
     {
-      using future_base_type = typename promise_type::future_base_type;
-      using promise_base_type = typename promise_type::promise_base_type;
+      using future_base_type = typename future_type::future_base_type;
+      using promise_base_type = typename future_type::promise_base_type;
       future_type continuation_future;
-      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR continuation(future_type *&_continuation_future, promise_type &&_p, callable_type &&_f, detail::function_ptr<void(future_base_type *)> &&_prev)
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR continuation(future_base_type *&_continuation_future, promise_type &&_p, callable_type &&_f, detail::function_ptr<void(future_base_type *)> &&_prev)
         : continuation<false, f_traits, implementation_policy, future_type, promise_type, callable_type>(std::move(_p), std::move(_f), std::move(_prev))
       {
         _continuation_future=&continuation_future;
@@ -1130,8 +1137,8 @@ namespace lightweight_futures {
       typename output_type::promise_type p;
       output_type ret(p.get_future());
       auto callable = (!is_shared && !set_state_info.continuation)
-        ? detail::make_function_ptr<void(future_type *)>(detail::continuation<true , f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>(set_state_info.continuation_future, std::move(p), std::forward<F>(f), std::move(set_state_info.continuation)))
-        : detail::make_function_ptr<void(future_type *)>(detail::continuation<false, f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>(std::move(p), std::forward<F>(f), std::move(set_state_info.continuation)));
+        ? detail::make_function_ptr<void(future_base_type *)>(detail::continuation<true , f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>(set_state_info.continuation_future, std::move(p), std::forward<F>(f), std::move(set_state_info.continuation)))
+        : detail::make_function_ptr<void(future_base_type *)>(detail::continuation<false, f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>(std::move(p), std::forward<F>(f), std::move(set_state_info.continuation)));
       if (is_shared && !set_state_info.continuation)
       {
         // Set myself (the shared state) as the continuations storage

@@ -84,7 +84,7 @@ namespace detail
     }
   public:
     // Note we always return value_type by value.
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type get()
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type get() &
     {
       static_cast<implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(this);
@@ -133,8 +133,9 @@ namespace detail
       this->clear();
       return v;
     }
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type get() && { return this->get(); }
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error()
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() &
     {
       static_cast<implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(this);
@@ -152,10 +153,11 @@ namespace detail
       return error_type();
     }
 #else
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error();
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() &;
 #endif
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() && { return this->get_error(); }
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception()
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() &
     {
       static_cast<implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(this);
@@ -177,8 +179,9 @@ namespace detail
       return exception_type();
     }
 #else
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception();
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() &;
 #endif
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() && { return this->get_exception(); }
     // Makes share() available on this future.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>>> share()
     {

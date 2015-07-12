@@ -1903,6 +1903,10 @@ BOOST_AUTO_TEST_CASE(works/future/lightweight, "Tests that our future-promise wo
   std::cout << "sizeof(future<bool>[2]) = " << sizeof(future<bool>[2]) << std::endl;
   BOOST_CHECK(!(sizeof(promise<bool>) & 3));
   BOOST_CHECK(!(sizeof(future<bool>) & 3));
+  BOOST_CHECK(sizeof(promise<bool>)<=64);
+  BOOST_CHECK(sizeof(future<bool>)<=64);
+  //BOOST_CHECK(alignof(promise<bool>)==64);
+  //BOOST_CHECK(alignof(future<bool>)==64);
   FuturePromiseConformanceTest<future, promise>();
 
   auto e(std::make_exception_ptr(5));
@@ -2006,7 +2010,7 @@ BOOST_AUTO_TEST_CASE(works/shared_future/lightweight, "Tests that our shared_fut
   SharedFuturePromiseConformanceTest<shared_future, promise>();
 }
 
-#if 0
+#if 1
 BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our future-promise continuations works as intended")
 {
   std::cout << "\n=== Tests that our future-promise continuations works as intended ===" << std::endl;
@@ -2073,8 +2077,8 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
     int test = 0, fail=0;
     promise<int> p;
     future<int> f(p.get_future());
-    future<int> f2(f.then([&test, &fail](
-#ifdef __cpp_generic_lambdas
+    future<int> f2(f.then([&test, &fail] (
+#if 0//def __cpp_generic_lambdas
       auto &&
 #else
       future<int> &&
@@ -2121,7 +2125,7 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
 }
 #endif
 
-#if 0
+#if 1
 BOOST_AUTO_TEST_CASE(works/shared_future/continuations/lightweight, "Tests that our shared_future-promise continuations works as intended")
 {
   std::cout << "\n=== Tests that our shared_future-promise continuations works as intended ===" << std::endl;

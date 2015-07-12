@@ -44,6 +44,7 @@ is done.
 Later:
  - [ ] Loosen explicit basic_monad constructors to allow option => result => monad implicitly, and
 monad => result => option explicitly (with potential exception throwing).
+ - [ ] Pack bools in basic_promise_future_storage into value_storage_impl, thus saving 8 bytes
  - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
  - [ ] Add tribool logic programming operator overloads
 
@@ -106,11 +107,11 @@ Three threads MPSC: 1921
   Destruction of future: 30
 
 ### lightweight future promise:
-Simple loop: 141                       - 166
-Producer Consumer: 262 (2.95x faster)  - 268
-  Creation and setting: 191              - 200
+Simple loop: 141                       - 180
+Producer Consumer: 262 (2.95x faster)  - 264
+  Creation and setting: 191              - 197
   Getting from future: 53                - 50
-  Destruction of future: 18              - 18
+  Destruction of future: 18              - 17
 Three threads MPSC: 519 (3.70x faster) - 954 (now doing genuine sleep waits)
   Creation: 241                          - 459
   Setting: 189                           - 340
@@ -126,7 +127,7 @@ Producer Consumer: 767
 
 ### lightweight shared_future promise:
 Simple loop: 350                       - 466
-Producer Consumer: 377 (2.03x faster)  - 506
+Producer Consumer: 377 (2.03x faster)  - 506 (regression is from enable_shared_from_this)
   Creation and setting: 238              - 333
   Getting from future: 31                - 44
   Destruction of future: 109             - 129
