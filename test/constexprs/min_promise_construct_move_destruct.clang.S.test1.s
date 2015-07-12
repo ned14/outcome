@@ -1,79 +1,68 @@
-   0:	48 81 ec a8 00 00 00 	sub    $0xa8,%rsp
-   7:	c6 44 24 70 00       	movb   $0x0,0x70(%rsp)
-   c:	c6 44 24 78 00       	movb   $0x0,0x78(%rsp)
-  11:	c6 44 24 7a 00       	movb   $0x0,0x7a(%rsp)
+   0:	48 81 ec 88 00 00 00 	sub    $0x88,%rsp
+   7:	c6 44 24 58 00       	movb   $0x0,0x58(%rsp)
+   c:	c6 44 24 60 00       	movb   $0x0,0x60(%rsp)
+  11:	c6 44 24 62 00       	movb   $0x0,0x62(%rsp)
   16:	0f 57 c0             	xorps  %xmm0,%xmm0
-  19:	0f 11 84 24 90 00 00 	movups %xmm0,0x90(%rsp)
-  20:	00 
-  21:	0f 11 84 24 80 00 00 	movups %xmm0,0x80(%rsp)
-  28:	00 
-  29:	48 c7 84 24 a0 00 00 	movq   $0x0,0xa0(%rsp)
-  30:	00 00 00 00 00 
-  35:	48 c7 44 24 58 00 00 	movq   $0x0,0x58(%rsp)
-  3c:	00 00 
-  3e:	48 c7 44 24 08 00 00 	movq   $0x0,0x8(%rsp)
-  45:	00 00 
-  47:	48 8d 7c 24 58       	lea    0x58(%rsp),%rdi
-  4c:	e8 00 00 00 00       	callq  51 <_Z5test1v+0x51>
-  51:	c6 44 24 20 00       	movb   $0x0,0x20(%rsp)
-  56:	0f b6 44 24 70       	movzbl 0x70(%rsp),%eax
-  5b:	83 f8 03             	cmp    $0x3,%eax
-  5e:	74 17                	je     77 <_Z5test1v+0x77>
-  60:	83 f8 02             	cmp    $0x2,%eax
-  63:	75 27                	jne    8c <_Z5test1v+0x8c>
-  65:	48 8d 4c 24 60       	lea    0x60(%rsp),%rcx
-  6a:	48 8d 54 24 10       	lea    0x10(%rsp),%rdx
-  6f:	0f 10 01             	movups (%rcx),%xmm0
-  72:	0f 11 02             	movups %xmm0,(%rdx)
-  75:	eb 22                	jmp    99 <_Z5test1v+0x99>
-  77:	48 8b 4c 24 60       	mov    0x60(%rsp),%rcx
-  7c:	48 89 4c 24 10       	mov    %rcx,0x10(%rsp)
-  81:	48 c7 44 24 60 00 00 	movq   $0x0,0x60(%rsp)
-  88:	00 00 
-  8a:	eb 0d                	jmp    99 <_Z5test1v+0x99>
-  8c:	83 f8 01             	cmp    $0x1,%eax
-  8f:	75 08                	jne    99 <_Z5test1v+0x99>
-  91:	8b 4c 24 60          	mov    0x60(%rsp),%ecx
-  95:	89 4c 24 10          	mov    %ecx,0x10(%rsp)
-  99:	88 44 24 20          	mov    %al,0x20(%rsp)
-  9d:	8b 44 24 78          	mov    0x78(%rsp),%eax
-  a1:	88 44 24 28          	mov    %al,0x28(%rsp)
-  a5:	89 c1                	mov    %eax,%ecx
-  a7:	c1 e9 10             	shr    $0x10,%ecx
-  aa:	88 4c 24 2a          	mov    %cl,0x2a(%rsp)
-  ae:	48 8b 8c 24 80 00 00 	mov    0x80(%rsp),%rcx
-  b5:	00 
-  b6:	48 89 4c 24 30       	mov    %rcx,0x30(%rsp)
-  bb:	84 c0                	test   %al,%al
-  bd:	74 05                	je     c4 <_Z5test1v+0xc4>
-  bf:	c6 44 24 29 00       	movb   $0x0,0x29(%rsp)
-  c4:	84 c0                	test   %al,%al
-  c6:	48 c7 84 24 80 00 00 	movq   $0x0,0x80(%rsp)
-  cd:	00 00 00 00 00 
-  d2:	0f 10 84 24 88 00 00 	movups 0x88(%rsp),%xmm0
-  d9:	00 
-  da:	48 c7 84 24 90 00 00 	movq   $0x0,0x90(%rsp)
-  e1:	00 00 00 00 00 
-  e6:	0f 10 8c 24 98 00 00 	movups 0x98(%rsp),%xmm1
-  ed:	00 
-  ee:	48 c7 84 24 a0 00 00 	movq   $0x0,0xa0(%rsp)
-  f5:	00 00 00 00 00 
-  fa:	0f 11 4c 24 48       	movups %xmm1,0x48(%rsp)
-  ff:	48 c7 84 24 98 00 00 	movq   $0x0,0x98(%rsp)
- 106:	00 00 00 00 00 
- 10b:	0f 11 44 24 38       	movups %xmm0,0x38(%rsp)
- 110:	48 c7 44 24 08 00 00 	movq   $0x0,0x8(%rsp)
- 117:	00 00 
- 119:	74 13                	je     12e <_Z5test1v+0x12e>
- 11b:	c6 44 24 79 00       	movb   $0x0,0x79(%rsp)
- 120:	48 8b 44 24 30       	mov    0x30(%rsp),%rax
- 125:	48 85 c0             	test   %rax,%rax
- 128:	74 04                	je     12e <_Z5test1v+0x12e>
- 12a:	c6 40 21 00          	movb   $0x0,0x21(%rax)
- 12e:	48 8d 7c 24 08       	lea    0x8(%rsp),%rdi
- 133:	e8 00 00 00 00       	callq  138 <_Z5test1v+0x138>
- 138:	48 8d 7c 24 58       	lea    0x58(%rsp),%rdi
- 13d:	e8 00 00 00 00       	callq  142 <_Z5test1v+0x142>
- 142:	48 81 c4 a8 00 00 00 	add    $0xa8,%rsp
- 149:	c3                   	retq   
- 14a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+  19:	0f 11 44 24 78       	movups %xmm0,0x78(%rsp)
+  1e:	0f 11 44 24 68       	movups %xmm0,0x68(%rsp)
+  23:	48 8d 7c 24 48       	lea    0x48(%rsp),%rdi
+  28:	e8 00 00 00 00       	callq  2d <_Z5test1v+0x2d>
+  2d:	c6 44 24 10 00       	movb   $0x0,0x10(%rsp)
+  32:	0f b6 44 24 58       	movzbl 0x58(%rsp),%eax
+  37:	83 f8 03             	cmp    $0x3,%eax
+  3a:	74 10                	je     4c <_Z5test1v+0x4c>
+  3c:	83 f8 02             	cmp    $0x2,%eax
+  3f:	75 1f                	jne    60 <_Z5test1v+0x60>
+  41:	0f 10 44 24 48       	movups 0x48(%rsp),%xmm0
+  46:	0f 29 04 24          	movaps %xmm0,(%rsp)
+  4a:	eb 20                	jmp    6c <_Z5test1v+0x6c>
+  4c:	48 8b 4c 24 48       	mov    0x48(%rsp),%rcx
+  51:	48 89 0c 24          	mov    %rcx,(%rsp)
+  55:	48 c7 44 24 48 00 00 	movq   $0x0,0x48(%rsp)
+  5c:	00 00 
+  5e:	eb 0c                	jmp    6c <_Z5test1v+0x6c>
+  60:	83 f8 01             	cmp    $0x1,%eax
+  63:	75 07                	jne    6c <_Z5test1v+0x6c>
+  65:	8b 4c 24 48          	mov    0x48(%rsp),%ecx
+  69:	89 0c 24             	mov    %ecx,(%rsp)
+  6c:	88 44 24 10          	mov    %al,0x10(%rsp)
+  70:	8b 44 24 60          	mov    0x60(%rsp),%eax
+  74:	88 44 24 18          	mov    %al,0x18(%rsp)
+  78:	89 c1                	mov    %eax,%ecx
+  7a:	c1 e9 10             	shr    $0x10,%ecx
+  7d:	88 4c 24 1a          	mov    %cl,0x1a(%rsp)
+  81:	48 8b 4c 24 68       	mov    0x68(%rsp),%rcx
+  86:	48 89 4c 24 20       	mov    %rcx,0x20(%rsp)
+  8b:	84 c0                	test   %al,%al
+  8d:	74 05                	je     94 <_Z5test1v+0x94>
+  8f:	c6 44 24 19 00       	movb   $0x0,0x19(%rsp)
+  94:	48 c7 44 24 68 00 00 	movq   $0x0,0x68(%rsp)
+  9b:	00 00 
+  9d:	48 85 c9             	test   %rcx,%rcx
+  a0:	74 08                	je     aa <_Z5test1v+0xaa>
+  a2:	48 8d 14 24          	lea    (%rsp),%rdx
+  a6:	48 89 51 20          	mov    %rdx,0x20(%rcx)
+  aa:	84 c0                	test   %al,%al
+  ac:	0f 10 44 24 70       	movups 0x70(%rsp),%xmm0
+  b1:	48 c7 44 24 78 00 00 	movq   $0x0,0x78(%rsp)
+  b8:	00 00 
+  ba:	48 8b 84 24 80 00 00 	mov    0x80(%rsp),%rax
+  c1:	00 
+  c2:	48 c7 84 24 80 00 00 	movq   $0x0,0x80(%rsp)
+  c9:	00 00 00 00 00 
+  ce:	48 89 44 24 38       	mov    %rax,0x38(%rsp)
+  d3:	0f 11 44 24 28       	movups %xmm0,0x28(%rsp)
+  d8:	74 13                	je     ed <_Z5test1v+0xed>
+  da:	c6 44 24 61 00       	movb   $0x0,0x61(%rsp)
+  df:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
+  e4:	48 85 c0             	test   %rax,%rax
+  e7:	74 04                	je     ed <_Z5test1v+0xed>
+  e9:	c6 40 19 00          	movb   $0x0,0x19(%rax)
+  ed:	48 8d 3c 24          	lea    (%rsp),%rdi
+  f1:	e8 00 00 00 00       	callq  f6 <_Z5test1v+0xf6>
+  f6:	48 8d 7c 24 48       	lea    0x48(%rsp),%rdi
+  fb:	e8 00 00 00 00       	callq  100 <_Z5test1v+0x100>
+ 100:	48 81 c4 88 00 00 00 	add    $0x88,%rsp
+ 107:	c3                   	retq   
+ 108:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+ 10f:	00 

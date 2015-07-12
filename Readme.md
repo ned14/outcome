@@ -32,8 +32,9 @@ and an unlocker type at the bottom of the hierarchy.
  - [x] Now value_storage for both promise and future is visible to both, eliminate vptr.
  - [x] Relocate continuation_future * into basic_promise_future_base so future can build it and promise
 can execute it. Also relocate sleeping_waiters.
- - [ ] Relocate enable_shared_from_this into basic_future. This should be safe now no type slicing
+ - [x] Relocate enable_shared_from_this into basic_future. This should be safe now no type slicing
 is done.
+ - [x] Fix failing constexpr test min_promise_future_reduce.
  
  - [ ] Implement N4399 continuations for shared_future.
  - [ ] Implement wait_for()/wait_until().
@@ -44,10 +45,7 @@ Later:
  - [ ] Loosen explicit basic_monad constructors to allow option => result => monad implicitly, and
 monad => result => option explicitly (with potential exception throwing).
  - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
- - [ ] option<bool> et al should really be 1 byte storage, not 2 bytes.
  - [ ] Add tribool logic programming operator overloads
- - [ ] Is there any way of not using reinterpret_cast to convert between future and shared_future and
-which doesn't involve ton of vectoring through type erasing virtual functions?
 
 
 # Benchmarks with early lightweight future-promise:
@@ -108,16 +106,16 @@ Three threads MPSC: 1921
   Destruction of future: 30
 
 ### lightweight future promise:
-Simple loop: 141
-Producer Consumer: 262 (2.95x faster)
-  Creation and setting: 191
-  Getting from future: 53
-  Destruction of future: 18
-Three threads MPSC: 519 (3.70x faster)
-  Creation: 241
-  Setting: 189
-  Getting from future: 63
-  Destruction of future: 26
+Simple loop: 141                       - 166
+Producer Consumer: 262 (2.95x faster)  - 268
+  Creation and setting: 191              - 200
+  Getting from future: 53                - 50
+  Destruction of future: 18              - 18
+Three threads MPSC: 519 (3.70x faster) - 954 (now doing genuine sleep waits)
+  Creation: 241                          - 459
+  Setting: 189                           - 340
+  Getting from future: 63                - 100
+  Destruction of future: 26              - 54
 
 ### libstdc++ 5.1 shared_future promise:
 Simple loop: 788
@@ -127,11 +125,11 @@ Producer Consumer: 767
   Destruction of future: 120
 
 ### lightweight shared_future promise:
-Simple loop: 350
-Producer Consumer: 377 (2.03x faster)
-  Creation and setting: 238
-  Getting from future: 31
-  Destruction of future: 109
+Simple loop: 350                       - 466
+Producer Consumer: 377 (2.03x faster)  - 506
+  Creation and setting: 238              - 333
+  Getting from future: 31                - 44
+  Destruction of future: 109             - 129
 
 
 ## VS2015:

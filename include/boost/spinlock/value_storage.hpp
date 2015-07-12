@@ -298,7 +298,7 @@ namespace lightweight_futures {
         break;
       }
     }
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage(const value_storage &o) noexcept(is_nothrow_copy_constructible)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage(const value_storage &o) noexcept(is_nothrow_copy_constructible) : base()
     {
       switch (o.type)
       {
@@ -316,7 +316,7 @@ namespace lightweight_futures {
       }
       this->type = o.type;
     }
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage(value_storage &&o) noexcept(is_nothrow_move_constructible)
+    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage(value_storage &&o) noexcept(is_nothrow_move_constructible) : base()
     {
       switch (o.type)
       {
