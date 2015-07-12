@@ -485,6 +485,7 @@ namespace lightweight_futures {
         return (*ptr)(std::move(args)...);
       }
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR function_ptr_storage *get() noexcept { return ptr; }
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void reset(function_ptr_storage *p=nullptr) noexcept { delete ptr; ptr = p; }
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR function_ptr_storage *release() noexcept { auto p = ptr; ptr = nullptr; return p; }
     };
     template<class R, class U> inline function_ptr<R> make_function_ptr(U &&f) { return function_ptr<R>(std::forward<U>(f), nullptr); }

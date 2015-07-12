@@ -296,12 +296,16 @@ namespace lightweight_futures {
         promise_base_type *_promise;
         future_base_type *_future;
       };
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_promise_future_storage() noexcept :
+      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage() noexcept :
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         _need_locks(false),
 #endif
         _broken_promise(false), _promise(nullptr)
-      {}
+      {
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+        if (_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
+#endif
+      }
       
       BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_constructible = value_storage_type::is_nothrow_copy_constructible;
       BOOST_STATIC_CONSTEXPR bool is_nothrow_move_constructible = value_storage_type::is_nothrow_move_constructible;
@@ -320,7 +324,9 @@ namespace lightweight_futures {
 #ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         if(_need_locks) new (&_lock) BOOST_SPINLOCK_FUTURE_MUTEX_TYPE();
 #endif
-        o._promise=nullptr;
+        o._promise = nullptr;
+        if(_promise)
+          _promise->_future = this;
       }
       basic_promise_future_storage(const basic_promise_future_storage &)=delete;
       basic_promise_future_storage &operator=(basic_promise_future_storage &&)=delete;
@@ -544,14 +550,17 @@ namespace lightweight_futures {
       typename base::lock_guard_type h1(this), h2(&o);
       if(!this->_detached)
       {
+        this->_storage.clear();
         if(h1._f)
         {
           h1._f->_broken_promise=true;
           h1._f->_promise=nullptr;
         }
         this->_future=nullptr;
-        this->_storage.clear();
         this->_detached=true;
+        this->_set_state_info.continuation_future = nullptr;
+        this->_set_state_info.continuation.reset();
+        this->_set_state_info.sleeping_waiters.reset();
       }
       if(!o._detached)
       {
@@ -560,6 +569,8 @@ namespace lightweight_futures {
         o._future=nullptr;
         if(this->_future)
           this->_future->_promise=this;
+        this->_detached = o._detached;
+        this->_set_state_info = std::move(o._set_state_info);
       }
       return *this;
     }
@@ -641,7 +652,7 @@ namespace lightweight_futures {
         if(this->_set_state_info.continuation_future)
           c(this->_set_state_info.continuation_future);
         else
-          c(this);
+          c(h._f);
         // Move locally my continuation and sleep wake info before release locks
         typename base::set_state_info_t state_info(std::move(this->_set_state_info));
         // Detach myself from my future
@@ -842,7 +853,19 @@ namespace lightweight_futures {
         throw future_error(future_errc::no_state);
     }
     // Called to convert from one type of future into this one. Lock of source is already held.
-    template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_future(std::nullptr_t, basic_future<U> &&o) : monad_type(typename basic_future<U>::monad_type(std::move(o))) { }
+    template<class U> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR basic_future(std::nullptr_t, basic_future<U> &&o) : monad_type(static_cast<typename basic_future<U>::monad_type &&>(o))
+    {
+      // base of future inheritance tree returns with lock held on o and his (now my) promise
+      // so as the final layer we need to unlock both
+#ifdef BOOST_SPINLOCK_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+      if (this->_need_locks)
+#endif
+      {
+        o._lock.unlock();
+        if (this->_promise)
+          this->_promise->_lock.unlock();
+      }
+    }
   public:
     //! \brief EXTENSION: constexpr capable constructor
     BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_future()
@@ -872,17 +895,19 @@ namespace lightweight_futures {
       lock_guard_type h1(this), h2(&o);
       if(valid())
       {
+        this->clear();
+        this->_broken_promise = false;
         if(this->_promise)
         {
           this->_promise->_future=nullptr;
           this->_promise->_detached=true;
           this->_promise=nullptr;
         }
-        this->clear();
       }
       if(o.valid())
       {
         this->_storage=std::move(o._storage);
+        this->_broken_promise = o._broken_promise;
         this->_promise=o._promise;
         o._promise=nullptr;
         if(this->_promise)
@@ -1130,7 +1155,7 @@ namespace lightweight_futures {
     //! \brief Explicit constructor from shared_ptr
     explicit shared_basic_future_ptr(std::shared_ptr<base_future_type> &&p) : _future(std::move(p)) { }
     //! \brief Default constructor
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR shared_basic_future_ptr() : shared_basic_future_ptr(base_future_type().share()) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR shared_basic_future_ptr() : _future(std::make_shared<base_future_type>()) { }
     //! \brief Default copy constructor
     shared_basic_future_ptr(shared_basic_future_ptr &&) = default;
     //! \brief Default move constructor

@@ -38,6 +38,7 @@
     <ProjectGuid>{C921A4E5-BFE1-4C7F-B19E-CD11FCF7946C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>spinlock</RootNamespace>
+    <TargetPlatformVersion>8.1</TargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

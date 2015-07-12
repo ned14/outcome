@@ -182,9 +182,9 @@ namespace detail
     // Makes share() available on this future.
     BOOST_SPINLOCK_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>>> share()
     {
-      typename implementation_type::lock_guard_type h(this);
-      basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>> ret(nullptr, std::move(*static_cast<implementation_type *>(this)));
-      return ret.share();
+	  using rettype=basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>>;
+	  rettype ret(nullptr, std::move(*static_cast<implementation_type *>(this)));
+      return shared_basic_future_ptr<rettype>(std::make_shared<rettype>(std::move(ret)));
     }
   };
   

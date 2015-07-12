@@ -194,7 +194,7 @@ namespace lightweight_futures {
       BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(error_type &&) noexcept(std::is_nothrow_move_constructible<error_type>::value) : type(storage_type::error) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(exception_type &&) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : type(storage_type::exception) { }
       struct emplace_t {};
-      template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit value_storage_impl(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value) : value(std::forward<Args>(args)...) { type=storage_type::value; }
+      template<class... Args> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR explicit value_storage_impl(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value) : value(std::forward<Args>(args)...) { type=storage_type::value; }
       BOOST_SPINLOCK_FUTURE_MSVC_HELP ~value_storage_impl() noexcept(is_nothrow_destructible) { clear(); }
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
       {
