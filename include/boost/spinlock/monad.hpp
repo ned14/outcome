@@ -516,12 +516,15 @@ namespace lightweight_futures {
       template<class U> struct function_ptr_storage_impl : public function_ptr_storage
       {
         U c;
-        BOOST_SPINLOCK_FUTURE_CONSTEXPR function_ptr_storage_impl(U &&_c) : c(std::move(_c)) { }
+        template<class... Args2> BOOST_SPINLOCK_FUTURE_CONSTEXPR function_ptr_storage_impl(Args2 &&... args) : c(std::forward<Args2>(args)...) { }
         virtual R operator()(Args &&... args) override final { return c(std::move(args)...); }
       };
       function_ptr_storage *ptr;
-      template<class U> explicit function_ptr(U &&f, std::nullptr_t) : ptr(new function_ptr_storage_impl<typename std::decay<U>::type>(std::forward<U>(f))) { }
+      template<class U> struct emplace_t {};
       template<class U, class V> friend inline function_ptr<U> make_function_ptr(V &&f);
+      template<class U> explicit function_ptr(std::nullptr_t, U &&f) : ptr(new function_ptr_storage_impl<typename std::decay<U>::type>(std::forward<U>(f))) { }
+      template<class R_, class U, class... Args2> friend inline function_ptr<R_> emplace_function_ptr(Args2 &&... args);
+      template<class U, class... Args2> explicit function_ptr(emplace_t<U>, Args2 &&... args) : ptr(new function_ptr_storage_impl<U>(std::forward<Args2>(args)...)) { }
     public:
       BOOST_SPINLOCK_FUTURE_CONSTEXPR function_ptr() noexcept : ptr(nullptr) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR function_ptr(function_ptr_storage *p) noexcept : ptr(p) { }
@@ -539,7 +542,11 @@ namespace lightweight_futures {
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void reset(function_ptr_storage *p=nullptr) noexcept { delete ptr; ptr = p; }
       BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR function_ptr_storage *release() noexcept { auto p = ptr; ptr = nullptr; return p; }
     };
-    template<class R, class U> inline function_ptr<R> make_function_ptr(U &&f) { return function_ptr<R>(std::forward<U>(f), nullptr); }
+    template<class R, class U> inline function_ptr<R> make_function_ptr(U &&f) { return function_ptr<R>(nullptr, std::forward<U>(f)); }
+    template<class R, class U, class... Args> inline function_ptr<R> emplace_function_ptr(Args &&... args)
+    {
+      return function_ptr<R>(typename function_ptr<R>::template emplace_t<U>(), std::forward<Args>(args)...);
+    }
   }
 
   namespace detail

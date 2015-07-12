@@ -1136,9 +1136,10 @@ namespace lightweight_futures {
       */
       typename output_type::promise_type p;
       output_type ret(p.get_future());
-      auto callable = (!is_shared && !set_state_info.continuation)
-        ? detail::make_function_ptr<void(future_base_type *)>(detail::continuation<true , f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>(set_state_info.continuation_future, std::move(p), std::forward<F>(f), std::move(set_state_info.continuation)))
-        : detail::make_function_ptr<void(future_base_type *)>(detail::continuation<false, f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>(std::move(p), std::forward<F>(f), std::move(set_state_info.continuation)));
+      BOOST_STATIC_CONSTEXPR bool relocate_future = (!is_shared && !set_state_info.continuation && !(f_traits::is_lvalue && f_traits::is_const));
+      auto callable = relocate_future
+        ? detail::emplace_function_ptr<void(future_base_type *), detail::continuation<true , f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>>(set_state_info.continuation_future, std::move(p), std::forward<F>(f), std::move(set_state_info.continuation))
+        : detail::emplace_function_ptr<void(future_base_type *), detail::continuation<false, f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>>(std::move(p), std::forward<F>(f), std::move(set_state_info.continuation));
       if (is_shared && !set_state_info.continuation)
       {
         // Set myself (the shared state) as the continuations storage
@@ -1194,8 +1195,12 @@ namespace lightweight_futures {
     //! \brief Adopting assignment
     shared_basic_future_ptr &operator=(base_future_type &&o) { _future=std::move(o); return *this; }
     //! \brief Calls share() on the supplied future
-    template<class Impl, typename=decltype(std::declval<basic_future<Impl>>().share())> shared_basic_future_ptr(basic_future<Impl> &&o)
-      : shared_basic_future_ptr(std::forward<basic_future<Impl>>(o).share()) { }
+    template<class Impl,
+      typename=decltype(std::declval<basic_future<Impl>>().share())
+    > shared_basic_future_ptr(basic_future<Impl> &&o)
+      : shared_basic_future_ptr(
+        shared_basic_future_ptr(std::forward<basic_future<Impl>>(o).share())
+        ) { }
     //! \brief Forwarding constructor
     template<class U, typename=typename std::enable_if<std::is_constructible<base_future_type, U>::value>::type> BOOST_SPINLOCK_FUTURE_CONSTEXPR shared_basic_future_ptr(U &&o) : shared_basic_future_ptr(base_future_type(std::forward<U>(o)).share()) { }
     //! \brief Forwards to operator bool

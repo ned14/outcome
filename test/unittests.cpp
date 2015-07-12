@@ -2078,12 +2078,12 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
     promise<int> p;
     future<int> f(p.get_future());
     future<int> f2(f.then([&test, &fail] (
-#if 0//def __cpp_generic_lambdas
+#ifdef __cpp_generic_lambdas
       auto &&
 #else
       future<int> &&
 #endif
-      f) {
+      f) -> int {
       if(f.get() != 5) fail++;
       if(test != 2) fail++;
       test++;

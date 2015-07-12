@@ -35,8 +35,7 @@ can execute it. Also relocate sleeping_waiters.
  - [x] Relocate enable_shared_from_this into basic_future. This should be safe now no type slicing
 is done.
  - [x] Fix failing constexpr test min_promise_future_reduce.
- 
- - [ ] Implement N4399 continuations for shared_future.
+ - [x] Implement N4399 continuations for shared_future.
  - [ ] Implement wait_for()/wait_until().
  - [ ] when_any/when_all composure.
  - [ ] Port AFIO's intrusive enqueued_task into a lightweight packaged_task design.
@@ -135,41 +134,41 @@ Producer Consumer: 377 (2.03x faster)  - 506 (regression is from enable_shared_f
 
 ## VS2015:
 ### Dinkumware future promise:
-Simple loop: 545
-Producer Consumer: 1084
+Simple loop: 545                       - 573
+Producer Consumer: 1084                - 1114
   Creation and setting: 587
   Getting from future: 215
   Destruction of future: 281
-Three threads MPSC: 1772
+Three threads MPSC: 1772               - 1832
   Creation: 888
   Setting: 534
   Getting from future: 300
   Destruction of future: 51
 
 ### lightweight future promise:
-Simple loop: 131
-Producer Consumer: 215 (5.04x faster)
-  Creation and setting: 168
-  Getting from future: 33
-  Destruction of future: 14
-Three threads MPSC: 742 (2.39x faster)
-  Creation: 360
-  Setting: 234
-  Getting from future: 83
-  Destruction of future: 66
+Simple loop: 131                         - 137
+Producer Consumer: 215 (5.04x faster)    - 209
+  Creation and setting: 168                - 165
+  Getting from future: 33                  - 32
+  Destruction of future: 14                - 12
+Three threads MPSC: 742 (2.39x faster)   - 929 (now doing genuine sleep waits)
+  Creation: 360                            - 426
+  Setting: 234                             - 344
+  Getting from future: 83                  - 85
+  Destruction of future: 66                - 73
 
 ### Dinkumware shared_future promise:
-Simple loop: 543
-Producer Consumer: 1092
+Simple loop: 543                         - 590
+Producer Consumer: 1092                  - 1112
   Creation and setting: 600
   Getting from future: 208
   Destruction of future: 284
 
 ### lightweight shared_future promise:
-Simple loop: 427
-Producer Consumer: 586 (1.86x faster)
-  Creation and setting: 332
-  Getting from future: 61
-  Destruction of future: 194
+Simple loop: 427                         - 564
+Producer Consumer: 586 (1.86x faster)    - 751 (regression is from enable_shared_from_this)
+  Creation and setting: 332                - 449
+  Getting from future: 61                  - 66
+  Destruction of future: 194               - 236
 
 </center>

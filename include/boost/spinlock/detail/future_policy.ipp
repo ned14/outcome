@@ -61,15 +61,15 @@ namespace detail
   //! [future_policy]
   template<typename R> struct BOOST_SPINLOCK_FUTURE_POLICY_NAME;
   template<typename R> struct BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME;
-  template<class future_storage, class value_type, class error_type=void, class exception_type=void> struct BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME;
-  template<class future_storage, class value_type, class error_type=void, class exception_type=void> struct BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME;
+  template<class future_storage, class _value_type, class error_type=void, class exception_type=void> struct BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME;
+  template<class future_storage, class _value_type, class error_type=void, class exception_type=void> struct BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME;
 
   // Inherited from publicly by basic_monad, so whatever you expose here you expose in basic_monad
-  template<class future_storage, class value_type, class error_type, class exception_type> struct BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME : public future_storage
+  template<class future_storage, class _value_type, class error_type, class exception_type> struct BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME : public future_storage
   {
     template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME(Args &&... args) : future_storage(std::forward<Args>(args)...) { }
   protected:
-    using implementation_type = basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<value_type>>;
+    using implementation_type = basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<_value_type>>;
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
     {
       switch(ec)
@@ -84,7 +84,7 @@ namespace detail
     }
   public:
     // Note we always return value_type by value.
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type get() &
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP _value_type get() &
     {
       static_cast<implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(this);
@@ -129,11 +129,11 @@ namespace detail
 #endif
       }
 #endif
-      value_type v(std::move(this->_storage.value));
+      _value_type v(std::move(this->_storage.value));
       this->clear();
       return v;
     }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type get() && { return this->get(); }
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP _value_type get() && { return this->get(); }
 #ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
     BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() &
     {
@@ -183,18 +183,18 @@ namespace detail
 #endif
     BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() && { return this->get_exception(); }
     // Makes share() available on this future.
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>>> share()
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<_value_type>>> share()
     {
-      using rettype=basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>>;
+      using rettype=basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<_value_type>>;
       return shared_basic_future_ptr<rettype>(nullptr, rettype(nullptr, std::move(*static_cast<implementation_type *>(this))));
     }
   };
   
-  template<class future_storage, class value_type, class error_type, class exception_type> struct BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME : public future_storage
+  template<class future_storage, class _value_type, class error_type, class exception_type> struct BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME : public future_storage
   {
     template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME(Args &&... args) : future_storage(std::forward<Args>(args)...) { }
   protected:
-    typedef basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>> implementation_type;
+    typedef basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<_value_type>> implementation_type;
     static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
     {
       switch(ec)
@@ -209,7 +209,7 @@ namespace detail
     }
   public:
     // Note we always return value_type by value.
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP value_type get() const
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP _value_type get() const
     {
       static_cast<const implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(const_cast<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME *>(this));
@@ -295,9 +295,9 @@ namespace detail
 #else
     BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() const;
 #endif
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>>> share() const
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<_value_type>>> share() const
     {
-      return shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>>>(const_cast<implementation_type *>(static_cast<const implementation_type *>(this))->shared_from_this());
+      return shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<_value_type>>>(const_cast<implementation_type *>(static_cast<const implementation_type *>(this))->shared_from_this());
     }
   };
 
