@@ -1136,7 +1136,7 @@ namespace lightweight_futures {
       */
       typename output_type::promise_type p;
       output_type ret(p.get_future());
-      BOOST_STATIC_CONSTEXPR bool relocate_future = (!is_shared && !set_state_info.continuation && !(f_traits::is_lvalue && f_traits::is_const));
+      bool relocate_future = (!is_shared && !(f_traits::is_lvalue && f_traits::is_const) && !set_state_info.continuation);
       auto callable = relocate_future
         ? detail::emplace_function_ptr<void(future_base_type *), detail::continuation<true , f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>>(set_state_info.continuation_future, std::move(p), std::forward<F>(f), std::move(set_state_info.continuation))
         : detail::emplace_function_ptr<void(future_base_type *), detail::continuation<false, f_traits, implementation_policy, basic_future, typename output_type::promise_type, typename std::decay<F>::type>>(std::move(p), std::forward<F>(f), std::move(set_state_info.continuation));
