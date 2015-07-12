@@ -295,9 +295,9 @@ namespace detail
 #else
     BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() const;
 #endif
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>>> share()
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>>> share() const
     {
-      return shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>>>(static_cast<implementation_type *>(this)->shared_from_this());
+      return shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<value_type>>>(const_cast<implementation_type *>(static_cast<const implementation_type *>(this))->shared_from_this());
     }
   };
 

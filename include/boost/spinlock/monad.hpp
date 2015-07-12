@@ -589,7 +589,8 @@ namespace lightweight_futures {
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR do_simple_continuation(U &&c) : _c(std::forward<U>(c)) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(input_type &&v)
       {
-        return output_type(do_invoke<traits::callable_argument_traits<callable_type, input_type>::is_rvalue>()(_c, std::move(v)));
+        using c_traits = traits::callable_argument_traits<callable_type, input_type>;
+        return output_type(do_invoke<c_traits::is_rvalue>()(_c, std::move(v)));
       }
     };
     // For when R is void
@@ -603,7 +604,8 @@ namespace lightweight_futures {
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR do_simple_continuation(U &&c) : _c(std::forward<U>(c)) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(input_type &&v)
       {
-        return do_invoke<traits::callable_argument_traits<callable_type, input_type>::is_rvalue>()(_c, std::move(v)), output_type();
+        using c_traits = traits::callable_argument_traits<callable_type, input_type>;
+        return do_invoke<c_traits::is_rvalue>()(_c, std::move(v)), output_type();
       }
     };
     // For when R is a monad
@@ -616,7 +618,8 @@ namespace lightweight_futures {
       template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR do_simple_continuation(U &&c) : _c(std::forward<U>(c)) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR output_type operator()(input_type &&v)
       {
-        return output_type(do_invoke<traits::callable_argument_traits<callable_type, input_type>::is_rvalue>()(_c, std::move(v)));
+        using c_traits = traits::callable_argument_traits<callable_type, input_type>;
+        return output_type(do_invoke<c_traits::is_rvalue>()(_c, std::move(v)));
       }
     };
     template<class R, class C, class Policy> using do_next = do_simple_continuation<R, C, basic_monad, Policy>;

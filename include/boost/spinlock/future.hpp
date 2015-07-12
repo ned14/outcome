@@ -1188,7 +1188,9 @@ namespace lightweight_futures {
     //! \brief Default copy assignment
     shared_basic_future_ptr &operator=(const shared_basic_future_ptr &) = default;
     //! \brief Adopting constructor
-    shared_basic_future_ptr(base_future_type &&o) : _future(o.share()) { }
+    shared_basic_future_ptr(base_future_type &&o) : shared_basic_future_ptr(o.share()) { }
+    //! \brief Adopting constructor
+    shared_basic_future_ptr(const base_future_type &o) : shared_basic_future_ptr(o.share()) { }
     //! \brief Adopting assignment
     shared_basic_future_ptr &operator=(base_future_type &&o) { _future=std::move(o); return *this; }
     //! \brief Calls share() on the supplied future
@@ -1241,9 +1243,12 @@ namespace lightweight_futures {
 
     //! \brief Forwards to wait()
     BOOST_SPINLOCK_FUTURE_IMPL(wait)
-    //! \brief Forwards to then()
-    BOOST_SPINLOCK_FUTURE_IMPL(then)
 #undef BOOST_SPINLOCK_FUTURE_IMPL
+    //! \brief Forwards to then()
+    template<class F> BOOST_SPINLOCK_FUTURE_MSVC_HELP auto then(F &&f) const -> shared_basic_future_ptr<decltype(_future->then(std::forward<F>(f)))>
+    {
+      return shared_basic_future_ptr<decltype(_future->then(std::forward<F>(f)))>(nullptr, _check()->then(std::forward<F>(f)));
+    }
   };
 
   // TODO
