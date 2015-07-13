@@ -1256,12 +1256,14 @@ namespace lightweight_futures {
     }
   };
 
-  // TODO
-  // template<class InputIterator> ? when_all(InputIterator first, InputIterator last);
-  // template<class... Futures> ? when_all(Futures &&... futures);
-  // template<class Sequence> struct when_any_result;
-  // template<class InputIterator> ? when_any(InputIterator first, InputIterator last);
-  // template<class... Futures> ? when_any(Futures &&... futures);
+  //! \brief Trait returning if a type is a promise \ingroup future_promise
+  template<class T> struct is_promise : std::false_type { };
+  template<class Impl> struct is_promise<basic_promise<Impl>> : std::true_type {};
+
+  //! \brief Trait returning if a type is a future \ingroup future_promise
+  template<class T> struct is_future : std::false_type { };
+  template<class Impl> struct is_future<basic_future<Impl>> : std::true_type { using future_type = basic_future<Impl>; };
+  template<class T> struct is_future<shared_basic_future_ptr<T>> : std::true_type { using future_type = T; };
 
   // TODO packaged_task
   
@@ -1269,7 +1271,7 @@ namespace lightweight_futures {
   {
     template<class promise_type, class future_type> struct stl_wait_implementation : public promise_type, public future_type
     {
-      stl_wait_implementation() : future_type(this->get_future()) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR stl_wait_implementation() : future_type(this->get_future()) { }
     };
   }
 
@@ -1282,6 +1284,113 @@ namespace lightweight_futures {
 #include "detail/future_policy.ipp"
 #define BOOST_SPINLOCK_FUTURE_NAME_POSTFIX _option
 #include "detail/future_policy.ipp"
+
+  //! \brief The results of a when_any() \ingroup future_promise
+  template<class Sequence> struct when_any_result
+  {
+    std::atomic<bool> _amfirst;
+    size_t index;
+    Sequence futures;
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR when_any_result() : _amfirst(false), index(0) { }
+  };
+
+  namespace detail
+  {
+    template<class rettype> struct when_all_state
+    {
+      promise<rettype> p;
+      std::atomic<size_t> count;
+      //! \todo Unnecessary duplicate of when_all_state?
+      rettype results;
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR when_all_state(size_t len) : count(len) { }
+    };
+    template<class State> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool when_all_unpack(size_t idx, State &state) { return false; }
+    template<class State, class Future, class... Futures> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool when_all_unpack(size_t idx, State &state, Future &&future, Futures &&... futures)
+    {
+      return (state->results[idx] = future.then([state](Future &&f)
+      {
+        if (!--state->count)
+          state->p.set_value(std::move(state->results));
+        return f.get();
+      }), when_all_unpack(idx + 1, state, std::forward<Futures>(futures)...));
+    }
+    template<class State> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool when_any_unpack(size_t idx, State &state) { return false; }
+    template<class State, class Future, class... Futures> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool when_any_unpack(size_t idx, State &state, Future &&future, Futures &&... futures)
+    {
+      return (state->futures[idx] = future.then([state, idx](Future &&f)
+      {
+        bool expected = false;
+        if (state->_amfirst.compare_exchange_strong(expected, true, std::memory_order_relaxed, std::memory_order_relaxed))
+        {
+          state->index = idx;
+          state->p.set_value(std::move(state->futures));
+        }
+        return f.get();
+      }), when_all_unpack(idx + 1, state, std::forward<Futures>(futures)...));
+    }
+  }
+
+  //! \brief Compose a future which becomes ready when all homogeneous futures in the iterator range become ready \ingroup future_promise
+  template<class InputIterator, typename = typename std::enable_if<is_future<typename std::iterator_traits<InputIterator>::value_type>::value>::type>
+  future<std::vector<typename std::iterator_traits<InputIterator>::value_type>> when_all(InputIterator first, InputIterator last)
+  {
+    using future_type = typename std::iterator_traits<InputIterator>::value_type;
+    using vectype = std::vector<future_type>;
+    size_t len = std::distance(first, last);
+    auto state = std::make_shared<detail::when_all_state<vectype>>(len);
+    auto &_state = *state;
+    _state.results.reserve(len);
+    for (auto it = first; it != last; ++it)
+      _state.results.push_back(it->then([state](future_type &&f) {
+        if (1==state->count.fetch_sub(1, std::memory_order_relaxed))
+          state->p.set_value(std::move(state->results));
+        return f.get();
+      }));
+    return _state.p.get_future();
+  }
+
+  //! \brief Compose a future which becomes ready when all heterogeneous futures in the iterator range become ready \ingroup future_promise
+  template<class... Futures> future<std::tuple<typename std::decay<Futures>::type...>> when_all(Futures &&... futures)
+  {
+    using vectype = std::tuple<typename std::decay<Futures>::type...>;
+    auto state = std::make_shared<detail::when_all_state<vectype>>(sizeof...(futures));
+    detail::when_all_unpack(0, state, std::forward<Futures>(futures)...);
+    return state->p.get_future();
+  }
+
+
+  //! \brief Compose a future which becomes ready when any one of the homogeneous futures in the iterator range becomes ready \ingroup future_promise
+  template<class InputIterator, typename = typename std::enable_if<is_future<typename std::iterator_traits<InputIterator>::value_type>::value>::type>
+  future<when_any_result<std::vector<typename std::iterator_traits<InputIterator>::value_type>>> when_any(InputIterator first, InputIterator last)
+  {
+    using future_type = typename std::iterator_traits<InputIterator>::value_type;
+    using vectype = std::vector<future_type>;
+    size_t len = std::distance(first, last);
+    auto state = std::make_shared<when_any_result<vectype>>();
+    auto &_state = *state;
+    _state.futures.reserve(len);
+    size_t n = 0;
+    for (auto it = first; it != last; ++it, ++n)
+      _state.futures.push_back(it->then([state, n](future_type &&f) {
+      bool expected = false;
+      if (state->_amfirst.compare_exchange_strong(expected, true, std::memory_order_relaxed, std::memory_order_relaxed))
+      {
+        state->index = n;
+        state->p.set_value(std::move(state->futures));
+      }
+      return f.get();
+    }));
+    return _state.p.get_future();
+  }
+
+  //! \brief Compose a future which becomes ready when any one of the homogeneous futures in the iterator range becomes ready \ingroup future_promise
+  template<class... Futures> future<when_any_result<std::tuple<typename std::decay<Futures>::type...>>> when_any(Futures &&... futures)
+  {
+    using vectype = std::tuple<typename std::decay<Futures>::type...>;
+    auto state = std::make_shared<when_any_result<vectype>>(sizeof...(futures));
+    detail::when_any_unpack(0, state, std::forward<Futures>(futures)...);
+    return state->p.get_future();
+  }
 
 }
 BOOST_SPINLOCK_V1_NAMESPACE_END

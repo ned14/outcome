@@ -36,14 +36,16 @@ can execute it. Also relocate sleeping_waiters.
 is done.
  - [x] Fix failing constexpr test min_promise_future_reduce.
  - [x] Implement N4399 continuations for shared_future.
- - [ ] Implement wait_for()/wait_until().
- - [ ] when_any/when_all composure.
+ - [x] when_any/when_all composure.
  - [ ] Port AFIO's intrusive enqueued_task into a lightweight packaged_task design.
 
 Later:
+ - [ ] Implement wait_for()/wait_until().
  - [ ] Loosen explicit basic_monad constructors to allow option => result => monad implicitly, and
 monad => result => option explicitly (with potential exception throwing).
  - [ ] Pack bools in basic_promise_future_storage into value_storage_impl, thus saving 8 bytes
+ - [ ] Add C++ 1z coroutines support
+ - [ ] Add Boost.Fiber support
  - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
  - [ ] Add tribool logic programming operator overloads
 
