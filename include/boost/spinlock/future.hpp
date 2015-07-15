@@ -854,7 +854,9 @@ namespace lightweight_futures {
     using future_errc = typename implementation_policy::future_errc;
     //! \brief The future_error type we use
     using future_error = typename implementation_policy::future_error;
-    
+    //! \brief The future_status type we use
+    using future_status = typename implementation_policy::future_status;
+
   protected:
     using lock_guard_type = typename monad_type::lock_guard_type;
     using future_base_type = typename monad_type::future_base_type;
@@ -1035,11 +1037,11 @@ namespace lightweight_futures {
   private:
     // NOTE: This isn't in wait() because of a bug in GCC's optimiser whereby any call of
     // std::future.wait() in the function, even if impossible to ever be called, inhibits optimisation
-    void _wait() const
+    template<class F> future_status _wait(F &&dowait, bool spin) const
     {
       lock_guard_type h(const_cast<basic_future *>(this));
       if(this->is_ready())
-        return;
+        return future_status::ready;
       _check_validity();
       using shared_ptr_type = std::shared_ptr<typename implementation_policy::wait_implementation>;
       using shared_ptr_storage_type = std::unique_ptr<shared_ptr_type>;
@@ -1048,14 +1050,14 @@ namespace lightweight_futures {
         waiter=*this->_promise->_set_state_info.sleeping_waiters;
       for (size_t count = 0; !this->is_ready(); ++count)
       {
-        while (!waiter && count >= implementation_policy::wait_spin_count)
+        while (!waiter && (!spin || count >= implementation_policy::wait_spin_count))
         {
           // Don't exclude during this lengthy sequence
           h.unlock();
           shared_ptr_storage_type newwaiter(new shared_ptr_type(std::make_shared<typename implementation_policy::wait_implementation>()));
           h.relock(const_cast<basic_future *>(this));
           if(this->is_ready())
-            return;
+            return future_status::ready;
           _check_validity();
           if (!this->_promise->_set_state_info.sleeping_waiters)
             this->_promise->_set_state_info.sleeping_waiters = std::move(newwaiter);
@@ -1063,11 +1065,15 @@ namespace lightweight_futures {
         }
         h.unlock();
         if (waiter)
-          waiter->wait();
+        {
+          if (dowait(waiter))
+            return future_status::timeout;
+        }
         else
           std::this_thread::yield();
         h.relock(const_cast<basic_future *>(this));
       }
+      return future_status::ready;
     }
   public:
     //! \brief SYNC POINT Wait for the future to become ready
@@ -1077,10 +1083,29 @@ namespace lightweight_futures {
       if(this->is_ready())
         return;
 #endif
-      _wait();
+      _wait([](std::shared_ptr<typename implementation_policy::wait_implementation> &waiter) {
+        waiter->wait();
+        return false;
+      }, true);
     }
-//// template<class R, class P> future_status wait_for(const std::chrono::duration<R, P> &rel_time) const;  // TODO
-//// template<class C, class D> future_status wait_until(const std::chrono::time_point<C, D> &abs_time) const;  // TODO
+    //! \brief SYNC POINT (if non-zero duration) Wait for the future to become ready for a duration
+    template<class R, class P> future_status wait_for(const std::chrono::duration<R, P> &rel_time) const
+    {
+#if !BOOST_SPINLOCK_IN_THREAD_SANITIZER
+      if (rel_time.count() == 0)
+        return this->is_ready() ? future_status::ready : future_status::timeout;
+#endif
+      std::chrono::time_point<std::chrono::steady_clock> point(std::chrono::steady_clock::now());
+      point += rel_time;
+      return wait_until(point);
+    }
+    //! \brief SYNC POINT Wait for the future to become ready until a deadline
+    template<class C, class D> future_status wait_until(const std::chrono::time_point<C, D> &abs_time) const
+    {
+      return _wait([&abs_time](std::shared_ptr<typename implementation_policy::wait_implementation> &waiter) {
+        return waiter->wait_until(abs_time)==future_status::timeout;
+      }, false);
+    }
     
     /*! \brief SYNC POINT Call F when the future signals.
     \param f Some callable. Must be noexcept if this future cannot transport an exception_type, else will static assert.
@@ -1174,6 +1199,47 @@ namespace lightweight_futures {
       return _future.get();
     }
   public:
+    //! \brief This future has a value_type
+    BOOST_STATIC_CONSTEXPR bool has_value_type = base_future_type::has_value_type;
+    //! \brief This future has an error_type
+    BOOST_STATIC_CONSTEXPR bool has_error_type = base_future_type::has_error_type;
+    //! \brief This future has an exception_type
+    BOOST_STATIC_CONSTEXPR bool has_exception_type = base_future_type::has_exception_type;
+    //! \brief The final implementation type
+    using implementation_type = typename base_future_type::implementation_type;
+    //! \brief The type potentially held by the future
+    using value_type = typename base_future_type::value_type;
+    //! \brief The error code potentially held by the future
+    using error_type = typename base_future_type::error_type;
+    //! \brief The exception ptr potentially held by the future
+    using exception_type = typename base_future_type::exception_type;
+    //! \brief Tag type for an empty future
+    struct empty_type { using parent_type = implementation_type; };
+    //! \brief Rebind this future type into a different value_type
+    template<typename U> using rebind = typename base_future_type::template rebind<U>;
+
+    //! \brief This future will never throw exceptions during move construction
+    BOOST_STATIC_CONSTEXPR bool is_nothrow_move_constructible = base_future_type::is_nothrow_move_constructible;
+    //! \brief This future will never throw exceptions during move assignment
+    BOOST_STATIC_CONSTEXPR bool is_nothrow_move_assignable = base_future_type::is_nothrow_destructible && base_future_type::is_nothrow_move_constructible;
+    //! \brief This future will never throw exceptions during destruction
+    BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = base_future_type::is_nothrow_destructible;
+
+    //! \brief Whether fetching value/error/exception is single shot
+    BOOST_STATIC_CONSTEXPR bool is_consuming = base_future_type::is_consuming;
+    //! \brief Whether this future is managed by shared_basic_future_ptr
+    BOOST_STATIC_CONSTEXPR bool is_shared = base_future_type::is_shared;
+    //! \brief The promise type matching this future type
+    using promise_type = basic_promise<base_future_type>;
+    //! \brief This future type
+    using future_type = shared_basic_future_ptr;
+    //! \brief The future_errc type we use
+    using future_errc = typename base_future_type::future_errc;
+    //! \brief The future_error type we use
+    using future_error = typename base_future_type::future_error;
+    //! \brief The future_status type we use
+    using future_status = typename base_future_type::future_status;
+
     //! \brief Explicit constructor from unshared underlying shared state
     explicit shared_basic_future_ptr(std::nullptr_t, base_future_type &&p) : _future(std::make_shared<base_future_type>(std::move(p))) { }
     //! \brief Explicit constructor from shared_ptr
@@ -1256,11 +1322,17 @@ namespace lightweight_futures {
     }
   };
 
-  //! \brief Trait returning if a type is a promise \ingroup future_promise
+  /*! \brief Trait returning if a type is a promise
+  \ingroup future_promise
+  \todo is_promise<> ought to be a concept or member function tested
+  */
   template<class T> struct is_promise : std::false_type { };
   template<class Impl> struct is_promise<basic_promise<Impl>> : std::true_type {};
 
-  //! \brief Trait returning if a type is a future \ingroup future_promise
+  /*! \brief Trait returning if a type is a future
+  \ingroup future_promise
+  \todo is_future<> ought to be a concept or member function tested
+  */
   template<class T> struct is_future : std::false_type { };
   template<class Impl> struct is_future<basic_future<Impl>> : std::true_type { using future_type = basic_future<Impl>; };
   template<class T> struct is_future<shared_basic_future_ptr<T>> : std::true_type { using future_type = T; };
@@ -1288,45 +1360,71 @@ namespace lightweight_futures {
   //! \brief The results of a when_any() \ingroup future_promise
   template<class Sequence> struct when_any_result
   {
-    std::atomic<bool> _amfirst;
     size_t index;
     Sequence futures;
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR when_any_result() : _amfirst(false), index(0) { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR when_any_result() : index(0) { }
   };
 
   namespace detail
   {
-    template<class rettype> struct when_all_state
+    // Borrowed from https://stackoverflow.com/questions/17424477/implementation-c14-make-integer-sequence#
+    template<unsigned N> struct index_sequence;
+    namespace moredetail
     {
-      promise<rettype> p;
-      std::atomic<size_t> count;
-      //! \todo Unnecessary duplicate of when_all_state?
-      rettype results;
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR when_all_state(size_t len) : count(len) { }
-    };
-    template<class State> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool when_all_unpack(size_t idx, State &state) { return false; }
-    template<class State, class Future, class... Futures> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool when_all_unpack(size_t idx, State &state, Future &&future, Futures &&... futures)
-    {
-      return (state->results[idx] = future.then([state](Future &&f)
-      {
-        if (!--state->count)
-          state->p.set_value(std::move(state->results));
-        return f.get();
-      }), when_all_unpack(idx + 1, state, std::forward<Futures>(futures)...));
+      template<class T> using Invoke = typename T::type;
+
+      template<unsigned...> struct seq { using type = seq; };
+
+      template<class S1, class S2> struct concat;
+
+      template<unsigned... I1, unsigned... I2>
+      struct concat<seq<I1...>, seq<I2...>>
+        : seq<I1..., (sizeof...(I1)+I2)...>{};
+
+      template<class S1, class S2>
+      using Concat = Invoke<concat<S1, S2>>;
+
+      template<unsigned N> using GenSeq = Invoke<index_sequence<N>>;
     }
-    template<class State> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool when_any_unpack(size_t idx, State &state) { return false; }
-    template<class State, class Future, class... Futures> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool when_any_unpack(size_t idx, State &state, Future &&future, Futures &&... futures)
+    template<unsigned N> struct index_sequence : moredetail::Concat<moredetail::GenSeq<N / 2>, moredetail::GenSeq<N - N / 2>> {};
+    template<> struct index_sequence<0> : moredetail::seq<>{};
+    template<> struct index_sequence<1> : moredetail::seq<0>{};
+    template<unsigned N> using make_index_sequence = index_sequence<N>;
+
+    template<class vectype, class InputIterator> struct when_all_any_state_vector
     {
-      return (state->futures[idx] = future.then([state, idx](Future &&f)
+      promise<vectype> _p;
+      std::atomic<size_t> _count;
+      InputIterator _first, _last;
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR when_all_any_state_vector(size_t count, InputIterator first, InputIterator last) : _count(count), _first(first), _last(last) { }
+    };
+    template<class... Futures> struct when_all_any_state_tuple
+    {
+      using tuple_type = std::tuple<Futures...>;
+      BOOST_STATIC_CONSTEXPR size_t tuple_size = sizeof...(Futures);
+      promise<tuple_type> _p;
+      std::atomic<size_t> _count;
+      std::tuple<Futures &&...> _futures;
+      template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR when_all_any_state_tuple(size_t count, Args &&... args) : _count(count), _futures(std::make_tuple(std::move(args)...)) { }
+    };
+    template<class Future, class... Futures, size_t... Ns> BOOST_SPINLOCK_FUTURE_CONSTEXPR std::tuple<Future, Futures...> future_tuple_copy_or_move(std::tuple<Future &&, Futures &&...> &src, index_sequence<Ns...>)
+    {
+      return std::tuple_cat(
+        std::make_tuple(Future::is_consuming ? Future(std::move(std::get<0>(src))) : Future(std::get<0>(src))),
+        future_tuple_copy_or_move(std::make_tuple(std::move(std::get<Ns+1>(src))...))
+        );
+    }
+
+    template<size_t Idx, class State> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool when_all_unpack(State &) { return false; }
+    template<size_t Idx, class State, class Future, class... Futures> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool when_all_unpack(State &state, Future &&, Futures &&... futures)
+    {
+      return (std::get<Idx>(state->_futures).then([state](Future &&)
       {
-        bool expected = false;
-        if (state->_amfirst.compare_exchange_strong(expected, true, std::memory_order_relaxed, std::memory_order_relaxed))
-        {
-          state->index = idx;
-          state->p.set_value(std::move(state->futures));
-        }
-        return f.get();
-      }), when_all_unpack(idx + 1, state, std::forward<Futures>(futures)...));
+        using state_type = decltype(*state);
+        BOOST_STATIC_CONSTEXPR size_t tuple_size = state_type::tuple_size;
+        if (1 == state->_count.fetch_sub(1, std::memory_order_relaxed))
+          state->_p.set_value(future_tuple_copy_or_move(state->_futures, make_index_sequence<tuple_size-1>()));
+      }), when_all_unpack<Idx+1>(state, std::forward<Futures>(futures)...));
     }
   }
 
@@ -1336,61 +1434,74 @@ namespace lightweight_futures {
   {
     using future_type = typename std::iterator_traits<InputIterator>::value_type;
     using vectype = std::vector<future_type>;
-    size_t len = std::distance(first, last);
-    auto state = std::make_shared<detail::when_all_state<vectype>>(len);
+    if (first == last)
+      return future<vectype>(vectype());
+    auto state = std::make_shared<detail::when_all_any_state_vector<vectype, InputIterator>>(std::distance(first, last), first, last);
     auto &_state = *state;
-    _state.results.reserve(len);
     for (auto it = first; it != last; ++it)
-      _state.results.push_back(it->then([state](future_type &&f) {
-        if (1==state->count.fetch_sub(1, std::memory_order_relaxed))
-          state->p.set_value(std::move(state->results));
-        return f.get();
-      }));
-    return _state.p.get_future();
+      it->then([state](future_type &&) {
+        if (1==state->_count.fetch_sub(1, std::memory_order_relaxed))
+        {
+          if(future_type::is_consuming)
+            state->_p.set_value(vectype(std::make_move_iterator(state->_first), std::make_move_iterator(state->_last)));
+          else
+            state->_p.set_value(vectype(state->_first, state->_last));
+        }
+      });
+    return _state._p.get_future();
   }
 
   //! \brief Compose a future which becomes ready when all heterogeneous futures in the iterator range become ready \ingroup future_promise
   template<class... Futures> future<std::tuple<typename std::decay<Futures>::type...>> when_all(Futures &&... futures)
   {
     using vectype = std::tuple<typename std::decay<Futures>::type...>;
-    auto state = std::make_shared<detail::when_all_state<vectype>>(sizeof...(futures));
-    detail::when_all_unpack(0, state, std::forward<Futures>(futures)...);
-    return state->p.get_future();
+    if (!sizeof...(Futures))
+      return future<vectype>(vectype());
+    auto state = std::make_shared<detail::when_all_any_state_tuple<Futures...>>(sizeof...(Futures), std::forward<Futures>(futures)...);
+    detail::when_all_unpack<0>(state, std::forward<Futures>(futures)...);
+    return state->_p.get_future();
   }
 
 
+#if 0
   //! \brief Compose a future which becomes ready when any one of the homogeneous futures in the iterator range becomes ready \ingroup future_promise
   template<class InputIterator, typename = typename std::enable_if<is_future<typename std::iterator_traits<InputIterator>::value_type>::value>::type>
   future<when_any_result<std::vector<typename std::iterator_traits<InputIterator>::value_type>>> when_any(InputIterator first, InputIterator last)
   {
     using future_type = typename std::iterator_traits<InputIterator>::value_type;
     using vectype = std::vector<future_type>;
-    size_t len = std::distance(first, last);
-    auto state = std::make_shared<when_any_result<vectype>>();
+    if (first == last)
+      return future<when_any_result<vectype>>(when_any_result<vectype>());
+    auto state = std::make_shared<when_any_result<vectype>>(first, last);
     auto &_state = *state;
-    _state.futures.reserve(len);
     size_t n = 0;
-    for (auto it = first; it != last; ++it, ++n)
-      _state.futures.push_back(it->then([state, n](future_type &&f) {
-      bool expected = false;
-      if (state->_amfirst.compare_exchange_strong(expected, true, std::memory_order_relaxed, std::memory_order_relaxed))
-      {
-        state->index = n;
-        state->p.set_value(std::move(state->futures));
-      }
-      return f.get();
-    }));
-    return _state.p.get_future();
+    for (auto &f : _state.futures)
+    {
+      f.then([state, n](future_type &&f) {
+        bool expected = false;
+        if (state->_amfirst.compare_exchange_strong(expected, true, std::memory_order_relaxed, std::memory_order_relaxed))
+        {
+          state->index = n;
+          state->p.set_value(std::move(state->futures));
+        }
+        return f.get();
+      });
+      n++;
+    }
+    return _state._p.get_future();
   }
 
   //! \brief Compose a future which becomes ready when any one of the homogeneous futures in the iterator range becomes ready \ingroup future_promise
   template<class... Futures> future<when_any_result<std::tuple<typename std::decay<Futures>::type...>>> when_any(Futures &&... futures)
   {
     using vectype = std::tuple<typename std::decay<Futures>::type...>;
+    if (!sizeof...(Futures))
+      return future<when_any_result<vectype>>(when_any_result<vectype>());
     auto state = std::make_shared<when_any_result<vectype>>(sizeof...(futures));
-    detail::when_any_unpack(0, state, std::forward<Futures>(futures)...);
-    return state->p.get_future();
+    detail::when_any_unpack<0>(state, std::forward<Futures>(futures)...);
+    return state->_p.get_future();
   }
+#endif
 
 }
 BOOST_SPINLOCK_V1_NAMESPACE_END

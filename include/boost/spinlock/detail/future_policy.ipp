@@ -207,9 +207,11 @@ namespace detail
           abort();
       }
     }
+    // If storage is packed into a byte, it cannot be referenced
+    using const_lvalue_type = typename std::conditional<future_storage::value_storage_type::is_referenceable, const typename future_storage::value_type &, _value_type>::type;
   public:
-    // Note we always return value_type by value.
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP _value_type get() const
+    // Note we always return value_type by const lvalue ref.
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP const_lvalue_type get() const
     {
       static_cast<const implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(const_cast<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME *>(this));
@@ -333,6 +335,8 @@ namespace detail
     using future_errc = std::future_errc;
     // The type of future exception to use for issuing exceptions
     using future_error = std::future_error;
+    // The type of future status to use
+    using future_status = std::future_status;
     // The category of error code to use
     static const std::error_category &future_category() noexcept { return std::future_category(); }
     // How many spins of yield to do waiting to be signalled before allocating a wait_implementation
@@ -370,6 +374,8 @@ namespace detail
     using future_errc = std::future_errc;
     // The type of future exception to use for issuing exceptions
     using future_error = std::future_error;
+    // The type of future status to use
+    using future_status = std::future_status;
     // The category of error code to use
     static const std::error_category &future_category() noexcept { return std::future_category(); }
     // How many spins of yield to do waiting to be signalled before allocating a wait_implementation

@@ -1218,12 +1218,12 @@ BOOST_AUTO_TEST_CASE(works/monad/optional, "Tests that the monad acts as an opti
   std::cout << "sizeof(option<void>[2]) = " << sizeof(option<void>[2]) << std::endl;
 
   BOOST_CHECK(!(sizeof(monad<bool>) & 3));
-  BOOST_CHECK(sizeof(option<void>)<=1);
-  BOOST_CHECK(sizeof(option<bool>)<=1);
-  BOOST_CHECK(sizeof(option<tribool>)<=2);
-  BOOST_CHECK(sizeof(option<void>[2])<=2);
-  BOOST_CHECK(sizeof(option<bool>[2])<=2);
-  BOOST_CHECK(sizeof(option<tribool>[2])<=4);
+  BOOST_CHECK(sizeof(option<void>)<=1U);
+  BOOST_CHECK(sizeof(option<bool>)<=1U);
+  BOOST_CHECK(sizeof(option<tribool>)<=2U);
+  BOOST_CHECK(sizeof(option<void>[2])<=2U);
+  BOOST_CHECK(sizeof(option<bool>[2])<=2U);
+  BOOST_CHECK(sizeof(option<tribool>[2])<=4U);
   
   // Make sure the special compact bool storage works
   BOOST_CHECK(option<bool>(false).get()==false);
@@ -1903,8 +1903,8 @@ BOOST_AUTO_TEST_CASE(works/future/lightweight, "Tests that our future-promise wo
   std::cout << "sizeof(future<bool>[2]) = " << sizeof(future<bool>[2]) << std::endl;
   BOOST_CHECK(!(sizeof(promise<bool>) & 3));
   BOOST_CHECK(!(sizeof(future<bool>) & 3));
-  BOOST_CHECK(sizeof(promise<bool>)<=64);
-  BOOST_CHECK(sizeof(future<bool>)<=64);
+  BOOST_CHECK(sizeof(promise<bool>)<=64U);
+  BOOST_CHECK(sizeof(future<bool>)<=64U);
   //BOOST_CHECK(alignof(promise<bool>)==64);
   //BOOST_CHECK(alignof(future<bool>)==64);
   FuturePromiseConformanceTest<future, promise>();
@@ -2010,7 +2010,6 @@ BOOST_AUTO_TEST_CASE(works/shared_future/lightweight, "Tests that our shared_fut
   SharedFuturePromiseConformanceTest<shared_future, promise>();
 }
 
-#if 1
 BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our future-promise continuations works as intended")
 {
   std::cout << "\n=== Tests that our future-promise continuations works as intended ===" << std::endl;
@@ -2123,9 +2122,7 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
     BOOST_CHECK(f4.get() == 2);
   }
 }
-#endif
 
-#if 1
 BOOST_AUTO_TEST_CASE(works/shared_future/continuations/lightweight, "Tests that our shared_future-promise continuations works as intended")
 {
   std::cout << "\n=== Tests that our shared_future-promise continuations works as intended ===" << std::endl;
@@ -2143,7 +2140,113 @@ BOOST_AUTO_TEST_CASE(works/shared_future/continuations/lightweight, "Tests that 
   BOOST_CHECK(f2.valid());
   BOOST_CHECK(f2.get() == 5);
 }
-#endif
+
+template<template<class> class F, template<class> class SF, template<class> class P> void WaitComposureConformanceTest()
+{
+  std::exception_ptr e(std::make_exception_ptr(std::runtime_error("hello")));
+  // Iterator based future when_all
+  {
+    std::vector<P<int>> promises(10);
+    std::vector<F<int>> futures;
+    for (auto &i : promises)
+      futures.push_back(i.get_future());
+    for (size_t n = 0; n < futures.size(); n++)
+      BOOST_CHECK(futures[n].valid());
+    F<std::vector<F<int>>> all(when_all(futures.begin(), futures.end()));
+    for (size_t n = 0; n < futures.size(); n++)
+      BOOST_CHECK(!futures[n].valid());
+    for (size_t n = 0; n < futures.size(); n++)
+    {
+      promises[n].set_value((int) n);
+      BOOST_CHECK(all.valid());
+      if(n==futures.size()-1)
+        BOOST_CHECK(std::future_status::ready == all.wait_for(std::chrono::seconds(0)));
+      else
+        BOOST_CHECK(std::future_status::timeout==all.wait_for(std::chrono::seconds(0)));
+    }
+    auto result(all.get());
+    BOOST_CHECK(!all.valid());
+    for (size_t n = 0; n < futures.size(); n++)
+    {
+      BOOST_CHECK(result[n].valid());
+      BOOST_CHECK(result[n].get()==(int) n);
+    }
+  }
+  // Iterator based shared_future when_all
+  {
+    std::vector<P<int>> promises(10);
+    std::vector<SF<int>> futures;
+    for (auto &i : promises)
+      futures.push_back(i.get_future());
+    for (size_t n = 0; n < futures.size(); n++)
+      BOOST_CHECK(futures[n].valid());
+    F<std::vector<SF<int>>> all(when_all(futures.begin(), futures.end()));
+    for (size_t n = 0; n < futures.size(); n++)
+      BOOST_CHECK(futures[n].valid());
+    for (size_t n = 0; n < futures.size(); n++)
+    {
+      promises[n].set_value((int) n);
+      BOOST_CHECK(all.valid());
+      if (n == futures.size() - 1)
+        BOOST_CHECK(std::future_status::ready == all.wait_for(std::chrono::seconds(0)));
+      else
+        BOOST_CHECK(std::future_status::timeout == all.wait_for(std::chrono::seconds(0)));
+    }
+    auto result(all.get());
+    BOOST_CHECK(!all.valid());
+    for (size_t n = 0; n < futures.size(); n++)
+    {
+      BOOST_CHECK(result[n].valid());
+      BOOST_CHECK(result[n].get() == (int) n);
+      BOOST_CHECK(futures[n].get() == (int) n);
+      const_cast<int &>(futures[n].get()) = -1;
+      BOOST_CHECK(result[n].get() == -1);
+    }
+  }
+  // Tuple based future when_all
+  {
+    struct Foo { };
+    auto promises = std::make_tuple(P<int>(), P<std::string>(), P<Foo>());
+    auto all(when_all(std::get<0>(promises).get_future(), std::get<1>(promises).get_future(), std::get<2>(promises).get_future()));
+    BOOST_CHECK(std::future_status::timeout == all.wait_for(std::chrono::seconds(0)));
+    std::get<0>(promises).set_value(0);
+    BOOST_CHECK(std::future_status::timeout == all.wait_for(std::chrono::seconds(0)));
+    std::get<1>(promises).set_exception(e);
+    BOOST_CHECK(std::future_status::timeout == all.wait_for(std::chrono::seconds(0)));
+    std::get<2>(promises).set_exception(e);
+    BOOST_CHECK(std::future_status::ready == all.wait_for(std::chrono::seconds(0)));
+    auto result(all.get());
+    BOOST_CHECK(!all.valid());
+    BOOST_CHECK(std::get<0>(result).valid());
+    BOOST_CHECK(std::get<0>(result).get() == 0);
+    BOOST_CHECK(std::get<1>(result).valid());
+    BOOST_CHECK_THROW(std::get<1>(result).get(), std::system_error);
+    BOOST_CHECK(std::get<2>(result).valid());
+    BOOST_CHECK_THROW(std::get<2>(result).get(), std::system_error);
+  }
+  //auto any(when_any(futures.begin(), futures.end()));
+}
+
+BOOST_AUTO_TEST_CASE(works/composure/future/lightweight, "Tests that our future-promise composes as intended")
+{
+  std::cout << "\n=== Tests that our future-promise composes as intended ===" << std::endl;
+  using namespace boost::spinlock::lightweight_futures;
+  WaitComposureConformanceTest<future, shared_future, promise>();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 static usCount overhead;
