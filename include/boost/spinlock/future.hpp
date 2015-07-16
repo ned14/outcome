@@ -771,7 +771,8 @@ namespace lightweight_futures {
         : p(std::move(_p)), f(std::move(_f)), prevcallable(std::move(_prev)) { }
       void operator()(future_base_type *_self)
       {
-        future_type *self=static_cast<future_type *>(_self);
+        future_type empty;
+        future_type *self=_self ? static_cast<future_type *>(_self) : &empty;
         // Execute the continuation
         try
         {
@@ -1417,7 +1418,7 @@ namespace lightweight_futures {
     };
     template<class future_type> struct future_vector_invalidate_if_moved<false, future_type>
     {
-      template<class InputIterator> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool operator()(InputIterator first, InputIterator last) const
+      template<class InputIterator> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool operator()(InputIterator, InputIterator) const
       {
         return true;
       }
@@ -1428,7 +1429,7 @@ namespace lightweight_futures {
     };
     template<class future_type> struct future_tuple_copy_or_move4<false, future_type>
     {
-      template<class U, class V> BOOST_SPINLOCK_FUTURE_CONSTEXPR future_type operator()(U &&u, V &&v) const { return std::forward<U>(u); }
+      template<class U, class V> BOOST_SPINLOCK_FUTURE_CONSTEXPR future_type operator()(U &&u, V &&) const { return std::forward<U>(u); }
     };
     template<bool do_move, class future_type> struct future_tuple_copy_or_move3
     {
