@@ -423,6 +423,40 @@ namespace traits
 
 namespace lightweight_futures
 {
+  namespace detail
+  {
+#ifdef __cpp_generic_lambdas
+    // Use the STL integer_sequence
+    template<class T, T... Ints> using integer_sequence = std::integer_sequence<T, Ints...>;
+    template<class T, T N> using make_integer_sequence = std::make_integer_sequence<T, N>;
+#else
+    template <typename T, T... ints> struct integer_sequence { };
+
+    namespace moredetail
+    {
+      template <typename T, T N, typename = void> struct make_integer_sequence_impl
+      {
+        template <typename> struct tmp;
+
+        template <T... Prev> struct tmp<integer_sequence<T, Prev...>>
+        {
+          using type = integer_sequence<T, Prev..., N - 1>;
+        };
+
+        using type = typename tmp<typename make_integer_sequence_impl<T, N - 1>::type>::type;
+      };
+
+      template <typename T, T N> struct make_integer_sequence_impl<T, N, typename std::enable_if<N == 0>::type>
+      {
+        using type = integer_sequence<T>;
+      };
+    }
+
+    template <typename T, T N> using make_integer_sequence = typename moredetail::make_integer_sequence_impl<T, N>::type;
+#endif
+    template<size_t... Ints> using index_sequence = integer_sequence<size_t, Ints...>;
+    template<size_t N> using make_index_sequence = make_integer_sequence<size_t, N>;
+  }
 
   //! \brief Enumeration of the ways in which a monad operation may fail \ingroup monad
   enum class monad_errc {

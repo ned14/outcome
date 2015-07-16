@@ -141,7 +141,8 @@ namespace lightweight_futures {
     template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct basic_promise_future_storage;
     template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct basic_promise_storage;
     template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> using basic_future_storage = basic_promise_future_storage<_value_type, _error_type, _exception_type, _wait_implementation>;
-    
+    template<bool reserve_future_storage, class f_traits, class implementation_policy, class future_type, class promise_type, class callable_type> struct continuation;
+
     template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct lock_guard
     {
       using promise_base_type = basic_promise_storage<_value_type, _error_type, _exception_type, _wait_implementation>;
@@ -487,6 +488,7 @@ namespace lightweight_futures {
   template<class implementation_policy> class basic_promise : protected detail::basic_promise_storage<typename implementation_policy::value_type, typename implementation_policy::error_type, typename implementation_policy::exception_type, typename implementation_policy::wait_implementation>
   {
     friend implementation_policy;
+    template<bool reserve_future_storage, class f_traits, class _implementation_policy, class future_type, class promise_type, class callable_type> friend struct detail::continuation;
     using base = detail::basic_promise_storage<typename implementation_policy::value_type, typename implementation_policy::error_type, typename implementation_policy::exception_type, typename implementation_policy::wait_implementation>;
   public:
     //! \brief The policy used to implement this basic_future
@@ -651,11 +653,15 @@ namespace lightweight_futures {
       if(state_info.sleeping_waiters)
         state_info.sleeping_waiters.get()->get()->set_value();
     }
-    template<class U> BOOST_SPINLOCK_FUTURE_MSVC_HELP void _set_state(U &&c)
+    template<class U> BOOST_SPINLOCK_FUTURE_MSVC_HELP void _set_state(U &&c, bool is_continuation=false)
     {
       lock_guard_type h(this);
-      if(this->_detached)
+      if (this->_detached)
+      {
+        if (is_continuation)
+          return;
         basic_future<implementation_policy>::_throw_error(monad_errc::already_set);
+      }
       if(h._f)
       {
         if(h._f->_storage.type!=value_storage_type::storage_type::empty)
@@ -682,6 +688,11 @@ namespace lightweight_futures {
           basic_future<implementation_policy>::_throw_error(monad_errc::already_set);
         c(this);
       }
+    }
+    // Sets state from a continuation (don't throw if the promise is broken)
+    BOOST_SPINLOCK_FUTURE_MSVC_HELP void _set_state_from_continuation(value_storage_type &&v)
+    {
+      _set_state([&v](future_base_type *self) { self->_storage.set_state(std::move(v)); }, true);
     }
   public:
     /*! \brief SYNC POINT EXTENSION Sets the state to be returned by the associated future to be the same as the value storage, releasing any waits occuring in other threads.
@@ -764,7 +775,7 @@ namespace lightweight_futures {
         // Execute the continuation
         try
         {
-          p.set_state(detail::do_then<typename f_traits::return_type, callable_type, implementation_policy>(std::move(f))(std::move(*self))._storage);
+          p._set_state_from_continuation(detail::do_then<typename f_traits::return_type, callable_type, implementation_policy>(std::move(f))(std::move(*self))._storage);
           if (implementation_policy::is_consuming && f_traits::is_rvalue)
           {
             // Concurrency TS requires us to zap storage after a consuming move
@@ -1367,30 +1378,6 @@ namespace lightweight_futures {
 
   namespace detail
   {
-    // Borrowed from https://stackoverflow.com/questions/17424477/implementation-c14-make-integer-sequence#
-    template<unsigned N> struct index_sequence;
-    namespace moredetail
-    {
-      template<class T> using Invoke = typename T::type;
-
-      template<unsigned...> struct seq { using type = seq; };
-
-      template<class S1, class S2> struct concat;
-
-      template<unsigned... I1, unsigned... I2>
-      struct concat<seq<I1...>, seq<I2...>>
-        : seq<I1..., (sizeof...(I1)+I2)...>{};
-
-      template<class S1, class S2>
-      using Concat = Invoke<concat<S1, S2>>;
-
-      template<unsigned N> using GenSeq = Invoke<index_sequence<N>>;
-    }
-    template<unsigned N> struct index_sequence : moredetail::Concat<moredetail::GenSeq<N / 2>, moredetail::GenSeq<N - N / 2>> {};
-    template<> struct index_sequence<0> : moredetail::seq<>{};
-    template<> struct index_sequence<1> : moredetail::seq<0>{};
-    template<unsigned N> using make_index_sequence = index_sequence<N>;
-
     template<class vectype, class InputIterator> struct when_all_any_state_vector
     {
       promise<vectype> _p;
@@ -1400,35 +1387,84 @@ namespace lightweight_futures {
     };
     template<class... Futures> struct when_all_any_state_tuple
     {
-      using tuple_type = std::tuple<Futures...>;
+      using tuple_type = std::tuple<typename std::decay<Futures>::type...>;
       BOOST_STATIC_CONSTEXPR size_t tuple_size = sizeof...(Futures);
       promise<tuple_type> _p;
       std::atomic<size_t> _count;
       std::tuple<Futures &&...> _futures;
-      template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR when_all_any_state_tuple(size_t count, Args &&... args) : _count(count), _futures(std::make_tuple(std::move(args)...)) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR when_all_any_state_tuple(size_t count, std::tuple<Futures &&...> futures) : _count(count), _futures(futures) { }
     };
-    template<class Future, class... Futures, size_t... Ns> BOOST_SPINLOCK_FUTURE_CONSTEXPR std::tuple<Future, Futures...> future_tuple_copy_or_move(std::tuple<Future &&, Futures &&...> &src, index_sequence<Ns...>)
+    template<bool do_move, class vectype> struct future_vector_copy_or_move
     {
-      return std::tuple_cat(
-        std::make_tuple(Future::is_consuming ? Future(std::move(std::get<0>(src))) : Future(std::get<0>(src))),
-        future_tuple_copy_or_move(std::make_tuple(std::move(std::get<Ns+1>(src))...))
-        );
+      template<class InputIterator> BOOST_SPINLOCK_FUTURE_CONSTEXPR vectype operator()(InputIterator first, InputIterator last) const
+      {
+        return vectype(std::make_move_iterator(first), std::make_move_iterator(last));
+      }
+    };
+    template<class vectype> struct future_vector_copy_or_move<false, vectype>
+    {
+      template<class InputIterator> BOOST_SPINLOCK_FUTURE_CONSTEXPR vectype operator()(InputIterator first, InputIterator last) const
+      {
+        return vectype(first, last);
+      }
+    };
+    template<bool do_move, class future_type> struct future_vector_invalidate_if_moved
+    {
+      template<class InputIterator> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool operator()(InputIterator first, InputIterator last) const
+      {
+        return (std::for_each(first, last, [](future_type &f) { f=future_type(); }), true);
+      }
+    };
+    template<class future_type> struct future_vector_invalidate_if_moved<false, future_type>
+    {
+      template<class InputIterator> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool operator()(InputIterator first, InputIterator last) const
+      {
+        return true;
+      }
+    };
+    template<bool do_move, class future_type> struct future_tuple_copy_or_move4
+    {
+      template<class U, class V> BOOST_SPINLOCK_FUTURE_CONSTEXPR future_type operator()(U &&u, V &&v) const { return (v=future_type(), std::forward<U>(u)); }
+    };
+    template<class future_type> struct future_tuple_copy_or_move4<false, future_type>
+    {
+      template<class U, class V> BOOST_SPINLOCK_FUTURE_CONSTEXPR future_type operator()(U &&u, V &&v) const { return std::forward<U>(u); }
+    };
+    template<bool do_move, class future_type> struct future_tuple_copy_or_move3
+    {
+      template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR future_type operator()(U &&v) const { return future_type(std::move(v)); }
+    };
+    template<class future_type> struct future_tuple_copy_or_move3<false, future_type>
+    {
+      template<class U> BOOST_SPINLOCK_FUTURE_CONSTEXPR future_type operator()(U &&v) const { return future_type(v); }
+    };
+    template<class Future> BOOST_SPINLOCK_FUTURE_CONSTEXPR typename std::decay<Future>::type future_tuple_copy_or_move2(Future &&f)
+    {
+      using future_type = typename std::decay<Future>::type;
+      return future_tuple_copy_or_move4<future_type::is_consuming, future_type>()(
+        future_tuple_copy_or_move3<future_type::is_consuming, future_type>()(std::forward<Future>(f)),
+        std::forward<Future>(f));
+    }
+    template<size_t... Ns, class... Futures> BOOST_SPINLOCK_FUTURE_CONSTEXPR std::tuple<typename std::decay<Futures>::type...> future_tuple_copy_or_move(index_sequence<Ns...>, std::tuple<Futures...> &&src)
+    {
+      return std::make_tuple(future_tuple_copy_or_move2(std::get<Ns>(std::move(src)))...);
     }
 
-    template<size_t Idx, class State> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool when_all_unpack(State &) { return false; }
-    template<size_t Idx, class State, class Future, class... Futures> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool when_all_unpack(State &state, Future &&, Futures &&... futures)
+    template<size_t Idx, size_t Total, class State> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool when_all_unpack(State &) { return false; }
+    template<size_t Idx, size_t Total, class State, class Future, class... Futures> BOOST_SPINLOCK_FUTURE_CONSTEXPR bool when_all_unpack(State &state, Future &&, Futures &&... futures)
     {
-      return (std::get<Idx>(state->_futures).then([state](Future &&)
+      return (std::get<Idx>(state->_futures).then([state](const typename std::decay<Future>::type &)
       {
-        using state_type = decltype(*state);
-        BOOST_STATIC_CONSTEXPR size_t tuple_size = state_type::tuple_size;
         if (1 == state->_count.fetch_sub(1, std::memory_order_relaxed))
-          state->_p.set_value(future_tuple_copy_or_move(state->_futures, make_index_sequence<tuple_size-1>()));
-      }), when_all_unpack<Idx+1>(state, std::forward<Futures>(futures)...));
+          state->_p.set_value(future_tuple_copy_or_move(make_index_sequence<Total>(), std::move(state->_futures)));
+      }), when_all_unpack<Idx+1, Total>(state, std::forward<Futures>(futures)...));
     }
   }
 
-  //! \brief Compose a future which becomes ready when all homogeneous futures in the iterator range become ready \ingroup future_promise
+  /*! \brief Compose a future which becomes ready when all homogeneous futures in the iterator range become ready. Be aware, as per the TS,
+  that the futures are only copied/moved at the point of them all becoming ready, so be careful of lifetime.
+  \ingroup future_promise
+  */
   template<class InputIterator, typename = typename std::enable_if<is_future<typename std::iterator_traits<InputIterator>::value_type>::value>::type>
   future<std::vector<typename std::iterator_traits<InputIterator>::value_type>> when_all(InputIterator first, InputIterator last)
   {
@@ -1439,30 +1475,32 @@ namespace lightweight_futures {
     auto state = std::make_shared<detail::when_all_any_state_vector<vectype, InputIterator>>(std::distance(first, last), first, last);
     auto &_state = *state;
     for (auto it = first; it != last; ++it)
-      it->then([state](future_type &&) {
+      it->then([state](const future_type &) {
         if (1==state->_count.fetch_sub(1, std::memory_order_relaxed))
         {
-          if(future_type::is_consuming)
-            state->_p.set_value(vectype(std::make_move_iterator(state->_first), std::make_move_iterator(state->_last)));
-          else
-            state->_p.set_value(vectype(state->_first, state->_last));
+          state->_p.set_value(detail::future_vector_copy_or_move<future_type::is_consuming, vectype>()(state->_first, state->_last));
+          detail::future_vector_invalidate_if_moved<future_type::is_consuming, future_type>()(state->_first, state->_last);
         }
       });
     return _state._p.get_future();
   }
 
-  //! \brief Compose a future which becomes ready when all heterogeneous futures in the iterator range become ready \ingroup future_promise
+  /*! \brief Compose a future which becomes ready when all heterogeneous futures in the iterator range become ready. Be aware, as per the TS,
+  that the futures are only copied/moved at the point of them all becoming ready, so be careful of lifetime.
+  \ingroup future_promise
+  */
   template<class... Futures> future<std::tuple<typename std::decay<Futures>::type...>> when_all(Futures &&... futures)
   {
     using vectype = std::tuple<typename std::decay<Futures>::type...>;
     if (!sizeof...(Futures))
       return future<vectype>(vectype());
-    auto state = std::make_shared<detail::when_all_any_state_tuple<Futures...>>(sizeof...(Futures), std::forward<Futures>(futures)...);
-    detail::when_all_unpack<0>(state, std::forward<Futures>(futures)...);
+    auto state = std::make_shared<detail::when_all_any_state_tuple<Futures...>>(sizeof...(Futures), std::forward_as_tuple(futures...));
+    detail::when_all_unpack<0, sizeof...(Futures)>(state, std::forward<Futures>(futures)...);
     return state->_p.get_future();
   }
 
 
+  //! \todo when_any()
 #if 0
   //! \brief Compose a future which becomes ready when any one of the homogeneous futures in the iterator range becomes ready \ingroup future_promise
   template<class InputIterator, typename = typename std::enable_if<is_future<typename std::iterator_traits<InputIterator>::value_type>::value>::type>

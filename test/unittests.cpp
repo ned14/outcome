@@ -2153,10 +2153,12 @@ template<template<class> class F, template<class> class SF, template<class> clas
     for (size_t n = 0; n < futures.size(); n++)
       BOOST_CHECK(futures[n].valid());
     F<std::vector<F<int>>> all(when_all(futures.begin(), futures.end()));
-    for (size_t n = 0; n < futures.size(); n++)
-      BOOST_CHECK(!futures[n].valid());
+    BOOST_CHECK(all.valid());
     for (size_t n = 0; n < futures.size(); n++)
     {
+      // Futures are not moved until all become ready
+      for (size_t m = 0; m < futures.size(); m++)
+        BOOST_CHECK(futures[m].valid());
       promises[n].set_value((int) n);
       BOOST_CHECK(all.valid());
       if(n==futures.size()-1)
@@ -2164,6 +2166,9 @@ template<template<class> class F, template<class> class SF, template<class> clas
       else
         BOOST_CHECK(std::future_status::timeout==all.wait_for(std::chrono::seconds(0)));
     }
+    // Futures should now all be invalid
+    for (size_t m = 0; m < futures.size(); m++)
+      BOOST_CHECK(!futures[m].valid());
     auto result(all.get());
     BOOST_CHECK(!all.valid());
     for (size_t n = 0; n < futures.size(); n++)
@@ -2181,8 +2186,7 @@ template<template<class> class F, template<class> class SF, template<class> clas
     for (size_t n = 0; n < futures.size(); n++)
       BOOST_CHECK(futures[n].valid());
     F<std::vector<SF<int>>> all(when_all(futures.begin(), futures.end()));
-    for (size_t n = 0; n < futures.size(); n++)
-      BOOST_CHECK(futures[n].valid());
+    BOOST_CHECK(all.valid());
     for (size_t n = 0; n < futures.size(); n++)
     {
       promises[n].set_value((int) n);
@@ -2191,6 +2195,8 @@ template<template<class> class F, template<class> class SF, template<class> clas
         BOOST_CHECK(std::future_status::ready == all.wait_for(std::chrono::seconds(0)));
       else
         BOOST_CHECK(std::future_status::timeout == all.wait_for(std::chrono::seconds(0)));
+      for (size_t m = 0; m < futures.size(); m++)
+        BOOST_CHECK(futures[m].valid());
     }
     auto result(all.get());
     BOOST_CHECK(!all.valid());
@@ -2199,6 +2205,7 @@ template<template<class> class F, template<class> class SF, template<class> clas
       BOOST_CHECK(result[n].valid());
       BOOST_CHECK(result[n].get() == (int) n);
       BOOST_CHECK(futures[n].get() == (int) n);
+      // Make sure the shared state really is shared between input futures and output futures
       const_cast<int &>(futures[n].get()) = -1;
       BOOST_CHECK(result[n].get() == -1);
     }
@@ -2206,23 +2213,31 @@ template<template<class> class F, template<class> class SF, template<class> clas
   // Tuple based future when_all
   {
     struct Foo { };
-    auto promises = std::make_tuple(P<int>(), P<std::string>(), P<Foo>());
-    auto all(when_all(std::get<0>(promises).get_future(), std::get<1>(promises).get_future(), std::get<2>(promises).get_future()));
+    P<int> promise1;
+    P<std::string> promise2;
+    P<Foo> promise3;
+    auto future1(promise1.get_future());
+    auto future2(promise2.get_future());
+    auto future3(promise3.get_future());
+    auto all(when_all(future1, future2, future3));
     BOOST_CHECK(std::future_status::timeout == all.wait_for(std::chrono::seconds(0)));
-    std::get<0>(promises).set_value(0);
+    promise1.set_value(0);
     BOOST_CHECK(std::future_status::timeout == all.wait_for(std::chrono::seconds(0)));
-    std::get<1>(promises).set_exception(e);
+    promise2.set_exception(e);
     BOOST_CHECK(std::future_status::timeout == all.wait_for(std::chrono::seconds(0)));
-    std::get<2>(promises).set_exception(e);
+    promise3.set_exception(e);
     BOOST_CHECK(std::future_status::ready == all.wait_for(std::chrono::seconds(0)));
+    BOOST_CHECK(!future1.valid());
+    BOOST_CHECK(!future2.valid());
+    BOOST_CHECK(!future3.valid());
     auto result(all.get());
     BOOST_CHECK(!all.valid());
     BOOST_CHECK(std::get<0>(result).valid());
     BOOST_CHECK(std::get<0>(result).get() == 0);
     BOOST_CHECK(std::get<1>(result).valid());
-    BOOST_CHECK_THROW(std::get<1>(result).get(), std::system_error);
+    BOOST_CHECK_THROW(std::get<1>(result).get(), std::runtime_error);
     BOOST_CHECK(std::get<2>(result).valid());
-    BOOST_CHECK_THROW(std::get<2>(result).get(), std::system_error);
+    BOOST_CHECK_THROW(std::get<2>(result).get(), std::runtime_error);
   }
   //auto any(when_any(futures.begin(), futures.end()));
 }

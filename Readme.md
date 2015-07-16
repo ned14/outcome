@@ -36,11 +36,12 @@ can execute it. Also relocate sleeping_waiters.
 is done.
  - [x] Fix failing constexpr test min_promise_future_reduce.
  - [x] Implement N4399 continuations for shared_future.
- - [x] when_any/when_all composure.
+ - [x] Implement wait_for()/wait_until().
+ - [x] when_all composure.
  - [ ] Port AFIO's intrusive enqueued_task into a lightweight packaged_task design.
 
 Later:
- - [ ] Implement wait_for()/wait_until().
+ - [ ] when_any composure.
  - [ ] Loosen explicit basic_monad constructors to allow option => result => monad implicitly, and
 monad => result => option explicitly (with potential exception throwing).
  - [ ] Pack bools in basic_promise_future_storage into value_storage_impl, thus saving 8 bytes
