@@ -848,6 +848,12 @@ namespace lightweight_futures {
   //! \brief True if the type passed is a monad or a reference to a monad
   template<class M> struct is_monad : detail::is_monad<typename std::decay<M>::type> { };
 
+  //! \brief Type tag for an empty monad \ingroup monad
+  struct empty_t { };
+
+  //! \brief Variable of type empty_t \ingroup monad
+  constexpr empty_t empty;
+
   /*! \class basic_monad
   \brief Implements a configurable lightweight simple monadic value transport with the same semantics and API as a future
   \tparam implementation_policy An implementation policy type
@@ -908,6 +914,8 @@ namespace lightweight_futures {
     basic_monad() = default;
     //! \brief Implicit constructor of an empty monad
     BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(empty_type) : basic_monad() { }
+    //! \brief Implicit constructor of an empty monad
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(empty_t) : basic_monad() { }
     //! \brief Implicit constructor from a value_type by copy
     BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : implementation_policy::base(v) { }
     //! \brief Implicit constructor from a value_type by move
@@ -1423,18 +1431,6 @@ namespace lightweight_futures {
   `tribool::true_`, `tribool::false_` and `tribool::false_` respectively. \ingroup monad
   */
   template<typename R> using monad = basic_monad<detail::monad_policy<R>>;
-  /*! \brief `result<R>` can hold a fixed variant list of empty, a type `R` or a lightweight `std::error_code` at a
-  space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `tribool::true_` and
-  `tribool::false_` respectively. This specialisation looks deliberately like Rust's `Result<T>`. \ingroup monad
-  */
-  template<typename R> using result = basic_monad<detail::result_policy<R>>;
-  /*! \brief `option<R>` can hold a fixed variant list of empty or a type `R` at a space cost of `sizeof(value_storage<R>)`
-  which is usually `sizeof(R)+8`, but may be smaller if `value_storage<R>` is specialised. This
-  corresponds to `tribool::unknown` and `tribool::true_` respectively. This specialisation looks deliberately
-  like Rust's `Option<T>`. \ingroup monad
-  */
-  template<typename R> using option = basic_monad<detail::option_policy<R>>;
-
   //! \brief Makes a monad from the type passed \ingroup monad
   template<class T> monad<T> make_monad(T &&v) { return monad<T>(std::forward<T>(v)); }
   //! \brief Makes an errored monad of type T \ingroup monad
@@ -1443,6 +1439,30 @@ namespace lightweight_futures {
   template<class T> monad<T> make_monad(std::exception_ptr v) { return monad<T>(std::move(v)); }
   //! \brief Makes an empty monad of type T \ingroup monad
   template<class T> monad<T> make_monad() { return monad<T>(); }
+
+  /*! \brief `result<R>` can hold a fixed variant list of empty, a type `R` or a lightweight `std::error_code` at a
+  space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `tribool::true_` and
+  `tribool::false_` respectively. This specialisation looks deliberately like Rust's `Result<T>`. \ingroup monad
+  */
+  template<typename R> using result = basic_monad<detail::result_policy<R>>;
+  //! \brief Makes a result from the type passed \ingroup monad
+  template<class T> result<T> make_result(T &&v) { return result<T>(std::forward<T>(v)); }
+  //! \brief Makes an errored result of type T \ingroup monad
+  template<class T> result<T> make_result(std::error_code v) { return result<T>(std::move(v)); }
+  //! \brief Makes an empty result of type T \ingroup monad
+  template<class T> result<T> make_result() { return result<T>(); }
+
+  /*! \brief `option<R>` can hold a fixed variant list of empty or a type `R` at a space cost of `sizeof(value_storage<R>)`
+  which is usually `sizeof(R)+8`, but may be smaller if `value_storage<R>` is specialised. This
+  corresponds to `tribool::unknown` and `tribool::true_` respectively. This specialisation looks deliberately
+  like Rust's `Option<T>`. \ingroup monad
+  */
+  template<typename R> using option = basic_monad<detail::option_policy<R>>;
+  //! \brief Makes a option from the type passed \ingroup monad
+  template<class T> option<T> make_option(T &&v) { return option<T>(std::forward<T>(v)); }
+  //! \brief Makes an empty option of type T \ingroup monad
+  template<class T> option<T> make_option() { return option<T>(); }
+
 }
 BOOST_SPINLOCK_V1_NAMESPACE_END
 
