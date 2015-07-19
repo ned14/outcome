@@ -849,10 +849,10 @@ namespace lightweight_futures {
   template<class M> struct is_monad : detail::is_monad<typename std::decay<M>::type> { };
 
   //! \brief Type tag for an empty monad \ingroup monad
-  struct empty_t { };
+  struct empty_t { constexpr empty_t() { } };
 
   //! \brief Variable of type empty_t \ingroup monad
-  constexpr empty_t empty;
+  constexpr empty_t empty = empty_t();
 
   /*! \class basic_monad
   \brief Implements a configurable lightweight simple monadic value transport with the same semantics and API as a future
