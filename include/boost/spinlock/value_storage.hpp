@@ -67,6 +67,7 @@ namespace lightweight_futures {
       struct no_value_type {};
       struct no_error_type {};
       struct no_exception_type {};
+      struct constexpr_standin_type {};
       template<class U, class V> using devoid = typename std::conditional<!std::is_void<U>::value, U, V>::type;
     public:
       BOOST_STATIC_CONSTEXPR bool has_value_type = !std::is_void<_value_type>::value;
@@ -95,6 +96,7 @@ namespace lightweight_futures {
         value_type value;
         error_type error;              // Often 16 bytes surprisingly
         exception_type exception;      // Typically 8 bytes
+        constexpr_standin_type _constexpr_standin_type;
       };
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -103,10 +105,7 @@ namespace lightweight_futures {
 
       BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value && std::is_nothrow_destructible<exception_type>::value && std::is_nothrow_destructible<error_type>::value;
 
-#if !defined(_MSC_VER) || _MSC_VER>1900
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR
-#endif
-        value_storage_impl() : type(storage_type::empty) { }
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl() noexcept : _constexpr_standin_type(constexpr_standin_type()), type(storage_type::empty) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : value(v), type(storage_type::value) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : error(v), type(storage_type::error) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : exception(v), type(storage_type::exception) { }

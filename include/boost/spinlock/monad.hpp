@@ -911,7 +911,7 @@ namespace lightweight_futures {
     BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
 
     //! \brief Default constructor, initialises to empty
-    basic_monad() = default;
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad() = default;
     //! \brief Implicit constructor of an empty monad
     BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(empty_type) : implementation_policy::base() { }
     //! \brief Implicit constructor of an empty monad

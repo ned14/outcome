@@ -38,6 +38,7 @@ is done.
  - [x] Implement N4399 continuations for shared_future.
  - [x] Implement wait_for()/wait_until().
  - [x] when_all composure.
+ - [ ] Replace all BOOST_CONSTEXPR and BOOST_STATIC_CONSTEXPR with constexpr.
  - [ ] Port AFIO's intrusive enqueued_task into a lightweight packaged_task design.
 
 Later:
