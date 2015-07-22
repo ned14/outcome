@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #ifdef _MSC_VER
 //# pragma inline_depth(255)
 //# pragma inline_recursion(on)
-# define BOOST_SPINLOCK_FUTURE_CONSTEXPR BOOST_FORCEINLINE
+# define BOOST_SPINLOCK_FUTURE_CONSTEXPR BOOST_CONSTEXPR
 # define BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR BOOST_FORCEINLINE
 # define BOOST_SPINLOCK_FUTURE_MSVC_HELP BOOST_FORCEINLINE
 #else
@@ -103,7 +103,10 @@ namespace lightweight_futures {
 
       BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value && std::is_nothrow_destructible<exception_type>::value && std::is_nothrow_destructible<error_type>::value;
 
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl() : type(storage_type::empty) { }
+#if !defined(_MSC_VER) || _MSC_VER>1900
+      BOOST_SPINLOCK_FUTURE_CONSTEXPR
+#endif
+        value_storage_impl() : type(storage_type::empty) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : value(v), type(storage_type::value) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : error(v), type(storage_type::error) { }
       BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : exception(v), type(storage_type::exception) { }

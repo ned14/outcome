@@ -913,9 +913,9 @@ namespace lightweight_futures {
     //! \brief Default constructor, initialises to empty
     basic_monad() = default;
     //! \brief Implicit constructor of an empty monad
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(empty_type) : basic_monad() { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(empty_type) : implementation_policy::base() { }
     //! \brief Implicit constructor of an empty monad
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(empty_t) : basic_monad() { }
+    BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(empty_t) : implementation_policy::base() { }
     //! \brief Implicit constructor from a value_type by copy
     BOOST_SPINLOCK_FUTURE_CONSTEXPR basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : implementation_policy::base(v) { }
     //! \brief Implicit constructor from a value_type by move
