@@ -37,31 +37,31 @@ DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <array>
 
-#ifdef BOOST_SPINLOCK_ENABLE_VALGRIND
+#ifdef BOOST_MONAD_ENABLE_VALGRIND
 #include "valgrind/drd.h"
-#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_CREATE(p) ANNOTATE_RWLOCK_CREATE(p)
-#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_DESTROY(p) ANNOTATE_RWLOCK_DESTROY(p)
-#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_ACQUIRED(p, s) ANNOTATE_RWLOCK_ACQUIRED(p, s)
-#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_RELEASED(p, s) ANNOTATE_RWLOCK_RELEASED(p, s)
-#define BOOST_SPINLOCK_ANNOTATE_IGNORE_READS_BEGIN() ANNOTATE_IGNORE_READS_BEGIN()
-#define BOOST_SPINLOCK_ANNOTATE_IGNORE_READS_END() ANNOTATE_IGNORE_READS_END()
-#define BOOST_SPINLOCK_ANNOTATE_IGNORE_WRITES_BEGIN() ANNOTATE_IGNORE_WRITES_BEGIN()
-#define BOOST_SPINLOCK_ANNOTATE_IGNORE_WRITES_END() ANNOTATE_IGNORE_WRITES_END()
-#define BOOST_SPINLOCK_DRD_IGNORE_VAR(x) DRD_IGNORE_VAR(x)
-#define BOOST_SPINLOCK_DRD_STOP_IGNORING_VAR(x) DRD_STOP_IGNORING_VAR(x)
-#define BOOST_SPINLOCK_RUNNING_ON_VALGRIND RUNNING_ON_VALGRIND
+#define BOOST_MONAD_ANNOTATE_RWLOCK_CREATE(p) ANNOTATE_RWLOCK_CREATE(p)
+#define BOOST_MONAD_ANNOTATE_RWLOCK_DESTROY(p) ANNOTATE_RWLOCK_DESTROY(p)
+#define BOOST_MONAD_ANNOTATE_RWLOCK_ACQUIRED(p, s) ANNOTATE_RWLOCK_ACQUIRED(p, s)
+#define BOOST_MONAD_ANNOTATE_RWLOCK_RELEASED(p, s) ANNOTATE_RWLOCK_RELEASED(p, s)
+#define BOOST_MONAD_ANNOTATE_IGNORE_READS_BEGIN() ANNOTATE_IGNORE_READS_BEGIN()
+#define BOOST_MONAD_ANNOTATE_IGNORE_READS_END() ANNOTATE_IGNORE_READS_END()
+#define BOOST_MONAD_ANNOTATE_IGNORE_WRITES_BEGIN() ANNOTATE_IGNORE_WRITES_BEGIN()
+#define BOOST_MONAD_ANNOTATE_IGNORE_WRITES_END() ANNOTATE_IGNORE_WRITES_END()
+#define BOOST_MONAD_DRD_IGNORE_VAR(x) DRD_IGNORE_VAR(x)
+#define BOOST_MONAD_DRD_STOP_IGNORING_VAR(x) DRD_STOP_IGNORING_VAR(x)
+#define BOOST_MONAD_RUNNING_ON_VALGRIND RUNNING_ON_VALGRIND
 #else
-#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_CREATE(p)
-#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_DESTROY(p)
-#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_ACQUIRED(p, s)
-#define BOOST_SPINLOCK_ANNOTATE_RWLOCK_RELEASED(p, s)
-#define BOOST_SPINLOCK_ANNOTATE_IGNORE_READS_BEGIN()
-#define BOOST_SPINLOCK_ANNOTATE_IGNORE_READS_END()
-#define BOOST_SPINLOCK_ANNOTATE_IGNORE_WRITES_BEGIN()
-#define BOOST_SPINLOCK_ANNOTATE_IGNORE_WRITES_END()
-#define BOOST_SPINLOCK_DRD_IGNORE_VAR(x)
-#define BOOST_SPINLOCK_DRD_STOP_IGNORING_VAR(x)
-#define BOOST_SPINLOCK_RUNNING_ON_VALGRIND (0)
+#define BOOST_MONAD_ANNOTATE_RWLOCK_CREATE(p)
+#define BOOST_MONAD_ANNOTATE_RWLOCK_DESTROY(p)
+#define BOOST_MONAD_ANNOTATE_RWLOCK_ACQUIRED(p, s)
+#define BOOST_MONAD_ANNOTATE_RWLOCK_RELEASED(p, s)
+#define BOOST_MONAD_ANNOTATE_IGNORE_READS_BEGIN()
+#define BOOST_MONAD_ANNOTATE_IGNORE_READS_END()
+#define BOOST_MONAD_ANNOTATE_IGNORE_WRITES_BEGIN()
+#define BOOST_MONAD_ANNOTATE_IGNORE_WRITES_END()
+#define BOOST_MONAD_DRD_IGNORE_VAR(x)
+#define BOOST_MONAD_DRD_STOP_IGNORING_VAR(x)
+#define BOOST_MONAD_RUNNING_ON_VALGRIND (0)
 #endif
 
 /*! \file spinlock.hpp
@@ -80,82 +80,82 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 
 #include "../bindlib/include/import.h"
 
-#if ! defined BOOST_SPINLOCK_CONSTEXPR
+#if ! defined BOOST_MONAD_CONSTEXPR
 # ifdef __cpp_constexpr
 // clang 3.2 and earlier has buggy constexpr support
 #  if !defined(__clang__) || (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__) >= 30300
-#   define BOOST_SPINLOCK_CONSTEXPR constexpr
+#   define BOOST_MONAD_CONSTEXPR constexpr
 #  endif
 # endif
 #endif
-#ifndef BOOST_SPINLOCK_CONSTEXPR
-# define BOOST_SPINLOCK_CONSTEXPR
+#ifndef BOOST_MONAD_CONSTEXPR
+# define BOOST_MONAD_CONSTEXPR
 #endif
 
-#if ! defined BOOST_SPINLOCK_RELAXED_CONSTEXPR
+#if ! defined BOOST_MONAD_RELAXED_CONSTEXPR
 # ifdef __cpp_relaxed_constexpr
-#  define BOOST_SPINLOCK_RELAXED_CONSTEXPR constexpr
+#  define BOOST_MONAD_RELAXED_CONSTEXPR constexpr
 # endif
 #endif
-#ifndef BOOST_SPINLOCK_RELAXED_CONSTEXPR
-# define BOOST_SPINLOCK_RELAXED_CONSTEXPR
+#ifndef BOOST_MONAD_RELAXED_CONSTEXPR
+# define BOOST_MONAD_RELAXED_CONSTEXPR
 #endif
 
-#if !defined BOOST_SPINLOCK_NOINLINE
-# define BOOST_SPINLOCK_NOINLINE BOOST_NOINLINE
+#if !defined BOOST_MONAD_NOINLINE
+# define BOOST_MONAD_NOINLINE BOOST_NOINLINE
 #endif
 
-#if !defined BOOST_SPINLOCK_FORCEINLINE
-# define BOOST_SPINLOCK_FORCEINLINE BOOST_FORCEINLINE
+#if !defined BOOST_MONAD_FORCEINLINE
+# define BOOST_MONAD_FORCEINLINE BOOST_FORCEINLINE
 #endif
 
-#ifndef BOOST_SPINLOCK_IN_THREAD_SANITIZER
+#ifndef BOOST_MONAD_IN_THREAD_SANITIZER
 # if defined(__has_feature)
 #  if __has_feature(thread_sanitizer)
-#   define BOOST_SPINLOCK_IN_THREAD_SANITIZER 1
+#   define BOOST_MONAD_IN_THREAD_SANITIZER 1
 #  endif
 # elif defined(__SANITIZE_ADDRESS__)
-#  define BOOST_SPINLOCK_IN_THREAD_SANITIZER 1
+#  define BOOST_MONAD_IN_THREAD_SANITIZER 1
 # endif
 #endif
-#ifndef BOOST_SPINLOCK_IN_THREAD_SANITIZER
-# define BOOST_SPINLOCK_IN_THREAD_SANITIZER 0
+#ifndef BOOST_MONAD_IN_THREAD_SANITIZER
+# define BOOST_MONAD_IN_THREAD_SANITIZER 0
 #endif
 
-#ifndef BOOST_SPINLOCK_ALIGN
+#ifndef BOOST_MONAD_ALIGN
 # ifdef __cpp_alignas
-#  define BOOST_SPINLOCK_ALIGN(n) alignas(n)
+#  define BOOST_MONAD_ALIGN(n) alignas(n)
 # elif defined(__GNUC__)
-#  define BOOST_SPINLOCK_ALIGN(n) __attribute__((aligned(n)))
+#  define BOOST_MONAD_ALIGN(n) __attribute__((aligned(n)))
 # elif defined(_MSC_VER)
-#  define BOOST_SPINLOCK_ALIGN(n) __declspec(align(n))
+#  define BOOST_MONAD_ALIGN(n) __declspec(align(n))
 # else
-#  define BOOST_SPINLOCK_ALIGN(n)
+#  define BOOST_MONAD_ALIGN(n)
 # endif
 #endif
 
-#ifndef BOOST_SPINLOCK_V1_STL11_IMPL
-#define BOOST_SPINLOCK_V1_STL11_IMPL std
+#ifndef BOOST_MONAD_V1_STL11_IMPL
+#define BOOST_MONAD_V1_STL11_IMPL std
 #endif
-#define BOOST_SPINLOCK_V1 (boost), (spinlock), (BOOST_BINDLIB_NAMESPACE_VERSION(v1, BOOST_SPINLOCK_V1_STL11_IMPL), inline)
-#define BOOST_SPINLOCK_V1_NAMESPACE       BOOST_BINDLIB_NAMESPACE      (BOOST_SPINLOCK_V1)
-#define BOOST_SPINLOCK_V1_NAMESPACE_BEGIN BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1)
-#define BOOST_SPINLOCK_V1_NAMESPACE_END   BOOST_BINDLIB_NAMESPACE_END  (BOOST_SPINLOCK_V1)
+#define BOOST_MONAD_V1 (boost), (spinlock), (BOOST_BINDLIB_NAMESPACE_VERSION(v1, BOOST_MONAD_V1_STL11_IMPL), inline)
+#define BOOST_MONAD_V1_NAMESPACE       BOOST_BINDLIB_NAMESPACE      (BOOST_MONAD_V1)
+#define BOOST_MONAD_V1_NAMESPACE_BEGIN BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_MONAD_V1)
+#define BOOST_MONAD_V1_NAMESPACE_END   BOOST_BINDLIB_NAMESPACE_END  (BOOST_MONAD_V1)
 
-#define BOOST_STL11_ATOMIC_MAP_NAMESPACE_BEGIN        BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline))
-#define BOOST_STL11_ATOMIC_MAP_NAMESPACE_END          BOOST_BINDLIB_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline))
+#define BOOST_STL11_ATOMIC_MAP_NAMESPACE_BEGIN        BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_MONAD_V1, (stl11, inline))
+#define BOOST_STL11_ATOMIC_MAP_NAMESPACE_END          BOOST_BINDLIB_NAMESPACE_END  (BOOST_MONAD_V1, (stl11, inline))
 #define BOOST_STL11_ATOMIC_MAP_NO_ATOMIC_CHAR32_T // missing VS14
 #define BOOST_STL11_ATOMIC_MAP_NO_ATOMIC_CHAR16_T // missing VS14
-#define BOOST_STL11_CHRONO_MAP_NAMESPACE_BEGIN        BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline), (chrono))
-#define BOOST_STL11_CHRONO_MAP_NAMESPACE_END          BOOST_BINDLIB_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline), (chrono))
-#define BOOST_STL11_MUTEX_MAP_NAMESPACE_BEGIN         BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline))
-#define BOOST_STL11_MUTEX_MAP_NAMESPACE_END           BOOST_BINDLIB_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline))
-#define BOOST_STL11_THREAD_MAP_NAMESPACE_BEGIN        BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline))
-#define BOOST_STL11_THREAD_MAP_NAMESPACE_END          BOOST_BINDLIB_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline))
-#include BOOST_BINDLIB_INCLUDE_STL11(../bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, atomic)
-#include BOOST_BINDLIB_INCLUDE_STL11(../bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, chrono)
-#include BOOST_BINDLIB_INCLUDE_STL11(../bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, mutex)
-#include BOOST_BINDLIB_INCLUDE_STL11(../bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, thread)
+#define BOOST_STL11_CHRONO_MAP_NAMESPACE_BEGIN        BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_MONAD_V1, (stl11, inline), (chrono))
+#define BOOST_STL11_CHRONO_MAP_NAMESPACE_END          BOOST_BINDLIB_NAMESPACE_END  (BOOST_MONAD_V1, (stl11, inline), (chrono))
+#define BOOST_STL11_MUTEX_MAP_NAMESPACE_BEGIN         BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_MONAD_V1, (stl11, inline))
+#define BOOST_STL11_MUTEX_MAP_NAMESPACE_END           BOOST_BINDLIB_NAMESPACE_END  (BOOST_MONAD_V1, (stl11, inline))
+#define BOOST_STL11_THREAD_MAP_NAMESPACE_BEGIN        BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_MONAD_V1, (stl11, inline))
+#define BOOST_STL11_THREAD_MAP_NAMESPACE_END          BOOST_BINDLIB_NAMESPACE_END  (BOOST_MONAD_V1, (stl11, inline))
+#include BOOST_BINDLIB_INCLUDE_STL11(../bindlib, BOOST_MONAD_V1_STL11_IMPL, atomic)
+#include BOOST_BINDLIB_INCLUDE_STL11(../bindlib, BOOST_MONAD_V1_STL11_IMPL, chrono)
+#include BOOST_BINDLIB_INCLUDE_STL11(../bindlib, BOOST_MONAD_V1_STL11_IMPL, mutex)
+#include BOOST_BINDLIB_INCLUDE_STL11(../bindlib, BOOST_MONAD_V1_STL11_IMPL, thread)
 
 // For dump
 #include <ostream>
@@ -164,16 +164,16 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 // Turn this on if you have a compiler which understands __transaction_relaxed
 //#define BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
 
-BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
+BOOST_MONAD_V1_NAMESPACE_BEGIN
 
-    BOOST_BINDLIB_DECLARE(BOOST_SPINLOCK_V1, "TODO FIXME") // TODO FIXME
+    BOOST_BINDLIB_DECLARE(BOOST_MONAD_V1, "TODO FIXME") // TODO FIXME
 
     /*! \struct lockable_ptr
      * \brief Lets you use a pointer to memory as a spinlock :)
      */
     template<typename T> struct lockable_ptr : atomic<T *>
     {
-      BOOST_SPINLOCK_CONSTEXPR lockable_ptr(T *v=nullptr) : atomic<T *>(v) { }
+      BOOST_MONAD_CONSTEXPR lockable_ptr(T *v=nullptr) : atomic<T *>(v) { }
       //! Returns the memory pointer part of the atomic
       T *get() BOOST_NOEXCEPT_OR_NOTHROW
       {
@@ -209,40 +209,40 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       atomic<T> v;
     public:
       typedef T value_type;
-      BOOST_SPINLOCK_RELAXED_CONSTEXPR spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : v(0)
+      BOOST_MONAD_RELAXED_CONSTEXPR spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : v(0)
       {
-        BOOST_SPINLOCK_ANNOTATE_RWLOCK_CREATE(this);
+        BOOST_MONAD_ANNOTATE_RWLOCK_CREATE(this);
         //v.store(0, memory_order_release);
       }
       spinlockbase(const spinlockbase &) = delete;
       //! Atomically move constructs
-      BOOST_SPINLOCK_RELAXED_CONSTEXPR spinlockbase(spinlockbase &&) BOOST_NOEXCEPT_OR_NOTHROW : v(0)
+      BOOST_MONAD_RELAXED_CONSTEXPR spinlockbase(spinlockbase &&) BOOST_NOEXCEPT_OR_NOTHROW : v(0)
       {
-        BOOST_SPINLOCK_ANNOTATE_RWLOCK_CREATE(this);
+        BOOST_MONAD_ANNOTATE_RWLOCK_CREATE(this);
         //v.store(o.v.exchange(0, memory_order_acq_rel));
         //v.store(0, memory_order_release);
       }
       ~spinlockbase()
       {
-#ifdef BOOST_SPINLOCK_ENABLE_VALGRIND
+#ifdef BOOST_MONAD_ENABLE_VALGRIND
         if(v.load(memory_order_acquire))
         {
-          BOOST_SPINLOCK_ANNOTATE_RWLOCK_RELEASED(this, true);
+          BOOST_MONAD_ANNOTATE_RWLOCK_RELEASED(this, true);
         }
 #endif
-        BOOST_SPINLOCK_ANNOTATE_RWLOCK_DESTROY(this);
+        BOOST_MONAD_ANNOTATE_RWLOCK_DESTROY(this);
       }
       spinlockbase &operator=(const spinlockbase &) = delete;
       spinlockbase &operator=(spinlockbase &&) = delete;
       //! Returns the raw atomic
-      BOOST_SPINLOCK_CONSTEXPR T load(memory_order o=memory_order_seq_cst) const BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
+      BOOST_MONAD_CONSTEXPR T load(memory_order o=memory_order_seq_cst) const BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
       //! Sets the raw atomic
       void store(T a, memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { v.store(a, o); }
       //! If atomic is zero, sets to 1 and returns true, else false.
       bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
-#if ! BOOST_SPINLOCK_IN_THREAD_SANITIZER  // no early outs for the sanitizer
-#ifdef BOOST_SPINLOCK_USE_VOLATILE_READ_FOR_AVOIDING_CMPXCHG
+#if ! BOOST_MONAD_IN_THREAD_SANITIZER  // no early outs for the sanitizer
+#ifdef BOOST_MONAD_USE_VOLATILE_READ_FOR_AVOIDING_CMPXCHG
         // MSVC's atomics always seq_cst, so use volatile read to create a true acquire
         volatile T *_v=(volatile T *) &v;
         if(*_v) // Avoid unnecessary cache line invalidation traffic
@@ -262,12 +262,12 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         if(ret)
 #endif
         {
-          BOOST_SPINLOCK_ANNOTATE_RWLOCK_ACQUIRED(this, true);
+          BOOST_MONAD_ANNOTATE_RWLOCK_ACQUIRED(this, true);
           return true;
         }
         else return false;
       }
-      BOOST_SPINLOCK_CONSTEXPR bool try_lock() const BOOST_NOEXCEPT_OR_NOTHROW
+      BOOST_MONAD_CONSTEXPR bool try_lock() const BOOST_NOEXCEPT_OR_NOTHROW
       {
         return v.load(memory_order_consume) ? false : true;  // Avoid unnecessary cache line invalidation traffic
       }
@@ -275,8 +275,8 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       bool try_lock(T &expected) BOOST_NOEXCEPT_OR_NOTHROW
       {
         T t(0);
-#if ! BOOST_SPINLOCK_IN_THREAD_SANITIZER  // no early outs for the sanitizer
-#ifdef BOOST_SPINLOCK_USE_VOLATILE_READ_FOR_AVOIDING_CMPXCHG
+#if ! BOOST_MONAD_IN_THREAD_SANITIZER  // no early outs for the sanitizer
+#ifdef BOOST_MONAD_USE_VOLATILE_READ_FOR_AVOIDING_CMPXCHG
         // MSVC's atomics always seq_cst, so use volatile read to create a true acquire
         volatile T *_v = (volatile T *)&v;
         if((t=*_v)) // Avoid unnecessary cache line invalidation traffic
@@ -291,7 +291,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         bool ret=v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_relaxed);
         if(ret)
         {
-          BOOST_SPINLOCK_ANNOTATE_RWLOCK_ACQUIRED(this, true);
+          BOOST_MONAD_ANNOTATE_RWLOCK_ACQUIRED(this, true);
           return true;
         }
         else return false;
@@ -299,10 +299,10 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       //! Sets the atomic to zero
       void unlock() BOOST_NOEXCEPT_OR_NOTHROW
       {
-        BOOST_SPINLOCK_ANNOTATE_RWLOCK_RELEASED(this, true);
+        BOOST_MONAD_ANNOTATE_RWLOCK_RELEASED(this, true);
         v.store(0, memory_order_release);
       }
-      BOOST_SPINLOCK_RELAXED_CONSTEXPR bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
+      BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
     };
     template<typename T> struct spinlockbase<lockable_ptr<T>>
     {
@@ -372,7 +372,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
         value.n&=~(size_t)1;
         v.store(value.v, memory_order_release);
       }
-      BOOST_SPINLOCK_RELAXED_CONSTEXPR bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
+      BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
     };
     namespace detail
     {
@@ -392,10 +392,10 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       template<class parenttype> struct policy : parenttype
       {
         static BOOST_CONSTEXPR_OR_CONST size_t spins_to_loop=spins;
-        BOOST_SPINLOCK_CONSTEXPR policy() {}
+        BOOST_MONAD_CONSTEXPR policy() {}
         policy(const policy &) = delete;
-        BOOST_SPINLOCK_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-        BOOST_SPINLOCK_RELAXED_CONSTEXPR inline bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
+        BOOST_MONAD_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
+        BOOST_MONAD_RELAXED_CONSTEXPR inline bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
         {
           if(parenttype::int_yield(n)) return true;
           if(n>=spins) return false;
@@ -410,10 +410,10 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       template<class parenttype> struct policy : parenttype
       {
         static BOOST_CONSTEXPR_OR_CONST size_t spins_to_yield=spins;
-        BOOST_SPINLOCK_CONSTEXPR policy() {}
+        BOOST_MONAD_CONSTEXPR policy() {}
         policy(const policy &) = delete;
-        BOOST_SPINLOCK_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-        BOOST_SPINLOCK_RELAXED_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
+        BOOST_MONAD_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
+        BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
         {
           if(parenttype::int_yield(n)) return true;
           if(n>=spins) return false;
@@ -427,10 +427,10 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
     {
       template<class parenttype> struct policy : parenttype
       {
-        BOOST_SPINLOCK_CONSTEXPR policy() {}
+        BOOST_MONAD_CONSTEXPR policy() {}
         policy(const policy &) = delete;
-        BOOST_SPINLOCK_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-        BOOST_SPINLOCK_RELAXED_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
+        BOOST_MONAD_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
+        BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
         {
           if(parenttype::int_yield(n)) return true;
           this_thread::sleep_for(chrono::milliseconds(1));
@@ -469,9 +469,9 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
     {
       typedef spinpolicy4<spinpolicy3<spinpolicy2<spinlockbase<T>>>> parenttype;
     public:
-      BOOST_SPINLOCK_CONSTEXPR spinlock() { }
+      BOOST_MONAD_CONSTEXPR spinlock() { }
       spinlock(const spinlock &) = delete;
-      BOOST_SPINLOCK_CONSTEXPR spinlock(spinlock &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
+      BOOST_MONAD_CONSTEXPR spinlock(spinlock &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
       void lock() BOOST_NOEXCEPT_OR_NOTHROW
       {
         for(size_t n=0;; n++)
@@ -507,7 +507,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
       return true;
     }
     // For when used with a spinlock
-    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_SPINLOCK_CONSTEXPR inline T is_lockable_locked(spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_MONAD_CONSTEXPR inline T is_lockable_locked(spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
     {
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
       // Annoyingly the atomic ops are marked as unsafe for atomic transactions, so ...
@@ -517,7 +517,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 #endif
     }
     // For when used with a spinlock
-    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_SPINLOCK_CONSTEXPR inline T is_lockable_locked(const spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_MONAD_CONSTEXPR inline T is_lockable_locked(const spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
     {
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
       // Annoyingly the atomic ops are marked as unsafe for atomic transactions, so ...
@@ -527,7 +527,7 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 #endif
     }
     // For when used with a locked_ptr
-    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_SPINLOCK_CONSTEXPR inline bool is_lockable_locked(spinlock<lockable_ptr<T>, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_MONAD_CONSTEXPR inline bool is_lockable_locked(spinlock<lockable_ptr<T>, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
     {
       return ((size_t) lockable.load(memory_order_consume))&1;
     }
@@ -535,8 +535,8 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 #ifndef BOOST_BEGIN_TRANSACT_LOCK
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
 #undef BOOST_USING_INTEL_TSX
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable) __transaction_relaxed { (void) BOOST_SPINLOCK_V1_NAMESPACE::is_lockable_locked(lockable); {
-#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) __transaction_relaxed { if((only_if_not_this)!=BOOST_SPINLOCK_V1_NAMESPACE::is_lockable_locked(lockable)) {
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) __transaction_relaxed { (void) BOOST_MONAD_V1_NAMESPACE::is_lockable_locked(lockable); {
+#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) __transaction_relaxed { if((only_if_not_this)!=BOOST_MONAD_V1_NAMESPACE::is_lockable_locked(lockable)) {
 #define BOOST_END_TRANSACT_LOCK(lockable) } }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N) __transaction_relaxed
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)
@@ -544,13 +544,13 @@ BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
 #endif
 
 #ifndef BOOST_BEGIN_TRANSACT_LOCK
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { BOOST_SPINLOCK_V1_NAMESPACE::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
-#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) if(lockable.lock(only_if_not_this)) { BOOST_SPINLOCK_V1_NAMESPACE::lock_guard<decltype(lockable)> __tsx_transaction(lockable, BOOST_SPINLOCK_V1_NAMESPACE::adopt_lock_t());
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { BOOST_MONAD_V1_NAMESPACE::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
+#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) if(lockable.lock(only_if_not_this)) { BOOST_MONAD_V1_NAMESPACE::lock_guard<decltype(lockable)> __tsx_transaction(lockable, BOOST_MONAD_V1_NAMESPACE::adopt_lock_t());
 #define BOOST_END_TRANSACT_LOCK(lockable) }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N)
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)
 #endif // BOOST_BEGIN_TRANSACT_LOCK
 
-BOOST_SPINLOCK_V1_NAMESPACE_END
+BOOST_MONAD_V1_NAMESPACE_END
 
-#endif // BOOST_SPINLOCK_HPP
+#endif // BOOST_MONAD_HPP

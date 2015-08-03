@@ -1,6 +1,6 @@
 #include "../../include/boost/spinlock/future.hpp"
 
-extern BOOST_SPINLOCK_NOINLINE int test1()
+extern BOOST_MONAD_NOINLINE int test1()
 {
   using namespace boost::spinlock::lightweight_futures;
   promise<int> p;
@@ -8,7 +8,7 @@ extern BOOST_SPINLOCK_NOINLINE int test1()
   p.set_value(5);
   return f.get();
 }
-extern BOOST_SPINLOCK_NOINLINE void test2()
+extern BOOST_MONAD_NOINLINE void test2()
 {
 }
 

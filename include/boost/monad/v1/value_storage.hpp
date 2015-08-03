@@ -29,8 +29,8 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef BOOST_SPINLOCK_VALUE_STORAGE_HPP
-#define BOOST_SPINLOCK_VALUE_STORAGE_HPP
+#ifndef BOOST_MONAD_VALUE_STORAGE_HPP
+#define BOOST_MONAD_VALUE_STORAGE_HPP
 
 #include "tribool.hpp"
 
@@ -38,20 +38,20 @@ DEALINGS IN THE SOFTWARE.
 #ifdef _MSC_VER
 //# pragma inline_depth(255)
 //# pragma inline_recursion(on)
-# define BOOST_SPINLOCK_FUTURE_CONSTEXPR BOOST_CONSTEXPR
-# define BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR BOOST_FORCEINLINE
-# define BOOST_SPINLOCK_FUTURE_MSVC_HELP BOOST_FORCEINLINE
+# define BOOST_MONAD_FUTURE_CONSTEXPR BOOST_CONSTEXPR
+# define BOOST_MONAD_FUTURE_CXX14_CONSTEXPR BOOST_FORCEINLINE
+# define BOOST_MONAD_FUTURE_MSVC_HELP BOOST_FORCEINLINE
 #else
-# define BOOST_SPINLOCK_FUTURE_CONSTEXPR BOOST_CONSTEXPR
-# define BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR BOOST_CXX14_CONSTEXPR
-# define BOOST_SPINLOCK_FUTURE_MSVC_HELP 
+# define BOOST_MONAD_FUTURE_CONSTEXPR BOOST_CONSTEXPR
+# define BOOST_MONAD_FUTURE_CXX14_CONSTEXPR BOOST_CXX14_CONSTEXPR
+# define BOOST_MONAD_FUTURE_MSVC_HELP 
 #endif
 
 /*! \file value_storage.hpp
 \brief Provides a fixed four state variant
 */
 
-BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
+BOOST_MONAD_V1_NAMESPACE_BEGIN
 namespace lightweight_futures {
 
   //! \brief Specialise to indicate that this type should use the single byte storage layout. You get six bits of storage.
@@ -105,21 +105,21 @@ namespace lightweight_futures {
 
       BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value && std::is_nothrow_destructible<exception_type>::value && std::is_nothrow_destructible<error_type>::value;
 
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl() noexcept : _constexpr_standin_type(constexpr_standin_type()), type(storage_type::empty) { }
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : value(v), type(storage_type::value) { }
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : error(v), type(storage_type::error) { }
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : exception(v), type(storage_type::exception) { }
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : value(std::move(v)), type(storage_type::value) { }
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : error(std::move(v)), type(storage_type::error) { }
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : exception(std::move(v)), type(storage_type::exception) { }
+      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl() noexcept : _constexpr_standin_type(constexpr_standin_type()), type(storage_type::empty) { }
+      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : value(v), type(storage_type::value) { }
+      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : error(v), type(storage_type::error) { }
+      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : exception(v), type(storage_type::exception) { }
+      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : value(std::move(v)), type(storage_type::value) { }
+      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : error(std::move(v)), type(storage_type::error) { }
+      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : exception(std::move(v)), type(storage_type::exception) { }
       struct emplace_t {};
-      template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit value_storage_impl(emplace_t, Args &&... args)
+      template<class... Args> BOOST_MONAD_FUTURE_CONSTEXPR explicit value_storage_impl(emplace_t, Args &&... args)
 #if !defined(_MSC_VER) || _MSC_VER > 190022816
         noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
 #endif
         : value(std::forward<Args>(args)...), type(storage_type::value) { }
-      BOOST_SPINLOCK_FUTURE_MSVC_HELP ~value_storage_impl() noexcept(is_nothrow_destructible) { clear(); }
-      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
+      BOOST_MONAD_FUTURE_MSVC_HELP ~value_storage_impl() noexcept(is_nothrow_destructible) { clear(); }
+      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
       {
         switch(type)
         {
@@ -188,17 +188,17 @@ namespace lightweight_futures {
 
       BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value;
 
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl() : type(storage_type::empty) { }
-      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : value(v) { type=storage_type::value; }
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(const error_type &) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : type(storage_type::error) { }
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(const exception_type &) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : type(storage_type::exception) { }
-      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage_impl(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : value(v) { type=storage_type::value; }
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(error_type &&) noexcept(std::is_nothrow_move_constructible<error_type>::value) : type(storage_type::error) { }
-      BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage_impl(exception_type &&) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : type(storage_type::exception) { }
+      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl() : type(storage_type::empty) { }
+      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : value(v) { type=storage_type::value; }
+      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(const error_type &) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : type(storage_type::error) { }
+      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(const exception_type &) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : type(storage_type::exception) { }
+      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR value_storage_impl(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : value(v) { type=storage_type::value; }
+      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(error_type &&) noexcept(std::is_nothrow_move_constructible<error_type>::value) : type(storage_type::error) { }
+      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(exception_type &&) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : type(storage_type::exception) { }
       struct emplace_t {};
-      template<class... Args> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR explicit value_storage_impl(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value) : value(std::forward<Args>(args)...) { type=storage_type::value; }
-      BOOST_SPINLOCK_FUTURE_MSVC_HELP ~value_storage_impl() noexcept(is_nothrow_destructible) { clear(); }
-      BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
+      template<class... Args> BOOST_MONAD_FUTURE_CXX14_CONSTEXPR explicit value_storage_impl(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value) : value(std::forward<Args>(args)...) { type=storage_type::value; }
+      BOOST_MONAD_FUTURE_MSVC_HELP ~value_storage_impl() noexcept(is_nothrow_destructible) { clear(); }
+      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
       {
         switch(type)
         {
@@ -263,14 +263,14 @@ namespace lightweight_futures {
     BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = base::is_nothrow_destructible;
 
     value_storage() = default;
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : base(v) { }
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : base(v) { }
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : base(v) { }
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : base(std::move(v)) { }
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : base(std::move(v)) { }
-    BOOST_SPINLOCK_FUTURE_CONSTEXPR value_storage(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : base(std::move(v)) { }
+    BOOST_MONAD_FUTURE_CONSTEXPR value_storage(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : base(v) { }
+    BOOST_MONAD_FUTURE_CONSTEXPR value_storage(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : base(v) { }
+    BOOST_MONAD_FUTURE_CONSTEXPR value_storage(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : base(v) { }
+    BOOST_MONAD_FUTURE_CONSTEXPR value_storage(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : base(std::move(v)) { }
+    BOOST_MONAD_FUTURE_CONSTEXPR value_storage(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : base(std::move(v)) { }
+    BOOST_MONAD_FUTURE_CONSTEXPR value_storage(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : base(std::move(v)) { }
     using emplace_t = typename base::emplace_t;
-    template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR explicit value_storage(emplace_t _, Args &&... args)
+    template<class... Args> BOOST_MONAD_FUTURE_CONSTEXPR explicit value_storage(emplace_t _, Args &&... args)
 #if !defined(_MSC_VER) || _MSC_VER > 190022816
       noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
 #endif
@@ -279,7 +279,7 @@ namespace lightweight_futures {
       typename = typename std::enable_if<std::is_same<_value_type,     _value_type2    >::value || std::is_constructible<_value_type,     _value_type2    >::value>::type,
       typename = typename std::enable_if<std::is_same<_error_type,     _error_type2    >::value || std::is_constructible<_error_type,     _error_type2    >::value>::type,
       typename = typename std::enable_if<std::is_same<_exception_type, _exception_type2>::value || std::is_constructible<_exception_type, _exception_type2>::value>::type
-    > BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR explicit value_storage(value_storage<_value_type2, _error_type2, _exception_type2> &&o)
+    > BOOST_MONAD_FUTURE_CXX14_CONSTEXPR explicit value_storage(value_storage<_value_type2, _error_type2, _exception_type2> &&o)
     {
       switch (o.type)
       {
@@ -300,7 +300,7 @@ namespace lightweight_futures {
         break;
       }
     }
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage(const value_storage &o) noexcept(is_nothrow_copy_constructible) : base()
+    BOOST_MONAD_FUTURE_CXX14_CONSTEXPR value_storage(const value_storage &o) noexcept(is_nothrow_copy_constructible) : base()
     {
       switch (o.type)
       {
@@ -318,7 +318,7 @@ namespace lightweight_futures {
       }
       this->type = o.type;
     }
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage(value_storage &&o) noexcept(is_nothrow_move_constructible) : base()
+    BOOST_MONAD_FUTURE_CXX14_CONSTEXPR value_storage(value_storage &&o) noexcept(is_nothrow_move_constructible) : base()
     {
       switch (o.type)
       {
@@ -336,25 +336,25 @@ namespace lightweight_futures {
       }
       this->type = o.type;
     }
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage &operator=(const value_storage &o) noexcept(is_nothrow_destructible && is_nothrow_copy_constructible)
+    BOOST_MONAD_FUTURE_CXX14_CONSTEXPR value_storage &operator=(const value_storage &o) noexcept(is_nothrow_destructible && is_nothrow_copy_constructible)
     {
       clear();
       new (this) value_storage(o);
       return *this;
     }
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR value_storage &operator=(value_storage &&o) noexcept(is_nothrow_destructible && is_nothrow_move_constructible)
+    BOOST_MONAD_FUTURE_CXX14_CONSTEXPR value_storage &operator=(value_storage &&o) noexcept(is_nothrow_destructible && is_nothrow_move_constructible)
     {
       clear();
       new (this) value_storage(std::move(o));
       return *this;
     }
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_state(value_storage &&o) noexcept(is_nothrow_destructible && is_nothrow_move_constructible)
+    BOOST_MONAD_FUTURE_CXX14_CONSTEXPR void set_state(value_storage &&o) noexcept(is_nothrow_destructible && is_nothrow_move_constructible)
     {
       clear();
       new (this) value_storage(std::move(o));
     }
 
-    BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void swap(value_storage &o) noexcept(is_nothrow_move_constructible)
+    BOOST_MONAD_FUTURE_CXX14_CONSTEXPR void swap(value_storage &o) noexcept(is_nothrow_move_constructible)
     {
       if(this->type == o.type)
       {
@@ -380,13 +380,13 @@ namespace lightweight_futures {
         *this = std::move(temp);
       }
     }
-    template<class U> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void set_value(U &&v)
+    template<class U> BOOST_MONAD_FUTURE_CXX14_CONSTEXPR void set_value(U &&v)
     {
       assert(this->type == storage_type::empty);
       new (&this->value) value_type(std::forward<U>(v));
       this->type = storage_type::value;
     }
-    template<class... Args> BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR void emplace_value(Args &&... v)
+    template<class... Args> BOOST_MONAD_FUTURE_CXX14_CONSTEXPR void emplace_value(Args &&... v)
     {
       assert(this->type == storage_type::empty);
       new (&this->value) value_type(std::forward<Args>(v)...);
@@ -398,7 +398,7 @@ namespace lightweight_futures {
       new (&this->exception) exception_type(std::move(e));
       this->type = storage_type::exception;
     }
-    // Note to self: this can't be BOOST_SPINLOCK_FUTURE_CXX14_CONSTEXPR
+    // Note to self: this can't be BOOST_MONAD_FUTURE_CXX14_CONSTEXPR
     void set_error(error_type e)
     {
       assert(this->type == storage_type::empty);
@@ -408,14 +408,14 @@ namespace lightweight_futures {
   };
 
 }
-BOOST_SPINLOCK_V1_NAMESPACE_END
+BOOST_MONAD_V1_NAMESPACE_END
 
 namespace std
 {
   //! \brief Deserialise a value_storage value_type (only value_type) \ingroup monad
-  template<class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::value_storage<_value_type, _error_type, _exception_type> &v)
+  template<class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, BOOST_MONAD_V1_NAMESPACE::lightweight_futures::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures;
+    using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
     switch (v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::value:
@@ -426,9 +426,9 @@ namespace std
     return s;
   }
   //! \brief Serialise a value_storage. Mostly useful for debug printing. \ingroup monad
-  template<class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures::value_storage<_value_type, _error_type, _exception_type> &v)
+  template<class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const BOOST_MONAD_V1_NAMESPACE::lightweight_futures::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace BOOST_SPINLOCK_V1_NAMESPACE::lightweight_futures;
+    using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
     switch (v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::empty:

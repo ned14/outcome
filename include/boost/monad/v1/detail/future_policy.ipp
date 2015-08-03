@@ -29,48 +29,48 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef BOOST_SPINLOCK_FUTURE_NAME_POSTFIX
-#error BOOST_SPINLOCK_FUTURE_NAME_POSTFIX needs to be defined
+#ifndef BOOST_MONAD_FUTURE_NAME_POSTFIX
+#error BOOST_MONAD_FUTURE_NAME_POSTFIX needs to be defined
 #endif
-#define BOOST_SPINLOCK_GLUE2(a, b) a ## b
-#define BOOST_SPINLOCK_GLUE(a, b) BOOST_SPINLOCK_GLUE2(a, b)
-#ifndef BOOST_SPINLOCK_PROMISE_NAME
-#define BOOST_SPINLOCK_PROMISE_NAME BOOST_SPINLOCK_GLUE(promise, BOOST_SPINLOCK_FUTURE_NAME_POSTFIX)
+#define BOOST_MONAD_GLUE2(a, b) a ## b
+#define BOOST_MONAD_GLUE(a, b) BOOST_MONAD_GLUE2(a, b)
+#ifndef BOOST_MONAD_PROMISE_NAME
+#define BOOST_MONAD_PROMISE_NAME BOOST_MONAD_GLUE(promise, BOOST_MONAD_FUTURE_NAME_POSTFIX)
 #endif
-#ifndef BOOST_SPINLOCK_FUTURE_NAME
-#define BOOST_SPINLOCK_FUTURE_NAME BOOST_SPINLOCK_GLUE(future, BOOST_SPINLOCK_FUTURE_NAME_POSTFIX)
+#ifndef BOOST_MONAD_FUTURE_NAME
+#define BOOST_MONAD_FUTURE_NAME BOOST_MONAD_GLUE(future, BOOST_MONAD_FUTURE_NAME_POSTFIX)
 #endif
-#ifndef BOOST_SPINLOCK_SHARED_FUTURE_NAME
-#define BOOST_SPINLOCK_SHARED_FUTURE_NAME BOOST_SPINLOCK_GLUE(shared_, BOOST_SPINLOCK_FUTURE_NAME)
+#ifndef BOOST_MONAD_SHARED_FUTURE_NAME
+#define BOOST_MONAD_SHARED_FUTURE_NAME BOOST_MONAD_GLUE(shared_, BOOST_MONAD_FUTURE_NAME)
 #endif
-#ifndef BOOST_SPINLOCK_FUTURE_POLICY_NAME
-#define BOOST_SPINLOCK_FUTURE_POLICY_NAME BOOST_SPINLOCK_GLUE(BOOST_SPINLOCK_FUTURE_NAME, _policy)
+#ifndef BOOST_MONAD_FUTURE_POLICY_NAME
+#define BOOST_MONAD_FUTURE_POLICY_NAME BOOST_MONAD_GLUE(BOOST_MONAD_FUTURE_NAME, _policy)
 #endif
-#ifndef BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME
-#define BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME BOOST_SPINLOCK_GLUE(BOOST_SPINLOCK_SHARED_FUTURE_NAME, _policy)
+#ifndef BOOST_MONAD_SHARED_FUTURE_POLICY_NAME
+#define BOOST_MONAD_SHARED_FUTURE_POLICY_NAME BOOST_MONAD_GLUE(BOOST_MONAD_SHARED_FUTURE_NAME, _policy)
 #endif
-#ifndef BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME
-#define BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME BOOST_SPINLOCK_GLUE(BOOST_SPINLOCK_FUTURE_NAME, _policy_base)
+#ifndef BOOST_MONAD_FUTURE_POLICY_BASE_NAME
+#define BOOST_MONAD_FUTURE_POLICY_BASE_NAME BOOST_MONAD_GLUE(BOOST_MONAD_FUTURE_NAME, _policy_base)
 #endif
-#ifndef BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME
-#define BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME BOOST_SPINLOCK_GLUE(BOOST_SPINLOCK_SHARED_FUTURE_NAME, _policy_base)
+#ifndef BOOST_MONAD_SHARED_FUTURE_POLICY_BASE_NAME
+#define BOOST_MONAD_SHARED_FUTURE_POLICY_BASE_NAME BOOST_MONAD_GLUE(BOOST_MONAD_SHARED_FUTURE_NAME, _policy_base)
 #endif
 
 namespace detail
 {
   //! [future_policy]
-  template<typename R> struct BOOST_SPINLOCK_FUTURE_POLICY_NAME;
-  template<typename R> struct BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME;
-  template<class future_storage, class _value_type, class error_type=void, class exception_type=void> struct BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME;
-  template<class future_storage, class _value_type, class error_type=void, class exception_type=void> struct BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME;
+  template<typename R> struct BOOST_MONAD_FUTURE_POLICY_NAME;
+  template<typename R> struct BOOST_MONAD_SHARED_FUTURE_POLICY_NAME;
+  template<class future_storage, class _value_type, class error_type=void, class exception_type=void> struct BOOST_MONAD_FUTURE_POLICY_BASE_NAME;
+  template<class future_storage, class _value_type, class error_type=void, class exception_type=void> struct BOOST_MONAD_SHARED_FUTURE_POLICY_BASE_NAME;
 
   // Inherited from publicly by basic_monad, so whatever you expose here you expose in basic_monad
-  template<class future_storage, class _value_type, class error_type, class exception_type> struct BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME : public future_storage
+  template<class future_storage, class _value_type, class error_type, class exception_type> struct BOOST_MONAD_FUTURE_POLICY_BASE_NAME : public future_storage
   {
-    template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME(Args &&... args) : future_storage(std::forward<Args>(args)...) { }
+    template<class... Args> BOOST_MONAD_FUTURE_CONSTEXPR BOOST_MONAD_FUTURE_POLICY_BASE_NAME(Args &&... args) : future_storage(std::forward<Args>(args)...) { }
   protected:
-    using implementation_type = basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<_value_type>>;
-    static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
+    using implementation_type = basic_future<BOOST_MONAD_FUTURE_POLICY_NAME<_value_type>>;
+    static BOOST_MONAD_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
     {
       switch(ec)
       {
@@ -84,15 +84,15 @@ namespace detail
     }
   public:
     // Note we always return value_type by value.
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP _value_type get() &
+    BOOST_MONAD_FUTURE_MSVC_HELP _value_type get() &
     {
       static_cast<implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(this);
       static_cast<implementation_type *>(this)->_check_validity();
-#if defined(BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE) || defined(BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE)
+#if defined(BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE) || defined(BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE)
       if(this->has_error() || this->has_exception())
       {
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
+#ifdef BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE
         if(this->has_error())
         {
           auto &category=this->_storage.error.category();
@@ -109,7 +109,7 @@ namespace detail
             this->clear();
             throw e;
           }*/
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
+#ifdef BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE
           else
           {
             std::system_error e(this->_storage.error);
@@ -119,7 +119,7 @@ namespace detail
 #endif
         }
 #endif
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
+#ifdef BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE
         if(this->has_exception())
         {
           std::exception_ptr e(this->_storage.exception);
@@ -133,9 +133,9 @@ namespace detail
       this->clear();
       return v;
     }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP _value_type get() && { return this->get(); }
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() &
+    BOOST_MONAD_FUTURE_MSVC_HELP _value_type get() && { return this->get(); }
+#ifdef BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE
+    BOOST_MONAD_FUTURE_MSVC_HELP error_type get_error() &
     {
       static_cast<implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(this);
@@ -146,18 +146,18 @@ namespace detail
         this->clear();
         return ec;
       }
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
+#ifdef BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE
       if(this->has_exception())
         return error_type((int) monad_errc::exception_present, monad_category());
 #endif
       return error_type();
     }
 #else
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() &;
+    BOOST_MONAD_FUTURE_MSVC_HELP error_type get_error() &;
 #endif
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() && { return this->get_error(); }
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() &
+    BOOST_MONAD_FUTURE_MSVC_HELP error_type get_error() && { return this->get_error(); }
+#ifdef BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE
+    BOOST_MONAD_FUTURE_MSVC_HELP exception_type get_exception() &
     {
       static_cast<implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(this);
@@ -179,23 +179,23 @@ namespace detail
       return exception_type();
     }
 #else
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() &;
+    BOOST_MONAD_FUTURE_MSVC_HELP exception_type get_exception() &;
 #endif
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() && { return this->get_exception(); }
+    BOOST_MONAD_FUTURE_MSVC_HELP exception_type get_exception() && { return this->get_exception(); }
     // Makes share() available on this future.
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<_value_type>>> share()
+    BOOST_MONAD_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_MONAD_SHARED_FUTURE_POLICY_NAME<_value_type>>> share()
     {
-      using rettype=basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<_value_type>>;
+      using rettype=basic_future<BOOST_MONAD_SHARED_FUTURE_POLICY_NAME<_value_type>>;
       return shared_basic_future_ptr<rettype>(nullptr, rettype(nullptr, std::move(*static_cast<implementation_type *>(this))));
     }
   };
   
-  template<class future_storage, class _value_type, class error_type, class exception_type> struct BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME : public future_storage
+  template<class future_storage, class _value_type, class error_type, class exception_type> struct BOOST_MONAD_SHARED_FUTURE_POLICY_BASE_NAME : public future_storage
   {
-    template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME(Args &&... args) : future_storage(std::forward<Args>(args)...) { }
+    template<class... Args> BOOST_MONAD_FUTURE_CONSTEXPR BOOST_MONAD_SHARED_FUTURE_POLICY_BASE_NAME(Args &&... args) : future_storage(std::forward<Args>(args)...) { }
   protected:
-    typedef basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<_value_type>> implementation_type;
-    static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
+    typedef basic_future<BOOST_MONAD_SHARED_FUTURE_POLICY_NAME<_value_type>> implementation_type;
+    static BOOST_MONAD_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
     {
       switch(ec)
       {
@@ -211,15 +211,15 @@ namespace detail
     using const_lvalue_type = typename std::conditional<future_storage::value_storage_type::is_referenceable, const typename future_storage::value_type &, _value_type>::type;
   public:
     // Note we always return value_type by const lvalue ref.
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP const_lvalue_type get() const
+    BOOST_MONAD_FUTURE_MSVC_HELP const_lvalue_type get() const
     {
       static_cast<const implementation_type *>(this)->wait();
-      typename implementation_type::lock_guard_type h(const_cast<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME *>(this));
+      typename implementation_type::lock_guard_type h(const_cast<BOOST_MONAD_SHARED_FUTURE_POLICY_BASE_NAME *>(this));
       static_cast<const implementation_type *>(this)->_check_validity();
-#if defined(BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE) || defined(BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE)
+#if defined(BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE) || defined(BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE)
       if(this->has_error() || this->has_exception())
       {
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
+#ifdef BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE
         if(this->has_error())
         {
           auto &category=this->_storage.error.category();
@@ -234,7 +234,7 @@ namespace detail
             std::ios_base::failure e(std::move(this->_storage.error));
             throw e;
           }*/
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
+#ifdef BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE
           else
           {
             std::system_error e(this->_storage.error);
@@ -243,7 +243,7 @@ namespace detail
 #endif
         }
 #endif
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
+#ifdef BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE
         if(this->has_exception())
         {
           std::exception_ptr e(this->_storage.exception);
@@ -254,31 +254,31 @@ namespace detail
 #endif
       return this->_storage.value;
     }
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() const
+#ifdef BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE
+    BOOST_MONAD_FUTURE_MSVC_HELP error_type get_error() const
     {
       static_cast<const implementation_type *>(this)->wait();
-      typename implementation_type::lock_guard_type h(const_cast<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME *>(this));
+      typename implementation_type::lock_guard_type h(const_cast<BOOST_MONAD_SHARED_FUTURE_POLICY_BASE_NAME *>(this));
       static_cast<const implementation_type *>(this)->_check_validity();
       if(this->has_error())
       {
         error_type ec(this->_storage.error);
         return ec;
       }
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
+#ifdef BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE
       if(this->has_exception())
         return error_type((int) monad_errc::exception_present, monad_category());
 #endif
       return error_type();
     }
 #else
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() const;
+    BOOST_MONAD_FUTURE_MSVC_HELP error_type get_error() const;
 #endif
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() const
+#ifdef BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE
+    BOOST_MONAD_FUTURE_MSVC_HELP exception_type get_exception() const
     {
       static_cast<const implementation_type *>(this)->wait();
-      typename implementation_type::lock_guard_type h(const_cast<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME *>(this));
+      typename implementation_type::lock_guard_type h(const_cast<BOOST_MONAD_SHARED_FUTURE_POLICY_BASE_NAME *>(this));
       static_cast<const implementation_type *>(this)->_check_validity();
       if(!this->has_error() && !this->has_exception())
         return exception_type();
@@ -295,37 +295,37 @@ namespace detail
       return exception_type();
     }
 #else
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() const;
+    BOOST_MONAD_FUTURE_MSVC_HELP exception_type get_exception() const;
 #endif
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<_value_type>>> share() const
+    BOOST_MONAD_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_MONAD_SHARED_FUTURE_POLICY_NAME<_value_type>>> share() const
     {
-      return shared_basic_future_ptr<basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<_value_type>>>(const_cast<implementation_type *>(static_cast<const implementation_type *>(this))->shared_from_this());
+      return shared_basic_future_ptr<basic_future<BOOST_MONAD_SHARED_FUTURE_POLICY_NAME<_value_type>>>(const_cast<implementation_type *>(static_cast<const implementation_type *>(this))->shared_from_this());
     }
   };
 
-  template<typename R> struct BOOST_SPINLOCK_FUTURE_POLICY_NAME
+  template<typename R> struct BOOST_MONAD_FUTURE_POLICY_NAME
   {
-    using monad_type = basic_monad<BOOST_SPINLOCK_FUTURE_POLICY_NAME>;
+    using monad_type = basic_monad<BOOST_MONAD_FUTURE_POLICY_NAME>;
     // In a monad policy, this is identical to monad_type. Not here.
-    using implementation_type = basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME>;
+    using implementation_type = basic_future<BOOST_MONAD_FUTURE_POLICY_NAME>;
     using value_type = R;
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
-    using error_type = BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE;
+#ifdef BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE
+    using error_type = BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE;
 #else
     using error_type = void;
 #endif
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-    using exception_type = BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE;
+#ifdef BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE
+    using exception_type = BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE;
 #else
     using exception_type = void;
 #endif
     // The wait implementation to use for waits and timed waits
     using wait_implementation = detail::stl_wait_implementation<std::promise<void>, std::future<void>>;
     // Future.get() locks, so define our own monad base type.
-    using base = BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
-    using other_base = BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
-    template<typename U> using rebind = basic_future<BOOST_SPINLOCK_FUTURE_POLICY_NAME<U>>;
-    template<typename U> using rebind_policy = BOOST_SPINLOCK_FUTURE_POLICY_NAME<U>;
+    using base = BOOST_MONAD_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
+    using other_base = BOOST_MONAD_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
+    template<typename U> using rebind = basic_future<BOOST_MONAD_FUTURE_POLICY_NAME<U>>;
+    template<typename U> using rebind_policy = BOOST_MONAD_FUTURE_POLICY_NAME<U>;
 
     // Does getting this future's state consume it?
     BOOST_STATIC_CONSTEXPR bool is_consuming=true;
@@ -342,29 +342,29 @@ namespace detail
     // How many spins of yield to do waiting to be signalled before allocating a wait_implementation
     BOOST_STATIC_CONSTEXPR size_t wait_spin_count = 1000;
   };
-  template<typename R> struct BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME
+  template<typename R> struct BOOST_MONAD_SHARED_FUTURE_POLICY_NAME
   {
-    using monad_type = basic_monad<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME>;
+    using monad_type = basic_monad<BOOST_MONAD_SHARED_FUTURE_POLICY_NAME>;
     // In a monad policy, this is identical to monad_type. Not here.
-    using implementation_type = basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME>;
+    using implementation_type = basic_future<BOOST_MONAD_SHARED_FUTURE_POLICY_NAME>;
     using value_type = R;
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
-    using error_type = BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE;
+#ifdef BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE
+    using error_type = BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE;
 #else
     using error_type = void;
 #endif
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-    using exception_type = BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE;
+#ifdef BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE
+    using exception_type = BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE;
 #else
     using exception_type = void;
 #endif
     // The wait implementation to use for waits and timed waits
     using wait_implementation = detail::stl_wait_implementation<std::promise<void>, std::future<void>>;
     // Future.get() locks, so define our own monad base type.
-    using base = BOOST_SPINLOCK_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
-    using other_base = BOOST_SPINLOCK_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
-    template<typename U> using rebind = basic_future<BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<U>>;
-    template<typename U> using rebind_policy = BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<U>;
+    using base = BOOST_MONAD_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
+    using other_base = BOOST_MONAD_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
+    template<typename U> using rebind = basic_future<BOOST_MONAD_SHARED_FUTURE_POLICY_NAME<U>>;
+    template<typename U> using rebind_policy = BOOST_MONAD_SHARED_FUTURE_POLICY_NAME<U>;
 
     // Does getting this future's state consume it?
     BOOST_STATIC_CONSTEXPR bool is_consuming=false;
@@ -385,71 +385,71 @@ namespace detail
 }
 
 //! \brief A predefined promise convenience type \ingroup future_promise
-template<typename R> using BOOST_SPINLOCK_PROMISE_NAME = basic_promise<detail::BOOST_SPINLOCK_FUTURE_POLICY_NAME<R>>;
+template<typename R> using BOOST_MONAD_PROMISE_NAME = basic_promise<detail::BOOST_MONAD_FUTURE_POLICY_NAME<R>>;
 //! \brief A predefined future convenience type \ingroup future_promise
-template<typename R> using BOOST_SPINLOCK_FUTURE_NAME = basic_future<detail::BOOST_SPINLOCK_FUTURE_POLICY_NAME<R>>;
+template<typename R> using BOOST_MONAD_FUTURE_NAME = basic_future<detail::BOOST_MONAD_FUTURE_POLICY_NAME<R>>;
 
-#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME BOOST_SPINLOCK_GLUE(make_ready_, BOOST_SPINLOCK_FUTURE_NAME)
+#define BOOST_MONAD_MAKE_READY_FUTURE_NAME BOOST_MONAD_GLUE(make_ready_, BOOST_MONAD_FUTURE_NAME)
 //! \brief A predefined make ready future convenience function \ingroup future_promise
-template<typename R> inline BOOST_SPINLOCK_FUTURE_NAME<typename std::decay<R>::type> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(R &&v)
+template<typename R> inline BOOST_MONAD_FUTURE_NAME<typename std::decay<R>::type> BOOST_MONAD_MAKE_READY_FUTURE_NAME(R &&v)
 {
-  return BOOST_SPINLOCK_FUTURE_NAME<typename std::decay<R>::type>(std::forward<R>(v));
+  return BOOST_MONAD_FUTURE_NAME<typename std::decay<R>::type>(std::forward<R>(v));
 }
-#undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
-#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME BOOST_SPINLOCK_GLUE(make_errored_, BOOST_SPINLOCK_FUTURE_NAME)
+#undef BOOST_MONAD_MAKE_READY_FUTURE_NAME
+#ifdef BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE
+#define BOOST_MONAD_MAKE_READY_FUTURE_NAME BOOST_MONAD_GLUE(make_errored_, BOOST_MONAD_FUTURE_NAME)
 //! \brief A predefined make errored future convenience function \ingroup future_promise
-template<typename R> inline BOOST_SPINLOCK_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE v)
+template<typename R> inline BOOST_MONAD_FUTURE_NAME<R> BOOST_MONAD_MAKE_READY_FUTURE_NAME(BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE v)
 {
-  return BOOST_SPINLOCK_FUTURE_NAME<R>(std::move(v));
+  return BOOST_MONAD_FUTURE_NAME<R>(std::move(v));
 }
-#undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
+#undef BOOST_MONAD_MAKE_READY_FUTURE_NAME
 #endif
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME BOOST_SPINLOCK_GLUE(make_exceptional_, BOOST_SPINLOCK_FUTURE_NAME)
+#ifdef BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE
+#define BOOST_MONAD_MAKE_READY_FUTURE_NAME BOOST_MONAD_GLUE(make_exceptional_, BOOST_MONAD_FUTURE_NAME)
 //! \brief A predefined make excepted future convenience function \ingroup future_promise
-template<typename R> inline BOOST_SPINLOCK_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE v)
+template<typename R> inline BOOST_MONAD_FUTURE_NAME<R> BOOST_MONAD_MAKE_READY_FUTURE_NAME(BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE v)
 {
-  return BOOST_SPINLOCK_FUTURE_NAME<R>(std::move(v));
+  return BOOST_MONAD_FUTURE_NAME<R>(std::move(v));
 }
-#undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
+#undef BOOST_MONAD_MAKE_READY_FUTURE_NAME
 #endif
 
 //! \brief A predefined shared future convenience type \ingroup future_promise
-template<typename R> using BOOST_SPINLOCK_SHARED_FUTURE_NAME = shared_basic_future_ptr<basic_future<detail::BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME<R>>>;
+template<typename R> using BOOST_MONAD_SHARED_FUTURE_NAME = shared_basic_future_ptr<basic_future<detail::BOOST_MONAD_SHARED_FUTURE_POLICY_NAME<R>>>;
 
-#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME BOOST_SPINLOCK_GLUE(make_ready_, BOOST_SPINLOCK_SHARED_FUTURE_NAME)
+#define BOOST_MONAD_MAKE_READY_FUTURE_NAME BOOST_MONAD_GLUE(make_ready_, BOOST_MONAD_SHARED_FUTURE_NAME)
 //! \brief A predefined make ready shared future convenience function \ingroup future_promise
-template<typename R> inline BOOST_SPINLOCK_SHARED_FUTURE_NAME<typename std::decay<R>::type> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(R &&v)
+template<typename R> inline BOOST_MONAD_SHARED_FUTURE_NAME<typename std::decay<R>::type> BOOST_MONAD_MAKE_READY_FUTURE_NAME(R &&v)
 {
-  return BOOST_SPINLOCK_SHARED_FUTURE_NAME<typename std::decay<R>::type>(std::forward<R>(v));
+  return BOOST_MONAD_SHARED_FUTURE_NAME<typename std::decay<R>::type>(std::forward<R>(v));
 }
-#undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
-#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME BOOST_SPINLOCK_GLUE(make_errored_, BOOST_SPINLOCK_SHARED_FUTURE_NAME)
+#undef BOOST_MONAD_MAKE_READY_FUTURE_NAME
+#ifdef BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE
+#define BOOST_MONAD_MAKE_READY_FUTURE_NAME BOOST_MONAD_GLUE(make_errored_, BOOST_MONAD_SHARED_FUTURE_NAME)
 //! \brief A predefined make errored shared future convenience function \ingroup future_promise
-template<typename R> inline BOOST_SPINLOCK_SHARED_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE v)
+template<typename R> inline BOOST_MONAD_SHARED_FUTURE_NAME<R> BOOST_MONAD_MAKE_READY_FUTURE_NAME(BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE v)
 {
-  return BOOST_SPINLOCK_SHARED_FUTURE_NAME<R>(std::move(v));
+  return BOOST_MONAD_SHARED_FUTURE_NAME<R>(std::move(v));
 }
-#undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
+#undef BOOST_MONAD_MAKE_READY_FUTURE_NAME
 #endif
-#ifdef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
-#define BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME BOOST_SPINLOCK_GLUE(make_exceptional_, BOOST_SPINLOCK_SHARED_FUTURE_NAME)
+#ifdef BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE
+#define BOOST_MONAD_MAKE_READY_FUTURE_NAME BOOST_MONAD_GLUE(make_exceptional_, BOOST_MONAD_SHARED_FUTURE_NAME)
 //! \brief A predefined make excepted shared future convenience function \ingroup future_promise
-template<typename R> inline BOOST_SPINLOCK_SHARED_FUTURE_NAME<R> BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME(BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE v)
+template<typename R> inline BOOST_MONAD_SHARED_FUTURE_NAME<R> BOOST_MONAD_MAKE_READY_FUTURE_NAME(BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE v)
 {
-  return BOOST_SPINLOCK_SHARED_FUTURE_NAME<R>(std::move(v));
+  return BOOST_MONAD_SHARED_FUTURE_NAME<R>(std::move(v));
 }
-#undef BOOST_SPINLOCK_MAKE_READY_FUTURE_NAME
+#undef BOOST_MONAD_MAKE_READY_FUTURE_NAME
 #endif
 
-#undef BOOST_SPINLOCK_FUTURE_NAME_POSTFIX
-#undef BOOST_SPINLOCK_GLUE
-#undef BOOST_SPINLOCK_PROMISE_NAME
-#undef BOOST_SPINLOCK_FUTURE_NAME
-#undef BOOST_SPINLOCK_SHARED_FUTURE_NAME
-#undef BOOST_SPINLOCK_FUTURE_POLICY_NAME
-#undef BOOST_SPINLOCK_SHARED_FUTURE_POLICY_NAME
-#undef BOOST_SPINLOCK_FUTURE_POLICY_ERROR_TYPE
-#undef BOOST_SPINLOCK_FUTURE_POLICY_EXCEPTION_TYPE
+#undef BOOST_MONAD_FUTURE_NAME_POSTFIX
+#undef BOOST_MONAD_GLUE
+#undef BOOST_MONAD_PROMISE_NAME
+#undef BOOST_MONAD_FUTURE_NAME
+#undef BOOST_MONAD_SHARED_FUTURE_NAME
+#undef BOOST_MONAD_FUTURE_POLICY_NAME
+#undef BOOST_MONAD_SHARED_FUTURE_POLICY_NAME
+#undef BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE
+#undef BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE

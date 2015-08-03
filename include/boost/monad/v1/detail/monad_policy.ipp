@@ -29,16 +29,16 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef BOOST_SPINLOCK_MONAD_NAME
-#error BOOST_SPINLOCK_MONAD_NAME needs to be defined
+#ifndef BOOST_MONAD_MONAD_NAME
+#error BOOST_MONAD_MONAD_NAME needs to be defined
 #endif
-#define BOOST_SPINLOCK_GLUE2(a, b) a ## b
-#define BOOST_SPINLOCK_GLUE(a, b) BOOST_SPINLOCK_GLUE2(a, b)
-#ifndef BOOST_SPINLOCK_MONAD_POLICY_NAME
-#define BOOST_SPINLOCK_MONAD_POLICY_NAME BOOST_SPINLOCK_GLUE(BOOST_SPINLOCK_MONAD_NAME, _policy)
+#define BOOST_MONAD_GLUE2(a, b) a ## b
+#define BOOST_MONAD_GLUE(a, b) BOOST_MONAD_GLUE2(a, b)
+#ifndef BOOST_MONAD_MONAD_POLICY_NAME
+#define BOOST_MONAD_MONAD_POLICY_NAME BOOST_MONAD_GLUE(BOOST_MONAD_MONAD_NAME, _policy)
 #endif
-#ifndef BOOST_SPINLOCK_MONAD_POLICY_BASE_NAME
-#define BOOST_SPINLOCK_MONAD_POLICY_BASE_NAME BOOST_SPINLOCK_GLUE(BOOST_SPINLOCK_MONAD_NAME, _policy_base)
+#ifndef BOOST_MONAD_MONAD_POLICY_BASE_NAME
+#define BOOST_MONAD_MONAD_POLICY_BASE_NAME BOOST_MONAD_GLUE(BOOST_MONAD_MONAD_NAME, _policy_base)
 #endif
 
 namespace detail
@@ -49,28 +49,28 @@ namespace detail
 #endif
   //! [future_policy]
   // Inherited from publicly by basic_monad, so whatever you expose here you expose in basic_monad
-  template<class monad_storage, class value_type, class error_type=void, class exception_type=void> struct BOOST_SPINLOCK_MONAD_POLICY_BASE_NAME : public monad_storage
+  template<class monad_storage, class value_type, class error_type=void, class exception_type=void> struct BOOST_MONAD_MONAD_POLICY_BASE_NAME : public monad_storage
   {
-    template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR BOOST_SPINLOCK_MONAD_POLICY_BASE_NAME(Args &&... args) : monad_storage(std::forward<Args>(args)...) { }
+    template<class... Args> BOOST_MONAD_FUTURE_CONSTEXPR BOOST_MONAD_MONAD_POLICY_BASE_NAME(Args &&... args) : monad_storage(std::forward<Args>(args)...) { }
   protected:
     // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
+    static BOOST_MONAD_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
     {
       throw monad_error(ec);
     }      
     // Common preamble to the below
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void _pre_get_value() const
+    BOOST_MONAD_FUTURE_MSVC_HELP void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
         _throw_error(monad_errc::no_state);
-#if defined(BOOST_SPINLOCK_MONAD_POLICY_ERROR_TYPE) || defined(BOOST_SPINLOCK_MONAD_POLICY_EXCEPTION_TYPE)
+#if defined(BOOST_MONAD_MONAD_POLICY_ERROR_TYPE) || defined(BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE)
       if(monad_storage::has_error() || monad_storage::has_exception())
       {
-#ifdef BOOST_SPINLOCK_MONAD_POLICY_ERROR_TYPE
+#ifdef BOOST_MONAD_MONAD_POLICY_ERROR_TYPE
         if(monad_storage::has_error())
           throw std::system_error(monad_storage::_storage.error);
 #endif
-#ifdef BOOST_SPINLOCK_MONAD_POLICY_EXCEPTION_TYPE
+#ifdef BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE
         if(monad_storage::has_exception())
           std::rethrow_exception(monad_storage::_storage.exception);
 #endif
@@ -82,14 +82,14 @@ namespace detail
     using const_lvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, const value_type &, value_type>::type;
     using rvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, value_type &&, value_type>::type;
   public:
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP lvalue_type get()   & { _pre_get_value(); return monad_storage::_storage.value; }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP lvalue_type value() & { _pre_get_value(); return monad_storage::_storage.value; }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP const_lvalue_type get()   const & { _pre_get_value(); return monad_storage::_storage.value; }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP const_lvalue_type value() const & { _pre_get_value(); return monad_storage::_storage.value; }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP rvalue_type get()   && { _pre_get_value(); return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value); }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP rvalue_type value() && { _pre_get_value(); return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value); }
-#ifdef BOOST_SPINLOCK_MONAD_POLICY_ERROR_TYPE
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() const
+    BOOST_MONAD_FUTURE_MSVC_HELP lvalue_type get()   & { _pre_get_value(); return monad_storage::_storage.value; }
+    BOOST_MONAD_FUTURE_MSVC_HELP lvalue_type value() & { _pre_get_value(); return monad_storage::_storage.value; }
+    BOOST_MONAD_FUTURE_MSVC_HELP const_lvalue_type get()   const & { _pre_get_value(); return monad_storage::_storage.value; }
+    BOOST_MONAD_FUTURE_MSVC_HELP const_lvalue_type value() const & { _pre_get_value(); return monad_storage::_storage.value; }
+    BOOST_MONAD_FUTURE_MSVC_HELP rvalue_type get()   && { _pre_get_value(); return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value); }
+    BOOST_MONAD_FUTURE_MSVC_HELP rvalue_type value() && { _pre_get_value(); return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value); }
+#ifdef BOOST_MONAD_MONAD_POLICY_ERROR_TYPE
+    BOOST_MONAD_FUTURE_MSVC_HELP error_type get_error() const
     {
       if(!monad_storage::is_ready())
       {
@@ -98,15 +98,15 @@ namespace detail
       }
       if(monad_storage::has_error())
         return monad_storage::_storage.error;
-#ifdef BOOST_SPINLOCK_MONAD_POLICY_EXCEPTION_TYPE
+#ifdef BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE
       if(monad_storage::has_exception())
         return error_type((int) monad_errc::exception_present, monad_category());
 #endif
       return error_type();
     }
 #endif
-#ifdef BOOST_SPINLOCK_MONAD_POLICY_EXCEPTION_TYPE
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() const
+#ifdef BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE
+    BOOST_MONAD_FUTURE_MSVC_HELP exception_type get_exception() const
     {
       if(!monad_storage::is_ready())
       {
@@ -126,28 +126,28 @@ namespace detail
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-  template<class monad_storage, class error_type, class exception_type> struct BOOST_SPINLOCK_MONAD_POLICY_BASE_NAME<monad_storage, void, error_type, exception_type> : public monad_storage
+  template<class monad_storage, class error_type, class exception_type> struct BOOST_MONAD_MONAD_POLICY_BASE_NAME<monad_storage, void, error_type, exception_type> : public monad_storage
   {
-    template<class... Args> BOOST_SPINLOCK_FUTURE_CONSTEXPR BOOST_SPINLOCK_MONAD_POLICY_BASE_NAME(Args &&... args) : monad_storage(std::forward<Args>(args)...) { }
+    template<class... Args> BOOST_MONAD_FUTURE_CONSTEXPR BOOST_MONAD_MONAD_POLICY_BASE_NAME(Args &&... args) : monad_storage(std::forward<Args>(args)...) { }
   protected:
     // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_SPINLOCK_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
+    static BOOST_MONAD_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
     {
       throw monad_error(ec);
     }      
     // Common preamble to the below
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void _pre_get_value() const
+    BOOST_MONAD_FUTURE_MSVC_HELP void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
         _throw_error(monad_errc::no_state);
-#if defined(BOOST_SPINLOCK_MONAD_POLICY_ERROR_TYPE) || defined(BOOST_SPINLOCK_MONAD_POLICY_EXCEPTION_TYPE)
+#if defined(BOOST_MONAD_MONAD_POLICY_ERROR_TYPE) || defined(BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE)
       if(monad_storage::has_error() || monad_storage::has_exception())
       {
-#ifdef BOOST_SPINLOCK_MONAD_POLICY_ERROR_TYPE
+#ifdef BOOST_MONAD_MONAD_POLICY_ERROR_TYPE
         if(monad_storage::has_error())
           throw std::system_error(monad_storage::_storage.error);
 #endif
-#ifdef BOOST_SPINLOCK_MONAD_POLICY_EXCEPTION_TYPE
+#ifdef BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE
         if(monad_storage::has_exception())
           std::rethrow_exception(monad_storage::_storage.exception);
 #endif
@@ -155,14 +155,14 @@ namespace detail
 #endif
     }
   public:
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void get()   & { _pre_get_value(); }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void value() & { _pre_get_value(); }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void get()   const & { _pre_get_value(); }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void value() const & { _pre_get_value(); }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void get()   && { _pre_get_value(); }
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP void value() && { _pre_get_value(); }
-#ifdef BOOST_SPINLOCK_MONAD_POLICY_ERROR_TYPE
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP error_type get_error() const
+    BOOST_MONAD_FUTURE_MSVC_HELP void get()   & { _pre_get_value(); }
+    BOOST_MONAD_FUTURE_MSVC_HELP void value() & { _pre_get_value(); }
+    BOOST_MONAD_FUTURE_MSVC_HELP void get()   const & { _pre_get_value(); }
+    BOOST_MONAD_FUTURE_MSVC_HELP void value() const & { _pre_get_value(); }
+    BOOST_MONAD_FUTURE_MSVC_HELP void get()   && { _pre_get_value(); }
+    BOOST_MONAD_FUTURE_MSVC_HELP void value() && { _pre_get_value(); }
+#ifdef BOOST_MONAD_MONAD_POLICY_ERROR_TYPE
+    BOOST_MONAD_FUTURE_MSVC_HELP error_type get_error() const
     {
       if(!monad_storage::is_ready())
       {
@@ -171,15 +171,15 @@ namespace detail
       }
       if(monad_storage::has_error())
         return monad_storage::_storage.error;
-#ifdef BOOST_SPINLOCK_MONAD_POLICY_EXCEPTION_TYPE
+#ifdef BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE
       if(monad_storage::has_exception())
         return error_type((int) monad_errc::exception_present, monad_category());
 #endif
       return error_type();
     }
 #endif
-#ifdef BOOST_SPINLOCK_MONAD_POLICY_EXCEPTION_TYPE
-    BOOST_SPINLOCK_FUTURE_MSVC_HELP exception_type get_exception() const
+#ifdef BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE
+    BOOST_MONAD_FUTURE_MSVC_HELP exception_type get_exception() const
     {
       if(!monad_storage::is_ready())
       {
@@ -198,64 +198,64 @@ namespace detail
   };
 
   // An implementation policy for basic_monad
-  template<typename R> struct BOOST_SPINLOCK_MONAD_POLICY_NAME
+  template<typename R> struct BOOST_MONAD_MONAD_POLICY_NAME
   {
     // The final resulting implementation type
-    typedef basic_monad<BOOST_SPINLOCK_MONAD_POLICY_NAME> implementation_type;
+    typedef basic_monad<BOOST_MONAD_MONAD_POLICY_NAME> implementation_type;
     // The value type to use. Can be void to disable.
     typedef R value_type;
     // The error code type to use. Can be void to disable.
-#ifdef BOOST_SPINLOCK_MONAD_POLICY_ERROR_TYPE
-    typedef BOOST_SPINLOCK_MONAD_POLICY_ERROR_TYPE error_type;
+#ifdef BOOST_MONAD_MONAD_POLICY_ERROR_TYPE
+    typedef BOOST_MONAD_MONAD_POLICY_ERROR_TYPE error_type;
 #else
     typedef void error_type;
 #endif
     // The exception pointer type to use. Can be void to disable.
-#ifdef BOOST_SPINLOCK_MONAD_POLICY_EXCEPTION_TYPE
-    typedef BOOST_SPINLOCK_MONAD_POLICY_EXCEPTION_TYPE exception_type;
+#ifdef BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE
+    typedef BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE exception_type;
 #else
     typedef void exception_type;
 #endif
     // The base class to use to store state
-    typedef BOOST_SPINLOCK_MONAD_POLICY_BASE_NAME<basic_monad_storage<BOOST_SPINLOCK_MONAD_POLICY_NAME>, value_type, error_type, exception_type> base;
+    typedef BOOST_MONAD_MONAD_POLICY_BASE_NAME<basic_monad_storage<BOOST_MONAD_MONAD_POLICY_NAME>, value_type, error_type, exception_type> base;
     
     // The type which basic_monad::rebind<U> should return
-    template<typename U> using rebind = basic_monad<BOOST_SPINLOCK_MONAD_POLICY_NAME<U>>;
+    template<typename U> using rebind = basic_monad<BOOST_MONAD_MONAD_POLICY_NAME<U>>;
     // The type which rebinding myself produces
-    template<typename U> using rebind_policy = BOOST_SPINLOCK_MONAD_POLICY_NAME<U>;
+    template<typename U> using rebind_policy = BOOST_MONAD_MONAD_POLICY_NAME<U>;
   };
-  template<> struct BOOST_SPINLOCK_MONAD_POLICY_NAME<void>
+  template<> struct BOOST_MONAD_MONAD_POLICY_NAME<void>
   {
     // The final resulting implementation type
-    typedef basic_monad<BOOST_SPINLOCK_MONAD_POLICY_NAME> implementation_type;
+    typedef basic_monad<BOOST_MONAD_MONAD_POLICY_NAME> implementation_type;
     // The value type to use. Can be void to disable.
     typedef void value_type;
     // The error code type to use. Can be void to disable.
-#ifdef BOOST_SPINLOCK_MONAD_POLICY_ERROR_TYPE
-    typedef BOOST_SPINLOCK_MONAD_POLICY_ERROR_TYPE error_type;
+#ifdef BOOST_MONAD_MONAD_POLICY_ERROR_TYPE
+    typedef BOOST_MONAD_MONAD_POLICY_ERROR_TYPE error_type;
 #else
     typedef void error_type;
 #endif
     // The exception pointer type to use. Can be void to disable.
-#ifdef BOOST_SPINLOCK_MONAD_POLICY_EXCEPTION_TYPE
-    typedef BOOST_SPINLOCK_MONAD_POLICY_EXCEPTION_TYPE exception_type;
+#ifdef BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE
+    typedef BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE exception_type;
 #else
     typedef void exception_type;
 #endif
     // The base class to use to store state
-    typedef BOOST_SPINLOCK_MONAD_POLICY_BASE_NAME<basic_monad_storage<BOOST_SPINLOCK_MONAD_POLICY_NAME>, value_type, error_type, exception_type> base;
+    typedef BOOST_MONAD_MONAD_POLICY_BASE_NAME<basic_monad_storage<BOOST_MONAD_MONAD_POLICY_NAME>, value_type, error_type, exception_type> base;
 
     // The type which basic_monad::rebind<U> should return
-    template<typename U> using rebind = basic_monad<BOOST_SPINLOCK_MONAD_POLICY_NAME<U>>;
+    template<typename U> using rebind = basic_monad<BOOST_MONAD_MONAD_POLICY_NAME<U>>;
     // The type which rebinding myself produces
-    template<typename U> using rebind_policy = BOOST_SPINLOCK_MONAD_POLICY_NAME<U>;
+    template<typename U> using rebind_policy = BOOST_MONAD_MONAD_POLICY_NAME<U>;
   };
 }
 
-#undef BOOST_SPINLOCK_GLUE
-#undef BOOST_SPINLOCK_GLUE2
-#undef BOOST_SPINLOCK_PROMISE_NAME
-#undef BOOST_SPINLOCK_MONAD_NAME
-#undef BOOST_SPINLOCK_MONAD_POLICY_NAME
-#undef BOOST_SPINLOCK_MONAD_POLICY_ERROR_TYPE
-#undef BOOST_SPINLOCK_MONAD_POLICY_EXCEPTION_TYPE
+#undef BOOST_MONAD_GLUE
+#undef BOOST_MONAD_GLUE2
+#undef BOOST_MONAD_PROMISE_NAME
+#undef BOOST_MONAD_MONAD_NAME
+#undef BOOST_MONAD_MONAD_POLICY_NAME
+#undef BOOST_MONAD_MONAD_POLICY_ERROR_TYPE
+#undef BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE

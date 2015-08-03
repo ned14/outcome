@@ -29,8 +29,8 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef BOOST_SPINLOCK_TRIBOOL_HPP
-#define BOOST_SPINLOCK_TRIBOOL_HPP
+#ifndef BOOST_MONAD_TRIBOOL_HPP
+#define BOOST_MONAD_TRIBOOL_HPP
 
 #include "spinlock.hpp"
 #include <istream>
@@ -41,7 +41,7 @@ DEALINGS IN THE SOFTWARE.
 \brief Provides a constexpr C++ 11 tribool
 */
 
-BOOST_SPINLOCK_V1_NAMESPACE_BEGIN
+BOOST_MONAD_V1_NAMESPACE_BEGIN
 namespace tribool
 {  
   /*! \defgroup tribool Constexpr C++ 11 tribool
@@ -94,20 +94,20 @@ namespace tribool
   //! \brief Return true if tribool is other/indeterminate/unknown. \ingroup tribool
   BOOST_CONSTEXPR inline bool unknown(tribool a) noexcept { return a==tribool::indeterminate; }
 }
-BOOST_SPINLOCK_V1_NAMESPACE_END
+BOOST_MONAD_V1_NAMESPACE_END
 
 namespace std
 {
-  inline istream &operator>>(istream &s, BOOST_SPINLOCK_V1_NAMESPACE::tribool::tribool &a)
+  inline istream &operator>>(istream &s, BOOST_MONAD_V1_NAMESPACE::tribool::tribool &a)
   {
     char c;
     s >> c;
-    a=(c=='1') ? BOOST_SPINLOCK_V1_NAMESPACE::tribool::tribool::true_ : (c=='0') ? BOOST_SPINLOCK_V1_NAMESPACE::tribool::tribool::false_ : BOOST_SPINLOCK_V1_NAMESPACE::tribool::tribool::other;
+    a=(c=='1') ? BOOST_MONAD_V1_NAMESPACE::tribool::tribool::true_ : (c=='0') ? BOOST_MONAD_V1_NAMESPACE::tribool::tribool::false_ : BOOST_MONAD_V1_NAMESPACE::tribool::tribool::other;
     return s;
   }
-  inline ostream &operator<<(ostream &s, BOOST_SPINLOCK_V1_NAMESPACE::tribool::tribool a)
+  inline ostream &operator<<(ostream &s, BOOST_MONAD_V1_NAMESPACE::tribool::tribool a)
   {
-    char c=(a==BOOST_SPINLOCK_V1_NAMESPACE::tribool::tribool::true_) ? '1' : (a==BOOST_SPINLOCK_V1_NAMESPACE::tribool::tribool::false_) ? '0' : '?';
+    char c=(a==BOOST_MONAD_V1_NAMESPACE::tribool::tribool::true_) ? '1' : (a==BOOST_MONAD_V1_NAMESPACE::tribool::tribool::false_) ? '0' : '?';
     return s << c;
   }
 }

@@ -2,11 +2,11 @@
 
 using namespace boost::spinlock::lightweight_futures;
 extern monad<int> unknown();
-extern BOOST_SPINLOCK_NOINLINE std::error_code test1()
+extern BOOST_MONAD_NOINLINE std::error_code test1()
 {
   return unknown().get_error();
 }
-extern BOOST_SPINLOCK_NOINLINE void test2()
+extern BOOST_MONAD_NOINLINE void test2()
 {
 }
 
