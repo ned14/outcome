@@ -220,7 +220,7 @@ namespace traits
       template<class _F, class _A> static not_well_formed test(...);
       template<class _F, class _A, class=decltype(std::declval<_F>()(std::declval<_A>()))> static auto test(_F &&f) noexcept(noexcept(f(std::declval<_A>()))) -> decltype(f(std::declval<_A>()));
       using type = decltype(test<F, A>(std::declval<F>()));
-      BOOST_STATIC_CONSTEXPR bool is_noexcept = noexcept(test<F, A>(std::declval<F>()));
+      static constexpr bool is_noexcept = noexcept(test<F, A>(std::declval<F>()));
     };
 
     // Without Expression SFINAE (VS2015), I actually don't know of a better way :(
@@ -237,17 +237,17 @@ namespace traits
       template<typename U> static ArrayOfTwo & func(...);
 
     public:
-      BOOST_STATIC_CONSTEXPR bool value = sizeof(func<Derived>(0)) == 2;
+      static constexpr bool value = sizeof(func<Derived>(0)) == 2;
     };
     template <bool enable, typename F, typename Arg> struct has_call_operator : public std::false_type {};
     template <typename F, typename Arg> struct has_call_operator<true, F, Arg> : public has_call_operator2<F, typename get_return_type<F, Arg>::type(Arg)>{};
 
     template<bool _is_const, bool _is_move, bool _is_lvalue, bool _is_auto, typename T=void> struct arg_form
     {
-      BOOST_STATIC_CONSTEXPR bool is_const = _is_const;
-      BOOST_STATIC_CONSTEXPR bool is_rvalue = _is_move;
-      BOOST_STATIC_CONSTEXPR bool is_lvalue = _is_lvalue;
-      BOOST_STATIC_CONSTEXPR bool is_auto = _is_auto;
+      static constexpr bool is_const = _is_const;
+      static constexpr bool is_rvalue = _is_move;
+      static constexpr bool is_lvalue = _is_lvalue;
+      static constexpr bool is_auto = _is_auto;
       using non_auto_type = T;
     };
 
@@ -280,11 +280,11 @@ namespace traits
 
       using result = decltype(test(&F::operator(), rank<15>()));
 
-      BOOST_STATIC_CONSTEXPR bool is_rvalue = result::is_rvalue;
-      BOOST_STATIC_CONSTEXPR bool is_lvalue = result::is_lvalue;
-      BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
+      static constexpr bool is_rvalue = result::is_rvalue;
+      static constexpr bool is_lvalue = result::is_lvalue;
+      static constexpr bool is_auto = result::is_auto;
       using type = typename result::non_auto_type;
-      BOOST_STATIC_CONSTEXPR bool is_const = result::is_auto ? result::is_const : std::is_const<type>::value;
+      static constexpr bool is_const = result::is_auto ? result::is_const : std::is_const<type>::value;
     };
     template<class F, class A> struct call_operator_argument_form<true, false, F, A>
     {
@@ -309,11 +309,11 @@ namespace traits
 
       using result = decltype(test(&F::operator(), rank<15>()));
 
-      BOOST_STATIC_CONSTEXPR bool is_rvalue = result::is_rvalue;
-      BOOST_STATIC_CONSTEXPR bool is_lvalue = result::is_lvalue;
-      BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
+      static constexpr bool is_rvalue = result::is_rvalue;
+      static constexpr bool is_lvalue = result::is_lvalue;
+      static constexpr bool is_auto = result::is_auto;
       using type = typename result::non_auto_type;
-      BOOST_STATIC_CONSTEXPR bool is_const = result::is_auto ? result::is_const : std::is_const<type>::value;
+      static constexpr bool is_const = result::is_auto ? result::is_const : std::is_const<type>::value;
     };
 
     template<bool is_function, bool is_const_well_formed, class F, class A> struct function_argument_form
@@ -335,11 +335,11 @@ namespace traits
 
       using result = decltype(test(F(), rank<10>()));
 
-      BOOST_STATIC_CONSTEXPR bool is_rvalue = result::is_rvalue;
-      BOOST_STATIC_CONSTEXPR bool is_lvalue = result::is_lvalue;
-      BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
+      static constexpr bool is_rvalue = result::is_rvalue;
+      static constexpr bool is_lvalue = result::is_lvalue;
+      static constexpr bool is_auto = result::is_auto;
       using type = typename result::non_auto_type;
-      BOOST_STATIC_CONSTEXPR bool is_const = result::is_auto ? result::is_const : std::is_const<type>::value;
+      static constexpr bool is_const = result::is_auto ? result::is_const : std::is_const<type>::value;
     };
     template<class F, class A> struct function_argument_form<true, false, F, A>
     {
@@ -357,11 +357,11 @@ namespace traits
 
       using result = decltype(test(F(), rank<10>()));
 
-      BOOST_STATIC_CONSTEXPR bool is_rvalue = result::is_rvalue;
-      BOOST_STATIC_CONSTEXPR bool is_lvalue = result::is_lvalue;
-      BOOST_STATIC_CONSTEXPR bool is_auto = result::is_auto;
+      static constexpr bool is_rvalue = result::is_rvalue;
+      static constexpr bool is_lvalue = result::is_lvalue;
+      static constexpr bool is_auto = result::is_auto;
       using type = typename result::non_auto_type;
-      BOOST_STATIC_CONSTEXPR bool is_const = result::is_auto ? result::is_const : std::is_const<type>::value;
+      static constexpr bool is_const = result::is_auto ? result::is_const : std::is_const<type>::value;
     };
 
   }
@@ -373,9 +373,9 @@ namespace traits
     //! \brief The type returned by the callable F when called with Arg
     using type = typename return_type::type;
     //! \brief Whether the call with Arg is well formed
-    BOOST_STATIC_CONSTEXPR bool value = !std::is_same<type, typename return_type::not_well_formed>::value;
+    static constexpr bool value = !std::is_same<type, typename return_type::not_well_formed>::value;
     //! \brief Whether the call with Arg is noexcept
-    BOOST_STATIC_CONSTEXPR bool is_noexcept = return_type::is_noexcept;
+    static constexpr bool is_noexcept = return_type::is_noexcept;
   };
 
   //! \brief Is F a class type and does it have a call operator callable with Arg?
@@ -388,15 +388,15 @@ namespace traits
     template<bool enable, class F, class A> struct callable_argument_traits
     {
       //! \brief Is the callable F called with Arg well formed?
-      BOOST_STATIC_CONSTEXPR bool valid = false;
+      static constexpr bool valid = false;
       //! \brief Is the arg const?
-      BOOST_STATIC_CONSTEXPR bool is_const = false;
+      static constexpr bool is_const = false;
       //! \brief Is the arg a rvalue ref?
-      BOOST_STATIC_CONSTEXPR bool is_rvalue = false;
+      static constexpr bool is_rvalue = false;
       //! \brief Is the arg a lvalue ref?
-      BOOST_STATIC_CONSTEXPR bool is_lvalue = false;
+      static constexpr bool is_lvalue = false;
       //! \brief Is the arg a templated arg?
-      BOOST_STATIC_CONSTEXPR bool is_auto = false;
+      static constexpr bool is_auto = false;
       //! \brief If the arg is not a templated arg, it is this type
       using type = void;
     };
@@ -406,7 +406,7 @@ namespace traits
         detail::function_argument_form<true, is_callable_is_well_formed<F, const A>::value, F, A>
       >::type
     {
-      BOOST_STATIC_CONSTEXPR bool valid = true;
+      static constexpr bool valid = true;
     };
   }
 
@@ -550,7 +550,7 @@ namespace lightweight_futures {
       template<class U> struct function_ptr_storage_impl : public function_ptr_storage
       {
         U c;
-        template<class... Args2> BOOST_MONAD_FUTURE_CONSTEXPR function_ptr_storage_impl(Args2 &&... args) : c(std::forward<Args2>(args)...) { }
+        template<class... Args2> constexpr function_ptr_storage_impl(Args2 &&... args) : c(std::forward<Args2>(args)...) { }
         virtual R operator()(Args &&... args) override final { return c(std::move(args)...); }
       };
       function_ptr_storage *ptr;
@@ -560,14 +560,14 @@ namespace lightweight_futures {
       template<class R_, class U, class... Args2> friend inline function_ptr<R_> emplace_function_ptr(Args2 &&... args);
       template<class U, class... Args2> explicit function_ptr(emplace_t<U>, Args2 &&... args) : ptr(new function_ptr_storage_impl<U>(std::forward<Args2>(args)...)) { }
     public:
-      BOOST_MONAD_FUTURE_CONSTEXPR function_ptr() noexcept : ptr(nullptr) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR function_ptr(function_ptr_storage *p) noexcept : ptr(p) { }
+      constexpr function_ptr() noexcept : ptr(nullptr) { }
+      constexpr function_ptr(function_ptr_storage *p) noexcept : ptr(p) { }
       BOOST_MONAD_FUTURE_CXX14_CONSTEXPR function_ptr(function_ptr &&o) noexcept : ptr(o.ptr) { o.ptr = nullptr; }
       function_ptr &operator=(function_ptr &&o) { delete ptr; ptr = o.ptr; o.ptr = nullptr; return *this; }
       function_ptr(const function_ptr &) = delete;
       function_ptr &operator=(const function_ptr &) = delete;
       ~function_ptr() { delete ptr; }
-      explicit BOOST_MONAD_FUTURE_CONSTEXPR operator bool() const noexcept { return !!ptr; }
+      explicit constexpr operator bool() const noexcept { return !!ptr; }
       BOOST_MONAD_FUTURE_CXX14_CONSTEXPR R operator()(Args... args) const
       {
         return (*ptr)(std::move(args)...);
@@ -592,7 +592,7 @@ namespace lightweight_futures {
     template<class> struct is_monad_monad;
     template<class Policy> struct is_monad_monad<basic_monad<Policy>>
     {
-      BOOST_STATIC_CONSTEXPR bool value=is_monad<typename basic_monad<Policy>::value_type>::value;
+      static constexpr bool value=is_monad<typename basic_monad<Policy>::value_type>::value;
     };
     
     // Convert any input type into a lvalue ref
@@ -627,7 +627,7 @@ namespace lightweight_futures {
       >::type output_type;
       typedef Monad<Policy> input_type;
       callable_type _c;
-      template<class U> BOOST_MONAD_FUTURE_CONSTEXPR do_simple_continuation(U &&c) : _c(std::forward<U>(c)) { }
+      template<class U> constexpr do_simple_continuation(U &&c) : _c(std::forward<U>(c)) { }
       BOOST_MONAD_FUTURE_CXX14_CONSTEXPR output_type operator()(input_type &&v)
       {
         using c_traits = traits::callable_argument_traits<callable_type, input_type>;
@@ -642,7 +642,7 @@ namespace lightweight_futures {
       typedef typename Monad<Policy>::template rebind<void> output_type;
       typedef Monad<Policy> input_type;
       callable_type _c;
-      template<class U> BOOST_MONAD_FUTURE_CONSTEXPR do_simple_continuation(U &&c) : _c(std::forward<U>(c)) { }
+      template<class U> constexpr do_simple_continuation(U &&c) : _c(std::forward<U>(c)) { }
       BOOST_MONAD_FUTURE_CXX14_CONSTEXPR output_type operator()(input_type &&v)
       {
         using c_traits = traits::callable_argument_traits<callable_type, input_type>;
@@ -656,7 +656,7 @@ namespace lightweight_futures {
       typedef Monad<Policy1> output_type;
       typedef Monad<Policy2> input_type;
       callable_type _c;
-      template<class U> BOOST_MONAD_FUTURE_CONSTEXPR do_simple_continuation(U &&c) : _c(std::forward<U>(c)) { }
+      template<class U> constexpr do_simple_continuation(U &&c) : _c(std::forward<U>(c)) { }
       BOOST_MONAD_FUTURE_CXX14_CONSTEXPR output_type operator()(input_type &&v)
       {
         using c_traits = traits::callable_argument_traits<callable_type, input_type>;
@@ -718,9 +718,9 @@ namespace lightweight_futures {
       typedef traits::callable_argument_traits<F, typename M::error_type> f_error_traits;
       typedef traits::callable_argument_traits<F, typename M::exception_type> f_exception_traits;
       typedef traits::callable_argument_traits<F, typename M::empty_type> f_empty_traits;
-      BOOST_STATIC_CONSTEXPR bool callable_takes_anything=f_value_traits::is_auto;
-      BOOST_STATIC_CONSTEXPR bool callable_is_uncallable=!callable_takes_anything && !is_monad<typename M::value_type>::value && (f_value_traits::valid+f_error_traits::valid+f_exception_traits::valid+f_empty_traits::valid)==0;
-      BOOST_STATIC_CONSTEXPR bool callable_is_ambiguous=!callable_takes_anything && !is_monad<typename M::value_type>::value && (f_value_traits::valid+f_error_traits::valid+f_exception_traits::valid+f_empty_traits::valid)>1;
+      static constexpr bool callable_takes_anything=f_value_traits::is_auto;
+      static constexpr bool callable_is_uncallable=!callable_takes_anything && !is_monad<typename M::value_type>::value && (f_value_traits::valid+f_error_traits::valid+f_exception_traits::valid+f_empty_traits::valid)==0;
+      static constexpr bool callable_is_ambiguous=!callable_takes_anything && !is_monad<typename M::value_type>::value && (f_value_traits::valid+f_error_traits::valid+f_exception_traits::valid+f_empty_traits::valid)>1;
       
       // Error out common mistakes in the callable parameter
       static_assert(!callable_is_uncallable,
@@ -790,23 +790,23 @@ namespace lightweight_futures {
         typename basic_monad<Policy>::template rebind<R> 
       >::type output_type;
       callable_type _c;
-      BOOST_MONAD_FUTURE_CONSTEXPR do_continuation(const callable_type &c) : _c(c) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR do_continuation(callable_type &c) : _c(c) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR do_continuation(callable_type &&c) : _c(std::move(c)) { }
+      constexpr do_continuation(const callable_type &c) : _c(c) { }
+      constexpr do_continuation(callable_type &c) : _c(c) { }
+      constexpr do_continuation(callable_type &&c) : _c(std::move(c)) { }
       template<class U,
         typename=typename enable_if_callable_valid<callable_type, U, typename basic_monad<Policy>::value_type, !std::is_void<R>::value>::type
-      > BOOST_MONAD_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<4>) const
+      > constexpr output_type operator()(U &&v, traits::detail::rank<4>) const
       {
         return output_type(do_invoke<traits::callable_argument_traits<callable_type, U>::is_rvalue>()(_c, std::move(v)));
       }
       template<class U,
         typename = typename enable_if_callable_valid<callable_type, U, typename basic_monad<Policy>::value_type, std::is_void<R>::value>::type
-      > BOOST_MONAD_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<3>) const
+      > constexpr output_type operator()(U &&v, traits::detail::rank<3>) const
       {
         return do_invoke<traits::callable_argument_traits<callable_type, U>::is_rvalue>()(_c, std::move(v)), output_type();
       }
-      template<class U, typename=typename std::enable_if<std::is_constructible<output_type, U>::value>::type> BOOST_MONAD_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<2>) const { return output_type(std::forward<U>(v)); }
-      template<class U> BOOST_MONAD_FUTURE_CONSTEXPR output_type operator()(U &&, traits::detail::rank<1>) const { return output_type(); }
+      template<class U, typename=typename std::enable_if<std::is_constructible<output_type, U>::value>::type> constexpr output_type operator()(U &&v, traits::detail::rank<2>) const { return output_type(std::forward<U>(v)); }
+      template<class U> constexpr output_type operator()(U &&, traits::detail::rank<1>) const { return output_type(); }
     };
     // For when R is a monad
     template<class Policy1,
@@ -821,23 +821,23 @@ namespace lightweight_futures {
       typedef basic_monad<Policy1> output_type;
       typedef basic_monad<Policy2> input_type;
       callable_type _c;
-      BOOST_MONAD_FUTURE_CONSTEXPR do_continuation(const callable_type &c) : _c(c) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR do_continuation(callable_type &c) : _c(c) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR do_continuation(callable_type &&c) : _c(std::move(c)) { }
+      constexpr do_continuation(const callable_type &c) : _c(c) { }
+      constexpr do_continuation(callable_type &c) : _c(c) { }
+      constexpr do_continuation(callable_type &&c) : _c(std::move(c)) { }
       template<class U,
         typename = typename enable_if_callable_valid<callable_type, U, input_type, !std::is_void<typename output_type::value_type>::value, typename input_type::value_type>::type
-      > BOOST_MONAD_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<4>) const
+      > constexpr output_type operator()(U &&v, traits::detail::rank<4>) const
       {
         return output_type(do_invoke<traits::callable_argument_traits<callable_type, U>::is_rvalue>()(_c, std::move(v)));
       }
       template<class U,
         typename = typename enable_if_callable_valid<callable_type, U, input_type, std::is_void<typename output_type::value_type>::value, typename input_type::value_type>::type
-      > BOOST_MONAD_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<3>) const
+      > constexpr output_type operator()(U &&v, traits::detail::rank<3>) const
       {
         return do_invoke<traits::callable_argument_traits<callable_type, U>::is_rvalue>()(_c, std::move(v)), output_type();
       }
-      template<class U, typename=typename std::enable_if<std::is_constructible<output_type, U>::value>::type> BOOST_MONAD_FUTURE_CONSTEXPR output_type operator()(U &&v, traits::detail::rank<2>) const { return output_type(std::forward<U>(v)); }
-      template<class U> BOOST_MONAD_FUTURE_CONSTEXPR output_type operator()(U &&, traits::detail::rank<1>) const { return output_type(); }
+      template<class U, typename=typename std::enable_if<std::is_constructible<output_type, U>::value>::type> constexpr output_type operator()(U &&v, traits::detail::rank<2>) const { return output_type(std::forward<U>(v)); }
+      template<class U> constexpr output_type operator()(U &&, traits::detail::rank<1>) const { return output_type(); }
     };
 
     template<class R, class C, class M> using do_bind = do_continuation<true,  R, C, M>;
@@ -878,14 +878,14 @@ namespace lightweight_futures {
     }
   protected:
     typedef value_storage<typename implementation_policy::value_type, typename implementation_policy::error_type, typename implementation_policy::exception_type> value_storage_type;
-    BOOST_MONAD_FUTURE_CONSTEXPR basic_monad(value_storage_type &&s) : implementation_policy::base(std::move(s)) { }
+    constexpr basic_monad(value_storage_type &&s) : implementation_policy::base(std::move(s)) { }
   public:
     //! \brief This monad has a value_type
-    BOOST_STATIC_CONSTEXPR bool has_value_type = value_storage_type::has_value_type;
+    static constexpr bool has_value_type = value_storage_type::has_value_type;
     //! \brief This monad has an error_type
-    BOOST_STATIC_CONSTEXPR bool has_error_type = value_storage_type::has_error_type;
+    static constexpr bool has_error_type = value_storage_type::has_error_type;
     //! \brief This monad has an exception_type
-    BOOST_STATIC_CONSTEXPR bool has_exception_type = value_storage_type::has_exception_type;
+    static constexpr bool has_exception_type = value_storage_type::has_exception_type;
     //! \brief The final implementation type
     typedef typename implementation_policy::implementation_type implementation_type;
     //! \brief The type potentially held by the monad
@@ -900,32 +900,32 @@ namespace lightweight_futures {
     template<typename U> using rebind = typename implementation_policy::template rebind<U>;
 
     //! \brief This monad will never throw exceptions during copy construction
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_constructible = value_storage_type::is_nothrow_copy_constructible;
+    static constexpr bool is_nothrow_copy_constructible = value_storage_type::is_nothrow_copy_constructible;
     //! \brief This monad will never throw exceptions during move construction
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_move_constructible = value_storage_type::is_nothrow_move_constructible;
+    static constexpr bool is_nothrow_move_constructible = value_storage_type::is_nothrow_move_constructible;
     //! \brief This monad will never throw exceptions during copy assignment
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_copy_constructible;
+    static constexpr bool is_nothrow_copy_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_copy_constructible;
     //! \brief This monad will never throw exceptions during move assignment
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_move_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_move_constructible;
+    static constexpr bool is_nothrow_move_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_move_constructible;
     //! \brief This monad will never throw exceptions during destruction
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
+    static constexpr bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
 
     //! \brief Default constructor, initialises to empty
-    BOOST_MONAD_FUTURE_CONSTEXPR basic_monad() = default;
+    constexpr basic_monad() = default;
     //! \brief Implicit constructor of an empty monad
-    BOOST_MONAD_FUTURE_CONSTEXPR basic_monad(empty_type) : implementation_policy::base() { }
+    constexpr basic_monad(empty_type) : implementation_policy::base() { }
     //! \brief Implicit constructor of an empty monad
-    BOOST_MONAD_FUTURE_CONSTEXPR basic_monad(empty_t) : implementation_policy::base() { }
+    constexpr basic_monad(empty_t) : implementation_policy::base() { }
     //! \brief Implicit constructor from a value_type by copy
-    BOOST_MONAD_FUTURE_CONSTEXPR basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : implementation_policy::base(v) { }
+    constexpr basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : implementation_policy::base(v) { }
     //! \brief Implicit constructor from a value_type by move
-    BOOST_MONAD_FUTURE_CONSTEXPR basic_monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : implementation_policy::base(std::move(v)) { }
+    constexpr basic_monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : implementation_policy::base(std::move(v)) { }
     /*! \brief Explicit constructor of a value_type allowing emplacement with no other means of construction. Only available
     if value_type which can't be a monad can be constructed from Args and if either there is more than one Arg or the Arg is not a value_type, an
     error_type, an exception_type nor an empty_type.
     */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-    template<class... Args> BOOST_MONAD_FUTURE_CONSTEXPR explicit basic_monad(Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value);
+    template<class... Args> constexpr explicit basic_monad(Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value);
 #else
     template<class Arg, class... Args,
       typename = typename std::enable_if<has_value_type &&
@@ -936,28 +936,28 @@ namespace lightweight_futures {
           && !std::is_same<error_type, typename std::decay<Arg>::type>::value
           && !std::is_same<exception_type, typename std::decay<Arg>::type>::value
           && !std::is_same<empty_type, typename std::decay<Arg>::type>::value))
-      >::type> BOOST_MONAD_FUTURE_CONSTEXPR explicit basic_monad(Arg &&arg, Args &&... args)
+      >::type> constexpr explicit basic_monad(Arg &&arg, Args &&... args)
 #if !defined(_MSC_VER) || _MSC_VER > 190022816
       noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value)
 #endif
       : implementation_policy::base(typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...) { }
 #endif
     //! \brief Implicit constructor from an initializer list
-    template<class U> BOOST_MONAD_FUTURE_CONSTEXPR basic_monad(std::initializer_list<U> l) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>>::value) : implementation_policy::base(typename value_storage_type::emplace_t(), std::move(l)) { }
+    template<class U> constexpr basic_monad(std::initializer_list<U> l) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>>::value) : implementation_policy::base(typename value_storage_type::emplace_t(), std::move(l)) { }
     //! \brief Implicit constructor from a error_type by copy
-    BOOST_MONAD_FUTURE_CONSTEXPR basic_monad(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : implementation_policy::base(v) { }
+    constexpr basic_monad(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : implementation_policy::base(v) { }
     //! \brief Implicit constructor from a error_type by move
-    BOOST_MONAD_FUTURE_CONSTEXPR basic_monad(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : implementation_policy::base(std::move(v)) { }
+    constexpr basic_monad(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : implementation_policy::base(std::move(v)) { }
     //! \brief Implicit constructor from a exception_type by copy
-    BOOST_MONAD_FUTURE_CONSTEXPR basic_monad(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : implementation_policy::base(v) { }
+    constexpr basic_monad(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : implementation_policy::base(v) { }
     //! \brief Implicit constructor from a exception_type by move
-    BOOST_MONAD_FUTURE_CONSTEXPR basic_monad(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : implementation_policy::base(std::move(v)) { }
+    constexpr basic_monad(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : implementation_policy::base(std::move(v)) { }
     //! \brief Explicit constructor from a different implementation of basic_monad
     template<class Policy,
       typename = typename std::enable_if<std::is_same<typename implementation_policy::value_type,     typename Policy::value_type    >::value || std::is_constructible<typename implementation_policy::value_type,     typename Policy::value_type    >::value>::type,
       typename = typename std::enable_if<std::is_same<typename implementation_policy::error_type,     typename Policy::error_type    >::value || std::is_constructible<typename implementation_policy::error_type,     typename Policy::error_type    >::value>::type,
       typename = typename std::enable_if<std::is_same<typename implementation_policy::exception_type, typename Policy::exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename Policy::exception_type>::value>::type
-    > BOOST_MONAD_FUTURE_CONSTEXPR explicit basic_monad(basic_monad<Policy> &&o) : implementation_policy::base(std::move(o)) { }
+    > constexpr explicit basic_monad(basic_monad<Policy> &&o) : implementation_policy::base(std::move(o)) { }
     //! \brief Move constructor
     basic_monad(basic_monad &&) = default;
     //! \brief Move assignment. Firstly clears any existing state, so exception throws during move will leave the monad empty.
@@ -968,26 +968,26 @@ namespace lightweight_futures {
     basic_monad &operator=(const basic_monad &) = default;
 
     //! \brief Same as `true_(tribool(*this))`
-    BOOST_MONAD_FUTURE_CONSTEXPR explicit operator bool() const noexcept { return has_value(); }
+    constexpr explicit operator bool() const noexcept { return has_value(); }
     //! \brief True if monad contains a value_type, unknown if monad is empty, else false if monad is errored/excepted.
-    BOOST_MONAD_FUTURE_CONSTEXPR operator tribool::tribool() const noexcept { return has_value() ? tribool::tribool::true_ : empty() ? tribool::tribool::unknown : tribool::tribool::false_; }
+    constexpr operator tribool::tribool() const noexcept { return has_value() ? tribool::tribool::true_ : empty() ? tribool::tribool::unknown : tribool::tribool::false_; }
     //! \brief True if monad is not empty
-    BOOST_MONAD_FUTURE_CONSTEXPR bool is_ready() const noexcept
+    constexpr bool is_ready() const noexcept
     {
       return implementation_policy::base::_storage.type!=value_storage_type::storage_type::empty;
     }
     //! \brief True if monad is empty
-    BOOST_MONAD_FUTURE_CONSTEXPR bool empty() const noexcept
+    constexpr bool empty() const noexcept
     {
       return implementation_policy::base::_storage.type==value_storage_type::storage_type::empty;
     }
     //! \brief True if monad contains a value_type
-    BOOST_MONAD_FUTURE_CONSTEXPR bool has_value() const noexcept
+    constexpr bool has_value() const noexcept
     {
       return implementation_policy::base::_storage.type==value_storage_type::storage_type::value;
     }
     //! \brief True if monad contains an error_type
-    BOOST_MONAD_FUTURE_CONSTEXPR bool has_error() const noexcept
+    constexpr bool has_error() const noexcept
     {
       return implementation_policy::base::_storage.type==value_storage_type::storage_type::error;
     }
@@ -995,7 +995,7 @@ namespace lightweight_futures {
     This needs to be true for both for compatibility with Boost.Thread's future. If you really want to test only for has exception only,
     pass true as the argument.
     */
-    BOOST_MONAD_FUTURE_CONSTEXPR bool has_exception(bool only_exception=false) const noexcept
+    constexpr bool has_exception(bool only_exception=false) const noexcept
     {
       return implementation_policy::base::_storage.type==value_storage_type::storage_type::exception || (!only_exception && implementation_policy::base::_storage.type==value_storage_type::storage_type::error);
     }
@@ -1011,12 +1011,12 @@ namespace lightweight_futures {
       return has_value() ? implementation_policy::base::_storage.value : v;
     }
     //! \brief If contains a value_type, return that value type, else return the supplied value_type
-    BOOST_MONAD_FUTURE_CONSTEXPR const value_type &get_or(const value_type &v) const & noexcept
+    constexpr const value_type &get_or(const value_type &v) const & noexcept
     {
       return has_value() ? implementation_policy::base::_storage.value : v;
     }
     //! \brief If contains a value_type, return that value type, else return the supplied value_type
-    BOOST_MONAD_FUTURE_CONSTEXPR const value_type &value_or(const value_type &v) const & noexcept
+    constexpr const value_type &value_or(const value_type &v) const & noexcept
     {
       return has_value() ? implementation_policy::base::_storage.value : v;
     }
@@ -1041,12 +1041,12 @@ namespace lightweight_futures {
       return has_value() ? v : implementation_policy::base::_storage.value;
     }
     //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-    BOOST_MONAD_FUTURE_CONSTEXPR const value_type &get_and(const value_type &v) const & noexcept
+    constexpr const value_type &get_and(const value_type &v) const & noexcept
     {
       return has_value() ? v: implementation_policy::base::_storage.value;
     }
     //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-    BOOST_MONAD_FUTURE_CONSTEXPR const value_type &value_and(const value_type &v) const & noexcept
+    constexpr const value_type &value_and(const value_type &v) const & noexcept
     {
       return has_value() ? v: implementation_policy::base::_storage.value;
     }
@@ -1375,45 +1375,45 @@ namespace lightweight_futures {
       typedef typename value_storage_type::exception_type exception_type;
 
       basic_monad_storage() = default;
-      template<class Policy> BOOST_MONAD_FUTURE_CONSTEXPR basic_monad_storage(basic_monad_storage<Policy> &&o) : _storage(std::move(o._storage)) { }
-      template<class Policy> BOOST_MONAD_FUTURE_CONSTEXPR basic_monad_storage(const basic_monad_storage<Policy> &o) : _storage(o._storage) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR explicit basic_monad_storage(value_storage_type &&v) : _storage(std::move(v)) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR basic_monad_storage(const value_type &v) : _storage(v) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR basic_monad_storage(value_type &&v) : _storage(std::move(v)) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR basic_monad_storage(const error_type &v) : _storage(v) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR basic_monad_storage(error_type &&v) : _storage(std::move(v)) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR basic_monad_storage(const exception_type &v) : _storage(v) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR basic_monad_storage(exception_type &&v) : _storage(std::move(v)) { }
-      template<class... Args> BOOST_MONAD_FUTURE_CONSTEXPR basic_monad_storage(typename value_storage_type::emplace_t _, Args &&...args) : _storage(_, std::forward<Args>(args)...) { }
+      template<class Policy> constexpr basic_monad_storage(basic_monad_storage<Policy> &&o) : _storage(std::move(o._storage)) { }
+      template<class Policy> constexpr basic_monad_storage(const basic_monad_storage<Policy> &o) : _storage(o._storage) { }
+      constexpr explicit basic_monad_storage(value_storage_type &&v) : _storage(std::move(v)) { }
+      constexpr basic_monad_storage(const value_type &v) : _storage(v) { }
+      constexpr basic_monad_storage(value_type &&v) : _storage(std::move(v)) { }
+      constexpr basic_monad_storage(const error_type &v) : _storage(v) { }
+      constexpr basic_monad_storage(error_type &&v) : _storage(std::move(v)) { }
+      constexpr basic_monad_storage(const exception_type &v) : _storage(v) { }
+      constexpr basic_monad_storage(exception_type &&v) : _storage(std::move(v)) { }
+      template<class... Args> constexpr basic_monad_storage(typename value_storage_type::emplace_t _, Args &&...args) : _storage(_, std::forward<Args>(args)...) { }
 
-      BOOST_MONAD_FUTURE_CONSTEXPR bool is_ready() const noexcept
+      constexpr bool is_ready() const noexcept
       {
         return _storage.type!=value_storage_type::storage_type::empty;
       }
-      BOOST_MONAD_FUTURE_CONSTEXPR bool empty() const noexcept
+      constexpr bool empty() const noexcept
       {
         return _storage.type==value_storage_type::storage_type::empty;
       }
-      BOOST_MONAD_FUTURE_CONSTEXPR bool has_value() const noexcept
+      constexpr bool has_value() const noexcept
       {
         return _storage.type==value_storage_type::storage_type::value;
       }
-      BOOST_MONAD_FUTURE_CONSTEXPR bool has_error() const noexcept
+      constexpr bool has_error() const noexcept
       {
         return _storage.type==value_storage_type::storage_type::error;
       }
-      BOOST_MONAD_FUTURE_CONSTEXPR bool has_exception(bool only_exception=false) const noexcept
+      constexpr bool has_exception(bool only_exception=false) const noexcept
       {
         return _storage.type==value_storage_type::storage_type::exception || (!only_exception && _storage.type==value_storage_type::storage_type::error);
       }
     };
     template<bool enable, class T> struct move_if
     {
-      template<class U> BOOST_MONAD_FUTURE_CONSTEXPR typename std::remove_reference<U>::type && operator()(U &&v) const { return static_cast<typename std::remove_reference<U>::type &&>(v); }
+      template<class U> constexpr typename std::remove_reference<U>::type && operator()(U &&v) const { return static_cast<typename std::remove_reference<U>::type &&>(v); }
     };
     template<class T> struct move_if<false, T>
     {
-      BOOST_MONAD_FUTURE_CONSTEXPR T operator()(T v) const { return v; }
+      constexpr T operator()(T v) const { return v; }
     };
   }
 #define BOOST_MONAD_MONAD_NAME monad

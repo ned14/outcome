@@ -308,11 +308,11 @@ namespace lightweight_futures {
 #endif
       }
       
-      BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_constructible = value_storage_type::is_nothrow_copy_constructible;
-      BOOST_STATIC_CONSTEXPR bool is_nothrow_move_constructible = value_storage_type::is_nothrow_move_constructible;
-      BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_copy_constructible;
-      BOOST_STATIC_CONSTEXPR bool is_nothrow_move_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_move_constructible;
-      BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
+      static constexpr bool is_nothrow_copy_constructible = value_storage_type::is_nothrow_copy_constructible;
+      static constexpr bool is_nothrow_move_constructible = value_storage_type::is_nothrow_move_constructible;
+      static constexpr bool is_nothrow_copy_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_copy_constructible;
+      static constexpr bool is_nothrow_move_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_move_constructible;
+      static constexpr bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
 
       // WARNING: Exits with lock on source held!
       template<class _value_type2, class _error_type2, class _exception_type2, class _wait_implementation2> BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(basic_promise_future_storage<_value_type2, _error_type2, _exception_type2, _wait_implementation2> &&o) noexcept(is_nothrow_move_constructible && basic_promise_future_storage<_value_type2, _error_type2, _exception_type2, _wait_implementation2>::is_nothrow_move_constructible)
@@ -418,23 +418,23 @@ namespace lightweight_futures {
         if(_need_locks) _lock.~BOOST_MONAD_FUTURE_MUTEX_TYPE_DESTRUCTOR();
 #endif
       }
-      BOOST_MONAD_FUTURE_CONSTEXPR bool is_ready() const noexcept
+      constexpr bool is_ready() const noexcept
       {
         return _storage.type!=value_storage_type::storage_type::empty;
       }
-      BOOST_MONAD_FUTURE_CONSTEXPR bool empty() const noexcept
+      constexpr bool empty() const noexcept
       {
         return _storage.type==value_storage_type::storage_type::empty;
       }
-      BOOST_MONAD_FUTURE_CONSTEXPR bool has_value() const noexcept
+      constexpr bool has_value() const noexcept
       {
         return _storage.type==value_storage_type::storage_type::value;
       }
-      BOOST_MONAD_FUTURE_CONSTEXPR bool has_error() const noexcept
+      constexpr bool has_error() const noexcept
       {
         return _storage.type==value_storage_type::storage_type::error;
       }
-      BOOST_MONAD_FUTURE_CONSTEXPR bool has_exception(bool only_exception=false) const noexcept
+      constexpr bool has_exception(bool only_exception=false) const noexcept
       {
         return _storage.type==value_storage_type::storage_type::exception || (!only_exception && _storage.type==value_storage_type::storage_type::error);
       }
@@ -465,8 +465,8 @@ namespace lightweight_futures {
         std::unique_ptr<std::shared_ptr<_wait_implementation>> sleeping_waiters;  // shared_ptr inhibits optimisation :(
         set_state_info_t() : continuation_future(nullptr) { }
       } _set_state_info;
-      BOOST_MONAD_FUTURE_CONSTEXPR basic_promise_storage() noexcept { }
-      BOOST_MONAD_FUTURE_CONSTEXPR basic_promise_storage(basic_promise_storage &&o) noexcept
+      constexpr basic_promise_storage() noexcept { }
+      constexpr basic_promise_storage(basic_promise_storage &&o) noexcept
         : base(std::move(o)), _set_state_info(std::move(o._set_state_info)) { }
       BOOST_MONAD_FUTURE_CXX14_CONSTEXPR void swap(basic_promise_storage &o) noexcept
       {
@@ -496,11 +496,11 @@ namespace lightweight_futures {
     //! \brief The value_storage used to hold any state
     using value_storage_type = typename base::value_storage_type;
     //! \brief This promise has a value_type
-    BOOST_STATIC_CONSTEXPR bool has_value_type = value_storage_type::has_value_type;
+    static constexpr bool has_value_type = value_storage_type::has_value_type;
     //! \brief This promise has an error_type
-    BOOST_STATIC_CONSTEXPR bool has_error_type = value_storage_type::has_error_type;
+    static constexpr bool has_error_type = value_storage_type::has_error_type;
     //! \brief This promise has an exception_type
-    BOOST_STATIC_CONSTEXPR bool has_exception_type = value_storage_type::has_exception_type;
+    static constexpr bool has_exception_type = value_storage_type::has_exception_type;
     //! \brief The final implementation type
     using implementation_type = typename implementation_policy::implementation_type;
     //! \brief The type potentially held by the promise
@@ -511,11 +511,11 @@ namespace lightweight_futures {
     using exception_type = typename value_storage_type::exception_type;
 
     //! \brief This promise will never throw exceptions during move construction
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_move_constructible = value_storage_type::is_nothrow_move_constructible;
+    static constexpr bool is_nothrow_move_constructible = value_storage_type::is_nothrow_move_constructible;
     //! \brief This promise will never throw exceptions during move assignment
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_move_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_move_constructible;
+    static constexpr bool is_nothrow_move_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_move_constructible;
     //! \brief This promise will never throw exceptions during destruction
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
+    static constexpr bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
 
     //! \brief This promise type
     typedef basic_promise promise_type;
@@ -530,7 +530,7 @@ namespace lightweight_futures {
     static_assert(std::is_move_constructible<value_type>::value || std::is_copy_constructible<value_type>::value, "Type must be move or copy constructible to be used in a lightweight basic_promise");
   public:
     //! \brief EXTENSION: constexpr capable constructor
-    BOOST_MONAD_FUTURE_CONSTEXPR basic_promise() = default;
+    constexpr basic_promise() = default;
 //// template<class Allocator> basic_promise(allocator_arg_t, Allocator a); // cannot support
     //! \brief SYNC POINT Move constructor
     BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_promise(basic_promise &&o) noexcept(is_nothrow_move_constructible) : base(std::move(o))
@@ -767,7 +767,7 @@ namespace lightweight_futures {
       promise_type p;
       callable_type f;
       detail::function_ptr<void(future_base_type *)> prevcallable;
-      BOOST_MONAD_FUTURE_CONSTEXPR continuation(promise_type &&_p, callable_type &&_f, detail::function_ptr<void(future_base_type *)> &&_prev)
+      constexpr continuation(promise_type &&_p, callable_type &&_f, detail::function_ptr<void(future_base_type *)> &&_prev)
         : p(std::move(_p)), f(std::move(_f)), prevcallable(std::move(_prev)) { }
       void operator()(future_base_type *_self)
       {
@@ -829,11 +829,11 @@ namespace lightweight_futures {
     using monad_type = basic_monad<implementation_policy>;
 
     //! \brief This future has a value_type
-    BOOST_STATIC_CONSTEXPR bool has_value_type = monad_type::has_value_type;
+    static constexpr bool has_value_type = monad_type::has_value_type;
     //! \brief This future has an error_type
-    BOOST_STATIC_CONSTEXPR bool has_error_type = monad_type::has_error_type;
+    static constexpr bool has_error_type = monad_type::has_error_type;
     //! \brief This future has an exception_type
-    BOOST_STATIC_CONSTEXPR bool has_exception_type = monad_type::has_exception_type;
+    static constexpr bool has_exception_type = monad_type::has_exception_type;
     //! \brief The final implementation type
     using implementation_type = typename monad_type::implementation_type;
     //! \brief The type potentially held by the future
@@ -848,16 +848,16 @@ namespace lightweight_futures {
     template<typename U> using rebind = typename implementation_policy::template rebind<U>;
 
     //! \brief This future will never throw exceptions during move construction
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_move_constructible = monad_type::is_nothrow_move_constructible;
+    static constexpr bool is_nothrow_move_constructible = monad_type::is_nothrow_move_constructible;
     //! \brief This future will never throw exceptions during move assignment
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_move_assignable = monad_type::is_nothrow_destructible && monad_type::is_nothrow_move_constructible;
+    static constexpr bool is_nothrow_move_assignable = monad_type::is_nothrow_destructible && monad_type::is_nothrow_move_constructible;
     //! \brief This future will never throw exceptions during destruction
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = monad_type::is_nothrow_destructible;
+    static constexpr bool is_nothrow_destructible = monad_type::is_nothrow_destructible;
 
     //! \brief Whether fetching value/error/exception is single shot
-    BOOST_STATIC_CONSTEXPR bool is_consuming=implementation_policy::is_consuming;
+    static constexpr bool is_consuming=implementation_policy::is_consuming;
     //! \brief Whether this future is managed by shared_basic_future_ptr
-    BOOST_STATIC_CONSTEXPR bool is_shared = implementation_policy::is_shared;
+    static constexpr bool is_shared = implementation_policy::is_shared;
     //! \brief The promise type matching this future type
     using promise_type = basic_promise<implementation_policy>;
     //! \brief This future type
@@ -898,9 +898,9 @@ namespace lightweight_futures {
     }
   public:
     //! \brief EXTENSION: constexpr capable constructor
-    BOOST_MONAD_FUTURE_CONSTEXPR basic_future() = default;
+    constexpr basic_future() = default;
     //! \brief Explicit construction of a ready/errored/excepted future from any of the types supported by the underlying monad. Alternative to make_ready_XXX.
-    template<class U, typename=typename std::enable_if<std::is_constructible<monad_type, U>::value>::type> BOOST_MONAD_FUTURE_CONSTEXPR explicit basic_future(U &&v) : monad_type(std::forward<U>(v))
+    template<class U, typename=typename std::enable_if<std::is_constructible<monad_type, U>::value>::type> constexpr explicit basic_future(U &&v) : monad_type(std::forward<U>(v))
     {
     }
     //! \brief SYNC POINT Move constructor
@@ -964,22 +964,22 @@ namespace lightweight_futures {
     
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
     //! \brief Same as `true_(tribool(*this))`
-    BOOST_MONAD_FUTURE_CONSTEXPR explicit operator bool() const noexcept;
+    constexpr explicit operator bool() const noexcept;
     //! \brief True if monad contains a value_type, false if monad is empty, else unknown.
-    BOOST_MONAD_FUTURE_CONSTEXPR operator tribool::tribool() const noexcept;
+    constexpr operator tribool::tribool() const noexcept;
     //! \brief True if monad is not empty
-    BOOST_MONAD_FUTURE_CONSTEXPR bool is_ready() const noexcept;
+    constexpr bool is_ready() const noexcept;
     //! \brief True if monad is empty
-    BOOST_MONAD_FUTURE_CONSTEXPR bool empty() const noexcept;
+    constexpr bool empty() const noexcept;
     //! \brief True if monad contains a value_type
-    BOOST_MONAD_FUTURE_CONSTEXPR bool has_value() const noexcept;
+    constexpr bool has_value() const noexcept;
     //! \brief True if monad contains an error_type
-    BOOST_MONAD_FUTURE_CONSTEXPR bool has_error() const noexcept;
+    constexpr bool has_error() const noexcept;
     /*! \brief True if monad contains an exception_type or error_type (any error_type is returned as an exception_ptr by get_exception()).
     This needs to be true for both for compatibility with Boost.Thread's future. If you really want to test only for has exception only,
     pass true as the argument.
     */
-    BOOST_MONAD_FUTURE_CONSTEXPR bool has_exception(bool only_exception = false) const noexcept;
+    constexpr bool has_exception(bool only_exception = false) const noexcept;
 #else
     using monad_type::operator bool;
     using monad_type::operator tribool::tribool;
@@ -1148,7 +1148,7 @@ namespace lightweight_futures {
         && (f_traits::is_rvalue || (f_traits::is_lvalue && f_traits::is_const)),
         "The callable passed to then() must take either a const lvalue reference to this future type, or a rvalue reference. If you are passing a templated function, make sure its auto parameter is rvalue or const lvalue reference qualified.");
       typedef typename detail::do_then<typename f_traits::return_type, F, implementation_policy>::output_type output_type;
-      BOOST_STATIC_CONSTEXPR bool is_f_noexcept = traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_future>::is_noexcept;
+      static constexpr bool is_f_noexcept = traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_future>::is_noexcept;
       static_assert(is_f_noexcept || output_type::has_exception_type, "If the future type returned by the callable cannot transport exceptions, the callable must be noexcept.");
       lock_guard_type h(this);
       // If we are already signalled, execute immediately as if monad.next()
@@ -1210,11 +1210,11 @@ namespace lightweight_futures {
     }
   public:
     //! \brief This future has a value_type
-    BOOST_STATIC_CONSTEXPR bool has_value_type = base_future_type::has_value_type;
+    static constexpr bool has_value_type = base_future_type::has_value_type;
     //! \brief This future has an error_type
-    BOOST_STATIC_CONSTEXPR bool has_error_type = base_future_type::has_error_type;
+    static constexpr bool has_error_type = base_future_type::has_error_type;
     //! \brief This future has an exception_type
-    BOOST_STATIC_CONSTEXPR bool has_exception_type = base_future_type::has_exception_type;
+    static constexpr bool has_exception_type = base_future_type::has_exception_type;
     //! \brief The final implementation type
     using implementation_type = typename base_future_type::implementation_type;
     //! \brief The type potentially held by the future
@@ -1229,16 +1229,16 @@ namespace lightweight_futures {
     template<typename U> using rebind = typename base_future_type::template rebind<U>;
 
     //! \brief This future will never throw exceptions during move construction
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_move_constructible = base_future_type::is_nothrow_move_constructible;
+    static constexpr bool is_nothrow_move_constructible = base_future_type::is_nothrow_move_constructible;
     //! \brief This future will never throw exceptions during move assignment
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_move_assignable = base_future_type::is_nothrow_destructible && base_future_type::is_nothrow_move_constructible;
+    static constexpr bool is_nothrow_move_assignable = base_future_type::is_nothrow_destructible && base_future_type::is_nothrow_move_constructible;
     //! \brief This future will never throw exceptions during destruction
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = base_future_type::is_nothrow_destructible;
+    static constexpr bool is_nothrow_destructible = base_future_type::is_nothrow_destructible;
 
     //! \brief Whether fetching value/error/exception is single shot
-    BOOST_STATIC_CONSTEXPR bool is_consuming = base_future_type::is_consuming;
+    static constexpr bool is_consuming = base_future_type::is_consuming;
     //! \brief Whether this future is managed by shared_basic_future_ptr
-    BOOST_STATIC_CONSTEXPR bool is_shared = base_future_type::is_shared;
+    static constexpr bool is_shared = base_future_type::is_shared;
     //! \brief The promise type matching this future type
     using promise_type = basic_promise<base_future_type>;
     //! \brief This future type
@@ -1255,7 +1255,7 @@ namespace lightweight_futures {
     //! \brief Explicit constructor from shared_ptr
     explicit shared_basic_future_ptr(std::shared_ptr<base_future_type> &&p) : _future(std::move(p)) { }
     //! \brief Default constructor
-    BOOST_MONAD_FUTURE_CONSTEXPR shared_basic_future_ptr() : _future(std::make_shared<base_future_type>()) { }
+    constexpr shared_basic_future_ptr() : _future(std::make_shared<base_future_type>()) { }
     //! \brief Default copy constructor
     shared_basic_future_ptr(shared_basic_future_ptr &&) = default;
     //! \brief Default move constructor
@@ -1278,7 +1278,7 @@ namespace lightweight_futures {
         shared_basic_future_ptr(std::forward<basic_future<Impl>>(o).share())
         ) { }
     //! \brief Forwarding constructor
-    template<class U, typename=typename std::enable_if<std::is_constructible<base_future_type, U>::value>::type> BOOST_MONAD_FUTURE_CONSTEXPR shared_basic_future_ptr(U &&o) : shared_basic_future_ptr(base_future_type(std::forward<U>(o)).share()) { }
+    template<class U, typename=typename std::enable_if<std::is_constructible<base_future_type, U>::value>::type> constexpr shared_basic_future_ptr(U &&o) : shared_basic_future_ptr(base_future_type(std::forward<U>(o)).share()) { }
     //! \brief Forwards to operator bool
     explicit operator bool() const { return _check()->operator bool(); }
     //! \brief Forwards to operator tribool
@@ -1353,7 +1353,7 @@ namespace lightweight_futures {
   {
     template<class promise_type, class future_type> struct stl_wait_implementation : public promise_type, public future_type
     {
-      BOOST_MONAD_FUTURE_CONSTEXPR stl_wait_implementation() : future_type(this->get_future()) { }
+      constexpr stl_wait_implementation() : future_type(this->get_future()) { }
     };
   }
 
@@ -1372,7 +1372,7 @@ namespace lightweight_futures {
   {
     size_t index;
     Sequence futures;
-    BOOST_MONAD_FUTURE_CONSTEXPR when_any_result() : index(0) { }
+    constexpr when_any_result() : index(0) { }
   };
 
   namespace detail
@@ -1382,75 +1382,75 @@ namespace lightweight_futures {
       promise<vectype> _p;
       std::atomic<size_t> _count;
       InputIterator _first, _last;
-      BOOST_MONAD_FUTURE_CONSTEXPR when_all_any_state_vector(size_t count, InputIterator first, InputIterator last) : _count(count), _first(first), _last(last) { }
+      constexpr when_all_any_state_vector(size_t count, InputIterator first, InputIterator last) : _count(count), _first(first), _last(last) { }
     };
     template<class... Futures> struct when_all_any_state_tuple
     {
       using tuple_type = std::tuple<typename std::decay<Futures>::type...>;
-      BOOST_STATIC_CONSTEXPR size_t tuple_size = sizeof...(Futures);
+      static constexpr size_t tuple_size = sizeof...(Futures);
       promise<tuple_type> _p;
       std::atomic<size_t> _count;
       std::tuple<Futures &&...> _futures;
-      BOOST_MONAD_FUTURE_CONSTEXPR when_all_any_state_tuple(size_t count, std::tuple<Futures &&...> futures) : _count(count), _futures(futures) { }
+      constexpr when_all_any_state_tuple(size_t count, std::tuple<Futures &&...> futures) : _count(count), _futures(futures) { }
     };
     template<bool do_move, class vectype> struct future_vector_copy_or_move
     {
-      template<class InputIterator> BOOST_MONAD_FUTURE_CONSTEXPR vectype operator()(InputIterator first, InputIterator last) const
+      template<class InputIterator> constexpr vectype operator()(InputIterator first, InputIterator last) const
       {
         return vectype(std::make_move_iterator(first), std::make_move_iterator(last));
       }
     };
     template<class vectype> struct future_vector_copy_or_move<false, vectype>
     {
-      template<class InputIterator> BOOST_MONAD_FUTURE_CONSTEXPR vectype operator()(InputIterator first, InputIterator last) const
+      template<class InputIterator> constexpr vectype operator()(InputIterator first, InputIterator last) const
       {
         return vectype(first, last);
       }
     };
     template<bool do_move, class future_type> struct future_vector_invalidate_if_moved
     {
-      template<class InputIterator> BOOST_MONAD_FUTURE_CONSTEXPR bool operator()(InputIterator first, InputIterator last) const
+      template<class InputIterator> constexpr bool operator()(InputIterator first, InputIterator last) const
       {
         return (std::for_each(first, last, [](future_type &f) { f=future_type(); }), true);
       }
     };
     template<class future_type> struct future_vector_invalidate_if_moved<false, future_type>
     {
-      template<class InputIterator> BOOST_MONAD_FUTURE_CONSTEXPR bool operator()(InputIterator, InputIterator) const
+      template<class InputIterator> constexpr bool operator()(InputIterator, InputIterator) const
       {
         return true;
       }
     };
     template<bool do_move, class future_type> struct future_tuple_copy_or_move4
     {
-      template<class U, class V> BOOST_MONAD_FUTURE_CONSTEXPR future_type operator()(U &&u, V &&v) const { return (v=future_type(), std::forward<U>(u)); }
+      template<class U, class V> constexpr future_type operator()(U &&u, V &&v) const { return (v=future_type(), std::forward<U>(u)); }
     };
     template<class future_type> struct future_tuple_copy_or_move4<false, future_type>
     {
-      template<class U, class V> BOOST_MONAD_FUTURE_CONSTEXPR future_type operator()(U &&u, V &&) const { return std::forward<U>(u); }
+      template<class U, class V> constexpr future_type operator()(U &&u, V &&) const { return std::forward<U>(u); }
     };
     template<bool do_move, class future_type> struct future_tuple_copy_or_move3
     {
-      template<class U> BOOST_MONAD_FUTURE_CONSTEXPR future_type operator()(U &&v) const { return future_type(std::move(v)); }
+      template<class U> constexpr future_type operator()(U &&v) const { return future_type(std::move(v)); }
     };
     template<class future_type> struct future_tuple_copy_or_move3<false, future_type>
     {
-      template<class U> BOOST_MONAD_FUTURE_CONSTEXPR future_type operator()(U &&v) const { return future_type(v); }
+      template<class U> constexpr future_type operator()(U &&v) const { return future_type(v); }
     };
-    template<class Future> BOOST_MONAD_FUTURE_CONSTEXPR typename std::decay<Future>::type future_tuple_copy_or_move2(Future &&f)
+    template<class Future> constexpr typename std::decay<Future>::type future_tuple_copy_or_move2(Future &&f)
     {
       using future_type = typename std::decay<Future>::type;
       return future_tuple_copy_or_move4<future_type::is_consuming, future_type>()(
         future_tuple_copy_or_move3<future_type::is_consuming, future_type>()(std::forward<Future>(f)),
         std::forward<Future>(f));
     }
-    template<size_t... Ns, class... Futures> BOOST_MONAD_FUTURE_CONSTEXPR std::tuple<typename std::decay<Futures>::type...> future_tuple_copy_or_move(index_sequence<Ns...>, std::tuple<Futures...> &&src)
+    template<size_t... Ns, class... Futures> constexpr std::tuple<typename std::decay<Futures>::type...> future_tuple_copy_or_move(index_sequence<Ns...>, std::tuple<Futures...> &&src)
     {
       return std::make_tuple(future_tuple_copy_or_move2(std::get<Ns>(std::move(src)))...);
     }
 
-    template<size_t Idx, size_t Total, class State> BOOST_MONAD_FUTURE_CONSTEXPR bool when_all_unpack(State &) { return false; }
-    template<size_t Idx, size_t Total, class State, class Future, class... Futures> BOOST_MONAD_FUTURE_CONSTEXPR bool when_all_unpack(State &state, Future &&, Futures &&... futures)
+    template<size_t Idx, size_t Total, class State> constexpr bool when_all_unpack(State &) { return false; }
+    template<size_t Idx, size_t Total, class State, class Future, class... Futures> constexpr bool when_all_unpack(State &state, Future &&, Futures &&... futures)
     {
       return (std::get<Idx>(state->_futures).then([state](const typename std::decay<Future>::type &)
       {

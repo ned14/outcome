@@ -32,7 +32,6 @@ DEALINGS IN THE SOFTWARE.
 #ifndef BOOST_ALLOCATOR_TESTING_HPP
 #define BOOST_ALLOCATOR_TESTING_HPP
 
-#include "boost/config.hpp"
 #include "../include/boost/monad/bindlib/include/import.h"
 #define BOOST_ALLOCATOR_TESTING (boost), (allocator_testing)
 #ifndef BOOST_ALLOCATOR_TESTING_STL11_IMPL

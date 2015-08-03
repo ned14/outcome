@@ -51,7 +51,7 @@ namespace detail
   // Inherited from publicly by basic_monad, so whatever you expose here you expose in basic_monad
   template<class monad_storage, class value_type, class error_type=void, class exception_type=void> struct BOOST_MONAD_MONAD_POLICY_BASE_NAME : public monad_storage
   {
-    template<class... Args> BOOST_MONAD_FUTURE_CONSTEXPR BOOST_MONAD_MONAD_POLICY_BASE_NAME(Args &&... args) : monad_storage(std::forward<Args>(args)...) { }
+    template<class... Args> constexpr BOOST_MONAD_MONAD_POLICY_BASE_NAME(Args &&... args) : monad_storage(std::forward<Args>(args)...) { }
   protected:
     // Must handle error situation ec. Can return false to cancel the calling operation.
     static BOOST_MONAD_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
@@ -128,7 +128,7 @@ namespace detail
 #endif
   template<class monad_storage, class error_type, class exception_type> struct BOOST_MONAD_MONAD_POLICY_BASE_NAME<monad_storage, void, error_type, exception_type> : public monad_storage
   {
-    template<class... Args> BOOST_MONAD_FUTURE_CONSTEXPR BOOST_MONAD_MONAD_POLICY_BASE_NAME(Args &&... args) : monad_storage(std::forward<Args>(args)...) { }
+    template<class... Args> constexpr BOOST_MONAD_MONAD_POLICY_BASE_NAME(Args &&... args) : monad_storage(std::forward<Args>(args)...) { }
   protected:
     // Must handle error situation ec. Can return false to cancel the calling operation.
     static BOOST_MONAD_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)

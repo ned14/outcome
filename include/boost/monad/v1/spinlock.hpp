@@ -80,18 +80,6 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 
 #include "../bindlib/include/import.h"
 
-#if ! defined BOOST_MONAD_CONSTEXPR
-# ifdef __cpp_constexpr
-// clang 3.2 and earlier has buggy constexpr support
-#  if !defined(__clang__) || (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__) >= 30300
-#   define BOOST_MONAD_CONSTEXPR constexpr
-#  endif
-# endif
-#endif
-#ifndef BOOST_MONAD_CONSTEXPR
-# define BOOST_MONAD_CONSTEXPR
-#endif
-
 #if ! defined BOOST_MONAD_RELAXED_CONSTEXPR
 # ifdef __cpp_relaxed_constexpr
 #  define BOOST_MONAD_RELAXED_CONSTEXPR constexpr
@@ -173,9 +161,9 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
      */
     template<typename T> struct lockable_ptr : atomic<T *>
     {
-      BOOST_MONAD_CONSTEXPR lockable_ptr(T *v=nullptr) : atomic<T *>(v) { }
+      constexpr lockable_ptr(T *v=nullptr) : atomic<T *>(v) { }
       //! Returns the memory pointer part of the atomic
-      T *get() BOOST_NOEXCEPT_OR_NOTHROW
+      T *get() noexcept
       {
         union
         {
@@ -187,7 +175,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         return value.v;
       }
       //! Returns the memory pointer part of the atomic
-      const T *get() const BOOST_NOEXCEPT_OR_NOTHROW
+      const T *get() const noexcept
       {
         union
         {
@@ -198,10 +186,10 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         value.n&=~(size_t)1;
         return value.v;
       }
-      T &operator*() BOOST_NOEXCEPT_OR_NOTHROW { return *get(); }
-      const T &operator*() const BOOST_NOEXCEPT_OR_NOTHROW { return *get(); }
-      T *operator->() BOOST_NOEXCEPT_OR_NOTHROW { return get(); }
-      const T *operator->() const BOOST_NOEXCEPT_OR_NOTHROW { return get(); }
+      T &operator*() noexcept { return *get(); }
+      const T &operator*() const noexcept { return *get(); }
+      T *operator->() noexcept { return get(); }
+      const T *operator->() const noexcept { return get(); }
     };
     template<typename T> struct spinlockbase
     {
@@ -209,14 +197,14 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       atomic<T> v;
     public:
       typedef T value_type;
-      BOOST_MONAD_RELAXED_CONSTEXPR spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW : v(0)
+      BOOST_MONAD_RELAXED_CONSTEXPR spinlockbase() noexcept : v(0)
       {
         BOOST_MONAD_ANNOTATE_RWLOCK_CREATE(this);
         //v.store(0, memory_order_release);
       }
       spinlockbase(const spinlockbase &) = delete;
       //! Atomically move constructs
-      BOOST_MONAD_RELAXED_CONSTEXPR spinlockbase(spinlockbase &&) BOOST_NOEXCEPT_OR_NOTHROW : v(0)
+      BOOST_MONAD_RELAXED_CONSTEXPR spinlockbase(spinlockbase &&) noexcept : v(0)
       {
         BOOST_MONAD_ANNOTATE_RWLOCK_CREATE(this);
         //v.store(o.v.exchange(0, memory_order_acq_rel));
@@ -235,11 +223,11 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       spinlockbase &operator=(const spinlockbase &) = delete;
       spinlockbase &operator=(spinlockbase &&) = delete;
       //! Returns the raw atomic
-      BOOST_MONAD_CONSTEXPR T load(memory_order o=memory_order_seq_cst) const BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
+      constexpr T load(memory_order o=memory_order_seq_cst) const noexcept { return v.load(o); }
       //! Sets the raw atomic
-      void store(T a, memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { v.store(a, o); }
+      void store(T a, memory_order o=memory_order_seq_cst) noexcept { v.store(a, o); }
       //! If atomic is zero, sets to 1 and returns true, else false.
-      bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
+      bool try_lock() noexcept
       {
 #if ! BOOST_MONAD_IN_THREAD_SANITIZER  // no early outs for the sanitizer
 #ifdef BOOST_MONAD_USE_VOLATILE_READ_FOR_AVOIDING_CMPXCHG
@@ -267,12 +255,12 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         }
         else return false;
       }
-      BOOST_MONAD_CONSTEXPR bool try_lock() const BOOST_NOEXCEPT_OR_NOTHROW
+      constexpr bool try_lock() const noexcept
       {
         return v.load(memory_order_consume) ? false : true;  // Avoid unnecessary cache line invalidation traffic
       }
       //! If atomic equals expected, sets to 1 and returns true, else false with expected updated to actual value.
-      bool try_lock(T &expected) BOOST_NOEXCEPT_OR_NOTHROW
+      bool try_lock(T &expected) noexcept
       {
         T t(0);
 #if ! BOOST_MONAD_IN_THREAD_SANITIZER  // no early outs for the sanitizer
@@ -297,12 +285,12 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         else return false;
       }
       //! Sets the atomic to zero
-      void unlock() BOOST_NOEXCEPT_OR_NOTHROW
+      void unlock() noexcept
       {
         BOOST_MONAD_ANNOTATE_RWLOCK_RELEASED(this, true);
         v.store(0, memory_order_release);
       }
-      BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
+      BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t) noexcept { return false; }
     };
     template<typename T> struct spinlockbase<lockable_ptr<T>>
     {
@@ -310,23 +298,23 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       lockable_ptr<T> v;
     public:
       typedef T *value_type;
-      spinlockbase() BOOST_NOEXCEPT_OR_NOTHROW { }
+      spinlockbase() noexcept { }
       spinlockbase(const spinlockbase &) = delete;
       //! Atomically move constructs
-      spinlockbase(spinlockbase &&o) BOOST_NOEXCEPT_OR_NOTHROW
+      spinlockbase(spinlockbase &&o) noexcept
       {
         v.store(o.v.exchange(nullptr, memory_order_acq_rel), memory_order_release);
       }
       spinlockbase &operator=(const spinlockbase &) = delete;
       spinlockbase &operator=(spinlockbase &&) = delete;
       //! Returns the memory pointer part of the atomic
-      T *get() BOOST_NOEXCEPT_OR_NOTHROW { return v.get(); }
-      T *operator->() BOOST_NOEXCEPT_OR_NOTHROW { return get(); }
+      T *get() noexcept { return v.get(); }
+      T *operator->() noexcept { return get(); }
       //! Returns the raw atomic
-      T *load(memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { return v.load(o); }
+      T *load(memory_order o=memory_order_seq_cst) noexcept { return v.load(o); }
 #if 0 // Forces cmpxchng on everything else, so avoid if at all possible.
       //! Sets the memory pointer part of the atomic preserving lockedness
-      void set(T *a) BOOST_NOEXCEPT_OR_NOTHROW
+      void set(T *a) noexcept
       {
         union
         {
@@ -345,8 +333,8 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       }
 #endif
       //! Sets the raw atomic
-      void store(T *a, memory_order o=memory_order_seq_cst) BOOST_NOEXCEPT_OR_NOTHROW { v.store(a, o); }
-      bool try_lock() BOOST_NOEXCEPT_OR_NOTHROW
+      void store(T *a, memory_order o=memory_order_seq_cst) noexcept { v.store(a, o); }
+      bool try_lock() noexcept
       {
         union
         {
@@ -360,7 +348,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         value.n|=1;
         return v.compare_exchange_weak(expected, value.v, memory_order_acquire, memory_order_relaxed);
       }
-      void unlock() BOOST_NOEXCEPT_OR_NOTHROW
+      void unlock() noexcept
       {
         union
         {
@@ -372,14 +360,14 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         value.n&=~(size_t)1;
         v.store(value.v, memory_order_release);
       }
-      BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t) BOOST_NOEXCEPT_OR_NOTHROW { return false; }
+      BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t) noexcept { return false; }
     };
     namespace detail
     {
-      template<bool use_pause> inline void smt_pause() BOOST_NOEXCEPT
+      template<bool use_pause> inline void smt_pause() noexcept
       {
       };
-      template<> inline void smt_pause<true>() BOOST_NOEXCEPT
+      template<> inline void smt_pause<true>() noexcept
       {
 #ifdef BOOST_SMT_PAUSE
         BOOST_SMT_PAUSE;
@@ -391,11 +379,11 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
     {
       template<class parenttype> struct policy : parenttype
       {
-        static BOOST_CONSTEXPR_OR_CONST size_t spins_to_loop=spins;
-        BOOST_MONAD_CONSTEXPR policy() {}
+        static constexpr size_t spins_to_loop=spins;
+        constexpr policy() {}
         policy(const policy &) = delete;
-        BOOST_MONAD_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-        BOOST_MONAD_RELAXED_CONSTEXPR inline bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
+        constexpr policy(policy &&o) noexcept : parenttype(std::move(o)) { }
+        BOOST_MONAD_RELAXED_CONSTEXPR inline bool int_yield(size_t n) noexcept
         {
           if(parenttype::int_yield(n)) return true;
           if(n>=spins) return false;
@@ -409,11 +397,11 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
     {
       template<class parenttype> struct policy : parenttype
       {
-        static BOOST_CONSTEXPR_OR_CONST size_t spins_to_yield=spins;
-        BOOST_MONAD_CONSTEXPR policy() {}
+        static constexpr size_t spins_to_yield=spins;
+        constexpr policy() {}
         policy(const policy &) = delete;
-        BOOST_MONAD_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-        BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
+        constexpr policy(policy &&o) noexcept : parenttype(std::move(o)) { }
+        BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t n) noexcept
         {
           if(parenttype::int_yield(n)) return true;
           if(n>=spins) return false;
@@ -427,10 +415,10 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
     {
       template<class parenttype> struct policy : parenttype
       {
-        BOOST_MONAD_CONSTEXPR policy() {}
+        constexpr policy() {}
         policy(const policy &) = delete;
-        BOOST_MONAD_CONSTEXPR policy(policy &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-        BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
+        constexpr policy(policy &&o) noexcept : parenttype(std::move(o)) { }
+        BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t n) noexcept
         {
           if(parenttype::int_yield(n)) return true;
           this_thread::sleep_for(chrono::milliseconds(1));
@@ -445,7 +433,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       {
       };
     };
-    template<class T> inline bool is_lockable_locked(T &lockable) BOOST_NOEXCEPT_OR_NOTHROW;
+    template<class T> inline bool is_lockable_locked(T &lockable) noexcept;
     /*! \class spinlock
     \brief A policy configurable spin lock meeting BasicLockable and Lockable.
     
@@ -469,10 +457,10 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
     {
       typedef spinpolicy4<spinpolicy3<spinpolicy2<spinlockbase<T>>>> parenttype;
     public:
-      BOOST_MONAD_CONSTEXPR spinlock() { }
+      constexpr spinlock() { }
       spinlock(const spinlock &) = delete;
-      BOOST_MONAD_CONSTEXPR spinlock(spinlock &&o) BOOST_NOEXCEPT : parenttype(std::move(o)) { }
-      void lock() BOOST_NOEXCEPT_OR_NOTHROW
+      constexpr spinlock(spinlock &&o) noexcept : parenttype(std::move(o)) { }
+      void lock() noexcept
       {
         for(size_t n=0;; n++)
         {
@@ -482,7 +470,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         }
       }
       //! Locks if the atomic is not the supplied value, else returning false
-      bool lock(T only_if_not_this) BOOST_NOEXCEPT_OR_NOTHROW
+      bool lock(T only_if_not_this) noexcept
       {
         for(size_t n=0;; n++)
         {
@@ -497,7 +485,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
     };
 
     //! \brief Determines if a lockable is locked. Type specialise this for performance if your lockable allows examination.
-    template<class T> inline bool is_lockable_locked(T &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    template<class T> inline bool is_lockable_locked(T &lockable) noexcept
     {
       if(lockable.try_lock())
       {
@@ -507,7 +495,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       return true;
     }
     // For when used with a spinlock
-    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_MONAD_CONSTEXPR inline T is_lockable_locked(spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> constexpr inline T is_lockable_locked(spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) noexcept
     {
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
       // Annoyingly the atomic ops are marked as unsafe for atomic transactions, so ...
@@ -517,7 +505,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
 #endif
     }
     // For when used with a spinlock
-    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_MONAD_CONSTEXPR inline T is_lockable_locked(const spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> constexpr inline T is_lockable_locked(const spinlock<T, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) noexcept
     {
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
       // Annoyingly the atomic ops are marked as unsafe for atomic transactions, so ...
@@ -527,7 +515,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
 #endif
     }
     // For when used with a locked_ptr
-    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> BOOST_MONAD_CONSTEXPR inline bool is_lockable_locked(spinlock<lockable_ptr<T>, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
+    template<class T, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> constexpr inline bool is_lockable_locked(spinlock<lockable_ptr<T>, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) noexcept
     {
       return ((size_t) lockable.load(memory_order_consume))&1;
     }

@@ -67,7 +67,7 @@ namespace detail
   // Inherited from publicly by basic_monad, so whatever you expose here you expose in basic_monad
   template<class future_storage, class _value_type, class error_type, class exception_type> struct BOOST_MONAD_FUTURE_POLICY_BASE_NAME : public future_storage
   {
-    template<class... Args> BOOST_MONAD_FUTURE_CONSTEXPR BOOST_MONAD_FUTURE_POLICY_BASE_NAME(Args &&... args) : future_storage(std::forward<Args>(args)...) { }
+    template<class... Args> constexpr BOOST_MONAD_FUTURE_POLICY_BASE_NAME(Args &&... args) : future_storage(std::forward<Args>(args)...) { }
   protected:
     using implementation_type = basic_future<BOOST_MONAD_FUTURE_POLICY_NAME<_value_type>>;
     static BOOST_MONAD_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
@@ -192,7 +192,7 @@ namespace detail
   
   template<class future_storage, class _value_type, class error_type, class exception_type> struct BOOST_MONAD_SHARED_FUTURE_POLICY_BASE_NAME : public future_storage
   {
-    template<class... Args> BOOST_MONAD_FUTURE_CONSTEXPR BOOST_MONAD_SHARED_FUTURE_POLICY_BASE_NAME(Args &&... args) : future_storage(std::forward<Args>(args)...) { }
+    template<class... Args> constexpr BOOST_MONAD_SHARED_FUTURE_POLICY_BASE_NAME(Args &&... args) : future_storage(std::forward<Args>(args)...) { }
   protected:
     typedef basic_future<BOOST_MONAD_SHARED_FUTURE_POLICY_NAME<_value_type>> implementation_type;
     static BOOST_MONAD_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
@@ -328,9 +328,9 @@ namespace detail
     template<typename U> using rebind_policy = BOOST_MONAD_FUTURE_POLICY_NAME<U>;
 
     // Does getting this future's state consume it?
-    BOOST_STATIC_CONSTEXPR bool is_consuming=true;
+    static constexpr bool is_consuming=true;
     // Is this future managed by shared_basic_future_ptr?
-    BOOST_STATIC_CONSTEXPR bool is_shared=false;
+    static constexpr bool is_shared=false;
     // The type of future_errc to use for issuing errors
     using future_errc = std::future_errc;
     // The type of future exception to use for issuing exceptions
@@ -340,7 +340,7 @@ namespace detail
     // The category of error code to use
     static const std::error_category &future_category() noexcept { return std::future_category(); }
     // How many spins of yield to do waiting to be signalled before allocating a wait_implementation
-    BOOST_STATIC_CONSTEXPR size_t wait_spin_count = 1000;
+    static constexpr size_t wait_spin_count = 1000;
   };
   template<typename R> struct BOOST_MONAD_SHARED_FUTURE_POLICY_NAME
   {
@@ -367,9 +367,9 @@ namespace detail
     template<typename U> using rebind_policy = BOOST_MONAD_SHARED_FUTURE_POLICY_NAME<U>;
 
     // Does getting this future's state consume it?
-    BOOST_STATIC_CONSTEXPR bool is_consuming=false;
+    static constexpr bool is_consuming=false;
     // Is this future managed by shared_basic_future_ptr?
-    BOOST_STATIC_CONSTEXPR bool is_shared=true;
+    static constexpr bool is_shared=true;
     // The type of future_errc to use for issuing errors
     using future_errc = std::future_errc;
     // The type of future exception to use for issuing exceptions
@@ -379,7 +379,7 @@ namespace detail
     // The category of error code to use
     static const std::error_category &future_category() noexcept { return std::future_category(); }
     // How many spins of yield to do waiting to be signalled before allocating a wait_implementation
-    BOOST_STATIC_CONSTEXPR size_t wait_spin_count = 1000;
+    static constexpr size_t wait_spin_count = 1000;
   };
 
 }

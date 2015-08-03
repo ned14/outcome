@@ -38,11 +38,9 @@ DEALINGS IN THE SOFTWARE.
 #ifdef _MSC_VER
 //# pragma inline_depth(255)
 //# pragma inline_recursion(on)
-# define BOOST_MONAD_FUTURE_CONSTEXPR BOOST_CONSTEXPR
 # define BOOST_MONAD_FUTURE_CXX14_CONSTEXPR BOOST_FORCEINLINE
 # define BOOST_MONAD_FUTURE_MSVC_HELP BOOST_FORCEINLINE
 #else
-# define BOOST_MONAD_FUTURE_CONSTEXPR BOOST_CONSTEXPR
 # define BOOST_MONAD_FUTURE_CXX14_CONSTEXPR BOOST_CXX14_CONSTEXPR
 # define BOOST_MONAD_FUTURE_MSVC_HELP 
 #endif
@@ -70,10 +68,10 @@ namespace lightweight_futures {
       struct constexpr_standin_type {};
       template<class U, class V> using devoid = typename std::conditional<!std::is_void<U>::value, U, V>::type;
     public:
-      BOOST_STATIC_CONSTEXPR bool has_value_type = !std::is_void<_value_type>::value;
-      BOOST_STATIC_CONSTEXPR bool has_error_type = !std::is_void<_error_type>::value;
-      BOOST_STATIC_CONSTEXPR bool has_exception_type = !std::is_void<_exception_type>::value;
-      BOOST_STATIC_CONSTEXPR bool is_referenceable = true;
+      static constexpr bool has_value_type = !std::is_void<_value_type>::value;
+      static constexpr bool has_error_type = !std::is_void<_error_type>::value;
+      static constexpr bool has_exception_type = !std::is_void<_exception_type>::value;
+      static constexpr bool is_referenceable = true;
       typedef devoid<_value_type, no_value_type> value_type;
       typedef devoid<_error_type, no_error_type> error_type;
       typedef devoid<_exception_type, no_exception_type> exception_type;
@@ -103,17 +101,17 @@ namespace lightweight_futures {
 #endif
       unsigned char type;
 
-      BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value && std::is_nothrow_destructible<exception_type>::value && std::is_nothrow_destructible<error_type>::value;
+      static constexpr bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value && std::is_nothrow_destructible<exception_type>::value && std::is_nothrow_destructible<error_type>::value;
 
-      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl() noexcept : _constexpr_standin_type(constexpr_standin_type()), type(storage_type::empty) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : value(v), type(storage_type::value) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : error(v), type(storage_type::error) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : exception(v), type(storage_type::exception) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : value(std::move(v)), type(storage_type::value) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : error(std::move(v)), type(storage_type::error) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : exception(std::move(v)), type(storage_type::exception) { }
+      constexpr value_storage_impl() noexcept : _constexpr_standin_type(constexpr_standin_type()), type(storage_type::empty) { }
+      constexpr value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : value(v), type(storage_type::value) { }
+      constexpr value_storage_impl(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : error(v), type(storage_type::error) { }
+      constexpr value_storage_impl(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : exception(v), type(storage_type::exception) { }
+      constexpr value_storage_impl(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : value(std::move(v)), type(storage_type::value) { }
+      constexpr value_storage_impl(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : error(std::move(v)), type(storage_type::error) { }
+      constexpr value_storage_impl(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : exception(std::move(v)), type(storage_type::exception) { }
       struct emplace_t {};
-      template<class... Args> BOOST_MONAD_FUTURE_CONSTEXPR explicit value_storage_impl(emplace_t, Args &&... args)
+      template<class... Args> constexpr explicit value_storage_impl(emplace_t, Args &&... args)
 #if !defined(_MSC_VER) || _MSC_VER > 190022816
         noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
 #endif
@@ -150,10 +148,10 @@ namespace lightweight_futures {
       struct no_exception_type {};
       template<class U, class V> using devoid = typename std::conditional<!std::is_void<U>::value, U, V>::type;
     public:
-      BOOST_STATIC_CONSTEXPR bool has_value_type = !std::is_void<_value_type>::value;
-      BOOST_STATIC_CONSTEXPR bool has_error_type = false;
-      BOOST_STATIC_CONSTEXPR bool has_exception_type = false;
-      BOOST_STATIC_CONSTEXPR bool is_referenceable = false;
+      static constexpr bool has_value_type = !std::is_void<_value_type>::value;
+      static constexpr bool has_error_type = false;
+      static constexpr bool has_exception_type = false;
+      static constexpr bool is_referenceable = false;
       typedef devoid<_value_type, unsigned char> value_type;
       typedef no_error_type error_type;
       typedef no_exception_type exception_type;
@@ -186,15 +184,15 @@ namespace lightweight_futures {
 #pragma warning(pop)
 #endif
 
-      BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value;
+      static constexpr bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value;
 
-      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl() : type(storage_type::empty) { }
+      constexpr value_storage_impl() : type(storage_type::empty) { }
       BOOST_MONAD_FUTURE_CXX14_CONSTEXPR value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : value(v) { type=storage_type::value; }
-      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(const error_type &) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : type(storage_type::error) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(const exception_type &) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : type(storage_type::exception) { }
+      constexpr value_storage_impl(const error_type &) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : type(storage_type::error) { }
+      constexpr value_storage_impl(const exception_type &) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : type(storage_type::exception) { }
       BOOST_MONAD_FUTURE_CXX14_CONSTEXPR value_storage_impl(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : value(v) { type=storage_type::value; }
-      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(error_type &&) noexcept(std::is_nothrow_move_constructible<error_type>::value) : type(storage_type::error) { }
-      BOOST_MONAD_FUTURE_CONSTEXPR value_storage_impl(exception_type &&) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : type(storage_type::exception) { }
+      constexpr value_storage_impl(error_type &&) noexcept(std::is_nothrow_move_constructible<error_type>::value) : type(storage_type::error) { }
+      constexpr value_storage_impl(exception_type &&) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : type(storage_type::exception) { }
       struct emplace_t {};
       template<class... Args> BOOST_MONAD_FUTURE_CXX14_CONSTEXPR explicit value_storage_impl(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value) : value(std::forward<Args>(args)...) { type=storage_type::value; }
       BOOST_MONAD_FUTURE_MSVC_HELP ~value_storage_impl() noexcept(is_nothrow_destructible) { clear(); }
@@ -243,9 +241,9 @@ namespace lightweight_futures {
   {
     typedef detail::value_storage_impl<_value_type, _error_type, _exception_type> base;
   public:
-    BOOST_STATIC_CONSTEXPR bool has_value_type = base::has_value_type;
-    BOOST_STATIC_CONSTEXPR bool has_error_type = base::has_error_type;
-    BOOST_STATIC_CONSTEXPR bool has_exception_type = base::has_exception_type;
+    static constexpr bool has_value_type = base::has_value_type;
+    static constexpr bool has_error_type = base::has_error_type;
+    static constexpr bool has_exception_type = base::has_exception_type;
     using value_type = typename base::value_type;
     using error_type = typename base::error_type;
     using exception_type = typename base::exception_type;
@@ -256,21 +254,21 @@ namespace lightweight_futures {
     static_assert(!std::is_same<error_type, exception_type>::value, "error_type and exception_type cannot be the same type");
 
 
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_constructible = std::is_nothrow_copy_constructible<value_type>::value && std::is_nothrow_copy_constructible<exception_type>::value && std::is_nothrow_copy_constructible<error_type>::value;
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_move_constructible = std::is_nothrow_move_constructible<value_type>::value && std::is_nothrow_move_constructible<exception_type>::value && std::is_nothrow_move_constructible<error_type>::value;
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_copy_assignable = std::is_nothrow_copy_assignable<value_type>::value && std::is_nothrow_copy_assignable<exception_type>::value && std::is_nothrow_copy_assignable<error_type>::value;
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_move_assignable = std::is_nothrow_move_assignable<value_type>::value && std::is_nothrow_move_assignable<exception_type>::value && std::is_nothrow_move_assignable<error_type>::value;
-    BOOST_STATIC_CONSTEXPR bool is_nothrow_destructible = base::is_nothrow_destructible;
+    static constexpr bool is_nothrow_copy_constructible = std::is_nothrow_copy_constructible<value_type>::value && std::is_nothrow_copy_constructible<exception_type>::value && std::is_nothrow_copy_constructible<error_type>::value;
+    static constexpr bool is_nothrow_move_constructible = std::is_nothrow_move_constructible<value_type>::value && std::is_nothrow_move_constructible<exception_type>::value && std::is_nothrow_move_constructible<error_type>::value;
+    static constexpr bool is_nothrow_copy_assignable = std::is_nothrow_copy_assignable<value_type>::value && std::is_nothrow_copy_assignable<exception_type>::value && std::is_nothrow_copy_assignable<error_type>::value;
+    static constexpr bool is_nothrow_move_assignable = std::is_nothrow_move_assignable<value_type>::value && std::is_nothrow_move_assignable<exception_type>::value && std::is_nothrow_move_assignable<error_type>::value;
+    static constexpr bool is_nothrow_destructible = base::is_nothrow_destructible;
 
     value_storage() = default;
-    BOOST_MONAD_FUTURE_CONSTEXPR value_storage(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : base(v) { }
-    BOOST_MONAD_FUTURE_CONSTEXPR value_storage(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : base(v) { }
-    BOOST_MONAD_FUTURE_CONSTEXPR value_storage(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : base(v) { }
-    BOOST_MONAD_FUTURE_CONSTEXPR value_storage(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : base(std::move(v)) { }
-    BOOST_MONAD_FUTURE_CONSTEXPR value_storage(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : base(std::move(v)) { }
-    BOOST_MONAD_FUTURE_CONSTEXPR value_storage(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : base(std::move(v)) { }
+    constexpr value_storage(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : base(v) { }
+    constexpr value_storage(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : base(v) { }
+    constexpr value_storage(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : base(v) { }
+    constexpr value_storage(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : base(std::move(v)) { }
+    constexpr value_storage(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : base(std::move(v)) { }
+    constexpr value_storage(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : base(std::move(v)) { }
     using emplace_t = typename base::emplace_t;
-    template<class... Args> BOOST_MONAD_FUTURE_CONSTEXPR explicit value_storage(emplace_t _, Args &&... args)
+    template<class... Args> constexpr explicit value_storage(emplace_t _, Args &&... args)
 #if !defined(_MSC_VER) || _MSC_VER > 190022816
       noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
 #endif

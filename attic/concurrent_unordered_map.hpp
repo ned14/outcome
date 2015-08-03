@@ -64,10 +64,10 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       size_t operator()(T v) const
       {
 #if defined(__x86_64__) || defined(_M_X64) || defined(__aarch64__) || defined(__ia64__) || defined(_M_IA64) || defined(__ppc64__)
-        static BOOST_CONSTEXPR_OR_CONST size_t basis=14695981039346656037ULL, prime=1099511628211ULL;
+        static constexpr size_t basis=14695981039346656037ULL, prime=1099511628211ULL;
         static_assert(sizeof(size_t)==8, "size_t is not 64 bit");
 #else
-        static BOOST_CONSTEXPR_OR_CONST size_t basis=2166136261U, prime=16777619U;
+        static constexpr size_t basis=2166136261U, prime=16777619U;
         static_assert(sizeof(size_t)==4, "size_t is not 32 bit");
 #endif
         const unsigned char *_v=(const unsigned char *)&v;
@@ -219,7 +219,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       typedef std::ptrdiff_t difference_type;
       
       template<class U> using spinlock_type=Spinlock<U>;
-      static BOOST_CONSTEXPR_OR_CONST bool unique_keys_assumed=assume_unique_keys;
+      static constexpr bool unique_keys_assumed=assume_unique_keys;
     private:
       spinlock_type<bool> _rehash_lock;
       hasher _hasher;
@@ -268,9 +268,9 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
           }
         }
       public:
-        BOOST_CONSTEXPR node_ptr_type() BOOST_NOEXCEPT : p(nullptr) {}
-        BOOST_CONSTEXPR node_ptr_type(std::nullptr_t) BOOST_NOEXCEPT : p(nullptr) {}
-        node_ptr_type(node_ptr_type &&o) BOOST_NOEXCEPT : allocator(std::move(o.allocator)), p(o.p) { o.p=nullptr; }
+        BOOST_CONSTEXPR node_ptr_type() noexcept : p(nullptr) {}
+        BOOST_CONSTEXPR node_ptr_type(std::nullptr_t) noexcept : p(nullptr) {}
+        node_ptr_type(node_ptr_type &&o) noexcept : allocator(std::move(o.allocator)), p(o.p) { o.p=nullptr; }
         node_ptr_type(const node_ptr_type &)=delete;
         node_ptr_type &operator=(node_ptr_type &&o) BOOST_NOEXCEPT_IF(detail::is_nothrow_destructible<value_type>::value)
         {
@@ -288,12 +288,12 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         {
           reset();
         }
-        pointer get() const BOOST_NOEXCEPT { return p; }
-        reference operator*() BOOST_NOEXCEPT { return *p; }
-        pointer operator->() BOOST_NOEXCEPT { return p; }
-        allocator_type get_allocator() const BOOST_NOEXCEPT { return allocator; }
-        explicit operator bool() const BOOST_NOEXCEPT { return p!=nullptr; }
-        pointer release() BOOST_NOEXCEPT
+        pointer get() const noexcept { return p; }
+        reference operator*() noexcept { return *p; }
+        pointer operator->() noexcept { return p; }
+        allocator_type get_allocator() const noexcept { return allocator; }
+        explicit operator bool() const noexcept { return p!=nullptr; }
+        pointer release() noexcept
         {
           value_type *ret=p;
           p=nullptr;
@@ -309,7 +309,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
           }
         }
         void reset(std::nullptr_t) BOOST_NOEXCEPT_IF(detail::is_nothrow_destructible<value_type>::value) { reset(); }
-        void swap(node_ptr_type &o) BOOST_NOEXCEPT
+        void swap(node_ptr_type &o) noexcept
         {
           node_ptr_type temp(std::move(*this));
           *this=std::move(o);
@@ -321,12 +321,12 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       {
         value_type *p;
         size_t hash;
-        item_type() BOOST_NOEXCEPT : p(nullptr), hash(0) { }
-        item_type(size_t _hash, value_type *_p) BOOST_NOEXCEPT : p(_p), hash(_hash) { }
-        item_type(size_t _hash, node_ptr_type &&_p) BOOST_NOEXCEPT : p(_p.release()), hash(_hash) { }
-        item_type(item_type &&o) BOOST_NOEXCEPT : p(std::move(o.p)), hash(o.hash) { o.p=nullptr; o.hash=0; }
+        item_type() noexcept : p(nullptr), hash(0) { }
+        item_type(size_t _hash, value_type *_p) noexcept : p(_p), hash(_hash) { }
+        item_type(size_t _hash, node_ptr_type &&_p) noexcept : p(_p.release()), hash(_hash) { }
+        item_type(item_type &&o) noexcept : p(std::move(o.p)), hash(o.hash) { o.p=nullptr; o.hash=0; }
         item_type(const item_type &o) = delete;
-        ~item_type() BOOST_NOEXCEPT
+        ~item_type() noexcept
         {
           assert(!p);
         }
@@ -339,7 +339,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         std::vector<item_type, item_type_allocator> items;
         bucket_type_impl() : count(0), items(0) { BOOST_MONAD_DRD_IGNORE_VAR(count); count.store(0, memory_order_relaxed); }
         ~bucket_type_impl() BOOST_NOEXCEPT_IF(detail::is_nothrow_destructible<decltype(items)>::value) { BOOST_MONAD_DRD_STOP_IGNORING_VAR(count); }
-        bucket_type_impl(bucket_type_impl &&) BOOST_NOEXCEPT : count(0) { BOOST_MONAD_DRD_IGNORE_VAR(count); count.store(0, memory_order_relaxed); }
+        bucket_type_impl(bucket_type_impl &&) noexcept : count(0) { BOOST_MONAD_DRD_IGNORE_VAR(count); count.store(0, memory_order_relaxed); }
         bucket_type_impl(const bucket_type_impl &) = delete;
         bucket_type_impl &operator=(bucket_type_impl &&) = delete;
         bucket_type_impl &operator=(const bucket_type_impl &) = delete;
@@ -352,7 +352,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         {
           static_assert(sizeof(bucket_type)==64, "bucket_type is not 64 bytes long!");
         }
-        bucket_type(bucket_type &&o) BOOST_NOEXCEPT : bucket_type_impl(std::move(o)) { }
+        bucket_type(bucket_type &&o) noexcept : bucket_type_impl(std::move(o)) { }
         bucket_type(const bucket_type &) = delete;
       };
 #elif 1
@@ -365,7 +365,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         {
           static_assert(sizeof(bucket_type)==32, "bucket_type is not 32 bytes long!");
         }
-        bucket_type(bucket_type &&o) BOOST_NOEXCEPT : bucket_type_impl(std::move(o)) { }
+        bucket_type(bucket_type &&o) noexcept : bucket_type_impl(std::move(o)) { }
         bucket_type(const bucket_type &) = delete;
       };
 #endif
@@ -375,7 +375,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       typedef std::array<buckets_type *, 8> old_buckets_type;
       old_buckets_type _oldbuckets;
       typename old_buckets_type::iterator _oldbucketit;
-      typename buckets_type::iterator _get_bucket(size_t k) BOOST_NOEXCEPT
+      typename buckets_type::iterator _get_bucket(size_t k) noexcept
       {
         //k ^= k + 0x9e3779b9 + (k<<6) + (k>>2); // really need to avoid sequential keys tapping the same cache line
         //k ^= k + 0x9e3779b9; // really need to avoid sequential keys tapping the same cache line
@@ -386,7 +386,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         BOOST_MONAD_ANNOTATE_IGNORE_READS_END();
         return ret;
       }
-      static float _calc_max_load_factor() BOOST_NOEXCEPT
+      static float _calc_max_load_factor() noexcept
       {
         return 1.0f;
 #if 0
@@ -411,9 +411,9 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
 #else
         static typename buckets_type::iterator dead() { static typename buckets_type::iterator it; return it; }
 #endif
-        iterator(const concurrent_unordered_map *parent) BOOST_NOEXCEPT : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_consume)), _offset((size_t) -1), _pending_incr(1) { buckets_type &buckets=*_bucket_data; _itb=buckets.begin(); }
-        iterator(const concurrent_unordered_map *parent, std::nullptr_t) BOOST_NOEXCEPT : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_consume)), _itb(dead()), _offset((size_t) -1), _pending_incr(0) { }
-        void _catch_up() BOOST_NOEXCEPT
+        iterator(const concurrent_unordered_map *parent) noexcept : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_consume)), _offset((size_t) -1), _pending_incr(1) { buckets_type &buckets=*_bucket_data; _itb=buckets.begin(); }
+        iterator(const concurrent_unordered_map *parent, std::nullptr_t) noexcept : _parent(const_cast<concurrent_unordered_map *>(parent)), _bucket_data(parent->_buckets.load(memory_order_consume)), _itb(dead()), _offset((size_t) -1), _pending_incr(0) { }
+        void _catch_up() noexcept
         {
           assert(_itb!=dead());
           if(_itb==dead())
@@ -447,33 +447,33 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
           if(_itb==buckets.end())
             _itb=dead();
         }
-        void _catch_up() const BOOST_NOEXCEPT { const_cast<iterator *>(this)->_catch_up(); }
+        void _catch_up() const noexcept { const_cast<iterator *>(this)->_catch_up(); }
       public:
-        iterator() BOOST_NOEXCEPT : _parent(nullptr), _bucket_data(nullptr), _itb(dead()), _offset((size_t) -1), _pending_incr(0) { }
-        bool operator!=(const iterator &o) const BOOST_NOEXCEPT
+        iterator() noexcept : _parent(nullptr), _bucket_data(nullptr), _itb(dead()), _offset((size_t) -1), _pending_incr(0) { }
+        bool operator!=(const iterator &o) const noexcept
         {
           if(_itb==dead() && o._itb==dead()) return false;
           if(_itb!=dead()) _catch_up();
           if(o._itb!=dead()) o._catch_up();
           return _itb!=o._itb || _offset!=o._offset;
         }
-        bool operator==(const iterator &o) const BOOST_NOEXCEPT
+        bool operator==(const iterator &o) const noexcept
         {
           if(_itb==dead() && o._itb==dead()) return true;
           if(_itb!=dead()) _catch_up();
           if(o._itb!=dead()) o._catch_up();
           return _itb==o._itb && _offset==o._offset;
         }
-        iterator &operator++() BOOST_NOEXCEPT
+        iterator &operator++() noexcept
         {
           if(_itb==dead())
             return *this;
           ++_pending_incr;
           return *this;
         }
-        iterator operator++(int) BOOST_NOEXCEPT { iterator t(*this); operator++(); return t; }
-        value_type &operator*() BOOST_NOEXCEPT { _catch_up(); return *_itb->items[_offset].p; }
-        value_type *operator->() BOOST_NOEXCEPT { _catch_up(); return _itb->items[_offset].p; }
+        iterator operator++(int) noexcept { iterator t(*this); operator++(); return t; }
+        value_type &operator*() noexcept { _catch_up(); return *_itb->items[_offset].p; }
+        value_type *operator->() noexcept { _catch_up(); return _itb->items[_offset].p; }
       };
       typedef iterator const_iterator; // FIXME
       // local_iterator
@@ -522,12 +522,12 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
     private:
       // FIXME Awaiting implementation
       concurrent_unordered_map(const concurrent_unordered_map &);
-      concurrent_unordered_map(concurrent_unordered_map &&) BOOST_NOEXCEPT;
+      concurrent_unordered_map(concurrent_unordered_map &&) noexcept;
       concurrent_unordered_map &operator=(const concurrent_unordered_map &);
-      concurrent_unordered_map &operator=(concurrent_unordered_map &&) BOOST_NOEXCEPT;
+      concurrent_unordered_map &operator=(concurrent_unordered_map &&) noexcept;
     public:
       //! Slow call returning if a map is empty. Average time is O(bucket count/item count/2)
-      bool empty() const BOOST_NOEXCEPT
+      bool empty() const noexcept
       {
         bool done;
         do
@@ -549,7 +549,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         return true;
       }
       //! Even slower call returning the number of items in the map. Average time is O(bucket count)
-      size_type size() const BOOST_NOEXCEPT
+      size_type size() const noexcept
       {
         size_type ret;
         bool done;
@@ -571,15 +571,15 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         } while(!done);
         return ret;
       }
-      size_type max_size() const BOOST_NOEXCEPT { return (size_type) -1; }
-      iterator begin() BOOST_NOEXCEPT { return iterator(this); }
-      const_iterator begin() const BOOST_NOEXCEPT { return const_iterator(this); }
-      const_iterator cbegin() const BOOST_NOEXCEPT { return const_iterator(this); }
-      iterator end() BOOST_NOEXCEPT { return iterator(this, nullptr); }
-      const_iterator end() const BOOST_NOEXCEPT { return const_iterator(this, nullptr); }
-      const_iterator cend() const BOOST_NOEXCEPT { return const_iterator(this, nullptr); }
+      size_type max_size() const noexcept { return (size_type) -1; }
+      iterator begin() noexcept { return iterator(this); }
+      const_iterator begin() const noexcept { return const_iterator(this); }
+      const_iterator cbegin() const noexcept { return const_iterator(this); }
+      iterator end() noexcept { return iterator(this, nullptr); }
+      const_iterator end() const noexcept { return const_iterator(this, nullptr); }
+      const_iterator cend() const noexcept { return const_iterator(this, nullptr); }
     private:
-      template<class C> void _find(const key_type &k, C &&c) BOOST_NOEXCEPT
+      template<class C> void _find(const key_type &k, C &&c) noexcept
       {
         size_t h=_hasher(k);
         bool done=false;
@@ -615,7 +615,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         } while(!done);
       }
     public:
-      iterator find(const key_type &k) BOOST_NOEXCEPT
+      iterator find(const key_type &k) noexcept
       {
         iterator ret=end();
         _find(k, [&](typename buckets_type::iterator &itb, size_t offset, item_type *i){
@@ -625,7 +625,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         });
         return ret;
       }
-      const_iterator find(const key_type &k) const BOOST_NOEXCEPT { return const_cast<concurrent_unordered_map *>(this)->find(k); } // FIXME
+      const_iterator find(const key_type &k) const noexcept { return const_cast<concurrent_unordered_map *>(this)->find(k); } // FIXME
       //! Rehash safe way of concurrently accessing a mapped type
       mapped_type &at(const key_type &k)
       {
@@ -683,13 +683,13 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         return *ret;
       }
       //! NOT rehash safe
-      size_type count(const key_type &k) const BOOST_NOEXCEPT { return end()!=find(k) ? 1 : 0; }
-      std::pair<iterator, iterator> equal_range(const key_type &k) BOOST_NOEXCEPT
+      size_type count(const key_type &k) const noexcept { return end()!=find(k) ? 1 : 0; }
+      std::pair<iterator, iterator> equal_range(const key_type &k) noexcept
       {
         iterator it=find(k);
         return std::make_pair(it, it);
       }
-      std::pair<const_iterator, const_iterator> equal_range(const key_type &k) const BOOST_NOEXCEPT
+      std::pair<const_iterator, const_iterator> equal_range(const key_type &k) const noexcept
       {
         const_iterator it=find(k);
         return std::make_pair(it, it);
@@ -828,7 +828,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       }
     public:
       //! Inserts a node ptr if it is possible without allocating memory. Useful for low latency. If iterator is valid, didn't insert due to key collision.
-      std::pair<iterator, bool> insert_noalloc(node_ptr_type &&v) BOOST_NOEXCEPT
+      std::pair<iterator, bool> insert_noalloc(node_ptr_type &&v) noexcept
       {
         return _insert(std::move(v), [](std::pair<iterator, bool> &ret, typename buckets_type::iterator &itb, size_t h, node_ptr_type &&v){ return true; });
       }
@@ -863,10 +863,10 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       }
       template<class... Args> iterator emplace_hint(const_iterator position, Args &&... args) { return emplace(std::forward<Args>(args)...); }
       //! Inserts a value if it is possible without allocating memory. Useful for low latency. If iterator is valid, didn't insert due to key collision.
-      std::pair<iterator, bool> insert_noalloc(const value_type &v) BOOST_NOEXCEPT { return insert_noalloc(value_type(v)); }
+      std::pair<iterator, bool> insert_noalloc(const value_type &v) noexcept { return insert_noalloc(value_type(v)); }
       std::pair<iterator, bool> insert(const value_type &v) { return insert(value_type(v)); }
       //! Move inserts a value if it is possible without allocating memory. Useful for low latency. If iterator is valid, didn't insert due to key collision.
-      std::pair<iterator, bool> insert_noalloc(value_type &&v) BOOST_NOEXCEPT
+      std::pair<iterator, bool> insert_noalloc(value_type &&v) noexcept
       {
         node_ptr_type n(make_node_ptr(std::move(v)));
         auto u=undoer([&]{
@@ -905,7 +905,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       }
       void insert(std::initializer_list<value_type> i) { insert(i.begin(), i.end()); }
       //! Extract a value into its node ptr for later insertion into something else
-      node_ptr_type extract(const_iterator it) BOOST_NOEXCEPT
+      node_ptr_type extract(const_iterator it) noexcept
       {
         //assert(it!=end());
         if(it==end()) return node_ptr_type();
@@ -936,7 +936,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         return former;
       }
       //! Extract a value into its node ptr for later insertion into something else
-      node_ptr_type extract(const key_type &k) BOOST_NOEXCEPT
+      node_ptr_type extract(const key_type &k) noexcept
       {
         size_t h=_hasher(k);
         bool done=false;
@@ -986,33 +986,33 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         return former;
       }
       //! Extract many values as node ptrs for later insertion into something else
-      std::vector<node_ptr_type> extract(const_iterator first, const_iterator last) BOOST_NOEXCEPT
+      std::vector<node_ptr_type> extract(const_iterator first, const_iterator last) noexcept
       {
         std::vector<node_ptr_type> ret;
         for(; first!=last; ++first)
           ret.push_back(extract(first));
         return ret;
       }
-      iterator erase(const_iterator it) BOOST_NOEXCEPT
+      iterator erase(const_iterator it) noexcept
       {
         iterator ret(it);
         ++ret;
         node_ptr_type e=extract(it);
         return e ? ret : end();
       }
-      size_type erase(const key_type &k) BOOST_NOEXCEPT
+      size_type erase(const key_type &k) noexcept
       {
         node_ptr_type e=extract(k);
         return e ? 1 : 0;
       }
-      iterator erase(const_iterator first, const_iterator last) BOOST_NOEXCEPT
+      iterator erase(const_iterator first, const_iterator last) noexcept
       {
         while(first!=last)
           first=erase(first);
         return last;
       }
 
-      void clear() BOOST_NOEXCEPT
+      void clear() noexcept
       {
         bool done;
         do
@@ -1040,7 +1040,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
           atomic_thread_fence(memory_order_release);
         } while(!done);
       }
-      void swap(concurrent_unordered_map &o) BOOST_NOEXCEPT
+      void swap(concurrent_unordered_map &o) noexcept
       {
         typedef decltype(_rehash_lock) rehash_lock_t;
         typedef decltype(o._rehash_lock) o_rehash_lock_t;
@@ -1110,28 +1110,28 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
           insert(rebind_node_ptr(e));
         }
       }
-      size_type bucket_count() const BOOST_NOEXCEPT { return _buckets.load(memory_order_consume)->size(); }
-      size_type max_bucket_count() const BOOST_NOEXCEPT { return _buckets.load(memory_order_consume)->max_size(); }
-      size_type bucket_size(size_type n) const BOOST_NOEXCEPT
+      size_type bucket_count() const noexcept { return _buckets.load(memory_order_consume)->size(); }
+      size_type max_bucket_count() const noexcept { return _buckets.load(memory_order_consume)->max_size(); }
+      size_type bucket_size(size_type n) const noexcept
       {
         buckets_type &buckets=*_buckets.load(memory_order_consume);
         bucket_type &b=buckets[n];
         return b.items.count.load(memory_order_relaxed);
       }
-      size_type bucket(const key_type &k) const BOOST_NOEXCEPT
+      size_type bucket(const key_type &k) const noexcept
       {
         buckets_type &buckets=*_buckets.load(memory_order_consume);
         return _hasher(k) % buckets.size();
       }
-      float load_factor() const BOOST_NOEXCEPT { return (float) size()/bucket_count(); }
-      float max_load_factor() const BOOST_NOEXCEPT { return _max_load_factor; }
-      void max_load_factor(float m) BOOST_NOEXCEPT { _max_load_factor=m; }
+      float load_factor() const noexcept { return (float) size()/bucket_count(); }
+      float max_load_factor() const noexcept { return _max_load_factor; }
+      void max_load_factor(float m) noexcept { _max_load_factor=m; }
       //! The minimum number of empty spaces in a bucket, thus avoiding an allocation on first insert. You need to rehash after setting this.
-      size_t min_bucket_capacity() const BOOST_NOEXCEPT { return _min_bucket_capacity; }
+      size_t min_bucket_capacity() const noexcept { return _min_bucket_capacity; }
       //! The minimum number of empty spaces in a bucket, thus avoiding an allocation on first insert. You need to rehash after setting this.
       void min_bucket_capacity(size_t n) { _min_bucket_capacity=n; }
     private:
-      static void _reset_buckets(buckets_type &buckets) BOOST_NOEXCEPT
+      static void _reset_buckets(buckets_type &buckets) noexcept
       {
         for(auto &b : buckets)
         {
@@ -1303,7 +1303,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       }
       hasher hash_function() const { return _hasher; }
       key_equal key_eq() const { return _key_equal; }
-      allocator_type get_allocator() const BOOST_NOEXCEPT { return _allocator; }
+      allocator_type get_allocator() const noexcept { return _allocator; }
       void dump_buckets(std::ostream &s) const
       {
         buckets_type &buckets=*_buckets.load(memory_order_consume);
