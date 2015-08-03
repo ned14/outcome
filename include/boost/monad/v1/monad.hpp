@@ -421,8 +421,6 @@ namespace traits
 
 }
 
-namespace lightweight_futures
-{
   namespace detail
   {
 #ifdef __cpp_generic_lambdas
@@ -465,7 +463,7 @@ namespace lightweight_futures
     exception_present = 3,  //!< Attempt to fetch an error state when the monad is in an exceptioned state
   };
 
-  namespace detail
+  namespace _detail
   {
     class monad_category : public std::error_category
     {
@@ -488,9 +486,9 @@ namespace lightweight_futures
   of one of these may not be constant throughout the process as per the ISO spec.
   \ingroup monad
   */
-  inline const detail::monad_category &monad_category()
+  inline const _detail::monad_category &monad_category()
   {
-    static detail::monad_category c;
+    static _detail::monad_category c;
     return c;
   }
 
@@ -516,19 +514,18 @@ namespace lightweight_futures
   }
 
   template<class Impl> class basic_monad;
-}
+
 BOOST_MONAD_V1_NAMESPACE_END
 
 namespace std
 {
   //! \brief Tells the STL this is an error code enum \ingroup monad
-  template<> struct is_error_code_enum<BOOST_MONAD_V1_NAMESPACE::lightweight_futures::monad_errc> : std::true_type {};
+  template<> struct is_error_code_enum<BOOST_MONAD_V1_NAMESPACE::monad_errc> : true_type {};
   //! \brief Tells the STL this is an error condition enum \ingroup monad
-  template<> struct is_error_condition_enum<BOOST_MONAD_V1_NAMESPACE::lightweight_futures::monad_errc> : std::true_type {};
+  template<> struct is_error_condition_enum<BOOST_MONAD_V1_NAMESPACE::monad_errc> : true_type {};
 }
 
 BOOST_MONAD_V1_NAMESPACE_BEGIN
-namespace lightweight_futures {
   
   using tribool::true_;
   using tribool::false_;
@@ -1463,13 +1460,12 @@ namespace lightweight_futures {
   //! \brief Makes an empty option of type T \ingroup monad
   template<class T> option<T> make_option() { return option<T>(); }
 
-}
 BOOST_MONAD_V1_NAMESPACE_END
 
 namespace std
 {
   //! \brief Specialise swap for basic_monad \ingroup monad
-  template<class Impl> inline void swap(BOOST_MONAD_V1_NAMESPACE::lightweight_futures::basic_monad<Impl> &a, BOOST_MONAD_V1_NAMESPACE::lightweight_futures::basic_monad<Impl> &b)
+  template<class Impl> inline void swap(BOOST_MONAD_V1_NAMESPACE::basic_monad<Impl> &a, BOOST_MONAD_V1_NAMESPACE::basic_monad<Impl> &b)
   {
     a.swap(b);
   }

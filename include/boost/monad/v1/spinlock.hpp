@@ -65,11 +65,15 @@ DEALINGS IN THE SOFTWARE.
 #endif
 
 /*! \file spinlock.hpp
-\brief Provides boost.spinlock
+\brief Provides a Lockable policy driven spinlock
 */
 
 /*! \mainpage
-This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing interesting spinlock related things.
+This is the proposed Boost.Monad library, a Boost C++ 11 library providing:
+- spinlock, a policy driven Lockable spinlock with constexpr extensions.
+- tribool, a constexpr C++ 11 tribool.
+- basic_monad, a factory and family of policy driven lightweight monads.
+- basic_future, a factory and family of policy driven lightweight non-allocating constexpr futures.
 */
 
 #if SPINLOCK_STANDALONE 

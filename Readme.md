@@ -38,17 +38,18 @@ is done.
  - [x] Implement N4399 continuations for shared_future.
  - [x] Implement wait_for()/wait_until().
  - [x] when_all composure.
- - [ ] Rename github to Boost.Monad.
- - [ ] Add when_all_p() to complement when_all() with error propagation.
- - [ ] Replace all BOOST_CONSTEXPR and BOOST_STATIC_CONSTEXPR with constexpr.
- - [ ] Port AFIO's intrusive enqueued_task into a lightweight packaged_task design.
+ - [x] Rename github to Boost.Monad.
+ - [x] Replace all BOOST_CONSTEXPR and BOOST_STATIC_CONSTEXPR with constexpr.
+ - [ ] Fully Boost.APIBind the library in order to get Boost.AFIO compiling again.
 
 Later:
  - [ ] when_any composure.
+ - [ ] Add when_all_p() to complement when_all() with error propagation.
+ - [ ] Port AFIO's intrusive enqueued_task into a lightweight packaged_task design.
  - [ ] Loosen explicit basic_monad constructors to allow option => result => monad implicitly, and
 monad => result => option explicitly (with potential exception throwing).
  - [ ] Pack bools in basic_promise_future_storage into value_storage_impl, thus saving 8 bytes
- - [ ] Add C++ 1z coroutines support
+ - [ ] Add testing of C++ 1z coroutines support
  - [ ] Add Boost.Fiber support
  - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
  - [ ] Add tribool logic programming operator overloads

@@ -138,6 +138,7 @@ namespace lightweight_futures {
   
   namespace detail
   {
+    using namespace BOOST_MONAD_V1_NAMESPACE::detail;
     template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct basic_promise_future_storage;
     template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct basic_promise_storage;
     template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> using basic_future_storage = basic_promise_future_storage<_value_type, _error_type, _exception_type, _wait_implementation>;

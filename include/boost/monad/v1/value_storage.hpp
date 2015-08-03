@@ -50,7 +50,6 @@ DEALINGS IN THE SOFTWARE.
 */
 
 BOOST_MONAD_V1_NAMESPACE_BEGIN
-namespace lightweight_futures {
 
   //! \brief Specialise to indicate that this type should use the single byte storage layout. You get six bits of storage.
   template<class _value_type> struct enable_single_byte_value_storage : std::false_type { };
@@ -405,15 +404,14 @@ namespace lightweight_futures {
     }
   };
 
-}
 BOOST_MONAD_V1_NAMESPACE_END
 
 namespace std
 {
   //! \brief Deserialise a value_storage value_type (only value_type) \ingroup monad
-  template<class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, BOOST_MONAD_V1_NAMESPACE::lightweight_futures::value_storage<_value_type, _error_type, _exception_type> &v)
+  template<class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, BOOST_MONAD_V1_NAMESPACE::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
+    using namespace BOOST_MONAD_V1_NAMESPACE;
     switch (v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::value:
@@ -424,9 +422,9 @@ namespace std
     return s;
   }
   //! \brief Serialise a value_storage. Mostly useful for debug printing. \ingroup monad
-  template<class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const BOOST_MONAD_V1_NAMESPACE::lightweight_futures::value_storage<_value_type, _error_type, _exception_type> &v)
+  template<class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const BOOST_MONAD_V1_NAMESPACE::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
+    using namespace BOOST_MONAD_V1_NAMESPACE;
     switch (v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::empty:
