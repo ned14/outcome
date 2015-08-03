@@ -38,6 +38,8 @@ is done.
  - [x] Implement N4399 continuations for shared_future.
  - [x] Implement wait_for()/wait_until().
  - [x] when_all composure.
+ - [ ] Rename github to Boost.Monad.
+ - [ ] Add when_all_p() to complement when_all() with error propagation.
  - [ ] Replace all BOOST_CONSTEXPR and BOOST_STATIC_CONSTEXPR with constexpr.
  - [ ] Port AFIO's intrusive enqueued_task into a lightweight packaged_task design.
 
