@@ -29,8 +29,8 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef BOOST_SPINLOCK_HPP
-#define BOOST_SPINLOCK_HPP
+#ifndef BOOST_MONAD_SPINLOCK_HPP
+#define BOOST_MONAD_SPINLOCK_HPP
 
 #include <assert.h>
 #include <vector>
@@ -73,12 +73,12 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 */
 
 #if SPINLOCK_STANDALONE 
-#include "bindlib/include/boost/config.hpp"
+#include "../bindlib/include/boost/config.hpp"
 #else
 #include "boost/config.hpp"
 #endif
 
-#include "bindlib/include/import.h"
+#include "../bindlib/include/import.h"
 
 #if ! defined BOOST_SPINLOCK_CONSTEXPR
 # ifdef __cpp_constexpr
@@ -152,10 +152,10 @@ This is the proposed Boost.Spinlock library, a Boost C++ 11 library providing in
 #define BOOST_STL11_MUTEX_MAP_NAMESPACE_END           BOOST_BINDLIB_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline))
 #define BOOST_STL11_THREAD_MAP_NAMESPACE_BEGIN        BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_SPINLOCK_V1, (stl11, inline))
 #define BOOST_STL11_THREAD_MAP_NAMESPACE_END          BOOST_BINDLIB_NAMESPACE_END  (BOOST_SPINLOCK_V1, (stl11, inline))
-#include BOOST_BINDLIB_INCLUDE_STL11(bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, atomic)
-#include BOOST_BINDLIB_INCLUDE_STL11(bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, chrono)
-#include BOOST_BINDLIB_INCLUDE_STL11(bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, mutex)
-#include BOOST_BINDLIB_INCLUDE_STL11(bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, thread)
+#include BOOST_BINDLIB_INCLUDE_STL11(../bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, atomic)
+#include BOOST_BINDLIB_INCLUDE_STL11(../bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, chrono)
+#include BOOST_BINDLIB_INCLUDE_STL11(../bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, mutex)
+#include BOOST_BINDLIB_INCLUDE_STL11(../bindlib, BOOST_SPINLOCK_V1_STL11_IMPL, thread)
 
 // For dump
 #include <ostream>

@@ -33,12 +33,12 @@ DEALINGS IN THE SOFTWARE.
 #define _CRT_SECURE_NO_WARNINGS 1
 
 #define BOOST_CATCH_CUSTOM_MAIN_DEFINED
-#include "../include/boost/spinlock/spinlock.hpp"
-#include "../include/boost/spinlock/bindlib/include/boost/test/unit_test.hpp"
+#include "../include/boost/monad/spinlock.hpp"
+#include "../include/boost/monad/bindlib/include/boost/test/unit_test.hpp"
 #include "timing.h"
 //#include "../include/boost/spinlock/concurrent_unordered_map.hpp"
-#include "../include/boost/spinlock/future.hpp"
-#include "../include/boost/spinlock/tribool.hpp"
+#include "../include/boost/monad/future.hpp"
+#include "../include/boost/monad/tribool.hpp"
 
 #include <stdio.h>
 #include <unordered_map>

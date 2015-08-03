@@ -1,4 +1,4 @@
-[submodule "include/boost/spinlock/bindlib"]
-	path = include/boost/spinlock/bindlib
+[submodule "include/boost/monad/bindlib"]
+	path = include/boost/monad/bindlib
 	url = https://github.com/ned14/Boost.APIBind.git
         branch = master

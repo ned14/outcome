@@ -33,7 +33,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = boost.spinlock
+PROJECT_NAME           = boost.monad
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -765,10 +765,10 @@ WARN_LOGFILE           = doxy_warnings.txt
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = \
-                         include/boost/spinlock/future.hpp \
-                         include/boost/spinlock/monad.hpp \
-                         include/boost/spinlock/spinlock.hpp \
-                         include/boost/spinlock/tribool.hpp
+                         include/boost/monad/v1/future.hpp \
+                         include/boost/monad/v1/monad.hpp \
+                         include/boost/monad/v1/spinlock.hpp \
+                         include/boost/monad/v1/tribool.hpp
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -877,7 +877,7 @@ EXCLUDE_SYMBOLS        =
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           = test example include/boost/spinlock include/boost/spinlock/detail
+EXAMPLE_PATH           = test example include/boost/monad include/boost/monad/detail
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and
@@ -2035,9 +2035,9 @@ PREDEFINED             = DOXYGEN_IS_IN_THE_HOUSE=1 \
     BOOST_STATIC_CONSTEXPR=static constexpr \
     BOOST_NOEXCEPT=noexcept \
     BOOST_NOEXCEPT_IF(a)=noexcept(a) \
-    BOOST_SPINLOCK_V1_NAMESPACE_BEGIN="namespace boost { namespace spinlock {" \
-    BOOST_SPINLOCK_V1_NAMESPACE_END="} }" \
-    BOOST_SPINLOCK_MONAD_ENABLE_OPERATORS=1
+    BOOST_MONAD_V1_NAMESPACE_BEGIN="namespace boost { namespace monad {" \
+    BOOST_MONAD_V1_NAMESPACE_END="} }" \
+    BOOST_MONAD_ENABLE_OPERATORS=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
