@@ -68,7 +68,7 @@ namespace detail
       {
 #ifdef BOOST_MONAD_MONAD_POLICY_ERROR_TYPE
         if(monad_storage::has_error())
-          throw std::system_error(monad_storage::_storage.error);
+          throw stl11::system_error(monad_storage::_storage.error);
 #endif
 #ifdef BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE
         if(monad_storage::has_exception())
@@ -116,7 +116,7 @@ namespace detail
       if(!monad_storage::has_error() && !monad_storage::has_exception())
         return exception_type();
       if(monad_storage::has_error())
-        return std::make_exception_ptr(std::system_error(monad_storage::_storage.error));
+        return std::make_exception_ptr(stl11::system_error(monad_storage::_storage.error));
       if(monad_storage::has_exception())
         return monad_storage::_storage.exception;
       return exception_type();
@@ -145,7 +145,7 @@ namespace detail
       {
 #ifdef BOOST_MONAD_MONAD_POLICY_ERROR_TYPE
         if(monad_storage::has_error())
-          throw std::system_error(monad_storage::_storage.error);
+          throw stl11::system_error(monad_storage::_storage.error);
 #endif
 #ifdef BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE
         if(monad_storage::has_exception())
@@ -189,7 +189,7 @@ namespace detail
       if(!monad_storage::has_error() && !monad_storage::has_exception())
         return exception_type();
       if(monad_storage::has_error())
-        return std::make_exception_ptr(std::system_error(monad_storage::_storage.error));
+        return std::make_exception_ptr(stl11::system_error(monad_storage::_storage.error));
       if(monad_storage::has_exception())
         return monad_storage::_storage.exception;
       return exception_type();

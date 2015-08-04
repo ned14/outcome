@@ -75,9 +75,9 @@ namespace detail
       switch(ec)
       {
         case monad_errc::already_set:
-          throw std::future_error(std::future_errc::promise_already_satisfied);
+          throw stl11::future_error(stl11::future_errc::promise_already_satisfied);
         case monad_errc::no_state:
-          throw std::future_error(std::future_errc::no_state);
+          throw stl11::future_error(stl11::future_errc::no_state);
         default:
           abort();
       }
@@ -97,9 +97,9 @@ namespace detail
         {
           auto &category=this->_storage.error.category();
           //! \todo Is there any way of making which exception type to throw from an error_category user extensible? Seems daft this isn't in the STL :(
-          if(category==std::future_category())
+          if(category==stl11::future_category())
           {
-            std::future_error e(this->_storage.error);
+            stl11::future_error e(this->_storage.error);
             this->clear();
             throw e;
           }
@@ -112,7 +112,7 @@ namespace detail
 #ifdef BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE
           else
           {
-            std::system_error e(this->_storage.error);
+            stl11::system_error e(this->_storage.error);
             this->clear();
             throw e;
           }
@@ -166,7 +166,7 @@ namespace detail
         return exception_type();
       if(this->has_error())
       {
-        exception_type e(std::make_exception_ptr(std::system_error(this->_storage.error)));
+        exception_type e(std::make_exception_ptr(stl11::system_error(this->_storage.error)));
         this->clear();
         return e;
       }
@@ -200,9 +200,9 @@ namespace detail
       switch(ec)
       {
         case monad_errc::already_set:
-          throw std::future_error(std::future_errc::promise_already_satisfied);
+          throw stl11::future_error(stl11::future_errc::promise_already_satisfied);
         case monad_errc::no_state:
-          throw std::future_error(std::future_errc::no_state);
+          throw stl11::future_error(stl11::future_errc::no_state);
         default:
           abort();
       }
@@ -224,9 +224,9 @@ namespace detail
         {
           auto &category=this->_storage.error.category();
           //! \todo Is there any way of making which exception type to throw from an error_category user extensible? Seems daft this isn't in the STL :(
-          if(category==std::future_category())
+          if(category==stl11::future_category())
           {
-            std::future_error e(this->_storage.error);
+            stl11::future_error e(this->_storage.error);
             throw e;
           }
           /*else if(category==std::iostream_category())
@@ -237,7 +237,7 @@ namespace detail
 #ifdef BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE
           else
           {
-            std::system_error e(this->_storage.error);
+            stl11::system_error e(this->_storage.error);
             throw e;
           }
 #endif
@@ -284,7 +284,7 @@ namespace detail
         return exception_type();
       if(this->has_error())
       {
-        exception_type e(std::make_exception_ptr(std::system_error(this->_storage.error)));
+        exception_type e(std::make_exception_ptr(stl11::system_error(this->_storage.error)));
         return e;
       }
       if(this->has_exception())
@@ -320,7 +320,7 @@ namespace detail
     using exception_type = void;
 #endif
     // The wait implementation to use for waits and timed waits
-    using wait_implementation = detail::stl_wait_implementation<std::promise<void>, std::future<void>>;
+    using wait_implementation = detail::stl_wait_implementation<stl11::promise<void>, stl11::future<void>>;
     // Future.get() locks, so define our own monad base type.
     using base = BOOST_MONAD_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
     using other_base = BOOST_MONAD_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
@@ -332,13 +332,13 @@ namespace detail
     // Is this future managed by shared_basic_future_ptr?
     static constexpr bool is_shared=false;
     // The type of future_errc to use for issuing errors
-    using future_errc = std::future_errc;
+    using future_errc = stl11::future_errc;
     // The type of future exception to use for issuing exceptions
-    using future_error = std::future_error;
+    using future_error = stl11::future_error;
     // The type of future status to use
-    using future_status = std::future_status;
+    using future_status = stl11::future_status;
     // The category of error code to use
-    static const std::error_category &future_category() noexcept { return std::future_category(); }
+    static const stl11::error_category &future_category() noexcept { return stl11::future_category(); }
     // How many spins of yield to do waiting to be signalled before allocating a wait_implementation
     static constexpr size_t wait_spin_count = 1000;
   };
@@ -359,7 +359,7 @@ namespace detail
     using exception_type = void;
 #endif
     // The wait implementation to use for waits and timed waits
-    using wait_implementation = detail::stl_wait_implementation<std::promise<void>, std::future<void>>;
+    using wait_implementation = detail::stl_wait_implementation<stl11::promise<void>, stl11::future<void>>;
     // Future.get() locks, so define our own monad base type.
     using base = BOOST_MONAD_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
     using other_base = BOOST_MONAD_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
@@ -371,13 +371,13 @@ namespace detail
     // Is this future managed by shared_basic_future_ptr?
     static constexpr bool is_shared=true;
     // The type of future_errc to use for issuing errors
-    using future_errc = std::future_errc;
+    using future_errc = stl11::future_errc;
     // The type of future exception to use for issuing exceptions
-    using future_error = std::future_error;
+    using future_error = stl11::future_error;
     // The type of future status to use
-    using future_status = std::future_status;
+    using future_status = stl11::future_status;
     // The category of error code to use
-    static const std::error_category &future_category() noexcept { return std::future_category(); }
+    static const stl11::error_category &future_category() noexcept { return stl11::future_category(); }
     // How many spins of yield to do waiting to be signalled before allocating a wait_implementation
     static constexpr size_t wait_spin_count = 1000;
   };

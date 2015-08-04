@@ -2,6 +2,9 @@
 
 */
 
+#ifndef TIMING_H
+#define TIMING_H
+
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -38,4 +41,5 @@ static usCount GetUsCount()
 	return ((usCount) tv.tv_sec*1000000000000LL)+tv.tv_usec*1000000LL;
 #endif
 }
+#endif
 #endif

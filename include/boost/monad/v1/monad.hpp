@@ -467,7 +467,7 @@ namespace traits
 
   namespace _detail
   {
-    class monad_category : public std::error_category
+    class monad_category : public stl11::error_category
     {
     public:
       virtual const char *name() const noexcept { return "basic_monad"; }
@@ -497,35 +497,45 @@ namespace traits
   //! \brief A monad exception object \ingroup monad
   class BOOST_SYMBOL_VISIBLE monad_error : public std::logic_error
   {
-    std::error_code _ec;
+    stl11::error_code _ec;
   public:
-    monad_error(std::error_code ec) : std::logic_error(ec.message()), _ec(std::move(ec)) { }
-    const std::error_code &code() const noexcept { return _ec; }
+    monad_error(stl11::error_code ec) : std::logic_error(ec.message()), _ec(std::move(ec)) { }
+    const stl11::error_code &code() const noexcept { return _ec; }
   };
 
   //! \brief ADL looked up by the STL to convert a monad_errc into an error_code. \ingroup monad
-  inline std::error_code make_error_code(monad_errc e)
+  inline stl11::error_code make_error_code(monad_errc e)
   {
-    return std::error_code(static_cast<int>(e), monad_category());
+    return stl11::error_code(static_cast<int>(e), monad_category());
   }
 
   //! \brief ADL looked up by the STL to convert a monad_errc into an error_condition. \ingroup monad
-  inline std::error_condition make_error_condition(monad_errc e)
+  inline stl11::error_condition make_error_condition(monad_errc e)
   {
-    return std::error_condition(static_cast<int>(e), monad_category());
+    return stl11::error_condition(static_cast<int>(e), monad_category());
   }
 
   template<class Impl> class basic_monad;
 
 BOOST_MONAD_V1_NAMESPACE_END
 
+#if BOOST_MONAD_USE_BOOST_THREAD
+namespace boost { namespace system
+{
+  //! \brief Tells the STL this is an error code enum \ingroup monad
+  template<> struct is_error_code_enum<BOOST_MONAD_V1_NAMESPACE::monad_errc> : std::true_type {};
+  //! \brief Tells the STL this is an error condition enum \ingroup monad
+  template<> struct is_error_condition_enum<BOOST_MONAD_V1_NAMESPACE::monad_errc> : std::true_type {};
+} }
+#else
 namespace std
 {
   //! \brief Tells the STL this is an error code enum \ingroup monad
-  template<> struct is_error_code_enum<BOOST_MONAD_V1_NAMESPACE::monad_errc> : true_type {};
+  template<> struct is_error_code_enum<BOOST_MONAD_V1_NAMESPACE::monad_errc> : std::true_type {};
   //! \brief Tells the STL this is an error condition enum \ingroup monad
-  template<> struct is_error_condition_enum<BOOST_MONAD_V1_NAMESPACE::monad_errc> : true_type {};
+  template<> struct is_error_condition_enum<BOOST_MONAD_V1_NAMESPACE::monad_errc> : std::true_type {};
 }
+#endif
 
 BOOST_MONAD_V1_NAMESPACE_BEGIN
   
@@ -1416,11 +1426,11 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
     };
   }
 #define BOOST_MONAD_MONAD_NAME monad
-#define BOOST_MONAD_MONAD_POLICY_ERROR_TYPE std::error_code
+#define BOOST_MONAD_MONAD_POLICY_ERROR_TYPE stl11::error_code
 #define BOOST_MONAD_MONAD_POLICY_EXCEPTION_TYPE std::exception_ptr
 #include "detail/monad_policy.ipp"
 #define BOOST_MONAD_MONAD_NAME result
-#define BOOST_MONAD_MONAD_POLICY_ERROR_TYPE std::error_code
+#define BOOST_MONAD_MONAD_POLICY_ERROR_TYPE stl11::error_code
 #include "detail/monad_policy.ipp"
 #define BOOST_MONAD_MONAD_NAME option
 #include "detail/monad_policy.ipp"

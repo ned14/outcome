@@ -35,7 +35,6 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_MONAD_FUTURE_H
 
 #include "monad.hpp"
-#include <future>
 
 /*! \file future.hpp
 \brief Provides a lightweight next generation future with N4399 Concurrency TS extensions
@@ -1102,18 +1101,18 @@ namespace lightweight_futures {
       }, true);
     }
     //! \brief SYNC POINT (if non-zero duration) Wait for the future to become ready for a duration
-    template<class R, class P> future_status wait_for(const std::chrono::duration<R, P> &rel_time) const
+    template<class R, class P> future_status wait_for(const stl11::chrono::duration<R, P> &rel_time) const
     {
 #if !BOOST_MONAD_IN_THREAD_SANITIZER
       if (rel_time.count() == 0)
         return this->is_ready() ? future_status::ready : future_status::timeout;
 #endif
-      std::chrono::time_point<std::chrono::steady_clock> point(std::chrono::steady_clock::now());
+      auto point(stl11::chrono::steady_clock::now());
       point += rel_time;
       return wait_until(point);
     }
     //! \brief SYNC POINT Wait for the future to become ready until a deadline
-    template<class C, class D> future_status wait_until(const std::chrono::time_point<C, D> &abs_time) const
+    template<class C, class D> future_status wait_until(const stl11::chrono::time_point<C, D> &abs_time) const
     {
       return _wait([&abs_time](std::shared_ptr<typename implementation_policy::wait_implementation> &waiter) {
         return waiter->wait_until(abs_time)==future_status::timeout;
@@ -1361,7 +1360,7 @@ namespace lightweight_futures {
   }
 
 #define BOOST_MONAD_FUTURE_NAME_POSTFIX 
-#define BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE std::error_code
+#define BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE stl11::error_code
 #define BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE std::exception_ptr
 #include "detail/future_policy.ipp"
 #define BOOST_MONAD_FUTURE_NAME_POSTFIX _result
