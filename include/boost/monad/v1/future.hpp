@@ -29,8 +29,10 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef BOOST_MONAD_FUTURE_HPP
-#define BOOST_MONAD_FUTURE_HPP
+#include "config.hpp"
+
+#ifndef BOOST_MONAD_FUTURE_H
+#define BOOST_MONAD_FUTURE_H
 
 #include "monad.hpp"
 #include <future>

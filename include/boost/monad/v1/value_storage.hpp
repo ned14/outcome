@@ -29,21 +29,12 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef BOOST_MONAD_VALUE_STORAGE_HPP
-#define BOOST_MONAD_VALUE_STORAGE_HPP
+#include "config.hpp"
+
+#ifndef BOOST_MONAD_VALUE_STORAGE_H
+#define BOOST_MONAD_VALUE_STORAGE_H
 
 #include "tribool.hpp"
-
-// For some odd reason, VS2015 really hates to do much inlining unless forced
-#ifdef _MSC_VER
-//# pragma inline_depth(255)
-//# pragma inline_recursion(on)
-# define BOOST_MONAD_FUTURE_CXX14_CONSTEXPR BOOST_FORCEINLINE
-# define BOOST_MONAD_FUTURE_MSVC_HELP BOOST_FORCEINLINE
-#else
-# define BOOST_MONAD_FUTURE_CXX14_CONSTEXPR BOOST_CXX14_CONSTEXPR
-# define BOOST_MONAD_FUTURE_MSVC_HELP 
-#endif
 
 /*! \file value_storage.hpp
 \brief Provides a fixed four state variant

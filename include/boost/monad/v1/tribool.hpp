@@ -29,13 +29,12 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef BOOST_MONAD_TRIBOOL_HPP
-#define BOOST_MONAD_TRIBOOL_HPP
+#include "config.hpp"
+
+#ifndef BOOST_MONAD_TRIBOOL_H
+#define BOOST_MONAD_TRIBOOL_H
 
 #include "spinlock.hpp"
-#include <istream>
-#include <ostream>
-#include <algorithm>
 
 /*! \file tribool.hpp
 \brief Provides a constexpr C++ 11 tribool
