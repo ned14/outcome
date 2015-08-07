@@ -37,8 +37,8 @@ DEALINGS IN THE SOFTWARE.
 This is the proposed Boost.Monad library, a Boost C++ 11 library providing:
 - spinlock, a policy driven Lockable spinlock with constexpr extensions.
 - tribool, a constexpr C++ 11 tribool.
-- basic_monad, a factory and family of policy driven lightweight monads.
-- basic_future, a factory and family of policy driven lightweight non-allocating constexpr futures.
+- \ref monad, a factory and family of policy driven lightweight monads.
+- \ref future_promise, a factory and family of policy driven lightweight non-allocating constexpr futures.
 */
 
 #include "config.hpp"
