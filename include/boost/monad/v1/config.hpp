@@ -129,6 +129,10 @@ DEALINGS IN THE SOFTWARE.
 # undef BOOST_MONAD_TRIBOOL_H
 # undef BOOST_MONAD_VALUE_STORAGE_H
 
+// We need to prevent future_category and future_errc being bound in from BOOST_MONAD_USE_BOOST_THREAD
+#define BOOST_STL11_FUTURE_MAP_NO_FUTURE_ERRC
+#define BOOST_STL11_FUTURE_MAP_NO_FUTURE_CATEGORY
+
 #define BOOST_STL11_ATOMIC_MAP_NAMESPACE_BEGIN        BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_MONAD_V1)
 #define BOOST_STL11_ATOMIC_MAP_NAMESPACE_END          BOOST_BINDLIB_NAMESPACE_END  (BOOST_MONAD_V1)
 #define BOOST_STL11_ATOMIC_MAP_NO_ATOMIC_CHAR32_T // missing VS14
@@ -151,6 +155,16 @@ DEALINGS IN THE SOFTWARE.
 #include BOOST_BINDLIB_INCLUDE_STL11(../bindlib, BOOST_MONAD_V1_STL11_IMPL, thread)
 
 BOOST_MONAD_V1_NAMESPACE_BEGIN
+  namespace stl11
+  {
+#if BOOST_MONAD_USE_BOOST_ERROR_CODE
+    using ::boost::future_category;
+    using ::boost::future_errc;
+#else
+    using ::std::future_category;
+    using ::std::future_errc;
+#endif
+  }
   namespace chrono = stl11::chrono;
   namespace this_thread = stl11::this_thread;
   template<class T> using lock_guard = stl11::lock_guard<T>;
