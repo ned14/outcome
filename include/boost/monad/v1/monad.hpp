@@ -519,7 +519,7 @@ namespace traits
 
 BOOST_MONAD_V1_NAMESPACE_END
 
-#if BOOST_MONAD_USE_BOOST_THREAD
+#if BOOST_MONAD_USE_BOOST_ERROR_CODE
 namespace boost { namespace system
 {
   //! \brief Tells the STL this is an error code enum \ingroup monad
