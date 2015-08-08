@@ -43,7 +43,8 @@ This is the proposed Boost.Monad library, a Boost C++ 11 library providing:
 
 #include "config.hpp"
 
-#ifdef BOOST_MONAD_NEED_DEFINE
+#ifndef BOOST_MONAD_SPINLOCK_H
+#define BOOST_MONAD_SPINLOCK_H
 
 BOOST_MONAD_V1_NAMESPACE_BEGIN
 

@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 #endif
 
 #include "../bindlib/include/import.h"
+#include "../bindlib/include/boost/config.hpp"
 
 #ifndef __cpp_alias_templates
 # error Boost.Monad needs template alias support in the compiler

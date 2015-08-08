@@ -67,31 +67,31 @@ namespace tribool
     unknown = 0        //!< Other/Indeterminate/Unknown
   };
   //! \brief Explicit construction from some signed integer. <0 false, >0 true, 0 is other \ingroup tribool
-  BOOST_CONSTEXPR inline tribool make_tribool(int v) noexcept { return v>0 ? tribool::true_ : v<0 ? tribool::false_ : tribool::other; }
+  constexpr inline tribool make_tribool(int v) noexcept { return v>0 ? tribool::true_ : v<0 ? tribool::false_ : tribool::other; }
   //! \brief If tribool is true return false, if tribool is false return true, else return other \ingroup tribool
-  BOOST_CONSTEXPR inline tribool operator ~(tribool v) noexcept { return static_cast<tribool>(-static_cast<signed char>(v)); }
+  constexpr inline tribool operator ~(tribool v) noexcept { return static_cast<tribool>(-static_cast<signed char>(v)); }
   //! \brief If a is true and b is true, return true, if either is false return false, else return other \ingroup tribool
-  BOOST_CONSTEXPR inline tribool operator &(tribool a, tribool b) noexcept { return (a==tribool::true_ && b==tribool::true_) ? tribool::true_ : (a==tribool::false_ || b==tribool::false_) ? tribool::false_ : tribool::other; }
+  constexpr inline tribool operator &(tribool a, tribool b) noexcept { return (a==tribool::true_ && b==tribool::true_) ? tribool::true_ : (a==tribool::false_ || b==tribool::false_) ? tribool::false_ : tribool::other; }
   //! \brief If a is true or b is true, return true, if either is other return other, else return false \ingroup tribool
-  BOOST_CONSTEXPR inline tribool operator |(tribool a, tribool b) noexcept { return (a==tribool::true_ || b==tribool::true_) ? tribool::true_ : (a==tribool::other || b==tribool::other) ? tribool::other : tribool::false_; }
+  constexpr inline tribool operator |(tribool a, tribool b) noexcept { return (a==tribool::true_ || b==tribool::true_) ? tribool::true_ : (a==tribool::other || b==tribool::other) ? tribool::other : tribool::false_; }
 
 //  //! \brief If tribool is false return true, else return false \ingroup tribool
-//  BOOST_CONSTEXPR inline bool operator !(tribool v) noexcept { return a==tribool::false_; }
+//  constexpr inline bool operator !(tribool v) noexcept { return a==tribool::false_; }
   //! \brief If a is true and b is true, return true \ingroup tribool
-  BOOST_CONSTEXPR inline bool operator &&(tribool a, tribool b) noexcept { return (a==tribool::true_ && b==tribool::true_); }
+  constexpr inline bool operator &&(tribool a, tribool b) noexcept { return (a==tribool::true_ && b==tribool::true_); }
   //! \brief If a is true or b is true, return true \ingroup tribool
-  BOOST_CONSTEXPR inline bool operator ||(tribool a, tribool b) noexcept { return (a==tribool::true_ || b==tribool::true_); }
+  constexpr inline bool operator ||(tribool a, tribool b) noexcept { return (a==tribool::true_ || b==tribool::true_); }
 
   //! \brief Return true if tribool is true. \ingroup tribool
-  BOOST_CONSTEXPR inline bool true_(tribool a) noexcept { return a==tribool::true_; }
+  constexpr inline bool true_(tribool a) noexcept { return a==tribool::true_; }
   //! \brief Return true if tribool is true. \ingroup tribool
-  BOOST_CONSTEXPR inline bool false_(tribool a) noexcept { return a==tribool::false_; }
+  constexpr inline bool false_(tribool a) noexcept { return a==tribool::false_; }
   //! \brief Return true if tribool is other/indeterminate/unknown. \ingroup tribool
-  BOOST_CONSTEXPR inline bool other(tribool a) noexcept { return a==tribool::indeterminate; }
+  constexpr inline bool other(tribool a) noexcept { return a==tribool::indeterminate; }
   //! \brief Return true if tribool is other/indeterminate/unknown. \ingroup tribool
-  BOOST_CONSTEXPR inline bool indeterminate(tribool a) noexcept { return a==tribool::indeterminate; }
+  constexpr inline bool indeterminate(tribool a) noexcept { return a==tribool::indeterminate; }
   //! \brief Return true if tribool is other/indeterminate/unknown. \ingroup tribool
-  BOOST_CONSTEXPR inline bool unknown(tribool a) noexcept { return a==tribool::indeterminate; }
+  constexpr inline bool unknown(tribool a) noexcept { return a==tribool::indeterminate; }
 }
 BOOST_MONAD_V1_NAMESPACE_END
 
