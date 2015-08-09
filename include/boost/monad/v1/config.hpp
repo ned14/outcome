@@ -81,7 +81,7 @@ DEALINGS IN THE SOFTWARE.
 #endif
 #if BOOST_MONAD_USE_BOOST_ERROR_CODE
 # define BOOST_MONAD_V1_ERROR_CODE_IMPL boost
-# include "boost/thread/futures/future_error.hpp"
+# include "boost/thread/future.hpp"
 #else
 # define BOOST_MONAD_V1_ERROR_CODE_IMPL std
 #endif
