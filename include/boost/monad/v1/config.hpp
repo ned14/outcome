@@ -81,6 +81,7 @@ DEALINGS IN THE SOFTWARE.
 #endif
 #if BOOST_MONAD_USE_BOOST_ERROR_CODE
 # define BOOST_MONAD_V1_ERROR_CODE_IMPL boost
+# include "boost/thread/futures/future_error.hpp"
 #else
 # define BOOST_MONAD_V1_ERROR_CODE_IMPL std
 #endif
@@ -129,8 +130,9 @@ DEALINGS IN THE SOFTWARE.
 # undef BOOST_MONAD_TRIBOOL_H
 # undef BOOST_MONAD_VALUE_STORAGE_H
 
-// We need to prevent future_category and future_errc being bound in from BOOST_MONAD_USE_BOOST_THREAD
+// We need to prevent future_category, future_errc and future_error being bound in from BOOST_MONAD_USE_BOOST_THREAD
 #define BOOST_STL11_FUTURE_MAP_NO_FUTURE_ERRC
+#define BOOST_STL11_FUTURE_MAP_NO_FUTURE_ERROR
 #define BOOST_STL11_FUTURE_MAP_NO_FUTURE_CATEGORY
 
 #define BOOST_STL11_ATOMIC_MAP_NAMESPACE_BEGIN        BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_MONAD_V1)
@@ -157,12 +159,14 @@ DEALINGS IN THE SOFTWARE.
 BOOST_MONAD_V1_NAMESPACE_BEGIN
   namespace stl11
   {
-#if BOOST_MONAD_USE_BOOST_THREAD
+#if BOOST_MONAD_USE_BOOST_ERROR_CODE
     using ::boost::future_category;
     using ::boost::future_errc;
+    using ::boost::future_error;
 #else
     using ::std::future_category;
     using ::std::future_errc;
+    using ::std::future_error;
 #endif
   }
   namespace chrono = stl11::chrono;
