@@ -157,7 +157,7 @@ DEALINGS IN THE SOFTWARE.
 BOOST_MONAD_V1_NAMESPACE_BEGIN
   namespace stl11
   {
-#if BOOST_MONAD_USE_BOOST_ERROR_CODE
+#if BOOST_MONAD_USE_BOOST_THREAD
     using ::boost::future_category;
     using ::boost::future_errc;
 #else
