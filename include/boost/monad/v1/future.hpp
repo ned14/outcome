@@ -292,7 +292,7 @@ namespace lightweight_futures {
 #pragma warning(pop)
 #endif
       union {
-        bool _detached;                   // Only used by promise
+        bool _future_created;             // Only used by promise
         bool _broken_promise;             // Only used by future
       };                                  // 32 bytes
       union {
@@ -552,30 +552,25 @@ namespace lightweight_futures {
     BOOST_MONAD_FUTURE_MSVC_HELP basic_promise &operator=(basic_promise &&o) noexcept(is_nothrow_move_constructible)
     {
       typename base::lock_guard_type h1(this), h2(&o);
-      if(!this->_detached)
+      this->_storage.clear();
+      if(h1._f)
       {
-        this->_storage.clear();
-        if(h1._f)
-        {
-          h1._f->_broken_promise=true;
-          h1._f->_promise=nullptr;
-        }
-        this->_future=nullptr;
-        this->_detached=true;
-        this->_set_state_info.continuation_future = nullptr;
-        this->_set_state_info.continuation.reset();
-        this->_set_state_info.sleeping_waiters.reset();
+        h1._f->_broken_promise=true;
+        h1._f->_promise=nullptr;
       }
-      if(!o._detached)
-      {
-        this->_storage=std::move(o._storage);
-        this->_future=o._future;
-        o._future=nullptr;
-        if(this->_future)
-          this->_future->_promise=this;
-        this->_detached = o._detached;
-        this->_set_state_info = std::move(o._set_state_info);
-      }
+      this->_future=nullptr;
+      this->_future_created=false;
+      this->_set_state_info.continuation_future = nullptr;
+      this->_set_state_info.continuation.reset();
+      this->_set_state_info.sleeping_waiters.reset();
+
+      this->_storage=std::move(o._storage);
+      this->_future=o._future;
+      o._future=nullptr;
+      if(this->_future)
+        this->_future->_promise=this;
+      this->_future_created = o._future_created;
+      this->_set_state_info = std::move(o._set_state_info);
       return *this;
     }
     basic_promise(const basic_promise &)=delete;
@@ -583,7 +578,7 @@ namespace lightweight_futures {
     //! \brief SYNC POINT Destroys the promise.
     BOOST_MONAD_FUTURE_MSVC_HELP ~basic_promise() noexcept(is_nothrow_destructible)
     {
-      if(!this->_detached)
+      if(this->_future_created && this->_future)
       {
         lock_guard_type h(this);
         if(h._f)
@@ -616,14 +611,11 @@ namespace lightweight_futures {
       }
 #endif
       lock_guard_type h(this);
-      if(h._f || this->_detached)
-        throw future_error(error_type(static_cast<int>(future_errc::future_already_retrieved), future_category()));
+      if(this->_future_created)
+        throw future_error(stl11::error_code(static_cast<int>(future_errc::future_already_retrieved), implementation_policy::future_category()));
       basic_future<implementation_policy> ret;
       if(this->_storage.type!=value_storage_type::storage_type::empty)
-      {
         ret._storage=std::move(this->_storage);
-        this->_detached=true;
-      }
       else
       {
         this->_future=&ret;
@@ -632,6 +624,7 @@ namespace lightweight_futures {
         ret._need_locks=this->_need_locks;
 #endif
       }
+      this->_future_created = true;
       h.unlock();
       return ret;
     }
@@ -639,7 +632,7 @@ namespace lightweight_futures {
     BOOST_MONAD_FUTURE_MSVC_HELP bool has_future() const noexcept
     {
       //detail::lock_guard<value_type> h(this);
-      return this->_future || this->_detached;
+      return this->_future || this->_future_created;
     }
 
   private:
@@ -658,12 +651,6 @@ namespace lightweight_futures {
     template<class U> BOOST_MONAD_FUTURE_MSVC_HELP void _set_state(U &&c, bool is_continuation=false)
     {
       lock_guard_type h(this);
-      if (this->_detached)
-      {
-        if (is_continuation)
-          return;
-        basic_future<implementation_policy>::_throw_error(monad_errc::already_set);
-      }
       if(h._f)
       {
         if(h._f->_storage.type!=value_storage_type::storage_type::empty)
@@ -678,7 +665,6 @@ namespace lightweight_futures {
         // Detach myself from my future
         h._f->_promise=nullptr;
         this->_future=nullptr;
-        this->_detached=true;
         h.unlock();
         // Wake any waiters
         if(state_info.continuation || state_info.sleeping_waiters)
@@ -686,6 +672,13 @@ namespace lightweight_futures {
       }
       else
       {
+        if (this->_future_created)
+        {
+          // Don't throw if setting the future of a continuation which has vanished
+          if (is_continuation)
+            return;
+          basic_future<implementation_policy>::_throw_error(monad_errc::no_state);
+        }
         if(this->_storage.type!=value_storage_type::storage_type::empty)
           basic_future<implementation_policy>::_throw_error(monad_errc::already_set);
         c(this);
@@ -880,9 +873,9 @@ namespace lightweight_futures {
     void _check_validity() const
     {
       if(this->_broken_promise)
-        throw future_error(error_type(static_cast<int>(future_errc::broken_promise), future_category()));
+        throw future_error(stl11::error_code(static_cast<int>(future_errc::broken_promise), implementation_policy::future_category()));
       if(!valid())
-        throw future_error(error_type(static_cast<int>(future_errc::no_state), future_category()));
+        throw future_error(stl11::error_code(static_cast<int>(future_errc::no_state), implementation_policy::future_category()));
     }
     // Called to convert from one type of future into this one. Lock of source is already held.
     template<class U> BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_future(std::nullptr_t, basic_future<U> &&o) : monad_type(static_cast<typename basic_future<U>::monad_type &&>(o))
@@ -930,7 +923,6 @@ namespace lightweight_futures {
         if(this->_promise)
         {
           this->_promise->_future=nullptr;
-          this->_promise->_detached=true;
           this->_promise=nullptr;
         }
       }
@@ -956,7 +948,6 @@ namespace lightweight_futures {
         if(this->_promise)
         {
           this->_promise->_future=nullptr;
-          this->_promise->_detached=true;
           this->_promise=nullptr;
         }
         // Destroy myself before locks exit
@@ -1283,7 +1274,7 @@ namespace lightweight_futures {
         shared_basic_future_ptr(std::forward<basic_future<Impl>>(o).share())
         ) { }
     //! \brief Forwarding constructor
-    template<class U, typename=typename std::enable_if<std::is_constructible<base_future_type, U>::value>::type> shared_basic_future_ptr(U &&o) : shared_basic_future_ptr(base_future_type(std::forward<U>(o)).share()) { }
+    template<class U, typename=typename std::enable_if<std::is_constructible<base_future_type, U>::value>::type> shared_basic_future_ptr(U &&o) : shared_basic_future_ptr(std::make_shared<base_future_type>(std::forward<U>(o))) { }
     //! \brief Forwards to operator bool
     explicit operator bool() const { return _check()->operator bool(); }
     //! \brief Forwards to operator tribool
