@@ -398,6 +398,8 @@ namespace detail
     static constexpr bool is_consuming=false;
     // Is this future managed by shared_basic_future_ptr?
     static constexpr bool is_shared=true;
+    // shared_basic_future_ptr needs to know what promise type to report
+    using promise_type = basic_promise<BOOST_MONAD_FUTURE_POLICY_NAME<R>>;
     // The type of future_errc to use for issuing errors
     using future_errc = stl11::future_errc;
     // The type of future exception to use for issuing exceptions

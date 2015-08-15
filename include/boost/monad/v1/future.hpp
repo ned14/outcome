@@ -1245,7 +1245,7 @@ namespace lightweight_futures {
     //! \brief Whether this future is managed by shared_basic_future_ptr
     static constexpr bool is_shared = base_future_type::is_shared;
     //! \brief The promise type matching this future type
-    using promise_type = typename base_future_type::promise_type;
+    using promise_type = typename base_future_type::policy::promise_type;
     //! \brief This future type
     using future_type = shared_basic_future_ptr;
     //! \brief The future_errc type we use
