@@ -543,7 +543,12 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
   using tribool::false_;
   using tribool::other;
   using tribool::indeterminate;
-  using tribool::unknown;  
+  using tribool::unknown;
+
+  namespace lightweight_futures {
+    template<typename R> class basic_promise;
+    template<typename R> class basic_future;
+  }
 
   namespace detail
   {
@@ -877,6 +882,8 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
     friend typename implementation_policy::template rebind_policy<void>;
     // Allow other implementations of myself unfettered access
     template<class U> friend class basic_monad;
+    // Allow basic_future to directly construct me
+    template<class U> friend class lightweight_futures::basic_future;
     friend inline std::istream &operator>>(std::istream &s, basic_monad &v)
     {
       return s >> v._storage;

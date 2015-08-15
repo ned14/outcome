@@ -1032,6 +1032,7 @@ namespace lightweight_futures {
     //! \brief If contains an exception_type, return the supplied exception_type else return the contained exception_type
     exception_type get_exception_and(exception_type e) const noexcept;
 #else
+    using monad_type::get_state;
     using monad_type::get;
     using monad_type::get_or;
     using monad_type::get_and;
@@ -1043,6 +1044,8 @@ namespace lightweight_futures {
     using monad_type::get_exception_and;
     using monad_type::share;
 #endif
+    //! \brief SYNC POINT Returns by move of the future state a corresponding monad
+    monad<value_type> get_monad() && { return monad<value_type>(std::move(this->get_state())); }
     //! \brief SYNC POINT Compatibility with Boost.Thread
     exception_type get_exception_ptr() { return this->get_exception(); }
     
@@ -1303,6 +1306,10 @@ namespace lightweight_futures {
     //! \brief Forwards to valid()
     BOOST_MONAD_FUTURE_IMPL(valid)
 
+    //! \brief Forwards to get_state()
+    BOOST_MONAD_FUTURE_IMPL(get_state)
+    //! \brief Forwards to get_monad()
+    BOOST_MONAD_FUTURE_IMPL(get_monad)
     //! \brief Forwards to get()
     BOOST_MONAD_FUTURE_IMPL(get)
     //! \brief Forwards to get_or()

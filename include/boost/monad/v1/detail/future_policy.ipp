@@ -83,6 +83,20 @@ namespace detail
       }
     }
   public:
+    BOOST_MONAD_FUTURE_MSVC_HELP typename future_storage::value_storage_type get_state() &
+    {
+      static_cast<implementation_type *>(this)->wait();
+      typename implementation_type::lock_guard_type h(this);
+      static_cast<implementation_type *>(this)->_check_validity();
+      return this->_storage;
+    }    
+    BOOST_MONAD_FUTURE_MSVC_HELP typename future_storage::value_storage_type get_state() &&
+    {
+      static_cast<implementation_type *>(this)->wait();
+      typename implementation_type::lock_guard_type h(this);
+      static_cast<implementation_type *>(this)->_check_validity();
+      return std::move(this->_storage);
+    }    
     // Note we always return value_type by value.
     BOOST_MONAD_FUTURE_MSVC_HELP _value_type get() &
     {
@@ -210,6 +224,20 @@ namespace detail
     // If storage is packed into a byte, it cannot be referenced
     using const_lvalue_type = typename std::conditional<future_storage::value_storage_type::is_referenceable, const typename future_storage::value_type &, _value_type>::type;
   public:
+    BOOST_MONAD_FUTURE_MSVC_HELP typename future_storage::value_storage_type get_state() &
+    {
+      static_cast<implementation_type *>(this)->wait();
+      typename implementation_type::lock_guard_type h(this);
+      static_cast<implementation_type *>(this)->_check_validity();
+      return this->_storage;
+    }    
+    BOOST_MONAD_FUTURE_MSVC_HELP typename future_storage::value_storage_type get_state() &&
+    {
+      static_cast<implementation_type *>(this)->wait();
+      typename implementation_type::lock_guard_type h(this);
+      static_cast<implementation_type *>(this)->_check_validity();
+      return std::move(this->_storage);
+    }    
     // Note we always return value_type by const lvalue ref.
     BOOST_MONAD_FUTURE_MSVC_HELP const_lvalue_type get() const
     {
