@@ -617,7 +617,7 @@ namespace lightweight_futures {
 #endif
       lock_guard_type h(this);
       if(h._f || this->_detached)
-        throw future_error(future_errc::future_already_retrieved);
+        throw future_error(error_type(static_cast<int>(future_errc::future_already_retrieved), future_category()));
       basic_future<implementation_policy> ret;
       if(this->_storage.type!=value_storage_type::storage_type::empty)
       {
@@ -880,9 +880,9 @@ namespace lightweight_futures {
     void _check_validity() const
     {
       if(this->_broken_promise)
-        throw future_error(future_errc::broken_promise);
+        throw future_error(error_type(static_cast<int>(future_errc::broken_promise), future_category()));
       if(!valid())
-        throw future_error(future_errc::no_state);
+        throw future_error(error_type(static_cast<int>(future_errc::no_state), future_category()));
     }
     // Called to convert from one type of future into this one. Lock of source is already held.
     template<class U> BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_future(std::nullptr_t, basic_future<U> &&o) : monad_type(static_cast<typename basic_future<U>::monad_type &&>(o))

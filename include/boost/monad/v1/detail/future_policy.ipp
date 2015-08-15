@@ -75,9 +75,9 @@ namespace detail
       switch(ec)
       {
         case monad_errc::already_set:
-          throw stl11::future_error(stl11::future_errc::promise_already_satisfied);
+          throw stl11::future_error(error_type(static_cast<int>(stl11::future_errc::promise_already_satisfied), stl11::future_category()));
         case monad_errc::no_state:
-          throw stl11::future_error(stl11::future_errc::no_state);
+          throw stl11::future_error(error_type(static_cast<int>(stl11::future_errc::no_state), stl11::future_category()));
         default:
           abort();
       }
@@ -214,9 +214,9 @@ namespace detail
       switch(ec)
       {
         case monad_errc::already_set:
-          throw stl11::future_error(stl11::future_errc::promise_already_satisfied);
+          throw stl11::future_error(error_type(static_cast<int>(stl11::future_errc::promise_already_satisfied), stl11::future_category()));
         case monad_errc::no_state:
-          throw stl11::future_error(stl11::future_errc::no_state);
+          throw stl11::future_error(error_type(static_cast<int>(stl11::future_errc::no_state), stl11::future_category()));
         default:
           abort();
       }
