@@ -674,6 +674,18 @@ namespace lightweight_futures {
       {
         if (this->_future_created)
         {
+          if(this->_set_state_info.continuation_future)
+          {
+            // If my future was created, then someone set continuations and then destroyed
+            // the future, I still need to execute continuations
+            c(this->_set_state_info.continuation_future);
+            // Move locally my continuation and sleep wake info before release locks
+            typename base::set_state_info_t state_info(std::move(this->_set_state_info));
+            h.unlock();
+            // Wake any waiters
+            if(state_info.continuation || state_info.sleeping_waiters)
+              _wake_waiters(state_info);
+          }
           // Don't throw if setting the future of a continuation which has vanished
           if (is_continuation)
             return;
@@ -780,7 +792,15 @@ namespace lightweight_futures {
         }
         catch (...)
         {
-          p.set_exception(std::current_exception());
+          try
+          {
+            p.set_exception(std::current_exception());
+          }
+          catch (const typename future_type::future_error &e)
+          {
+            if (e.code().value() != static_cast<int>(future_type::future_errc::no_state))
+              throw;
+          }
         }
         if (prevcallable)
           prevcallable(self);
@@ -1261,7 +1281,7 @@ namespace lightweight_futures {
     //! \brief Default copy assignment
     shared_basic_future_ptr &operator=(const shared_basic_future_ptr &) = default;
     //! \brief Adopting constructor
-    shared_basic_future_ptr(base_future_type &&o) : shared_basic_future_ptr(o.share()) { }
+    shared_basic_future_ptr(base_future_type &&o) : shared_basic_future_ptr(std::make_shared<base_future_type>(std::move(o))) { }
     //! \brief Adopting constructor
     shared_basic_future_ptr(const base_future_type &o) : shared_basic_future_ptr(o.share()) { }
     //! \brief Adopting assignment
