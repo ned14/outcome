@@ -200,7 +200,7 @@ namespace detail
     BOOST_MONAD_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_MONAD_SHARED_FUTURE_POLICY_NAME<_value_type>>> share()
     {
       using rettype=basic_future<BOOST_MONAD_SHARED_FUTURE_POLICY_NAME<_value_type>>;
-      return shared_basic_future_ptr<rettype>(nullptr, rettype(nullptr, std::move(*static_cast<implementation_type *>(this))));
+      return shared_basic_future_ptr<rettype>(rettype(nullptr, std::move(*static_cast<implementation_type *>(this))));
     }
   };
   
@@ -325,10 +325,7 @@ namespace detail
 #else
     BOOST_MONAD_FUTURE_MSVC_HELP exception_type get_exception() const;
 #endif
-    BOOST_MONAD_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_MONAD_SHARED_FUTURE_POLICY_NAME<_value_type>>> share() const
-    {
-      return shared_basic_future_ptr<basic_future<BOOST_MONAD_SHARED_FUTURE_POLICY_NAME<_value_type>>>(const_cast<implementation_type *>(static_cast<const implementation_type *>(this))->shared_from_this());
-    }
+    BOOST_MONAD_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_MONAD_SHARED_FUTURE_POLICY_NAME<_value_type>>> share() const = delete;
   };
 
   template<typename R> struct BOOST_MONAD_FUTURE_POLICY_NAME

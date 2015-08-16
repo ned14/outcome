@@ -672,19 +672,22 @@ namespace lightweight_futures {
       }
       else
       {
+        // If there once was a future and now there isn't ...
         if (this->_future_created)
         {
-          if(this->_set_state_info.continuation_future)
+          // And are there continuations?
+          if(this->_set_state_info.continuation)
           {
-            // If my future was created, then someone set continuations and then destroyed
-            // the future, I still need to execute continuations
+            future_base_type empty;
+            // If was a shared_future, this will be null
+            if(!this->_set_state_info.continuation_future)
+              this->_set_state_info.continuation_future=&empty;
             c(this->_set_state_info.continuation_future);
             // Move locally my continuation and sleep wake info before release locks
             typename base::set_state_info_t state_info(std::move(this->_set_state_info));
             h.unlock();
             // Wake any waiters
-            if(state_info.continuation || state_info.sleeping_waiters)
-              _wake_waiters(state_info);
+            _wake_waiters(state_info);
           }
           // Don't throw if setting the future of a continuation which has vanished
           if (is_continuation)
@@ -967,6 +970,9 @@ namespace lightweight_futures {
         lock_guard_type h(this);
         if(this->_promise)
         {
+          // If I'm a shared promise, I am the continuation future
+          if (is_shared && this->_promise->_set_state_info.continuation_future == this)
+            this->_promise->_set_state_info.continuation_future = nullptr;
           this->_promise->_future=nullptr;
           this->_promise=nullptr;
         }
@@ -1214,13 +1220,13 @@ namespace lightweight_futures {
     //! \brief The type of future this references
     typedef _future_type base_future_type;
   private:
-    std::shared_ptr<base_future_type> _future;
+    mutable std::shared_ptr<base_future_type> _future;
     base_future_type *_check() const
     {
       if(!_future)
       {
-        if(!base_future_type::_throw_error(monad_errc::no_state))
-          abort();
+        // Technically I don't need to lock here
+        _future=std::make_shared<base_future_type>();
       }
       return _future.get();
     }
@@ -1266,12 +1272,12 @@ namespace lightweight_futures {
     //! \brief The future_status type we use
     using future_status = typename base_future_type::future_status;
 
-    //! \brief Explicit constructor from unshared underlying shared state
-    explicit shared_basic_future_ptr(std::nullptr_t, base_future_type &&p) : _future(std::make_shared<base_future_type>(std::move(p))) { }
-    //! \brief Explicit constructor from shared_ptr
-    explicit shared_basic_future_ptr(std::shared_ptr<base_future_type> &&p) : _future(std::move(p)) { }
+    //! \brief Implicit constructor from unshared underlying shared state
+    shared_basic_future_ptr(base_future_type &&p) : _future(std::make_shared<base_future_type>(std::move(p))) { }
+    // For the .then() infrastructure only
+    shared_basic_future_ptr(base_future_type &p) : _future(std::make_shared<base_future_type>(std::move(p))) { }
     //! \brief Default constructor
-    constexpr shared_basic_future_ptr() : _future(std::make_shared<base_future_type>()) { }
+    constexpr shared_basic_future_ptr() = default;
     //! \brief Default copy constructor
     shared_basic_future_ptr(shared_basic_future_ptr &&) = default;
     //! \brief Default move constructor
@@ -1280,13 +1286,7 @@ namespace lightweight_futures {
     shared_basic_future_ptr &operator=(shared_basic_future_ptr &&) = default;
     //! \brief Default copy assignment
     shared_basic_future_ptr &operator=(const shared_basic_future_ptr &) = default;
-    //! \brief Adopting constructor
-    shared_basic_future_ptr(base_future_type &&o) : shared_basic_future_ptr(std::make_shared<base_future_type>(std::move(o))) { }
-    //! \brief Adopting constructor
-    shared_basic_future_ptr(const base_future_type &o) : shared_basic_future_ptr(o.share()) { }
-    //! \brief Adopting assignment
-    shared_basic_future_ptr &operator=(base_future_type &&o) { _future=std::move(o); return *this; }
-    //! \brief Calls share() on the supplied future
+    //! \brief Converts from another kind of future by calling share() on it
     template<class Impl,
       typename=decltype(std::declval<basic_future<Impl>>().share())
     > shared_basic_future_ptr(basic_future<Impl> &&o)
@@ -1294,7 +1294,7 @@ namespace lightweight_futures {
         shared_basic_future_ptr(std::forward<basic_future<Impl>>(o).share())
         ) { }
     //! \brief Forwarding constructor
-    template<class U, typename=typename std::enable_if<std::is_constructible<base_future_type, U>::value>::type> shared_basic_future_ptr(U &&o) : shared_basic_future_ptr(std::make_shared<base_future_type>(std::forward<U>(o))) { }
+    template<class U, typename=typename std::enable_if<std::is_constructible<base_future_type, U>::value>::type> shared_basic_future_ptr(U &&o) : _future(std::make_shared<base_future_type>(std::forward<U>(o))) { }
     //! \brief Forwards to operator bool
     explicit operator bool() const { return _check()->operator bool(); }
     //! \brief Forwards to operator tribool
@@ -1348,7 +1348,7 @@ namespace lightweight_futures {
     //! \brief Forwards to then()
     template<class F> BOOST_MONAD_FUTURE_MSVC_HELP auto then(F &&f) const -> shared_basic_future_ptr<decltype(_future->then(std::forward<F>(f)))>
     {
-      return shared_basic_future_ptr<decltype(_future->then(std::forward<F>(f)))>(nullptr, _check()->then(std::forward<F>(f)));
+      return shared_basic_future_ptr<decltype(_future->then(std::forward<F>(f)))>(_check()->then(std::forward<F>(f)));
     }
   };
 
