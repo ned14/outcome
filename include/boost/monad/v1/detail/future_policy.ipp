@@ -82,6 +82,7 @@ namespace detail
           abort();
       }
     }
+    using value_type = typename std::conditional<future_storage::value_storage_type::is_referenceable, typename future_storage::value_type, _value_type>::type;
   public:
     BOOST_MONAD_FUTURE_MSVC_HELP typename future_storage::value_storage_type get_state() &
     {
@@ -98,7 +99,7 @@ namespace detail
       return std::move(this->_storage);
     }    
     // Note we always return value_type by value.
-    BOOST_MONAD_FUTURE_MSVC_HELP _value_type get() &
+    BOOST_MONAD_FUTURE_MSVC_HELP value_type get() &
     {
       static_cast<implementation_type *>(this)->wait();
       typename implementation_type::lock_guard_type h(this);
@@ -143,11 +144,11 @@ namespace detail
 #endif
       }
 #endif
-      _value_type v(std::move(this->_storage.value));
+      value_type v(std::move(this->_storage.value));
       this->clear();
       return v;
     }
-    BOOST_MONAD_FUTURE_MSVC_HELP _value_type get() && { return this->get(); }
+    BOOST_MONAD_FUTURE_MSVC_HELP value_type get() && { return this->get(); }
 #ifdef BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE
     BOOST_MONAD_FUTURE_MSVC_HELP error_type get_error() &
     {
