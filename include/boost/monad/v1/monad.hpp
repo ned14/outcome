@@ -1490,4 +1490,9 @@ namespace std
   }
 }
 
+//! \brief Expands into if((m).has_error()) return (m).get_error(); else if((m).has_exception()) return (m).get_exception()
+#define BOOST_MONAD_PROPAGATE(m) if((m).has_error()) return (m).get_error(); else if((m).has_exception()) return (m).get_exception()
+//! \brief Expands into BOOST_MONAD_PROPAGATE(m); auto v((m).get())
+#define BOOST_MONAD_AUTO(v, m) BOOST_MONAD_PROPAGATE(m); auto v((m).get())
+
 #endif
