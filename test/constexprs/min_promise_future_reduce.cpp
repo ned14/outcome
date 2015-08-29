@@ -1,10 +1,10 @@
 #define BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
 
-#include "../../include/boost/spinlock/future.hpp"
+#include "../../include/boost/outcome/future.hpp"
 
 extern BOOST_OUTCOME_NOINLINE int test1()
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   promise<int> p;
   p.set_value(5);
   future<int> f(p.get_future());

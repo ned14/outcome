@@ -1,9 +1,9 @@
-#include "../../include/boost/spinlock/future.hpp"
+#include "../../include/boost/outcome/future.hpp"
 
 extern BOOST_OUTCOME_NOINLINE void test1()
 {
-  using namespace boost::spinlock::lightweight_futures;
-  monad<int> m;
+  using namespace boost::outcome;
+  outcome<int> m;
 }
 extern BOOST_OUTCOME_NOINLINE void test2()
 {

@@ -1066,7 +1066,7 @@ BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
 
 BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   static_assert(std::is_constructible<monad<long>, int>::value, "Sanity check that monad can be constructed from a value_type");
   static_assert(std::is_constructible<monad<monad<long>>, int>::value, "Sanity check that outer monad can be constructed from an inner monad's value_type");
   static_assert(!std::is_constructible<monad<monad<monad<long>>>, int>::value, "Sanity check that outer monad can not be constructed from an inner inner monad's value_type");
@@ -1202,7 +1202,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
 
 BOOST_AUTO_TEST_CASE(works/monad/optional, "Tests that the monad acts as an optional R")
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   using boost::spinlock::tribool::tribool;
   std::cout << "sizeof(monad<bool>) = " << sizeof(monad<bool>) << std::endl;
   std::cout << "sizeof(result<bool>) = " << sizeof(result<bool>) << std::endl;
@@ -1249,7 +1249,7 @@ BOOST_AUTO_TEST_CASE(works/monad/optional, "Tests that the monad acts as an opti
 
 BOOST_AUTO_TEST_CASE(works/monad/fileopen, "Tests that the monad semantically represents opening a file")
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
 
   //! [monad_example]
   auto openfile=[](std::string path) noexcept -> monad<int>
@@ -1288,7 +1288,7 @@ BOOST_AUTO_TEST_CASE(works/monad/fileopen, "Tests that the monad semantically re
 
 BOOST_AUTO_TEST_CASE(works/monad/noexcept, "Tests that the monad correctly inherits noexcept from its type R")
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   {
     typedef monad<int> type;
     std::cout << "monad<int> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
@@ -1360,7 +1360,7 @@ BOOST_AUTO_TEST_CASE(works/monad/noexcept, "Tests that the monad correctly inher
 
 BOOST_AUTO_TEST_CASE(works/monad/udts, "Tests that the monad works as intended with user-defined types")
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   // No default constructor, no copy/move, no assignment
   {
     struct udt
@@ -1464,7 +1464,7 @@ BOOST_AUTO_TEST_CASE(works/monad/udts, "Tests that the monad works as intended w
 
 BOOST_AUTO_TEST_CASE(works/monad/containers, "Tests that the monad works as intended inside containers")
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   std::vector<monad<std::vector<int>>> vect;
   vect.push_back({5, 6, 7, 8});
   vect.push_back({1, 2, 3, 4});
@@ -1479,7 +1479,7 @@ BOOST_AUTO_TEST_CASE(works/monad/containers, "Tests that the monad works as inte
 
 BOOST_AUTO_TEST_CASE(works/monad/swap, "Tests that the monad swaps as intended")
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   monad<std::string> a("niall"), b("douglas");
   BOOST_CHECK(a.get()=="niall");
   BOOST_CHECK(b.get()=="douglas");
@@ -1494,7 +1494,7 @@ BOOST_AUTO_TEST_CASE(works/monad/swap, "Tests that the monad swaps as intended")
 
 BOOST_AUTO_TEST_CASE(works/monad/serialisation, "Tests that the monad serialises and deserialises as intended")
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   monad<std::string> a("niall"), b(std::error_code(5, std::generic_category())), c(std::make_exception_ptr(std::ios_base::failure("A test failure message")));
   std::cout << "a contains " << a << " and b contains " << b << " and c contains " << c << std::endl;
   std::string buffer("hello");
@@ -1505,7 +1505,7 @@ BOOST_AUTO_TEST_CASE(works/monad/serialisation, "Tests that the monad serialises
 
 BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with next() as intended")
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   std::error_code ec;
   monad<std::string> a("niall"), b(ec);
   // Does auto unwrapping work?
@@ -1542,7 +1542,7 @@ BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with next
 #ifdef BOOST_OUTCOME_ENABLE_OPERATORS
 BOOST_AUTO_TEST_CASE(works/monad/callable, "Tests that the monad works as intended holding callables")
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   auto a=make_monad([](int a){return 5+a;});
   BOOST_CHECK(a.get()(1)==6);
   BOOST_CHECK(a(2)==7);
@@ -1555,7 +1555,7 @@ BOOST_AUTO_TEST_CASE(works/monad/callable, "Tests that the monad works as intend
 
 BOOST_AUTO_TEST_CASE(works/monad/unwrap, "Tests that the monad unwraps as intended")
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   std::error_code ec;
   monad<std::string> a("niall"), b(ec);
   monad<monad<std::string>> c(std::move(a)), d(std::move(b));
@@ -1578,7 +1578,7 @@ BOOST_AUTO_TEST_CASE(works/monad/unwrap, "Tests that the monad unwraps as intend
 
 BOOST_AUTO_TEST_CASE(works/monad/bind, "Tests that the monad continues with bind() as intended")
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   std::error_code ec;
   {
     monad<std::string> a("niall"), b(ec);
@@ -1646,7 +1646,7 @@ BOOST_AUTO_TEST_CASE(works/monad/bind, "Tests that the monad continues with bind
 
 BOOST_AUTO_TEST_CASE(works/monad/map, "Tests that the monad continues with map() as intended")
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   std::error_code ec;
   {
     monad<std::string> a("niall"), b(ec);
@@ -1727,7 +1727,7 @@ BOOST_AUTO_TEST_CASE(works/monad/map, "Tests that the monad continues with map()
 
 BOOST_AUTO_TEST_CASE(works/monad/match, "Tests that the monad matches as intended")
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   //! [monad_match_example]
   struct o_type
   {
@@ -1751,7 +1751,7 @@ BOOST_AUTO_TEST_CASE(works/monad/match, "Tests that the monad matches as intende
 
 BOOST_AUTO_TEST_CASE(works/monad/operators, "Tests that the monad custom operators work as intended")
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   //! [monad_operators_example]
   {
     std::error_code ec;
@@ -1896,7 +1896,7 @@ BOOST_AUTO_TEST_CASE(works/future/std, "Tests that std future-promise passes our
 BOOST_AUTO_TEST_CASE(works/future/lightweight, "Tests that our future-promise works as intended")
 {
   std::cout << "\n=== Tests that our future-promise works as intended ===" << std::endl;
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   std::cout << "sizeof(promise<bool>) = " << sizeof(promise<bool>) << std::endl;
   std::cout << "sizeof(future<bool>) = " << sizeof(future<bool>) << std::endl;
   std::cout << "sizeof(promise<bool>[2]) = " << sizeof(promise<bool>[2]) << std::endl;
@@ -2002,7 +2002,7 @@ BOOST_AUTO_TEST_CASE(works/shared_future/std, "Tests that std shared_future-prom
 BOOST_AUTO_TEST_CASE(works/shared_future/lightweight, "Tests that our shared_future-promise works as intended")
 {
   std::cout << "\n=== Tests that our shared_future-promise works as intended ===" << std::endl;
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   std::cout << "sizeof(promise<bool>) = " << sizeof(promise<bool>) << std::endl;
   std::cout << "sizeof(shared_future<bool>) = " << sizeof(shared_future<bool>) << std::endl;
   promise<bool> p;
@@ -2013,7 +2013,7 @@ BOOST_AUTO_TEST_CASE(works/shared_future/lightweight, "Tests that our shared_fut
 BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our future-promise continuations works as intended")
 {
   std::cout << "\n=== Tests that our future-promise continuations works as intended ===" << std::endl;
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   // Check basic Concurrency TS conformance
   {
     int test = 0;
@@ -2126,7 +2126,7 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
 BOOST_AUTO_TEST_CASE(works/shared_future/continuations/lightweight, "Tests that our shared_future-promise continuations works as intended")
 {
   std::cout << "\n=== Tests that our shared_future-promise continuations works as intended ===" << std::endl;
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   int test = 0;
   promise<void> p;
   shared_future<void> f(p.get_future());
@@ -2245,7 +2245,7 @@ template<template<class> class F, template<class> class SF, template<class> clas
 BOOST_AUTO_TEST_CASE(works/composure/future/lightweight, "Tests that our future-promise composes as intended")
 {
   std::cout << "\n=== Tests that our future-promise composes as intended ===" << std::endl;
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   WaitComposureConformanceTest<future, shared_future, promise>();
 }
 
@@ -2315,7 +2315,7 @@ BOOST_AUTO_TEST_CASE(performance/future/simple/std, "Tests the performance of st
 BOOST_AUTO_TEST_CASE(performance/future/simple/lightweight, "Tests the performance of our future-promise in a simple loop")
 {
   std::cout << "\n=== Tests the performance of our future-promise in a simple loop ===" << std::endl;
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   auto result=CalculateFuturePerformanceSimple<future, promise>("lightweight");
   std::cout << "Approximately " << (result/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round" << std::endl;
 }
@@ -2323,7 +2323,7 @@ BOOST_AUTO_TEST_CASE(performance/future/simple/lightweight, "Tests the performan
 BOOST_AUTO_TEST_CASE(performance/future_option/simple, "Tests the performance of our future_option in a simple loop")
 {
   std::cout << "\n=== Tests the performance of our future_option in a simple loop ===" << std::endl;
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   std::cout << "sizeof(promise_option<bool>) = " << sizeof(promise_option<bool>) << std::endl;
   std::cout << "sizeof(future_option<bool>) = " << sizeof(future_option<bool>) << std::endl;
   std::cout << "sizeof(promise_option<bool>[2]) = " << sizeof(promise_option<bool>[2]) << std::endl;
@@ -2344,7 +2344,7 @@ BOOST_AUTO_TEST_CASE(performance/shared_future/simple/std, "Tests the performanc
 BOOST_AUTO_TEST_CASE(performance/shared_future/simple/lightweight, "Tests the performance of our shared_future-promise in a simple loop")
 {
   std::cout << "\n=== Tests the performance of our shared_future-promise in a simple loop ===" << std::endl;
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   auto result=CalculateFuturePerformanceSimple<shared_future, promise>("lightweight");
   std::cout << "Approximately " << (result/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round" << std::endl;
 }
@@ -2403,7 +2403,7 @@ BOOST_AUTO_TEST_CASE(performance/future/producerconsumer/std, "Tests the perform
 BOOST_AUTO_TEST_CASE(performance/future/producerconsumer/lightweight, "Tests the performance of our future-promise in a producer consumer")
 {
   std::cout << "\n=== Tests the performance of our future-promise in a producer consumer ===" << std::endl;
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   auto result=CalculateFuturePerformanceProducerConsumer<future, promise>("lightweight");
   std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation and setting." << std::endl;
   std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per getting." << std::endl;
@@ -2414,7 +2414,7 @@ BOOST_AUTO_TEST_CASE(performance/future/producerconsumer/lightweight, "Tests the
 BOOST_AUTO_TEST_CASE(performance/future_option/producerconsumer, "Tests the performance of our future_option in a producer consumer")
 {
   std::cout << "\n=== Tests the performance of our future_option in a producer consumer ===" << std::endl;
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   auto result=CalculateFuturePerformanceProducerConsumer<future_option, promise_option>("lightweight");
   std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation and setting." << std::endl;
   std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per getting." << std::endl;
@@ -2435,7 +2435,7 @@ BOOST_AUTO_TEST_CASE(performance/shared_future/producerconsumer/std, "Tests the 
 BOOST_AUTO_TEST_CASE(performance/shared_future/producerconsumer/lightweight, "Tests the performance of our shared_future-promise in a producer consumer")
 {
   std::cout << "\n=== Tests the performance of our shared_future-promise in a producer consumer ===" << std::endl;
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   auto result=CalculateFuturePerformanceProducerConsumer<shared_future, promise>("lightweight");
   std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation and setting." << std::endl;
   std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per getting." << std::endl;
@@ -2568,7 +2568,7 @@ BOOST_AUTO_TEST_CASE(performance/future/threaded/std, "Tests the performance of 
 BOOST_AUTO_TEST_CASE(performance/future/threaded/lightweight, "Tests the performance of our future-promise in a threaded producer consumer")
 {
   std::cout << "\n=== Tests the performance of our future-promise in a threaded producer consumer ===" << std::endl;
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   auto result=CalculateFuturePerformanceThreaded<future, promise>("lightweight");
   std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation." << std::endl;
   std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per setting." << std::endl;
@@ -2580,7 +2580,7 @@ BOOST_AUTO_TEST_CASE(performance/future/threaded/lightweight, "Tests the perform
 BOOST_AUTO_TEST_CASE(performance/future_option/threaded, "Tests the performance of our future_option in a threaded producer consumer")
 {
   std::cout << "\n=== Tests the performance of our future_option in a threaded producer consumer ===" << std::endl;
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   auto result=CalculateFuturePerformanceThreaded<future_option, promise_option>("lightweight");
   std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation." << std::endl;
   std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per setting." << std::endl;

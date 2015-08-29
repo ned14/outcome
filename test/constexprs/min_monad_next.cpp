@@ -1,10 +1,10 @@
-#include "../../include/boost/spinlock/future.hpp"
+#include "../../include/boost/outcome/future.hpp"
 
-using namespace boost::spinlock::lightweight_futures;
+using namespace boost::outcome;
 
-extern BOOST_OUTCOME_NOINLINE monad<int> test1(int n)
+extern BOOST_OUTCOME_NOINLINE outcome<int> test1(int n)
 {
-  return monad<int>(n).next([](monad<int> m) { return m.get()*3; });
+  return outcome<int>(n).next([](outcome<int> m) { return m.get()*3; });
 }
 extern BOOST_OUTCOME_NOINLINE void test2()
 {
@@ -12,7 +12,7 @@ extern BOOST_OUTCOME_NOINLINE void test2()
 
 int main(void)
 {
-  monad<int> m(test1(5));
+  outcome<int> m(test1(5));
   test2();
   return m.get()!=15;
 }

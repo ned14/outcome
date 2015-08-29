@@ -9,7 +9,7 @@
   000000000000001E: 33 C0              xor         eax,eax
   0000000000000020: 88 44 24 68        mov         byte ptr [rsp+68h],al
   0000000000000024: 48 8D 4C 24 30     lea         rcx,[rsp+30h]
-  0000000000000029: E8 00 00 00 00     call        ?unknown@@YA?AV?$basic_monad@U?$monad_policy@H@detail@lightweight_futures@v1_std@spinlock@boost@@@lightweight_futures@v1_std@spinlock@boost@@XZ
+  0000000000000029: E8 00 00 00 00     call        ?unknown@@YA?AV?$basic_monad@U?$monad_policy@H@detail@v1_std_std@outcome@boost@@@v1_std_std@outcome@boost@@XZ
   000000000000002E: 90                 nop
   000000000000002F: 4C 8D 44 24 68     lea         r8,[rsp+68h]
   0000000000000034: 48 8B D3           mov         rdx,rbx
@@ -27,19 +27,16 @@
   000000000000001F: 4C 8B C1           mov         r8,rcx
   0000000000000022: 48 8D 4C 24 40     lea         rcx,[rsp+40h]
   0000000000000027: E8 00 00 00 00     call        replaced
-  0000000000000000: 48 83 EC 38        sub         rsp,38h
-  0000000000000004: 48 C7 44 24 08 FE  mov         qword ptr [rsp+8],0FFFFFFFFFFFFFFFEh
-                    FF FF FF
-  000000000000000D: C7 04 24 00 00 00  mov         dword ptr [rsp],0
+  0000000000000000: 48 83 EC 18        sub         rsp,18h
+  0000000000000004: 41 8B 00           mov         eax,dword ptr [r8]
+  0000000000000007: C7 04 24 00 00 00  mov         dword ptr [rsp],0
                     00
-  0000000000000014: 41 8B 00           mov         eax,dword ptr [r8]
-  0000000000000017: 8D 0C 40           lea         ecx,[rax+rax*2]
-  000000000000001A: 89 0A              mov         dword ptr [rdx],ecx
-  000000000000001C: C6 42 10 01        mov         byte ptr [rdx+10h],1
-  0000000000000020: 48 8B C2           mov         rax,rdx
-  0000000000000023: 48 83 C4 38        add         rsp,38h
-  0000000000000027: C3                 ret
-  0000000000000028: CC                 int         3
+  000000000000000E: C6 42 10 01        mov         byte ptr [rdx+10h],1
+  0000000000000012: 8D 0C 40           lea         ecx,[rax+rax*2]
+  0000000000000015: 48 8B C2           mov         rax,rdx
+  0000000000000018: 89 0A              mov         dword ptr [rdx],ecx
+  000000000000001A: 48 83 C4 18        add         rsp,18h
+  000000000000001E: C3                 ret
 
   000000000000002C: 48 8B C3           mov         rax,rbx
   000000000000002F: 48 83 C4 30        add         rsp,30h

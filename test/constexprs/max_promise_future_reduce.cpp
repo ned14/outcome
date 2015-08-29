@@ -1,8 +1,8 @@
-#include "../../include/boost/spinlock/future.hpp"
+#include "../../include/boost/outcome/future.hpp"
 
 extern BOOST_OUTCOME_NOINLINE int test1()
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome::lightweight_futures;
   promise<int> p;
   future<int> f(p.get_future());
   p.set_value(5);

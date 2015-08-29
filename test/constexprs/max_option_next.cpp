@@ -1,6 +1,6 @@
-#include "../../include/boost/spinlock/future.hpp"
+#include "../../include/boost/outcome/future.hpp"
 
-using namespace boost::spinlock::lightweight_futures;
+using namespace boost::outcome;
 extern option<int> unknown();
 extern BOOST_OUTCOME_NOINLINE option<int> test1()
 {

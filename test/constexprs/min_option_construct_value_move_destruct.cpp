@@ -1,8 +1,8 @@
-#include "../../include/boost/spinlock/future.hpp"
+#include "../../include/boost/outcome/future.hpp"
 
 extern BOOST_OUTCOME_NOINLINE int test1()
 {
-  using namespace boost::spinlock::lightweight_futures;
+  using namespace boost::outcome;
   option<int> m1(5);
   option<int> m2(std::move(m1));
   return std::move(m2).get();

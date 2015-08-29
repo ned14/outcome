@@ -1,7 +1,7 @@
-#include "../../include/boost/spinlock/future.hpp"
+#include "../../include/boost/outcome/future.hpp"
 
-using namespace boost::spinlock::lightweight_futures;
-extern monad<int> unknown();
+using namespace boost::outcome;
+extern outcome<int> unknown();
 extern BOOST_OUTCOME_NOINLINE std::exception_ptr test1()
 {
   return unknown().get_exception();
