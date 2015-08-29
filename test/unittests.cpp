@@ -45,10 +45,10 @@ DEALINGS IN THE SOFTWARE.
 #include <algorithm>
 
 #ifdef _MSC_VER
-# define BOOST_MONAD_POSIX_OPEN ::_open
+# define BOOST_OUTCOME_POSIX_OPEN ::_open
 # include <io.h>
 #else
-# define BOOST_MONAD_POSIX_OPEN ::open
+# define BOOST_OUTCOME_POSIX_OPEN ::open
 # include <fcntl.h>
 #endif
 
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_SUITE(all)
 
 BOOST_AUTO_TEST_CASE(works/spinlock, "Tests that the spinlock works as intended")
 {
-  BOOST_MONAD_V1_NAMESPACE::spinlock<bool> lock;
+  BOOST_OUTCOME_V1_NAMESPACE::spinlock<bool> lock;
   BOOST_REQUIRE(lock.try_lock());
   BOOST_REQUIRE(!lock.try_lock());
   lock.unlock();
@@ -77,8 +77,8 @@ BOOST_AUTO_TEST_CASE(works/spinlock, "Tests that the spinlock works as intended"
 
 BOOST_AUTO_TEST_CASE(works/spinlock/threaded, "Tests that the spinlock works as intended under threads")
 {
-  BOOST_MONAD_V1_NAMESPACE::spinlock<bool> lock;
-  BOOST_MONAD_V1_NAMESPACE::atomic<size_t> gate(0);
+  BOOST_OUTCOME_V1_NAMESPACE::spinlock<bool> lock;
+  BOOST_OUTCOME_V1_NAMESPACE::atomic<size_t> gate(0);
 #pragma omp parallel
   {
     ++gate;
@@ -102,8 +102,8 @@ BOOST_AUTO_TEST_CASE(works/spinlock/threaded, "Tests that the spinlock works as 
 
 BOOST_AUTO_TEST_CASE(works/spinlock/transacted, "Tests that the spinlock works as intended under transactions")
 {
-  BOOST_MONAD_V1_NAMESPACE::spinlock<bool> lock;
-  BOOST_MONAD_V1_NAMESPACE::atomic<size_t> gate(0);
+  BOOST_OUTCOME_V1_NAMESPACE::spinlock<bool> lock;
+  BOOST_OUTCOME_V1_NAMESPACE::atomic<size_t> gate(0);
   size_t locked=0;
 #pragma omp parallel
   {
@@ -129,7 +129,7 @@ template<class T> struct do_lock<true, T> { void operator()(T &lock) { int e=0; 
 template<class locktype> double CalculatePerformance(bool use_transact)
 {
   locktype lock;
-  BOOST_MONAD_V1_NAMESPACE::atomic<size_t> gate(0);
+  BOOST_OUTCOME_V1_NAMESPACE::atomic<size_t> gate(0);
   struct
   {
     size_t value;
@@ -180,7 +180,7 @@ template<class locktype> double CalculatePerformance(bool use_transact)
 BOOST_AUTO_TEST_CASE(performance/spinlock/binary, "Tests the performance of binary spinlocks")
 {
   printf("\n=== Binary spinlock performance ===\n");
-  typedef BOOST_MONAD_V1_NAMESPACE::spinlock<bool> locktype;
+  typedef BOOST_OUTCOME_V1_NAMESPACE::spinlock<bool> locktype;
   printf("1. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
   printf("2. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
   printf("3. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE(performance/spinlock/binary, "Tests the performance of bina
 BOOST_AUTO_TEST_CASE(performance/spinlock/binary/transaction, "Tests the performance of binary spinlock transactions")
 {
   printf("\n=== Transacted binary spinlock performance ===\n");
-  typedef BOOST_MONAD_V1_NAMESPACE::spinlock<bool> locktype;
+  typedef BOOST_OUTCOME_V1_NAMESPACE::spinlock<bool> locktype;
   printf("1. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
   printf("2. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
   printf("3. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
@@ -198,7 +198,7 @@ BOOST_AUTO_TEST_CASE(performance/spinlock/binary/transaction, "Tests the perform
 BOOST_AUTO_TEST_CASE(performance/spinlock/tristate, "Tests the performance of tristate spinlocks")
 {
   printf("\n=== Tristate spinlock performance ===\n");
-  typedef BOOST_MONAD_V1_NAMESPACE::spinlock<int> locktype;
+  typedef BOOST_OUTCOME_V1_NAMESPACE::spinlock<int> locktype;
   printf("1. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
   printf("2. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
   printf("3. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(performance/spinlock/tristate, "Tests the performance of tr
 BOOST_AUTO_TEST_CASE(performance/spinlock/tristate/transaction, "Tests the performance of tristate spinlock transactions")
 {
   printf("\n=== Transacted tristate spinlock performance ===\n");
-  typedef BOOST_MONAD_V1_NAMESPACE::spinlock<int> locktype;
+  typedef BOOST_OUTCOME_V1_NAMESPACE::spinlock<int> locktype;
   printf("1. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
   printf("2. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
   printf("3. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE(performance/spinlock/tristate/transaction, "Tests the perfo
 BOOST_AUTO_TEST_CASE(performance/spinlock/pointer, "Tests the performance of pointer spinlocks")
 {
   printf("\n=== Pointer spinlock performance ===\n");
-  typedef BOOST_MONAD_V1_NAMESPACE::spinlock<BOOST_MONAD_V1_NAMESPACE::lockable_ptr<int>> locktype;
+  typedef BOOST_OUTCOME_V1_NAMESPACE::spinlock<BOOST_OUTCOME_V1_NAMESPACE::lockable_ptr<int>> locktype;
   printf("1. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
   printf("2. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
   printf("3. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(false));
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE(performance/spinlock/pointer, "Tests the performance of poi
 BOOST_AUTO_TEST_CASE(performance/spinlock/pointer/transaction, "Tests the performance of pointer spinlock transactions")
 {
   printf("\n=== Transacted pointer spinlock performance ===\n");
-  typedef BOOST_MONAD_V1_NAMESPACE::spinlock<BOOST_MONAD_V1_NAMESPACE::lockable_ptr<int>> locktype;
+  typedef BOOST_OUTCOME_V1_NAMESPACE::spinlock<BOOST_OUTCOME_V1_NAMESPACE::lockable_ptr<int>> locktype;
   printf("1. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
   printf("2. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
   printf("3. Achieved %lf transactions per second\n", CalculatePerformance<locktype>(true));
@@ -233,8 +233,8 @@ BOOST_AUTO_TEST_CASE(performance/spinlock/pointer/transaction, "Tests the perfor
 
 static double CalculateMallocPerformance(size_t size, bool use_transact)
 {
-  BOOST_MONAD_V1_NAMESPACE::spinlock<bool> lock;
-  BOOST_MONAD_V1_NAMESPACE::atomic<size_t> gate(0);
+  BOOST_OUTCOME_V1_NAMESPACE::spinlock<bool> lock;
+  BOOST_OUTCOME_V1_NAMESPACE::atomic<size_t> gate(0);
   usCount start, end;
 #pragma omp parallel
   {
@@ -301,7 +301,7 @@ BOOST_AUTO_TEST_CASE(performance/malloc/transact/large, "Tests the transact perf
 
 BOOST_AUTO_TEST_CASE(works/tribool, "Tests that the tribool works as intended")
 {
-  using BOOST_MONAD_V1_NAMESPACE::tribool::tribool;
+  using BOOST_OUTCOME_V1_NAMESPACE::tribool::tribool;
   auto t(tribool::true_), f(tribool::false_), o(tribool::other), u(tribool::unknown);
   BOOST_CHECK(true_(t));
   BOOST_CHECK(false_(f));
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE(works/tribool, "Tests that the tribool works as intended")
 
 BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE::traits;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::traits;
   {
     int foo=1;
     // Capturing lambdas
@@ -421,17 +421,17 @@ BOOST_AUTO_TEST_CASE(works/traits, "Tests that the traits work as intended")
 
 BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
-  static_assert(std::is_constructible<monad<long>, int>::value, "Sanity check that monad can be constructed from a value_type");
-  static_assert(std::is_constructible<monad<monad<long>>, int>::value, "Sanity check that outer monad can be constructed from an inner monad's value_type");
-  static_assert(!std::is_constructible<monad<monad<monad<long>>>, int>::value, "Sanity check that outer monad can not be constructed from an inner inner monad's value_type");
-  static_assert(!std::is_constructible<monad<monad<monad<monad<long>>>>, int>::value, "Sanity check that outer monad can not be constructed from an inner inner monad's value_type");
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  static_assert(std::is_constructible<outcome<long>, int>::value, "Sanity check that monad can be constructed from a value_type");
+  static_assert(std::is_constructible<outcome<outcome<long>>, int>::value, "Sanity check that outer monad can be constructed from an inner monad's value_type");
+  static_assert(!std::is_constructible<outcome<outcome<outcome<long>>>, int>::value, "Sanity check that outer monad can not be constructed from an inner inner monad's value_type");
+  static_assert(!std::is_constructible<outcome<outcome<outcome<outcome<long>>>>, int>::value, "Sanity check that outer monad can not be constructed from an inner inner monad's value_type");
 
-  static_assert(std::is_constructible<monad<int>, monad<long>>::value, "Sanity check that compatible monads can be constructed from one another");
-  static_assert(!std::is_constructible<monad<std::string>, monad<int>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
-  //static_assert(!std::is_constructible<monad<monad<int>>, monad<long>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
+  static_assert(std::is_constructible<outcome<int>, outcome<long>>::value, "Sanity check that compatible monads can be constructed from one another");
+  static_assert(!std::is_constructible<outcome<std::string>, outcome<int>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
+  //static_assert(!std::is_constructible<outcome<outcome<int>>, outcome<long>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
   {
-    monad<int> m;
+    outcome<int> m;
     BOOST_CHECK(!m);
     BOOST_CHECK(unknown(m));
     BOOST_CHECK(!m.is_ready());
@@ -443,7 +443,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
     BOOST_CHECK_THROW(m.get_exception(), monad_error);
   }
   {
-    monad<void> m;
+    outcome<void> m;
     BOOST_CHECK(!m);
     BOOST_CHECK(unknown(m));
     BOOST_CHECK(!m.is_ready());
@@ -455,7 +455,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
     BOOST_CHECK_THROW(m.get_exception(), monad_error);
   }
   {
-    monad<int> m(5);
+    outcome<int> m(5);
     BOOST_CHECK(m);
     BOOST_CHECK(true_(m));
     BOOST_CHECK(m.is_ready());
@@ -478,7 +478,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
     BOOST_CHECK_THROW(m.get_exception(), monad_error);
   }
   {
-    monad<std::string> m("niall");
+    outcome<std::string> m("niall");
     BOOST_CHECK(m);
     BOOST_CHECK(m.is_ready());
     BOOST_CHECK(m.has_value());
@@ -496,7 +496,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m);
   }
   {
-    monad<void> m;
+    outcome<void> m;
     m.set_value();
     BOOST_CHECK(m);
     BOOST_CHECK(true_(m));
@@ -520,7 +520,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
   {
     stl11::error_code ec(5, stl11::system_category());
     auto e=std::make_exception_ptr(stl11::system_error(ec));
-    monad<int> m(ec);
+    outcome<int> m(ec);
     BOOST_CHECK(!m);
     BOOST_CHECK(false_(m));
     BOOST_CHECK(m.is_ready());
@@ -542,7 +542,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
   }
   {
     auto e=std::make_exception_ptr(5);
-    monad<int> m(e);
+    outcome<int> m(e);
     BOOST_CHECK(!m);
     BOOST_CHECK(false_(m));
     BOOST_CHECK(m.is_ready());
@@ -557,14 +557,14 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
 
 BOOST_AUTO_TEST_CASE(works/monad/optional, "Tests that the monad acts as an optional R")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
-  using BOOST_MONAD_V1_NAMESPACE::tribool::tribool;
-  std::cout << "sizeof(monad<bool>) = " << sizeof(monad<bool>) << std::endl;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  using BOOST_OUTCOME_V1_NAMESPACE::tribool::tribool;
+  std::cout << "sizeof(outcome<bool>) = " << sizeof(outcome<bool>) << std::endl;
   std::cout << "sizeof(result<bool>) = " << sizeof(result<bool>) << std::endl;
   std::cout << "sizeof(option<bool>) = " << sizeof(option<bool>) << std::endl;
   std::cout << "sizeof(option<tribool>) = " << sizeof(option<tribool>) << std::endl;
 
-  std::cout << "sizeof(monad<bool>[2]) = " << sizeof(monad<bool>[2]) << std::endl;
+  std::cout << "sizeof(outcome<bool>[2]) = " << sizeof(outcome<bool>[2]) << std::endl;
   std::cout << "sizeof(result<bool>[2]) = " << sizeof(result<bool>[2]) << std::endl;
   std::cout << "sizeof(option<bool>[2]) = " << sizeof(option<bool>[2]) << std::endl;
   std::cout << "sizeof(option<tribool>[2]) = " << sizeof(option<tribool>[2]) << std::endl;
@@ -572,7 +572,7 @@ BOOST_AUTO_TEST_CASE(works/monad/optional, "Tests that the monad acts as an opti
   std::cout << "sizeof(option<void>) = " << sizeof(option<void>) << std::endl;
   std::cout << "sizeof(option<void>[2]) = " << sizeof(option<void>[2]) << std::endl;
 
-  BOOST_CHECK(!(sizeof(monad<bool>) & 3));
+  BOOST_CHECK(!(sizeof(outcome<bool>) & 3));
   BOOST_CHECK(sizeof(option<void>)<=1U);
   BOOST_CHECK(sizeof(option<bool>)<=1U);
   BOOST_CHECK(sizeof(option<tribool>)<=2U);
@@ -604,13 +604,13 @@ BOOST_AUTO_TEST_CASE(works/monad/optional, "Tests that the monad acts as an opti
 
 BOOST_AUTO_TEST_CASE(works/monad/fileopen, "Tests that the monad semantically represents opening a file")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
 
   //! [monad_example]
-  auto openfile=[](std::string path) noexcept -> monad<int>
+  auto openfile=[](std::string path) noexcept -> outcome<int>
   {
     int fd;
-    while(-1==(fd=BOOST_MONAD_POSIX_OPEN(path.c_str(), 0)) && EINTR==errno);
+    while(-1==(fd=BOOST_OUTCOME_POSIX_OPEN(path.c_str(), 0)) && EINTR==errno);
     try
     {
       if(-1==fd)
@@ -643,19 +643,19 @@ BOOST_AUTO_TEST_CASE(works/monad/fileopen, "Tests that the monad semantically re
 
 BOOST_AUTO_TEST_CASE(works/monad/noexcept, "Tests that the monad correctly inherits noexcept from its type R")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   {
-    typedef monad<int> type;
-    std::cout << "monad<int> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
-    std::cout << "monad<int> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
-    std::cout << "monad<int> is_nothrow_copy_assignable="    << type::is_nothrow_copy_assignable << std::endl;
-    std::cout << "monad<int> is_nothrow_move_assignable="    << type::is_nothrow_move_assignable << std::endl;
-    std::cout << "monad<int> is_nothrow_destructible="       << type::is_nothrow_destructible << std::endl;
+    typedef outcome<int> type;
+    std::cout << "outcome<int> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
+    std::cout << "outcome<int> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
+    std::cout << "outcome<int> is_nothrow_copy_assignable="    << type::is_nothrow_copy_assignable << std::endl;
+    std::cout << "outcome<int> is_nothrow_move_assignable="    << type::is_nothrow_move_assignable << std::endl;
+    std::cout << "outcome<int> is_nothrow_destructible="       << type::is_nothrow_destructible << std::endl;
     BOOST_CHECK(type::is_nothrow_copy_constructible == std::is_nothrow_copy_constructible<type>::value);
     BOOST_CHECK(type::is_nothrow_move_constructible == std::is_nothrow_move_constructible<type>::value);
     BOOST_CHECK(type::is_nothrow_copy_assignable    == std::is_nothrow_copy_assignable<type>::value);
     BOOST_CHECK(type::is_nothrow_move_assignable    == std::is_nothrow_move_assignable<type>::value);
-    // VS2015 is randomly flipping std::is_nothrow_destructible for monad<int>. I'd assume memory corruption.
+    // VS2015 is randomly flipping std::is_nothrow_destructible for outcome<int>. I'd assume memory corruption.
 #ifndef _MSC_VER
     BOOST_CHECK(type::is_nothrow_destructible       == std::is_nothrow_destructible<type>::value);
 #endif
@@ -663,18 +663,18 @@ BOOST_AUTO_TEST_CASE(works/monad/noexcept, "Tests that the monad correctly inher
     BOOST_CHECK(true  == std::is_nothrow_move_constructible<type>::value);
     BOOST_CHECK(true  == std::is_nothrow_copy_assignable<type>::value);
     BOOST_CHECK(true  == std::is_nothrow_move_assignable<type>::value);
-    // VS2015 is randomly flipping std::is_nothrow_destructible for monad<int>. I'd assume memory corruption.
+    // VS2015 is randomly flipping std::is_nothrow_destructible for outcome<int>. I'd assume memory corruption.
 #ifndef _MSC_VER
     BOOST_CHECK(true  == std::is_nothrow_destructible<type>::value);
 #endif
   }
   {
-    typedef monad<std::string> type;
-    std::cout << "monad<string> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
-    std::cout << "monad<string> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
-    std::cout << "monad<string> is_nothrow_copy_assignable="    << type::is_nothrow_copy_assignable << std::endl;
-    std::cout << "monad<string> is_nothrow_move_assignable="    << type::is_nothrow_move_assignable << std::endl;
-    std::cout << "monad<string> is_nothrow_destructible="       << type::is_nothrow_destructible << std::endl;
+    typedef outcome<std::string> type;
+    std::cout << "outcome<string> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
+    std::cout << "outcome<string> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
+    std::cout << "outcome<string> is_nothrow_copy_assignable="    << type::is_nothrow_copy_assignable << std::endl;
+    std::cout << "outcome<string> is_nothrow_move_assignable="    << type::is_nothrow_move_assignable << std::endl;
+    std::cout << "outcome<string> is_nothrow_destructible="       << type::is_nothrow_destructible << std::endl;
     BOOST_CHECK(type::is_nothrow_copy_constructible == std::is_nothrow_copy_constructible<type>::value);
     BOOST_CHECK(type::is_nothrow_move_constructible == std::is_nothrow_move_constructible<type>::value);
     BOOST_CHECK(type::is_nothrow_copy_assignable    == std::is_nothrow_copy_assignable<type>::value);
@@ -694,12 +694,12 @@ BOOST_AUTO_TEST_CASE(works/monad/noexcept, "Tests that the monad correctly inher
       Except(Except &&) noexcept(false) {}
       ~Except() noexcept(false) { }
     };
-    typedef monad<Except> type;
-    std::cout << "monad<Except> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
-    std::cout << "monad<Except> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
-    std::cout << "monad<Except> is_nothrow_copy_assignable="    << type::is_nothrow_copy_assignable << std::endl;
-    std::cout << "monad<Except> is_nothrow_move_assignable="    << type::is_nothrow_move_assignable << std::endl;
-    std::cout << "monad<Except> is_nothrow_destructible="       << type::is_nothrow_destructible << std::endl;
+    typedef outcome<Except> type;
+    std::cout << "outcome<Except> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
+    std::cout << "outcome<Except> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
+    std::cout << "outcome<Except> is_nothrow_copy_assignable="    << type::is_nothrow_copy_assignable << std::endl;
+    std::cout << "outcome<Except> is_nothrow_move_assignable="    << type::is_nothrow_move_assignable << std::endl;
+    std::cout << "outcome<Except> is_nothrow_destructible="       << type::is_nothrow_destructible << std::endl;
     BOOST_CHECK(type::is_nothrow_copy_constructible == std::is_nothrow_copy_constructible<type>::value);
     BOOST_CHECK(type::is_nothrow_move_constructible == std::is_nothrow_move_constructible<type>::value);
     BOOST_CHECK(type::is_nothrow_copy_assignable    == std::is_nothrow_copy_assignable<type>::value);
@@ -715,7 +715,7 @@ BOOST_AUTO_TEST_CASE(works/monad/noexcept, "Tests that the monad correctly inher
 
 BOOST_AUTO_TEST_CASE(works/monad/udts, "Tests that the monad works as intended with user-defined types")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   // No default constructor, no copy/move, no assignment
   {
     struct udt
@@ -728,7 +728,7 @@ BOOST_AUTO_TEST_CASE(works/monad/udts, "Tests that the monad works as intended w
       udt &operator=(const udt &) = delete;
       udt &operator=(udt &&) = delete;
     };
-    monad<udt> foo(5);
+    outcome<udt> foo(5);
     BOOST_CHECK(5==foo.get().a);
   }
   // Emplace construct, throws during move and copy
@@ -744,7 +744,7 @@ BOOST_AUTO_TEST_CASE(works/monad/udts, "Tests that the monad works as intended w
       udt &operator=(udt &&) { throw std::logic_error("move"); }
     };
     // Emplace constructs
-    monad<udt> foo("douglas");
+    outcome<udt> foo("douglas");
     BOOST_CHECK("douglas"==foo.get().a);
     foo.emplace("niall");
     BOOST_CHECK("niall"==foo.get().a);
@@ -778,7 +778,7 @@ BOOST_AUTO_TEST_CASE(works/monad/udts, "Tests that the monad works as intended w
     BOOST_CHECK("niall"==foo.get().a);
     // Does throwing during copy assignment work?
     {
-      monad<udt> foo2("douglas");
+      outcome<udt> foo2("douglas");
       try
       {
         foo2=foo;
@@ -797,7 +797,7 @@ BOOST_AUTO_TEST_CASE(works/monad/udts, "Tests that the monad works as intended w
     }
     // Does throwing during move assignment work?
     {
-      monad<udt> foo2("douglas");
+      outcome<udt> foo2("douglas");
       try
       {
         foo2=std::move(foo);
@@ -819,8 +819,8 @@ BOOST_AUTO_TEST_CASE(works/monad/udts, "Tests that the monad works as intended w
 
 BOOST_AUTO_TEST_CASE(works/monad/containers, "Tests that the monad works as intended inside containers")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
-  std::vector<monad<std::vector<int>>> vect;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  std::vector<outcome<std::vector<int>>> vect;
   vect.push_back({5, 6, 7, 8});
   vect.push_back({1, 2, 3, 4});
   BOOST_REQUIRE(vect.size()==2U);
@@ -834,8 +834,8 @@ BOOST_AUTO_TEST_CASE(works/monad/containers, "Tests that the monad works as inte
 
 BOOST_AUTO_TEST_CASE(works/monad/swap, "Tests that the monad swaps as intended")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
-  monad<std::string> a("niall"), b("douglas");
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  outcome<std::string> a("niall"), b("douglas");
   BOOST_CHECK(a.get()=="niall");
   BOOST_CHECK(b.get()=="douglas");
   std::swap(a, b);
@@ -849,8 +849,8 @@ BOOST_AUTO_TEST_CASE(works/monad/swap, "Tests that the monad swaps as intended")
 
 BOOST_AUTO_TEST_CASE(works/monad/serialisation, "Tests that the monad serialises and deserialises as intended")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
-  monad<std::string> a("niall"), b(stl11::error_code(5, stl11::generic_category())), c(std::make_exception_ptr(std::ios_base::failure("A test failure message")));
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  outcome<std::string> a("niall"), b(stl11::error_code(5, stl11::generic_category())), c(std::make_exception_ptr(std::ios_base::failure("A test failure message")));
   std::cout << "a contains " << a << " and b contains " << b << " and c contains " << c << std::endl;
   std::string buffer("hello");
   std::stringstream ss(buffer);
@@ -860,15 +860,15 @@ BOOST_AUTO_TEST_CASE(works/monad/serialisation, "Tests that the monad serialises
 
 BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with next() as intended")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   stl11::error_code ec;
-  monad<std::string> a("niall"), b(ec);
+  outcome<std::string> a("niall"), b(ec);
   // Does auto unwrapping work?
-  auto c(a.next([](monad<std::string> v) {return v; }));
+  auto c(a.next([](outcome<std::string> v) {return v; }));
   BOOST_CHECK(c.get() == "niall");
   BOOST_CHECK(a.get() == "niall");
   // Does auto wrapping work?
-  auto d(a.next([](monad<std::string> &&) {return 5; }));
+  auto d(a.next([](outcome<std::string> &&) {return 5; }));
   BOOST_CHECK(d.get() == 5);
   BOOST_CHECK(a.get() == "niall");
 #ifdef __cpp_generic_lambdas
@@ -878,11 +878,11 @@ BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with next
   BOOST_CHECK(a.get() == "niall");
 #endif
   // Does error propagation work?
-  auto f(b.next([](monad<std::string> v) {return v; }));
+  auto f(b.next([](outcome<std::string> v) {return v; }));
   BOOST_CHECK(f.has_error());
 
   // Does automatic move semantics work?
-  auto j(a.next([](monad<std::string> &&v) {return std::move(v); }));
+  auto j(a.next([](outcome<std::string> &&v) {return std::move(v); }));
   BOOST_CHECK(j.get() == "niall");
   BOOST_CHECK(a.get().empty());
 #ifdef __cpp_generic_lambdas
@@ -894,15 +894,15 @@ BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with next
 #endif
 }
 
-#ifdef BOOST_MONAD_ENABLE_OPERATORS
+#ifdef BOOST_OUTCOME_ENABLE_OPERATORS
 BOOST_AUTO_TEST_CASE(works/monad/callable, "Tests that the monad works as intended holding callables")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
-  auto a=make_monad([](int a){return 5+a;});
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  auto a=make_outcome([](int a){return 5+a;});
   BOOST_CHECK(a.get()(1)==6);
   BOOST_CHECK(a(2)==7);
 #ifdef __cpp_generic_lambdas
-  auto b=make_monad([](auto a){return 5+a;});
+  auto b=make_outcome([](auto a){return 5+a;});
   BOOST_CHECK(b.get()(1)==6);
   BOOST_CHECK(b(2)==7);
 #endif
@@ -910,12 +910,12 @@ BOOST_AUTO_TEST_CASE(works/monad/callable, "Tests that the monad works as intend
 
 BOOST_AUTO_TEST_CASE(works/monad/unwrap, "Tests that the monad unwraps as intended")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   stl11::error_code ec;
-  monad<std::string> a("niall"), b(ec);
-  monad<monad<std::string>> c(std::move(a)), d(std::move(b));
-  monad<monad<monad<std::string>>> e(std::move(c)), f(std::move(d));
-  monad<monad<monad<monad<std::string>>>> g(std::move(e)), h(std::move(f));
+  outcome<std::string> a("niall"), b(ec);
+  outcome<outcome<std::string>> c(std::move(a)), d(std::move(b));
+  outcome<outcome<outcome<std::string>>> e(std::move(c)), f(std::move(d));
+  outcome<outcome<outcome<outcome<std::string>>>> g(std::move(e)), h(std::move(f));
   auto i(g.unwrap()), j(h.unwrap());
   BOOST_CHECK((std::is_same<decltype(a), decltype(i)>::value));
   BOOST_CHECK((std::is_same<decltype(b), decltype(j)>::value));
@@ -933,28 +933,28 @@ BOOST_AUTO_TEST_CASE(works/monad/unwrap, "Tests that the monad unwraps as intend
 
 BOOST_AUTO_TEST_CASE(works/monad/bind, "Tests that the monad continues with bind() as intended")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   stl11::error_code ec;
   {
-    monad<std::string> a("niall"), b(ec);
+    outcome<std::string> a("niall"), b(ec);
     // Does bind work?
     auto c(a.bind([](std::string &&) {return 5;}));
-    auto c2(a.bind([](std::string &&) -> monad<int> {return 5;}));
+    auto c2(a.bind([](std::string &&) -> outcome<int> {return 5;}));
     BOOST_CHECK(c.get()==5);
     BOOST_CHECK(c2.get()==5);
     BOOST_CHECK(a.get() == "niall");
     auto d(b.bind([](std::string &&) {return 5;}));
-    auto d2(b.bind([](std::string &&) -> monad<int> {return 5;}));
+    auto d2(b.bind([](std::string &&) -> outcome<int> {return 5;}));
     BOOST_CHECK(d.has_error());
     BOOST_CHECK(d2.has_error());
 #ifdef __cpp_generic_lambdas
     auto e(a.bind([](auto) {return 5;}));
-    auto e2(a.bind([](auto) -> monad<int> {return 5; }));
+    auto e2(a.bind([](auto) -> outcome<int> {return 5; }));
     BOOST_CHECK(e.get()==5);
     BOOST_CHECK(e2.get() == 5);
     BOOST_CHECK(a.get() == "niall");
     auto f(b.bind([](auto) {return 5;}));
-    auto f2(b.bind([](auto) -> monad<int> {return 5;}));
+    auto f2(b.bind([](auto) -> outcome<int> {return 5;}));
     BOOST_CHECK(f.has_error());
     BOOST_CHECK(f2.has_error());
 #endif
@@ -978,14 +978,14 @@ BOOST_AUTO_TEST_CASE(works/monad/bind, "Tests that the monad continues with bind
       a.bind([ec](std::string){return ec;})
        .bind([](stl11::error_code){return std::make_exception_ptr(5);})
        .bind([](std::exception_ptr){return;})
-       .bind([](monad<std::string>::empty_type){return std::string("douglas");})
+       .bind([](outcome<std::string>::empty_type){return std::string("douglas");})
     );
     BOOST_CHECK(x.get()=="douglas");
     auto y(
-      a.bind([ec](std::string) -> monad<int> {return ec;})
+      a.bind([ec](std::string) -> outcome<int> {return ec;})
        .bind([](stl11::error_code){return std::make_exception_ptr(5);})
        .bind([](std::exception_ptr){return;})
-       .bind([](monad<int>::empty_type){return 5;})
+       .bind([](outcome<int>::empty_type){return 5;})
     );
     BOOST_CHECK(y.get()==5);
     auto z(
@@ -1001,28 +1001,28 @@ BOOST_AUTO_TEST_CASE(works/monad/bind, "Tests that the monad continues with bind
 
 BOOST_AUTO_TEST_CASE(works/monad/map, "Tests that the monad continues with map() as intended")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   stl11::error_code ec;
   {
-    monad<std::string> a("niall"), b(ec);
+    outcome<std::string> a("niall"), b(ec);
     // Does map work?
     auto c(a.map([](std::string &&) {return 5; }));
-    auto c2(a.map([](std::string &&) -> monad<int> {return 5; }));
+    auto c2(a.map([](std::string &&) -> outcome<int> {return 5; }));
     BOOST_CHECK(c.get() == 5);
     BOOST_CHECK(c2.get().get() == 5);
     BOOST_CHECK(a.get() == "niall");
     auto d(b.map([](std::string &&) {return 5; }));
-    auto d2(b.map([](std::string &&) -> monad<int> {return 5; }));
+    auto d2(b.map([](std::string &&) -> outcome<int> {return 5; }));
     BOOST_CHECK(d.has_error());
     BOOST_CHECK(d2.has_error());
 #ifdef __cpp_generic_lambdas
     auto e(a.map([](auto) {return 5; }));
-    auto e2(a.map([](auto) -> monad<int> {return 5; }));
+    auto e2(a.map([](auto) -> outcome<int> {return 5; }));
     BOOST_CHECK(e.get() == 5);
     BOOST_CHECK(e2.get().get() == 5);
     BOOST_CHECK(a.get() == "niall");
     auto f(b.map([](auto) {return 5; }));
-    auto f2(b.map([](auto) -> monad<int> {return 5; }));
+    auto f2(b.map([](auto) -> outcome<int> {return 5; }));
     BOOST_CHECK(f.has_error());
     BOOST_CHECK(f2.has_error());
 #endif
@@ -1046,27 +1046,27 @@ BOOST_AUTO_TEST_CASE(works/monad/map, "Tests that the monad continues with map()
       a.map([ec](std::string) {return ec; })
       .map([](stl11::error_code) {return std::make_exception_ptr(5); })
       .map([](std::exception_ptr) {return; })
-      .map([](monad<std::string>::empty_type) {return std::string("douglas"); })
+      .map([](outcome<std::string>::empty_type) {return std::string("douglas"); })
       );
     BOOST_CHECK(x.get() == "douglas");
     auto y(
-      a.map([ec](std::string) -> monad<long> {return ec; })
-      // Type is now monad<monad<long>> where the inner monad is errored
+      a.map([ec](std::string) -> outcome<long> {return ec; })
+      // Type is now outcome<outcome<long>> where the inner monad is errored
       .map([](stl11::error_code) {return std::make_exception_ptr(5); })
       .map([](std::exception_ptr) {return; })
-      .map([](monad<monad<long>>::empty_type) -> monad<long> {return 5; })
-      // Type is now monad<monad<long>> where the inner monad is errored
+      .map([](outcome<outcome<long>>::empty_type) -> outcome<long> {return 5; })
+      // Type is now outcome<outcome<long>> where the inner monad is errored
       );
-    // None of the above maps fire after the first as the first returns a monad<monad<int>>,
+    // None of the above maps fire after the first as the first returns a outcome<outcome<int>>,
     // so it's always un-erroroed.
     BOOST_CHECK(y.has_value());
     BOOST_CHECK(y.unwrap().has_error());
     auto y2(
-      a.map([ec](std::string) -> monad<long> {return ec; })
-      // Type is now monad<monad<long>>
-      .map([](monad<long> v) { return v.map([](stl11::error_code) {return std::make_exception_ptr(5); }); })
-      .map([](monad<long> v) { return v.map([](std::exception_ptr) {return; }); })
-      .map([](monad<long> v) { return v.map([](monad<long>::empty_type) {return 5L; }); })
+      a.map([ec](std::string) -> outcome<long> {return ec; })
+      // Type is now outcome<outcome<long>>
+      .map([](outcome<long> v) { return v.map([](stl11::error_code) {return std::make_exception_ptr(5); }); })
+      .map([](outcome<long> v) { return v.map([](std::exception_ptr) {return; }); })
+      .map([](outcome<long> v) { return v.map([](outcome<long>::empty_type) {return 5L; }); })
       );
     BOOST_CHECK(y2.unwrap().get()==5);
     auto z(
@@ -1082,7 +1082,7 @@ BOOST_AUTO_TEST_CASE(works/monad/map, "Tests that the monad continues with map()
 
 BOOST_AUTO_TEST_CASE(works/monad/match, "Tests that the monad matches as intended")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   //! [monad_match_example]
   struct o_type
   {
@@ -1091,12 +1091,12 @@ BOOST_AUTO_TEST_CASE(works/monad/match, "Tests that the monad matches as intende
     void operator()(int) const { BOOST_CHECK(expected==1); }
     void operator()(stl11::error_code) const { BOOST_CHECK(expected==2); }
     void operator()(std::exception_ptr) const { BOOST_CHECK(expected==3); }
-    void operator()(monad<int>::empty_type) const { BOOST_CHECK(expected==4); }
+    void operator()(outcome<int>::empty_type) const { BOOST_CHECK(expected==4); }
     o_type() : expected(0) { }
   } o;
   stl11::error_code ec;
   std::exception_ptr e;
-  monad<int> a(5);
+  outcome<int> a(5);
   o.expected=1; a.match(o);
   o.expected=2; a=ec; a.match(o);
   o.expected=3; a=e; a.match(o);
@@ -1106,16 +1106,16 @@ BOOST_AUTO_TEST_CASE(works/monad/match, "Tests that the monad matches as intende
 
 BOOST_AUTO_TEST_CASE(works/monad/operators, "Tests that the monad custom operators work as intended")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   //! [monad_operators_example]
   {
     stl11::error_code ec;
-    monad<int> a(5);
-    monad<int> b(a & 6);   // a has a value, so become 6
-    monad<int> c(b | 4);   // b has a value, so remain at 6
-    monad<int> d(a & ec);  // a has a value, so become errored
-    monad<int> e(d & 2);   // d does not have a value, so remain errored
-    monad<int> f(d | 2);   // d does not have a value, so become 2
+    outcome<int> a(5);
+    outcome<int> b(a & 6);   // a has a value, so become 6
+    outcome<int> c(b | 4);   // b has a value, so remain at 6
+    outcome<int> d(a & ec);  // a has a value, so become errored
+    outcome<int> e(d & 2);   // d does not have a value, so remain errored
+    outcome<int> f(d | 2);   // d does not have a value, so become 2
     BOOST_CHECK(b.get()==6);
     BOOST_CHECK(c.get()==6);
     BOOST_CHECK(d.has_error());
@@ -1125,20 +1125,20 @@ BOOST_AUTO_TEST_CASE(works/monad/operators, "Tests that the monad custom operato
 
   stl11::error_code ec;
   {
-    monad<std::string> a("niall");
+    outcome<std::string> a("niall");
     // Does bind work with chains of value, error, exception and empty?
     auto x(
       a >> [ec](std::string){return ec;}
         >> [](stl11::error_code){return std::make_exception_ptr(5);}
         >> [](std::exception_ptr){return;}
-        >> [](monad<std::string>::empty_type){return std::string("douglas");}
+        >> [](outcome<std::string>::empty_type){return std::string("douglas");}
     );
     BOOST_CHECK(x.get()=="douglas");
     auto y(
-      a >> [ec](std::string) -> monad<int> {return ec;}
+      a >> [ec](std::string) -> outcome<int> {return ec;}
         >> [](stl11::error_code){return std::make_exception_ptr(5);}
         >> [](std::exception_ptr){return;}
-        >> [](monad<int>::empty_type){return 5;}
+        >> [](outcome<int>::empty_type){return 5;}
     );
     BOOST_CHECK(y.get()==5);
     auto z(
@@ -1159,7 +1159,7 @@ BOOST_AUTO_TEST_CASE(works/monad/operators, "Tests that the monad custom operato
 #if 1  // futures
 template<template<class> class F, template<class> class P> void FuturePromiseConformanceTest()
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   std::exception_ptr e(std::make_exception_ptr(std::runtime_error("hello")));
   {
     {
@@ -1244,7 +1244,7 @@ template<template<class> class F, template<class> class P> void FuturePromiseCon
 BOOST_AUTO_TEST_CASE(works/future/std, "Tests that std future-promise passes our conformance suite")
 {
   std::cout << "\n=== Tests that std future-promise passes our conformance suite ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   std::cout << "sizeof(promise<bool>) = " << sizeof(stl11::promise<bool>) << std::endl;
   std::cout << "sizeof(future<bool>) = " << sizeof(stl11::future<bool>) << std::endl;
   FuturePromiseConformanceTest<stl11::future, stl11::promise>();
@@ -1253,8 +1253,8 @@ BOOST_AUTO_TEST_CASE(works/future/std, "Tests that std future-promise passes our
 BOOST_AUTO_TEST_CASE(works/future/lightweight, "Tests that our future-promise works as intended")
 {
   std::cout << "\n=== Tests that our future-promise works as intended ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE;
-  using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures;
   std::cout << "sizeof(promise<bool>) = " << sizeof(promise<bool>) << std::endl;
   std::cout << "sizeof(future<bool>) = " << sizeof(future<bool>) << std::endl;
   std::cout << "sizeof(promise<bool>[2]) = " << sizeof(promise<bool>[2]) << std::endl;
@@ -1279,7 +1279,7 @@ BOOST_AUTO_TEST_CASE(works/future/lightweight, "Tests that our future-promise wo
 
 template<template<class> class F, template<class> class P> void SharedFuturePromiseConformanceTest()
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   std::exception_ptr e(std::make_exception_ptr(std::runtime_error("hello")));
   {
     {
@@ -1354,7 +1354,7 @@ template<template<class> class F, template<class> class P> void SharedFutureProm
 BOOST_AUTO_TEST_CASE(works/shared_future/std, "Tests that std shared_future-promise passes our conformance suite")
 {
   std::cout << "\n=== Tests that std shared_future-promise passes our conformance suite ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   std::cout << "sizeof(promise<bool>) = " << sizeof(stl11::promise<bool>) << std::endl;
   std::cout << "sizeof(shared_future<bool>) = " << sizeof(stl11::shared_future<bool>) << std::endl;
   SharedFuturePromiseConformanceTest<stl11::shared_future, stl11::promise>();
@@ -1363,7 +1363,7 @@ BOOST_AUTO_TEST_CASE(works/shared_future/std, "Tests that std shared_future-prom
 BOOST_AUTO_TEST_CASE(works/shared_future/lightweight, "Tests that our shared_future-promise works as intended")
 {
   std::cout << "\n=== Tests that our shared_future-promise works as intended ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures;
   std::cout << "sizeof(promise<bool>) = " << sizeof(promise<bool>) << std::endl;
   std::cout << "sizeof(shared_future<bool>) = " << sizeof(shared_future<bool>) << std::endl;
   promise<bool> p;
@@ -1374,7 +1374,7 @@ BOOST_AUTO_TEST_CASE(works/shared_future/lightweight, "Tests that our shared_fut
 BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our future-promise continuations works as intended")
 {
   std::cout << "\n=== Tests that our future-promise continuations works as intended ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures;
   // Check basic Concurrency TS conformance
   {
     int test = 0;
@@ -1487,7 +1487,7 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
 BOOST_AUTO_TEST_CASE(works/shared_future/continuations/lightweight, "Tests that our shared_future-promise continuations works as intended")
 {
   std::cout << "\n=== Tests that our shared_future-promise continuations works as intended ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures;
   int test = 0;
   promise<void> p;
   shared_future<void> f(p.get_future());
@@ -1504,7 +1504,7 @@ BOOST_AUTO_TEST_CASE(works/shared_future/continuations/lightweight, "Tests that 
 
 template<template<class> class F, template<class> class SF, template<class> class P> void WaitComposureConformanceTest()
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   std::exception_ptr e(std::make_exception_ptr(std::runtime_error("hello")));
   // Iterator based future when_all
   {
@@ -1607,7 +1607,7 @@ template<template<class> class F, template<class> class SF, template<class> clas
 BOOST_AUTO_TEST_CASE(works/composure/future/lightweight, "Tests that our future-promise composes as intended")
 {
   std::cout << "\n=== Tests that our future-promise composes as intended ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures;
   WaitComposureConformanceTest<future, shared_future, promise>();
 }
 
@@ -1648,7 +1648,7 @@ BOOST_AUTO_TEST_CASE(performance/overhead, "Calculate the timing overhead and wa
 template<template<class> class F, template<class> class P> double CalculateFuturePerformanceSimple(const char *desc)
 {
   double total=0;
-  size_t loops=BOOST_MONAD_RUNNING_ON_VALGRIND ? 10000 : 1000000;
+  size_t loops=BOOST_OUTCOME_RUNNING_ON_VALGRIND ? 10000 : 1000000;
   for(size_t m=0; m<5; m++)
   {
     auto begin = GetUsCount();
@@ -1669,7 +1669,7 @@ template<template<class> class F, template<class> class P> double CalculateFutur
 
 BOOST_AUTO_TEST_CASE(performance/future/simple/std, "Tests the performance of std future-promise in a simple loop")
 {
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   std::cout << "\n=== Tests the performance of std future-promise in a simple loop ===" << std::endl;
   auto result=CalculateFuturePerformanceSimple<stl11::future, stl11::promise>("std");
   std::cout << "Approximately " << (result/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round" << std::endl;
@@ -1678,7 +1678,7 @@ BOOST_AUTO_TEST_CASE(performance/future/simple/std, "Tests the performance of st
 BOOST_AUTO_TEST_CASE(performance/future/simple/lightweight, "Tests the performance of our future-promise in a simple loop")
 {
   std::cout << "\n=== Tests the performance of our future-promise in a simple loop ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures;
   auto result=CalculateFuturePerformanceSimple<future, promise>("lightweight");
   std::cout << "Approximately " << (result/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round" << std::endl;
 }
@@ -1686,7 +1686,7 @@ BOOST_AUTO_TEST_CASE(performance/future/simple/lightweight, "Tests the performan
 BOOST_AUTO_TEST_CASE(performance/future_option/simple, "Tests the performance of our future_option in a simple loop")
 {
   std::cout << "\n=== Tests the performance of our future_option in a simple loop ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures;
   std::cout << "sizeof(promise_option<bool>) = " << sizeof(promise_option<bool>) << std::endl;
   std::cout << "sizeof(future_option<bool>) = " << sizeof(future_option<bool>) << std::endl;
   std::cout << "sizeof(promise_option<bool>[2]) = " << sizeof(promise_option<bool>[2]) << std::endl;
@@ -1700,7 +1700,7 @@ BOOST_AUTO_TEST_CASE(performance/future_option/simple, "Tests the performance of
 BOOST_AUTO_TEST_CASE(performance/shared_future/simple/std, "Tests the performance of std shared_future-promise in a simple loop")
 {
   std::cout << "\n=== Tests the performance of std shared_future-promise in a simple loop ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   auto result=CalculateFuturePerformanceSimple<stl11::shared_future, stl11::promise>("std");
   std::cout << "Approximately " << (result/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round" << std::endl;
 }
@@ -1708,7 +1708,7 @@ BOOST_AUTO_TEST_CASE(performance/shared_future/simple/std, "Tests the performanc
 BOOST_AUTO_TEST_CASE(performance/shared_future/simple/lightweight, "Tests the performance of our shared_future-promise in a simple loop")
 {
   std::cout << "\n=== Tests the performance of our shared_future-promise in a simple loop ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures;
   auto result=CalculateFuturePerformanceSimple<shared_future, promise>("lightweight");
   std::cout << "Approximately " << (result/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per round" << std::endl;
 }
@@ -1716,7 +1716,7 @@ BOOST_AUTO_TEST_CASE(performance/shared_future/simple/lightweight, "Tests the pe
 template<template<class> class F, template<class> class P> std::tuple<double, double, double> CalculateFuturePerformanceProducerConsumer(const char *desc)
 {
   double setting=0, getting=0, destruction=0;
-  size_t loops=BOOST_MONAD_RUNNING_ON_VALGRIND ? 10000 : 1000000;
+  size_t loops=BOOST_OUTCOME_RUNNING_ON_VALGRIND ? 10000 : 1000000;
   std::vector<F<int>> futures(loops);
   for(size_t m=0; m<5; m++)
   {
@@ -1757,7 +1757,7 @@ template<template<class> class F, template<class> class P> std::tuple<double, do
 BOOST_AUTO_TEST_CASE(performance/future/producerconsumer/std, "Tests the performance of std future-promise in a producer consumer")
 {
   std::cout << "\n=== Tests the performance of std future-promise in a producer consumer ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   auto result=CalculateFuturePerformanceProducerConsumer<stl11::future, stl11::promise>("std");
   std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation and setting." << std::endl;
   std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per getting." << std::endl;
@@ -1768,7 +1768,7 @@ BOOST_AUTO_TEST_CASE(performance/future/producerconsumer/std, "Tests the perform
 BOOST_AUTO_TEST_CASE(performance/future/producerconsumer/lightweight, "Tests the performance of our future-promise in a producer consumer")
 {
   std::cout << "\n=== Tests the performance of our future-promise in a producer consumer ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures;
   auto result=CalculateFuturePerformanceProducerConsumer<future, promise>("lightweight");
   std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation and setting." << std::endl;
   std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per getting." << std::endl;
@@ -1779,7 +1779,7 @@ BOOST_AUTO_TEST_CASE(performance/future/producerconsumer/lightweight, "Tests the
 BOOST_AUTO_TEST_CASE(performance/future_option/producerconsumer, "Tests the performance of our future_option in a producer consumer")
 {
   std::cout << "\n=== Tests the performance of our future_option in a producer consumer ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures;
   auto result=CalculateFuturePerformanceProducerConsumer<future_option, promise_option>("lightweight");
   std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation and setting." << std::endl;
   std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per getting." << std::endl;
@@ -1790,7 +1790,7 @@ BOOST_AUTO_TEST_CASE(performance/future_option/producerconsumer, "Tests the perf
 BOOST_AUTO_TEST_CASE(performance/shared_future/producerconsumer/std, "Tests the performance of std shared_future-promise in a producer consumer")
 {
   std::cout << "\n=== Tests the performance of std shared_future-promise in a producer consumer ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   auto result=CalculateFuturePerformanceProducerConsumer<stl11::shared_future, stl11::promise>("std");
   std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation and setting." << std::endl;
   std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per getting." << std::endl;
@@ -1801,7 +1801,7 @@ BOOST_AUTO_TEST_CASE(performance/shared_future/producerconsumer/std, "Tests the 
 BOOST_AUTO_TEST_CASE(performance/shared_future/producerconsumer/lightweight, "Tests the performance of our shared_future-promise in a producer consumer")
 {
   std::cout << "\n=== Tests the performance of our shared_future-promise in a producer consumer ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures;
   auto result=CalculateFuturePerformanceProducerConsumer<shared_future, promise>("lightweight");
   std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation and setting." << std::endl;
   std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per getting." << std::endl;
@@ -1822,7 +1822,7 @@ template<template<class> class F, template<class> class P> std::tuple<double, do
       char pad2[128-sizeof(F<size_t>)];
       spaced_t() : first(false)
       {
-      BOOST_MONAD_DRD_IGNORE_VAR(first);
+      BOOST_OUTCOME_DRD_IGNORE_VAR(first);
       }
     };
     std::vector<spaced_t> futures;
@@ -1834,7 +1834,7 @@ template<template<class> class F, template<class> class P> std::tuple<double, do
   } datas[THREADS];
   std::vector<std::thread> threads;
   std::atomic<size_t> done(THREADS+1);
-  size_t loops=BOOST_MONAD_RUNNING_ON_VALGRIND ? 1000 : 100000;
+  size_t loops=BOOST_OUTCOME_RUNNING_ON_VALGRIND ? 1000 : 100000;
   std::cout << "Running " << THREADS << " threads of " << loops << " iterations" << std::endl;
   for(size_t n=0; n<THREADS; n++)
   {
@@ -1923,7 +1923,7 @@ lastround:
 BOOST_AUTO_TEST_CASE(performance/future/threaded/std, "Tests the performance of std future-promise in a threaded producer consumer")
 {
   std::cout << "\n=== Tests the performance of std future-promise in a threaded producer consumer ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
   auto result=CalculateFuturePerformanceThreaded<stl11::future, stl11::promise>("std");
   std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation." << std::endl;
   std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per setting." << std::endl;
@@ -1935,7 +1935,7 @@ BOOST_AUTO_TEST_CASE(performance/future/threaded/std, "Tests the performance of 
 BOOST_AUTO_TEST_CASE(performance/future/threaded/lightweight, "Tests the performance of our future-promise in a threaded producer consumer")
 {
   std::cout << "\n=== Tests the performance of our future-promise in a threaded producer consumer ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures;
   auto result=CalculateFuturePerformanceThreaded<future, promise>("lightweight");
   std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation." << std::endl;
   std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per setting." << std::endl;
@@ -1947,7 +1947,7 @@ BOOST_AUTO_TEST_CASE(performance/future/threaded/lightweight, "Tests the perform
 BOOST_AUTO_TEST_CASE(performance/future_option/threaded, "Tests the performance of our future_option in a threaded producer consumer")
 {
   std::cout << "\n=== Tests the performance of our future_option in a threaded producer consumer ===" << std::endl;
-  using namespace BOOST_MONAD_V1_NAMESPACE::lightweight_futures;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures;
   auto result=CalculateFuturePerformanceThreaded<future_option, promise_option>("lightweight");
   std::cout << "Approximately " << (std::get<0>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per creation." << std::endl;
   std::cout << "Approximately " << (std::get<1>(result)/NANOSECONDS_PER_CPU_CYCLE) << " CPU cycles per setting." << std::endl;

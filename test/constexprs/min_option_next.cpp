@@ -2,11 +2,11 @@
 
 using namespace boost::spinlock::lightweight_futures;
 
-extern BOOST_MONAD_NOINLINE option<int> test1(int n)
+extern BOOST_OUTCOME_NOINLINE option<int> test1(int n)
 {
   return option<int>(n).next([](option<int> m) { return m.get()*3; });
 }
-extern BOOST_MONAD_NOINLINE void test2()
+extern BOOST_OUTCOME_NOINLINE void test2()
 {
 }
 

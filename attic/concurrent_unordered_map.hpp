@@ -44,7 +44,7 @@ DEALINGS IN THE SOFTWARE.
 //# endif
 //#endif
 
-BOOST_MONAD_V1_NAMESPACE_BEGIN
+BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 
     namespace detail
     {
@@ -181,7 +181,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
 
     The ThreadSanitizer runs at a reasonable speed, and it's what the automated unit testing CI uses.
 
-    valgrind helgrind runs so slowly as to be pretty much useless. valgrind drd is much better, but still very slow. Define BOOST_MONAD_ENABLE_VALGRIND
+    valgrind helgrind runs so slowly as to be pretty much useless. valgrind drd is much better, but still very slow. Define BOOST_OUTCOME_ENABLE_VALGRIND
     to build in valgrind race detection instrumentation.
     
     ## Acknowledgements: ##
@@ -337,9 +337,9 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         spinlock_type<unsigned char> lock;  // = 2 if you need to reload the bucket list
         atomic<unsigned> count; // count is used items in there
         std::vector<item_type, item_type_allocator> items;
-        bucket_type_impl() : count(0), items(0) { BOOST_MONAD_DRD_IGNORE_VAR(count); count.store(0, memory_order_relaxed); }
-        ~bucket_type_impl() BOOST_NOEXCEPT_IF(detail::is_nothrow_destructible<decltype(items)>::value) { BOOST_MONAD_DRD_STOP_IGNORING_VAR(count); }
-        bucket_type_impl(bucket_type_impl &&) noexcept : count(0) { BOOST_MONAD_DRD_IGNORE_VAR(count); count.store(0, memory_order_relaxed); }
+        bucket_type_impl() : count(0), items(0) { BOOST_OUTCOME_DRD_IGNORE_VAR(count); count.store(0, memory_order_relaxed); }
+        ~bucket_type_impl() BOOST_NOEXCEPT_IF(detail::is_nothrow_destructible<decltype(items)>::value) { BOOST_OUTCOME_DRD_STOP_IGNORING_VAR(count); }
+        bucket_type_impl(bucket_type_impl &&) noexcept : count(0) { BOOST_OUTCOME_DRD_IGNORE_VAR(count); count.store(0, memory_order_relaxed); }
         bucket_type_impl(const bucket_type_impl &) = delete;
         bucket_type_impl &operator=(bucket_type_impl &&) = delete;
         bucket_type_impl &operator=(const bucket_type_impl &) = delete;
@@ -380,10 +380,10 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         //k ^= k + 0x9e3779b9 + (k<<6) + (k>>2); // really need to avoid sequential keys tapping the same cache line
         //k ^= k + 0x9e3779b9; // really need to avoid sequential keys tapping the same cache line
         buckets_type &buckets=*_buckets.load(memory_order_acquire);
-        BOOST_MONAD_ANNOTATE_IGNORE_READS_BEGIN(); // doesn't realise that buckets never changes, so lack of lock between write and read not important
+        BOOST_OUTCOME_ANNOTATE_IGNORE_READS_BEGIN(); // doesn't realise that buckets never changes, so lack of lock between write and read not important
         size_type i=k % buckets.size();
         typename buckets_type::iterator ret=buckets.begin()+i;
-        BOOST_MONAD_ANNOTATE_IGNORE_READS_END();
+        BOOST_OUTCOME_ANNOTATE_IGNORE_READS_END();
         return ret;
       }
       static float _calc_max_load_factor() noexcept
@@ -770,7 +770,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
           if(!unique_keys_assumed)
           {
             // First search for equivalents and empties.
-#if ! BOOST_MONAD_IN_THREAD_SANITIZER  // no early outs for the sanitizer
+#if ! BOOST_OUTCOME_IN_THREAD_SANITIZER  // no early outs for the sanitizer
             if(b.count.load(memory_order_relaxed))
 #else
             if(true)
@@ -946,7 +946,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
           auto itb=_get_bucket(h);
           bucket_type &b=*itb;
           size_t offset=0;
-#if ! BOOST_MONAD_IN_THREAD_SANITIZER  // no early outs for the sanitizer
+#if ! BOOST_OUTCOME_IN_THREAD_SANITIZER  // no early outs for the sanitizer
           if(b.count.load(memory_order_relaxed))
 #endif
           {
@@ -1314,7 +1314,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       }
     }; // concurrent_unordered_map
 
-BOOST_MONAD_V1_NAMESPACE_END
+BOOST_OUTCOME_V1_NAMESPACE_END
 
 #if 0
 namespace std

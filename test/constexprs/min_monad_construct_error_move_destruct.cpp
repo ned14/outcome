@@ -1,13 +1,13 @@
 #include "../../include/boost/spinlock/future.hpp"
 
-extern BOOST_MONAD_NOINLINE std::error_code test1(std::error_code ec)
+extern BOOST_OUTCOME_NOINLINE std::error_code test1(std::error_code ec)
 {
   using namespace boost::spinlock::lightweight_futures;
   monad<int> m1(std::move(ec));
   monad<int> m2(std::move(m1));
   return m2.get_error();
 }
-extern BOOST_MONAD_NOINLINE void test2()
+extern BOOST_OUTCOME_NOINLINE void test2()
 {
 }
 

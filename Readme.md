@@ -1,9 +1,9 @@
 <center>
 master branch unit test status:
 
-Linux: [![Build Status](https://ci.nedprod.com/job/Boost.Monad%20Test%20Linux%20GCC%205/badge/icon)](https://ci.nedprod.com/job/Boost.Monad%20Test%20Linux%20GCC%205/) Windows: [![Build Status](https://ci.nedprod.com/job/Boost.Monad%20Test%20Win8%20VS2014/badge/icon)](https://ci.nedprod.com/job/Boost.Monad%20Test%20Win8%20VS2014/) Coverage: [![Coverage Status](https://coveralls.io/repos/ned14/boost.spinlock/badge.svg?branch=master)](https://coveralls.io/r/ned14/boost.spinlock?branch=master) Docs: [![Build Status](https://ci.nedprod.com/job/Boost.Monad%20Documentation/badge/icon)](https://ci.nedprod.com/job/Boost.Monad%20Documentation)
+Linux: [![Build Status](https://ci.nedprod.com/job/Boost.Monad%20Test%20Linux%20GCC%205/badge/icon)](https://ci.nedprod.com/job/Boost.Monad%20Test%20Linux%20GCC%205/) Windows: [![Build Status](https://ci.nedprod.com/job/Boost.Monad%20Test%20Win8%20VS2014/badge/icon)](https://ci.nedprod.com/job/Boost.Monad%20Test%20Win8%20VS2014/) Coverage: [![Coverage Status](https://coveralls.io/repos/ned14/boost.outcome/badge.svg?branch=master)](https://coveralls.io/r/ned14/boost.outcome?branch=master) Docs: [![Build Status](https://ci.nedprod.com/job/Boost.Monad%20Documentation/badge/icon)](https://ci.nedprod.com/job/Boost.Monad%20Documentation)
 
-Documentation: https://ned14.github.io/boost.monad/ (PDF: https://ned14.github.io/boost.monad/refman.pdf)
+Documentation: https://ned14.github.io/boost.outcome/ (PDF: https://ned14.github.io/boost.outcome/refman.pdf)
 
 Lightweight promise-future:
  - [x] Map ternary true/false/other into namespace lightweight_futures.
@@ -40,7 +40,8 @@ is done.
  - [x] when_all composure.
  - [x] Rename github to Boost.Monad.
  - [x] Replace all BOOST_CONSTEXPR and BOOST_STATIC_CONSTEXPR with constexpr.
- - [ ] Fully Boost.APIBind the library in order to get Boost.AFIO compiling again.
+ - [x] Fully Boost.APIBind the library in order to get Boost.AFIO compiling again.
+ - [x] Rename github once again this time to Boost.Outcome.
 
 Later:
  - [ ] when_any composure.

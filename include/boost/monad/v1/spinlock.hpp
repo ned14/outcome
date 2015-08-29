@@ -43,12 +43,12 @@ This is the proposed Boost.Monad library, a Boost C++ 11 library providing:
 
 #include "config.hpp"
 
-#ifndef BOOST_MONAD_SPINLOCK_H
-#define BOOST_MONAD_SPINLOCK_H
+#ifndef BOOST_OUTCOME_SPINLOCK_H
+#define BOOST_OUTCOME_SPINLOCK_H
 
-BOOST_MONAD_V1_NAMESPACE_BEGIN
+BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 
-    BOOST_BINDLIB_DECLARE(BOOST_MONAD_V1, "TODO FIXME") // TODO FIXME
+    BOOST_BINDLIB_DECLARE(BOOST_OUTCOME_V1, "TODO FIXME") // TODO FIXME
 
     /*! \struct lockable_ptr
      * \brief Lets you use a pointer to memory as a spinlock :)
@@ -91,28 +91,28 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       atomic<T> v;
     public:
       typedef T value_type;
-      BOOST_MONAD_RELAXED_CONSTEXPR spinlockbase() noexcept : v(0)
+      BOOST_OUTCOME_RELAXED_CONSTEXPR spinlockbase() noexcept : v(0)
       {
-        BOOST_MONAD_ANNOTATE_RWLOCK_CREATE(this);
+        BOOST_OUTCOME_ANNOTATE_RWLOCK_CREATE(this);
         //v.store(0, memory_order_release);
       }
       spinlockbase(const spinlockbase &) = delete;
       //! Atomically move constructs
-      BOOST_MONAD_RELAXED_CONSTEXPR spinlockbase(spinlockbase &&) noexcept : v(0)
+      BOOST_OUTCOME_RELAXED_CONSTEXPR spinlockbase(spinlockbase &&) noexcept : v(0)
       {
-        BOOST_MONAD_ANNOTATE_RWLOCK_CREATE(this);
+        BOOST_OUTCOME_ANNOTATE_RWLOCK_CREATE(this);
         //v.store(o.v.exchange(0, memory_order_acq_rel));
         //v.store(0, memory_order_release);
       }
       ~spinlockbase()
       {
-#ifdef BOOST_MONAD_ENABLE_VALGRIND
+#ifdef BOOST_OUTCOME_ENABLE_VALGRIND
         if(v.load(memory_order_acquire))
         {
-          BOOST_MONAD_ANNOTATE_RWLOCK_RELEASED(this, true);
+          BOOST_OUTCOME_ANNOTATE_RWLOCK_RELEASED(this, true);
         }
 #endif
-        BOOST_MONAD_ANNOTATE_RWLOCK_DESTROY(this);
+        BOOST_OUTCOME_ANNOTATE_RWLOCK_DESTROY(this);
       }
       spinlockbase &operator=(const spinlockbase &) = delete;
       spinlockbase &operator=(spinlockbase &&) = delete;
@@ -123,8 +123,8 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       //! If atomic is zero, sets to 1 and returns true, else false.
       bool try_lock() noexcept
       {
-#if ! BOOST_MONAD_IN_THREAD_SANITIZER  // no early outs for the sanitizer
-#ifdef BOOST_MONAD_USE_VOLATILE_READ_FOR_AVOIDING_CMPXCHG
+#if ! BOOST_OUTCOME_IN_THREAD_SANITIZER  // no early outs for the sanitizer
+#ifdef BOOST_OUTCOME_USE_VOLATILE_READ_FOR_AVOIDING_CMPXCHG
         // MSVC's atomics always seq_cst, so use volatile read to create a true acquire
         volatile T *_v=(volatile T *) &v;
         if(*_v) // Avoid unnecessary cache line invalidation traffic
@@ -144,7 +144,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         if(ret)
 #endif
         {
-          BOOST_MONAD_ANNOTATE_RWLOCK_ACQUIRED(this, true);
+          BOOST_OUTCOME_ANNOTATE_RWLOCK_ACQUIRED(this, true);
           return true;
         }
         else return false;
@@ -157,8 +157,8 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       bool try_lock(T &expected) noexcept
       {
         T t(0);
-#if ! BOOST_MONAD_IN_THREAD_SANITIZER  // no early outs for the sanitizer
-#ifdef BOOST_MONAD_USE_VOLATILE_READ_FOR_AVOIDING_CMPXCHG
+#if ! BOOST_OUTCOME_IN_THREAD_SANITIZER  // no early outs for the sanitizer
+#ifdef BOOST_OUTCOME_USE_VOLATILE_READ_FOR_AVOIDING_CMPXCHG
         // MSVC's atomics always seq_cst, so use volatile read to create a true acquire
         volatile T *_v = (volatile T *)&v;
         if((t=*_v)) // Avoid unnecessary cache line invalidation traffic
@@ -173,7 +173,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         bool ret=v.compare_exchange_weak(expected, 1, memory_order_acquire, memory_order_relaxed);
         if(ret)
         {
-          BOOST_MONAD_ANNOTATE_RWLOCK_ACQUIRED(this, true);
+          BOOST_OUTCOME_ANNOTATE_RWLOCK_ACQUIRED(this, true);
           return true;
         }
         else return false;
@@ -181,10 +181,10 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
       //! Sets the atomic to zero
       void unlock() noexcept
       {
-        BOOST_MONAD_ANNOTATE_RWLOCK_RELEASED(this, true);
+        BOOST_OUTCOME_ANNOTATE_RWLOCK_RELEASED(this, true);
         v.store(0, memory_order_release);
       }
-      BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t) noexcept { return false; }
+      BOOST_OUTCOME_RELAXED_CONSTEXPR bool int_yield(size_t) noexcept { return false; }
     };
     template<typename T> struct spinlockbase<lockable_ptr<T>>
     {
@@ -254,7 +254,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         value.n&=~(size_t)1;
         v.store(value.v, memory_order_release);
       }
-      BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t) noexcept { return false; }
+      BOOST_OUTCOME_RELAXED_CONSTEXPR bool int_yield(size_t) noexcept { return false; }
     };
     namespace detail
     {
@@ -277,7 +277,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         constexpr policy() {}
         policy(const policy &) = delete;
         constexpr policy(policy &&o) noexcept : parenttype(std::move(o)) { }
-        BOOST_MONAD_RELAXED_CONSTEXPR inline bool int_yield(size_t n) noexcept
+        BOOST_OUTCOME_RELAXED_CONSTEXPR inline bool int_yield(size_t n) noexcept
         {
           if(parenttype::int_yield(n)) return true;
           if(n>=spins) return false;
@@ -295,7 +295,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         constexpr policy() {}
         policy(const policy &) = delete;
         constexpr policy(policy &&o) noexcept : parenttype(std::move(o)) { }
-        BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t n) noexcept
+        BOOST_OUTCOME_RELAXED_CONSTEXPR bool int_yield(size_t n) noexcept
         {
           if(parenttype::int_yield(n)) return true;
           if(n>=spins) return false;
@@ -312,7 +312,7 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
         constexpr policy() {}
         policy(const policy &) = delete;
         constexpr policy(policy &&o) noexcept : parenttype(std::move(o)) { }
-        BOOST_MONAD_RELAXED_CONSTEXPR bool int_yield(size_t n) noexcept
+        BOOST_OUTCOME_RELAXED_CONSTEXPR bool int_yield(size_t n) noexcept
         {
           if(parenttype::int_yield(n)) return true;
           this_thread::sleep_for(chrono::milliseconds(1));
@@ -417,8 +417,8 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
 #ifndef BOOST_BEGIN_TRANSACT_LOCK
 #ifdef BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
 #undef BOOST_USING_INTEL_TSX
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable) __transaction_relaxed { (void) BOOST_MONAD_V1_NAMESPACE::is_lockable_locked(lockable); {
-#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) __transaction_relaxed { if((only_if_not_this)!=BOOST_MONAD_V1_NAMESPACE::is_lockable_locked(lockable)) {
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) __transaction_relaxed { (void) BOOST_OUTCOME_V1_NAMESPACE::is_lockable_locked(lockable); {
+#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) __transaction_relaxed { if((only_if_not_this)!=BOOST_OUTCOME_V1_NAMESPACE::is_lockable_locked(lockable)) {
 #define BOOST_END_TRANSACT_LOCK(lockable) } }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N) __transaction_relaxed
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)
@@ -426,13 +426,13 @@ BOOST_MONAD_V1_NAMESPACE_BEGIN
 #endif
 
 #ifndef BOOST_BEGIN_TRANSACT_LOCK
-#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { BOOST_MONAD_V1_NAMESPACE::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
-#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) if(lockable.lock(only_if_not_this)) { BOOST_MONAD_V1_NAMESPACE::lock_guard<decltype(lockable)> __tsx_transaction(lockable, BOOST_MONAD_V1_NAMESPACE::adopt_lock_t());
+#define BOOST_BEGIN_TRANSACT_LOCK(lockable) { BOOST_OUTCOME_V1_NAMESPACE::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
+#define BOOST_BEGIN_TRANSACT_LOCK_ONLY_IF_NOT(lockable, only_if_not_this) if(lockable.lock(only_if_not_this)) { BOOST_OUTCOME_V1_NAMESPACE::lock_guard<decltype(lockable)> __tsx_transaction(lockable, BOOST_OUTCOME_V1_NAMESPACE::adopt_lock_t());
 #define BOOST_END_TRANSACT_LOCK(lockable) }
 #define BOOST_BEGIN_NESTED_TRANSACT_LOCK(N)
 #define BOOST_END_NESTED_TRANSACT_LOCK(N)
 #endif // BOOST_BEGIN_TRANSACT_LOCK
 
-BOOST_MONAD_V1_NAMESPACE_END
+BOOST_OUTCOME_V1_NAMESPACE_END
 
-#endif // BOOST_MONAD_HPP
+#endif // BOOST_OUTCOME_HPP

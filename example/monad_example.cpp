@@ -1,7 +1,7 @@
 #include "../include/boost/monad.hpp"
 #include <iostream>
 
-using namespace BOOST_MONAD_V1_NAMESPACE;
+using namespace BOOST_OUTCOME_V1_NAMESPACE;
 
 //! [monad_bind_example]
 template<class T> monad<T> do_test(monad<T> m)

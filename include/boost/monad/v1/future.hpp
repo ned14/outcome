@@ -31,8 +31,8 @@ DEALINGS IN THE SOFTWARE.
 
 #include "config.hpp"
 
-#ifndef BOOST_MONAD_FUTURE_H
-#define BOOST_MONAD_FUTURE_H
+#ifndef BOOST_OUTCOME_FUTURE_H
+#define BOOST_OUTCOME_FUTURE_H
 
 #include "monad.hpp"
 
@@ -116,21 +116,21 @@ except for the added members which are commented:
 */
 
 // Used by constexpr testing to make sure I haven't borked any constexpr fold paths
-//#define BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+//#define BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
 
-#if BOOST_MONAD_IN_THREAD_SANITIZER
-#define BOOST_MONAD_FUTURE_MUTEX_TYPE std::mutex
-#define BOOST_MONAD_FUTURE_MUTEX_TYPE_DESTRUCTOR mutex
-#define BOOST_MONAD_FUTURE_NO_SANITIZE_LOAD(v) ((std::atomic<decltype(v)> *)(&v))->load(std::memory_order::memory_order_relaxed)
-#define BOOST_MONAD_FUTURE_NO_SANITIZE_STORE(v, x) ((std::atomic<decltype(v)> *)(&v))->store((x), std::memory_order::memory_order_relaxed)
+#if BOOST_OUTCOME_IN_THREAD_SANITIZER
+#define BOOST_OUTCOME_FUTURE_MUTEX_TYPE std::mutex
+#define BOOST_OUTCOME_FUTURE_MUTEX_TYPE_DESTRUCTOR mutex
+#define BOOST_OUTCOME_FUTURE_NO_SANITIZE_LOAD(v) ((std::atomic<decltype(v)> *)(&v))->load(std::memory_order::memory_order_relaxed)
+#define BOOST_OUTCOME_FUTURE_NO_SANITIZE_STORE(v, x) ((std::atomic<decltype(v)> *)(&v))->store((x), std::memory_order::memory_order_relaxed)
 #else
-#define BOOST_MONAD_FUTURE_MUTEX_TYPE spinlock<bool>
-#define BOOST_MONAD_FUTURE_MUTEX_TYPE_DESTRUCTOR spinlock<bool>
-#define BOOST_MONAD_FUTURE_NO_SANITIZE_LOAD(v) (v)
-#define BOOST_MONAD_FUTURE_NO_SANITIZE_STORE(v, x) ((v)=(x))
+#define BOOST_OUTCOME_FUTURE_MUTEX_TYPE spinlock<bool>
+#define BOOST_OUTCOME_FUTURE_MUTEX_TYPE_DESTRUCTOR spinlock<bool>
+#define BOOST_OUTCOME_FUTURE_NO_SANITIZE_LOAD(v) (v)
+#define BOOST_OUTCOME_FUTURE_NO_SANITIZE_STORE(v, x) ((v)=(x))
 #endif
 
-BOOST_MONAD_V1_NAMESPACE_BEGIN
+BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 namespace lightweight_futures {
   
   template<typename R> class basic_promise;
@@ -139,7 +139,7 @@ namespace lightweight_futures {
   
   namespace detail
   {
-    using namespace BOOST_MONAD_V1_NAMESPACE::detail;
+    using namespace BOOST_OUTCOME_V1_NAMESPACE::detail;
     template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct basic_promise_future_storage;
     template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct basic_promise_storage;
     template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> using basic_future_storage = basic_promise_future_storage<_value_type, _error_type, _exception_type, _wait_implementation>;
@@ -153,21 +153,21 @@ namespace lightweight_futures {
       future_base_type *_f;
       lock_guard(const lock_guard &)=delete;
       lock_guard(lock_guard &&)=delete;
-      BOOST_MONAD_FUTURE_MSVC_HELP lock_guard(promise_base_type *p) : _p(nullptr), _f(nullptr)
+      BOOST_OUTCOME_FUTURE_MSVC_HELP lock_guard(promise_base_type *p) : _p(nullptr), _f(nullptr)
       {
         relock(p);
       }
-      BOOST_MONAD_FUTURE_MSVC_HELP lock_guard(future_base_type *f) : _p(nullptr), _f(nullptr)
+      BOOST_OUTCOME_FUTURE_MSVC_HELP lock_guard(future_base_type *f) : _p(nullptr), _f(nullptr)
       {
         relock(f);
       }
-      BOOST_MONAD_FUTURE_MSVC_HELP ~lock_guard()
+      BOOST_OUTCOME_FUTURE_MSVC_HELP ~lock_guard()
       {
         unlock();
       }
-      BOOST_MONAD_FUTURE_MSVC_HELP void relock(promise_base_type *p)
+      BOOST_OUTCOME_FUTURE_MSVC_HELP void relock(promise_base_type *p)
       {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         // constexpr fold
         if(!p->_need_locks)
         {
@@ -198,9 +198,9 @@ namespace lightweight_futures {
           p->_lock.unlock();
         }
       }
-      BOOST_MONAD_FUTURE_MSVC_HELP void relock(future_base_type *f)
+      BOOST_OUTCOME_FUTURE_MSVC_HELP void relock(future_base_type *f)
       {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         // constexpr fold
         if(!f->_need_locks)
         {
@@ -235,7 +235,7 @@ namespace lightweight_futures {
       {
         if(_p)
         {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
           if(_p->_need_locks)
 #endif
             _p->_lock.unlock();
@@ -243,7 +243,7 @@ namespace lightweight_futures {
         }
         if(_f)
         {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
           if(_f->_need_locks)
 #endif
             _f->_lock.unlock();
@@ -258,13 +258,13 @@ namespace lightweight_futures {
     };
 
     // Stop source being moved without a lock
-    template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> BOOST_MONAD_FUTURE_CXX14_CONSTEXPR void locking_basic_promise_future_storage_mover(basic_promise_future_storage<_value_type, _error_type, _exception_type, _wait_implementation> *v)
+    template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR void locking_basic_promise_future_storage_mover(basic_promise_future_storage<_value_type, _error_type, _exception_type, _wait_implementation> *v)
     {
       typename basic_promise_future_storage<_value_type, _error_type, _exception_type, _wait_implementation>::lock_guard_type h(v);
       h.release();
     }
     // The base class for all basic_promises and basic_futures, aligned to 64 bytes to make one per cache line
-    template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct /*BOOST_MONAD_ALIGN(64)*/ basic_promise_future_storage
+    template<class _value_type, class _error_type, class _exception_type, class _wait_implementation> struct /*BOOST_OUTCOME_ALIGN(64)*/ basic_promise_future_storage
     {
       using lock_guard_type = lock_guard<_value_type, _error_type, _exception_type, _wait_implementation>;
       using promise_base_type = basic_promise_storage<_value_type, _error_type, _exception_type, _wait_implementation>;
@@ -276,17 +276,17 @@ namespace lightweight_futures {
       value_storage_type _storage;      // 24 bytes
 
       //! \todo Could eliminate 8 bytes of storage by packing basic_promise_future_storage bools into value_storage_type
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       bool _need_locks;                 // Used to inhibit unnecessary atomic use, thus enabling constexpr collapse
 #endif
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4624)
 #endif
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
-      union { BOOST_MONAD_FUTURE_MUTEX_TYPE _lock; };  // Delay construction
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+      union { BOOST_OUTCOME_FUTURE_MUTEX_TYPE _lock; };  // Delay construction
 #else
-      BOOST_MONAD_FUTURE_MUTEX_TYPE _lock;
+      BOOST_OUTCOME_FUTURE_MUTEX_TYPE _lock;
 #endif
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -299,14 +299,14 @@ namespace lightweight_futures {
         promise_base_type *_promise;
         future_base_type *_future;
       };                                  // 40 bytes
-      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage() noexcept :
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage() noexcept :
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         _need_locks(false),
 #endif
         _broken_promise(false), _promise(nullptr)
       {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
-        if (_need_locks) new (&_lock) BOOST_MONAD_FUTURE_MUTEX_TYPE();
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+        if (_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
 #endif
       }
       
@@ -317,15 +317,15 @@ namespace lightweight_futures {
       static constexpr bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
 
       // WARNING: Exits with lock on source held!
-      template<class _value_type2, class _error_type2, class _exception_type2, class _wait_implementation2> BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(basic_promise_future_storage<_value_type2, _error_type2, _exception_type2, _wait_implementation2> &&o) noexcept(is_nothrow_move_constructible && basic_promise_future_storage<_value_type2, _error_type2, _exception_type2, _wait_implementation2>::is_nothrow_move_constructible)
+      template<class _value_type2, class _error_type2, class _exception_type2, class _wait_implementation2> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(basic_promise_future_storage<_value_type2, _error_type2, _exception_type2, _wait_implementation2> &&o) noexcept(is_nothrow_move_constructible && basic_promise_future_storage<_value_type2, _error_type2, _exception_type2, _wait_implementation2>::is_nothrow_move_constructible)
         : _storage((locking_basic_promise_future_storage_mover(&o), std::move(o._storage)))
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(o._need_locks)
 #endif
         , _broken_promise(o._broken_promise), _promise(o._promise)
       {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
-        if(_need_locks) new (&_lock) BOOST_MONAD_FUTURE_MUTEX_TYPE();
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+        if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
 #endif
         o._promise = nullptr;
         if(_promise)
@@ -334,90 +334,90 @@ namespace lightweight_futures {
       basic_promise_future_storage(const basic_promise_future_storage &)=delete;
       basic_promise_future_storage &operator=(basic_promise_future_storage &&)=delete;
       basic_promise_future_storage &operator=(const basic_promise_future_storage &)=delete;
-      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR explicit basic_promise_future_storage(value_storage_type &&v) noexcept(is_nothrow_move_constructible) : _storage(std::move(v))
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR explicit basic_promise_future_storage(value_storage_type &&v) noexcept(is_nothrow_move_constructible) : _storage(std::move(v))
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
         , _broken_promise(false), _promise(nullptr)
       {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
-        if(_need_locks) new (&_lock) BOOST_MONAD_FUTURE_MUTEX_TYPE();
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+        if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
 #endif
       }
-      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : _storage(v)
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : _storage(v)
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
         , _broken_promise(false), _promise(nullptr)
       {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
-        if(_need_locks) new (&_lock) BOOST_MONAD_FUTURE_MUTEX_TYPE();
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+        if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
 #endif
       }
-      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : _storage(std::move(v))
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : _storage(std::move(v))
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
         , _broken_promise(false), _promise(nullptr)
       {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
-        if(_need_locks) new (&_lock) BOOST_MONAD_FUTURE_MUTEX_TYPE();
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+        if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
 #endif
       }
-      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : _storage(v)
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : _storage(v)
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
         , _broken_promise(false), _promise(nullptr)
       {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
-        if(_need_locks) new (&_lock) BOOST_MONAD_FUTURE_MUTEX_TYPE();
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+        if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
 #endif
       }
-      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : _storage(std::move(v))
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value) : _storage(std::move(v))
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
         , _broken_promise(false), _promise(nullptr)
       {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
-        if(_need_locks) new (&_lock) BOOST_MONAD_FUTURE_MUTEX_TYPE();
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+        if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
 #endif
       }
-      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : _storage(v)
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : _storage(v)
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
         , _broken_promise(false), _promise(nullptr)
       {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
-        if(_need_locks) new (&_lock) BOOST_MONAD_FUTURE_MUTEX_TYPE();
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+        if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
 #endif
       }
-      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : _storage(std::move(v))
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : _storage(std::move(v))
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
         , _broken_promise(false), _promise(nullptr)
       {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
-        if(_need_locks) new (&_lock) BOOST_MONAD_FUTURE_MUTEX_TYPE();
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+        if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
 #endif
       }
-      template<class... Args> BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(typename value_storage_type::emplace_t _, Args &&...args) : _storage(_, std::forward<Args>(args)...)
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+      template<class... Args> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_promise_future_storage(typename value_storage_type::emplace_t _, Args &&...args) : _storage(_, std::forward<Args>(args)...)
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
         , _broken_promise(false), _promise(nullptr)
       {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
-        if(_need_locks) new (&_lock) BOOST_MONAD_FUTURE_MUTEX_TYPE();
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+        if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
 #endif
       }
       ~basic_promise_future_storage() noexcept(is_nothrow_destructible)
       {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
-        if(_need_locks) _lock.~BOOST_MONAD_FUTURE_MUTEX_TYPE_DESTRUCTOR();
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+        if(_need_locks) _lock.~BOOST_OUTCOME_FUTURE_MUTEX_TYPE_DESTRUCTOR();
 #endif
       }
       constexpr bool is_ready() const noexcept
@@ -440,16 +440,16 @@ namespace lightweight_futures {
       {
         return _storage.type==value_storage_type::storage_type::exception || (!only_exception && _storage.type==value_storage_type::storage_type::error);
       }
-      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR void swap(basic_promise_future_storage &o) noexcept(is_nothrow_move_constructible)
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR void swap(basic_promise_future_storage &o) noexcept(is_nothrow_move_constructible)
       {
         _storage.swap(o._storage);
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         std::swap(_need_locks, o._need_locks);
 #endif
         std::swap(_broken_promise, o._broken_promise);
         std::swap(_promise, o._promise);
       }
-      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
       {
         _storage.clear();
       }
@@ -470,7 +470,7 @@ namespace lightweight_futures {
       constexpr basic_promise_storage() noexcept { }
       constexpr basic_promise_storage(basic_promise_storage &&o) noexcept
         : base(std::move(o)), _set_state_info(std::move(o._set_state_info)) { }
-      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR void swap(basic_promise_storage &o) noexcept
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR void swap(basic_promise_storage &o) noexcept
       {
         base::swap(o);
         std::swap(_set_state_info.continuation_future, o._set_state_info.continuation_future);
@@ -535,11 +535,11 @@ namespace lightweight_futures {
     constexpr basic_promise() = default;
 //// template<class Allocator> basic_promise(allocator_arg_t, Allocator a); // cannot support
     //! \brief SYNC POINT Move constructor
-    BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_promise(basic_promise &&o) noexcept(is_nothrow_move_constructible) : base(std::move(o))
+    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_promise(basic_promise &&o) noexcept(is_nothrow_move_constructible) : base(std::move(o))
     {
       // base of promise inheritance tree returns with lock held on o and his (now my) future
       // so as the final layer we need to unlock both
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       if(this->_need_locks)
 #endif
       {
@@ -549,7 +549,7 @@ namespace lightweight_futures {
       }
     }
     //! \brief SYNC POINT Move assignment. If throws during move, destination promise is left as if default constructed i.e. any previous promise contents are destroyed.
-    BOOST_MONAD_FUTURE_MSVC_HELP basic_promise &operator=(basic_promise &&o) noexcept(is_nothrow_move_constructible)
+    BOOST_OUTCOME_FUTURE_MSVC_HELP basic_promise &operator=(basic_promise &&o) noexcept(is_nothrow_move_constructible)
     {
       typename base::lock_guard_type h1(this), h2(&o);
       this->_storage.clear();
@@ -576,7 +576,7 @@ namespace lightweight_futures {
     basic_promise(const basic_promise &)=delete;
     basic_promise &operator=(const basic_promise &)=delete;
     //! \brief SYNC POINT Destroys the promise.
-    BOOST_MONAD_FUTURE_MSVC_HELP ~basic_promise() noexcept(is_nothrow_destructible)
+    BOOST_OUTCOME_FUTURE_MSVC_HELP ~basic_promise() noexcept(is_nothrow_destructible)
     {
       if(this->_future_created && this->_future)
       {
@@ -593,21 +593,21 @@ namespace lightweight_futures {
     }
     
     //! \brief SYNC POINT Swap this promise for another
-    BOOST_MONAD_FUTURE_MSVC_HELP void swap(basic_promise &o) noexcept(is_nothrow_move_constructible)
+    BOOST_OUTCOME_FUTURE_MSVC_HELP void swap(basic_promise &o) noexcept(is_nothrow_move_constructible)
     {
       lock_guard_type h1(this), h2(&o);
       base::swap(o);
     }
     
     //! \brief SYNC POINT Create a future to be associated with this promise. Can be called exactly once, else throws a `future_already_retrieved`.
-    BOOST_MONAD_FUTURE_MSVC_HELP basic_future<implementation_policy> get_future()
+    BOOST_OUTCOME_FUTURE_MSVC_HELP basic_future<implementation_policy> get_future()
     {
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       // If no value stored yet, I need locks on from now on
       if(!this->_need_locks && this->_storage.type==value_storage_type::storage_type::empty)
       {
         this->_need_locks=true;
-        new (&this->_lock) BOOST_MONAD_FUTURE_MUTEX_TYPE();
+        new (&this->_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
       }
 #endif
       lock_guard_type h(this);
@@ -620,7 +620,7 @@ namespace lightweight_futures {
       {
         this->_future=&ret;
         ret._promise=this;
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         ret._need_locks=this->_need_locks;
 #endif
       }
@@ -629,7 +629,7 @@ namespace lightweight_futures {
       return ret;
     }
     //! \brief EXTENSION: Does this basic_promise have a future?
-    BOOST_MONAD_FUTURE_MSVC_HELP bool has_future() const noexcept
+    BOOST_OUTCOME_FUTURE_MSVC_HELP bool has_future() const noexcept
     {
       //detail::lock_guard<value_type> h(this);
       return this->_future || this->_future_created;
@@ -648,7 +648,7 @@ namespace lightweight_futures {
       if(state_info.sleeping_waiters)
         state_info.sleeping_waiters.get()->get()->set_value();
     }
-    template<class U> BOOST_MONAD_FUTURE_MSVC_HELP void _set_state(U &&c, bool is_continuation=false)
+    template<class U> BOOST_OUTCOME_FUTURE_MSVC_HELP void _set_state(U &&c, bool is_continuation=false)
     {
       lock_guard_type h(this);
       if(h._f)
@@ -700,38 +700,38 @@ namespace lightweight_futures {
       }
     }
     // Sets state from a continuation (don't throw if the promise is broken)
-    BOOST_MONAD_FUTURE_MSVC_HELP void _set_state_from_continuation(value_storage_type &&v)
+    BOOST_OUTCOME_FUTURE_MSVC_HELP void _set_state_from_continuation(value_storage_type &&v)
     {
       _set_state([&v](future_base_type *self) { self->_storage.set_state(std::move(v)); }, true);
     }
   public:
     /*! \brief SYNC POINT EXTENSION Sets the state to be returned by the associated future to be the same as the value storage, releasing any waits occuring in other threads.
     */
-    BOOST_MONAD_FUTURE_MSVC_HELP void set_state(value_storage_type &&v)
+    BOOST_OUTCOME_FUTURE_MSVC_HELP void set_state(value_storage_type &&v)
     {
       _set_state([&v](future_base_type *self){ self->_storage.set_state(std::move(v));});
     }
     /*! \brief SYNC POINT Sets the value to be returned by the associated future to be a default constructed value_type, releasing any waits occuring in other threads.
     */
-    BOOST_MONAD_FUTURE_MSVC_HELP void set_value()
+    BOOST_OUTCOME_FUTURE_MSVC_HELP void set_value()
     {
       _set_state([](future_base_type *self){ self->_storage.set_value(value_type());});
     }
     /*! \brief SYNC POINT Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
     */
-    BOOST_MONAD_FUTURE_MSVC_HELP void set_value(const value_type &v)
+    BOOST_OUTCOME_FUTURE_MSVC_HELP void set_value(const value_type &v)
     {
       _set_state([&v](future_base_type *self){ self->_storage.set_value(v);});
     }
     /*! \brief SYNC POINT Sets the value to be returned by the associated future, releasing any waits occuring in other threads.
     */
-    BOOST_MONAD_FUTURE_MSVC_HELP void set_value(value_type &&v)
+    BOOST_OUTCOME_FUTURE_MSVC_HELP void set_value(value_type &&v)
     {
       _set_state([&v](future_base_type *self){ self->_storage.set_value(std::move(v));});
     }
     /*! \brief SYNC POINT EXTENSION: Sets the value by emplacement to be returned by the associated future, releasing any waits occuring in other threads.
     */
-    template<class... Args> BOOST_MONAD_FUTURE_MSVC_HELP void emplace_value(Args &&... args)
+    template<class... Args> BOOST_OUTCOME_FUTURE_MSVC_HELP void emplace_value(Args &&... args)
     {
 #if defined(__GNUC__) && !defined(__clang__) && (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__) < 40900
       // GCC before 4.9 can't cope with variadic args unpack in lambda captures
@@ -742,12 +742,12 @@ namespace lightweight_futures {
 #endif
     }
     //! \brief SYNC POINT EXTENSION: Set an error code outcome (doesn't allocate)
-    BOOST_MONAD_FUTURE_MSVC_HELP void set_error(error_type e)
+    BOOST_OUTCOME_FUTURE_MSVC_HELP void set_error(error_type e)
     {
       _set_state([&e](future_base_type *self){ self->_storage.set_error(std::move(e));});
     }
     //! \brief SYNC POINT Sets an exception outcome
-    BOOST_MONAD_FUTURE_MSVC_HELP void set_exception(exception_type e)
+    BOOST_OUTCOME_FUTURE_MSVC_HELP void set_exception(exception_type e)
     {
       _set_state([&e](future_base_type *self){ self->_storage.set_exception(std::move(e));});
     }
@@ -815,7 +815,7 @@ namespace lightweight_futures {
       using future_base_type = typename future_type::future_base_type;
       using promise_base_type = typename future_type::promise_base_type;
       future_type continuation_future;
-      BOOST_MONAD_FUTURE_CXX14_CONSTEXPR continuation(future_base_type *&_continuation_future, promise_type &&_p, callable_type &&_f, detail::function_ptr<void(future_base_type *)> &&_prev)
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR continuation(future_base_type *&_continuation_future, promise_type &&_p, callable_type &&_f, detail::function_ptr<void(future_base_type *)> &&_prev)
         : continuation<false, f_traits, implementation_policy, future_type, promise_type, callable_type>(std::move(_p), std::move(_f), std::move(_prev))
       {
         _continuation_future=&continuation_future;
@@ -901,11 +901,11 @@ namespace lightweight_futures {
         throw future_error(stl11::error_code(static_cast<int>(future_errc::no_state), implementation_policy::future_category()));
     }
     // Called to convert from one type of future into this one. Lock of source is already held.
-    template<class U> BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_future(std::nullptr_t, basic_future<U> &&o) : monad_type(static_cast<typename basic_future<U>::monad_type &&>(o))
+    template<class U> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_future(std::nullptr_t, basic_future<U> &&o) : monad_type(static_cast<typename basic_future<U>::monad_type &&>(o))
     {
       // base of future inheritance tree returns with lock held on o and his (now my) promise
       // so as the final layer we need to unlock both
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       if (this->_need_locks)
 #endif
       {
@@ -922,11 +922,11 @@ namespace lightweight_futures {
     {
     }
     //! \brief SYNC POINT Move constructor
-    BOOST_MONAD_FUTURE_CXX14_CONSTEXPR basic_future(basic_future &&o) noexcept(is_nothrow_move_constructible) : monad_type(std::move(o))
+    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_future(basic_future &&o) noexcept(is_nothrow_move_constructible) : monad_type(std::move(o))
     {
       // base of future inheritance tree returns with lock held on o and his (now my) promise
       // so as the final layer we need to unlock both
-#ifdef BOOST_MONAD_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
+#ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
       if(this->_need_locks)
 #endif
       {
@@ -936,7 +936,7 @@ namespace lightweight_futures {
       }
     }
     //! \brief SYNC POINT Move assignment. If it throws during the move, the future is left as if default constructed.
-    BOOST_MONAD_FUTURE_MSVC_HELP basic_future &operator=(basic_future &&o) noexcept(is_nothrow_move_assignable)
+    BOOST_OUTCOME_FUTURE_MSVC_HELP basic_future &operator=(basic_future &&o) noexcept(is_nothrow_move_assignable)
     {
       lock_guard_type h1(this), h2(&o);
       if(valid())
@@ -963,7 +963,7 @@ namespace lightweight_futures {
     basic_future(const basic_future &)=delete;
     basic_future &operator=(const basic_future &)=delete;
     //! \brief SYNC POINT Destructs the future.
-    BOOST_MONAD_FUTURE_MSVC_HELP ~basic_future() noexcept(is_nothrow_destructible)
+    BOOST_OUTCOME_FUTURE_MSVC_HELP ~basic_future() noexcept(is_nothrow_destructible)
     {
       if(valid())
       {
@@ -1062,7 +1062,7 @@ namespace lightweight_futures {
     using monad_type::share;
 #endif
     //! \brief SYNC POINT Returns by move of the future state a corresponding monad
-    monad<value_type> get_monad() && { return monad<value_type>(std::move(this->get_state())); }
+    outcome<value_type> get_monad() && { return outcome<value_type>(std::move(this->get_state())); }
     //! \brief SYNC POINT Compatibility with Boost.Thread
     exception_type get_exception_ptr() { return this->get_exception(); }
     
@@ -1111,7 +1111,7 @@ namespace lightweight_futures {
     //! \brief SYNC POINT Wait for the future to become ready
     void wait() const
     {
-#if !BOOST_MONAD_IN_THREAD_SANITIZER
+#if !BOOST_OUTCOME_IN_THREAD_SANITIZER
       if(this->is_ready())
         return;
 #endif
@@ -1123,7 +1123,7 @@ namespace lightweight_futures {
     //! \brief SYNC POINT (if non-zero duration) Wait for the future to become ready for a duration
     template<class R, class P> future_status wait_for(const stl11::chrono::duration<R, P> &rel_time) const
     {
-#if !BOOST_MONAD_IN_THREAD_SANITIZER
+#if !BOOST_OUTCOME_IN_THREAD_SANITIZER
       if (rel_time.count() == 0)
         return this->is_ready() ? future_status::ready : future_status::timeout;
 #endif
@@ -1162,7 +1162,7 @@ namespace lightweight_futures {
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
     template<class F> future<...> then(F &&f);
 #else
-    template<class _F> BOOST_MONAD_FUTURE_MSVC_HELP typename detail::do_then<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_future>::type, typename std::decay<_F>::type, implementation_policy>::output_type then(_F &&f)
+    template<class _F> BOOST_OUTCOME_FUTURE_MSVC_HELP typename detail::do_then<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_future>::type, typename std::decay<_F>::type, implementation_policy>::output_type then(_F &&f)
     {
       typedef typename std::decay<_F>::type F;
       typedef traits::callable_argument_traits<F, basic_future> f_traits;
@@ -1299,54 +1299,54 @@ namespace lightweight_futures {
     explicit operator bool() const { return _check()->operator bool(); }
     //! \brief Forwards to operator tribool
     explicit operator tribool::tribool() const { return _check()->operator tribool::tribool(); }
-#define BOOST_MONAD_FUTURE_IMPL(name) \
-    template<class... Args> BOOST_MONAD_FUTURE_MSVC_HELP auto name(Args &&... args) const noexcept(noexcept(_future->name(std::forward<Args>(args)...))) -> decltype(_future->name(std::forward<Args>(args)...)) \
+#define BOOST_OUTCOME_FUTURE_IMPL(name) \
+    template<class... Args> BOOST_OUTCOME_FUTURE_MSVC_HELP auto name(Args &&... args) const noexcept(noexcept(_future->name(std::forward<Args>(args)...))) -> decltype(_future->name(std::forward<Args>(args)...)) \
     { \
       return _check()->name(std::forward<Args>(args)...); \
     }
     //! \brief Forwards to is_ready()
-    BOOST_MONAD_FUTURE_IMPL(is_ready)
+    BOOST_OUTCOME_FUTURE_IMPL(is_ready)
     //! \brief Forwards to empty()
-    BOOST_MONAD_FUTURE_IMPL(empty)
+    BOOST_OUTCOME_FUTURE_IMPL(empty)
     //! \brief Forwards to has_value()
-    BOOST_MONAD_FUTURE_IMPL(has_value)
+    BOOST_OUTCOME_FUTURE_IMPL(has_value)
     //! \brief Forwards to has_error()
-    BOOST_MONAD_FUTURE_IMPL(has_error)
+    BOOST_OUTCOME_FUTURE_IMPL(has_error)
     //! \brief Forwards to has_exception()
-    BOOST_MONAD_FUTURE_IMPL(has_exception)
+    BOOST_OUTCOME_FUTURE_IMPL(has_exception)
     //! \brief Forwards to valid()
-    BOOST_MONAD_FUTURE_IMPL(valid)
+    BOOST_OUTCOME_FUTURE_IMPL(valid)
 
     //! \brief Forwards to get_state()
-    BOOST_MONAD_FUTURE_IMPL(get_state)
+    BOOST_OUTCOME_FUTURE_IMPL(get_state)
     //! \brief Forwards to get_monad()
-    BOOST_MONAD_FUTURE_IMPL(get_monad)
+    BOOST_OUTCOME_FUTURE_IMPL(get_monad)
     //! \brief Forwards to get()
-    BOOST_MONAD_FUTURE_IMPL(get)
+    BOOST_OUTCOME_FUTURE_IMPL(get)
     //! \brief Forwards to get_or()
-    BOOST_MONAD_FUTURE_IMPL(get_or)
+    BOOST_OUTCOME_FUTURE_IMPL(get_or)
     //! \brief Forwards to get_and()
-    BOOST_MONAD_FUTURE_IMPL(get_and)
+    BOOST_OUTCOME_FUTURE_IMPL(get_and)
     //! \brief Forwards to get_error()
-    BOOST_MONAD_FUTURE_IMPL(get_error)
+    BOOST_OUTCOME_FUTURE_IMPL(get_error)
     //! \brief Forwards to get_error_or()
-    BOOST_MONAD_FUTURE_IMPL(get_error_or)
+    BOOST_OUTCOME_FUTURE_IMPL(get_error_or)
     //! \brief Forwards to get_error_and()
-    BOOST_MONAD_FUTURE_IMPL(get_error_and)
+    BOOST_OUTCOME_FUTURE_IMPL(get_error_and)
     //! \brief Forwards to get_exception()
-    BOOST_MONAD_FUTURE_IMPL(get_exception)
+    BOOST_OUTCOME_FUTURE_IMPL(get_exception)
     //! \brief Forwards to get_exception_or()
-    BOOST_MONAD_FUTURE_IMPL(get_exception_or)
+    BOOST_OUTCOME_FUTURE_IMPL(get_exception_or)
     //! \brief Forwards to get_exception_and()
-    BOOST_MONAD_FUTURE_IMPL(get_exception_and)
+    BOOST_OUTCOME_FUTURE_IMPL(get_exception_and)
     //! \brief Forwards to get_exception_ptr()
-    BOOST_MONAD_FUTURE_IMPL(get_exception_ptr)
+    BOOST_OUTCOME_FUTURE_IMPL(get_exception_ptr)
 
     //! \brief Forwards to wait()
-    BOOST_MONAD_FUTURE_IMPL(wait)
-#undef BOOST_MONAD_FUTURE_IMPL
+    BOOST_OUTCOME_FUTURE_IMPL(wait)
+#undef BOOST_OUTCOME_FUTURE_IMPL
     //! \brief Forwards to then()
-    template<class F> BOOST_MONAD_FUTURE_MSVC_HELP auto then(F &&f) const -> shared_basic_future_ptr<decltype(_future->then(std::forward<F>(f)))>
+    template<class F> BOOST_OUTCOME_FUTURE_MSVC_HELP auto then(F &&f) const -> shared_basic_future_ptr<decltype(_future->then(std::forward<F>(f)))>
     {
       return shared_basic_future_ptr<decltype(_future->then(std::forward<F>(f)))>(_check()->then(std::forward<F>(f)));
     }
@@ -1377,14 +1377,14 @@ namespace lightweight_futures {
     };
   }
 
-#define BOOST_MONAD_FUTURE_NAME_POSTFIX 
-#define BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE stl11::error_code
-#define BOOST_MONAD_FUTURE_POLICY_EXCEPTION_TYPE std::exception_ptr
+#define BOOST_OUTCOME_FUTURE_NAME_POSTFIX 
+#define BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE stl11::error_code
+#define BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE std::exception_ptr
 #include "detail/future_policy.ipp"
-#define BOOST_MONAD_FUTURE_NAME_POSTFIX _result
-#define BOOST_MONAD_FUTURE_POLICY_ERROR_TYPE std::error_code
+#define BOOST_OUTCOME_FUTURE_NAME_POSTFIX _result
+#define BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE std::error_code
 #include "detail/future_policy.ipp"
-#define BOOST_MONAD_FUTURE_NAME_POSTFIX _option
+#define BOOST_OUTCOME_FUTURE_NAME_POSTFIX _option
 #include "detail/future_policy.ipp"
 
   //! \brief The results of a when_any() \ingroup future_promise
@@ -1561,15 +1561,15 @@ namespace lightweight_futures {
 #endif
 
 }
-BOOST_MONAD_V1_NAMESPACE_END
+BOOST_OUTCOME_V1_NAMESPACE_END
 
 namespace std
 {
-  template<typename R> inline void swap(BOOST_MONAD_V1_NAMESPACE::lightweight_futures::basic_promise<R> &a, BOOST_MONAD_V1_NAMESPACE::lightweight_futures::basic_promise<R> &b)
+  template<typename R> inline void swap(BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures::basic_promise<R> &a, BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures::basic_promise<R> &b)
   {
     a.swap(b);
   }
-  template<typename R> inline void swap(BOOST_MONAD_V1_NAMESPACE::lightweight_futures::basic_future<R> &a, BOOST_MONAD_V1_NAMESPACE::lightweight_futures::basic_future<R> &b)
+  template<typename R> inline void swap(BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures::basic_future<R> &a, BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures::basic_future<R> &b)
   {
     a.swap(b);
   }

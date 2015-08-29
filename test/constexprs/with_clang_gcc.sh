@@ -26,11 +26,11 @@ do
   
   if [ 1 -eq 1 ]; then
     echo "Compiling ${FILE} with gcc ..."
-    g++-5 -c -o $FILE.o -O3 -std=c++14 -fno-keep-inline-functions -DBOOST_MONAD_ENABLE_OPERATORS=1 -DSPINLOCK_STANDALONE=1 -DNDEBUG $f
+    g++-5 -c -o $FILE.o -O3 -std=c++14 -fno-keep-inline-functions -DBOOST_OUTCOME_ENABLE_OPERATORS=1 -DSPINLOCK_STANDALONE=1 -DNDEBUG $f
     objdump -d -S $FILE.o > $FILE.gcc.S
 
     echo "Compiling ${FILE} with clang ..."
-    clang++-3.7 -Wall -Wextra -c -o $FILE.o -O3 -std=c++14 -DBOOST_CXX14_CONSTEXPR=constexpr -DBOOST_MONAD_ENABLE_OPERATORS=1 -DSPINLOCK_STANDALONE=1 -DNDEBUG $f
+    clang++-3.7 -Wall -Wextra -c -o $FILE.o -O3 -std=c++14 -DBOOST_CXX14_CONSTEXPR=constexpr -DBOOST_OUTCOME_ENABLE_OPERATORS=1 -DSPINLOCK_STANDALONE=1 -DNDEBUG $f
     objdump -d -S $FILE.o > $FILE.clang.S
     rm $FILE.o
   fi

@@ -45,10 +45,10 @@ DEALINGS IN THE SOFTWARE.
 #include <algorithm>
 
 #ifdef _MSC_VER
-# define BOOST_MONAD_POSIX_OPEN ::_open
+# define BOOST_OUTCOME_POSIX_OPEN ::_open
 # include <io.h>
 #else
-# define BOOST_MONAD_POSIX_OPEN ::open
+# define BOOST_OUTCOME_POSIX_OPEN ::open
 # include <fcntl.h>
 #endif
 
@@ -593,8 +593,8 @@ BOOST_AUTO_TEST_CASE(works/concurrent_unordered_map/rehash/concurrent, "Tests th
   gate=boost::spinlock::thread::hardware_concurrency();
   if(gate<2) gate=2;
   size_t threads=gate, rehashes=0;
-  BOOST_MONAD_ANNOTATE_IGNORE_READS_BEGIN();
-  BOOST_MONAD_ANNOTATE_IGNORE_WRITES_BEGIN();
+  BOOST_OUTCOME_ANNOTATE_IGNORE_READS_BEGIN();
+  BOOST_OUTCOME_ANNOTATE_IGNORE_WRITES_BEGIN();
   std::vector<std::thread> _threads;
   for(size_t thread=0; thread<threads; thread++)
   {
@@ -615,7 +615,7 @@ BOOST_AUTO_TEST_CASE(works/concurrent_unordered_map/rehash/concurrent, "Tests th
       else
       {
         std::string foo("n");
-        size_t iters=BOOST_MONAD_RUNNING_ON_VALGRIND ? 1000000 : 100000000;
+        size_t iters=BOOST_OUTCOME_RUNNING_ON_VALGRIND ? 1000000 : 100000000;
         for(size_t n=0; n<iters; n++)
         {
           size_t v=n*10+thread;
@@ -631,8 +631,8 @@ BOOST_AUTO_TEST_CASE(works/concurrent_unordered_map/rehash/concurrent, "Tests th
   }
   for(auto &i : _threads)
     i.join();
-  BOOST_MONAD_ANNOTATE_IGNORE_READS_END();
-  BOOST_MONAD_ANNOTATE_IGNORE_WRITES_END();
+  BOOST_OUTCOME_ANNOTATE_IGNORE_READS_END();
+  BOOST_OUTCOME_ANNOTATE_IGNORE_WRITES_END();
   printf("Achieved %u rehashes\n", (unsigned) rehashes);
 }
 
@@ -827,7 +827,7 @@ static double CalculateConcurrentUnorderedMapPerformance(size_t reserve, int typ
   //gate=4;
   size_t threads=gate;
   printf("There are %u threads in this CPU\n", (unsigned) threads);
-  size_t iters=BOOST_MONAD_RUNNING_ON_VALGRIND ? 100000 : 10000000;
+  size_t iters=BOOST_OUTCOME_RUNNING_ON_VALGRIND ? 100000 : 10000000;
   start=GetUsCount();
 #pragma omp parallel for
   for(int thread=0; thread<threads; thread++)
@@ -1255,7 +1255,7 @@ BOOST_AUTO_TEST_CASE(works/monad/fileopen, "Tests that the monad semantically re
   auto openfile=[](std::string path) noexcept -> monad<int>
   {
     int fd;
-    while(-1==(fd=BOOST_MONAD_POSIX_OPEN(path.c_str(), 0)) && EINTR==errno);
+    while(-1==(fd=BOOST_OUTCOME_POSIX_OPEN(path.c_str(), 0)) && EINTR==errno);
     try
     {
       if(-1==fd)
@@ -1539,7 +1539,7 @@ BOOST_AUTO_TEST_CASE(works/monad/then, "Tests that the monad continues with next
 #endif
 }
 
-#ifdef BOOST_MONAD_ENABLE_OPERATORS
+#ifdef BOOST_OUTCOME_ENABLE_OPERATORS
 BOOST_AUTO_TEST_CASE(works/monad/callable, "Tests that the monad works as intended holding callables")
 {
   using namespace boost::spinlock::lightweight_futures;
@@ -2286,7 +2286,7 @@ BOOST_AUTO_TEST_CASE(performance/overhead, "Calculate the timing overhead and wa
 template<template<class> class F, template<class> class P> double CalculateFuturePerformanceSimple(const char *desc)
 {
   double total=0;
-  size_t loops=BOOST_MONAD_RUNNING_ON_VALGRIND ? 10000 : 1000000;
+  size_t loops=BOOST_OUTCOME_RUNNING_ON_VALGRIND ? 10000 : 1000000;
   for(size_t m=0; m<5; m++)
   {
     auto begin = GetUsCount();
@@ -2352,7 +2352,7 @@ BOOST_AUTO_TEST_CASE(performance/shared_future/simple/lightweight, "Tests the pe
 template<template<class> class F, template<class> class P> std::tuple<double, double, double> CalculateFuturePerformanceProducerConsumer(const char *desc)
 {
   double setting=0, getting=0, destruction=0;
-  size_t loops=BOOST_MONAD_RUNNING_ON_VALGRIND ? 10000 : 1000000;
+  size_t loops=BOOST_OUTCOME_RUNNING_ON_VALGRIND ? 10000 : 1000000;
   std::vector<F<int>> futures(loops);
   for(size_t m=0; m<5; m++)
   {
@@ -2456,7 +2456,7 @@ template<template<class> class F, template<class> class P> std::tuple<double, do
       char pad2[128-sizeof(F<size_t>)];
       spaced_t() : first(false)
       {
-      BOOST_MONAD_DRD_IGNORE_VAR(first);
+      BOOST_OUTCOME_DRD_IGNORE_VAR(first);
       }
     };
     std::vector<spaced_t> futures;
@@ -2468,7 +2468,7 @@ template<template<class> class F, template<class> class P> std::tuple<double, do
   } datas[THREADS];
   std::vector<std::thread> threads;
   std::atomic<size_t> done(THREADS+1);
-  size_t loops=BOOST_MONAD_RUNNING_ON_VALGRIND ? 1000 : 100000;
+  size_t loops=BOOST_OUTCOME_RUNNING_ON_VALGRIND ? 1000 : 100000;
   std::cout << "Running " << THREADS << " threads of " << loops << " iterations" << std::endl;
   for(size_t n=0; n<THREADS; n++)
   {

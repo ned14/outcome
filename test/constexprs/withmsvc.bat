@@ -17,7 +17,7 @@ echo ^<?xml version="1.0" encoding="UTF-8"?^> > results.xml
 echo ^<testsuite name="constexprs"^> >> results.xml
 for %%f in (*.cpp) do (
   set FILE=%%~nf
-  cl /EHsc /c /O2 /GS- /GR /Gy /Zc:inline /DBOOST_MONAD_ENABLE_OPERATORS=1 /DSPINLOCK_STANDALONE=1 /DNDEBUG %%f
+  cl /EHsc /c /O2 /GS- /GR /Gy /Zc:inline /DBOOST_OUTCOME_ENABLE_OPERATORS=1 /DSPINLOCK_STANDALONE=1 /DNDEBUG %%f
   dumpbin /disasm !FILE!.obj > !FILE!.msvc.S
   del !FILE!.obj
   set LINE=

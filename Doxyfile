@@ -33,7 +33,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = boost.monad
+PROJECT_NAME           = boost.outcome
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -2035,9 +2035,9 @@ PREDEFINED             = DOXYGEN_IS_IN_THE_HOUSE=1 \
     BOOST_STATIC_CONSTEXPR=static constexpr \
     BOOST_NOEXCEPT=noexcept \
     BOOST_NOEXCEPT_IF(a)=noexcept(a) \
-    BOOST_MONAD_V1_NAMESPACE_BEGIN="namespace boost { namespace monad {" \
-    BOOST_MONAD_V1_NAMESPACE_END="} }" \
-    BOOST_MONAD_ENABLE_OPERATORS=1
+    BOOST_OUTCOME_V1_NAMESPACE_BEGIN="namespace boost { namespace outcome {" \
+    BOOST_OUTCOME_V1_NAMESPACE_END="} }" \
+    BOOST_OUTCOME_ENABLE_OPERATORS=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
