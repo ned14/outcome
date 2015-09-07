@@ -204,7 +204,142 @@ namespace detail
       return shared_basic_future_ptr<rettype>(rettype(nullptr, std::move(*static_cast<implementation_type *>(this))));
     }
   };
-  
+  template<class future_storage, class error_type, class exception_type> struct BOOST_OUTCOME_FUTURE_POLICY_BASE_NAME<future_storage, void, error_type, exception_type> : public future_storage
+  {
+    template<class... Args> constexpr BOOST_OUTCOME_FUTURE_POLICY_BASE_NAME(Args &&... args) : future_storage(std::forward<Args>(args)...) { }
+  protected:
+    using implementation_type = basic_future<BOOST_OUTCOME_FUTURE_POLICY_NAME<void>>;
+    static BOOST_OUTCOME_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
+    {
+      switch(ec)
+      {
+        case monad_errc::already_set:
+          throw stl11::future_error(stl11::error_code(static_cast<int>(stl11::future_errc::promise_already_satisfied), stl11::future_category()));
+        case monad_errc::no_state:
+          throw stl11::future_error(stl11::error_code(static_cast<int>(stl11::future_errc::no_state), stl11::future_category()));
+        default:
+          abort();
+      }
+    }
+  public:
+    BOOST_OUTCOME_FUTURE_MSVC_HELP typename future_storage::value_storage_type get_state() &
+    {
+      static_cast<implementation_type *>(this)->wait();
+      typename implementation_type::lock_guard_type h(this);
+      static_cast<implementation_type *>(this)->_check_validity();
+      return this->_storage;
+    }    
+    BOOST_OUTCOME_FUTURE_MSVC_HELP typename future_storage::value_storage_type get_state() &&
+    {
+      static_cast<implementation_type *>(this)->wait();
+      typename implementation_type::lock_guard_type h(this);
+      static_cast<implementation_type *>(this)->_check_validity();
+      return std::move(this->_storage);
+    }    
+    // Note we always return value_type by value.
+    BOOST_OUTCOME_FUTURE_MSVC_HELP void get() &
+    {
+      static_cast<implementation_type *>(this)->wait();
+      typename implementation_type::lock_guard_type h(this);
+      static_cast<implementation_type *>(this)->_check_validity();
+#if defined(BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE) || defined(BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE)
+      if(this->has_error() || this->has_exception())
+      {
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE
+        if(this->has_error())
+        {
+          auto &category=this->_storage.error.category();
+          //! \todo Is there any way of making which exception type to throw from an error_category user extensible? Seems daft this isn't in the STL :(
+          if(category==stl11::future_category())
+          {
+            stl11::future_error e(this->_storage.error);
+            this->clear();
+            throw e;
+          }
+          /*else if(category==std::iostream_category())
+          {
+            std::ios_base::failure e(std::move(this->_storage.error));
+            this->clear();
+            throw e;
+          }*/
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE
+          else
+          {
+            stl11::system_error e(this->_storage.error);
+            this->clear();
+            throw e;
+          }
+#endif
+        }
+#endif
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE
+        if(this->has_exception())
+        {
+          std::exception_ptr e(this->_storage.exception);
+          this->clear();
+          std::rethrow_exception(e);
+        }
+#endif
+      }
+#endif
+      this->clear();
+    }
+    BOOST_OUTCOME_FUTURE_MSVC_HELP void get() && { return this->get(); }
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE
+    BOOST_OUTCOME_FUTURE_MSVC_HELP error_type get_error() &
+    {
+      static_cast<implementation_type *>(this)->wait();
+      typename implementation_type::lock_guard_type h(this);
+      static_cast<implementation_type *>(this)->_check_validity();
+      if(this->has_error())
+      {
+        error_type ec(this->_storage.error);
+        this->clear();
+        return ec;
+      }
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE
+      if(this->has_exception())
+        return error_type((int) monad_errc::exception_present, monad_category());
+#endif
+      return error_type();
+    }
+#else
+    BOOST_OUTCOME_FUTURE_MSVC_HELP error_type get_error() &;
+#endif
+    BOOST_OUTCOME_FUTURE_MSVC_HELP error_type get_error() && { return this->get_error(); }
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE
+    BOOST_OUTCOME_FUTURE_MSVC_HELP exception_type get_exception() &
+    {
+      static_cast<implementation_type *>(this)->wait();
+      typename implementation_type::lock_guard_type h(this);
+      static_cast<implementation_type *>(this)->_check_validity();
+      if(!this->has_error() && !this->has_exception())
+        return exception_type();
+      if(this->has_error())
+      {
+        exception_type e(std::make_exception_ptr(stl11::system_error(this->_storage.error)));
+        this->clear();
+        return e;
+      }
+      if(this->has_exception())
+      {
+        exception_type e(this->_storage.exception);
+        this->clear();
+        return e;
+      }
+      return exception_type();
+    }
+#else
+    BOOST_OUTCOME_FUTURE_MSVC_HELP exception_type get_exception() &;
+#endif
+    BOOST_OUTCOME_FUTURE_MSVC_HELP exception_type get_exception() && { return this->get_exception(); }
+    // Makes share() available on this future.
+    BOOST_OUTCOME_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME<void>>> share()
+    {
+      using rettype=basic_future<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME<void>>;
+      return shared_basic_future_ptr<rettype>(rettype(nullptr, std::move(*static_cast<implementation_type *>(this))));
+    }
+  };
   template<class future_storage, class _value_type, class error_type, class exception_type> struct BOOST_OUTCOME_SHARED_FUTURE_POLICY_BASE_NAME : public future_storage
   {
     template<class... Args> constexpr BOOST_OUTCOME_SHARED_FUTURE_POLICY_BASE_NAME(Args &&... args) : future_storage(std::forward<Args>(args)...) { }
@@ -327,6 +462,125 @@ namespace detail
     BOOST_OUTCOME_FUTURE_MSVC_HELP exception_type get_exception() const;
 #endif
     BOOST_OUTCOME_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME<_value_type>>> share() const = delete;
+  };
+  template<class future_storage, class error_type, class exception_type> struct BOOST_OUTCOME_SHARED_FUTURE_POLICY_BASE_NAME<future_storage, void, error_type, exception_type> : public future_storage
+  {
+    template<class... Args> constexpr BOOST_OUTCOME_SHARED_FUTURE_POLICY_BASE_NAME(Args &&... args) : future_storage(std::forward<Args>(args)...) { }
+  protected:
+    typedef basic_future<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME<void>> implementation_type;
+    static BOOST_OUTCOME_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec)
+    {
+      switch(ec)
+      {
+        case monad_errc::already_set:
+          throw stl11::future_error(stl11::error_code(static_cast<int>(stl11::future_errc::promise_already_satisfied), stl11::future_category()));
+        case monad_errc::no_state:
+          throw stl11::future_error(stl11::error_code(static_cast<int>(stl11::future_errc::no_state), stl11::future_category()));
+        default:
+          abort();
+      }
+    }
+  public:
+    BOOST_OUTCOME_FUTURE_MSVC_HELP typename future_storage::value_storage_type get_state() &
+    {
+      static_cast<implementation_type *>(this)->wait();
+      typename implementation_type::lock_guard_type h(this);
+      static_cast<implementation_type *>(this)->_check_validity();
+      return this->_storage;
+    }    
+    BOOST_OUTCOME_FUTURE_MSVC_HELP typename future_storage::value_storage_type get_state() &&
+    {
+      static_cast<implementation_type *>(this)->wait();
+      typename implementation_type::lock_guard_type h(this);
+      static_cast<implementation_type *>(this)->_check_validity();
+      return std::move(this->_storage);
+    }    
+    BOOST_OUTCOME_FUTURE_MSVC_HELP void get() const
+    {
+      static_cast<const implementation_type *>(this)->wait();
+      typename implementation_type::lock_guard_type h(const_cast<BOOST_OUTCOME_SHARED_FUTURE_POLICY_BASE_NAME *>(this));
+      static_cast<const implementation_type *>(this)->_check_validity();
+#if defined(BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE) || defined(BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE)
+      if(this->has_error() || this->has_exception())
+      {
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE
+        if(this->has_error())
+        {
+          auto &category=this->_storage.error.category();
+          //! \todo Is there any way of making which exception type to throw from an error_category user extensible? Seems daft this isn't in the STL :(
+          if(category==stl11::future_category())
+          {
+            stl11::future_error e(this->_storage.error);
+            throw e;
+          }
+          /*else if(category==std::iostream_category())
+          {
+            std::ios_base::failure e(std::move(this->_storage.error));
+            throw e;
+          }*/
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE
+          else
+          {
+            stl11::system_error e(this->_storage.error);
+            throw e;
+          }
+#endif
+        }
+#endif
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE
+        if(this->has_exception())
+        {
+          std::exception_ptr e(this->_storage.exception);
+          std::rethrow_exception(e);
+        }
+#endif
+      }
+#endif
+    }
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE
+    BOOST_OUTCOME_FUTURE_MSVC_HELP error_type get_error() const
+    {
+      static_cast<const implementation_type *>(this)->wait();
+      typename implementation_type::lock_guard_type h(const_cast<BOOST_OUTCOME_SHARED_FUTURE_POLICY_BASE_NAME *>(this));
+      static_cast<const implementation_type *>(this)->_check_validity();
+      if(this->has_error())
+      {
+        error_type ec(this->_storage.error);
+        return ec;
+      }
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE
+      if(this->has_exception())
+        return error_type((int) monad_errc::exception_present, monad_category());
+#endif
+      return error_type();
+    }
+#else
+    BOOST_OUTCOME_FUTURE_MSVC_HELP error_type get_error() const;
+#endif
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE
+    BOOST_OUTCOME_FUTURE_MSVC_HELP exception_type get_exception() const
+    {
+      static_cast<const implementation_type *>(this)->wait();
+      typename implementation_type::lock_guard_type h(const_cast<BOOST_OUTCOME_SHARED_FUTURE_POLICY_BASE_NAME *>(this));
+      static_cast<const implementation_type *>(this)->_check_validity();
+      if(!this->has_error() && !this->has_exception())
+        return exception_type();
+      if(this->has_error())
+      {
+        exception_type e(std::make_exception_ptr(stl11::system_error(this->_storage.error)));
+        return e;
+      }
+      if(this->has_exception())
+      {
+        exception_type e(this->_storage.exception);
+        return e;
+      }
+      return exception_type();
+    }
+#else
+    BOOST_OUTCOME_FUTURE_MSVC_HELP exception_type get_exception() const;
+#endif
+    BOOST_OUTCOME_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME<void>>> share() const = delete;
   };
 
   template<typename R> struct BOOST_OUTCOME_FUTURE_POLICY_NAME

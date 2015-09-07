@@ -450,7 +450,7 @@ BOOST_AUTO_TEST_CASE(works/monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.get(), monad_error);
+    BOOST_CHECK_THROW(([&m]() -> void { return m.get(); }()), monad_error);
     BOOST_CHECK_THROW(m.get_error(), monad_error);
     BOOST_CHECK_THROW(m.get_exception(), monad_error);
   }
@@ -1408,6 +1408,20 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
     BOOST_CHECK(f3.get() == 2);
     BOOST_CHECK(!f3.valid());
   }
+  {
+    int test = 0;
+    promise<void> p;
+    future<void> f(p.get_future());
+    future<int> f2(f.then([&test](future<void> &&f) { BOOST_CHECK_NO_THROW(([&f]() -> void { return f.get(); }())); test = 1; return 5; }));
+    BOOST_CHECK(f.valid());
+    BOOST_CHECK(f2.valid());
+    BOOST_CHECK(test == 0);
+    p.set_value();
+    BOOST_CHECK(test == 1);
+    BOOST_CHECK(!f.valid());  // consuming continuation, therefore f is consumed
+    BOOST_CHECK(f2.valid());
+    BOOST_CHECK(f2.get() == 5);
+  }
 
   // EXTENSIONS
   // Check that a const lvalue taking continuation does NOT consume the future
@@ -1491,7 +1505,7 @@ BOOST_AUTO_TEST_CASE(works/shared_future/continuations/lightweight, "Tests that 
   int test = 0;
   promise<void> p;
   shared_future<void> f(p.get_future());
-  shared_future<int> f2(f.then([&test](const shared_future<void> &) { test = 1; return 5; }));
+  shared_future<int> f2(f.then([&test](const shared_future<void> &f) { BOOST_CHECK_NO_THROW(([&f]() -> void { return f.get(); }())); test = 1; return 5; }));
   BOOST_CHECK(f.valid());
   BOOST_CHECK(f2.valid());
   BOOST_CHECK(test == 0);
