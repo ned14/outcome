@@ -59,10 +59,90 @@ DEALINGS IN THE SOFTWARE.
 namespace detail
 {
   //! [future_policy]
-  template<typename R> struct BOOST_OUTCOME_FUTURE_POLICY_NAME;
-  template<typename R> struct BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME;
   template<class future_storage, class _value_type, class error_type=void, class exception_type=void> struct BOOST_OUTCOME_FUTURE_POLICY_BASE_NAME;
   template<class future_storage, class _value_type, class error_type=void, class exception_type=void> struct BOOST_OUTCOME_SHARED_FUTURE_POLICY_BASE_NAME;
+
+  template<typename R> struct BOOST_OUTCOME_FUTURE_POLICY_NAME
+  {
+    using monad_type = basic_monad<BOOST_OUTCOME_FUTURE_POLICY_NAME>;
+    // In a monad policy, this is identical to monad_type. Not here.
+    using implementation_type = basic_future<BOOST_OUTCOME_FUTURE_POLICY_NAME>;
+    using value_type = R;
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE
+    using error_type = BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE;
+#else
+    using error_type = void;
+#endif
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE
+    using exception_type = BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE;
+#else
+    using exception_type = void;
+#endif
+    // The wait implementation to use for waits and timed waits
+    using wait_implementation = detail::stl_wait_implementation<stl11::promise<void>, stl11::future<void>>;
+    // Future.get() locks, so define our own monad base type.
+    using base = BOOST_OUTCOME_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
+    using other_base = BOOST_OUTCOME_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
+    template<typename U> using rebind = basic_future<BOOST_OUTCOME_FUTURE_POLICY_NAME<U>>;
+    template<typename U> using rebind_policy = BOOST_OUTCOME_FUTURE_POLICY_NAME<U>;
+
+    // Does getting this future's state consume it?
+    static constexpr bool is_consuming=true;
+    // Is this future managed by shared_basic_future_ptr?
+    static constexpr bool is_shared=false;
+    // The type of future_errc to use for issuing errors
+    using future_errc = stl11::future_errc;
+    // The type of future exception to use for issuing exceptions
+    using future_error = stl11::future_error;
+    // The type of future status to use
+    using future_status = stl11::future_status;
+    // The category of error code to use
+    static const stl11::error_category &future_category() noexcept { return stl11::future_category(); }
+    // How many spins of yield to do waiting to be signalled before allocating a wait_implementation
+    static constexpr size_t wait_spin_count = 1000;
+  };
+  template<typename R> struct BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME
+  {
+    using monad_type = basic_monad<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME>;
+    // In a monad policy, this is identical to monad_type. Not here.
+    using implementation_type = basic_future<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME>;
+    using value_type = R;
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE
+    using error_type = BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE;
+#else
+    using error_type = void;
+#endif
+#ifdef BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE
+    using exception_type = BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE;
+#else
+    using exception_type = void;
+#endif
+    // The wait implementation to use for waits and timed waits
+    using wait_implementation = detail::stl_wait_implementation<stl11::promise<void>, stl11::future<void>>;
+    // Future.get() locks, so define our own monad base type.
+    using base = BOOST_OUTCOME_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
+    using other_base = BOOST_OUTCOME_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
+    template<typename U> using rebind = basic_future<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME<U>>;
+    template<typename U> using rebind_policy = BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME<U>;
+
+    // Does getting this future's state consume it?
+    static constexpr bool is_consuming=false;
+    // Is this future managed by shared_basic_future_ptr?
+    static constexpr bool is_shared=true;
+    // shared_basic_future_ptr needs to know what promise type to report
+    using promise_type = basic_promise<BOOST_OUTCOME_FUTURE_POLICY_NAME<R>>;
+    // The type of future_errc to use for issuing errors
+    using future_errc = stl11::future_errc;
+    // The type of future exception to use for issuing exceptions
+    using future_error = stl11::future_error;
+    // The type of future status to use
+    using future_status = stl11::future_status;
+    // The category of error code to use
+    static const stl11::error_category &future_category() noexcept { return stl11::future_category(); }
+    // How many spins of yield to do waiting to be signalled before allocating a wait_implementation
+    static constexpr size_t wait_spin_count = 1000;
+  };
+
 
   // Inherited from publicly by basic_monad, so whatever you expose here you expose in basic_monad
   template<class future_storage, class _value_type, class error_type, class exception_type> struct BOOST_OUTCOME_FUTURE_POLICY_BASE_NAME : public future_storage
@@ -334,11 +414,7 @@ namespace detail
 #endif
     BOOST_OUTCOME_FUTURE_MSVC_HELP exception_type get_exception() && { return this->get_exception(); }
     // Makes share() available on this future.
-    BOOST_OUTCOME_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME<void>>> share()
-    {
-      using rettype=basic_future<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME<void>>;
-      return shared_basic_future_ptr<rettype>(rettype(nullptr, std::move(*static_cast<implementation_type *>(this))));
-    }
+    BOOST_OUTCOME_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME<void>>> share();
   };
   template<class future_storage, class _value_type, class error_type, class exception_type> struct BOOST_OUTCOME_SHARED_FUTURE_POLICY_BASE_NAME : public future_storage
   {
@@ -583,86 +659,11 @@ namespace detail
     BOOST_OUTCOME_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME<void>>> share() const = delete;
   };
 
-  template<typename R> struct BOOST_OUTCOME_FUTURE_POLICY_NAME
+  template<class future_storage, class error_type, class exception_type> BOOST_OUTCOME_FUTURE_MSVC_HELP shared_basic_future_ptr<basic_future<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME<void>>> BOOST_OUTCOME_FUTURE_POLICY_BASE_NAME<future_storage, void, error_type, exception_type>::share()
   {
-    using monad_type = basic_monad<BOOST_OUTCOME_FUTURE_POLICY_NAME>;
-    // In a monad policy, this is identical to monad_type. Not here.
-    using implementation_type = basic_future<BOOST_OUTCOME_FUTURE_POLICY_NAME>;
-    using value_type = R;
-#ifdef BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE
-    using error_type = BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE;
-#else
-    using error_type = void;
-#endif
-#ifdef BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE
-    using exception_type = BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE;
-#else
-    using exception_type = void;
-#endif
-    // The wait implementation to use for waits and timed waits
-    using wait_implementation = detail::stl_wait_implementation<stl11::promise<void>, stl11::future<void>>;
-    // Future.get() locks, so define our own monad base type.
-    using base = BOOST_OUTCOME_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
-    using other_base = BOOST_OUTCOME_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
-    template<typename U> using rebind = basic_future<BOOST_OUTCOME_FUTURE_POLICY_NAME<U>>;
-    template<typename U> using rebind_policy = BOOST_OUTCOME_FUTURE_POLICY_NAME<U>;
-
-    // Does getting this future's state consume it?
-    static constexpr bool is_consuming=true;
-    // Is this future managed by shared_basic_future_ptr?
-    static constexpr bool is_shared=false;
-    // The type of future_errc to use for issuing errors
-    using future_errc = stl11::future_errc;
-    // The type of future exception to use for issuing exceptions
-    using future_error = stl11::future_error;
-    // The type of future status to use
-    using future_status = stl11::future_status;
-    // The category of error code to use
-    static const stl11::error_category &future_category() noexcept { return stl11::future_category(); }
-    // How many spins of yield to do waiting to be signalled before allocating a wait_implementation
-    static constexpr size_t wait_spin_count = 1000;
-  };
-  template<typename R> struct BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME
-  {
-    using monad_type = basic_monad<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME>;
-    // In a monad policy, this is identical to monad_type. Not here.
-    using implementation_type = basic_future<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME>;
-    using value_type = R;
-#ifdef BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE
-    using error_type = BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE;
-#else
-    using error_type = void;
-#endif
-#ifdef BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE
-    using exception_type = BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE;
-#else
-    using exception_type = void;
-#endif
-    // The wait implementation to use for waits and timed waits
-    using wait_implementation = detail::stl_wait_implementation<stl11::promise<void>, stl11::future<void>>;
-    // Future.get() locks, so define our own monad base type.
-    using base = BOOST_OUTCOME_SHARED_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
-    using other_base = BOOST_OUTCOME_FUTURE_POLICY_BASE_NAME<basic_future_storage<value_type, error_type, exception_type, wait_implementation>, value_type, error_type, exception_type>;
-    template<typename U> using rebind = basic_future<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME<U>>;
-    template<typename U> using rebind_policy = BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME<U>;
-
-    // Does getting this future's state consume it?
-    static constexpr bool is_consuming=false;
-    // Is this future managed by shared_basic_future_ptr?
-    static constexpr bool is_shared=true;
-    // shared_basic_future_ptr needs to know what promise type to report
-    using promise_type = basic_promise<BOOST_OUTCOME_FUTURE_POLICY_NAME<R>>;
-    // The type of future_errc to use for issuing errors
-    using future_errc = stl11::future_errc;
-    // The type of future exception to use for issuing exceptions
-    using future_error = stl11::future_error;
-    // The type of future status to use
-    using future_status = stl11::future_status;
-    // The category of error code to use
-    static const stl11::error_category &future_category() noexcept { return stl11::future_category(); }
-    // How many spins of yield to do waiting to be signalled before allocating a wait_implementation
-    static constexpr size_t wait_spin_count = 1000;
-  };
+    using rettype=basic_future<BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME<void>>;
+    return shared_basic_future_ptr<rettype>(rettype(nullptr, std::move(*static_cast<implementation_type *>(this))));
+  }
 
 }
 
