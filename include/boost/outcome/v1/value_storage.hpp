@@ -82,6 +82,7 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
       union
       {
         value_type value;
+        value_type _value_raw;
         error_type error;              // Often 16 bytes surprisingly
         exception_type exception;      // Typically 8 bytes
         constexpr_standin_type _constexpr_standin_type;
@@ -275,7 +276,7 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
         this->type = storage_type::empty;
         break;
       case storage_type::value:
-        detail::move_construct_if<has_value_type>(&this->value, std::move(o.value));
+        detail::move_construct_if<has_value_type>(&this->_value_raw, std::move(o._value_raw));
         this->type = storage_type::value;
         break;
       case storage_type::error:
@@ -295,7 +296,7 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
       case storage_type::empty:
         break;
       case storage_type::value:
-        new (&this->value) value_type(o.value);
+        new (&this->_value_raw) value_type(o._value_raw);
         break;
       case storage_type::error:
         new (&this->error) error_type(o.error);
@@ -313,7 +314,7 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
       case storage_type::empty:
         break;
       case storage_type::value:
-        new (&this->value) value_type(std::move(o.value));
+        new (&this->_value_raw) value_type(std::move(o._value_raw));
         break;
       case storage_type::error:
         new (&this->error) error_type(std::move(o.error));
@@ -371,13 +372,13 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
     template<class U> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR void set_value(U &&v)
     {
       assert(this->type == storage_type::empty);
-      new (&this->value) value_type(std::forward<U>(v));
+      new (&this->_value_raw) value_type(std::forward<U>(v));
       this->type = storage_type::value;
     }
     template<class... Args> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR void emplace_value(Args &&... v)
     {
       assert(this->type == storage_type::empty);
-      new (&this->value) value_type(std::forward<Args>(v)...);
+      new (&this->_value_raw) value_type(std::forward<Args>(v)...);
       this->type = storage_type::value;
     }
     void set_exception(exception_type e)
