@@ -250,6 +250,8 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 
 
 // For dump
+#include <algorithm>
+#include <istream>
 #include <ostream>
 
 
