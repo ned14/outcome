@@ -863,12 +863,6 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
   //! \brief True if the type passed is a monad or a reference to a monad
   template<class M> struct is_monad : detail::is_monad<typename std::decay<M>::type> { };
 
-  //! \brief Type tag for an empty monad \ingroup monad
-  struct empty_t { constexpr empty_t() { } };
-
-  //! \brief Variable of type empty_t \ingroup monad
-  constexpr empty_t empty = empty_t();
-
   /*! \class basic_monad
   \brief Implements a configurable lightweight simple monadic value transport with the same semantics and API as a future
   \tparam implementation_policy An implementation policy type
@@ -930,9 +924,15 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
     //! \brief Default constructor, initialises to empty
     constexpr basic_monad() = default;
     //! \brief Implicit constructor of an empty monad
-    constexpr basic_monad(empty_type) : implementation_policy::base() { }
+    constexpr basic_monad(empty_type) noexcept : implementation_policy::base() { }
     //! \brief Implicit constructor of an empty monad
-    constexpr basic_monad(empty_t) : implementation_policy::base() { }
+    constexpr basic_monad(empty_t _) noexcept : implementation_policy::base(_) { }
+    //! \brief Implicit constructor of a valued monad (default constructed)
+    constexpr basic_monad(value_t _) noexcept(std::is_nothrow_default_constructible<value_type>::value) : implementation_policy::base(_) { }
+    //! \brief Implicit constructor of an errored monad (default constructed)
+    constexpr basic_monad(error_t _) noexcept(std::is_nothrow_default_constructible<error_type>::value) : implementation_policy::base(_) { }
+    //! \brief Implicit constructor of an excepted monad (default constructed)
+    constexpr basic_monad(exception_t _) noexcept(std::is_nothrow_default_constructible<exception_type>::value) : implementation_policy::base(_) { }
     //! \brief Implicit constructor from a value_type by copy
     constexpr basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : implementation_policy::base(v) { }
     //! \brief Implicit constructor from a value_type by move
@@ -1395,6 +1395,10 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
       template<class Policy> constexpr basic_monad_storage(basic_monad_storage<Policy> &&o) : _storage(std::move(o._storage)) { }
       template<class Policy> constexpr basic_monad_storage(const basic_monad_storage<Policy> &o) : _storage(o._storage) { }
       constexpr explicit basic_monad_storage(value_storage_type &&v) : _storage(std::move(v)) { }
+      constexpr basic_monad_storage(empty_t _) : _storage(_) { }
+      constexpr basic_monad_storage(value_t _) : _storage(_) { }
+      constexpr basic_monad_storage(error_t _) : _storage(_) { }
+      constexpr basic_monad_storage(exception_t _) : _storage(_) { }
       constexpr basic_monad_storage(const value_type &v) : _storage(v) { }
       constexpr basic_monad_storage(value_type &&v) : _storage(std::move(v)) { }
       constexpr basic_monad_storage(const error_type &v) : _storage(v) { }
@@ -1456,6 +1460,10 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
   template<class T> outcome<T> make_outcome(std::exception_ptr v) { return outcome<T>(std::move(v)); }
   //! \brief Makes an empty outcome of type T \ingroup monad
   template<class T> outcome<T> make_outcome() { return outcome<T>(); }
+  //! \brief Make a ready outcome from the type passed \ingroup monad
+  template<class T> outcome<T> make_ready_outcome(T &&v) { return outcome<T>(std::forward<T>(v)); }
+  //! \brief Make a ready outcome from the type passed \ingroup monad
+  outcome<void> make_ready_outcome() { return outcome<void>(); }
 
   /*! \brief `result<R>` can hold a fixed variant list of empty, a type `R` or a lightweight `std::error_code` at a
   space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `tribool::true_` and
@@ -1468,6 +1476,10 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
   template<class T> result<T> make_result(std::error_code v) { return result<T>(std::move(v)); }
   //! \brief Makes an empty result of type T \ingroup monad
   template<class T> result<T> make_result() { return result<T>(); }
+  //! \brief Makes a result from the type passed \ingroup monad
+  template<class T> result<T> make_ready_result(T &&v) { return result<T>(std::forward<T>(v)); }
+  //! \brief Makes a result from the type passed \ingroup monad
+  result<void> make_ready_result() { return result<void>(); }
 
   /*! \brief `option<R>` can hold a fixed variant list of empty or a type `R` at a space cost of `sizeof(value_storage<R>)`
   which is usually `sizeof(R)+8`, but may be smaller if `value_storage<R>` is specialised. This
@@ -1479,6 +1491,10 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
   template<class T> option<T> make_option(T &&v) { return option<T>(std::forward<T>(v)); }
   //! \brief Makes an empty option of type T \ingroup monad
   template<class T> option<T> make_option() { return option<T>(); }
+  //! \brief Makes a option from the type passed \ingroup monad
+  template<class T> option<T> make_ready_option(T &&v) { return option<T>(std::forward<T>(v)); }
+  //! \brief Makes a option from the type passed \ingroup monad
+  option<void> make_ready_option() { return option<void>(); }
 
 BOOST_OUTCOME_V1_NAMESPACE_END
 

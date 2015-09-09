@@ -42,6 +42,30 @@ DEALINGS IN THE SOFTWARE.
 
 BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 
+  //! \brief Type tag for an empty monad \ingroup monad
+  struct empty_t { constexpr empty_t() { } };
+
+  //! \brief Variable of type empty_t \ingroup monad
+  constexpr empty_t empty = empty_t();
+
+  //! \brief Type tag for a valued monad \ingroup monad
+  struct value_t { constexpr value_t() { } };
+
+  //! \brief Variable of type value_t \ingroup monad
+  constexpr value_t value = value_t();
+
+  //! \brief Type tag for an errored monad \ingroup monad
+  struct error_t { constexpr error_t() { } };
+
+  //! \brief Variable of type error_t \ingroup monad
+  constexpr error_t error = error_t();
+
+  //! \brief Type tag for an excepted monad \ingroup monad
+  struct exception_t { constexpr exception_t() { } };
+
+  //! \brief Variable of type exception_t \ingroup monad
+  constexpr exception_t exception = exception_t();
+
   //! \brief Specialise to indicate that this type should use the single byte storage layout. You get six bits of storage.
   template<class _value_type> struct enable_single_byte_value_storage : std::false_type { };
   template<> struct enable_single_byte_value_storage<void> : std::true_type { };
@@ -57,6 +81,7 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
       struct no_exception_type {};
       struct constexpr_standin_type {};
       template<class U, class V> using devoid = typename std::conditional<!std::is_void<U>::value, U, V>::type;
+      friend inline std::ostream &operator<<(std::ostream &s, const no_value_type &) { return s << "void"; }
     public:
       static constexpr bool has_value_type = !std::is_void<_value_type>::value;
       static constexpr bool has_error_type = !std::is_void<_error_type>::value;
@@ -95,6 +120,10 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
       static constexpr bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value && std::is_nothrow_destructible<exception_type>::value && std::is_nothrow_destructible<error_type>::value;
 
       constexpr value_storage_impl() noexcept : _constexpr_standin_type(constexpr_standin_type()), type(storage_type::empty) { }
+      constexpr value_storage_impl(empty_t) noexcept : _constexpr_standin_type(constexpr_standin_type()), type(storage_type::empty) { }
+      constexpr value_storage_impl(value_t) noexcept(std::is_nothrow_default_constructible<value_type>::value) : value(value_type()), type(storage_type::value) { }
+      constexpr value_storage_impl(error_t) noexcept(std::is_nothrow_default_constructible<error_type>::value) : error(error_type()), type(storage_type::error) { }
+      constexpr value_storage_impl(exception_t) noexcept(std::is_nothrow_default_constructible<exception_type>::value) : exception(exception_type()), type(storage_type::exception) { }
       constexpr value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : value(v), type(storage_type::value) { }
       constexpr value_storage_impl(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : error(v), type(storage_type::error) { }
       constexpr value_storage_impl(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : exception(v), type(storage_type::exception) { }
@@ -129,7 +158,7 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
         }
       }
     };
-    
+
     template<class _value_type> class value_storage_impl<_value_type, void, void, true>
     {
       static_assert(std::is_integral<_value_type>::value || std::is_void<_value_type>::value, "Types enabled for packed storage using enable_single_byte_value_storage must be integral types.");
@@ -177,13 +206,17 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 
       static constexpr bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value;
 
-      constexpr value_storage_impl() : type(storage_type::empty) { }
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl() : type(storage_type::empty) { }
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(empty_t) noexcept : type(storage_type::empty) { }
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(value_t) noexcept(std::is_nothrow_default_constructible<value_type>::value) : value(value_type()) { type = storage_type::value; }
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(error_t) noexcept(std::is_nothrow_default_constructible<error_type>::value) : error(error_type()), type(storage_type::error) { }
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(exception_t) noexcept(std::is_nothrow_default_constructible<exception_type>::value) : exception(exception_type()), type(storage_type::exception) { }
       BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : value(v) { type=storage_type::value; }
-      constexpr value_storage_impl(const error_type &) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : type(storage_type::error) { }
-      constexpr value_storage_impl(const exception_type &) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : type(storage_type::exception) { }
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(const error_type &) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : type(storage_type::error) { }
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(const exception_type &) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : type(storage_type::exception) { }
       BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value) : value(v) { type=storage_type::value; }
-      constexpr value_storage_impl(error_type &&) noexcept(std::is_nothrow_move_constructible<error_type>::value) : type(storage_type::error) { }
-      constexpr value_storage_impl(exception_type &&) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : type(storage_type::exception) { }
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(error_type &&) noexcept(std::is_nothrow_move_constructible<error_type>::value) : type(storage_type::error) { }
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(exception_type &&) noexcept(std::is_nothrow_move_constructible<exception_type>::value) : type(storage_type::exception) { }
       struct emplace_t {};
       template<class... Args> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR explicit value_storage_impl(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value) : value(std::forward<Args>(args)...) { type=storage_type::value; }
       BOOST_OUTCOME_FUTURE_MSVC_HELP ~value_storage_impl() noexcept(is_nothrow_destructible) { clear(); }
@@ -252,6 +285,10 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
     static constexpr bool is_nothrow_destructible = base::is_nothrow_destructible;
 
     value_storage() = default;
+    constexpr value_storage(empty_t _) noexcept : base(_) { }
+    constexpr value_storage(value_t _) noexcept(std::is_nothrow_default_constructible<value_type>::value) : base(_) { }
+    constexpr value_storage(error_t _) noexcept(std::is_nothrow_default_constructible<error_type>::value) : base(_) { }
+    constexpr value_storage(exception_t _) noexcept(std::is_nothrow_default_constructible<exception_type>::value) : base(_) { }
     constexpr value_storage(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : base(v) { }
     constexpr value_storage(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : base(v) { }
     constexpr value_storage(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : base(v) { }

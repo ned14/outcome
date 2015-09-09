@@ -817,6 +817,18 @@ BOOST_AUTO_TEST_CASE(works/monad/udts, "Tests that the monad works as intended w
   }
 }
 
+BOOST_AUTO_TEST_CASE(works/monad/void, "Tests that the monad works as intended with void")
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  // Can't construct a void
+  {
+    outcome<void> a, b(empty), c(value), d(make_ready_outcome());
+    BOOST_CHECK(a == b);
+    BOOST_CHECK(b != c);
+    BOOST_CHECK(c == d);
+  }
+}
+
 BOOST_AUTO_TEST_CASE(works/monad/containers, "Tests that the monad works as intended inside containers")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
