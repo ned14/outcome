@@ -824,8 +824,11 @@ BOOST_AUTO_TEST_CASE(works/monad/void, "Tests that the monad works as intended w
   {
     outcome<void> a, b(empty), c(value), d(make_ready_outcome());
     BOOST_CHECK(a == b);
-    BOOST_CHECK(b != c);
     BOOST_CHECK(c == d);
+    BOOST_CHECK(a != c);
+    BOOST_CHECK(b != c);
+    BOOST_CHECK(a != d);
+    BOOST_CHECK(b != d);
   }
 }
 
@@ -1287,6 +1290,14 @@ BOOST_AUTO_TEST_CASE(works/future/lightweight, "Tests that our future-promise wo
   BOOST_CHECK(f1.get() == 5);
   BOOST_CHECK(f2.get_error() == ec);
   BOOST_CHECK(f3.get_exception() == e);
+  future<void> v0;
+  future<void> v1(make_ready_future());
+  future<void> v2(make_errored_future<void>(ec));
+  future<void> v3(make_exceptional_future<void>(e));
+  BOOST_CHECK_THROWS(([&v0]() -> void { return v0.get(); }()));
+  BOOST_CHECK_NO_THROW(([&v1]() -> void { return v1.get(); }()));
+  BOOST_CHECK(v2.get_error() == ec);
+  BOOST_CHECK(v3.get_exception() == e);
 }
 
 template<template<class> class F, template<class> class P> void SharedFuturePromiseConformanceTest()

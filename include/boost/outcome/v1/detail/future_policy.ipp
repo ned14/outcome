@@ -678,6 +678,11 @@ template<typename R> inline BOOST_OUTCOME_FUTURE_NAME<typename std::decay<R>::ty
 {
   return BOOST_OUTCOME_FUTURE_NAME<typename std::decay<R>::type>(std::forward<R>(v));
 }
+//! \brief A predefined make ready future convenience function \ingroup future_promise
+inline BOOST_OUTCOME_FUTURE_NAME<void> BOOST_OUTCOME_MAKE_READY_FUTURE_NAME()
+{
+  return BOOST_OUTCOME_FUTURE_NAME<void>(value);
+}
 #undef BOOST_OUTCOME_MAKE_READY_FUTURE_NAME
 #ifdef BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE
 #define BOOST_OUTCOME_MAKE_READY_FUTURE_NAME BOOST_OUTCOME_GLUE(make_errored_, BOOST_OUTCOME_FUTURE_NAME)
@@ -706,6 +711,11 @@ template<typename R> using BOOST_OUTCOME_SHARED_FUTURE_NAME = shared_basic_futur
 template<typename R> inline BOOST_OUTCOME_SHARED_FUTURE_NAME<typename std::decay<R>::type> BOOST_OUTCOME_MAKE_READY_FUTURE_NAME(R &&v)
 {
   return BOOST_OUTCOME_SHARED_FUTURE_NAME<typename std::decay<R>::type>(std::forward<R>(v));
+}
+//! \brief A predefined make ready shared future convenience function \ingroup future_promise
+inline BOOST_OUTCOME_SHARED_FUTURE_NAME<void> BOOST_OUTCOME_MAKE_READY_FUTURE_NAME()
+{
+  return BOOST_OUTCOME_SHARED_FUTURE_NAME<void>(value);
 }
 #undef BOOST_OUTCOME_MAKE_READY_FUTURE_NAME
 #ifdef BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE
