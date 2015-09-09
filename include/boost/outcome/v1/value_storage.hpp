@@ -209,8 +209,8 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
       BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl() : type(storage_type::empty) { }
       BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(empty_t) noexcept : type(storage_type::empty) { }
       BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(value_t) noexcept(std::is_nothrow_default_constructible<value_type>::value) : value(value_type()) { type = storage_type::value; }
-      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(error_t) noexcept(std::is_nothrow_default_constructible<error_type>::value) : error(error_type()), type(storage_type::error) { }
-      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(exception_t) noexcept(std::is_nothrow_default_constructible<exception_type>::value) : exception(exception_type()), type(storage_type::exception) { }
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(error_t) noexcept(std::is_nothrow_default_constructible<error_type>::value) : error(error_type()) { type=storage_type::error; }
+      BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(exception_t) noexcept(std::is_nothrow_default_constructible<exception_type>::value) : exception(exception_type()) { type=storage_type::exception; }
       BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value) : value(v) { type=storage_type::value; }
       BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(const error_type &) noexcept(std::is_nothrow_copy_constructible<error_type>::value) : type(storage_type::error) { }
       BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(const exception_type &) noexcept(std::is_nothrow_copy_constructible<exception_type>::value) : type(storage_type::exception) { }
