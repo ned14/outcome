@@ -1298,6 +1298,18 @@ BOOST_AUTO_TEST_CASE(works/future/lightweight, "Tests that our future-promise wo
   BOOST_CHECK_NO_THROW(([&v1]() -> void { return v1.get(); }()));
   BOOST_CHECK(v2.get_error() == ec);
   BOOST_CHECK(v3.get_exception() == e);
+
+  // issue #4 future dead before promise set semantics
+  {
+    promise<int> p;
+    p.get_future();
+    BOOST_CHECK_THROWS(p.set_value(1));  // this is by design unless BOOST_OUTCOME_SET_PROMISE_AFTER_FUTURE_IS_NOTHROW is defined
+  }
+  {
+    promise<int> p;
+    p.get_future().then([](future<int> &&f) { BOOST_CHECK(f.get() == 1); });
+    BOOST_CHECK_NO_THROW(p.set_value(1));  // value is consumed by something, so doesn't throw
+  }
 }
 
 template<template<class> class F, template<class> class P> void SharedFuturePromiseConformanceTest()

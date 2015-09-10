@@ -42,7 +42,7 @@ DEALINGS IN THE SOFTWARE.
 \headerfile include/boost/spinlock/future.hpp ""
 */
 
-/*! \defgroup future_promise Lightweight next generation STL compatible futures with N4399 C++ 1z Concurrency TS extensions
+/*! \defgroup future_promise Lightweight next generation mostly STL compatible futures with N4399 C++ 1z Concurrency TS extensions
 
 C++ 1z Concurrency TS extensions N-paper used: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4399.html
 
@@ -61,8 +61,8 @@ as per N4399. As an extension, you can also simply construct the future directly
 
 In exchange for some minor limitations, this lightweight promise-future is 2x-3x faster than
 `std::promise` and `std::future` in the non-blocking case. You also get deep integration with basic_monad and
-lots of cool functional programming stuff. Unless you use continuations, they allocate no memory whatsoever and
-entirely rely on your compiler's optimiser to do the right thing (we have unit testing to make sure they []with some
+lots of cool functional programming stuff. Unless you use continuations or cause a thread sleep in `wait()`, they allocate no memory whatsoever and
+entirely rely on your compiler's optimiser to do the right thing (we have unit testing to make sure they [with some
 compiler-version-specific exceptions] do do the right thing). Extreme care was taken throughout this code base to ensure
 an absolute minimum impact on build times *if not optimising*, unlike almost all other monad implementations out there.
 If you *are* optimising however, because of the care taken to hint to the compiler to eliminate as much code as possible,
@@ -95,6 +95,24 @@ Other things to consider:
 - As both promise and future must have sizeof greater than sizeof(T), don't use multi-Kb sized T's
 as they'll get copied and moved around.
 - Don't use any of the `monad_errc` nor `future_errc` error codes for the errored return, else expect misoperation.
+- Dinkumware, libstdc++ and libc++ STLs all don't throw `no_state` with this code sequence, but these futures do:
+
+ \code
+ promise<int> p;
+ p.get_future();  // creates and destroys the future
+ p.set_value(1);  // Lightweight futures throw no_state here
+ \endcode
+
+ The rationale is that the value or exception being set has nowhere to go, so this needs to be trapped as most especially
+you do not want to be silently sinking exception throws. The following does not throw however:
+
+ \code
+ promise<int> p;
+ p.get_future().then([](auto&&) {});
+ p.set_value(1);  // Value is sent to the continuation, this is okay
+ \endcode
+
+ The above more strict behaviour does not violate the ISO C++ standard, so I consider it a quality of implementation detail.
 
 Extensions to the ISO C++ standard specification (and Concurrency TS):
 
@@ -105,6 +123,11 @@ enhancements to `std::future`. Boost.Thread's API extensions are all very useful
 on some platforms, so avoiding it completely can add 10-15% to some use cases.
 - You can add as many continuations to future as you like so long as only the first added continuation takes an rvalue reference.
 
+## How to use with ASIO's `async_result` ##
+
+You may find the gist at https://gist.github.com/jamboree/d769ec6a3933117d47c5 useful. This implements the traits for
+ASIO to use lightweight futures.
+
 ## Supplying your own implementations of `basic_future<T>` ##
 
 Just as with basic_monad, basic_promise and basic_future are highly customisable with any kind of semantics or error
@@ -112,7 +135,7 @@ types you like.
 
 To do this, simply supply a policy type of the following form. Note that this is identical to basic_monad's policy,
 except for the added members which are commented:
-\snippet future_policy.ipp future_policy
+\snippet detail/future_policy.ipp future_policy
 */
 
 // Used by constexpr testing to make sure I haven't borked any constexpr fold paths
@@ -648,7 +671,7 @@ namespace lightweight_futures {
       if(state_info.sleeping_waiters)
         state_info.sleeping_waiters.get()->get()->set_value();
     }
-    template<class U> BOOST_OUTCOME_FUTURE_MSVC_HELP void _set_state(U &&c, bool is_continuation=false)
+    template<class U> BOOST_OUTCOME_FUTURE_MSVC_HELP void _set_state(U &&c, bool set_from_continuation=false)
     {
       lock_guard_type h(this);
       if(h._f)
@@ -688,11 +711,16 @@ namespace lightweight_futures {
             h.unlock();
             // Wake any waiters
             _wake_waiters(state_info);
+            return;
           }
           // Don't throw if setting the future of a continuation which has vanished
-          if (is_continuation)
+          if (set_from_continuation)
             return;
+#ifdef BOOST_OUTCOME_SET_PROMISE_AFTER_FUTURE_IS_NOTHROW
+          return;
+#else
           basic_future<implementation_policy>::_throw_error(monad_errc::no_state);
+#endif
         }
         if(this->_storage.type!=value_storage_type::storage_type::empty)
           basic_future<implementation_policy>::_throw_error(monad_errc::already_set);
