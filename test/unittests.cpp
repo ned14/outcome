@@ -1254,6 +1254,12 @@ template<template<class> class F, template<class> class P> void FuturePromiseCon
 //    BOOST_CHECK(!f.has_value());
     BOOST_CHECK_THROW(f.get(), stl11::future_error);
   }
+  // issue #4 future dead before promise set semantics
+  {
+    P<int> p;
+    p.get_future();
+    BOOST_CHECK_NO_THROW(p.set_value(1));
+  }
 }
 
 BOOST_AUTO_TEST_CASE(works/future/std, "Tests that std future-promise passes our conformance suite")
@@ -1300,11 +1306,6 @@ BOOST_AUTO_TEST_CASE(works/future/lightweight, "Tests that our future-promise wo
   BOOST_CHECK(v3.get_exception() == e);
 
   // issue #4 future dead before promise set semantics
-  {
-    promise<int> p;
-    p.get_future();
-    BOOST_CHECK_THROWS(p.set_value(1));  // this is by design unless BOOST_OUTCOME_SET_PROMISE_AFTER_FUTURE_IS_NOTHROW is defined
-  }
   {
     promise<int> p;
     p.get_future().then([](future<int> &&f) { BOOST_CHECK(f.get() == 1); });

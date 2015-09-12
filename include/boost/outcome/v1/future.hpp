@@ -95,24 +95,7 @@ Other things to consider:
 - As both promise and future must have sizeof greater than sizeof(T), don't use multi-Kb sized T's
 as they'll get copied and moved around.
 - Don't use any of the `monad_errc` nor `future_errc` error codes for the errored return, else expect misoperation.
-- Dinkumware, libstdc++ and libc++ STLs all don't throw `no_state` with this code sequence, but these futures do:
-
- \code
- promise<int> p;
- p.get_future();  // creates and destroys the future
- p.set_value(1);  // Lightweight futures throw no_state here
- \endcode
-
- The rationale is that the value or exception being set has nowhere to go, so this needs to be trapped as most especially
-you do not want to be silently sinking exception throws. The following does not throw however:
-
- \code
- promise<int> p;
- p.get_future().then([](auto&&) {});
- p.set_value(1);  // Value is sent to the continuation, this is okay
- \endcode
-
- The above more strict behaviour does not violate the ISO C++ standard, so I consider it a quality of implementation detail.
+- Defining `BOOST_OUTCOME_FUTURE_EXTRA_SAFETY_CHECKS` can be useful to trap problematic use patterns.
 
 Extensions to the ISO C++ standard specification (and Concurrency TS):
 
@@ -137,6 +120,11 @@ To do this, simply supply a policy type of the following form. Note that this is
 except for the added members which are commented:
 \snippet detail/future_policy.ipp future_policy
 */
+
+//! \def BOOST_OUTCOME_FUTURE_EXTRA_SAFETY_CHECKS Define to enable extra (non standards conforming) semantic use safety checks
+#ifdef BOOST_OUTCOME_FUTURE_EXTRA_SAFETY_CHECKS
+#define BOOST_OUTCOME_SET_ORPHANED_PROMISE_THROWS_NO_STATE 1
+#endif
 
 // Used by constexpr testing to make sure I haven't borked any constexpr fold paths
 //#define BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
@@ -315,7 +303,10 @@ namespace lightweight_futures {
 #pragma warning(pop)
 #endif
       union {
-        bool _future_created;             // Only used by promise
+        struct {                          // Only used by promise
+          bool _future_created;
+          bool _state_set;
+        };
         bool _broken_promise;             // Only used by future
       };                                  // 32 bytes
       union {
@@ -326,7 +317,7 @@ namespace lightweight_futures {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         _need_locks(false),
 #endif
-        _broken_promise(false), _promise(nullptr)
+        _future_created(false), _state_set(false), _promise(nullptr)
       {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         if (_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
@@ -345,7 +336,7 @@ namespace lightweight_futures {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(o._need_locks)
 #endif
-        , _broken_promise(o._broken_promise), _promise(o._promise)
+        , _future_created(o._future_created), _state_set(o._state_set), _promise(o._promise)
       {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
@@ -361,7 +352,7 @@ namespace lightweight_futures {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
-        , _broken_promise(false), _promise(nullptr)
+        , _future_created(false), _state_set(false), _promise(nullptr)
       {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
@@ -371,7 +362,7 @@ namespace lightweight_futures {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
-        , _broken_promise(false), _promise(nullptr)
+        , _future_created(false), _state_set(false), _promise(nullptr)
       {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
@@ -381,7 +372,7 @@ namespace lightweight_futures {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
-        , _broken_promise(false), _promise(nullptr)
+        , _future_created(false), _state_set(false), _promise(nullptr)
       {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
@@ -391,7 +382,7 @@ namespace lightweight_futures {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
-        , _broken_promise(false), _promise(nullptr)
+        , _future_created(false), _state_set(false), _promise(nullptr)
       {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
@@ -401,7 +392,7 @@ namespace lightweight_futures {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
-        , _broken_promise(false), _promise(nullptr)
+        , _future_created(false), _state_set(false), _promise(nullptr)
       {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
@@ -411,7 +402,7 @@ namespace lightweight_futures {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
-        , _broken_promise(false), _promise(nullptr)
+        , _future_created(false), _state_set(false), _promise(nullptr)
       {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
@@ -421,7 +412,7 @@ namespace lightweight_futures {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
-        , _broken_promise(false), _promise(nullptr)
+        , _future_created(false), _state_set(false), _promise(nullptr)
       {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
@@ -431,7 +422,7 @@ namespace lightweight_futures {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         , _need_locks(false)
 #endif
-        , _broken_promise(false), _promise(nullptr)
+        , _future_created(false), _state_set(false), _promise(nullptr)
       {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         if(_need_locks) new (&_lock) BOOST_OUTCOME_FUTURE_MUTEX_TYPE();
@@ -469,7 +460,8 @@ namespace lightweight_futures {
 #ifdef BOOST_OUTCOME_FUTURE_ENABLE_CONSTEXPR_LOCK_FOLDING
         std::swap(_need_locks, o._need_locks);
 #endif
-        std::swap(_broken_promise, o._broken_promise);
+        std::swap(_future_created, o._future_created);
+        std::swap(_state_set, o._state_set);
         std::swap(_promise, o._promise);
       }
       BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
@@ -583,6 +575,7 @@ namespace lightweight_futures {
       }
       this->_future=nullptr;
       this->_future_created=false;
+      this->_state_set = false;
       this->_set_state_info.continuation_future = nullptr;
       this->_set_state_info.continuation.reset();
       this->_set_state_info.sleeping_waiters.reset();
@@ -593,6 +586,7 @@ namespace lightweight_futures {
       if(this->_future)
         this->_future->_promise=this;
       this->_future_created = o._future_created;
+      this->_state_set = o._state_set;
       this->_set_state_info = std::move(o._set_state_info);
       return *this;
     }
@@ -674,15 +668,16 @@ namespace lightweight_futures {
     template<class U> BOOST_OUTCOME_FUTURE_MSVC_HELP void _set_state(U &&c, bool set_from_continuation=false)
     {
       lock_guard_type h(this);
+      if (this->_state_set)
+        basic_future<implementation_policy>::_throw_error(monad_errc::already_set);
       if(h._f)
       {
-        if(h._f->_storage.type!=value_storage_type::storage_type::empty)
-          basic_future<implementation_policy>::_throw_error(monad_errc::already_set);
         // If there are continuations, set the state there instead of to my future
         if(this->_set_state_info.continuation_future)
           c(this->_set_state_info.continuation_future);
         else
           c(h._f);
+        this->_state_set = true;
         // Move locally my continuation and sleep wake info before release locks
         typename base::set_state_info_t state_info(std::move(this->_set_state_info));
         // Detach myself from my future
@@ -716,15 +711,14 @@ namespace lightweight_futures {
           // Don't throw if setting the future of a continuation which has vanished
           if (set_from_continuation)
             return;
-#ifdef BOOST_OUTCOME_SET_PROMISE_AFTER_FUTURE_IS_NOTHROW
+#ifndef BOOST_OUTCOME_SET_ORPHANED_PROMISE_THROWS_NO_STATE
           return;
 #else
           basic_future<implementation_policy>::_throw_error(monad_errc::no_state);
 #endif
         }
-        if(this->_storage.type!=value_storage_type::storage_type::empty)
-          basic_future<implementation_policy>::_throw_error(monad_errc::already_set);
         c(this);
+        this->_state_set = true;
       }
     }
     // Sets state from a continuation (don't throw if the promise is broken)
