@@ -1,5 +1,5 @@
 /* unittests.cpp
-Unit testing for memory transactions
+Unit testing for outcomes
 (C) 2013-2015 Niall Douglas http://www.nedproductions.biz/
 
 
@@ -1420,16 +1420,31 @@ BOOST_AUTO_TEST_CASE(works/future/continuations/lightweight, "Tests that our fut
     future<int> f2(f.then([&test](future<double> &&f) { BOOST_CHECK(f.get() == 78.0); test = 1; return 5; }));
     // Automatic unwrapping of future<future<T>>
     future<int> f3(f2.then([&test](future<int> &&f) { BOOST_CHECK(f.get() == 5); test = 2; return make_ready_future(2); }));
+    // Return of not ready future should pass through
+    promise<int> p4;
+    future<int> f4(p4.get_future());
+    future<int> f5(f3.then([&f4](future<int> &&f) mutable
+    {
+      BOOST_CHECK(f.get() == 2);
+      future<int> g(std::move(f4));
+      return g;
+    }));
     BOOST_CHECK(f.valid());
     BOOST_CHECK(f2.valid());
     BOOST_CHECK(f3.valid());
+    BOOST_CHECK(f4.valid());
+    BOOST_CHECK(f5.valid());
     BOOST_CHECK(test == 0);
     p.set_value(78.0);
     BOOST_CHECK(test == 2);
-    BOOST_CHECK(!f.valid());  // consuming continuation, therefore f is consumed
-    BOOST_CHECK(!f2.valid()); // ditto
-    BOOST_CHECK(f3.get() == 2);
-    BOOST_CHECK(!f3.valid());
+    BOOST_CHECK(!f.valid());     // consuming continuation, therefore f is consumed
+    BOOST_CHECK(!f2.valid());    // ditto
+    BOOST_CHECK(!f3.valid());    // ditto
+    BOOST_CHECK(!f4.valid());    // f4 moved from by continuation
+    BOOST_CHECK(f5.valid());     // still valid because p4 has not set it yet
+    p4.set_value(99);
+    BOOST_CHECK(f5.get() == 99);
+    BOOST_CHECK(!f5.valid());
   }
   {
     int test = 0;

@@ -645,7 +645,13 @@ namespace lightweight_futures {
       h.unlock();
       return ret;
     }
-    //! \brief EXTENSION: Does this basic_promise have a future?
+    //! \brief EXTENSION: Is this basic_promise valid (has an attached future, or future not yet fetched)?
+    BOOST_OUTCOME_FUTURE_MSVC_HELP bool valid() const noexcept
+    {
+      //detail::lock_guard<value_type> h(this);
+      return this->_future || !this->_future_created;
+    }
+    //! \brief EXTENSION: Has get_future() been called at some point?
     BOOST_OUTCOME_FUTURE_MSVC_HELP bool has_future() const noexcept
     {
       //detail::lock_guard<value_type> h(this);
@@ -722,9 +728,29 @@ namespace lightweight_futures {
       }
     }
     // Sets state from a continuation (don't throw if the promise is broken)
-    BOOST_OUTCOME_FUTURE_MSVC_HELP void _set_state_from_continuation(value_storage_type &&v)
+    BOOST_OUTCOME_FUTURE_MSVC_HELP void _set_state_from_continuation(future_base_type &&v)
     {
-      _set_state([&v](future_base_type *self) { self->_storage.set_state(std::move(v)); }, true);
+      // If the continuation returned a ready future or equivalent, set my future to the new state
+      if (v.is_ready())
+        _set_state([&v](future_base_type *self) { self->_storage.set_state(std::move(v._storage)); }, true);
+      else
+      {
+        // Need to detach me from my future and make my future's promise the promise belonging to the one returned by the continuation
+        typename base::lock_guard_type h1(this), h2(&v);
+        // Reset myself
+        this->_storage.clear();
+        this->_future = nullptr;
+        this->_future_created = false;
+        this->_state_set = false;
+        assert(!this->_set_state_info.continuation);
+        this->_set_state_info.continuation_future = nullptr;
+        this->_set_state_info.continuation.reset();
+        this->_set_state_info.sleeping_waiters.reset();
+        // Set my future's promise to continuation's promise
+        h1._f->_promise = h2._f->_promise;
+        h2._f->_promise = nullptr;
+        h1._f->_promise->_future = h1._f;
+      }
     }
   public:
     /*! \brief SYNC POINT EXTENSION Sets the state to be returned by the associated future to be the same as the value storage, releasing any waits occuring in other threads.
@@ -808,7 +834,7 @@ namespace lightweight_futures {
         // Execute the continuation
         try
         {
-          p._set_state_from_continuation(detail::do_then<typename f_traits::return_type, callable_type, implementation_policy>(std::move(f))(std::move(*self))._storage);
+          p._set_state_from_continuation(detail::do_then<typename f_traits::return_type, callable_type, implementation_policy>(std::move(f))(std::move(*self)));
           if (implementation_policy::is_consuming && f_traits::is_rvalue)
           {
             // Concurrency TS requires us to zap storage after a consuming move
