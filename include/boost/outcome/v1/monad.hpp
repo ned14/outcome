@@ -1464,6 +1464,16 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
   template<class T> outcome<T> make_ready_outcome(T &&v) { return outcome<T>(std::forward<T>(v)); }
   //! \brief Make a ready outcome from the type passed \ingroup monad
   outcome<void> make_ready_outcome() { return outcome<void>(value); }
+  //! \brief Make an errored outcome from the type passed \ingroup monad
+  template<class T> outcome<T> make_errored_outcome(std::error_code v) { return outcome<T>(std::move(v)); }
+  //! \brief Make a generic errored outcome from the errno passed \ingroup monad
+  template<class T> outcome<T> make_errored_outcome(int e) { return outcome<T>(std::error_code(e, std::generic_category())); }
+#if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
+  //! \brief Make a system errored outcome from the code passed \ingroup monad
+  template<class T> outcome<T> make_errored_outcome(DWORD e) { return outcome<T>(std::error_code(e, std::system_category())); }
+#endif
+  //! \brief Make an excepted outcome from the type passed \ingroup monad
+  template<class T> outcome<T> make_exceptional_outcome(std::exception_ptr v) { return outcome<T>(std::move(v)); }
 
   /*! \brief `result<R>` can hold a fixed variant list of empty, a type `R` or a lightweight `std::error_code` at a
   space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `tribool::true_` and
@@ -1480,6 +1490,14 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
   template<class T> result<T> make_ready_result(T &&v) { return result<T>(std::forward<T>(v)); }
   //! \brief Makes a result from the type passed \ingroup monad
   result<void> make_ready_result() { return result<void>(value); }
+  //! \brief Make an errored result from the type passed \ingroup monad
+  template<class T> result<T> make_errored_result(std::error_code v) { return result<T>(std::move(v)); }
+  //! \brief Make a generic errored outcome from the errno passed \ingroup monad
+  template<class T> result<T> make_errored_result(int e) { return result<T>(std::error_code(e, std::generic_category())); }
+#if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
+  //! \brief Make a system errored outcome from the code passed \ingroup monad
+  template<class T> result<T> make_errored_result(DWORD e) { return result<T>(std::error_code(e, std::system_category())); }
+#endif
 
   /*! \brief `option<R>` can hold a fixed variant list of empty or a type `R` at a space cost of `sizeof(value_storage<R>)`
   which is usually `sizeof(R)+8`, but may be smaller if `value_storage<R>` is specialised. This

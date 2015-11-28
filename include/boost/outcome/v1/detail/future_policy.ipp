@@ -692,11 +692,18 @@ template<typename R> inline BOOST_OUTCOME_FUTURE_NAME<R> BOOST_OUTCOME_MAKE_READ
   return BOOST_OUTCOME_FUTURE_NAME<R>(std::move(v));
 }
 #ifdef BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE_GENERIC_CATEGORY
-//! \brief A predefined make errored shared future convenience function \ingroup future_promise
+//! \brief A predefined make generic errored future convenience function \ingroup future_promise
 template<typename R> inline BOOST_OUTCOME_FUTURE_NAME<R> BOOST_OUTCOME_MAKE_READY_FUTURE_NAME(int v)
 {
   return BOOST_OUTCOME_FUTURE_NAME<R>(BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE(v, BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE_GENERIC_CATEGORY()));
 }
+#if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
+//! \brief A predefined make system errored future convenience function \ingroup future_promise
+template<typename R> inline BOOST_OUTCOME_FUTURE_NAME<R> BOOST_OUTCOME_MAKE_READY_FUTURE_NAME(DWORD v)
+{
+  return BOOST_OUTCOME_FUTURE_NAME<R>(BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE(v, BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE_SYSTEM_CATEGORY()));
+}
+#endif
 #endif
 #undef BOOST_OUTCOME_MAKE_READY_FUTURE_NAME
 #endif
@@ -733,11 +740,18 @@ template<typename R> inline BOOST_OUTCOME_SHARED_FUTURE_NAME<R> BOOST_OUTCOME_MA
   return BOOST_OUTCOME_SHARED_FUTURE_NAME<R>(std::move(v));
 }
 #ifdef BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE_GENERIC_CATEGORY
-//! \brief A predefined make errored shared future convenience function \ingroup future_promise
+//! \brief A predefined make generic errored shared future convenience function \ingroup future_promise
 template<typename R> inline BOOST_OUTCOME_SHARED_FUTURE_NAME<R> BOOST_OUTCOME_MAKE_READY_FUTURE_NAME(int v)
 {
   return BOOST_OUTCOME_SHARED_FUTURE_NAME<R>(BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE(v, BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE_GENERIC_CATEGORY()));
 }
+#if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
+//! \brief A predefined make system errored shared future convenience function \ingroup future_promise
+template<typename R> inline BOOST_OUTCOME_SHARED_FUTURE_NAME<R> BOOST_OUTCOME_MAKE_READY_FUTURE_NAME(DWORD v)
+{
+  return BOOST_OUTCOME_SHARED_FUTURE_NAME<R>(BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE(v, BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE_SYSTEM_CATEGORY()));
+}
+#endif
 #endif
 #undef BOOST_OUTCOME_MAKE_READY_FUTURE_NAME
 #endif
@@ -760,4 +774,5 @@ template<typename R> inline BOOST_OUTCOME_SHARED_FUTURE_NAME<R> BOOST_OUTCOME_MA
 #undef BOOST_OUTCOME_SHARED_FUTURE_POLICY_NAME
 #undef BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE
 #undef BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE_GENERIC_CATEGORY
+#undef BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE_SYSTEM_CATEGORY
 #undef BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE

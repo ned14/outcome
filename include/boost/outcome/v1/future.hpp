@@ -1428,11 +1428,13 @@ namespace lightweight_futures {
 #define BOOST_OUTCOME_FUTURE_NAME_POSTFIX 
 #define BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE stl11::error_code
 #define BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE_GENERIC_CATEGORY stl11::generic_category
+#define BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE_SYSTEM_CATEGORY stl11::system_category
 #define BOOST_OUTCOME_FUTURE_POLICY_EXCEPTION_TYPE std::exception_ptr
 #include "detail/future_policy.ipp"
 #define BOOST_OUTCOME_FUTURE_NAME_POSTFIX _result
 #define BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE stl11::error_code
 #define BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE_GENERIC_CATEGORY stl11::generic_category
+#define BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE_SYSTEM_CATEGORY stl11::system_category
 #include "detail/future_policy.ipp"
 #define BOOST_OUTCOME_FUTURE_NAME_POSTFIX _option
 #include "detail/future_policy.ipp"
