@@ -1525,9 +1525,17 @@ namespace std
   }
 }
 
+//! \brief Expands into if((m).has_error()) return (m).get_error()
+#define BOOST_OUTCOME_PROPAGATE_ERROR(m) if((m).has_error()) return (m).get_error()
+//! \brief Expands into if((m).has_exception()) return (m).get_exception()
+#define BOOST_OUTCOME_PROPAGATE_EXCEPTION(m) if((m).has_exception()) return (m).get_exception()
 //! \brief Expands into if((m).has_error()) return (m).get_error(); else if((m).has_exception()) return (m).get_exception()
-#define BOOST_OUTCOME_PROPAGATE(m) if((m).has_error()) return (m).get_error(); else if((m).has_exception()) return (m).get_exception()
-//! \brief Expands into BOOST_OUTCOME_PROPAGATE(m); auto v((m).get())
-#define BOOST_OUTCOME_AUTO(v, m) BOOST_OUTCOME_PROPAGATE(m); auto v((m).get())
+#define BOOST_OUTCOME_PROPAGATE_FAILURE(m) if((m).has_error()) return (m).get_error(); else if((m).has_exception()) return (m).get_exception()
+//! \brief Expands into BOOST_OUTCOME_PROPAGATE_ERROR(m); auto v((m).get())
+#define BOOST_OUTCOME_FILTER_ERROR(v, m) BOOST_OUTCOME_PROPAGATE_ERROR((m)); auto v(std::move((m).get()))
+//! \brief Expands into BOOST_OUTCOME_PROPAGATE_EXCEPTION(m); auto v((m).get())
+#define BOOST_OUTCOME_FILTER_EXCEPTION(v, m) BOOST_OUTCOME_PROPAGATE_EXCEPTION((m)); auto v(std::move((m).get()))
+//! \brief Expands into BOOST_OUTCOME_PROPAGATE_FAILURE(m); auto v((m).get())
+#define BOOST_OUTCOME_FILTER_FAILURE(v, m) BOOST_OUTCOME_PROPAGATE_FAILURE((m)); auto v(std::move((m).get()))
 
 #endif
