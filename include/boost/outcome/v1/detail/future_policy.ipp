@@ -699,7 +699,7 @@ template<typename R> inline BOOST_OUTCOME_FUTURE_NAME<R> BOOST_OUTCOME_MAKE_READ
 }
 #if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 //! \brief A predefined make system errored future convenience function \ingroup future_promise
-template<typename R> inline BOOST_OUTCOME_FUTURE_NAME<R> BOOST_OUTCOME_MAKE_READY_FUTURE_NAME(DWORD v)
+template<typename R> inline BOOST_OUTCOME_FUTURE_NAME<R> BOOST_OUTCOME_MAKE_READY_FUTURE_NAME(unsigned long v)
 {
   return BOOST_OUTCOME_FUTURE_NAME<R>(BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE(v, BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE_SYSTEM_CATEGORY()));
 }
@@ -747,7 +747,7 @@ template<typename R> inline BOOST_OUTCOME_SHARED_FUTURE_NAME<R> BOOST_OUTCOME_MA
 }
 #if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 //! \brief A predefined make system errored shared future convenience function \ingroup future_promise
-template<typename R> inline BOOST_OUTCOME_SHARED_FUTURE_NAME<R> BOOST_OUTCOME_MAKE_READY_FUTURE_NAME(DWORD v)
+template<typename R> inline BOOST_OUTCOME_SHARED_FUTURE_NAME<R> BOOST_OUTCOME_MAKE_READY_FUTURE_NAME(unsigned long v)
 {
   return BOOST_OUTCOME_SHARED_FUTURE_NAME<R>(BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE(v, BOOST_OUTCOME_FUTURE_POLICY_ERROR_TYPE_SYSTEM_CATEGORY()));
 }

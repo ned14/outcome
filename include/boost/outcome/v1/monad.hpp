@@ -1470,7 +1470,7 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
   template<class T> outcome<T> make_errored_outcome(int e) { return outcome<T>(std::error_code(e, std::generic_category())); }
 #if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
   //! \brief Make a system errored outcome from the code passed \ingroup monad
-  template<class T> outcome<T> make_errored_outcome(DWORD e) { return outcome<T>(std::error_code(e, std::system_category())); }
+  template<class T> outcome<T> make_errored_outcome(unsigned long e) { return outcome<T>(std::error_code(e, std::system_category())); }
 #endif
   //! \brief Make an excepted outcome from the type passed \ingroup monad
   template<class T> outcome<T> make_exceptional_outcome(std::exception_ptr v) { return outcome<T>(std::move(v)); }
@@ -1496,7 +1496,7 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
   template<class T> result<T> make_errored_result(int e) { return result<T>(std::error_code(e, std::generic_category())); }
 #if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
   //! \brief Make a system errored outcome from the code passed \ingroup monad
-  template<class T> result<T> make_errored_result(DWORD e) { return result<T>(std::error_code(e, std::system_category())); }
+  template<class T> result<T> make_errored_result(unsigned long e) { return result<T>(std::error_code(e, std::system_category())); }
 #endif
 
   /*! \brief `option<R>` can hold a fixed variant list of empty or a type `R` at a space cost of `sizeof(value_storage<R>)`
