@@ -1460,10 +1460,13 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
   template<class T> outcome<T> make_outcome(std::exception_ptr v) { return outcome<T>(std::move(v)); }
   //! \brief Makes an empty outcome of type T \ingroup monad
   template<class T> outcome<T> make_outcome() { return outcome<T>(); }
+  //! \brief Makes an empty outcome of type void \ingroup monad
+  template<> outcome<void> make_outcome<void>() { return outcome<void>(); }
   //! \brief Make a ready outcome from the type passed \ingroup monad
   template<class T> outcome<T> make_ready_outcome(T &&v) { return outcome<T>(std::forward<T>(v)); }
   //! \brief Make a ready outcome from the type passed \ingroup monad
-  outcome<void> make_ready_outcome() { return outcome<void>(value); }
+  template<class T> outcome<T> make_ready_outcome() { static_assert(!std::is_same<T, T>::value, "Empty make_ready_outcome<T> not specialised"); }
+  template<> outcome<void> make_ready_outcome<void>() { return outcome<void>(value); }
   //! \brief Make an errored outcome from the type passed \ingroup monad
   template<class T> outcome<T> make_errored_outcome(std::error_code v) { return outcome<T>(std::move(v)); }
   //! \brief Make a generic errored outcome from the errno passed \ingroup monad
@@ -1486,10 +1489,13 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
   template<class T> result<T> make_result(std::error_code v) { return result<T>(std::move(v)); }
   //! \brief Makes an empty result of type T \ingroup monad
   template<class T> result<T> make_result() { return result<T>(); }
+  //! \brief Makes an empty result of type void \ingroup monad
+  template<> result<void> make_result<void>() { return result<void>(); }
   //! \brief Makes a result from the type passed \ingroup monad
   template<class T> result<T> make_ready_result(T &&v) { return result<T>(std::forward<T>(v)); }
   //! \brief Makes a result from the type passed \ingroup monad
-  result<void> make_ready_result() { return result<void>(value); }
+  template<class T> result<T> make_ready_result() { static_assert(!std::is_same<T, T>::value, "Empty make_ready_result<T> not specialised"); }
+  template<> result<void> make_ready_result<void>() { return result<void>(value); }
   //! \brief Make an errored result from the type passed \ingroup monad
   template<class T> result<T> make_errored_result(std::error_code v) { return result<T>(std::move(v)); }
   //! \brief Make a generic errored outcome from the errno passed \ingroup monad
@@ -1509,10 +1515,13 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
   template<class T> option<T> make_option(T &&v) { return option<T>(std::forward<T>(v)); }
   //! \brief Makes an empty option of type T \ingroup monad
   template<class T> option<T> make_option() { return option<T>(); }
+  //! \brief Makes an empty option of type void \ingroup monad
+  template<> option<void> make_option<void>() { return option<void>(); }
   //! \brief Makes a option from the type passed \ingroup monad
   template<class T> option<T> make_ready_option(T &&v) { return option<T>(std::forward<T>(v)); }
   //! \brief Makes a option from the type passed \ingroup monad
-  option<void> make_ready_option() { return option<void>(value); }
+  template<class T> option<T> make_ready_option() { static_assert(!std::is_same<T, T>::value, "Empty make_ready_option<T> not specialised"); }
+  template<> option<void> make_ready_option<void>() { return option<void>(value); }
 
 BOOST_OUTCOME_V1_NAMESPACE_END
 
