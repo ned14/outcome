@@ -1531,11 +1531,20 @@ namespace std
 #define BOOST_OUTCOME_PROPAGATE_EXCEPTION(m) { const auto &__v=(m); if(__v.has_exception()) return __v.get_exception(); }
 //! \brief Expands into { const auto &__v=(m); if(__v.has_error()) return __v.get_error(); else if(__v.has_exception()) return __v.get_exception(); }
 #define BOOST_OUTCOME_PROPAGATE_FAILURE(m) { const auto &__v=(m); if(__v.has_error()) return __v.get_error(); else if(__v.has_exception()) return __v.get_exception(); }
+
+#define BOOST_OUTCOME_GLUE2(x, y) x ## y
+#define BOOST_OUTCOME_GLUE(x, y) BOOST_OUTCOME_GLUE2(x, y)
+//#define BOOST_OUTCOME_UNIQUE_NAME BOOST_OUTCOME_GLUE(__t, __COUNTER)
+#define BOOST_OUTCOME_UNIQUE_NAME __t
+
+#define BOOST_OUTCOME_FILTER_ERROR2(unique, v, m) auto &&unique=(m); if(unique.has_error()) return unique.get_error(); auto v(std::move(std::move(unique).get()))
+#define BOOST_OUTCOME_FILTER_EXCEPTION2(unique, v, m) auto &&unique=(m); if(unique.has_exception()) return unique.get_exception(); auto v(std::move(std::move(unique).get()))
+#define BOOST_OUTCOME_FILTER_FAILURE2(unique, v, m) auto &&unique=(m); if(unique.has_error()) return unique.get_error(); else if(unique.has_exception()) return unique.get_exception(); auto v(std::move(std::move(unique).get()))
 //! \brief Expands into BOOST_OUTCOME_PROPAGATE_ERROR(m); auto v((m).get())
-#define BOOST_OUTCOME_FILTER_ERROR(v, m) auto &&__v##__COUNTER__=(m); if(__v##__COUNTER__.has_error()) return __v##__COUNTER__.get_error(); auto v(std::move(std::move(__v##__COUNTER__).get()))
+#define BOOST_OUTCOME_FILTER_ERROR(v, m) BOOST_OUTCOME_FILTER_ERROR2(BOOST_OUTCOME_UNIQUE_NAME, v, m)
 //! \brief Expands into BOOST_OUTCOME_PROPAGATE_EXCEPTION(m); auto v((m).get())
-#define BOOST_OUTCOME_FILTER_EXCEPTION(v, m) auto &&__v##__COUNTER__=(m); if(__v##__COUNTER__.has_exception()) return __v##__COUNTER__.get_exception(); auto v(std::move(std::move(__v##__COUNTER__).get()))
+#define BOOST_OUTCOME_FILTER_EXCEPTION(v, m) BOOST_OUTCOME_FILTER_EXCEPTION2(BOOST_OUTCOME_UNIQUE_NAME, v, m)
 //! \brief Expands into BOOST_OUTCOME_PROPAGATE_FAILURE(m); auto v((m).get())
-#define BOOST_OUTCOME_FILTER_FAILURE(v, m) auto &&__v##__COUNTER__=(m); if(__v##__COUNTER__.has_error()) return __v##__COUNTER__.get_error(); else if(__v##__COUNTER__.has_exception()) return __v##__COUNTER__.get_exception(); auto v(std::move(std::move(__v##__COUNTER__).get()))
+#define BOOST_OUTCOME_FILTER_FAILURE(v, m) BOOST_OUTCOME_FILTER_FAILURE2(BOOST_OUTCOME_UNIQUE_NAME, v, m)
 
 #endif
