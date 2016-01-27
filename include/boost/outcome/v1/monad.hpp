@@ -1541,6 +1541,11 @@ namespace std
 //! \brief Expands into { const auto &__v=(m); if(__v.has_error()) return __v.get_error(); else if(__v.has_exception()) return __v.get_exception(); }
 #define BOOST_OUTCOME_PROPAGATE_FAILURE(m) { const auto &__v=(m); if(__v.has_error()) return __v.get_error(); else if(__v.has_exception()) return __v.get_exception(); }
 
+//! \brief Expands into 
+#define BOOST_OUTCOME_THROW_ERROR(m) { const auto &__v=(m); if(__v.has_error()) throw std::system_error(__v.get_error()); }
+//! \brief Expands into 
+#define BOOST_OUTCOME_THROW_FAILURE(m) { const auto &__v=(m); if(__v.has_error()) throw std::system_error(__v.get_error()); else if(__v.has_exception()) return std::rethrow_exception(__v.get_exception()); }
+
 #define BOOST_OUTCOME_GLUE2(x, y) x ## y
 #define BOOST_OUTCOME_GLUE(x, y) BOOST_OUTCOME_GLUE2(x, y)
 //#define BOOST_OUTCOME_UNIQUE_NAME BOOST_OUTCOME_GLUE(__t, __COUNTER)
