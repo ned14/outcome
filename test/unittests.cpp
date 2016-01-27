@@ -822,7 +822,7 @@ BOOST_AUTO_TEST_CASE(works/monad/void, "Tests that the monad works as intended w
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
   // Can't construct a void
   {
-    outcome<void> a, b(empty), c(value), d(make_ready_outcome());
+    outcome<void> a, b(empty), c(value), d(make_ready_outcome<void>());
     BOOST_CHECK(a == b);
     BOOST_CHECK(c == d);
     BOOST_CHECK(a != c);
