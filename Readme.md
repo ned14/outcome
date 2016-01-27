@@ -5,43 +5,9 @@ Linux: [![Build Status](https://ci.nedprod.com/job/Boost.Monad%20Test%20Linux%20
 
 Documentation: https://ned14.github.io/boost.outcome/ (PDF: https://ned14.github.io/boost.outcome/refman.pdf)
 
-Lightweight promise-future:
- - [x] Map ternary true/false/other into namespace lightweight_futures.
- - [x] Have future-promise conformance suite also run for std::future.
- - [x] Write thread sanitising fuzz tester to monte carlo for race conditions.
- - [x] Add iostream overloads for basic_monad
- - [x] Return monad_errc::exception_present error code for when get_error() sees an excepted state.
- - [x] Implement shared_future_policy and a conformance suite for shared_future.
- - [x] Implement shared_future_ptr which thunks a shared_future API through a shared_ptr to
-basic_future<shared_future_policy>.
- - [x] Document synchronisation APIs in promise future.
- - [x] Audit all unlocked state reads with writes for raciness.
- - [x] Refactor the tribool logic mapping such that empty => unknown.
- - [x] Implement N4399 continuations for future.
- - [x] Use of reinterpret_cast to implement future => shared_future is naughty and should be done properly.
- - [x] Have basic_monad gain an explicit conversion constructor from other basic_monad with different
-implementation policies such that compatible monads can convert into one another.
- - [x] wait() should sleep the thread as necessary.
- - [x] Split implementation policy for value_storage into separate policy (allows value_storage
-to convert without considering future-promise type).
- - [x] Get value_storage<bool> and value_storage<void> to consume 1 byte, not 2 bytes.
- - [x] Fix future operator= and move constructor being racy by placing a locker type at the top of the hierarchy
-and an unlocker type at the bottom of the hierarchy.
- - [x] Move value_storage into basic_promise_future_base and separate pointer into a union.
- - [x] typedef basic_future_base and basic_promise_base to a basic_promise_future_base.
- - [x] Now value_storage for both promise and future is visible to both, eliminate vptr.
- - [x] Relocate continuation_future * into basic_promise_future_base so future can build it and promise
-can execute it. Also relocate sleeping_waiters.
- - [x] Relocate enable_shared_from_this into basic_future. This should be safe now no type slicing
-is done.
- - [x] Fix failing constexpr test min_promise_future_reduce.
- - [x] Implement N4399 continuations for shared_future.
- - [x] Implement wait_for()/wait_until().
- - [x] when_all composure.
- - [x] Rename github to Boost.Monad.
- - [x] Replace all BOOST_CONSTEXPR and BOOST_STATIC_CONSTEXPR with constexpr.
- - [x] Fully Boost.APIBind the library in order to get Boost.AFIO compiling again.
- - [x] Rename github once again this time to Boost.Outcome.
+Outcome/Result/Option:
+ - [ ] Add constexpr compile unit tests for when <T> is a LiteralType.
+ - [ ] Fix all remaining mentions of Boost.Monad (e.g. doxygen docs)
 
 Later:
  - [ ] when_any composure.
