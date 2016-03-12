@@ -40,6 +40,9 @@ DEALINGS IN THE SOFTWARE.
 #ifndef __cpp_alias_templates
 # error Boost.Outcome needs template alias support in the compiler
 #endif
+#ifndef __cpp_attributes
+# error Boost.Outcome needs attributes support in the compiler
+#endif
 #ifndef __cpp_variadic_templates
 # error Boost.Outcome needs variadic template support in the compiler
 #endif
