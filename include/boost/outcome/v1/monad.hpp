@@ -1718,10 +1718,10 @@ namespace std
       return std::rethrow_exception(__v.get_exception());                                                                                                                                                                                                                                                                      \
   }
 
-#define BOOST_OUTCOME_GLUE2(x, y) x##y
-#define BOOST_OUTCOME_GLUE(x, y) BOOST_OUTCOME_GLUE2(x, y)
-//#define BOOST_OUTCOME_UNIQUE_NAME BOOST_OUTCOME_GLUE(__t, __COUNTER)
-#define BOOST_OUTCOME_UNIQUE_NAME __t
+#define BOOST_OUTCOME__GLUE2(x, y) x##y
+#define BOOST_OUTCOME__GLUE(x, y) BOOST_OUTCOME__GLUE2(x, y)
+#define BOOST_OUTCOME_UNIQUE_NAME BOOST_OUTCOME__GLUE(__t, __COUNTER__)
+//#define BOOST_OUTCOME_UNIQUE_NAME __t
 
 #define BOOST_OUTCOME_FILTER_ERROR2(unique, v, m)                                                                                                                                                                                                                                                                              \
   auto &&unique = (m);                                                                                                                                                                                                                                                                                                         \
