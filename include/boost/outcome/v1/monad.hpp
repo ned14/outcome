@@ -1618,11 +1618,13 @@ template <> result<void> make_ready_result<void>()
 //! \brief Make an errored result from the type passed \ingroup monad
 template <class T> result<T> make_errored_result(std::error_code v, const char *extended = nullptr)
 {
+  (void) extended;
   return result<T>(std::move(v));
 }
 //! \brief Make a generic errored outcome from the errno passed \ingroup monad
 template <class T> result<T> make_errored_result(int e, const char *extended = nullptr)
 {
+  (void) extended;
   return result<T>(std::error_code(e, std::generic_category()));
 }
 #if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
