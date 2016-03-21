@@ -1631,6 +1631,7 @@ template <class T> result<T> make_errored_result(int e, const char *extended = n
 //! \brief Make a system errored outcome from the code passed \ingroup monad
 template <class T> result<T> make_errored_result(unsigned long e, const char *extended = nullptr)
 {
+  (void) extended;
   return result<T>(std::error_code(e, std::system_category()));
 }
 #endif
