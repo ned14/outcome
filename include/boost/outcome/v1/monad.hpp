@@ -1515,63 +1515,63 @@ heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+8)`. This cor
 */
 template <typename R> using outcome = basic_monad<detail::monad_policy<R>>;
 //! \brief Makes an outcome from the type passed \ingroup monad
-template <class T> outcome<T> make_outcome(T &&v)
+template <class T> inline outcome<T> make_outcome(T &&v)
 {
   return outcome<T>(std::forward<T>(v));
 }
 //! \brief Makes an errored outcome of type T \ingroup monad
-template <class T> outcome<T> make_outcome(std::error_code v)
+template <class T> inline outcome<T> make_outcome(std::error_code v)
 {
   return outcome<T>(std::move(v));
 }
 //! \brief Makes an excepted outcome of type T \ingroup monad
-template <class T> outcome<T> make_outcome(std::exception_ptr v)
+template <class T> inline outcome<T> make_outcome(std::exception_ptr v)
 {
   return outcome<T>(std::move(v));
 }
 //! \brief Makes an empty outcome of type T \ingroup monad
-template <class T> outcome<T> make_outcome()
+template <class T> inline outcome<T> make_outcome()
 {
   return outcome<T>();
 }
 //! \brief Makes an empty outcome of type void \ingroup monad
-template <> outcome<void> make_outcome<void>()
+template <> inline outcome<void> make_outcome<void>()
 {
   return outcome<void>();
 }
 //! \brief Make a ready outcome from the type passed \ingroup monad
-template <class T> outcome<T> make_ready_outcome(T &&v)
+template <class T> inline outcome<T> make_ready_outcome(T &&v)
 {
   return outcome<T>(std::forward<T>(v));
 }
 //! \brief Make a ready outcome from the type passed \ingroup monad
-template <class T> outcome<T> make_ready_outcome()
+template <class T> inline outcome<T> make_ready_outcome()
 {
   static_assert(!std::is_same<T, T>::value, "Empty make_ready_outcome<T> not specialised");
 }
-template <> outcome<void> make_ready_outcome<void>()
+template <> inline outcome<void> make_ready_outcome<void>()
 {
   return outcome<void>(value);
 }
 //! \brief Make an errored outcome from the type passed \ingroup monad
-template <class T> outcome<T> make_errored_outcome(std::error_code v)
+template <class T> inline outcome<T> make_errored_outcome(std::error_code v)
 {
   return outcome<T>(std::move(v));
 }
 //! \brief Make a generic errored outcome from the errno passed \ingroup monad
-template <class T> outcome<T> make_errored_outcome(int e)
+template <class T> inline outcome<T> make_errored_outcome(int e)
 {
   return outcome<T>(std::error_code(e, std::generic_category()));
 }
 #if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 //! \brief Make a system errored outcome from the code passed \ingroup monad
-template <class T> outcome<T> make_errored_outcome(unsigned long e)
+template <class T> inline outcome<T> make_errored_outcome(unsigned long e)
 {
   return outcome<T>(std::error_code(e, std::system_category()));
 }
 #endif
 //! \brief Make an excepted outcome from the type passed \ingroup monad
-template <class T> outcome<T> make_exceptional_outcome(std::exception_ptr v)
+template <class T> inline outcome<T> make_exceptional_outcome(std::exception_ptr v)
 {
   return outcome<T>(std::move(v));
 }
@@ -1582,54 +1582,54 @@ space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `t
 */
 template <typename R> using result = basic_monad<detail::result_policy<R>>;
 //! \brief Makes a result from the type passed \ingroup monad
-template <class T> result<T> make_result(T &&v)
+template <class T> inline result<T> make_result(T &&v)
 {
   return result<T>(std::forward<T>(v));
 }
 //! \brief Makes an errored result of type T \ingroup monad
-template <class T> result<T> make_result(std::error_code v)
+template <class T> inline result<T> make_result(std::error_code v)
 {
   return result<T>(std::move(v));
 }
 //! \brief Makes an empty result of type T \ingroup monad
-template <class T> result<T> make_result()
+template <class T> inline result<T> make_result()
 {
   return result<T>();
 }
 //! \brief Makes an empty result of type void \ingroup monad
-template <> result<void> make_result<void>()
+template <> inline result<void> make_result<void>()
 {
   return result<void>();
 }
 //! \brief Makes a result from the type passed \ingroup monad
-template <class T> result<T> make_ready_result(T &&v)
+template <class T> inline result<T> make_ready_result(T &&v)
 {
   return result<T>(std::forward<T>(v));
 }
 //! \brief Makes a result from the type passed \ingroup monad
-template <class T> result<T> make_ready_result()
+template <class T> inline result<T> make_ready_result()
 {
   static_assert(!std::is_same<T, T>::value, "Empty make_ready_result<T> not specialised");
 }
-template <> result<void> make_ready_result<void>()
+template <> inline result<void> make_ready_result<void>()
 {
   return result<void>(value);
 }
 //! \brief Make an errored result from the type passed \ingroup monad
-template <class T> result<T> make_errored_result(std::error_code v, const char *extended = nullptr)
+template <class T> inline result<T> make_errored_result(std::error_code v, const char *extended = nullptr)
 {
   (void) extended;
   return result<T>(std::move(v));
 }
 //! \brief Make a generic errored outcome from the errno passed \ingroup monad
-template <class T> result<T> make_errored_result(int e, const char *extended = nullptr)
+template <class T> inline result<T> make_errored_result(int e, const char *extended = nullptr)
 {
   (void) extended;
   return result<T>(std::error_code(e, std::generic_category()));
 }
 #if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 //! \brief Make a system errored outcome from the code passed \ingroup monad
-template <class T> result<T> make_errored_result(unsigned long e, const char *extended = nullptr)
+template <class T> inline result<T> make_errored_result(unsigned long e, const char *extended = nullptr)
 {
   (void) extended;
   return result<T>(std::error_code(e, std::system_category()));
@@ -1643,31 +1643,31 @@ like Rust's `Option<T>`. \ingroup monad
 */
 template <typename R> using option = basic_monad<detail::option_policy<R>>;
 //! \brief Makes a option from the type passed \ingroup monad
-template <class T> option<T> make_option(T &&v)
+template <class T> inline option<T> make_option(T &&v)
 {
   return option<T>(std::forward<T>(v));
 }
 //! \brief Makes an empty option of type T \ingroup monad
-template <class T> option<T> make_option()
+template <class T> inline option<T> make_option()
 {
   return option<T>();
 }
 //! \brief Makes an empty option of type void \ingroup monad
-template <> option<void> make_option<void>()
+template <> inline option<void> make_option<void>()
 {
   return option<void>();
 }
 //! \brief Makes a option from the type passed \ingroup monad
-template <class T> option<T> make_ready_option(T &&v)
+template <class T> inline option<T> make_ready_option(T &&v)
 {
   return option<T>(std::forward<T>(v));
 }
 //! \brief Makes a option from the type passed \ingroup monad
-template <class T> option<T> make_ready_option()
+template <class T> inline option<T> make_ready_option()
 {
   static_assert(!std::is_same<T, T>::value, "Empty make_ready_option<T> not specialised");
 }
-template <> option<void> make_ready_option<void>()
+template <> inline option<void> make_ready_option<void>()
 {
   return option<void>(value);
 }
