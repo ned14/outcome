@@ -36,6 +36,10 @@ DEALINGS IN THE SOFTWARE.
 
 #include "value_storage.hpp"
 
+#ifdef _WIN32
+#include <winerror.h>  // for the win32 error code mapping
+#endif
+
 /*! \file monad.hpp
 \brief Provides a lightweight simple monadic value transport
 
@@ -1509,6 +1513,173 @@ namespace detail
 #define BOOST_OUTCOME_MONAD_NAME option
 #include "detail/monad_policy.ipp"
 
+#if defined(_WIN32)
+namespace detail
+{
+  inline std::error_code win32_to_error_code(unsigned long e) noexcept
+  {
+    // Convert various win32 error codes to their POSIX equivalents
+    // TODO FIXME: Really ought to map the network error codes
+    switch(e)
+    {
+    case ERROR_BAD_ARGUMENTS:
+      return std::error_code(E2BIG, std::generic_category());
+    case ERROR_ACCESS_DENIED:
+    case ERROR_CURRENT_DIRECTORY:
+    case ERROR_NETWORK_ACCESS_DENIED:
+    case ERROR_CANNOT_MAKE:
+    case ERROR_FAIL_I24:
+    case ERROR_DRIVE_LOCKED:
+      return std::error_code(EACCES, std::generic_category());
+    //      return std::error_code(EADDRINUSE, std::generic_category());
+    //      return std::error_code(EADDRNOTAVAIL, std::generic_category());
+    //      return std::error_code(EAFNOSUPPORT, std::generic_category());
+    case ERROR_LOCK_VIOLATION:
+    case ERROR_NO_PROC_SLOTS:
+    case ERROR_MAX_THRDS_REACHED:
+    case ERROR_LOCK_FAILED:
+    case ERROR_NOT_READY:
+    case ERROR_SHARING_VIOLATION:
+    case ERROR_TOO_MANY_SEMAPHORES:
+      return std::error_code(EAGAIN, std::generic_category());
+    //      return std::error_code(EALREADY, std::generic_category());
+    case ERROR_INVALID_HANDLE:
+    case ERROR_INVALID_TARGET_HANDLE:
+    case ERROR_DIRECT_ACCESS_HANDLE:
+      return std::error_code(EBADF, std::generic_category());
+    //      return std::error_code(EBADMSG, std::generic_category());
+    case ERROR_BUSY:
+      return std::error_code(EBUSY, std::generic_category());
+    case ERROR_CANCELLED:
+      return std::error_code(ECANCELED, std::generic_category());
+    case ERROR_WAIT_NO_CHILDREN:
+    case ERROR_CHILD_NOT_COMPLETE:
+      return std::error_code(ECHILD, std::generic_category());
+    //      return std::error_code(ECONNABORTED, std::generic_category());
+    //      return std::error_code(ECONNREFUSED, std::generic_category());
+    //      return std::error_code(ECONNRESET, std::generic_category());
+    case ERROR_POSSIBLE_DEADLOCK:
+      return std::error_code(EDEADLK, std::generic_category());
+    //      return std::error_code(EDESTADDRREQ, std::generic_category());
+    //      return std::error_code(EDOM, std::generic_category());
+    case ERROR_FILE_EXISTS:
+    case ERROR_ALREADY_EXISTS:
+      return std::error_code(EEXIST, std::generic_category());
+    case ERROR_INVALID_ADDRESS:
+      return std::error_code(EFAULT, std::generic_category());
+    case ERROR_FILE_TOO_LARGE:
+      return std::error_code(EFBIG, std::generic_category());
+    //      return std::error_code(EHOSTUNREACH, std::generic_category());
+    //      return std::error_code(EIDRM, std::generic_category());
+    //      return std::error_code(EILSEQ, std::generic_category());
+    case ERROR_IO_PENDING:
+      return std::error_code(EINPROGRESS, std::generic_category());
+    //      return std::error_code(EINTR, std::generic_category());
+    case ERROR_INVALID_FUNCTION:
+    case ERROR_INVALID_BLOCK:
+    case ERROR_BAD_ENVIRONMENT:
+    case ERROR_INVALID_ACCESS:
+    case ERROR_INVALID_DATA:
+    case ERROR_INVALID_PARAMETER:
+    case ERROR_NEGATIVE_SEEK:
+    case ERROR_SEEK_ON_DEVICE:
+    case ERROR_BAD_LENGTH:
+    case ERROR_INSUFFICIENT_BUFFER:
+      return std::error_code(EINVAL, std::generic_category());
+    case ERROR_CRC:
+    case ERROR_SEEK:
+    case ERROR_SECTOR_NOT_FOUND:
+    case ERROR_WRITE_FAULT:
+    case ERROR_READ_FAULT:
+    case ERROR_GEN_FAILURE:
+      return std::error_code(EIO, std::generic_category());
+    //      return std::error_code(EISCONN, std::generic_category());
+    //      return std::error_code(EISDIR, std::generic_category());
+    //      return std::error_code(ELOOP, std::generic_category());
+    //      return std::error_code(EMFILE, std::generic_category());
+    case ERROR_TOO_MANY_LINKS:
+      return std::error_code(EMLINK, std::generic_category());
+    //      return std::error_code(EMSGSIZE, std::generic_category());
+    case ERROR_FILENAME_EXCED_RANGE:
+    case ERROR_BUFFER_OVERFLOW:
+      return std::error_code(ENAMETOOLONG, std::generic_category());
+    //      return std::error_code(ENETDOWN, std::generic_category());
+    //      return std::error_code(ENETRESET, std::generic_category());
+    //      return std::error_code(ENETUNREACH, std::generic_category());
+    case ERROR_TOO_MANY_OPEN_FILES:
+      return std::error_code(ENFILE, std::generic_category());
+    //      return std::error_code(ENOBUFS, std::generic_category());
+    //      return std::error_code(ENODATA, std::generic_category());
+    //      return std::error_code(ENODEV, std::generic_category());
+    case ERROR_FILE_NOT_FOUND:
+    case ERROR_PATH_NOT_FOUND:
+    case ERROR_NO_MORE_FILES:
+    case ERROR_BAD_NETPATH:
+    case ERROR_BAD_NET_NAME:
+      return std::error_code(ENOENT, std::generic_category());
+    case ERROR_BAD_FORMAT:
+      return std::error_code(ENOEXEC, std::generic_category());
+    //      return std::error_code(ENOLCK, std::generic_category());
+    //      return std::error_code(ENOLINK, std::generic_category());
+    case ERROR_ARENA_TRASHED:
+    case ERROR_NOT_ENOUGH_MEMORY:
+    case ERROR_OUTOFMEMORY:
+      return std::error_code(ENOMEM, std::generic_category());
+    //      return std::error_code(ENOMSG, std::generic_category());
+    //      return std::error_code(ENOPROTOOPT, std::generic_category());
+    case ERROR_DISK_FULL:
+    case ERROR_HANDLE_DISK_FULL:
+      return std::error_code(ENOSPC, std::generic_category());
+    //      return std::error_code(ENOSR, std::generic_category());
+    //      return std::error_code(ENOSTR, std::generic_category());
+    case ERROR_NOT_SUPPORTED:
+      return std::error_code(ENOSYS, std::generic_category());
+    //      return std::error_code(ENOTCONN, std::generic_category());
+    case ERROR_BAD_PATHNAME:
+    case ERROR_DIRECTORY:
+      return std::error_code(ENOTDIR, std::generic_category());
+    case ERROR_DIR_NOT_EMPTY:
+      return std::error_code(ENOTEMPTY, std::generic_category());
+    //      return std::error_code(ENOTRECOVERABLE, std::generic_category());
+    //      return std::error_code(ENOTSOCK, std::generic_category());
+    case ERROR_CALL_NOT_IMPLEMENTED:
+      return std::error_code(ENOTSUP, std::generic_category());
+    //      return std::error_code(ENOTTY, std::generic_category());
+    case ERROR_INVALID_DRIVE:
+      return std::error_code(ENXIO, std::generic_category());
+    //      return std::error_code(EOPNOTSUPP, std::generic_category());
+    case ERROR_ARITHMETIC_OVERFLOW:
+      return std::error_code(EOVERFLOW, std::generic_category());
+    //      return std::error_code(EOWNERDEAD, std::generic_category());
+    //      return std::error_code(EPERM, std::generic_category());
+    case ERROR_BROKEN_PIPE:
+    case ERROR_NO_DATA:
+    case ERROR_PIPE_NOT_CONNECTED:
+      return std::error_code(EPIPE, std::generic_category());
+    //      return std::error_code(EPROTO, std::generic_category());
+    //      return std::error_code(EPROTONOSUPPORT, std::generic_category());
+    //      return std::error_code(EPROTOTYPE, std::generic_category());
+    //      return std::error_code(ERANGE, std::generic_category());
+    case ERROR_WRITE_PROTECT:
+      return std::error_code(EROFS, std::generic_category());
+    //      return std::error_code(ESPIPE, std::generic_category());
+    //      return std::error_code(ESRCH, std::generic_category());
+    //      return std::error_code(ETIME, std::generic_category());
+    case ERROR_SEM_TIMEOUT:
+    case WAIT_TIMEOUT:
+      return std::error_code(ETIMEDOUT, std::generic_category());
+    //      return std::error_code(ETXTBSY, std::generic_category());
+    case ERROR_CANT_WAIT:
+      return std::error_code(EWOULDBLOCK, std::generic_category());
+    case ERROR_NOT_SAME_DEVICE:
+      return std::error_code(EXDEV, std::generic_category());
+    }
+    // Return the win32 error code directly
+    return std::error_code(e, std::system_category());
+  }
+}
+#endif
+
 /*! \brief `outcome<R>` can hold a fixed variant list of empty, a type `R`, a lightweight `std::error_code` or a
 heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`,
 `tribool::true_`, `tribool::false_` and `tribool::false_` respectively. \ingroup monad
@@ -1567,7 +1738,7 @@ template <class T> inline outcome<T> make_errored_outcome(int e)
 //! \brief Make a system errored outcome from the code passed \ingroup monad
 template <class T> inline outcome<T> make_errored_outcome(unsigned long e)
 {
-  return outcome<T>(std::error_code(e, std::system_category()));
+  return outcome<T>(detail::win32_to_error_code(e));
 }
 #endif
 //! \brief Make an excepted outcome from the type passed \ingroup monad
@@ -1632,7 +1803,7 @@ template <class T> inline result<T> make_errored_result(int e, const char *exten
 template <class T> inline result<T> make_errored_result(unsigned long e, const char *extended = nullptr)
 {
   (void) extended;
-  return result<T>(std::error_code(e, std::system_category()));
+  return result<T>(detail::win32_to_error_code(e));
 }
 #endif
 
