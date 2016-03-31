@@ -1523,6 +1523,7 @@ namespace detail
     switch(e)
     {
     case ERROR_BAD_ARGUMENTS:
+    case ERROR_BAD_ENVIRONMENT:
       return std::error_code(E2BIG, std::generic_category());
     case ERROR_ACCESS_DENIED:
     case ERROR_CURRENT_DIRECTORY:
@@ -1624,11 +1625,13 @@ namespace detail
     case ERROR_ARENA_TRASHED:
     case ERROR_NOT_ENOUGH_MEMORY:
     case ERROR_OUTOFMEMORY:
+    case ERROR_NOT_ENOUGH_QUOTA:
       return std::error_code(ENOMEM, std::generic_category());
     //      return std::error_code(ENOMSG, std::generic_category());
     //      return std::error_code(ENOPROTOOPT, std::generic_category());
     case ERROR_DISK_FULL:
     case ERROR_HANDLE_DISK_FULL:
+    case ERROR_DISK_QUOTA_EXCEEDED:
       return std::error_code(ENOSPC, std::generic_category());
     //      return std::error_code(ENOSR, std::generic_category());
     //      return std::error_code(ENOSTR, std::generic_category());
