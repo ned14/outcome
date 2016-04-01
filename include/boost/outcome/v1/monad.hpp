@@ -226,6 +226,11 @@ static inline ringbuffer_log::simple_ringbuffer_log<4096> &extended_error_code_l
   return log;
 }
 
+#ifndef BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK
+#define BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK
+#endif
+
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)  // use of strncpy
@@ -245,12 +250,14 @@ public:
   error_code_extended()
       : _unique_id((size_t) -1)
   {
+    BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK;
   }
   //! Construct from the usual int and error_category, but with optional additional message, two 32 bit codes and backtrace
   error_code_extended(int ec, const stl11::error_category &cat, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false)
       : stl11::error_code(ec, cat)
       , _unique_id(msg ? extended_error_code_log().emplace_back(ringbuffer_log::level::error, msg, code1, code2, backtrace ? nullptr : "", 0) : (size_t) -1)
   {
+    BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK;
   }
   //! Construct from error code enum
   template <class ErrorCodeEnum>
@@ -258,6 +265,7 @@ public:
       : stl11::error_code(e)
       , _unique_id((size_t) -1)
   {
+    BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK;
   }
   //! Assign
   void assign(int ec, const stl11::error_category &cat, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false) { *this = error_code_extended(ec, cat, msg, code1, code2, backtrace); }
