@@ -36,8 +36,11 @@ DEALINGS IN THE SOFTWARE.
 
 #include "value_storage.hpp"
 
+#include "../bindlib/include/ringbuffer_log.hpp"
+
 #ifdef _WIN32
-#include <winerror.h>  // for the win32 error code mapping
+#define NOMINMAX      // stop min/max macros
+#include <windows.h>  // for the win32 error code mapping
 #endif
 
 /*! \file monad.hpp
@@ -215,6 +218,115 @@ To do this, simply supply a policy type of the following form:
 
 
 BOOST_OUTCOME_V1_NAMESPACE_BEGIN
+
+// Slight misuse of ringbuffer_log to keep extended error code information
+static inline ringbuffer_log::simple_ringbuffer_log<4096> &extended_error_code_log()
+{
+  static ringbuffer_log::simple_ringbuffer_log<4096> log(ringbuffer_log::level::error);
+  return log;
+}
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4996)  // use of strncpy
+#endif
+
+/*! \class error_code_extended
+\brief Keeps additional information about a std::error_code like custom error message,
+backtrace etc. Can be safely type sliced into a std::error_code.
+*/
+class error_code_extended : public stl11::error_code
+{
+  friend inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec);
+  using unique_id = ringbuffer_log::simple_ringbuffer_log<4096>::unique_id;
+  size_t _unique_id;  // into extended_error_code_log
+public:
+  //! Default construction
+  error_code_extended()
+      : _unique_id((size_t) -1)
+  {
+  }
+  //! Construct from the usual int and error_category, but with optional additional message, two 32 bit codes and backtrace
+  error_code_extended(int ec, const stl11::error_category &cat, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false)
+      : stl11::error_code(ec, cat)
+      , _unique_id(msg ? extended_error_code_log().emplace_back(ringbuffer_log::level::error, msg, code1, code2, backtrace ? nullptr : "", 0) : (size_t) -1)
+  {
+  }
+  //! Construct from error code enum
+  template <class ErrorCodeEnum>
+  error_code_extended(ErrorCodeEnum e)
+      : stl11::error_code(e)
+      , _unique_id((size_t) -1)
+  {
+  }
+  //! Assign
+  void assign(int ec, const stl11::error_category &cat, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false) { *this = error_code_extended(ec, cat, msg, code1, code2, backtrace); }
+  //! Clear contents
+  void clear()
+  {
+    stl11::error_code::clear();
+    _unique_id = (size_t) -1;
+  }
+  //! Fill a buffer with any extended error message and codes, returning bytes of buffer filled (zero if no extended message).
+  size_t extended_message(char *buffer, size_t len, unsigned &code1, unsigned &code2) const noexcept
+  {
+    auto &log = extended_error_code_log();
+    if(!log.valid(unique_id(_unique_id)))
+      return 0;
+    auto &item = log[unique_id(_unique_id)];
+    strncpy(buffer, item.message, len - 1);
+    buffer[len - 1] = 0;
+    code1 = item.code32[0];
+    code2 = item.code32[1];
+    if(!log.valid(unique_id(_unique_id)))
+    {
+      buffer[0] = 0;
+      return 0;
+    }
+    return strlen(buffer);
+  }
+  //! Returns an array of strings describing the backtrace. You must free() this after use.
+  char **backtrace() const noexcept
+  {
+    auto &log = extended_error_code_log();
+    if(!log.valid(unique_id(_unique_id)))
+      return 0;
+    auto &item = log[unique_id(_unique_id)];
+    char **ret = nullptr;
+    if(!item.using_backtrace)
+    {
+      ret = (char **) calloc(2 * sizeof(char *) + sizeof(item.function) + 1, 1);
+      if(!ret)
+        return nullptr;
+      ret[0] = (char *) ret + 2 * sizeof(char *);
+      strncpy(ret[0], item.function, sizeof(item.function));
+      return ret;
+    }
+    else
+      ret = backtrace_symbols((void **) item.backtrace, sizeof(item.backtrace) / sizeof(item.backtrace[0]));
+    if(!log.valid(unique_id(_unique_id)))
+    {
+      free(ret);
+      return 0;
+    }
+    return ret;
+  }
+};
+inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec)
+{
+  s << ec.category().name() << ':' << ec.value();
+  auto &log = extended_error_code_log();
+  if(log.valid(error_code_extended::unique_id(ec._unique_id)))
+  {
+    auto &item = log[error_code_extended::unique_id(ec._unique_id)];
+    s << " { " << item.message << ", " << item.code32[0] << ", " << item.code32[1] << " }";
+  }
+  return s;
+}
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 namespace traits
 {
@@ -1504,11 +1616,11 @@ namespace detail
   };
 }
 #define BOOST_OUTCOME_MONAD_NAME monad
-#define BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE stl11::error_code
+#define BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE error_code_extended
 #define BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE std::exception_ptr
 #include "detail/monad_policy.ipp"
 #define BOOST_OUTCOME_MONAD_NAME result
-#define BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE stl11::error_code
+#define BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE error_code_extended
 #include "detail/monad_policy.ipp"
 #define BOOST_OUTCOME_MONAD_NAME option
 #include "detail/monad_policy.ipp"
@@ -1516,7 +1628,7 @@ namespace detail
 #if defined(_WIN32)
 namespace detail
 {
-  inline std::error_code win32_to_error_code(unsigned long e) noexcept
+  inline int win32_to_posix_error(unsigned long e) noexcept
   {
     // Convert various win32 error codes to their POSIX equivalents
     // TODO FIXME: Really ought to map the network error codes
@@ -1524,17 +1636,17 @@ namespace detail
     {
     case ERROR_BAD_ARGUMENTS:
     case ERROR_BAD_ENVIRONMENT:
-      return std::error_code(E2BIG, std::generic_category());
+      return E2BIG;
     case ERROR_ACCESS_DENIED:
     case ERROR_CURRENT_DIRECTORY:
     case ERROR_NETWORK_ACCESS_DENIED:
     case ERROR_CANNOT_MAKE:
     case ERROR_FAIL_I24:
     case ERROR_DRIVE_LOCKED:
-      return std::error_code(EACCES, std::generic_category());
-    //      return std::error_code(EADDRINUSE, std::generic_category());
-    //      return std::error_code(EADDRNOTAVAIL, std::generic_category());
-    //      return std::error_code(EAFNOSUPPORT, std::generic_category());
+      return EACCES;
+    //      return EADDRINUSE;
+    //      return EADDRNOTAVAIL;
+    //      return EAFNOSUPPORT;
     case ERROR_LOCK_VIOLATION:
     case ERROR_NO_PROC_SLOTS:
     case ERROR_MAX_THRDS_REACHED:
@@ -1542,43 +1654,42 @@ namespace detail
     case ERROR_NOT_READY:
     case ERROR_SHARING_VIOLATION:
     case ERROR_TOO_MANY_SEMAPHORES:
-      return std::error_code(EAGAIN, std::generic_category());
-    //      return std::error_code(EALREADY, std::generic_category());
+      return EAGAIN;
+    //      return EALREADY;
     case ERROR_INVALID_HANDLE:
     case ERROR_INVALID_TARGET_HANDLE:
     case ERROR_DIRECT_ACCESS_HANDLE:
-      return std::error_code(EBADF, std::generic_category());
-    //      return std::error_code(EBADMSG, std::generic_category());
+      return EBADF;
+    //      return EBADMSG;
     case ERROR_BUSY:
-      return std::error_code(EBUSY, std::generic_category());
+      return EBUSY;
     case ERROR_CANCELLED:
-      return std::error_code(ECANCELED, std::generic_category());
+      return ECANCELED;
     case ERROR_WAIT_NO_CHILDREN:
     case ERROR_CHILD_NOT_COMPLETE:
-      return std::error_code(ECHILD, std::generic_category());
-    //      return std::error_code(ECONNABORTED, std::generic_category());
-    //      return std::error_code(ECONNREFUSED, std::generic_category());
-    //      return std::error_code(ECONNRESET, std::generic_category());
+      return ECHILD;
+    //      return ECONNABORTED;
+    //      return ECONNREFUSED;
+    //      return ECONNRESET;
     case ERROR_POSSIBLE_DEADLOCK:
-      return std::error_code(EDEADLK, std::generic_category());
-    //      return std::error_code(EDESTADDRREQ, std::generic_category());
-    //      return std::error_code(EDOM, std::generic_category());
+      return EDEADLK;
+    //      return EDESTADDRREQ;
+    //      return EDOM;
     case ERROR_FILE_EXISTS:
     case ERROR_ALREADY_EXISTS:
-      return std::error_code(EEXIST, std::generic_category());
+      return EEXIST;
     case ERROR_INVALID_ADDRESS:
-      return std::error_code(EFAULT, std::generic_category());
+      return EFAULT;
     case ERROR_FILE_TOO_LARGE:
-      return std::error_code(EFBIG, std::generic_category());
-    //      return std::error_code(EHOSTUNREACH, std::generic_category());
-    //      return std::error_code(EIDRM, std::generic_category());
-    //      return std::error_code(EILSEQ, std::generic_category());
+      return EFBIG;
+    //      return EHOSTUNREACH;
+    //      return EIDRM;
+    //      return EILSEQ;
     case ERROR_IO_PENDING:
-      return std::error_code(EINPROGRESS, std::generic_category());
-    //      return std::error_code(EINTR, std::generic_category());
+      return EINPROGRESS;
+    //      return EINTR;
     case ERROR_INVALID_FUNCTION:
     case ERROR_INVALID_BLOCK:
-    case ERROR_BAD_ENVIRONMENT:
     case ERROR_INVALID_ACCESS:
     case ERROR_INVALID_DATA:
     case ERROR_INVALID_PARAMETER:
@@ -1586,99 +1697,131 @@ namespace detail
     case ERROR_SEEK_ON_DEVICE:
     case ERROR_BAD_LENGTH:
     case ERROR_INSUFFICIENT_BUFFER:
-      return std::error_code(EINVAL, std::generic_category());
+      return EINVAL;
     case ERROR_CRC:
     case ERROR_SEEK:
     case ERROR_SECTOR_NOT_FOUND:
     case ERROR_WRITE_FAULT:
     case ERROR_READ_FAULT:
     case ERROR_GEN_FAILURE:
-      return std::error_code(EIO, std::generic_category());
-    //      return std::error_code(EISCONN, std::generic_category());
-    //      return std::error_code(EISDIR, std::generic_category());
-    //      return std::error_code(ELOOP, std::generic_category());
-    //      return std::error_code(EMFILE, std::generic_category());
+      return EIO;
+    //      return EISCONN;
+    //      return EISDIR;
+    //      return ELOOP;
+    //      return EMFILE;
     case ERROR_TOO_MANY_LINKS:
-      return std::error_code(EMLINK, std::generic_category());
-    //      return std::error_code(EMSGSIZE, std::generic_category());
+      return EMLINK;
+    //      return EMSGSIZE;
     case ERROR_FILENAME_EXCED_RANGE:
     case ERROR_BUFFER_OVERFLOW:
-      return std::error_code(ENAMETOOLONG, std::generic_category());
-    //      return std::error_code(ENETDOWN, std::generic_category());
-    //      return std::error_code(ENETRESET, std::generic_category());
-    //      return std::error_code(ENETUNREACH, std::generic_category());
+      return ENAMETOOLONG;
+    //      return ENETDOWN;
+    //      return ENETRESET;
+    //      return ENETUNREACH;
     case ERROR_TOO_MANY_OPEN_FILES:
-      return std::error_code(ENFILE, std::generic_category());
-    //      return std::error_code(ENOBUFS, std::generic_category());
-    //      return std::error_code(ENODATA, std::generic_category());
-    //      return std::error_code(ENODEV, std::generic_category());
+      return ENFILE;
+    //      return ENOBUFS;
+    //      return ENODATA;
+    //      return ENODEV;
     case ERROR_FILE_NOT_FOUND:
     case ERROR_PATH_NOT_FOUND:
     case ERROR_NO_MORE_FILES:
     case ERROR_BAD_NETPATH:
     case ERROR_BAD_NET_NAME:
-      return std::error_code(ENOENT, std::generic_category());
+      return ENOENT;
     case ERROR_BAD_FORMAT:
-      return std::error_code(ENOEXEC, std::generic_category());
-    //      return std::error_code(ENOLCK, std::generic_category());
-    //      return std::error_code(ENOLINK, std::generic_category());
+      return ENOEXEC;
+    //      return ENOLCK;
+    //      return ENOLINK;
     case ERROR_ARENA_TRASHED:
     case ERROR_NOT_ENOUGH_MEMORY:
     case ERROR_OUTOFMEMORY:
     case ERROR_NOT_ENOUGH_QUOTA:
-      return std::error_code(ENOMEM, std::generic_category());
-    //      return std::error_code(ENOMSG, std::generic_category());
-    //      return std::error_code(ENOPROTOOPT, std::generic_category());
+      return ENOMEM;
+    //      return ENOMSG;
+    //      return ENOPROTOOPT;
     case ERROR_DISK_FULL:
     case ERROR_HANDLE_DISK_FULL:
     case ERROR_DISK_QUOTA_EXCEEDED:
-      return std::error_code(ENOSPC, std::generic_category());
-    //      return std::error_code(ENOSR, std::generic_category());
-    //      return std::error_code(ENOSTR, std::generic_category());
+      return ENOSPC;
+    //      return ENOSR;
+    //      return ENOSTR;
     case ERROR_NOT_SUPPORTED:
-      return std::error_code(ENOSYS, std::generic_category());
-    //      return std::error_code(ENOTCONN, std::generic_category());
+      return ENOSYS;
+    //      return ENOTCONN;
     case ERROR_BAD_PATHNAME:
     case ERROR_DIRECTORY:
-      return std::error_code(ENOTDIR, std::generic_category());
+      return ENOTDIR;
     case ERROR_DIR_NOT_EMPTY:
-      return std::error_code(ENOTEMPTY, std::generic_category());
-    //      return std::error_code(ENOTRECOVERABLE, std::generic_category());
-    //      return std::error_code(ENOTSOCK, std::generic_category());
+      return ENOTEMPTY;
+    //      return ENOTRECOVERABLE;
+    //      return ENOTSOCK;
     case ERROR_CALL_NOT_IMPLEMENTED:
-      return std::error_code(ENOTSUP, std::generic_category());
-    //      return std::error_code(ENOTTY, std::generic_category());
+      return ENOTSUP;
+    //      return ENOTTY;
     case ERROR_INVALID_DRIVE:
-      return std::error_code(ENXIO, std::generic_category());
-    //      return std::error_code(EOPNOTSUPP, std::generic_category());
+      return ENXIO;
+    //      return EOPNOTSUPP;
     case ERROR_ARITHMETIC_OVERFLOW:
-      return std::error_code(EOVERFLOW, std::generic_category());
-    //      return std::error_code(EOWNERDEAD, std::generic_category());
-    //      return std::error_code(EPERM, std::generic_category());
+      return EOVERFLOW;
+    //      return EOWNERDEAD;
+    //      return EPERM;
     case ERROR_BROKEN_PIPE:
     case ERROR_NO_DATA:
     case ERROR_PIPE_NOT_CONNECTED:
-      return std::error_code(EPIPE, std::generic_category());
-    //      return std::error_code(EPROTO, std::generic_category());
-    //      return std::error_code(EPROTONOSUPPORT, std::generic_category());
-    //      return std::error_code(EPROTOTYPE, std::generic_category());
-    //      return std::error_code(ERANGE, std::generic_category());
+      return EPIPE;
+    //      return EPROTO;
+    //      return EPROTONOSUPPORT;
+    //      return EPROTOTYPE;
+    //      return ERANGE;
     case ERROR_WRITE_PROTECT:
-      return std::error_code(EROFS, std::generic_category());
-    //      return std::error_code(ESPIPE, std::generic_category());
-    //      return std::error_code(ESRCH, std::generic_category());
-    //      return std::error_code(ETIME, std::generic_category());
+      return EROFS;
+    //      return ESPIPE;
+    //      return ESRCH;
+    //      return ETIME;
     case ERROR_SEM_TIMEOUT:
     case WAIT_TIMEOUT:
-      return std::error_code(ETIMEDOUT, std::generic_category());
-    //      return std::error_code(ETXTBSY, std::generic_category());
+      return ETIMEDOUT;
+    //      return ETXTBSY;
     case ERROR_CANT_WAIT:
-      return std::error_code(EWOULDBLOCK, std::generic_category());
+      return EWOULDBLOCK;
     case ERROR_NOT_SAME_DEVICE:
-      return std::error_code(EXDEV, std::generic_category());
+      return EXDEV;
     }
     // Return the win32 error code directly
-    return std::error_code(e, std::system_category());
+    return -1;
+  }
+  inline error_code_extended win32_to_error_code(unsigned long e) noexcept
+  {
+    int posix_errno = win32_to_posix_error(e);
+    if(posix_errno != -1)
+    {
+      char buffer[256];
+      DWORD len = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 0, e, 0, buffer, sizeof(buffer), 0);
+      if(!len)
+      {
+        memcpy(buffer, "unknown error code", 19);
+        len = 19;
+      }
+      // Remove annoying CRLF at end of message sometimes
+      while(10 == buffer[len - 1])
+      {
+        buffer[len - 1] = 0;
+        len--;
+        if(13 == buffer[len - 1])
+        {
+          buffer[len - 1] = 0;
+          len--;
+        }
+      }
+      // Return extended error code with the original win32 error message and code
+      error_code_extended ret(posix_errno, stl11::generic_category(), buffer, e);
+      return ret;
+    }
+    else
+    {
+      return error_code_extended(e, stl11::system_category());
+    }
   }
 }
 #endif
