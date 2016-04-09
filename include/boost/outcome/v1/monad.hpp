@@ -1662,6 +1662,7 @@ namespace detail
     case ERROR_NOT_READY:
     case ERROR_SHARING_VIOLATION:
     case ERROR_TOO_MANY_SEMAPHORES:
+    case ERROR_DELETE_PENDING:
       return EAGAIN;
     //      return EALREADY;
     case ERROR_INVALID_HANDLE:
