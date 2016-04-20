@@ -260,12 +260,24 @@ public:
     BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK;
   }
   //! Construct from error code enum
-  template <class ErrorCodeEnum>
+  template <class ErrorCodeEnum, typename = std::enable_if_t<stl11::is_error_code_enum<ErrorCodeEnum>::value>>
   error_code_extended(ErrorCodeEnum e)
       : stl11::error_code(e)
       , _unique_id((size_t) -1)
   {
     BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK;
+  }
+  //! Explicit copy construction from error_code
+  explicit error_code_extended(const stl11::error_code &e)
+      : stl11::error_code(e)
+      , _unique_id((size_t) -1)
+  {
+  }
+  //! Explicit move construction from error_code
+  explicit error_code_extended(stl11::error_code &&e)
+      : stl11::error_code(std::move(e))
+      , _unique_id((size_t) -1)
+  {
   }
   //! Assign
   void assign(int ec, const stl11::error_category &cat, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false) { *this = error_code_extended(ec, cat, msg, code1, code2, backtrace); }
