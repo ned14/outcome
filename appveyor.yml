@@ -1,0 +1,40 @@
+# version format
+version: 0.01.{build}-{branch}
+ 
+# branches to build
+branches:
+  # blacklist
+  except:
+    - gh-pages
+skip_tags: true
+ 
+# Operating system (build VM template)
+os: Visual Studio 2015
+init:
+  - git config --global core.longpaths true
+
+clone_folder: c:\boost.outcome
+platform: x64 
+configuration: Release
+
+before_build:
+  - git submodule update --init --recursive
+  - git submodule foreach git checkout master
+  - git submodule foreach git pull origin master
+  - cd test
+  - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+build_script:
+  - withmsvc.bat
+after_build:
+
+before_test:
+test_script:
+  - unittests_1.exe --reporter junit --out results_1.xml
+  - unittests_N.exe --reporter junit --out results_N.xml
+after_test:
+
+on_success:
+on_failure:
+on_finish:
+  - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\results_1.xml))
+  - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\results_N.xml))
