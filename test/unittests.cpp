@@ -41,7 +41,10 @@ DEALINGS IN THE SOFTWARE.
 #include "../include/boost/outcome/spinlock.hpp"
 #include "timing.h"
 //#include "../include/boost/spinlock/concurrent_unordered_map.hpp"
+#include "../include/boost/outcome/monad.hpp"
+#if TEST_OUTCOME_FUTURE
 #include "../include/boost/outcome/future.hpp"
+#endif
 #include "../include/boost/outcome/tribool.hpp"
 
 #include <algorithm>
@@ -1153,7 +1156,7 @@ BOOST_AUTO_TEST_CASE(works / monad / operators, "Tests that the monad custom ope
 #endif
 
 
-#if 1  // futures
+#if TEST_OUTCOME_FUTURE  // futures
 template <template <class> class F, template <class> class P> void FuturePromiseConformanceTest()
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
