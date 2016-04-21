@@ -254,10 +254,8 @@ public:
   }
   //! Construct from the usual int and error_category, but with optional additional message, two 32 bit codes and backtrace
   error_code_extended(int ec, const stl11::error_category &cat, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false)
-      : stl11::error_code(ec, cat)
-      , _unique_id(msg ? extended_error_code_log().emplace_back(ringbuffer_log::level::error, msg, code1, code2, backtrace ? nullptr : "", 0) : (size_t) -1)
+      : error_code_extended(stl11::error_code(ec, cat), msg, code1, code2, backtrace)
   {
-    BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK;
   }
   //! Construct from error code enum
   template <class ErrorCodeEnum, typename = std::enable_if_t<stl11::is_error_code_enum<ErrorCodeEnum>::value>>
@@ -268,16 +266,16 @@ public:
     BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK;
   }
   //! Explicit copy construction from error_code
-  explicit error_code_extended(const stl11::error_code &e)
-      : stl11::error_code(e)
-      , _unique_id((size_t) -1)
+  explicit error_code_extended(const stl11::error_code &e, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false)
+      : error_code_extended(stl11::error_code(e), msg, code1, code2, backtrace)
   {
   }
   //! Explicit move construction from error_code
-  explicit error_code_extended(stl11::error_code &&e)
+  explicit error_code_extended(stl11::error_code &&e, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false)
       : stl11::error_code(std::move(e))
-      , _unique_id((size_t) -1)
+      , _unique_id(msg ? extended_error_code_log().emplace_back(ringbuffer_log::level::error, msg, code1, code2, backtrace ? nullptr : "", 0) : (size_t) -1)
   {
+    BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK;
   }
   //! Assign
   void assign(int ec, const stl11::error_category &cat, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false) { *this = error_code_extended(ec, cat, msg, code1, code2, backtrace); }
@@ -1812,36 +1810,44 @@ namespace detail
     // Return the win32 error code directly
     return -1;
   }
-  inline error_code_extended win32_to_error_code(unsigned long e) noexcept
+  inline error_code_extended win32_to_error_code(unsigned long e, const char *extended) noexcept
   {
     int posix_errno = win32_to_posix_error(e);
+    // If we are going to map to POSIX, record the original message and win32 error code
     if(posix_errno != -1)
     {
-      char buffer[256];
-      DWORD len = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 0, e, 0, buffer, sizeof(buffer), 0);
-      if(!len)
+      if(!extended)
       {
-        memcpy(buffer, "unknown error code", 19);
-        len = 19;
-      }
-      // Remove annoying CRLF at end of message sometimes
-      while(10 == buffer[len - 1])
-      {
-        buffer[len - 1] = 0;
-        len--;
-        if(13 == buffer[len - 1])
+        char buffer[256];
+        DWORD len = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 0, e, 0, buffer, sizeof(buffer), 0);
+        if(!len)
+        {
+          memcpy(buffer, "unknown error code", 19);
+          len = 19;
+        }
+        // Remove annoying CRLF at end of message sometimes
+        while(10 == buffer[len - 1])
         {
           buffer[len - 1] = 0;
           len--;
+          if(13 == buffer[len - 1])
+          {
+            buffer[len - 1] = 0;
+            len--;
+          }
         }
+        // Return extended error code with the original win32 error message and code
+        error_code_extended ret(posix_errno, stl11::generic_category(), buffer, e);
+        return ret;
       }
-      // Return extended error code with the original win32 error message and code
-      error_code_extended ret(posix_errno, stl11::generic_category(), buffer, e);
+      // Return extended error code with the original win32 error code but with extended message
+      error_code_extended ret(posix_errno, stl11::generic_category(), extended, e);
       return ret;
     }
     else
     {
-      return error_code_extended(e, stl11::system_category());
+      // Return the win32 error code with system category
+      return error_code_extended(e, stl11::system_category(), extended);
     }
   }
 }
@@ -1858,7 +1864,7 @@ template <class T> inline outcome<T> make_outcome(T &&v)
   return outcome<T>(std::forward<T>(v));
 }
 //! \brief Makes an errored outcome of type T \ingroup monad
-template <class T> inline outcome<T> make_outcome(std::error_code v)
+template <class T> inline outcome<T> make_outcome(error_code_extended v)
 {
   return outcome<T>(std::move(v));
 }
@@ -1892,20 +1898,20 @@ template <> inline outcome<void> make_ready_outcome<void>()
   return outcome<void>(value);
 }
 //! \brief Make an errored outcome from the type passed \ingroup monad
-template <class T> inline outcome<T> make_errored_outcome(std::error_code v)
+template <class T> inline outcome<T> make_errored_outcome(error_code_extended v)
 {
   return outcome<T>(std::move(v));
 }
 //! \brief Make a generic errored outcome from the errno passed \ingroup monad
-template <class T> inline outcome<T> make_errored_outcome(int e)
+template <class T> inline outcome<T> make_errored_outcome(int e, const char *extended = nullptr)
 {
-  return outcome<T>(std::error_code(e, std::generic_category()));
+  return outcome<T>(error_code_extended(e, std::generic_category(), extended));
 }
 #if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 //! \brief Make a system errored outcome from the code passed \ingroup monad
-template <class T> inline outcome<T> make_errored_outcome(unsigned long e)
+template <class T> inline outcome<T> make_errored_outcome(unsigned long e, const char *extended = nullptr)
 {
-  return outcome<T>(detail::win32_to_error_code(e));
+  return outcome<T>(detail::win32_to_error_code(e, extended));
 }
 #endif
 //! \brief Make an excepted outcome from the type passed \ingroup monad
@@ -1925,7 +1931,7 @@ template <class T> inline result<T> make_result(T &&v)
   return result<T>(std::forward<T>(v));
 }
 //! \brief Makes an errored result of type T \ingroup monad
-template <class T> inline result<T> make_result(std::error_code v)
+template <class T> inline result<T> make_result(error_code_extended v)
 {
   return result<T>(std::move(v));
 }
@@ -1954,23 +1960,20 @@ template <> inline result<void> make_ready_result<void>()
   return result<void>(value);
 }
 //! \brief Make an errored result from the type passed \ingroup monad
-template <class T> inline result<T> make_errored_result(std::error_code v, const char *extended = nullptr)
+template <class T> inline result<T> make_errored_result(error_code_extended v)
 {
-  (void) extended;
   return result<T>(std::move(v));
 }
 //! \brief Make a generic errored outcome from the errno passed \ingroup monad
 template <class T> inline result<T> make_errored_result(int e, const char *extended = nullptr)
 {
-  (void) extended;
-  return result<T>(std::error_code(e, std::generic_category()));
+  return result<T>(error_code_extended(e, std::generic_category(), extended));
 }
 #if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 //! \brief Make a system errored outcome from the code passed \ingroup monad
 template <class T> inline result<T> make_errored_result(unsigned long e, const char *extended = nullptr)
 {
-  (void) extended;
-  return result<T>(detail::win32_to_error_code(e));
+  return result<T>(detail::win32_to_error_code(e, extended));
 }
 #endif
 
