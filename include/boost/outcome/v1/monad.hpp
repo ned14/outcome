@@ -258,7 +258,7 @@ public:
   {
   }
   //! Construct from error code enum
-  template <class ErrorCodeEnum, typename = std::enable_if_t<stl11::is_error_code_enum<ErrorCodeEnum>::value>>
+  template <class ErrorCodeEnum, typename = typename std::enable_if<stl11::is_error_code_enum<ErrorCodeEnum>::value>::type>
   error_code_extended(ErrorCodeEnum e)
       : stl11::error_code(e)
       , _unique_id((size_t) -1)
