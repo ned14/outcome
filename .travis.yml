@@ -20,6 +20,9 @@ addons:
     - g++-5
     - clang-3.7
 
+cache:
+ - apt
+ 
 before_install:
  - git submodule update --init --recursive
 
