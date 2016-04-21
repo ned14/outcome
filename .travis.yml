@@ -1,0 +1,33 @@
+language: cpp
+os:
+ - linux
+notifications:
+  email:
+#    recipients:
+#      - one@example.com
+#      - other@example.com
+    on_success: change # [always|never|change] # default: change
+    on_failure: change # [always|never|change] # default: always
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    - llvm-toolchain-precise-3.7
+    packages:
+    - g++-4.8
+    - g++-5
+    - clang-3.7
+
+before_install:
+ - git submodule update --init --recursive
+
+script:
+ - cd test
+ - BUILD_EXTRA=1 CXX=g++-5 ./withgcc.sh
+ - ./unittests_1
+ - ./unittests_N
+ 
+after_success:
+
+after_failure:
