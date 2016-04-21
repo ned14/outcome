@@ -1,9 +1,9 @@
 <center>
 master branch unit test status:
 
-Linux: [![Build Status](https://ci.nedprod.com/job/Boost.Monad%20Test%20Linux%20GCC%205/badge/icon)](https://ci.nedprod.com/job/Boost.Monad%20Test%20Linux%20GCC%205/) Windows: [![Build Status](https://ci.nedprod.com/job/Boost.Monad%20Test%20Win8%20VS2014/badge/icon)](https://ci.nedprod.com/job/Boost.Monad%20Test%20Win8%20VS2014/) Coverage: [![Coverage Status](https://coveralls.io/repos/ned14/boost.outcome/badge.svg?branch=master)](https://coveralls.io/r/ned14/boost.outcome?branch=master) Docs: [![Build Status](https://ci.nedprod.com/job/Boost.Monad%20Documentation/badge/icon)](https://ci.nedprod.com/job/Boost.Monad%20Documentation)
+Linux: [![Build Status](https://travis-ci.org/ned14/boost.outcome.svg?branch=master)](https://travis-ci.org/ned14/boost.outcome) Windows: [![Build Status](https://ci.nedprod.com/job/Boost.Monad%20Test%20Win8%20VS2014/badge/icon)](https://ci.nedprod.com/job/Boost.Monad%20Test%20Win8%20VS2014/) Coverage: [![Build status](https://ci.appveyor.com/api/projects/status/roe4dacos4gnlu66/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-outcome/branch/master)
 
-Documentation: https://ned14.github.io/boost.outcome/ (PDF: https://ned14.github.io/boost.outcome/refman.pdf)
+Documentation: https://ned14.github.io/boost.outcome/
 
 Outcome/Result/Option:
  - [ ] Add constexpr compile unit tests for when <T> is a LiteralType.

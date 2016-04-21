@@ -1,4 +1,5 @@
 language: cpp
+sudo: false
 os:
  - linux
 notifications:
@@ -15,7 +16,7 @@ addons:
     - ubuntu-toolchain-r-test
     - llvm-toolchain-precise-3.7
     packages:
-    - g++-4.8
+    - g++-4.9
     - g++-5
     - clang-3.7
 
@@ -27,7 +28,9 @@ script:
  - BUILD_EXTRA=1 CXX=g++-5 ./withgcc.sh
  - ./unittests_1
  - ./unittests_N
+ - ./unittests_coverage
  
 after_success:
+ - ./update_coveralls.sh
 
 after_failure:
