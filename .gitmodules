@@ -2,3 +2,7 @@
 	path = include/boost/outcome/bindlib
 	url = https://github.com/ned14/Boost.APIBind.git
         branch = master
+[submodule "doc/html"]
+	path = doc/html
+	url = https://github.com/ned14/boost.outcome.git
+	branch = gh-pages
