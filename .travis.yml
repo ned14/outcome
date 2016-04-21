@@ -30,9 +30,8 @@ script:
  - ./unittests_1
  - ./unittests_N
  - ./unittests_coverage
- - cd ..
  
 after_success:
- - bash -x test/update_coveralls.sh `pwd`
+ - bash -x ./update_coveralls.sh `pwd`
 
 after_failure:
