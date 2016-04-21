@@ -10,6 +10,7 @@ notifications:
     on_success: change # [always|never|change] # default: change
     on_failure: change # [always|never|change] # default: always
 
+
 addons:
   apt:
     sources:
@@ -29,8 +30,9 @@ script:
  - ./unittests_1
  - ./unittests_N
  - ./unittests_coverage
+ - cd ..
  
 after_success:
- - ./update_coveralls.sh
+ - bash -x test/update_coveralls.sh `pwd`
 
 after_failure:
