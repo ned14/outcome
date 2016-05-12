@@ -1194,12 +1194,28 @@ error_type, an exception_type nor an empty_type.
       : implementation_policy::base(std::move(v))
   {
   }
-  //! \brief Explicit constructor from a different implementation of basic_monad
+  /*! \brief Explicit move constructor from a basic_monad with a differing implementation policy.
+  For this constructor to be available, value_type, error_type and exception_type must be identical
+  or constructible.
+  */
   template <class Policy, typename = typename std::enable_if<std::is_same<typename implementation_policy::value_type, typename Policy::value_type>::value || std::is_constructible<typename implementation_policy::value_type, typename Policy::value_type>::value>::type,
             typename = typename std::enable_if<std::is_same<typename implementation_policy::error_type, typename Policy::error_type>::value || std::is_constructible<typename implementation_policy::error_type, typename Policy::error_type>::value>::type,
             typename = typename std::enable_if<std::is_same<typename implementation_policy::exception_type, typename Policy::exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename Policy::exception_type>::value>::type>
   constexpr explicit basic_monad(basic_monad<Policy> &&o)
       : implementation_policy::base(std::move(o))
+  {
+  }
+  /*! \brief Explicit conversion constructor from a basic_monad with a differening implementation
+  policy. For this conversion to be available, value_type must be identical or constructible, error_type must be
+  identical, constructible or the source monad must have no error_type, and exception_type must be identical,
+  constructible or the source monad must have no exception_type.
+  */
+  template <
+  class Policy, typename = typename std::enable_if<std::is_same<typename implementation_policy::value_type, typename Policy::value_type>::value || std::is_constructible<typename implementation_policy::value_type, typename Policy::value_type>::value>::type,
+  typename = typename std::enable_if<std::is_void<typename Policy::error_type>::value || std::is_same<typename implementation_policy::error_type, typename Policy::error_type>::value || std::is_constructible<typename implementation_policy::error_type, typename Policy::error_type>::value>::type,
+  typename = typename std::enable_if<std::is_void<typename Policy::exception_type>::value || std::is_same<typename implementation_policy::exception_type, typename Policy::exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename Policy::exception_type>::value>::type>
+  constexpr explicit basic_monad(const basic_monad<Policy> &o)
+      : implementation_policy::base(static_cast<const basic_monad &>(o) /* safe because we're always copying upwards in complexity*/)
   {
   }
   //! \brief Move constructor
@@ -1861,7 +1877,12 @@ template <typename R> using outcome = basic_monad<detail::monad_policy<R>>;
 //! \brief Makes an outcome from the type passed \ingroup monad
 template <class T> inline outcome<T> make_outcome(T &&v)
 {
-  return outcome<T>(std::forward<T>(v));
+  return outcome<T>(std::move(v));
+}
+//! \brief Makes an outcome from the type passed \ingroup monad
+template <class T> inline outcome<T> make_outcome(const T &v)
+{
+  return outcome<T>(v);
 }
 //! \brief Makes an errored outcome of type T \ingroup monad
 template <class T> inline outcome<T> make_outcome(error_code_extended v)
@@ -1886,7 +1907,12 @@ template <> inline outcome<void> make_outcome<void>()
 //! \brief Make a ready outcome from the type passed \ingroup monad
 template <class T> inline outcome<T> make_ready_outcome(T &&v)
 {
-  return outcome<T>(std::forward<T>(v));
+  return outcome<T>(std::move(v));
+}
+//! \brief Make a ready outcome from the type passed \ingroup monad
+template <class T> inline outcome<T> make_ready_outcome(const T &v)
+{
+  return outcome<T>(v);
 }
 //! \brief Make a ready outcome from the type passed \ingroup monad
 template <class T> inline outcome<T> make_ready_outcome()
@@ -1928,7 +1954,12 @@ template <typename R> using result = basic_monad<detail::result_policy<R>>;
 //! \brief Makes a result from the type passed \ingroup monad
 template <class T> inline result<T> make_result(T &&v)
 {
-  return result<T>(std::forward<T>(v));
+  return result<T>(std::move(v));
+}
+//! \brief Makes a result from the type passed \ingroup monad
+template <class T> inline result<T> make_result(const T &v)
+{
+  return result<T>(v);
 }
 //! \brief Makes an errored result of type T \ingroup monad
 template <class T> inline result<T> make_result(error_code_extended v)
@@ -1948,7 +1979,12 @@ template <> inline result<void> make_result<void>()
 //! \brief Makes a result from the type passed \ingroup monad
 template <class T> inline result<T> make_ready_result(T &&v)
 {
-  return result<T>(std::forward<T>(v));
+  return result<T>(std::move(v));
+}
+//! \brief Makes a result from the type passed \ingroup monad
+template <class T> inline result<T> make_ready_result(const T &v)
+{
+  return result<T>(v);
 }
 //! \brief Makes a result from the type passed \ingroup monad
 template <class T> inline result<T> make_ready_result()
@@ -1986,7 +2022,12 @@ template <typename R> using option = basic_monad<detail::option_policy<R>>;
 //! \brief Makes a option from the type passed \ingroup monad
 template <class T> inline option<T> make_option(T &&v)
 {
-  return option<T>(std::forward<T>(v));
+  return option<T>(std::move(v));
+}
+//! \brief Makes a option from the type passed \ingroup monad
+template <class T> inline option<T> make_option(const T &v)
+{
+  return option<T>(v);
 }
 //! \brief Makes an empty option of type T \ingroup monad
 template <class T> inline option<T> make_option()
@@ -2001,7 +2042,12 @@ template <> inline option<void> make_option<void>()
 //! \brief Makes a option from the type passed \ingroup monad
 template <class T> inline option<T> make_ready_option(T &&v)
 {
-  return option<T>(std::forward<T>(v));
+  return option<T>(std::move(v));
+}
+//! \brief Makes a option from the type passed \ingroup monad
+template <class T> inline option<T> make_ready_option(const T &v)
+{
+  return option<T>(v);
 }
 //! \brief Makes a option from the type passed \ingroup monad
 template <class T> inline option<T> make_ready_option()
@@ -2011,6 +2057,38 @@ template <class T> inline option<T> make_ready_option()
 template <> inline option<void> make_ready_option<void>()
 {
   return option<void>(value);
+}
+
+
+//! \brief Makes an outcome from a result \ingroup monad
+template <class T> inline outcome<T> as_outcome(result<T> &&v)
+{
+  return outcome<T>(std::move(v));
+}
+//! \brief Makes an outcome from a result \ingroup monad
+template <class T> inline outcome<T> as_outcome(const result<T> &v)
+{
+  return outcome<T>(v);
+}
+//! \brief Makes an outcome from an option \ingroup monad
+template <class T> inline outcome<T> as_outcome(option<T> &&v)
+{
+  return outcome<T>(std::move(v));
+}
+//! \brief Makes an outcome from an option \ingroup monad
+template <class T> inline outcome<T> as_outcome(const option<T> &v)
+{
+  return outcome<T>(v);
+}
+//! \brief Makes a result from an option \ingroup monad
+template <class T> inline result<T> as_result(option<T> &&v)
+{
+  return result<T>(std::move(v));
+}
+//! \brief Makes a result from an option \ingroup monad
+template <class T> inline result<T> as_result(const option<T> &v)
+{
+  return result<T>(v);
 }
 
 BOOST_OUTCOME_V1_NAMESPACE_END
