@@ -591,6 +591,37 @@ namespace std
     return s;
   }
   //! \brief Serialise a value_storage. Mostly useful for debug printing. \ingroup monad
+  template <class _value_type> inline ostream &operator<<(ostream &s, const BOOST_OUTCOME_V1_NAMESPACE::value_storage<_value_type, void, void> &v)
+  {
+    using namespace BOOST_OUTCOME_V1_NAMESPACE;
+    using _error_type = void;
+    using _exception_type = void;
+    switch(v.type)
+    {
+    case value_storage<_value_type, _error_type, _exception_type>::storage_type::empty:
+      return s << "(empty)";
+    case value_storage<_value_type, _error_type, _exception_type>::storage_type::value:
+      return s << v.value;
+    default:
+      return s << "(unknown)";
+    }
+  }
+  template <class _value_type, class _error_type> inline ostream &operator<<(ostream &s, const BOOST_OUTCOME_V1_NAMESPACE::value_storage<_value_type, _error_type, void> &v)
+  {
+    using namespace BOOST_OUTCOME_V1_NAMESPACE;
+    using _exception_type = void;
+    switch(v.type)
+    {
+    case value_storage<_value_type, _error_type, _exception_type>::storage_type::empty:
+      return s << "(empty)";
+    case value_storage<_value_type, _error_type, _exception_type>::storage_type::value:
+      return s << v.value;
+    case value_storage<_value_type, _error_type, _exception_type>::storage_type::error:
+      return s << "(" << v.error.category().name() << " std::error_code " << v.error.value() << ": " << v.error.message() << ")";
+    default:
+      return s << "(unknown)";
+    }
+  }
   template <class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const BOOST_OUTCOME_V1_NAMESPACE::value_storage<_value_type, _error_type, _exception_type> &v)
   {
     using namespace BOOST_OUTCOME_V1_NAMESPACE;
@@ -613,7 +644,7 @@ namespace std
       }
       /*catch(const future_error &e)
       {
-        return s << "(std::future_error code " << e.code() << ": " << e.what() << ")";
+      return s << "(std::future_error code " << e.code() << ": " << e.what() << ")";
       }*/
       catch(const exception &e)
       {
@@ -626,7 +657,6 @@ namespace std
     default:
       return s << "(unknown)";
     }
-    return s;
   }
 }
 
