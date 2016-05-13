@@ -55,7 +55,7 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 
 BOOST_BINDLIB_DECLARE(BOOST_OUTCOME_V1, "TODO FIXME")  // TODO FIXME
 
-/*! \struct lockable_ptr
+/*! \tparam T The type of the pointer
  * \brief Lets you use a pointer to memory as a spinlock :)
  */
 template <typename T> struct lockable_ptr : atomic<T *>
