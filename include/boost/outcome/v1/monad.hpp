@@ -1904,6 +1904,11 @@ template <> inline outcome<void> make_outcome<void>()
 {
   return outcome<void>();
 }
+//! \brief Makes an empty outcome of type T \ingroup monad
+template <class T> inline outcome<T> make_empty_outcome()
+{
+  return outcome<T>();
+}
 //! \brief Make a ready outcome from the type passed \ingroup monad
 template <class T> inline outcome<T> make_ready_outcome(T &&v)
 {
@@ -1976,6 +1981,11 @@ template <> inline result<void> make_result<void>()
 {
   return result<void>();
 }
+//! \brief Makes an empty result of type T \ingroup monad
+template <class T> inline result<T> make_empty_result()
+{
+  return result<T>();
+}
 //! \brief Makes a result from the type passed \ingroup monad
 template <class T> inline result<T> make_ready_result(T &&v)
 {
@@ -2038,6 +2048,11 @@ template <class T> inline option<T> make_option()
 template <> inline option<void> make_option<void>()
 {
   return option<void>();
+}
+//! \brief Makes an empty option of type T \ingroup monad
+template <class T> inline option<T> make_empty_option()
+{
+  return option<T>();
 }
 //! \brief Makes a option from the type passed \ingroup monad
 template <class T> inline option<T> make_ready_option(T &&v)
