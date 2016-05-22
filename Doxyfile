@@ -765,7 +765,6 @@ WARN_LOGFILE           = doxy_warnings.txt
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = \
-                         include/boost/outcome/v1/future.hpp \
                          include/boost/outcome/v1/monad.hpp \
                          include/boost/outcome/v1/spinlock.hpp \
                          include/boost/outcome/v1/tribool.hpp

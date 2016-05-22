@@ -245,6 +245,7 @@
       <CppLanguageStandard>c++1y</CppLanguageStandard>
       <StrictAliasing>true</StrictAliasing>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>-Wdocumentation %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

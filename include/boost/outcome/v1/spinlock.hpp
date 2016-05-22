@@ -1,6 +1,6 @@
 /* spinlock.hpp
 Provides yet another spinlock
-(C) 2013-2014 Niall Douglas http://www.nedprod.com/
+(C) 2013-2016 Niall Douglas http://www.nedprod.com/
 File Created: Sept 2013
 
 
@@ -38,7 +38,6 @@ This is the proposed Boost.Monad library, a Boost C++ 14 library providing:
 - spinlock, a policy driven Lockable spinlock with constexpr extensions.
 - tribool, a constexpr C++ 11 tribool.
 - \ref monad, a factory and family of policy driven lightweight monads.
-- \ref future_promise, a factory and family of policy driven lightweight non-allocating constexpr futures.
 
 You need these compilers or better:
 - GCC 4.9

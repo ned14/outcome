@@ -1,6 +1,6 @@
 /* monad.hpp
 The world's most simple C++ monad
-(C) 2015 Niall Douglas http://www.nedprod.com/
+(C) 2015-2016 Niall Douglas http://www.nedprod.com/
 File Created: June 2015
 
 
