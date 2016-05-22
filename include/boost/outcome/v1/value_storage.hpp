@@ -34,7 +34,7 @@ DEALINGS IN THE SOFTWARE.
 #ifndef BOOST_OUTCOME_VALUE_STORAGE_H
 #define BOOST_OUTCOME_VALUE_STORAGE_H
 
-#include "tribool.hpp"
+#include "../bindlib/include/tribool.hpp"
 
 /*! \file value_storage.hpp
 \brief Provides a fixed four state variant
