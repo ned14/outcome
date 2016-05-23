@@ -34,8 +34,8 @@ DEALINGS IN THE SOFTWARE.
 #include <_mingw.h>
 #endif
 
-#include "../bindlib/include/boost/config.hpp"
-#include "../bindlib/include/import.h"
+#include "../boost-lite/include/boost/config.hpp"
+#include "../boost-lite/include/import.h"
 
 #ifndef __cpp_alias_templates
 #error Boost.Outcome needs template alias support in the compiler
@@ -138,7 +138,7 @@ DEALINGS IN THE SOFTWARE.
 // clang-format off
 #define BOOST_STL11_SYSTEM_ERROR_MAP_NAMESPACE_BEGIN BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_OUTCOME_V1, (stl11))
 #define BOOST_STL11_SYSTEM_ERROR_MAP_NAMESPACE_END BOOST_BINDLIB_NAMESPACE_END(BOOST_OUTCOME_V1, (stl11))
-#include BOOST_BINDLIB_INCLUDE_STL11(../bindlib, BOOST_OUTCOME_V1_ERROR_CODE_IMPL, system_error)
+#include BOOST_BINDLIB_INCLUDE_STL11(../boost-lite, BOOST_OUTCOME_V1_ERROR_CODE_IMPL, system_error)
 // clang-format on
 
 // For some odd reason, VS2015 really hates to do much inlining unless forced

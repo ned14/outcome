@@ -36,7 +36,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include "value_storage.hpp"
 
-#include "../bindlib/include/ringbuffer_log.hpp"
+#include "../boost-lite/include/ringbuffer_log.hpp"
 
 #ifdef _WIN32
 #define NOMINMAX      // stop min/max macros
