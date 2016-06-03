@@ -595,6 +595,53 @@ BOOST_AUTO_TEST_CASE(works / monad / swap, "Tests that the monad swaps as intend
   BOOST_CHECK(b.get_error() == error_code_extended());
 }
 
+BOOST_AUTO_TEST_CASE(works / monad / upconvert, "Tests that the monad converts into bigger editions of itself")
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  // Same type
+  {
+    option<int> a1, a10(5);
+    result<int> b1(a1), b10(a10);
+    outcome<int> c1(a1), c2(b1), c10(a10), c11(b10);
+    BOOST_CHECK(a1.empty());
+    BOOST_CHECK(b1.empty());
+    BOOST_CHECK(c1.empty());
+    BOOST_CHECK(c2.empty());
+    BOOST_CHECK(a10.get() == 5);
+    BOOST_CHECK(b10.get() == 5);
+    BOOST_CHECK(c10.get() == 5);
+    BOOST_CHECK(c11.get() == 5);
+  }
+  // Converting type
+  {
+    option<short> a1, a10(5);
+    result<float> b1(a1), b10(a10);
+    outcome<double> c1(a1), c2(b1), c10(a10), c11(b10);
+    BOOST_CHECK(a1.empty());
+    BOOST_CHECK(b1.empty());
+    BOOST_CHECK(c1.empty());
+    BOOST_CHECK(c2.empty());
+    BOOST_CHECK(a10.get() == 5);
+    BOOST_CHECK(b10.get() == 5);
+    BOOST_CHECK(c10.get() == 5);
+    BOOST_CHECK(c11.get() == 5);
+  }
+  // void
+  {
+    option<void> a1, a10(make_ready_option<void>());
+    result<void> b1(a1), b10(a10);
+    outcome<void> c1(a1), c2(b1), c10(a10), c11(b10);
+    BOOST_CHECK(a1.empty());
+    BOOST_CHECK(b1.empty());
+    BOOST_CHECK(c1.empty());
+    BOOST_CHECK(c2.empty());
+    BOOST_CHECK(a10.is_ready());
+    BOOST_CHECK(b10.is_ready());
+    BOOST_CHECK(c10.is_ready());
+    BOOST_CHECK(c11.is_ready());
+  }
+}
+
 BOOST_AUTO_TEST_CASE(works / monad / serialisation, "Tests that the monad serialises and deserialises as intended")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;

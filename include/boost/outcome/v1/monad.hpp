@@ -1215,7 +1215,7 @@ error_type, an exception_type nor an empty_type.
   typename = typename std::enable_if<std::is_void<typename Policy::error_type>::value || std::is_same<typename implementation_policy::error_type, typename Policy::error_type>::value || std::is_constructible<typename implementation_policy::error_type, typename Policy::error_type>::value>::type,
   typename = typename std::enable_if<std::is_void<typename Policy::exception_type>::value || std::is_same<typename implementation_policy::exception_type, typename Policy::exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename Policy::exception_type>::value>::type>
   constexpr explicit basic_monad(const basic_monad<Policy> &o)
-      : implementation_policy::base(static_cast<const basic_monad &>(o) /* safe because we're always copying upwards in complexity*/)
+      : implementation_policy::base(o)
   {
   }
   //! \brief Move constructor

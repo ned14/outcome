@@ -441,8 +441,15 @@ public:
   {
   }
   template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<std::is_same<_value_type, _value_type2>::value || std::is_constructible<_value_type, _value_type2>::value>::type,
-            typename = typename std::enable_if<std::is_same<_error_type, _error_type2>::value || std::is_constructible<_error_type, _error_type2>::value>::type,
-            typename = typename std::enable_if<std::is_same<_exception_type, _exception_type2>::value || std::is_constructible<_exception_type, _exception_type2>::value>::type>
+            typename = typename std::enable_if<std::is_void<_error_type2>::value || std::is_same<_error_type, _error_type2>::value || std::is_constructible<_error_type, _error_type2>::value>::type,
+            typename = typename std::enable_if<std::is_void<_exception_type2>::value || std::is_same<_exception_type, _exception_type2>::value || std::is_constructible<_exception_type, _exception_type2>::value>::type>
+  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR explicit value_storage(const value_storage<_value_type2, _error_type2, _exception_type2> &o)
+      : value_storage(value_storage<_value_type2, _error_type2, _exception_type2>(o) /* delegate to move constructor */)
+  {
+  }
+  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<std::is_same<_value_type, _value_type2>::value || std::is_constructible<_value_type, _value_type2>::value>::type,
+            typename = typename std::enable_if<std::is_void<_error_type2>::value || std::is_same<_error_type, _error_type2>::value || std::is_constructible<_error_type, _error_type2>::value>::type,
+            typename = typename std::enable_if<std::is_void<_exception_type2>::value || std::is_same<_exception_type, _exception_type2>::value || std::is_constructible<_exception_type, _exception_type2>::value>::type>
   BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR explicit value_storage(value_storage<_value_type2, _error_type2, _exception_type2> &&o)
   {
     switch(o.type)
@@ -451,15 +458,15 @@ public:
       this->type = storage_type::empty;
       break;
     case storage_type::value:
-      detail::move_construct_if<has_value_type>(&this->_value_raw, std::move(o._value_raw));
+      detail::move_construct_if<has_value_type && o.has_value_type>(&this->_value_raw, std::move(o._value_raw));
       this->type = storage_type::value;
       break;
     case storage_type::error:
-      detail::move_construct_if<has_error_type>(&this->error, std::move(o.error));
+      detail::move_construct_if<has_error_type && o.has_error_type>(&this->error, std::move(o.error));
       this->type = storage_type::error;
       break;
     case storage_type::exception:
-      detail::move_construct_if<has_exception_type>(&this->exception, std::move(o.exception));
+      detail::move_construct_if<has_exception_type && o.has_exception_type>(&this->exception, std::move(o.exception));
       this->type = storage_type::exception;
       break;
     }
