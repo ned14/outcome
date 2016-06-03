@@ -152,6 +152,24 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
   static_assert(std::is_constructible<outcome<int>, outcome<long>>::value, "Sanity check that compatible monads can be constructed from one another");
   static_assert(!std::is_constructible<outcome<std::string>, outcome<int>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
   // static_assert(!std::is_constructible<outcome<outcome<int>>, outcome<long>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
+
+  static_assert(!outcome<void>::has_value_type, "Sanity check that outcome<void> does not have a value_type");
+  static_assert(outcome<void>::has_error_type, "Sanity check that outcome<void> has an error_type");
+  static_assert(outcome<void>::has_exception_type, "Sanity check that outcome<void> has an exception_type");
+  // static_assert(std::is_void<outcome<void>::value_type>::value, "Sanity check that outcome<void> has a void value_type");
+
+  static_assert(!result<void>::has_value_type, "Sanity check that result<void> does not have a value_type");
+  static_assert(result<void>::has_error_type, "Sanity check that result<void> has an error_type");
+  static_assert(!result<void>::has_exception_type, "Sanity check that result<void> has an exception_type");
+  // static_assert(std::is_void<result<void>::value_type>::value, "Sanity check that result<void> has a void value_type");
+  // static_assert(std::is_void<result<void>::exception_type>::value, "Sanity check that result<void> has a void exception_type");
+
+  static_assert(!option<void>::has_value_type, "Sanity check that option<void> does not have a value_type");
+  static_assert(!option<void>::has_error_type, "Sanity check that option<void> has an error_type");
+  static_assert(!option<void>::has_exception_type, "Sanity check that option<void> has an exception_type");
+  // static_assert(std::is_void<option<void>::value_type>::value, "Sanity check that option<void> has a void value_type");
+  // static_assert(std::is_void<option<void>::error_type>::value, "Sanity check that option<void> has a void error_type");
+  // static_assert(std::is_void<option<void>::exception_type>::value, "Sanity check that option<void> has a void exception_type");
   {
     outcome<int> m;
     BOOST_CHECK(!m);
