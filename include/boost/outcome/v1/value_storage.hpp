@@ -458,15 +458,15 @@ public:
       this->type = storage_type::empty;
       break;
     case storage_type::value:
-      detail::move_construct_if<has_value_type && o.has_value_type>(&this->_value_raw, std::move(o._value_raw));
+      detail::move_construct_if<has_value_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_value_type>(&this->_value_raw, std::move(o._value_raw));
       this->type = storage_type::value;
       break;
     case storage_type::error:
-      detail::move_construct_if<has_error_type && o.has_error_type>(&this->error, std::move(o.error));
+      detail::move_construct_if<has_error_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_error_type>(&this->error, std::move(o.error));
       this->type = storage_type::error;
       break;
     case storage_type::exception:
-      detail::move_construct_if<has_exception_type && o.has_exception_type>(&this->exception, std::move(o.exception));
+      detail::move_construct_if<has_exception_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_exception_type>(&this->exception, std::move(o.exception));
       this->type = storage_type::exception;
       break;
     }
