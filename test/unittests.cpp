@@ -53,7 +53,7 @@ DEALINGS IN THE SOFTWARE.
 #include <fcntl.h>
 #endif
 
-#include "allocator_testing.hpp"
+#include "../include/boost/outcome/boost-lite/include/allocator_testing.hpp"
 
 BOOST_AUTO_TEST_SUITE(all)
 
