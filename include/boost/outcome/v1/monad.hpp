@@ -220,9 +220,9 @@ To do this, simply supply a policy type of the following form:
 BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 
 // Slight misuse of ringbuffer_log to keep extended error code information
-static inline ringbuffer_log::simple_ringbuffer_log<4096> &extended_error_code_log()
+static inline boost_lite::ringbuffer_log::simple_ringbuffer_log<4096> &extended_error_code_log()
 {
-  static ringbuffer_log::simple_ringbuffer_log<4096> log(ringbuffer_log::level::error);
+  static boost_lite::ringbuffer_log::simple_ringbuffer_log<4096> log(boost_lite::ringbuffer_log::level::error);
   return log;
 }
 
@@ -243,7 +243,7 @@ backtrace etc. Can be safely type sliced into a std::error_code.
 class error_code_extended : public stl11::error_code
 {
   friend inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec);
-  using unique_id = ringbuffer_log::simple_ringbuffer_log<4096>::unique_id;
+  using unique_id = boost_lite::ringbuffer_log::simple_ringbuffer_log<4096>::unique_id;
   size_t _unique_id;  // into extended_error_code_log
 public:
   //! Default construction
@@ -273,7 +273,7 @@ public:
   //! Explicit move construction from error_code
   explicit error_code_extended(stl11::error_code &&e, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false)
       : stl11::error_code(std::move(e))
-      , _unique_id(msg ? extended_error_code_log().emplace_back(ringbuffer_log::level::error, msg, code1, code2, backtrace ? nullptr : "", 0) : (size_t) -1)
+      , _unique_id(msg ? extended_error_code_log().emplace_back(boost_lite::ringbuffer_log::level::error, msg, code1, code2, backtrace ? nullptr : "", 0) : (size_t) -1)
   {
     BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK;
   }
