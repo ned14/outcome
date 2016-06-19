@@ -2,7 +2,11 @@
 	path = doc/html
 	url = https://github.com/ned14/boost.outcome.git
 	branch = gh-pages
+	fetchRecurseSubmodules = true
+	ignore = none
 [submodule "include/boost/outcome/boost-lite"]
 	path = include/boost/outcome/boost-lite
 	url = https://github.com/ned14/boost-lite.git
 	branch = master
+	fetchRecurseSubmodules = true
+	ignore = untracked
