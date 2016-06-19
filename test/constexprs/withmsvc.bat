@@ -17,7 +17,7 @@ echo ^<?xml version="1.0" encoding="UTF-8"?^> > results.xml
 echo ^<testsuite name="constexprs"^> >> results.xml
 for %%f in (*.cpp) do (
   set FILE=%%~nf
-  cl /EHsc /c /O2 /GS- /GR /Gy /Zc:inline /DBOOST_OUTCOME_ENABLE_OPERATORS=1 /DSPINLOCK_STANDALONE=1 /DNDEBUG %%f
+  cl /EHsc /c /O2 /GS- /GR /Gy /Zc:inline /DBOOST_OUTCOME_ENABLE_OPERATORS=1 /D_UNICODE=1 /DUNICODE=1 /DNDEBUG %%f
   dumpbin /disasm !FILE!.obj > !FILE!.msvc.S
   del !FILE!.obj
   set LINE=
@@ -27,6 +27,7 @@ for %%f in (*.cpp) do (
   ) else (
     set MSVCLINE=!MSVCLINE!,!LINE!
   )
+  echo Opcodes generated: !LINE!
   if not "!FILE:min_=!" == "!FILE!" (
       echo   ^<testcase name="!FILE!.msvc"^> >> results.xml
       if !LINE! GTR 7 (
@@ -39,6 +40,7 @@ for %%f in (*.cpp) do (
         ) else if "!FILE!" == "min_monad_then" (
           echo     ^<skipped/^> >> results.xml
         ) else (
+          echo FAILURE: Opcodes generated !LINE! exceeds 7
           echo     ^<failure message="Opcodes generated !LINE! exceeds 7"/^> >> results.xml
         )
       )
@@ -49,6 +51,7 @@ for %%f in (*.cpp) do (
       echo     ^</system-out^> >> results.xml
       echo   ^</testcase^> >> results.xml
     )
+    echo.
   )
 )
 echo ^</testsuite^> >> results.xml

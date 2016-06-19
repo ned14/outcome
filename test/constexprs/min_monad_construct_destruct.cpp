@@ -1,11 +1,11 @@
-#include "../../include/boost/outcome/future.hpp"
+#include "../../include/boost/outcome.hpp"
 
-extern BOOST_OUTCOME_NOINLINE void test1()
+extern BOOST_NOINLINE void test1()
 {
   using namespace boost::outcome;
   outcome<int> m;
 }
-extern BOOST_OUTCOME_NOINLINE void test2()
+extern BOOST_NOINLINE void test2()
 {
 }
 

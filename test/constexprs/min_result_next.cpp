@@ -1,12 +1,12 @@
-#include "../../include/boost/outcome/future.hpp"
+#include "../../include/boost/outcome.hpp"
 
 using namespace boost::outcome;
 
-extern BOOST_OUTCOME_NOINLINE result<int> test1(int n)
+extern BOOST_NOINLINE result<int> test1(int n)
 {
   return result<int>(n).next([](result<int> m) { return m.get()*3; });
 }
-extern BOOST_OUTCOME_NOINLINE void test2()
+extern BOOST_NOINLINE void test2()
 {
 }
 

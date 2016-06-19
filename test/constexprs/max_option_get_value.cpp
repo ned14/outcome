@@ -1,12 +1,12 @@
-#include "../../include/boost/outcome/future.hpp"
+#include "../../include/boost/outcome.hpp"
 
 using namespace boost::outcome;
 extern option<int> unknown();
-extern BOOST_OUTCOME_NOINLINE int test1()
+extern BOOST_NOINLINE int test1()
 {
   return unknown().get();
 }
-extern BOOST_OUTCOME_NOINLINE void test2()
+extern BOOST_NOINLINE void test2()
 {
 }
 
