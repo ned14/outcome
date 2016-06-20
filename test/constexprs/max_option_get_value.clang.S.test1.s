@@ -12,7 +12,7 @@
   20:	83 f9 01             	cmp    $0x1,%ecx
   23:	75 05                	jne    2a <_Z5test1v+0x2a>
   25:	c6 44 24 04 00       	movb   $0x0,0x4(%rsp)
-  2a:	5a                   	pop    %rdx
+  2a:	59                   	pop    %rcx
   2b:	c3                   	retq   
   2c:	bf 02 00 00 00       	mov    $0x2,%edi
   31:	e8 00 00 00 00       	callq  36 <_Z5test1v+0x36>

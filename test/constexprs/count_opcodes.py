@@ -4,8 +4,8 @@
 # File created: June 2015
 
 import sys, os
-debug=True
-inputfile='count_opcodes_test.s'
+debug=False
+inputfile=None #'count_opcodes_test.s'
 
 try:
     os.remove(sys.argv[1]+'.test1.s')
@@ -85,13 +85,15 @@ while not done:
                 idx=-1
             elif offset!=-1:
                 calltarget=opcodes[idx+1:offset]
+            else:
+                calltarget=opcodes[idx+1:opcodes.find('>', idx)]
         if isDumpBin:
             idx=opcodes.find('?', callop);
             calltarget=opcodes[idx:opcodes.find('\n', idx)]
         if idx!=-1:
             if debug:
                 print("   contains call to "+str(calltarget)+" which has found="+str(calltarget in functions))
-            if calltarget != function and calltarget in functions:
+            if calltarget in functions:
                 done=False
                 expansion=functions[calltarget]
                 # Replace calltarget string

@@ -7,7 +7,7 @@
   13:	a8 3f                	test   $0x3f,%al
   15:	0f 95 c0             	setne  %al
   18:	0f b6 c0             	movzbl %al,%eax
-  1b:	5a                   	pop    %rdx
+  1b:	59                   	pop    %rcx
   1c:	c3                   	retq   
   1d:	bf 02 00 00 00       	mov    $0x2,%edi
   22:	e8 00 00 00 00       	callq  27 <_Z5test1v+0x27>
@@ -20,7 +20,7 @@
   38:	48 89 c7             	mov    %rax,%rdi
   3b:	e8 00 00 00 00       	callq  40 replaced
   40:	c3                   	retq   
-  41:	66 66 66 66 66 66 2e 	data32 data32 data32 data32 data32 nopw %cs:0x0(%rax,%rax,1)
+  41:	66 66 66 66 66 66 2e 	data16 data16 data16 data16 data16 nopw %cs:0x0(%rax,%rax,1)
   48:	0f 1f 84 00 00 00 00 
   4f:	00 
 

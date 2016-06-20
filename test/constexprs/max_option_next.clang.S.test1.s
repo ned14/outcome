@@ -34,7 +34,7 @@
   68:	48 89 c7             	mov    %rax,%rdi
   6b:	e8 00 00 00 00       	callq  70 replaced
   70:	c3                   	retq   
-  71:	66 66 66 66 66 66 2e 	data32 data32 data32 data32 data32 nopw %cs:0x0(%rax,%rax,1)
+  71:	66 66 66 66 66 66 2e 	data16 data16 data16 data16 data16 nopw %cs:0x0(%rax,%rax,1)
   78:	0f 1f 84 00 00 00 00 
   7f:	00 
 
