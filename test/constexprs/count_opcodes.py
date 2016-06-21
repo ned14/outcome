@@ -5,7 +5,7 @@
 
 import sys, os
 debug=False
-inputfile=None #'count_opcodes_test.s'
+inputfile=None #'max_monad_bind.msvc_clang.S'
 
 try:
     os.remove(sys.argv[1]+'.test1.s')
@@ -32,28 +32,37 @@ if inputfile is None:
 # call        ?get_future@?$promise@H@lightweight_futures@v1_std@spinlock@boost@@QEAA?AV?$future@H@2345@XZ
 
 thisfunction=None
+linecount=0
 with open(inputfile, 'rt') as ih:
     for line in ih:
-        if thisfunction is None:
-            if line[:4]=='0000':
-                isObjDump=True
-                thisfunction=line[18:-3]
-                thisfunctionopcodes=""
+        line2=line.rstrip()
+        linecount=linecount+1
+        #print("Line "+str(linecount)+" is '"+line2+"'")
+        while True:
+            if thisfunction is None:
+                if len(line2)==0:
+                    pass
+                elif line[:4]=='0000':
+                    isObjDump=True
+                    thisfunction=line[18:-3]
+                    thisfunctionopcodes=""
+                    if debug:
+                        print("\nLine "+str(linecount)+" new objdump function "+thisfunction)
+                elif line2[0]!=' ' and line2[0]!='$' and line2[-1]==':':
+                    isDumpBin=True
+                    thisfunction=line[:line.find(' ')]
+                    thisfunctionopcodes=""
+                    if debug:
+                        print("\nLine "+str(linecount)+" new dumpbin function "+thisfunction)
+            elif len(line2)==0 or (line2[0]!=' ' and line2[0]!='$' and line2[-1]==':'):
                 if debug:
-                    print("New objdump function "+thisfunction)
-            elif line[0]=='?':
-                isDumpBin=True
-                thisfunction=line[:line.find(' ')]
-                thisfunctionopcodes=""
-                if debug:
-                    print("New dumpbin function "+thisfunction)
-        elif len(line)==1:
-            if debug:
-                print("Storing function "+str(thisfunction)+" with "+str(thisfunctionopcodes.count('\n'))+" lines")
-            functions[thisfunction]=thisfunctionopcodes
-            thisfunction=None
-        else:
-            thisfunctionopcodes+=line
+                    print("Storing function "+str(thisfunction)+" with "+str(thisfunctionopcodes.count('\n'))+" lines")
+                functions[thisfunction]=thisfunctionopcodes
+                thisfunction=None
+                continue
+            else:
+                thisfunctionopcodes+=line
+            break
 if thisfunction is not None:
     functions[thisfunction]=thisfunctionopcodes
 
@@ -90,6 +99,8 @@ while not done:
         if isDumpBin:
             idx=opcodes.find('?', callop);
             calltarget=opcodes[idx:opcodes.find('\n', idx)]
+            if calltarget.startswith('?test1@@'):
+                idx=-1
         if idx!=-1:
             if debug:
                 print("   contains call to "+str(calltarget)+" which has found="+str(calltarget in functions))
