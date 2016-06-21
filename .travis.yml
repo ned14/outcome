@@ -52,10 +52,6 @@ before_install:
 
 script:
  -
-   env;
-   ls llvm-$LLVM_VERSION/bin;
-   llvm-$LLVM_VERSION/bin/clang++-3.8 --version;
-   clang++-3.8 --version;
    if [ "$__" = "Unit tests" ]; then
      cd test;
      BUILD_EXTRA=1 CXX=g++-6 ./withgcc.sh;
@@ -67,6 +63,7 @@ script:
    if [ "$__" = "Code bloat tests" ]; then
      cd test/constexprs;
      ./with_clang_gcc.sh;
+     cat results.xml;
      if grep -Fxq "failure message" results.xml; then
        exit 1;
      fi;
