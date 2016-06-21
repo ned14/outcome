@@ -19,14 +19,19 @@ addons:
     - ubuntu-toolchain-r-test
 #    - llvm-toolchain-precise-3.8  ## not currently working due to bad source signing key
     packages:
+    - python3
     - g++-4.9
     - g++-6
 
-env:
- - __="Unit tests"
- - __="Code bloat tests"
+matrix:
+  include:
+    - language: cpp
+      env: __="Unit tests"
+    - language: cpp
+      env: __="Code bloat tests"
  
 cache:
+  apt: true
   directories:
     - llvm-3.8.0
     
@@ -41,6 +46,7 @@ before_install:
       fi;
       llvm-$LLVM_VERSION/bin/llvm-config --version;
       export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
+      export PATH="llvm-$LLVM_VERSION/bin:$PATH"
     fi
  - git submodule update --init --recursive
 
