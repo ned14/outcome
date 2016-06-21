@@ -43,7 +43,7 @@ before_install:
       fi;
       llvm-$LLVM_VERSION/bin/llvm-config --version;
       export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
-      export PATH="llvm-$LLVM_VERSION/bin:$PATH";
+      export PATH="$PWD/llvm-$LLVM_VERSION/bin:$PATH";
     fi
  - git submodule update --init --recursive
 
