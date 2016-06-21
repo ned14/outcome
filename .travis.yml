@@ -7,11 +7,8 @@ branches:
     - master
 notifications:
   email:
-#    recipients:
-#      - one@example.com
-#      - other@example.com
-    on_success: change # [always|never|change] # default: change
-    on_failure: change # [always|never|change] # default: always
+    recipients:
+      - nialldouglas14@gmail.com
 
 addons:
   apt:
