@@ -50,6 +50,9 @@ before_install:
 script:
  -
    env;
+   ls llvm-$LLVM_VERSION/bin;
+   llvm-$LLVM_VERSION/bin/clang++-3.8 --version;
+   clang++-3.8 --version;
    if [ "$__" = "Unit tests" ]; then
      cd test;
      BUILD_EXTRA=1 CXX=g++-6 ./withgcc.sh;
