@@ -49,6 +49,7 @@ before_install:
 
 script:
  -
+   env;
    if [ "$__" = "Unit tests" ]; then
      cd test;
      BUILD_EXTRA=1 CXX=g++-6 ./withgcc.sh;
