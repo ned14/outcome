@@ -23,12 +23,9 @@ addons:
     - g++-4.9
     - g++-6
 
-matrix:
-  include:
-    - language: cpp
-      env: __="Unit tests"
-    - language: cpp
-      env: __="Code bloat tests"
+env:
+ - __="Unit tests"
+ - __="Code bloat tests"
  
 cache:
   apt: true
@@ -46,7 +43,7 @@ before_install:
       fi;
       llvm-$LLVM_VERSION/bin/llvm-config --version;
       export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
-      export PATH="llvm-$LLVM_VERSION/bin:$PATH"
+      export PATH="llvm-$LLVM_VERSION/bin:$PATH";
     fi
  - git submodule update --init --recursive
 
