@@ -30,11 +30,9 @@ after_build:
 before_test:
 test_script:
   - unittests_1.exe --reporter junit --out results_1.xml
-  - unittests_N.exe --reporter junit --out results_N.xml
 after_test:
 
 on_success:
 on_failure:
 on_finish:
   - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\results_1.xml))
-  - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\results_N.xml))
