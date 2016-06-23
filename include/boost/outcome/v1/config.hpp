@@ -52,6 +52,9 @@ DEALINGS IN THE SOFTWARE.
 #ifndef __cpp_constexpr
 #error Boost.Outcome needs constexpr (C++ 11) support in the compiler
 #endif
+#ifndef __cpp_variable_templates
+#error Boost.Outcome needs variable template support in the compiler
+#endif
 
 #if defined(BOOST_OUTCOME_LATEST_VERSION) && BOOST_OUTCOME_LATEST_VERSION < 1
 #error You need to include the latest version of Boost.Outcome before any earlier versions within the same translation unit
