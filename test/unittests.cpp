@@ -297,9 +297,49 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
 BOOST_AUTO_TEST_CASE(works / monad / comparison, "Tests that the monad can compare to compatible monads")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  outcome<int> a(1), b(2), c(2);
-  BOOST_CHECK(a != b);
-  BOOST_CHECK(b == c);
+  // value comparison
+  {
+    outcome<int> a(1), b(2), c(2);
+    BOOST_CHECK(a == a);
+    BOOST_CHECK(b == b);
+    BOOST_CHECK(c == c);
+    BOOST_CHECK(a != b);
+    BOOST_CHECK(b == c);
+  }
+  // homogeneous outcome comparison
+  {
+    auto make_exception_ptr = [] {
+      try
+      {
+        throw std::runtime_error("hi");
+      }
+      catch(...)
+      {
+        return std::current_exception();
+      }
+    };
+    auto p = make_exception_ptr();
+    outcome<int> a, b(2), c(make_errored_outcome<int>(EINVAL)), d(make_exceptional_outcome<int>(p));
+    BOOST_CHECK(a == a);
+    BOOST_CHECK(a != b);
+    BOOST_CHECK(a != c);
+    BOOST_CHECK(a != d);
+    BOOST_CHECK(b == b);
+    BOOST_CHECK(b != c);
+    BOOST_CHECK(b != d);
+    BOOST_CHECK(c == c);
+    BOOST_CHECK(c != d);
+    BOOST_CHECK(d == d);
+    outcome<int> e(make_errored_outcome<int>(EINVAL)), f(make_exceptional_outcome<int>(p));
+    BOOST_CHECK(c == e);
+    BOOST_CHECK(d == f);
+  }
+  // heterogeneous outcome comparison, so outcome<int> to outcome<double> etc
+  {}  // upconverting outcome comparison, so outcome<int>==result<int> etc
+  {
+  }
+  // What about result<int>==outcome<int>?
+  // Should I do outcome<int>(5) == 5? Unsure if it's wise
 }
 
 BOOST_AUTO_TEST_CASE(works / monad / optional, "Tests that the monad acts as an optional R")

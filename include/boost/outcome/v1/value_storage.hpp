@@ -605,6 +605,7 @@ public:
     case storage_type::exception:
       return detail::compare_if < has_exception_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_exception_type > (this->exception, o.exception);
     }
+    return false;
   }
   template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<is_compatible_with<_value_type2, _error_type2, _exception_type2>>::type> BOOST_OUTCOME_CXX14_CONSTEXPR bool operator!=(const value_storage<_value_type2, _error_type2, _exception_type2> &o) const
   {

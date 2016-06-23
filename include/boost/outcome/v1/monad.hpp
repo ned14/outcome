@@ -1096,10 +1096,16 @@ public:
   typedef typename implementation_policy::implementation_type implementation_type;
   //! \brief The type potentially held by the monad
   typedef typename value_storage_type::value_type value_type;
+  //! \brief The raw type potentially held by the monad
+  typedef typename implementation_policy::value_type raw_value_type;
   //! \brief The error code potentially held by the monad
   typedef typename value_storage_type::error_type error_type;
+  //! \brief The raw error code potentially held by the monad
+  typedef typename implementation_policy::error_type raw_error_type;
   //! \brief The exception ptr potentially held by the monad
   typedef typename value_storage_type::exception_type exception_type;
+  //! \brief The raw exception ptr potentially held by the monad
+  typedef typename implementation_policy::exception_type raw_exception_type;
   //! \brief Tag type for an empty monad
   struct empty_type
   {
@@ -1118,6 +1124,24 @@ public:
   static constexpr bool is_nothrow_move_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_move_constructible;
   //! \brief This monad will never throw exceptions during destruction
   static constexpr bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
+#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 190024123)
+  //! \brief This monad is compatible with the monad specified
+  template <class OtherMonad> static constexpr bool is_compatible_with = value_storage_type::template is_compatible_with<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
+  template <class OtherMonad, class Base = typename std::conditional<is_compatible_with<OtherMonad>, std::true_type, std::false_type>::type> struct _is_compatible_with : Base
+  {
+  };
+#else
+  // MSVC ICEs with the above, so for compatibility:
+  template <class OtherMonad,
+            class Base = typename std::conditional<
+            (std::is_same<typename implementation_policy::value_type, typename OtherMonad::raw_value_type>::value || std::is_constructible<typename implementation_policy::value_type, typename OtherMonad::raw_value_type>::value) &&
+            (std::is_void<typename OtherMonad::raw_error_type>::value || std::is_same<typename implementation_policy::error_type, typename OtherMonad::raw_error_type>::value || std::is_constructible<typename implementation_policy::error_type, typename OtherMonad::raw_error_type>::value) &&
+            (std::is_void<typename OtherMonad::raw_exception_type>::value || std::is_same<typename implementation_policy::exception_type, typename OtherMonad::raw_exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename OtherMonad::raw_exception_type>::value),
+            std::true_type, std::false_type>::type>
+  struct _is_compatible_with : Base
+  {
+  };
+#endif
 
   //! \brief Default constructor, initialises to empty
   constexpr basic_monad() = default;
@@ -1210,10 +1234,7 @@ error_type, an exception_type nor an empty_type.
   identical, constructible or the source monad must have no error_type, and exception_type must be identical,
   constructible or the source monad must have no exception_type.
   */
-  template <
-  class Policy, typename = typename std::enable_if<std::is_same<typename implementation_policy::value_type, typename Policy::value_type>::value || std::is_constructible<typename implementation_policy::value_type, typename Policy::value_type>::value>::type,
-  typename = typename std::enable_if<std::is_void<typename Policy::error_type>::value || std::is_same<typename implementation_policy::error_type, typename Policy::error_type>::value || std::is_constructible<typename implementation_policy::error_type, typename Policy::error_type>::value>::type,
-  typename = typename std::enable_if<std::is_void<typename Policy::exception_type>::value || std::is_same<typename implementation_policy::exception_type, typename Policy::exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename Policy::exception_type>::value>::type>
+  template <class Policy, typename = typename std::enable_if<_is_compatible_with<basic_monad<Policy>>::value>::type>
   constexpr explicit basic_monad(const basic_monad<Policy> &o)
       : implementation_policy::base(o)
   {
@@ -1328,6 +1349,19 @@ error_type, an exception_type nor an empty_type.
   BOOST_OUTCOME_CONVINCE_MSVC void swap(basic_monad &o) noexcept(is_nothrow_move_constructible) { implementation_policy::base::_storage.swap(o._storage); }
   //! \brief Destructs any state stored, resetting to empty
   BOOST_OUTCOME_CONVINCE_MSVC void clear() noexcept(is_nothrow_destructible) { implementation_policy::base::_storage.clear(); }
+
+  //! \brief True if this monad exactly equals the other monad
+  template <class Policy, typename = typename std::enable_if<_is_compatible_with<basic_monad<Policy>>::value>::type> constexpr bool operator==(const basic_monad<Policy> &o) const { return implementation_policy::base::_storage == o._storage; }
+  //! \brief True if this monad does not exactly equal the other monad
+  template <class Policy, typename = typename std::enable_if<_is_compatible_with<basic_monad<Policy>>::value>::type> constexpr bool operator!=(const basic_monad<Policy> &o) const { return implementation_policy::base::_storage != o._storage; }
+  //! \brief Disabled to prevent accidental usage
+  template <class T> bool operator<(T) const = delete;
+  //! \brief Disabled to prevent accidental usage
+  template <class T> bool operator<=(T) const = delete;
+  //! \brief Disabled to prevent accidental usage
+  template <class T> bool operator>(T) const = delete;
+  //! \brief Disabled to prevent accidental usage
+  template <class T> bool operator>=(T) const = delete;
 
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
 //! \brief If contains a value_type, returns a lvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
