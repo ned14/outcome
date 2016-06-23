@@ -9,7 +9,7 @@ rm -rf unittests_* *.gcda *.gcno
 INCLUDE=""
 if [ -n "$BUILD_EXTRA" ]; then
   echo Building unittests_coverage ...
-  g++-4.9 -std=c++1y -pthread -O1 -DNDEBUG -DRUNNING_ON_VALGRIND=1 -g -gdwarf-2 -o unittests_coverage unittests.cpp -lrt -fprofile-arcs -ftest-coverage -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-elide-constructors -fno-inline $INCLUDE
+  g++-6 -std=c++1y -pthread -O1 -DNDEBUG -DRUNNING_ON_VALGRIND=1 -g -gdwarf-2 -o unittests_coverage unittests.cpp -lrt -fprofile-arcs -ftest-coverage -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-elide-constructors -fno-inline $INCLUDE
 fi
 #echo Building unittests_valgrind ...
 #time $CXX -std=c++1z -pthread -O1 -DNDEBUG -DBOOST_OUTCOME_ENABLE_OPERATORS=1 -g -gdwarf-2 -o unittests_valgrind unittests.cpp -lrt -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-elide-constructors -fno-inline -DBOOST_SPINLOCK_ENABLE_VALGRIND $INCLUDE
