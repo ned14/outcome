@@ -599,7 +599,7 @@ public:
     case storage_type::empty:
       return true;
     case storage_type::value:
-      return detail::compare_if < has_value_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_value_type > (this->_value_raw, o._value_raw);
+      return (!has_value_type && !value_storage<_value_type2, _error_type2, _exception_type2>::has_value_type) || detail::compare_if < has_value_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_value_type > (this->_value_raw, o._value_raw);
     case storage_type::error:
       return detail::compare_if < has_error_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_error_type > (this->error, o.error);
     case storage_type::exception:
