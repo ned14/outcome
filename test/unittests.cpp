@@ -39,7 +39,6 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_CATCH_CUSTOM_MAIN_DEFINED
 #include "../include/boost/outcome/boost-lite/include/boost/test/unit_test.hpp"
 #include "../include/boost/outcome/monad.hpp"
-#include "timing.h"
 
 #include <algorithm>
 #include <stdio.h>

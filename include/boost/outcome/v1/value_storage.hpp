@@ -393,6 +393,12 @@ public:
   static constexpr bool is_nothrow_move_assignable = std::is_nothrow_move_assignable<value_type>::value && std::is_nothrow_move_assignable<exception_type>::value && std::is_nothrow_move_assignable<error_type>::value;
   static constexpr bool is_nothrow_destructible = base::is_nothrow_destructible;
 
+  template <class _value_type2> static constexpr bool value_type_is_compatible_with = std::is_same<_value_type, _value_type2>::value || std::is_constructible<_value_type, _value_type2>::value;
+  template <class _error_type2> static constexpr bool error_type_is_compatible_with = std::is_void<_error_type2>::value || std::is_same<_error_type, _error_type2>::value || std::is_constructible<_error_type, _error_type2>::value;
+  template <class _exception_type2> static constexpr bool exception_type_is_compatible_with = std::is_void<_exception_type2>::value || std::is_same<_exception_type, _exception_type2>::value || std::is_constructible<_exception_type, _exception_type2>::value;
+
+  template <class _value_type2, class _error_type2, class _exception_type2> static constexpr bool is_compatible_with = value_type_is_compatible_with<_value_type2> &&error_type_is_compatible_with<_error_type2> &&exception_type_is_compatible_with<_exception_type2>;
+
   value_storage() = default;
   constexpr value_storage(empty_t _) noexcept : base(_) {}
   constexpr value_storage(value_t _) noexcept(std::is_nothrow_default_constructible<value_type>::value)
@@ -440,17 +446,12 @@ public:
       : base(_, std::forward<Args>(args)...)
   {
   }
-  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<std::is_same<_value_type, _value_type2>::value || std::is_constructible<_value_type, _value_type2>::value>::type,
-            typename = typename std::enable_if<std::is_void<_error_type2>::value || std::is_same<_error_type, _error_type2>::value || std::is_constructible<_error_type, _error_type2>::value>::type,
-            typename = typename std::enable_if<std::is_void<_exception_type2>::value || std::is_same<_exception_type, _exception_type2>::value || std::is_constructible<_exception_type, _exception_type2>::value>::type>
+  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<is_compatible_with<_value_type2, _error_type2, _exception_type2>>::type>
   BOOST_OUTCOME_CXX14_CONSTEXPR explicit value_storage(const value_storage<_value_type2, _error_type2, _exception_type2> &o)
       : value_storage(value_storage<_value_type2, _error_type2, _exception_type2>(o) /* delegate to move constructor */)
   {
   }
-  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<std::is_same<_value_type, _value_type2>::value || std::is_constructible<_value_type, _value_type2>::value>::type,
-            typename = typename std::enable_if<std::is_void<_error_type2>::value || std::is_same<_error_type, _error_type2>::value || std::is_constructible<_error_type, _error_type2>::value>::type,
-            typename = typename std::enable_if<std::is_void<_exception_type2>::value || std::is_same<_exception_type, _exception_type2>::value || std::is_constructible<_exception_type, _exception_type2>::value>::type>
-  BOOST_OUTCOME_CXX14_CONSTEXPR explicit value_storage(value_storage<_value_type2, _error_type2, _exception_type2> &&o)
+  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<is_compatible_with<_value_type2, _error_type2, _exception_type2>>::type> BOOST_OUTCOME_CXX14_CONSTEXPR explicit value_storage(value_storage<_value_type2, _error_type2, _exception_type2> &&o)
   {
     switch(o.type)
     {
@@ -578,6 +579,7 @@ public:
     new(&this->error) error_type(std::move(e));
     this->type = storage_type::error;
   }
+  // BOOST_OUTCOME_CXX14_CONSTEXPR bool operator==()
 };
 
 BOOST_OUTCOME_V1_NAMESPACE_END
