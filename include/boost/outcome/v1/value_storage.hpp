@@ -345,6 +345,7 @@ namespace detail
       }
     }
   };
+
   template <bool enable, class U, class V> struct move_construct_if_impl
   {
     void operator()(U *v, V &&o) const { new(v) U(std::move(o)); }
@@ -354,6 +355,16 @@ namespace detail
     void operator()(U *, V &&) const {}
   };
   template <bool enable, class U, class V> inline void move_construct_if(U *v, V &&o) { move_construct_if_impl<enable, U, V>()(v, std::move(o)); }
+
+  template <bool enable, class U, class V> struct compare_if_impl
+  {
+    bool operator()(const U &v, const V &o) const { return v == o; }
+  };
+  template <class U, class V> struct compare_if_impl<false, U, V>
+  {
+    bool operator()(const U &, const V &) const { return false; }
+  };
+  template <bool enable, class U, class V> inline bool compare_if(const U &v, const V &o) { return compare_if_impl<enable, U, V>()(v, o); }
 }
 
 /*! \class value_storage
@@ -579,7 +590,26 @@ public:
     new(&this->error) error_type(std::move(e));
     this->type = storage_type::error;
   }
-  // BOOST_OUTCOME_CXX14_CONSTEXPR bool operator==()
+  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<is_compatible_with<_value_type2, _error_type2, _exception_type2>>::type> BOOST_OUTCOME_CXX14_CONSTEXPR bool operator==(const value_storage<_value_type2, _error_type2, _exception_type2> &o) const
+  {
+    if(this->type != o.type)
+      return false;
+    switch(this->type)
+    {
+    case storage_type::empty:
+      return true;
+    case storage_type::value:
+      return detail::compare_if < has_value_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_value_type > (this->_value_raw, o._value_raw);
+    case storage_type::error:
+      return detail::compare_if < has_error_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_error_type > (this->error, o.error);
+    case storage_type::exception:
+      return detail::compare_if < has_exception_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_exception_type > (this->exception, o.exception);
+    }
+  }
+  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<is_compatible_with<_value_type2, _error_type2, _exception_type2>>::type> BOOST_OUTCOME_CXX14_CONSTEXPR bool operator!=(const value_storage<_value_type2, _error_type2, _exception_type2> &o) const
+  {
+    return !(*this == o);
+  }
 };
 
 BOOST_OUTCOME_V1_NAMESPACE_END

@@ -294,6 +294,14 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
   }
 }
 
+BOOST_AUTO_TEST_CASE(works / monad / comparison, "Tests that the monad can compare to compatible monads")
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  outcome<int> a(1), b(2), c(2);
+  BOOST_CHECK(a != b);
+  BOOST_CHECK(b == c);
+}
+
 BOOST_AUTO_TEST_CASE(works / monad / optional, "Tests that the monad acts as an optional R")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
