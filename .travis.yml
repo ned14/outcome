@@ -16,8 +16,8 @@ addons:
     - ubuntu-toolchain-r-test
 #    - llvm-toolchain-precise-3.8  ## not currently working due to bad source signing key
     packages:
+    - g++-6
     - python3
-    - gcc-6
 
 env:
  - __="Unit tests"
