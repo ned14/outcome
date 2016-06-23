@@ -60,9 +60,9 @@ namespace detail
 
   protected:
     // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_OUTCOME_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec) { throw monad_error(ec); }
+    static BOOST_OUTCOME_CONVINCE_MSVC bool _throw_error(monad_errc ec) { throw monad_error(ec); }
     // Common preamble to the below
-    BOOST_OUTCOME_FUTURE_MSVC_HELP void _pre_get_value() const
+    BOOST_OUTCOME_CONVINCE_MSVC void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
         _throw_error(monad_errc::no_state);
@@ -86,38 +86,38 @@ namespace detail
     using rvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, value_type &&, value_type>::type;
 
   public:
-    BOOST_OUTCOME_FUTURE_MSVC_HELP lvalue_type get() &
+    BOOST_OUTCOME_CONVINCE_MSVC lvalue_type get() &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
-    BOOST_OUTCOME_FUTURE_MSVC_HELP lvalue_type value() &
+    BOOST_OUTCOME_CONVINCE_MSVC lvalue_type value() &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
-    BOOST_OUTCOME_FUTURE_MSVC_HELP const_lvalue_type get() const &
+    BOOST_OUTCOME_CONVINCE_MSVC const_lvalue_type get() const &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
-    BOOST_OUTCOME_FUTURE_MSVC_HELP const_lvalue_type value() const &
+    BOOST_OUTCOME_CONVINCE_MSVC const_lvalue_type value() const &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
-    BOOST_OUTCOME_FUTURE_MSVC_HELP rvalue_type get() &&
+    BOOST_OUTCOME_CONVINCE_MSVC rvalue_type get() &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
-    BOOST_OUTCOME_FUTURE_MSVC_HELP rvalue_type value() &&
+    BOOST_OUTCOME_CONVINCE_MSVC rvalue_type value() &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
 #ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
-    BOOST_OUTCOME_FUTURE_MSVC_HELP error_type get_error() const
+    BOOST_OUTCOME_CONVINCE_MSVC error_type get_error() const
     {
       if(!monad_storage::is_ready())
       {
@@ -134,7 +134,7 @@ namespace detail
     }
 #endif
 #ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
-    BOOST_OUTCOME_FUTURE_MSVC_HELP exception_type get_exception() const
+    BOOST_OUTCOME_CONVINCE_MSVC exception_type get_exception() const
     {
       if(!monad_storage::is_ready())
       {
@@ -161,9 +161,9 @@ namespace detail
 
   protected:
     // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_OUTCOME_FUTURE_MSVC_HELP bool _throw_error(monad_errc ec) { throw monad_error(ec); }
+    static BOOST_OUTCOME_CONVINCE_MSVC bool _throw_error(monad_errc ec) { throw monad_error(ec); }
     // Common preamble to the below
-    BOOST_OUTCOME_FUTURE_MSVC_HELP void _pre_get_value() const
+    BOOST_OUTCOME_CONVINCE_MSVC void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
         _throw_error(monad_errc::no_state);
@@ -183,14 +183,14 @@ namespace detail
     }
 
   public:
-    BOOST_OUTCOME_FUTURE_MSVC_HELP void get() & { _pre_get_value(); }
-    BOOST_OUTCOME_FUTURE_MSVC_HELP void value() & { _pre_get_value(); }
-    BOOST_OUTCOME_FUTURE_MSVC_HELP void get() const & { _pre_get_value(); }
-    BOOST_OUTCOME_FUTURE_MSVC_HELP void value() const & { _pre_get_value(); }
-    BOOST_OUTCOME_FUTURE_MSVC_HELP void get() && { _pre_get_value(); }
-    BOOST_OUTCOME_FUTURE_MSVC_HELP void value() && { _pre_get_value(); }
+    BOOST_OUTCOME_CONVINCE_MSVC void get() & { _pre_get_value(); }
+    BOOST_OUTCOME_CONVINCE_MSVC void value() & { _pre_get_value(); }
+    BOOST_OUTCOME_CONVINCE_MSVC void get() const & { _pre_get_value(); }
+    BOOST_OUTCOME_CONVINCE_MSVC void value() const & { _pre_get_value(); }
+    BOOST_OUTCOME_CONVINCE_MSVC void get() && { _pre_get_value(); }
+    BOOST_OUTCOME_CONVINCE_MSVC void value() && { _pre_get_value(); }
 #ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
-    BOOST_OUTCOME_FUTURE_MSVC_HELP error_type get_error() const
+    BOOST_OUTCOME_CONVINCE_MSVC error_type get_error() const
     {
       if(!monad_storage::is_ready())
       {
@@ -207,7 +207,7 @@ namespace detail
     }
 #endif
 #ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
-    BOOST_OUTCOME_FUTURE_MSVC_HELP exception_type get_exception() const
+    BOOST_OUTCOME_CONVINCE_MSVC exception_type get_exception() const
     {
       if(!monad_storage::is_ready())
       {

@@ -376,6 +376,14 @@
   <ItemGroup>
     <ClCompile Include="unittests.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\boost\outcome\v1\config.hpp" />
+    <ClInclude Include="..\include\boost\outcome\v1\monad.hpp" />
+    <ClInclude Include="..\include\boost\outcome\v1\value_storage.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Readme.md" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

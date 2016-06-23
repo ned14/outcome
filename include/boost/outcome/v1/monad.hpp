@@ -761,7 +761,7 @@ namespace detail
   public:
     constexpr function_ptr() noexcept : ptr(nullptr) {}
     constexpr function_ptr(function_ptr_storage *p) noexcept : ptr(p) {}
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR function_ptr(function_ptr &&o) noexcept : ptr(o.ptr) { o.ptr = nullptr; }
+    BOOST_OUTCOME_CXX14_CONSTEXPR function_ptr(function_ptr &&o) noexcept : ptr(o.ptr) { o.ptr = nullptr; }
     function_ptr &operator=(function_ptr &&o)
     {
       delete ptr;
@@ -773,14 +773,14 @@ namespace detail
     function_ptr &operator=(const function_ptr &) = delete;
     ~function_ptr() { delete ptr; }
     explicit constexpr operator bool() const noexcept { return !!ptr; }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR R operator()(Args... args) const { return (*ptr)(std::move(args)...); }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR function_ptr_storage *get() noexcept { return ptr; }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR void reset(function_ptr_storage *p = nullptr) noexcept
+    BOOST_OUTCOME_CXX14_CONSTEXPR R operator()(Args... args) const { return (*ptr)(std::move(args)...); }
+    BOOST_OUTCOME_CXX14_CONSTEXPR function_ptr_storage *get() noexcept { return ptr; }
+    BOOST_OUTCOME_CXX14_CONSTEXPR void reset(function_ptr_storage *p = nullptr) noexcept
     {
       delete ptr;
       ptr = p;
     }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR function_ptr_storage *release() noexcept
+    BOOST_OUTCOME_CXX14_CONSTEXPR function_ptr_storage *release() noexcept
     {
       auto p = ptr;
       ptr = nullptr;
@@ -814,11 +814,11 @@ namespace detail
   // Call C with A either by rvalue or lvalue ref
   template <bool with_rvalue> struct do_invoke
   {
-    template <class C, class A> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR auto operator()(C &&c, A &&a) -> decltype(c(static_cast<typename to_lvalue_ref<A>::type>(a))) { return c(static_cast<typename to_lvalue_ref<A>::type>(a)); }
+    template <class C, class A> BOOST_OUTCOME_CXX14_CONSTEXPR auto operator()(C &&c, A &&a) -> decltype(c(static_cast<typename to_lvalue_ref<A>::type>(a))) { return c(static_cast<typename to_lvalue_ref<A>::type>(a)); }
   };
   template <> struct do_invoke<true>
   {
-    template <class C, class A> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR auto operator()(C &&c, A &&a) -> decltype(c(std::move(a))) { return c(std::move(a)); }
+    template <class C, class A> BOOST_OUTCOME_CXX14_CONSTEXPR auto operator()(C &&c, A &&a) -> decltype(c(std::move(a))) { return c(std::move(a)); }
   };
   /* Invokes the callable passed to next() folding any monad return type
   R is the type returned by the callable
@@ -841,7 +841,7 @@ namespace detail
         : _c(std::forward<U>(c))
     {
     }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR output_type operator()(input_type &&v)
+    BOOST_OUTCOME_CXX14_CONSTEXPR output_type operator()(input_type &&v)
     {
       using c_traits = traits::callable_argument_traits<callable_type, input_type>;
       return output_type(do_invoke<c_traits::is_rvalue>()(_c, std::move(v)));
@@ -860,7 +860,7 @@ namespace detail
         : _c(std::forward<U>(c))
     {
     }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR output_type operator()(input_type &&v)
+    BOOST_OUTCOME_CXX14_CONSTEXPR output_type operator()(input_type &&v)
     {
       using c_traits = traits::callable_argument_traits<callable_type, input_type>;
       return do_invoke<c_traits::is_rvalue>()(_c, std::move(v)), output_type();
@@ -878,7 +878,7 @@ namespace detail
         : _c(std::forward<U>(c))
     {
     }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR output_type operator()(input_type &&v)
+    BOOST_OUTCOME_CXX14_CONSTEXPR output_type operator()(input_type &&v)
     {
       using c_traits = traits::callable_argument_traits<callable_type, input_type>;
       return output_type(do_invoke<c_traits::is_rvalue>()(_c, std::move(v)));
@@ -893,15 +893,15 @@ namespace detail
   {
     typedef M input_type;
     typedef input_type output_type;
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR output_type operator()(const input_type &v) const { return v; }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR output_type operator()(input_type &&v) const { return std::move(v); }
+    BOOST_OUTCOME_CXX14_CONSTEXPR output_type operator()(const input_type &v) const { return v; }
+    BOOST_OUTCOME_CXX14_CONSTEXPR output_type operator()(input_type &&v) const { return std::move(v); }
   };
   template <class M> struct do_unwrap2<true, M>
   {
     typedef M input_type;
     typedef typename input_type::value_type unwrapped_type;
     typedef typename do_unwrap<unwrapped_type>::output_type output_type;
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR output_type operator()(const input_type &v) const
+    BOOST_OUTCOME_CXX14_CONSTEXPR output_type operator()(const input_type &v) const
     {
       if(v.has_error())
         return do_unwrap<unwrapped_type>()(v.get_error());
@@ -912,7 +912,7 @@ namespace detail
       else
         return do_unwrap<unwrapped_type>()(unwrapped_type());
     }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR output_type operator()(input_type &&v) const
+    BOOST_OUTCOME_CXX14_CONSTEXPR output_type operator()(input_type &&v) const
     {
       if(v.has_error())
         return do_unwrap<unwrapped_type>()(std::move(v).get_error());
@@ -1246,88 +1246,88 @@ error_type, an exception_type nor an empty_type.
   constexpr bool has_exception(bool only_exception = false) const noexcept { return implementation_policy::base::_storage.type == value_storage_type::storage_type::exception || (!only_exception && implementation_policy::base::_storage.type == value_storage_type::storage_type::error); }
 
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_type &get_or(value_type &v) & noexcept { return has_value() ? implementation_policy::base::_storage.value : v; }
+  BOOST_OUTCOME_CXX14_CONSTEXPR value_type &get_or(value_type &v) & noexcept { return has_value() ? implementation_policy::base::_storage.value : v; }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_type &value_or(value_type &v) & noexcept { return has_value() ? implementation_policy::base::_storage.value : v; }
+  BOOST_OUTCOME_CXX14_CONSTEXPR value_type &value_or(value_type &v) & noexcept { return has_value() ? implementation_policy::base::_storage.value : v; }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
   constexpr const value_type &get_or(const value_type &v) const &noexcept { return has_value() ? implementation_policy::base::_storage.value : v; }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
   constexpr const value_type &value_or(const value_type &v) const &noexcept { return has_value() ? implementation_policy::base::_storage.value : v; }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_type &&get_or(value_type &&v) && noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
+  BOOST_OUTCOME_CXX14_CONSTEXPR value_type &&get_or(value_type &&v) && noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_type &&value_or(value_type &&v) && noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
+  BOOST_OUTCOME_CXX14_CONSTEXPR value_type &&value_or(value_type &&v) && noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
   //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_type &get_and(value_type &v) & noexcept { return has_value() ? v : implementation_policy::base::_storage.value; }
+  BOOST_OUTCOME_CXX14_CONSTEXPR value_type &get_and(value_type &v) & noexcept { return has_value() ? v : implementation_policy::base::_storage.value; }
   //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_type &value_and(value_type &v) & noexcept { return has_value() ? v : implementation_policy::base::_storage.value; }
+  BOOST_OUTCOME_CXX14_CONSTEXPR value_type &value_and(value_type &v) & noexcept { return has_value() ? v : implementation_policy::base::_storage.value; }
   //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
   constexpr const value_type &get_and(const value_type &v) const &noexcept { return has_value() ? v : implementation_policy::base::_storage.value; }
   //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
   constexpr const value_type &value_and(const value_type &v) const &noexcept { return has_value() ? v : implementation_policy::base::_storage.value; }
   //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_type &&get_and(value_type &&v) && noexcept { return has_value() ? std::move(v) : std::move(implementation_policy::base::_storage.value); }
+  BOOST_OUTCOME_CXX14_CONSTEXPR value_type &&get_and(value_type &&v) && noexcept { return has_value() ? std::move(v) : std::move(implementation_policy::base::_storage.value); }
   //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_type &&value_and(value_type &&v) && noexcept { return has_value() ? std::move(v) : std::move(implementation_policy::base::_storage.value); }
+  BOOST_OUTCOME_CXX14_CONSTEXPR value_type &&value_and(value_type &&v) && noexcept { return has_value() ? std::move(v) : std::move(implementation_policy::base::_storage.value); }
   //! \brief Disposes of any existing state, setting the monad to the value storage
-  BOOST_OUTCOME_FUTURE_MSVC_HELP void set_state(value_storage_type &&v)
+  BOOST_OUTCOME_CONVINCE_MSVC void set_state(value_storage_type &&v)
   {
     implementation_policy::base::_storage.clear();
     implementation_policy::base::_storage.set_state(std::move(v));
   }
   //! \brief Disposes of any existing state, setting the monad to a copy of the value_type
-  BOOST_OUTCOME_FUTURE_MSVC_HELP void set_value(const value_type &v)
+  BOOST_OUTCOME_CONVINCE_MSVC void set_value(const value_type &v)
   {
     implementation_policy::base::_storage.clear();
     implementation_policy::base::_storage.set_value(v);
   }
   //! \brief Disposes of any existing state, setting the monad to a move of the value_type
-  BOOST_OUTCOME_FUTURE_MSVC_HELP void set_value(value_type &&v)
+  BOOST_OUTCOME_CONVINCE_MSVC void set_value(value_type &&v)
   {
     implementation_policy::base::_storage.clear();
     implementation_policy::base::_storage.set_value(std::move(v));
   }
   //! \brief Disposes of any existing state, setting the monad to a default value
-  BOOST_OUTCOME_FUTURE_MSVC_HELP void set_value()
+  BOOST_OUTCOME_CONVINCE_MSVC void set_value()
   {
     implementation_policy::base::_storage.clear();
     implementation_policy::base::_storage.set_value(value_type());
   }
   //! \brief Disposes of any existing state, setting the monad to an emplaced construction
-  template <class... Args> BOOST_OUTCOME_FUTURE_MSVC_HELP void emplace(Args &&... args)
+  template <class... Args> BOOST_OUTCOME_CONVINCE_MSVC void emplace(Args &&... args)
   {
     implementation_policy::base::_storage.clear();
     implementation_policy::base::_storage.emplace_value(std::forward<Args>(args)...);
   }
 
   //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
-  BOOST_OUTCOME_FUTURE_MSVC_HELP error_type get_error_or(error_type e) const noexcept { return has_error() ? implementation_policy::base::_storage.error : std::move(e); }
+  BOOST_OUTCOME_CONVINCE_MSVC error_type get_error_or(error_type e) const noexcept { return has_error() ? implementation_policy::base::_storage.error : std::move(e); }
   //! \brief If contains an error_type, return the supplied error_type else return the contained error_type
-  BOOST_OUTCOME_FUTURE_MSVC_HELP error_type get_error_and(error_type e) const noexcept { return has_error() ? std::move(e) : implementation_policy::base::_storage.error; }
+  BOOST_OUTCOME_CONVINCE_MSVC error_type get_error_and(error_type e) const noexcept { return has_error() ? std::move(e) : implementation_policy::base::_storage.error; }
   //! \brief Disposes of any existing state, setting the monad to the error_type
-  BOOST_OUTCOME_FUTURE_MSVC_HELP void set_error(error_type v)
+  BOOST_OUTCOME_CONVINCE_MSVC void set_error(error_type v)
   {
     implementation_policy::base::_storage.clear();
     implementation_policy::base::_storage.set_error(std::move(v));
   }
 
   //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
-  BOOST_OUTCOME_FUTURE_MSVC_HELP exception_type get_exception_or(exception_type e) const noexcept { return has_exception() ? implementation_policy::base::_storage.exception : std::move(e); }
+  BOOST_OUTCOME_CONVINCE_MSVC exception_type get_exception_or(exception_type e) const noexcept { return has_exception() ? implementation_policy::base::_storage.exception : std::move(e); }
   //! \brief If contains an exception_type, return the supplied exception_type else return the contained exception_type
-  BOOST_OUTCOME_FUTURE_MSVC_HELP exception_type get_exception_and(exception_type e) const noexcept { return has_exception() ? std::move(e) : implementation_policy::base::_storage.exception; }
+  BOOST_OUTCOME_CONVINCE_MSVC exception_type get_exception_and(exception_type e) const noexcept { return has_exception() ? std::move(e) : implementation_policy::base::_storage.exception; }
   //! \brief Disposes of any existing state, setting the monad to the exception_type
-  BOOST_OUTCOME_FUTURE_MSVC_HELP void set_exception(exception_type v)
+  BOOST_OUTCOME_CONVINCE_MSVC void set_exception(exception_type v)
   {
     implementation_policy::base::_storage.clear();
     implementation_policy::base::_storage.set_exception(std::move(v));
   }
   //! \brief Disposes of any existing state, setting the monad to make_exception_type(forward<E>(e))
-  template <typename E> BOOST_OUTCOME_FUTURE_MSVC_HELP void set_exception(E &&e) { set_exception(make_exception_type(std::forward<E>(e))); }
+  template <typename E> BOOST_OUTCOME_CONVINCE_MSVC void set_exception(E &&e) { set_exception(make_exception_type(std::forward<E>(e))); }
 
   //! \brief Swaps one monad for another
-  BOOST_OUTCOME_FUTURE_MSVC_HELP void swap(basic_monad &o) noexcept(is_nothrow_move_constructible) { implementation_policy::base::_storage.swap(o._storage); }
+  BOOST_OUTCOME_CONVINCE_MSVC void swap(basic_monad &o) noexcept(is_nothrow_move_constructible) { implementation_policy::base::_storage.swap(o._storage); }
   //! \brief Destructs any state stored, resetting to empty
-  BOOST_OUTCOME_FUTURE_MSVC_HELP void clear() noexcept(is_nothrow_destructible) { implementation_policy::base::_storage.clear(); }
+  BOOST_OUTCOME_CONVINCE_MSVC void clear() noexcept(is_nothrow_destructible) { implementation_policy::base::_storage.clear(); }
 
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
 //! \brief If contains a value_type, returns a lvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
@@ -1434,7 +1434,7 @@ allows a very easy way of converting between different configurations of monad c
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
   template <class F> monad<...> next(F &&f);
 #else
-  template <class _F> BOOST_OUTCOME_FUTURE_MSVC_HELP typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_monad>::type, typename std::decay<_F>::type, implementation_policy>::output_type next(_F &&f)
+  template <class _F> BOOST_OUTCOME_CONVINCE_MSVC typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_monad>::type, typename std::decay<_F>::type, implementation_policy>::output_type next(_F &&f)
   {
     typedef typename std::decay<_F>::type F;
     typedef traits::callable_argument_traits<F, basic_monad> f_traits;
@@ -1448,20 +1448,20 @@ allows a very easy way of converting between different configurations of monad c
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
   monad<...> unwrap() const &;
 #else
-  BOOST_OUTCOME_FUTURE_MSVC_HELP typename detail::do_unwrap<basic_monad>::output_type unwrap() const & { return detail::do_unwrap<basic_monad>()(*this); }
+  BOOST_OUTCOME_CONVINCE_MSVC typename detail::do_unwrap<basic_monad>::output_type unwrap() const & { return detail::do_unwrap<basic_monad>()(*this); }
 #endif
 //! \brief If I am a monad<monad<...>>, return move of most nested monad<...>, else return move of *this
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
   monad<...> unwrap() &&;
 #else
-  BOOST_OUTCOME_FUTURE_MSVC_HELP typename detail::do_unwrap<basic_monad>::output_type unwrap() && { return detail::do_unwrap<basic_monad>()(std::move(*this)); }
+  BOOST_OUTCOME_CONVINCE_MSVC typename detail::do_unwrap<basic_monad>::output_type unwrap() && { return detail::do_unwrap<basic_monad>()(std::move(*this)); }
 #endif
 
 //! \brief If bool(*this), return basic_monad(F(get())).unwrap, else return basic_monad<result_of<F(get())>>(error)
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
   template <class F> monad<...> bind(F &&f);
 #else
-  template <class _F> BOOST_OUTCOME_FUTURE_MSVC_HELP typename detail::do_bind<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type bind(_F &&f)
+  template <class _F> BOOST_OUTCOME_CONVINCE_MSVC typename detail::do_bind<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type bind(_F &&f)
   {
     typedef typename std::decay<_F>::type F;
     typedef detail::do_bind<typename detail::bind_map_parameter_validation<F, basic_monad>::return_type, F, basic_monad> impl;
@@ -1479,14 +1479,14 @@ allows a very easy way of converting between different configurations of monad c
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
   template <class F> monad<...> operator>>(F &&f);
 #else
-  template <class _F> BOOST_OUTCOME_FUTURE_MSVC_HELP typename detail::do_bind<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type operator>>(_F &&f) { return bind(std::forward<_F>(f)); }
+  template <class _F> BOOST_OUTCOME_CONVINCE_MSVC typename detail::do_bind<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type operator>>(_F &&f) { return bind(std::forward<_F>(f)); }
 #endif
 
 //! \brief If bool(*this), return basic_monad(F(get())), else return basic_monad<result_of<F(get())>>(error)
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
   template <class F> monad<...> map(F &&f);
 #else
-  template <class _F> BOOST_OUTCOME_FUTURE_MSVC_HELP typename detail::do_map<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type map(_F &&f)
+  template <class _F> BOOST_OUTCOME_CONVINCE_MSVC typename detail::do_map<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type map(_F &&f)
   {
     typedef typename std::decay<_F>::type F;
     typedef detail::do_map<typename detail::bind_map_parameter_validation<F, basic_monad>::return_type, F, basic_monad> impl;
@@ -1506,7 +1506,7 @@ allows a very easy way of converting between different configurations of monad c
   template <class F> basic_monad(F(contents)).unwrap() match(F &&f);
 #else
   template <class _F>
-  BOOST_OUTCOME_FUTURE_MSVC_HELP typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, value_type>::type, typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, value_type>::type(basic_monad &&), implementation_policy>::output_type match(_F &&f)
+  BOOST_OUTCOME_CONVINCE_MSVC typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, value_type>::type, typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, value_type>::type(basic_monad &&), implementation_policy>::output_type match(_F &&f)
   {
     typedef typename std::decay<_F>::type F;
     typedef traits::callable_argument_traits<F, value_type> f_traits_value;
@@ -1526,24 +1526,24 @@ allows a very easy way of converting between different configurations of monad c
   }
 
   //! \brief If contains a value_type, invoke the call operator on that type. Return type must be default constructible.
-  template <class... Args, typename = typename std::result_of<value_type(Args...)>::type> BOOST_OUTCOME_FUTURE_MSVC_HELP auto operator()(Args &&... args) -> decltype(this->get()(std::forward<Args>(args)...))
+  template <class... Args, typename = typename std::result_of<value_type(Args...)>::type> BOOST_OUTCOME_CONVINCE_MSVC auto operator()(Args &&... args) -> decltype(this->get()(std::forward<Args>(args)...))
   {
     typedef decltype(this->get()(std::forward<Args>(args)...)) rettype;
     return has_value() ? this->get()(std::forward<Args>(args)...) : rettype();
   }
 
   //! \brief If contains a value_type, return that value type, else return the supplied type
-  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_monad operator|(U &&v) & { return has_value() ? *this : basic_monad(std::forward<U>(v)); }
+  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_CXX14_CONSTEXPR basic_monad operator|(U &&v) & { return has_value() ? *this : basic_monad(std::forward<U>(v)); }
   //! \brief If contains a value_type, return that value type, else return the supplied type
-  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_monad operator|(U &&v) const & { return has_value() ? *this : basic_monad(std::forward<U>(v)); }
+  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_CXX14_CONSTEXPR basic_monad operator|(U &&v) const & { return has_value() ? *this : basic_monad(std::forward<U>(v)); }
   //! \brief If contains a value_type, return that value type, else return the supplied type
-  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_monad operator|(U &&v) && { return has_value() ? std::move(*this) : basic_monad(std::forward<U>(v)); }
+  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_CXX14_CONSTEXPR basic_monad operator|(U &&v) && { return has_value() ? std::move(*this) : basic_monad(std::forward<U>(v)); }
   //! \brief If contains a value_type, return the supplied type else the value_type
-  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_monad operator&(U &&v) & { return has_value() ? basic_monad(std::forward<U>(v)) : *this; }
+  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_CXX14_CONSTEXPR basic_monad operator&(U &&v) & { return has_value() ? basic_monad(std::forward<U>(v)) : *this; }
   //! \brief If contains a value_type, return the supplied type else the value_type
-  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_monad operator&(U &&v) const & { return has_value() ? basic_monad(std::forward<U>(v)) : *this; }
+  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_CXX14_CONSTEXPR basic_monad operator&(U &&v) const & { return has_value() ? basic_monad(std::forward<U>(v)) : *this; }
   //! \brief If contains a value_type, return the supplied type else the value_type
-  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR basic_monad operator&(U &&v) && { return has_value() ? basic_monad(std::forward<U>(v)) : std::move(*this); }
+  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_CXX14_CONSTEXPR basic_monad operator&(U &&v) && { return has_value() ? basic_monad(std::forward<U>(v)) : std::move(*this); }
 
 
 #endif

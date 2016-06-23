@@ -203,8 +203,8 @@ namespace detail
         , type(storage_type::value)
     {
     }
-    BOOST_OUTCOME_FUTURE_MSVC_HELP ~value_storage_impl() noexcept(is_nothrow_destructible) { clear(); }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
+    BOOST_OUTCOME_CONVINCE_MSVC ~value_storage_impl() noexcept(is_nothrow_destructible) { clear(); }
+    BOOST_OUTCOME_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
     {
       switch(type)
       {
@@ -277,49 +277,49 @@ namespace detail
 
     static constexpr bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value;
 
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl()
+    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl()
         : type(storage_type::empty)
     {
     }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(empty_t) noexcept : type(storage_type::empty) {}
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(value_t) noexcept(std::is_nothrow_default_constructible<value_type>::value)
+    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(empty_t) noexcept : type(storage_type::empty) {}
+    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(value_t) noexcept(std::is_nothrow_default_constructible<value_type>::value)
         : value(value_type())
     {
       type = storage_type::value;
     }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(error_t) noexcept(std::is_nothrow_default_constructible<error_type>::value)
+    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(error_t) noexcept(std::is_nothrow_default_constructible<error_type>::value)
         : error(error_type())
     {
       type = storage_type::error;
     }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(exception_t) noexcept(std::is_nothrow_default_constructible<exception_type>::value)
+    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(exception_t) noexcept(std::is_nothrow_default_constructible<exception_type>::value)
         : exception(exception_type())
     {
       type = storage_type::exception;
     }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
+    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
         : value(v)
     {
       type = storage_type::value;
     }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(const error_type &) noexcept(std::is_nothrow_copy_constructible<error_type>::value)
+    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(const error_type &) noexcept(std::is_nothrow_copy_constructible<error_type>::value)
         : type(storage_type::error)
     {
     }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(const exception_type &) noexcept(std::is_nothrow_copy_constructible<exception_type>::value)
+    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(const exception_type &) noexcept(std::is_nothrow_copy_constructible<exception_type>::value)
         : type(storage_type::exception)
     {
     }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
+    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
         : value(v)
     {
       type = storage_type::value;
     }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(error_type &&) noexcept(std::is_nothrow_move_constructible<error_type>::value)
+    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(error_type &&) noexcept(std::is_nothrow_move_constructible<error_type>::value)
         : type(storage_type::error)
     {
     }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage_impl(exception_type &&) noexcept(std::is_nothrow_move_constructible<exception_type>::value)
+    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(exception_type &&) noexcept(std::is_nothrow_move_constructible<exception_type>::value)
         : type(storage_type::exception)
     {
     }
@@ -327,13 +327,13 @@ namespace detail
     {
     };
     template <class... Args>
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR explicit value_storage_impl(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+    BOOST_OUTCOME_CXX14_CONSTEXPR explicit value_storage_impl(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
         : value(std::forward<Args>(args)...)
     {
       type = storage_type::value;
     }
-    BOOST_OUTCOME_FUTURE_MSVC_HELP ~value_storage_impl() noexcept(is_nothrow_destructible) { clear(); }
-    BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
+    BOOST_OUTCOME_CONVINCE_MSVC ~value_storage_impl() noexcept(is_nothrow_destructible) { clear(); }
+    BOOST_OUTCOME_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
     {
       switch(type)
       {
@@ -443,14 +443,14 @@ public:
   template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<std::is_same<_value_type, _value_type2>::value || std::is_constructible<_value_type, _value_type2>::value>::type,
             typename = typename std::enable_if<std::is_void<_error_type2>::value || std::is_same<_error_type, _error_type2>::value || std::is_constructible<_error_type, _error_type2>::value>::type,
             typename = typename std::enable_if<std::is_void<_exception_type2>::value || std::is_same<_exception_type, _exception_type2>::value || std::is_constructible<_exception_type, _exception_type2>::value>::type>
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR explicit value_storage(const value_storage<_value_type2, _error_type2, _exception_type2> &o)
+  BOOST_OUTCOME_CXX14_CONSTEXPR explicit value_storage(const value_storage<_value_type2, _error_type2, _exception_type2> &o)
       : value_storage(value_storage<_value_type2, _error_type2, _exception_type2>(o) /* delegate to move constructor */)
   {
   }
   template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<std::is_same<_value_type, _value_type2>::value || std::is_constructible<_value_type, _value_type2>::value>::type,
             typename = typename std::enable_if<std::is_void<_error_type2>::value || std::is_same<_error_type, _error_type2>::value || std::is_constructible<_error_type, _error_type2>::value>::type,
             typename = typename std::enable_if<std::is_void<_exception_type2>::value || std::is_same<_exception_type, _exception_type2>::value || std::is_constructible<_exception_type, _exception_type2>::value>::type>
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR explicit value_storage(value_storage<_value_type2, _error_type2, _exception_type2> &&o)
+  BOOST_OUTCOME_CXX14_CONSTEXPR explicit value_storage(value_storage<_value_type2, _error_type2, _exception_type2> &&o)
   {
     switch(o.type)
     {
@@ -471,7 +471,7 @@ public:
       break;
     }
   }
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage(const value_storage &o) noexcept(is_nothrow_copy_constructible)
+  BOOST_OUTCOME_CXX14_CONSTEXPR value_storage(const value_storage &o) noexcept(is_nothrow_copy_constructible)
       : base()
   {
     switch(o.type)
@@ -490,7 +490,7 @@ public:
     }
     this->type = o.type;
   }
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage(value_storage &&o) noexcept(is_nothrow_move_constructible)
+  BOOST_OUTCOME_CXX14_CONSTEXPR value_storage(value_storage &&o) noexcept(is_nothrow_move_constructible)
       : base()
   {
     switch(o.type)
@@ -509,25 +509,25 @@ public:
     }
     this->type = o.type;
   }
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage &operator=(const value_storage &o) noexcept(is_nothrow_destructible &&is_nothrow_copy_constructible)
+  BOOST_OUTCOME_CXX14_CONSTEXPR value_storage &operator=(const value_storage &o) noexcept(is_nothrow_destructible &&is_nothrow_copy_constructible)
   {
     clear();
     new(this) value_storage(o);
     return *this;
   }
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR value_storage &operator=(value_storage &&o) noexcept(is_nothrow_destructible &&is_nothrow_move_constructible)
+  BOOST_OUTCOME_CXX14_CONSTEXPR value_storage &operator=(value_storage &&o) noexcept(is_nothrow_destructible &&is_nothrow_move_constructible)
   {
     clear();
     new(this) value_storage(std::move(o));
     return *this;
   }
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR void set_state(value_storage &&o) noexcept(is_nothrow_destructible &&is_nothrow_move_constructible)
+  BOOST_OUTCOME_CXX14_CONSTEXPR void set_state(value_storage &&o) noexcept(is_nothrow_destructible &&is_nothrow_move_constructible)
   {
     clear();
     new(this) value_storage(std::move(o));
   }
 
-  BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR void swap(value_storage &o) noexcept(is_nothrow_move_constructible)
+  BOOST_OUTCOME_CXX14_CONSTEXPR void swap(value_storage &o) noexcept(is_nothrow_move_constructible)
   {
     if(this->type == o.type)
     {
@@ -553,13 +553,13 @@ public:
       *this = std::move(temp);
     }
   }
-  template <class U> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR void set_value(U &&v)
+  template <class U> BOOST_OUTCOME_CXX14_CONSTEXPR void set_value(U &&v)
   {
     assert(this->type == storage_type::empty);
     new(&this->_value_raw) value_type(std::forward<U>(v));
     this->type = storage_type::value;
   }
-  template <class... Args> BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR void emplace_value(Args &&... v)
+  template <class... Args> BOOST_OUTCOME_CXX14_CONSTEXPR void emplace_value(Args &&... v)
   {
     assert(this->type == storage_type::empty);
     new(&this->_value_raw) value_type(std::forward<Args>(v)...);
@@ -571,7 +571,7 @@ public:
     new(&this->exception) exception_type(std::move(e));
     this->type = storage_type::exception;
   }
-  // Note to self: this can't be BOOST_OUTCOME_FUTURE_CXX14_CONSTEXPR
+  // Note to self: this can't be BOOST_OUTCOME_CXX14_CONSTEXPR
   void set_error(error_type e)
   {
     assert(this->type == storage_type::empty);
