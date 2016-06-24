@@ -1127,7 +1127,7 @@ public:
   template <class OtherMonad, class Base = typename std::conditional<is_constructible<OtherMonad>, std::true_type, std::false_type>::type> struct _is_constructible : Base
   {
   };
-  //! \brief This monad is comparable to the monad specified
+  //! \brief This monad is comparable to the monad specified. Note this is as if ThisMonad::operator==(OtherMonad), so without associativity i.e. is this monad comparable to the other monad which != the other monad is comparable to this monad.
   template <class OtherMonad> static constexpr bool is_comparable = value_storage_type::template is_comparable_to<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
   template <class OtherMonad, class Base = typename std::conditional<is_comparable<OtherMonad>, std::true_type, std::false_type>::type> struct _is_comparable : Base
   {
@@ -1590,10 +1590,20 @@ template <class Policy1, class Policy2> constexpr inline typename std::enable_if
 {
   return a.__storage() == b.__storage();
 }
+//! \brief True if this monad exactly equals the other monad (associative)
+template <class Policy1, class Policy2> constexpr inline typename std::enable_if<!basic_monad<Policy1>::template _is_comparable<basic_monad<Policy2>>::value && basic_monad<Policy2>::template _is_comparable<basic_monad<Policy1>>::value, bool>::type operator==(const basic_monad<Policy1> &a, const basic_monad<Policy2> &b)
+{
+  return b.__storage() == a.__storage();
+}
 //! \brief True if this monad does not exactly equal the other monad
 template <class Policy1, class Policy2> constexpr inline typename std::enable_if<basic_monad<Policy1>::template _is_comparable<basic_monad<Policy2>>::value, bool>::type operator!=(const basic_monad<Policy1> &a, const basic_monad<Policy2> &b)
 {
   return a.__storage() != b.__storage();
+}
+//! \brief True if this monad does not exactly equal the other monad (associative)
+template <class Policy1, class Policy2> constexpr inline typename std::enable_if<!basic_monad<Policy1>::template _is_comparable<basic_monad<Policy2>>::value && basic_monad<Policy2>::template _is_comparable<basic_monad<Policy1>>::value, bool>::type operator!=(const basic_monad<Policy1> &a, const basic_monad<Policy2> &b)
+{
+  return b.__storage() != a.__storage();
 }
 
 namespace detail

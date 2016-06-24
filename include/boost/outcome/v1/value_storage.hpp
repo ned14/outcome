@@ -408,7 +408,7 @@ public:
   // True if this storage can be constructed from the specified storage
   template <class _value_type2, class _error_type2, class _exception_type2> static constexpr bool is_constructible_from = value_type_is_constructible_from<_value_type2> &&error_type_is_constructible_from<_error_type2> &&exception_type_is_constructible_from<_exception_type2>;
 
-  template <class _value_type2> static constexpr bool value_type_is_comparable_to = value_type_is_constructible_from<_value_type2> || std::is_void<_value_type2>::value;
+  template <class _value_type2> static constexpr bool value_type_is_comparable_to = std::is_void<_value_type2>::value || value_type_is_constructible_from<_value_type2>;
   template <class _error_type2> static constexpr bool error_type_is_comparable_to = error_type_is_constructible_from<_error_type2>;
   template <class _exception_type2> static constexpr bool exception_type_is_comparable_to = exception_type_is_constructible_from<_exception_type2>;
   // True if this storage can be compared to the specified storage
@@ -603,7 +603,7 @@ public:
     case storage_type::empty:
       return true;
     case storage_type::value:
-      return (!has_value_type && !value_storage<_value_type2, _error_type2, _exception_type2>::has_value_type) || detail::compare_if < has_value_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_value_type > (this->_value_raw, o._value_raw);
+      return (!has_value_type && !value_storage<_value_type2, _error_type2, _exception_type2>::has_value_type) || detail::compare_if < has_value_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_value_type > (this->value, o.value);
     case storage_type::error:
       return detail::compare_if < has_error_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_error_type > (this->error, o.error);
     case storage_type::exception:
