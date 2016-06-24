@@ -143,6 +143,7 @@ BOOST_AUTO_TEST_CASE(works / traits, "Tests that the traits work as intended")
 BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  using namespace boost_lite::tribool;
   static_assert(std::is_constructible<outcome<long>, int>::value, "Sanity check that monad can be constructed from a value_type");
   static_assert(std::is_constructible<outcome<outcome<long>>, int>::value, "Sanity check that outer monad can be constructed from an inner monad's value_type");
   static_assert(!std::is_constructible<outcome<outcome<outcome<long>>>, int>::value, "Sanity check that outer monad can not be constructed from an inner inner monad's value_type");
@@ -172,7 +173,7 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
   {
     outcome<int> m;
     BOOST_CHECK(!m);
-    BOOST_CHECK(unknown(m));
+    BOOST_CHECK(unknown(tribool(m)));
     BOOST_CHECK(!m.is_ready());
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
@@ -184,7 +185,7 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
   {
     outcome<void> m;
     BOOST_CHECK(!m);
-    BOOST_CHECK(unknown(m));
+    BOOST_CHECK(unknown(tribool(m)));
     BOOST_CHECK(!m.is_ready());
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
@@ -196,7 +197,7 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
   {
     outcome<int> m(5);
     BOOST_CHECK(m);
-    BOOST_CHECK(true_(m));
+    BOOST_CHECK(true_(tribool(m)));
     BOOST_CHECK(m.is_ready());
     BOOST_CHECK(m.has_value());
     BOOST_CHECK(!m.has_error());
@@ -238,7 +239,7 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     outcome<void> m;
     m.set_value();
     BOOST_CHECK(m);
-    BOOST_CHECK(true_(m));
+    BOOST_CHECK(true_(tribool(m)));
     BOOST_CHECK(m.is_ready());
     BOOST_CHECK(m.has_value());
     BOOST_CHECK(!m.has_error());
@@ -261,7 +262,7 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     auto e = std::make_exception_ptr(stl11::system_error(ec));
     outcome<int> m(ec);
     BOOST_CHECK(!m);
-    BOOST_CHECK(false_(m));
+    BOOST_CHECK(false_(tribool(m)));
     BOOST_CHECK(m.is_ready());
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
@@ -283,7 +284,7 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     auto e = std::make_exception_ptr(5);
     outcome<int> m(e);
     BOOST_CHECK(!m);
-    BOOST_CHECK(false_(m));
+    BOOST_CHECK(false_(tribool(m)));
     BOOST_CHECK(m.is_ready());
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
@@ -297,6 +298,17 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
 BOOST_AUTO_TEST_CASE(works / monad / comparison, "Tests that the monad can compare to compatible monads")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  auto make_exception_ptr = [] {
+    try
+    {
+      throw std::runtime_error("hi");
+    }
+    catch(...)
+    {
+      return std::current_exception();
+    }
+  };
+  auto p = make_exception_ptr();
   // value comparison
   {
     outcome<int> a(1), b(2), c(2);
@@ -308,17 +320,6 @@ BOOST_AUTO_TEST_CASE(works / monad / comparison, "Tests that the monad can compa
   }
   // homogeneous outcome comparison
   {
-    auto make_exception_ptr = [] {
-      try
-      {
-        throw std::runtime_error("hi");
-      }
-      catch(...)
-      {
-        return std::current_exception();
-      }
-    };
-    auto p = make_exception_ptr();
     outcome<int> a, b(2), c(make_errored_outcome<int>(EINVAL)), d(make_exceptional_outcome<int>(p));
     BOOST_CHECK(a == a);
     BOOST_CHECK(a != b);
@@ -335,17 +336,54 @@ BOOST_AUTO_TEST_CASE(works / monad / comparison, "Tests that the monad can compa
     BOOST_CHECK(d == f);
   }
   // heterogeneous outcome comparison, so outcome<int> to outcome<double> etc
-  {}  // upconverting outcome comparison, so outcome<int>==result<int> etc
   {
+    outcome<int> a(1);
+    outcome<double> b(1);
+    outcome<unsigned short> c(1);
+    BOOST_CHECK(a == b);
+    BOOST_CHECK(a == c);
+    BOOST_CHECK(b == a);
+    BOOST_CHECK(b == c);
+    BOOST_CHECK(c == a);
+    BOOST_CHECK(c == b);
+    outcome<void> d, e(make_ready_outcome<void>());
+    outcome<unsigned short> f(make_errored_outcome<unsigned short>(EINVAL));
+    outcome<double> g(make_exceptional_outcome<double>(p));
+    BOOST_CHECK(a != d);
+    BOOST_CHECK(a != e);
+    BOOST_CHECK(a != f);
+    BOOST_CHECK(a != g);
+    BOOST_CHECK(d != e);
+    BOOST_CHECK(d != f);
+    BOOST_CHECK(e != f);
+    BOOST_CHECK(f != g);
   }
-  // What about result<int>==outcome<int>?
+  // upconverting outcome comparison, so outcome<int>==result<int> etc
+  {
+    outcome<int> a(1);
+    result<int> b(1);
+    option<int> c(1);
+    BOOST_CHECK(a == b);
+    BOOST_CHECK(a == c);
+    BOOST_CHECK(b == a);
+    BOOST_CHECK(b == c);
+    BOOST_CHECK(c == a);
+    BOOST_CHECK(c == b);
+    result<void> d, e(make_ready_result<void>()), f(make_errored_result<void>(EINVAL));
+    option<bool> g, h(true);
+    BOOST_CHECK(a != d);
+    BOOST_CHECK(a != e);
+    BOOST_CHECK(a != f);
+    BOOST_CHECK(a != g);
+    BOOST_CHECK(a == h);
+  }
   // Should I do outcome<int>(5) == 5? Unsure if it's wise
 }
 
 BOOST_AUTO_TEST_CASE(works / monad / optional, "Tests that the monad acts as an optional R")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  using tribool::tribool;
+  using boost_lite::tribool::tribool;
   std::cout << "sizeof(outcome<bool>) = " << sizeof(outcome<bool>) << std::endl;
   std::cout << "sizeof(result<bool>) = " << sizeof(result<bool>) << std::endl;
   std::cout << "sizeof(option<bool>) = " << sizeof(option<bool>) << std::endl;

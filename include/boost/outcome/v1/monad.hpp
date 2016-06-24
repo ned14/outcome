@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #include "value_storage.hpp"
 
 #include "../boost-lite/include/ringbuffer_log.hpp"
+#include "../boost-lite/include/tribool.hpp"
 
 #ifdef _WIN32
 #define NOMINMAX      // stop min/max macros
@@ -708,12 +709,6 @@ namespace std
 
 BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 
-using tribool::true_;
-using tribool::false_;
-using tribool::other;
-using tribool::indeterminate;
-using tribool::unknown;
-
 namespace lightweight_futures
 {
   template <typename R> class basic_promise;
@@ -1076,8 +1071,10 @@ template <class implementation_policy> class basic_monad : public implementation
   template <class U> friend class basic_monad;
   // Allow basic_future to directly construct me
   template <class U> friend class lightweight_futures::basic_future;
+  // Allow serialisation
   friend inline std::istream &operator>>(std::istream &s, basic_monad &v) { return s >> v._storage; }
   friend inline std::ostream &operator<<(std::ostream &s, const basic_monad &v) { return s << v._storage; }
+
 protected:
   typedef value_storage<typename implementation_policy::value_type, typename implementation_policy::error_type, typename implementation_policy::exception_type> value_storage_type;
   constexpr basic_monad(value_storage_type &&s)
@@ -1125,9 +1122,14 @@ public:
   //! \brief This monad will never throw exceptions during destruction
   static constexpr bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
 #if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 190024123)
-  //! \brief This monad is compatible with the monad specified
-  template <class OtherMonad> static constexpr bool is_compatible_with = value_storage_type::template is_compatible_with<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
-  template <class OtherMonad, class Base = typename std::conditional<is_compatible_with<OtherMonad>, std::true_type, std::false_type>::type> struct _is_compatible_with : Base
+  //! \brief This monad is constructible from the monad specified
+  template <class OtherMonad> static constexpr bool is_constructible = value_storage_type::template is_constructible_from<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
+  template <class OtherMonad, class Base = typename std::conditional<is_constructible<OtherMonad>, std::true_type, std::false_type>::type> struct _is_constructible : Base
+  {
+  };
+  //! \brief This monad is comparable to the monad specified
+  template <class OtherMonad> static constexpr bool is_comparable = value_storage_type::template is_comparable_to<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
+  template <class OtherMonad, class Base = typename std::conditional<is_comparable<OtherMonad>, std::true_type, std::false_type>::type> struct _is_comparable : Base
   {
   };
 #else
@@ -1138,7 +1140,16 @@ public:
             (std::is_void<typename OtherMonad::raw_error_type>::value || std::is_same<typename implementation_policy::error_type, typename OtherMonad::raw_error_type>::value || std::is_constructible<typename implementation_policy::error_type, typename OtherMonad::raw_error_type>::value) &&
             (std::is_void<typename OtherMonad::raw_exception_type>::value || std::is_same<typename implementation_policy::exception_type, typename OtherMonad::raw_exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename OtherMonad::raw_exception_type>::value),
             std::true_type, std::false_type>::type>
-  struct _is_compatible_with : Base
+  struct _is_constructible : Base
+  {
+  };
+  template <class OtherMonad,
+            class Base = typename std::conditional<
+            (std::is_void<typename OtherMonad::raw_value_type>::value || std::is_same<typename implementation_policy::value_type, typename OtherMonad::raw_value_type>::value || std::is_constructible<typename implementation_policy::value_type, typename OtherMonad::raw_value_type>::value) &&
+            (std::is_void<typename OtherMonad::raw_error_type>::value || std::is_same<typename implementation_policy::error_type, typename OtherMonad::raw_error_type>::value || std::is_constructible<typename implementation_policy::error_type, typename OtherMonad::raw_error_type>::value) &&
+            (std::is_void<typename OtherMonad::raw_exception_type>::value || std::is_same<typename implementation_policy::exception_type, typename OtherMonad::raw_exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename OtherMonad::raw_exception_type>::value),
+            std::true_type, std::false_type>::type>
+  struct _is_comparable : Base
   {
   };
 #endif
@@ -1234,7 +1245,7 @@ error_type, an exception_type nor an empty_type.
   identical, constructible or the source monad must have no error_type, and exception_type must be identical,
   constructible or the source monad must have no exception_type.
   */
-  template <class Policy, typename = typename std::enable_if<_is_compatible_with<basic_monad<Policy>>::value>::type>
+  template <class Policy, typename = typename std::enable_if<_is_constructible<basic_monad<Policy>>::value>::type>
   constexpr explicit basic_monad(const basic_monad<Policy> &o)
       : implementation_policy::base(o)
   {
@@ -1251,7 +1262,7 @@ error_type, an exception_type nor an empty_type.
   //! \brief Same as `true_(tribool(*this))`
   constexpr explicit operator bool() const noexcept { return has_value(); }
   //! \brief True if monad contains a value_type, unknown if monad is empty, else false if monad is errored/excepted.
-  constexpr operator tribool::tribool() const noexcept { return has_value() ? tribool::tribool::true_ : empty() ? tribool::tribool::unknown : tribool::tribool::false_; }
+  constexpr explicit operator boost_lite::tribool::tribool() const noexcept { return has_value() ? boost_lite::tribool::tribool::true_ : empty() ? boost_lite::tribool::tribool::unknown : boost_lite::tribool::tribool::false_; }
   //! \brief True if monad is not empty
   constexpr bool is_ready() const noexcept { return implementation_policy::base::_storage.type != value_storage_type::storage_type::empty; }
   //! \brief True if monad is empty
@@ -1350,18 +1361,8 @@ error_type, an exception_type nor an empty_type.
   //! \brief Destructs any state stored, resetting to empty
   BOOST_OUTCOME_CONVINCE_MSVC void clear() noexcept(is_nothrow_destructible) { implementation_policy::base::_storage.clear(); }
 
-  //! \brief True if this monad exactly equals the other monad
-  template <class Policy, typename = typename std::enable_if<_is_compatible_with<basic_monad<Policy>>::value>::type> constexpr bool operator==(const basic_monad<Policy> &o) const { return implementation_policy::base::_storage == o._storage; }
-  //! \brief True if this monad does not exactly equal the other monad
-  template <class Policy, typename = typename std::enable_if<_is_compatible_with<basic_monad<Policy>>::value>::type> constexpr bool operator!=(const basic_monad<Policy> &o) const { return implementation_policy::base::_storage != o._storage; }
-  //! \brief Disabled to prevent accidental usage
-  template <class T> bool operator<(T) const = delete;
-  //! \brief Disabled to prevent accidental usage
-  template <class T> bool operator<=(T) const = delete;
-  //! \brief Disabled to prevent accidental usage
-  template <class T> bool operator>(T) const = delete;
-  //! \brief Disabled to prevent accidental usage
-  template <class T> bool operator>=(T) const = delete;
+  // Accessor for underlying storage. Used by the comparison functions
+  const value_storage_type &__storage() const noexcept { return this->_storage; }
 
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
 //! \brief If contains a value_type, returns a lvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
@@ -1584,6 +1585,16 @@ allows a very easy way of converting between different configurations of monad c
 ///@}
 #endif
 };
+//! \brief True if this monad exactly equals the other monad
+template <class Policy1, class Policy2> constexpr inline typename std::enable_if<basic_monad<Policy1>::template _is_comparable<basic_monad<Policy2>>::value, bool>::type operator==(const basic_monad<Policy1> &a, const basic_monad<Policy2> &b)
+{
+  return a.__storage() == b.__storage();
+}
+//! \brief True if this monad does not exactly equal the other monad
+template <class Policy1, class Policy2> constexpr inline typename std::enable_if<basic_monad<Policy1>::template _is_comparable<basic_monad<Policy2>>::value, bool>::type operator!=(const basic_monad<Policy1> &a, const basic_monad<Policy2> &b)
+{
+  return a.__storage() != b.__storage();
+}
 
 namespace detail
 {
