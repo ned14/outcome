@@ -380,6 +380,48 @@ BOOST_AUTO_TEST_CASE(works / monad / comparison, "Tests that the monad can compa
   // Should I do outcome<int>(5) == 5? Unsure if it's wise
 }
 
+
+// Test the underlying storage for triviality
+static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::detail::value_storage_impl_trivial<int, void, void> test_constexpr1a(int f)
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  return detail::value_storage_impl_trivial<int, void, void>(f);
+}
+// Test the underlying storage for triviality
+static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::detail::value_storage_impl_trivial<void, void, void> test_constexpr1b()
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  return detail::value_storage_impl_trivial<void, void, void>();
+}
+// Test the underlying storage for constexpr
+static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::value_storage<int, void, void> test_constexpr2a(int f)
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  return value_storage<int, void, void>(f);
+}
+// Test the underlying storage for constexpr
+static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::value_storage<void, void, void> test_constexpr2b()
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  return value_storage<void, void, void>();
+}
+#ifdef __cpp_relaxed_constexpr
+#endif
+
+BOOST_AUTO_TEST_CASE(works / monad / constexpr, "Tests that the monad works as intended in a constexpr evaluation context")
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  using namespace boost_lite::tribool;
+
+  static_assert(std::is_literal_type<void>::value, "failed");
+
+  constexpr auto a = test_constexpr1a(5);
+  constexpr auto b = test_constexpr1b();
+  constexpr auto c = test_constexpr2a(5);
+  constexpr auto d = test_constexpr2b();
+}
+
+
 BOOST_AUTO_TEST_CASE(works / monad / optional, "Tests that the monad acts as an optional R")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;

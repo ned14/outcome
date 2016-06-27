@@ -86,263 +86,20 @@ template <> struct enable_single_byte_value_storage<void> : std::true_type
 template <> struct enable_single_byte_value_storage<bool> : std::true_type
 {
 };
+
 namespace detail
 {
-  template <class _value_type, class _error_type, class _exception_type, bool use_single_byte = enable_single_byte_value_storage<_value_type>::value> class value_storage_impl
-  {
-    // Define stand in types for when these are void. As they are private, they
-    // are disabled for SFINAE and any attempt to use them yields a useful error message.
-    struct no_value_type
-    {
-    };
-    struct no_error_type
-    {
-    };
-    struct no_exception_type
-    {
-    };
-    struct constexpr_standin_type
-    {
-    };
-    template <class U, class V> using devoid = typename std::conditional<!std::is_void<U>::value, U, V>::type;
-    friend inline std::ostream &operator<<(std::ostream &s, const no_value_type &) { return s << "void"; }
-  public:
-    static constexpr bool has_value_type = !std::is_void<_value_type>::value;
-    static constexpr bool has_error_type = !std::is_void<_error_type>::value;
-    static constexpr bool has_exception_type = !std::is_void<_exception_type>::value;
-    static constexpr bool is_referenceable = true;
-    typedef devoid<_value_type, no_value_type> value_type;
-    typedef devoid<_error_type, no_error_type> error_type;
-    typedef devoid<_exception_type, no_exception_type> exception_type;
-    struct storage_type
-    {
-      enum storage_type_t : unsigned char
-      {
-        empty,
-        value,
-        error,
-        exception
-      };
-    };
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4624)
-#endif
-    union {
-      value_type value;
-      value_type _value_raw;
-      error_type error;          // Often 16 bytes surprisingly
-      exception_type exception;  // Typically 8 bytes
-      constexpr_standin_type _constexpr_standin_type;
-    };
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-    unsigned char type;
+#define BOOST_OUTCOME_VALUE_STORAGE_IMPL value_storage_impl_trivial
+#define BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR 0
+#include "detail/value_storage.ipp"
+#undef BOOST_OUTCOME_VALUE_STORAGE_IMPL
+#undef BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
 
-    static constexpr bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value && std::is_nothrow_destructible<exception_type>::value && std::is_nothrow_destructible<error_type>::value;
-
-    constexpr value_storage_impl() noexcept : _constexpr_standin_type(constexpr_standin_type()), type(storage_type::empty) {}
-    constexpr value_storage_impl(empty_t) noexcept : _constexpr_standin_type(constexpr_standin_type()), type(storage_type::empty) {}
-    constexpr value_storage_impl(value_t) noexcept(std::is_nothrow_default_constructible<value_type>::value)
-        : value(value_type())
-        , type(storage_type::value)
-    {
-    }
-    constexpr value_storage_impl(error_t) noexcept(std::is_nothrow_default_constructible<error_type>::value)
-        : error(error_type())
-        , type(storage_type::error)
-    {
-    }
-    constexpr value_storage_impl(exception_t) noexcept(std::is_nothrow_default_constructible<exception_type>::value)
-        : exception(exception_type())
-        , type(storage_type::exception)
-    {
-    }
-    constexpr value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
-        : value(v)
-        , type(storage_type::value)
-    {
-    }
-    constexpr value_storage_impl(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value)
-        : error(v)
-        , type(storage_type::error)
-    {
-    }
-    constexpr value_storage_impl(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value)
-        : exception(v)
-        , type(storage_type::exception)
-    {
-    }
-    constexpr value_storage_impl(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
-        : value(std::move(v))
-        , type(storage_type::value)
-    {
-    }
-    constexpr value_storage_impl(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value)
-        : error(std::move(v))
-        , type(storage_type::error)
-    {
-    }
-    constexpr value_storage_impl(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value)
-        : exception(std::move(v))
-        , type(storage_type::exception)
-    {
-    }
-    struct emplace_t
-    {
-    };
-    template <class... Args>
-    constexpr explicit value_storage_impl(emplace_t, Args &&... args)
-#if !defined(_MSC_VER) || _MSC_VER > 190022816
-    noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
-#endif
-        : value(std::forward<Args>(args)...)
-        , type(storage_type::value)
-    {
-    }
-    BOOST_OUTCOME_CONVINCE_MSVC ~value_storage_impl() noexcept(is_nothrow_destructible) { clear(); }
-    BOOST_OUTCOME_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
-    {
-      switch(type)
-      {
-      case storage_type::empty:
-        break;
-      case storage_type::value:
-        value.~value_type();
-        type = storage_type::empty;
-        break;
-      case storage_type::error:
-        error.~error_type();
-        type = storage_type::empty;
-        break;
-      case storage_type::exception:
-        exception.~exception_type();
-        type = storage_type::empty;
-        break;
-      }
-    }
-  };
-
-  template <class _value_type> class value_storage_impl<_value_type, void, void, true>
-  {
-    static_assert(std::is_integral<_value_type>::value || std::is_void<_value_type>::value, "Types enabled for packed storage using enable_single_byte_value_storage must be integral types.");
-    // Define stand in types for when these are void. As they are private, they
-    // are disabled for SFINAE and any attempt to use them yields a useful error message.
-    struct no_error_type
-    {
-    };
-    struct no_exception_type
-    {
-    };
-    template <class U, class V> using devoid = typename std::conditional<!std::is_void<U>::value, U, V>::type;
-
-  public:
-    static constexpr bool has_value_type = !std::is_void<_value_type>::value;
-    static constexpr bool has_error_type = false;
-    static constexpr bool has_exception_type = false;
-    static constexpr bool is_referenceable = false;
-    typedef devoid<_value_type, unsigned char> value_type;
-    typedef no_error_type error_type;
-    typedef no_exception_type exception_type;
-    struct storage_type
-    {
-      enum storage_type_t : unsigned char
-      {
-        empty,
-        value,
-        error,
-        exception
-      };
-    };
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4624 4201)
-#endif
-    union {
-      unsigned char _value_raw;
-      struct
-      {
-        unsigned char value : 6;
-        unsigned char type : 2;
-      };
-      error_type error;
-      exception_type exception;
-    };
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-
-    static constexpr bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value;
-
-    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl()
-        : type(storage_type::empty)
-    {
-    }
-    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(empty_t) noexcept : type(storage_type::empty) {}
-    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(value_t) noexcept(std::is_nothrow_default_constructible<value_type>::value)
-        : value(value_type())
-    {
-      type = storage_type::value;
-    }
-    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(error_t) noexcept(std::is_nothrow_default_constructible<error_type>::value)
-        : error(error_type())
-    {
-      type = storage_type::error;
-    }
-    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(exception_t) noexcept(std::is_nothrow_default_constructible<exception_type>::value)
-        : exception(exception_type())
-    {
-      type = storage_type::exception;
-    }
-    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
-        : value(v)
-    {
-      type = storage_type::value;
-    }
-    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(const error_type &) noexcept(std::is_nothrow_copy_constructible<error_type>::value)
-        : type(storage_type::error)
-    {
-    }
-    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(const exception_type &) noexcept(std::is_nothrow_copy_constructible<exception_type>::value)
-        : type(storage_type::exception)
-    {
-    }
-    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
-        : value(v)
-    {
-      type = storage_type::value;
-    }
-    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(error_type &&) noexcept(std::is_nothrow_move_constructible<error_type>::value)
-        : type(storage_type::error)
-    {
-    }
-    BOOST_OUTCOME_CXX14_CONSTEXPR value_storage_impl(exception_type &&) noexcept(std::is_nothrow_move_constructible<exception_type>::value)
-        : type(storage_type::exception)
-    {
-    }
-    struct emplace_t
-    {
-    };
-    template <class... Args>
-    BOOST_OUTCOME_CXX14_CONSTEXPR explicit value_storage_impl(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
-        : value(std::forward<Args>(args)...)
-    {
-      type = storage_type::value;
-    }
-    BOOST_OUTCOME_CONVINCE_MSVC ~value_storage_impl() noexcept(is_nothrow_destructible) { clear(); }
-    BOOST_OUTCOME_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
-    {
-      switch(type)
-      {
-      case storage_type::empty:
-        break;
-      default:
-        type = storage_type::empty;
-        break;
-      }
-    }
-  };
+#define BOOST_OUTCOME_VALUE_STORAGE_IMPL value_storage_impl_nontrivial
+#define BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR 1
+#include "detail/value_storage.ipp"
+#undef BOOST_OUTCOME_VALUE_STORAGE_IMPL
+#undef BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
 
   template <bool enable, class U, class V> struct move_construct_if_impl
   {
@@ -378,9 +135,12 @@ you specialise `enable_single_byte_value_storage<T>` with `true_type`, and both 
 and `exception_type` are disabled (void), a special single byte storage implementation is
 enabled. Both `bool` and `void` are already specialised.
 */
-template <class _value_type, class _error_type, class _exception_type> class value_storage : public detail::value_storage_impl<_value_type, _error_type, _exception_type>
+template <class _value_type, class _error_type, class _exception_type>
+class value_storage : public std::conditional<std::is_literal_type<_value_type>::value && std::is_literal_type<_error_type>::value && std::is_literal_type<_exception_type>::value, detail::value_storage_impl_trivial<_value_type, _error_type, _exception_type>,
+                                              detail::value_storage_impl_nontrivial<_value_type, _error_type, _exception_type>>::type
 {
-  typedef detail::value_storage_impl<_value_type, _error_type, _exception_type> base;
+  using base = typename std::conditional<std::is_literal_type<_value_type>::value && std::is_literal_type<_error_type>::value && std::is_literal_type<_exception_type>::value, detail::value_storage_impl_trivial<_value_type, _error_type, _exception_type>,
+                                         detail::value_storage_impl_nontrivial<_value_type, _error_type, _exception_type>>::type;
 
 public:
   static constexpr bool has_value_type = base::has_value_type;
