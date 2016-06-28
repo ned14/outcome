@@ -174,7 +174,7 @@ public:
   // True if this storage can be compared to the specified storage
   template <class _value_type2, class _error_type2, class _exception_type2> static constexpr bool is_comparable_to = value_type_is_comparable_to<_value_type2> &&error_type_is_comparable_to<_error_type2> &&exception_type_is_comparable_to<_exception_type2>;
 
-  value_storage() = default;
+  constexpr value_storage() = default;
   constexpr value_storage(empty_t _) noexcept : base(_) {}
   constexpr value_storage(value_t _) noexcept(std::is_nothrow_default_constructible<value_type>::value)
       : base(_)

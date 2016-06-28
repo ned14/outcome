@@ -171,6 +171,22 @@ public:
   }
 };
 
+#ifndef BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER
+#if defined(__BYTE_ORDER__)
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER(t, v) ((((unsigned char) (v)) & 0x3f) | ((((t) &0x3)) << 6))
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#error Unsure if endianness affects bits in a byte, you need to test and send a pull request on github
+#endif
+#endif
+#ifndef BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER
+#ifdef _MSC_VER
+#define BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER(t, v) ((((unsigned char) (v)) & 0x3f) | ((((t) &0x3)) << 6))
+#else
+#error Could not figure out the endianness of this platform
+#endif
+#endif
+#endif
 template <class _value_type> class BOOST_OUTCOME_VALUE_STORAGE_IMPL<_value_type, void, void, true>
 {
   static_assert(std::is_integral<_value_type>::value || std::is_void<_value_type>::value, "Types enabled for packed storage using enable_single_byte_value_storage must be integral types.");
@@ -223,49 +239,44 @@ public:
   static constexpr bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value;
 
   constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL()
-      : type(storage_type::empty)
+      : _value_raw(BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER(storage_type::empty, 0))
   {
   }
-  constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL(empty_t) noexcept : type(storage_type::empty) {}
-  BOOST_OUTCOME_CXX14_CONSTEXPR BOOST_OUTCOME_VALUE_STORAGE_IMPL(value_t) noexcept(std::is_nothrow_default_constructible<value_type>::value)
-      : value(value_type())
+  constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL(empty_t) noexcept : _value_raw(BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER(storage_type::empty, 0)) {}
+  constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL(value_t) noexcept(std::is_nothrow_default_constructible<value_type>::value)
+      : _value_raw(BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER(storage_type::value, 0))
   {
-    type = storage_type::value;
   }
-  BOOST_OUTCOME_CXX14_CONSTEXPR BOOST_OUTCOME_VALUE_STORAGE_IMPL(error_t) noexcept(std::is_nothrow_default_constructible<error_type>::value)
-      : error(error_type())
+  constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL(error_t) noexcept(std::is_nothrow_default_constructible<error_type>::value)
+      : _value_raw(BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER(storage_type::error, 0))
   {
-    type = storage_type::error;
   }
-  BOOST_OUTCOME_CXX14_CONSTEXPR BOOST_OUTCOME_VALUE_STORAGE_IMPL(exception_t) noexcept(std::is_nothrow_default_constructible<exception_type>::value)
-      : exception(exception_type())
+  constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL(exception_t) noexcept(std::is_nothrow_default_constructible<exception_type>::value)
+      : _value_raw(BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER(storage_type::exception, 0))
   {
-    type = storage_type::exception;
   }
-  BOOST_OUTCOME_CXX14_CONSTEXPR BOOST_OUTCOME_VALUE_STORAGE_IMPL(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
-      : value(v)
+  constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
+      : _value_raw(BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER(storage_type::value, v))
   {
-    type = storage_type::value;
   }
   constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL(const error_type &) noexcept(std::is_nothrow_copy_constructible<error_type>::value)
-      : type(storage_type::error)
+      : _value_raw(BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER(storage_type::error, 0))
   {
   }
   constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL(const exception_type &) noexcept(std::is_nothrow_copy_constructible<exception_type>::value)
-      : type(storage_type::exception)
+      : _value_raw(BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER(storage_type::exception, 0))
   {
   }
-  BOOST_OUTCOME_CXX14_CONSTEXPR BOOST_OUTCOME_VALUE_STORAGE_IMPL(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
-      : value(v)
+  constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
+      : _value_raw(BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER(storage_type::value, v))
   {
-    type = storage_type::value;
   }
   constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL(error_type &&) noexcept(std::is_nothrow_move_constructible<error_type>::value)
-      : type(storage_type::error)
+      : _value_raw(BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER(storage_type::error, 0))
   {
   }
   constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL(exception_type &&) noexcept(std::is_nothrow_move_constructible<exception_type>::value)
-      : type(storage_type::exception)
+      : _value_raw(BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER(storage_type::exception, 0))
   {
   }
   struct emplace_t
