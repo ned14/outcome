@@ -102,8 +102,8 @@ namespace detail
 #undef BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
 
   template <class _value_type, class _error_type, class _exception_type>
-  static constexpr bool can_have_trivial_destructor = (std::is_trivial<_value_type>::value || std::is_trivially_destructible<_value_type>::value) || (std::is_trivial<_error_type>::value || std::is_trivially_destructible<_error_type>::value) ||
-                                                      (std::is_trivial<_exception_type>::value || std::is_trivially_destructible<_exception_type>::value);
+  static constexpr bool can_have_trivial_destructor = (std::is_literal_type<_value_type>::value || std::is_trivially_destructible<_value_type>::value) && (std::is_literal_type<_error_type>::value || std::is_trivially_destructible<_error_type>::value) &&
+                                                      (std::is_literal_type<_exception_type>::value || std::is_trivially_destructible<_exception_type>::value);
   template <bool enable, class U, class V> struct move_construct_if_impl
   {
     void operator()(U *v, V &&o) const { new(v) U(std::move(o)); }

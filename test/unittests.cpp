@@ -427,12 +427,15 @@ BOOST_AUTO_TEST_CASE(works / monad / constexpr, "Tests that the monad works as i
   static_assert(std::is_literal_type<value_storage<void, void, void>>::value, "value_storage<void, void, void> is not a literal type!");
   static_assert(std::is_literal_type<option<int>>::value, "option<int> is not a literal type!");
   static_assert(std::is_literal_type<option<bool>>::value, "option<bool> is not a literal type!");
-  // Unfortunately result<T> can never be a literal type as error_code can never be literal due to it
-  // taking the exclusively runtime output from the static global function error_category()
+  // Unfortunately result<T> can never be a literal type as error_code can never be literal
   //
-  // It can however be trivially destructible
+  // It can however be trivially destructible as error_code is trivially destructible. That
+  // makes possible lots of compiler optimisations
+  static_assert(!std::is_literal_type<result<int>>::value, "result<int> is a literal type!");
   static_assert(result<int>::is_trivially_destructible, "result<int> is not trivially destructible!");
   static_assert(std::is_trivially_destructible<result<int>>::value, "result<int> is not trivially destructible!");
+  static_assert(result<void>::is_trivially_destructible, "result<void> is not trivially destructible!");
+  static_assert(std::is_trivially_destructible<result<void>>::value, "result<void> is not trivially destructible!");
 
   constexpr auto a = test_constexpr1a(5);
   constexpr auto b = test_constexpr1b();
