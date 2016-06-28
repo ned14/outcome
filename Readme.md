@@ -9,10 +9,11 @@ Todo:
  - [x] Fix all remaining mentions of Boost.Monad (e.g. doxygen docs)
  - [x] Loosen explicit basic_monad constructors to allow option => result => monad implicitly.
  - [x] Pack bools in basic_promise_future_storage into value_storage_impl, thus saving 8 bytes
- - [ ] Add constexpr compile unit tests for when `<T>` is a LiteralType.
  - [x] Get the constexpr tests firing per-commit in Travis (and maybe Appveyor)
  - [x] Add comparison operators for monad (long overdue!). These need to be able to compare
 heterogeneous monad types (add unit tests proving this).
+ - [x] Add constexpr compile unit tests for when `<T>` is a LiteralType.
+ - [ ] Add unit tests for `result<int>` being trivially destructible
  - [ ] Add debugging visualisers for Monad for VS2015 as a minimum (it's getting painful to work
 on AFIO without these!)
  

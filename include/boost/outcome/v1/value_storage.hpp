@@ -101,6 +101,9 @@ namespace detail
 #undef BOOST_OUTCOME_VALUE_STORAGE_IMPL
 #undef BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
 
+  template <class _value_type, class _error_type, class _exception_type>
+  static constexpr bool can_have_trivial_destructor = (std::is_trivial<_value_type>::value || std::is_trivially_destructible<_value_type>::value) || (std::is_trivial<_error_type>::value || std::is_trivially_destructible<_error_type>::value) ||
+                                                      (std::is_trivial<_exception_type>::value || std::is_trivially_destructible<_exception_type>::value);
   template <bool enable, class U, class V> struct move_construct_if_impl
   {
     void operator()(U *v, V &&o) const { new(v) U(std::move(o)); }
@@ -136,11 +139,9 @@ and `exception_type` are disabled (void), a special single byte storage implemen
 enabled. Both `bool` and `void` are already specialised.
 */
 template <class _value_type, class _error_type, class _exception_type>
-class value_storage : public std::conditional<std::is_literal_type<_value_type>::value && std::is_literal_type<_error_type>::value && std::is_literal_type<_exception_type>::value, detail::value_storage_impl_trivial<_value_type, _error_type, _exception_type>,
-                                              detail::value_storage_impl_nontrivial<_value_type, _error_type, _exception_type>>::type
+class value_storage : public std::conditional<detail::can_have_trivial_destructor<_value_type, _error_type, _exception_type>, detail::value_storage_impl_trivial<_value_type, _error_type, _exception_type>, detail::value_storage_impl_nontrivial<_value_type, _error_type, _exception_type>>::type
 {
-  using base = typename std::conditional<std::is_literal_type<_value_type>::value && std::is_literal_type<_error_type>::value && std::is_literal_type<_exception_type>::value, detail::value_storage_impl_trivial<_value_type, _error_type, _exception_type>,
-                                         detail::value_storage_impl_nontrivial<_value_type, _error_type, _exception_type>>::type;
+  using base = typename std::conditional<detail::can_have_trivial_destructor<_value_type, _error_type, _exception_type>, detail::value_storage_impl_trivial<_value_type, _error_type, _exception_type>, detail::value_storage_impl_nontrivial<_value_type, _error_type, _exception_type>>::type;
 
 public:
   static constexpr bool has_value_type = base::has_value_type;

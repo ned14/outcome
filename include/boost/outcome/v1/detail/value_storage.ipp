@@ -56,6 +56,7 @@ public:
   static constexpr bool has_error_type = !std::is_void<_error_type>::value;
   static constexpr bool has_exception_type = !std::is_void<_exception_type>::value;
   static constexpr bool is_referenceable = true;
+  static constexpr bool is_trivially_destructible = !BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR;
   typedef devoid<_value_type, no_value_type> value_type;
   typedef devoid<_error_type, no_error_type> error_type;
   typedef devoid<_exception_type, no_exception_type> exception_type;
@@ -205,6 +206,7 @@ public:
   static constexpr bool has_error_type = false;
   static constexpr bool has_exception_type = false;
   static constexpr bool is_referenceable = false;
+  static constexpr bool is_trivially_destructible = !BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR;
   typedef devoid<_value_type, unsigned char> value_type;
   typedef no_error_type error_type;
   typedef no_exception_type exception_type;

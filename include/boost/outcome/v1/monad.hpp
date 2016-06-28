@@ -1121,6 +1121,8 @@ public:
   static constexpr bool is_nothrow_move_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_move_constructible;
   //! \brief This monad will never throw exceptions during destruction
   static constexpr bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
+  //! \brief This monad does not implement a destructor
+  static constexpr bool is_trivially_destructible = value_storage_type::is_trivially_destructible;
 #if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 190024123)
   //! \brief This monad is constructible from the monad specified
   template <class OtherMonad> static constexpr bool is_constructible = value_storage_type::template is_constructible_from<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
@@ -1155,7 +1157,10 @@ public:
 #endif
 
   //! \brief Default constructor, initialises to empty
-  constexpr basic_monad() = default;
+  constexpr basic_monad()
+      : implementation_policy::base()
+  {
+  }
   //! \brief Implicit constructor of an empty monad
   constexpr basic_monad(empty_type) noexcept : implementation_policy::base() {}
   //! \brief Implicit constructor of an empty monad
