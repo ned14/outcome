@@ -1251,11 +1251,11 @@ error_type, an exception_type nor an empty_type.
   {
   }
   //! \brief Move constructor
-  basic_monad(basic_monad &&) = default;
+  constexpr basic_monad(basic_monad &&) = default;
   //! \brief Move assignment. Firstly clears any existing state, so exception throws during move will leave the monad empty.
   basic_monad &operator=(basic_monad &&) = default;
   //! \brief Copy constructor
-  basic_monad(const basic_monad &v) = default;
+  constexpr basic_monad(const basic_monad &v) = default;
   //! \brief Copy assignment. Firstly clears any existing state, so exception throws during copy will leave the monad empty.
   basic_monad &operator=(const basic_monad &) = default;
 

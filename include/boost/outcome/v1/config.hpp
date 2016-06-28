@@ -154,7 +154,8 @@ namespace stl11
 //# pragma inline_recursion(on)
 #define BOOST_OUTCOME_CXX14_CONSTEXPR BOOST_FORCEINLINE
 #define BOOST_OUTCOME_CONVINCE_MSVC BOOST_FORCEINLINE
-#elif defined(__c2__)
+#elif defined(__c2__) || defined(__clang__) || defined(__GNUC__)
+// On clang and GCC we now require C++ 14 constexpr
 #define BOOST_OUTCOME_CXX14_CONSTEXPR constexpr
 #define BOOST_OUTCOME_CONVINCE_MSVC
 #else
