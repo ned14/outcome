@@ -1,2 +1,3 @@
 "max_monad_bind","max_monad_get_error","max_monad_get_exception","max_monad_get_value","max_monad_next","max_option_get_value","max_option_get_value_bool","max_option_next","max_result_get_value","max_result_next","min_monad_bind","min_monad_construct_destruct","min_monad_construct_error_move_destruct","min_monad_construct_exception_move_destruct","min_monad_construct_value_move_destruct","min_monad_next","min_option_construct_value_move_destruct","min_option_next","min_result_construct_value_move_destruct","min_result_next" 
 102,183,1790,1734,1818,107,111,163,1710,1772,101,0,6,1814,4,1817,4,162,4,1771 
+102,183,1790,1734,1818,106,110,125,1709,1735,101,0,6,1814,4,1817,1,118,1,1721 

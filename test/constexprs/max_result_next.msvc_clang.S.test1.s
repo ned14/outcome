@@ -1,54 +1,44 @@
-  0000000000000000: 55                 push        rbp
-  0000000000000001: 56                 push        rsi
-  0000000000000002: 48 81 EC D8 00 00  sub         rsp,0D8h
+  0000000000000000: 56                 push        rsi
+  0000000000000001: 57                 push        rdi
+  0000000000000002: 48 81 EC 98 00 00  sub         rsp,98h
                     00
-  0000000000000009: 48 8D AC 24 80 00  lea         rbp,[rsp+80h]
-                    00 00
-  0000000000000011: 48 C7 45 50 FE FF  mov         qword ptr [rbp+50h],0FFFFFFFFFFFFFFFEh
-                    FF FF
-  0000000000000019: 48 89 CE           mov         rsi,rcx
-  000000000000001C: 48 8D 4D 30        lea         rcx,[rbp+30h]
-  0000000000000020: E8 00 00 00 00     call        ?unknown@@YA?AV?$basic_monad@U?$result_policy@H@detail@v1_std_std@outcome@boost@@@v1_std_std@outcome@boost@@XZ
-  0000000000000025: 0F B6 45 48        movzx       eax,byte ptr [rbp+48h]
-  0000000000000029: 83 F8 02           cmp         eax,2
-  000000000000002C: 74 0A              je          0000000000000038
-  000000000000002E: 83 F8 01           cmp         eax,1
-  0000000000000031: 75 16              jne         0000000000000049
-  0000000000000033: 8B 4D 30           mov         ecx,dword ptr [rbp+30h]
-  0000000000000036: EB 11              jmp         0000000000000049
-  0000000000000038: 8B 4D 30           mov         ecx,dword ptr [rbp+30h]
-  000000000000003B: 8B 55 44           mov         edx,dword ptr [rbp+44h]
-  000000000000003E: 89 55 00           mov         dword ptr [rbp],edx
-  0000000000000041: 0F 10 45 34        movups      xmm0,xmmword ptr [rbp+34h]
-  0000000000000045: 0F 29 45 F0        movaps      xmmword ptr [rbp-10h],xmm0
-  0000000000000049: 3C 02              cmp         al,2
-  000000000000004B: 74 2D              je          000000000000007A
-  000000000000004D: 84 C0              test        al,al
-  000000000000004F: 74 59              je          00000000000000AA
-  0000000000000051: 8D 0C 49           lea         ecx,[rcx+rcx*2]
-  0000000000000054: 89 0E              mov         dword ptr [rsi],ecx
-  0000000000000056: C6 46 18 01        mov         byte ptr [rsi+18h],1
-  000000000000005A: 83 F8 03           cmp         eax,3
-  000000000000005D: 74 0A              je          0000000000000069
-  000000000000005F: 83 F8 02           cmp         eax,2
-  0000000000000062: 74 05              je          0000000000000069
-  0000000000000064: 83 F8 01           cmp         eax,1
-  0000000000000067: 75 04              jne         000000000000006D
-  0000000000000069: C6 45 48 00        mov         byte ptr [rbp+48h],0
-  000000000000006D: 48 89 F0           mov         rax,rsi
-  0000000000000070: 48 81 C4 D8 00 00  add         rsp,0D8h
+  0000000000000009: 48 89 CE           mov         rsi,rcx
+  000000000000000C: 48 8D 4C 24 50     lea         rcx,[rsp+50h]
+  0000000000000011: E8 00 00 00 00     call        ?unknown@@YA?AV?$basic_monad@U?$result_policy@H@detail@v1_std_std@outcome@boost@@@v1_std_std@outcome@boost@@XZ
+  0000000000000016: 0F B6 44 24 68     movzx       eax,byte ptr [rsp+68h]
+  000000000000001B: 83 F8 02           cmp         eax,2
+  000000000000001E: 74 0B              je          000000000000002B
+  0000000000000020: 83 F8 01           cmp         eax,1
+  0000000000000023: 75 1C              jne         0000000000000041
+  0000000000000025: 8B 4C 24 50        mov         ecx,dword ptr [rsp+50h]
+  0000000000000029: EB 16              jmp         0000000000000041
+  000000000000002B: 8B 4C 24 50        mov         ecx,dword ptr [rsp+50h]
+  000000000000002F: 8B 54 24 64        mov         edx,dword ptr [rsp+64h]
+  0000000000000033: 89 54 24 40        mov         dword ptr [rsp+40h],edx
+  0000000000000037: 0F 10 44 24 54     movups      xmm0,xmmword ptr [rsp+54h]
+  000000000000003C: 0F 29 44 24 30     movaps      xmmword ptr [rsp+30h],xmm0
+  0000000000000041: 3C 02              cmp         al,2
+  0000000000000043: 74 1A              je          000000000000005F
+  0000000000000045: 84 C0              test        al,al
+  0000000000000047: 74 4F              je          0000000000000098
+  0000000000000049: 8D 04 49           lea         eax,[rcx+rcx*2]
+  000000000000004C: 89 06              mov         dword ptr [rsi],eax
+  000000000000004E: C6 46 18 01        mov         byte ptr [rsi+18h],1
+  0000000000000052: 48 89 F0           mov         rax,rsi
+  0000000000000055: 48 81 C4 98 00 00  add         rsp,98h
                     00
-  0000000000000077: 5E                 pop         rsi
-  0000000000000078: 5D                 pop         rbp
-  0000000000000079: C3                 ret
-  000000000000007A: 89 4D 10           mov         dword ptr [rbp+10h],ecx
-  000000000000007D: 8B 45 F8           mov         eax,dword ptr [rbp-8]
-  0000000000000080: 89 45 1C           mov         dword ptr [rbp+1Ch],eax
-  0000000000000083: 48 8B 45 F0        mov         rax,qword ptr [rbp-10h]
-  0000000000000087: 48 89 45 14        mov         qword ptr [rbp+14h],rax
-  000000000000008B: 48 8D 4D C8        lea         rcx,[rbp-38h]
-  000000000000008F: 48 8D 55 10        lea         rdx,[rbp+10h]
-  0000000000000093: E8 00 00 00 00     call        replaced
+  000000000000005C: 5F                 pop         rdi
+  000000000000005D: 5E                 pop         rsi
+  000000000000005E: C3                 ret
+  000000000000005F: 89 4C 24 20        mov         dword ptr [rsp+20h],ecx
+  0000000000000063: 8B 44 24 38        mov         eax,dword ptr [rsp+38h]
+  0000000000000067: 89 44 24 2C        mov         dword ptr [rsp+2Ch],eax
+  000000000000006B: 48 8B 44 24 30     mov         rax,qword ptr [rsp+30h]
+  0000000000000070: 48 89 44 24 24     mov         qword ptr [rsp+24h],rax
+  0000000000000075: 48 8D 74 24 70     lea         rsi,[rsp+70h]
+  000000000000007A: 48 8D 54 24 20     lea         rdx,[rsp+20h]
+  000000000000007F: 48 89 F1           mov         rcx,rsi
+  0000000000000082: E8 00 00 00 00     call        replaced
   0000000000000000: 55                 push        rbp
   0000000000000001: 56                 push        rsi
   0000000000000002: 57                 push        rdi
@@ -1508,50 +1498,64 @@
   00000000000001BA: 0F 0B              ud2
   00000000000001BC: 0F 1F 40 00        nop         dword ptr [rax]
 
-  0000000000000098: 48 8D 15 00 00 00  lea         rdx,[_TI4?AVsystem_error@std@@]
+  0000000000000087: 48 8D 15 00 00 00  lea         rdx,[_TI4?AVsystem_error@std@@]
                     00
-  000000000000009F: 48 8D 4D C8        lea         rcx,[rbp-38h]
-  00000000000000A3: E8 00 00 00 00     call        _CxxThrowException
-  00000000000000A8: 0F 0B              ud2
-  00000000000000AA: C7 45 20 00 00 00  mov         dword ptr [rbp+20h],0
-                    00
-  00000000000000B1: 48 C7 45 28 00 00  mov         qword ptr [rbp+28h],0
+  000000000000008E: 48 89 F1           mov         rcx,rsi
+  0000000000000091: E8 00 00 00 00     call        _CxxThrowException
+  0000000000000096: 0F 0B              ud2
+  0000000000000098: 48 8D 74 24 20     lea         rsi,[rsp+20h]
+  000000000000009D: BA 02 00 00 00     mov         edx,2
+  00000000000000A2: 48 89 F1           mov         rcx,rsi
+  00000000000000A5: E8 00 00 00 00     call        replaced
+  0000000000000000: 56                 push        rsi
+  0000000000000001: 57                 push        rdi
+  0000000000000002: 48 83 EC 28        sub         rsp,28h
+  0000000000000006: 89 D7              mov         edi,edx
+  0000000000000008: 48 89 CE           mov         rsi,rcx
+  000000000000000B: C7 06 00 00 00 00  mov         dword ptr [rsi],0
+  0000000000000011: 48 C7 46 08 00 00  mov         qword ptr [rsi+8],0
                     00 00
-  00000000000000B9: 8B 05 00 00 00 00  mov         eax,dword ptr [?$TSS0@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV0_detail@123@XZ@4HA]
-  00000000000000BF: 8B 0D 00 00 00 00  mov         ecx,dword ptr [_tls_index]
-  00000000000000C5: 65 48 8B 14 25 58  mov         rdx,qword ptr gs:[58h]
+  0000000000000019: 8B 05 00 00 00 00  mov         eax,dword ptr [?$TSS0@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV0_detail@123@XZ@4HA]
+  000000000000001F: 8B 0D 00 00 00 00  mov         ecx,dword ptr [_tls_index]
+  0000000000000025: 65 48 8B 14 25 58  mov         rdx,qword ptr gs:[58h]
                     00 00 00
-  00000000000000CE: 48 8B 0C CA        mov         rcx,qword ptr [rdx+rcx*8]
-  00000000000000D2: 3B 81 00 00 00 00  cmp         eax,dword ptr _Init_thread_epoch[rcx]
-  00000000000000D8: 7E 4B              jle         0000000000000125
-  00000000000000DA: 48 8D 0D 00 00 00  lea         rcx,[?$TSS0@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV0_detail@123@XZ@4HA]
+  000000000000002E: 48 8B 0C CA        mov         rcx,qword ptr [rdx+rcx*8]
+  0000000000000032: 3B 81 00 00 00 00  cmp         eax,dword ptr _Init_thread_epoch[rcx]
+  0000000000000038: 7E 4B              jle         0000000000000085
+  000000000000003A: 48 8D 0D 00 00 00  lea         rcx,[?$TSS0@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV0_detail@123@XZ@4HA]
                     00
-  00000000000000E1: E8 00 00 00 00     call        _Init_thread_header
-  00000000000000E6: 8B 05 00 00 00 00  mov         eax,dword ptr [?$TSS0@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV0_detail@123@XZ@4HA]
-  00000000000000EC: 83 F8 FF           cmp         eax,0FFFFFFFFh
-  00000000000000EF: 75 34              jne         0000000000000125
-  00000000000000F1: 48 8D 05 00 00 00  lea         rax,[?c@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV1_detail@234@XZ@4V15234@A]
+  0000000000000041: E8 00 00 00 00     call        _Init_thread_header
+  0000000000000046: 8B 05 00 00 00 00  mov         eax,dword ptr [?$TSS0@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV0_detail@123@XZ@4HA]
+  000000000000004C: 83 F8 FF           cmp         eax,0FFFFFFFFh
+  000000000000004F: 75 34              jne         0000000000000085
+  0000000000000051: 48 8D 05 00 00 00  lea         rax,[?c@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV1_detail@234@XZ@4V15234@A]
                     00
-  00000000000000F8: 48 89 05 08 00 00  mov         qword ptr [?c@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV1_detail@234@XZ@4V15234@A+8],rax
+  0000000000000058: 48 89 05 08 00 00  mov         qword ptr [?c@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV1_detail@234@XZ@4V15234@A+8],rax
                     00
-  00000000000000FF: 48 8D 05 00 00 00  lea         rax,[??_7monad_category@_detail@v1_std_std@outcome@boost@@6B@]
+  000000000000005F: 48 8D 05 00 00 00  lea         rax,[??_7monad_category@_detail@v1_std_std@outcome@boost@@6B@]
                     00
-  0000000000000106: 48 89 05 00 00 00  mov         qword ptr [?c@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV1_detail@234@XZ@4V15234@A],rax
+  0000000000000066: 48 89 05 00 00 00  mov         qword ptr [?c@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV1_detail@234@XZ@4V15234@A],rax
                     00
-  000000000000010D: 48 8D 0D 00 00 00  lea         rcx,[??__Fc@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV1_detail@234@XZ@YAXXZ]
+  000000000000006D: 48 8D 0D 00 00 00  lea         rcx,[??__Fc@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV1_detail@234@XZ@YAXXZ]
                     00
-  0000000000000114: E8 00 00 00 00     call        atexit
-  0000000000000119: 48 8D 0D 00 00 00  lea         rcx,[?$TSS0@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV0_detail@123@XZ@4HA]
+  0000000000000074: E8 00 00 00 00     call        atexit
+  0000000000000079: 48 8D 0D 00 00 00  lea         rcx,[?$TSS0@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV0_detail@123@XZ@4HA]
                     00
-  0000000000000120: E8 00 00 00 00     call        _Init_thread_footer
-  0000000000000125: C7 45 20 02 00 00  mov         dword ptr [rbp+20h],2
+  0000000000000080: E8 00 00 00 00     call        _Init_thread_footer
+  0000000000000085: 89 3E              mov         dword ptr [rsi],edi
+  0000000000000087: 48 8D 05 00 00 00  lea         rax,[?c@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV1_detail@234@XZ@4V15234@A]
                     00
-  000000000000012C: 48 8D 05 00 00 00  lea         rax,[?c@?1??monad_category@v1_std_std@outcome@boost@@YAAEBV1_detail@234@XZ@4V15234@A]
-                    00
-  0000000000000133: 48 89 45 28        mov         qword ptr [rbp+28h],rax
-  0000000000000137: 48 8D 4D A0        lea         rcx,[rbp-60h]
-  000000000000013B: 48 8D 55 20        lea         rdx,[rbp+20h]
-  000000000000013F: E8 00 00 00 00     call        replaced
+  000000000000008E: 48 89 46 08        mov         qword ptr [rsi+8],rax
+  0000000000000092: 48 89 F0           mov         rax,rsi
+  0000000000000095: 48 83 C4 28        add         rsp,28h
+  0000000000000099: 5F                 pop         rdi
+  000000000000009A: 5E                 pop         rsi
+  000000000000009B: C3                 ret
+
+  00000000000000AA: 48 8D 7C 24 70     lea         rdi,[rsp+70h]
+  00000000000000AF: 48 89 F9           mov         rcx,rdi
+  00000000000000B2: 48 89 F2           mov         rdx,rsi
+  00000000000000B5: E8 00 00 00 00     call        replaced
   0000000000000000: 55                 push        rbp
   0000000000000001: 56                 push        rsi
   0000000000000002: 57                 push        rdi
@@ -1623,10 +1627,9 @@
   00000000000000DB: 0F 0B              ud2
   00000000000000DD: 0F 1F 00           nop         dword ptr [rax]
 
-  0000000000000144: 48 8D 15 00 00 00  lea         rdx,[_TI3?AVmonad_error@v1_std_std@outcome@boost@@]
+  00000000000000BA: 48 8D 15 00 00 00  lea         rdx,[_TI3?AVmonad_error@v1_std_std@outcome@boost@@]
                     00
-  000000000000014B: 48 8D 4D A0        lea         rcx,[rbp-60h]
-  000000000000014F: E8 00 00 00 00     call        _CxxThrowException
-  0000000000000154: 0F 0B              ud2
-  0000000000000156: 66 2E 0F 1F 84 00  nop         word ptr cs:[rax+rax]
-                    00 00 00 00
+  00000000000000C1: 48 89 F9           mov         rcx,rdi
+  00000000000000C4: E8 00 00 00 00     call        _CxxThrowException
+  00000000000000C9: 0F 0B              ud2
+  00000000000000CB: 0F 1F 44 00 00     nop         dword ptr [rax+rax]

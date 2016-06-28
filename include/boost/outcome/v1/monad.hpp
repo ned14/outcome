@@ -1123,7 +1123,7 @@ public:
   static constexpr bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
   //! \brief This monad does not implement a destructor
   static constexpr bool is_trivially_destructible = value_storage_type::is_trivially_destructible;
-#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 190024123)
+#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 190024210 /* VS2015 Update 3*/)
   //! \brief This monad is constructible from the monad specified
   template <class OtherMonad> static constexpr bool is_constructible = value_storage_type::template is_constructible_from<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
   template <class OtherMonad, class Base = typename std::conditional<is_constructible<OtherMonad>, std::true_type, std::false_type>::type> struct _is_constructible : Base
@@ -1256,7 +1256,10 @@ error_type, an exception_type nor an empty_type.
   {
   }
   //! \brief Move constructor
-  constexpr basic_monad(basic_monad &&) = default;
+  constexpr basic_monad(basic_monad &&o) noexcept(is_nothrow_move_constructible)
+      : implementation_policy::base(std::move(o))
+  {
+  }
   //! \brief Move assignment. Firstly clears any existing state, so exception throws during move will leave the monad empty.
   basic_monad &operator=(basic_monad &&) = default;
   //! \brief Copy constructor
