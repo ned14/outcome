@@ -405,20 +405,37 @@ static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::value_storage<void, void, vo
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
   return value_storage<void, void, void>();
 }
-#ifdef __cpp_relaxed_constexpr
-#endif
+// Test option<int> for constexpr
+static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::option<int> test_constexpr3a(int f)
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  return make_ready_option<int>(f);
+}
+// Test option<bool> for constexpr
+static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::option<bool> test_constexpr3b()
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  return make_empty_option<bool>();
+}
 
 BOOST_AUTO_TEST_CASE(works / monad / constexpr, "Tests that the monad works as intended in a constexpr evaluation context")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
   using namespace boost_lite::tribool;
 
-  static_assert(std::is_literal_type<void>::value, "failed");
+  static_assert(std::is_literal_type<value_storage<int, void, void>>::value, "value_storage<int, void, void> is not a literal type!");
+  static_assert(std::is_literal_type<value_storage<void, void, void>>::value, "value_storage<void, void, void> is not a literal type!");
+  static_assert(std::is_literal_type<option<int>>::value, "option<int> is not a literal type!");
+  static_assert(std::is_literal_type<option<bool>>::value, "option<bool> is not a literal type!");
+  // Unfortunately result<T> can never be a literal type as error_code can never be literal due to it
+  // taking the exclusively runtime output from the static global function error_category()
 
   constexpr auto a = test_constexpr1a(5);
   constexpr auto b = test_constexpr1b();
   constexpr auto c = test_constexpr2a(5);
   constexpr auto d = test_constexpr2b();
+  constexpr auto e = test_constexpr3a(5);
+  constexpr auto f = test_constexpr3b();
 }
 
 
