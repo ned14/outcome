@@ -356,7 +356,7 @@ public:
 };
 inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec)
 {
-  s << ec.category().name() << ':' << ec.value();
+  s << ec.category().name() << " code " << ec.value() << ": " << ec.message();
   auto &log = extended_error_code_log();
   if(log.valid(error_code_extended::unique_id(ec._unique_id)))
   {

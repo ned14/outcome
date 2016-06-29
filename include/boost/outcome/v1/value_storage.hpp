@@ -422,7 +422,7 @@ namespace std
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::value:
       return s << v.value;
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::error:
-      return s << "(" << v.error.category().name() << " std::error_code " << v.error.value() << ": " << v.error.message() << ")";
+      return s << v.error;
     default:
       return s << "(unknown)";
     }
@@ -437,7 +437,7 @@ namespace std
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::value:
       return s << v.value;
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::error:
-      return s << "(" << v.error.category().name() << " std::error_code " << v.error.value() << ": " << v.error.message() << ")";
+      return s << v.error;
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::exception:
       try
       {
@@ -445,7 +445,7 @@ namespace std
       }
       catch(const system_error &e)
       {
-        return s << "(std::system_error code " << e.code() << ": " << e.what() << ")";
+        return s << "std::system_error code " << e.code() << ": " << e.what();
       }
       /*catch(const future_error &e)
       {
@@ -453,11 +453,11 @@ namespace std
       }*/
       catch(const exception &e)
       {
-        return s << "(std::exception: " << e.what() << ")";
+        return s << "std::exception: " << e.what();
       }
       catch(...)
       {
-        return s << "(unknown exception)";
+        return s << "unknown exception";
       }
     default:
       return s << "(unknown)";
