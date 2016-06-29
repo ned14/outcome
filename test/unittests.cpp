@@ -443,6 +443,12 @@ BOOST_AUTO_TEST_CASE(works / monad / constexpr, "Tests that the monad works as i
   constexpr auto d = test_constexpr2b();
   constexpr auto e = test_constexpr3a(5);
   constexpr auto f = test_constexpr3b();
+  (void) a;
+  (void) b;
+  (void) c;
+  (void) d;
+  (void) e;
+  (void) f;
 }
 
 

@@ -14,7 +14,7 @@ Todo:
 heterogeneous monad types (add unit tests proving this).
  - [x] Add constexpr compile unit tests for when `<T>` is a LiteralType.
  - [x] Add unit tests for `result<int>` being trivially destructible
- - [ ] Add debugging visualisers for Monad for VS2015 as a minimum (it's getting painful to work
+ - [x] Add debugging visualisers for Monad for VS2015 as a minimum (it's getting painful to work
 on AFIO without these!)
  
 Later:
