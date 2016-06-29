@@ -60,9 +60,9 @@ Predefined basic_monad implementations:
 heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`,
 `tribool::true_`, `tribool::false_` and `tribool::false_` respectively.
 
-Pros: Covers all bases. You can return error codes for normal errors, exception pointers for exceptional events.
+<b>Pros:</b> Covers all bases. You can return error codes for normal errors, exception pointers for exceptional events.
 
-Cons: Because of the potential `exception_ptr` which is an atomic fence, compilers tend to generate
+<b>Cons:</b> Because of the potential `exception_ptr` which is an atomic fence, compilers tend to generate
 code bloat especially where the potential states of an outcome are unknown (e.g. it is being returned from
 an extern function).
 </dd>
@@ -71,13 +71,13 @@ an extern function).
 space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `tribool::true_` and
 `tribool::false_` respectively. This specialisation looks deliberately like Rust's `Result<T>`.
 
-Pros: Much lighter weight than an outcome, plus it will have a trivial destructor if `R` has a trivial
+<b>Pros:</b> Much lighter weight than an outcome, plus it will have a trivial destructor if `R` has a trivial
 destructor (the compiler and STL can shortcut many operations when there is a trivial destructor). Code
 bloat is minimal except on the Dinkumware STL which makes fetching error categories an atomic fence,
 however this is usually a one off cost. clang and GCC do an excellent job optimising code using `result<R>`
 often down to zero overhead, unless using the Dinkumware STL.
 
-Cons: Error code constructors must consume an error category instance which is a runtime only input.
+<b>Cons:</b> Error code constructors must consume an error category instance which is a runtime only input.
 `result<T>` therefore cannot be used in a constexpr evaluation context.
 </dd>
   <dt>`option<R>`</dt>
@@ -87,9 +87,9 @@ which is usually `sizeof(R)+8`, but may be smaller if `value_storage<R>` is spec
 `option<bool>` below). This corresponds to `tribool::unknown` and `tribool::true_`
 respectively. This specialisation looks deliberately like Rust's `Option<T>`.
 
-Pros: Can be used in constexpr programming. Compiles down to optimal overhead on all compilers.
+<b>Pros:</b> Can be used in constexpr programming. Compiles down to optimal overhead on all compilers.
 
-Cons: Least expressive of the available options.
+<b>Cons:</b> Least expressive of the available options.
 </dd>
 </dl>
 
@@ -237,7 +237,7 @@ construction lightweight. If that happens, the monad always has empty state afte
 
 ## Supplying your own implementations of `basic_monad<T>` ##
 To do this, simply supply a policy type of the following form:
-\snippet monad.hpp monad_policy
+\snippet monad_policy.ipp monad_policy
 */
 
 
@@ -1084,7 +1084,7 @@ template <class M> struct is_monad : detail::is_monad<typename std::decay<M>::ty
 \ingroup monad
 
 */
-template <class implementation_policy> class basic_monad : public implementation_policy::base
+template <class implementation_policy> class BOOST_CXX17_NODISCARD basic_monad : public implementation_policy::base
 {
   // Allow my policy unfettered acces
   friend implementation_policy;

@@ -48,7 +48,6 @@ namespace detail
 #pragma warning(disable : 4800)  // forcing value to bool
 #pragma warning(disable : 4702)  // unreachable code
 #endif
-  //! [future_policy]
   // Inherited from publicly by basic_monad, so whatever you expose here you expose in basic_monad
   template <class monad_storage, class value_type, class error_type = void, class exception_type = void> struct BOOST_OUTCOME_MONAD_POLICY_BASE_NAME : public monad_storage
   {
@@ -225,8 +224,9 @@ namespace detail
 #endif
   };
 
+  //! [monad_policy]
   // An implementation policy for basic_monad
-  template <typename R> struct BOOST_CXX17_NODISCARD BOOST_OUTCOME_MONAD_POLICY_NAME
+  template <typename R> struct BOOST_OUTCOME_MONAD_POLICY_NAME
   {
     // The final resulting implementation type
     typedef basic_monad<BOOST_OUTCOME_MONAD_POLICY_NAME> implementation_type;
@@ -252,7 +252,8 @@ namespace detail
     // The type which rebinding myself produces
     template <typename U> using rebind_policy = BOOST_OUTCOME_MONAD_POLICY_NAME<U>;
   };
-  template <> struct BOOST_CXX17_NODISCARD BOOST_OUTCOME_MONAD_POLICY_NAME<void>
+  //! [monad_policy]
+  template <> struct BOOST_OUTCOME_MONAD_POLICY_NAME<void>
   {
     // The final resulting implementation type
     typedef basic_monad<BOOST_OUTCOME_MONAD_POLICY_NAME> implementation_type;

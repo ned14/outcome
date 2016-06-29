@@ -439,16 +439,20 @@ BOOST_AUTO_TEST_CASE(works / monad / constexpr, "Tests that the monad works as i
 
   constexpr auto a = test_constexpr1a(5);
   constexpr auto b = test_constexpr1b();
+  (void) a;
+  (void) b;
+// GCC won't allow our move constructor which uses operator new to allow the type T
+// to have no default constructor nor move assignment
+#if !defined(__GNUC__) || defined(__clang__)
   constexpr auto c = test_constexpr2a(5);
   constexpr auto d = test_constexpr2b();
   constexpr auto e = test_constexpr3a(5);
   constexpr auto f = test_constexpr3b();
-  (void) a;
-  (void) b;
   (void) c;
   (void) d;
   (void) e;
   (void) f;
+#endif
 }
 
 
