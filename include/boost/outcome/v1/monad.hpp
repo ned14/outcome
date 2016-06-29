@@ -58,35 +58,60 @@ Predefined basic_monad implementations:
   <dt>`outcome<R>`</dt>
     <dd>Can hold a fixed variant list of empty, a type `R`, a lightweight `std::error_code` or a
 heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`,
-`tribool::true_`, `tribool::false_` and `tribool::false_` respectively.</dd>
+`tribool::true_`, `tribool::false_` and `tribool::false_` respectively.
+
+Pros: Covers all bases. You can return error codes for normal errors, exception pointers for exceptional events.
+
+Cons: Because of the potential `exception_ptr` which is an atomic fence, compilers tend to generate
+code bloat especially where the potential states of an outcome are unknown (e.g. it is being returned from
+an extern function).
+</dd>
   <dt>`result<R>`</dt>
     <dd>Can hold a fixed variant list of empty, a type `R` or a lightweight `std::error_code` at a
 space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `tribool::true_` and
-`tribool::false_` respectively. This specialisation looks deliberately like Rust's `Result<T>`.</dd>
+`tribool::false_` respectively. This specialisation looks deliberately like Rust's `Result<T>`.
+
+Pros: Much lighter weight than an outcome, plus it will have a trivial destructor if `R` has a trivial
+destructor (the compiler and STL can shortcut many operations when there is a trivial destructor). Code
+bloat is minimal except on the Dinkumware STL which makes fetching error categories an atomic fence,
+however this is usually a one off cost. clang and GCC do an excellent job optimising code using `result<R>`
+often down to zero overhead, unless using the Dinkumware STL.
+
+Cons: Error code constructors must consume an error category instance which is a runtime only input.
+`result<T>` therefore cannot be used in a constexpr evaluation context.
+</dd>
   <dt>`option<R>`</dt>
     <dd>Can hold a fixed variant list of empty or a type `R` at a space cost of `sizeof(value_storage<R>)`
 which is usually `sizeof(R)+8`, but may be smaller if `value_storage<R>` is specialised e.g.
-`sizeof(option<char>)` is just two bytes, and `sizeof(option<bool>)` is just one byte (see note about
+`sizeof(option<char>)` is just two bytes, and `sizeof(option<bool>)` and `sizeof(option<void>)` is just one byte (see note about
 `option<bool>` below). This corresponds to `tribool::unknown` and `tribool::true_`
-respectively. This specialisation looks deliberately like Rust's `Option<T>`.</dd>
+respectively. This specialisation looks deliberately like Rust's `Option<T>`.
+
+Pros: Can be used in constexpr programming. Compiles down to optimal overhead on all compilers.
+
+Cons: Least expressive of the available options.
+</dd>
 </dl>
 
 Features:
 
-- Very lightweight on build times and run times up to the point of zero execution cost and just an eight
-byte space overhead. See below for benchmarks. Requires min clang 3.2, GCC 4.8 or VS2015.
+- Very lightweight on build times and run times up to the point of zero execution cost and a one to eight
+byte space overhead. See below for benchmarks. Requires min clang 3.7, GCC 5.0 or VS2015 Update 2.
 - Just enough monad, nothing more, nothing fancy. Replicates the future API, so if you know how to
 use a future you already know how to use this.
 - Enables convenient and easy all-`noexcept` coding and design, giving you powerful error handling facilities
 with automatic exception safety.
-- Can replace most uses of `optional<T>`.
-- Deep integration with lightweight future-promise (i.e. async monadic programming) also in this library which
-subclasses these monads. See \ref future_promise.
+- Can replace most uses of `optional<T>` with seamless interop with more expressive forms e.g.
+`monad<int> != option<int>`.
 - Comprehensive unit testing and validation suite.
-- Mirrors `noexcept` of type R.
+- Mirrors `noexcept` and trivial destructiveness of type R.
 - Type R can have no default constructor, move nor copy.
 - Works inside a STL container, and type R can be a STL container.
-  - No comparison operations nor hashing is provided, deliberately to keep things simple.
+- Equivalence and non-equivalence operators provided. These can compare disparate monads.
+  - Relational operators NOT provided to keep things simple.
+- You can explicitly cheap convert monads from less expressive to more expressive.
+- There is a debugging visualiser for basic_monad for VS2015 in doc/boost.outcome.natvis. A visualiser
+for GDB is forthcoming.
 
 ## Notes: ##
 
@@ -101,16 +126,16 @@ outcome<std::string> b(std::move(a));
 BOOST_CHECK(a.has_value());  // true
 \endcode
 
-Moving an outcome does a move of its underlying contents, so any contents remain at whatever
+Moving an outcome <i>does a move of its underlying contents</i>, so any contents remain at whatever
 the move constructor for that content leaves things. In other words, a moved from outcome
-does not become empty, if you want that then call clear().
+<b>does not</b> become empty, if you want that then call clear().
 
 Be aware that due to packing the bool into the same byte of storage as the empty/value state,
 `option<bool>.get()` does not return any reference to the internal store, but provides value
 returns instead. This also applies to any type enabled for single byte storage using
 the `enable_single_byte_value_storage` trait.
 
-So long as you avoid the exception_type code paths (`result<R>`, `option<R>`), this implementation will be
+So long as you avoid the exception_type code paths (stick with `result<R>`, `option<R>`), this implementation will be
 ideally reduced to as few assembler instructions as possible by most recent compilers [1]
 which can include exactly zero assembler instructions output. This outcome is therefore
 identical in terms of execution overhead to using the R type you specify directly - you
@@ -121,9 +146,7 @@ A similar thing applies to error_type which is a lightweight implementation on m
 systems. An exception is on VS2015 as the lvalue reference to system_category appears
 to be constructed via thread safe once routine called "Immortalize", so when you
 construct an error_type on MSVC you'll force a memory synchronisation during the constructor
-only. error_types are very cheap to pass around though as they are but an integer and a lvalue ref,
-though I see that on GCC and clang 16 bytes is always copied around instead of completely
-eliding the copy.
+only. error_types are very cheap to pass around though as they are but an integer and a lvalue ref.
 
 exception_type is also pretty good on anything but MSVC, though never zero assembler
 instructions. As soon as an exception_type \em could be created, you'll force out about twenty
