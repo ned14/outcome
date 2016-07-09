@@ -5,7 +5,7 @@
 #ifndef TIMING_H
 #define TIMING_H
 
-#ifdef WIN32
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 typedef unsigned __int64 usCount;
