@@ -71,7 +71,7 @@ script:
      cd build;
      cmake .. -DCMAKE_BUILD_TYPE=Release;
      make;
-     ctest -D Continuous;
+     ctest -D Experimental;
    fi
  
 after_success:
