@@ -393,7 +393,6 @@ namespace std
     default:
       throw ios_base::failure("Set the type of lightweight_futures::value_storage to a value_type before deserialising into it");
     }
-    return s;
   }
   //! \brief Serialise a value_storage. Mostly useful for debug printing. \ingroup monad
   template <class _value_type> inline ostream &operator<<(ostream &s, const BOOST_OUTCOME_V1_NAMESPACE::value_storage<_value_type, void, void> &v)

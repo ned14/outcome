@@ -33,4 +33,8 @@ all_compile_features(PUBLIC
 )
 
 # For all possible configurations of this library, add each test
+list_filter(outcome_TESTS EXCLUDE REGEX "test_multiabi.cpp")
 include(BoostLiteMakeStandardTests)
+foreach(test_target ${outcome_TEST_TARGETS})
+  target_compile_definitions(${test_target} PUBLIC BOOST_OUTCOME_ENABLE_OPERATORS=1)
+endforeach()
