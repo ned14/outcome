@@ -18,6 +18,7 @@ platform: x64
 configuration: Release
 
 before_build:
+  - git checkout master
   - git submodule update --init --recursive
   - mkdir build
 build_script:
