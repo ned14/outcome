@@ -163,4 +163,7 @@ namespace stl11
 #define BOOST_OUTCOME_CONVINCE_MSVC
 #endif
 
+#include <ostream>  // for printing
+#include <cassert>  // for asserting :)
+
 #endif  // BOOST_OUTCOME_NEED_DEFINE
