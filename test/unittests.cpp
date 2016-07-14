@@ -34,11 +34,12 @@ DEALINGS IN THE SOFTWARE.
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4503)  // decorated name length exceeded
+#pragma warning(disable : 4714)  // function marked __forceinline not inlined
 #endif
 
 #define BOOST_CATCH_CUSTOM_MAIN_DEFINED
 #include "../include/boost/outcome/boost-lite/include/boost/test/unit_test.hpp"
-#include "../include/boost/outcome/monad.hpp"
+#include "../include/boost/outcome/outcome.hpp"
 
 #include <algorithm>
 #include <stdio.h>
@@ -74,6 +75,7 @@ BOOST_AUTO_TEST_CASE(works / traits, "Tests that the traits work as intended")
     int (*h)(int &&) = [](int &&) -> int { return 5; };
     int (*i)(const int &) = [](const int &) -> int { return 5; };
     int (*j)(int &) = [](int &) -> int { return 5; };
+    (void)g; (void)h; (void)i; (void)j;
 
     static_assert(callable_argument_traits<decltype(a), int>::valid, "callable not recognised as valid");
     static_assert(callable_argument_traits<decltype(b), int &&>::valid, "callable not recognised as valid");

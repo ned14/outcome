@@ -21,16 +21,27 @@ include(BoostLiteMakeHeaderOnlyLibrary)
 include(BoostLiteApplyDefaultDefinitions)
 # Set the C++ features this library requires
 all_compile_features(PUBLIC
-  # cxx_exceptions                        ## Annoyingly not supported by cmake 3.4
+  # cxx_exceptions                        ## Annoyingly not supported by cmake 3.6
   cxx_alias_templates
   cxx_variadic_templates
   cxx_noexcept
   cxx_constexpr
   cxx_thread_local
-  #cxx_init_captures                      ## Not supported yet by cmake 3.4
+  #cxx_init_captures                      ## Not supported yet by cmake 3.6
   cxx_attributes
-  cxx_variable_templates
 )
+if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
+  all_compile_features(PUBLIC
+    cxx_variable_templates
+  )
+endif()
 
 # For all possible configurations of this library, add each test
+list_filter(outcome_TESTS EXCLUDE REGEX "test_multiabi.cpp")
 include(BoostLiteMakeStandardTests)
+if(TARGET outcome_hl_pch)
+  target_compile_definitions(outcome_hl_pch PUBLIC BOOST_OUTCOME_ENABLE_OPERATORS=1)
+endif()
+foreach(test_target ${outcome_TEST_TARGETS})
+  target_compile_definitions(${test_target} PUBLIC BOOST_OUTCOME_ENABLE_OPERATORS=1)
+endforeach()
