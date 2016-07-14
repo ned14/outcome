@@ -19,17 +19,17 @@ configuration: Release
 
 before_build:
   - git submodule update --init --recursive
-  - git submodule foreach git checkout master
-  - git submodule foreach git pull origin master
-  - cd test
-  - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+  - mkdir build
 build_script:
-  - withmsvc.bat
+  - cd build
+  - cmake ..
+  - cmake --build . --config Release
 after_build:
 
 before_test:
 test_script:
-  - unittests_1.exe --reporter junit --out results_1.xml
+  - ctest -D Continuous -C Release
+  - Release\unittests-outcome_hl.exe --reporter junit --out ..\results_1.xml
 after_test:
 
 on_success:

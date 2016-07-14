@@ -22,6 +22,7 @@ addons:
 env:
  - __="Unit tests"
  - __="Code bloat tests"
+ - __="cmake tests"
  
 cache:
   apt: true
@@ -62,6 +63,14 @@ script:
      if grep -q "failure message" results.xml; then
        exit 1;
      fi;
+   fi
+ -
+   if [ "$__" = "cmake tests" ]; then
+     mkdir build;
+     cd build;
+     cmake .. -DCMAKE_BUILD_TYPE=Release;
+     make;
+     ctest -D Continuous;
    fi
  
 after_success:
