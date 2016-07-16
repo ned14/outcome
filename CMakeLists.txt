@@ -9,7 +9,7 @@ ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/ve
 # Sets the usual PROJECT_NAME etc
 project(outcome VERSION ${VERSIONSTRING} LANGUAGES CXX)
 # Also set a *cmake* namespace for this project
-set(PROJECT_NAMESPACE boost::)
+set(PROJECT_NAMESPACE boost-)
 include(CTest)
 
 # Update this header file with the current git SHA and last timestamp
@@ -45,3 +45,7 @@ endif()
 foreach(test_target ${outcome_TEST_TARGETS})
   target_compile_definitions(${test_target} PUBLIC BOOST_OUTCOME_ENABLE_OPERATORS=1)
 endforeach()
+
+# Make available this library for install and export
+include(BoostLiteMakeInstall)
+include(BoostLiteMakeExport)
