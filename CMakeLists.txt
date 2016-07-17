@@ -1,16 +1,28 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
-# Bring in the Boost lite cmake tooling
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/boost-lite/cmake")
+# If necessary bring in the Boost lite cmake tooling
+list(FIND CMAKE_MODULE_PATH "boost-lite" boost_lite_idx)
+if(${boost_lite_idx} EQUAL -1)
+  if(EXISTS "${CMAKE_SOURCE_DIR}/../boost-lite/cmake")
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../boost-lite/cmake")
+  elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/boost-lite/cmake")
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/boost-lite/cmake")
+  else()
+    message(FATAL_ERROR "FATAL: A copy of boost-lite cannot be found. Try running 'git submodule update --init --recursive'")
+  endif()
+endif()
 include(BoostLiteRequireOutOfSourceBuild)
-include(BoostLiteUtils)  # for ParseProjectVersionFromHpp and UpdateRevisionHppFromGit
+include(BoostLiteUtils)
 
 # Parse the version we tell cmake directly from the version header file
 ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/version.hpp" VERSIONSTRING)
 # Sets the usual PROJECT_NAME etc
 project(outcome VERSION ${VERSIONSTRING} LANGUAGES CXX)
 # Also set a *cmake* namespace for this project
-set(PROJECT_NAMESPACE boost-)
+set(PROJECT_NAMESPACE boost--)
+# Bring in CTest support
 include(CTest)
+# Find my library dependencies
+find_boostish_library(boost-lite 1.0 REQUIRED)
 
 # Update this header file with the current git SHA and last timestamp
 UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/revision.hpp")
@@ -35,6 +47,8 @@ if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
     cxx_variable_templates
   )
 endif()
+# Set the library dependencies this library has
+all_sources(PUBLIC boost-lite)
 
 # For all possible configurations of this library, add each test
 list_filter(outcome_TESTS EXCLUDE REGEX "test_multiabi.cpp")
