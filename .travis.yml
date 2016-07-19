@@ -20,6 +20,7 @@ addons:
     - g++-6
     - python3
     - cmake
+    - cmake-data
 
 env:
  - __="Unit tests"
