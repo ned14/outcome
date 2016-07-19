@@ -72,7 +72,7 @@ script:
    if [ "$__" = "cmake tests" ]; then
      mkdir build;
      cd build;
-     cmake .. -DCMAKE_BUILD_TYPE=Release;
+     cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-6;
      make;
      ctest -D Experimental;
    fi
