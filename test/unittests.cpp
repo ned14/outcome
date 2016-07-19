@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #endif
 
 #define BOOST_CATCH_CUSTOM_MAIN_DEFINED
-#include "../include/boost/outcome/boost-lite/include/boost/test/unit_test.hpp"
+#include "../boost-lite/include/boost/test/unit_test.hpp"
 #include "../include/boost/outcome/outcome.hpp"
 
 #include <algorithm>
@@ -53,7 +53,7 @@ DEALINGS IN THE SOFTWARE.
 #include <fcntl.h>
 #endif
 
-#include "../include/boost/outcome/boost-lite/include/allocator_testing.hpp"
+#include "../boost-lite/include/allocator_testing.hpp"
 
 BOOST_AUTO_TEST_SUITE(all)
 

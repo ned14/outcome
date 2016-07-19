@@ -241,7 +241,7 @@ To do this, simply supply a policy type of the following form:
 */
 
 
-BOOST_OUTCOME_V1_NAMESPACE_BEGIN
+BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN
 
 // Slight misuse of ringbuffer_log to keep extended error code information
 static inline boost_lite::ringbuffer_log::simple_ringbuffer_log<4096> &extended_error_code_log()
@@ -730,7 +730,7 @@ namespace std
 }
 #endif
 
-BOOST_OUTCOME_V1_NAMESPACE_BEGIN
+BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN
 
 namespace lightweight_futures
 {

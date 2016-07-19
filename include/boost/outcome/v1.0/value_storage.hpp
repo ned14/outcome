@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 \brief Provides a fixed four state variant
 */
 
-BOOST_OUTCOME_V1_NAMESPACE_BEGIN
+BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN
 
 //! \brief Type tag for an empty monad \ingroup monad
 struct empty_t

@@ -48,7 +48,7 @@ if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
   )
 endif()
 # Set the library dependencies this library has
-all_sources(PUBLIC boost-lite)
+target_link_libraries(outcome_hl INTERFACE boost-lite_hl)
 
 # For all possible configurations of this library, add each test
 list_filter(outcome_TESTS EXCLUDE REGEX "test_multiabi.cpp")
