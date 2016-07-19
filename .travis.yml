@@ -14,10 +14,12 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
+    - george-edison55-precise-backports
 #    - llvm-toolchain-precise-3.8  ## not currently working due to bad source signing key
     packages:
     - g++-6
     - python3
+    - cmake
 
 env:
  - __="Unit tests"
