@@ -6,7 +6,7 @@ if [ -z "$CXX" ]; then
   fi
 fi
 rm -rf unittests_* *.gcda *.gcno
-INCLUDE=""
+INCLUDE="-I../include/boost/outcome/v1.0"
 if [ -n "$BUILD_EXTRA" ]; then
   echo Building unittests_coverage ...
   g++-6 -std=c++1y -pthread -O1 -DNDEBUG -DRUNNING_ON_VALGRIND=1 -g -gdwarf-2 -o unittests_coverage unittests.cpp -lrt -fprofile-arcs -ftest-coverage -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-elide-constructors -fno-inline $INCLUDE
