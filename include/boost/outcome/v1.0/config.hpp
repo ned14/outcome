@@ -35,7 +35,6 @@ DEALINGS IN THE SOFTWARE.
 #endif
 
 #include "../boost-lite/include/boost/config.hpp"
-#include "../boost-lite/include/import.h"
 
 #ifndef __cpp_alias_templates
 #error Boost.Outcome needs template alias support in the compiler
@@ -63,6 +62,7 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_OUTCOME_LATEST_VERSION 1
 #endif
 
+#include "../boost-lite/include/import.h"
 #undef BOOST_OUTCOME_V1_STL11_IMPL
 #undef BOOST_OUTCOME_V1_ERROR_CODE_IMPL
 #undef BOOST_OUTCOME_V1
