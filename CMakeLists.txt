@@ -24,10 +24,12 @@ include(CTest)
 # Find my library dependencies
 find_boostish_library(boost-lite 1.0 REQUIRED)
 
-# Update this header file with the current git SHA and last timestamp
-UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/revision.hpp")
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(BoostLiteMakeHeaderOnlyLibrary)
+if(NOT PROJECT_IS_DEPENDENCY)
+  # Update this header file with the current git SHA and last timestamp
+  UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/revision.hpp")
+endif()
 
 # Set the standard definitions for these libraries and bring in the all_* helper functions
 include(BoostLiteApplyDefaultDefinitions)
