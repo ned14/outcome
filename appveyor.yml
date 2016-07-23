@@ -36,5 +36,5 @@ after_test:
 on_success:
 on_failure:
 on_finish:
-  - ps: (new-object net.webclient).UploadFile("http://my.cdash.org/submit.php?project=Boost.Outcome", (Resolve-Path .\results.xml))
+  - curl -T results.xml http://my.cdash.org/submit.php?project=Boost.Outcome
   - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\results.xml))
