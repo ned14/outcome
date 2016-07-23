@@ -19,6 +19,8 @@ ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/ve
 project(outcome VERSION ${VERSIONSTRING} LANGUAGES CXX)
 # Also set a *cmake* namespace for this project
 set(PROJECT_NAMESPACE boost--)
+# This file should be updated with the last git SHA next commit
+UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/revision.hpp")
 # Bring in CTest support
 include(CTest)
 # Find my library dependencies
@@ -26,10 +28,6 @@ find_boostish_library(boost-lite 1.0 REQUIRED)
 
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(BoostLiteMakeHeaderOnlyLibrary)
-if(NOT PROJECT_IS_DEPENDENCY)
-  # Update this header file with the current git SHA and last timestamp
-  UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/revision.hpp")
-endif()
 
 # Set the standard definitions for these libraries and bring in the all_* helper functions
 include(BoostLiteApplyDefaultDefinitions)
