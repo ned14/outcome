@@ -29,11 +29,12 @@ after_build:
 
 before_test:
 test_script:
-  - bin\Release\outcome_hl-unittests.exe --reporter junit --out results_1.xml
-  - ctest -D Experimental -C Release -T Submit --extra-submit results_1.xml
+  - bin\Release\outcome_hl-unittests.exe --reporter junit --out results.junit.xml
 after_test:
+  - ..\include\boost\outcome\boost-lite\scripts\merge_junit_results.py results.xml results.junit.xml
 
 on_success:
 on_failure:
 on_finish:
-  - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\results_1.xml))
+  - ps: (new-object net.webclient).UploadFile("http://my.cdash.org/submit.php?project=Boost.Outcome", (Resolve-Path .\results.xml))
+  - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\results.xml))
