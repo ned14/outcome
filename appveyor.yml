@@ -31,4 +31,4 @@ after_test:
 on_success:
 on_failure:
 on_finish:
-  - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path cmake_ci\bin\Release\results.xml))
+  - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path cmake_ci\merged_junit_results.xml))
