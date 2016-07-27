@@ -25,7 +25,7 @@ addons:
 env:
  - __="Unit tests"
  - __="Code bloat tests"
- - __="cmake tests"
+ - __="cmake tests" NAME=TravisLinuxWorker
  
 cache:
   apt: true
