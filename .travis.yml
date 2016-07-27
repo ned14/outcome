@@ -70,13 +70,7 @@ script:
    fi
  -
    if [ "$__" = "cmake tests" ]; then
-     mkdir build;
-     cd build;
-     cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-6;
-     make;
-     make test;
-     python ../include/boost/outcome/boost-lite/scripts/merge_junit_results.py results.xml bin/*.junit.xml;
-     curl -T results.xml http://my.cdash.org/submit.php?project=Boost.Outcome;
+     CXX=g++-6 ctest -S .ci.cmake -V;
    fi
  
 after_success:

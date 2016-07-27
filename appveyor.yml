@@ -20,14 +20,12 @@ configuration: Release
 before_build:
   - git checkout master
   - git submodule update --init --recursive
-  - mkdir build
 build_script:
-  - cd build
-  - cmake ..
-  - cmake --build . --config Release
+  - ctest -S .ci.cmake -V
 after_build:
 
 before_test:
+  - cd cmake_ci
 test_script:
   - bin\Release\outcome_hl-unittests.exe --reporter junit --out results.junit.xml
 after_test:
@@ -36,5 +34,4 @@ after_test:
 on_success:
 on_failure:
 on_finish:
-  - curl -T results.xml http://my.cdash.org/submit.php?project=Boost.Outcome
   - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\results.xml))
