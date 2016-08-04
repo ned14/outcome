@@ -29,6 +29,8 @@ find_boostish_library(boost-lite 1.0 REQUIRED)
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(BoostLiteMakeHeaderOnlyLibrary)
 
+# Create a custom doxygen generation target
+include(BoostLiteMakeDoxygen)
 # Set the standard definitions for these libraries and bring in the all_* helper functions
 include(BoostLiteApplyDefaultDefinitions)
 # Set the C++ features this library requires

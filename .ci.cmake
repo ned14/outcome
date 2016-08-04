@@ -17,7 +17,7 @@ endif()
 include(BoostLiteUtils)
 
 
-configure_ctest_script_for_cdash("outcome" "cmake_ci")
+CONFIGURE_CTEST_SCRIPT_FOR_CDASH("outcome" "cmake_ci")
 ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 
 ctest_start("Experimental")
