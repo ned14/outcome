@@ -12,6 +12,7 @@ if(${boost_lite_idx} EQUAL -1)
 endif()
 include(BoostLiteRequireOutOfSourceBuild)
 include(BoostLiteUtils)
+include(BoostLitePolicies)
 
 # Parse the version we tell cmake directly from the version header file
 ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/version.hpp" VERSIONSTRING)
@@ -21,8 +22,8 @@ project(outcome VERSION ${VERSIONSTRING} LANGUAGES CXX)
 set(PROJECT_NAMESPACE boost--)
 # This file should be updated with the last git SHA next commit
 UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/revision.hpp")
-# Bring in CTest support
-include(CTest)
+# Setup this cmake environment for this project
+include(BoostLiteSetupProject)
 # Find my library dependencies
 find_boostish_library(boost-lite 1.0 REQUIRED)
 
@@ -43,6 +44,7 @@ all_compile_features(PUBLIC
   cxx_thread_local
   #cxx_init_captures                      ## Not supported yet by cmake 3.6
   cxx_attributes
+  cxx_generic_lambdas
 )
 if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
   all_compile_features(PUBLIC

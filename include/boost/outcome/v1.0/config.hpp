@@ -29,6 +29,11 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+//! \file config.hpp Configures a compiler environment for Outcome header code
+//! \defgroup config Configuration macros
+
+#define BOOST_OUTCOME_CONFIGURED
+
 // Pull in detection of __MINGW64_VERSION_MAJOR
 #ifdef __MINGW32__
 #include <_mingw.h>
@@ -54,13 +59,10 @@ DEALINGS IN THE SOFTWARE.
 #ifndef __cpp_variable_templates
 #error Boost.Outcome needs variable template support in the compiler
 #endif
+#ifndef __cpp_generic_lambdas
+#error Boost.AFIO needs generic lambda support in the compiler
+#endif
 
-#if defined(BOOST_OUTCOME_LATEST_VERSION) && BOOST_OUTCOME_LATEST_VERSION < 1
-#error You need to include the latest version of Boost.Outcome before any earlier versions within the same translation unit
-#endif
-#ifndef BOOST_OUTCOME_LATEST_VERSION
-#define BOOST_OUTCOME_LATEST_VERSION 1
-#endif
 
 #include "../boost-lite/include/import.h"
 #undef BOOST_OUTCOME_V1_STL11_IMPL
@@ -80,6 +82,7 @@ DEALINGS IN THE SOFTWARE.
 #error Boost.Outcome requires that Boost.Thread be configured to v3 or later
 #endif
 #else
+//! \brief The C++ 11 STL to use (std|boost). Defaults to std. \ingroup config
 #define BOOST_OUTCOME_V1_STL11_IMPL std
 #ifndef BOOST_OUTCOME_USE_BOOST_THREAD
 #define BOOST_OUTCOME_USE_BOOST_THREAD 0
@@ -88,18 +91,70 @@ DEALINGS IN THE SOFTWARE.
 #if BOOST_OUTCOME_USE_BOOST_ERROR_CODE
 #define BOOST_OUTCOME_V1_ERROR_CODE_IMPL boost
 #else
+//! \brief The C++ 11 `error_code` to use (std|boost). Defaults to std. \ingroup config
 #define BOOST_OUTCOME_V1_ERROR_CODE_IMPL std
 #endif
 
 #ifdef BOOST_OUTCOME_UNSTABLE_VERSION
 #include "../revision.hpp"
-#define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(v1, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL, BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE), inline)
+#define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(v, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL, BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE), inline)
 #elif BOOST_OUTCOME_LATEST_VERSION == 1
-#define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(v1, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL), inline)
+#define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(v, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL), inline)
 #else
-#define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(v1, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL))
+#define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(v, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL))
 #endif
-#if defined(GENERATING_CXX_MODULE_INTERFACE)
+/*! \def BOOST_OUTCOME_V1
+\ingroup config
+\brief The namespace configuration of this Boost.Outcome v1. Consists of a sequence
+of bracketed tokens later fused by the preprocessor into namespace and C++ module names.
+*/
+#if DOXYGEN_SHOULD_SKIP_THIS
+//! The Boost namespace
+namespace boost
+{
+  //! The Outcome namespace
+  namespace outcome
+  {
+    //! Inline namespace for this version of Outcome
+    inline namespace v1_xxx
+    {
+    }
+  }
+}
+/*! \brief The namespace of this Boost.Outcome v1 which will be some unknown inline
+namespace starting with `v1_` inside the `boost::afio` namespace.
+\ingroup config
+*/
+#define BOOST_OUTCOME_V1_NAMESPACE boost::outcome::v1_xxx
+/*! \brief Expands into the appropriate namespace markup to enter the Outcome v1 namespace.
+\ingroup config
+*/
+#define BOOST_OUTCOME_V1_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                          \
+  namespace boost                                                                                                                                                                                                                                                                                                              \
+  {                                                                                                                                                                                                                                                                                                                            \
+    namespace outcome                                                                                                                                                                                                                                                                                                             \
+    {                                                                                                                                                                                                                                                                                                                          \
+      inline namespace v1_xxx                                                                                                                                                                                                                                                                                                  \
+      {
+/*! \brief Expands into the appropriate namespace markup to enter the C++ module
+exported Outcome v1 namespace.
+\ingroup config
+*/
+#define BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                          \
+  export namespace boost                                                                                                                                                                                                                                                                                                              \
+  {                                                                                                                                                                                                                                                                                                                            \
+    namespace outcome                                                                                                                                                                                                                                                                                                             \
+    {                                                                                                                                                                                                                                                                                                                          \
+      inline namespace v1_xxx                                                                                                                                                                                                                                                                                                      \
+      {
+/*! \brief Expands into the appropriate namespace markup to exit the Outcome v1 namespace.
+\ingroup config
+*/
+#define BOOST_OUTCOME_V1_NAMESPACE_END                                                                                                                                                                                                                                                                                            \
+  }                                                                                                                                                                                                                                                                                                                            \
+  }                                                                                                                                                                                                                                                                                                                            \
+  }
+#elif defined(GENERATING_CXX_MODULE_INTERFACE)
 #define BOOST_OUTCOME_V1_NAMESPACE BOOSTLITE_BIND_NAMESPACE(BOOST_OUTCOME_V1)
 #define BOOST_OUTCOME_V1_NAMESPACE_BEGIN BOOSTLITE_BIND_NAMESPACE_BEGIN(BOOST_OUTCOME_V1)
 #define BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN BOOSTLITE_BIND_NAMESPACE_EXPORT_BEGIN(BOOST_OUTCOME_V1)
