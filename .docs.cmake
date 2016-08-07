@@ -21,7 +21,7 @@ ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 include(FindGit)
 checked_execute_process("git reset"
   COMMAND "${GIT_EXECUTABLE}" checkout gh-pages
-  COMMAND "${GIT_EXECUTABLE}" reset --hard ae7119571a3c81cb9a683a21f2759df1d742e998
+#  COMMAND "${GIT_EXECUTABLE}" reset --hard ae7119571a3c81cb9a683a21f2759df1d742e998
   WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/doc/html"
 )
 
