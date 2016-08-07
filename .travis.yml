@@ -79,7 +79,8 @@ script:
      git config --global push.default simple;
      git config --global user.name "Jenkins nedprod CI";
      git config --global user.email "foo@nowhere";
-     ctest -S .docs.cmake -V;
+     git remote add origin https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost.outcome
+     CXX=g++-6 ctest -S .docs.cmake -V;
    fi
  
 after_success:
