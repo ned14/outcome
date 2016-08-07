@@ -81,7 +81,6 @@ script:
      git config --global user.email "foo@nowhere";
      git remote rm origin;
      git remote add origin https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost.outcome;
-     git remote -v;
      CXX=g++-6 ctest -S .docs.cmake -V;
    fi
  
