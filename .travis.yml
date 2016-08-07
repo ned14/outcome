@@ -21,11 +21,13 @@ addons:
     - python3
     - cmake
     - cmake-data
+    - doxygen
 
 env:
  - __="Unit tests"
  - __="Code bloat tests"
  - __="cmake tests" NAME=TravisLinuxWorker
+ - __="Documentation" NAME=TravisLinuxWorker
  
 cache:
   apt: true
@@ -71,6 +73,10 @@ script:
  -
    if [ "$__" = "cmake tests" ]; then
      CXX=g++-6 ctest -S .ci.cmake -V;
+   fi
+ -
+   if [ "$__" = "Documentation" ]; then
+     ctest -S .docs.cmake -V;
    fi
  
 after_success:
