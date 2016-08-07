@@ -769,6 +769,7 @@ WARN_LOGFILE           = doxygen_warnings.log
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = release_notes.md \
+                         include/boost/outcome \
                          include/boost/outcome/v1.0
 
 # This tag can be used to specify the character encoding of the source files
@@ -836,13 +837,13 @@ EXCLUDE_PATTERNS       =
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories use the pattern */test/*
 
-EXCLUDE_SYMBOLS        = detail::* *::detail::*
+EXCLUDE_SYMBOLS        = detail::* *::detail::* *::_detail::*
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or directories
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           = test example include/boost/outcome/v1 include/boost/outcome/v1/detail
+EXAMPLE_PATH           = test example include/boost/outcome/v1.0 include/boost/outcome/v1.0/detail
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and
@@ -1007,7 +1008,7 @@ VERBATIM_HEADERS       = YES
 # compiled with the --with-libclang option.
 # The default value is: NO.
 
-CLANG_ASSISTED_PARSING = NO
+CLANG_ASSISTED_PARSING = YES
 
 # If clang assisted parsing is enabled you can provide the compiler with command
 # line options that you would normally use when invoking the compiler. Note that
@@ -2020,13 +2021,7 @@ INCLUDE_FILE_PATTERNS  =
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
 PREDEFINED             = DOXYGEN_IS_IN_THE_HOUSE=1 DOXYGEN_SHOULD_SKIP_THIS=1 \
-    BOOST_CONSTEXPR=constexpr \
-    BOOST_CXX14_CONSTEXPR=constexpr \
-    BOOST_STATIC_CONSTEXPR=static constexpr \
-    BOOST_NOEXCEPT=noexcept \
-    BOOST_NOEXCEPT_IF(a)=noexcept(a) \
-    BOOST_OUTCOME_V1_NAMESPACE_BEGIN="namespace boost { namespace outcome {" \
-    BOOST_OUTCOME_V1_NAMESPACE_END="} }" \
+    BOOST_OUTCOME_CXX14_CONSTEXPR=constexpr \
     BOOST_OUTCOME_ENABLE_OPERATORS=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
@@ -2036,7 +2031,12 @@ PREDEFINED             = DOXYGEN_IS_IN_THE_HOUSE=1 DOXYGEN_SHOULD_SKIP_THIS=1 \
 # definition found in the source code.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-EXPAND_AS_DEFINED      = 
+EXPAND_AS_DEFINED      = BOOST_CXX14_CONSTEXPR \
+    BOOST_OUTCOME_V1_NAMESPACE BOOST_OUTCOME_V1_NAMESPACE_BEGIN BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN BOOST_OUTCOME_V1_NAMESPACE_END \
+    BOOST_OUTCOME_VERSION_GLUE2 BOOST_OUTCOME_VERSION_GLUE BOOST_OUTCOME_HEADERS_PATH4 BOOST_OUTCOME_HEADERS_PATH3 BOOST_OUTCOME_HEADERS_PATH2 \
+    BOOST_OUTCOME_HEADERS_PATH BOOST_OUTCOME_MODULE_NAME \
+    BOOST_OUTCOME_VERSION_MAJOR BOOST_OUTCOME_VERSION_MINOR
+
 
 # If the SKIP_FUNCTION_MACROS tag is set to YES then doxygen's preprocessor will
 # remove all references to function-like macros that are alone on a line, have
@@ -2071,7 +2071,7 @@ TAGFILES               =
 # tag file that is based on the input files it reads. See section "Linking to
 # external documentation" for more information about the usage of tag files.
 
-GENERATE_TAGFILE       =
+GENERATE_TAGFILE       = outcome.doxygen
 
 # If the ALLEXTERNALS tag is set to YES, all external class will be listed in
 # the class index. If set to NO, only the inherited external classes will be

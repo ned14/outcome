@@ -30,6 +30,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 //! \file config.hpp Configures a compiler environment for Outcome header code
+
 //! \defgroup config Configuration macros
 
 #define BOOST_OUTCOME_CONFIGURED
@@ -85,6 +86,7 @@ DEALINGS IN THE SOFTWARE.
 //! \brief The C++ 11 STL to use (std|boost). Defaults to std. \ingroup config
 #define BOOST_OUTCOME_V1_STL11_IMPL std
 #ifndef BOOST_OUTCOME_USE_BOOST_THREAD
+//! \brief Whether to use Boost.Thread instead of the C++ 11 STL `std::thread`. Defaults to the C++ 11 STL thread. \ingroup config
 #define BOOST_OUTCOME_USE_BOOST_THREAD 0
 #endif
 #endif

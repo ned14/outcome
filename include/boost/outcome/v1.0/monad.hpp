@@ -210,68 +210,7 @@ about 2000 assembler instructions as soon as you might touch an exception_type, 
 this with Microsoft and it looks to be hard for them to fix due to backwards compatibility
 reasons.
 
-[1]: GCC 5.1 does a perfect job, VS2015 does a good job, clang 3.7 not so great. See next section.
-
-## Complexity guarantees ##
-
-These x64 opcode guarantees are empirically determined by the unit test suite, and the per-commit
-CI testing will fail if they suddenly are exceeded. The maximum is calculated by taking an outcome
-in from a non-visible source where the compiler has to generate code paths to handle an unknown
-input state, whereas the minimum is calculated by setting an outcome's state in view of the compiler's
-optimiser such that it can usually completely elide opcodes generated (though note that varies
-enormously by compiler to the extent that the known code generates more opcodes than the unknown code).
-All results are for `R = int`.
-
-### `outcome<R>`: ###
-<dl>
- <dt>clang 3.7</dt>
-  <dd>51 opcodes <= Value transport <= 32 opcodes<br></dd>
-  <dd>6 opcodes <= Error transport <= 50 opcodes<br></dd>
-  <dd>54 opcodes <= Exception transport <= 35 opcodes<br></dd>
-  <dd>55 opcodes <= next() <= 76 opcodes<br></dd>
-  <dd>4 opcodes <= bind() <= 42 opcodes</dd>
- <dt>GCC 5.1</dt>
-  <dd>1 opcodes <= Value transport <= 50 opcodes<br></dd>
-  <dd>8 opcodes <= Error transport <= 37 opcodes<br></dd>
-  <dd>27 opcodes <= Exception transport <= 151 opcodes<br></dd>
-  <dd>4 opcodes <= next() <= 89 opcodes<br></dd>
-  <dd>5 opcodes <= bind() <= 44 opcodes</dd>
- <dt>VS2015</dt>
-  <dd>4 opcodes <= Value transport <= 1879 opcodes<br></dd>
-  <dd>6 opcodes <= Error transport <= 159 opcodes<br></dd>
-  <dd>1973 opcodes <= Exception transport <= 1940 opcodes<br></dd>
-  <dd>1981 opcodes <= next() <= 1982 opcodes<br></dd>
-  <dd>103 opcodes <= bind() <= 104 opcodes</dd>
-</dl>
-
-### `result<R>`: ###
-<dl>
- <dt>clang 3.7</dt>
-  <dd>2 opcodes <= Value transport <= 49 opcodes<br></dd>
-  <dd>4 opcodes <= next() <= 56 opcodes<br></dd>
- <dt>GCC 5.1</dt>
-  <dd>1 opcodes <= Value transport <= 32 opcodes<br></dd>
-  <dd>4 opcodes <= next() <= 52 opcodes<br></dd>
- <dt>VS2015</dt>
-  <dd>4 opcodes <= Value transport <= 1848 opcodes<br></dd>
-  <dd>1918 opcodes <= next() <= 1919 opcodes<br></dd>
-</dl>
-
-### `option<R>`: ###
-<dl>
- <dt>clang 3.7</dt>
-  <dd>2 opcodes <= Value transport <= 26 opcodes<br></dd>
-  <dd>5 opcodes <= next() <= 37 opcodes<br></dd>
- <dt>GCC 5.1</dt>
-  <dd>1 opcodes <= Value transport <= 9 opcodes<br></dd>
-  <dd>4 opcodes <= next() <= 27 opcodes<br></dd>
- <dt>VS2015</dt>
-  <dd>4 opcodes <= Value transport <= 117 opcodes<br></dd>
-  <dd>185 opcodes <= next() <= 186 opcodes<br></dd>
-</dl>
-
-Despite the opcode spillage, performance is \b excellent on all compilers. Modern optimisers do a really
-great job at reaching tens of CPU cycle overhead with this monad design.
+[1]: GCC 5.1 does a perfect job, VS2015 does a good job, clang 3.7 not so great.
 
 ## Examples ##
 
@@ -293,6 +232,10 @@ construction lightweight. If that happens, the monad always has empty state afte
 ## Supplying your own implementations of `basic_monad<T>` ##
 To do this, simply supply a policy type of the following form:
 \snippet monad_policy.ipp monad_policy
+*/
+
+/*! \defgroup macro_helpers Useful preprocessor macros which expand into commonly written boilerplate
+\ingroup monad
 */
 
 
@@ -478,13 +421,16 @@ namespace traits
       using non_auto_type = T;
     };
 
-    template <int R> struct rank : rank<R - 1>
+    template<int R> struct rank;
+#ifndef DOXYGEN_IS_IN_THE_HOUSE
+    template<int R> struct rank : rank<R - 1>
     {
       static_assert(R > 0, "");
     };
-    template <> struct rank<0>
+    template<> struct rank<0>
     {
     };
+#endif
 
     template <bool is_class, bool is_const_well_formed, class F, class A> struct call_operator_argument_form
     {
@@ -2255,21 +2201,21 @@ namespace std
   template <class Impl> inline void swap(BOOST_OUTCOME_V1_NAMESPACE::basic_monad<Impl> &a, BOOST_OUTCOME_V1_NAMESPACE::basic_monad<Impl> &b) { a.swap(b); }
 }
 
-//! \brief Expands into { const auto &__v=(m); if(__v.has_error()) return __v.get_error(); }
+//! \brief Expands into { const auto &__v=(m); if(__v.has_error()) return __v.get_error(); } \ingroup macro_helpers
 #define BOOST_OUTCOME_PROPAGATE_ERROR(m)                                                                                                                                                                                                                                                                                       \
   {                                                                                                                                                                                                                                                                                                                            \
     const auto &__v = (m);                                                                                                                                                                                                                                                                                                     \
     if(__v.has_error())                                                                                                                                                                                                                                                                                                        \
       return __v.get_error();                                                                                                                                                                                                                                                                                                  \
   }
-//! \brief Expands into { const auto &__v=(m); if(__v.has_exception()) return __v.get_exception(); }
+//! \brief Expands into { const auto &__v=(m); if(__v.has_exception()) return __v.get_exception(); } \ingroup macro_helpers
 #define BOOST_OUTCOME_PROPAGATE_EXCEPTION(m)                                                                                                                                                                                                                                                                                   \
   {                                                                                                                                                                                                                                                                                                                            \
     const auto &__v = (m);                                                                                                                                                                                                                                                                                                     \
     if(__v.has_exception())                                                                                                                                                                                                                                                                                                    \
       return __v.get_exception();                                                                                                                                                                                                                                                                                              \
   }
-//! \brief Expands into { const auto &__v=(m); if(__v.has_error()) return __v.get_error(); else if(__v.has_exception()) return __v.get_exception(); }
+//! \brief Expands into { const auto &__v=(m); if(__v.has_error()) return __v.get_error(); else if(__v.has_exception()) return __v.get_exception(); } \ingroup macro_helpers
 #define BOOST_OUTCOME_PROPAGATE_FAILURE(m)                                                                                                                                                                                                                                                                                     \
   {                                                                                                                                                                                                                                                                                                                            \
     const auto &__v = (m);                                                                                                                                                                                                                                                                                                     \
@@ -2279,14 +2225,14 @@ namespace std
       return __v.get_exception();                                                                                                                                                                                                                                                                                              \
   }
 
-//! \brief Expands into
+//! \brief Expands into { const auto &__v = (m); if(__v.has_error()) throw std::system_error(__v.get_error()); } \ingroup macro_helpers
 #define BOOST_OUTCOME_THROW_ERROR(m)                                                                                                                                                                                                                                                                                           \
   {                                                                                                                                                                                                                                                                                                                            \
     const auto &__v = (m);                                                                                                                                                                                                                                                                                                     \
     if(__v.has_error())                                                                                                                                                                                                                                                                                                        \
       throw std::system_error(__v.get_error());                                                                                                                                                                                                                                                                                \
   }
-//! \brief Expands into
+//! \brief Expands into { const auto &__v = (m); if(__v.has_error()) throw std::system_error(__v.get_error()); else if(__v.has_exception()) return std::rethrow_exception(__v.get_exception()); }  \ingroup macro_helpers
 #define BOOST_OUTCOME_THROW_FAILURE(m)                                                                                                                                                                                                                                                                                         \
   {                                                                                                                                                                                                                                                                                                                            \
     const auto &__v = (m);                                                                                                                                                                                                                                                                                                     \
@@ -2318,13 +2264,14 @@ namespace std
   else if(unique.has_exception())                                                                                                                                                                                                                                                                                              \
     return unique.get_exception();                                                                                                                                                                                                                                                                                             \
   auto v(std::move(std::move(unique).get()))
-//! \brief Expands into BOOST_OUTCOME_PROPAGATE_ERROR(m); auto v((m).get())
+//! \brief Expands into BOOST_OUTCOME_PROPAGATE_ERROR(m); auto v((m).get()) \ingroup macro_helpers
 #define BOOST_OUTCOME_FILTER_ERROR(v, m) BOOST_OUTCOME_FILTER_ERROR2(BOOST_OUTCOME_UNIQUE_NAME, v, m)
-//! \brief Expands into BOOST_OUTCOME_PROPAGATE_EXCEPTION(m); auto v((m).get())
+//! \brief Expands into BOOST_OUTCOME_PROPAGATE_EXCEPTION(m); auto v((m).get()) \ingroup macro_helpers
 #define BOOST_OUTCOME_FILTER_EXCEPTION(v, m) BOOST_OUTCOME_FILTER_EXCEPTION2(BOOST_OUTCOME_UNIQUE_NAME, v, m)
-//! \brief Expands into BOOST_OUTCOME_PROPAGATE_FAILURE(m); auto v((m).get())
+//! \brief Expands into BOOST_OUTCOME_PROPAGATE_FAILURE(m); auto v((m).get()) \ingroup macro_helpers
 #define BOOST_OUTCOME_FILTER_FAILURE(v, m) BOOST_OUTCOME_FILTER_FAILURE2(BOOST_OUTCOME_UNIQUE_NAME, v, m)
 
+//! \brief A boilerplate sequence of `catch(exceptions...)` returning those exceptions as their equivalent `result<T>` \ingroup macro_helpers
 #define BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT(type)                                                                                                                                                                                                                                                                          \
   \
 catch(const std::invalid_argument &e)                                                                                                                                                                                                                                                                                          \
