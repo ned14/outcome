@@ -56,12 +56,12 @@ before_install:
 script:
  -
    if [ "$__" = "Unit tests" ]; then
-     tar cfJ outcome.tar.xz . --exclude llvm* --exclude outcome.tar.xz --exclude .git;
+     tar cfJ ../outcome.tar.xz . --exclude llvm* --exclude .git;
      cd test;
      BUILD_EXTRA=1 CXX=g++-6 ./withgcc.sh;
      ./unittests_1 || exit 1;
      ./unittests_coverage || exit 1;
-     curl -T outcome.tar.xz -uned14:$BINTRAY_API_KEY https://api.bintray.com/content/ned14/generic/Boost.Outcome/v1.0/Boost.Outcome_source_`date +%Y%m%d%H%H`.tar.xz;
+     curl -T ../outcome.tar.xz -uned14:$BINTRAY_API_KEY https://api.bintray.com/content/ned14/generic/Boost.Outcome/v1.0/Boost.Outcome_source_`date +%Y%m%d%H%H`.tar.xz;
    fi
  -
    if [ "$__" = "Code bloat tests" ]; then
@@ -86,7 +86,7 @@ script:
      cd ../..;
      CXX=g++-6 ctest -S .docs.cmake -V;
      cd doc/html;
-     git commit -a -m "upd" && git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost.outcome gh-pages;
+     git add . && git commit -a -m "Travis CI updates documentation" && git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost.outcome gh-pages;
      cd ../..;
    fi
  
