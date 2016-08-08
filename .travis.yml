@@ -79,8 +79,13 @@ script:
      git config --global push.default simple;
      git config --global user.name "Jenkins nedprod CI";
      git config --global user.email "foo@nowhere";
+     cd doc/html;
+     git checkout gh-pages;
+     cd ../..;
      CXX=g++-6 ctest -S .docs.cmake -V;
-     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost.outcome gh-pages;
+     cd doc/html;
+     git commit -a -m "upd" && git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost.outcome gh-pages;
+     cd ../..;
    fi
  
 after_success:
