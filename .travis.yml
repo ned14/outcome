@@ -27,7 +27,7 @@ env:
  - __="Unit tests"
  - __="Code bloat tests"
  - __="cmake tests" NAME=TravisLinuxWorker
- - __="Documentation" NAME=TravisLinuxWorker
+ - __="Documentation" NAME=TravisDocumentation
  
 cache:
   apt: true
@@ -56,7 +56,7 @@ before_install:
 script:
  -
    if [ "$__" = "Unit tests" ]; then
-     tar cfJ outcome.tar.xz . --exclude llvm*;
+     tar cfJ outcome.tar.xz . --exclude llvm* --exclude outcome.tar.xz --exclude .git;
      cd test;
      BUILD_EXTRA=1 CXX=g++-6 ./withgcc.sh;
      ./unittests_1 || exit 1;
