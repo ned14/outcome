@@ -56,10 +56,12 @@ before_install:
 script:
  -
    if [ "$__" = "Unit tests" ]; then
+     tar cfJ outcome.tar.xz . --exclude llvm*
      cd test;
      BUILD_EXTRA=1 CXX=g++-6 ./withgcc.sh;
      ./unittests_1 || exit 1;
      ./unittests_coverage || exit 1;
+     curl -T outcome.tar.xz -uned14:$BINTRAY_API_KEY https://api.bintray.com/content/ned14/generic/Boost.Outcome/v1.0/Boost.Outcome_source_`date +%Y%m%d%H%H`.tar.xz
    fi
  -
    if [ "$__" = "Code bloat tests" ]; then
