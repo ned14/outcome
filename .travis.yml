@@ -56,14 +56,13 @@ before_install:
 script:
  -
    if [ "$__" = "Unit tests" ]; then
-     tar cfJ ../outcome.tar.xz . --exclude llvm* --exclude .git;
+     TARNAME=boost.outcome-v1.0-source-`date +%Y%m%d%H%M`.tar.xz;
+     tar cfJ ../$TARNAME . --exclude llvm* --exclude .git;
      cd test;
      BUILD_EXTRA=1 CXX=g++-6 ./withgcc.sh;
      ./unittests_1 || exit 1;
      ./unittests_coverage || exit 1;
-     NAME=boost.outcome-v1.0-source-`date +%Y%m%d%H%M`.tar.xz;
-     curl -T ../../outcome.tar.xz -uned14:$BINTRAY_API_KEY https://api.bintray.com/content/ned14/generic/Boost.Outcome/v1.0/$NAME;
-     curl -X POST -uned14:$BINTRAY_API_KEY https://api.bintray.com/content/ned14/generic/Boost.Outcome/v1.0/publish;
+     #curl --data-binary @../../$TARNAME https://dedi4.nedprod.com/static/files/upload/$TARNAME;
    fi
  -
    if [ "$__" = "Code bloat tests" ]; then
