@@ -5,6 +5,8 @@ Linux: [![Build Status](https://travis-ci.org/ned14/boost.outcome.svg?branch=mas
 
 Documentation: https://ned14.github.io/boost.outcome/
 
+Tarballs of source with all unit tests passing: https://dedi4.nedprod.com/static/files/
+
 Todo:
  - [x] Fix all remaining mentions of Boost.Monad (e.g. doxygen docs)
  - [x] Loosen explicit basic_monad constructors to allow option => result => monad implicitly.
