@@ -40,24 +40,24 @@ DEALINGS IN THE SOFTWARE.
 #undef BOOST_OUTCOME_NAMESPACE_VERSION
 #undef BOOST_OUTCOME_MODULE_NAME
 
-#define BOOST_OUTCOME_VERSION_GLUE2(a, b, c) a ## b ## c
-#define BOOST_OUTCOME_VERSION_GLUE(a, b, c)  BOOST_OUTCOME_VERSION_GLUE2(a, b, c)
+#define BOOST_OUTCOME_VERSION_GLUE2(a, b, c) a##b##c
+#define BOOST_OUTCOME_VERSION_GLUE(a, b, c) BOOST_OUTCOME_VERSION_GLUE2(a, b, c)
 
 // Hard coded as this is a specific version
-#define BOOST_OUTCOME_VERSION_MAJOR    1
-#define BOOST_OUTCOME_VERSION_MINOR    0
-#define BOOST_OUTCOME_VERSION_PATCH    0
+#define BOOST_OUTCOME_VERSION_MAJOR 1
+#define BOOST_OUTCOME_VERSION_MINOR 0
+#define BOOST_OUTCOME_VERSION_PATCH 0
 #define BOOST_OUTCOME_VERSION_REVISION 0
 //! \brief The namespace boost::outcome::v ## BOOST_OUTCOME_NAMESPACE_VERSION
-#define BOOST_OUTCOME_NAMESPACE_VERSION   BOOST_OUTCOME_VERSION_GLUE(BOOST_OUTCOME_VERSION_MAJOR, _, BOOST_OUTCOME_VERSION_MINOR)
+#define BOOST_OUTCOME_NAMESPACE_VERSION BOOST_OUTCOME_VERSION_GLUE(BOOST_OUTCOME_VERSION_MAJOR, _, BOOST_OUTCOME_VERSION_MINOR)
 
 #if defined(__cpp_modules) || defined(DOXYGEN_SHOULD_SKIP_THIS)
 #if defined(_MSC_VER) && !defined(__clang__)
 //! \brief The Outcome C++ module name
-#define BOOST_OUTCOME_MODULE_NAME BOOST_OUTCOME_VERSION_GLUE(outcome_v, BOOST_OUTCOME_NAMESPACE_VERSION,)
+#define BOOST_OUTCOME_MODULE_NAME BOOST_OUTCOME_VERSION_GLUE(outcome_v, BOOST_OUTCOME_NAMESPACE_VERSION, )
 #else
 //! \brief The Outcome C++ module name
-#define BOOST_OUTCOME_MODULE_NAME BOOST_OUTCOME_VERSION_GLUE(outcome_v, BOOST_OUTCOME_NAMESPACE_VERSION,)
+#define BOOST_OUTCOME_MODULE_NAME BOOST_OUTCOME_VERSION_GLUE(outcome_v, BOOST_OUTCOME_NAMESPACE_VERSION, )
 #endif
 #endif
 
@@ -421,13 +421,13 @@ namespace traits
       using non_auto_type = T;
     };
 
-    template<int R> struct rank;
+    template <int R> struct rank;
 #ifndef DOXYGEN_IS_IN_THE_HOUSE
-    template<int R> struct rank : rank<R - 1>
+    template <int R> struct rank : rank<R - 1>
     {
       static_assert(R > 0, "");
     };
-    template<> struct rank<0>
+    template <> struct rank<0>
     {
     };
 #endif
@@ -1147,7 +1147,7 @@ public:
   static constexpr bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
   //! \brief This monad does not implement a destructor
   static constexpr bool is_trivially_destructible = value_storage_type::is_trivially_destructible;
-#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 190024210 /* VS2015 Update 3*/)
+#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 190024220 /* VS2015 Update 3*/)
   //! \brief This monad is constructible from the monad specified
   template <class OtherMonad> static constexpr bool is_constructible = value_storage_type::template is_constructible_from<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
   template <class OtherMonad, class Base = typename std::conditional<is_constructible<OtherMonad>, std::true_type, std::false_type>::type> struct _is_constructible : Base
