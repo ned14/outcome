@@ -156,11 +156,14 @@ public:
   static_assert(!std::is_same<value_type, exception_type>::value, "R and exception_type cannot be the same type");
   static_assert(!std::is_same<error_type, exception_type>::value, "error_type and exception_type cannot be the same type");
 
+  // Is this storage copy and move constructible?
+  static constexpr bool is_copy_constructible = (!has_value_type || std::is_copy_constructible<value_type>::value) && (!has_error_type || std::is_copy_constructible<exception_type>::value) && (!has_exception_type || std::is_copy_constructible<error_type>::value);
+  static constexpr bool is_move_constructible = (!has_value_type || std::is_move_constructible<value_type>::value) && (!has_error_type || std::is_move_constructible<exception_type>::value) && (!has_exception_type || std::is_move_constructible<error_type>::value);
 
-  static constexpr bool is_nothrow_copy_constructible = std::is_nothrow_copy_constructible<value_type>::value && std::is_nothrow_copy_constructible<exception_type>::value && std::is_nothrow_copy_constructible<error_type>::value;
-  static constexpr bool is_nothrow_move_constructible = std::is_nothrow_move_constructible<value_type>::value && std::is_nothrow_move_constructible<exception_type>::value && std::is_nothrow_move_constructible<error_type>::value;
-  static constexpr bool is_nothrow_copy_assignable = std::is_nothrow_copy_assignable<value_type>::value && std::is_nothrow_copy_assignable<exception_type>::value && std::is_nothrow_copy_assignable<error_type>::value;
-  static constexpr bool is_nothrow_move_assignable = std::is_nothrow_move_assignable<value_type>::value && std::is_nothrow_move_assignable<exception_type>::value && std::is_nothrow_move_assignable<error_type>::value;
+  static constexpr bool is_nothrow_copy_constructible = (!has_value_type || std::is_nothrow_copy_constructible<value_type>::value) && (!has_error_type || std::is_nothrow_copy_constructible<exception_type>::value) && (!has_exception_type || std::is_nothrow_copy_constructible<error_type>::value);
+  static constexpr bool is_nothrow_move_constructible = (!has_value_type || std::is_nothrow_move_constructible<value_type>::value) && (!has_error_type || std::is_nothrow_move_constructible<exception_type>::value) && (!has_exception_type || std::is_nothrow_move_constructible<error_type>::value);
+  static constexpr bool is_nothrow_copy_assignable = (!has_value_type || std::is_nothrow_copy_assignable<value_type>::value) && (!has_error_type || std::is_nothrow_copy_assignable<exception_type>::value) && (!has_exception_type || std::is_nothrow_copy_assignable<error_type>::value);
+  static constexpr bool is_nothrow_move_assignable = (!has_value_type || std::is_nothrow_move_assignable<value_type>::value) && (!has_error_type || std::is_nothrow_move_assignable<exception_type>::value) && (!has_exception_type || std::is_nothrow_move_assignable<error_type>::value);
   static constexpr bool is_nothrow_destructible = base::is_nothrow_destructible;
 
   template <class _value_type2> static constexpr bool value_type_is_constructible_from = std::is_same<_value_type, _value_type2>::value || std::is_constructible<_value_type, _value_type2>::value;
