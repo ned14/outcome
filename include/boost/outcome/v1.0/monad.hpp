@@ -242,7 +242,7 @@ To do this, simply supply a policy type of the following form:
 BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN
 
 // Slight misuse of ringbuffer_log to keep extended error code information
-static inline boost_lite::ringbuffer_log::simple_ringbuffer_log<4096> &extended_error_code_log()
+inline boost_lite::ringbuffer_log::simple_ringbuffer_log<4096> &extended_error_code_log()
 {
   static boost_lite::ringbuffer_log::simple_ringbuffer_log<4096> log(boost_lite::ringbuffer_log::level::error);
   return log;
@@ -1386,7 +1386,7 @@ error_type, an exception_type nor an empty_type.
     implementation_policy::base::_storage.set_exception(std::move(v));
   }
   //! \brief Disposes of any existing state, setting the monad to make_exception_type(forward<E>(e))
-  template <typename E> BOOST_OUTCOME_CONVINCE_MSVC void set_exception(E &&e) { set_exception(make_exception_type(std::forward<E>(e))); }
+  template <typename E, typename = typename std::enable_if<std::is_same<E, E>::value && has_exception_type>::type> BOOST_OUTCOME_CONVINCE_MSVC void set_exception(E &&e) { set_exception(make_exception_type(std::forward<E>(e))); }
 
   //! \brief Swaps one monad for another
   BOOST_OUTCOME_CONVINCE_MSVC void swap(basic_monad &o) noexcept(is_nothrow_move_constructible) { implementation_policy::base::_storage.swap(o._storage); }
