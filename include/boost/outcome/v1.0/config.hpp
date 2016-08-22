@@ -99,11 +99,11 @@ DEALINGS IN THE SOFTWARE.
 
 #ifdef BOOST_OUTCOME_UNSTABLE_VERSION
 #include "../revision.hpp"
-#define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(v, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL, BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE), inline)
+#define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL, BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE), inline)
 #elif BOOST_OUTCOME_LATEST_VERSION == 1
-#define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(v, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL), inline)
+#define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL), inline)
 #else
-#define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(v, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL))
+#define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL))
 #endif
 /*! \def BOOST_OUTCOME_V1
 \ingroup config
@@ -131,10 +131,10 @@ namespace starting with `v1_` inside the `boost::afio` namespace.
 /*! \brief Expands into the appropriate namespace markup to enter the Outcome v1 namespace.
 \ingroup config
 */
-#define BOOST_OUTCOME_V1_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                          \
+#define BOOST_OUTCOME_V1_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                       \
   namespace boost                                                                                                                                                                                                                                                                                                              \
   {                                                                                                                                                                                                                                                                                                                            \
-    namespace outcome                                                                                                                                                                                                                                                                                                             \
+    namespace outcome                                                                                                                                                                                                                                                                                                          \
     {                                                                                                                                                                                                                                                                                                                          \
       inline namespace v1_xxx                                                                                                                                                                                                                                                                                                  \
       {
@@ -142,17 +142,17 @@ namespace starting with `v1_` inside the `boost::afio` namespace.
 exported Outcome v1 namespace.
 \ingroup config
 */
-#define BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                          \
-  export namespace boost                                                                                                                                                                                                                                                                                                              \
+#define BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                \
+  export namespace boost                                                                                                                                                                                                                                                                                                       \
   {                                                                                                                                                                                                                                                                                                                            \
-    namespace outcome                                                                                                                                                                                                                                                                                                             \
+    namespace outcome                                                                                                                                                                                                                                                                                                          \
     {                                                                                                                                                                                                                                                                                                                          \
-      inline namespace v1_xxx                                                                                                                                                                                                                                                                                                      \
+      inline namespace v1_xxx                                                                                                                                                                                                                                                                                                  \
       {
 /*! \brief Expands into the appropriate namespace markup to exit the Outcome v1 namespace.
 \ingroup config
 */
-#define BOOST_OUTCOME_V1_NAMESPACE_END                                                                                                                                                                                                                                                                                            \
+#define BOOST_OUTCOME_V1_NAMESPACE_END                                                                                                                                                                                                                                                                                         \
   }                                                                                                                                                                                                                                                                                                                            \
   }                                                                                                                                                                                                                                                                                                                            \
   }
@@ -231,7 +231,7 @@ namespace stl11
 #define BOOST_OUTCOME_CONVINCE_MSVC
 #endif
 
-#include <ostream>  // for printing
 #include <cassert>  // for asserting :)
+#include <ostream>  // for printing
 
 #endif  // BOOST_OUTCOME_NEED_DEFINE
