@@ -89,6 +89,12 @@ import BOOST_OUTCOME_MODULE_NAME;
 #ifndef BOOST_OUTCOME_MONAD_H
 #define BOOST_OUTCOME_MONAD_H
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4714)  // failure to __forceinline
+#pragma warning(disable : 4996)  // use of strncpy
+#endif
+
 #include "value_storage.hpp"
 
 #include "../boost-lite/include/ringbuffer_log.hpp"
@@ -252,12 +258,6 @@ inline boost_lite::ringbuffer_log::simple_ringbuffer_log<4096> &extended_error_c
 #define BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK
 #endif
 
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4996)  // use of strncpy
-#endif
-
 /*! \class error_code_extended
 \brief Keeps additional information about a std::error_code like custom error message,
 backtrace etc. Can be safely type sliced into a std::error_code.
@@ -363,10 +363,6 @@ inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec)
   }
   return s;
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 namespace traits
 {
@@ -2336,6 +2332,9 @@ catch(...)                                                                      
     return make_errored_result<type>(EAGAIN, "unknown exception");                                                                                                                                                                                                                                                             \
   }
 
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #endif
 #endif
