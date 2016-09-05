@@ -22,7 +22,7 @@ ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 
 ctest_start("Experimental")
 ctest_configure()
-ctest_build()
+ctest_build(TARGET _hl)
 ctest_test(RETURN_VALUE retval)
 merge_junit_results_into_ctest_xml()
 #ctest_upload(FILES )
