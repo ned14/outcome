@@ -156,7 +156,7 @@ exported Outcome v1 namespace.
   }                                                                                                                                                                                                                                                                                                                            \
   }                                                                                                                                                                                                                                                                                                                            \
   }
-#elif defined(GENERATING_CXX_MODULE_INTERFACE)
+#elif defined(GENERATING_OUTCOME_MODULE_INTERFACE)
 #define BOOST_OUTCOME_V1_NAMESPACE BOOSTLITE_BIND_NAMESPACE(BOOST_OUTCOME_V1)
 #define BOOST_OUTCOME_V1_NAMESPACE_BEGIN BOOSTLITE_BIND_NAMESPACE_BEGIN(BOOST_OUTCOME_V1)
 #define BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN BOOSTLITE_BIND_NAMESPACE_EXPORT_BEGIN(BOOST_OUTCOME_V1)
