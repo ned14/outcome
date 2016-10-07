@@ -394,7 +394,7 @@ namespace std
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::value:
       return s >> v.value;
     default:
-      throw ios_base::failure("Set the type of lightweight_futures::value_storage to a value_type before deserialising into it");
+      BOOST_OUTCOME_THROW(ios_base::failure("Set the type of lightweight_futures::value_storage to a value_type before deserialising into it"));
     }
   }
   //! \brief Serialise a value_storage. Mostly useful for debug printing. \ingroup monad

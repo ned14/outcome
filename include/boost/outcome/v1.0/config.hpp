@@ -234,4 +234,16 @@ namespace stl11
 #include <cassert>  // for asserting :)
 #include <ostream>  // for printing
 
+#ifndef BOOST_OUTCOME_THROW
+#ifdef __cpp_exceptions
+#define BOOST_OUTCOME_THROW(expr) throw expr
+#else
+#include <stdio.h>
+#define BOOST_OUTCOME_THROW(expr)                                                                                                                                                                                                                                                                                              \
+  fprintf(stderr, "FATAL: Boost.Outcome throws exception " #expr " with exceptions disabled\n");                                                                                                                                                                                                                               \
+  assert(("throw " #expr, false));                                                                                                                                                                                                                                                                                             \
+  std::terminate()
+#endif
+#endif
+
 #endif  // BOOST_OUTCOME_NEED_DEFINE

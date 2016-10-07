@@ -56,15 +56,39 @@ endif()
 # Set the library dependencies this library has
 target_link_libraries(outcome_hl INTERFACE boost-lite_hl)
 
-# For all possible configurations of this library, add each test
-list_filter(outcome_TESTS EXCLUDE REGEX "test_multiabi.cpp")
-include(BoostLiteMakeStandardTests)
-if(TARGET outcome_hl_pch)
-  target_compile_definitions(outcome_hl_pch PUBLIC BOOST_OUTCOME_ENABLE_OPERATORS=1)
+if(NOT PROJECT_IS_DEPENDENCY)
+  # For all possible configurations of this library, add each test
+  list_filter(outcome_TESTS EXCLUDE REGEX "test_multiabi.cpp|unittests_noexcept.cpp")
+  include(BoostLiteMakeStandardTests)
+  if(TARGET outcome_hl_pch)
+    target_compile_definitions(outcome_hl_pch PUBLIC BOOST_OUTCOME_ENABLE_OPERATORS=1)
+  endif()
+  foreach(test_target ${outcome_TEST_TARGETS})
+    target_compile_definitions(${test_target} PUBLIC BOOST_OUTCOME_ENABLE_OPERATORS=1)
+  endforeach()
+
+  # Add a very custom test, one with exceptions and RTTI disabled
+  add_executable(outcome_hl--unittests_noexcept "test/unittests_noexcept.cpp")
+  set_target_properties(outcome_hl--unittests_noexcept PROPERTIES EXCLUDE_FROM_ALL ON)
+  add_dependencies(_hl outcome_hl--unittests_noexcept)
+  if(WIN32)
+    target_compile_definitions(outcome_hl--unittests_noexcept PUBLIC _UNICODE)
+  endif()
+  if(MSVC AND NOT CLANG)
+    target_compile_options(outcome_hl--unittests_noexcept PUBLIC /EHs-c- /GR-)
+  else()
+    target_compile_options(outcome_hl--unittests_noexcept PUBLIC -fno-exceptions -fno-rtti)
+  endif()
+  list(APPEND outcome_TEST_TARGETS outcome_hl--unittests_noexcept)
+  set_target_properties(outcome_hl--unittests_noexcept PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    POSITION_INDEPENDENT_CODE ON
+  )
+  # I don't actually want to run this, it fails every time by design
+  #add_test(NAME outcome_hl--unittests_noexcept CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
+  #COMMAND $<TARGET_FILE:outcome_hl--unittests_noexcept>
+  #)
 endif()
-foreach(test_target ${outcome_TEST_TARGETS})
-  target_compile_definitions(${test_target} PUBLIC BOOST_OUTCOME_ENABLE_OPERATORS=1)
-endforeach()
 
 # Make available this library for install and export
 include(BoostLiteMakeInstall)

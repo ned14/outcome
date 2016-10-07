@@ -108,7 +108,7 @@ import BOOST_OUTCOME_MODULE_NAME;
 /*! \file monad.hpp
 \brief Provides a lightweight simple monadic value transport
 
-\headerfile include/boost/spinlock/monad.hpp ""
+\headerfile include/boost/outcome/outcome.hpp ""
 */
 
 /*! \defgroup monad Configurable lightweight simple monadic value transport with the same semantics and API as a future
@@ -162,6 +162,9 @@ byte space overhead. See below for benchmarks. Requires min clang 3.7, GCC 5.0 o
 use a future you already know how to use this.
 - Enables convenient and easy all-`noexcept` coding and design, giving you powerful error handling facilities
 with automatic exception safety.
+- Works just fine with exceptions and RTTI disabled. You may wish to replace the `BOOST_OUTCOME_THROW()` macro
+however with what to do when an exception would have been thrown e.g. trying to get a value from an errored
+or excepted monad.
 - Can replace most uses of `optional<T>` with seamless interop with more expressive forms e.g.
 `monad<int> != option<int>`.
 - Comprehensive unit testing and validation suite.
@@ -2226,14 +2229,14 @@ namespace std
   {                                                                                                                                                                                                                                                                                                                            \
     const auto &__v = (m);                                                                                                                                                                                                                                                                                                     \
     if(__v.has_error())                                                                                                                                                                                                                                                                                                        \
-      throw std::system_error(__v.get_error());                                                                                                                                                                                                                                                                                \
+      BOOST_OUTCOME_THROW(std::system_error(__v.get_error()));                                                                                                                                                                                                                                                                 \
   }
 //! \brief Expands into { const auto &__v = (m); if(__v.has_error()) throw std::system_error(__v.get_error()); else if(__v.has_exception()) return std::rethrow_exception(__v.get_exception()); }  \ingroup macro_helpers
 #define BOOST_OUTCOME_THROW_FAILURE(m)                                                                                                                                                                                                                                                                                         \
   {                                                                                                                                                                                                                                                                                                                            \
     const auto &__v = (m);                                                                                                                                                                                                                                                                                                     \
     if(__v.has_error())                                                                                                                                                                                                                                                                                                        \
-      throw std::system_error(__v.get_error());                                                                                                                                                                                                                                                                                \
+      BOOST_OUTCOME_THROW(std::system_error(__v.get_error()));                                                                                                                                                                                                                                                                 \
     else if(__v.has_exception())                                                                                                                                                                                                                                                                                               \
       return std::rethrow_exception(__v.get_exception());                                                                                                                                                                                                                                                                      \
   }
