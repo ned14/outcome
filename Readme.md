@@ -8,7 +8,18 @@ Documentation: https://ned14.github.io/boost.outcome/
 Tarballs of source with all unit tests passing: https://dedi4.nedprod.com/static/files/
 
 Todo:
- - [x] Fix all remaining mentions of Boost.Monad (e.g. doxygen docs)
+ - [ ] Add a new `-fno-exceptions` compatible Boost.Test emulation to Boost-lite and get Outcome's
+unit tests passing under that.
+ - [ ] Add macro helpers to Outcome for returning outcomes out of things which cannot return values
+like constructors, and convert said exceptions/TLS back into outcomes.
+  - Make use of `std::system_error(errno, system_category, "custom error message");`
+ - [ ] Audit all uses of `std::error_code.code()` and replace with `std::errc::whatever` as
+appropriate.
+ - [ ] Split all uses of `BOOST_OUTCOME_THROW()` into separate macros for each throw site and type,
+each of which default to `BOOST_OUTCOME_THROW()`.
+  - `BOOST_OUTCOME_THROW()` should print a stack backtrace before fatal exiting.
+ - [ ] Fix all remaining uses of `monad<T>` (e.g. doxygen docs).
+ - [ ] Test relaxed constexpr in VS15 once that is released and delete the hack macro.
  - [x] Loosen explicit basic_monad constructors to allow option => result => monad implicitly.
  - [x] Pack bools in basic_promise_future_storage into value_storage_impl, thus saving 8 bytes
  - [x] Get the constexpr tests firing per-commit in Travis (and maybe Appveyor)
