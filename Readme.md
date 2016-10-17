@@ -19,6 +19,8 @@ appropriate.
 each of which default to `BOOST_OUTCOME_THROW()`.
   - `BOOST_OUTCOME_THROW()` should print a stack backtrace before fatal exiting.
  - [ ] Fix all remaining uses of `monad<T>` (e.g. doxygen docs).
+ - [ ] Move the detailed `basic_monad` docs out of the group monad page and onto the front page
+  - Also add a tutorial
  - [ ] Test relaxed constexpr in VS15 once that is released and delete the hack macro.
  - [x] Loosen explicit basic_monad constructors to allow option => result => monad implicitly.
  - [x] Pack bools in basic_promise_future_storage into value_storage_impl, thus saving 8 bytes
