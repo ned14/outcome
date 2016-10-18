@@ -22,6 +22,11 @@ each of which default to `BOOST_OUTCOME_THROW()`.
  - [ ] Move the detailed `basic_monad` docs out of the group monad page and onto the front page
   - Also add a tutorial
  - [ ] Test relaxed constexpr in VS15 once that is released and delete the hack macro.
+ - Jenkins to upload per commit to package distros **source packages** for these:
+  - [ ] launchpad (Ubuntu, Debian). Instructions at https://help.launchpad.net/Packaging/PPA/BuildingASourcePackage
+  - [ ] vcpkg (Microsoft). Instructions at https://github.com/Microsoft/vcpkg/blob/master/docs/EXAMPLES.md
+  - [ ] homebrew (OS X). Instructions at http://formalfriday.club/2015/01/05/creating-your-own-homebrew-tap-and-formula.html
+  - [ ] FreeBSD packages. Instructions at https://www.freebsd.org/doc/handbook/ports-poudriere.html
  - [x] Loosen explicit basic_monad constructors to allow option => result => monad implicitly.
  - [x] Pack bools in basic_promise_future_storage into value_storage_impl, thus saving 8 bytes
  - [x] Get the constexpr tests firing per-commit in Travis (and maybe Appveyor)
