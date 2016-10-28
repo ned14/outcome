@@ -277,6 +277,7 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(m.has_exception());
     BOOST_CHECK_THROW(m.get(), stl11::system_error);
     BOOST_CHECK(m.get_error() == ec);
+#ifdef __cpp_exceptions
     BOOST_CHECK(m.get_exception());
     try
     {
@@ -287,6 +288,7 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
       BOOST_CHECK(ex.code() == ec);
       BOOST_CHECK(ex.code().value() == 5);
     }
+#endif
   }
   {
     auto e = std::make_exception_ptr(5);
@@ -306,17 +308,7 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
 BOOST_AUTO_TEST_CASE(works / monad / comparison, "Tests that the monad can compare to compatible monads")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  auto make_exception_ptr = [] {
-    try
-    {
-      throw std::runtime_error("hi");
-    }
-    catch(...)
-    {
-      return std::current_exception();
-    }
-  };
-  auto p = make_exception_ptr();
+  auto p = std::make_exception_ptr(std::runtime_error("hi"));
   // value comparison
   {
     outcome<int> a(1), b(2), c(2);
@@ -514,6 +506,7 @@ BOOST_AUTO_TEST_CASE(works / monad / optional, "Tests that the monad acts as an 
   //! [optional_example]
 }
 
+#ifdef __cpp_exceptions
 BOOST_AUTO_TEST_CASE(works / monad / fileopen, "Tests that the monad semantically represents opening a file")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
@@ -553,6 +546,7 @@ BOOST_AUTO_TEST_CASE(works / monad / fileopen, "Tests that the monad semanticall
   BOOST_CHECK(a.get_error() == error_code_extended(ENOENT, stl11::generic_category()));
   //! [monad_example]
 }
+#endif
 
 #ifdef __cpp_exceptions
 // std nothrow traits seem to return random values if exceptions are disabled on MSVC
@@ -651,6 +645,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
     outcome<udt> foo(5);
     BOOST_CHECK(5 == foo.get().a);
   }
+#ifdef __cpp_exceptions
   // Emplace construct, throws during move and copy
   {
     struct udt
@@ -738,6 +733,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
       BOOST_CHECK("niall" == foo.get().a);
     }
   }
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(works / monad / void, "Tests that the monad works as intended with void")

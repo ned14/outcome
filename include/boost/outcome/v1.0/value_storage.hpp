@@ -441,6 +441,7 @@ namespace std
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::error:
       return s << v.error;
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::exception:
+#ifdef __cpp_exceptions
       try
       {
         rethrow_exception(v.exception);
@@ -458,6 +459,7 @@ namespace std
         return s << "std::exception: " << e.what();
       }
       catch(...)
+#endif
       {
         return s << "unknown exception";
       }

@@ -249,11 +249,11 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 namespace detail
 {
-  inline void do_fatal_exit(const char *expr)
+  BOOST_NORETURN inline void do_fatal_exit(const char *expr)
   {
     void *bt[16];
     size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0]));
-    fprintf(stderr, "FATAL: Boost.Outcome throws exception " #expr " with exceptions disabled\n");
+    fprintf(stderr, "FATAL: Boost.Outcome throws exception %s with exceptions disabled\n", expr);
     char **bts = backtrace_symbols(bt, btlen);
     if(bts)
     {
@@ -261,7 +261,6 @@ namespace detail
         fprintf(stderr, "  %s\n", bts[n]);
       free(bts);
     }
-    assert(("throw " #expr, false));
     std::terminate();
   }
 }
