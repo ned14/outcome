@@ -10,6 +10,7 @@ Tarballs of source with all unit tests passing: https://dedi4.nedprod.com/static
 Todo:
  - [ ] Add a new `-fno-exceptions` compatible Boost.Test emulation to Boost-lite and get Outcome's
 unit tests passing under that.
+ - [ ] Add clang-tidy support to Boost lite and get it running regularly.
  - [ ] Add macro helpers to Outcome for returning outcomes out of things which cannot return values
 like constructors, and convert said exceptions/TLS back into outcomes.
   - Make use of `std::system_error(errno, system_category, "custom error message");`

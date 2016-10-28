@@ -33,15 +33,17 @@ DEALINGS IN THE SOFTWARE.
 #define _CRT_SECURE_NO_WARNINGS 1
 
 #ifdef _MSC_VER
+#pragma warning(disable : 4127)  // conditional expression is constant
 #pragma warning(disable : 4503)  // decorated name length exceeded
 #pragma warning(disable : 4714)  // function marked __forceinline not inlined
 #endif
 
-#define BOOST_CATCH_CUSTOM_MAIN_DEFINED
+#define BOOSTLITE_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
 #include "../boost-lite/include/boost/test/unit_test.hpp"
 #include "../include/boost/outcome/outcome.hpp"
 
 #include <algorithm>
+#include <functional>
 #include <stdio.h>
 #include <unordered_map>
 
@@ -75,7 +77,10 @@ BOOST_AUTO_TEST_CASE(works / traits, "Tests that the traits work as intended")
     int (*h)(int &&) = [](int &&) -> int { return 5; };
     int (*i)(const int &) = [](const int &) -> int { return 5; };
     int (*j)(int &) = [](int &) -> int { return 5; };
-    (void)g; (void)h; (void)i; (void)j;
+    (void) g;
+    (void) h;
+    (void) i;
+    (void) j;
 
     static_assert(callable_argument_traits<decltype(a), int>::valid, "callable not recognised as valid");
     static_assert(callable_argument_traits<decltype(b), int &&>::valid, "callable not recognised as valid");
@@ -1125,7 +1130,7 @@ int main(int argc, char *argv[])
   CPU_SET_S(1, 2, cpuset);
   pthread_setaffinity_np(pthread_self(), CPU_ALLOC_SIZE(2), cpuset);
 #endif
-  int result = Catch::Session().run(argc, argv);
+  int result = BOOSTLITE_BOOST_UNIT_TEST_RUN_TESTS(argc, argv);
   return result;
 }
 #endif
