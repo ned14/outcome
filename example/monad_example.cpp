@@ -4,7 +4,7 @@
 using namespace BOOST_OUTCOME_V1_NAMESPACE;
 
 //! [monad_bind_example]
-template<class T> monad<T> do_test(monad<T> m)
+template<class T> outcome<T> do_test(outcome<T> m)
 {
   std::cout << "The value of my input monad is ";
   if(m)
@@ -24,9 +24,9 @@ template<class T> monad<T> do_test(monad<T> m)
 
 int main(void)
 {
-  do_test(make_monad(5));
-  do_test(make_monad<std::string>());
-  do_test(make_monad<int>(std::error_code(5, std::generic_category())));
-  do_test(make_monad<double>(std::make_exception_ptr(std::logic_error("bad dog"))));
+  do_test(make_outcome(5));
+  do_test(make_outcome<std::string>());
+  do_test(make_outcome<int>(std::error_code(5, std::generic_category())));
+  do_test(make_outcome<double>(std::make_exception_ptr(std::logic_error("bad dog"))));
   return 0;
 }
