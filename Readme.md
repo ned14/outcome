@@ -8,18 +8,19 @@ Documentation: https://ned14.github.io/boost.outcome/
 Tarballs of source with all unit tests passing: https://dedi4.nedprod.com/static/files/
 
 Todo:
- - [ ] Add a new `-fno-exceptions` compatible Boost.Test emulation to Boost-lite and get Outcome's
+ - [x] Add a new `-fno-exceptions` compatible Boost.Test emulation to Boost-lite and get Outcome's
 unit tests passing under that.
+ - [ ] Get monad_example.cpp being compiled by Boost-lite during docs generation because it had got broken :(
  - [ ] Add clang-tidy support to Boost lite and get it running regularly.
  - [ ] Add macro helpers to Outcome for returning outcomes out of things which cannot return values
 like constructors, and convert said exceptions/TLS back into outcomes.
   - Make use of `std::system_error(errno, system_category, "custom error message");`
  - [ ] Audit all uses of `std::error_code.code()` and replace with `std::errc::whatever` as
 appropriate.
- - [ ] Split all uses of `BOOST_OUTCOME_THROW()` into separate macros for each throw site and type,
+ - [x] Split all uses of `BOOST_OUTCOME_THROW()` into separate macros for each throw site and type,
 each of which default to `BOOST_OUTCOME_THROW()`.
   - `BOOST_OUTCOME_THROW()` should print a stack backtrace before fatal exiting.
- - [ ] Fix all remaining uses of `monad<T>` (e.g. doxygen docs).
+ - [x] Fix all remaining uses of `monad<T>` (e.g. doxygen docs).
  - [ ] Move the detailed `basic_monad` docs out of the group monad page and onto the front page
   - Also add a tutorial
  - [ ] Test relaxed constexpr in VS15 once that is released and delete the hack macro.

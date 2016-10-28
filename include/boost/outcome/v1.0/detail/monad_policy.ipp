@@ -59,7 +59,7 @@ namespace detail
 
   protected:
     // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_OUTCOME_CONVINCE_MSVC bool _throw_error(monad_errc ec) { BOOST_OUTCOME_THROW(monad_error(ec)); }
+    static BOOST_OUTCOME_CONVINCE_MSVC bool _throw_error(monad_errc ec) { BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
     // Common preamble to the below
     BOOST_OUTCOME_CONVINCE_MSVC void _pre_get_value() const
     {
@@ -70,11 +70,11 @@ namespace detail
       {
 #ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
         if(monad_storage::has_error())
-          BOOST_OUTCOME_THROW(stl11::system_error(monad_storage::_storage.error));
+          BOOST_OUTCOME_THROW_SYSTEM_ERROR(monad_storage::_storage.error, stl11::system_error(monad_storage::_storage.error));
 #endif
 #ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
         if(monad_storage::has_exception())
-          std::rethrow_exception(monad_storage::_storage.exception);
+          BOOST_OUTCOME_RETHROW_EXCEPTION(monad_storage::_storage.exception);
 #endif
       }
 #endif
@@ -160,7 +160,7 @@ namespace detail
 
   protected:
     // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_OUTCOME_CONVINCE_MSVC bool _throw_error(monad_errc ec) { BOOST_OUTCOME_THROW(monad_error(ec)); }
+    static BOOST_OUTCOME_CONVINCE_MSVC bool _throw_error(monad_errc ec) { BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
     // Common preamble to the below
     BOOST_OUTCOME_CONVINCE_MSVC void _pre_get_value() const
     {
@@ -171,11 +171,11 @@ namespace detail
       {
 #ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
         if(monad_storage::has_error())
-          BOOST_OUTCOME_THROW(stl11::system_error(monad_storage::_storage.error));
+          BOOST_OUTCOME_THROW_SYSTEM_ERROR(monad_storage::_storage.error, stl11::system_error(monad_storage::_storage.error));
 #endif
 #ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
         if(monad_storage::has_exception())
-          std::rethrow_exception(monad_storage::_storage.exception);
+          BOOST_OUTCOME_RETHROW_EXCEPTION(monad_storage::_storage.exception);
 #endif
       }
 #endif

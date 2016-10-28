@@ -38,9 +38,10 @@ DEALINGS IN THE SOFTWARE.
 #pragma warning(disable : 4714)  // function marked __forceinline not inlined
 #endif
 
+#include "../include/boost/outcome/outcome.hpp"
+
 #define BOOSTLITE_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
 #include "../boost-lite/include/boost/test/unit_test.hpp"
-#include "../include/boost/outcome/outcome.hpp"
 
 #include <algorithm>
 #include <functional>
@@ -553,6 +554,8 @@ BOOST_AUTO_TEST_CASE(works / monad / fileopen, "Tests that the monad semanticall
   //! [monad_example]
 }
 
+#ifdef __cpp_exceptions
+// std nothrow traits seem to return random values if exceptions are disabled on MSVC
 BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly inherits noexcept from its type R")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
@@ -625,6 +628,7 @@ BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly i
     BOOST_CHECK(false == std::is_nothrow_destructible<type>::value);
   }
 }
+#endif
 
 BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intended with user-defined types")
 {

@@ -158,19 +158,21 @@ Features:
 
 - Very lightweight on build times and run times up to the point of zero execution cost and a one to eight
 byte space overhead. See below for benchmarks. Requires min clang 3.7, GCC 5.0 or VS2015 Update 2.
-- Just enough monad, nothing more, nothing fancy. Replicates the future API, so if you know how to
-use a future you already know how to use this.
+- Just enough monad, nothing more, nothing fancy. Replicates the `future<T>`, `optional<T>` and `expected<T, E>`
+API, so if you know how to use one of those you already know how to use this.
 - Enables convenient and easy all-`noexcept` coding and design, giving you powerful error handling facilities
 with automatic exception safety.
 - Works just fine with exceptions and RTTI disabled. You may wish to replace the `BOOST_OUTCOME_THROW()` macro
-however with what to do when an exception would have been thrown e.g. trying to get a value from an errored
+with what to do when an exception would have been thrown e.g. trying to get a value from an errored
 or excepted monad.
 - Can replace most uses of `optional<T>` with seamless interop with more expressive forms e.g.
-`monad<int> != option<int>`.
+`outcome<int> != option<int>`.
 - Comprehensive unit testing and validation suite.
 - Mirrors `noexcept` and trivial destructiveness of type R.
 - Type R can have no default constructor, move nor copy.
 - Works inside a STL container, and type R can be a STL container.
+- If type R throws during moves, receiving monad is left in empty state having destructing anything it had
+before. This behaviour, which was considered undesirable for `variant<>`, is optimal for the compiler's optimiser.
 - Equivalence and non-equivalence operators provided. These can compare disparate monads.
   - Relational operators NOT provided to keep things simple.
 - You can explicitly cheap convert monads from less expressive to more expressive.
@@ -235,10 +237,10 @@ can stand in for `optional<T>` like this:
 The API is actually not too distant from `optional<T>`, so with a bit of regex find and replace
 you could use `option<T>` instead.
 
-The need for `monad<T>` to be able to be empty was to make exception throws by T during copy and move
+The need for `basic_monad<T, EC, E>` to be able to be empty was to make exception throws by T during copy and move
 construction lightweight. If that happens, the monad always has empty state afterwards.
 
-## Supplying your own implementations of `basic_monad<T>` ##
+## Supplying your own implementations of `basic_monad<T, EC, E>` ##
 To do this, simply supply a policy type of the following form:
 \snippet monad_policy.ipp monad_policy
 */
@@ -1411,21 +1413,21 @@ By default only next() is available. This prevents you writing code which impact
 
 Classic monadic programming consists of a sequence of nested functional operations:
 <dl>
-  <dt>JOIN (single): monad<monad<T>>.get() -> monad<T></dt>
-  <dt>JOIN (maximum): monad<monad<monad<monad<T>>>>.unwrap() -> monad<T></dt>
+  <dt>JOIN (single): outcome<outcome<T>>.get() -> outcome<T></dt>
+  <dt>JOIN (maximum): outcome<outcome<outcome<outcome<T>>>>.unwrap() -> outcome<T></dt>
     <dd>Whatever is the first monad containing a non-monad is returned.</dd>
-  <dt>MAP: monad<T>.map(R(T)) -> monad<R></dt>
-    <dd>If callable maps T to R, map() maps a monad<T> to a monad<R> if monad<T>
+  <dt>MAP: outcome<T>.map(R(T)) -> outcome<R></dt>
+    <dd>If callable maps T to R, map() maps a outcome<T> to a outcome<R> if outcome<T>
     contains a T. If it contains an error or is empty, that is passed through.</dd>
-  <dt>BIND: monad<T>.bind(monad<R>(T)) -> monad<R></dt>
-  <dt>BIND: monad<T>.bind(R(T)) -> monad<R></dt>
-    <dd>If callable maps T to monad<R> and if monad<T> contains a T, then bind() maps
-    a monad<T> to a monad<R> else if callable maps T to R and if monad<T> contains a T,
-    bind() maps a monad<T> to a monad<R>. In other words, returning a monad from the
+  <dt>BIND: outcome<T>.bind(outcome<R>(T)) -> outcome<R></dt>
+  <dt>BIND: outcome<T>.bind(R(T)) -> outcome<R></dt>
+    <dd>If callable maps T to outcome<R> and if outcome<T> contains a T, then bind() maps
+    a outcome<T> to a outcome<R> else if callable maps T to R and if outcome<T> contains a T,
+    bind() maps a outcome<T> to a outcome<R>. In other words, returning a monad from the
     callable does not wrap it in another monad. If the originating monad did not
     contain a T, that is passed through.</dd>
 </dl>
-We also support monad<T>.next(R(monad<T>)) for semantic equivalence to futures where the
+We also support outcome<T>.next(R(outcome<T>)) for semantic equivalence to futures where the
 callable is called with the originating monad. This
 acts like bind(), so if the callable returns a monad it is not wrapped in another
 monad. Unlike map() or bind(), next() always calls the callable no matter what the
@@ -1470,7 +1472,7 @@ originating monad.
 else pass through the monad. For this reason, any callable with an `empty_type` parameter must
 always return the same monad type as the originating monad.
 
-Note that for nested monads e.g. monad<monad<int>>, either or both of the inner or outer
+Note that for nested monads e.g. outcome<outcome<int>>, either or both of the inner or outer
 monads can be with value or with error or empty. You should have your binds and maps
 work appropriately.
 
@@ -1498,7 +1500,7 @@ a monad, that monad can be of any template parameter configuration and it will b
 allows a very easy way of converting between different configurations of monad cost free.
 */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-  template <class F> monad<...> next(F &&f);
+  template <class F> basic_monad<...> next(F &&f);
 #else
   template <class _F> BOOST_OUTCOME_CONVINCE_MSVC typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_monad>::type, typename std::decay<_F>::type, implementation_policy>::output_type next(_F &&f)
   {
@@ -1510,22 +1512,22 @@ allows a very easy way of converting between different configurations of monad c
 #endif
 
 #ifdef BOOST_OUTCOME_ENABLE_OPERATORS
-//! \brief If I am a monad<monad<...>>, return copy of most nested monad<...>, else return copy of *this
+//! \brief If I am a basic_monad<basic_monad<...>>, return copy of most nested basic_monad<...>, else return copy of *this
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-  monad<...> unwrap() const &;
+  basic_monad<...> unwrap() const &;
 #else
   BOOST_OUTCOME_CONVINCE_MSVC typename detail::do_unwrap<basic_monad>::output_type unwrap() const & { return detail::do_unwrap<basic_monad>()(*this); }
 #endif
-//! \brief If I am a monad<monad<...>>, return move of most nested monad<...>, else return move of *this
+//! \brief If I am a basic_monad<basic_monad<...>>, return move of most nested basic_monad<...>, else return move of *this
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-  monad<...> unwrap() &&;
+  basic_monad<...> unwrap() &&;
 #else
   BOOST_OUTCOME_CONVINCE_MSVC typename detail::do_unwrap<basic_monad>::output_type unwrap() && { return detail::do_unwrap<basic_monad>()(std::move(*this)); }
 #endif
 
 //! \brief If bool(*this), return basic_monad(F(get())).unwrap, else return basic_monad<result_of<F(get())>>(error)
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-  template <class F> monad<...> bind(F &&f);
+  template <class F> basic_monad<...> bind(F &&f);
 #else
   template <class _F> BOOST_OUTCOME_CONVINCE_MSVC typename detail::do_bind<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type bind(_F &&f)
   {
@@ -1543,14 +1545,14 @@ allows a very easy way of converting between different configurations of monad c
 #endif
 //! \brief If bool(*this), return basic_monad(F(get())).unwrap, else return basic_monad<result_of<F(get())>>(error)
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-  template <class F> monad<...> operator>>(F &&f);
+  template <class F> basic_monad<...> operator>>(F &&f);
 #else
   template <class _F> BOOST_OUTCOME_CONVINCE_MSVC typename detail::do_bind<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type operator>>(_F &&f) { return bind(std::forward<_F>(f)); }
 #endif
 
 //! \brief If bool(*this), return basic_monad(F(get())), else return basic_monad<result_of<F(get())>>(error)
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-  template <class F> monad<...> map(F &&f);
+  template <class F> basic_monad<...> map(F &&f);
 #else
   template <class _F> BOOST_OUTCOME_CONVINCE_MSVC typename detail::do_map<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type map(_F &&f)
   {

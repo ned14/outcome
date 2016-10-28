@@ -210,10 +210,12 @@ namespace stl11
 BOOST_OUTCOME_V1_NAMESPACE_END
 #else
 #include "../boost-lite/include/bind/stl11/std/system_error"
+BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 namespace stl11
 {
   using namespace boost_lite::bind::std::system_error;
 }
+BOOST_OUTCOME_V1_NAMESPACE_END
 #endif
 
 // For some odd reason, VS2015 really hates to do much inlining unless forced
@@ -239,11 +241,59 @@ namespace stl11
 #define BOOST_OUTCOME_THROW(expr) throw expr
 #else
 #include <stdio.h>
-#define BOOST_OUTCOME_THROW(expr)                                                                                                                                                                                                                                                                                              \
-  fprintf(stderr, "FATAL: Boost.Outcome throws exception " #expr " with exceptions disabled\n");                                                                                                                                                                                                                               \
-  assert(("throw " #expr, false));                                                                                                                                                                                                                                                                                             \
-  std::terminate()
+#ifdef _WIN32
+#include "../boost-lite/include/execinfo_win64.h"
+#else
+#include <execinfo.h>
+#endif
+BOOST_OUTCOME_V1_NAMESPACE_BEGIN
+namespace detail
+{
+  inline void do_fatal_exit(const char *expr)
+  {
+    void *bt[16];
+    size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0]));
+    fprintf(stderr, "FATAL: Boost.Outcome throws exception " #expr " with exceptions disabled\n");
+    char **bts = backtrace_symbols(bt, btlen);
+    if(bts)
+    {
+      for(size_t n = 0; n < btlen; n++)
+        fprintf(stderr, "  %s\n", bts[n]);
+      free(bts);
+    }
+    assert(("throw " #expr, false));
+    std::terminate();
+  }
+}
+BOOST_OUTCOME_V1_NAMESPACE_END
+//! Redefine to have something else occur when Outcome throws an exception
+#define BOOST_OUTCOME_THROW(expr) BOOST_OUTCOME_V1_NAMESPACE::detail::do_fatal_exit(#expr)
 #endif
 #endif
+
+#ifndef BOOST_OUTCOME_THROW_DESERIALISATION_FAILURE
+//! Predefine to have something else occur when Outcome throws an exception due to a deserialisation failure
+#define BOOST_OUTCOME_THROW_DESERIALISATION_FAILURE(m, expr) BOOST_OUTCOME_THROW(expr)
+#endif
+
+#ifndef BOOST_OUTCOME_THROW_MONAD_ERROR
+//! Predefine to have something else occur when Outcome throws a monad_error due to being asked to do something not possible
+#define BOOST_OUTCOME_THROW_MONAD_ERROR(ec, expr) BOOST_OUTCOME_THROW(expr)
+#endif
+
+#ifndef BOOST_OUTCOME_THROW_SYSTEM_ERROR
+//! Predefine to have something else occur when Outcome throws a system_error with an error_code from the monad
+#define BOOST_OUTCOME_THROW_SYSTEM_ERROR(ec, expr) BOOST_OUTCOME_THROW(expr)
+#endif
+
+#ifndef BOOST_OUTCOME_RETHROW_EXCEPTION
+#ifdef __cpp_exceptions
+#define BOOST_OUTCOME_RETHROW_EXCEPTION(ex) std::rethrow_exception(ex)
+#else
+//! Predefine to have something else occur when Outcome rethrows an exception_ptr from the monad
+#define BOOST_OUTCOME_RETHROW_EXCEPTION(ex) BOOST_OUTCOME_THROW(std::rethrow_exception(ex))
+#endif
+#endif
+
 
 #endif  // BOOST_OUTCOME_NEED_DEFINE

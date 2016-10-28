@@ -67,8 +67,8 @@ if(NOT PROJECT_IS_DEPENDENCY)
     target_compile_definitions(${test_target} PUBLIC BOOST_OUTCOME_ENABLE_OPERATORS=1)
   endforeach()
 
-  # Add a very custom test, one with exceptions and RTTI disabled
-  add_executable(outcome_hl--unittests_noexcept "test/unittests_noexcept.cpp")
+  # Add the unit tests but with exceptions and RTTI disabled
+  add_executable(outcome_hl--unittests_noexcept "test/unittests.cpp")
   set_target_properties(outcome_hl--unittests_noexcept PROPERTIES EXCLUDE_FROM_ALL ON)
   add_dependencies(_hl outcome_hl--unittests_noexcept)
   if(WIN32)
@@ -84,10 +84,9 @@ if(NOT PROJECT_IS_DEPENDENCY)
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     POSITION_INDEPENDENT_CODE ON
   )
-  # I don't actually want to run this, it fails every time by design
-  #add_test(NAME outcome_hl--unittests_noexcept CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
-  #COMMAND $<TARGET_FILE:outcome_hl--unittests_noexcept>
-  #)
+  add_test(NAME outcome_hl--unittests_noexcept CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
+    COMMAND $<TARGET_FILE:outcome_hl--unittests_noexcept>
+  )
 endif()
 
 # Make available this library for install and export
