@@ -8,39 +8,29 @@ Documentation: https://ned14.github.io/boost.outcome/
 Tarballs of source with all unit tests passing: https://dedi4.nedprod.com/static/files/
 
 Todo:
- - [x] Add a new `-fno-exceptions` compatible Boost.Test emulation to Boost-lite and get Outcome's
-unit tests passing under that.
- - [ ] Get monad_example.cpp being compiled by Boost-lite during docs generation because it had got broken :(
  - [ ] Add clang-tidy support to Boost lite and get it running regularly.
  - [ ] Add macro helpers to Outcome for returning outcomes out of things which cannot return values
 like constructors, and convert said exceptions/TLS back into outcomes.
   - Make use of `std::system_error(errno, system_category, "custom error message");`
  - [ ] Audit all uses of `std::error_code.code()` and replace with `std::errc::whatever` as
 appropriate.
- - [x] Split all uses of `BOOST_OUTCOME_THROW()` into separate macros for each throw site and type,
-each of which default to `BOOST_OUTCOME_THROW()`.
-  - `BOOST_OUTCOME_THROW()` should print a stack backtrace before fatal exiting.
- - [x] Fix all remaining uses of `monad<T>` (e.g. doxygen docs).
  - [ ] Move the detailed `basic_monad` docs out of the group monad page and onto the front page
   - Also add a tutorial
  - [ ] Test relaxed constexpr in VS15 once that is released and delete the hack macro.
- - Jenkins to upload per commit to package distros **source packages** for these:
-  - [ ] launchpad (Ubuntu, Debian). Instructions at https://help.launchpad.net/Packaging/PPA/BuildingASourcePackage
-  - [ ] vcpkg (Microsoft). Instructions at https://github.com/Microsoft/vcpkg/blob/master/docs/EXAMPLES.md
-  - [ ] homebrew (OS X). Instructions at http://formalfriday.club/2015/01/05/creating-your-own-homebrew-tap-and-formula.html
-  - [ ] FreeBSD packages. Instructions at https://www.freebsd.org/doc/handbook/ports-poudriere.html
- - [x] Loosen explicit basic_monad constructors to allow option => result => monad implicitly.
- - [x] Pack bools in basic_promise_future_storage into value_storage_impl, thus saving 8 bytes
- - [x] Get the constexpr tests firing per-commit in Travis (and maybe Appveyor)
- - [x] Add comparison operators for monad (long overdue!). These need to be able to compare
-heterogeneous monad types (add unit tests proving this).
- - [x] Add constexpr compile unit tests for when `<T>` is a LiteralType.
- - [x] Add unit tests for `result<int>` being trivially destructible
- - [x] Add debugging visualisers for Monad for VS2015 as a minimum (it's getting painful to work
-on AFIO without these!)
+ - Need to write script which uses github API to scan commits on develop branch for CI
+saying all passes. If so:
+  - [ ] Merge that commit from develop branch into master branch
+  - [ ] Build a complete source distro and place it at https://dedi4.nedprod.com/static/files/
+  - [ ] Push to:
+   - [ ] launchpad (Ubuntu, Debian). Instructions at https://help.launchpad.net/Packaging/PPA/BuildingASourcePackage
+   - [ ] vcpkg (Microsoft). Instructions at https://github.com/Microsoft/vcpkg/blob/master/docs/EXAMPLES.md
+   - [ ] homebrew (OS X). Instructions at http://formalfriday.club/2015/01/05/creating-your-own-homebrew-tap-and-formula.html
+   - [ ] FreeBSD packages. Instructions at https://www.freebsd.org/doc/handbook/ports-poudriere.html
  
 Later:
  - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
  - [ ] Add tribool logic programming operator overloads
+ - [ ] Latest version push script really ought to test library in flat boost-lite configuration
+and only push if additionally it passes with all latest master branches as well as stamped branches
 
 </center>

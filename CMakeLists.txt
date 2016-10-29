@@ -58,12 +58,12 @@ target_link_libraries(outcome_hl INTERFACE boost-lite_hl)
 
 if(NOT PROJECT_IS_DEPENDENCY)
   # For all possible configurations of this library, add each test
-  list_filter(outcome_TESTS EXCLUDE REGEX "test_multiabi.cpp|unittests_noexcept.cpp")
+  list_filter(outcome_TESTS EXCLUDE REGEX "test_multiabi.cpp")
   include(BoostLiteMakeStandardTests)
   if(TARGET outcome_hl_pch)
     target_compile_definitions(outcome_hl_pch PUBLIC BOOST_OUTCOME_ENABLE_OPERATORS=1)
   endif()
-  foreach(test_target ${outcome_TEST_TARGETS})
+  foreach(test_target ${outcome_TEST_TARGETS} ${outcome_EXAMPLE_TARGETS})
     target_compile_definitions(${test_target} PUBLIC BOOST_OUTCOME_ENABLE_OPERATORS=1)
   endforeach()
 
