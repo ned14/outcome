@@ -44,8 +44,8 @@ DEALINGS IN THE SOFTWARE.
 #include "../boost-lite/include/boost/test/unit_test.hpp"
 
 #include <algorithm>
+#include <cstdio>
 #include <functional>
-#include <stdio.h>
 #include <unordered_map>
 
 #ifdef _MSC_VER
@@ -186,9 +186,9 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.get(), monad_error);
-    BOOST_CHECK_THROW(m.get_error(), monad_error);
-    BOOST_CHECK_THROW(m.get_exception(), monad_error);
+    BOOST_CHECK_THROW(m.get(), const monad_error &);
+    BOOST_CHECK_THROW(m.get_error(), const monad_error &);
+    BOOST_CHECK_THROW(m.get_exception(), const monad_error &);
   }
   {
     outcome<void> m;
@@ -198,9 +198,9 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(([&m]() -> void { return m.get(); }()), monad_error);
-    BOOST_CHECK_THROW(m.get_error(), monad_error);
-    BOOST_CHECK_THROW(m.get_exception(), monad_error);
+    BOOST_CHECK_THROW(([&m]() -> void { return m.get(); }()), const monad_error &);
+    BOOST_CHECK_THROW(m.get_error(), const monad_error &);
+    BOOST_CHECK_THROW(m.get_exception(), const monad_error &);
   }
   {
     outcome<int> m(5);
@@ -221,9 +221,9 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.get(), monad_error);
-    BOOST_CHECK_THROW(m.get_error(), monad_error);
-    BOOST_CHECK_THROW(m.get_exception(), monad_error);
+    BOOST_CHECK_THROW(m.get(), const monad_error &);
+    BOOST_CHECK_THROW(m.get_error(), const monad_error &);
+    BOOST_CHECK_THROW(m.get_exception(), const monad_error &);
   }
   {
     outcome<std::string> m("niall");
@@ -261,13 +261,13 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.get(), monad_error);
-    BOOST_CHECK_THROW(m.get_error(), monad_error);
-    BOOST_CHECK_THROW(m.get_exception(), monad_error);
+    BOOST_CHECK_THROW(m.get(), const monad_error &);
+    BOOST_CHECK_THROW(m.get_error(), const monad_error &);
+    BOOST_CHECK_THROW(m.get_exception(), const monad_error &);
   }
   {
     error_code_extended ec(5, stl11::system_category());
-    auto e = std::make_exception_ptr(stl11::system_error(ec));
+    auto e = std::make_exception_ptr(stl11::system_error(ec));  // NOLINT
     outcome<int> m(ec);
     BOOST_CHECK(!m);
     BOOST_CHECK(false_(tribool(m)));
@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
     BOOST_CHECK(m.has_exception());
-    BOOST_CHECK_THROW(m.get(), stl11::system_error);
+    BOOST_CHECK_THROW(m.get(), const stl11::system_error &);
     BOOST_CHECK(m.get_error() == ec);
 #ifdef __cpp_exceptions
     BOOST_CHECK(m.get_exception());
@@ -291,7 +291,10 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
 #endif
   }
   {
-    auto e = std::make_exception_ptr(5);
+    struct Foo
+    {
+    };
+    auto e = std::make_exception_ptr(Foo());
     outcome<int> m(e);
     BOOST_CHECK(!m);
     BOOST_CHECK(false_(tribool(m)));
@@ -299,7 +302,7 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(m.has_exception());
-    BOOST_CHECK_THROW(m.get(), int);
+    BOOST_CHECK_THROW(m.get(), const Foo &);
     BOOST_CHECK(m.get_error());
     BOOST_CHECK(m.get_exception() == e);
   }
@@ -487,14 +490,16 @@ BOOST_AUTO_TEST_CASE(works / monad / optional, "Tests that the monad acts as an 
 
   //! [optional_example]
   auto maybe_getenv = [](const char *n) -> option<const char *> {
-    if(const char *x = std::getenv(n))
+    const char *x = std::getenv(n);
+    if(x != nullptr)
+    {
       return x;
-    else
-      return {};
+    }
+    return {};
   };
   auto a = maybe_getenv("SHOULDNEVEREXIST");
   BOOST_CHECK(!a);
-  BOOST_CHECK_THROW(a.value(), monad_error);
+  BOOST_CHECK_THROW(a.value(), const monad_error &);
   BOOST_CHECK(a.value_or(nullptr) == nullptr);
 #ifdef _WIN32
   auto b = maybe_getenv("HOMEPATH");
@@ -515,8 +520,10 @@ BOOST_AUTO_TEST_CASE(works / monad / fileopen, "Tests that the monad semanticall
   auto openfile = [](std::string path) noexcept->outcome<int>
   {
     int fd;
-    while(-1 == (fd = BOOST_OUTCOME_POSIX_OPEN(path.c_str(), 0)) && EINTR == errno)
-      ;
+    do
+    {
+      fd = BOOST_OUTCOME_POSIX_OPEN(path.c_str(), 0);
+    } while(-1 == fd && EINTR == errno);
     try
     {
       if(-1 == fd)
@@ -524,8 +531,9 @@ BOOST_AUTO_TEST_CASE(works / monad / fileopen, "Tests that the monad semanticall
         int code = errno;
         // If a temporary failure, this is an expected unexpected outcome
         if(EBUSY == code || EISDIR == code || ELOOP == code || ENOENT == code || ENOTDIR == code || EPERM == code || EACCES == code)
+        {
           return error_code_extended(code, stl11::generic_category());
-
+        }
         // If a non-temporary failure, this is an unexpected outcome
         return std::make_exception_ptr(stl11::system_error(code, stl11::generic_category(), strerror(code)));
       }
@@ -554,7 +562,7 @@ BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly i
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
   {
-    typedef outcome<int> type;
+    using type = outcome<int>;
     std::cout << "outcome<int> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
     std::cout << "outcome<int> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
     std::cout << "outcome<int> is_nothrow_copy_assignable=" << type::is_nothrow_copy_assignable << std::endl;
@@ -568,17 +576,17 @@ BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly i
 #ifndef _MSC_VER
     BOOST_CHECK(type::is_nothrow_destructible == std::is_nothrow_destructible<type>::value);
 #endif
-    BOOST_CHECK(true == std::is_nothrow_copy_constructible<type>::value);
-    BOOST_CHECK(true == std::is_nothrow_move_constructible<type>::value);
-    BOOST_CHECK(true == std::is_nothrow_copy_assignable<type>::value);
-    BOOST_CHECK(true == std::is_nothrow_move_assignable<type>::value);
+    BOOST_CHECK(std::is_nothrow_copy_constructible<type>::value);
+    BOOST_CHECK(std::is_nothrow_move_constructible<type>::value);
+    BOOST_CHECK(std::is_nothrow_copy_assignable<type>::value);
+    BOOST_CHECK(std::is_nothrow_move_assignable<type>::value);
 // VS2015 is randomly flipping std::is_nothrow_destructible for outcome<int>. I'd assume memory corruption.
 #ifndef _MSC_VER
-    BOOST_CHECK(true == std::is_nothrow_destructible<type>::value);
+    BOOST_CHECK(std::is_nothrow_destructible<type>::value);
 #endif
   }
   {
-    typedef outcome<std::string> type;
+    using type = outcome<std::string>;
     std::cout << "outcome<string> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
     std::cout << "outcome<string> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
     std::cout << "outcome<string> is_nothrow_copy_assignable=" << type::is_nothrow_copy_assignable << std::endl;
@@ -589,22 +597,30 @@ BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly i
     BOOST_CHECK(type::is_nothrow_copy_assignable == std::is_nothrow_copy_assignable<type>::value);
     BOOST_CHECK(type::is_nothrow_move_assignable == std::is_nothrow_move_assignable<type>::value);
     BOOST_CHECK(type::is_nothrow_destructible == std::is_nothrow_destructible<type>::value);
-    BOOST_CHECK(false == std::is_nothrow_copy_constructible<type>::value);
-    BOOST_CHECK(true == std::is_nothrow_move_constructible<type>::value);
-    BOOST_CHECK(false == std::is_nothrow_copy_assignable<type>::value);
-    BOOST_CHECK(true == std::is_nothrow_move_assignable<type>::value);
-    BOOST_CHECK(true == std::is_nothrow_destructible<type>::value);
+    BOOST_CHECK(!std::is_nothrow_copy_constructible<type>::value);
+    BOOST_CHECK(std::is_nothrow_move_constructible<type>::value);
+    BOOST_CHECK(!std::is_nothrow_copy_assignable<type>::value);
+    BOOST_CHECK(std::is_nothrow_move_assignable<type>::value);
+    BOOST_CHECK(std::is_nothrow_destructible<type>::value);
   }
   {
     struct Except
     {
       int n;
       Except() = delete;
-      Except(const Except &) noexcept(false) {}
-      Except(Except &&) noexcept(false) {}
-      ~Except() noexcept(false) {}
+      Except(const Except & /*unused*/) noexcept(false)
+          : n(0)
+      {
+      }
+      Except(Except && /*unused*/) noexcept(false)
+          : n(0)
+      {
+      }
+      Except &operator=(const Except & /*unused*/) noexcept(false) { return *this; }
+      Except &operator=(Except && /*unused*/) noexcept(false) { return *this; }
+      ~Except() noexcept(false) { n = 0; }
     };
-    typedef outcome<Except> type;
+    using type = outcome<Except>;
     std::cout << "outcome<Except> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
     std::cout << "outcome<Except> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
     std::cout << "outcome<Except> is_nothrow_copy_assignable=" << type::is_nothrow_copy_assignable << std::endl;
@@ -615,11 +631,11 @@ BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly i
     BOOST_CHECK(type::is_nothrow_copy_assignable == std::is_nothrow_copy_assignable<type>::value);
     BOOST_CHECK(type::is_nothrow_move_assignable == std::is_nothrow_move_assignable<type>::value);
     BOOST_CHECK(type::is_nothrow_destructible == std::is_nothrow_destructible<type>::value);
-    BOOST_CHECK(false == std::is_nothrow_copy_constructible<type>::value);
-    BOOST_CHECK(false == std::is_nothrow_move_constructible<type>::value);
-    BOOST_CHECK(false == std::is_nothrow_copy_assignable<type>::value);
-    BOOST_CHECK(false == std::is_nothrow_move_assignable<type>::value);
-    BOOST_CHECK(false == std::is_nothrow_destructible<type>::value);
+    BOOST_CHECK(!std::is_nothrow_copy_constructible<type>::value);
+    BOOST_CHECK(!std::is_nothrow_move_constructible<type>::value);
+    BOOST_CHECK(!std::is_nothrow_copy_assignable<type>::value);
+    BOOST_CHECK(!std::is_nothrow_move_assignable<type>::value);
+    BOOST_CHECK(!std::is_nothrow_destructible<type>::value);
   }
 }
 #endif
@@ -632,7 +648,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
     struct udt
     {
       int a;
-      udt(int _a)
+      explicit udt(int _a)
           : a(_a)
       {
       }
@@ -641,6 +657,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
       udt(udt &&) = delete;
       udt &operator=(const udt &) = delete;
       udt &operator=(udt &&) = delete;
+      ~udt() = default;
     };
     outcome<udt> foo(5);
     BOOST_CHECK(5 == foo.get().a);
@@ -651,15 +668,16 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
     struct udt
     {
       std::string a;
-      udt(std::string _a)
-          : a(_a)
+      explicit udt(std::string _a)
+          : a(std::move(_a))
       {
       }
       udt() = delete;
-      udt(const udt &) { throw std::logic_error("copy"); }
-      udt(udt &&) { throw std::logic_error("move"); }
-      udt &operator=(const udt &) { throw std::logic_error("copy"); }
-      udt &operator=(udt &&) { throw std::logic_error("move"); }
+      udt(const udt & /*unused*/) { throw std::logic_error("copy"); }
+      udt(udt && /*unused*/) noexcept(false) { throw std::logic_error("move"); }
+      udt &operator=(const udt & /*unused*/) { throw std::logic_error("copy"); }
+      udt &operator=(udt && /*unused*/) noexcept(false) { throw std::logic_error("move"); }
+      ~udt() { a.clear(); }
     };
     // Emplace constructs
     outcome<udt> foo("douglas");
@@ -668,7 +686,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
     BOOST_CHECK("niall" == foo.get().a);
     try
     {
-      auto foo2(foo);
+      auto foo2(foo);  // NOLINT
       BOOST_CHECK(false);
     }
     catch(const std::logic_error &e)
@@ -869,7 +887,7 @@ BOOST_AUTO_TEST_CASE(works / monad / then, "Tests that the monad continues with 
 #ifdef __cpp_generic_lambdas
   // Does automatic move semantics with auto lambdas work?
   a.emplace("niall");
-  auto k(a.next([](auto &&v) { return std::move(v); }));
+  auto k(a.next([](auto &&v) { return std::move(v); }));  // NOLINT
   BOOST_CHECK(k.get() == "niall");
   BOOST_CHECK(a.get().empty());
 #endif
@@ -946,10 +964,10 @@ BOOST_AUTO_TEST_CASE(works / monad / bind, "Tests that the monad continues with 
     BOOST_CHECK(h.has_error());
     a.emplace("niall");
 #ifdef __cpp_generic_lambdas
-    auto i(a.bind([](auto &&v) { return std::move(v); }));
+    auto i(a.bind([](auto &&v) { return std::move(v); }));  // NOLINT
     BOOST_CHECK(i.get() == "niall");
     BOOST_CHECK(a.get().empty());
-    auto j(b.bind([](auto &&v) { return std::move(v); }));
+    auto j(b.bind([](auto &&v) { return std::move(v); }));  // NOLINT
     BOOST_CHECK(j.has_error());
     a.emplace("niall");
 #endif
@@ -999,10 +1017,10 @@ BOOST_AUTO_TEST_CASE(works / monad / map, "Tests that the monad continues with m
     BOOST_CHECK(h.has_error());
     a.emplace("niall");
 #ifdef __cpp_generic_lambdas
-    auto i(a.map([](auto &&v) { return std::move(v); }));
+    auto i(a.map([](auto &&v) { return std::move(v); }));  // NOLINT
     BOOST_CHECK(i.get() == "niall");
     BOOST_CHECK(a.get().empty());
-    auto j(b.map([](auto &&v) { return std::move(v); }));
+    auto j(b.map([](auto &&v) { return std::move(v); }));  // NOLINT
     BOOST_CHECK(j.has_error());
     a.emplace("niall");
 #endif
@@ -1043,10 +1061,10 @@ BOOST_AUTO_TEST_CASE(works / monad / match, "Tests that the monad matches as int
   {
     int expected;
     // monad.match() will call an overload for each possible content it might have
-    void operator()(int) const { BOOST_CHECK(expected == 1); }
-    void operator()(error_code_extended) const { BOOST_CHECK(expected == 2); }
-    void operator()(std::exception_ptr) const { BOOST_CHECK(expected == 3); }
-    void operator()(outcome<int>::empty_type) const { BOOST_CHECK(expected == 4); }
+    void operator()(int /*unused*/) const { BOOST_CHECK(expected == 1); }
+    void operator()(error_code_extended /*unused*/) const { BOOST_CHECK(expected == 2); }
+    void operator()(std::exception_ptr /*unused*/) const { BOOST_CHECK(expected == 3); }  // NOLINT
+    void operator()(outcome<int>::empty_type /*unused*/) const { BOOST_CHECK(expected == 4); }
     o_type()
         : expected(0)
     {
@@ -1056,16 +1074,16 @@ BOOST_AUTO_TEST_CASE(works / monad / match, "Tests that the monad matches as int
   std::exception_ptr e;
   outcome<int> a(5);
   o.expected = 1;
-  a.match(o);
+  (void) a.match(o);
   o.expected = 2;
   a = ec;
-  a.match(o);
+  (void) a.match(o);
   o.expected = 3;
   a = e;
-  a.match(o);
+  (void) a.match(o);
   o.expected = 4;
   a.clear();
-  a.match(o);
+  (void) a.match(o);
   //! [monad_match_example]
 }
 
