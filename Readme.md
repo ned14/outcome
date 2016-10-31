@@ -8,10 +8,6 @@ Documentation: https://ned14.github.io/boost.outcome/
 Tarballs of source with all unit tests passing: https://dedi4.nedprod.com/static/files/
 
 Todo:
- - [ ] Add clang-tidy support to Boost lite and get it running regularly.
- - [ ] Add macro helpers to Outcome for returning outcomes out of things which cannot return values
-like constructors, and convert said exceptions/TLS back into outcomes.
-  - Make use of `std::system_error(errno, system_category, "custom error message");`
  - [ ] Audit all uses of `std::error_code.code()` and replace with `std::errc::whatever` as
 appropriate.
  - [ ] Move the detailed `basic_monad` docs out of the group monad page and onto the front page
@@ -30,6 +26,9 @@ saying all passes. If so:
 Later:
  - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
  - [ ] Add tribool logic programming operator overloads
+ - [ ] Add macro helpers to Outcome for returning outcomes out of things which cannot return values
+like constructors, and convert said exceptions/TLS back into outcomes.
+  - Make use of `std::system_error(errno, system_category, "custom error message");`
  - [ ] Latest version push script really ought to test library in flat boost-lite configuration
 and only push if additionally it passes with all latest master branches as well as stamped branches
 
