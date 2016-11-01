@@ -179,7 +179,8 @@ common in the wild.
 
 \subsection error_code C++ 11 style error handling: `error_code` and `noexcept`
 
-C++ 11 brought in two new features to help with this problem:
+C++ 11 brought in two new features to help bridge the gap between the over use of
+exception throws to report routine failures and C error handling:
 (i) `noexcept` and (ii) the standardisation of
 `error_code` from Boost. `noexcept` lets you mark functions with the
 guarantee that they shall **never** throw exceptions. This is commonly
@@ -234,6 +235,7 @@ handle_ref openfile(const char *path, std::error_code &ec) noexcept
   int fd = open(path, O_RDONLY);
   if(fd == -1)
   {
+    // Construct an error code in the OS errors domain
     ec = std::error_code(errno, std::system_category());
     return {};
   }
@@ -241,6 +243,8 @@ handle_ref openfile(const char *path, std::error_code &ec) noexcept
   if(p == nullptr)
   {
     close(fd);
+    // Construct an error code matching the generic OS error equivalent
+    // to the ENOMEM error condition
     ec = std::make_error_code(std::errc::not_enough_memory);
     return {};
   }
@@ -273,13 +277,175 @@ invert. This makes writing correct exception safe code much easier, plus
 unpredictable execution times due to exception throws cannot occur. The
 compiler can also reduce executable bloat by not generating stack unwind tables
 around that call which is useful for some C++ users.
-
 2. It allows one to segment truly exceptional events into exception throws with
 stack unwinds and to handle ordinary and common failures in normal forward execution
 program logic. This is exactly the error handling model used by the new systems
 languages Swift and Rust.
 
-\subsection sea_of_noexcept C++ 17 style error handling: `optional<T>` and `expected<T, E>`
 
+\subsection optional C++ 17/20 style error handling: `optional<T>` and `expected<T, E>`
+
+C++ 17 isn't finished at the time of writing, but we are very sure that at least
+<a href="http://en.cppreference.com/w/cpp/utility/optional">`std::optional<T>`</a>
+will be in it. It remains to be seen if LEWG's `expected<T, E>` will make it,
+if not then most STL implementations will probably ship an implementation as an experimental
+and if your STL does not, there is always the reference implementation at https://github.com/viboes/std-make
+which ought to work on any C++ 14 compiler.
+
+The following discussion is based on `expected<T, E>` as detailed by
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf">P0323R1</a>
+which is the latest LEWG proposal paper at the time of writing (Nov 2016) and indeed
+one where `expected<T, E>` was pared down significantly from its original proposal. It
+should be noted that C++ may yet end up adopting something quite different, though
+given how long `expected<T, E>` has been around by now, and how it is getting to fitting
+nicely between `optional<T>` and `variant<T, E>`, it would seem unlikely.
+`expected<T, E>` is intended as a strict superset of `optional<T>` with aspects
+of `std::variant<T, E>`, indeed much of LEWG's remaining work on the proposal is on
+reconciling the small remaining semantic differences between `expected<T, nullopt_t>`
+and `optional<T>`.
+
+\subsubsection optional Returning `optional<T>`
+
+In some programming contexts we don't need to know why an operation failed, only
+that it did. Throwing an exception after failing to find a file is a good example
+of the kind of failure which is very common and where throwing an exception to
+handle that event is excessive and inappropriate. One might therefore design
+a routine expected to frequently fail in C++ as:
+
+\code
+// Returns true for success and fills \em out with the opened file, else false
+bool openfile(handle_ref &out, const char *path) noexcept;
+\endcode
+
+Wouldn't it be much nicer though if you didn't force the caller to have to
+instantiate a copy of `handle_ref` before each call, not least because such
+a requirement messes badly with using `openfile()` in generic template code
+and moreover it could be the case that constructing a `handle_ref` is an
+atomic operation, and is thus wasted work if the failure to open is very
+common? This is where `optional<T>` comes in:
+
+\code
+// Returns the opened handle on success, else an empty optional
+std::optional<handle_ref> openfile(const char *path) noexcept;
+...
+auto fh_ = openfile("foo");
+if(fh_)
+{
+  handle_ref fh = std::move(fh_.value());
+  fh->read(... etc
+}
+\endcode
+
+`optional<T>` is pretty boring and unsurprising like any good primitive. It's
+also fairly intuitive, almost any C++ programmer will immediately understand
+what the code above does from inspection.
+
+
+\subsubsection expected `expected<T, E>`
+
+Many familiar with the filesystem will find the above use case of `optional<T>`
+unsettling because there are many reasons why one couldn't open a file rather
+than merely it was not found. Imagine, for example, that a program is attempting
+to open a few thousand files on a networked drive which has broken its connection -
+in this case every single failure will take considerable time to return and
+there is zero chance *any* file open will ever succeed, so what the user sees
+is an apparently hanged program. Far better would be if the `openfile()` function
+could return the cause of its failure, and we could then treat all errors which are different
+to file not found as reason to abort.
+
+Enter LEWG's proposed `expected<T, E>` which can hold either an expected value of
+type `T` or an unexpected value of type `E`. Like `variant<T, E>`, `expected<T, E>`
+is a discrimated union storing either `T` or `E` in the same storage space.
+
+\code
+// Returns the expected opened handle on success, or an unexpected cause of failure
+std::expected<handle_ref, std::error_code> openfile(const char *path) noexcept
+{
+  int fd = open(path, O_RDONLY);
+  if(fd == -1)
+  {
+    return std::make_unexpected<std::error_code>(errno, std::system_category());
+  }
+  std::error_code ec;
+  auto *p = new(std::nothrow) some_derived_handle_implementation(fd, ec);
+  if(p == nullptr)
+  {
+    close(fd);
+    return std::make_unexpected<std::error_code>(std::errc::not_enough_memory);
+  }
+  if(ec)
+  {
+    delete p;
+    return std::make_unexpected<std::error_code>(std::move(ec));
+  }
+  return handle_ref(p);  // expected<> takes implicit conversion from type T
+}
+...
+auto fh_ = openfile("foo");
+if(!fh_ && fh_.error() != std::errc::no_such_file_or_directory)
+{
+  // This is serious, abort
+  throw std::system_error(std::move(fh_.error()));
+}
+else if(fh_)
+{
+  handle_ref fh = std::move(fh_.value());
+  fh->read(... etc
+}
+\endcode
+
+This code looks a bit contrived and artificial, but from my best reading of
+P0323R1 it is minimal. I would say that the reference library actually
+declares `expected<T, E = std::exception_ptr>` as the default, so let's rewrite
+the above to match that design instead:
+
+\code
+// Returns the expected opened handle on success, or an unexpected cause of failure
+std::expected<handle_ref> openfile(const char *path) noexcept
+{
+  int fd = -1;
+  try
+  {
+    fd = open(path, O_RDONLY);
+    if(fd == -1)
+    {
+      return std::system_error(std::error_code(errno, std::system_category()));
+    }
+    return handle_ref(new some_derived_handle_implementation(fd));
+  }
+  catch(...)
+  {
+    if(fd == -1)
+      close(fd);
+    return std::unexpected<>(std::current_exception());
+  }
+}
+...
+auto fh_ = openfile("foo");
+if(!fh_)
+{
+  try
+  {
+    std::rethrow_exception(fh_.error());
+  }
+  catch(const std::system_error &e)
+  {
+    if(e.code() != std::errc::no_such_file_or_directory)
+      rethrow;
+  }
+  // All other exception types are rethrown
+}
+else
+{
+  handle_ref fh = std::move(fh_.value());
+  fh->read(... etc
+}
+\endcode
+
+This looks much more like how `expected<T, E>` is supposed to be used. It
+also demonstrates for the first time a design pattern which Outcome is
+designed to ease writing: *islands of exception throw in a sea of noexcept*.
+
+\subsection islands Islands of exception throw in a sea of `noexcept`
 
 To be continued ...
