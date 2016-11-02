@@ -177,7 +177,7 @@ Experts will quite correctly chafe at the use of `std::runtime_error` to
 report a file not found, but nevertheless such a design pattern is very
 common in the wild.
 
-\subsection error_code C++ 11 style error handling: `error_code` and `noexcept`
+\subsection error_code C++ 11 style error handling: <tt>error_code</tt> and <tt>noexcept</tt>
 
 C++ 11 brought in two new features to help bridge the gap between the over use of
 exception throws to report routine failures and C error handling:
@@ -283,7 +283,7 @@ program logic. This is exactly the error handling model used by the new systems
 languages Swift and Rust.
 
 
-\subsection optional C++ 17/20 style error handling: `optional<T>` and `expected<T, E>`
+\subsection optional C++ 17/20 style error handling: <tt>optional<T></tt> and <tt>expected<T, E></tt>
 
 C++ 17 isn't finished at the time of writing, but we are very sure that at least
 <a href="http://en.cppreference.com/w/cpp/utility/optional">`std::optional<T>`</a>
@@ -300,11 +300,11 @@ should be noted that C++ may yet end up adopting something quite different, thou
 given how long `expected<T, E>` has been around by now, and how it is getting to fitting
 nicely between `optional<T>` and `variant<T, E>`, it would seem unlikely.
 `expected<T, E>` is intended as a strict superset of `optional<T>` with aspects
-of `std::variant<T, E>`, indeed much of LEWG's remaining work on the proposal is on
-reconciling the small remaining semantic differences between `expected<T, nullopt_t>`
-and `optional<T>`.
+of <a href="http://en.cppreference.com/w/cpp/utility/variant">`std::variant<T, E>`</a>,
+indeed much of LEWG's remaining work on the proposal is on reconciling the small
+remaining semantic differences between `expected<T, nullopt_t>` and `optional<T>`.
 
-\subsubsection optional Returning `optional<T>`
+\subsubsection optional Returning <tt>optional<T></tt>
 
 In some programming contexts we don't need to know why an operation failed, only
 that it did. Throwing an exception after failing to find a file is a good example
@@ -341,7 +341,7 @@ also fairly intuitive, almost any C++ programmer will immediately understand
 what the code above does from inspection.
 
 
-\subsubsection expected `expected<T, E>`
+\subsubsection expected Returning <tt>expected<T, E></tt>
 
 Many familiar with the filesystem will find the above use case of `optional<T>`
 unsettling because there are many reasons why one couldn't open a file rather
@@ -446,6 +446,6 @@ This looks much more like how `expected<T, E>` is supposed to be used. It
 also demonstrates for the first time a design pattern which Outcome is
 designed to ease writing: *islands of exception throw in a sea of noexcept*.
 
-\subsection islands Islands of exception throw in a sea of `noexcept`
+\subsection islands Islands of exception throw in a sea of <tt>noexcept</tt>
 
 To be continued ...
