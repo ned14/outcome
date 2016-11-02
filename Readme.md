@@ -8,8 +8,10 @@ Documentation: https://ned14.github.io/boost.outcome/
 Tarballs of source with all unit tests passing: https://dedi4.nedprod.com/static/files/
 
 Todo:
- - [ ] Audit all uses of `std::error_code.code()` and replace with `std::errc::whatever` as
-appropriate.
+ - [ ] Create new Win32 and NT error code categories and have make_errored_outcome() use those
+ - [ ] `make install` needs to install dependency headers too
+   - [ ] https://wiki.debian.org/Packaging/Intro?action=show&redirect=IntroDebianPackaging
+   apt-get install devscripts. 
  - [ ] Move the detailed `basic_monad` docs out of the group monad page and onto the front page
   - Also add a tutorial
  - [ ] Test relaxed constexpr in VS15 once that is released and delete the hack macro.

@@ -1747,7 +1747,7 @@ namespace detail
 #define BOOST_OUTCOME_MONAD_NAME option
 #include "detail/monad_policy.ipp"
 
-#if defined(_WIN32)
+#if defined(_WIN32) && 0  // Disabled as win32 error code mapping is to be discouraged!
 namespace detail
 {
   inline int win32_to_posix_error(unsigned long e) noexcept
