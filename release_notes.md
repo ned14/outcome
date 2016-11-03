@@ -93,7 +93,7 @@ think is a bug, please open an issue.
 
 \section introduction Introduction and Design Rationale
 
-\subsection enums C style error handling: integer returns
+\subsection c-style C style error handling: integer returns
 
 Historically C++ 98 code has taken one of two design patterns when returning
 errors from functions. This pattern is taken from C, and indeed is pure C:
@@ -134,7 +134,7 @@ times in their career. Variations on the same pattern are returning the enum typ
 directly, returning a boolean and using a thread locally stored global variable
 such as `errno` and so on.
 
-\subsection exceptions C++ 98 style error handling: throwing exceptions
+\subsection cpp98-style C++ 98 style error handling: throwing exceptions
 
 The second C++ 98 design pattern ought to also be very familiar to readers:
 \code
@@ -177,7 +177,7 @@ Experts will quite correctly chafe at the use of `std::runtime_error` to
 report a file not found, but nevertheless such a design pattern is very
 common in the wild.
 
-\subsection error_code C++ 11 style error handling: <tt>error_code</tt> and <tt>noexcept</tt>
+\subsection cpp11-style C++ 11 style error handling: error_code and noexcept
 
 C++ 11 brought in two new features to help bridge the gap between the over use of
 exception throws to report routine failures and C error handling:
@@ -283,7 +283,7 @@ program logic. This is exactly the error handling model used by the new systems
 languages Swift and Rust.
 
 
-\subsection optional C++ 17/20 style error handling: <tt>optional<T></tt> and <tt>expected<T, E></tt>
+\subsection cpp17-style C++ 17/20 style error handling: optional<T> and expected<T, E>
 
 C++ 17 isn't finished at the time of writing, but we are very sure that at least
 <a href="http://en.cppreference.com/w/cpp/utility/optional">`std::optional<T>`</a>
@@ -304,7 +304,18 @@ of <a href="http://en.cppreference.com/w/cpp/utility/variant">`std::variant<T, E
 indeed much of LEWG's remaining work on the proposal is on reconciling the small
 remaining semantic differences between `expected<T, nullopt_t>` and `optional<T>`.
 
-\subsubsection optional Returning <tt>optional<T></tt>
+The original prototype Boost.Expected library was a large and very complex beastie -
+I was fortunate to be employed on a contract in 2015 where I saw it deployed at
+scale into a large C++ codebase. Indeed, much of what I witnessed there had a big impact in
+how Outcome ended up being designed. P0323R1 proposes an enormously simplified
+implementation which ought to fix all of the showstopper problems with the original
+that I am aware of, and P0323R1's `expected<T, E>` has a huge resemblance to
+Outcome in every day usage, which is unintentionally deliberate as the committee have
+made most of the changes I also made in Outcome. Outcome still
+contributes significant value for low-latency users, as we shall see later.
+
+
+\subsubsection optional Returning optional<T>
 
 In some programming contexts we don't need to know why an operation failed, only
 that it did. Throwing an exception after failing to find a file is a good example
@@ -341,7 +352,7 @@ also fairly intuitive, almost any C++ programmer will immediately understand
 what the code above does from inspection.
 
 
-\subsubsection expected Returning <tt>expected<T, E></tt>
+\subsubsection expected Returning expected<T, E>
 
 Many familiar with the filesystem will find the above use case of `optional<T>`
 unsettling because there are many reasons why one couldn't open a file rather
@@ -351,11 +362,25 @@ in this case every single failure will take considerable time to return and
 there is zero chance *any* file open will ever succeed, so what the user sees
 is an apparently hanged program. Far better would be if the `openfile()` function
 could return the cause of its failure, and we could then treat all errors which are different
-to file not found as reason to abort.
+to file-not-found as reason to abort.
 
 Enter LEWG's proposed `expected<T, E>` which can hold either an expected value of
 type `T` or an unexpected value of type `E`. Like `variant<T, E>`, `expected<T, E>`
-is a discrimated union storing either `T` or `E` in the same storage space.
+is a discrimated union storing either `T` or `E` in the same storage space, but
+unlike the variant, expected treats the `T` as a positive thing (fetchable via a
+`.value()`) and `E` as a negative thing (fetchable via a `.error()`). Because
+`expected<T, E>` provides a "never empty" guarantee similar to variant,
+it currently requires type `E` to be nothrow copy and move constructible and assignable.
+Expected is a bit less intuitive to use than optional, but its rules are straightforward:
+`expected<T, E>` will greedily and implicitly construct from any type from which a `T` can be constructed,
+after which it will hold an instance of `T`. If you wish to construct an `expected<T, E>`
+holding an instance of unexpected `E`, you need to feed it an `unexpected<E>` which is
+type sugar to indicate you want an instance of `E` implicitly converted into an `expected<T, E>`.
+As with everything else in C++ 11 onwards, there is a `make_expected(T)` and a `make_unexpected(E)`
+which do any type deduction and conversion for you into the right contents of `expected<T, E>`.
+
+All this sounds a bit complex, but really it's much easier to use. Here is a
+non-throwing implementation based on `expected<T, E>`
 
 \code
 // Returns the expected opened handle on success, or an unexpected cause of failure
@@ -364,19 +389,19 @@ std::expected<handle_ref, std::error_code> openfile(const char *path) noexcept
   int fd = open(path, O_RDONLY);
   if(fd == -1)
   {
-    return std::make_unexpected<std::error_code>(errno, std::system_category());
+    return std::make_unexpected(std::error_code(errno, std::system_category());
   }
   std::error_code ec;
   auto *p = new(std::nothrow) some_derived_handle_implementation(fd, ec);
   if(p == nullptr)
   {
     close(fd);
-    return std::make_unexpected<std::error_code>(std::errc::not_enough_memory);
+    return std::make_unexpected(std::make_error_code(std::errc::not_enough_memory));
   }
   if(ec)
   {
     delete p;
-    return std::make_unexpected<std::error_code>(std::move(ec));
+    return std::make_unexpected(std::move(ec));
   }
   return handle_ref(p);  // expected<> takes implicit conversion from type T
 }
@@ -394,14 +419,14 @@ else if(fh_)
 }
 \endcode
 
-This code looks a bit contrived and artificial, but from my best reading of
-P0323R1 it is minimal. I would say that the reference library actually
-declares `expected<T, E = std::exception_ptr>` as the default, so let's rewrite
-the above to match that design instead:
+The prototype Boost.Expected library and the P0323R1 reference library actually
+declares `expected<T, E = std::exception_ptr>` as the default despite that P0323R1
+no longer makes any mention of type `E` being defaulted, so for completeness
+let's rewrite the above to match that design instead:
 
 \code
 // Returns the expected opened handle on success, or an unexpected cause of failure
-std::expected<handle_ref> openfile(const char *path) noexcept
+std::expected<handle_ref, std::exception_ptr> openfile(const char *path) noexcept
 {
   int fd = -1;
   try
@@ -409,15 +434,15 @@ std::expected<handle_ref> openfile(const char *path) noexcept
     fd = open(path, O_RDONLY);
     if(fd == -1)
     {
-      return std::system_error(std::error_code(errno, std::system_category()));
+      throw std::system_error(std::error_code(errno, std::system_category()));
     }
-    return handle_ref(new some_derived_handle_implementation(fd));
+    return make_handle_ref<some_derived_handle_implementation>(fd);
   }
   catch(...)
   {
-    if(fd == -1)
+    if(fd != -1)
       close(fd);
-    return std::unexpected<>(std::current_exception());
+    return std::make_unexpected(std::current_exception());
   }
 }
 ...
@@ -442,10 +467,10 @@ else
 }
 \endcode
 
-This looks much more like how `expected<T, E>` is supposed to be used. It
-also demonstrates for the first time a design pattern which Outcome is
-designed to ease writing: *islands of exception throw in a sea of noexcept*.
+This is the very first time in this tutorial that we have seen the design pattern
+around which Outcome was specifically designed to make easy: *islands of exception
+throw in a sea of noexcept*.
 
-\subsection islands Islands of exception throw in a sea of <tt>noexcept</tt>
+\subsection sea-of-noexcept "Islands of exception throw in a sea of noexcept"
 
 To be continued ...
