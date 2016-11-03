@@ -4,9 +4,10 @@ Section: libdevel
 Priority: optional
 Standards-Version: 3.9.2
 Build-Depends: debhelper (>= 9)
+Homepage: https://ned14.github.io/boost.outcome
+Vcs-Git: https://github.com/ned14/boost.outcome
 
 Package: libboost-outcome1.00-dev
 Architecture: all
 Description: Provides very lightweight monadic outcome<T>, result<T> and option<T>.
 Homepage: https://ned14.github.io/boost.outcome
-Bugs: https://github.com/ned14/boost.outcome/issues
