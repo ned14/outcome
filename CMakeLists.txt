@@ -56,7 +56,7 @@ endif()
 # Set the library dependencies this library has
 target_link_libraries(outcome_hl INTERFACE boost-lite_hl)
 
-if(NOT PROJECT_IS_DEPENDENCY)
+if(EXISTS "tests" AND NOT PROJECT_IS_DEPENDENCY)
   # For all possible configurations of this library, add each test
   list_filter(outcome_TESTS EXCLUDE REGEX "test_multiabi.cpp")
   include(BoostLiteMakeStandardTests)
