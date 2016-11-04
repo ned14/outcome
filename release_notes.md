@@ -91,7 +91,7 @@ for your problem is also a good idea. If you are encountering what you
 think is a bug, please open an issue.
 
 
-\section introduction Introduction and Design Rationale
+\section cpp_error_handling_history Quick history of error handling design patterns from C++ 98 to C++ 17
 
 \subsection c-style C style error handling: integer returns
 
@@ -471,6 +471,96 @@ This is the very first time in this tutorial that we have seen the design patter
 around which Outcome was specifically designed to make easy: *islands of exception
 throw in a sea of noexcept*.
 
+
 \subsection sea-of-noexcept "Islands of exception throw in a sea of noexcept"
+
+This design pattern was intended in C++ 11 to be the method by which that large
+minority of C++ users who disable RTTI and exceptions entirely could be brought
+back into ISO standard C++. The pattern is easy:
+1. Every `extern` API in your translation unit is marked `noexcept` and uses a
+non-throwing mechanism such as `std::error_code` or `std::expected<T, E>` to return errors.
+2. Code within a translation unit is generally not marked `noexcept`, or indeed
+may throw and catch exceptions before returning out of an extern `noexcept` API.
+3. Because all `extern` function calls are `noexcept` throughout the entire codebase, the compiler's optimiser 
+*ought* to elide emission of stack unwind code and all other exception throw handling
+overhead in any sequence of code inside the translation unit *as if* exceptions had
+been globally disabled at the command line.
+4. Where code inside a translation unit does call something which could throw e.g.
+much of the STL, exception handling overhead *ought* to be confined to the containing `try` ...
+`catch` **island**.
+5. Consumers of your `extern` API need not care how that API is internally implemented
+as they shall never seen an exception thrown out of that API, and the compiler will
+optimise your code which uses that `extern` API in its **sea** of `noexcept` accordingly.
+
+
+
+\section introduction Introduction and Design Rationale of Outcome
+
+After that literature review of how C++ has implemented error handling and how code
+might implement error handling from C++ 17/20 onwards, the question now to be answered
+is *"When to use Outcome instead of Expected?"*
+
+\subsection design_differences Design differences between `expected<T, E>` and Outcomes
+
+1. Outcome is designed specifically for low latency/very high performance C++. It
+therefore works perfectly with exceptions and RTTI disabled and its CI compiles per
+commit typical use cases of Outcomes and counts the assembler operations emitted to ensure
+code bloat is kept optimally minimum. On all recent GCCs and clangs, if the compiler's
+optimiser can infer the state of an outcome, **all runtime overhead due to the outcome
+is completely eliminated** (sans optimiser bugs which appear from time to time). This
+means for inlined code if you return a `result<T>(T())`, the compiler will generate
+identical code as if you had returned a `T()` directly.
+2. Outcome actually provides `boost::outcome::basic_monad<T, EC, E>` and the
+convenience typedefs:
+ 1. `template<class T> using outcome = basic_monad<T, std::error_code, std::exception_ptr>;`
+ 2. `template<class T> using result = basic_monad<T, std::error_code, void>;`
+ 3. `template<class T> using option = basic_monad<T, void, void>;`
+ 
+ You can use any type `EC` or `E` you like so long as they act as if a `std::error_code`
+ and a `std::exception_ptr` respectively e.g. `boost::error_code` and `boost::exception_ptr`.
+ **Unlike** the `E` in `expected<T, E>` Outcome fixes the model of `EC` and `E` in stone,
+ so they *must* provide at least the same APIs and behaviours as an error code and an
+ exception pointer.
+3. Types `T`, `EC` and `E` cannot be the same nor be constructible from one another. The
+reason for this is that unlike `expected<T, E>`, outcomes implicitly construct from any
+of types `T`, `EC` or `E`. A lot of readers will immediately groan on reading this, but
+there is a very good reason for this choice explained shortly. 
+4. As suggested by the presence of an `option<T>`, all `basic_monad<>` instances have a
+formal empty state. There is no "never empty" guarantee, and this is very deliberately so
+to enable sane semantics when exceptions are disabled and also to not confuse the compiler's
+optimiser with complex potential branches in move construction (which can cause the optimiser
+to give up prematurely).
+5. You can explicitly convert from any less representative `basic_monad<>` to any more
+representative form because that is always a loss free, non-throwing operation (and often
+entirely eliminated by the compiler at runtime). This is
+because it is expected that lowest level code will return `option<T>` and `result<T>`
+and higher level code will return `outcome<T>`, so this makes for seamless up-conversion.
+6. For the most part, `expected<T, std::error_code>` and `outcome::result<T>` ought to be close
+to interchangeable in most use cases. This is intentional and deliberate.
+7. Outcomes implement equivalence operators, but not comparison nor hash operations.
+This is due to https://akrzemi1.wordpress.com/2014/12/02/a-gotcha-with-optional/ where
+you either choose implicit construction OR comparison operations or else risk surprising
+behaviours. That means you can only place Outcomes in non-map STL containers.
+8. Finally, Outcome goes out of its way to be as cheap on compile time as possible by having
+the compiler do as little work as possible if not optimising. A lot of the rigidity
+above stems from systematically avoiding metaprogramming, SFINAE, instantiation of helper types
+during deduction, or doing anything which would cause the compiler to not use `O(1)` constant
+time operations during non-optimising compilation except where unavoidable. There is also a useful side effect of this
+implementation simplicity on helping the compiler's optimiser "to do the right thing" when
+facing real world use cases as well.
+
+ The reason for this approach was due to my work experience with original prototype Boost.Expected in
+2015 where we saw large increases in compile times once Expected was deployed at scale - remember
+*every single API* is returning an instance of one of these and much branch logic is working
+with them in every function. P0323R1 Expected removes a large chunk of metaprogrammed functionality,
+specifically the monadic operations which should help a great deal. Nevertheless, from
+my best reading P0323R1 Expected still demands much more from the compiler than Outcome does.
+Deploying Outcome into a large C++ codebase ought to have as minimal a compile time impact
+as possible for a variant implementation, something which matters on code bases heading into
+the tens of millions of lines like many low latency/high performance users.
+
+\subsection When should you use Outcome instead of Expected?
+
+1. 
 
 To be continued ...
