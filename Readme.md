@@ -8,11 +8,13 @@ Documentation: https://ned14.github.io/boost.outcome/
 Tarballs of source with all unit tests passing: https://dedi4.nedprod.com/static/files/
 
 Todo:
- - [ ] Create new Win32 and NT error code categories and have make_errored_outcome() use those
+ - [ ] Create new Win32 and NT error code categories and have make_errored_outcome() use those.
+ Have a python script auto generate the code into separate header files.
  - [ ] `make install` needs to install dependency headers too
-   - [ ] https://wiki.debian.org/Packaging/Intro?action=show&redirect=IntroDebianPackaging
-   apt-get install devscripts. 
-   boost-outcome_1.0.orig.tar.xz
+ - [ ] Solve the apt packaging problem. Either:
+   1. boost-lite cmake needs to gain the ability to be called by debian dh (see make_deb.sh).
+   This would also solve building binary distros and would let us host on launchpad.
+   2. Configure our own simple apt repo https://askubuntu.com/questions/529/how-to-set-up-an-apt-repository
  - [ ] Move the detailed `basic_monad` docs out of the group monad page and onto the front page
   - Also add a tutorial
  - [ ] Test relaxed constexpr in VS15 once that is released and delete the hack macro.
