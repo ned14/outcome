@@ -80,12 +80,14 @@ constexpr exception_t exception = exception_t();
 template <class _value_type> struct enable_single_byte_value_storage : std::false_type
 {
 };
+#ifndef BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE
 template <> struct enable_single_byte_value_storage<void> : std::true_type
 {
 };
 template <> struct enable_single_byte_value_storage<bool> : std::true_type
 {
 };
+#endif
 
 namespace detail
 {
