@@ -1236,7 +1236,7 @@ if value_type which can't be a monad can be constructed from Args and if either 
 error_type, an exception_type nor an empty_type.
 */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-  template <class... Args> constexpr basic_monad(inplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value);
+  template <class... Args> explicit constexpr basic_monad(inplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value);
 #else
   template <class Arg, class... Args>
   constexpr explicit basic_monad(inplace_t, Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value)

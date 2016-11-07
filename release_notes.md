@@ -576,15 +576,15 @@ therefore works perfectly with exceptions and RTTI disabled and its CI compiles 
 commit typical use cases of Outcomes and counts the assembler operations emitted by GCC, clang and MSVC to ensure
 code bloat is kept optimally minimal. On all recent GCCs and clangs, if the compiler's
 optimiser can infer the state of an outcome, **all runtime overhead due to the outcome
-is completely eliminated** (sans optimiser bugs which appear from time to time). This
+ought to be completely eliminated** (sans optimiser bugs which appear from time to time). This
 means for inlined code if you return a `result<T>(T())`, the compiler will generate
 identical code as if you had returned a `T()` directly.
 2. Outcome's actual core implementation is `boost::outcome::basic_monad<Policy<T, EC, E>>` with these
 convenience typedefs:
  \code
- template<class T> using outcome = basic_monad<Policy<T, std::error_code, std::exception_ptr>>;
- template<class T> using result = basic_monad<Policy<T, std::error_code, void>>;
- template<class T> using option = basic_monad<Policy<T, void, void>>;
+ template<class T> using outcome = basic_monad<monad_policy<T, std::error_code, std::exception_ptr>>;
+ template<class T> using result = basic_monad<result_policy<T, std::error_code, void>>;
+ template<class T> using option = basic_monad<option_policy<T, void, void>>;
  \endcode 
  You can use any type `EC` or `E` you like so long as they act as if a `std::error_code`
  and a `std::exception_ptr` respectively e.g. `boost::error_code` and `boost::exception_ptr`.
@@ -596,15 +596,17 @@ convenience typedefs:
 formal empty state. There is no "never empty" guarantee which
 enables sane semantics when exceptions are disabled and also to not confuse the compiler's
 optimiser with complex potential branches in move construction (which can cause the optimiser
-to give up prematurely). It sidesteps the problem of move assignment throwing an
+to give up prematurely). It sidesteps handling the problem of move assignment throwing an
 exception, in which case Outcomes are left in an empty state. It ensures all `basic_monad<>`
-are constexpr default constructible. Finally, it enables `basic_monad<Policy<void>>`
-to have useful semantics as a generic error or exception transport. 
-4. Like `expected<T, E>`, implicit conversion exists from any `basic_monad<Policy<T1, EC1, E1>>` to
+are constexpr default constructible. If you attempt to get a value from an empty Outcome,
+the compiler will throw an `outcome::monad_error` if exceptions are available, else it
+calls the macro `BOOST_OUTCOME_THROW_MONAD_ERROR()` which by default dumps a stack trace
+and terminates the process.
+4. Like `expected<T, E>`, explicit conversion exists from any `basic_monad<Policy<T1, EC1, E1>>` to
 any `basic_monad<Policy<T2, EC2, E2>>` if all of `T2`, `EC2` and `E2` are constructible from
 `T1`, `EC1` and `E1` respectively. `basic_monad<Policy<void>>` has special significance: you
-can always implicitly construct any arbitrary `basic_monad<Policy<T>>` from any
-`basic_monad<Policy<void>>`. The rules are as follows:
+can always implicitly safely construct any arbitrary `basic_monad<Policy<T>>` from any
+`basic_monad<Policy<void>>` which is always a lossless operation. The rules are as follows:
  1. If input `basic_monad<Policy<void>>` is empty, `basic_monad<Policy<T>>` is empty.
  2. If input `basic_monad<Policy<void>>` has value, `basic_monad<Policy<T>>` is a default
 constructed `T`.
@@ -613,10 +615,11 @@ same error either copy or move constructed as appropriate.
  4. If input `basic_monad<Policy<void>>` has an exception, `basic_monad<Policy<T>>` has the
 same exception either copy or move constructed as appropriate.
 
- This is how Outcome implements the `unexpected<E>` type sugar used by Expected to initialise
-an `expected<T, E>` with an `E`. In Outcome, return a void Outcome with the error or exception
+ This is Outcome's implementation of the `unexpected<E>` type sugar used by Expected to initialise
+an `expected<T, E>` with an `E`. In Outcome, returning a void Outcome with the error or exception
 you want (or better, use the `make_errored_result<>`, `make_errored_outcome<>` or
-`make_exceptional_outcome<>` free functions).
+`make_exceptional_outcome<>` free functions) will be implicitly converted into whatever type of
+Outcome you wish with the errored or excepted state.
 5. Types `T`, `EC` and `E` cannot be the same nor be constructible from one another, and this
 is enforced by static assertion at compile time. This prevents pointless confusion and
 maintenance difficulty (if you really, really need to return error codes or exception
@@ -668,34 +671,76 @@ synopsis. Indeed originally a non-allocating high performance `promise<T>...futu
 simply supplied a policy class implementing the additional features of promise-future to
 `basic_monad<>` whereby C++ 17 future continuations were modelled as monadic binds
 (it can be still found in the attic directory for anyone interested, though note how stale
-it likely is by now).
-That level of flexibility remains in the design for anyone interested in adding more
+it likely is by now). That level of flexibility remains in the design for anyone interested in adding more
 `basic_monad<>` specialisations e.g. packed storage.
 
 The following is a synopsis for `outcome<T>` which is configured with `value_type = T`,
 `error_type = std::error_code` and `exception_type = std::exception_ptr`. If it were a
-`result<T>`, only `value_type` and `error_type` functions would be present, similar if it were
-a `option<T>` only `value_type` functions would be present.
+`result<T>`, only `value_type` and `error_type` functions would be present, similarly if it were
+an `option<T>` only `value_type` functions would be present.
 
 \code
-// "class" outcome is actually a template alias to basic_monad<Policy<...>>
+BOOST_OUTCOME_V1_NAMESPACE_BEGIN
+
+// Tag types for empty, valued, errored and excepted outcomes
+struct empty_t; constexpr empty_t empty;
+struct value_t; constexpr value_t value;
+struct error_t; constexpr error_t error;
+struct exception_t; constexpr exception_t exception;
+
+// Specialise to std::true_type for types you wish to store in a single byte
+// (void and bool are done for you unless you define BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE)
+template <class _value_type> struct enable_single_byte_value_storage;
+
+// Remember "class" outcome is actually a template alias to basic_monad<Policy<...>>
 template <class T>
 class outcome
 {
 public:
-  using value_type = T;                                                        // also in expected<>
-  using error_type = std::error_code;                                          // also in expected<>
-  using exception_type = std::exception_ptr;
-  template <class U> using rebind = outcome<U>;                                // also in expected<>
+  // true if configured to hold a value_type, an error_type or an exception_type
+  static constexpr bool has_value_type;
+  static constexpr bool has_error_type;
+  static constexpr bool has_exception_type;
+  
+  using value_type = T;                                                        // similar in expected<> [3]
+  using error_type = std::error_code;                                          // similar in expected<> [3]
+  using exception_type = std::exception_ptr;                                   // [3]
+  
+  using raw_value_type = T;                                                    // The actual type configured
+  using raw_error_type = std::error_code;                                      // ditto
+  using raw_exception_type = std::exception_ptr;                               // ditto
 
-  constexpr outcome() noexcept([1]);                                           // also in expected<>
+  template <class U> using rebind = outcome<U>;                                // also in expected<>
+  
+  static constexpr bool is_nothrow_copy_constructible;
+  static constexpr bool is_nothrow_move_constructible;
+  static constexpr bool is_nothrow_copy_assignable;
+  static constexpr bool is_nothrow_move_assignable;
+  static constexpr bool is_nothrow_destructible;
+  static constexpr bool is_trivially_destructible;
+  template <class OtherMonad> static constexpr bool is_constructible;
+  template <class OtherMonad> static constexpr bool is_comparable;
+
+  constexpr outcome() noexcept([1]);                                           // also in expected<>, use make_outcome<T>() instead
   constexpr outcome(const outcome&) noexcept([1]);                             // also in expected<>
   constexpr outcome(outcome&&) noexcept([1]);                                  // also in expected<>
-  constexpr outcome(const value_type&) noexcept([1]);                          // also in expected<>
-  constexpr outcome(value_type&&) noexcept([1]);                               // also in expected<>
-  template <class... Args>
-    constexpr explicit outcome(in_place_t, Args&&...);                         // also in expected<>
 
+  // Constructing empty or with a value_type
+  constexpr outcome(empty_t) noexcept;                                         // use make_outcome<T>() instead
+  constexpr outcome(value_t) noexcept(T);                                      // use make_ready_outcome<T>() instead
+  constexpr outcome(const value_type&) noexcept(T);                            // also in expected<>
+  constexpr outcome(value_type&&) noexcept(T);                                 // also in expected<>
+  template <class... Args>
+    constexpr explicit outcome(in_place_t, Args&&...) noexcept(T);             // also in expected<>
+  template <class U>
+    constexpr outcome(in_place_t, std::initializer_list<U>) noexcept(T);       // also in expected<>
+
+  // Constructing from emptiness, error or excepted state of any other outcome
+  constexpr outcome(const rebind<void>&) noexcept([1]);                        // use as_void() instead
+  constexpr outcome(rebind<void>&&) noexcept([1]);                             // use as_void() instead
+
+  
+  
   ~outcome() noexcept([1]);  // Not implemented if value_type, error_type and exception_type are trivially destructible
 
   constexpr outcome& operator=(const outcome&) noexcept([1]);                  // also in expected<>
@@ -731,6 +776,11 @@ public:
   constexpr error_type&& error_or(error_type&&) noexcept &&;
 
 };
+// NOTE requires state to be set to valued beforehand (and can only deserialise a value)
+template<class Policy> inline std::istream &operator>>(std::istream &s, basic_monad<Policy> &v);
+template<class Policy> inline std::ostream &operator<<(std::ostream &s, const basic_monad<Policy> &v);
+
+BOOST_OUTCOME_V1_NAMESPACE_END
 \endcode
 
 [1]: The `noexcept` for each of these is determined by calculating the `noexcept`
@@ -741,5 +791,9 @@ of those types can throw, so can the outcome's operation.
 a single byte is used to store `T`, in which case you will not be returned a pointer
 nor reference to `T`. It is enabled for `bool` and `void` unless the
 macro `BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE` is defined.
+
+[3]: If the monad was configured with `void` in this place, this is configured with an
+internal non-accessible type usefully named to indicate you are trying to use
+something not possible which will generate a very obvious descriptive compiler error.
 
 To be continued ...
