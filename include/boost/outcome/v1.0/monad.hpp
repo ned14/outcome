@@ -1075,6 +1075,13 @@ namespace detail
 #endif
 }
 
+//! \brief Tag type for inplace construction
+struct inplace_t
+{
+};
+//! \brief Constexpr instance of inplace construction tag type
+static constexpr inplace_t inplace;
+
 //! \brief True if the type passed is a monad or a reference to a monad
 template <class M> struct is_monad : detail::is_monad<typename std::decay<M>::type>
 {
@@ -1136,6 +1143,13 @@ public:
   //! \brief Rebind this monad type into a different value_type
   template <typename U> using rebind = typename implementation_policy::template rebind<U>;
 
+private:
+  struct implicit_conversion_from_void_disabled
+  {
+  };
+  using void_rebound = typename std::conditional<has_value_type, rebind<void>, implicit_conversion_from_void_disabled>::type;
+
+public:
   //! \brief This monad will never throw exceptions during copy construction
   static constexpr bool is_nothrow_copy_constructible = value_storage_type::is_nothrow_copy_constructible;
   //! \brief This monad will never throw exceptions during move construction
@@ -1163,7 +1177,7 @@ public:
   // MSVC ICEs with the above, so for compatibility:
   template <class OtherMonad,
             class Base = typename std::conditional<
-            (std::is_same<typename implementation_policy::value_type, typename OtherMonad::raw_value_type>::value || std::is_constructible<typename implementation_policy::value_type, typename OtherMonad::raw_value_type>::value) &&
+            (std::is_same<typename implementation_policy::value_type, typename OtherMonad::raw_value_type>::value || std::is_void<typename OtherMonad::raw_value_type>::value || std::is_constructible<typename implementation_policy::value_type, typename OtherMonad::raw_value_type>::value) &&
             (std::is_void<typename OtherMonad::raw_error_type>::value || std::is_same<typename implementation_policy::error_type, typename OtherMonad::raw_error_type>::value || std::is_constructible<typename implementation_policy::error_type, typename OtherMonad::raw_error_type>::value) &&
             (std::is_void<typename OtherMonad::raw_exception_type>::value || std::is_same<typename implementation_policy::exception_type, typename OtherMonad::raw_exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename OtherMonad::raw_exception_type>::value),
             std::true_type, std::false_type>::type>
@@ -1195,6 +1209,7 @@ public:
       : implementation_policy::base(_)
   {
   }
+#if 0
   //! \brief Implicit constructor of an errored monad (default constructed)
   constexpr basic_monad(error_t _) noexcept(std::is_nothrow_default_constructible<error_type>::value)
       : implementation_policy::base(_)
@@ -1205,6 +1220,7 @@ public:
       : implementation_policy::base(_)
   {
   }
+#endif
   //! \brief Implicit constructor from a value_type by copy
   constexpr basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
       : implementation_policy::base(v)
@@ -1220,25 +1236,31 @@ if value_type which can't be a monad can be constructed from Args and if either 
 error_type, an exception_type nor an empty_type.
 */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-  template <class... Args> constexpr explicit basic_monad(Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value);
+  template <class... Args> constexpr basic_monad(inplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value);
 #else
-  template <class Arg, class... Args, typename = typename std::enable_if<has_value_type && !is_monad<value_type>::value && std::is_constructible<value_type, Arg, Args...>::value &&
-                                                                         (sizeof...(Args) != 0 || (!std::is_same<value_type, typename std::decay<Arg>::type>::value && !std::is_same<error_type, typename std::decay<Arg>::type>::value && !std::is_same<exception_type, typename std::decay<Arg>::type>::value &&
-                                                                                                   !std::is_same<empty_type, typename std::decay<Arg>::type>::value))>::type>
-  constexpr explicit basic_monad(Arg &&arg, Args &&... args)
-#if !defined(_MSC_VER) || _MSC_VER > 190022816
-  noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value)
-#endif
+  template <class Arg, class... Args>
+  constexpr explicit basic_monad(inplace_t, Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value)
       : implementation_policy::base(typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...)
   {
   }
 #endif
   //! \brief Implicit constructor from an initializer list
   template <class U>
-  constexpr basic_monad(std::initializer_list<U> l) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>>::value)
+  constexpr basic_monad(inplace_t, std::initializer_list<U> l) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>>::value)
       : implementation_policy::base(typename value_storage_type::emplace_t(), std::move(l))
   {
   }
+  //! \brief Implicit constructor from an identically configured basic_monad<void> by copy
+  constexpr basic_monad(const void_rebound &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value)
+      : implementation_policy::base(v)
+  {
+  }
+  //! \brief Implicit constructor from an identically configured basic_monad<void> by move
+  constexpr basic_monad(void_rebound &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value)
+      : implementation_policy::base(std::move(v))
+  {
+  }
+#if 1  // Seems safe to leave these turned on
   //! \brief Implicit constructor from a error_type by copy
   constexpr basic_monad(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value)
       : implementation_policy::base(v)
@@ -1259,11 +1281,12 @@ error_type, an exception_type nor an empty_type.
       : implementation_policy::base(std::move(v))
   {
   }
+#endif
   /*! \brief Explicit move constructor from a basic_monad with a differing implementation policy.
   For this constructor to be available, value_type, error_type and exception_type must be identical
   or constructible.
   */
-  template <class Policy, typename = typename std::enable_if<std::is_same<typename implementation_policy::value_type, typename Policy::value_type>::value || std::is_constructible<typename implementation_policy::value_type, typename Policy::value_type>::value>::type,
+  template <class Policy, typename = typename std::enable_if<std::is_same<typename implementation_policy::value_type, typename Policy::value_type>::value || std::is_void<typename Policy::value_type>::value || std::is_constructible<typename implementation_policy::value_type, typename Policy::value_type>::value>::type,
             typename = typename std::enable_if<std::is_same<typename implementation_policy::error_type, typename Policy::error_type>::value || std::is_constructible<typename implementation_policy::error_type, typename Policy::error_type>::value>::type,
             typename = typename std::enable_if<std::is_same<typename implementation_policy::exception_type, typename Policy::exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename Policy::exception_type>::value>::type>
   constexpr explicit basic_monad(basic_monad<Policy> &&o)
@@ -1322,6 +1345,10 @@ error_type, an exception_type nor an empty_type.
   BOOST_OUTCOME_CXX14_CONSTEXPR value_type &&get_or(value_type &&v) && noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
   BOOST_OUTCOME_CXX14_CONSTEXPR value_type &&value_or(value_type &&v) && noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
+  //! \brief If contains a value_type, return that value type, else return the supplied value_type
+  BOOST_OUTCOME_CXX14_CONSTEXPR const value_type &&get_or(const value_type &&v) const &&noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
+  //! \brief If contains a value_type, return that value type, else return the supplied value_type
+  BOOST_OUTCOME_CXX14_CONSTEXPR const value_type &&value_or(const value_type &&v) const &&noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
   //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
   BOOST_OUTCOME_CXX14_CONSTEXPR value_type &get_and(value_type &v) & noexcept { return has_value() ? v : implementation_policy::base::_storage.value; }
   //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
@@ -1334,6 +1361,10 @@ error_type, an exception_type nor an empty_type.
   BOOST_OUTCOME_CXX14_CONSTEXPR value_type &&get_and(value_type &&v) && noexcept { return has_value() ? std::move(v) : std::move(implementation_policy::base::_storage.value); }
   //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
   BOOST_OUTCOME_CXX14_CONSTEXPR value_type &&value_and(value_type &&v) && noexcept { return has_value() ? std::move(v) : std::move(implementation_policy::base::_storage.value); }
+  //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
+  BOOST_OUTCOME_CXX14_CONSTEXPR const value_type &&get_and(const value_type &&v) const &&noexcept { return has_value() ? std::move(v) : std::move(implementation_policy::base::_storage.value); }
+  //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
+  BOOST_OUTCOME_CXX14_CONSTEXPR const value_type &&value_and(const value_type &&v) const &&noexcept { return has_value() ? std::move(v) : std::move(implementation_policy::base::_storage.value); }
   //! \brief Disposes of any existing state, setting the monad to the value storage
   BOOST_OUTCOME_CONVINCE_MSVC void set_state(value_storage_type &&v)
   {
@@ -1973,27 +2004,22 @@ template <class T> constexpr inline outcome<T> make_outcome(const T &v)
   return outcome<T>(v);
 }
 //! \brief Makes an errored outcome of type T \ingroup monad
-template <class T> inline outcome<T> make_outcome(error_code_extended v)
+template <class T = void> inline outcome<T> make_outcome(error_code_extended v)
 {
   return outcome<T>(std::move(v));
 }
 //! \brief Makes an excepted outcome of type T \ingroup monad
-template <class T> inline outcome<T> make_outcome(std::exception_ptr v)
+template <class T = void> inline outcome<T> make_outcome(std::exception_ptr v)
 {
   return outcome<T>(std::move(v));
 }
 //! \brief Makes an empty outcome of type T \ingroup monad
-template <class T> constexpr inline outcome<T> make_outcome()
+template <class T = void> constexpr inline outcome<T> make_outcome()
 {
   return outcome<T>();
 }
-//! \brief Makes an empty outcome of type void \ingroup monad
-template <> inline outcome<void> make_outcome<void>()
-{
-  return outcome<void>();
-}
 //! \brief Makes an empty outcome of type T \ingroup monad
-template <class T> constexpr inline outcome<T> make_empty_outcome()
+template <class T = void> constexpr inline outcome<T> make_empty_outcome()
 {
   return outcome<T>();
 }
@@ -2008,7 +2034,7 @@ template <class T> constexpr inline outcome<T> make_ready_outcome(const T &v)
   return outcome<T>(v);
 }
 //! \brief Make a ready outcome from the type passed \ingroup monad
-template <class T> constexpr inline outcome<T> make_ready_outcome()
+template <class T = void> constexpr inline outcome<T> make_ready_outcome()
 {
   static_assert(!std::is_same<T, T>::value, "Empty make_ready_outcome<T> not specialised");
 }
@@ -2017,24 +2043,24 @@ template <> inline outcome<void> make_ready_outcome<void>()
   return outcome<void>(value);
 }
 //! \brief Make an errored outcome from the type passed \ingroup monad
-template <class T> inline outcome<T> make_errored_outcome(error_code_extended v)
+template <class T = void> inline outcome<T> make_errored_outcome(error_code_extended v)
 {
   return outcome<T>(std::move(v));
 }
 //! \brief Make a generic errored outcome from the errno passed \ingroup monad
-template <class T> constexpr inline outcome<T> make_errored_outcome(int e, const char *extended = nullptr)
+template <class T = void> inline outcome<T> make_errored_outcome(int e, const char *extended = nullptr)
 {
   return outcome<T>(error_code_extended(e, std::generic_category(), extended));
 }
 #if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 //! \brief Make a system errored outcome from the code passed \ingroup monad
-template <class T> constexpr inline outcome<T> make_errored_outcome(unsigned long e, const char *extended = nullptr)
+template <class T = void> constexpr inline outcome<T> make_errored_outcome(unsigned long e, const char *extended = nullptr)
 {
   return outcome<T>(detail::win32_to_error_code(e, extended));
 }
 #endif
 //! \brief Make an excepted outcome from the type passed \ingroup monad
-template <class T> inline outcome<T> make_exceptional_outcome(std::exception_ptr v)
+template <class T = void> inline outcome<T> make_exceptional_outcome(std::exception_ptr v)
 {
   return outcome<T>(std::move(v));
 }
@@ -2055,22 +2081,17 @@ template <class T> constexpr inline result<T> make_result(const T &v)
   return result<T>(v);
 }
 //! \brief Makes an errored result of type T \ingroup monad
-template <class T> inline result<T> make_result(error_code_extended v)
+template <class T = void> inline result<T> make_result(error_code_extended v)
 {
   return result<T>(std::move(v));
 }
 //! \brief Makes an empty result of type T \ingroup monad
-template <class T> constexpr inline result<T> make_result()
+template <class T = void> constexpr inline result<T> make_result()
 {
   return result<T>();
 }
-//! \brief Makes an empty result of type void \ingroup monad
-template <> inline result<void> make_result<void>()
-{
-  return result<void>();
-}
 //! \brief Makes an empty result of type T \ingroup monad
-template <class T> constexpr inline result<T> make_empty_result()
+template <class T = void> constexpr inline result<T> make_empty_result()
 {
   return result<T>();
 }
@@ -2085,7 +2106,7 @@ template <class T> constexpr inline result<T> make_ready_result(const T &v)
   return result<T>(v);
 }
 //! \brief Makes a result from the type passed \ingroup monad
-template <class T> constexpr inline result<T> make_ready_result()
+template <class T = void> constexpr inline result<T> make_ready_result()
 {
   static_assert(!std::is_same<T, T>::value, "Empty make_ready_result<T> not specialised");
 }
@@ -2094,18 +2115,18 @@ template <> inline result<void> make_ready_result<void>()
   return result<void>(value);
 }
 //! \brief Make an errored result from the type passed \ingroup monad
-template <class T> inline result<T> make_errored_result(error_code_extended v)
+template <class T = void> inline result<T> make_errored_result(error_code_extended v)
 {
   return result<T>(std::move(v));
 }
 //! \brief Make a generic errored outcome from the errno passed \ingroup monad
-template <class T> constexpr inline result<T> make_errored_result(int e, const char *extended = nullptr)
+template <class T = void> constexpr inline result<T> make_errored_result(int e, const char *extended = nullptr)
 {
   return result<T>(error_code_extended(e, std::generic_category(), extended));
 }
 #if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 //! \brief Make a system errored outcome from the code passed \ingroup monad
-template <class T> constexpr inline result<T> make_errored_result(unsigned long e, const char *extended = nullptr)
+template <class T = void> constexpr inline result<T> make_errored_result(unsigned long e, const char *extended = nullptr)
 {
   return result<T>(detail::win32_to_error_code(e, extended));
 }
@@ -2128,17 +2149,12 @@ template <class T> constexpr inline option<T> make_option(const T &v)
   return option<T>(v);
 }
 //! \brief Makes an empty option of type T \ingroup monad
-template <class T> constexpr inline option<T> make_option()
+template <class T = void> constexpr inline option<T> make_option()
 {
   return option<T>();
 }
-//! \brief Makes an empty option of type void \ingroup monad
-template <> constexpr inline option<void> make_option<void>()
-{
-  return option<void>();
-}
 //! \brief Makes an empty option of type T \ingroup monad
-template <class T> constexpr inline option<T> make_empty_option()
+template <class T = void> constexpr inline option<T> make_empty_option()
 {
   return option<T>();
 }
@@ -2153,7 +2169,7 @@ template <class T> constexpr inline option<T> make_ready_option(const T &v)
   return option<T>(v);
 }
 //! \brief Makes a option from the type passed \ingroup monad
-template <class T> constexpr inline option<T> make_ready_option()
+template <class T = void> constexpr inline option<T> make_ready_option()
 {
   static_assert(!std::is_same<T, T>::value, "Empty make_ready_option<T> not specialised");
 }
@@ -2194,6 +2210,34 @@ template <class T> constexpr inline result<T> as_result(const option<T> &v)
   return result<T>(v);
 }
 
+//! \brief Makes a void outcome from an input outcome, forwarding any emptiness, error or exception \ingroup monad
+template <class T> inline outcome<void> as_void(const outcome<T> &v)
+{
+  if(v.has_exception())
+    return v.get_exception();
+  if(v.has_error())
+    return v.get_error();
+  if(v.has_value())
+    return make_ready_outcome<void>();
+  return make_empty_outcome<void>();
+}
+//! \brief Makes a void result from an input result, forwarding any emptiness or error \ingroup monad
+template <class T> inline result<void> as_void(const result<T> &v)
+{
+  if(v.has_error())
+    return v.get_error();
+  if(v.has_value())
+    return make_ready_result<void>();
+  return make_empty_result<void>();
+}
+//! \brief Makes a void option from an input option, forwarding any emptiness \ingroup monad
+template <class T> BOOST_CXX14_CONSTEXPR inline option<void> as_void(const option<T> &v)
+{
+  if(v.has_value())
+    return make_ready_option<void>();
+  return make_empty_option<void>();
+}
+
 BOOST_OUTCOME_V1_NAMESPACE_END
 
 namespace std
@@ -2202,75 +2246,19 @@ namespace std
   template <class Impl> inline void swap(BOOST_OUTCOME_V1_NAMESPACE::basic_monad<Impl> &a, BOOST_OUTCOME_V1_NAMESPACE::basic_monad<Impl> &b) { a.swap(b); }
 }
 
-//! \brief Expands into { const auto &__v=(m); if(__v.has_error()) return __v.get_error(); } \ingroup macro_helpers
-#define BOOST_OUTCOME_PROPAGATE_ERROR(m)                                                                                                                                                                                                                                                                                       \
-  {                                                                                                                                                                                                                                                                                                                            \
-    const auto &__v = (m);                                                                                                                                                                                                                                                                                                     \
-    if(__v.has_error())                                                                                                                                                                                                                                                                                                        \
-      return __v.get_error();                                                                                                                                                                                                                                                                                                  \
-  }
-//! \brief Expands into { const auto &__v=(m); if(__v.has_exception()) return __v.get_exception(); } \ingroup macro_helpers
-#define BOOST_OUTCOME_PROPAGATE_EXCEPTION(m)                                                                                                                                                                                                                                                                                   \
-  {                                                                                                                                                                                                                                                                                                                            \
-    const auto &__v = (m);                                                                                                                                                                                                                                                                                                     \
-    if(__v.has_exception())                                                                                                                                                                                                                                                                                                    \
-      return __v.get_exception();                                                                                                                                                                                                                                                                                              \
-  }
-//! \brief Expands into { const auto &__v=(m); if(__v.has_error()) return __v.get_error(); else if(__v.has_exception()) return __v.get_exception(); } \ingroup macro_helpers
-#define BOOST_OUTCOME_PROPAGATE_FAILURE(m)                                                                                                                                                                                                                                                                                     \
-  {                                                                                                                                                                                                                                                                                                                            \
-    const auto &__v = (m);                                                                                                                                                                                                                                                                                                     \
-    if(__v.has_error())                                                                                                                                                                                                                                                                                                        \
-      return __v.get_error();                                                                                                                                                                                                                                                                                                  \
-    else if(__v.has_exception())                                                                                                                                                                                                                                                                                               \
-      return __v.get_exception();                                                                                                                                                                                                                                                                                              \
-  }
-
-//! \brief Expands into { const auto &__v = (m); if(__v.has_error()) throw std::system_error(__v.get_error()); } \ingroup macro_helpers
-#define BOOST_OUTCOME_THROW_ERROR(m)                                                                                                                                                                                                                                                                                           \
-  {                                                                                                                                                                                                                                                                                                                            \
-    const auto &__v = (m);                                                                                                                                                                                                                                                                                                     \
-    if(__v.has_error())                                                                                                                                                                                                                                                                                                        \
-      BOOST_OUTCOME_THROW(std::system_error(__v.get_error()));                                                                                                                                                                                                                                                                 \
-  }
-//! \brief Expands into { const auto &__v = (m); if(__v.has_error()) throw std::system_error(__v.get_error()); else if(__v.has_exception()) return std::rethrow_exception(__v.get_exception()); }  \ingroup macro_helpers
-#define BOOST_OUTCOME_THROW_FAILURE(m)                                                                                                                                                                                                                                                                                         \
-  {                                                                                                                                                                                                                                                                                                                            \
-    const auto &__v = (m);                                                                                                                                                                                                                                                                                                     \
-    if(__v.has_error())                                                                                                                                                                                                                                                                                                        \
-      BOOST_OUTCOME_THROW(std::system_error(__v.get_error()));                                                                                                                                                                                                                                                                 \
-    else if(__v.has_exception())                                                                                                                                                                                                                                                                                               \
-      return std::rethrow_exception(__v.get_exception());                                                                                                                                                                                                                                                                      \
-  }
-
 #define BOOST_OUTCOME__GLUE2(x, y) x##y
 #define BOOST_OUTCOME__GLUE(x, y) BOOST_OUTCOME__GLUE2(x, y)
 #define BOOST_OUTCOME_UNIQUE_NAME BOOST_OUTCOME__GLUE(__t, __COUNTER__)
 //#define BOOST_OUTCOME_UNIQUE_NAME __t
 
-#define BOOST_OUTCOME_FILTER_ERROR2(unique, v, m)                                                                                                                                                                                                                                                                              \
+#define BOOST_OUTCOME_TRY2(unique, v, m)                                                                                                                                                                                                                                                                                       \
   auto &&unique = (m);                                                                                                                                                                                                                                                                                                         \
-  if(unique.has_error())                                                                                                                                                                                                                                                                                                       \
-    return unique.get_error();                                                                                                                                                                                                                                                                                                 \
+  if(!unique.has_value())                                                                                                                                                                                                                                                                                                      \
+    return BOOST_OUTCOME_V1_NAMESPACE::as_void(unique);                                                                                                                                                                                                                                                                        \
   auto v(std::move(std::move(unique).get()))
-#define BOOST_OUTCOME_FILTER_EXCEPTION2(unique, v, m)                                                                                                                                                                                                                                                                          \
-  auto &&unique = (m);                                                                                                                                                                                                                                                                                                         \
-  if(unique.has_exception())                                                                                                                                                                                                                                                                                                   \
-    return unique.get_exception();                                                                                                                                                                                                                                                                                             \
-  auto v(std::move(std::move(unique).get()))
-#define BOOST_OUTCOME_FILTER_FAILURE2(unique, v, m)                                                                                                                                                                                                                                                                            \
-  auto &&unique = (m);                                                                                                                                                                                                                                                                                                         \
-  if(unique.has_error())                                                                                                                                                                                                                                                                                                       \
-    return unique.get_error();                                                                                                                                                                                                                                                                                                 \
-  else if(unique.has_exception())                                                                                                                                                                                                                                                                                              \
-    return unique.get_exception();                                                                                                                                                                                                                                                                                             \
-  auto v(std::move(std::move(unique).get()))
-//! \brief Expands into BOOST_OUTCOME_PROPAGATE_ERROR(m); auto v((m).get()) \ingroup macro_helpers
-#define BOOST_OUTCOME_FILTER_ERROR(v, m) BOOST_OUTCOME_FILTER_ERROR2(BOOST_OUTCOME_UNIQUE_NAME, v, m)
-//! \brief Expands into BOOST_OUTCOME_PROPAGATE_EXCEPTION(m); auto v((m).get()) \ingroup macro_helpers
-#define BOOST_OUTCOME_FILTER_EXCEPTION(v, m) BOOST_OUTCOME_FILTER_EXCEPTION2(BOOST_OUTCOME_UNIQUE_NAME, v, m)
-//! \brief Expands into BOOST_OUTCOME_PROPAGATE_FAILURE(m); auto v((m).get()) \ingroup macro_helpers
-#define BOOST_OUTCOME_FILTER_FAILURE(v, m) BOOST_OUTCOME_FILTER_FAILURE2(BOOST_OUTCOME_UNIQUE_NAME, v, m)
+//! \brief If the monad returned by expression \em m is empty, erroneous or excepted, propagate that by immediately returning a void immediately, else return the unwrapped value
+#define BOOST_OUTCOME_TRY(v, m) BOOST_OUTCOME_TRY2(BOOST_OUTCOME_UNIQUE_NAME, v, m)
+
 
 //! \brief A boilerplate sequence of `catch(exceptions...)` returning those exceptions as their equivalent `result<T>` \ingroup macro_helpers
 #define BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT(type)                                                                                                                                                                                                                                                                          \

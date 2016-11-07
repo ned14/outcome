@@ -158,8 +158,15 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
   static_assert(!std::is_constructible<outcome<outcome<outcome<outcome<long>>>>, int>::value, "Sanity check that outer monad can not be constructed from an inner inner monad's value_type");
 
   static_assert(std::is_constructible<outcome<int>, outcome<long>>::value, "Sanity check that compatible monads can be constructed from one another");
+  static_assert(std::is_constructible<outcome<outcome<int>>, outcome<long>>::value, "Sanity check that outer monad can be constructed from a compatible monad");
+  static_assert(std::is_constructible<outcome<outcome<outcome<int>>>, outcome<long>>::value, "Sanity check that outer monad can be constructed from a compatible monad up to two nestings deep");
+  static_assert(!std::is_constructible<outcome<outcome<outcome<outcome<int>>>>, outcome<long>>::value, "Sanity check that outer monad cannot be constructed from a compatible monad three or more nestings deep");
   static_assert(!std::is_constructible<outcome<std::string>, outcome<int>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
-  // static_assert(!std::is_constructible<outcome<outcome<int>>, outcome<long>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
+
+  static_assert(std::is_constructible<outcome<int>, outcome<void>>::value, "Sanity check that all monads can be constructed from a void monad");
+  static_assert(std::is_constructible<outcome<outcome<int>>, outcome<void>>::value, "Sanity check that outer monad can be constructed from a compatible monad");
+  static_assert(std::is_constructible<outcome<outcome<outcome<int>>>, outcome<void>>::value, "Sanity check that outer monad can be constructed from a compatible monad up to two nestings deep");
+  static_assert(!std::is_constructible<outcome<void>, outcome<int>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
 
   static_assert(!outcome<void>::has_value_type, "Sanity check that outcome<void> does not have a value_type");
   static_assert(outcome<void>::has_error_type, "Sanity check that outcome<void> has an error_type");
@@ -659,7 +666,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
       udt &operator=(udt &&) = delete;
       ~udt() = default;
     };
-    outcome<udt> foo(5);
+    outcome<udt> foo(inplace, 5);
     BOOST_CHECK(5 == foo.get().a);
   }
 #ifdef __cpp_exceptions
@@ -680,7 +687,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
       ~udt() { a.clear(); }
     };
     // Emplace constructs
-    outcome<udt> foo("douglas");
+    outcome<udt> foo(inplace, "douglas");
     BOOST_CHECK("douglas" == foo.get().a);
     foo.emplace("niall");
     BOOST_CHECK("niall" == foo.get().a);
@@ -714,7 +721,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
     BOOST_CHECK("niall" == foo.get().a);
     // Does throwing during copy assignment work?
     {
-      outcome<udt> foo2("douglas");
+      outcome<udt> foo2(inplace, "douglas");
       try
       {
         foo2 = foo;
@@ -733,7 +740,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
     }
     // Does throwing during move assignment work?
     {
-      outcome<udt> foo2("douglas");
+      outcome<udt> foo2(inplace, "douglas");
       try
       {
         foo2 = std::move(foo);
@@ -773,8 +780,8 @@ BOOST_AUTO_TEST_CASE(works / monad / containers, "Tests that the monad works as 
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
   std::vector<outcome<std::vector<int>>> vect;
-  vect.push_back({5, 6, 7, 8});
-  vect.push_back({1, 2, 3, 4});
+  vect.push_back(std::vector<int>{5, 6, 7, 8});
+  vect.push_back(std::vector<int>{1, 2, 3, 4});
   BOOST_REQUIRE(vect.size() == 2U);
   BOOST_CHECK(vect[0].get().size() == 4U);
   BOOST_CHECK(vect[1].get().size() == 4U);
@@ -844,6 +851,43 @@ BOOST_AUTO_TEST_CASE(works / monad / upconvert, "Tests that the monad converts i
     BOOST_CHECK(c10.is_ready());
     BOOST_CHECK(c11.is_ready());
   }
+}
+
+BOOST_AUTO_TEST_CASE(works / monad / propagate, "Tests that the monad propagates errors between different editions of itself")
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  auto t0 = [&](int a) { return make_errored_result<long>(a); };
+  auto t1 = [&](int a) {
+    result<double> f(t0(a));  // double is constructible from long
+    return f;
+  };
+  auto t2 = [&](int a) {
+    result<void> f(t1(a).get_error());
+    return f;
+  };
+  auto t3 = [&](int a) {
+    outcome<std::string> f(t2(a));
+    return f;
+  };
+  BOOST_CHECK(t3(5).get_error().value() == 5);
+  result<int> a1(make_empty_result<void>());
+  result<int> a2(make_ready_result<void>());
+  result<int> a3(make_errored_result<void>(5));
+  BOOST_CHECK(a1.empty());
+  BOOST_CHECK(!a1.has_value());
+  BOOST_CHECK(!a1.has_error());
+  BOOST_CHECK(!a2.empty());
+  BOOST_CHECK(a2.has_value());
+  BOOST_CHECK(!a2.has_error());
+  BOOST_CHECK(!a3.empty());
+  BOOST_CHECK(!a3.has_value());
+  BOOST_CHECK(a3.has_error());
+
+  auto t4 = [&](int a) -> result<std::string> {
+    BOOST_OUTCOME_TRY(f, t0(a));
+    return std::to_string(f);
+  };
+  BOOST_CHECK(t4(5).get() == "5");
 }
 
 BOOST_AUTO_TEST_CASE(works / monad / serialisation, "Tests that the monad serialises and deserialises as intended")
