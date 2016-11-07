@@ -422,7 +422,9 @@ else if(fh_)
 
 The prototype Boost.Expected library and the P0323R1 reference library actually
 declares `expected<T, E = std::exception_ptr>` as the default despite that P0323R1
-specifies `expected<T, E = std::error_condition>` as the default, so for completeness
+specifies `expected<T, E = std::error_condition>` as the default (note: I have no
+idea why LEWG would use error condition as a default, such a default would lose
+information for users so I have assumed they'll change it to error code soon), so for completeness
 let's rewrite the above to match a `E = std::exception_ptr` design instead:
 
 \code
@@ -497,7 +499,7 @@ optimise your code which uses that `extern` API in its **sea** of `noexcept` acc
 \subsubsection exceptions-are-exceptional "Exceptions are exceptional, errors are not failure"
 
 In addition to the pure "sea of noexcept" for low latency users, there is one other new
-error handling design pattern to mention made possible by `expected<T, E> or especially
+error handling design pattern to mention made possible by `expected<T, E>` or especially
 Outcomes which combines "sea of noexcept" with exception throws. The idea is that ordinarily
 speaking code never throws an exception, and returns all failures anticipated by the programmer
 through `expected<T, E>` as an `E`. If however something
@@ -586,7 +588,8 @@ convenience typedefs:
  and a `std::exception_ptr` respectively e.g. `boost::error_code` and `boost::exception_ptr`.
  **Unlike** the `E` in `expected<T, E>`, Outcome hard codes the model of `EC` and `E` in stone,
  so they *must* provide at least the same APIs and behaviours as an error code and an
- exception pointer.
+ exception pointer or be `void`, in which case the specialisation doesn't provide the ability
+ to store an instance of that type.
 3. Types `T`, `EC` and `E` cannot be the same nor be constructible from one another (this
 is enforced by static assertion at compile time). The
 reason for this is that unlike `expected<T, E>`, outcomes implicitly construct from any
@@ -643,7 +646,9 @@ It should be stressed that `basic_monad<>` is a policy driven class where the po
 class has the ability to arbitrarily extend and/or replace member functions listed in this
 synopsis. Indeed originally a non-allocating high performance `promise<T>...future<T>` implementation
 simply supplied a policy class implementing the additional features of promise-future to
-`basic_monad<>` whereby C++ 17 future continuations were modelled as monadic binds.
+`basic_monad<>` whereby C++ 17 future continuations were modelled as monadic binds
+(it can be still found in the attic directory for anyone interested, though note how stale
+it likely is by now).
 That level of flexibility remains in the design for anyone interested in adding more
 `basic_monad<>` specialisations e.g. packed storage.
 
