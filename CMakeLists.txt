@@ -83,6 +83,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   set_target_properties(outcome_hl--unittests_noexcept PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     POSITION_INDEPENDENT_CODE ON
+    CXX_STANDARD 14
   )
   add_test(NAME outcome_hl--unittests_noexcept CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
     COMMAND $<TARGET_FILE:outcome_hl--unittests_noexcept>

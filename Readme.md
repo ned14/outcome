@@ -8,11 +8,12 @@ Documentation: https://ned14.github.io/boost.outcome/
 Tarballs of source with all unit tests passing: https://dedi4.nedprod.com/static/files/
 
 Todo:
- - [ ] Replace all get_error() with error(), get_exception() with exception(). Eliminate get().
+ - [x] Make any `outcome<T>` constructible from `outcome<void>`
+ - [x] Replace all get_error() with error(), get_exception() with exception(). Eliminate get().
 Add operator * and operator->.
- - [ ] Emplace constructor needs to start with in_place_t. And take an initialiser list too.
+ - [x] Emplace constructor needs to start with in_place_t. And take an initialiser list too.
  - [ ] Create new Win32 and NT error code categories and have make_errored_outcome() use those.
- Have a python script auto generate the code into separate header files.
+ Have a python script auto generate the code into separate header files. Add those to boost-lite.
  - [ ] `make install` needs to install dependency headers too
  - [ ] Solve the apt packaging problem. Either:
    1. boost-lite cmake needs to gain the ability to be called by debian dh (see make_deb.sh).

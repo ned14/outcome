@@ -569,7 +569,9 @@ use case of handling errors only.
 
 \subsection design_differences Design differences between Expected and Outcomes
 
-1. Outcome is designed specifically for returning output from function calls in low latency/very high performance C++. It
+1. Outcome is designed specifically for returning output from function calls in
+low latency/very high performance C++ of the kind
+<a href="https://groups.google.com/a/isocpp.org/forum/#!forum/sg14">WG21 WG14</a> is working upon. It
 therefore works perfectly with exceptions and RTTI disabled and its CI compiles per
 commit typical use cases of Outcomes and counts the assembler operations emitted by GCC, clang and MSVC to ensure
 code bloat is kept optimally minimal. On all recent GCCs and clangs, if the compiler's
@@ -590,37 +592,55 @@ convenience typedefs:
  so they *must* provide at least the same APIs and behaviours as an error code and an
  exception pointer or be `void`, in which case the specialisation doesn't provide the ability
  to store an instance of that type.
-3. Types `T`, `EC` and `E` cannot be the same nor be constructible from one another (this
-is enforced by static assertion at compile time). The
-reason for this is that unlike `expected<T, E>`, outcomes implicitly construct from any
-of types `T`, `EC` or `E`. A lot of readers will groan on reading that, but
-in practice because there is no possibility of the programmer confusing how to construct a
-`T` or an `EC` or an `E` due to the hard coding, there is no unexpected behaviours in practice
-as you cannot accidentally construct the wrong state unintentionally.
-4. As suggested by the presence of an `option<T>` convenience typedef, all `basic_monad<>` instances have a
+3. As suggested by the presence of an `option<T>` convenience typedef, all `basic_monad<>` instances have a
 formal empty state. There is no "never empty" guarantee which
 enables sane semantics when exceptions are disabled and also to not confuse the compiler's
 optimiser with complex potential branches in move construction (which can cause the optimiser
-to give up prematurely). It also sidesteps the problem of move assignment throwing an
-exception, in which case Outcomes are left in an empty state.
-5. You can explicitly convert from any less representative `basic_monad<>` to any more
+to give up prematurely). It sidesteps the problem of move assignment throwing an
+exception, in which case Outcomes are left in an empty state. It ensures all `basic_monad<>`
+are constexpr default constructible. Finally, it enables `basic_monad<Policy<void>>`
+to have useful semantics as a generic error or exception transport. 
+4. Like `expected<T, E>`, implicit conversion exists from any `basic_monad<Policy<T1, EC1, E1>>` to
+any `basic_monad<Policy<T2, EC2, E2>>` if all of `T2`, `EC2` and `E2` are constructible from
+`T1`, `EC1` and `E1` respectively. `basic_monad<Policy<void>>` has special significance: you
+can always implicitly construct any arbitrary `basic_monad<Policy<T>>` from any
+`basic_monad<Policy<void>>`. The rules are as follows:
+ 1. If input `basic_monad<Policy<void>>` is empty, `basic_monad<Policy<T>>` is empty.
+ 2. If input `basic_monad<Policy<void>>` has value, `basic_monad<Policy<T>>` is a default
+constructed `T`.
+ 3. If input `basic_monad<Policy<void>>` has an error, `basic_monad<Policy<T>>` has the
+same error either copy or move constructed as appropriate.
+ 4. If input `basic_monad<Policy<void>>` has an exception, `basic_monad<Policy<T>>` has the
+same exception either copy or move constructed as appropriate.
+
+ This is how Outcome implements the `unexpected<E>` type sugar used by Expected to initialise
+an `expected<T, E>` with an `E`. In Outcome, return a void Outcome with the error or exception
+you want (or better, use the `make_errored_result<>`, `make_errored_outcome<>` or
+`make_exceptional_outcome<>` free functions).
+5. Types `T`, `EC` and `E` cannot be the same nor be constructible from one another, and this
+is enforced by static assertion at compile time. This prevents pointless confusion and
+maintenance difficulty (if you really, really need to return error codes or exception
+pointers as `T`, wrap them in a thin type wrapper).
+6. You can explicitly convert from any less representative `basic_monad<>` to any more
 representative form because that is always a loss free, non-throwing operation (and usually
 entirely eliminated by the compiler at runtime, if it can it will simply treat the same
 storage differently as if by `static_cast<>`). This is
 because it is expected that lowest level code will return `option<T>` and `result<T>`
 and higher level code will return `outcome<T>`, so this makes for seamless up-conversion as
-you move further away from low level code.
-6. For the most part, `expected<T, std::error_code>` and `outcome::result<T>` ought to be close
-to interchangeable in most use cases, and could be configurable template alias swappable in most code. This is
-intentional and deliberate to provide a bridge for code until Expected is standardised.
-7. Outcomes implement equality/non-equality operators, but not ordering comparison nor hash operations.
+you move further away from low level code. This also lets you return a `result<void>` with
+an error code and it'll auto upconvert to any `outcome<T>`.
+7. For the most part, `expected<T, std::error_code>` and `outcome::result<T>` ought to be close
+to interchangeable in most use cases, and could be configurably template alias swappable in most
+code. There is one glaring exception however, and that is that a default constructed Outcome
+is **empty**, not to a default constructed `T` which makes sense given the formal empty state.
+8. Outcomes implement equality/non-equality operators, but not ordering comparison nor hash operations.
 This is due to https://akrzemi1.wordpress.com/2014/12/02/a-gotcha-with-optional/ where
 you either choose implicit construction OR comparison operations or else risk surprising
 behaviours. That means you can only place Outcomes in non-mapped STL containers. It is
 trivial for users to write a simple wrapper class for Outcomes implementing comparison
 and hashing if they ever really needed to store Outcomes in associative maps.
-8. Finally, Outcome goes out of its way to be as cheap on compile time as possible by having
-the compiler do as little work as possible if not optimising. A lot of the rigidity
+9. Finally, Outcome goes out of its way to be as cheap on compile time as possible by having
+the compiler do as little work as possible if not optimising. A lot of the hard coded rigidity
 above stems from systematically avoiding, whenever possible, metaprogramming, SFINAE, instantiation of helper types
 during deduction, or doing anything which would cause the compiler to not use `O(1)` constant
 time operations during non-optimising compilation. I have also found empirically that there
@@ -663,48 +683,49 @@ template <class T>
 class outcome
 {
 public:
-  using value_type = T;                                       // also in expected<>
-  using error_type = std::error_code;                         // also in expected<>
+  using value_type = T;                                                        // also in expected<>
+  using error_type = std::error_code;                                          // also in expected<>
   using exception_type = std::exception_ptr;
-  template <class U> using rebind = outcome<U>;               // also in expected<>
+  template <class U> using rebind = outcome<U>;                                // also in expected<>
 
-  constexpr outcome() noexcept([1]);                          // also in expected<>
-  constexpr outcome(const outcome&) noexcept([1]);            // also in expected<>
-  constexpr outcome(outcome&&) noexcept([1]);                 // also in expected<>
-  constexpr outcome(const value_type&) noexcept([1]);         // also in expected<>
-  constexpr outcome(value_type&&) noexcept([1]);              // also in expected<>
+  constexpr outcome() noexcept([1]);                                           // also in expected<>
+  constexpr outcome(const outcome&) noexcept([1]);                             // also in expected<>
+  constexpr outcome(outcome&&) noexcept([1]);                                  // also in expected<>
+  constexpr outcome(const value_type&) noexcept([1]);                          // also in expected<>
+  constexpr outcome(value_type&&) noexcept([1]);                               // also in expected<>
   template <class... Args>
-    constexpr explicit outcome(in_place_t, Args&&...);        // also in expected<>
+    constexpr explicit outcome(in_place_t, Args&&...);                         // also in expected<>
 
   ~outcome() noexcept([1]);  // Not implemented if value_type, error_type and exception_type are trivially destructible
 
-  constexpr outcome& operator=(const outcome&) noexcept([1]); // also in expected<>
-  constexpr outcome& operator=(outcome&&) noexcept([1]);      // also in expected<>
+  constexpr outcome& operator=(const outcome&) noexcept([1]);                  // also in expected<>
+  constexpr outcome& operator=(outcome&&) noexcept([1]);                       // also in expected<>
   template <class... Args>
-    constexpr void emplace(Args&&...) noexcept([1]);          // also in expected<>
-  constexpr void swap(outcome&) noexcept([1]);                // also in expected<>
+    constexpr void emplace(Args&&...) noexcept([1]);                           // also in expected<>
+  constexpr void swap(outcome&) noexcept([1]);                                 // also in expected<>
 
-  constexpr explicit operator bool() const noexcept;          // also in expected<>
-  constexpr bool has_value() const noexcept;                  // also in expected<>
+  constexpr explicit operator bool() const noexcept;                           // also in expected<>
+  constexpr bool has_value() const noexcept;                                   // also in expected<>
   constexpr bool has_error() const noexcept;
   constexpr bool has_exception() const noexcept;
 
-  constexpr const value_type* operator ->() const;            // also in expected<>, missing if [2]
-  constexpr value_type* operator ->();                        // also in expected<>, missing if [2]
-  constexpr const value_type& operator *() const&;            // also in expected<>, returns by value if [2]
-  constexpr value_type& operator *() &;                       // also in expected<>, returns by value if [2]
-  constexpr value_type&& operator *() &&;                     // also in expected<>, returns by value if [2]
+  constexpr const value_type* operator ->() const;                             // also in expected<>, missing if [2]
+  constexpr value_type* operator ->();                                         // also in expected<>, missing if [2]
+  constexpr const value_type& operator *() const&;                             // also in expected<>, returns by value if [2]
+  constexpr value_type& operator *() &;                                        // also in expected<>, returns by value if [2]
+  constexpr const value_type&& operator *() const&&;                           // also in expected<>, returns by value if [2]
+  constexpr value_type&& operator *() &&;                                      // also in expected<>, returns by value if [2]
 
-  constexpr const value_type& value() const&;                 // also in expected<>
-  constexpr value_type& value() &;                            // also in expected<>
-  constexpr value_type&& value() &&;                          // also in expected<>
-  constexpr const value_type &value_or(const value_type &) noexcept const&;  // similar in expected<>
-  constexpr value_type& value_or(value_type&) noexcept &;                    // similar in expected<>
-  constexpr value_type&& value_or(value_type&&) noexcept &&;                 // similar in expected<>
+  constexpr const value_type& value() const&;                                  // also in expected<>
+  constexpr value_type& value() &;                                             // also in expected<>
+  constexpr const value_type&& value() const&&;                                // also in expected<>
+  constexpr value_type&& value() &&;                                           // also in expected<>
+  constexpr const value_type &value_or(const value_type &) noexcept const&;    // similar in expected<>
+  constexpr value_type& value_or(value_type&) noexcept &;                      // similar in expected<>
+  constexpr const value_type&& value_or(const value_type&&) noexcept const&&;  // similar in expected<>
+  constexpr value_type&& value_or(value_type&&) noexcept &&;                   // similar in expected<>
 
-  constexpr const error_type& error() const&;                 // also in expected<>
-  constexpr error_type& error() &;                            // also in expected<>
-  constexpr error_type&& error() &&;                          // also in expected<>
+  constexpr error_type error() const;                                          // similar in expected<>
   constexpr const error_type &error_or(const error_type &) noexcept const&;
   constexpr error_type& error_or(error_type&) noexcept &;
   constexpr error_type&& error_or(error_type&&) noexcept &&;
