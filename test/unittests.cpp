@@ -856,38 +856,42 @@ BOOST_AUTO_TEST_CASE(works / monad / upconvert, "Tests that the monad converts i
 BOOST_AUTO_TEST_CASE(works / monad / propagate, "Tests that the monad propagates errors between different editions of itself")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  auto t0 = [&](int a) { return make_errored_result<long>(a); };
-  auto t1 = [&](int a) {
-    result<double> f(t0(a));  // double is constructible from long
-    return f;
-  };
-  auto t2 = [&](int a) {
-    result<void> f(t1(a).get_error());
-    return f;
-  };
-  auto t3 = [&](int a) {
-    outcome<std::string> f(t2(a));
-    return f;
-  };
-  BOOST_CHECK(t3(5).get_error().value() == 5);
-  result<int> a1(make_empty_result<void>());
-  result<int> a2(make_ready_result<void>());
-  result<int> a3(make_errored_result<void>(5));
-  BOOST_CHECK(a1.empty());
-  BOOST_CHECK(!a1.has_value());
-  BOOST_CHECK(!a1.has_error());
-  BOOST_CHECK(!a2.empty());
-  BOOST_CHECK(a2.has_value());
-  BOOST_CHECK(!a2.has_error());
-  BOOST_CHECK(!a3.empty());
-  BOOST_CHECK(!a3.has_value());
-  BOOST_CHECK(a3.has_error());
-
-  auto t4 = [&](int a) -> result<std::string> {
-    BOOST_OUTCOME_TRY(f, t0(a));
-    return std::to_string(f);
-  };
-  BOOST_CHECK(t4(5).get() == "5");
+  {
+    auto t0 = [&](int a) { return make_errored_result<long>(a); };
+    auto t1 = [&](int a) {
+      result<double> f(t0(a));  // double is constructible from long
+      return f;
+    };
+    auto t2 = [&](int a) {
+      result<void> f(t1(a).get_error());
+      return f;
+    };
+    auto t3 = [&](int a) {
+      outcome<std::string> f(t2(a));
+      return f;
+    };
+    BOOST_CHECK(t3(5).get_error().value() == 5);
+    result<int> a1(make_empty_result<void>());
+    result<int> a2(make_ready_result<void>());
+    result<int> a3(make_errored_result<void>(5));
+    BOOST_CHECK(a1.empty());
+    BOOST_CHECK(!a1.has_value());
+    BOOST_CHECK(!a1.has_error());
+    BOOST_CHECK(!a2.empty());
+    BOOST_CHECK(a2.has_value());
+    BOOST_CHECK(!a2.has_error());
+    BOOST_CHECK(!a3.empty());
+    BOOST_CHECK(!a3.has_value());
+    BOOST_CHECK(a3.has_error());
+  }
+  {
+    auto t0 = [&](int a) { return make_result<long>(a); };
+    auto t1 = [&](int a) -> result<std::string> {
+      BOOST_OUTCOME_TRY(f, t0(a));
+      return std::to_string(f);
+    };
+    BOOST_CHECK(t1(5).get() == "5");
+  }
 }
 
 BOOST_AUTO_TEST_CASE(works / monad / serialisation, "Tests that the monad serialises and deserialises as intended")
