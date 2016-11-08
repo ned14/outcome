@@ -682,36 +682,39 @@ an `option<T>` only `value_type` functions would be present.
 \code
 BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 
-// Tag types for empty, valued, errored and excepted outcomes
+// Tag types for creating empty, valued, errored and excepted basic_monad's
 struct empty_t; constexpr empty_t empty;
 struct value_t; constexpr value_t value;
 struct error_t; constexpr error_t error;
 struct exception_t; constexpr exception_t exception;
 
-// Specialise to std::true_type for types you wish to store in a single byte
+// Specialise to std::true_type for types you wish to store in a packed single byte
 // (void and bool are done for you unless you define BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE)
 template <class _value_type> struct enable_single_byte_value_storage;
 
-// Remember "class" outcome is actually a template alias to basic_monad<Policy<...>>
-template <class T>
-class outcome
+// Remember basic_monad<Policy<...>> is aliased to outcome<T>, result<T> and option<T>
+template <class T, class EC = std::error_code, class E = std::exception_ptr>
+class basic_monad<monad_policy<T, EC, E>>
 {
 public:
   // true if configured to hold a value_type, an error_type or an exception_type
   static constexpr bool has_value_type;
   static constexpr bool has_error_type;
   static constexpr bool has_exception_type;
+ 
+  // If configured with void, set to a helpfully named unusable type 
+  using value_type = T | unusable;                                             // similar in expected<> [3]
+  using error_type = EC | unusable;                                            // similar in expected<> [3]
+  using exception_type = E | unusable;                                         // [3]
   
-  using value_type = T;                                                        // similar in expected<> [3]
-  using error_type = std::error_code;                                          // similar in expected<> [3]
-  using exception_type = std::exception_ptr;                                   // [3]
-  
-  using raw_value_type = T;                                                    // The actual type configured
-  using raw_error_type = std::error_code;                                      // ditto
-  using raw_exception_type = std::exception_ptr;                               // ditto
+  // The actual types configured
+  using raw_value_type = T | void;                                             // The actual type configured
+  using raw_error_type = EC | void;                                            // ditto
+  using raw_exception_type = E | void;                                         // ditto
 
-  template <class U> using rebind = outcome<U>;                                // also in expected<>
-  
+  template <class U> using rebind = basic_monad<U>;                            // also in expected<>
+
+  // The properties of this monad, and relative to other monads
   static constexpr bool is_nothrow_copy_constructible;
   static constexpr bool is_nothrow_move_constructible;
   static constexpr bool is_nothrow_copy_assignable;
@@ -721,39 +724,59 @@ public:
   template <class OtherMonad> static constexpr bool is_constructible;
   template <class OtherMonad> static constexpr bool is_comparable;
 
-  constexpr outcome() noexcept([1]);                                           // also in expected<>, use make_outcome<T>() instead
-  constexpr outcome(const outcome&) noexcept([1]);                             // also in expected<>
-  constexpr outcome(outcome&&) noexcept([1]);                                  // also in expected<>
+  // Default implicit construction and copy and move construction
+  constexpr basic_monad() noexcept([1]);                                       // also in expected<>, use make_basic_monad<T>() instead
+  constexpr basic_monad(const basic_monad&) noexcept([1]);                     // also in expected<>
+  constexpr basic_monad(basic_monad&&) noexcept([1]);                          // also in expected<>
 
-  // Constructing empty or with a value_type
-  constexpr outcome(empty_t) noexcept;                                         // use make_outcome<T>() instead
-  constexpr outcome(value_t) noexcept(T);                                      // use make_ready_outcome<T>() instead
-  constexpr outcome(const value_type&) noexcept(T);                            // also in expected<>
-  constexpr outcome(value_type&&) noexcept(T);                                 // also in expected<>
+  // Implicit constructing empty or with a value_type
+  constexpr basic_monad(empty_t) noexcept;                                     // use make_basic_XXX<T>() instead
+  constexpr basic_monad(value_t) noexcept(T);                                  // use make_ready_XXX<T>() instead
+  constexpr basic_monad(const value_type&) noexcept(T);                        // also in expected<>
+  constexpr basic_monad(value_type&&) noexcept(T);                             // also in expected<>
+  
+  // Explicit emplacement of a value_type
   template <class... Args>
-    constexpr explicit outcome(in_place_t, Args&&...) noexcept(T);             // also in expected<>
+    constexpr explicit basic_monad(in_place_t, Args&&...) noexcept(T);         // also in expected<>
   template <class U>
-    constexpr outcome(in_place_t, std::initializer_list<U>) noexcept(T);       // also in expected<>
+    constexpr basic_monad(in_place_t, std::initializer_list<U>) noexcept(T);   // also in expected<>
 
-  // Constructing from emptiness, error or excepted state of any other outcome
-  constexpr outcome(const rebind<void>&) noexcept([1]);                        // use as_void() instead
-  constexpr outcome(rebind<void>&&) noexcept([1]);                             // use as_void() instead
-
+  // Implicit construction from emptiness, error or excepted state of a void basic_monad
+  constexpr basic_monad(const rebind<void>&) noexcept([1]);                    // use as_void() to create a void monad
+  constexpr basic_monad(rebind<void>&&) noexcept([1]);                         // use as_void() to create a void monad
   
+  // Implicit construction with error_type or exception_type
+  constexpr basic_monad(const error_type&) noexcept(EC);                       // use make_errored_XXX() instead
+  constexpr basic_monad(error_type&&) noexcept(EC);                            // use make_errored_XXX() instead
+  constexpr basic_monad(const exception_type&) noexcept(E);                    // use make_exceptional_XXX() instead
+  constexpr basic_monad(exception_type&&) noexcept(E);                         // use make_exceptional_XXX() instead
   
-  ~outcome() noexcept([1]);  // Not implemented if value_type, error_type and exception_type are trivially destructible
+  // Explicit up converting move and copy constructors, only
+  // available if T, EC and E are constructible from T2, EC2 and E2
+  // and no information can ever be lost
+  template <class T2, class EC2, class E2>
+    constexpr explicit basic_monad(basic_monad<monad_policy<T2, EC2, E2>> &&) noexcept([1]);
+  template <class T2, class EC2, class E2>
+    constexpr explicit basic_monad(const basic_monad<monad_policy<T2, EC2, E2>> &) noexcept([1]);
+  
+  // Not implemented if value_type, error_type and exception_type are all trivially destructible
+  // thus making basic_monad a LiteralType (i.e. constexpr usable)
+  ~basic_monad() noexcept([1]);
 
-  constexpr outcome& operator=(const outcome&) noexcept([1]);                  // also in expected<>
-  constexpr outcome& operator=(outcome&&) noexcept([1]);                       // also in expected<>
-  template <class... Args>
-    constexpr void emplace(Args&&...) noexcept([1]);                           // also in expected<>
-  constexpr void swap(outcome&) noexcept([1]);                                 // also in expected<>
+  // Assignment. Note exception throws during assignment leave the monad empty
+  constexpr basic_monad& operator=(const basic_monad&) noexcept([1]);          // also in expected<>
+  constexpr basic_monad& operator=(basic_monad&&) noexcept([1]);               // also in expected<>
 
+  // Observers
   constexpr explicit operator bool() const noexcept;                           // also in expected<>
+  constexpr explicit operator boost_lite::tribool::tribool() const noexcept;   // other if monad empty, false if monad errored/excepted
+  constexpr bool is_ready() const noexcept;                                    // i.e. not empty
+  constexpr bool empty() const noexcept;
   constexpr bool has_value() const noexcept;                                   // also in expected<>
   constexpr bool has_error() const noexcept;
-  constexpr bool has_exception() const noexcept;
+  constexpr bool has_exception(bool only_exception = false) const noexcept;    // NOTE defaults to true also if has_error()
 
+  // For compatibility with expected<T, E> and optional<T>
   constexpr const value_type* operator ->() const;                             // also in expected<>, missing if [2]
   constexpr value_type* operator ->();                                         // also in expected<>, missing if [2]
   constexpr const value_type& operator *() const&;                             // also in expected<>, returns by value if [2]
@@ -761,6 +784,7 @@ public:
   constexpr const value_type&& operator *() const&&;                           // also in expected<>, returns by value if [2]
   constexpr value_type&& operator *() &&;                                      // also in expected<>, returns by value if [2]
 
+  // Retrieving value_type
   constexpr const value_type& value() const&;                                  // also in expected<>
   constexpr value_type& value() &;                                             // also in expected<>
   constexpr const value_type&& value() const&&;                                // also in expected<>
@@ -770,12 +794,30 @@ public:
   constexpr const value_type&& value_or(const value_type&&) noexcept const&&;  // similar in expected<>
   constexpr value_type&& value_or(value_type&&) noexcept &&;                   // similar in expected<>
 
+  // Setting value_type, disposes any previous state
+  constexpr void set_value(const value_type&);
+  constexpr void set_value(value_type&&);
+  constexpr void set_value();
+  template <class... Args>
+    constexpr void emplace(Args&&...) noexcept([1]);                           // also in expected<>
+  
+  // Retrieving and setting error_type and exception_type
   constexpr error_type error() const;                                          // similar in expected<>
-  constexpr const error_type &error_or(const error_type &) noexcept const&;
-  constexpr error_type& error_or(error_type&) noexcept &;
-  constexpr error_type&& error_or(error_type&&) noexcept &&;
+  constexpr error_type error_or(error_type) noexcept const;
+  constexpr void set_error(error_type);
+  constexpr exception_type exception() const;
+  constexpr exception_type exception_or(exception_type) noexcept const;
+  constexpr void set_exception(exception_type);
+  template<class E> void set_exception(E&&);                                   // via std::make_exception_ptr
 
+  // Swap and clear to empty
+  void swap(basic_monad&) noexcept([1]);                                       // also in expected<>
+  void clear() noexcept([1]);
+
+#ifdef BOOST_OUTCOME_ENABLE_OPERATORS                                          // defaults to disabled
+#endif
 };
+
 // NOTE requires state to be set to valued beforehand (and can only deserialise a value)
 template<class Policy> inline std::istream &operator>>(std::istream &s, basic_monad<Policy> &v);
 template<class Policy> inline std::ostream &operator<<(std::ostream &s, const basic_monad<Policy> &v);
@@ -785,7 +827,7 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 
 [1]: The `noexcept` for each of these is determined by calculating the `noexcept`
 for the same operation in each of `T`, `EC` and `E`. If the same operation on any
-of those types can throw, so can the outcome's operation.
+of those types can throw, so can the basic_monad's operation.
 
 [2]: The trait `boost::outcome::enable_single_byte_value_storage<T>` determines if
 a single byte is used to store `T`, in which case you will not be returned a pointer

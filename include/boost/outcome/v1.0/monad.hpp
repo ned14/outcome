@@ -1349,22 +1349,6 @@ error_type, an exception_type nor an empty_type.
   BOOST_OUTCOME_CXX14_CONSTEXPR const value_type &&get_or(const value_type &&v) const &&noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
   BOOST_OUTCOME_CXX14_CONSTEXPR const value_type &&value_or(const value_type &&v) const &&noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
-  //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-  BOOST_OUTCOME_CXX14_CONSTEXPR value_type &get_and(value_type &v) & noexcept { return has_value() ? v : implementation_policy::base::_storage.value; }
-  //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-  BOOST_OUTCOME_CXX14_CONSTEXPR value_type &value_and(value_type &v) & noexcept { return has_value() ? v : implementation_policy::base::_storage.value; }
-  //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-  constexpr const value_type &get_and(const value_type &v) const &noexcept { return has_value() ? v : implementation_policy::base::_storage.value; }
-  //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-  constexpr const value_type &value_and(const value_type &v) const &noexcept { return has_value() ? v : implementation_policy::base::_storage.value; }
-  //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-  BOOST_OUTCOME_CXX14_CONSTEXPR value_type &&get_and(value_type &&v) && noexcept { return has_value() ? std::move(v) : std::move(implementation_policy::base::_storage.value); }
-  //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-  BOOST_OUTCOME_CXX14_CONSTEXPR value_type &&value_and(value_type &&v) && noexcept { return has_value() ? std::move(v) : std::move(implementation_policy::base::_storage.value); }
-  //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-  BOOST_OUTCOME_CXX14_CONSTEXPR const value_type &&get_and(const value_type &&v) const &&noexcept { return has_value() ? std::move(v) : std::move(implementation_policy::base::_storage.value); }
-  //! \brief If contains a value_type, return the supplied value_type else return the contained value_type
-  BOOST_OUTCOME_CXX14_CONSTEXPR const value_type &&value_and(const value_type &&v) const &&noexcept { return has_value() ? std::move(v) : std::move(implementation_policy::base::_storage.value); }
   //! \brief Disposes of any existing state, setting the monad to the value storage
   BOOST_OUTCOME_CONVINCE_MSVC void set_state(value_storage_type &&v)
   {
@@ -1398,8 +1382,8 @@ error_type, an exception_type nor an empty_type.
 
   //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
   BOOST_OUTCOME_CONVINCE_MSVC error_type get_error_or(error_type e) const noexcept { return has_error() ? implementation_policy::base::_storage.error : std::move(e); }
-  //! \brief If contains an error_type, return the supplied error_type else return the contained error_type
-  BOOST_OUTCOME_CONVINCE_MSVC error_type get_error_and(error_type e) const noexcept { return has_error() ? std::move(e) : implementation_policy::base::_storage.error; }
+  //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
+  BOOST_OUTCOME_CONVINCE_MSVC error_type error_or(error_type e) const noexcept { return has_error() ? implementation_policy::base::_storage.error : std::move(e); }
   //! \brief Disposes of any existing state, setting the monad to the error_type
   BOOST_OUTCOME_CONVINCE_MSVC void set_error(error_type v)
   {
@@ -1409,8 +1393,8 @@ error_type, an exception_type nor an empty_type.
 
   //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
   BOOST_OUTCOME_CONVINCE_MSVC exception_type get_exception_or(exception_type e) const noexcept { return has_exception() ? implementation_policy::base::_storage.exception : std::move(e); }
-  //! \brief If contains an exception_type, return the supplied exception_type else return the contained exception_type
-  BOOST_OUTCOME_CONVINCE_MSVC exception_type get_exception_and(exception_type e) const noexcept { return has_exception() ? std::move(e) : implementation_policy::base::_storage.exception; }
+  //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
+  BOOST_OUTCOME_CONVINCE_MSVC exception_type exception_or(exception_type e) const noexcept { return has_exception() ? implementation_policy::base::_storage.exception : std::move(e); }
   //! \brief Disposes of any existing state, setting the monad to the exception_type
   BOOST_OUTCOME_CONVINCE_MSVC void set_exception(exception_type v)
   {
