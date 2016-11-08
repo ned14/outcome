@@ -814,13 +814,93 @@ public:
   void swap(basic_monad&) noexcept([1]);                                       // also in expected<>
   void clear() noexcept([1]);
 
-#ifdef BOOST_OUTCOME_ENABLE_OPERATORS                                          // defaults to disabled
+#ifdef BOOST_OUTCOME_ENABLE_OPERATORS                                          // defaults to disabled (documented below)
+  basic_monad<...> unwrap() const &;
+  basic_monad<...> unwrap() &&;
+  template<class F> basic_monad<...> bind(F &&f);
+  template<class F> basic_monad<...> operator>>(F &&f);
+  template<class F> basic_monad<...> map(F &&f);
+  template<class F> basic_monad(F(contents)).unwrap() match(F &&f);
+  template<class... Args> decltype(value_type(Args...)) operator()(Args &&...);
+  
+  template<class U> constexpr basic_monad operator|(U &&) &;
+  template<class U> constexpr basic_monad operator|(U &&) const&;
+  template<class U> constexpr basic_monad operator|(U &&) &&;
+  template<class U> constexpr basic_monad operator&(U &&) &;
+  template<class U> constexpr basic_monad operator&(U &&) const&;
+  template<class U> constexpr basic_monad operator&(U &&) &&;
 #endif
 };
 
 // NOTE requires state to be set to valued beforehand (and can only deserialise a value)
 template<class Policy> inline std::istream &operator>>(std::istream &s, basic_monad<Policy> &v);
 template<class Policy> inline std::ostream &operator<<(std::ostream &s, const basic_monad<Policy> &v);
+
+// Equality operators
+template<class Policy1, class Policy2> constexpr inline bool operator==(const basic_monad<Policy1> &, const basic_monad<Policy2> &);
+template<class Policy1, class Policy2> constexpr inline bool operator!=(const basic_monad<Policy1> &, const basic_monad<Policy2> &);
+
+// Outcome makers
+template <class T> constexpr inline outcome<T> make_outcome(T &&v);
+template <class T> constexpr inline outcome<T> make_outcome(const T &v)
+template <class T = void> inline outcome<T> make_outcome(error_code_extended v)
+template <class T = void> inline outcome<T> make_outcome(std::exception_ptr v)
+template <class T = void> constexpr inline outcome<T> make_outcome()
+template <class T = void> constexpr inline outcome<T> make_empty_outcome()
+template <class T> constexpr inline outcome<T> make_ready_outcome(T &&v)
+template <class T> constexpr inline outcome<T> make_ready_outcome(const T &v)
+template <class T = void> constexpr inline outcome<T> make_ready_outcome()
+template <> inline outcome<void> make_ready_outcome<void>()
+template <class T = void> inline outcome<T> make_errored_outcome(error_code_extended v)
+template <class T = void> inline outcome<T> make_errored_outcome(int e, const char *extended = nullptr)
+#if defined(_WIN32)
+template <class T = void> constexpr inline outcome<T> make_errored_outcome(unsigned long e, const char *extended = nullptr)
+#endif
+template <class T = void> inline outcome<T> make_exceptional_outcome(std::exception_ptr v)
+
+// Result makers
+template <class T> constexpr inline result<T> make_result(T &&v)
+template <class T> constexpr inline result<T> make_result(const T &v)
+template <class T = void> inline result<T> make_result(error_code_extended v)
+template <class T = void> constexpr inline result<T> make_result()
+template <class T = void> constexpr inline result<T> make_empty_result()
+template <class T> constexpr inline result<T> make_ready_result(T &&v)
+template <class T> constexpr inline result<T> make_ready_result(const T &v)
+template <class T = void> constexpr inline result<T> make_ready_result()
+template <> inline result<void> make_ready_result<void>()
+template <class T = void> inline result<T> make_errored_result(error_code_extended v)
+template <class T = void> constexpr inline result<T> make_errored_result(int e, const char *extended = nullptr)
+#if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
+template <class T = void> constexpr inline result<T> make_errored_result(unsigned long e, const char *extended = nullptr)
+#endif
+
+// Option makers
+template <class T> constexpr inline option<T> make_option(T &&v)
+template <class T> constexpr inline option<T> make_option(const T &v)
+template <class T = void> constexpr inline option<T> make_option()
+template <class T = void> constexpr inline option<T> make_empty_option()
+template <class T> constexpr inline option<T> make_ready_option(T &&v)
+template <class T> constexpr inline option<T> make_ready_option(const T &v)
+template <class T = void> constexpr inline option<T> make_ready_option()
+template <> constexpr inline option<void> make_ready_option<void>()
+
+// Upconverters
+template <class T> constexpr inline outcome<T> as_outcome(result<T> &&v)
+template <class T> constexpr inline outcome<T> as_outcome(const result<T> &v)
+template <class T> constexpr inline outcome<T> as_outcome(option<T> &&v)
+template <class T> constexpr inline outcome<T> as_outcome(const option<T> &v)
+template <class T> constexpr inline result<T> as_result(option<T> &&v)
+template <class T> constexpr inline result<T> as_result(const option<T> &v)
+
+// Emptiness, errored and excepted state extractors
+template <class T> inline outcome<void> as_void(const outcome<T> &v)
+template <class T> inline result<void> as_void(const result<T> &v)
+template <class T> constexpr inline option<void> as_void(const option<T> &v)
+
+// Equivalent to try! in Rust and Swift
+#define BOOST_OUTCOME_TRY(variable_to_initialise, monad)
+// Boilerplate catching all the STL exceptions, returning a result<type>
+#define BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT(type)
 
 BOOST_OUTCOME_V1_NAMESPACE_END
 \endcode
