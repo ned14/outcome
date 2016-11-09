@@ -8,19 +8,11 @@ Documentation: https://ned14.github.io/boost.outcome/
 Tarballs of source with all unit tests passing: https://dedi4.nedprod.com/static/files/
 
 Todo:
- - [x] Make any `outcome<T>` constructible from `outcome<void>`
- - [x] Replace all get_error() with error(), get_exception() with exception(). Eliminate get().
-Add operator * and operator->.
- - [x] Emplace constructor needs to start with in_place_t. And take an initialiser list too.
- - [ ] Create new Win32 and NT error code categories and have make_errored_outcome() use those.
- Have a python script auto generate the code into separate header files. Add those to boost-lite.
  - [ ] `make install` needs to install dependency headers too
  - [ ] Solve the apt packaging problem. Either:
    1. boost-lite cmake needs to gain the ability to be called by debian dh (see make_deb.sh).
    This would also solve building binary distros and would let us host on launchpad.
    2. Configure our own simple apt repo https://askubuntu.com/questions/529/how-to-set-up-an-apt-repository
- - [ ] Move the detailed `basic_monad` docs out of the group monad page and onto the front page
-  - Also add a tutorial
  - [ ] Test relaxed constexpr in VS15 once that is released and delete the hack macro.
  - Need to write script which uses github API to scan commits on develop branch for CI
 saying all passes. If so:
@@ -40,5 +32,7 @@ like constructors, and convert said exceptions/TLS back into outcomes.
   - Make use of `std::system_error(errno, system_category, "custom error message");`
  - [ ] Latest version push script really ought to test library in flat boost-lite configuration
 and only push if additionally it passes with all latest master branches as well as stamped branches
+ - [ ] Create new Win32 and NT error code categories and have make_errored_outcome() use those.
+ Have a python script auto generate the code into separate header files. Add those to boost-lite.
 
 </center>

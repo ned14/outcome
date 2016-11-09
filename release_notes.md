@@ -13,15 +13,14 @@
 
 This is the proposed Boost.Outcome library, a Boost C++ 14 library providing
 a factory and family of policy driven lightweight monadic value-or-error transports with
-the convenience specialisations of `outcome<T>`, `result<T>` and `option<T>`.
+the convenience simple specialisations of `outcome<T>`, `result<T>` and `option<T>`.
 Its main intended usage is as an ultra light weight error handling framework,
 providing a more expressive and type safe alternative to error code integers
 or enums, yet much lower overhead than exception throws, and unlike alternatives
-it works perfectly with exceptions and RTTI disabled. It may have lower compile
-and runtime overheads than the `expected<T, E>` heading for standardisation, if not then it
-is certainly more convenient to program with for error handling than using
-`expected<T, E>` as it was specifically designed and tailored for this purpose.
-One could view Outcome as a "hard coded for performance" `expected<T, E>`.
+such as `expected<T, E>` it works perfectly with exceptions and RTTI disabled and
+thus is suitable for low-latency/games/finance users. One could view Outcome as a
+"hard coded" less generic `expected<T, E>` intended mainly as a universal outcome
+handling framework for C++, hence being named "Outcome".
 
 If you are familiar with Swift's error code throws or Rust's `Result<T>` and `Option<T>`,
 you will find almost identical semantics in the transports provided here.
@@ -657,7 +656,7 @@ once Expected was deployed at scale - remember
 with them in every function, potentially instantiating lots of shim and helper deduction and
 introspection types each time. P0323R1 Expected removes a large chunk of metaprogrammed functionality,
 specifically the monadic operations which should help a great deal. Nevertheless, from
-my best reading, P0323R1 Expected still demands much more from the compiler than Outcome does.
+my best reading, P0323R1 Expected still demands more from the compiler than Outcome does.
 Deploying Outcome into a large C++ codebase ought to have as minimal a compile time impact
 as possible for a variant implementation, something which matters on code bases heading into
 the tens of millions of lines like many potential low latency/high performance users will have.
@@ -923,15 +922,117 @@ something not possible which will generate a very obvious descriptive compiler e
 
 The above synopsis of Outcome looks lengthy and complex, but almost all of it is
 convenience overloads of one form or other. In usage Outcome is generally "stupid easy"
-to program with. Here is a real world use case distilled from AFIO v2:
+to program with, especially if you're already used to `std::optional`. Here is a real
+world use case distilled from AFIO v2's source code:
 
 \snippet usecase_example.cpp file_create_example
 
+Unlike the earlier example functions opening a file, the above is not a toy use case
+and it covers almost all of the permutations of creating or opening a file which is
+common to POSIX and Windows. We make use of the fact that `basic_monad<>::value()`
+returns a non-const lvalue ref when the monad instance is a non-const stack allocated
+instance, binding it to the convenience lvalue ref `nativeh` which points at a union
+containing the `HANDLE` later filled with the opened handle.
 
-To be continued ...
+We make use of `BOOST_OUTCOME_TRY(var, expr)` which is a macro expanding to:
+
+\code
+  auto &&unique = (expr);                                  // "unique" is a preprocessor generated unique temporary identifier
+  if(!unique.has_value())
+    return BOOST_OUTCOME_V1_NAMESPACE::as_void(unique);
+  auto var(std::move(std::move(unique).value()))
+\endcode
+
+This gets as close as is possible in C++ to the `try!` facility in Rust or Swift without
+using exception throws, and you'll find yourself using it a very great deal when writing
+code using Outcome. Like `try!`, the monad returning expression is executed and its returned
+monad checked to see if it has a value. If it does, the value is extracted out of the monad
+and placed in the variable you asked for. If it did not contain a value, the emptiness/errored/excepted
+state is converted into a void form monad and returned immediately from the calling function,
+thus propagating the errored state up the stack. You'll note we cast the stack allocated monad
+instance into a rvalue ref before asking for its value, this return a rvalue ref to the value.
+We then pass that rvalue ref through to the variable instance constructor so the value is moved
+and not copied.
+
+We also make use of a convenience overload of the `make_errored_XXX()` functions where a
+single `int` is assumed to be a POSIX code in the `errno` domain and a single `DWORD` is assumed to
+be a Win32 code in the `GetLastError()` domain. This allows very easy conversion of system
+error codes into the appropriate `std::error_code` thusly returned wrapped in a monad.
+
+Finally we also make use of the `BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT` macro which is a long
+sequence of STL exception type catch clauses:
+
+\code
+catch(const std::invalid_argument &e)
+{
+  return BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EINVAL, e.what());
+}
+catch(const std::domain_error &e)
+{
+  return BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EDOM, e.what());
+}
+catch(const std::length_error &e)
+{
+  return BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(E2BIG, e.what());
+}
+catch(const std::out_of_range &e)
+{
+  return BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(ERANGE, e.what());
+}
+catch(const std::logic_error &e) /* base class for this group */
+{
+  return BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EINVAL, e.what());
+}
+catch(const std::system_error &e) /* also catches ios::failure */
+{
+  return BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(BOOST_OUTCOME_V1_NAMESPACE::error_code_extended(e.code(), e.what()));
+}
+catch(const std::overflow_error &e)
+{
+  return BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EOVERFLOW, e.what());
+}
+catch(const std::range_error &e)
+{
+  return BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(ERANGE, e.what());
+}
+catch(const std::runtime_error &e) /* base class for this group */
+{
+  return BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EAGAIN, e.what());
+}
+catch(const std::bad_alloc &e)
+{
+  return BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(ENOMEM, e.what());
+}
+catch(const std::exception &e)
+{
+  return BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EINVAL, e.what());
+}
+catch(...)
+{
+  return BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EAGAIN, "unknown exception");
+}
+\endcode
+
+You will surely note that the `make_errored_XXX()` functions actually take an `int` and an optional
+`const char *`. This is the purpose of `error_code_extended` which extends `std::error_code` with
+a pointer from which one can retrieve the original `what()` text message from the caught exception.
+This preserves all original information from caught exceptions, at least for the STL exception types.
+If you are throwing your own custom types with extra information, you should note that Outcome
+does provide a mechanism for the storage of arbitrary extra data in `error_code_extended`, it
+isn't limited at all to just a string. It is **safe** to slice `error_code_extended` into an
+`std::error_code`, so you can safely feed `error_code_extended` to anything consuming a
+`std::error_code`. Currently `error_code_extended` does not permit implicit construction from
+a `std::error_code`, so you need to either construct an `error_code_extended` directly or
+feed a `std::error_code` into the `error_code_extended` constructor.
 
 
-\section functional Functional programming extensions (optional)
+\section advanced More advanced usage
+
+99% of Outcome users already have everything they will ever need - Outcome is a very
+simple library. However "full fat" monadic functional programming is also provided
+using a very clean and powerful API, albeit at a fair cost to compile times.
+
+\subsection functional Functional programming extensions (optional)
 
 \note All code in this section can be enabled by defining `BOOST_OUTCOME_ENABLE_OPERATORS`.
 By default only `next()` is available. This prevents you writing code which impacts build times.
