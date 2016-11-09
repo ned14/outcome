@@ -16,17 +16,18 @@ a factory and family of policy driven lightweight monadic value-or-error transpo
 the convenience simple specialisations of `outcome<T>`, `result<T>` and `option<T>`.
 Its main intended usage is as an ultra light weight error handling framework,
 providing a more expressive and type safe alternative to error code integers
-or enums, yet much lower overhead than exception throws, and unlike alternatives
-such as `expected<T, E>` it works perfectly with exceptions and RTTI disabled and
-thus is suitable for low-latency/games/finance users. One could view Outcome as a
-"hard coded" less generic `expected<T, E>` intended mainly as a universal outcome
-handling framework for C++, hence being named "Outcome".
+or enums, yet much lower overhead than exception throws. Unlike alternatives
+such as `expected<T, E>`, it works perfectly with exceptions and RTTI disabled and
+thus is suitable for low-latency/games/finance/SG14 users. One could view Outcome as a
+"hard coded", less generic `expected<T, E>` intended mainly as a minimum overhead
+universal outcome handling framework for C++, hence being named "Outcome".
 
 If you are familiar with Swift's error code throws or Rust's `Result<T>` and `Option<T>`,
 you will find almost identical semantics in the transports provided here.
 One can therefore write systems programming code using these transports in C++
 in the same design pattern as when writing in Rust or Swift, and with a similarly
-low runtime overhead.
+low runtime overhead. Outcome even has a `try` macro doing the same thing as in
+Rust and Swift!
 
 \section prerequisites Prerequisites and Installation
 
@@ -841,64 +842,65 @@ template<class Policy1, class Policy2> constexpr inline bool operator!=(const ba
 
 // Outcome makers
 template <class T> constexpr inline outcome<T> make_outcome(T &&v);
-template <class T> constexpr inline outcome<T> make_outcome(const T &v)
-template <class T = void> inline outcome<T> make_outcome(error_code_extended v)
-template <class T = void> inline outcome<T> make_outcome(std::exception_ptr v)
-template <class T = void> constexpr inline outcome<T> make_outcome()
-template <class T = void> constexpr inline outcome<T> make_empty_outcome()
-template <class T> constexpr inline outcome<T> make_ready_outcome(T &&v)
-template <class T> constexpr inline outcome<T> make_ready_outcome(const T &v)
-template <class T = void> constexpr inline outcome<T> make_ready_outcome()
-template <> inline outcome<void> make_ready_outcome<void>()
-template <class T = void> inline outcome<T> make_errored_outcome(error_code_extended v)
-template <class T = void> inline outcome<T> make_errored_outcome(int e, const char *extended = nullptr)
+template <class T> constexpr inline outcome<T> make_outcome(const T &v);
+template <class T = void> inline outcome<T> make_outcome(error_code_extended v);
+template <class T = void> inline outcome<T> make_outcome(std::exception_ptr v);
+template <class T = void> constexpr inline outcome<T> make_outcome();
+template <class T = void> constexpr inline outcome<T> make_empty_outcome();
+template <class T> constexpr inline outcome<T> make_ready_outcome(T &&v);
+template <class T> constexpr inline outcome<T> make_ready_outcome(const T &v);
+template <class T = void> constexpr inline outcome<T> make_ready_outcome();
+template <> inline outcome<void> make_ready_outcome<void>();
+template <class T = void> inline outcome<T> make_errored_outcome(error_code_extended v);
+template <class T = void> inline outcome<T> make_errored_outcome(int e, const char *extended = nullptr);                      // errno consumer
 #if defined(_WIN32)
-template <class T = void> constexpr inline outcome<T> make_errored_outcome(unsigned long e, const char *extended = nullptr)
+template <class T = void> constexpr inline outcome<T> make_errored_outcome(unsigned long e, const char *extended = nullptr);  // GetLastError() consumer
 #endif
-template <class T = void> inline outcome<T> make_exceptional_outcome(std::exception_ptr v)
+template <class T = void> inline outcome<T> make_exceptional_outcome(std::exception_ptr v);
 
 // Result makers
-template <class T> constexpr inline result<T> make_result(T &&v)
-template <class T> constexpr inline result<T> make_result(const T &v)
-template <class T = void> inline result<T> make_result(error_code_extended v)
-template <class T = void> constexpr inline result<T> make_result()
-template <class T = void> constexpr inline result<T> make_empty_result()
-template <class T> constexpr inline result<T> make_ready_result(T &&v)
-template <class T> constexpr inline result<T> make_ready_result(const T &v)
-template <class T = void> constexpr inline result<T> make_ready_result()
-template <> inline result<void> make_ready_result<void>()
-template <class T = void> inline result<T> make_errored_result(error_code_extended v)
-template <class T = void> constexpr inline result<T> make_errored_result(int e, const char *extended = nullptr)
-#if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
-template <class T = void> constexpr inline result<T> make_errored_result(unsigned long e, const char *extended = nullptr)
+template <class T> constexpr inline result<T> make_result(T &&v);
+template <class T> constexpr inline result<T> make_result(const T &v);
+template <class T = void> inline result<T> make_result(error_code_extended v);
+template <class T = void> constexpr inline result<T> make_result();
+template <class T = void> constexpr inline result<T> make_empty_result();
+template <class T> constexpr inline result<T> make_ready_result(T &&v);
+template <class T> constexpr inline result<T> make_ready_result(const T &v);
+template <class T = void> constexpr inline result<T> make_ready_result();
+template <> inline result<void> make_ready_result<void>();
+template <class T = void> inline result<T> make_errored_result(error_code_extended v);
+template <class T = void> constexpr inline result<T> make_errored_result(int e, const char *extended = nullptr);              // errno consumer
+#if defined(_WIN32)
+template <class T = void> constexpr inline result<T> make_errored_result(unsigned long e, const char *extended = nullptr);    // GetLastError() consumer
 #endif
 
 // Option makers
-template <class T> constexpr inline option<T> make_option(T &&v)
-template <class T> constexpr inline option<T> make_option(const T &v)
-template <class T = void> constexpr inline option<T> make_option()
-template <class T = void> constexpr inline option<T> make_empty_option()
-template <class T> constexpr inline option<T> make_ready_option(T &&v)
-template <class T> constexpr inline option<T> make_ready_option(const T &v)
-template <class T = void> constexpr inline option<T> make_ready_option()
-template <> constexpr inline option<void> make_ready_option<void>()
+template <class T> constexpr inline option<T> make_option(T &&v);
+template <class T> constexpr inline option<T> make_option(const T &v);
+template <class T = void> constexpr inline option<T> make_option();
+template <class T = void> constexpr inline option<T> make_empty_option();
+template <class T> constexpr inline option<T> make_ready_option(T &&v);
+template <class T> constexpr inline option<T> make_ready_option(const T &v);
+template <class T = void> constexpr inline option<T> make_ready_option();
+template <> constexpr inline option<void> make_ready_option<void>();
 
 // Upconverters
-template <class T> constexpr inline outcome<T> as_outcome(result<T> &&v)
-template <class T> constexpr inline outcome<T> as_outcome(const result<T> &v)
-template <class T> constexpr inline outcome<T> as_outcome(option<T> &&v)
-template <class T> constexpr inline outcome<T> as_outcome(const option<T> &v)
-template <class T> constexpr inline result<T> as_result(option<T> &&v)
-template <class T> constexpr inline result<T> as_result(const option<T> &v)
+template <class T> constexpr inline outcome<T> as_outcome(result<T> &&v);
+template <class T> constexpr inline outcome<T> as_outcome(const result<T> &v);
+template <class T> constexpr inline outcome<T> as_outcome(option<T> &&v);
+template <class T> constexpr inline outcome<T> as_outcome(const option<T> &v);
+template <class T> constexpr inline result<T> as_result(option<T> &&v);
+template <class T> constexpr inline result<T> as_result(const option<T> &v);
 
 // Emptiness, errored and excepted state extractors
-template <class T> inline outcome<void> as_void(const outcome<T> &v)
-template <class T> inline result<void> as_void(const result<T> &v)
-template <class T> constexpr inline option<void> as_void(const option<T> &v)
+template <class T> inline outcome<void> as_void(const outcome<T> &v);
+template <class T> inline result<void> as_void(const result<T> &v);
+template <class T> constexpr inline option<void> as_void(const option<T> &v);
 
-// Equivalent to try! in Rust and Swift
+// Equivalent to try! in Rust and Swift (see below for docs)
 #define BOOST_OUTCOME_TRY(variable_to_initialise, monad)
-// Boilerplate catching all the STL exceptions, returning an equivalent result<void>
+
+// Boilerplate catching all the STL exceptions, returning an equivalent result<void> (see below for docs)
 #define BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT
 
 BOOST_OUTCOME_V1_NAMESPACE_END
@@ -929,7 +931,7 @@ world use case distilled from AFIO v2's source code:
 
 Unlike the earlier example functions opening a file, the above is not a toy use case
 and it covers almost all of the permutations of creating or opening a file which is
-common to POSIX and Windows. We make use of the fact that `basic_monad<>::value()`
+common to POSIX and Windows. We make use of the fact that `basic_monad<> ::value()`
 returns a non-const lvalue ref when the monad instance is a non-const stack allocated
 instance, binding it to the convenience lvalue ref `nativeh` which points at a union
 containing the `HANDLE` later filled with the opened handle.
@@ -950,9 +952,11 @@ monad checked to see if it has a value. If it does, the value is extracted out o
 and placed in the variable you asked for. If it did not contain a value, the emptiness/errored/excepted
 state is converted into a void form monad and returned immediately from the calling function,
 thus propagating the errored state up the stack. You'll note we cast the stack allocated monad
-instance into a rvalue ref before asking for its value, this return a rvalue ref to the value.
+instance into a rvalue ref before asking for its value, this returns a rvalue ref to the value.
 We then pass that rvalue ref through to the variable instance constructor so the value is moved
-and not copied.
+and not copied. I have disassembled this sequence on the main compilers and found that where
+the compiler knows for a fact that a value is being returned, all runtime overhead over a
+straight return of a value is eliminated.
 
 We also make use of a convenience overload of the `make_errored_XXX()` functions where a
 single `int` is assumed to be a POSIX code in the `errno` domain and a single `DWORD` is assumed to
@@ -1037,7 +1041,7 @@ using a very clean and powerful API, albeit at a fair cost to compile times.
 \note All code in this section can be enabled by defining `BOOST_OUTCOME_ENABLE_OPERATORS`.
 By default only `next()` is available. This prevents you writing code which impacts build times.
 
-It is assumed in this section that you already monadic functional programming. This
+It is assumed in this section that you already understand monadic functional programming. This
 section is simply to explain how these are implemented in Outcome.
 
 Classic monadic programming consists of a sequence of nested functional operations:
