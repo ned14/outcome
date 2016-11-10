@@ -964,7 +964,8 @@ be a Win32 code in the `GetLastError()` domain. This allows very easy conversion
 error codes into the appropriate `std::error_code` thusly returned wrapped in a monad.
 
 Finally we also make use of the `BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT` macro which is a long
-sequence of STL exception type catch clauses:
+sequence of STL exception type catch clauses converting STL exception types into their
+equivalent error codes:
 
 \code
 catch(const std::invalid_argument &e)
@@ -1019,15 +1020,91 @@ catch(...)
 
 You will surely note that the `make_errored_XXX()` functions actually take an `int` and an optional
 `const char *`. This is the purpose of `error_code_extended` which extends `std::error_code` with
-a pointer from which one can retrieve the original `what()` text message from the caught exception.
-This preserves all original information from caught exceptions, at least for the STL exception types.
-If you are throwing your own custom types with extra information, you should note that Outcome
-does provide a mechanism for the storage of arbitrary extra data in `error_code_extended`, it
-isn't limited at all to just a string. It is **safe** to slice `error_code_extended` into an
-`std::error_code`, so you can safely feed `error_code_extended` to anything consuming a
-`std::error_code`. Currently `error_code_extended` does not permit implicit construction from
-a `std::error_code`, so you need to either construct an `error_code_extended` directly or
-feed a `std::error_code` into the `error_code_extended` constructor.
+the following synposis:
+
+\code
+class error_code_extended : public std::error_code
+{
+public:
+  error_code_extended();
+  error_code_extended(int ec, const std::error_category &cat, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false);
+  template <class ErrorCodeEnum, typename = typename std::enable_if<std::is_error_code_enum<ErrorCodeEnum>::value>::type>
+  error_code_extended(ErrorCodeEnum e);
+  explicit error_code_extended(const std::error_code &e, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false);
+  explicit error_code_extended(std::error_code &&e, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false);
+  void assign(int ec, const std::error_category &cat, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false);
+  void clear();
+  
+  // New member functions
+  size_t extended_message(char *buffer, size_t len, unsigned &code1, unsigned &code2) const noexcept;
+  char **backtrace() const noexcept;
+};
+inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec);
+\endcode
+
+`error_code_extended` is completely API compatible with `std::error_code` and all its
+member functions can be used the same way. You can supply a `std::error_code` to an
+extended error code, or else construct an extended error code the same way you would a
+STL error code. You should note that it is **always safe** to slice `error_code_extended`
+into an `std::error_code`, so you can safely feed `error_code_extended` to anything
+consuming a `std::error_code`.
+
+The main big additions are obviously the ability to add a custom string message to an extended
+error code, this allows the preservation of the original `what()` message when converting a
+thrown exception into an extended error code. You can also add two arbitrary unsigned integer
+codes and most interestingly, a backtrace. The extended message and backtrace can be later
+fetched using the new member functions, though note that the storage for these is kept in a
+statically allocated threadsafe ring buffer and so may vanish at some arbitrary later point
+when the storage gets recycled.
+
+If you are throwing your own custom types with custom information, you should note that
+you can create your own custom extended error code type using the same reusable
+microsecond fast threadsafe logging framework that Outcome uses. This won't be documented
+here as that framework (`ringbuffer_log`) lives in Boost-lite, but it's fairly easy to study
+Outcome's and Boost-lite's source code which is all on github.
+
+
+\section when_use When am I supposed to use what when?
+
+The total available permutations may seem overwhelming at this point, but as with any
+fundamental primitive the possibilities are endless. However, here are some quick notes
+to help you decide what design pattern to use for your particular code base:
+
+\subsection outcome_vs_result When should I use a result<T> instead of an outcome<T>?
+
+`outcome<T>` has the potential to carry a `std::exception_ptr` which is implemented
+by any STL I can think of as something very similar to a `std::shared_ptr` i.e. it
+uses atomics to manage the reference count. Atomics are unavoidably a *compiler fence*
+i.e. the compiler **must** emit code at the point of the fence. Outcome has been
+very carefully written to let the compiler's optimiser *not* emit code thus leading
+to its stellar low runtime overhead. Whilst recent versions of GCC and clang seem
+reasonably good at eliding compiler fences caused by use of atomics in `std::exception_ptr`
+when the compiler is absolutely sure that no `std::exception_ptr` can be transported,
+where there is doubt the compiler has no choice but to generate a lot more output.
+`result<T>` cannot transport a `std::exception_ptr` and therefore doesn't force the
+compiler to generate output (except unfortunately on the Dinkumware STL where fetching
+a STL error category e.g. `std::generic_category()` uses atomics).
+
+So in short, always use `result<T>` where possible.
+
+\subsection result_vs_outcome When should I use an outcome<T> instead of a result<T>?
+
+The main reason to use an `outcome<T>` is in the "sea of noexcept" design pattern
+where implementations may throw exceptions, but all public extern APIs are always
+noexcept. `outcome<T>` provides a lossless method of exporting the thrown exception
+but without loading the programmer with dealing with control flow reversal.
+
+However the role where `outcome<T>` really shines is in the "exceptions are exceptional"
+design pattern where the errored state means an expected error which was handled inline
+but the exceptioned state means an operation was aborted.
+
+The main reason I designed and wrote Outcome was to gain a universal error handling
+framework which could express *in the minimum possible overhead* the many
+error handling designs possible and even more importantly, that individual libraries
+could use the design pattern which best suited them whilst seamlessly interoperating
+with other libraries using different error handling designs. To go into a bit more
+detail:
+* Proposed <a href="https://ned14.github.io/boost.afio/">Boost.AFIO v2</a>
 
 
 \section advanced More advanced usage

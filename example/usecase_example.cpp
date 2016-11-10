@@ -140,10 +140,14 @@ namespace file_create
   extern BOOST_SYMBOL_EXPORT result<file_handle> file_create(file_handle::path_type _path, file_handle::mode _mode = file_handle::mode::read, file_handle::creation _creation = file_handle::creation::open_existing, file_handle::caching _caching = file_handle::caching::all,
                                                              file_handle::flag flags = file_handle::flag::none) noexcept
   {
+#ifdef __cpp_exceptions
+    // If exceptions are turned on (the above is the C++ 17 feature detection
+    // macro, Boost-lite provides a consistent set of these on all platforms)
     // noexcept functions should always wrap their innards in a try...catch,
     // if you don't ever call a potentially throwing piece of code the compiler
-    // will completely elide this.
+    // will completely elide the runtime try...catch overhead.
     try
+#endif
     {
       result<file_handle> ret(file_handle(std::move(_path), _caching, flags));
       native_handle_type &nativeh = ret.value()._v;
@@ -184,9 +188,11 @@ namespace file_create
       }
       return ret;
     }
+#ifdef __cpp_exceptions
     // Catch all the STL exceptions, converting them to an equivalent result<>
     // containing a system_error with the appropriate error_code.
     BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT
+#endif
   }
   //! [file_create_example]
 }
