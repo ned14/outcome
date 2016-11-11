@@ -137,8 +137,12 @@ namespace file_create
   //! [file_create_example]
   using namespace minimal_afio;
   using boost_lite::ringbuffer_log::last190;
-  extern BOOST_SYMBOL_EXPORT result<file_handle> file_create(file_handle::path_type _path, file_handle::mode _mode = file_handle::mode::read, file_handle::creation _creation = file_handle::creation::open_existing, file_handle::caching _caching = file_handle::caching::all,
-                                                             file_handle::flag flags = file_handle::flag::none) noexcept
+  extern BOOST_SYMBOL_EXPORT result<file_handle> file_create(              //
+  file_handle::path_type _path,                                            //
+  file_handle::mode _mode = file_handle::mode::read,                       //
+  file_handle::creation _creation = file_handle::creation::open_existing,  //
+  file_handle::caching _caching = file_handle::caching::all,               //
+  file_handle::flag flags = file_handle::flag::none) noexcept              //
   {
 #ifdef __cpp_exceptions
     // If exceptions are turned on (the above is the C++ 17 feature detection
@@ -151,6 +155,7 @@ namespace file_create
     {
       result<file_handle> ret(file_handle(std::move(_path), _caching, flags));
       native_handle_type &nativeh = ret.value()._v;
+
       // access_mask_from_handle_mode() returns a result<ACCESS_MASK>,
       // if it is signalled then propagate it immediately by returning it,
       // else unwrap the return value into the variable access
@@ -170,6 +175,7 @@ namespace file_create
         creation = TRUNCATE_EXISTING;
         break;
       }
+
       // attributes_from_handle_caching_and_flags() returns a result<DWORD>,
       // so if it errors the propagate immediately, else unpack DWORD into
       // the variable attribs
@@ -177,6 +183,7 @@ namespace file_create
       if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFile(ret.value()._path.c_str(), access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, creation, attribs, NULL)))
       {
         DWORD errcode = GetLastError();
+
         // make_errored_result() understands DWORDs on Windows. It also understands
         // int for automatic errno conversion.
         return make_errored_result<file_handle>(errcode, last190(ret.value()._path.u8string()));

@@ -96,6 +96,9 @@ for your problem is also a good idea. If you are encountering what you
 think is a bug, please open an issue.
 
 
+\br
+\hr
+\br
 \section cpp_error_handling_history Design Rationale: Quick history of error handling design patterns from C++ 98 to C++ 17
 
 \subsection c-style C style error handling: integer returns
@@ -559,17 +562,19 @@ if(fh_)
 This "separation of concerns" pattern has a great aesthetic appeal to most,
 including myself. This is likely why Rust adopted it.
 
-However I must admit that after more than a year of practice I haven't found myself
-using it a great deal. It fits well for some codebases, but very much a
+However I must admit that after more than a year of using Outcome I haven't found myself
+using this design a great deal. It fits well for some codebases, but very much a
 minority. The problem in my opinion is that the cost of writing and maintaining correct
 and fully tested code which can invert control flow at any moment is high
 and typically very much underestimated. Therefore, it is only in some code bases
 that it is worth placing that high burden on the code, and in most code bases it is not.
 Hence in most code bases I write forwards only execution code where there is no
 possible way of inverting control flow at all i.e. no exceptions can be thrown,
-despite that exceptions are turned on.
+despite that exceptions are available.
 
-
+\br
+\hr
+\br
 \section introduction Introducing Outcome
 
 After that literature review of how C++ has implemented error handling and how code
@@ -586,7 +591,7 @@ use case of handling errors only.
 
 1. Outcome is designed specifically for returning output from function calls in
 low latency/very high performance C++ of the kind
-<a href="https://groups.google.com/a/isocpp.org/forum/#!forum/sg14">WG21 WG14</a> is working upon. It
+<a href="https://groups.google.com/a/isocpp.org/forum/#!forum/sg14">WG21 SG14</a> is working upon. It
 therefore works perfectly with exceptions and RTTI disabled and its CI compiles per
 commit typical use cases of Outcomes and counts the assembler operations emitted by GCC, clang and MSVC to ensure
 code bloat is kept optimally minimal. On all recent GCCs and clangs, if the compiler's
@@ -597,7 +602,7 @@ identical code as if you had returned a `T(...)` directly.
 2. Outcome's actual core implementation is `boost::outcome::basic_monad<Policy<T, EC, E>>` with these
 convenience typedefs:
  \code
- template<class T> using outcome = basic_monad<monad_policy<T, std::error_code, std::exception_ptr>>;
+ template<class T> using outcome = basic_monad< monad_policy<T, std::error_code, std::exception_ptr>>;
  template<class T> using result  = basic_monad<result_policy<T, std::error_code, void>>;
  template<class T> using option  = basic_monad<option_policy<T, void, void>>;
  \endcode 
@@ -608,7 +613,7 @@ convenience typedefs:
  exception pointer or be `void`, in which case the specialisation doesn't provide the ability
  to store an instance of that type.
 3. As suggested by the presence of an `option<T>` convenience typedef, all `basic_monad<>` instances have a
-formal empty state. There is no "almost never empty" guarantee which
+formal empty state. There is no <a href="http://en.cppreference.com/w/cpp/utility/variant/valueless_by_exception">"almost never empty" guarantee</a> which
 enables sane semantics when exceptions are disabled and also to not confuse the compiler's
 optimiser with complex potential branches in move construction (which can cause the optimiser
 to give up prematurely). It sidesteps handling the problem of move assignment throwing an
@@ -617,10 +622,10 @@ are constexpr default constructible. If you attempt to get a value from an empty
 the compiler will throw an `outcome::monad_error` if exceptions are available, else it
 calls the macro `BOOST_OUTCOME_THROW_MONAD_ERROR()` which by default dumps a stack trace
 and terminates the process.
-4. Like `expected<T, E>`, explicit conversion exists from any `basic_monad<Policy<T1, EC1, E1>>` to
+4. Like `expected<T, E>`, **explicit** conversion exists from any `basic_monad<Policy<T1, EC1, E1>>` to
 any `basic_monad<Policy<T2, EC2, E2>>` if all of `T2`, `EC2` and `E2` are constructible from
 `T1`, `EC1` and `E1` respectively. `basic_monad<Policy<void>>` has special significance: you
-can always implicitly safely construct any arbitrary `basic_monad<Policy<T>>` from any
+can always **implicitly** safely construct any arbitrary `basic_monad<Policy<T>>` from any
 `basic_monad<Policy<void>>` which is always a lossless operation. The rules are as follows:
  1. If input `basic_monad<Policy<void>>` is empty, `basic_monad<Policy<T>>` is empty.
  2. If input `basic_monad<Policy<void>>` has value, `basic_monad<Policy<T>>` is a default
@@ -655,20 +660,20 @@ is **empty**, not to a default constructed `T` which makes sense given the forma
 This is due to https://akrzemi1.wordpress.com/2014/12/02/a-gotcha-with-optional/ where
 you either choose implicit construction OR comparison operations or else risk surprising
 behaviours. That means you can only place Outcomes in non-mapped STL containers. It is
-trivial for users to write a simple wrapper class for Outcomes implementing comparison
-and hashing if they ever really needed to store Outcomes in associative maps.
+trivial for users to supply custom comparison and hashing operations to the STL associative
+map if they ever really needed to store Outcomes in associative maps.
 9. Finally, Outcome goes out of its way to be as cheap on compile time as possible by having
 the compiler do as little work as possible if not optimising. A lot of the hard coded rigidity
 above stems from systematically avoiding, whenever possible, metaprogramming, SFINAE, instantiation of helper types
 during deduction, or doing anything which would cause the compiler to not use `O(1)` constant
 time operations during non-optimising compilation. I have also found empirically that there
 is also a useful side effect of this simplicity of implementation on helping the compiler's
-optimiser "to do the right thing" when facing real world use cases.
+optimiser "to do the right thing" by eliminating assembler generated when facing real world use cases.
 
  The reason for this minimum compile time load approach was due to my work experience
 with original prototype Boost.Expected in 2015 where we saw large increases in compile times
 once Expected was deployed at scale - remember
-*every single API* is returning an instance of one of these and much branch logic is working
+*every single function* is returning an instance of one of these and much branch logic is working
 with them in every function, potentially instantiating lots of shim and helper deduction and
 introspection types each time. P0323R1 Expected removes a large chunk of metaprogrammed functionality,
 specifically the monadic operations which should help a great deal. Nevertheless, from
@@ -678,7 +683,7 @@ as possible for a variant implementation, something which matters on code bases 
 the tens of millions of lines like many potential low latency/high performance users will have.
 
 
-\section synopsis Synopsis of basic_monad<> and outcome<T>, result<T> and option<T>
+\subsection synopsis Synopsis of basic_monad<> and outcome<T>, result<T> and option<T>
 
 It should be stressed that `basic_monad<>` is a policy driven class where the policy
 class has the ability to arbitrarily extend and/or replace member functions listed in this
@@ -721,6 +726,7 @@ public:
   using value_type = T | unusable;                                             // similar in expected<> [3]
   using error_type = EC | unusable;                                            // similar in expected<> [3]
   using exception_type = E | unusable;                                         // [3]
+  struct empty_type;                                                           // empty tag for this monad, unlike empty_t which is for all monads
   
   // The actual types configured
   using raw_value_type = T | void;                                             // The actual type configured
@@ -740,12 +746,12 @@ public:
   template <class OtherMonad> static constexpr bool is_comparable;
 
   // Default implicit construction and copy and move construction
-  constexpr basic_monad() noexcept([1]);                                       // also in expected<>, use make_basic_monad<T>() instead
+  constexpr basic_monad() noexcept([1]);                                       // also in expected<>, use make_empty_monad<T>() instead
   constexpr basic_monad(const basic_monad&) noexcept([1]);                     // also in expected<>
   constexpr basic_monad(basic_monad&&) noexcept([1]);                          // also in expected<>
 
   // Implicit constructing empty or with a value_type
-  constexpr basic_monad(empty_t) noexcept;                                     // use make_basic_XXX<T>() instead
+  constexpr basic_monad(empty_t) noexcept;                                     // use make_empty_XXX<T>() instead
   constexpr basic_monad(value_t) noexcept(T);                                  // use make_ready_XXX<T>() instead
   constexpr basic_monad(const value_type&) noexcept(T);                        // also in expected<>
   constexpr basic_monad(value_type&&) noexcept(T);                             // also in expected<>
@@ -849,6 +855,7 @@ public:
 
 // NOTE requires state to be set to valued beforehand (and can only deserialise a value)
 template<class Policy> inline std::istream &operator>>(std::istream &s, basic_monad<Policy> &v);
+// Intended for printing rather than serialisation to storage
 template<class Policy> inline std::ostream &operator<<(std::ostream &s, const basic_monad<Policy> &v);
 
 // Equality operators
@@ -864,7 +871,7 @@ template <class T = void> constexpr inline outcome<T> make_outcome();
 template <class T = void> constexpr inline outcome<T> make_empty_outcome();
 template <class T> constexpr inline outcome<T> make_ready_outcome(T &&v);
 template <class T> constexpr inline outcome<T> make_ready_outcome(const T &v);
-template <class T = void> constexpr inline outcome<T> make_ready_outcome();
+template <class T = void> constexpr inline outcome<T> make_ready_outcome();  // can be specialised for some type T, defaults to refusing to compile except for void
 template <> inline outcome<void> make_ready_outcome<void>();
 template <class T = void> inline outcome<T> make_errored_outcome(error_code_extended v);
 template <class T = void> inline outcome<T> make_errored_outcome(int e, const char *extended = nullptr);                      // errno consumer
@@ -881,7 +888,7 @@ template <class T = void> constexpr inline result<T> make_result();
 template <class T = void> constexpr inline result<T> make_empty_result();
 template <class T> constexpr inline result<T> make_ready_result(T &&v);
 template <class T> constexpr inline result<T> make_ready_result(const T &v);
-template <class T = void> constexpr inline result<T> make_ready_result();
+template <class T = void> constexpr inline result<T> make_ready_result();    // can be specialised for some type T, defaults to refusing to compile except for void
 template <> inline result<void> make_ready_result<void>();
 template <class T = void> inline result<T> make_errored_result(error_code_extended v);
 template <class T = void> constexpr inline result<T> make_errored_result(int e, const char *extended = nullptr);              // errno consumer
@@ -896,7 +903,7 @@ template <class T = void> constexpr inline option<T> make_option();
 template <class T = void> constexpr inline option<T> make_empty_option();
 template <class T> constexpr inline option<T> make_ready_option(T &&v);
 template <class T> constexpr inline option<T> make_ready_option(const T &v);
-template <class T = void> constexpr inline option<T> make_ready_option();
+template <class T = void> constexpr inline option<T> make_ready_option();    // can be specialised for some type T, defaults to refusing to compile except for void
 template <> constexpr inline option<void> make_ready_option<void>();
 
 // Upconverters
@@ -935,7 +942,7 @@ internal non-accessible type usefully named to indicate you are trying to use
 something not possible which will generate a very obvious descriptive compiler error.
 
 
-\section examples Examples of usage
+\subsection examples Examples of usage
 
 The above synopsis of Outcome looks lengthy and complex, but almost all of it is
 convenience overloads of one form or other. In usage Outcome is generally "stupid easy"
@@ -945,8 +952,8 @@ world use case distilled from AFIO v2's source code:
 \snippet usecase_example.cpp file_create_example
 
 Unlike the earlier example functions opening a file, the above is not a toy use case
-and it covers almost all of the permutations of creating or opening a file which is
-common to POSIX and Windows. We make use of the fact that `basic_monad<> ::value()`
+and it covers almost all of the permutations of creating or opening a file which are
+common to POSIX and Windows. We make use of the fact that `basic_monad<>``::``value()`
 returns a non-const lvalue ref when the monad instance is a non-const stack allocated
 instance, binding it to the convenience lvalue ref `nativeh` which points at a union
 containing the `HANDLE` later filled with the opened handle.
@@ -964,14 +971,14 @@ This gets as close as is possible in C++ to the `try!` facility in Rust or Swift
 using exception throws, and you'll find yourself using it a very great deal when writing
 code using Outcome. Like `try!`, the monad returning expression is executed and its returned
 monad checked to see if it has a value. If it does, the value is extracted out of the monad
-and placed in the variable you asked for. If it did not contain a value, the emptiness/errored/excepted
+and placed in the variable you asked for. If it did not contain a value, the emptiness/errored/exceptioned
 state is converted into a void form monad and returned immediately from the calling function,
-thus propagating the errored state up the stack. You'll note we cast the stack allocated monad
+thus propagating the empty/errored/exceptioned state up the stack. You'll note we cast the stack allocated monad
 instance into a rvalue ref before asking for its value, this returns a rvalue ref to the value.
 We then pass that rvalue ref through to the variable instance constructor so the value is moved
-and not copied. I have disassembled this sequence on the main compilers and found that where
+and not copied when possible. I have disassembled this sequence on the main compilers and found that where
 the compiler knows for a fact that a value is being returned, all runtime overhead over a
-straight return of a value is eliminated.
+straight return of a value is usually eliminated.
 
 We also make use of a convenience overload of the `make_errored_XXX()` functions where a
 single `int` is assumed to be a POSIX code in the `errno` domain and a single `DWORD` is assumed to
@@ -1051,9 +1058,12 @@ public:
   void clear();
   
   // New member functions
+  // Fill a char buffer with the extended message, retrieving the two extended unsigned integer codes
   size_t extended_message(char *buffer, size_t len, unsigned &code1, unsigned &code2) const noexcept;
+  // Return an array of strings describing the stack at the time of construction. MUST call free() on this returned pointer.
   char **backtrace() const noexcept;
 };
+// Prints the extended error code, including any extended information if available
 inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec);
 \endcode
 
@@ -1067,18 +1077,22 @@ consuming a `std::error_code`.
 The main big additions are obviously the ability to add a custom string message to an extended
 error code, this allows the preservation of the original `what()` message when converting a
 thrown exception into an extended error code. You can also add two arbitrary unsigned integer
-codes and most interestingly, a backtrace. The extended message and backtrace can be later
+codes and most interestingly, a backtrace of the stack at the point of construction. The extended message and backtrace can be later
 fetched using the new member functions, though note that the storage for these is kept in a
 statically allocated threadsafe ring buffer and so may vanish at some arbitrary later point
-when the storage gets recycled.
+when the storage gets recycled. If this happens, `extended_message()` will return zero characters
+written and `backtrace()` will return a null pointer.
 
 If you are throwing your own custom types with custom information, you should note that
 you can create your own custom extended error code type using the same reusable
 microsecond fast threadsafe logging framework that Outcome uses. This won't be documented
 here as that framework (`ringbuffer_log`) lives in Boost-lite, but it's fairly easy to study
-Outcome's and Boost-lite's source code which is all on github.
+Outcome's and Boost-lite's source code all of which is on github.
 
 
+\br
+\hr
+\br
 \section when_use When am I supposed to use what when?
 
 The total available permutations may seem overwhelming at this point, because as with any
@@ -1095,13 +1109,15 @@ very carefully written to let the compiler's optimiser *not* emit code thus lead
 to its stellar low runtime overhead. Whilst recent versions of GCC and clang seem
 reasonably good at eliding compiler fences caused by use of atomics in `std::exception_ptr`
 when the compiler is absolutely sure that no `std::exception_ptr` can be transported,
-where there is doubt the compiler has no choice but to generate a lot more output.
+where there is doubt the compiler has no choice but to generate a lot more assembler
+to cover all the possible outcomes.
 `result<T>` cannot transport a `std::exception_ptr` and therefore doesn't force the
 compiler to generate output (except unfortunately on the Dinkumware STL where fetching
 a STL error category e.g. `std::generic_category()` uses atomics).
 
-So in short, always use `result<T>` where doing so does not impact negatively on your
-codebase.
+So in short, always use `result<T>` instead of `outcome<T>` where doing so does not
+impact negatively on your codebase, and remember one bit of your code can use
+`result<T>` and another `outcome<T>` just fine.
 
 \subsection result_vs_outcome When should I use an outcome<T> instead of a result<T>?
 
@@ -1112,17 +1128,18 @@ but without loading the programmer with dealing with unexpected control flow rev
 thus helping the programmer write correct exception safe code faster.
 
 One can implement the "exceptions are exceptional" design pattern easily with Expected:
-expected errors are returned via `expected<T, E>` and aborting errors are returned via
+expected errors are returned via `expected<T, E> = E` and aborting errors are returned via
 an exception throw. However the role where using `outcome<T>` really shines is in the "exceptions
-are exceptional" combined with "sea of noexcept" design patterns where the errored state
-means an expected error which was handled inline but the exceptioned state means an operation
+are exceptional" combined with "sea of noexcept" design pattern where the errored state
+means an expected error which was handled inline, but the exceptioned state means an operation
 was aborted, yet the programmer still can easily write exception safe forward-only-execution
-code. This is where using Outcome adds significant value over using Expected.
+code not having to worry about unexpected control flow inversion. This is where using Outcome
+adds significant value over using Expected.
 
 Finally, there is a third big reason to use Outcome. The main reason I designed and wrote
 Outcome was to implement a universal error handling framework which could express *in the
-minimum possible overhead* and without losing information the many C++ error handling design patterns possible, and even
-more importantly, that individual libraries could use the design pattern which best suited
+minimum possible overhead*, and without losing information, the many C++ error handling design patterns possible, and even
+more importantly that individual libraries could use the design pattern which best suited
 them whilst seamlessly interoperating with other libraries using different error handling
 designs. To go into a bit more detail:
 * Proposed <a href="https://ned14.github.io/boost.afio/">Boost.AFIO v2</a> is a very low
@@ -1136,16 +1153,19 @@ permutation run in its permutation tables of preconditions, postconditions, para
 and outcomes. KernelTest itself is written using the
 "exceptions are exceptional" design pattern where expected errors are returned via
 outcomes but unexpected errors which abort the test use thrown exceptions which are
-collected into `outcome<T>`'s.
+collected into `outcome<T>`'s. AFIO v2's test suite is written using KernelTest.
 * Planned Boost.BLOBStore will be a versioned, ACID transactional key to BLOB store written
 using AFIO v2 which will use both the "sea of noexcept" and the "exceptions are exceptional"
 design patterns together. This allows user supplied callbacks to throw exceptions which aborts
 the current transaction and for those exceptions to be propagated, if desired, out of BLOBStore
 whilst the internal implementation of BLOBStore and indeed its public API is all noexcept
 and never throws exceptions (writing correct filesystem code is hard enough without dealing
-with unexpected control flow reversal).
+with unexpected control flow reversal). BLOBStore will also use KernelTest for its test suite.
 
 
+\br
+\hr
+\br
 \section advanced More advanced usage
 
 99% of Outcome users already have everything they will ever need - Outcome is a very

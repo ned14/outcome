@@ -1158,11 +1158,20 @@ BOOST_AUTO_TEST_CASE(works / monad / operators, "Tests that the monad custom ope
   {
     outcome<std::string> a("niall");
     // Does bind work with chains of value, error, exception and empty?
-    auto x(a >> [ec](std::string) { return ec; } >> [](error_code_extended) { return std::make_exception_ptr(5); } >> [](std::exception_ptr) { return; } >> [](outcome<std::string>::empty_type) { return std::string("douglas"); });
+    auto x(a >> [ec](std::string) { return ec; }                              //
+           >> [](error_code_extended) { return std::make_exception_ptr(5); }  //
+           >> [](std::exception_ptr) { return; }                              //
+           >> [](outcome<std::string>::empty_type) { return std::string("douglas"); });
     BOOST_CHECK(x.get() == "douglas");
-    auto y(a >> [ec](std::string) -> outcome<int> { return ec; } >> [](error_code_extended) { return std::make_exception_ptr(5); } >> [](std::exception_ptr) { return; } >> [](outcome<int>::empty_type) { return 5; });
+    auto y(a >> [ec](std::string) -> outcome<int> { return ec; }                                        //
+                                     >> [](error_code_extended) { return std::make_exception_ptr(5); }  //
+                                     >> [](std::exception_ptr) { return; }                              //
+                                     >> [](outcome<int>::empty_type) { return 5; });
     BOOST_CHECK(y.get() == 5);
-    auto z(a >> [](std::string &&v) { return std::move(v); } >> [](std::string &&v) { return std::move(v); } >> [](std::string &&v) { return std::move(v); } >> [](std::string &&v) { return std::move(v); });
+    auto z(a >> [](std::string &&v) { return std::move(v); }  //
+           >> [](std::string &&v) { return std::move(v); }    //
+           >> [](std::string &&v) { return std::move(v); }    //
+           >> [](std::string &&v) { return std::move(v); });
     BOOST_CHECK(z.get() == "niall");
     BOOST_CHECK(a.get().empty());
   }
