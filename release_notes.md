@@ -32,6 +32,9 @@ Rust and Swift!
 \note Boost.Outcome has not been peer reviewed and is not part of the Boost libraries
 (yet). It is hoped it will enter the peer review queue in Q1 2017.
 
+\todo Add a vanilla use case snippet here
+
+<br/><hr/><br/>
 
 \section prerequisites Prerequisites and Installation
 
@@ -95,10 +98,8 @@ If you have a problem, please review the FAQ and the wiki. Searching
 for your problem is also a good idea. If you are encountering what you
 think is a bug, please open an issue.
 
+<br/><hr/><br/>
 
-\br
-\hr
-\br
 \section cpp_error_handling_history Design Rationale: Quick history of error handling design patterns from C++ 98 to C++ 17
 
 \subsection c-style C style error handling: integer returns
@@ -299,6 +300,10 @@ will be in it. It remains to be seen if LEWG's `expected<T, E>` will make it,
 if not then most STL implementations will probably ship an implementation as an experimental
 and if your STL does not, there is always the reference implementation at https://github.com/viboes/std-make
 which ought to work on any C++ 14 compiler.
+
+\note LEWG is the C++ standard committee's Library Evolution Working Group. They work
+on improving the C++ standard runtime library which will gain `std::optional<T>` and
+`std::variant<...>` in C++ 17 and probably `std::expected<T, E>` in C++ 17 or C++ 20.
 
 The following discussion is based on `expected<T, E>` as detailed by
 <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf">P0323R1</a>
@@ -572,9 +577,8 @@ Hence in most code bases I write forwards only execution code where there is no
 possible way of inverting control flow at all i.e. no exceptions can be thrown,
 despite that exceptions are available.
 
-\br
-\hr
-\br
+<br/><hr/><br/>
+
 \section introduction Introducing Outcome
 
 After that literature review of how C++ has implemented error handling and how code
@@ -951,6 +955,9 @@ world use case distilled from AFIO v2's source code:
 
 \snippet usecase_example.cpp file_create_example
 
+\todo Add link to whole source code in an online compiler explorer so end users can
+play with the use case
+
 Unlike the earlier example functions opening a file, the above is not a toy use case
 and it covers almost all of the permutations of creating or opening a file which are
 common to POSIX and Windows. We make use of the fact that `basic_monad<>``::``value()`
@@ -1090,9 +1097,8 @@ here as that framework (`ringbuffer_log`) lives in Boost-lite, but it's fairly e
 Outcome's and Boost-lite's source code all of which is on github.
 
 
-\br
-\hr
-\br
+<br/><hr/><br/>
+
 \section when_use When am I supposed to use what when?
 
 The total available permutations may seem overwhelming at this point, because as with any
@@ -1163,9 +1169,8 @@ and never throws exceptions (writing correct filesystem code is hard enough with
 with unexpected control flow reversal). BLOBStore will also use KernelTest for its test suite.
 
 
-\br
-\hr
-\br
+<br/><hr/><br/>
+
 \section advanced More advanced usage
 
 99% of Outcome users already have everything they will ever need - Outcome is a very
