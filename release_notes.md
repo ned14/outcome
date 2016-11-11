@@ -29,6 +29,10 @@ in the same design pattern as when writing in Rust or Swift, and with a similarl
 low runtime overhead. Outcome even has a `try` macro doing the same thing as in
 Rust and Swift!
 
+\note Boost.Outcome has not been peer reviewed and is not part of the Boost libraries
+(yet). It is hoped it will enter the peer review queue in Q1 2017.
+
+
 \section prerequisites Prerequisites and Installation
 
 Boost.Outcome is a header only library known to work on these compilers or better:
@@ -46,8 +50,8 @@ and go, including Outcome using one of these depending on how you install Outcom
 - \code #include "boost.outcome/include/boost/outcome.hpp" \endcode
 
 Each commit is tested by Travis and Appveyor. A nightly cronjob figures out which
-latest commit all tests passed for and pushes a distribution to the following
-package repositories:
+latest commit all tests passed for all supported platforms and pushes a distribution
+to the following package repositories:
 
 \subsection windows Installing on Windows
 
@@ -82,7 +86,7 @@ tarball. Tarballs are only uploaded if everything built and all tests passed.
 The master branch is automatically set to whichever was the last commit on develop
 branch to pass all unit tests.
 
-\section support Support
+\subsection support Support
 
 <a href="https://stackoverflow.com/">StackOverflow</a> with the boost-outcome tag is the preferred place to ask questions on usage.
 
@@ -92,7 +96,7 @@ for your problem is also a good idea. If you are encountering what you
 think is a bug, please open an issue.
 
 
-\section cpp_error_handling_history Quick history of error handling design patterns from C++ 98 to C++ 17
+\section cpp_error_handling_history Design Rationale: Quick history of error handling design patterns from C++ 98 to C++ 17
 
 \subsection c-style C style error handling: integer returns
 
@@ -298,7 +302,7 @@ The following discussion is based on `expected<T, E>` as detailed by
 which is the latest LEWG proposal paper at the time of writing (Nov 2016) and indeed
 one where `expected<T, E>` was pared down significantly from its original proposal. It
 should be noted that C++ may yet end up adopting something quite different, though
-given how long `expected<T, E>` has been around by now, and how it is getting to fitting
+given how long `expected<T, E>` has been around by now, and how well it fits
 nicely between `optional<T>` and `variant<T, E>`, it would seem unlikely.
 `expected<T, E>` is intended as a strict superset of `optional<T>` with aspects
 of <a href="http://en.cppreference.com/w/cpp/utility/variant">`std::variant<T, E>`</a>,
@@ -310,10 +314,11 @@ I was fortunate to be employed on a contract in 2015 where I saw it deployed at
 scale into a large C++ codebase. Indeed, much of what I witnessed there had a big impact in
 how Outcome ended up being designed. P0323R1 proposes an enormously simplified
 implementation which ought to fix all of the showstopper problems with the original
-that I am aware of, and P0323R1's `expected<T, E>` has a huge resemblance to
-Outcome in every day usage, which is unintentionally deliberate as the committee have
-made most of the changes I also made in Outcome. Outcome still
-contributes significant value for low-latency users, as we shall see later.
+that I am aware of, and P0323R1's reduced `expected<T, E>` has ended up having a huge
+resemblance to Outcome in every day usage. It is heartening that the committee have
+made most of the changes I also made in Outcome, as that suggests I am on the right track.
+Outcome's slightly different design still contributes a lot of value for the specific
+use of error handling in my opinion, as we shall hopefully see next.
 
 
 \subsubsection optional Returning optional<T>
@@ -363,14 +368,14 @@ in this case every single failure will take considerable time to return and
 there is zero chance *any* file open will ever succeed, so what the user sees
 is an apparently hanged program. Far better would be if the `openfile()` function
 could return the cause of its failure, and we could then treat all errors which are different
-to file-not-found as reason to abort.
+to file-not-found as reason to **abort**.
 
 Enter LEWG's proposed `expected<T, E>` which can hold either an expected value of
 type `T` or an unexpected value of type `E`. Like `variant<T, E>`, `expected<T, E>`
-is a discrimated union storing either `T` or `E` in the same storage space, but
+is a discriminated union storing either `T` or `E` in the same storage space, but
 unlike the variant, expected treats the `T` as a positive thing (fetchable via a
-`.value()`) and `E` as a negative thing (fetchable via a `.error()`). Because
-`expected<T, E>` provides a "never empty" guarantee similar to variant,
+`.value()`) and `E` as a negative thing (fetchable via an `.error()`). Because
+`expected<T, E>` provides a "almost never empty" guarantee similar to variant,
 it currently requires type `E` to be nothrow copy and move constructible and assignable.
 Expected is a bit less intuitive to use than optional, but its rules are straightforward:
 `expected<T, E>` will greedily and implicitly construct from any type from which a `T` can be constructed,
@@ -425,7 +430,7 @@ declares `expected<T, E = std::exception_ptr>` as the default despite that P0323
 specifies `expected<T, E = std::error_condition>` as the default (note: I have no
 idea why LEWG would use error condition as a default, such a default would lose
 information for users so I have assumed they'll change it to error code soon), so for completeness
-let's rewrite the above to match a `E = std::exception_ptr` design instead:
+let's rewrite the above to match an `E = std::exception_ptr` design instead:
 
 \code
 // Returns the expected opened handle on success, or an unexpected cause of failure
@@ -459,9 +464,9 @@ if(!fh_)
   catch(const std::system_error &e)
   {
     if(e.code() != std::errc::no_such_file_or_directory)
-      rethrow;
+      throw;
   }
-  // All other exception types are rethrown
+  // All other exception types were rethrown
 }
 else
 {
@@ -474,29 +479,32 @@ This is the very first time in this tutorial that we have seen the design patter
 around which Outcome was specifically designed to make easy: *islands of exception
 throw in a sea of noexcept*.
 
-\subsubsection sea-of-noexcept "Islands of exception throw in a sea of noexcept"
+\subsubsection sea-of-noexcept The "Islands of exception throw in a sea of noexcept" design pattern
 
-This design pattern was intended in C++ 11 to be the method by which that large
+This design pattern was intended by the committee in C++ 11 to be the method by which that large
 minority of C++ users who disable RTTI and exceptions entirely could be brought
 back into ISO standard C++. The pattern is easy:
 1. Every `extern` API in your translation unit is marked `noexcept` and uses a
 non-throwing mechanism such as `std::error_code` or `std::expected<T, E>` or
-Outcomes to return errors.
+Outcomes or even a C-style integer to return errors.
 2. Code within a translation unit is generally not marked `noexcept`, or indeed
 may throw and catch exceptions before returning out of an extern `noexcept` API.
-3. Because all `extern` function calls are `noexcept` throughout the entire codebase, the compiler's optimiser 
-*ought* to elide emission of stack unwind code and all other exception throw handling
+3. Because all `extern` function calls are `noexcept` throughout the entire codebase,
+from any given translation unit it is never the case that implementation code will
+ever call a potentially throwing function (C APIs are assumed to never throw on
+most C++ compilers). Because no calls to unknown code will ever throw, the compiler's
+optimiser  *ought* to elide emission of stack unwind code and all other exception throw handling
 overhead in any sequence of code inside the translation unit *as if* exceptions had
 been globally disabled at the command line.
 4. Where code inside a translation unit does call something which could throw e.g.
 much of the STL, exception handling overhead *ought* to be confined to the containing `try` ...
-`catch` **island**.
+`catch` **island** at best, at worst to that given translation unit.
 5. Consumers of your `extern` API need not care how that API is internally implemented
 as they shall never see an exception thrown out of that API, and the compiler will
 optimise your code which uses that `extern` API in its **sea** of `noexcept` accordingly.
 
 
-\subsubsection exceptions-are-exceptional "Exceptions are exceptional, errors are not failure"
+\subsubsection exceptions-are-exceptional The "Exceptions are exceptional, errors are not failure" design pattern
 
 In addition to the pure "sea of noexcept" for low latency users, there is one other new
 error handling design pattern to mention made possible by `expected<T, E>` or especially
@@ -521,7 +529,7 @@ std::expected<handle_ref, std::error_code> openfile(const char *path)
   int fd = open(path, O_RDONLY);
   if(fd == -1)
   {
-    int code=errno;
+    int code = errno;
     // If a temporary failure, this is an expected unexpected outcome
     if(EINTR==code || EBUSY==code || EISDIR==code || ELOOP==code || ENOENT==code || ENOTDIR==code || EPERM==code || EACCES==code)
       return std::make_unexpected(std::error_code(code, std::system_category());
@@ -549,13 +557,20 @@ if(fh_)
 \endcode
 
 This "separation of concerns" pattern has a great aesthetic appeal to most,
-including myself. However I must admit that in practice I haven't found myself
-using it a great deal because I find writing forwards only exception safe code
-much quicker to write correctly first time than exception safe code which correctly
-handles arbitrary control flow reversal.
+including myself. This is likely why Rust adopted it.
+
+However I must admit that after more than a year of practice I haven't found myself
+using it a great deal. It fits well for some codebases, but very much a
+minority. The problem in my opinion is that the cost of writing and maintaining correct
+and fully tested code which can invert control flow at any moment is high
+and typically very much underestimated. Therefore, it is only in some code bases
+that it is worth placing that high burden on the code, and in most code bases it is not.
+Hence in most code bases I write forwards only execution code where there is no
+possible way of inverting control flow at all i.e. no exceptions can be thrown,
+despite that exceptions are turned on.
 
 
-\section introduction Introduction and Design Rationale of Outcome
+\section introduction Introducing Outcome
 
 After that literature review of how C++ has implemented error handling and how code
 might implement error handling from C++ 17/20 onwards, one might think that Outcome
@@ -577,14 +592,14 @@ commit typical use cases of Outcomes and counts the assembler operations emitted
 code bloat is kept optimally minimal. On all recent GCCs and clangs, if the compiler's
 optimiser can infer the state of an outcome, **all runtime overhead due to the outcome
 ought to be completely eliminated** (sans optimiser bugs which appear from time to time). This
-means for inlined code if you return a `result<T>(T())`, the compiler will generate
-identical code as if you had returned a `T()` directly.
+means for inlined code if you return a `result<T>(T(...))`, the compiler will generate
+identical code as if you had returned a `T(...)` directly.
 2. Outcome's actual core implementation is `boost::outcome::basic_monad<Policy<T, EC, E>>` with these
 convenience typedefs:
  \code
  template<class T> using outcome = basic_monad<monad_policy<T, std::error_code, std::exception_ptr>>;
- template<class T> using result = basic_monad<result_policy<T, std::error_code, void>>;
- template<class T> using option = basic_monad<option_policy<T, void, void>>;
+ template<class T> using result  = basic_monad<result_policy<T, std::error_code, void>>;
+ template<class T> using option  = basic_monad<option_policy<T, void, void>>;
  \endcode 
  You can use any type `EC` or `E` you like so long as they act as if a `std::error_code`
  and a `std::exception_ptr` respectively e.g. `boost::error_code` and `boost::exception_ptr`.
@@ -593,7 +608,7 @@ convenience typedefs:
  exception pointer or be `void`, in which case the specialisation doesn't provide the ability
  to store an instance of that type.
 3. As suggested by the presence of an `option<T>` convenience typedef, all `basic_monad<>` instances have a
-formal empty state. There is no "never empty" guarantee which
+formal empty state. There is no "almost never empty" guarantee which
 enables sane semantics when exceptions are disabled and also to not confuse the compiler's
 optimiser with complex potential branches in move construction (which can cause the optimiser
 to give up prematurely). It sidesteps handling the problem of move assignment throwing an
