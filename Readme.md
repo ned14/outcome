@@ -9,6 +9,9 @@ Tarballs of source with all unit tests passing: https://dedi4.nedprod.com/static
 
 Todo:
  - [ ] `make install` needs to install dependency headers too
+ - [ ] Add config where in release mode the exception throwing macros generate link errors
+for symbols with the function name and line number in them.
+ - [ ] Document the exception throwing macros in the tutorial
  - [ ] Solve the apt packaging problem. Either:
    1. boost-lite cmake needs to gain the ability to be called by debian dh (see make_deb.sh).
    This would also solve building binary distros and would let us host on launchpad.
