@@ -294,6 +294,12 @@ languages Swift and Rust.
 
 \subsection cpp17-style C++ 17/20 style error handling: optional<T> and expected<T, E>
 
+\todo Relocate this entire discussion about Expected into a separate section outside
+the tutorial. Continue here with a purely Outcome based implementation of the toy
+open file function. There is too great a jump between the nice baby steps up until now
+and suddenly leaping into WG21 speak and future C++ 17 classes which tutorial users
+don't care about nor need to know about, they are here for Outcome, not Expected.
+
 C++ 17 isn't finished at the time of writing, but we are very sure that at least
 <a href="http://en.cppreference.com/w/cpp/utility/optional">`std::optional<T>`</a>
 will be in it. It remains to be seen if LEWG's `expected<T, E>` will make it,
