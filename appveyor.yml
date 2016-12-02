@@ -5,6 +5,7 @@ version: 0.01.{build}-{branch}
 branches:
   # blacklist
   except:
+    - master
     - gh-pages
 skip_tags: true
  
@@ -18,7 +19,7 @@ platform: x64
 configuration: Release
 
 before_build:
-  - git checkout master
+  - git checkout develop
   - git submodule update --init --recursive
 build_script:
   - ctest -S .ci.cmake -V

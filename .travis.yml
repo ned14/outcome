@@ -5,7 +5,6 @@ os:
 branches:
   only:
     - develop
-    - master
 notifications:
   email:
     recipients:
@@ -51,7 +50,7 @@ before_install:
       export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
       export PATH="$PWD/llvm-$LLVM_VERSION/bin:$PATH";
     fi
- - git checkout master
+ - git checkout develop
  - git submodule update --init --recursive
 
 script:
