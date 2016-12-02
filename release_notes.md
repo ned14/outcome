@@ -32,7 +32,7 @@ Rust and Swift!
 \note Boost.Outcome has not been peer reviewed and is not part of the Boost libraries
 (yet). It is hoped it will enter the peer review queue in Q1 2017.
 
-\todo Add a vanilla use case snippet here
+\snippet simple_example.cpp simple_example
 
 <br/><hr/><br/>
 
