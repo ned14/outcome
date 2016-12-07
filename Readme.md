@@ -11,6 +11,7 @@ Todo:
  - [ ] `make install` needs to install dependency headers too
  - [ ] Add config where in release mode the exception throwing macros generate link errors
 for symbols with the function name and line number in them.
+ - [ ] Add nothrow make functions for outcomes, maybe with error lvalue ref constructor editions for results.
  - [ ] Document the exception throwing macros in the tutorial
  - [ ] Solve the apt packaging problem. Either:
    1. boost-lite cmake needs to gain the ability to be called by debian dh (see make_deb.sh).
