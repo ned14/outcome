@@ -34,7 +34,7 @@ Rust and Swift!
 
 \snippet simple_example.cpp simple_example
 
-<br/><hr/><br/>
+<br><hr><br>
 
 \section prerequisites Prerequisites and Installation
 
@@ -98,7 +98,7 @@ If you have a problem, please review the FAQ and the wiki. Searching
 for your problem is also a good idea. If you are encountering what you
 think is a bug, please open an issue.
 
-<br/><hr/><br/>
+<br><hr><br>
 
 \section cpp_error_handling_history Design Rationale: Quick history of error handling design patterns from C++ 98 to C++ 17
 
@@ -583,7 +583,7 @@ Hence in most code bases I write forwards only execution code where there is no
 possible way of inverting control flow at all i.e. no exceptions can be thrown,
 despite that exceptions are available.
 
-<br/><hr/><br/>
+<br><hr><br>
 
 \section introduction Introducing Outcome
 
@@ -1103,7 +1103,7 @@ here as that framework (`ringbuffer_log`) lives in Boost-lite, but it's fairly e
 Outcome's and Boost-lite's source code all of which is on github.
 
 
-<br/><hr/><br/>
+<br><hr><br>
 
 \section when_use When am I supposed to use what when?
 
@@ -1175,7 +1175,7 @@ and never throws exceptions (writing correct filesystem code is hard enough with
 with unexpected control flow reversal). BLOBStore will also use KernelTest for its test suite.
 
 
-<br/><hr/><br/>
+<br><hr><br>
 
 \section advanced More advanced usage
 

@@ -1,5 +1,6 @@
 #include "../include/boost/outcome.hpp"
 #include <string>
+#include <iostream>
 
 //! [simple_example]
 namespace bo = BOOST_OUTCOME_V1_NAMESPACE;
@@ -12,6 +13,8 @@ namespace bo = BOOST_OUTCOME_V1_NAMESPACE;
 // errors. Note the noexcept, this means that calling this
 // function will NEVER invert execution flow unexpectedly.
 bo::outcome<int> getConfigParam(std::string name) noexcept;
+
+extern void runWithMax(int);
 
 int main()
 {
@@ -28,3 +31,11 @@ int main()
     std::cerr << "getConfigParam reports error " << oi.error() << std::endl;
 }
 //! [simple_example]
+
+bo::outcome<int> getConfigParam(std::string name) noexcept
+{
+  return 5;
+}
+extern void runWithMax(int)
+{
+}
