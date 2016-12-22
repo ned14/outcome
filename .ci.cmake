@@ -21,6 +21,7 @@ CONFIGURE_CTEST_SCRIPT_FOR_CDASH("outcome" "cmake_ci")
 ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 
 ctest_start("Experimental")
+ctest_update()
 ctest_configure()
 ctest_build()
 ctest_test(RETURN_VALUE retval)

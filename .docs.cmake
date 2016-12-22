@@ -26,6 +26,7 @@ include(FindGit)
 #)
 
 ctest_start("Documentation")
+ctest_update()
 ctest_configure()
 ctest_build(TARGET outcome_docs)
 #checked_execute_process("git commit"
