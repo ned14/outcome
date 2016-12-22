@@ -19,6 +19,8 @@ include(BoostLiteUtils)
 
 CONFIGURE_CTEST_SCRIPT_FOR_CDASH("outcome" "cmake_ci")
 ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
+include(FindGit)
+set(CTEST_GIT_COMMAND "${GIT_EXECUTABLE}")
 
 ctest_start("Experimental")
 ctest_update()
