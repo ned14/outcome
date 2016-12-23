@@ -55,7 +55,6 @@ before_install:
 script:
  -
    if [ "$__" = "Unit tests" ]; then
-     git submodule update --init --recursive;
      TARNAME=boost.outcome-v1.0-source-`date +%Y%m%d%H%M`.tar.xz;
      tar cfJ ../$TARNAME . --exclude llvm* --exclude .git;
      cd test;
@@ -66,7 +65,6 @@ script:
    fi
  -
    if [ "$__" = "Code bloat tests" ]; then
-     git submodule update --init --recursive;
      cd test/constexprs;
      ./with_clang_gcc.sh;
      cat results.xml;

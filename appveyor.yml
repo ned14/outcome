@@ -20,6 +20,7 @@ configuration: Release
 
 before_build:
   - git checkout develop
+  - git submodule update --init --recursive
 build_script:
   - ctest -S .ci.cmake -V
 after_build:
