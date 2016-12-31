@@ -56,7 +56,9 @@ DEALINGS IN THE SOFTWARE.
 #include <fcntl.h>
 #endif
 
+#ifdef __cpp_exceptions
 #include "../boost-lite/include/allocator_testing.hpp"
+#endif
 
 BOOST_AUTO_TEST_SUITE(all)
 

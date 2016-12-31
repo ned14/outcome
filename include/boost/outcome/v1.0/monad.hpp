@@ -1078,6 +1078,7 @@ namespace detail
 //! \brief Tag type for inplace construction
 struct inplace_t
 {
+  constexpr inplace_t() {}
 };
 //! \brief Constexpr instance of inplace construction tag type
 static constexpr inplace_t inplace;
