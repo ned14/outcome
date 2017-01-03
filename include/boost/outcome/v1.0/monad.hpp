@@ -1163,7 +1163,7 @@ public:
   static constexpr bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
   //! \brief This monad does not implement a destructor
   static constexpr bool is_trivially_destructible = value_storage_type::is_trivially_destructible;
-#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 190024220 /* VS2015 Update 3*/)
+#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 191024728 /* VS2017 RC1*/)
   //! \brief This monad is constructible from the monad specified
   template <class OtherMonad> static constexpr bool is_constructible = value_storage_type::template is_constructible_from<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
   template <class OtherMonad, class Base = typename std::conditional<is_constructible<OtherMonad>, std::true_type, std::false_type>::type> struct _is_constructible : Base

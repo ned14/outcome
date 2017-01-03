@@ -12,6 +12,11 @@ Documentation: https://ned14.github.io/boost.outcome/
 Tarballs of source with all unit tests passing: https://dedi4.nedprod.com/static/files/
 
 Todo:
+ - [ ] Use "clean" method for getting cmake to not specify /EHsc, eliminate those annoying warnings.
+ - [ ] All BOOST_NOEXCEPT etc macros need to become BL_NOEXCEPT etc macros which try to set themselves
+from any BOOST_NOEXCEPT if defined, else define one's own. This should solve macro redefinition warnings
+when someone includes Boost before Outcome.
+ - [ ] Test relaxed constexpr in VS15 once that is released and delete the hack macro.
  - [ ] `make install` needs to install dependency headers too
  - [ ] Add config where in release mode the exception throwing macros generate link errors
 for symbols with the function name and line number in them.
@@ -21,7 +26,6 @@ for symbols with the function name and line number in them.
    1. boost-lite cmake needs to gain the ability to be called by debian dh (see make_deb.sh).
    This would also solve building binary distros and would let us host on launchpad.
    2. Configure our own simple apt repo https://askubuntu.com/questions/529/how-to-set-up-an-apt-repository
- - [ ] Test relaxed constexpr in VS15 once that is released and delete the hack macro.
  - Need to write script which uses github API to scan commits on develop branch for CI
 saying all passes. If so:
   - [x] Merge that commit from develop branch into master branch
