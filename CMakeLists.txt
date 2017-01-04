@@ -74,15 +74,12 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   if(WIN32)
     target_compile_definitions(outcome_hl--unittests_noexcept PUBLIC _UNICODE)
   endif()
-  if(MSVC AND NOT CLANG)
-    target_compile_options(outcome_hl--unittests_noexcept PUBLIC /EHs-c- /GR-)
-  else()
-    target_compile_options(outcome_hl--unittests_noexcept PUBLIC -fno-exceptions -fno-rtti)
-  endif()
   list(APPEND outcome_TEST_TARGETS outcome_hl--unittests_noexcept)
   set_target_properties(outcome_hl--unittests_noexcept PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     POSITION_INDEPENDENT_CODE ON
+    CXX_EXCEPTIONS OFF
+    CXX_RTTI OFF
     CXX_STANDARD 14
   )
   add_test(NAME outcome_hl--unittests_noexcept CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
