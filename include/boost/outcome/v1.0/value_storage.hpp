@@ -228,11 +228,11 @@ public:
   {
   }
   template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<is_constructible_from<_value_type2, _error_type2, _exception_type2>>::type>
-  BOOST_OUTCOME_CXX14_CONSTEXPR explicit value_storage(const value_storage<_value_type2, _error_type2, _exception_type2> &o)
+  BOOST_OUTCOME_CONSTEXPR explicit value_storage(const value_storage<_value_type2, _error_type2, _exception_type2> &o)
       : value_storage(value_storage<_value_type2, _error_type2, _exception_type2>(o) /* delegate to move constructor */)
   {
   }
-  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<is_constructible_from<_value_type2, _error_type2, _exception_type2>>::type> BOOST_OUTCOME_CXX14_CONSTEXPR explicit value_storage(value_storage<_value_type2, _error_type2, _exception_type2> &&o)
+  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<is_constructible_from<_value_type2, _error_type2, _exception_type2>>::type> BOOST_OUTCOME_CONSTEXPR explicit value_storage(value_storage<_value_type2, _error_type2, _exception_type2> &&o)
   {
     switch(o.type)
     {
@@ -253,7 +253,7 @@ public:
       break;
     }
   }
-  BOOST_OUTCOME_CXX14_CONSTEXPR value_storage(const value_storage &o) noexcept(is_nothrow_copy_constructible)
+  BOOST_OUTCOME_CONSTEXPR value_storage(const value_storage &o) noexcept(is_nothrow_copy_constructible)
       : base()
   {
     switch(o.type)
@@ -272,7 +272,7 @@ public:
     }
     this->type = o.type;
   }
-  BOOST_OUTCOME_CXX14_CONSTEXPR value_storage(value_storage &&o) noexcept(is_nothrow_move_constructible)
+  BOOST_OUTCOME_CONSTEXPR value_storage(value_storage &&o) noexcept(is_nothrow_move_constructible)
       : base()
   {
     switch(o.type)
@@ -291,25 +291,25 @@ public:
     }
     this->type = o.type;
   }
-  BOOST_OUTCOME_CXX14_CONSTEXPR value_storage &operator=(const value_storage &o) noexcept(is_nothrow_destructible &&is_nothrow_copy_constructible)
+  BOOST_OUTCOME_CONSTEXPR value_storage &operator=(const value_storage &o) noexcept(is_nothrow_destructible &&is_nothrow_copy_constructible)
   {
     clear();
     new(this) value_storage(o);
     return *this;
   }
-  BOOST_OUTCOME_CXX14_CONSTEXPR value_storage &operator=(value_storage &&o) noexcept(is_nothrow_destructible &&is_nothrow_move_constructible)
+  BOOST_OUTCOME_CONSTEXPR value_storage &operator=(value_storage &&o) noexcept(is_nothrow_destructible &&is_nothrow_move_constructible)
   {
     clear();
     new(this) value_storage(std::move(o));
     return *this;
   }
-  BOOST_OUTCOME_CXX14_CONSTEXPR void set_state(value_storage &&o) noexcept(is_nothrow_destructible &&is_nothrow_move_constructible)
+  BOOST_OUTCOME_CONSTEXPR void set_state(value_storage &&o) noexcept(is_nothrow_destructible &&is_nothrow_move_constructible)
   {
     clear();
     new(this) value_storage(std::move(o));
   }
 
-  BOOST_OUTCOME_CXX14_CONSTEXPR void swap(value_storage &o) noexcept(is_nothrow_move_constructible)
+  BOOST_OUTCOME_CONSTEXPR void swap(value_storage &o) noexcept(is_nothrow_move_constructible)
   {
     if(this->type == o.type)
     {
@@ -335,13 +335,13 @@ public:
       *this = std::move(temp);
     }
   }
-  template <class U> BOOST_OUTCOME_CXX14_CONSTEXPR void set_value(U &&v)
+  template <class U> BOOST_OUTCOME_CONSTEXPR void set_value(U &&v)
   {
     assert(this->type == storage_type::empty);
     new(&this->_value_raw) value_type(std::forward<U>(v));
     this->type = storage_type::value;
   }
-  template <class... Args> BOOST_OUTCOME_CXX14_CONSTEXPR void emplace_value(Args &&... v)
+  template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args &&... v)
   {
     assert(this->type == storage_type::empty);
     new(&this->_value_raw) value_type(std::forward<Args>(v)...);
@@ -353,14 +353,14 @@ public:
     new(&this->exception) exception_type(std::move(e));
     this->type = storage_type::exception;
   }
-  // Note to self: this can't be BOOST_OUTCOME_CXX14_CONSTEXPR
+  // Note to self: this can't be BOOST_OUTCOME_CONSTEXPR
   void set_error(error_type e)
   {
     assert(this->type == storage_type::empty);
     new(&this->error) error_type(std::move(e));
     this->type = storage_type::error;
   }
-  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<is_comparable_to<_value_type2, _error_type2, _exception_type2>>::type> BOOST_OUTCOME_CXX14_CONSTEXPR bool operator==(const value_storage<_value_type2, _error_type2, _exception_type2> &o) const
+  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<is_comparable_to<_value_type2, _error_type2, _exception_type2>>::type> BOOST_OUTCOME_CONSTEXPR bool operator==(const value_storage<_value_type2, _error_type2, _exception_type2> &o) const
   {
     if(this->type != o.type)
       return false;
@@ -377,7 +377,7 @@ public:
     }
     return false;
   }
-  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<is_comparable_to<_value_type2, _error_type2, _exception_type2>>::type> BOOST_OUTCOME_CXX14_CONSTEXPR bool operator!=(const value_storage<_value_type2, _error_type2, _exception_type2> &o) const
+  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<is_comparable_to<_value_type2, _error_type2, _exception_type2>>::type> BOOST_OUTCOME_CONSTEXPR bool operator!=(const value_storage<_value_type2, _error_type2, _exception_type2> &o) const
   {
     return !(*this == o);
   }

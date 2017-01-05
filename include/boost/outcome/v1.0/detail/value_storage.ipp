@@ -150,11 +150,13 @@ public:
 #if BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
   BOOST_OUTCOME_CONVINCE_MSVC ~BOOST_OUTCOME_VALUE_STORAGE_IMPL()
 #if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER != 191024728 /* VS2017 RC1*/)
-   noexcept(is_nothrow_destructible)
+  noexcept(is_nothrow_destructible)
 #endif
-   { clear(); }
+  {
+    clear();
+  }
 #endif
-  BOOST_OUTCOME_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
+  BOOST_OUTCOME_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
   {
     switch(type)
     {
@@ -289,7 +291,7 @@ public:
   {
   };
   template <class... Args>
-  BOOST_OUTCOME_CXX14_CONSTEXPR explicit BOOST_OUTCOME_VALUE_STORAGE_IMPL(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+  BOOST_OUTCOME_CONSTEXPR explicit BOOST_OUTCOME_VALUE_STORAGE_IMPL(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
       : value(std::forward<Args>(args)...)
   {
     type = storage_type::value;
@@ -297,7 +299,7 @@ public:
 #if BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
   BOOST_OUTCOME_CONVINCE_MSVC ~BOOST_OUTCOME_VALUE_STORAGE_IMPL() noexcept(is_nothrow_destructible) { clear(); }
 #endif
-  BOOST_OUTCOME_CXX14_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
+  BOOST_OUTCOME_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
   {
     switch(type)
     {

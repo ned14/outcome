@@ -40,19 +40,13 @@ DEALINGS IN THE SOFTWARE.
 #include <_mingw.h>
 #endif
 
-#include "../boost-lite/include/boost/config.hpp"
+#include "../boost-lite/include/config.hpp"
 
-#ifndef __cpp_alias_templates
-#error Boost.Outcome needs template alias support in the compiler
-#endif
 #ifndef __cpp_attributes
 #error Boost.Outcome needs attributes support in the compiler
 #endif
 #ifndef __cpp_variadic_templates
 #error Boost.Outcome needs variadic template support in the compiler
-#endif
-#ifndef __cpp_noexcept
-#error Boost.Outcome needs noexcept support in the compiler
 #endif
 #ifndef __cpp_constexpr
 #error Boost.Outcome needs constexpr (C++ 11) support in the compiler
@@ -222,14 +216,14 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 #if defined(_MSC_VER) && !defined(__c2__)
 //# pragma inline_depth(255)
 //# pragma inline_recursion(on)
-#define BOOST_OUTCOME_CXX14_CONSTEXPR BOOST_FORCEINLINE
-#define BOOST_OUTCOME_CONVINCE_MSVC BOOST_FORCEINLINE
+#define BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE
+#define BOOST_OUTCOME_CONVINCE_MSVC BOOSTLITE_FORCEINLINE
 #elif defined(__c2__) || defined(__clang__) || defined(__GNUC__)
 // On clang and GCC we now require C++ 14 constexpr
-#define BOOST_OUTCOME_CXX14_CONSTEXPR constexpr
+#define BOOST_OUTCOME_CONSTEXPR constexpr
 #define BOOST_OUTCOME_CONVINCE_MSVC
 #else
-#define BOOST_OUTCOME_CXX14_CONSTEXPR BOOST_CXX14_CONSTEXPR
+#define BOOST_OUTCOME_CONSTEXPR BOOSTLITE_CONSTEXPR
 #define BOOST_OUTCOME_CONVINCE_MSVC
 #endif
 
@@ -249,7 +243,7 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 namespace detail
 {
-  BOOST_NORETURN inline void do_fatal_exit(const char *expr)
+  BOOSTLITE_NORETURN inline void do_fatal_exit(const char *expr)
   {
     void *bt[16];
     size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0]));
