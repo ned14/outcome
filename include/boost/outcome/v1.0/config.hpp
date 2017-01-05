@@ -212,20 +212,14 @@ namespace stl11
 BOOST_OUTCOME_V1_NAMESPACE_END
 #endif
 
-// For some odd reason, VS2015 really hates to do much inlining unless forced
-#if defined(_MSC_VER) && !defined(__c2__)
-//# pragma inline_depth(255)
-//# pragma inline_recursion(on)
-#define BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE
-#define BOOST_OUTCOME_CONVINCE_MSVC BOOSTLITE_FORCEINLINE
-#elif defined(__c2__) || defined(__clang__) || defined(__GNUC__)
-// On clang and GCC we now require C++ 14 constexpr
+// If we have relaxed constexpr on this compiler, use that
+#if __cpp_constexpr >= 201304
 #define BOOST_OUTCOME_CONSTEXPR constexpr
-#define BOOST_OUTCOME_CONVINCE_MSVC
 #else
-#define BOOST_OUTCOME_CONSTEXPR BOOSTLITE_CONSTEXPR
-#define BOOST_OUTCOME_CONVINCE_MSVC
+#define BOOST_OUTCOME_CONSTEXPR
 #endif
+// Hopefully shortly to be removed, but may need to keep it for VS2015 sanity
+#define BOOST_OUTCOME_CONVINCE_MSVC
 
 #include <cassert>  // for asserting :)
 #include <ostream>  // for printing
