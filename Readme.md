@@ -9,10 +9,12 @@ CTest dashboard: http://my.cdash.org/index.php?project=Boost.Outcome
 
 Documentation: https://ned14.github.io/boost.outcome/
 
-Tarballs of source with all unit tests passing: https://dedi4.nedprod.com/static/files/
+Latest tarball of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/boost.outcome-v1.0-source-latest.tar.xz
+
+Past tarballs of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/boost.outcome
 
 Todo:
- - [ ] Use "clean" method for getting cmake to not specify /EHsc, eliminate those annoying warnings.
+ - [x] Use "clean" method for getting cmake to not specify /EHsc, eliminate those annoying warnings.
  - [ ] All BOOST_NOEXCEPT etc macros need to become BL_NOEXCEPT etc macros which try to set themselves
 from any BOOST_NOEXCEPT if defined, else define one's own. This should solve macro redefinition warnings
 when someone includes Boost before Outcome.
