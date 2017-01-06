@@ -297,7 +297,7 @@ public:
     type = storage_type::value;
   }
 #if BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
-  BOOST_OUTCOME_CONSTEXPR ~BOOST_OUTCOME_VALUE_STORAGE_IMPL() noexcept(is_nothrow_destructible) { clear(); }
+  ~BOOST_OUTCOME_VALUE_STORAGE_IMPL() noexcept(is_nothrow_destructible) { clear(); }
 #endif
   BOOST_OUTCOME_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
   {
