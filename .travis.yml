@@ -1,5 +1,6 @@
 language: cpp
 sudo: false
+compiler: clang  # temporary as Travis' GCC 6 is borked
 os:
  - linux
 branches:
@@ -56,9 +57,10 @@ script:
  -
    if [ "$__" = "Unit tests" ]; then
      cd test;
-     BUILD_EXTRA=1 CXX=g++-6 ./withgcc.sh;
+#     BUILD_EXTRA=1 CXX=clang++ ./withgcc.sh;
+     CXX=clang++ ./withgcc.sh;
      ./unittests_1 || exit 1;
-     ./unittests_coverage || exit 1;
+#     ./unittests_coverage || exit 1;
    fi
  -
    if [ "$__" = "Code bloat tests" ]; then
@@ -71,7 +73,7 @@ script:
    fi
  -
    if [ "$__" = "cmake tests" ]; then
-     CXX=g++-6 ctest -S .ci.cmake -V;
+     CXX=clang++ ctest -S .ci.cmake -V;
    fi
  -
    if [ "$__" = "Documentation" ]; then
@@ -81,7 +83,7 @@ script:
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
-     CXX=g++-6 ctest -S .docs.cmake -V;
+     CXX=clang++ ctest -S .docs.cmake -V;
      cd doc/html;
      git add . || true;
      git commit -a -m "Travis CI updates documentation" || true;

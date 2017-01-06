@@ -41,8 +41,8 @@ Rust and Swift!
 \section prerequisites Prerequisites
 
 Boost.Outcome is a header only C++ 14 library known to work on these compilers or better:
-- GCC 5.0
-- clang 3.7
+- GCC 6.0
+- clang 3.5
 - VS2015 Update 2
 - clang 3.7 with Microsoft Codegen ("winclang")
 
