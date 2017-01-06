@@ -148,7 +148,7 @@ public:
   {
   }
 #if BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
-  BOOST_OUTCOME_CONSTEXPR ~BOOST_OUTCOME_VALUE_STORAGE_IMPL()
+  ~BOOST_OUTCOME_VALUE_STORAGE_IMPL()
 #if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER != 191024728 /* VS2017 RC1*/)
   noexcept(is_nothrow_destructible)
 #endif
