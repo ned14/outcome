@@ -57,10 +57,8 @@ script:
  -
    if [ "$__" = "Unit tests" ]; then
      cd test;
-#     BUILD_EXTRA=1 CXX=clang++ ./withgcc.sh;
      CXX=clang++ ./withgcc.sh;
      ./unittests_1 || exit 1;
-#     ./unittests_coverage || exit 1;
    fi
  -
    if [ "$__" = "Code bloat tests" ]; then
