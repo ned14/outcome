@@ -1,5 +1,7 @@
 <center><table border="0">
 <tr>
+<td align="center"> <a href="https://dedi4.nedprod.com/static/files/boost.outcome-v1.0-source-latest.tar.xz">Source Tarball</a> </td>
+<td align="center"> <a href="https://github.com/ned14/boost.outcome">Boost.Outcome on GitHub</a> </td>
 <td align="center"> <a href="http://my.cdash.org/index.php?project=Boost.Outcome">CTest summary</a><br/><a href="http://my.cdash.org/index.php?project=Boost.Outcome">dashboard</a> </td>
 <td align="center"> <a href="https://travis-ci.org/ned14/boost.outcome">Linux CI:</a><img src="https://travis-ci.org/ned14/boost.outcome.svg?branch=master"/> </td>
 <td align="center"> <a href="https://ci.appveyor.com/project/ned14/boost-outcome/branch/master">Windows CI:</a><img src="https://ci.appveyor.com/api/projects/status/roe4dacos4gnlu66/branch/master?svg=true"/> </td>
@@ -58,6 +60,8 @@ to the following package repositories:
 
 \subsection windows Installing on Windows
 
+\todo This is yet to be implemented
+
 If you are using VS15 or better it comes with VCPkg, a package manager. Open
 a Developer Tools prompt and type:
 
@@ -67,10 +71,14 @@ Once installed it is available for usage in any Visual Studio project.
 
 \subsection linux Installing on Ubuntu/Debian
 
+\todo This is yet to be implemented
+
 <pre>add-apt-repository ppa:ned14/boost.outcome
 apt-get install libboost-outcome-dev</pre>
 
 \subsection osx Installing on OS X
+
+\todo This is yet to be implemented
 
 Assuming you have <a href="http://brew.sh/">homebrew</a> installed, then:
 
@@ -79,15 +87,20 @@ brew install boost.outcome</pre>
 
 \subsection source Installing via source archive
 
-Visit https://dedi4.nedprod.com/static/files/ and download the latest boost.outcome
-tarball. Tarballs are only uploaded if everything built and all tests passed.
+<a href="https://dedi4.nedprod.com/static/files/boost.outcome-v1.0-source-latest.tar.xz">You can
+find the latest boost.outcome to build and pass on all the CIs here.</a>
+https://dedi4.nedprod.com/static/files/boost.outcome also retains the last month of CI passing
+tarballs.
 
 \subsection repo Installing via git subrepository
 
-`git submodule add https://github.com/ned14/boost.outcome`
+<pre>git submodule add https://github.com/ned14/boost.outcome
+cd boost.outcome
+git submodule update --init --recursive
+</pre>
 
 The master branch is automatically set to whichever was the last commit on develop
-branch to pass all unit tests.
+branch to pass all unit tests on Linux and Windows.
 
 \subsection support Support
 
