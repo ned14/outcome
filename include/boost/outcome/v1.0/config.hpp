@@ -218,8 +218,6 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 #else
 #define BOOST_OUTCOME_CONSTEXPR
 #endif
-// Hopefully shortly to be removed, but may need to keep it for VS2015 sanity
-#define BOOST_OUTCOME_CONVINCE_MSVC
 
 #include <cassert>  // for asserting :)
 #include <ostream>  // for printing

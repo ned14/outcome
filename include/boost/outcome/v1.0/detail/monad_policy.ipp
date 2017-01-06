@@ -59,9 +59,9 @@ namespace detail
 
   protected:
     // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_OUTCOME_CONVINCE_MSVC bool _throw_error(monad_errc ec) { BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
     // Common preamble to the below
-    BOOST_OUTCOME_CONVINCE_MSVC void _pre_get_value() const
+    BOOST_OUTCOME_CONSTEXPR void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
         _throw_error(monad_errc::no_state);
@@ -86,79 +86,79 @@ namespace detail
     using const_rvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, const value_type &&, value_type>::type;
 
   public:
-    BOOST_OUTCOME_CONVINCE_MSVC const auto *operator-> () const
+    BOOST_OUTCOME_CONSTEXPR const auto *operator-> () const
     {
       _pre_get_value();
       return &monad_storage::_storage.value;
     }
-    BOOST_OUTCOME_CONVINCE_MSVC auto *operator-> ()
+    BOOST_OUTCOME_CONSTEXPR auto *operator-> ()
     {
       _pre_get_value();
       return &monad_storage::_storage.value;
     }
 
-    BOOST_OUTCOME_CONVINCE_MSVC lvalue_type operator*() &
+    BOOST_OUTCOME_CONSTEXPR lvalue_type operator*() &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
-    BOOST_OUTCOME_CONVINCE_MSVC lvalue_type get() &
+    BOOST_OUTCOME_CONSTEXPR lvalue_type get() &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
-    BOOST_OUTCOME_CONVINCE_MSVC lvalue_type value() &
+    BOOST_OUTCOME_CONSTEXPR lvalue_type value() &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
-    BOOST_OUTCOME_CONVINCE_MSVC const_lvalue_type operator*() const &
+    BOOST_OUTCOME_CONSTEXPR const_lvalue_type operator*() const &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
-    BOOST_OUTCOME_CONVINCE_MSVC const_lvalue_type get() const &
+    BOOST_OUTCOME_CONSTEXPR const_lvalue_type get() const &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
-    BOOST_OUTCOME_CONVINCE_MSVC const_lvalue_type value() const &
+    BOOST_OUTCOME_CONSTEXPR const_lvalue_type value() const &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
-    BOOST_OUTCOME_CONVINCE_MSVC rvalue_type operator*() &&
+    BOOST_OUTCOME_CONSTEXPR rvalue_type operator*() &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
-    BOOST_OUTCOME_CONVINCE_MSVC rvalue_type get() &&
+    BOOST_OUTCOME_CONSTEXPR rvalue_type get() &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
-    BOOST_OUTCOME_CONVINCE_MSVC rvalue_type value() &&
+    BOOST_OUTCOME_CONSTEXPR rvalue_type value() &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
-    BOOST_OUTCOME_CONVINCE_MSVC const_rvalue_type operator*() const &&
+    BOOST_OUTCOME_CONSTEXPR const_rvalue_type operator*() const &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
-    BOOST_OUTCOME_CONVINCE_MSVC const_rvalue_type get() const &&
+    BOOST_OUTCOME_CONSTEXPR const_rvalue_type get() const &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
-    BOOST_OUTCOME_CONVINCE_MSVC const_rvalue_type value() const &&
+    BOOST_OUTCOME_CONSTEXPR const_rvalue_type value() const &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
 #ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
-    BOOST_OUTCOME_CONVINCE_MSVC error_type get_error() const
+    BOOST_OUTCOME_CONSTEXPR error_type get_error() const
     {
       if(!monad_storage::is_ready())
       {
@@ -173,10 +173,10 @@ namespace detail
 #endif
       return error_type();
     }
-    BOOST_OUTCOME_CONVINCE_MSVC error_type error() const { return get_error(); }
+    BOOST_OUTCOME_CONSTEXPR error_type error() const { return get_error(); }
 #endif
 #ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
-    BOOST_OUTCOME_CONVINCE_MSVC exception_type get_exception() const
+    BOOST_OUTCOME_CONSTEXPR exception_type get_exception() const
     {
       if(!monad_storage::is_ready())
       {
@@ -191,7 +191,7 @@ namespace detail
         return monad_storage::_storage.exception;
       return exception_type();
     }
-    BOOST_OUTCOME_CONVINCE_MSVC exception_type exception() const { return get_exception(); }
+    BOOST_OUTCOME_CONSTEXPR exception_type exception() const { return get_exception(); }
 #endif
   };
   template <class monad_storage, class error_type, class exception_type> struct BOOST_OUTCOME_MONAD_POLICY_BASE_NAME<monad_storage, void, error_type, exception_type> : public monad_storage
@@ -204,9 +204,9 @@ namespace detail
 
   protected:
     // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_OUTCOME_CONVINCE_MSVC bool _throw_error(monad_errc ec) { BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
     // Common preamble to the below
-    BOOST_OUTCOME_CONVINCE_MSVC void _pre_get_value() const
+    BOOST_OUTCOME_CONSTEXPR void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
         _throw_error(monad_errc::no_state);
@@ -226,20 +226,20 @@ namespace detail
     }
 
   public:
-    BOOST_OUTCOME_CONVINCE_MSVC void operator*() & { _pre_get_value(); }
-    BOOST_OUTCOME_CONVINCE_MSVC void get() & { _pre_get_value(); }
-    BOOST_OUTCOME_CONVINCE_MSVC void value() & { _pre_get_value(); }
-    BOOST_OUTCOME_CONVINCE_MSVC void operator*() const & { _pre_get_value(); }
-    BOOST_OUTCOME_CONVINCE_MSVC void get() const & { _pre_get_value(); }
-    BOOST_OUTCOME_CONVINCE_MSVC void value() const & { _pre_get_value(); }
-    BOOST_OUTCOME_CONVINCE_MSVC void operator*() && { _pre_get_value(); }
-    BOOST_OUTCOME_CONVINCE_MSVC void get() && { _pre_get_value(); }
-    BOOST_OUTCOME_CONVINCE_MSVC void value() && { _pre_get_value(); }
-    BOOST_OUTCOME_CONVINCE_MSVC void operator*() const && { _pre_get_value(); }
-    BOOST_OUTCOME_CONVINCE_MSVC void get() const && { _pre_get_value(); }
-    BOOST_OUTCOME_CONVINCE_MSVC void value() const && { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR void operator*() & { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR void get() & { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR void value() & { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR void operator*() const & { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR void get() const & { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR void value() const & { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR void operator*() && { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR void get() && { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR void value() && { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR void operator*() const && { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR void get() const && { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR void value() const && { _pre_get_value(); }
 #ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
-    BOOST_OUTCOME_CONVINCE_MSVC error_type get_error() const
+    BOOST_OUTCOME_CONSTEXPR error_type get_error() const
     {
       if(!monad_storage::is_ready())
       {
@@ -254,10 +254,10 @@ namespace detail
 #endif
       return error_type();
     }
-    BOOST_OUTCOME_CONVINCE_MSVC error_type error() const { return get_error(); }
+    BOOST_OUTCOME_CONSTEXPR error_type error() const { return get_error(); }
 #endif
 #ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
-    BOOST_OUTCOME_CONVINCE_MSVC exception_type get_exception() const
+    BOOST_OUTCOME_CONSTEXPR exception_type get_exception() const
     {
       if(!monad_storage::is_ready())
       {
@@ -272,7 +272,7 @@ namespace detail
         return monad_storage::_storage.exception;
       return exception_type();
     }
-    BOOST_OUTCOME_CONVINCE_MSVC exception_type exception() const { return get_exception(); }
+    BOOST_OUTCOME_CONSTEXPR exception_type exception() const { return get_exception(); }
 #endif
   };
 
