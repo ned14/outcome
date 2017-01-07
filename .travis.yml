@@ -1,5 +1,6 @@
-dist: trusty
+#dist: trusty
 language: cpp
+compiler: clang-3.9
 sudo: false
 os:
  - linux
@@ -16,9 +17,10 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     - george-edison55-precise-backports
-#    - llvm-toolchain-precise-3.8  ## not currently working due to bad source signing key
+    - llvm-toolchain-precise-3.9
     packages:
     - g++-6
+    - clang-3.9
     - python3
     - cmake
     - cmake-data
@@ -57,13 +59,14 @@ script:
  -
    if [ "$__" = "Unit tests" ]; then
      cd test;
-     CXX=g++-6 ./withgcc.sh;
+     BUILD_EXTRA=1 CXX=clang++-3.9 ./withgcc.sh;
      ./unittests_1 || exit 1;
+     ./unittests_coverage || exit 1;
    fi
  -
    if [ "$__" = "Code bloat tests" ]; then
      cd test/constexprs;
-     CXX=g++-6 ./with_clang_gcc.sh;
+     ./with_clang_gcc.sh;
      cat results.xml;
      if grep -q "failure message" results.xml; then
        exit 1;
@@ -71,7 +74,7 @@ script:
    fi
  -
    if [ "$__" = "cmake tests" ]; then
-     CXX=g++-6 ctest -S .ci.cmake -V;
+     CXX=clang++-3.9 ctest -S .ci.cmake -V;
    fi
  -
    if [ "$__" = "Documentation" ]; then
@@ -81,7 +84,7 @@ script:
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
-     CXX=g++-6 ctest -S .docs.cmake -V;
+     CXX=clang++-3.9 ctest -S .docs.cmake -V;
      cd doc/html;
      git add . || true;
      git commit -a -m "Travis CI updates documentation" || true;
