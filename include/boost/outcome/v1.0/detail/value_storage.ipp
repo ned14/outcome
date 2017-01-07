@@ -148,7 +148,7 @@ public:
   {
   }
 #if BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
-  BOOST_OUTCOME_CONVINCE_MSVC ~BOOST_OUTCOME_VALUE_STORAGE_IMPL()
+  ~BOOST_OUTCOME_VALUE_STORAGE_IMPL()
 #if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER != 191024728 /* VS2017 RC1*/)
   noexcept(is_nothrow_destructible)
 #endif
@@ -297,7 +297,7 @@ public:
     type = storage_type::value;
   }
 #if BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
-  BOOST_OUTCOME_CONVINCE_MSVC ~BOOST_OUTCOME_VALUE_STORAGE_IMPL() noexcept(is_nothrow_destructible) { clear(); }
+  ~BOOST_OUTCOME_VALUE_STORAGE_IMPL() noexcept(is_nothrow_destructible) { clear(); }
 #endif
   BOOST_OUTCOME_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
   {

@@ -1,15 +1,15 @@
-<center><table border="0">
+<center><table border="0" cellpadding="4">
 <tr>
-<td align="center"> <a href="https://dedi4.nedprod.com/static/files/boost.outcome-v1.0-source-latest.tar.xz">Source Tarball</a> </td>
-<td align="center"> <a href="https://github.com/ned14/boost.outcome">Boost.Outcome on GitHub</a> </td>
-<td align="center"> <a href="http://my.cdash.org/index.php?project=Boost.Outcome">CTest summary</a><br/><a href="http://my.cdash.org/index.php?project=Boost.Outcome">dashboard</a> </td>
+<td align="center"> <a href="https://dedi4.nedprod.com/static/files/boost.outcome-v1.0-source-latest.tar.xz">Source</a><br><a href="https://dedi4.nedprod.com/static/files/boost.outcome-v1.0-source-latest.tar.xz">Tarball</a> </td>
+<td align="center"> <a href="https://github.com/ned14/boost.outcome">Boost.Outcome</a><br><a href="https://github.com/ned14/boost.outcome">on GitHub</a> </td>
+<td align="center"> <a href="http://my.cdash.org/index.php?project=Boost.Outcome">CTest summary</a><br><a href="http://my.cdash.org/index.php?project=Boost.Outcome">dashboard</a> </td>
 <td align="center"> <a href="https://travis-ci.org/ned14/boost.outcome">Linux CI:</a><img src="https://travis-ci.org/ned14/boost.outcome.svg?branch=master"/> </td>
 <td align="center"> <a href="https://ci.appveyor.com/project/ned14/boost-outcome/branch/master">Windows CI:</a><img src="https://ci.appveyor.com/api/projects/status/roe4dacos4gnlu66/branch/master?svg=true"/> </td>
 <td align="center"> <a href="https://coveralls.io/r/ned14/boost.outcome?branch=master">Coverage:</a><img src="https://coveralls.io/repos/ned14/boost.outcome/badge.svg?branch=master"/> </td>
 </tr>
 </table></center>
 
-\tableofcontents
+[TOC]
 
 \section description Description
 
@@ -38,69 +38,38 @@ Rust and Swift!
 
 <br><hr><br>
 
-\section prerequisites Prerequisites and Installation
+\section prerequisites Prerequisites
 
-Boost.Outcome is a header only library known to work on these compilers or better:
-- GCC 5.0
-- clang 3.7
+Boost.Outcome is a header only C++ 14 library known to work on these compilers or better:
+- GCC 6.0
+- clang 3.5
 - VS2015 Update 2
 - clang 3.7 with Microsoft Codegen ("winclang")
 
-Its sole mandatory dependency is on https://github.com/ned14/boost-lite, a minimal
-emulation of Boost for C++ 14. A copy is embedded internally so a copy of Boost is
-**not** required to use this library. You can simply drop Outcome into your project
-and go, including Outcome using one of these depending on how you install Outcome:
+**A copy of Boost is not required to use this library**. You can simply drop Outcome into
+your project and go.
 
-- \code #include <boost/outcome.hpp> \endcode
-- \code #include "boost.outcome/include/boost/outcome.hpp" \endcode
+\warning VS2015 generates a lot of code bloat when using Outcome in large code bases.
+If you can use VS2017 which implements C++ 14 constexpr and has a better optimiser for
+modern C++, you will see much tigher executables. Execution speed is pretty similar
+between the two, and remains lower than GCC or clang which generate close to optimally
+minimum sized output with Outcome at all times.
 
-Each commit is tested by Travis and Appveyor. A nightly cronjob figures out which
-latest commit all tests passed for all supported platforms and pushes a distribution
-to the following package repositories:
 
-\subsection windows Installing on Windows
+\ref installation
 
-\todo This is yet to be implemented
 
-If you are using VS15 or better it comes with VCPkg, a package manager. Open
-a Developer Tools prompt and type:
 
-`vcpkg install boost.outcome`
 
-Once installed it is available for usage in any Visual Studio project.
 
-\subsection linux Installing on Ubuntu/Debian
 
-\todo This is yet to be implemented
 
-<pre>add-apt-repository ppa:ned14/boost.outcome
-apt-get install libboost-outcome-dev</pre>
 
-\subsection osx Installing on OS X
 
-\todo This is yet to be implemented
 
-Assuming you have <a href="http://brew.sh/">homebrew</a> installed, then:
 
-<pre>brew tap ned14/tap
-brew install boost.outcome</pre>
 
-\subsection source Installing via source archive
 
-<a href="https://dedi4.nedprod.com/static/files/boost.outcome-v1.0-source-latest.tar.xz">You can
-find the latest boost.outcome to build and pass on all the CIs here.</a>
-https://dedi4.nedprod.com/static/files/boost.outcome also retains the last month of CI passing
-tarballs.
-
-\subsection repo Installing via git subrepository
-
-<pre>git submodule add https://github.com/ned14/boost.outcome
-cd boost.outcome
-git submodule update --init --recursive
-</pre>
-
-The master branch is automatically set to whichever was the last commit on develop
-branch to pass all unit tests on Linux and Windows.
 
 \subsection support Support
 

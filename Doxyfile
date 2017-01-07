@@ -768,7 +768,7 @@ WARN_LOGFILE           = doxygen_warnings.log
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = release_notes.md \
+INPUT                  = doc/md \
                          include/boost/outcome \
                          include/boost/outcome/v1.0
 
@@ -911,7 +911,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE = release_notes.md
+USE_MDFILE_AS_MAINPAGE = mainpage.md
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
@@ -1221,7 +1221,7 @@ DOCSET_FEEDNAME        = "Doxygen generated docs"
 # The default value is: org.doxygen.Project.
 # This tag requires that the tag GENERATE_DOCSET is set to YES.
 
-DOCSET_BUNDLE_ID       = org.doxygen.Project
+DOCSET_BUNDLE_ID       = org.doxygen.boostoutcome
 
 # The DOCSET_PUBLISHER_ID tag specifies a string that should uniquely identify
 # the documentation publisher. This should be a reverse domain-name style
@@ -1229,13 +1229,13 @@ DOCSET_BUNDLE_ID       = org.doxygen.Project
 # The default value is: org.doxygen.Publisher.
 # This tag requires that the tag GENERATE_DOCSET is set to YES.
 
-DOCSET_PUBLISHER_ID    = org.doxygen.Publisher
+DOCSET_PUBLISHER_ID    = org.doxygen.nedproductions
 
 # The DOCSET_PUBLISHER_NAME tag identifies the documentation publisher.
 # The default value is: Publisher.
 # This tag requires that the tag GENERATE_DOCSET is set to YES.
 
-DOCSET_PUBLISHER_NAME  = Publisher
+DOCSET_PUBLISHER_NAME  = ned Productions
 
 # If the GENERATE_HTMLHELP tag is set to YES then doxygen generates three
 # additional HTML index files: index.hhp, index.hhc, and index.hhk. The
@@ -1320,7 +1320,7 @@ QCH_FILE               =
 # The default value is: org.doxygen.Project.
 # This tag requires that the tag GENERATE_QHP is set to YES.
 
-QHP_NAMESPACE          = org.doxygen.Project
+QHP_NAMESPACE          = org.doxygen.boostoutcome
 
 # The QHP_VIRTUAL_FOLDER tag specifies the namespace to use when generating Qt
 # Help Project output. For more information please see Qt Help Project / Virtual
@@ -1379,7 +1379,7 @@ GENERATE_ECLIPSEHELP   = NO
 # The default value is: org.doxygen.Project.
 # This tag requires that the tag GENERATE_ECLIPSEHELP is set to YES.
 
-ECLIPSE_DOC_ID         = org.doxygen.Project
+ECLIPSE_DOC_ID         = org.doxygen.boostoutcome
 
 # If you want full control over the layout of the generated HTML pages it might
 # be necessary to disable the index and replace it with your own. The
@@ -2022,8 +2022,7 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = DOXYGEN_IS_IN_THE_HOUSE=1 DOXYGEN_SHOULD_SKIP_THIS=1 \
     BOOST_OUTCOME_CONSTEXPR=constexpr \
-    BOOST_OUTCOME_ENABLE_OPERATORS=1 \
-    BOOST_OUTCOME_CONVINCE_MSVC=constexpr
+    BOOST_OUTCOME_ENABLE_OPERATORS=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
@@ -2032,7 +2031,7 @@ PREDEFINED             = DOXYGEN_IS_IN_THE_HOUSE=1 DOXYGEN_SHOULD_SKIP_THIS=1 \
 # definition found in the source code.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-EXPAND_AS_DEFINED      = BOOSTLITE_CONSTEXPR \
+EXPAND_AS_DEFINED      = BOOST_OUTCOME_CONSTEXPR \
     BOOST_OUTCOME_V1_NAMESPACE BOOST_OUTCOME_V1_NAMESPACE_BEGIN BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN BOOST_OUTCOME_V1_NAMESPACE_END \
     BOOST_OUTCOME_VERSION_GLUE2 BOOST_OUTCOME_VERSION_GLUE BOOST_OUTCOME_HEADERS_PATH4 BOOST_OUTCOME_HEADERS_PATH3 BOOST_OUTCOME_HEADERS_PATH2 \
     BOOST_OUTCOME_HEADERS_PATH BOOST_OUTCOME_MODULE_NAME \

@@ -1,3 +1,4 @@
+dist: trusty
 language: cpp
 sudo: false
 os:
@@ -56,14 +57,13 @@ script:
  -
    if [ "$__" = "Unit tests" ]; then
      cd test;
-     BUILD_EXTRA=1 CXX=g++-6 ./withgcc.sh;
+     CXX=g++-6 ./withgcc.sh;
      ./unittests_1 || exit 1;
-     ./unittests_coverage || exit 1;
    fi
  -
    if [ "$__" = "Code bloat tests" ]; then
      cd test/constexprs;
-     ./with_clang_gcc.sh;
+     CXX=g++-6 ./with_clang_gcc.sh;
      cat results.xml;
      if grep -q "failure message" results.xml; then
        exit 1;

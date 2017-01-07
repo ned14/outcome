@@ -16,7 +16,7 @@ Past tarballs of source with all tests passing on Linux and Windows: https://ded
 Todo:
  - [x] Use "clean" method for getting cmake to not specify /EHsc, eliminate those annoying warnings.
  - [x] Don't define BOOST_* C++ feature macros so we don't collide with Boost anymore.
- - [ ] Test relaxed constexpr in VS15 once that is released and delete the hack macro.
+ - [x] Test relaxed constexpr in VS15 once that is released and delete the hack macro.
  - [ ] `make install` needs to install dependency headers too
  - [ ] Add config where in release mode the exception throwing macros generate link errors
 for symbols with the function name and line number in them.
