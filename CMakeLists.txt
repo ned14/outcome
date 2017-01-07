@@ -82,7 +82,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
     CXX_STANDARD 14
   )
   add_test(NAME outcome_hl--unittests_noexcept CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
-    COMMAND $<TARGET_FILE:outcome_hl--unittests_noexcept> --reporter junit --out outcome_hl--unittests_noexcept.junit.xml
+    COMMAND $<TARGET_FILE:outcome_hl--unittests_noexcept> --reporter junit --out $<TARGET_FILE:outcome_hl--unittests_noexcept>.junit.xml
   )
 endif()
 
