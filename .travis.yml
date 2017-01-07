@@ -1,7 +1,7 @@
 dist: trusty
 language: cpp
 compiler:
-# - g++-6
+ - g++-6
  - clang
 sudo: false
 os:
