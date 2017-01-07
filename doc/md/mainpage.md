@@ -49,11 +49,11 @@ Boost.Outcome is a header only C++ 14 library known to work on these compilers o
 **A copy of Boost is not required to use this library**. You can simply drop Outcome into
 your project and go.
 
-\warning VS2015 generates a lot of code bloat when using Outcome in large code bases.
+\warning MSVC generates significant code bloat when using Outcome in large code bases.
 If you can use VS2017 which implements C++ 14 constexpr and has a better optimiser for
-modern C++, you will see much tigher executables. Execution speed is pretty similar
-between the two, and remains lower than GCC or clang which generate close to optimally
-minimum sized output with Outcome at all times.
+modern C++, you will see tigher executables. Execution speed is not particularly
+different, though one would have thought the extra cache load caused by code bloat might
+affect some applications. In this situation, use LLVM clang targeting the MSVC ABI.
 
 
 \ref installation
