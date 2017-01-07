@@ -1,11 +1,12 @@
 dist: trusty
 language: cpp
 compiler:
- - g++-6
+# - g++-6   # disabled until ubuntu-toolchain-r-test fix their borked GCC 6.2 build
  - clang
 sudo: false
 os:
  - linux
+ - osx
 branches:
   only:
     - develop
@@ -34,6 +35,15 @@ env:
  - __="Code bloat tests"
  - __="cmake tests" NAME=TravisLinuxWorker
  - __="Documentation" NAME=TravisDocumentation
+ 
+matrix:
+  exclude:
+  - os: osx
+    env: __="Unit tests"
+  - os: osx
+    env: __="Code bloat tests"
+  - os: osx
+    env: __="Documentation" NAME=TravisDocumentation
  
 #cache:
 #  apt: true
