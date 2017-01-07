@@ -33,17 +33,22 @@ addons:
 env:
  - __="Unit tests"
  - __="Code bloat tests"
- - __="cmake tests" NAME=TravisLinuxWorker
  - __="Documentation" NAME=TravisDocumentation
+ - __="cmake tests" NAME=TravisLinuxWorker
+ - __="cmake tests" NAME=TravisOSXWorker
  
 matrix:
   exclude:
+  - os: linux
+    env: __="cmake tests" NAME=TravisOSXWorker
   - os: osx
     env: __="Unit tests"
   - os: osx
     env: __="Code bloat tests"
   - os: osx
     env: __="Documentation" NAME=TravisDocumentation
+  - os: osx
+    env: __="cmake tests" NAME=TravisLinuxWorker
  
 #cache:
 #  apt: true

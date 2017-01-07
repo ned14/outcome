@@ -43,7 +43,6 @@ all_compile_features(PUBLIC
   cxx_variadic_templates
   cxx_noexcept
   cxx_constexpr
-  cxx_thread_local
   cxx_lambda_init_captures
   cxx_attributes
   cxx_generic_lambdas
