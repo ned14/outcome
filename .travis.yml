@@ -35,12 +35,12 @@ env:
  - __="Code bloat tests"
  - __="Documentation" NAME=TravisDocumentation
  - __="cmake tests" NAME=TravisLinuxWorker
- - __="cmake tests" NAME=TravisOSXWorker
+ - __="cmake tests osx" NAME=TravisOSXWorker
  
 matrix:
   exclude:
   - os: linux
-    env: __="cmake tests" NAME=TravisOSXWorker
+    env: __="cmake tests osx" NAME=TravisOSXWorker
   - os: osx
     env: __="Unit tests"
   - os: osx
@@ -93,6 +93,10 @@ script:
  -
    if [ "$__" = "cmake tests" ]; then
      ctest -S .ci.cmake -V;
+   fi
+ -
+   if [ "$__" = "cmake tests osx" ]; then
+     ctest -S .ci.cmake -V -E noexcept;
    fi
  -
    if [ "$__" = "Documentation" ]; then
