@@ -1,6 +1,8 @@
 dist: trusty
 language: cpp
-compiler: clang-3.9
+compiler:
+ - g++-6
+ - clang
 sudo: false
 os:
  - linux
@@ -32,34 +34,33 @@ env:
  - __="cmake tests" NAME=TravisLinuxWorker
  - __="Documentation" NAME=TravisDocumentation
  
-cache:
-  apt: true
-  directories:
-    - llvm-3.9.1
+#cache:
+#  apt: true
+#  directories:
+#    - llvm-3.9.1
     
 before_install:
- -
-    LLVM_VERSION=3.9.1;
-    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-      if [ -z "$(ls -A llvm-$LLVM_VERSION)" ]; then
-        wget -O llvm-$LLVM_VERSION.tar.xz http://llvm.org/releases/$LLVM_VERSION/clang+llvm-$LLVM_VERSION-x86_64-linux-gnu-debian8.tar.xz;
-        mkdir llvm-$LLVM_VERSION;
-        xzcat llvm-$LLVM_VERSION.tar.xz | tar -xvf - --strip 1 -C llvm-$LLVM_VERSION;
-        cd llvm-$LLVM_VERSION/bin;
-        ln -s clang-3.9 clang++-3.9;
-        cd ../..;
-      fi;
-      llvm-$LLVM_VERSION/bin/llvm-config --version;
-      export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
-      export PATH="$PWD/llvm-$LLVM_VERSION/bin:$PATH";
-    fi
- - git checkout develop
+# -
+#    LLVM_VERSION=3.9.1;
+#    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+#      if [ -z "$(ls -A llvm-$LLVM_VERSION)" ]; then
+#        wget -O llvm-$LLVM_VERSION.tar.xz http://llvm.org/releases/$LLVM_VERSION/clang+llvm-$LLVM_VERSION-x86_64-linux-gnu-debian8.tar.xz;
+#        mkdir llvm-$LLVM_VERSION;
+#        xzcat llvm-$LLVM_VERSION.tar.xz | tar -xvf - --strip 1 -C llvm-$LLVM_VERSION;
+#        cd llvm-$LLVM_VERSION/bin;
+#        ln -s clang-3.9 clang++-3.9;
+#        cd ../..;
+#      fi;
+#      llvm-$LLVM_VERSION/bin/llvm-config --version;
+#      export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
+#      export PATH="$PWD/llvm-$LLVM_VERSION/bin:$PATH";
+#    fi
 
 script:
  -
    if [ "$__" = "Unit tests" ]; then
      cd test;
-     BUILD_EXTRA=1 CXX=clang++-3.9 ./withgcc.sh;
+     BUILD_EXTRA=1 ./withgcc.sh;
      ./unittests_1 || exit 1;
      ./unittests_coverage || exit 1;
    fi
@@ -74,7 +75,7 @@ script:
    fi
  -
    if [ "$__" = "cmake tests" ]; then
-     CXX=clang++-3.9 ctest -S .ci.cmake -V;
+     ctest -S .ci.cmake -V;
    fi
  -
    if [ "$__" = "Documentation" ]; then
@@ -84,7 +85,7 @@ script:
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
-     CXX=clang++-3.9 ctest -S .docs.cmake -V;
+     ctest -S .docs.cmake -V;
      cd doc/html;
      git add . || true;
      git commit -a -m "Travis CI updates documentation" || true;
