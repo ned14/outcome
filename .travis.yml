@@ -62,7 +62,7 @@ script:
  -
    if [ "$__" = "Unit tests" ]; then
      cd test;
-     BUILD_EXTRA=1 ./withgcc.sh;
+     BUILD_EXTRA=1 ./withgcc.sh || true;
      ./unittests_1 || exit 1;
      ./unittests_coverage || exit 1;
    fi
