@@ -1,4 +1,4 @@
-#dist: trusty
+dist: trusty
 language: cpp
 compiler: clang-3.9
 sudo: false
@@ -17,10 +17,10 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     - george-edison55-precise-backports
-    - llvm-toolchain-precise
+#    - llvm-toolchain-precise
     packages:
     - g++-6
-    - clang-3.9
+#    - clang-3.9
     - python3
     - cmake
     - cmake-data
@@ -35,18 +35,18 @@ env:
 cache:
   apt: true
   directories:
-    - llvm-3.8.0
+    - llvm-3.9.1
     
 before_install:
  -
-    LLVM_VERSION=3.8.0;
+    LLVM_VERSION=3.9.1;
     if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
       if [ -z "$(ls -A llvm-$LLVM_VERSION)" ]; then
-        wget -O llvm-$LLVM_VERSION.tar.xz http://llvm.org/releases/$LLVM_VERSION/clang+llvm-$LLVM_VERSION-x86_64-linux-gnu-ubuntu-14.04.tar.xz;
+        wget -O llvm-$LLVM_VERSION.tar.xz http://llvm.org/releases/$LLVM_VERSION/clang+llvm-$LLVM_VERSION-x86_64-linux-gnu-debian8.tar.xz;
         mkdir llvm-$LLVM_VERSION;
         xzcat llvm-$LLVM_VERSION.tar.xz | tar -xvf - --strip 1 -C llvm-$LLVM_VERSION;
         cd llvm-$LLVM_VERSION/bin;
-        ln -s clang-3.8 clang++-3.8;
+        ln -s clang-3.9 clang++-3.9;
         cd ../..;
       fi;
       llvm-$LLVM_VERSION/bin/llvm-config --version;
