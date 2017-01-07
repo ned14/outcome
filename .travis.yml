@@ -1,7 +1,7 @@
 dist: trusty
 language: cpp
 compiler:
- - g++-7
+# - g++-6
  - clang
 sudo: false
 os:
@@ -18,10 +18,11 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - george-edison55-precise-backports
+#    - george-edison55-precise-backports
+#    - george-edison55-cmake-3.x
 #    - llvm-toolchain-precise
     packages:
-    - g++-7
+    - g++-6
 #    - clang-3.9
     - python3
     - cmake
@@ -55,7 +56,7 @@ before_install:
 #      export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
 #      export PATH="$PWD/llvm-$LLVM_VERSION/bin:$PATH";
 #    fi
- - if [ "$CXX" = "g++" ]; then export CXX=g++-7; fi
+ - if [ "$CXX" = "g++" ]; then export CXX=g++-6; fi
 
 script:
  -

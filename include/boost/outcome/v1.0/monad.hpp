@@ -2022,6 +2022,7 @@ template <class T> constexpr inline outcome<T> make_ready_outcome(const T &v)
 template <class T = void> constexpr inline outcome<T> make_ready_outcome()
 {
   static_assert(!std::is_same<T, T>::value, "Empty make_ready_outcome<T> not specialised");
+  return outcome<T>();
 }
 template <> inline outcome<void> make_ready_outcome<void>()
 {
@@ -2094,6 +2095,7 @@ template <class T> constexpr inline result<T> make_ready_result(const T &v)
 template <class T = void> constexpr inline result<T> make_ready_result()
 {
   static_assert(!std::is_same<T, T>::value, "Empty make_ready_result<T> not specialised");
+  return result<T>();
 }
 template <> inline result<void> make_ready_result<void>()
 {
@@ -2157,6 +2159,7 @@ template <class T> constexpr inline option<T> make_ready_option(const T &v)
 template <class T = void> constexpr inline option<T> make_ready_option()
 {
   static_assert(!std::is_same<T, T>::value, "Empty make_ready_option<T> not specialised");
+  return option<T>();
 }
 template <> constexpr inline option<void> make_ready_option<void>()
 {
