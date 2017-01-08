@@ -7,7 +7,7 @@ A nightly cronjob figures out which latest commit all tests passed for all those
 merges that commit to master branch. From that master branch, a distribution is made to the following package
 repositories.
 
-\subsection windows Installing on Windows
+\section windows Installing on Windows
 
 \todo This is yet to be implemented
 
@@ -20,7 +20,7 @@ Once installed it is available for usage in any Visual Studio project using:
 
 \code #include <boost/outcome.hpp> \endcode
 
-\subsection ubuntu Installing on Ubuntu/Debian
+\section ubuntu Installing on Ubuntu/Debian
 
 \todo This is yet to be implemented
 
@@ -31,7 +31,7 @@ Once installed it is available for usage in any C++ 14 project using:
 
 \code #include <boost/outcome.hpp> \endcode
 
-\subsection osx Installing on OS X
+\section osx Installing on OS X
 
 \todo This is yet to be implemented
 
@@ -44,7 +44,7 @@ Once installed it is available for usage in any C++ 14 project using:
 
 \code #include <boost/outcome.hpp> \endcode
 
-\subsection tarball Installing via source tarball (all other platforms)
+\section tarball Installing via source tarball (all other platforms)
 
 Outcome is a header only C++ library with no external dependencies and therefore requires no
 compilation - <a href="https://dedi4.nedprod.com/static/files/boost.outcome-v1.0-source-latest.tar.xz">
@@ -55,7 +55,7 @@ simply download and untar this tarball</a> and you can use Outcome via:
 If you need a slightly older Outcome, https://dedi4.nedprod.com/static/files/boost.outcome
 retains the last month of CI passing tarballs.
 
-\subsection gitsubrepo Installing via git subrepository into your project's git repository
+\section gitsubrepo Installing via git subrepository into your project's git repository
 
 This route has the big advantage of automatically staying up to date with bugs fixes in
 Outcome. Simply do:

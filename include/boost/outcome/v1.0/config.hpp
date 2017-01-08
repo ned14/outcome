@@ -262,8 +262,10 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 #endif
 
 #ifndef BOOST_OUTCOME_THROW_MONAD_ERROR
-//! Predefine to have something else occur when Outcome throws a monad_error due to being asked to do something not possible
-#define BOOST_OUTCOME_THROW_MONAD_ERROR(ec, expr) BOOST_OUTCOME_THROW(expr)
+/*! Predefine to have something else occur when Outcome throws a monad_error due to being asked to do something not possible
+\return Can return false to cancel the calling operation (see `_throw_error()` in monad_policy.ipp).
+*/
+#define BOOST_OUTCOME_THROW_MONAD_ERROR(ec, expr) BOOST_OUTCOME_THROW(expr), false
 #endif
 
 #ifndef BOOST_OUTCOME_THROW_SYSTEM_ERROR

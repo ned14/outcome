@@ -59,7 +59,7 @@ namespace detail
 
   protected:
     // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
     // Common preamble to the below
     BOOST_OUTCOME_CONSTEXPR void _pre_get_value() const
     {
@@ -204,7 +204,7 @@ namespace detail
 
   protected:
     // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
     // Common preamble to the below
     BOOST_OUTCOME_CONSTEXPR void _pre_get_value() const
     {

@@ -1,8 +1,12 @@
 dist: trusty
 language: cpp
+compiler:
+# - g++-6   # disabled until ubuntu-toolchain-r-test fix their borked GCC 6.2 build
+ - clang
 sudo: false
 os:
  - linux
+ - osx
 branches:
   only:
     - develop
@@ -15,10 +19,12 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - george-edison55-precise-backports
-#    - llvm-toolchain-precise-3.8  ## not currently working due to bad source signing key
+#    - george-edison55-precise-backports
+#    - george-edison55-cmake-3.x
+#    - llvm-toolchain-precise
     packages:
     - g++-6
+#    - clang-3.9
     - python3
     - cmake
     - cmake-data
@@ -27,43 +33,58 @@ addons:
 env:
  - __="Unit tests"
  - __="Code bloat tests"
- - __="cmake tests" NAME=TravisLinuxWorker
  - __="Documentation" NAME=TravisDocumentation
+ - __="cmake tests" NAME=TravisLinuxWorker
+ - __="cmake tests osx" NAME=TravisOSXWorker
  
-cache:
-  apt: true
-  directories:
-    - llvm-3.8.0
+matrix:
+  exclude:
+  - os: linux
+    env: __="cmake tests osx" NAME=TravisOSXWorker
+  - os: osx
+    env: __="Unit tests"
+  - os: osx
+    env: __="Code bloat tests"
+  - os: osx
+    env: __="Documentation" NAME=TravisDocumentation
+  - os: osx
+    env: __="cmake tests" NAME=TravisLinuxWorker
+ 
+#cache:
+#  apt: true
+#  directories:
+#    - llvm-3.9.1
     
 before_install:
- -
-    LLVM_VERSION=3.8.0;
-    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-      if [ -z "$(ls -A llvm-$LLVM_VERSION)" ]; then
-        wget -O llvm-$LLVM_VERSION.tar.xz http://llvm.org/releases/$LLVM_VERSION/clang+llvm-$LLVM_VERSION-x86_64-linux-gnu-ubuntu-14.04.tar.xz;
-        mkdir llvm-$LLVM_VERSION;
-        xzcat llvm-$LLVM_VERSION.tar.xz | tar -xvf - --strip 1 -C llvm-$LLVM_VERSION;
-        cd llvm-$LLVM_VERSION/bin;
-        ln -s clang-3.8 clang++-3.8;
-        cd ../..;
-      fi;
-      llvm-$LLVM_VERSION/bin/llvm-config --version;
-      export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
-      export PATH="$PWD/llvm-$LLVM_VERSION/bin:$PATH";
-    fi
- - git checkout develop
+# -
+#    LLVM_VERSION=3.9.1;
+#    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+#      if [ -z "$(ls -A llvm-$LLVM_VERSION)" ]; then
+#        wget -O llvm-$LLVM_VERSION.tar.xz http://llvm.org/releases/$LLVM_VERSION/clang+llvm-$LLVM_VERSION-x86_64-linux-gnu-debian8.tar.xz;
+#        mkdir llvm-$LLVM_VERSION;
+#        xzcat llvm-$LLVM_VERSION.tar.xz | tar -xvf - --strip 1 -C llvm-$LLVM_VERSION;
+#        cd llvm-$LLVM_VERSION/bin;
+#        ln -s clang-3.9 clang++-3.9;
+#        cd ../..;
+#      fi;
+#      llvm-$LLVM_VERSION/bin/llvm-config --version;
+#      export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
+#      export PATH="$PWD/llvm-$LLVM_VERSION/bin:$PATH";
+#    fi
+ - if [ "$CXX" = "g++" ]; then export CXX=g++-6; fi
 
 script:
  -
    if [ "$__" = "Unit tests" ]; then
      cd test;
-     CXX=g++-6 ./withgcc.sh;
+     BUILD_EXTRA=1 ./withgcc.sh || true;
      ./unittests_1 || exit 1;
+     ./unittests_coverage || exit 1;
    fi
  -
    if [ "$__" = "Code bloat tests" ]; then
      cd test/constexprs;
-     CXX=g++-6 ./with_clang_gcc.sh;
+     ./with_clang_gcc.sh;
      cat results.xml;
      if grep -q "failure message" results.xml; then
        exit 1;
@@ -71,7 +92,11 @@ script:
    fi
  -
    if [ "$__" = "cmake tests" ]; then
-     CXX=g++-6 ctest -S .ci.cmake -V;
+     ctest -S .ci.cmake -V;
+   fi
+ -
+   if [ "$__" = "cmake tests osx" ]; then
+     ctest -S .ci.cmake -V -E noexcept;
    fi
  -
    if [ "$__" = "Documentation" ]; then
@@ -81,7 +106,7 @@ script:
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
-     CXX=g++-6 ctest -S .docs.cmake -V;
+     ctest -S .docs.cmake -V;
      cd doc/html;
      git add . || true;
      git commit -a -m "Travis CI updates documentation" || true;
