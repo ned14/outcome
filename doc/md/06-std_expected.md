@@ -1,5 +1,5 @@
-\anchor std-expected
 # Outcome and the upcoming std::expected<T, E>
+\anchor std-expected
 
 C++ 17 isn't finished at the time of writing, but we are very sure that at least
 <a href="http://en.cppreference.com/w/cpp/utility/optional">`std::optional<T>`</a>

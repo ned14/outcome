@@ -274,7 +274,7 @@ Outcome also provides some very useful helper macros you'll find yourself using 
 for the same operation in each of `T`, `EC` and `E`. If the same operation on any
 of those types can throw, so can the basic_monad's operation.
 
-[2]: The trait \ref boost::outcome::v1_xxx::enable_single_byte_value_storage<T> determines if
+[2]: The trait \ref boost::outcome::v1_xxx::enable_single_byte_value_storage determines if
 a single byte is used to store `T`, in which case you will not be returned a pointer
 nor reference to `T`. It is enabled for `bool` and `void` unless the
 macro \ref BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE is defined.

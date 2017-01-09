@@ -1,5 +1,5 @@
-\anchor tutorial
 # Tutorial
+\anchor tutorial
 
 Outcome's utility cannot be fully understood without understanding how C++ does
 error handling. Due to C++'s maturity, error handling takes many forms which
