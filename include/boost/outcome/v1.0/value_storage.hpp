@@ -80,6 +80,12 @@ constexpr exception_t exception = exception_t();
 template <class _value_type> struct enable_single_byte_value_storage : std::false_type
 {
 };
+//! \def BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE
+//! \brief Define to disable coercing option<void> and option<bool> into a single byte of storage
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+#define BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE
+#undef BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE
+#endif
 #ifndef BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE
 template <> struct enable_single_byte_value_storage<void> : std::true_type
 {

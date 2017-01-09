@@ -35,7 +35,7 @@ Outcome's slightly different design still contributes a lot of value for the spe
 use of error handling in my opinion, as we shall hopefully see next.
 
 
-\subsubsection optional Returning optional<T>
+\section optional Returning optional<T>
 
 In some programming contexts we don't need to know why an operation failed, only
 that it did. Throwing an exception after failing to find a file is a good example
@@ -72,7 +72,7 @@ also fairly intuitive, almost any C++ programmer will immediately understand
 what the code above does from inspection.
 
 
-\subsubsection expected Returning expected<T, E>
+\subsection expected Returning expected<T, E>
 
 Many familiar with the filesystem will find the above use case of `optional<T>`
 unsettling because there are many reasons why one couldn't open a file rather
@@ -193,43 +193,23 @@ This is the very first time in this tutorial that we have seen the design patter
 around which Outcome was specifically designed to make easy: *islands of exception
 throw in a sea of noexcept*.
 
-\subsubsection sea-of-noexcept The "Islands of exception throw in a sea of noexcept" design pattern
-
-This design pattern was intended by the committee in C++ 11 to be the method by which that large
-minority of C++ users who disable RTTI and exceptions entirely could be brought
-back into ISO standard C++. The pattern is easy:
-1. Every `extern` API in your translation unit is marked `noexcept` and uses a
-non-throwing mechanism such as `std::error_code` or `std::expected<T, E>` or
-Outcomes or even a C-style integer to return errors.
-2. Code within a translation unit is generally not marked `noexcept`, or indeed
-may throw and catch exceptions before returning out of an extern `noexcept` API.
-3. Because all `extern` function calls are `noexcept` throughout the entire codebase,
-from any given translation unit it is never the case that implementation code will
-ever call a potentially throwing function (C APIs are assumed to never throw on
-most C++ compilers). Because no calls to unknown code will ever throw, the compiler's
-optimiser  *ought* to elide emission of stack unwind code and all other exception throw handling
-overhead in any sequence of code inside the translation unit *as if* exceptions had
-been globally disabled at the command line.
-4. Where code inside a translation unit does call something which could throw e.g.
-much of the STL, exception handling overhead *ought* to be confined to the containing `try` ...
-`catch` **island** at best, at worst to that given translation unit.
-5. Consumers of your `extern` API need not care how that API is internally implemented
-as they shall never see an exception thrown out of that API, and the compiler will
-optimise your code which uses that `extern` API in its **sea** of `noexcept` accordingly.
 
 
-\subsubsection exceptions-are-exceptional The "Exceptions are exceptional, errors are not failure" design pattern
 
-In addition to the pure "sea of noexcept" for low latency users, there is one other new
-error handling design pattern to mention made possible by `expected<T, E>` or especially
-Outcomes which combines "sea of noexcept" with exception throws. The idea is that ordinarily
-speaking code never throws an exception, and returns all failures anticipated by the programmer
-through `expected<T, E>` as an `E`. If however something
-very unexpected occurs, an *exceptional* event, we exclusively use exception throws to abort
-the current operation entirely. For anyone familiar with Rust, this is **exactly** the Rust
-error handling model: `Result<T>` and `Option<T>` return errors expected by the programmer
-whereas a stack unwinding panic of the current thread is how exceptional, programmer
-unanticipated events are handled.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 As you will see later, Outcome makes implementing this error handling design pattern easier
 than in Expected, but let's merge our two code examples using Expected above into one
@@ -285,7 +265,7 @@ despite that exceptions are available.
 
 <br><hr><br>
 
-\section introduction Introducing Outcome
+\section introduction2 Introducing Outcome
 
 After that literature review of how C++ has implemented error handling and how code
 might implement error handling from C++ 17/20 onwards, one might think that Outcome

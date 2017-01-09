@@ -207,50 +207,182 @@ and proceeding regardless.
 
 \section cpp17-style C++ 17 style error handling: outcome<T>, result<T> and option<T>, and their C++ standard near-equivalents optional<T> and expected<T, E>
 
-todo
+\ref boost::outcome::v1_xxx::basic_monad "basic_monad<>" is a policy driven utility class
+provided by Outcome that implements a value transport. The value transported has
+semantics defined by the policy, but the policy this tutorial will cover is one
+which closely matches the C++ 17/20 utility classes <a href="http://en.cppreference.com/w/cpp/utility/optional">`std::optional<T>`</a> and
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf">`std::experimental::expected<T, E>` (P0323R1)</a>, and which takes this form:
+
+~~~{.cpp}
+template<
+  class monad_storage,
+  class value_type,
+  class error_type,
+  class exception_type
+  > struct BOOST_OUTCOME_MONAD_POLICY_BASE_NAME : public monad_storage
+{ ... };
+~~~
+This policy implements variant storage of `value_type`, `error_type` and `exception_type`.
+You can use any type `error_type` or `exception_type` you like so long as they act as if a `std::error_code`
+and a `std::exception_ptr` respectively e.g. `boost::error_code` and `boost::exception_ptr`.
+**Unlike** the `E` in `expected<T, E>`, Outcome hard codes the model of `error_type` and `exception_type` in stone,
+so they *must* provide at least the same APIs and behaviours as an error code and an
+exception pointer or be `void`, in which case the specialisation doesn't provide the ability
+to store an instance of that type. You cannot use a `value_type`, an `error_type` or an `exception_type`
+which are constructible into one another.
+
+Outcome provides these convenience typedefs so you don't have to worry about any of the above detail:
+~~~{.cpp}
+template<class T> using outcome = basic_monad<  monad_policy<T, std::error_code, std::exception_ptr> >;
+template<class T> using result  = basic_monad< result_policy<T, std::error_code, void> >;
+template<class T> using option  = basic_monad< option_policy<T, void, void> >;
+~~~
+So, an `option<T>` can store either a `T` or empty, same as `std::optional<T>`.
+A `result<T>` can store any one of empty, a `T` or a `std::error_code`. And finally
+an `outcome<T>` can store any one of empty, a `T`, a `std::error_code` or an
+`std::exception_ptr`. The member functions on any of these three are a superset
+of the same member functions on `std::optional<T>`, `std::experimental::expected<T, E>` or indeed a
+`std::future<T>`, which is to say:
+- You retrieve a value type using the `value()` or `get()` member functions.
+- You retrieve an error type using the `error()` or `get_error()` member functions.
+- You retrieve an exception type use the `exception()` or `get_exception()` member functions.
+- There are also state inspection member functions which have the entirely unsurprising
+nomenclature `has_value()`, `has_error()` and `has_exception()`.
+- Semantics of things like `operator bool()`, `operator*()` and `operator->()` all
+behave exactly the same as `std::optional<T>` and `std::experimental::expected<T, E>`,
+and indeed exactly as you would intutively guess.
 
 Reusing the same `openfile()` example from the earlier examples, this is it written
 using Outcome's `result<T>`:
 
 ~~~{.cpp}
+using namespace BOOST_OUTCOME_V1_NAMESPACE;
+
 // Returns the expected opened handle on success, or an unexpected cause of failure
-std::expected<handle_ref, std::error_code> openfile(const char *path) noexcept
+result<handle_ref> openfile(const char *path) noexcept
 {
   int fd = open(path, O_RDONLY);
   if(fd == -1)
   {
-    return std::make_unexpected(std::error_code(errno, std::system_category());
+    // Normally make_errored_result<>() would take a std::error_code, but for convenience
+    // if make_errored_result<>() is given an int, we assume this means a POSIX error
+	// code. An additional overload exists on Windows for DWORDs so GetLastError() can be
+	// passed directly to make_errored_result<>().
+	
+    return make_errored_result<>(errno);
   }
-  std::error_code ec;
-  auto *p = new(std::nothrow) some_derived_handle_implementation(fd, ec);
-  if(p == nullptr)
+  try
   {
-    close(fd);
-    return std::make_unexpected(std::make_error_code(std::errc::not_enough_memory));
+    try
+	{
+      return handle_ref(new some_derived_handle_implementation(fd));  // result<> implicitly constructs from its `T`
+	}
+	catch(...)
+	{
+	  close(fd);
+	  throw;
+	}
   }
-  if(ec)
-  {
-    delete p;
-    return std::make_unexpected(std::move(ec));
-  }
-  return handle_ref(p);  // expected<> takes implicit conversion from type T
+  /* This macro is a long series of catch(const std::exception_type &) clauses
+  converting the STL exception types into their corresponding std::error_code with
+  std::generic_category. At the end a catch all clause converts to EAGAIN.
+  The error code is then returned via make_errored_result<>.
+  */
+  BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT
 }
 ...
 auto fh_ = openfile("foo");
+// We don't mind file not found errors, but anything else is serious
 if(!fh_ && fh_.error() != std::errc::no_such_file_or_directory)
 {
-  // This is serious, abort
-  throw std::system_error(std::move(fh_.error()));
+  // If the error code was not file not found, abort the current operation by
+  // throwing the special exception type the STL reserves for transporting an
+  // error code
+  (void) fh_.value();  // does throw std::system_error(std::move(fh_.error())) for you
 }
-else if(fh_)
+else if(fh_)  // outcomes are boolean true if and only if they contain a value type
 {
-  handle_ref fh = std::move(fh_.value());
+  handle_ref fh = std::move(fh_.value());  // extract via move the value type
   fh->read(... etc
 }
 ~~~
 
+Some may feel that the potential loss of information caused by throwing away unknown C++
+exception throws is unacceptable. This of course depends on your particular code base,
+if you are really sure that you never will throw anything but STL exception types, then
+you need not worry. Still, if you code may well throw a custom exception type then this
+is what `outcome<T>` is for:
 
-\subsubsection sea-of-noexcept The "Islands of exception throw in a sea of noexcept" design pattern
+~~~{.cpp}
+using namespace BOOST_OUTCOME_V1_NAMESPACE;
+
+// Returns the expected opened handle on success, a cause of not success (error_code),
+// or why there was an unexpected and probably catastrophic failure (exception_ptr)
+outcome<handle_ref> openfile(const char *path) noexcept
+{
+  int fd = open(path, O_RDONLY);
+  if(fd == -1)
+  {
+    // result<> is less expressive than outcome<> and so implicitly converts into outcome<>
+    return make_errored_result<>(errno);
+  }
+  try
+  {
+    return handle_ref(new some_derived_handle_implementation(fd));  // outcome<> implicitly constructs from its `T`
+  }
+  catch(...)
+  {
+    close(fd);
+    return make_exceptional_outcome<>();  // defaults to using std::current_exception()
+  }
+}
+...
+auto fh_ = openfile("foo");
+// We don't mind file not found errors, but anything else is serious
+if(!fh_)
+{
+  // If the error code was not file not found, abort by rethrowing the
+  // exact error or exception which occurred
+  if(!fh_.has_error() || fh_.error() != std::errc::no_such_file_or_directory)
+  {
+    (void) fh_.value();
+  }
+}
+else
+{
+  handle_ref fh = std::move(fh_.value());  // extract via move the value type
+  fh->read(... etc
+}
+~~~
+
+You might wonder why one would ever use `result<>` instead of `outcome<>` seeing as it leads
+to simpler, more elegant and expressive code? The reason why is that the compiler's optimiser
+is required to treat a potential use of `exception_ptr` as a synchronisation event because like
+`shared_ptr`, it is implemented using an atomically incremented and decremented reference count.
+By "synchronisation event" I mean that the compiler is *required* to assume memory could be modified, and therefore
+*must* emit assembler to check the globally visible state rather than elide it. In other words, the compiler can entirely elide
+and fuse long sequences of `result<>` to a much greater extent than it can `outcome<>`
+because the only globally visible effects of potentially creating an error code is the
+effect on global state of instantiating its error category. Therefore the compiler can emit
+exactly one call of the error category function, and thereafter assume subsequent calls to
+it will not affect globally visible state.
+
+\note The Dinkumware STL supplied with Visual Studio makes any fetch of an error category
+an operation with globally visible consequences. Compilers using this STL therefore must
+emit a lot more assembler than with other STL implementations.
+
+So, to sum up, try to use `option<T>` where that's appropriate. `option<T>` is constexpr
+available and very often vanishes entirely from the assembler generated. Try to use
+`result<T>` where you don't need a full `outcome<T>` where that's appropriate. And
+remember a less expressive form always implicitly converts into a more expressive form,
+so you can always feed options into results or outcomes, or results into outcomes.
+
+\subsection try The BOOST_OUTCOME_TRY() macro
+
+todo
+
+
+\subsection sea-of-noexcept The "Islands of exception throw in a sea of noexcept" design pattern
 
 This design pattern was intended by the committee in C++ 11 to be the method by which that large
 minority of C++ users who disable RTTI and exceptions entirely could be brought
@@ -275,7 +407,7 @@ as they shall never see an exception thrown out of that API, and the compiler wi
 optimise your code which uses that `extern` API in its **sea** of `noexcept` accordingly.
 
 
-\subsubsection exceptions-are-exceptional The "Exceptions are exceptional, errors are not failure" design pattern
+\subsection exceptions-are-exceptional The "Exceptions are exceptional, errors are not failure" design pattern
 
 In addition to the pure "sea of noexcept" for low latency users, there is one other new
 error handling design pattern to mention made possible by `expected<T, E>` or especially
@@ -311,7 +443,7 @@ as close as is feasible onto the standard utility classes:
 
 In 95% of use cases, Outcome's convenience typedefs should be typedef-swappable for `optional<T>`
 and `expected<T, E>`, and Outcome has been carefully designed to maximise this.
-There are some important semantic differences though, for those interested please see \ref std_expected
+There are some important semantic differences though, for those interested please see \ref std-expected
 for lots of detail. In summary, Outcome is intended as an *ultra lightweight universal 
 error handling framework* which lets you the programmer seamlessly transport error states
 around without adding any extra overhead nor losing any information, folding everything into

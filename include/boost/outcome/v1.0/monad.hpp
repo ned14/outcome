@@ -2046,7 +2046,7 @@ template <class T = void> constexpr inline outcome<T> make_errored_outcome(unsig
 }
 #endif
 //! \brief Make an excepted outcome from the type passed \ingroup monad
-template <class T = void> inline outcome<T> make_exceptional_outcome(std::exception_ptr v)
+template <class T = void> inline outcome<T> make_exceptional_outcome(std::exception_ptr v = std::current_exception())
 {
   return outcome<T>(std::move(v));
 }

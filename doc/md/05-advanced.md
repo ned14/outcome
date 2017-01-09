@@ -4,7 +4,7 @@
 simple library. However "full fat" monadic functional programming is also provided
 using a very clean and powerful API, albeit at a fair cost to compile times.
 
-\subsection functional Functional programming extensions (optional)
+\section functional Functional programming extensions (optional)
 
 \note All code in this section can be enabled by defining `BOOST_OUTCOME_ENABLE_OPERATORS`.
 By default only `next()` is available. This prevents you writing code which impacts build times.
