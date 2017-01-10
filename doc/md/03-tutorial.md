@@ -205,7 +205,11 @@ the advantage that the error won't be lost, however in practice aborting partial
 completed operations can lose other people's data just as much as ignoring errors
 and proceeding regardless.
 
-Summarising this into a design pattern:
+\todo Mention disadvantages, like doubling the API count (needing double the API
+reference docs etc), forcing the caller to create an error code, not trapping when
+errors are not checked etc
+
+Summarising this section into a design pattern:
 
 \subsection sea-of-noexcept The "Islands of exception throw in a sea of noexcept" design pattern
 
@@ -249,7 +253,9 @@ class specialised with a policy which very closely matches `basic_monad<>`'s sem
 `std::optional<T>` and `std::experimental::expected<T, E>` (this hasn't been approved
 yet by ISO WG21, but it's very close, likely later in 2017). In addition you gain a much more
 comprehensive monadic programming interface, and ultra low runtime overheads. But we will come
-back to that later.
+back to that later. We won't labour the point, but you can absolutely
+substitute in most code an `option<T>` for a `std::optional<T>` and a `result<T>` for a
+`std::experimental::expected<T, std::error_code>`. There is no easy equivalent for `outcome<T>`.
 
 Each of `option<T>`, `result<T>` and `outcome<T>` being actually a `basic_monad<>` instance
 have a very straightforward API, and less expressive monads implicitly convert into more
@@ -265,7 +271,8 @@ nomenclature `empty()`, `has_value()`, `has_error()` and `has_exception()`.
 - Semantics of things like `emplace()`, `operator*()` and `operator->()` all
 behave exactly the same as `std::optional<T>` and `std::experimental::expected<T, E>`,
 and indeed exactly as you would intutively guess as they behave the same as anywhere in the STL.
-- `if(monad)` is true if and only if the monad contains an instance of `T`.
+- `if(monad)` is true if and only if the monad contains an instance of `T`, again exactly
+the same as anywhere else in the STL.
 
 What happens if you try retrieving a value from a monad not containing a value?
 - If it is empty, the macro `BOOST_OUTCOME_THROW_MONAD_ERROR(monad_error(monad_errc::no_state))`
@@ -281,14 +288,20 @@ the `std::exception_ptr` contained by the monad.
 
 What happens if you try retrieving an error from a monad not containing an error?
 - If it is empty, same as for the retrieving a value from not a valued monad.
-- If it is valued, returns a default constructed error code.
+- If it is valued, returns a default constructed (i.e. null) error code.
 - If it is excepted, returns an error code of `monad_category()` with code `monad_errc::exception_present`. 
 
 What happens if you try retrieving an exception from a monad not containing an exception?
 - If it is empty, same as for the retrieving a value from not a valued monad.
-- If it is valued, returns a default constructed exception ptr.
+- If it is valued, returns a default constructed (i.e. null) exception ptr.
 - If it is errored, returns an exception ptr to a `std::system_error` instance containing
 the monad's error code.
+
+And finally, if your compiler is in C++ 17 mode or later, monads are marked with the
+<a href="http://en.cppreference.com/w/cpp/language/attributes">`[[nodiscard]]`</a> attribute.
+This means the compiler ought to warn if you forget to examine monads returned by functions.
+If you really mean to throw away a returned monad, make sure you cast it to void to tell
+the compiler you specifically intend to throw it away.
 
 Reusing the same `openfile()` example from the earlier examples, this is it written
 using Outcome's `result<T>`:
@@ -325,6 +338,7 @@ result<handle_ref> openfile(const char *path) noexcept
   converting the STL exception types into their corresponding std::error_code with
   std::generic_category. At the end a catch all clause converts to EAGAIN.
   The error code is then returned via make_errored_result<>. */
+  
   BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT
 }
 ...
@@ -392,7 +406,7 @@ else
 }
 ~~~
 
-This is a really elegant expression of error handling in C++: catastrophic errors are returned
+I think you'll agree that this is a really elegant expression of error handling in C++: catastrophic errors are returned
 as exception ptrs, non serious errors are returned as error codes. All public APIs are `noexcept`
 and therefore calling them never causes an unexpected inversion of control flow. If this aesthetic
 appeals to you, then you need to be using Outcome in your code!
@@ -401,8 +415,8 @@ You might wonder why one would ever use `result<>` instead of `outcome<>` seeing
 to simpler, more elegant and expressive code? The reason why is that the compiler's optimiser
 is required to treat a potential use of `exception_ptr` as a synchronisation event because like
 `shared_ptr`, it is implemented using an atomically incremented and decremented reference count.
-By "synchronisation event" I mean that the compiler is *required* to assume memory could be modified, and therefore
-*must* emit assembler to check the globally visible state rather than elide it. In other words, the compiler can entirely elide
+By "synchronisation event" I mean that the compiler is *required* to emit changes visible to other threads, and therefore
+*must* emit assembler to read-modify-write the globally visible state rather than elide it. In other words, the compiler can entirely elide
 and fuse long sequences of `result<>` to a much greater extent than it can `outcome<>`
 because the only globally visible effects of potentially creating an error code is the
 effect on global state of instantiating its error category. Therefore the compiler can emit
@@ -480,7 +494,7 @@ onto the stack.
 
 \section conclusion Conclusion
 
-This tutorial has been kept deliberately as simple as possible after feedback from the Boost developers'
+This tutorial has been kept deliberately as simple as possible after valuable feedback from the Boost developers'
 mailing list, and it has intentionally not covered a large chunk of Outcome's detail.
 Further documentation includes \ref advanced "Advanced usage: Outcome as a Monad" and
 \ref std-expected "Outcome and the upcoming std::expected<T, E>".
@@ -511,7 +525,7 @@ the `monad.natvis` file.
 \subsection optimal A demonstration of how optimally tuned code using Outcome becomes
 
 We shall end this tutorial with a demonstration of how little runtime overhead Outcome produces which
-was achieved after investing a lot of effort. Unlike
+was achieved after investing a lot of effort by the author. Unlike
 many libraries which claim to care about runtime overhead, Outcome's CIs actually run per-commit a test
 suite which compiles various sequences of code using outcomes and counts the assembler instructions
 emitted. This ensures changes do not ruin Outcome's laboriously implemented tuning for current compiler
@@ -547,5 +561,9 @@ main:
 	ret
 	.cfi_endproc
 ~~~
+Yes, that's exactly one assembler instruction which simply returns 8. The fact you used Outcome has
+entirely disappeared from runtime overhead.
+
 To achieve this level of optimiser strength reduction on the big three compilers took a great deal of
-tedious trial and error so your code using Outcome didn't have to. Enjoy!
+tedious trial and error structuring the implementation just right such that your code using Outcome
+doesn't have to. Enjoy!
