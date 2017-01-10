@@ -422,7 +422,7 @@ so you can always feed options into results or outcomes, or results into outcome
 
 Let's summarise all this into another new error handling design pattern:
 
-\subsubsection exceptions-are-exceptional The "Exceptions are exceptional, errors are not failure" design pattern
+\subsection exceptions-are-exceptional The "Exceptions are exceptional, errors are not failure" design pattern
 
 In addition to the pure "sea of noexcept" for low latency users mentioned earlier, there is one other new
 error handling design pattern to mention made possible by
