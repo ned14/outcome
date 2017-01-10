@@ -208,19 +208,41 @@ and proceeding regardless.
 
 \section cpp17-style C++ 17 style error handling: outcome<T>, result<T> and option<T>, and their C++ standard near-equivalents optional<T> and expected<T, E>
 
-\ref boost::outcome::v1_xxx::basic_monad "basic_monad<>" is a policy driven utility class
-provided by Outcome that implements a value transport. The value transported has
-semantics defined by the policy, but the policy this tutorial will cover is one
-which closely matches the C++ 17/20 utility classes <a href="http://en.cppreference.com/w/cpp/utility/optional">`std::optional<T>`</a> and
-<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf">`std::experimental::expected<T, E>` (P0323R1)</a>, and which takes this form:
+\subsection relation-to-cpp17 A small bit of detail before resuming the tutorial
 
+We are finally onto Outcome! 95% of users will not need to know nor care about this,
+but readers should be aware (so they know what a debugger is showing them when debugging
+code using Outcome [1]) that Outcome is implemented as the policy driven utility class
+\ref boost::outcome::v1_xxx::basic_monad "basic_monad<>". The policy supplied has wide
+latitude to affect the semantics of the monad, but the policy this tutorial will cover is one
+which closely matches `basic_monad<>`'s semantics to the C++ 17/20 utility classes
+`std::optional<T>` and `std::experimental::expected<T, E>` (this hasn't been approved
+yet by ISO WG21, but it's very close, likely later in 2017). As a quick summary of what
+these C++ 17/20 utility classes (will) do:
+
+<dl>
+  <dt><a href="http://en.cppreference.com/w/cpp/utility/optional">`std::optional<T>`</a></dt>
+  <dd>Utility class managing an optional contained value i.e. a value which may or may
+  not be present.</dd>
+  <dt><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf">`std::experimental::expected<T, E>` (P0323R1)</a></dt>
+  <dd>Utility class managing one of three variant states, an expected `T` or an unexpected `E`
+  or no value (with the no value semantics matching <a href="http://en.cppreference.com/w/cpp/utility/variant">std::variant<...></a>).</dd>
+</dl>
+
+Outcome's near equivalents for these are supersets of the C++ standard utility classes
+adding monadic semantics (see \ref advanced), but also with some minor semantic
+differences made for the purposes of improved performance and suitability for high performance/low
+latency/gaming/trading applications as per <a href="https://github.com/WG21-SG14">WG21 SG14</a>'s mandate.
+For a detailed list of the exact semantic differences see \ref std-expected.
+
+The `basic_monad<>` policy this tutorial covers takes this form:
 ~~~{.cpp}
 template<
   class monad_storage,
   class value_type,
   class error_type,
-  class exception_type
-  > struct BOOST_OUTCOME_MONAD_POLICY_BASE_NAME : public monad_storage
+  class exception_type>
+struct BOOST_OUTCOME_MONAD_POLICY_BASE_NAME : public monad_storage
 { ... };
 ~~~
 This policy implements variant storage of `value_type`, `error_type` and `exception_type`.
@@ -232,7 +254,14 @@ exception pointer or be `void`, in which case the specialisation doesn't provide
 to store an instance of that type. You cannot use a `value_type`, an `error_type` or an `exception_type`
 which are constructible into one another.
 
-Outcome provides these convenience typedefs so you don't have to worry about any of the above detail:
+[1]: Outcome provides a debugging visualiser for Microsoft Visual Studio such that any
+`basic_monad<>` displays itself without any internal clutter. Just link into your final binary
+the `monad.natvis` file.
+
+\subsection easy_usage Ach my head is hurting, make this easier!
+
+As mentioned earlier, 95% of Outcome's users won't need to know the above because they
+will be using these convenience typedefs in their code:
 ~~~{.cpp}
 template<class T> using outcome = basic_monad<  monad_policy<T, std::error_code, std::exception_ptr> >;
 template<class T> using result  = basic_monad< result_policy<T, std::error_code, void> >;
@@ -267,28 +296,27 @@ result<handle_ref> openfile(const char *path) noexcept
   {
     // Normally make_errored_result<>() would take a std::error_code, but for convenience
     // if make_errored_result<>() is given an int, we assume this means a POSIX error
-	// code. An additional overload exists on Windows for DWORDs so GetLastError() can be
-	// passed directly to make_errored_result<>().
+    // code. An additional overload exists on Windows for DWORDs so GetLastError() can be
+    // passed directly to make_errored_result<>().
 	
     return make_errored_result<>(errno);
   }
   try
   {
     try
-	{
+    {
       return handle_ref(new some_derived_handle_implementation(fd));  // result<> implicitly constructs from its `T`
-	}
-	catch(...)
-	{
-	  close(fd);
-	  throw;
-	}
+    }
+    catch(...)
+    {
+      close(fd);
+      throw;
+    }
   }
   /* This macro is a long series of catch(const std::exception_type &) clauses
   converting the STL exception types into their corresponding std::error_code with
   std::generic_category. At the end a catch all clause converts to EAGAIN.
-  The error code is then returned via make_errored_result<>.
-  */
+  The error code is then returned via make_errored_result<>. */
   BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT
 }
 ...
@@ -311,7 +339,7 @@ else if(fh_)  // outcomes are boolean true if and only if they contain a value t
 Some may feel that the potential loss of information caused by throwing away unknown C++
 exception throws is unacceptable. This of course depends on your particular code base,
 if you are really sure that you never will throw anything but STL exception types, then
-you need not worry. Still, if you code may well throw a custom exception type then this
+you need not worry. Still, if your code may well throw a custom exception type then this
 is what `outcome<T>` is for:
 
 ~~~{.cpp}
@@ -370,7 +398,8 @@ it will not affect globally visible state.
 
 \note The Dinkumware STL supplied with Visual Studio makes any fetch of an error category
 an operation with globally visible consequences. Compilers using this STL therefore must
-emit a lot more assembler than with other STL implementations.
+emit a lot more assembler than with other STL implementations. This is part of the reason
+why MSVC generates code bloat unlike GCC or clang.
 
 So, to sum up, try to use `option<T>` where that's appropriate. `option<T>` is constexpr
 available and very often vanishes entirely from the assembler generated. Try to use
