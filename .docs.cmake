@@ -28,6 +28,10 @@ set(CTEST_GIT_COMMAND "${GIT_EXECUTABLE}")
 
 ctest_start("Documentation")
 ctest_update()
+checked_execute_process("git reset"
+  COMMAND "${GIT_EXECUTABLE}" checkout gh-pages
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/doc/html"
+)
 ctest_configure()
 ctest_build(TARGET outcome_docs)
 #checked_execute_process("git commit"
