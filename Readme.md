@@ -40,6 +40,7 @@ saying all passes. If so:
 Later:
  - [ ] Need to get boost-lite's cmake come up with a preprocessed edition as the master include header
    - Need two editions, one with `BOOST_OUTCOME_ENABLE_ADVANCED` and one without.
+   - Preprocessed edition ought to include the SHA in the namespace!
  - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
  - [ ] Add tribool logic programming operator overloads
  - [ ] Add macro helpers to Outcome for returning outcomes out of things which cannot return values
