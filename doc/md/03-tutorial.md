@@ -205,26 +205,23 @@ the advantage that the error won't be lost, however in practice aborting partial
 completed operations can lose other people's data just as easily as ignoring errors
 and proceeding regardless.
 
-It does however have some disadvantages (which upcoming C++ 17/20 library additions
+Once you've been programming using the non-throwing API form for a while, some
+disadvantages begin to become obvious (which upcoming C++ 17/20 library additions
 will address):
 
-1. Once you've been programming using the non-throwing API form for a while, you
-begin to realise how clunky it is for callers of your function to have to create
+1. It is clunky for callers of your function to have to create
 a `std::error_code` on the stack before calling the function passing in a lvalue
-ref, then manually check the error code to see if it has been set on return.
-This is mainly an aesthetic concern in terms of being annoying having to type
-more stuff and remembering to check return codes just like in C, but unless the
-compiler inlines the called function then there is an optimisation penalty as
-with all functions which have parameters which can affect the caller's stack.
-Functions which solely return change rather than changing the caller via their parameters
-will tend to optimise better.
-2. It might not seem a big thing unless you see it in a large program, but having
+ref. There is a temptation for programmers to reuse the `error_code &ec` instance passed
+to their function, and this can become a source of unintended lost errors because
+errors already written there get overwritten or reset during error handling.
+2. It is annoying having to type more boilerplate and remembering to check return codes just
+like in C. The compiler should be telling me when I forget to check an error, but
+the C++ 17 nodiscard attribute can't work with the lvalue ref passing pattern.
+This design pattern therefore suffers from the same problem as C style error codes,
+errors "get lost" or ignored inadvertently.
+3. It might not seem a big thing until you see it in a large program, but having
 throwing and non-throwing variants of every API means doubling your API count.
 That means more maintenance, more testing, more documentation, more clutter.
-3. Probably the most serious practical concern with this design pattern is that
-there is no way to get the compiler to remind you to check error codes because
-this design pattern defeats static analysis. This design pattern therefore suffers
-from the same problem as C style error codes, errors "get lost" or ignored inadvertently.
 
 Summarising this section into a design pattern:
 
@@ -285,8 +282,9 @@ move from a contained value.
   - Note that `void` is an entirely legal value type, and is considered always less expressive than
   any other value type i.e. an `outcome<void>` will implicitly convert into an `outcome<int>`
   preserving any empty, errored or excepted state. A valued state converts into default initialisation.
+  Void monads are used very extensively internally to convert between different value typed monads.
 - You retrieve an error type using the `error()` or `get_error()` member functions.
-- You retrieve an exception type use the `exception()` or `get_exception()` member functions.
+- You retrieve an exception type using the `exception()` or `get_exception()` member functions.
 - There are also state inspection member functions which have the entirely unsurprising
 STL nomenclature `empty()`, `has_value()`, `has_error()` and `has_exception()`.
 - Semantics of things like `emplace()`, `operator*()` and `operator->()` all
@@ -321,7 +319,7 @@ the monad's error code.
 And finally, if your compiler is in C++ 17 mode or later, monads are marked with the
 <a href="http://en.cppreference.com/w/cpp/language/attributes">`[[nodiscard]]`</a> attribute.
 This means the compiler ought to warn if you forget to examine monads returned by functions.
-If you really mean to throw away a returned monad, make sure you cast it to void to tell
+If you really mean to throw away a returned monad, make sure you cast it to `void` to tell
 the compiler you specifically intend to throw it away.
 
 Reusing the same `openfile()` example from the earlier examples, this is it written
@@ -491,19 +489,16 @@ outcome<sometype> another_function()
   ...
   // This is the "try" operation common in Rust or Swift
   // It takes the form try! var = openfile(...);
-  handle_ref var;
+  outcome<handle_ref> unique_temporary = openfile(...);
+  if(unique_temporary.has_error())
   {
-    outcome<handle_ref> unique_temporary = openfile(...);
-    if(unique_temporary.has_error())
-    {
-      return make_errored_outcome<sometype>(std::move(unique_temporary.error());
-    }
-    if(unique_temporary.has_exception())
-    {
-      return make_exceptional_outcome<sometype>(std::move(unique_temporary.exception());
-    }
-    var = std::move(unique_temporary.value());
+    return make_errored_outcome<void>(std::move(unique_temporary.error());
   }
+  if(unique_temporary.has_exception())
+  {
+    return make_exceptional_outcome<void>(std::move(unique_temporary.exception());
+  }
+  handle_ref var(std::move(unique_temporary.value()));
 }
 ~~~
 
@@ -515,7 +510,7 @@ in the monad into the `var` variable which is of the contained value type.
 
 Because of the limitations of C++, Outcome cannot provide a nice syntax like `try var = openfile(...)`.
 The best it can do is `BOOST_OUTCOME_TRY(var, openfile(...))` which will declare `var` using `auto`
-onto the stack initialised to the contents of any valued monad returned by the expression, else it
+onto the stack initialised to the moved contents of any valued monad returned by the expression, else it
 will convert the returned monad to its `<void>` form and return that immediately which ought to
 implicitly convert to whatever the return monad type of the enclosing function is.
 
