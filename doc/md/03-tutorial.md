@@ -202,12 +202,29 @@ around that call which is useful for some C++ users.
 2. Simple usage of the API will default to the throwing (i.e. abort this operation)
 overload which is probably what most users *think* they want. This does have
 the advantage that the error won't be lost, however in practice aborting partially
-completed operations can lose other people's data just as much as ignoring errors
+completed operations can lose other people's data just as easily as ignoring errors
 and proceeding regardless.
 
-\todo Mention disadvantages, like doubling the API count (needing double the API
-reference docs etc), forcing the caller to create an error code, not trapping when
-errors are not checked etc
+It does however have some disadvantages (which upcoming C++ 17/20 library additions
+will address):
+
+1. Once you've been programming using the non-throwing API form for a while, you
+begin to realise how clunky it is for callers of your function to have to create
+a `std::error_code` on the stack before calling the function passing in a lvalue
+ref, then manually check the error code to see if it has been set on return.
+This is mainly an aesthetic concern in terms of being annoying having to type
+more stuff and remembering to check return codes just like in C, but unless the
+compiler inlines the called function then there is an optimisation penalty as
+with all functions which have parameters which can affect the caller's stack.
+Functions which solely return change rather than changing the caller via their parameters
+will tend to optimise better.
+2. It might not seem a big thing unless you see it in a large program, but having
+throwing and non-throwing variants of every API means doubling your API count.
+That means more maintenance, more testing, more documentation, more clutter.
+3. Probably the most serious practical concern with this design pattern is that
+there is no way to get the compiler to remind you to check error codes because
+this design pattern defeats static analysis. This design pattern therefore suffers
+from the same problem as C style error codes, errors "get lost" or ignored inadvertently.
 
 Summarising this section into a design pattern:
 
@@ -255,19 +272,23 @@ yet by ISO WG21, but it's very close, likely later in 2017). In addition you gai
 comprehensive monadic programming interface, and ultra low runtime overheads. But we will come
 back to that later. We won't labour the point, but you can absolutely
 substitute in most code an `option<T>` for a `std::optional<T>` and a `result<T>` for a
-`std::experimental::expected<T, std::error_code>`. There is no easy equivalent for `outcome<T>`.
+`std::experimental::expected<T, std::error_code>` and this is intentional in the design
+of Outcome. There is no easy (planned) STL equivalent for `outcome<T>`.
 
 Each of `option<T>`, `result<T>` and `outcome<T>` being actually a `basic_monad<>` instance
 have a very straightforward API, and less expressive monads implicitly convert into more
 expressive forms on demand. We will call the type `T` the value type, the error type
-will be any `std::error_code` present and the exception type will be any `std::exception_ptr` present.
+will be any `std::error_code`-ish present and the exception type will be any `std::exception_ptr`-ish present.
 - You retrieve a value type using the `value()` or `get()` member functions. These come
 with const lvalue ref, lvalue ref and rvalue ref overloads, so you can directly modify or
 move from a contained value.
+  - Note that `void` is an entirely legal value type, and is considered always less expressive than
+  any other value type i.e. an `outcome<void>` will implicitly convert into an `outcome<int>`
+  preserving any empty, errored or excepted state. A valued state converts into default initialisation.
 - You retrieve an error type using the `error()` or `get_error()` member functions.
 - You retrieve an exception type use the `exception()` or `get_exception()` member functions.
 - There are also state inspection member functions which have the entirely unsurprising
-nomenclature `empty()`, `has_value()`, `has_error()` and `has_exception()`.
+STL nomenclature `empty()`, `has_value()`, `has_error()` and `has_exception()`.
 - Semantics of things like `emplace()`, `operator*()` and `operator->()` all
 behave exactly the same as `std::optional<T>` and `std::experimental::expected<T, E>`,
 and indeed exactly as you would intutively guess as they behave the same as anywhere in the STL.
@@ -351,14 +372,14 @@ if(!fh_ && fh_.error() != std::errc::no_such_file_or_directory)
   // error code
   (void) fh_.value();  // does throw std::system_error(std::move(fh_.error())) for you
 }
-else if(fh_)  // outcomes are boolean true if and only if they contain a value type
+if(fh_)  // outcomes are boolean true if and only if they contain a value type
 {
   handle_ref fh = std::move(fh_.value());  // extract via move the value type
   fh->read(... etc
 }
 ~~~
 
-Some may feel that the potential loss of information caused by throwing away unknown C++
+Some may feel that the potential loss of information caused by throwing away unmatched C++
 exception throws is unacceptable. This of course depends on your particular code base,
 if you are really sure that you never will throw anything but STL exception types, then
 you need not worry. Still, if your code may well throw a custom exception type then this
@@ -389,7 +410,6 @@ outcome<handle_ref> openfile(const char *path) noexcept
 }
 ...
 auto fh_ = openfile("foo");
-// We don't mind file not found errors, but anything else is serious
 if(!fh_)
 {
   // If the error code was not file not found, abort by rethrowing the
@@ -399,15 +419,18 @@ if(!fh_)
     (void) fh_.value();
   }
 }
-else
+if(fh_)
 {
   handle_ref fh = std::move(fh_.value());  // extract via move the value type
   fh->read(... etc
 }
 ~~~
 
-I think you'll agree that this is a really elegant expression of error handling in C++: catastrophic errors are returned
-as exception ptrs, non serious errors are returned as error codes. All public APIs are `noexcept`
+I think you'll agree that this is a really elegant expression of error handling in C++ and
+is a nice improvement over having to stack allocate error codes to be passed in by lvalue
+ref into APIs. Catastrophic errors are returned as exception ptrs which can be rethrown without
+loss of information, non serious errors are returned as error codes which can be from any
+arbitrary third party library's error code domain. All public APIs are `noexcept`
 and therefore calling them never causes an unexpected inversion of control flow. If this aesthetic
 appeals to you, then you need to be using Outcome in your code!
 
@@ -416,7 +439,10 @@ to simpler, more elegant and expressive code? The reason why is that the compile
 is required to treat a potential use of `exception_ptr` as a synchronisation event because like
 `shared_ptr`, it is implemented using an atomically incremented and decremented reference count.
 By "synchronisation event" I mean that the compiler is *required* to emit changes visible to other threads, and therefore
-*must* emit assembler to read-modify-write the globally visible state rather than elide it. In other words, the compiler can entirely elide
+*must* emit assembler to read-modify-write the globally visible state rather than elide it.
+In addition to this, monads only have trivial destructors if everything they could contain
+also has a trivial destructor, and an exception ptr has a non-trivial destructor.
+In other words, the compiler can entirely elide
 and fuse long sequences of `result<>` to a much greater extent than it can `outcome<>`
 because the only globally visible effects of potentially creating an error code is the
 effect on global state of instantiating its error category. Therefore the compiler can emit
@@ -426,7 +452,7 @@ it will not affect globally visible state.
 \note The Dinkumware STL supplied with Visual Studio makes any fetch of an error category
 an operation with globally visible consequences. Compilers using this STL therefore must
 emit a lot more assembler than with other STL implementations. This is part of the reason
-why MSVC generates code bloat unlike GCC or clang.
+why MSVC generates additional code bloat above that of GCC or clang.
 
 So, to sum up, try to use `option<T>` where that's appropriate. `option<T>` is constexpr
 available and very often vanishes entirely from the assembler generated. Try to use
@@ -450,7 +476,7 @@ whereas a stack unwinding panic of the current thread is how exceptional, progra
 unanticipated events are handled.
 
 
-\subsection try The BOOST_OUTCOME_TRY(var, expression) macro
+\subsection try Propagating errors up the call stack: The BOOST_OUTCOME_TRY(var, expression) macro
 
 A very common operation with monadic transports is the `try` operation which means this
 boilerplate:
@@ -489,13 +515,18 @@ in the monad into the `var` variable which is of the contained value type.
 
 Because of the limitations of C++, Outcome cannot provide a nice syntax like `try var = openfile(...)`.
 The best it can do is `BOOST_OUTCOME_TRY(var, openfile(...))` which will declare `var` using `auto`
-onto the stack.
+onto the stack initialised to the contents of any valued monad returned by the expression, else it
+will convert the returned monad to its `<void>` form and return that immediately which ought to
+implicitly convert to whatever the return monad type of the enclosing function is.
 
+
+<hr><br>
 
 \section conclusion Conclusion
 
 This tutorial has been kept deliberately as simple as possible after valuable feedback from the Boost developers'
 mailing list, and it has intentionally not covered a large chunk of Outcome's detail.
+A "single page cheat sheet" can be found at \ref quickstart "Quick start for the expert".
 Further documentation includes \ref advanced "Advanced usage: Outcome as a Monad" and
 \ref std-expected "Outcome and the upcoming std::expected<T, E>".
 
@@ -516,21 +547,34 @@ struct BOOST_OUTCOME_MONAD_POLICY_BASE_NAME : public monad_storage
 Any of `value_type`, `error_type` and `exception_type` can be `void`, in which case they are not in
 use in this instance. If you are using Microsoft Visual Studio, Outcome provides a debugging visualiser
 such that any `basic_monad<>` displays itself without any internal clutter. Just link into your final binary
-the `monad.natvis` file.
+the `monad.natvis` file. Contributions of a GDB debugging visualiser would be welcome (open a pull request).
 
 \subsection error_codes What you need to know about error_code_extended
 
-\todo Talk about error_code_extended
+Earlier in this tutorial we referred to `std::error_code`-ish. Outcome's `option<T>`, `result<T>`
+and `outcome<T>` are actually bound to use \ref boost::outcome::v1_xxx::error_code_extended "error_code_extended"
+rather than `std::error_code`. `error_code_extended` inherits publicly from `std::error_code`,
+adding two new member functions: `extended_message()` and `backtrace()`. These *may* provide
+additional information about the error code like any `what()` message from the C++ exception
+the error code was constructed from (if any), or the stack backtrace of the point at which the
+`error_code_extended` was constructed. It is absolutely safe to type slice an `error_code_extended`
+into a `std::error_code` at any time, the extended error code contains nothing needing destructing.
+You can therefore feed the extended error code to anything accepting a `std::error_code`.
+
+\note Note to Boost peer reviewers: You cannot currently implicitly construct an extended error code
+from a standard error code. This is to prevent accidental extended => normal => extended conversions
+which would lose the extended data. Please do say in any review if you think this a bad idea.
 
 \subsection optimal A demonstration of how optimally tuned code using Outcome becomes
 
 We shall end this tutorial with a demonstration of how little runtime overhead Outcome produces which
-was achieved after investing a lot of effort by the author. Unlike
+was achieved after investing a lot of trial and error effort by the author with the optimisers of the
+three big compilers. Unlike
 many libraries which claim to care about runtime overhead, Outcome's CIs actually run per-commit a test
 suite which compiles various sequences of code using outcomes and counts the assembler instructions
 emitted. This ensures changes do not ruin Outcome's laboriously implemented tuning for current compiler
 optimisers to make sure they generate minimum runtime overhead. Here is a small program written using
-Outcome's monadic operators and lambda bind:
+\ref advanced "Outcome's monadic operators" and lambda bind:
 
 ~~~{.cpp}
 int main(void)
@@ -546,7 +590,8 @@ containing a 6, that is then bound to the generic lambda which compares the valu
 is not returns 8, creating another new `result<int>` (because the lambda returned an `int`) containing
 the returned value. The OR operator creates yet another `result<int>` replacing the value with 2 if the
 monad were not valued, but because it is valued g will take on the type `result<int>` propagated from the
-front and the value 8. So that is at least four `result<int>` instances constructed and destructed above.
+front and the value 8. So that is four `result<int>` instances constructed and destructed above, two
+copy operations and one move operation.
 
 Compiling this with GCC 6.2 with `-std=c++1z -S -O3` yields this assembler:
 ~~~{.s}
@@ -555,15 +600,11 @@ Compiling this with GCC 6.2 with `-std=c++1z -S -O3` yields this assembler:
 	.globl	main
 	.type	main, @function
 main:
-.LFB3280:
 	.cfi_startproc
 	movl	$8, %eax
 	ret
 	.cfi_endproc
 ~~~
 Yes, that's exactly one assembler instruction which simply returns 8. The fact you used Outcome has
-entirely disappeared from runtime overhead.
-
-To achieve this level of optimiser strength reduction on the big three compilers took a great deal of
-tedious trial and error structuring the implementation just right such that your code using Outcome
-doesn't have to. Enjoy!
+entirely disappeared from runtime overhead because the compiler has completely eliminated the considerable
+quantities of C++ which could have been executed. Enjoy!

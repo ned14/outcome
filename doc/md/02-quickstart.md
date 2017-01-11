@@ -1,4 +1,5 @@
-# Quick start for the expert {#quickstart}
+# Quick start for the expert
+\anchor quickstart
 
 This section is for those needing to quickly refresh their memory on Outcome or those very familiar
 with `std::experimental::expected<T, E>`. It is not suitable for beginners who should use the \ref tutorial.

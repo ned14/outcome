@@ -674,17 +674,13 @@ inline const _detail::monad_category &monad_category()
 }
 
 //! \brief A monad exception object \ingroup monad
-class BOOSTLITE_SYMBOL_VISIBLE monad_error : public std::logic_error
+class BOOSTLITE_SYMBOL_VISIBLE monad_error : public stl11::system_error
 {
-  stl11::error_code _ec;
-
 public:
   monad_error(stl11::error_code ec)
-      : std::logic_error(ec.message())
-      , _ec(std::move(ec))
+      : std::system_error(ec)
   {
   }
-  const stl11::error_code &code() const noexcept { return _ec; }
 };
 
 //! \brief ADL looked up by the STL to convert a monad_errc into an error_code. \ingroup monad
