@@ -816,6 +816,7 @@ namespace detail
   {
   };
 
+#ifdef BOOST_OUTCOME_ENABLE_ADVANCED
   // Does the monad contain a monad?
   template <class> struct is_monad_monad;
   template <class Policy> struct is_monad_monad<basic_monad<Policy>>
@@ -902,7 +903,6 @@ namespace detail
   };
   template <class R, class C, class Policy> using do_next = do_simple_continuation<R, C, basic_monad, Policy>;
 
-#ifdef BOOST_OUTCOME_ENABLE_OPERATORS
   template <bool is_monad_monad, class M> struct do_unwrap2;
   template <class M> using do_unwrap = do_unwrap2<is_monad_monad<M>::value, M>;
   template <bool is_monad_monad, class M> struct do_unwrap2
@@ -1417,10 +1417,11 @@ error_type, an exception_type nor an empty_type.
 //! \brief If contains an exception_type, returns that exception_type. If contains an error_type, returns system_error(error_type). If contains a value_type, returns a null exception_type. Can only throw the exception monad_error(no_state) if empty.
 #endif
 
+#ifdef BOOST_OUTCOME_ENABLE_ADVANCED
 /*! \name Functional programming extensions (optional)
 \ingroup monad
 
-\note All code in this section can be enabled by defining BOOST_OUTCOME_ENABLE_OPERATORS.
+\note All code in this section can be enabled by defining BOOST_OUTCOME_ENABLE_ADVANCED.
 By default only next() is available. This prevents you writing code which impacts build times.
 
 Classic monadic programming consists of a sequence of nested functional operations:
@@ -1523,7 +1524,6 @@ allows a very easy way of converting between different configurations of monad c
   }
 #endif
 
-#ifdef BOOST_OUTCOME_ENABLE_OPERATORS
 //! \brief If I am a basic_monad<basic_monad<...>>, return copy of most nested basic_monad<...>, else return copy of *this
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
   basic_monad<...> unwrap() const &;

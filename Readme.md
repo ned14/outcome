@@ -18,7 +18,7 @@ Todo:
  - [x] Don't define BOOST_* C++ feature macros so we don't collide with Boost anymore.
  - [x] Test relaxed constexpr in VS15 once that is released and delete the hack macro.
  - [x] Document the exception throwing macros in the tutorial
- - [ ] Rejig `BOOST_OUTCOME_ENABLE_OPERATORS` to decide what ought to be in or out.
+ - [x] Rejig `BOOST_OUTCOME_ENABLE_OPERATORS` to decide what ought to be in or out.
  - [ ] `make install` needs to install dependency headers too
  - [ ] Add config where in release mode the exception throwing macros generate link errors
 for symbols with the function name and line number in them.
@@ -39,6 +39,7 @@ saying all passes. If so:
  
 Later:
  - [ ] Need to get boost-lite's cmake come up with a preprocessed edition as the master include header
+   - Need two editions, one with `BOOST_OUTCOME_ENABLE_ADVANCED` and one without.
  - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
  - [ ] Add tribool logic programming operator overloads
  - [ ] Add macro helpers to Outcome for returning outcomes out of things which cannot return values
