@@ -1,4 +1,5 @@
-# Advanced usage: Outcome as a Monad {#advanced}
+# Advanced usage: Outcome as a Monad
+\anchor advanced
 
 99% of Outcome users already have everything they will ever need - Outcome is a very
 simple library. However "full fat" monadic functional programming is also provided
