@@ -1,6 +1,8 @@
 # Advanced usage: Outcome as a Monad
 \anchor advanced
 
+\warning This section is still a work in progress and may be out of date, incorrect or make no sense!
+
 99% of Outcome users already have everything they will ever need - Outcome is a very
 simple library. However "full fat" monadic functional programming is also provided
 using a very clean and powerful API, albeit at a fair cost to compile times.

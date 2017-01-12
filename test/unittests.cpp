@@ -907,6 +907,7 @@ BOOST_AUTO_TEST_CASE(works / monad / serialisation, "Tests that the monad serial
   BOOST_CHECK(a.get() == "hello");
 }
 
+#ifdef BOOST_OUTCOME_ENABLE_ADVANCED
 BOOST_AUTO_TEST_CASE(works / monad / then, "Tests that the monad continues with next() as intended")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
@@ -943,7 +944,6 @@ BOOST_AUTO_TEST_CASE(works / monad / then, "Tests that the monad continues with 
 #endif
 }
 
-#ifdef BOOST_OUTCOME_ENABLE_OPERATORS
 BOOST_AUTO_TEST_CASE(works / monad / callable, "Tests that the monad works as intended holding callables")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;

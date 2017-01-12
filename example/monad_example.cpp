@@ -1,8 +1,8 @@
-#define BOOST_OUTCOME_ENABLE_OPERATORS 1
+#define BOOST_OUTCOME_ENABLE_ADVANCED 1
 #include "../include/boost/outcome.hpp"
 #include <iostream>
 
-#ifndef BOOST_OUTCOME_ENABLE_OPERATORS
+#ifndef BOOST_OUTCOME_ENABLE_ADVANCED
 #error Failed
 #endif
 

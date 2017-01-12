@@ -2022,7 +2022,7 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = DOXYGEN_IS_IN_THE_HOUSE=1 DOXYGEN_SHOULD_SKIP_THIS=1 \
     BOOST_OUTCOME_CONSTEXPR=constexpr \
-    BOOST_OUTCOME_ENABLE_OPERATORS=1
+    BOOST_OUTCOME_ENABLE_ADVANCED=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

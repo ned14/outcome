@@ -1,4 +1,7 @@
-# Frequently Asked Questions {#faq}
+# Frequently Asked Questions
+\anchor faq
+
+\warning This section is still a work in progress and may be out of date, incorrect or make no sense!
 
 \section when_use When am I supposed to use what when?
 

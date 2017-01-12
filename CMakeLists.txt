@@ -60,10 +60,10 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   list_filter(outcome_TESTS EXCLUDE REGEX "test_multiabi.cpp")
   include(BoostLiteMakeStandardTests)
   if(TARGET outcome_hl_pch)
-    target_compile_definitions(outcome_hl_pch PUBLIC BOOST_OUTCOME_ENABLE_OPERATORS=1)
+    target_compile_definitions(outcome_hl_pch PUBLIC BOOST_OUTCOME_ENABLE_ADVANCED=1)
   endif()
   foreach(test_target ${outcome_TEST_TARGETS} ${outcome_EXAMPLE_TARGETS})
-    target_compile_definitions(${test_target} PUBLIC BOOST_OUTCOME_ENABLE_OPERATORS=1)
+    target_compile_definitions(${test_target} PUBLIC BOOST_OUTCOME_ENABLE_ADVANCED=1)
   endforeach()
 
   # Add the unit tests but with exceptions and RTTI disabled

@@ -1,4 +1,5 @@
-# Quick start for the expert {#quickstart}
+# Quick start for the expert
+\anchor quickstart
 
 This section is for those needing to quickly refresh their memory on Outcome or those very familiar
 with `std::experimental::expected<T, E>`. It is not suitable for beginners who should use the \ref tutorial.
@@ -173,19 +174,19 @@ public:
   void swap(basic_monad&) noexcept([1]);                                       // also in expected<>
   void clear() noexcept([1]);
 
-#ifdef BOOST_OUTCOME_ENABLE_OPERATORS                                          // defaults to disabled (documented in Advanced Usage)
-  basic_monad<...> unwrap() const &;
+#ifdef BOOST_OUTCOME_ENABLE_ADVANCED                                           // defaults to disabled (documented in Advanced Usage)
+  basic_monad<...> unwrap() const &;                                           // return innermost monad
   basic_monad<...> unwrap() &&;
-  template<class F> basic_monad<...> bind(F &&f);
-  template<class F> basic_monad<...> operator>>(F &&f);
-  template<class F> basic_monad<...> map(F &&f);
-  template<class F> basic_monad(F(contents)).unwrap() match(F &&f);
-  template<class... Args> decltype(value_type(Args...)) operator()(Args &&...);
+  template<class F> basic_monad<...> bind(F &&f);                              // traditional monad bind operation
+  template<class F> basic_monad<...> operator>>(F &&f);                        // alias for bind() to keep Haskell folk happy
+  template<class F> basic_monad<...> map(F &&f);                               // traditional monad map operation
+  template<class F> basic_monad(F(contents)).unwrap() match(F &&f);            // call callable with contents of monad
+  template<class... Args> decltype(value_type(Args...)) operator()(Args &&...);// as if value()(Args...)
   
-  template<class U> constexpr basic_monad operator|(U &&) &;
+  template<class U> constexpr basic_monad operator|(U &&) &;                   // if the monad is not valued, return monad with U
   template<class U> constexpr basic_monad operator|(U &&) const&;
   template<class U> constexpr basic_monad operator|(U &&) &&;
-  template<class U> constexpr basic_monad operator&(U &&) &;
+  template<class U> constexpr basic_monad operator&(U &&) &;                   // if the monad is valued, return monad with U
   template<class U> constexpr basic_monad operator&(U &&) const&;
   template<class U> constexpr basic_monad operator&(U &&) &&;
 #endif
