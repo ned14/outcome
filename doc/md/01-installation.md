@@ -43,8 +43,6 @@ Once installed it is available for usage in any C++ 14 project using:
 
 \section osx Installing on OS X
 
-\todo This is yet to be implemented
-
 Assuming you have <a href="http://brew.sh/">homebrew</a> installed, then:
 
 <pre>brew tap ned14/tap
@@ -97,18 +95,18 @@ mkdir build
 cd build
 cmake ..
 cmake --build .
+ctest
 </pre>
 
-On POSIX now do:
-<pre>
-bin/outcome_hl--unittests
-bin/outcome_hl--unittests_noexcept
-</pre>
+On some cmake generators (Visual Studio, Xcode) you may need to tell cmake build a configuration
+like Release or Debug. Similarly, ctest needs to be told the same e.g.
 
-On Windows now do:
 <pre>
-bin/Debug/outcome_hl--unittests
-bin/Debug/outcome_hl--unittests_noexcept
+mkdir build
+cd build
+cmake ..
+cmake --build . --config Release
+ctest -C Release
 </pre>
 
 In case you are curious why there is a "noexcept" edition of the unit tests, this is

@@ -1,8 +1,6 @@
 # Outcome and the upcoming C++ 20 std::expected<T, E>
 \anchor std-expected
 
-\warning This section is still a work in progress and may be out of date, incorrect or make no sense!
-
 C++ 17 isn't finished at the time of writing, but we are very sure that at least
 <a href="http://en.cppreference.com/w/cpp/utility/optional">`std::optional<T>`</a>
 will be in it. It remains to be seen if LEWG's `expected<T, E>` will make it,
