@@ -1,8 +1,7 @@
 # Frequently Asked Questions
 \anchor faq
 
-\section dontlike Hard coding error_code and exception_ptr is incredibly restrictive and ruins Outcome for
-me. Can you not do that please (i.e. make it more like expected<T, E> with its arbitrary type E)?
+\section dontlike Hard coding error_code and exception_ptr is incredibly restrictive and ruins Outcome for me. Can you not do that please (i.e. make it more like expected<T, E> with its arbitrary type E)?
 
 Outcome isn't a direct substitute for Expected per se. It can substitute for Expected's default
 configuration of E = std::error_code and because it's less configurable and less flexible than
@@ -10,7 +9,21 @@ Expected, we can achieve much tighter assembler output by the compiler. It's a t
 imposes more restrictions but gives you faster, tighter, more predictable code. Expected is the
 STL primitive useful for a wide variety of tasks, not just error handling.
 
-However much of the opposition to the hard coded error type is due to not realising how
+One of the *huge* advantages of using `result<T>` in low latency code is precisely the hard coding
+of error codes as the error type. Error codes have <a href="http://en.cppreference.com/w/cpp/language/destructor#Trivial_destructor">trivial destructors</a>,
+and that means `result<T>` is trivially destructible i.e. the compiler's optimiser can assume that
+any storage occupied by `result<T>` needs nothing doing to it when disposing of an instance.
+That in turn allows the amazing folding up of long sequences of `result<T>` based operations by
+the compiler's optimiser into zero assembler output. There is nothing stopping you using Expected
+with its default error type of an error code which achieves much the same thing, but when you
+allow programmers to modify the error type then you'll find programmers do so without realising
+the consequences. In low latency SG14 type applications you need to **enforce** low latency best
+practice in just the same way as such applications invariably globally disable C++ exceptions.
+It's not that C++ exceptions are slow, it's rather if you give the programmers the freedom then
+they'll use it. Take away that freedom, and they're write better domain specific code with fewer
+surprises. This is the use case for Outcomes.
+
+Furthermore, much of the opposition to the hard coded error type is due to not realising how
 extended \ref boost::outcome::v1_xxx::error_code_extended "error_code_extended" is.
 Above and beyond the integer code and category that `error_code` provides, `error_code_extended`'s
 constructor adds:
@@ -20,7 +33,8 @@ using memory allocation and feed it to a newly constructed extended error code a
 allocating memory. This makes error handling performance predictable.
 - Two arbitrary unsigned integers. These could be fused into a `void *`, up to you.
 - You can ask for a stack backtrace to be taken, thus allowing identification of what code sequence
-resulted in the error. This also does not allocate memory.
+resulted in the error. This also does not allocate memory and costs a maximum of about 35
+microseconds on a fast Intel CPU if your stack down to seven levels deep is in warm cache.
 
 To make using this extended functionality even easier, in the \ref quickstart "Quick start"
 synopsis you may have noticed that the `make_errored_*()` functions accept an optional `const char *`
@@ -29,7 +43,7 @@ exception into an error code for you e.g. through you using `BOOST_OUTCOME_CATCH
 the conversion always feeds the exception's `what()` as the extended string description so no
 information is lost.
 
-\warning The extended information is stored in a global threadsafe ringbuffer. It will get garbage
+\warning The extended information is stored in a preallocated global threadsafe ringbuffer. It will get garbage
 collected at some point when the ring buffer wraps. The garbage collection is not synchronised with
 use of that data, so there is small chance that the extended data will get overwritten in mid use if
 you leave it too long between the error code being created and making use of its extended data. You
@@ -50,8 +64,7 @@ let you define a custom error code category for any custom enum or custom intege
 
 <hr><br>
 
-\section error_chains How do I implement chains of errors to transport errors happening whilst handling
-another error?
+\section error_chains How do I implement chains of errors to transport errors happening whilst handling another error?
 
 C++ 11 already has you covered. <a href="http://en.cppreference.com/w/cpp/error/nested_exception">`std::nested_exception`</a>
 lets you nest exceptions of arbitrary types within each other. It returns a standard `std::exception_ptr`
