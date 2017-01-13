@@ -1,4 +1,4 @@
-# Outcome and the upcoming std::expected<T, E>
+# Outcome and the upcoming C++ 20 std::expected<T, E>
 \anchor std-expected
 
 \warning This section is still a work in progress and may be out of date, incorrect or make no sense!
@@ -12,8 +12,7 @@ which ought to work on any C++ 14 compiler.
 
 \note LEWG is the C++ standard committee's Library Evolution Working Group. They work
 on improving the C++ standard runtime library which will gain `std::optional<T>` and
-`std::variant<...>` in C++ 17 and probably `std::expected<T, E>` in C++ 17 or C++ 20.
-
+`std::variant<...>` in C++ 17 and probably `std::expected<T, E>` in C++ 20.
 The following discussion is based on `expected<T, E>` as detailed by
 <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf">P0323R1</a>
 which is the latest LEWG proposal paper at the time of writing (Nov 2016) and indeed
@@ -37,62 +36,12 @@ made most of the changes I also made in Outcome, as that suggests I am on the ri
 Outcome's slightly different design still contributes a lot of value for the specific
 use of error handling in my opinion, as we shall hopefully see next.
 
-
-\section optional Returning optional<T>
-
-In some programming contexts we don't need to know why an operation failed, only
-that it did. Throwing an exception after failing to find a file is a good example
-of the kind of failure which is very common and where throwing an exception to
-handle that event is excessive and inappropriate. One might therefore design
-a routine expected to frequently fail in C++ as:
-
-\code
-// Returns true for success and fills \em out with the opened file, else false
-bool openfile(handle_ref &out, const char *path) noexcept;
-\endcode
-
-Wouldn't it be much nicer though if you didn't force the caller to have to
-instantiate a copy of `handle_ref` before each call, not least because such
-a requirement messes badly with using `openfile()` in generic template code
-and moreover it could be the case that constructing a `handle_ref` is an
-atomic operation, and is thus wasted work if the failure to open is very
-common? This is where `optional<T>` comes in:
-
-\code
-// Returns the opened handle on success, else an empty optional
-std::optional<handle_ref> openfile(const char *path) noexcept;
-...
-auto fh_ = openfile("foo");
-if(fh_)
-{
-  handle_ref fh = std::move(fh_.value());
-  fh->read(... etc
-}
-\endcode
-
-`optional<T>` is pretty boring and unsurprising like any good primitive. It's
-also fairly intuitive, almost any C++ programmer will immediately understand
-what the code above does from inspection.
-
-
-\subsection expected Returning expected<T, E>
-
-Many familiar with the filesystem will find the above use case of `optional<T>`
-unsettling because there are many reasons why one couldn't open a file rather
-than merely it was not found. Imagine, for example, that a program is attempting
-to open a few thousand files on a networked drive which has broken its connection -
-in this case every single failure will take considerable time to return and
-there is zero chance *any* file open will ever succeed, so what the user sees
-is an apparently hanged program. Far better would be if the `openfile()` function
-could return the cause of its failure, and we could then treat all errors which are different
-to file-not-found as reason to **abort**.
-
-Enter LEWG's proposed `expected<T, E>` which can hold either an expected value of
+LEWG's proposed `expected<T, E>` as per P0323R1 can hold either an expected value of
 type `T` or an unexpected value of type `E`. Like `variant<T, E>`, `expected<T, E>`
 is a discriminated union storing either `T` or `E` in the same storage space, but
 unlike the variant, expected treats the `T` as a positive thing (fetchable via a
 `.value()`) and `E` as a negative thing (fetchable via an `.error()`). Because
-`expected<T, E>` provides a "almost never empty" guarantee similar to variant,
+`expected<T, E>` provides an "almost never empty" guarantee similar to variant,
 it currently requires type `E` to be nothrow copy and move constructible and assignable.
 Expected is a bit less intuitive to use than optional, but its rules are straightforward:
 `expected<T, E>` will greedily and implicitly construct from any type from which a `T` can be constructed,
@@ -103,9 +52,9 @@ As with everything else in C++ 11 onwards, there is a `make_expected(T)` and a `
 which do any type deduction and conversion for you into the right contents of `expected<T, E>`.
 
 All this sounds a bit complex, but really it's much easier to use. Here is a
-non-throwing implementation based on `expected<T, E>`
+non-throwing implementation of the tutorial's `openfile()` based on `expected<T, E>`
 
-\code
+~~~{.cpp}
 // Returns the expected opened handle on success, or an unexpected cause of failure
 std::expected<handle_ref, std::error_code> openfile(const char *path) noexcept
 {
@@ -135,152 +84,31 @@ if(!fh_ && fh_.error() != std::errc::no_such_file_or_directory)
   // This is serious, abort
   throw std::system_error(std::move(fh_.error()));
 }
-else if(fh_)
-{
-  handle_ref fh = std::move(fh_.value());
-  fh->read(... etc
-}
-\endcode
-
-The prototype Boost.Expected library and the P0323R1 reference library actually
-declares `expected<T, E = std::exception_ptr>` as the default despite that P0323R1
-specifies `expected<T, E = std::error_condition>` as the default (note: I have no
-idea why LEWG would use error condition as a default, such a default would lose
-information for users so I have assumed they'll change it to error code soon), so for completeness
-let's rewrite the above to match an `E = std::exception_ptr` design instead:
-
-\code
-// Returns the expected opened handle on success, or an unexpected cause of failure
-std::expected<handle_ref, std::exception_ptr> openfile(const char *path) noexcept
-{
-  int fd = -1;
-  try
-  {
-    fd = open(path, O_RDONLY);
-    if(fd == -1)
-    {
-      throw std::system_error(std::error_code(errno, std::system_category()));
-    }
-    return make_handle_ref<some_derived_handle_implementation>(fd);
-  }
-  catch(...)
-  {
-    if(fd != -1)
-      close(fd);
-    return std::make_unexpected(std::current_exception());
-  }
-}
-...
-auto fh_ = openfile("foo");
-if(!fh_)
-{
-  try
-  {
-    std::rethrow_exception(fh_.error());
-  }
-  catch(const std::system_error &e)
-  {
-    if(e.code() != std::errc::no_such_file_or_directory)
-      throw;
-  }
-  // All other exception types were rethrown
-}
-else
-{
-  handle_ref fh = std::move(fh_.value());
-  fh->read(... etc
-}
-\endcode
-
-This is the very first time in this tutorial that we have seen the design pattern
-around which Outcome was specifically designed to make easy: *islands of exception
-throw in a sea of noexcept*.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-As you will see later, Outcome makes implementing this error handling design pattern easier
-than in Expected, but let's merge our two code examples using Expected above into one
-treating expected failures are unexceptional and exceptional failures as thrown exceptions:
-
-\code
-// Returns the expected opened handle on success, an error code if an anticipated error,
-// throws a system error if an unanticipated exceptional failure
-std::expected<handle_ref, std::error_code> openfile(const char *path)
-{
-  int fd = open(path, O_RDONLY);
-  if(fd == -1)
-  {
-    int code = errno;
-    // If a temporary failure, this is an expected unexpected outcome
-    if(EINTR==code || EBUSY==code || EISDIR==code || ELOOP==code || ENOENT==code || ENOTDIR==code || EPERM==code || EACCES==code)
-      return std::make_unexpected(std::error_code(code, std::system_category());
-    // If anything else, it's serious and we should abort
-    throw std::system_error(std::error_code(code, std::system_category()));
-  }
-  try
-  {
-    return make_handle_ref<some_derived_handle_implementation>(fd);
-  }
-  catch(...)
-  {
-    close(fd);
-    throw;
-  }
-}
-...
-auto fh_ = openfile("foo");
-// If !fh_, it's an expected failure we ignored
 if(fh_)
 {
   handle_ref fh = std::move(fh_.value());
   fh->read(... etc
 }
-\endcode
+~~~
 
-This "separation of concerns" pattern has a great aesthetic appeal to most,
-including myself. This is likely why Rust adopted it.
-
-However I must admit that after more than a year of using Outcome I haven't found myself
-using this design a great deal. It fits well for some codebases, but very much a
-minority. The problem in my opinion is that the cost of writing and maintaining correct
-and fully tested code which can invert control flow at any moment is high
-and typically very much underestimated. Therefore, it is only in some code bases
-that it is worth placing that high burden on the code, and in most code bases it is not.
-Hence in most code bases I write forwards only execution code where there is no
-possible way of inverting control flow at all i.e. no exceptions can be thrown,
-despite that exceptions are available.
+\note The prototype Boost.Expected library and the P0323R1 reference library actually
+declares `expected<T, E = std::exception_ptr>` as the default despite that P0323R1
+specifies `expected<T, E = std::error_condition>` as the default. I have no
+idea why LEWG would use error condition as a default, such a default would lose
+information for users so I have assumed they'll change it to error code soon.
 
 <br><hr><br>
 
-\section introduction2 Introducing Outcome
+\section design_differences Design differences between Expected and Outcome
 
-After that literature review of how C++ has implemented error handling and how code
-might implement error handling from C++ 17/20 onwards, one might think that Outcome
+After all the documentation to date, one might think that Outcome
 and Expected are interchangeable. They do cover substantially similar ground and in
 the semantic sense they are the same thing, however where Expected is intended as a
 generic fundamental type useful for many things, Outcome is specifically
 intended as a universal error handling framework capable of lossless propagation of
 all possible kinds of C++ error with the least possible runtime and compile time
 overhead. It could be considered as a "fixed feature" Expected specialised for the
-use case of handling errors only.
-
-\subsection design_differences Design differences between Expected and Outcomes
+use case of handling errors only. Here are the exact differences:
 
 1. Outcome is designed specifically for returning output from function calls in
 low latency/very high performance C++ of the kind
@@ -294,11 +122,11 @@ means for inlined code if you return a `result<T>(T(...))`, the compiler will ge
 identical code as if you had returned a `T(...)` directly.
 2. Outcome's actual core implementation is `boost::outcome::basic_monad<Policy<T, EC, E>>` with these
 convenience typedefs:
- \code
+ ~~~{.cpp}
  template<class T> using outcome = basic_monad< monad_policy<T, std::error_code, std::exception_ptr>>;
  template<class T> using result  = basic_monad<result_policy<T, std::error_code, void>>;
  template<class T> using option  = basic_monad<option_policy<T, void, void>>;
- \endcode 
+ ~~~
  You can use any type `EC` or `E` you like so long as they act as if a `std::error_code`
  and a `std::exception_ptr` respectively e.g. `boost::error_code` and `boost::exception_ptr`.
  **Unlike** the `E` in `expected<T, E>`, Outcome hard codes the model of `EC` and `E` in stone,
