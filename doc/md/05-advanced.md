@@ -1,16 +1,14 @@
 # Advanced usage: Outcome as a Monad
 \anchor advanced
 
-\warning This section is still a work in progress and may be out of date, incorrect or make no sense!
-
 99% of Outcome users already have everything they will ever need - Outcome is a very
 simple library. However "full fat" monadic functional programming is also provided
 using a very clean and powerful API, albeit at a fair cost to compile times.
 
 \section functional Functional programming extensions (optional)
 
-\note All code in this section can be enabled by defining `BOOST_OUTCOME_ENABLE_OPERATORS`.
-By default only `next()` is available. This prevents you writing code which impacts build times.
+\note All code in this section can be enabled by defining `BOOST_OUTCOME_ENABLE_ADVANCED`.
+By default is it off. This prevents you writing code which impacts build times.
 
 It is assumed in this section that you already understand monadic functional programming. This
 section is simply to explain how these are implemented in Outcome.
@@ -32,11 +30,12 @@ Classic monadic programming consists of a sequence of nested functional operatio
     contain a `T`, that is passed through.</dd>
 </dl>
 We also support `outcome<T>.next(R(outcome<T>))` for semantic equivalence to futures where the
-callable is called with the originating monad. This
-acts like `bind()`, so if the callable returns a monad it is not wrapped in another
+callable is called with the originating monad. This acts somewhat like `bind()`, so if the callable returns a monad it is not wrapped in another
 monad. Unlike `map()` or `bind()`, `next()` always calls the callable no matter what the
 monad contains, so it is up to you to interrogate the monad. Note that the originating
 monad is passed by const lvalue ref unless the callable takes a rvalue ref to the monad.
+Note that due to being much simpler, the load on the compiler when you use `next()` is considerably less than when you
+use `map()` or `bind()`.
 
 A quick use example:
 \snippet monad_example.cpp monad_bind_example
@@ -86,7 +85,7 @@ passed. `unwrap()` is implemented using a recursively expanded structure which i
 okay for low unwrap depths. `next()` is probably the least weighty of the monadic operators
 as it's relatively dumb and the only metaprogramming is to determine whether to wrap
 the return type with a monad or not. Because of this impact on compile times, by default
-all operations apart from `next()` are not compiled in without the `BOOST_OUTCOME_ENABLE_OPERATORS`
+all operations apart from `next()` are not compiled in without the `BOOST_OUTCOME_ENABLE_ADVANCED`
 macro being defined beforehand.
 
 ### Acknowledgements ###
