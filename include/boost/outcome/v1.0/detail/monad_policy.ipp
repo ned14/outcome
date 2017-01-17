@@ -1,6 +1,6 @@
 /* monad_policy.ipp
-Non-allocating constexpr future-promise
-(C) 2015 Niall Douglas http://www.nedprod.com/
+Configures basic_monad as an option<T>, result<T> and outcome<T>.
+(C) 2015-2017 Niall Douglas http://www.nedprod.com/
 File Created: July 2015
 
 
@@ -276,7 +276,6 @@ namespace detail
 #endif
   };
 
-  //! [monad_policy]
   // An implementation policy for basic_monad
   template <typename R> struct BOOST_OUTCOME_MONAD_POLICY_NAME
   {
@@ -304,7 +303,6 @@ namespace detail
     // The type which rebinding myself produces
     template <typename U> using rebind_policy = BOOST_OUTCOME_MONAD_POLICY_NAME<U>;
   };
-  //! [monad_policy]
   template <> struct BOOST_OUTCOME_MONAD_POLICY_NAME<void>
   {
     // The final resulting implementation type
