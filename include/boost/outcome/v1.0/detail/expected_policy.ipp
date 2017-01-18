@@ -1,7 +1,7 @@
-/* monad_policy.ipp
-Configures basic_monad as an option<T>, result<T> and outcome<T>.
+/* expected_policy.ipp
+Configures basic_monad as a LEWG expected<T, E> implementation
 (C) 2015-2017 Niall Douglas http://www.nedprod.com/
-File Created: July 2015
+File Created: Jan 2017
 
 
 Boost Software License - Version 1.0 - August 17th, 2003
@@ -29,18 +29,6 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef BOOST_OUTCOME_MONAD_NAME
-#error BOOST_OUTCOME_MONAD_NAME needs to be defined
-#endif
-#define BOOST_OUTCOME_GLUE2(a, b) a##b
-#define BOOST_OUTCOME_GLUE(a, b) BOOST_OUTCOME_GLUE2(a, b)
-#ifndef BOOST_OUTCOME_MONAD_POLICY_NAME
-#define BOOST_OUTCOME_MONAD_POLICY_NAME BOOST_OUTCOME_GLUE(BOOST_OUTCOME_MONAD_NAME, _policy)
-#endif
-#ifndef BOOST_OUTCOME_MONAD_POLICY_BASE_NAME
-#define BOOST_OUTCOME_MONAD_POLICY_BASE_NAME BOOST_OUTCOME_GLUE(BOOST_OUTCOME_MONAD_NAME, _policy_base)
-#endif
-
 namespace detail
 {
 #ifdef _MSC_VER
@@ -49,41 +37,37 @@ namespace detail
 #pragma warning(disable : 4702)  // unreachable code
 #endif
   // Inherited from publicly by basic_monad, so whatever you expose here you expose in basic_monad
-  template <class monad_storage, class value_type, class error_type = void, class exception_type = void> struct BOOST_OUTCOME_MONAD_POLICY_BASE_NAME : public monad_storage
+  template <class monad_storage, class value_type, class error_type, class exception_type> struct expected_policy_base : public monad_storage
   {
     template <class... Args>
-    constexpr BOOST_OUTCOME_MONAD_POLICY_BASE_NAME(Args &&... args)
+    constexpr expected_policy_base(Args &&... args)
         : monad_storage(std::forward<Args>(args)...)
     {
     }
 
   protected:
-    // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    // expected's default constructor constructs a value_type
+    constexpr expected_policy_base() : monad_storage(value_t()) {}
     // Common preamble to the below
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
-        _throw_error(monad_errc::no_state);
-#if defined(BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE) || defined(BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE)
+        BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS();
       if(monad_storage::has_error() || monad_storage::has_exception())
       {
-#ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
         if(monad_storage::has_error())
-          BOOST_OUTCOME_THROW_SYSTEM_ERROR(monad_storage::_storage.error, stl11::system_error(monad_storage::_storage.error));
-#endif
-#ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
+          BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS(monad_storage::_storage.error);
+#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
         if(monad_storage::has_exception())
           BOOST_OUTCOME_RETHROW_EXCEPTION(monad_storage::_storage.exception);
 #endif
       }
-#endif
     }
     // If storage is packed into a byte, it cannot be referenced
-    using lvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, value_type &, value_type>::type;
-    using const_lvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, const value_type &, value_type>::type;
-    using rvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, value_type &&, value_type>::type;
-    using const_rvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, const value_type &&, value_type>::type;
+    using lvalue_type = value_type &;
+    using const_lvalue_type = const value_type &;
+    using rvalue_type = value_type &&;
+    using const_rvalue_type = const value_type &&;
 
   public:
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const auto *operator-> () const
@@ -157,31 +141,27 @@ namespace detail
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
-#ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type get_error() const
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
-          return error_type();
+        BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS();
       }
       if(monad_storage::has_error())
         return monad_storage::_storage.error;
-#ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
+#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
       if(monad_storage::has_exception())
         return error_type((int) monad_errc::exception_present, monad_category());
 #endif
       return error_type();
     }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
-#endif
-#ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
+#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type get_exception() const
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
-          return exception_type();
+        BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS();
       }
       if(!monad_storage::has_error() && !monad_storage::has_exception())
         return exception_type();
@@ -194,35 +174,31 @@ namespace detail
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type exception() const { return get_exception(); }
 #endif
   };
-  template <class monad_storage, class error_type, class exception_type> struct BOOST_OUTCOME_MONAD_POLICY_BASE_NAME<monad_storage, void, error_type, exception_type> : public monad_storage
+  template <class monad_storage, class error_type, class exception_type> struct expected_policy_base<monad_storage, void, error_type, exception_type> : public monad_storage
   {
     template <class... Args>
-    constexpr BOOST_OUTCOME_MONAD_POLICY_BASE_NAME(Args &&... args)
+    constexpr expected_policy_base(Args &&... args)
         : monad_storage(std::forward<Args>(args)...)
     {
     }
 
   protected:
-    // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    // expected's default constructor constructs a value_type
+    constexpr expected_policy_base() : monad_storage(value_t()) {}
     // Common preamble to the below
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
-        _throw_error(monad_errc::no_state);
-#if defined(BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE) || defined(BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE)
+        BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS();
       if(monad_storage::has_error() || monad_storage::has_exception())
       {
-#ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
         if(monad_storage::has_error())
-          BOOST_OUTCOME_THROW_SYSTEM_ERROR(monad_storage::_storage.error, stl11::system_error(monad_storage::_storage.error));
-#endif
-#ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
+          BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS(monad_storage::_storage.error);
+#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
         if(monad_storage::has_exception())
           BOOST_OUTCOME_RETHROW_EXCEPTION(monad_storage::_storage.exception);
 #endif
       }
-#endif
     }
 
   public:
@@ -238,31 +214,27 @@ namespace detail
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() const && { _pre_get_value(); }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get() const && { _pre_get_value(); }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void value() const && { _pre_get_value(); }
-#ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type get_error() const
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
-          return error_type();
+        BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS();
       }
       if(monad_storage::has_error())
         return monad_storage::_storage.error;
-#ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
+#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
       if(monad_storage::has_exception())
         return error_type((int) monad_errc::exception_present, monad_category());
 #endif
       return error_type();
     }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
-#endif
-#ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
+#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type get_exception() const
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
-          return exception_type();
+        BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS();
       }
       if(!monad_storage::has_error() && !monad_storage::has_exception())
         return exception_type();
@@ -276,68 +248,54 @@ namespace detail
 #endif
   };
 
+  //! [monad_policy]
   // An implementation policy for basic_monad
-  template <typename R> struct BOOST_OUTCOME_MONAD_POLICY_NAME
+  template <typename R, typename EC> struct expected_policy
   {
     // The final resulting implementation type
-    typedef basic_monad<BOOST_OUTCOME_MONAD_POLICY_NAME> implementation_type;
+    typedef basic_monad<expected_policy> implementation_type;
     // The value type to use. Can be void to disable.
     typedef R value_type;
 // The error code type to use. Can be void to disable.
-#ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
-    typedef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE error_type;
-#else
-    typedef void error_type;
-#endif
+    typedef EC error_type;
 // The exception pointer type to use. Can be void to disable.
-#ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
-    typedef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE exception_type;
+#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
+    typedef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE exception_type;
 #else
     typedef void exception_type;
 #endif
     // The base class to use to store state
-    typedef BOOST_OUTCOME_MONAD_POLICY_BASE_NAME<basic_monad_storage<BOOST_OUTCOME_MONAD_POLICY_NAME>, value_type, error_type, exception_type> base;
+    typedef expected_policy_base<basic_monad_storage<expected_policy>, value_type, error_type, exception_type> base;
 
     // The type which basic_monad::rebind<U> should return
-    template <typename U> using rebind = basic_monad<BOOST_OUTCOME_MONAD_POLICY_NAME<U>>;
+    template <typename U> using rebind = basic_monad<expected_policy<U, EC>>;
     // The type which rebinding myself produces
-    template <typename U> using rebind_policy = BOOST_OUTCOME_MONAD_POLICY_NAME<U>;
+    template <typename U> using rebind_policy = expected_policy<U, EC>;
   };
-  template <> struct BOOST_OUTCOME_MONAD_POLICY_NAME<void>
+  //! [monad_policy]
+  template <typename EC> struct expected_policy<void, EC>
   {
     // The final resulting implementation type
-    typedef basic_monad<BOOST_OUTCOME_MONAD_POLICY_NAME> implementation_type;
+    typedef basic_monad<expected_policy> implementation_type;
     // The value type to use. Can be void to disable.
     typedef void value_type;
 // The error code type to use. Can be void to disable.
-#ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
-    typedef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE error_type;
-#else
-    typedef void error_type;
-#endif
+    typedef EC error_type;
 // The exception pointer type to use. Can be void to disable.
-#ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
-    typedef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE exception_type;
+#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
+    typedef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE exception_type;
 #else
     typedef void exception_type;
 #endif
     // The base class to use to store state
-    typedef BOOST_OUTCOME_MONAD_POLICY_BASE_NAME<basic_monad_storage<BOOST_OUTCOME_MONAD_POLICY_NAME>, value_type, error_type, exception_type> base;
+    typedef expected_policy_base<basic_monad_storage<expected_policy>, value_type, error_type, exception_type> base;
 
     // The type which basic_monad::rebind<U> should return
-    template <typename U> using rebind = basic_monad<BOOST_OUTCOME_MONAD_POLICY_NAME<U>>;
+    template <typename U> using rebind = basic_monad<expected_policy<U, EC>>;
     // The type which rebinding myself produces
-    template <typename U> using rebind_policy = BOOST_OUTCOME_MONAD_POLICY_NAME<U>;
+    template <typename U> using rebind_policy = expected_policy<U, EC>;
   };
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 }
-
-#undef BOOST_OUTCOME_GLUE
-#undef BOOST_OUTCOME_GLUE2
-#undef BOOST_OUTCOME_PROMISE_NAME
-#undef BOOST_OUTCOME_MONAD_NAME
-#undef BOOST_OUTCOME_MONAD_POLICY_NAME
-#undef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
-#undef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE

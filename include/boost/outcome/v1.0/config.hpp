@@ -251,25 +251,25 @@ namespace detail
   }
 }
 BOOST_OUTCOME_V1_NAMESPACE_END
-//! Redefine to have something else occur when Outcome throws an exception
+//! \brief Redefine to have something else occur when Outcome throws an exception
 #define BOOST_OUTCOME_THROW(expr) BOOST_OUTCOME_V1_NAMESPACE::detail::do_fatal_exit(#expr)
 #endif
 #endif
 
 #ifndef BOOST_OUTCOME_THROW_DESERIALISATION_FAILURE
-//! Predefine to have something else occur when Outcome throws an exception due to a deserialisation failure
+//! \brief Predefine to have something else occur when Outcome throws an exception due to a deserialisation failure
 #define BOOST_OUTCOME_THROW_DESERIALISATION_FAILURE(m, expr) BOOST_OUTCOME_THROW(expr)
 #endif
 
 #ifndef BOOST_OUTCOME_THROW_MONAD_ERROR
-/*! Predefine to have something else occur when Outcome throws a monad_error due to being asked to do something not possible
+/*! \brief Predefine to have something else occur when Outcome throws a monad_error due to being asked to do something not possible
 \return Can return false to cancel the calling operation (see `_throw_error()` in monad_policy.ipp).
 */
 #define BOOST_OUTCOME_THROW_MONAD_ERROR(ec, expr) BOOST_OUTCOME_THROW(expr), false
 #endif
 
 #ifndef BOOST_OUTCOME_THROW_SYSTEM_ERROR
-//! Predefine to have something else occur when Outcome throws a system_error with an error_code from the monad
+//! \brief Predefine to have something else occur when Outcome throws a system_error with an error_code from the monad
 #define BOOST_OUTCOME_THROW_SYSTEM_ERROR(ec, expr) BOOST_OUTCOME_THROW(expr)
 #endif
 
@@ -277,9 +277,14 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 #ifdef __cpp_exceptions
 #define BOOST_OUTCOME_RETHROW_EXCEPTION(ex) std::rethrow_exception(ex)
 #else
-//! Predefine to have something else occur when Outcome rethrows an exception_ptr from the monad
+//! \brief Predefine to have something else occur when Outcome rethrows an exception_ptr from the monad
 #define BOOST_OUTCOME_RETHROW_EXCEPTION(ex) BOOST_OUTCOME_THROW(std::rethrow_exception(ex))
 #endif
+#endif
+
+#ifndef BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS
+//! \brief Predefine to what you want the Expected implementation to when throwing a bad_expected_access
+#define BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS(...) BOOST_OUTCOME_THROW(make_bad_expected_access(__VA_ARGS__))
 #endif
 
 
