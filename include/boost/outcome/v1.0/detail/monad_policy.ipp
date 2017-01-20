@@ -51,13 +51,18 @@ namespace detail
   // Inherited from publicly by basic_monad, so whatever you expose here you expose in basic_monad
   template <class monad_storage, class value_type, class error_type = void, class exception_type = void> struct BOOST_OUTCOME_MONAD_POLICY_BASE_NAME : public monad_storage
   {
+  protected:
+    BOOST_OUTCOME_MONAD_POLICY_BASE_NAME() = delete;
+    BOOST_OUTCOME_MONAD_POLICY_BASE_NAME(const BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &) = delete;
+    BOOST_OUTCOME_MONAD_POLICY_BASE_NAME(BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &&) = delete;
+    BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &operator=(const BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &) = default;
+    BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &operator=(BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &&) = default;
+    struct passthru_t {};
     template <class... Args>
-    constexpr BOOST_OUTCOME_MONAD_POLICY_BASE_NAME(Args &&... args)
-        : monad_storage(std::forward<Args>(args)...)
+    constexpr BOOST_OUTCOME_MONAD_POLICY_BASE_NAME(passthru_t, Args &&... args)
+      : monad_storage(std::forward<Args>(args)...)
     {
     }
-
-  protected:
     // Must handle error situation ec. Can return false to cancel the calling operation.
     static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
     // Common preamble to the below
@@ -196,13 +201,18 @@ namespace detail
   };
   template <class monad_storage, class error_type, class exception_type> struct BOOST_OUTCOME_MONAD_POLICY_BASE_NAME<monad_storage, void, error_type, exception_type> : public monad_storage
   {
+  protected:
+    BOOST_OUTCOME_MONAD_POLICY_BASE_NAME() = delete;
+    BOOST_OUTCOME_MONAD_POLICY_BASE_NAME(const BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &) = delete;
+    BOOST_OUTCOME_MONAD_POLICY_BASE_NAME(BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &&) = delete;
+    BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &operator=(const BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &) = default;
+    BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &operator=(BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &&) = default;
+    struct passthru_t {};
     template <class... Args>
-    constexpr BOOST_OUTCOME_MONAD_POLICY_BASE_NAME(Args &&... args)
-        : monad_storage(std::forward<Args>(args)...)
+    constexpr BOOST_OUTCOME_MONAD_POLICY_BASE_NAME(passthru_t, Args &&... args)
+      : monad_storage(std::forward<Args>(args)...)
     {
     }
-
-  protected:
     // Must handle error situation ec. Can return false to cancel the calling operation.
     static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
     // Common preamble to the below
@@ -295,6 +305,12 @@ namespace detail
 #else
     typedef void exception_type;
 #endif
+
+    // Ought the monad be default constructible?
+    static constexpr bool is_default_constructible = true;
+    // Is default construction non-throwing?
+    static constexpr bool is_nothrow_default_constructible = true;
+
     // The base class to use to store state
     typedef BOOST_OUTCOME_MONAD_POLICY_BASE_NAME<basic_monad_storage<BOOST_OUTCOME_MONAD_POLICY_NAME>, value_type, error_type, exception_type> base;
 
@@ -321,6 +337,12 @@ namespace detail
 #else
     typedef void exception_type;
 #endif
+
+    // Ought the monad be default constructible?
+    static constexpr bool is_default_constructible = true;
+    // Is default construction non-throwing?
+    static constexpr bool is_nothrow_default_constructible = true;
+
     // The base class to use to store state
     typedef BOOST_OUTCOME_MONAD_POLICY_BASE_NAME<basic_monad_storage<BOOST_OUTCOME_MONAD_POLICY_NAME>, value_type, error_type, exception_type> base;
 
