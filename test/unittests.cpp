@@ -580,6 +580,11 @@ BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly i
   }
   {
     using type = outcome<std::string>;
+    std::cout << "string is_nothrow_copy_constructible=" << std::is_nothrow_copy_constructible<std::string>::value << std::endl;
+    std::cout << "string is_nothrow_move_constructible=" << std::is_nothrow_move_constructible<std::string>::value << std::endl;
+    std::cout << "string is_nothrow_copy_assignable=" << std::is_nothrow_copy_assignable<std::string>::value << std::endl;
+    std::cout << "string is_nothrow_move_assignable=" << std::is_nothrow_move_assignable<std::string>::value << std::endl;
+    std::cout << "string is_nothrow_destructible=" << std::is_nothrow_destructible<std::string>::value << std::endl;
     std::cout << "outcome<string> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
     std::cout << "outcome<string> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
     std::cout << "outcome<string> is_nothrow_copy_assignable=" << type::is_nothrow_copy_assignable << std::endl;
@@ -590,11 +595,11 @@ BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly i
     BOOST_CHECK(type::is_nothrow_copy_assignable == std::is_nothrow_copy_assignable<type>::value);
     BOOST_CHECK(type::is_nothrow_move_assignable == std::is_nothrow_move_assignable<type>::value);
     BOOST_CHECK(type::is_nothrow_destructible == std::is_nothrow_destructible<type>::value);
-    BOOST_CHECK(!std::is_nothrow_copy_constructible<type>::value);
-    BOOST_CHECK(std::is_nothrow_move_constructible<type>::value);
-    BOOST_CHECK(!std::is_nothrow_copy_assignable<type>::value);
-    BOOST_CHECK(std::is_nothrow_move_assignable<type>::value);
-    BOOST_CHECK(std::is_nothrow_destructible<type>::value);
+    BOOST_CHECK(std::is_nothrow_copy_constructible<type>::value == std::is_nothrow_copy_constructible<std::string>::value);
+    BOOST_CHECK(std::is_nothrow_move_constructible<type>::value == std::is_nothrow_move_constructible<std::string>::value);
+    BOOST_CHECK(std::is_nothrow_copy_assignable<type>::value == std::is_nothrow_copy_assignable<std::string>::value);
+    BOOST_CHECK(std::is_nothrow_move_assignable<type>::value == std::is_nothrow_move_assignable<std::string>::value);
+    BOOST_CHECK(std::is_nothrow_destructible<type>::value == std::is_nothrow_destructible<std::string>::value);
   }
   {
     struct Except

@@ -172,7 +172,7 @@ void except_default_constructor_error_code()
 void except_default_constructor_constexpr()
 {
   // From value constructor.
-  BOOST_CONSTEXPR stde::expected<int,int> e;
+  BOOST_CONSTEXPR stde::expected<int,void> e;
   BOOST_CHECK(!e.empty());
 }
 
@@ -242,13 +242,14 @@ void expected_from_exception()
 {
   // From stde::unexpected_type constructor.
   stde::expected<int, std::exception_ptr> e(stde::make_unexpected(std::make_exception_ptr(test_exception())));
-  BOOST_CHECK_THROW(e.value(), test_exception);
-  BOOST_CHECK_EQ(!e.empty(), false);
+  BOOST_CHECK_THROW(e.value(), stde::bad_expected_access<std::exception_ptr>);
   BOOST_CHECK_EQ(static_cast<bool>(e), false);
 }
 
 void expected_from_copy_value()
 {
+  static_assert(stde::expected<int>::is_copy_constructible, "");
+  static_assert(std::is_copy_constructible<stde::expected<int>>::value, "");
   // From copy constructor.
   stde::expected<int> ef(5);
   stde::expected<int> e(ef);
@@ -264,8 +265,7 @@ void expected_from_copy_exception()
   // From stde::unexpected_type constructor.
   stde::expected<int, std::exception_ptr> ef(stde::make_unexpected(std::make_exception_ptr(test_exception())));
   stde::expected<int, std::exception_ptr> e(ef);
-  BOOST_CHECK_THROW(e.value(), test_exception);
-  BOOST_CHECK_EQ(!e.empty(), false);
+  BOOST_CHECK_THROW(e.value(), stde::bad_expected_access<std::exception_ptr>);
   BOOST_CHECK_EQ(static_cast<bool>(e), false);
 }
 
@@ -284,8 +284,7 @@ void expected_from_exception_ptr()
 {
   // From exception_ptr constructor.
   stde::expected<int, std::exception_ptr> e(stde::make_unexpected(std::make_exception_ptr(test_exception())));
-  BOOST_CHECK_THROW(e.value(), test_exception);
-  BOOST_CHECK_EQ(!e.empty(), false);
+  BOOST_CHECK_THROW(e.value(), stde::bad_expected_access<std::exception_ptr>);
   BOOST_CHECK_EQ(static_cast<bool>(e), false);
 }
 
@@ -313,7 +312,6 @@ void expected_from_catch_block()
     stde::expected<int, std::exception_ptr> e(stde::make_unexpected(std::current_exception()));
 
     BOOST_CHECK_THROW(e.value(), std::exception);
-    BOOST_CHECK_EQ(!e.empty(), false);
     BOOST_CHECK_EQ(static_cast<bool>(e), false);
   }
 }
@@ -361,7 +359,6 @@ void expected_from_error_error_condition()
   } catch (stde::bad_expected_access<std::error_condition>& ex) {
     BOOST_CHECK(error_from_except_check(ex));
   }
-  BOOST_CHECK_EQ(!e.empty(), false);
   BOOST_CHECK_EQ(static_cast<bool>(e), false);
 }
 
@@ -369,16 +366,18 @@ void expected_from_error_error_condition()
 void except_valid_constexpr_int()
 {
   // From value constructor.
-  BOOST_CONSTEXPR stde::expected<int,int> e;
+  BOOST_CONSTEXPR stde::expected<int,void> e;
   BOOST_CONSTEXPR bool b = !e.empty();
   BOOST_CHECK(b);
 }
 void except_value_constexpr_int()
 {
+#if !defined(_MSC_VER) || _MSC_VER > 1900 /* VS2015 */
   // From value constructor.
-  BOOST_CONSTEXPR stde::expected<int,int> e(1);
+  BOOST_CONSTEXPR stde::expected<int,void> e(1);
   BOOST_CONSTEXPR int x = e.value();
   BOOST_CHECK_EQ(x, 1);
+#endif
 }
 
 void expected_from_value3()
@@ -493,7 +492,6 @@ void expected_from_exception_catch()
     stde::expected<int, std::exception_ptr> e = stde::make_unexpected(std::current_exception());
 
     BOOST_CHECK_THROW(e.value(), std::exception);
-    BOOST_CHECK_EQ(!e.empty(), false);
     BOOST_CHECK_EQ(static_cast<bool>(e), false);
   }
 }
@@ -511,16 +509,14 @@ void expected_from_error()
   } catch (stde::bad_expected_access<std::error_condition>& ex) {
     BOOST_CHECK(error_from_except_check(ex));
   }
-  BOOST_CHECK_EQ(!e.empty(), false);
   BOOST_CHECK_EQ(static_cast<bool>(e), false);
 }
 
 void expected_from_error_U()
 {
   // From stde::unexpected_type constructor.
-  auto e = stde::make_expected_from_error<int, short>(42);
-  static_assert(std::is_same<decltype(e), stde::expected<int, short>>{}, "");
-  BOOST_CHECK_EQ(!e.empty(), false);
+  auto e = stde::make_expected_from_error<std::string, short>(42);
+  static_assert(std::is_same<decltype(e), stde::expected<std::string, short>>{}, "");
   BOOST_CHECK_EQ(static_cast<bool>(e), false);
 }
 
@@ -540,8 +536,7 @@ void expected_from_exception_ptr2()
 {
   // From exception_ptr constructor.
   auto e = stde::expected<int, std::exception_ptr>(stde::make_unexpected(std::make_exception_ptr(test_exception())));
-  BOOST_CHECK_THROW(e.value(), test_exception);
-  BOOST_CHECK_EQ(!e.empty(), false);
+  BOOST_CHECK_THROW(e.value(), stde::bad_expected_access<std::exception_ptr>);
   BOOST_CHECK_EQ(static_cast<bool>(e), false);
 }
 
@@ -655,16 +650,31 @@ void expected_swap_exception()
   try {
     (void)e.value();
     BOOST_CHECK(true);
-  } catch (std::invalid_argument& ex)
+  }
+  catch (stde::bad_expected_access<std::exception_ptr> &e)
   {
-    BOOST_CHECK(equal_to_e2(ex));
+    try
+    {
+      std::rethrow_exception(e.error());
+    }
+    catch (std::invalid_argument &ex)
+    {
+      BOOST_CHECK(equal_to_e2(ex));
+    }
   }
   try {
     (void)e2.value();
     BOOST_CHECK(true);
-  } catch (std::invalid_argument& ex)
+  } catch (stde::bad_expected_access<std::exception_ptr> &e)
   {
-    BOOST_CHECK(equal_to_e(ex));
+    try
+    {
+      std::rethrow_exception(e.error());
+    }
+    catch (std::invalid_argument &ex)
+    {
+      BOOST_CHECK(equal_to_e(ex));
+    }
   }
 
   e2.swap(e);
@@ -672,16 +682,32 @@ void expected_swap_exception()
   try {
     (void)e.value();
     BOOST_CHECK(true);
-  } catch (std::invalid_argument& ex)
+  }
+  catch (stde::bad_expected_access<std::exception_ptr> &e)
   {
-    BOOST_CHECK(equal_to_e(ex));
+    try
+    {
+      std::rethrow_exception(e.error());
+    }
+    catch (std::invalid_argument& ex)
+    {
+      BOOST_CHECK(equal_to_e(ex));
+    }
   }
   try {
     (void)e2.value();
     BOOST_CHECK(true);
-  } catch (std::invalid_argument& ex)
+  }
+  catch (stde::bad_expected_access<std::exception_ptr> &e)
   {
-    BOOST_CHECK(equal_to_e2(ex));
+    try
+    {
+      std::rethrow_exception(e.error());
+    }
+    catch (std::invalid_argument& ex)
+    {
+      BOOST_CHECK(equal_to_e2(ex));
+    }
   }
 }
 
@@ -705,22 +731,23 @@ void expected_swap_function_value()
 
 int main()
 {
-
   static_assert(! std::is_default_constructible<NoDefaultConstructible>::value, "");
   static_assert(! std::is_default_constructible<stde::expected<NoDefaultConstructible>>::value, "");
 
   static_assert(! std::is_copy_constructible<NoCopyConstructible>::value, "");
   static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, NoCopyConstructible const& >::value, "");
-  static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, stde::expected<NoCopyConstructible> const& >::value, "");
-  static_assert(! std::is_copy_constructible<stde::expected<NoCopyConstructible>>::value, "");
+//  static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, stde::expected<NoCopyConstructible> const& >::value, "");
+//  static_assert(! std::is_copy_constructible<stde::expected<NoCopyConstructible>>::value, "");
 
   {
     NoMoveConstructible nmc;
     //NoMoveConstructible nmc2 = std::move(nmc); // FAILS as expected
 
     stde::expected<NoMoveConstructible> x = std::move(nmc); // DOESN'T FAIL as copy is selected instead
+    (void)x;
   }
   static_assert(! std::is_move_constructible<NoMoveConstructible>::value, "");
+  static_assert(! stde::expected<NoMoveConstructible>::is_move_constructible, "");
   static_assert( std::is_constructible<stde::expected<NoMoveConstructible>, NoMoveConstructible && >::value, "");
   static_assert( std::is_move_constructible<stde::expected<NoMoveConstructible>>::value, "");
 
@@ -1524,7 +1551,7 @@ void movesem_expected_expected()
   }
 
   {
-  stde::expected<expected<int,int>> oi2 {expect, stde::make_unexpected(-1)};
+  stde::expected<expected<void,int>> oi2 {expect, stde::make_unexpected(-1)};
   BOOST_CHECK (bool(oi2));
   BOOST_CHECK (!*oi2);
   }

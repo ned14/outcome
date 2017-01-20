@@ -87,7 +87,6 @@ template <class _value_type> struct enable_single_byte_value_storage : std::fals
 #undef BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE
 #endif
 // Temporarily disable single byte storage
-#define BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE
 #ifndef BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE
 template <> struct enable_single_byte_value_storage<void> : std::true_type
 {
@@ -162,12 +161,18 @@ public:
   using exception_type = typename base::exception_type;
   using storage_type = typename base::storage_type;
   using base::clear;
-  static_assert(!std::is_same<value_type, error_type>::value, "R and error_type cannot be the same type");
-  static_assert(!std::is_same<value_type, exception_type>::value, "R and exception_type cannot be the same type");
+  static_assert(!std::is_same<value_type, error_type>::value, "value_type and error_type cannot be the same type");
+  static_assert(!std::is_same<value_type, exception_type>::value, "value_type and exception_type cannot be the same type");
   static_assert(!std::is_same<error_type, exception_type>::value, "error_type and exception_type cannot be the same type");
+  //static_assert(!std::is_constructible<value_type, error_type>::value, "value_type cannot be constructible from error_type");
+  //static_assert(!std::is_constructible<value_type, exception_type>::value, "value_type cannot be constructible from exception_type");
+  //static_assert(!std::is_constructible<error_type, exception_type>::value, "error_type cannot be constructible from exception_type");
 
   // Is this storage copy and move constructible?
   static constexpr bool is_nothrow_move_constructible = base::is_nothrow_move_constructible;
+  static constexpr bool is_nothrow_copy_constructible = base::is_nothrow_copy_constructible;
+  static constexpr bool is_nothrow_move_assignable = base::is_nothrow_move_assignable;
+  static constexpr bool is_nothrow_copy_assignable = base::is_nothrow_copy_assignable;
   static constexpr bool is_nothrow_destructible = base::is_nothrow_destructible;
 
 #if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 191024728 /* VS2017 RC1*/)
@@ -277,6 +282,24 @@ public:
   {
     clear();
     new(this) value_storage(std::move(o));
+  }
+  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args&&... args)
+  {
+    clear();
+    new(&this->_value_raw) value_type(std::forward<Args>(args)...);
+    this->type = storage_type::value;
+  }
+  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_error(Args&&... args)
+  {
+    clear();
+    new(&this->error) error_type(std::forward<Args>(args)...);
+    this->type = storage_type::error;
+  }
+  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_exception(Args&&... args)
+  {
+    clear();
+    new(&this->exception) exception_type(std::forward<Args>(args)...);
+    this->type = storage_type::exception;
   }
 
   BOOST_OUTCOME_CONSTEXPR void swap(value_storage &o) noexcept(is_nothrow_move_constructible)

@@ -1161,9 +1161,9 @@ public:
   //! \brief This monad will never throw exceptions during move construction
   static constexpr bool is_nothrow_move_constructible = value_storage_type::is_nothrow_move_constructible;
   //! \brief This monad will never throw exceptions during copy assignment
-  static constexpr bool is_nothrow_copy_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_copy_constructible;
+  static constexpr bool is_nothrow_copy_assignable = value_storage_type::is_nothrow_copy_assignable;
   //! \brief This monad will never throw exceptions during move assignment
-  static constexpr bool is_nothrow_move_assignable = value_storage_type::is_nothrow_destructible && value_storage_type::is_nothrow_move_constructible;
+  static constexpr bool is_nothrow_move_assignable = value_storage_type::is_nothrow_move_assignable;
   //! \brief This monad will never throw exceptions during destruction
   static constexpr bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
   //! \brief This monad does not implement a destructor
@@ -1339,32 +1339,27 @@ error_type, an exception_type nor an empty_type.
   //! \brief Disposes of any existing state, setting the monad to the value storage
   BOOST_OUTCOME_CONSTEXPR void set_state(value_storage_type &&v)
   {
-    implementation_policy::base::_storage.clear();
     implementation_policy::base::_storage.set_state(std::move(v));
   }
   //! \brief Disposes of any existing state, setting the monad to a copy of the value_type
   BOOST_OUTCOME_CONSTEXPR void set_value(const value_type &v)
   {
-    implementation_policy::base::_storage.clear();
-    implementation_policy::base::_storage.set_value(v);
+    implementation_policy::base::_storage.emplace_value(v);
   }
   //! \brief Disposes of any existing state, setting the monad to a move of the value_type
   BOOST_OUTCOME_CONSTEXPR void set_value(value_type &&v)
   {
-    implementation_policy::base::_storage.clear();
-    implementation_policy::base::_storage.set_value(std::move(v));
+    implementation_policy::base::_storage.emplace_value(std::move(v));
   }
   //! \brief Disposes of any existing state, setting the monad to a default value
   BOOST_OUTCOME_CONSTEXPR void set_value()
   {
-    implementation_policy::base::_storage.clear();
-    implementation_policy::base::_storage = decltype(implementation_policy::base::_storage)(value_type());
+    implementation_policy::base::_storage.emplace_value(value_type());
   }
   //! \brief Disposes of any existing state, setting the monad to an emplaced construction
   template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace(Args &&... args)
   {
-    implementation_policy::base::_storage.clear();
-    implementation_policy::base::_storage = decltype(implementation_policy::base::_storage)(typename value_storage_type::emplace_t(), std::forward<Args>(args)...);
+    implementation_policy::base::_storage.emplace_value(std::forward<Args>(args)...);
   }
 
   //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
@@ -1375,7 +1370,7 @@ error_type, an exception_type nor an empty_type.
   BOOST_OUTCOME_CONSTEXPR void set_error(error_type v)
   {
     implementation_policy::base::_storage.clear();
-    implementation_policy::base::_storage = decltype(implementation_policy::base::_storage)(std::move(v));
+    implementation_policy::base::_storage.emplace_error(std::move(v));
   }
 
   //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
@@ -1386,7 +1381,7 @@ error_type, an exception_type nor an empty_type.
   BOOST_OUTCOME_CONSTEXPR void set_exception(exception_type v)
   {
     implementation_policy::base::_storage.clear();
-    implementation_policy::base::_storage = decltype(implementation_policy::base::_storage)(std::move(v));
+    implementation_policy::base::_storage.emplace_exception(std::move(v));
   }
   //! \brief Disposes of any existing state, setting the monad to make_exception_type(forward<E>(e))
   template <typename E, typename = typename std::enable_if<std::is_same<E, E>::value && has_exception_type>::type> BOOST_OUTCOME_CONSTEXPR void set_exception(E &&e) { set_exception(make_exception_type(std::forward<E>(e))); }
@@ -1664,6 +1659,10 @@ namespace detail
     typedef typename value_storage_type::exception_type exception_type;
 
     constexpr basic_monad_storage() = default;
+    constexpr basic_monad_storage(const basic_monad_storage &) = default;
+    constexpr basic_monad_storage(basic_monad_storage &&) = default;
+    BOOST_OUTCOME_CONSTEXPR basic_monad_storage &operator=(const basic_monad_storage &) = default;
+    BOOST_OUTCOME_CONSTEXPR basic_monad_storage &operator=(basic_monad_storage &&) = default;
     template <class Policy>
     constexpr basic_monad_storage(basic_monad_storage<Policy> &&o)
         : _storage(std::move(o._storage))
@@ -2230,6 +2229,12 @@ the basic_monad machinery do the implicit conversion to some `expected<T, E>`.
 - Types `T` and `E` cannot be constructible into one another.
 - `expected<T, E>` defaults E to `error_code_extended`. If you don't like this,
 predefine the `BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE` macro.
+- Our Expected always defines the copy and move constructors even if the
+the type configured is not capable of it. That means `std::is_copy_constructible`
+returns true. The only cause of this is that the only way I could make this work
+was to make every constructor templated which
+is real bad for compile times. So I elected to break the Expected spec here.
+The constant bool at `expected<T, E>::is_copy_constructible` is an easy workaround.
 */
 
 #ifndef BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE
@@ -2344,6 +2349,7 @@ template <class T, class E> constexpr inline expected<T, E> make_expected_from_e
 //! \brief Make an errored expected from the type passed \ingroup expected
 template <class T, class E, class U> constexpr inline expected<T, E> make_expected_from_error(U &&v)
 {
+  static_assert(std::is_constructible<E, U>::value, "An E must be constructible from a U");
   return expected<T, E>(std::forward<U>(v));
 }
 // Not implementing this as I think it redundant and highly likely to disappear from the next P-paper
