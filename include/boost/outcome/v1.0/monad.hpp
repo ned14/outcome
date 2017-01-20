@@ -1071,13 +1071,13 @@ namespace detail
 #endif
 }
 
-//! \brief Tag type for inplace construction
-struct inplace_t
+//! \brief Tag type for in_place construction
+struct in_place_t
 {
-  constexpr inplace_t() {}
+  constexpr in_place_t() {}
 };
-//! \brief Constexpr instance of inplace construction tag type
-static constexpr inplace_t inplace;
+//! \brief Constexpr instance of in_place construction tag type
+static constexpr in_place_t in_place;
 
 //! \brief True if the type passed is a monad or a reference to a monad
 template <class M> struct is_monad : detail::is_monad<typename std::decay<M>::type>
@@ -1233,17 +1233,17 @@ if value_type which can't be a monad can be constructed from Args and if either 
 error_type, an exception_type nor an empty_type.
 */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-  template <class... Args> explicit constexpr basic_monad(inplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value);
+  template <class... Args> explicit constexpr basic_monad(in_place_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value);
 #else
   template <class Arg, class... Args>
-  constexpr explicit basic_monad(inplace_t, Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value)
+  constexpr explicit basic_monad(in_place_t, Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value)
       : implementation_policy::base(typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...)
   {
   }
 #endif
   //! \brief Implicit constructor from an initializer list
   template <class U>
-  constexpr basic_monad(inplace_t, std::initializer_list<U> l) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>>::value)
+  constexpr basic_monad(in_place_t, std::initializer_list<U> l) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>>::value)
       : implementation_policy::base(typename value_storage_type::emplace_t(), std::move(l))
   {
   }
@@ -2223,12 +2223,12 @@ template <class T> BOOSTLITE_CONSTEXPR inline option<void> as_void(const option<
 }
 
 
-
+#ifndef BOOST_OUTCOME_LEAN_AND_MEAN
 /********************************************************** LEWG Expected implementation  ***********************************************************/
 
 /*! \defgroup expected Implementation of LEWG proposed expected<T, E>
 
-For your convenience, Outcome implements the LEWG Expected proposal as per 
+For your convenience, Outcome implements the LEWG Expected proposal as per
 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf. To our knowledge,
 this implementation is very close to the proposal with these exceptions:
 - P0323R1 doesn't yet specify what will be done if you try accessing an expected
@@ -2249,20 +2249,25 @@ predefine the `BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE` macro.
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable: 4814)
+#pragma warning(disable : 4814)
 #endif
 /*! \class bad_expected_access
 \ingroup expected
 \brief The exception type thrown when you try to access an errored expected
 */
-template<class E> class bad_expected_access : public std::logic_error
+template <class E> class bad_expected_access : public std::logic_error
 {
   E _error;
+
 public:
   //! \brief The type of error
   using error_type = E;
   //! \brief Constructs an instance taking a copy
-  explicit bad_expected_access(const error_type &e) : std::logic_error("Bad expected access of value when error was present"), _error(e) {}
+  explicit bad_expected_access(const error_type &e)
+      : std::logic_error("Bad expected access of value when error was present")
+      , _error(e)
+  {
+  }
   //! \brief Returns the error
   constexpr const error_type &error() const & { return _error; }
   //! \brief Returns the error
@@ -2273,16 +2278,25 @@ public:
   constexpr error_type &&error() && { return _error; }
 };
 //! \brief Type thrown due to valueless by exception state
-template<> class bad_expected_access<void> : public std::logic_error
+template <> class bad_expected_access<void> : public std::logic_error
 {
 public:
   //! \brief The type of error
   using error_type = void;
   //! \brief Constructs an instance
-  explicit bad_expected_access() : std::logic_error("Bad expected access of value when valueless due to exception") {}
+  explicit bad_expected_access()
+      : std::logic_error("Bad expected access of value when valueless due to exception")
+  {
+  }
 };
-template<class E> inline bad_expected_access<E> make_bad_expected_access(const E &v) { return bad_expected_access<E>(v); }
-inline bad_expected_access<void> make_bad_expected_access() { return bad_expected_access<void>(); }
+template <class E> inline bad_expected_access<E> make_bad_expected_access(const E &v)
+{
+  return bad_expected_access<E>(v);
+}
+inline bad_expected_access<void> make_bad_expected_access()
+{
+  return bad_expected_access<void>();
+}
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
@@ -2295,7 +2309,7 @@ space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `t
 */
 template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> using expected = basic_monad<detail::expected_policy<R, E>>;
 //! \brief Type sugar to indicate type E is an unexpected value \ingroup expected
-template<typename E> using unexpected_type = option<E>;
+template <typename E> using unexpected_type = basic_monad<detail::expected_policy<void, E>>;
 //! \brief Tag type for unexpected \ingroup expected
 using unexpect_t = error_t;
 //! \brief Tag value for unexpected \ingroup expected
@@ -2347,7 +2361,7 @@ template <class T, class E, class U> constexpr inline expected<T, E> make_expect
 
 
 /********************************************************** LEWG Expected implementation  ***********************************************************/
-
+#endif  // BOOST_OUTCOME_LEAN_AND_MEAN
 
 BOOST_OUTCOME_V1_NAMESPACE_END
 

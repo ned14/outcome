@@ -1,6 +1,6 @@
 /* unittests.cpp
 Unit testing for outcomes
-(C) 2013-2016 Niall Douglas http://www.nedproductions.biz/
+(C) 2013-2017 Niall Douglas http://www.nedproductions.biz/
 
 
 Boost Software License - Version 1.0 - August 17th, 2003

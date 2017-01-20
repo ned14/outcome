@@ -12,17 +12,10 @@ repositories.
 
 \section windows Installing on Windows
 
-If you are using VS2017 or better it comes with VCPkg, a package manager. Open
-a Developer Tools prompt and type:
-
-<pre>vcpkg update
-vcpkg install boost-outcome
-</pre>
-
-Once installed it is available for usage in any Visual Studio project using:
-
-\code #include <boost/outcome.hpp> \endcode
-
+If you are using VS2017 or better it comes with VCPkg, a package manager, which lets you
+install various open source libraries as if system libraries for MSVC. Unfortunately
+its maintainers won't accept libraries without formal version releases (yeah I know), so for now
+you're best using the source tarball or git subrepo methods described below.
 
 <br><hr><br>
 
