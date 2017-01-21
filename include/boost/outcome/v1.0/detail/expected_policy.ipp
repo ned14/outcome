@@ -39,15 +39,20 @@ namespace detail
   // Inherited from publicly by basic_monad, so whatever you expose here you expose in basic_monad
   template <class monad_storage, class value_type, class error_type, class exception_type> struct expected_policy_base : public monad_storage
   {
+  protected:
+    expected_policy_base() = delete;
+    expected_policy_base(const expected_policy_base &) = delete;
+    expected_policy_base(expected_policy_base &&) = delete;
+    expected_policy_base &operator=(const expected_policy_base &) = default;
+    expected_policy_base &operator=(expected_policy_base &&) = default;
+    struct passthru_t {};
     template <class... Args>
-    constexpr expected_policy_base(Args &&... args)
-        : monad_storage(std::forward<Args>(args)...)
+    constexpr expected_policy_base(passthru_t, Args &&... args)
+      : monad_storage(std::forward<Args>(args)...)
     {
     }
-
-  protected:
     // expected's default constructor constructs a value_type
-    constexpr expected_policy_base() : monad_storage(value_t()) {}
+    constexpr expected_policy_base(passthru_t) : monad_storage(value_t()) { }
     // Common preamble to the below
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
     {
@@ -176,15 +181,20 @@ namespace detail
   };
   template <class monad_storage, class error_type, class exception_type> struct expected_policy_base<monad_storage, void, error_type, exception_type> : public monad_storage
   {
+  protected:
+    expected_policy_base() = delete;
+    expected_policy_base(const expected_policy_base &) = delete;
+    expected_policy_base(expected_policy_base &&) = delete;
+    expected_policy_base &operator=(const expected_policy_base &) = default;
+    expected_policy_base &operator=(expected_policy_base &&) = default;
+    struct passthru_t {};
     template <class... Args>
-    constexpr expected_policy_base(Args &&... args)
-        : monad_storage(std::forward<Args>(args)...)
+    constexpr expected_policy_base(passthru_t, Args &&... args)
+      : monad_storage(std::forward<Args>(args)...)
     {
     }
-
-  protected:
     // expected's default constructor constructs a value_type
-    constexpr expected_policy_base() : monad_storage(value_t()) {}
+    constexpr expected_policy_base(passthru_t) : monad_storage(value_t()) {}
     // Common preamble to the below
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
     {
@@ -256,14 +266,20 @@ namespace detail
     typedef basic_monad<expected_policy> implementation_type;
     // The value type to use. Can be void to disable.
     typedef R value_type;
-// The error code type to use. Can be void to disable.
+    // The error code type to use. Can be void to disable.
     typedef EC error_type;
-// The exception pointer type to use. Can be void to disable.
+    // The exception pointer type to use. Can be void to disable.
 #ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
     typedef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE exception_type;
 #else
     typedef void exception_type;
 #endif
+
+    // Ought the monad be default constructible?
+    static constexpr bool is_default_constructible = std::is_default_constructible<value_type>::value;
+    // Is default construction non-throwing?
+    static constexpr bool is_nothrow_default_constructible = std::is_nothrow_default_constructible<value_type>::value;
+
     // The base class to use to store state
     typedef expected_policy_base<basic_monad_storage<expected_policy>, value_type, error_type, exception_type> base;
 
@@ -287,6 +303,12 @@ namespace detail
 #else
     typedef void exception_type;
 #endif
+
+    // Ought the monad be default constructible?
+    static constexpr bool is_default_constructible = true;
+    // Is default construction non-throwing?
+    static constexpr bool is_nothrow_default_constructible = true;
+
     // The base class to use to store state
     typedef expected_policy_base<basic_monad_storage<expected_policy>, value_type, error_type, exception_type> base;
 

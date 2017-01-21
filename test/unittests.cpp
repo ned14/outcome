@@ -393,18 +393,7 @@ BOOST_AUTO_TEST_CASE(works / monad / comparison, "Tests that the monad can compa
 }
 
 
-// Test the underlying storage for triviality
-static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::detail::value_storage_impl_trivial<int, void, void> test_constexpr1a(int f)
-{
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  return detail::value_storage_impl_trivial<int, void, void>(f);
-}
-// Test the underlying storage for triviality
-static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::detail::value_storage_impl_trivial<void, void, void> test_constexpr1b()
-{
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  return detail::value_storage_impl_trivial<void, void, void>();
-}
+#if __cpp_constexpr >= 201304
 // Test the underlying storage for constexpr
 static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::value_storage<int, void, void> test_constexpr2a(int f)
 {
@@ -449,13 +438,8 @@ BOOST_AUTO_TEST_CASE(works / monad / constexpr, "Tests that the monad works as i
   static_assert(result<void>::is_trivially_destructible, "result<void> is not trivially destructible!");
   static_assert(std::is_trivially_destructible<result<void>>::value, "result<void> is not trivially destructible!");
 
-  constexpr auto a = test_constexpr1a(5);
-  constexpr auto b = test_constexpr1b();
-  (void) a;
-  (void) b;
 // GCC won't allow our move constructor which uses operator new to allow the type T
 // to have no default constructor nor move assignment
-#if !defined(__GNUC__) || defined(__clang__)
   constexpr auto c = test_constexpr2a(5);
   constexpr auto d = test_constexpr2b();
   constexpr auto e = test_constexpr3a(5);
@@ -464,8 +448,8 @@ BOOST_AUTO_TEST_CASE(works / monad / constexpr, "Tests that the monad works as i
   (void) d;
   (void) e;
   (void) f;
-#endif
 }
+#endif
 
 
 BOOST_AUTO_TEST_CASE(works / monad / optional, "Tests that the monad acts as an optional R")
@@ -596,6 +580,11 @@ BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly i
   }
   {
     using type = outcome<std::string>;
+    std::cout << "string is_nothrow_copy_constructible=" << std::is_nothrow_copy_constructible<std::string>::value << std::endl;
+    std::cout << "string is_nothrow_move_constructible=" << std::is_nothrow_move_constructible<std::string>::value << std::endl;
+    std::cout << "string is_nothrow_copy_assignable=" << std::is_nothrow_copy_assignable<std::string>::value << std::endl;
+    std::cout << "string is_nothrow_move_assignable=" << std::is_nothrow_move_assignable<std::string>::value << std::endl;
+    std::cout << "string is_nothrow_destructible=" << std::is_nothrow_destructible<std::string>::value << std::endl;
     std::cout << "outcome<string> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
     std::cout << "outcome<string> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
     std::cout << "outcome<string> is_nothrow_copy_assignable=" << type::is_nothrow_copy_assignable << std::endl;
@@ -606,11 +595,11 @@ BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly i
     BOOST_CHECK(type::is_nothrow_copy_assignable == std::is_nothrow_copy_assignable<type>::value);
     BOOST_CHECK(type::is_nothrow_move_assignable == std::is_nothrow_move_assignable<type>::value);
     BOOST_CHECK(type::is_nothrow_destructible == std::is_nothrow_destructible<type>::value);
-    BOOST_CHECK(!std::is_nothrow_copy_constructible<type>::value);
-    BOOST_CHECK(std::is_nothrow_move_constructible<type>::value);
-    BOOST_CHECK(!std::is_nothrow_copy_assignable<type>::value);
-    BOOST_CHECK(std::is_nothrow_move_assignable<type>::value);
-    BOOST_CHECK(std::is_nothrow_destructible<type>::value);
+    BOOST_CHECK(std::is_nothrow_copy_constructible<type>::value == std::is_nothrow_copy_constructible<std::string>::value);
+    BOOST_CHECK(std::is_nothrow_move_constructible<type>::value == std::is_nothrow_move_constructible<std::string>::value);
+    BOOST_CHECK(std::is_nothrow_copy_assignable<type>::value == std::is_nothrow_copy_assignable<std::string>::value);
+    BOOST_CHECK(std::is_nothrow_move_assignable<type>::value == std::is_nothrow_move_assignable<std::string>::value);
+    BOOST_CHECK(std::is_nothrow_destructible<type>::value == std::is_nothrow_destructible<std::string>::value);
   }
   {
     struct Except
@@ -668,7 +657,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
       udt &operator=(udt &&) = delete;
       ~udt() = default;
     };
-    outcome<udt> foo(inplace, 5);
+    outcome<udt> foo(in_place, 5);
     BOOST_CHECK(5 == foo.get().a);
   }
 #ifdef __cpp_exceptions
@@ -688,8 +677,18 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
       udt &operator=(udt && /*unused*/) noexcept(false) { throw std::logic_error("move"); }
       ~udt() { a.clear(); }
     };
+    static_assert(!std::is_default_constructible<udt>::value, "udt is default constructible");
+    static_assert(std::is_copy_constructible<udt>::value, "udt is not copy constructible");
+    static_assert(std::is_move_constructible<udt>::value, "udt is not move constructible");
+    static_assert(value_storage<udt, void, void>::is_copy_constructible, "value_storage<udt> is not copy constructible");
+    static_assert(value_storage<udt, void, void>::is_move_constructible, "value_storage<udt> is not move constructible");
+    static_assert(std::is_copy_constructible<value_storage<udt, void, void>>::value, "value_storage<udt> is not copy constructible");
+    static_assert(std::is_move_constructible<value_storage<udt, void, void>>::value, "value_storage<udt> is not move constructible");
+    static_assert(std::is_default_constructible<outcome<udt>>::value, "outcome<udt> is not default constructible");
+    static_assert(std::is_copy_constructible<outcome<udt>>::value, "outcome<udt> is not copy constructible");
+    static_assert(std::is_move_constructible<outcome<udt>>::value, "outcome<udt> is not move constructible");
     // Emplace constructs
-    outcome<udt> foo(inplace, "douglas");
+    outcome<udt> foo(in_place, "douglas");
     BOOST_CHECK("douglas" == foo.get().a);
     foo.emplace("niall");
     BOOST_CHECK("niall" == foo.get().a);
@@ -723,7 +722,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
     BOOST_CHECK("niall" == foo.get().a);
     // Does throwing during copy assignment work?
     {
-      outcome<udt> foo2(inplace, "douglas");
+      outcome<udt> foo2(in_place, "douglas");
       try
       {
         foo2 = foo;
@@ -742,7 +741,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
     }
     // Does throwing during move assignment work?
     {
-      outcome<udt> foo2(inplace, "douglas");
+      outcome<udt> foo2(in_place, "douglas");
       try
       {
         foo2 = std::move(foo);

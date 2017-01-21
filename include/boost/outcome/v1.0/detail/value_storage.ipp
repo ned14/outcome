@@ -46,7 +46,7 @@ template <class _value_type, class _error_type, class _exception_type, bool use_
   struct no_exception_type
   {
   };
-  struct constexpr_standin_type
+  struct empty_type
   {
   };
   template <class U, class V> using devoid = typename std::conditional<!std::is_void<U>::value, U, V>::type;
@@ -75,21 +75,31 @@ public:
 #pragma warning(disable : 4624)
 #endif
   union {
-    value_type value;
+    empty_type _empty;
     value_type _value_raw;
+    value_type value;
     error_type error;          // Often 16 bytes surprisingly
     exception_type exception;  // Typically 8 bytes
-    constexpr_standin_type _constexpr_standin_type;
   };
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
   unsigned char type;
 
+  // Is this storage copy and move constructible?
+  static constexpr bool is_copy_constructible = (!has_value_type || std::is_copy_constructible<value_type>::value) && (!has_error_type || std::is_copy_constructible<error_type>::value) && (!has_exception_type || std::is_copy_constructible<exception_type>::value);
+  static constexpr bool is_move_constructible = (!has_value_type || std::is_move_constructible<value_type>::value) && (!has_error_type || std::is_move_constructible<error_type>::value) && (!has_exception_type || std::is_move_constructible<exception_type>::value);
+  static constexpr bool is_copy_assignable = (!has_value_type || std::is_copy_assignable<value_type>::value) && (!has_error_type || std::is_copy_assignable<error_type>::value) && (!has_exception_type || std::is_copy_assignable<exception_type>::value);
+  static constexpr bool is_move_assignable = (!has_value_type || std::is_move_assignable<value_type>::value) && (!has_error_type || std::is_move_assignable<error_type>::value) && (!has_exception_type || std::is_move_assignable<exception_type>::value);
+
+  static constexpr bool is_nothrow_copy_constructible = (!has_value_type || std::is_nothrow_copy_constructible<value_type>::value) && (!has_error_type || std::is_nothrow_copy_constructible<error_type>::value) && (!has_exception_type || std::is_nothrow_copy_constructible<exception_type>::value);
+  static constexpr bool is_nothrow_move_constructible = (!has_value_type || std::is_nothrow_move_constructible<value_type>::value) && (!has_error_type || std::is_nothrow_move_constructible<error_type>::value) && (!has_exception_type || std::is_nothrow_move_constructible<exception_type>::value);
+  static constexpr bool is_nothrow_copy_assignable = (!has_value_type || std::is_nothrow_copy_assignable<value_type>::value) && (!has_error_type || std::is_nothrow_copy_assignable<error_type>::value) && (!has_exception_type || std::is_nothrow_copy_assignable<exception_type>::value);
+  static constexpr bool is_nothrow_move_assignable = (!has_value_type || std::is_nothrow_move_assignable<value_type>::value) && (!has_error_type || std::is_nothrow_move_assignable<error_type>::value) && (!has_exception_type || std::is_nothrow_move_assignable<exception_type>::value);
   static constexpr bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value && std::is_nothrow_destructible<exception_type>::value && std::is_nothrow_destructible<error_type>::value;
 
-  constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL() noexcept : _constexpr_standin_type(constexpr_standin_type()), type(storage_type::empty) {}
-  constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL(empty_t) noexcept : _constexpr_standin_type(constexpr_standin_type()), type(storage_type::empty) {}
+  constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL() noexcept : _empty(empty_type()), type(storage_type::empty) {}
+  constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL(empty_t) noexcept : _empty(empty_type()), type(storage_type::empty) {}
   constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL(value_t) noexcept(std::is_nothrow_default_constructible<value_type>::value)
       : value(value_type())
       , type(storage_type::value)
@@ -147,7 +157,84 @@ public:
       , type(storage_type::value)
   {
   }
+  // If it has a non trivial destructor, we actively need to copy and move as well as destroy
 #if BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
+  BOOST_OUTCOME_VALUE_STORAGE_IMPL(const BOOST_OUTCOME_VALUE_STORAGE_IMPL &o) noexcept(is_nothrow_copy_constructible) : _empty(empty_type()), type(storage_type::empty)
+  {
+    switch(o.type)
+    {
+    case storage_type::empty:
+      break;
+    case storage_type::value:
+      new(&_value_raw) value_type(o._value_raw);  // use _value_raw to work around byte packing
+      break;
+    case storage_type::error:
+      new(&error) error_type(o.error);
+      break;
+    case storage_type::exception:
+      new(&exception) exception_type(o.exception);
+      break;
+    }
+    type = o.type;
+  }
+  BOOST_OUTCOME_VALUE_STORAGE_IMPL &operator=(const BOOST_OUTCOME_VALUE_STORAGE_IMPL &o) noexcept(is_nothrow_copy_assignable)
+  {
+    clear();
+    switch(o.type)
+    {
+    case storage_type::empty:
+      break;
+    case storage_type::value:
+      value = o.value;
+      break;
+    case storage_type::error:
+      error = o.error;
+      break;
+    case storage_type::exception:
+      exception = o.exception;
+      break;
+    }
+    type = o.type;
+    return *this;
+  }
+  BOOST_OUTCOME_VALUE_STORAGE_IMPL(BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o) noexcept(is_nothrow_move_constructible) : _empty(empty_type()), type(storage_type::empty)
+  {
+    switch(o.type)
+    {
+    case storage_type::empty:
+      break;
+    case storage_type::value:
+      new(&_value_raw) value_type(std::move(o._value_raw));  // use _value_raw to work around byte packing
+      break;
+    case storage_type::error:
+      new(&error) error_type(std::move(o.error));
+      break;
+    case storage_type::exception:
+      new(&exception) exception_type(std::move(o.exception));
+      break;
+    }
+    type = o.type;
+  }
+  BOOST_OUTCOME_VALUE_STORAGE_IMPL &operator=(BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o) noexcept(is_nothrow_move_assignable)
+  {
+    clear();
+    switch(o.type)
+    {
+    case storage_type::empty:
+      break;
+    case storage_type::value:
+      value = std::move(o.value);
+      break;
+    case storage_type::error:
+      error = std::move(o.error);
+      break;
+    case storage_type::exception:
+      exception = std::move(o.exception);
+      break;
+    }
+    type = o.type;
+    return *this;
+  }
   ~BOOST_OUTCOME_VALUE_STORAGE_IMPL()
 #if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER != 191024728 /* VS2017 RC1*/)
   noexcept(is_nothrow_destructible)
@@ -205,6 +292,9 @@ template <class _value_type> class BOOST_OUTCOME_VALUE_STORAGE_IMPL<_value_type,
   struct no_exception_type
   {
   };
+  struct empty_type
+  {
+  };
   template <class U, class V> using devoid = typename std::conditional<!std::is_void<U>::value, U, V>::type;
 
 public:
@@ -231,6 +321,7 @@ public:
 #pragma warning(disable : 4624 4201)
 #endif
   union {
+    empty_type _empty;
     unsigned char _value_raw;
     struct
     {
@@ -244,7 +335,17 @@ public:
 #pragma warning(pop)
 #endif
 
-  static constexpr bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value;
+  // Is this storage copy and move constructible?
+  static constexpr bool is_copy_constructible = (!has_value_type || std::is_copy_constructible<value_type>::value) && (!has_error_type || std::is_copy_constructible<error_type>::value) && (!has_exception_type || std::is_copy_constructible<exception_type>::value);
+  static constexpr bool is_move_constructible = (!has_value_type || std::is_move_constructible<value_type>::value) && (!has_error_type || std::is_move_constructible<error_type>::value) && (!has_exception_type || std::is_move_constructible<exception_type>::value);
+  static constexpr bool is_copy_assignable = (!has_value_type || std::is_copy_assignable<value_type>::value) && (!has_error_type || std::is_copy_assignable<error_type>::value) && (!has_exception_type || std::is_copy_assignable<exception_type>::value);
+  static constexpr bool is_move_assignable = (!has_value_type || std::is_move_assignable<value_type>::value) && (!has_error_type || std::is_move_assignable<error_type>::value) && (!has_exception_type || std::is_move_assignable<exception_type>::value);
+
+  static constexpr bool is_nothrow_copy_constructible = (!has_value_type || std::is_nothrow_copy_constructible<value_type>::value) && (!has_error_type || std::is_nothrow_copy_constructible<error_type>::value) && (!has_exception_type || std::is_nothrow_copy_constructible<exception_type>::value);
+  static constexpr bool is_nothrow_move_constructible = (!has_value_type || std::is_nothrow_move_constructible<value_type>::value) && (!has_error_type || std::is_nothrow_move_constructible<error_type>::value) && (!has_exception_type || std::is_nothrow_move_constructible<exception_type>::value);
+  static constexpr bool is_nothrow_copy_assignable = (!has_value_type || std::is_nothrow_copy_assignable<value_type>::value) && (!has_error_type || std::is_nothrow_copy_assignable<error_type>::value) && (!has_exception_type || std::is_nothrow_copy_assignable<exception_type>::value);
+  static constexpr bool is_nothrow_move_assignable = (!has_value_type || std::is_nothrow_move_assignable<value_type>::value) && (!has_error_type || std::is_nothrow_move_assignable<error_type>::value) && (!has_exception_type || std::is_nothrow_move_assignable<exception_type>::value);
+  static constexpr bool is_nothrow_destructible = std::is_nothrow_destructible<value_type>::value && std::is_nothrow_destructible<exception_type>::value && std::is_nothrow_destructible<error_type>::value;
 
   constexpr BOOST_OUTCOME_VALUE_STORAGE_IMPL()
       : _value_raw(BOOST_OUTCOME_VALUE_STORAGE_IMPL_PACKED_INITIALISER(storage_type::empty, 0))
