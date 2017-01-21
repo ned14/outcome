@@ -42,7 +42,7 @@ Rust and Swift!
 Boost.Outcome is a header only C++ 14 library known to work on these compilers or better:
 - clang 3.5 (LLVM)
 - clang 3.7 (with Microsoft Codegen)
-- GCC 6.0
+- GCC 5.4
 - VS2015 Update 2
 - Xcode 7.3
 

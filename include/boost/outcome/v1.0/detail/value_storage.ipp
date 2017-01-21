@@ -76,7 +76,6 @@ public:
 #endif
   union {
     empty_type _empty;
-    value_type _value_raw;
     value_type value;
     error_type error;          // Often 16 bytes surprisingly
     exception_type exception;  // Typically 8 bytes
@@ -166,7 +165,7 @@ public:
     case storage_type::empty:
       break;
     case storage_type::value:
-      new(&_value_raw) value_type(o._value_raw);  // use _value_raw to work around byte packing
+      new(&value) value_type(o.value);
       break;
     case storage_type::error:
       new(&error) error_type(o.error);
@@ -204,7 +203,7 @@ public:
     case storage_type::empty:
       break;
     case storage_type::value:
-      new(&_value_raw) value_type(std::move(o._value_raw));  // use _value_raw to work around byte packing
+      new(&value) value_type(std::move(o.value));
       break;
     case storage_type::error:
       new(&error) error_type(std::move(o.error));
@@ -243,6 +242,24 @@ public:
     clear();
   }
 #endif
+  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args&&... args)
+  {
+    clear();
+    new(&value) value_type(std::forward<Args>(args)...);
+    type = storage_type::value;
+  }
+  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_error(Args&&... args)
+  {
+    clear();
+    new(&error) error_type(std::forward<Args>(args)...);
+    type = storage_type::error;
+  }
+  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_exception(Args&&... args)
+  {
+    clear();
+    new(&exception) exception_type(std::forward<Args>(args)...);
+    type = storage_type::exception;
+  }
   BOOST_OUTCOME_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
   {
     switch(type)
@@ -400,6 +417,12 @@ public:
 #if BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
   ~BOOST_OUTCOME_VALUE_STORAGE_IMPL() noexcept(is_nothrow_destructible) { clear(); }
 #endif
+  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args&&... args)
+  {
+    clear();
+    value = value_type(std::forward<Args>(args)...);
+    type = storage_type::value;
+  }
   BOOST_OUTCOME_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
   {
     switch(type)
