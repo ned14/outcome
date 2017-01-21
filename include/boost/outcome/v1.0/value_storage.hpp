@@ -125,7 +125,8 @@ namespace detail
   };
   template <> struct emplace_value_if<false>
   {
-    template<class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_value_if(U *, V &&) {
+    template<class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_value_if(U *v, V &&) {
+      v->emplace_value();
     }
   };
   template <bool enable> struct emplace_error_if
@@ -136,7 +137,8 @@ namespace detail
   };
   template <> struct emplace_error_if<false>
   {
-    template<class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_error_if(U *, V &&) {
+    template<class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_error_if(U *v, V &&) {
+      v->emplace_error();
     }
   };
   template <bool enable> struct emplace_exception_if
@@ -147,7 +149,8 @@ namespace detail
   };
   template <> struct emplace_exception_if<false>
   {
-    template<class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_exception_if(U *, V &&) {
+    template<class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_exception_if(U *v, V &&) {
+      v->emplace_exception();
     }
   };
 
@@ -345,8 +348,47 @@ public:
     else
     {
       value_storage temp(std::move(o));
+#ifdef __cpp_exceptions
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4297)  // use of throw within a noexcept function
+#endif
+      try
+      {
+        try
+        {
+          o = std::move(*this);
+          try
+          {
+            *this = std::move(temp);
+          }
+          catch (...)
+          {
+            *this = std::move(o);
+            throw;
+          }
+        }
+        catch (...)
+        {
+          o = std::move(temp);
+          throw;
+        }
+      }
+      catch (...)
+      {
+        // Silence static analysers
+        if (is_nothrow_move_constructible)
+          std::terminate();
+        else
+          throw;
+      }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+#else
       o = std::move(*this);
       *this = std::move(temp);
+#endif
     }
   }
   template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<_is_comparable_to<_value_type2, _error_type2, _exception_type2>::value>::type> BOOST_OUTCOME_CONSTEXPR bool operator==(const value_storage<_value_type2, _error_type2, _exception_type2> &o) const
