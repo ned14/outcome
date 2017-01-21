@@ -1179,9 +1179,11 @@ public:
   template<class OtherMonad> using _is_constructible = typename value_storage_type::template _is_constructible_from<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
   template<class OtherMonad> using _is_comparable = typename value_storage_type::template _is_comparable_to<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
 
-  //! \brief Default constructor, disabled if policy does not allow default construction
-  template<bool enabled = is_default_constructible, typename = typename std::enable_if<enabled>::type> constexpr basic_monad() noexcept(is_nothrow_default_constructible)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t())
+  //! \brief Default constructor
+  //template<bool enabled = is_default_constructible, typename = typename std::enable_if<enabled>::type> constexpr basic_monad() noexcept(is_nothrow_default_constructible)
+  //    : implementation_policy::base(typename implementation_policy::base::passthru_t())
+  constexpr basic_monad() noexcept(is_nothrow_default_constructible)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t())
   {
   }
   //! \brief Implicit constructor of an empty monad
@@ -1205,13 +1207,17 @@ public:
   {
   }
 #endif
-  //! \brief Implicit constructor from a value_type by copy, disabled if value_type does not allow copy construction
-  template<bool enabled = std::is_copy_constructible<value_type>::value, typename = typename std::enable_if<enabled>::type> constexpr basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
+  //! \brief Implicit constructor from a value_type by copy
+  //template<bool enabled = std::is_copy_constructible<value_type>::value, typename = typename std::enable_if<enabled>::type> constexpr basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
+  //    : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
+  constexpr basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
   {
   }
-  //! \brief Implicit constructor from a value_type by move, disable if value_type does not allow move constructions
-  template<bool enabled = std::is_move_constructible<value_type>::value, typename = typename std::enable_if<enabled>::type> constexpr basic_monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
+  //! \brief Implicit constructor from a value_type by move
+  //template<bool enabled = std::is_move_constructible<value_type>::value, typename = typename std::enable_if<enabled>::type> constexpr basic_monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
+  //    : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
+  constexpr basic_monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
       : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
   {
   }
@@ -1244,7 +1250,7 @@ error_type, an exception_type nor an empty_type.
       : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
   {
   }
-#if 1
+#if 1  // Seems safe to leave these turned on
   //! \brief Implicit constructor from a error_type by copy
   constexpr basic_monad(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value)
       : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
@@ -1287,12 +1293,12 @@ error_type, an exception_type nor an empty_type.
       : implementation_policy::base(typename implementation_policy::base::passthru_t(), o)
   {
   }
-  //! \brief Move constructor, disabled if monad cannot be move constructed
+  //! \brief Move constructor
   constexpr basic_monad(basic_monad &&o) noexcept(is_nothrow_move_constructible)
       : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(o))
   {
   }
-  //! \brief Copy constructor, disabled if monad cannot be copy constructed
+  //! \brief Copy constructor
   constexpr basic_monad(const basic_monad &o) noexcept(is_nothrow_copy_constructible)
     : implementation_policy::base(typename implementation_policy::base::passthru_t(), o)
   {
@@ -1369,7 +1375,6 @@ error_type, an exception_type nor an empty_type.
   //! \brief Disposes of any existing state, setting the monad to the error_type
   BOOST_OUTCOME_CONSTEXPR void set_error(error_type v)
   {
-    implementation_policy::base::_storage.clear();
     implementation_policy::base::_storage.emplace_error(std::move(v));
   }
 
@@ -1380,7 +1385,6 @@ error_type, an exception_type nor an empty_type.
   //! \brief Disposes of any existing state, setting the monad to the exception_type
   BOOST_OUTCOME_CONSTEXPR void set_exception(exception_type v)
   {
-    implementation_policy::base::_storage.clear();
     implementation_policy::base::_storage.emplace_exception(std::move(v));
   }
   //! \brief Disposes of any existing state, setting the monad to make_exception_type(forward<E>(e))
@@ -2226,15 +2230,22 @@ this situation as that seemed sensible. If the LEWG proposal decides on somethin
 different, this implementation will change to track the LEWG proposal.
 - `unexpected_type<E>` is implemented as an `expected<void, E>` and it lets
 the basic_monad machinery do the implicit conversion to some `expected<T, E>`.
-- Types `T` and `E` cannot be constructible into one another.
+- Types `T` and `E` cannot be constructible into one another. This is a fundamental
+design choice in basic_monad to significantly reduce compile times so it won't be
+fixed.
 - `expected<T, E>` defaults E to `error_code_extended`. If you don't like this,
 predefine the `BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE` macro.
-- Our Expected always defines the copy and move constructors even if the
+- Our Expected always defines the default, copy and move constructors even if the
 the type configured is not capable of it. That means `std::is_copy_constructible`
-returns true. The only cause of this is that the only way I could make this work
-was to make every constructor templated which
-is real bad for compile times. So I elected to break the Expected spec here.
-The constant bool at `expected<T, E>::is_copy_constructible` is an easy workaround.
+etc returns true when they should return false. The reason why is again to
+significantly improve compile times by hugely reducing the number of templates
+which need to be instantiated during routine basic_monad usage, and again
+this won't be fixed. Instead use the static constexpr bools at:
+  - `expected<T, E>::is_default_constructible`
+  - `expected<T, E>::is_copy_constructible`
+  - `expected<T, E>::is_move_constructible`
+ Depending on what any Boost peer review thinks, we may inject correct answers
+for the type traits for basic_monad into namespace std.
 */
 
 #ifndef BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE

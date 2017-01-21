@@ -19,6 +19,7 @@ Todo:
  - [x] Test relaxed constexpr in VS15 once that is released and delete the hack macro.
  - [x] Document the exception throwing macros in the tutorial
  - [x] Rejig `BOOST_OUTCOME_ENABLE_OPERATORS` to decide what ought to be in or out.
+ - [ ] Break monad.hpp into separate files.
  - [ ] `make install` needs to install dependency headers too
  - [ ] Add config where in release mode the exception throwing macros generate link errors
 for symbols with the function name and line number in them.
