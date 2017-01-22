@@ -326,7 +326,7 @@ public:
     new(this) value_storage(std::move(o));
   }
 
-  BOOST_OUTCOME_CONSTEXPR void swap(value_storage &o) noexcept(is_nothrow_move_constructible)
+  void swap(value_storage &o) noexcept(is_nothrow_move_constructible)
   {
     if(this->type == o.type)
     {
@@ -348,10 +348,14 @@ public:
     else
     {
       value_storage temp(std::move(o));
-#if defined(__cpp_exceptions) && (!defined(__clang__) || __clang_major__>=4 || (__clang_major__==3 && __clang_minor__>=9))
+#if defined(__cpp_exceptions)
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4297)  // use of throw within a noexcept function
+#endif
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wterminate"
 #endif
       try
       {
@@ -382,6 +386,9 @@ public:
         else
           throw;
       }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
