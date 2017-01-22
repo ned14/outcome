@@ -1105,7 +1105,9 @@ template <class implementation_policy> class BOOSTLITE_NODISCARD basic_monad : p
   friend inline std::ostream &operator<<(std::ostream &s, const basic_monad &v) { return s << v._storage; }
 
 protected:
-  struct from_value_storage_type_t {};
+  struct from_value_storage_type_t
+  {
+  };
   typedef value_storage<typename implementation_policy::value_type, typename implementation_policy::error_type, typename implementation_policy::exception_type> value_storage_type;
   constexpr explicit basic_monad(from_value_storage_type_t, value_storage_type &&s)
       : implementation_policy::base(std::move(s))
@@ -1176,14 +1178,14 @@ public:
 #endif
 
   // MSVC can't cope with the above, so for compatibility:
-  template<class OtherMonad> using _is_constructible = typename value_storage_type::template _is_constructible_from<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
-  template<class OtherMonad> using _is_comparable = typename value_storage_type::template _is_comparable_to<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
+  template <class OtherMonad> using _is_constructible = typename value_storage_type::template _is_constructible_from<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
+  template <class OtherMonad> using _is_comparable = typename value_storage_type::template _is_comparable_to<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
 
   //! \brief Default constructor
-  //template<bool enabled = is_default_constructible, typename = typename std::enable_if<enabled>::type> constexpr basic_monad() noexcept(is_nothrow_default_constructible)
+  // template<bool enabled = is_default_constructible, typename = typename std::enable_if<enabled>::type> constexpr basic_monad() noexcept(is_nothrow_default_constructible)
   //    : implementation_policy::base(typename implementation_policy::base::passthru_t())
   constexpr basic_monad() noexcept(is_nothrow_default_constructible)
-    : implementation_policy::base(typename implementation_policy::base::passthru_t())
+      : implementation_policy::base(typename implementation_policy::base::passthru_t())
   {
   }
   //! \brief Implicit constructor of an empty monad
@@ -1208,14 +1210,14 @@ public:
   }
 #endif
   //! \brief Implicit constructor from a value_type by copy
-  //template<bool enabled = std::is_copy_constructible<value_type>::value, typename = typename std::enable_if<enabled>::type> constexpr basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
+  // template<bool enabled = std::is_copy_constructible<value_type>::value, typename = typename std::enable_if<enabled>::type> constexpr basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
   //    : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
   constexpr basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
-    : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
+      : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
   {
   }
   //! \brief Implicit constructor from a value_type by move
-  //template<bool enabled = std::is_move_constructible<value_type>::value, typename = typename std::enable_if<enabled>::type> constexpr basic_monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
+  // template<bool enabled = std::is_move_constructible<value_type>::value, typename = typename std::enable_if<enabled>::type> constexpr basic_monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
   //    : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
   constexpr basic_monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
       : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
@@ -1300,12 +1302,12 @@ error_type, an exception_type nor an empty_type.
   }
   //! \brief Copy constructor
   constexpr basic_monad(const basic_monad &o) noexcept(is_nothrow_copy_constructible)
-    : implementation_policy::base(typename implementation_policy::base::passthru_t(), o)
+      : implementation_policy::base(typename implementation_policy::base::passthru_t(), o)
   {
   }
   // \brief Move assignment
   BOOST_OUTCOME_CONSTEXPR basic_monad &operator=(basic_monad &&) = default;
-  // \brief Move assignment
+  // \brief Copy assignment
   BOOST_OUTCOME_CONSTEXPR basic_monad &operator=(const basic_monad &) = default;
 
   //! \brief Same as `true_(tribool(*this))`
@@ -1343,50 +1345,29 @@ error_type, an exception_type nor an empty_type.
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
   BOOST_OUTCOME_CONSTEXPR const value_type &&value_or(const value_type &&v) const &&noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
   //! \brief Disposes of any existing state, setting the monad to the value storage
-  BOOST_OUTCOME_CONSTEXPR void set_state(value_storage_type &&v)
-  {
-    implementation_policy::base::_storage.set_state(std::move(v));
-  }
+  BOOST_OUTCOME_CONSTEXPR void set_state(value_storage_type &&v) { implementation_policy::base::_storage.set_state(std::move(v)); }
   //! \brief Disposes of any existing state, setting the monad to a copy of the value_type
-  BOOST_OUTCOME_CONSTEXPR void set_value(const value_type &v)
-  {
-    implementation_policy::base::_storage.emplace_value(v);
-  }
+  BOOST_OUTCOME_CONSTEXPR void set_value(const value_type &v) { implementation_policy::base::_storage.emplace_value(v); }
   //! \brief Disposes of any existing state, setting the monad to a move of the value_type
-  BOOST_OUTCOME_CONSTEXPR void set_value(value_type &&v)
-  {
-    implementation_policy::base::_storage.emplace_value(std::move(v));
-  }
+  BOOST_OUTCOME_CONSTEXPR void set_value(value_type &&v) { implementation_policy::base::_storage.emplace_value(std::move(v)); }
   //! \brief Disposes of any existing state, setting the monad to a default value
-  BOOST_OUTCOME_CONSTEXPR void set_value()
-  {
-    implementation_policy::base::_storage.emplace_value(value_type());
-  }
+  BOOST_OUTCOME_CONSTEXPR void set_value() { implementation_policy::base::_storage.emplace_value(value_type()); }
   //! \brief Disposes of any existing state, setting the monad to an emplaced construction
-  template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace(Args &&... args)
-  {
-    implementation_policy::base::_storage.emplace_value(std::forward<Args>(args)...);
-  }
+  template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace(Args &&... args) { implementation_policy::base::_storage.emplace_value(std::forward<Args>(args)...); }
 
   //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
   BOOST_OUTCOME_CONSTEXPR error_type get_error_or(error_type e) const noexcept { return has_error() ? implementation_policy::base::_storage.error : std::move(e); }
   //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
   BOOST_OUTCOME_CONSTEXPR error_type error_or(error_type e) const noexcept { return has_error() ? implementation_policy::base::_storage.error : std::move(e); }
   //! \brief Disposes of any existing state, setting the monad to the error_type
-  BOOST_OUTCOME_CONSTEXPR void set_error(error_type v)
-  {
-    implementation_policy::base::_storage.emplace_error(std::move(v));
-  }
+  BOOST_OUTCOME_CONSTEXPR void set_error(error_type v) { implementation_policy::base::_storage.emplace_error(std::move(v)); }
 
   //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
   BOOST_OUTCOME_CONSTEXPR exception_type get_exception_or(exception_type e) const noexcept { return has_exception() ? implementation_policy::base::_storage.exception : std::move(e); }
   //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
   BOOST_OUTCOME_CONSTEXPR exception_type exception_or(exception_type e) const noexcept { return has_exception() ? implementation_policy::base::_storage.exception : std::move(e); }
   //! \brief Disposes of any existing state, setting the monad to the exception_type
-  BOOST_OUTCOME_CONSTEXPR void set_exception(exception_type v)
-  {
-    implementation_policy::base::_storage.emplace_exception(std::move(v));
-  }
+  BOOST_OUTCOME_CONSTEXPR void set_exception(exception_type v) { implementation_policy::base::_storage.emplace_exception(std::move(v)); }
   //! \brief Disposes of any existing state, setting the monad to make_exception_type(forward<E>(e))
   template <typename E, typename = typename std::enable_if<std::is_same<E, E>::value && has_exception_type>::type> BOOST_OUTCOME_CONSTEXPR void set_exception(E &&e) { set_exception(make_exception_type(std::forward<E>(e))); }
 

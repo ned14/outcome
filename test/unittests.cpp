@@ -438,8 +438,6 @@ BOOST_AUTO_TEST_CASE(works / monad / constexpr, "Tests that the monad works as i
   static_assert(result<void>::is_trivially_destructible, "result<void> is not trivially destructible!");
   static_assert(std::is_trivially_destructible<result<void>>::value, "result<void> is not trivially destructible!");
 
-// GCC won't allow our move constructor which uses operator new to allow the type T
-// to have no default constructor nor move assignment
   constexpr auto c = test_constexpr2a(5);
   constexpr auto d = test_constexpr2b();
   constexpr auto e = test_constexpr3a(5);
@@ -477,9 +475,12 @@ BOOST_AUTO_TEST_CASE(works / monad / optional, "Tests that the monad acts as an 
   BOOST_CHECK(sizeof(option<bool>[2]) <= 2U);
   BOOST_CHECK(sizeof(option<tribool>[2]) <= 4U);
 
+// Temporarily disable single byte storage until GCC fixes itself
+#if !(defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 7)
   // Make sure the special compact bool storage works
   BOOST_CHECK(option<bool>(false).get() == false);
   BOOST_CHECK(option<bool>(true).get() == true);
+#endif
 
   //! [optional_example]
   auto maybe_getenv = [](const char *n) -> option<const char *> {
