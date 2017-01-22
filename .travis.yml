@@ -24,7 +24,7 @@ addons:
 #    - llvm-toolchain-precise
     packages:
     - g++-6
-    - clang-3.6
+#    - clang-3.9
     - python3
     - cmake
     - cmake-data
@@ -72,7 +72,6 @@ before_install:
 #      export PATH="$PWD/llvm-$LLVM_VERSION/bin:$PATH";
 #    fi
  - if [ "$CXX" = "g++" ]; then export CXX=g++-6; fi
- - if [ "$CXX" = "clang++" ]; then export CXX=clang++-3.6; fi
 
 script:
  -
