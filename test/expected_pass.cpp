@@ -757,7 +757,7 @@ int main()
 #endif
   static_assert(! std::is_move_constructible<NoMoveConstructible>::value, "");
   static_assert(! stde::expected<NoMoveConstructible>::is_move_constructible, "");
-  static_assert( std::is_constructible<stde::expected<NoMoveConstructible>, NoMoveConstructible && >::value, "");
+//  static_assert( std::is_constructible<stde::expected<NoMoveConstructible>, NoMoveConstructible && >::value, "");
   static_assert( std::is_move_constructible<stde::expected<NoMoveConstructible>>::value, "");
 
   except_default_constructor();
