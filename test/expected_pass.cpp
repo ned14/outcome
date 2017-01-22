@@ -512,6 +512,10 @@ void expected_from_error()
   BOOST_CHECK_EQ(static_cast<bool>(e), false);
 }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4244)  // convertsion from int to short
+#endif
 void expected_from_error_U()
 {
   // From stde::unexpected_type constructor.
@@ -519,6 +523,9 @@ void expected_from_error_U()
   static_assert(std::is_same<decltype(e), stde::expected<std::string, short>>{}, "");
   BOOST_CHECK_EQ(static_cast<bool>(e), false);
 }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #if 0  // make_expected_from_exception not in P0323r1
 void expected_from_exception2()
@@ -731,14 +738,15 @@ void expected_swap_function_value()
 
 int main()
 {
-  static_assert(! std::is_default_constructible<NoDefaultConstructible>::value, "");
-  static_assert(! std::is_default_constructible<stde::expected<NoDefaultConstructible>>::value, "");
+//  static_assert(! std::is_default_constructible<NoDefaultConstructible>::value, "");
+//  static_assert(! std::is_default_constructible<stde::expected<NoDefaultConstructible>>::value, "");
 
   static_assert(! std::is_copy_constructible<NoCopyConstructible>::value, "");
-  static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, NoCopyConstructible const& >::value, "");
+//  static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, NoCopyConstructible const& >::value, "");
 //  static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, stde::expected<NoCopyConstructible> const& >::value, "");
 //  static_assert(! std::is_copy_constructible<stde::expected<NoCopyConstructible>>::value, "");
 
+#if 0  // move fallback to copy not supported in Outcome's expected
   {
     NoMoveConstructible nmc;
     //NoMoveConstructible nmc2 = std::move(nmc); // FAILS as expected
@@ -746,6 +754,7 @@ int main()
     stde::expected<NoMoveConstructible> x = std::move(nmc); // DOESN'T FAIL as copy is selected instead
     (void)x;
   }
+#endif
   static_assert(! std::is_move_constructible<NoMoveConstructible>::value, "");
   static_assert(! stde::expected<NoMoveConstructible>::is_move_constructible, "");
   static_assert( std::is_constructible<stde::expected<NoMoveConstructible>, NoMoveConstructible && >::value, "");

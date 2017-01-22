@@ -76,7 +76,6 @@ public:
 #endif
   union {
     empty_type _empty;
-    value_type _value_raw;
     value_type value;
     error_type error;          // Often 16 bytes surprisingly
     exception_type exception;  // Typically 8 bytes
@@ -166,7 +165,7 @@ public:
     case storage_type::empty:
       break;
     case storage_type::value:
-      new(&_value_raw) value_type(o._value_raw);  // use _value_raw to work around byte packing
+      new(&value) value_type(o.value);
       break;
     case storage_type::error:
       new(&error) error_type(o.error);
@@ -177,26 +176,52 @@ public:
     }
     type = o.type;
   }
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4297)  // use of throw within a noexcept function
+#endif
   BOOST_OUTCOME_VALUE_STORAGE_IMPL &operator=(const BOOST_OUTCOME_VALUE_STORAGE_IMPL &o) noexcept(is_nothrow_copy_assignable)
   {
-    clear();
-    switch(o.type)
+    if (type == o.type)
     {
-    case storage_type::empty:
-      break;
-    case storage_type::value:
-      value = o.value;
-      break;
-    case storage_type::error:
-      error = o.error;
-      break;
-    case storage_type::exception:
-      exception = o.exception;
-      break;
+#ifdef __cpp_exceptions
+      try
+      {
+#endif
+        switch (o.type)
+        {
+        case storage_type::empty:
+          break;
+        case storage_type::value:
+          value = o.value;
+          break;
+        case storage_type::error:
+          error = o.error;
+          break;
+        case storage_type::exception:
+          exception = o.exception;
+          break;
+        }
+#ifdef __cpp_exceptions
+      }
+      catch (...)
+      {
+        // If copy assignment threw, reset to empty
+        clear();
+        throw;
+      }
+#endif
     }
-    type = o.type;
+    else
+    {
+      clear();
+      new(this) BOOST_OUTCOME_VALUE_STORAGE_IMPL(o);
+    }
     return *this;
   }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
   BOOST_OUTCOME_VALUE_STORAGE_IMPL(BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o) noexcept(is_nothrow_move_constructible) : _empty(empty_type()), type(storage_type::empty)
   {
     switch(o.type)
@@ -204,7 +229,7 @@ public:
     case storage_type::empty:
       break;
     case storage_type::value:
-      new(&_value_raw) value_type(std::move(o._value_raw));  // use _value_raw to work around byte packing
+      new(&value) value_type(std::move(o.value));
       break;
     case storage_type::error:
       new(&error) error_type(std::move(o.error));
@@ -215,26 +240,52 @@ public:
     }
     type = o.type;
   }
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4297)  // use of throw within a noexcept function
+#endif
   BOOST_OUTCOME_VALUE_STORAGE_IMPL &operator=(BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o) noexcept(is_nothrow_move_assignable)
   {
-    clear();
-    switch(o.type)
+    if (type == o.type)
     {
-    case storage_type::empty:
-      break;
-    case storage_type::value:
-      value = std::move(o.value);
-      break;
-    case storage_type::error:
-      error = std::move(o.error);
-      break;
-    case storage_type::exception:
-      exception = std::move(o.exception);
-      break;
+#ifdef __cpp_exceptions
+      try
+      {
+#endif
+        switch (o.type)
+        {
+        case storage_type::empty:
+          break;
+        case storage_type::value:
+          value = std::move(o.value);
+          break;
+        case storage_type::error:
+          error = std::move(o.error);
+          break;
+        case storage_type::exception:
+          exception = std::move(o.exception);
+          break;
+        }
+#ifdef __cpp_exceptions
+      }
+      catch (...)
+      {
+        // If move assignment threw, reset to empty
+        clear();
+        throw;
+      }
+#endif
     }
-    type = o.type;
+    else
+    {
+      clear();
+      new(this) BOOST_OUTCOME_VALUE_STORAGE_IMPL(std::move(o));
+    }
     return *this;
   }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
   ~BOOST_OUTCOME_VALUE_STORAGE_IMPL()
 #if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER != 191024728 /* VS2017 RC1*/)
   noexcept(is_nothrow_destructible)
@@ -243,6 +294,24 @@ public:
     clear();
   }
 #endif
+  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args&&... args)
+  {
+    clear();
+    new(&value) value_type(std::forward<Args>(args)...);
+    type = storage_type::value;
+  }
+  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_error(Args&&... args)
+  {
+    clear();
+    new(&error) error_type(std::forward<Args>(args)...);
+    type = storage_type::error;
+  }
+  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_exception(Args&&... args)
+  {
+    clear();
+    new(&exception) exception_type(std::forward<Args>(args)...);
+    type = storage_type::exception;
+  }
   BOOST_OUTCOME_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
   {
     switch(type)
@@ -400,6 +469,12 @@ public:
 #if BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
   ~BOOST_OUTCOME_VALUE_STORAGE_IMPL() noexcept(is_nothrow_destructible) { clear(); }
 #endif
+  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args&&... args)
+  {
+    clear();
+    value = value_type(std::forward<Args>(args)...);
+    type = storage_type::value;
+  }
   BOOST_OUTCOME_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
   {
     switch(type)

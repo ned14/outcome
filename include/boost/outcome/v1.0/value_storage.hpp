@@ -1,6 +1,6 @@
 /* value_storage.hpp
-The world's most simple C++ monad
-(C) 2015 Niall Douglas http://www.nedprod.com/
+Storage for the world's most simple C++ monad
+(C) 2015-2017 Niall Douglas http://www.nedprod.com/
 File Created: July 2015
 
 
@@ -86,7 +86,10 @@ template <class _value_type> struct enable_single_byte_value_storage : std::fals
 #define BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE
 #undef BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE
 #endif
-// Temporarily disable single byte storage
+// Temporarily disable single byte storage until GCC fixes itself
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 7
+#define BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE
+#endif
 #ifndef BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE
 template <> struct enable_single_byte_value_storage<void> : std::true_type
 {
@@ -113,15 +116,43 @@ namespace detail
   template <class _value_type, class _error_type, class _exception_type>
   static constexpr bool can_have_trivial_destructor = (std::is_literal_type<_value_type>::value || std::is_trivially_destructible<_value_type>::value) && (std::is_literal_type<_error_type>::value || std::is_trivially_destructible<_error_type>::value) &&
                                                       (std::is_literal_type<_exception_type>::value || std::is_trivially_destructible<_exception_type>::value);
-  template <bool enable, class U, class V> struct move_construct_if_impl
+
+  template <bool enable> struct emplace_value_if
   {
-    void operator()(U *v, V &&o) const { new(v) U(std::move(o)); }
+    template<class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_value_if(U *v, V &&o) {
+      v->emplace_value(std::forward<V>(o));
+    }
   };
-  template <class U, class V> struct move_construct_if_impl<false, U, V>
+  template <> struct emplace_value_if<false>
   {
-    void operator()(U *, V &&) const {}
+    template<class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_value_if(U *v, V &&) {
+      v->emplace_value();
+    }
   };
-  template <bool enable, class U, class V> inline void move_construct_if(U *v, V &&o) { move_construct_if_impl<enable, U, V>()(v, std::move(o)); }
+  template <bool enable> struct emplace_error_if
+  {
+    template<class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_error_if(U *v, V &&o) {
+      v->emplace_error(std::forward<V>(o));
+    }
+  };
+  template <> struct emplace_error_if<false>
+  {
+    template<class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_error_if(U *v, V &&) {
+      v->emplace_error();
+    }
+  };
+  template <bool enable> struct emplace_exception_if
+  {
+    template<class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_exception_if(U *v, V &&o) {
+      v->emplace_exception(std::forward<V>(o));
+    }
+  };
+  template <> struct emplace_exception_if<false>
+  {
+    template<class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_exception_if(U *v, V &&) {
+      v->emplace_exception();
+    }
+  };
 
   template <bool enable, class U, class V> struct compare_if_impl
   {
@@ -255,26 +286,37 @@ public:
   {
   }
   template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<_is_constructible_from<_value_type2, _error_type2, _exception_type2>::value>::type>
-  BOOST_OUTCOME_CONSTEXPR explicit value_storage(const value_storage<_value_type2, _error_type2, _exception_type2> &o)
-    : value_storage(value_storage<_value_type2, _error_type2, _exception_type2>(o) /* delegate to move constructor */) {}
-  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<_is_constructible_from<_value_type2, _error_type2, _exception_type2>::value>::type> BOOST_OUTCOME_CONSTEXPR explicit value_storage(value_storage<_value_type2, _error_type2, _exception_type2> &&o) : base()
+  BOOST_OUTCOME_CONSTEXPR explicit value_storage(const value_storage<_value_type2, _error_type2, _exception_type2> &o) : base()
   {
     switch (o.type)
     {
     case storage_type::empty:
-      this->type = storage_type::empty;
       break;
     case storage_type::value:
-      detail::move_construct_if<has_value_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_value_type>(&this->_value_raw, std::move(o._value_raw));
-      this->type = storage_type::value;
+      detail::emplace_value_if<has_value_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_value_type>(this, o.value);
       break;
     case storage_type::error:
-      detail::move_construct_if<has_error_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_error_type>(&this->error, std::move(o.error));
-      this->type = storage_type::error;
+      detail::emplace_error_if<has_error_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_error_type>(this, o.error);
       break;
     case storage_type::exception:
-      detail::move_construct_if<has_exception_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_exception_type>(&this->exception, std::move(o.exception));
-      this->type = storage_type::exception;
+      detail::emplace_exception_if<has_exception_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_exception_type>(this, o.exception);
+      break;
+    }
+  }
+  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<base::is_referenceable && _is_constructible_from<_value_type2, _error_type2, _exception_type2>::value>::type> BOOST_OUTCOME_CONSTEXPR explicit value_storage(value_storage<_value_type2, _error_type2, _exception_type2> &&o) : base()
+  {
+    switch (o.type)
+    {
+    case storage_type::empty:
+      break;
+    case storage_type::value:
+      detail::emplace_value_if<has_value_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_value_type>(this, std::move(o.value));
+      break;
+    case storage_type::error:
+      detail::emplace_error_if<has_error_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_error_type>(this, std::move(o.error));
+      break;
+    case storage_type::exception:
+      detail::emplace_exception_if<has_exception_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_exception_type>(this, std::move(o.exception));
       break;
     }
   }
@@ -282,24 +324,6 @@ public:
   {
     clear();
     new(this) value_storage(std::move(o));
-  }
-  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args&&... args)
-  {
-    clear();
-    new(&this->_value_raw) value_type(std::forward<Args>(args)...);
-    this->type = storage_type::value;
-  }
-  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_error(Args&&... args)
-  {
-    clear();
-    new(&this->error) error_type(std::forward<Args>(args)...);
-    this->type = storage_type::error;
-  }
-  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_exception(Args&&... args)
-  {
-    clear();
-    new(&this->exception) exception_type(std::forward<Args>(args)...);
-    this->type = storage_type::exception;
   }
 
   BOOST_OUTCOME_CONSTEXPR void swap(value_storage &o) noexcept(is_nothrow_move_constructible)
@@ -324,8 +348,47 @@ public:
     else
     {
       value_storage temp(std::move(o));
+#ifdef __cpp_exceptions
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4297)  // use of throw within a noexcept function
+#endif
+      try
+      {
+        try
+        {
+          o = std::move(*this);
+          try
+          {
+            *this = std::move(temp);
+          }
+          catch (...)
+          {
+            *this = std::move(o);
+            throw;
+          }
+        }
+        catch (...)
+        {
+          o = std::move(temp);
+          throw;
+        }
+      }
+      catch (...)
+      {
+        // Silence static analysers
+        if (is_nothrow_move_constructible)
+          std::terminate();
+        else
+          throw;
+      }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+#else
       o = std::move(*this);
       *this = std::move(temp);
+#endif
     }
   }
   template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<_is_comparable_to<_value_type2, _error_type2, _exception_type2>::value>::type> BOOST_OUTCOME_CONSTEXPR bool operator==(const value_storage<_value_type2, _error_type2, _exception_type2> &o) const
