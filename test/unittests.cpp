@@ -467,6 +467,8 @@ BOOST_AUTO_TEST_CASE(works / monad / optional, "Tests that the monad acts as an 
   std::cout << "sizeof(option<void>) = " << sizeof(option<void>) << std::endl;
   std::cout << "sizeof(option<void>[2]) = " << sizeof(option<void>[2]) << std::endl;
 
+// Temporarily disable single byte storage until GCC fixes itself
+#if !(defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 7)
   BOOST_CHECK(!(sizeof(outcome<bool>) & 3));
   BOOST_CHECK(sizeof(option<void>) <= 1U);
   BOOST_CHECK(sizeof(option<bool>) <= 1U);
@@ -474,13 +476,11 @@ BOOST_AUTO_TEST_CASE(works / monad / optional, "Tests that the monad acts as an 
   BOOST_CHECK(sizeof(option<void>[2]) <= 2U);
   BOOST_CHECK(sizeof(option<bool>[2]) <= 2U);
   BOOST_CHECK(sizeof(option<tribool>[2]) <= 4U);
+#endif
 
-// Temporarily disable single byte storage until GCC fixes itself
-#if !(defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 7)
   // Make sure the special compact bool storage works
   BOOST_CHECK(option<bool>(false).get() == false);
   BOOST_CHECK(option<bool>(true).get() == true);
-#endif
 
   //! [optional_example]
   auto maybe_getenv = [](const char *n) -> option<const char *> {
