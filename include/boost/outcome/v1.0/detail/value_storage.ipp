@@ -244,6 +244,10 @@ public:
 #pragma warning(push)
 #pragma warning(disable: 4297)  // use of throw within a noexcept function
 #endif
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wterminate"
+#endif
   BOOST_OUTCOME_VALUE_STORAGE_IMPL &operator=(BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o) noexcept(is_nothrow_move_assignable)
   {
     if (type == o.type)
@@ -272,7 +276,11 @@ public:
       {
         // If move assignment threw, reset to empty
         clear();
-        throw;
+        // Shush static analysers
+        if (is_nothrow_move_assignable)
+          std::terminate();
+        else
+          throw;
       }
 #endif
     }
@@ -283,6 +291,9 @@ public:
     }
     return *this;
   }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif

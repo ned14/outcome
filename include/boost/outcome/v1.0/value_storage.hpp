@@ -206,7 +206,7 @@ public:
   static constexpr bool is_nothrow_copy_assignable = base::is_nothrow_copy_assignable;
   static constexpr bool is_nothrow_destructible = base::is_nothrow_destructible;
 
-#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 191024728 /* VS2017 RC1*/)
+#if (defined(_MSC_VER) && _MSC_FULL_VER > 191024728 /* VS2017 RC1*/) || __clang_major__>=4 || (__clang_major__==3 && __clang_minor__>=8)
   template <class _value_type2> static constexpr bool value_type_is_constructible_from = std::is_same<_value_type, _value_type2>::value || std::is_void<_value_type2>::value || std::is_constructible<_value_type, _value_type2>::value;
   template <class _error_type2> static constexpr bool error_type_is_constructible_from = std::is_void<_error_type2>::value || std::is_same<_error_type, _error_type2>::value || std::is_constructible<_error_type, _error_type2>::value;
   template <class _exception_type2> static constexpr bool exception_type_is_constructible_from = std::is_void<_exception_type2>::value || std::is_same<_exception_type, _exception_type2>::value || std::is_constructible<_exception_type, _exception_type2>::value;
@@ -326,7 +326,7 @@ public:
     new(this) value_storage(std::move(o));
   }
 
-  BOOST_OUTCOME_CONSTEXPR void swap(value_storage &o) noexcept(is_nothrow_move_constructible)
+  void swap(value_storage &o) noexcept(is_nothrow_move_constructible)
   {
     if(this->type == o.type)
     {
@@ -348,10 +348,14 @@ public:
     else
     {
       value_storage temp(std::move(o));
-#ifdef __cpp_exceptions
+#if defined(__cpp_exceptions)
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4297)  // use of throw within a noexcept function
+#endif
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wterminate"
 #endif
       try
       {
@@ -382,6 +386,9 @@ public:
         else
           throw;
       }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif

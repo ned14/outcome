@@ -21,103 +21,174 @@ namespace stde = BOOST_OUTCOME_V1_NAMESPACE;
 struct NoDefaultConstructible
 {
   NoDefaultConstructible() = delete;
-  NoDefaultConstructible(int)  {};
+  NoDefaultConstructible(int){};
 };
 
 struct NoCopyConstructible
 {
-  NoCopyConstructible()  {};
-  NoCopyConstructible(NoCopyConstructible const&) = delete;
+  NoCopyConstructible(){};
+  NoCopyConstructible(NoCopyConstructible const &) = delete;
   NoCopyConstructible(NoCopyConstructible &&) = default;
 };
 struct NoMoveConstructible
 {
-  NoMoveConstructible()  {};
-  NoMoveConstructible(NoMoveConstructible const&) = default;
+  NoMoveConstructible(){};
+  NoMoveConstructible(NoMoveConstructible const &) = default;
   NoMoveConstructible(NoMoveConstructible &&) = delete;
-  NoMoveConstructible& operator=(NoMoveConstructible const&) = default;
-  NoMoveConstructible& operator=(NoMoveConstructible &&) = delete;
+  NoMoveConstructible &operator=(NoMoveConstructible const &) = default;
+  NoMoveConstructible &operator=(NoMoveConstructible &&) = delete;
 };
 
 enum State
 {
-    sDefaultConstructed,
-    sValueCopyConstructed,
-    sValueMoveConstructed,
-    sCopyConstructed,
-    sMoveConstructed,
-    sMoveAssigned,
-    sCopyAssigned,
-    sValueCopyAssigned,
-    sValueMoveAssigned,
-    sMovedFrom,
-    sValueConstructed
+  sDefaultConstructed,
+  sValueCopyConstructed,
+  sValueMoveConstructed,
+  sCopyConstructed,
+  sMoveConstructed,
+  sMoveAssigned,
+  sCopyAssigned,
+  sValueCopyAssigned,
+  sValueMoveAssigned,
+  sMovedFrom,
+  sValueConstructed
 };
 
 struct OracleVal
 {
-    State s;
-    int i;
-    OracleVal(int i = 0) : s(sValueConstructed), i(i) {}
+  State s;
+  int i;
+  OracleVal(int i = 0)
+      : s(sValueConstructed)
+      , i(i)
+  {
+  }
 };
 
 struct Oracle
 {
-    State s;
-    OracleVal val;
+  State s;
+  OracleVal val;
 
-    Oracle() : s(sDefaultConstructed) {}
-    Oracle(const OracleVal& v) : s(sValueCopyConstructed), val(v) {}
-    Oracle(OracleVal&& v) : s(sValueMoveConstructed), val(std::move(v)) {v.s = sMovedFrom;}
-    Oracle(const Oracle& o) : s(sCopyConstructed), val(o.val) {}
-    Oracle(Oracle&& o) : s(sMoveConstructed), val(std::move(o.val)) {o.s = sMovedFrom;}
+  Oracle()
+      : s(sDefaultConstructed)
+  {
+  }
+  Oracle(const OracleVal &v)
+      : s(sValueCopyConstructed)
+      , val(v)
+  {
+  }
+  Oracle(OracleVal &&v)
+      : s(sValueMoveConstructed)
+      , val(std::move(v))
+  {
+    v.s = sMovedFrom;
+  }
+  Oracle(const Oracle &o)
+      : s(sCopyConstructed)
+      , val(o.val)
+  {
+  }
+  Oracle(Oracle &&o)
+      : s(sMoveConstructed)
+      , val(std::move(o.val))
+  {
+    o.s = sMovedFrom;
+  }
 
-    Oracle& operator=(const OracleVal& v) { s = sValueCopyConstructed; val = v; return *this; }
-    Oracle& operator=(OracleVal&& v) { s = sValueMoveConstructed; val = std::move(v); v.s = sMovedFrom; return *this; }
-    Oracle& operator=(const Oracle& o) { s = sCopyConstructed; val = o.val; return *this; }
-    Oracle& operator=(Oracle&& o) { s = sMoveConstructed; val = std::move(o.val); o.s = sMovedFrom; return *this; }
+  Oracle &operator=(const OracleVal &v)
+  {
+    s = sValueCopyConstructed;
+    val = v;
+    return *this;
+  }
+  Oracle &operator=(OracleVal &&v)
+  {
+    s = sValueMoveConstructed;
+    val = std::move(v);
+    v.s = sMovedFrom;
+    return *this;
+  }
+  Oracle &operator=(const Oracle &o)
+  {
+    s = sCopyConstructed;
+    val = o.val;
+    return *this;
+  }
+  Oracle &operator=(Oracle &&o)
+  {
+    s = sMoveConstructed;
+    val = std::move(o.val);
+    o.s = sMovedFrom;
+    return *this;
+  }
 };
 
 struct Guard
 {
-    std::string val;
-    Guard() : val{} {}
-    explicit Guard(std::string s, int = 0) : val(s) {}
-    Guard(const Guard&) = delete;
-    Guard(Guard&&) = delete;
-    void operator=(const Guard&) = delete;
-    void operator=(Guard&&) = delete;
+  std::string val;
+  Guard()
+      : val{}
+  {
+  }
+  explicit Guard(std::string s, int = 0)
+      : val(s)
+  {
+  }
+  Guard(const Guard &) = delete;
+  Guard(Guard &&) = delete;
+  void operator=(const Guard &) = delete;
+  void operator=(Guard &&) = delete;
 };
 
 struct ExplicitStr
 {
-    std::string s;
-    explicit ExplicitStr(const char* chp) : s(chp) {};
+  std::string s;
+  explicit ExplicitStr(const char *chp)
+      : s(chp){};
 };
 
 struct Date
 {
-    int i;
-    Date() = delete;
-    Date(int i) : i{i} {};
-    Date(Date&& d) : i(d.i) { d.i = 0; }
-    Date(const Date&) = delete;
-    Date& operator=(const Date&) = delete;
-    Date& operator=(Date&& d) { i = d.i; d.i = 0; return *this;};
+  int i;
+  Date() = delete;
+  Date(int i)
+      : i{i} {};
+  Date(Date &&d)
+      : i(d.i)
+  {
+    d.i = 0;
+  }
+  Date(const Date &) = delete;
+  Date &operator=(const Date &) = delete;
+  Date &operator=(Date &&d)
+  {
+    i = d.i;
+    d.i = 0;
+    return *this;
+  };
 };
 
-template <class T>
-struct MoveAware
+template <class T> struct MoveAware
 {
   T val;
   bool moved;
-  MoveAware(T val) : val(val), moved(false) {}
-  MoveAware(MoveAware const&) = delete;
-  MoveAware(MoveAware&& rhs) : val(rhs.val), moved(rhs.moved) {
+  MoveAware(T val)
+      : val(val)
+      , moved(false)
+  {
+  }
+  MoveAware(MoveAware const &) = delete;
+  MoveAware(MoveAware &&rhs)
+      : val(rhs.val)
+      , moved(rhs.moved)
+  {
     rhs.moved = true;
   }
-  MoveAware& operator=(MoveAware const&) = delete;
-  MoveAware& operator=(MoveAware&& rhs) {
+  MoveAware &operator=(MoveAware const &) = delete;
+  MoveAware &operator=(MoveAware &&rhs)
+  {
     val = (rhs.val);
     moved = (rhs.moved);
     rhs.moved = true;
@@ -128,36 +199,50 @@ struct MoveAware
 struct OverloadedAddressOf
 {
   OverloadedAddressOf() {}
-  OverloadedAddressOf* operator&() const { return nullptr; }
+  OverloadedAddressOf *operator&() const { return nullptr; }
 };
 
-//using namespace boost;
-//using namespace boost::functional;
+// using namespace boost;
+// using namespace boost::functional;
 
 class test_exception : public std::exception
 {
 };
 
-int throwing_fun(){ throw test_exception(); }
-int nothrowing_fun(){ return 4; }
+int throwing_fun()
+{
+  throw test_exception();
+}
+int nothrowing_fun()
+{
+  return 4;
+}
 
-void void_throwing_fun(){ throw test_exception(); }
-void do_nothing_fun(){}
+void void_throwing_fun()
+{
+  throw test_exception();
+}
+void do_nothing_fun()
+{
+}
 
 void except_default_constructor()
 {
   // From value constructor.
-  stde::expected<int> e {};
-  try {
+  stde::expected<int> e{};
+  try
+  {
     int i = e.value();
-    (void)i;
+    (void) i;
     BOOST_CHECK(true);
-  } catch(...) {
+  }
+  catch(...)
+  {
     BOOST_CHECK(false);
   };
-  BOOST_CHECK( !e.empty() );
-  BOOST_CHECK( e );
-  BOOST_CHECK( static_cast<bool>(e) );
+  BOOST_CHECK(!e.empty());
+  BOOST_CHECK(e);
+  BOOST_CHECK(static_cast<bool>(e));
 }
 
 void except_default_constructor_error_code()
@@ -165,14 +250,14 @@ void except_default_constructor_error_code()
   // From value constructor.
   stde::expected<int, std::error_code> e;
   BOOST_CHECK(!e.empty());
-  BOOST_CHECK( e);
-  BOOST_CHECK( static_cast<bool>(e));
+  BOOST_CHECK(e);
+  BOOST_CHECK(static_cast<bool>(e));
 }
 
 void except_default_constructor_constexpr()
 {
   // From value constructor.
-  BOOST_CONSTEXPR stde::expected<int,void> e;
+  BOOST_CONSTEXPR stde::expected<int, void> e;
   BOOST_CHECK(!e.empty());
 }
 
@@ -180,7 +265,7 @@ void expected_from_value()
 {
   // From value constructor.
   stde::expected<int> e(5);
-  //BOOST_REQUIRE_NO_THROW(e.value());
+  // BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_CHECK_EQ(e.value(), 5);
   BOOST_CHECK_EQ(*e, 5);
   BOOST_CHECK(!e.empty());
@@ -192,7 +277,7 @@ void expected_from_value2()
   // From value constructor.
   stde::expected<int> e(5);
   e = {};
-  BOOST_CHECK( !e.empty() );
+  BOOST_CHECK(!e.empty());
   BOOST_CHECK_EQ(e.value(), 0);
 }
 
@@ -200,42 +285,40 @@ void expected_from_cnv_value()
 {
   OracleVal v;
   stde::expected<Oracle> e(v);
-  //BOOST_REQUIRE_NO_THROW(e.value());
-  BOOST_CHECK(! ! e) ;
+  // BOOST_REQUIRE_NO_THROW(e.value());
+  BOOST_CHECK(!!e);
   BOOST_CHECK(!e.empty());
   BOOST_CHECK(bool(e));
-  BOOST_CHECK_EQ(e.value().s,  sMoveConstructed);
+  BOOST_CHECK_EQ(e.value().s, sMoveConstructed);
   BOOST_CHECK_EQ(v.s, sValueConstructed);
 
   stde::expected<Oracle> e2(std::move(v));
-  //BOOST_REQUIRE_NO_THROW(e2.value());
-  BOOST_CHECK(! ! e2) ;
+  // BOOST_REQUIRE_NO_THROW(e2.value());
+  BOOST_CHECK(!!e2);
   BOOST_CHECK(!e2.empty());
   BOOST_CHECK(bool(e2));
   BOOST_CHECK_EQ(e.value().s, sMoveConstructed);
   BOOST_CHECK_EQ(v.s, sMovedFrom);
-
 }
 
 void expected_from_in_place_value()
 {
-   OracleVal v;
-   stde::expected<Oracle> e{stde::in_place , v};
-   //BOOST_REQUIRE_NO_THROW(e.value());
-   BOOST_CHECK(! ! e) ;
-   BOOST_CHECK(!e.empty());
-   BOOST_CHECK(bool(e));
-   BOOST_CHECK_EQ(e.value().s, sValueCopyConstructed);
-   BOOST_CHECK_EQ(v.s, sValueConstructed);
+  OracleVal v;
+  stde::expected<Oracle> e{stde::in_place, v};
+  // BOOST_REQUIRE_NO_THROW(e.value());
+  BOOST_CHECK(!!e);
+  BOOST_CHECK(!e.empty());
+  BOOST_CHECK(bool(e));
+  BOOST_CHECK_EQ(e.value().s, sValueCopyConstructed);
+  BOOST_CHECK_EQ(v.s, sValueConstructed);
 
-   stde::expected<Oracle> e2{stde::in_place , std::move(v)};
-   //BOOST_REQUIRE_NO_THROW(e2.value());
-   BOOST_CHECK(! ! e2) ;
-   BOOST_CHECK(!e2.empty());
-   BOOST_CHECK(bool(e2));
-   BOOST_CHECK_EQ(e2.value().s, sValueMoveConstructed);
-   BOOST_CHECK_EQ(v.s, sMovedFrom);
-
+  stde::expected<Oracle> e2{stde::in_place, std::move(v)};
+  // BOOST_REQUIRE_NO_THROW(e2.value());
+  BOOST_CHECK(!!e2);
+  BOOST_CHECK(!e2.empty());
+  BOOST_CHECK(bool(e2));
+  BOOST_CHECK_EQ(e2.value().s, sValueMoveConstructed);
+  BOOST_CHECK_EQ(v.s, sMovedFrom);
 }
 
 void expected_from_exception()
@@ -253,7 +336,7 @@ void expected_from_copy_value()
   // From copy constructor.
   stde::expected<int> ef(5);
   stde::expected<int> e(ef);
-  //BOOST_REQUIRE_NO_THROW(e.value());
+  // BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_CHECK_EQ(e.value(), 5);
   BOOST_CHECK_EQ(*e, 5);
   BOOST_CHECK(!e.empty());
@@ -273,7 +356,7 @@ void expected_from_in_place()
 {
   // From stde::in_place constructor.
   stde::expected<std::string> e(stde::in_place, "stde::in_place");
-  //BOOST_REQUIRE_NO_THROW(e.value());
+  // BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_CHECK_EQ(e.value(), "stde::in_place");
   BOOST_CHECK_EQ(*e, "stde::in_place");
   BOOST_CHECK(!e.empty());
@@ -293,7 +376,7 @@ void expected_from_moved_value()
   // From move value constructor.
   std::string value = "my value";
   stde::expected<std::string> e = std::move(value);
-  //BOOST_REQUIRE_NO_THROW(e.value());
+  // BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_CHECK_EQ(e.value(), "my value");
   BOOST_CHECK_EQ(*e, "my value");
   BOOST_CHECK(!e.empty());
@@ -319,18 +402,18 @@ void expected_from_catch_block()
 
 void make_expected_E_from_value()
 {
-  //auto e = stde::make_expected<std::string>( 5 );
-  //BOOST_CHECK_EQ(!e.empty(), false);
+  // auto e = stde::make_expected<std::string>( 5 );
+  // BOOST_CHECK_EQ(!e.empty(), false);
 }
 void make_expected_from_U_value()
 {
-  stde::expected<short> e = stde::make_expected<short>( 5 );
+  stde::expected<short> e = stde::make_expected<short>(5);
   static_assert(std::is_same<decltype(e), stde::expected<short>>{}, "");
   BOOST_CHECK_EQ(!e.empty(), true);
 }
 void make_expected_from_U_value2()
 {
-  stde::expected<std::string> e = stde::make_expected<std::string>( "aa" );
+  stde::expected<std::string> e = stde::make_expected<std::string>("aa");
   static_assert(std::is_same<decltype(e), stde::expected<std::string>>{}, "");
   BOOST_CHECK_EQ(!e.empty(), true);
 }
@@ -338,8 +421,8 @@ void make_expected_from_U_value2()
 void expected_from_value_error_condition()
 {
   // From value constructor.
-  stde::expected<int,std::error_condition> e(5);
-  //BOOST_REQUIRE_NO_THROW(e.value());
+  stde::expected<int, std::error_condition> e(5);
+  // BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_CHECK_EQ(e.value(), 5);
   BOOST_CHECK_EQ(*e, 5);
   BOOST_CHECK(!e.empty());
@@ -350,13 +433,13 @@ void expected_from_error_error_condition()
 {
   // From stde::unexpected_type constructor.
   stde::expected<int, std::error_condition> e(stde::unexpected_type<std::error_condition>(std::make_error_condition(std::errc::invalid_argument)));
-  auto error_from_except_check = [](const stde::bad_expected_access<std::error_condition>& except)
+  auto error_from_except_check = [](const stde::bad_expected_access<std::error_condition> &except) { return std::errc(except.error().value()) == std::errc::invalid_argument; };
+  try
   {
-    return std::errc(except.error().value()) == std::errc::invalid_argument;
-  };
-  try {
-    (void)e.value();
-  } catch (stde::bad_expected_access<std::error_condition>& ex) {
+    (void) e.value();
+  }
+  catch(stde::bad_expected_access<std::error_condition> &ex)
+  {
     BOOST_CHECK(error_from_except_check(ex));
   }
   BOOST_CHECK_EQ(static_cast<bool>(e), false);
@@ -366,7 +449,7 @@ void expected_from_error_error_condition()
 void except_valid_constexpr_int()
 {
   // From value constructor.
-  BOOST_CONSTEXPR stde::expected<int,void> e;
+  BOOST_CONSTEXPR stde::expected<int, void> e;
   BOOST_CONSTEXPR bool b = !e.empty();
   BOOST_CHECK(b);
 }
@@ -374,7 +457,7 @@ void except_value_constexpr_int()
 {
 #if !defined(_MSC_VER) || _MSC_VER > 1900 /* VS2015 */
   // From value constructor.
-  BOOST_CONSTEXPR stde::expected<int,void> e(1);
+  BOOST_CONSTEXPR stde::expected<int, void> e(1);
   BOOST_CONSTEXPR int x = e.value();
   BOOST_CHECK_EQ(x, 1);
 #endif
@@ -387,7 +470,7 @@ void expected_from_value3()
 
   // From value assignment.
   e = 8;
-  //BOOST_REQUIRE_NO_THROW(e.value());
+  // BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_CHECK_EQ(e.value(), 8);
   BOOST_CHECK_EQ(*e, 8);
   BOOST_CHECK(!e.empty());
@@ -401,7 +484,7 @@ void expected_from_copy_expected()
 
   // From value assignment.
   e = e2;
-  //BOOST_REQUIRE_NO_THROW(e.value());
+  // BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_CHECK_EQ(e.value(), 8);
   BOOST_CHECK_EQ(*e, 8);
   BOOST_CHECK(!e.empty());
@@ -410,20 +493,23 @@ void expected_from_copy_expected()
 
 void expected_from_moved_expected()
 {
+  std::string s("e"), s2("e2");
+  s = std::move(s2);
+  bool stl_string_has_broken_move_assignment = !s2.empty();
   stde::expected<std::string> e("e");
   stde::expected<std::string> e2("e2");
 
   // From value assignment.
   e = std::move(e2);
-  //BOOST_REQUIRE_NO_THROW(e.value());
+  // BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_CHECK_EQ(e.value(), "e2");
   BOOST_CHECK_EQ(*e, "e2");
   BOOST_CHECK(!e.empty());
   BOOST_CHECK(static_cast<bool>(e));
 
-  //BOOST_REQUIRE_NO_THROW(e2.value());
-  BOOST_CHECK_EQ(e2.value(), "");
-  BOOST_CHECK_EQ(*e2, "");
+  // BOOST_REQUIRE_NO_THROW(e2.value());
+  BOOST_CHECK_EQ(e2.value(), stl_string_has_broken_move_assignment ? "e" : "");
+  BOOST_CHECK_EQ(*e2, stl_string_has_broken_move_assignment ? "e" : "");
   BOOST_CHECK(!e2.empty());
   BOOST_CHECK(static_cast<bool>(e2));
 }
@@ -436,7 +522,7 @@ void expected_from_in_place2()
 
   // From emplace method.
   e.emplace("emplace method");
-  //BOOST_REQUIRE_NO_THROW(e.value());
+  // BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_CHECK_EQ(e.value(), "emplace method");
   BOOST_CHECK_EQ(*e, "emplace method");
   BOOST_CHECK(!e.empty());
@@ -450,7 +536,7 @@ void expected_from_move_value()
   std::string value = "my value";
   // From assignment operator.
   e = std::move(value);
-  //BOOST_REQUIRE_NO_THROW(e.value());
+  // BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_CHECK_EQ(e.value(), "my value");
   BOOST_CHECK_EQ(*e, "my value");
   BOOST_CHECK(!e.empty());
@@ -461,9 +547,9 @@ void expected_from_move_value()
 void expected_from_in_place3()
 {
   // From stde::in_place factory.
-  //auto e = stde::make_expected<std::string>("stde::in_place");
+  // auto e = stde::make_expected<std::string>("stde::in_place");
   auto e = stde::expected<std::string>("stde::in_place");
-  //BOOST_REQUIRE_NO_THROW(e.value());
+  // BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_CHECK_EQ(e.value(), "stde::in_place");
   BOOST_CHECK_EQ(*e, "stde::in_place");
   BOOST_CHECK(!e.empty());
@@ -473,7 +559,7 @@ void expected_from_in_place_error()
 {
   // From stde::in_place factory.
   auto e = stde::expected<std::string, std::error_condition>("stde::in_place");
-  //BOOST_REQUIRE_NO_THROW(e.value());
+  // BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_CHECK_EQ(e.value(), "stde::in_place");
   BOOST_CHECK_EQ(*e, "stde::in_place");
   BOOST_CHECK(!e.empty());
@@ -500,13 +586,13 @@ void expected_from_error()
 {
   // From stde::unexpected_type constructor.
   auto e = stde::make_expected_from_error<int>(std::make_error_condition(std::errc::invalid_argument));
-  auto error_from_except_check = [](const stde::bad_expected_access<std::error_condition>& except)
+  auto error_from_except_check = [](const stde::bad_expected_access<std::error_condition> &except) { return std::errc(except.error().value()) == std::errc::invalid_argument; };
+  try
   {
-    return std::errc(except.error().value()) == std::errc::invalid_argument;
-  };
-  try {
-    (void)e.value();
-  } catch (stde::bad_expected_access<std::error_condition>& ex) {
+    (void) e.value();
+  }
+  catch(stde::bad_expected_access<std::error_condition> &ex)
+  {
     BOOST_CHECK(error_from_except_check(ex));
   }
   BOOST_CHECK_EQ(static_cast<bool>(e), false);
@@ -514,7 +600,7 @@ void expected_from_error()
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable: 4244)  // convertsion from int to short
+#pragma warning(disable : 4244)  // convertsion from int to short
 #endif
 void expected_from_error_U()
 {
@@ -651,34 +737,37 @@ void expected_swap_exception()
 
   e.swap(e2);
 
-  auto equal_to_e = [](const std::invalid_argument& except) { return std::string(except.what()) == "e"; };
-  auto equal_to_e2 = [](const std::invalid_argument& except) { return std::string(except.what()) == "e2"; };
+  auto equal_to_e = [](const std::invalid_argument &except) { return std::string(except.what()) == "e"; };
+  auto equal_to_e2 = [](const std::invalid_argument &except) { return std::string(except.what()) == "e2"; };
 
-  try {
-    (void)e.value();
+  try
+  {
+    (void) e.value();
     BOOST_CHECK(true);
   }
-  catch (stde::bad_expected_access<std::exception_ptr> &e)
+  catch(stde::bad_expected_access<std::exception_ptr> &e)
   {
     try
     {
       std::rethrow_exception(e.error());
     }
-    catch (std::invalid_argument &ex)
+    catch(std::invalid_argument &ex)
     {
       BOOST_CHECK(equal_to_e2(ex));
     }
   }
-  try {
-    (void)e2.value();
+  try
+  {
+    (void) e2.value();
     BOOST_CHECK(true);
-  } catch (stde::bad_expected_access<std::exception_ptr> &e)
+  }
+  catch(stde::bad_expected_access<std::exception_ptr> &e)
   {
     try
     {
       std::rethrow_exception(e.error());
     }
-    catch (std::invalid_argument &ex)
+    catch(std::invalid_argument &ex)
     {
       BOOST_CHECK(equal_to_e(ex));
     }
@@ -686,32 +775,34 @@ void expected_swap_exception()
 
   e2.swap(e);
 
-  try {
-    (void)e.value();
+  try
+  {
+    (void) e.value();
     BOOST_CHECK(true);
   }
-  catch (stde::bad_expected_access<std::exception_ptr> &e)
+  catch(stde::bad_expected_access<std::exception_ptr> &e)
   {
     try
     {
       std::rethrow_exception(e.error());
     }
-    catch (std::invalid_argument& ex)
+    catch(std::invalid_argument &ex)
     {
       BOOST_CHECK(equal_to_e(ex));
     }
   }
-  try {
-    (void)e2.value();
+  try
+  {
+    (void) e2.value();
     BOOST_CHECK(true);
   }
-  catch (stde::bad_expected_access<std::exception_ptr> &e)
+  catch(stde::bad_expected_access<std::exception_ptr> &e)
   {
     try
     {
       std::rethrow_exception(e.error());
     }
-    catch (std::invalid_argument& ex)
+    catch(std::invalid_argument &ex)
     {
       BOOST_CHECK(equal_to_e2(ex));
     }
@@ -738,10 +829,10 @@ void expected_swap_function_value()
 
 int main()
 {
-//  static_assert(! std::is_default_constructible<NoDefaultConstructible>::value, "");
-//  static_assert(! std::is_default_constructible<stde::expected<NoDefaultConstructible>>::value, "");
+  //  static_assert(! std::is_default_constructible<NoDefaultConstructible>::value, "");
+  //  static_assert(! std::is_default_constructible<stde::expected<NoDefaultConstructible>>::value, "");
 
-  static_assert(! std::is_copy_constructible<NoCopyConstructible>::value, "");
+  static_assert(!std::is_copy_constructible<NoCopyConstructible>::value, "");
 //  static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, NoCopyConstructible const& >::value, "");
 //  static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, stde::expected<NoCopyConstructible> const& >::value, "");
 //  static_assert(! std::is_copy_constructible<stde::expected<NoCopyConstructible>>::value, "");
@@ -755,10 +846,10 @@ int main()
     (void)x;
   }
 #endif
-  static_assert(! std::is_move_constructible<NoMoveConstructible>::value, "");
-  static_assert(! stde::expected<NoMoveConstructible>::is_move_constructible, "");
-  static_assert( std::is_constructible<stde::expected<NoMoveConstructible>, NoMoveConstructible && >::value, "");
-  static_assert( std::is_move_constructible<stde::expected<NoMoveConstructible>>::value, "");
+  static_assert(!std::is_move_constructible<NoMoveConstructible>::value, "");
+  static_assert(!stde::expected<NoMoveConstructible>::is_move_constructible, "");
+  //  static_assert( std::is_constructible<stde::expected<NoMoveConstructible>, NoMoveConstructible && >::value, "");
+  static_assert(std::is_move_constructible<stde::expected<NoMoveConstructible>>::value, "");
 
   except_default_constructor();
   except_default_constructor_error_code();
@@ -790,9 +881,9 @@ int main()
   expected_from_exception_catch();
   expected_from_error();
   expected_from_error_U();
-  //expected_from_exception2();
+  // expected_from_exception2();
   expected_from_exception_ptr2();
-  //make_expected_from_call_fun();
+  // make_expected_from_call_fun();
   make_expected_from_call_void_fun();
   expected_swap_value();
   expected_swap_exception();
