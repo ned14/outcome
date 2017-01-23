@@ -2250,19 +2250,19 @@ public:
   //! \brief The type of error
   using error_type = E;
   //! \brief Constructs an instance taking a copy
-  explicit bad_expected_access(const error_type &e)
+  explicit bad_expected_access(const error_type &e) noexcept
       : std::logic_error("Bad expected access of value when error was present")
       , _error(e)
   {
   }
   //! \brief Returns the error
-  const error_type &error() const & { return _error; }
+  const error_type &error() const & noexcept { return _error; }
   //! \brief Returns the error
-  error_type &error() & { return _error; }
+  error_type &error() & noexcept { return _error; }
   //! \brief Returns the error
-  const error_type &&error() const && { return _error; }
+  const error_type &&error() const && noexcept { return _error; }
   //! \brief Returns the error
-  error_type &&error() && { return _error; }
+  error_type &&error() && noexcept { return _error; }
 };
 //! \brief Type thrown due to valueless by exception state
 template <> class bad_expected_access<void> : public std::logic_error
@@ -2271,16 +2271,16 @@ public:
   //! \brief The type of error
   using error_type = void;
   //! \brief Constructs an instance
-  explicit bad_expected_access()
+  explicit bad_expected_access() noexcept
       : std::logic_error("Bad expected access of value when valueless due to exception")
   {
   }
 };
-template <class E> inline bad_expected_access<E> make_bad_expected_access(const E &v)
+template <class E> inline bad_expected_access<E> make_bad_expected_access(const E &v) noexcept
 {
   return bad_expected_access<E>(v);
 }
-inline bad_expected_access<void> make_bad_expected_access()
+inline bad_expected_access<void> make_bad_expected_access() noexcept
 {
   return bad_expected_access<void>();
 }

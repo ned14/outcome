@@ -39,6 +39,10 @@ namespace detail
   // Inherited from publicly by basic_monad, so whatever you expose here you expose in basic_monad
   template <class monad_storage, class value_type, class error_type, class exception_type> struct expected_policy_base : public monad_storage
   {
+    static_assert(!std::is_constructible<value_type, error_type>::value, "value_type cannot be constructible from error_type");
+    static_assert(!std::is_constructible<error_type, value_type>::value, "error_type cannot be constructible from value_type");
+    static_assert(std::is_void<error_type>::value || std::is_nothrow_copy_constructible<error_type>::value, "error_type must be nothrow copy constructible");
+    static_assert(std::is_void<error_type>::value || std::is_nothrow_move_constructible<error_type>::value, "error_type must be nothrow move constructible");
   protected:
     expected_policy_base() = delete;
     expected_policy_base(const expected_policy_base &) = delete;

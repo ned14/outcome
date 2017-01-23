@@ -13,13 +13,13 @@
 
 \section description Description
 
-This is the proposed Boost.Outcome library, a Boost C++ 14 library providing
+This is the Outcome library, a Boost C++ 14 library providing
 a factory and family of policy driven lightweight monadic value-or-error transports with
 the convenience simple specialisations of `expected<T, E>`, `outcome<T>`, `result<T>` and `option<T>`.
 Its main intended usage is as an ultra light weight error handling framework,
 providing a more expressive and type safe alternative to error code integers
-or enums, yet much lower overhead than exception throws. Unlike alternatives
-such as the likely C++ 20 reference `expected<T, E>` implementation, it works perfectly
+or enums, yet much lower overhead than exception throws. Unlike alternative implementations
+such as the reference `expected<T, E>` implementation, it works perfectly
 with exceptions and RTTI disabled and thus is suitable for low-latency/games/finance/SG14
 users. One could view Outcome as a minimum overhead
 universal outcome handling framework for C++, hence being named "Outcome".
@@ -31,7 +31,7 @@ in the same design pattern as when writing in Rust or Swift, and with a similarl
 low runtime overhead. Outcome even has a `try` macro doing mostly the same thing as in
 Rust and Swift!
 
-\note Boost.Outcome has not been peer reviewed and is not part of the Boost libraries
+\note Outcome has not been peer reviewed and is not part of the Boost libraries
 (yet). It is hoped it will enter the peer review queue in Q1 2017.
 
 \snippet simple_example.cpp simple_example
