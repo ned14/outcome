@@ -430,6 +430,8 @@ if(fh_)
 You'll note we've changed the error type from a `std::error_code` to a `std::exception_ptr`
 in order to transport, without losing information, all possible C++ exception throws.
 
+\subsubsection sea_of_noexcept Sea of noexcept, islands of exception throw
+
 The "sea of noexcept, islands of exception throw" design pattern is characterised by
 all `extern` function APIs i.e. all functions callable by code outside the current
 translation unit being marked `noexcept`. Because code outside the current translation
@@ -446,7 +448,7 @@ fewer implicit potential execution paths to test for correctness.
 
 Meanwhile internal to the implementation of `openfile()`, we do throw exceptions, but
 there is **always** a master `try...catch(...)` catchall clause at the base of the
-function. This is because if you have anything else, the compiler is required by the C++
+function. This is because if you have anything but a catchall try-catch, the compiler is required by the C++
 standard to insert a call to `std::terminate()` if any exception throw reaches a noexcept
 function boundary. Assuming that you really don't want that to happen, we therefore always
 catch all exceptions and convert them into a `std::exception_ptr` which we return out
@@ -456,6 +458,19 @@ of the function via the normal value return mechanism as an unexpected Expected 
 any use of `std::shared_ptr` as they need to be implemented the same way (i.e. with malloc and atomics) according to the
 C++ standard. For most code this is an acceptable overhead, if that is not the case in your
 code then Tutorial part B is for you.
+
+Finally, within any translation unit you do NOT mark non-extern functions with `noexcept`
+unless the function cannot fail. Because the compiler can see an entire translation unit
+as a single whole, it will deduce which non-extern functions can throw and which can not
+(any calls by you into other translation units will use extern functions marked `noexcept`,
+hence the only exception throws which the compiler needs to consider will be thrown from
+within the current translation unit only). The compiler ought to then optimise the current
+translation unit down to an **optimal** edition maximising the regions of code known by
+the compiler to be incapable of throwing exceptions, thus eliminating any EH tables etc
+for that code. Indeed, if the master catchall try-catch at the base of an extern function
+is deduced by the compiler to not be needed, all recent compilers will eliminate that
+from the runtime code generated too, effectively making it as if you compiled the
+translation unit with C++ exceptions globally disabled.
 
 \subsubsection bad_expected_access Expected's bad_expected_access<E>
 
@@ -572,4 +587,41 @@ public:
 ~~~
 
 \note You should be aware that Outcome's Expected implementation varies from the above in
-a few very minor ways. See \ref outcome_expected_reference "Outcome's implementation of Expected" for an exact detail.
+a few very minor ways. It also provides a considerable number of extensions. See
+\ref outcome_expected_reference "Outcome's implementation of Expected" for an exact detail.
+
+As inferred in the example code cases earlier, you can check if an `expected<T, E>`
+has an expected value via a simple test for boolean true or more explicitly via `.has_value()`
+before retrieving the value using `.value()`. A useful shortcut can be `.value_or()`
+where you would otherwise write a ternary operation selecting on the Expected having
+an expected value.
+
+Finally, the current proposal before WG21 has not yet added a mechanism for testing if
+the Expected is valueless or not, so you currently have no way of testing for that
+except by catching the exception thrown. It *may* mirror `std::variant<...>`'s `valueless_by_exception()`
+observer function, or it may choose something else. Outcome's implementation of
+Expected implements a '.empty()' extension, this seemed to fit the rest of STL the best.
+
+\section expected_example Short example program using expected<T, E>
+
+Up until now we have been referring to Expected via the namespace `std::experimental`.
+Outcome obviously does not provide Expected in that namespace, instead it uses the
+outcome namespace which you can find via either of these forms:
+
+~~~{.cpp}
+// Traditional: use SOME version Boost.Outcome visible to the compiler/linker
+namespace outcome = boost::outcome;
+
+// Better: use EXACTLY the Boost.Outcome visible in the current translation unit
+namespace outcome = BOOST_OUTCOME_V1_NAMESPACE;
+~~~
+
+The `BOOST_OUTCOME_V1_NAMESPACE` macro encodes a unique hexadecimal value per release. This guarantees
+that the linker will not substitute a different version of Outcome than the Outcome you compiled against.
+It is therefore recommended that you use the `BOOST_OUTCOME_V1_NAMESPACE` macro.
+
+This example program using `expected<T, E>` replicates <a href="http://rustbyexample.com/std/result.html">the use example in
+the documentation for Rust's `Result<T, E>`</a>. As you'll see in Tutorial part B, you
+would be unwise to use `expected<T, E>` like this in large C++ programs.
+
+\snippet expected_example.cpp expected_example

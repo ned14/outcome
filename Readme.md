@@ -23,7 +23,9 @@ Todo:
  - [ ] `make install` needs to install dependency headers too
  - [ ] Add config where in release mode the exception throwing macros generate link errors
 for symbols with the function name and line number in them.
- - [ ] Add nothrow make functions for outcomes, maybe with error lvalue ref constructor editions for results.
+ - [ ] Need to get boost-lite's cmake come up with a preprocessed edition as the master include header
+   - Need two editions, one with `BOOST_OUTCOME_ENABLE_ADVANCED` and one without.
+   - Preprocessed edition ought to include the SHA in the namespace!
  - [ ] Solve the apt packaging problem. Either:
    1. boost-lite cmake needs to gain the ability to be called by debian dh (see make_deb.sh).
    This would also solve building binary distros and would let us host on launchpad.
@@ -34,14 +36,11 @@ saying all passes. If so:
   - [x] Build a complete source distro and place it at https://dedi4.nedprod.com/static/files/
   - [ ] Push to:
    - [ ] launchpad (Ubuntu, Debian). Instructions at https://help.launchpad.net/Packaging/PPA/BuildingASourcePackage
-   - [ ] vcpkg (Microsoft). Instructions at https://github.com/Microsoft/vcpkg/blob/master/docs/EXAMPLES.md
    - [ ] homebrew (OS X). Instructions at http://formalfriday.club/2015/01/05/creating-your-own-homebrew-tap-and-formula.html
    - [ ] FreeBSD packages. Instructions at https://www.freebsd.org/doc/handbook/ports-poudriere.html
  
 Later:
- - [ ] Need to get boost-lite's cmake come up with a preprocessed edition as the master include header
-   - Need two editions, one with `BOOST_OUTCOME_ENABLE_ADVANCED` and one without.
-   - Preprocessed edition ought to include the SHA in the namespace!
+ - [ ] Add nothrow make functions for outcomes, maybe with error lvalue ref constructor editions for results.
  - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
  - [ ] Add tribool logic programming operator overloads
  - [ ] Add macro helpers to Outcome for returning outcomes out of things which cannot return values
