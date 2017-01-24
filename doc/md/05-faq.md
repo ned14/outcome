@@ -1,6 +1,47 @@
 # Frequently Asked Questions
 \anchor faq
 
+\section expected_qoi How close to the proposed C++ 20 standard expected<T, E> is Outcome's
+expected<T, E> implementation?
+
+Outcome's `expected<T, E>` implementation is highly conforming to the current
+proposal text, indeed more so than the current LEWG reference implementation at
+https://github.com/viboes/std-make. Outcome uses the **exact same** unit test suite
+as the LEWG Expected reference implementation, and passes it handily. As the LEWG
+reference implementation updates its unit test suite, we shall keep pace.
+
+These are the known deviations from the WG21 LEWG Expected proposal as per
+http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf:
+- P0323R1 doesn't yet specify what will be done if you try accessing an expected
+which is valueless due to exception. We throw a `bad_expected_access<void>` in
+this situation as that seemed logical. If the LEWG proposal decides on something
+different, this implementation will change to track the LEWG proposal.
+- Types `T` and `E` cannot be constructible into one another. This is a fundamental
+design choice in basic_monad to significantly reduce compile times so it won't be
+fixed.
+- `unexpected_type<E>` is implemented as an `expected<void, E>` and it lets
+the basic_monad machinery do the implicit conversion to some `expected<T, E>`
+through the less representative to more representative conversion rules.
+- Our `expected<T, E>` defaults E to `error_code_extended` rather than `std::error_condition`
+(the LEWG proposal is almost certainly wrong on this, it should be `std::error_code`).
+If you don't like this, predefine the `BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE` macro.
+- We don't implement the ordering and hashing operator overloads due to https://akrzemi1.wordpress.com/2014/12/02/a-gotcha-with-optional/.
+The fact the LEWG proposal does as currently proposed is a defect.
+- We don't implement `make_expected_from_call()` as we think it highly likely to be
+removed from the next version of the proposal due to it conferring little value.
+- Our Expected always defines the default, copy and move constructors even if the
+the type configured is not capable of it. That means `std::is_copy_constructible`
+etc returns true when they should return false. The reason why is again to
+significantly improve compile times by hugely reducing the number of templates
+which need to be instantiated during routine basic_monad usage, and again
+this won't be fixed. Instead use the static constexpr bools at:
+  - `expected<T, E>::is_default_constructible`
+  - `expected<T, E>::is_copy_constructible`
+  - `expected<T, E>::is_move_constructible`
+ \note Depending on what any Boost peer review thinks, we may inject correct answers
+for the type traits for basic_monad into namespace std.
+
+
 \section dontlike Hard coding error_code and exception_ptr is incredibly restrictive and ruins Outcome for me. Can you not do that please (i.e. make it more like expected<T, E> with its arbitrary type E)?
 
 Outcome isn't a direct substitute for Expected per se. It can substitute for Expected's default
@@ -36,7 +77,7 @@ allocating memory. This makes error handling performance predictable.
 resulted in the error. This also does not allocate memory and costs a maximum of about 35
 microseconds on a fast Intel CPU if your stack down to seven levels deep is in warm cache.
 
-To make using this extended functionality even easier, in the \ref quickstart "Quick start"
+To make using this extended functionality even easier, in the Quick start
 synopsis you may have noticed that the `make_errored_*()` functions accept an optional `const char *`
 string. This is simply fed to `error_code_extended`'s constructor. If Outcome ever converts a C++
 exception into an error code for you e.g. through you using `BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT`,

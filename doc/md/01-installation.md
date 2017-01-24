@@ -14,7 +14,7 @@ repositories.
 
 If you are using VS2017 or better it comes with VCPkg, a package manager, which lets you
 install various open source libraries as if system libraries for MSVC. Unfortunately
-its maintainers won't accept libraries without formal version releases (yeah I know), so for now
+its maintainers won't accept libraries without formal version releases which is disappointing, so for now
 you're best using the source tarball or git subrepo methods described below.
 
 <br><hr><br>
