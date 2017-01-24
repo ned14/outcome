@@ -2309,14 +2309,14 @@ inline expected<void> make_expected()
   return expected<void>();
 }
 //! \brief Makes an expected from the type passed \ingroup expected
-template <class T> constexpr inline expected<T> make_expected(T &&v)
+template <class T, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> constexpr inline expected<T, E> make_expected(T &&v)
 {
-  return expected<T>(std::move(v));
+  return expected<T, E>(std::move(v));
 }
 //! \brief Makes an expected from the type passed \ingroup expected
-template <class T> constexpr inline expected<T> make_expected(const T &v)
+template <class T, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> constexpr inline expected<T, E> make_expected(const T &v)
 {
-  return expected<T>(v);
+  return expected<T, E>(v);
 }
 //! \brief Makes an unexpected from the type passed \ingroup expected
 template <class E> constexpr inline unexpected_type<E> make_unexpected(E &&v)

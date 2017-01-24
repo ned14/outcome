@@ -2,6 +2,7 @@
 #include "../include/boost/outcome.hpp"
 
 #include <cfloat>
+#include <cmath>
 #include <iostream>
 
 namespace outcome = BOOST_OUTCOME_V1_NAMESPACE;
@@ -18,11 +19,11 @@ namespace checked
   
   using MathResult = outcome::expected<double, MathError>;
   static inline MathResult MathResultOk(double x) { return outcome::make_expected<double, MathError>(x); }
-  static inline MathResult MathResultErr(MathError e) { return outcome::make_unexpected<double, MathError>(e); }
+  static inline MathResult MathResultErr(MathError e) { return outcome::make_expected_from_error<double, MathError>(e); }
   
   MathResult div(double x, double y) noexcept
   {
-    if(fabs(y) < FLT_EPSILON)
+    if(::fabs(y) < FLT_EPSILON)
     {
       // This operation would fail, instead let's return the reason of
       // the failure wrapped in E
@@ -39,14 +40,14 @@ namespace checked
   {
     if(x < 0.0)
       return MathResultErr(MathError::NegativeSquareRoot);
-    return MathResultOk(sqrt(x));
+    return MathResultOk(::sqrt(x));
   }
 
   MathResult ln(double x) noexcept
   {
     if(x < 0.0)
       return MathResultErr(MathError::NegativeLogarithm);
-    return MathResultOk(ln(x));
+    return MathResultOk(::log(x));
   }
 }
 
@@ -55,19 +56,19 @@ double op(double x, double y)
   // Outcome provides a .match() extension, but this is 100% standard Expected
   // Also using outcome::result<T> instead of expected<T, E> would enable
   // intelligent printing of the error code to std::cerr
-  MathResult ratio = checked::div(x, y);
+  checked::MathResult ratio = checked::div(x, y);
   if(!ratio)
   {
     std::cerr << "PANIC: MatchResult::DivisionByZero" << std::endl;
     std::terminate();
   }
-  MathResult ln = checked::ln(*ratio);
+  checked::MathResult ln = checked::ln(*ratio);
   if(!ln)
   {
     std::cerr << "PANIC: MatchResult::NegativeLogarithm" << std::endl;
     std::terminate();
   }
-  MathResult sqrt = checked::sqrt(*ln);
+  checked::MathResult sqrt = checked::sqrt(*ln);
   if(!sqrt)
   {
     std::cerr << "PANIC: MatchResult::NegativeSquareRoot" << std::endl;
