@@ -40,6 +40,7 @@ saying all passes. If so:
    - [ ] FreeBSD packages. Instructions at https://www.freebsd.org/doc/handbook/ports-poudriere.html
  
 Later:
+ - [ ] error_or() ought to have rvalue ref etc overloads, and exception_or()
  - [ ] Add nothrow make functions for outcomes, maybe with error lvalue ref constructor editions for results.
  - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
  - [ ] Add tribool logic programming operator overloads
