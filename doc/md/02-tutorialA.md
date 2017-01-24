@@ -18,7 +18,7 @@ big advantage of requiring you to type less boilerplate during use.
 This tutorial is therefore split into two parts. The first part (part A) provides a broad
 overview of error handling in C++ in general and how `expected<T, E>` will
 contribute to that big menu of error handling design patterns available to the C++ programmer.
-The second part (part B) describes why you probably ought
+The second part (\ref tutorial_outcome "part B") describes why you probably ought
 to not use unrestricted `expected<T, E>` in any real world code base and why
 you ought to use the refinements of `outcome<T>` or `result<T>` instead.
 
