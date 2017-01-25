@@ -63,7 +63,7 @@ codes. You also force programmers coming later to your code to deal with a multi
 of local error code domains which may or may not mean the same thing. Expect a multiplication of lots of
 little switch statements mapping one small domain of error code to another, all of which
 must be maintained and parsed by programmers coming later to your codebase. The growing
-maintenance burden over time is obvious.
+maintenance burden over time is obvious, and a further worked example follows below.
 
 The third reason is that the C++ 11 standard library already provides an enum of the
 most common error codes for you so you don't feel like going off and reinventing
@@ -250,17 +250,190 @@ result<int> foo()
 ... and note that you can feed `make_error()` any custom error code enum understood
 by `std::error_code`.
 
-If you have found this explanation persuasive so far, you can guess where Outcome's more
-hard coded and less flexible refinements to `expected<T, E>` are going.
+<hr><br>
+
+\section expected_boilerplate Unrestricted use of expected<T, E> means typing more boilerplate
+
+If you weren't convinced by the previous section, let's look at another problem which
+unrestricted use of Expected has: the quantity of boilerplate it makes you write.
+
+\snippet expected_try1.cpp expected_try1
+
+The example is contrived for sure, but it shows the problem of having lots of local
+custom error code domains. In the above example, `MathError2` has a different assignment
+of integer values to `MathError1`, but they could simply be different error code enums.
+As is common in any code base of any size, one layer of functions (`div10mul3()`) will call into an
+inner layer of more basic functions (`div()`) and will need to pass back out any errors
+encountered.
+
+There are two things to note in this example. The first is that due to the error code
+domains being different, you need to convert error codes using a switch statement. The
+second is that on bad access, Expected throws a templated exception type with the type `E` as the
+template parameter. I can tell you that it is far too easy in the real world to accidentally
+mistype or forget to update the type caught in the catch statement leading to unintentional
+bugs which are quite tricky to track down.
+
+Again, restricting `expected<T, E>` to `E =  std::error_code` makes the code much more
+maintainable and easy to parse by humans:
+
+\snippet expected_try2.cpp expected_try2
+
+You'll note the use of the convenience macro `BOOST_OUTCOME_TRY(var, expr)` which provides
+some of the `try` keyword in Swift or Rust. The try operation evaluates the expression and if
+the result returned is an unexpected value, it immediately returns from the current function
+with the same unexpected value - therefore your type `E` needs to be the same. If it is an
+expected value, that value is *unwrapped* and returned as the result from the try operation.
+
+Unlike the `try` keyword, the macro is not an expression so you can't write statements like
+`if(BOOST_OUTCOME_TRY(var, expr))` as you can in Rust or Swift, this is due to a limitation
+of the C++ language (you can't return from functions in an expression). What you can do is to
+initialise a variable `var` on the stack to the unwrapped return value from the expression,
+so you might write:
+
+~~~{.cpp}
+expected<std::string, std::error_code> somefunc();
+...
+expected<int, std::error_code> someotherfunc()
+{
+  // If somefunc() returns an E, immediately return an
+  // expected<int, std::error_code> with the same E
+  // as if return make_unexpected(somefunc().error());
+  BOOST_OUTCOME_TRY(v, somefunc());
+  // ... else unpack the T into v as if
+  // std::string v(std::move(somefunc().value());
+  return v.empty() ? 0 : v.size();
+}
+~~~
 
 <hr><br>
 
-\section expected_boilerplate Using expected<T, E> means typing more boilerplate
+\section error_code_extended Outcome's extended std::error_code
 
-todo
+A lot of people find `std::error_code` too constraining and value their custom error types
+precisely because they can carry *payload* e.g. a custom string describing exactly the cause
+of the error, or maybe a backtrace of the exact offending call sequence leading to the error.
+They therefore reject the restriction to `std::error_code` as unsuitable for their use case.
+
+Outcome provides an \ref boost::outcome::v1_xxx::error_code_extended "error_code_extended"
+refinement of `std::error_code` for exactly this situation. `error_code_extended` inherits publicly from `std::error_code`,
+adding two new member functions: `extended_message()` and `backtrace()`. These *may* provide
+additional information about the error code like any `what()` message from the C++ exception
+the error code was constructed from (if any), or the stack backtrace of the point at which the
+`error_code_extended` was constructed.
+
+~~~{.cpp}
+class error_code_extended : public std::error_code
+{
+public:
+  error_code_extended();
+  error_code_extended(int ec, const std::error_category &cat, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false);
+  template <class ErrorCodeEnum, typename = typename std::enable_if<std::is_error_code_enum<ErrorCodeEnum>::value>::type>
+    error_code_extended(ErrorCodeEnum e);
+  explicit error_code_extended(const std::error_code &e, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false);
+  explicit error_code_extended(std::error_code &&e, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false);
+  void assign(int ec, const std::error_category &cat, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false);
+  void clear();
+  
+  // New member functions
+
+  // Fill a char buffer with the extended message, retrieving the two extended unsigned integer codes
+  size_t extended_message(char *buffer, size_t len, unsigned &code1, unsigned &code2) const noexcept;
+
+  // Return an array of strings describing the stack at the time of construction. MUST call free() on this returned pointer.
+  char **backtrace() const noexcept;
+};
+
+// Prints the extended error code, including any extended information if available
+inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec);
+~~~
+
+`error_code_extended` is completely API compatible with `std::error_code` and all its
+member functions can be used the same way. You can supply a `std::error_code` to an
+extended error code, or else construct an extended error code the same way you would a
+STL error code. You should note that it is **always safe** to slice `error_code_extended`
+into an `std::error_code`, so you can safely feed `error_code_extended` to anything
+consuming a `std::error_code`.
+
+The main big additions are obviously the ability to add a custom string message to an extended
+error code, this allows the preservation of the original `what()` message when converting a
+thrown exception into an extended error code. You can also add two arbitrary unsigned integer
+codes and most interestingly, a backtrace of the stack at the point of construction. The extended message and backtrace can be later
+fetched using the new member functions, though note that the storage for these is kept in a
+statically allocated threadsafe ring buffer and so may vanish at some arbitrary later point
+when the storage gets recycled. If this happens, `extended_message()` will return zero characters
+written and `backtrace()` will return a null pointer.
+
+Because the storage for the extended information may be recycled at any arbitrary future
+point, you ought to make sure that you copy the extended information as soon as possible
+after the `error_code_extended` is constructed. In other words, don't store `error_code_extended`
+as-is into say a vector, instead extract the information into a custom struct.
+
+\note Construction of an extended error code with extended message or codes takes a maximum of
+a microsecond on recent hardware due to an atomic pointer increment. Constructing an extended
+error code with backtrace takes a maximum of about 35 microseconds on a recent Ivy Bridge Intel CPU.
+**No memory allocation** is ever performed when constructing an extended error code, latency
+is always predictable.
 
 <hr><br>
 
 \section outcome_rationale Where Outcome's outcome<T>, result<T> and option<T> come from
+
+Hopefully by now you are persuaded to always *restrict* your use of `expected<T, E>` to
+one of:
+
+~~~{.cpp}
+template<class T> using result = outcome::expected<T, std::error_code>;
+using bad_result_access = outcome::bad_expected_access<std::error_code>;
+~~~
+
+... or ...
+
+~~~{.cpp}
+template<class T> using result = outcome::expected<T, std::exception_ptr>;
+using bad_result_access = outcome::bad_expected_access<std::exception_ptr>;
+~~~
+
+If you've been convinced, then you'll be glad that Outcome provides additional
+refinements of `expected<T, E>` designed to make your programming life even easier again.
+As a rough **semantic** map onto `optional<T>`, `variant<...>` and
+`expected<T, E>`:
+
+<pre>
+template<class T> using option = std::optional<T>;
+
+template<class T> using result = std::optional<
+  std::experimental::expected<
+    T,
+    error_code_extended
+  >
+>;
+
+template<class T> using outcome = std::optional<
+  std::experimental::expected<
+    T,
+    std::variant<
+      error_code_extended,
+      std::exception_ptr
+    >
+  >
+>;
+</pre>
+
+So Outcome's `outcome<T>`, `result<T>` and `option<T>` assume the error type is hard coded
+to the C++ 11 standard error transport infrastructure, and because they hard code this they
+can make a series of optimisations both at runtime and for you the programmer during
+coding which an `expected<T, E>` implementation can not. In Outcome's refinements,
+an *empty* transport is empty, a *valued* transport contains a `T`, an *errored* transport
+contains an `error_code_extended` and an *excepted* transport contains a `std::exception_ptr`.
+- `.value()` on an errored transport directly throws `std::system_error` with the error code
+instead of throwing a wrapper type.
+- `.value()` on an excepted transport directly rethrows the exception pointer instead of
+throwing a wrapper type.
+- Implicit conversion is permitted for any less representative form into any more
+representative form, so `option<T>` auto converts to a `result<T>` preserving exact contents.
+This turns out to be very useful in large C++ codebases where the lowest layers tend
+to be written using `option<T>` and `result<T>`, whilst highest layers tend to be written
+using `outcome<T>` and C++ exception throws.
+
 
 todo

@@ -621,7 +621,7 @@ that the linker will not substitute a different version of Outcome than the Outc
 It is therefore recommended that you use the `BOOST_OUTCOME_V1_NAMESPACE` macro.
 
 This example program using `expected<T, E>` replicates <a href="http://rustbyexample.com/std/result.html">the use example in
-the documentation for Rust's `Result<T, E>`</a>. As you'll see in Tutorial part B, you
+the documentation for Rust's `Result<T, E>`</a>. As you will see in Tutorial part B, you
 would be unwise to use `expected<T, E>` like this in large C++ programs.
 
 \snippet expected_example.cpp expected_example
