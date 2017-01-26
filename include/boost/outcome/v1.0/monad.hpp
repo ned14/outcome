@@ -2348,6 +2348,16 @@ template <class T, class E, class U> constexpr inline expected<T, E> make_expect
 // template <class F> constexpr expected<typename result_type<F>::type> make_expected_from_call(F f);
 
 
+//! \brief Makes a void expected from an input expected, forwarding any emptiness or error \ingroup expected
+template <class T, class E> inline expected<void, E> as_void(const expected<T, E> &v)
+{
+  if (v.has_error())
+    return expected<void, E>(v.get_error());
+  if (v.has_value())
+    return expected<void, E>();
+  return expected<void, E>(empty);
+}
+
 /********************************************************** LEWG Expected implementation  ***********************************************************/
 #endif  // BOOST_OUTCOME_LEAN_AND_MEAN
 

@@ -18,8 +18,6 @@ namespace checked
   };
   
   using MathResult = outcome::expected<double, MathError>;
-  static inline MathResult MathResultOk(double x) { return outcome::make_expected<double, MathError>(x); }
-  static inline MathResult MathResultErr(MathError e) { return outcome::make_expected_from_error<double, MathError>(e); }
   
   MathResult div(double x, double y) noexcept
   {
@@ -27,27 +25,27 @@ namespace checked
     {
       // This operation would fail, instead let's return the reason of
       // the failure wrapped in E
-      return MathResultErr(MathError::DivisionByZero);
+      return outcome::make_unexpected(MathError::DivisionByZero);
     }
     else
     {
       // This operation is valid, return the result wrapped in T
-      return MathResultOk(x / y);
+      return x / y;
     }
   }
 
   MathResult sqrt(double x) noexcept
   {
     if(x < 0.0)
-      return MathResultErr(MathError::NegativeSquareRoot);
-    return MathResultOk(::sqrt(x));
+      return outcome::make_unexpected(MathError::NegativeSquareRoot);
+    return ::sqrt(x);
   }
 
   MathResult ln(double x) noexcept
   {
     if(x < 0.0)
-      return MathResultErr(MathError::NegativeLogarithm);
-    return MathResultOk(::log(x));
+      return outcome::make_unexpected(MathError::NegativeLogarithm);
+    return ::log(x);
   }
 }
 
