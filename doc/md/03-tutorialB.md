@@ -12,17 +12,20 @@ standardisation. `expected<T, E>` is a very flexible
 and generic utility class allowing perhaps too much unwise customisation in the hands
 of its users, so Outcome also provides a family of more hard coded and deliberately
 less flexible refinements to `expected<T, E>` called `outcome<T>` and `result<T>`
-the use of which ought to generate lower overhead.
-These less flexible refinements are likely much better suited to large code bases,
-encourage users to not unintentionally write bad practice code and come with the
-big advantage of requiring you to type less boilerplate during use.
+the use of which ought to generate more maintainable code bases and require less
+typing of boilerplate by the programmer.
 
-This tutorial is therefore split into two parts. The first part (\ref tutorial_expected "part A") provides a broad
-overview of error handling in C++ in general and how `expected<T, E>` will
-contribute to that big menu of error handling design patterns available to the C++ programmer.
-The second part (part B) describes why you probably ought
+This tutorial is therefore split into three parts:
+1. The first part (\ref tutorial_expected "part A") provides a broad overview of error handling in
+C++ in general and how the `expected<T, E>` proposed for standardisation will contribute
+to that big menu of error handling design patterns available to the C++ programmer.
+This part isn't relevant to Outcome the library, but places it in context.
+2. The second part (part B, this part) describes why you probably ought
 to not use unrestricted `expected<T, E>` in any real world code base and why
 you ought to use the refinements of `outcome<T>` or `result<T>` instead.
+3. The third part (part C) walks you through using Outcome's refinements `outcome<T>`
+and `result<T>`. Usage is very similar to Expected, but with less typing and
+more convenient extensions.
 
 <hr><br>
 
