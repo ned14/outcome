@@ -16,13 +16,12 @@
 This is the Outcome library, a Boost C++ 14 library providing an implementation of
 `expected<T, E>` (which is on the C++ 20 standardisation track), with refinements of
 `expected<T, E>` for large C++ codebases `outcome<T>` and `result<T>`.
-Its main intended usage is as an ultra light weight error handling framework,
+Its main intended usage is within an ultra light weight error handling system,
 providing a more expressive and type safe alternative to error code integers
-or enums, yet much lower overhead than exception throws. Unlike alternative
-implementations, it works perfectly
+or enums. Unlike alternative implementations, it works perfectly
 with exceptions and RTTI disabled and thus is suitable for low-latency/games/finance/SG14
 users. One could view Outcome as a minimum overhead
-universal outcome handling framework for C++, hence being named "Outcome".
+universal outcome transport mechanism for C++, hence being named "Outcome".
 
 If you are familiar with Swift's error code throws or Rust's `Result<T>`,
 you will find almost identical semantics in the transports provided here.
