@@ -1,12 +1,10 @@
-# Tutorial part B: Outcome's outcome<T>, result<T> and option<T>
-\anchor tutorial_outcome
+# Tutorial part B: Don't use expected<T, E>!
+\anchor tutorial_whynot
 
 [TOC]
 
-\todo This section is not finished yet and may contain inaccurate or incorrect information.
-
 Outcome provides a number of utility classes useful for ultra lightweight and constant time error
-handling in C++ 14 and later. One of these is \ref expected_qoi "a highly conforming expected<T, E> implementation"
+handling in C++ 14 and later. One of these is \ref outcome_expected_reference "a highly conforming expected<T, E> implementation"
 which is currently before the ISO C++ standards Library Evolution Working Group for
 standardisation. `expected<T, E>` is a very flexible
 and generic utility class allowing perhaps too much unwise customisation in the hands
@@ -23,9 +21,22 @@ This part isn't relevant to Outcome the library, but places it in context.
 2. The second part (part B, this part) describes why you probably ought
 to not use unrestricted `expected<T, E>` in any real world code base and why
 you ought to use the refinements of `outcome<T>` or `result<T>` instead.
-3. The third part (part C) walks you through using Outcome's refinements `outcome<T>`
-and `result<T>`. Usage is very similar to Expected, but with less typing and
-more convenient extensions.
+3. The third part (\ref tutorial_outcome "part C") walks you through using Outcome's refinements `outcome<T>`
+and `result<T>`, plus its `extended_error_code`. Usage is very similar to Expected,
+but with less typing and more convenient extensions.
+
+<hr><br>
+
+\section expected_is_unstable Expected is unstable
+
+Outcome's implementation of Expected WILL track the LEWG Expected
+proposal. No API backwards compatibility will be maintained, so if proposed LEWG Expected
+breaks your code, so will Outcome's Expected.
+
+If you would like to use a stable API, Outcome's refinements
+of `outcome<T>` and `result<T>` are expected to be API stable, or else pin yourself to
+an older git SHA revision of the Outcome library.
+
 
 <hr><br>
 
@@ -308,135 +319,52 @@ expected<int, std::error_code> someotherfunc()
 }
 ~~~
 
-<hr><br>
-
-\section error_code_extended Outcome's extended std::error_code
-
-A lot of people find `std::error_code` too constraining and value their custom error types
-precisely because they can carry *payload* e.g. a custom string describing exactly the cause
-of the error, or maybe a backtrace of the exact offending call sequence leading to the error.
-They therefore reject the restriction to `std::error_code` as unsuitable for their use case.
-
-Outcome provides an \ref boost::outcome::v1_xxx::error_code_extended "error_code_extended"
-refinement of `std::error_code` for exactly this situation. `error_code_extended` inherits publicly from `std::error_code`,
-adding two new member functions: `extended_message()` and `backtrace()`. These *may* provide
-additional information about the error code like any `what()` message from the C++ exception
-the error code was constructed from (if any), or the stack backtrace of the point at which the
-`error_code_extended` was constructed.
-
-~~~{.cpp}
-class error_code_extended : public std::error_code
-{
-public:
-  error_code_extended();
-  error_code_extended(int ec, const std::error_category &cat, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false);
-  template <class ErrorCodeEnum, typename = typename std::enable_if<std::is_error_code_enum<ErrorCodeEnum>::value>::type>
-    error_code_extended(ErrorCodeEnum e);
-  explicit error_code_extended(const std::error_code &e, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false);
-  explicit error_code_extended(std::error_code &&e, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false);
-  void assign(int ec, const std::error_category &cat, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false);
-  void clear();
-  
-  // New member functions
-
-  // Fill a char buffer with the extended message, retrieving the two extended unsigned integer codes
-  size_t extended_message(char *buffer, size_t len, unsigned &code1, unsigned &code2) const noexcept;
-
-  // Return an array of strings describing the stack at the time of construction. MUST call free() on this returned pointer.
-  char **backtrace() const noexcept;
-};
-
-// Prints the extended error code, including any extended information if available
-inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec);
-~~~
-
-`error_code_extended` is completely API compatible with `std::error_code` and all its
-member functions can be used the same way. You can supply a `std::error_code` to an
-extended error code, or else construct an extended error code the same way you would a
-STL error code. You should note that it is **always safe** to slice `error_code_extended`
-into an `std::error_code`, so you can safely feed `error_code_extended` to anything
-consuming a `std::error_code`.
-
-The main big additions are obviously the ability to add a custom string message to an extended
-error code, this allows the preservation of the original `what()` message when converting a
-thrown exception into an extended error code. You can also add two arbitrary unsigned integer
-codes and most interestingly, a backtrace of the stack at the point of construction. The extended message and backtrace can be later
-fetched using the new member functions, though note that the storage for these is kept in a
-statically allocated threadsafe ring buffer and so may vanish at some arbitrary later point
-when the storage gets recycled. If this happens, `extended_message()` will return zero characters
-written and `backtrace()` will return a null pointer.
-
-Because the storage for the extended information may be recycled at any arbitrary future
-point, you ought to make sure that you copy the extended information as soon as possible
-after the `error_code_extended` is constructed. In other words, don't store `error_code_extended`
-as-is into say a vector, instead extract the information into a custom struct.
-
-\note Construction of an extended error code with extended message or codes takes a maximum of
-a microsecond on recent hardware due to an atomic pointer increment. Constructing an extended
-error code with backtrace takes a maximum of about 35 microseconds on a recent Ivy Bridge Intel CPU.
-**No memory allocation** is ever performed when constructing an extended error code, latency
-is always predictable.
 
 <hr><br>
 
-\section outcome_rationale Where Outcome's outcome<T>, result<T> and option<T> come from
+\section error_codes_insufficient std::error_code CAN replace your custom error types
 
-Hopefully by now you are persuaded to always *restrict* your use of `expected<T, E>` to
-one of:
+The final reason that people say they need to use custom error types with Expected is because
+they need the custom error type to carry custom *payload* such as data directly relating to the error
+which occurred, and because `std::error_code` can only
+carry a situation-unspecific integer code and category, that it is therefore unsuited for
+their particular use case. Let's have a look at a typical custom error type carrying payload:
 
-~~~{.cpp}
-template<class T> using result = outcome::expected<T, std::error_code>;
-using bad_result_access = outcome::bad_expected_access<std::error_code>;
-~~~
+\snippet expected_payload1.cpp expected_payload1
 
-... or ...
+So here we have a file open function which opens some path returning a reference counted handle
+to the open file and if that fails, it will return
+a custom error type with the path of the file which failed as its payload. As much as this is
+a simple example where the payload carried is just a pointer, you could actually transport any
+arbitrary data as your payload such as a stack backtrace etc.
 
-~~~{.cpp}
-template<class T> using result = outcome::expected<T, std::exception_ptr>;
-using bad_result_access = outcome::bad_expected_access<std::exception_ptr>;
-~~~
+The thing is, `std::error_code` is exactly the right solution to this problem. A lot of people
+hung up on their custom error types aren't thinking the problem through using STL fundamentals
+as building blocks with which to compose better and more elegant solutions:
 
-If you've been convinced, then you'll be glad that Outcome provides additional
-refinements of `expected<T, E>` designed to make your programming life even easier again.
-As a rough **semantic** map onto `optional<T>`, `variant<...>` and
-`expected<T, E>`:
+\snippet expected_payload2.cpp expected_payload2
 
-<pre>
-template<class T> using option = std::optional<T>;
+As you can now see, we still have a custom error type, but it's now a `std::error_code` combined
+with payload. A big improvement with this design is that the errors returned by the system calls
+are now preserved perfectly rather than being converted into some generic "i/o failed" error code.
+The failure to allocate memory is now returned using the standard error code for that event, and
+the only error condition which is truly bespoke `format_corrupt` gets its own error code category.
 
-template<class T> using result = std::optional<
-  std::experimental::expected<
-    T,
-    error_code_extended
-  >
->;
+As much as the second example is much better design, it still has a custom error type the use of which
+precludes using convenience macros like `BOOST_OUTCOME_TRY` across disjoint domains of error.
+If that's acceptable to you, then work away, but be aware that Outcome's refinements of `outcome<T>`
+and `result<T>` don't use a `std::error_code`, they instead use an `outcome::error_code_extended`
+which extends `std::error_code` with most of the common payloads that most people would want to
+transmit with their errors.
 
-template<class T> using outcome = std::optional<
-  std::experimental::expected<
-    T,
-    std::variant<
-      error_code_extended,
-      std::exception_ptr
-    >
-  >
->;
-</pre>
-
-So Outcome's `outcome<T>`, `result<T>` and `option<T>` assume the error type is hard coded
-to the C++ 11 standard error transport infrastructure, and because they hard code this they
-can make a series of optimisations both at runtime and for you the programmer during
-coding which an `expected<T, E>` implementation can not. In Outcome's refinements,
-an *empty* transport is empty, a *valued* transport contains a `T`, an *errored* transport
-contains an `error_code_extended` and an *excepted* transport contains a `std::exception_ptr`.
-- `.value()` on an errored transport directly throws `std::system_error` with the error code
-instead of throwing a wrapper type.
-- `.value()` on an excepted transport directly rethrows the exception pointer instead of
-throwing a wrapper type.
-- Implicit conversion is permitted for any less representative form into any more
-representative form, so `option<T>` auto converts to a `result<T>` preserving exact contents.
-This turns out to be very useful in large C++ codebases where the lowest layers tend
-to be written using `option<T>` and `result<T>`, whilst highest layers tend to be written
-using `outcome<T>` and C++ exception throws.
-
-
-todo
+`error_code_extended` won't of course cover truly bespoke needs, and if you are finding your
+custom error type is getting richly featured enough to require
+<a href="http://en.cppreference.com/w/cpp/language/destructor#Trivial_destructor">a non-trivial destructor</a>
+then you should be aware that `expected<T, E>` must always use the lowest common denominator
+between `T` and `E`, so if your `E` has a non-trivial destructor, so will all `expected<T, E>`.
+This can mean that compilers will "blow out" code where such `expected<T, E>` is used i.e.
+generate a lot of code bloat. Again, if that's acceptable to you for your use case, then work away.
+But if that worries or bothers you, then you had best stick to trivial custom error types or
+better still, use Outcome's refinements of `outcome<T>` and `result<T>` which remove that
+choice entirely and give you in return a less boilerplate and more powerful programming
+experience. That is exactly the subject of Part C of this tutorial, next.

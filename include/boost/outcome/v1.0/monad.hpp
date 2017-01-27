@@ -330,6 +330,22 @@ public:
     }
     return strlen(buffer);
   }
+  //! Fill a buffer with any backtrace available, returning items filled if any.
+  size_t raw_backtrace(void **buffer, size_t len) const noexcept
+  {
+    auto &log = extended_error_code_log();
+    if (!log.valid(unique_id(_unique_id)))
+      return 0;
+    auto &item = log[unique_id(_unique_id)];
+    size_t written = 0;
+    void ** _backtrace = (void **) item.backtrace;
+    for (size_t n = 0; n < len && n < sizeof(item.backtrace) / sizeof(item.backtrace[0]); n++)
+    {
+      buffer[n] = _backtrace[n];
+      written++;
+    }
+    return written;
+  }
   //! Returns an array of strings describing the backtrace. You must free() this after use.
   char **backtrace() const noexcept
   {
@@ -2214,7 +2230,7 @@ the basic_monad machinery do the implicit conversion to some `expected<T, E>`.
 - Types `T` and `E` cannot be constructible into one another. This is a fundamental
 design choice in basic_monad to significantly reduce compile times so it won't be
 fixed.
-- `expected<T, E>` defaults E to `error_code_extended`. If you don't like this,
+- `expected<T, E>` defaults E to `std::error_code`. If you don't like this,
 predefine the `BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE` macro.
 - Our Expected always defines the default, copy and move constructors even if the
 the type configured is not capable of it. That means `std::is_copy_constructible`
@@ -2230,8 +2246,8 @@ for the type traits for basic_monad into namespace std.
 */
 
 #ifndef BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE
-//! \brief Predefine to change the default error type for expected to something else. Defaults to `error_code_extended`.
-#define BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE error_code_extended
+//! \brief Predefine to change the default error type for expected to something else. Defaults to `std::error_code`.
+#define BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE std::error_code
 #endif
 
 #ifdef _MSC_VER

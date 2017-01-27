@@ -4,7 +4,7 @@
 [TOC]
 
 Outcome provides a number of utility classes useful for ultra lightweight and constant time error
-handling in C++ 14 and later. One of these is \ref expected_qoi "a highly conforming expected<T, E> implementation"
+handling in C++ 14 and later. One of these is \ref outcome_expected_reference "a highly conforming expected<T, E> implementation"
 which is currently before the ISO C++ standards Library Evolution Working Group for
 standardisation. `expected<T, E>` is a very flexible
 and generic utility class allowing perhaps too much unwise customisation in the hands
@@ -18,12 +18,12 @@ This tutorial is therefore split into three parts:
 C++ in general and how the `expected<T, E>` proposed for standardisation will contribute
 to that big menu of error handling design patterns available to the C++ programmer.
 This part isn't relevant to Outcome the library, but places it in context.
-2. The second part (\ref tutorial_outcome "part B") describes why you probably ought
+2. The second part (\ref tutorial_whynot "part B") describes why you probably ought
 to not use unrestricted `expected<T, E>` in any real world code base and why
 you ought to use the refinements of `outcome<T>` or `result<T>` instead.
-3. The third part (part C) walks you through using Outcome's refinements `outcome<T>`
-and `result<T>`. Usage is very similar to Expected, but with less typing and
-more convenient extensions.
+3. The third part (\ref tutorial_outcome "part C") walks you through using Outcome's refinements `outcome<T>`
+and `result<T>`, plus its `extended_error_code`. Usage is very similar to Expected,
+but with less typing and more convenient extensions.
 
 \section c-style C style error handling: integer returns
 
@@ -629,8 +629,3 @@ would be unwise to use `expected<T, E>` like this in large C++ programs.
 
 \snippet expected_example.cpp expected_example
 
-\warning **BE WARNED** that Outcome's Expected implementation WILL track the LEWG Expected
-proposal. No API backwards compatibility will be maintained, so if proposed LEWG Expected
-breaks your code, so be it. If you would like to use a stable API, Outcome's refinements
-of `outcome<T>` and `result<T>` are expected to be API stable, or else pin yourself to
-an older git SHA revision of the Outcome library.
