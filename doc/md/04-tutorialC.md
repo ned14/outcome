@@ -74,13 +74,13 @@ public:
   
   // New member functions follow
 
-  //! Fill a buffer with any extended error message and codes, returning bytes of buffer filled (zero if no extended message).
+  // Fill a buffer with any extended error message and codes, returning bytes of buffer filled (zero if no extended message).
   size_t extended_message(char *buffer, size_t len, unsigned &code1, unsigned &code2) const noexcept;
 
-  //! Fill a buffer with any backtrace available, returning items filled if any.
+  // Fill a buffer with any backtrace available, returning items filled if any.
   size_t raw_backtrace(void **buffer, size_t len) const noexcept
 
-  //! Returns an array of strings describing the backtrace. You must free() this after use.
+  // Returns an array of strings describing the backtrace. You must free() this after use.
   char **backtrace() const noexcept;
 };
 
