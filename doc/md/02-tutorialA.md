@@ -96,16 +96,11 @@ extern handle_ref openfile(const char *path)
   {
     throw std::runtime_error("File not found");
   }
-  try
-  {
-    // Could throw std::bad_alloc or any other kind of exception during construction
-    return handle_ref(new some_derived_handle_implementation(fd));
-  }
-  catch(...)
-  {
-    close(fd);
-    throw;
-  }
+  // RAII close the file if exception throw
+  handle temp(fd);
+
+  // Could throw std::bad_alloc or any other kind of exception during construction
+  return handle_ref(new some_derived_handle_implementation(temp));
 }
 ~~~
 
