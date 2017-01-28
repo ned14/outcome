@@ -4,7 +4,9 @@
 You should read <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf">P0323R1</a>
 if you want a C++ standards level of detail regarding exactly what each member function's
 preconditions, effects and postconditions are. Unless otherwise indicated, Outcome's Expected behaves
-exactly the same.
+exactly the same. Outcome uses the **exact same** unit test suite
+as the LEWG Expected reference implementation, and passes it handily. As the LEWG
+reference implementation updates its unit test suite, we shall keep pace.
 
 For your convenience we copy and paste P0323R1's Expected synopsis here in the left hand column.
 In the right hand column we show Outcome's Expected implementation with the lines matched to the
@@ -18,6 +20,36 @@ feel the LEWG Expected is defective in that area (e.g. the use of `decay<>` for 
 precludes manufacturing `expected<const T>` which we have found to be in practice very useful). If
 it is missing, it is either because we feel its presence is a defect in the LEWG Expected or we think
 it not worth implementing.
+
+A summary of the main differences:
+- P0323R1 doesn't yet specify what will be done if you try accessing an expected
+which is valueless due to exception. We throw a `bad_expected_access<void>` in
+this situation as that seemed logical. If the LEWG proposal decides on something
+different, this implementation will change to track the LEWG proposal.
+- Types `T` and `E` cannot be constructible into one another. This is a fundamental
+design choice in basic_monad to significantly reduce compile times so it won't be
+fixed.
+- `unexpected_type<E>` is implemented as an `expected<void, E>` and it lets
+the basic_monad machinery do the implicit conversion to some `expected<T, E>`
+through the less representative to more representative conversion rules.
+- Our `expected<T, E>` defaults E to `std::error_code` rather than `std::error_condition`
+(the LEWG proposal is almost certainly wrong on this, it should be `std::error_code`).
+If you don't like this, predefine the `BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE` macro.
+- We don't implement the ordering and hashing operator overloads due to https://akrzemi1.wordpress.com/2014/12/02/a-gotcha-with-optional/.
+The fact the LEWG proposal does as currently proposed is a defect.
+- We don't implement `make_expected_from_call()` as we think it highly likely to be
+removed from the next version of the proposal due to it conferring little value.
+- Our Expected always defines the default, copy and move constructors even if the
+the type configured is not capable of it. That means `std::is_copy_constructible`
+etc returns true when they should return false. The reason why is again to
+significantly improve compile times by hugely reducing the number of templates
+which need to be instantiated during routine basic_monad usage, and again
+this won't be fixed. Instead use the static constexpr bools at:
+  - `expected<T, E>::is_default_constructible`
+  - `expected<T, E>::is_copy_constructible`
+  - `expected<T, E>::is_move_constructible`
+ \note Depending on what any Boost peer review thinks, we may inject correct answers
+for the type traits for basic_monad into namespace std.
 
 <hr><br>
 
@@ -255,7 +287,7 @@ namespace boost {
 namespace outcome {
 inline namespace v1_xxx {
   // X.Z.4, expected for object types
-  template <class T, class E = error_code_extended>
+  template <class T, class E = std::error_code>
     using expected = basic_monad<detail::expected_policy<T, E>>;
 
   // X.Z.5, Specialization for void.
@@ -342,9 +374,9 @@ inline namespace v1_xxx {
   inline void swap(expected<T,E>&, expected<T,E>&) noexcept(see below);
 
   // X.Z.12, Factories
-  template <class T, class E = error_code_extended>
+  template <class T, class E = std::error_code>
     constexpr inline expected<T, E> make_expected(const T& v);
-  template <class T, class E = error_code_extended>
+  template <class T, class E = std::error_code>
     constexpr inline expected<T, E> make_expected(T&& v);
   inline expected<void> make_expected();
   template <class T, class E>
