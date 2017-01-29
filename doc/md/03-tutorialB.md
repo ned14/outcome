@@ -27,7 +27,7 @@ but with less typing and more convenient extensions.
 
 <hr><br>
 
-\section expected_is_unstable Expected is unstable
+\section expected_is_unstable Expected is unstable!!!
 
 Outcome's implementation of Expected WILL track the LEWG Expected
 proposal. No API backwards compatibility will be maintained, so if proposed LEWG Expected
@@ -189,7 +189,26 @@ using MathResult = outcome::expected<double, MathError>;
 
 Anything which can "speak" `std::error_code` can now work perfectly with your error
 code system because you are using a standard error code domain (i.e. the POSIX error
-code domain).
+code domain). And for reference, the C++ 11 STL ships with these ready to go predefined error
+categories and error enumerations:
+
+<dl>
+  <dt><a href="http://en.cppreference.com/w/cpp/error/generic_category">`std::generic_category()`</a>
+  with corresponding enumeration <a href="http://en.cppreference.com/w/cpp/error/errc">`std::errc`</a></dt>
+  <dd>The POSIX standard error code domain as retrieved by the `errno` variable after calling
+  a POSIX function.</dd>
+  <dt><a href="http://en.cppreference.com/w/cpp/error/system_category">`std::system_category()`</a>
+  with a platform specific enumeration</dt>
+  <dd>The "usual" error code domain for your particular host OS, so on Linux/FreeBSD/OS X/Android
+  this is the exact same domain as `generic_category()`. On Microsoft Windows this is the error code
+  domain as returned by the Win32 `GetLastError()` function. Other platforms can vary.</dd>
+  <dt><a href="http://en.cppreference.com/w/cpp/io/iostream_category">`std::iostream_category()`</a>
+  with corresponding enumeration <a href="http://en.cppreference.com/w/cpp/io/io_errc">`std::io_errc`</a></dt>
+  <dd>The STL iostreams error code domain.</dd>
+  <dt><a href="http://en.cppreference.com/w/cpp/thread/future/future_category">`std::future_category()`</a>
+  with corresponding enumeration <a href="http://en.cppreference.com/w/cpp/thread/future_errc">`std::future_errc`</a></dt>
+  <dd>The STL future-promise error code domain.</dd>
+</dl>
 
 But let's say you really, really wanted to have your own custom error
 code scheme, this is how you tell C++ 11's standard error code infrastructure about
@@ -346,7 +365,9 @@ as building blocks with which to compose better and more elegant solutions:
 
 As you can now see, we still have a custom error type, but it's now a `std::error_code` combined
 with payload. A big improvement with this design is that the errors returned by the system calls
-are now preserved perfectly rather than being converted into some generic "i/o failed" error code.
+are now preserved perfectly rather than being converted into some generic "i/o failed" error code,
+and in fact because we use `system_category` for the error codes returned by the host OS, we lose
+no information whatsoever about the original error.
 The failure to allocate memory is now returned using the standard error code for that event, and
 the only error condition which is truly bespoke `format_corrupt` gets its own error code category.
 

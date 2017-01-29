@@ -64,7 +64,11 @@ struct file_error
   // Construct from a generic problem
   file_error(std::errc problem, const char *_path) : code(std::make_error_code(problem)), path(_path) {}
   // Construct from an errno
+#ifdef _MSC_VER  // On MSVC the POSIX open()/read() etc functions are generic_category
+  file_error(int _errno, const char *_path) : code(_errno, std::generic_category()), path(_path) {}
+#else
   file_error(int _errno, const char *_path) : code(_errno, std::system_category()), path(_path) {}
+#endif
   // Construct from an extended error code
   file_error(extended_error ec, const char *_path) : code(static_cast<int>(ec), detail::extended_error_category()), path(_path) {}
 };

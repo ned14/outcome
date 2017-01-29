@@ -651,7 +651,7 @@ namespace detail
 //! \brief Enumeration of the ways in which a monad operation may fail \ingroup monad
 enum class monad_errc
 {
-  already_set = 1,        //!< Attempt to store a value into the monad twice
+  //already_set = 1,        //!< Attempt to store a value into the monad twice
   no_state = 2,           //!< Attempt to use without a state
   exception_present = 3,  //!< Attempt to fetch an error state when the monad is in an exceptioned state
 };
@@ -2458,6 +2458,8 @@ catch(const std::exception &e)                                                  
   {                                                                                                                                                                                                                                                                                                                            \
     return BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EINVAL, e.what());                                                                                                                                                                                                                                            \
   }                                                                                                                                                                                                                                                                                                                            \
+//! \brief A boilerplate sequence of `catch(exceptions...)` plus a catch all returning those exceptions as their equivalent `result<void>` \ingroup macro_helpers
+#define BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT                                                                                                                                                                                                                                    \
   \
 catch(...)                                                                                                                                                                                                                                                                                                                     \
   {                                                                                                                                                                                                                                                                                                                            \
