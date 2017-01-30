@@ -27,16 +27,43 @@ but with less typing and more convenient extensions.
 
 <hr><br>
 
-\section expected_is_unstable Expected is unstable!!!
+This part of the tutorial is a bit unusual as it's a sort of polemic against what most
+consider to be one of the best parts of `expected<T, E>`: that you can and should choose
+any arbitrary type `E` on a case by case basis as is conventional in other languages such
+as Rust or Swift. Hopefully by the end of this part you will be persuaded to always
+*restrict* your use of `expected<T, E>` in C++ to one of:
 
-Outcome's implementation of Expected WILL track the LEWG Expected
-proposal. No API backwards compatibility will be maintained, so if proposed LEWG Expected
-breaks your code, so will Outcome's Expected.
+~~~{.cpp}
+template<class T> using result = outcome::expected<T, std::error_code>;
+using bad_result_access = outcome::bad_expected_access<std::error_code>;
+~~~
 
-If you would like to use a stable API, Outcome's refinements
-of `outcome<T>` and `result<T>` are expected to be API stable, or else pin yourself to
-an older git SHA revision of the Outcome library.
+... or ...
 
+~~~{.cpp}
+template<class T> using result = outcome::expected<T, std::exception_ptr>;
+using bad_result_access = outcome::bad_expected_access<std::exception_ptr>;
+~~~
+
+... where the latter is a superset of the former, because you can wrap any arbitrary
+`std::error_code` instance into a `std::exception_ptr` instance using the C++ 11 STL
+error code wrapping C++ exception type `std::system_error`:
+
+~~~{.cpp}
+std::error_code ec;
+std::exception_ptr e = std::make_exception_ptr(std::system_error(ec));
+
+// OR
+
+std::exception_ptr e = std::make_exception_ptr(std::system_error(ec, "custom what() string"));
+~~~
+
+The reason why this polemic is needed is because during the many pre-reviews
+of Outcome on Boost, SG14 and Reddit, it became clear that the choice that Outcome
+made to hard code the error type to error codes or exception pointers in Outcome's
+refinements of `outcome<T>` and `result<T>` was not at all clear to most people
+interested in using `expected<T, E>`. It became clear that the rationale would need
+to be spelled out, and that is this part B of the tutorial.
 
 <hr><br>
 
