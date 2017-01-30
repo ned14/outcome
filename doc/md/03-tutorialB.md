@@ -65,6 +65,17 @@ refinements of `outcome<T>` and `result<T>` was not at all clear to most people
 interested in using `expected<T, E>`. It became clear that the rationale would need
 to be spelled out, and that is this part B of the tutorial.
 
+As with all polemical texts, you may find yourself disagreeing with everything in this
+section and that therefore you will think the hardcoded `E` refinements of `outcome<T>` and
+`result<T>` will be of no use to you. Two things should be noted. The first is that the
+hard coding allows the refinements to do a fair bit of tedious boilerplate for you,
+so the refinements are undoubtedly less tedious to program with if you accept the hard coding.
+The second is that even if you profoundly disagree with everything in this section,
+there is no obligation to use anything in Outcome outside what was already described
+in part A and in \ref outcome_expected_reference "the reference API page for Outcome's Expected implementation".
+Outcome's Expected implementation is high quality, and should be competitive with any
+future STL implementation of `expected<T, E>`.
+
 <hr><br>
 
 \section expected_is_bad Unrestricted use of expected<T, E> is bad practice
