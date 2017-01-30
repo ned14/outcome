@@ -1,4 +1,4 @@
-# Tutorial part B: Don't use expected<T, E>!
+# Tutorial part B: Don't use the E in expected<T, E>!
 \anchor tutorial_whynot
 
 [TOC]
