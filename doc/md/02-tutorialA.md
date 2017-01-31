@@ -25,6 +25,9 @@ you ought to use the refinements of `outcome<T>` or `result<T>` instead.
 and `result<T>`, plus its `extended_error_code`. Usage is very similar to Expected,
 but with less typing and more convenient extensions.
 
+<hr><br>
+
+
 \section c-style C style error handling: integer returns
 
 Historically C++ 98 code has taken one of two design patterns when returning
@@ -599,6 +602,24 @@ the Expected is valueless or not, so you currently have no way of testing for th
 except by catching the exception thrown. It *may* mirror `std::variant<...>`'s `valueless_by_exception()`
 observer function, or it may choose something else. Outcome's implementation of
 Expected implements a '.empty()' extension, this seemed to fit the rest of STL the best.
+
+
+<hr><br>
+
+\section expected_is_unstable Expected is unstable!!!
+
+Before we say or do anything else, we need to clearly state:
+
+\warning Outcome's implementation of Expected WILL track the LEWG Expected
+proposal. No API backwards compatibility will be maintained, so if proposed LEWG Expected
+breaks your code, so will Outcome's Expected.
+
+If you would like to use a stable API, Outcome's refinements
+of `outcome<T>` and `result<T>` are expected to be API stable, or else pin yourself to
+an older git SHA revision of the Outcome library.
+
+
+<hr><br>
 
 \section expected_example Short example program using expected<T, E>
 

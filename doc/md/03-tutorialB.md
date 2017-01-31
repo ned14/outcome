@@ -1,4 +1,4 @@
-# Tutorial part B: Don't use expected<T, E>!
+# Tutorial part B: Don't use the E in expected<T, E>!
 \anchor tutorial_whynot
 
 [TOC]
@@ -27,16 +27,54 @@ but with less typing and more convenient extensions.
 
 <hr><br>
 
-\section expected_is_unstable Expected is unstable!!!
+This part of the tutorial is a bit unusual as it's a sort of polemic against what most
+consider to be one of the best parts of `expected<T, E>`: that you can and should choose
+any arbitrary type `E` on a case by case basis as is conventional in other languages such
+as Rust or Swift. Hopefully by the end of this part you will be persuaded to always
+*restrict* your use of `expected<T, E>` in C++ to one of:
 
-Outcome's implementation of Expected WILL track the LEWG Expected
-proposal. No API backwards compatibility will be maintained, so if proposed LEWG Expected
-breaks your code, so will Outcome's Expected.
+~~~{.cpp}
+template<class T> using result = outcome::expected<T, std::error_code>;
+using bad_result_access = outcome::bad_expected_access<std::error_code>;
+~~~
 
-If you would like to use a stable API, Outcome's refinements
-of `outcome<T>` and `result<T>` are expected to be API stable, or else pin yourself to
-an older git SHA revision of the Outcome library.
+... or ...
 
+~~~{.cpp}
+template<class T> using result = outcome::expected<T, std::exception_ptr>;
+using bad_result_access = outcome::bad_expected_access<std::exception_ptr>;
+~~~
+
+... where the latter is a superset of the former, because you can wrap any arbitrary
+`std::error_code` instance into a `std::exception_ptr` instance using the C++ 11 STL
+error code wrapping C++ exception type `std::system_error`:
+
+~~~{.cpp}
+std::error_code ec;
+std::exception_ptr e = std::make_exception_ptr(std::system_error(ec));
+
+// OR
+
+std::exception_ptr e = std::make_exception_ptr(std::system_error(ec, "custom what() string"));
+~~~
+
+The reason why this polemic is needed is because during the many pre-reviews
+of Outcome on Boost, SG14 and Reddit, it became clear that the choice that Outcome
+made to hard code the error type to error codes or exception pointers in Outcome's
+refinements of `outcome<T>` and `result<T>` was not at all clear to most people
+interested in using `expected<T, E>`. It became clear that the rationale would need
+to be spelled out, and that is this part B of the tutorial.
+
+As with all polemical texts, you may find yourself disagreeing with everything in this
+section and that therefore you will think the hardcoded `E` refinements of `outcome<T>` and
+`result<T>` will be of no use to you. Two things should be noted. The first is that the
+hard coding allows the refinements to do a fair bit of tedious boilerplate for you,
+so the refinements are undoubtedly less tedious to program with if you accept the hard coding.
+The second is that even if you profoundly disagree with everything in this section,
+there is no obligation to use anything in Outcome outside what was already described
+in part A and in \ref outcome_expected_reference "the reference API page for Outcome's Expected implementation".
+Outcome's Expected implementation is high quality, and should be competitive with any
+future STL implementation of `expected<T, E>`.
 
 <hr><br>
 
