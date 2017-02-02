@@ -1,13 +1,13 @@
 #include "../../include/boost/outcome.hpp"
 
-extern BOOST_NOINLINE int test1()
+extern BOOSTLITE_NOINLINE int test1()
 {
   using namespace boost::outcome;
   option<int> m1(5);
   option<int> m2(std::move(m1));
   return std::move(m2).get();
 }
-extern BOOST_NOINLINE void test2()
+extern BOOSTLITE_NOINLINE void test2()
 {
 }
 

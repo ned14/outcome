@@ -209,10 +209,11 @@ get the monadic functionality totally free of execution overhead where the compi
 to reduce it to such.
 
 A similar thing applies to error_type which is a lightweight implementation on most
-systems. An exception is on VS2015 as the lvalue reference to system_category appears
+systems. An exception is on Visual Studio as the lvalue reference to system_category appears
 to be constructed via thread safe once routine called "Immortalize", so when you
 construct an error_type on MSVC you'll force a memory synchronisation during the constructor
-only. error_types are very cheap to pass around though as they are but an integer and a lvalue ref.
+only. You can work around this by using the category factory functions in namespace deatomiced_categories.
+error_types are very cheap to pass around though as they are but an integer and a lvalue ref.
 
 exception_type is also pretty good on anything but MSVC, though never zero assembler
 instructions. As soon as an exception_type \em could be created, you'll force out about twenty
@@ -257,6 +258,39 @@ inline boost_lite::ringbuffer_log::simple_ringbuffer_log<4096> &extended_error_c
 {
   static boost_lite::ringbuffer_log::simple_ringbuffer_log<4096> log(boost_lite::ringbuffer_log::level::error);
   return log;
+}
+
+//! \brief De-atomiced error categories, prevents the STL inlining an atomic fence when fetching these
+//! error categories
+namespace deatomiced_categories
+{
+  namespace detail
+  {
+    BOOSTLITE_NOINLINE inline const std::error_category &_generic_category()
+    {
+      const std::error_category &c = stl11::generic_category();
+      return c;
+    }
+
+    BOOSTLITE_NOINLINE inline const std::error_category &_system_category()
+    {
+      const std::error_category &c = stl11::system_category();
+      return c;
+    }
+  }
+  //! \brief De-atomic fascade for std::generic_category()
+  inline const std::error_category &generic_category()
+  {
+    const std::error_category &c = detail::_generic_category();
+    return c;
+  }
+
+  //! \brief De-atomic fascade for std::system_category()
+  inline const std::error_category &system_category()
+  {
+    const std::error_category &c = detail::_system_category();
+    return c;
+  }
 }
 
 #ifndef BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK
@@ -2022,13 +2056,13 @@ template <class T = void> inline outcome<T> make_errored_outcome(error_code_exte
 //! \brief Make a generic errored outcome from the errno passed \ingroup monad
 template <class T = void> inline outcome<T> make_errored_outcome(int e, const char *extended = nullptr)
 {
-  return outcome<T>(error_code_extended(e, std::generic_category(), extended));
+  return outcome<T>(error_code_extended(e, deatomiced_categories::generic_category(), extended));
 }
 #if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 //! \brief Make a system errored outcome from the code passed \ingroup monad
 template <class T = void> constexpr inline outcome<T> make_errored_outcome(unsigned long e, const char *extended = nullptr)
 {
-  return outcome<T>(error_code_extended(e, stl11::system_category(), extended));
+  return outcome<T>(error_code_extended(e, deatomiced_categories::system_category(), extended));
 }
 #endif
 //! \brief Make an excepted outcome from the type passed \ingroup monad
@@ -2095,13 +2129,13 @@ template <class T = void> inline result<T> make_errored_result(error_code_extend
 //! \brief Make a generic errored outcome from the errno passed \ingroup monad
 template <class T = void> constexpr inline result<T> make_errored_result(int e, const char *extended = nullptr)
 {
-  return result<T>(error_code_extended(e, std::generic_category(), extended));
+  return result<T>(error_code_extended(e, deatomiced_categories::generic_category(), extended));
 }
 #if defined(_WIN32) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 //! \brief Make a system errored outcome from the code passed \ingroup monad
 template <class T = void> constexpr inline result<T> make_errored_result(unsigned long e, const char *extended = nullptr)
 {
-  return result<T>(error_code_extended(e, stl11::system_category(), extended));
+  return result<T>(error_code_extended(e, deatomiced_categories::system_category(), extended));
 }
 #endif
 
