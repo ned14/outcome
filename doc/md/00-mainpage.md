@@ -13,21 +13,22 @@
 
 \section description Description
 
-This is the Outcome library, a Boost C++ 14 library providing an implementation of
-`expected<T, E>` (which is on the C++ 20 standardisation track), with refinements of
-`expected<T, E>` for large C++ codebases `outcome<T>` and `result<T>`.
-Its main intended usage is within an ultra light weight error handling system,
-providing a more expressive and type safe alternative to error code integers
-or enums. Unlike alternative implementations, it works perfectly
-with exceptions and RTTI disabled and thus is suitable for low-latency/games/finance/SG14
-users. One could view Outcome as a minimum overhead
-universal outcome transport mechanism for C++, hence being named "Outcome".
+This is the Outcome library. It is a C++ 14 library intended to aid ultra-lightweight
+error handling in large C++ codebases, providing a more expressive and type safe
+alternative to integer error codes or enums.
+
+Unlike alternative implementations, it works perfectly with exceptions and RTTI
+disabled and is thus suitable for low-latency/games/finance/SG14 users. One could
+view Outcome as a minimum overhead universal outcome transport mechanism for C++,
+hence being named "Outcome".
+
+The Outcome library provides an implementation of `expected<T, E>` (which is on the
+C++ 20 standardisation track), with the `expected<T, E>` refinements `outcome<T>` and
+`result<T>`.
 
 If you are familiar with Swift's error code throws or Rust's `Result<T>`,
 you will find almost identical semantics in the transports provided here.
-One can therefore write systems programming code using these transports in C++
-in the same design pattern as when writing in Rust or Swift, and with a similarly
-low runtime overhead. Outcome even has a `BOOST_OUTCOME_TRY` macro doing most of the
+Outcome even has a `BOOST_OUTCOME_TRY` macro doing most of the
 `try` keyword in Rust and Swift!
 
 \note Outcome has not been peer reviewed and is not part of the Boost libraries
@@ -38,7 +39,7 @@ low runtime overhead. Outcome even has a `BOOST_OUTCOME_TRY` macro doing most of
 
 \page prerequisites Prerequisites
 
-Boost.Outcome is a header only C++ 14 library known to work on these compilers or better:
+Outcome is a header only C++ 14 library known to work on these compilers or better:
 - clang 3.5 (LLVM)
 - clang 3.7 (with Microsoft Codegen)
 - GCC 5.4

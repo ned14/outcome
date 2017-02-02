@@ -1,29 +1,21 @@
-# Tutorial part B: Don't use the E in expected<T, E>!
+# Expected<T, E> in Practice
 \anchor tutorial_whynot
 
 [TOC]
 
-Outcome provides a number of utility classes useful for ultra lightweight and constant time error
-handling in C++ 14 and later. One of these is \ref outcome_expected_reference "a highly conforming expected<T, E> implementation"
-which is currently before the ISO C++ standards Library Evolution Working Group for
-standardisation. `expected<T, E>` is a very flexible
-and generic utility class allowing perhaps too much unwise customisation in the hands
-of its users, so Outcome also provides a family of more hard coded and deliberately
-less flexible refinements to `expected<T, E>` called `outcome<T>` and `result<T>`
-the use of which ought to generate more maintainable code bases and require less
-typing of boilerplate by the programmer.
-
-This tutorial is therefore split into three parts:
+Outcome's design rationale and tutorial is split into three parts:
 1. The first part (\ref tutorial_expected "part A") provides a broad overview of error handling in
 C++ in general and how the `expected<T, E>` proposed for standardisation will contribute
 to that big menu of error handling design patterns available to the C++ programmer.
-This part isn't relevant to Outcome the library, but places it in context.
-2. The second part (part B, this part) describes why you probably ought
-to not use unrestricted `expected<T, E>` in any real world code base and why
-you ought to use the refinements of `outcome<T>` or `result<T>` instead.
-3. The third part (\ref tutorial_outcome "part C") walks you through using Outcome's refinements `outcome<T>`
-and `result<T>`, plus its `extended_error_code`. Usage is very similar to Expected,
-but with less typing and more convenient extensions.
+This part places Outcome the library in context.
+2. The second part (part B, this part) describes some design anti-patterns common
+with inexperienced usage of `expected<T, E>` in C++ which you ought to avoid.
+It shows you how to use `expected<T, E>` in a way which integrates well with the
+C++ 11 STL's standard error code facilities `std::error_code` and `std::error_category`.
+3. The third part (\ref tutorial_outcome "part C") walks you through using Outcome's
+`expected<T, E>` refinements `outcome<T>` and `result<T>`, plus its `extended_error_code`.
+Usage is very similar to Expected, but with less typing, less runtime overhead and
+more convenient extensions.
 
 <hr><br>
 
