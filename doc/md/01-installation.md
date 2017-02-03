@@ -10,45 +10,7 @@ repositories.
 
 <br><hr><br>
 
-\section windows Installing on Windows
-
-If you are using VS2017 or better it comes with VCPkg, a package manager, which lets you
-install various open source libraries as if system libraries for MSVC. Unfortunately
-its maintainers won't accept libraries without formal version releases which is disappointing, so for now
-you're best using the source tarball or git subrepo methods described below.
-
-<br><hr><br>
-
-\section ubuntu Installing on Ubuntu/Debian
-
-\todo This is yet to be implemented
-
-<pre>add-apt-repository ppa:ned14/boost.outcome
-apt-get update
-apt-get install libboost-outcome-dev</pre>
-
-Once installed it is available for usage in any C++ 14 project using:
-
-\code #include <boost/outcome.hpp> \endcode
-
-
-<br><hr><br>
-
-\section osx Installing on OS X
-
-Assuming you have <a href="http://brew.sh/">homebrew</a> installed, then:
-
-<pre>brew tap ned14/tap
-brew install boost.outcome</pre>
-
-Once installed it is available for usage in any C++ 14 project using:
-
-\code #include <boost/outcome.hpp> \endcode
-
-
-<br><hr><br>
-
-\section tarball Installing via source tarball (all other platforms)
+\section tarball Installing via source tarball
 
 Outcome is a header only C++ library with no external dependencies and therefore requires no
 compilation. <a href="https://dedi4.nedprod.com/static/files/boost.outcome-v1.0-source-latest.tar.xz">

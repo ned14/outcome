@@ -20,24 +20,13 @@ Todo:
  - [x] Document the exception throwing macros in the tutorial
  - [x] Rejig `BOOST_OUTCOME_ENABLE_OPERATORS` to decide what ought to be in or out.
  - [ ] Break monad.hpp into separate files.
+ - [ ] Wrap `std::generic_category()` etc with non-atomic fascades for error_code_extended.
  - [ ] `make install` needs to install dependency headers too
  - [ ] Add config where in release mode the exception throwing macros generate link errors
 for symbols with the function name and line number in them.
  - [ ] Need to get boost-lite's cmake come up with a preprocessed edition as the master include header
    - Need two editions, one with `BOOST_OUTCOME_ENABLE_ADVANCED` and one without.
    - Preprocessed edition ought to include the SHA in the namespace!
- - [ ] Solve the apt packaging problem. Either:
-   1. boost-lite cmake needs to gain the ability to be called by debian dh (see make_deb.sh).
-   This would also solve building binary distros and would let us host on launchpad.
-   2. Configure our own simple apt repo https://askubuntu.com/questions/529/how-to-set-up-an-apt-repository
- - Need to write script which uses github API to scan commits on develop branch for CI
-saying all passes. If so:
-  - [x] Merge that commit from develop branch into master branch
-  - [x] Build a complete source distro and place it at https://dedi4.nedprod.com/static/files/
-  - [ ] Push to:
-   - [ ] launchpad (Ubuntu, Debian). Instructions at https://help.launchpad.net/Packaging/PPA/BuildingASourcePackage
-   - [ ] homebrew (OS X). Instructions at http://formalfriday.club/2015/01/05/creating-your-own-homebrew-tap-and-formula.html
-   - [ ] FreeBSD packages. Instructions at https://www.freebsd.org/doc/handbook/ports-poudriere.html
  
 Later:
  - [ ] error_or() ought to have rvalue ref etc overloads, and exception_or()

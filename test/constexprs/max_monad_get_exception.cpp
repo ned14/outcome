@@ -2,11 +2,11 @@
 
 using namespace boost::outcome;
 extern outcome<int> unknown();
-extern BOOST_NOINLINE std::exception_ptr test1()
+extern BOOSTLITE_NOINLINE std::exception_ptr test1()
 {
   return unknown().get_exception();
 }
-extern BOOST_NOINLINE void test2()
+extern BOOSTLITE_NOINLINE void test2()
 {
 }
 

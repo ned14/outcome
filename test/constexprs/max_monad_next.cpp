@@ -2,11 +2,11 @@
 
 using namespace boost::outcome;
 extern outcome<int> unknown();
-extern BOOST_NOINLINE outcome<int> test1()
+extern BOOSTLITE_NOINLINE outcome<int> test1()
 {
   return unknown().next([](outcome<int> m) { return m.get()*3; });
 }
-extern BOOST_NOINLINE void test2()
+extern BOOSTLITE_NOINLINE void test2()
 {
 }
 
