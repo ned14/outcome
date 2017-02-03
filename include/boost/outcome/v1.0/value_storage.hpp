@@ -423,6 +423,7 @@ public:
 
 BOOST_OUTCOME_V1_NAMESPACE_END
 
+#ifndef BOOST_OUTCOME_DISABLE_IOSTREAMS
 namespace std
 {
   //! \brief Deserialise a value_storage value_type (only value_type) \ingroup monad
@@ -508,5 +509,6 @@ namespace std
     }
   }
 }
+#endif
 
 #endif
