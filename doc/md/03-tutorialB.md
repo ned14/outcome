@@ -19,62 +19,11 @@ more convenient extensions.
 
 <hr><br>
 
-This part of the tutorial is a bit unusual as it's a sort of polemic against what most
-consider to be one of the best parts of `expected<T, E>`: that you can and should choose
-any arbitrary type `E` on a case by case basis as is conventional in other languages such
-as Rust or Swift. Hopefully by the end of this part you will be persuaded to always
-*restrict* your use of `expected<T, E>` in C++ to one of:
-
-~~~{.cpp}
-template<class T> using result = outcome::expected<T, std::error_code>;
-using bad_result_access = outcome::bad_expected_access<std::error_code>;
-~~~
-
-... or ...
-
-~~~{.cpp}
-template<class T> using result = outcome::expected<T, std::exception_ptr>;
-using bad_result_access = outcome::bad_expected_access<std::exception_ptr>;
-~~~
-
-... where the latter is a superset of the former, because you can wrap any arbitrary
-`std::error_code` instance into a `std::exception_ptr` instance using the C++ 11 STL
-error code wrapping C++ exception type `std::system_error`:
-
-~~~{.cpp}
-std::error_code ec;
-std::exception_ptr e = std::make_exception_ptr(std::system_error(ec));
-
-// OR
-
-std::exception_ptr e = std::make_exception_ptr(std::system_error(ec, "custom what() string"));
-~~~
-
-The reason why this polemic is needed is because during the many pre-reviews
-of Outcome on Boost, SG14 and Reddit, it became clear that the choice that Outcome
-made to hard code the error type to error codes or exception pointers in Outcome's
-refinements of `outcome<T>` and `result<T>` was not at all clear to most people
-interested in using `expected<T, E>`. It became clear that the rationale would need
-to be spelled out, and that is this part B of the tutorial.
-
-As with all polemical texts, you may find yourself disagreeing with everything in this
-section and that therefore you will think the hardcoded `E` refinements of `outcome<T>` and
-`result<T>` will be of no use to you. Two things should be noted. The first is that the
-hard coding allows the refinements to do a fair bit of tedious boilerplate for you,
-so the refinements are undoubtedly less tedious to program with if you accept the hard coding.
-The second is that even if you profoundly disagree with everything in this section,
-there is no obligation to use anything in Outcome outside what was already described
-in part A and in \ref outcome_expected_reference "the reference API page for Outcome's Expected implementation".
-Outcome's Expected implementation is high quality, and should be competitive with any
-future STL implementation of `expected<T, E>`.
-
-<hr><br>
-
-\section expected_is_bad Unrestricted use of expected<T, E> is bad practice
+\section expected_simple_e_is_bad Simple E types in expected<T, E> is bad practice in C++
 
 Most people very keen on Expected entering C++ will be coming from a Swift or especially
 Rust background where when you use `Result<T, E>`, you invariably supply a bespoke enum of
-error codes for type E like this fragment of Rust:
+error codes for type `E` like this fragment of Rust:
 
 ~~~{.rs}
 pub enum MathError {
@@ -100,10 +49,7 @@ to do the right thing and use the standard C++ 11 infrastructure for error codes
 a worked example follows below.
 
 The second reason is that if everybody goes off and locally defines their own custom error
-code system, you multiply significantly the number of `expected<T, E>` permutations
-which the compiler has to deal with. That means slower compile and link times, just
-because you couldn't be bothered to use the standard library's infrastructure for error
-codes. You also force programmers coming later to your code to deal with a multitude
+code system, you force programmers coming later to your code to deal with a multitude
 of local error code domains which may or may not mean the same thing. Expect a multiplication of lots of
 little switch statements mapping one small domain of error code to another, all of which
 must be maintained and parsed by programmers coming later to your codebase. The growing
@@ -112,107 +58,17 @@ maintenance burden over time is obvious, and a further worked example follows be
 The third reason is that the C++ 11 standard library already provides an enum of the
 most common error codes for you so you don't feel like going off and reinventing
 the wheel. It's called <a href="http://en.cppreference.com/w/cpp/error/errc">`std::errc`</a>
-and it has the following contents:
-
-~~~{.cpp}
-#include <system_error>  // header to bring in this enum
-
-namespace std
-{
-  enum class errc
-  {
-    address_family_not_supported        = EAFNOSUPPORT,
-    address_in_use                      = EADDRINUSE,
-    address_not_available               = EADDRNOTAVAIL,
-    already_connected                   = EISCONN,
-    argument_list_too_long              = E2BIG,
-    argument_out_of_domain              = EDOM,
-    bad_address                         = EFAULT,
-    bad_file_descriptor                 = EBADF,
-    bad_message                         = EBADMSG,
-    broken_pipe                         = EPIPE,
-    connection_aborted                  = ECONNABORTED,
-    connection_already_in_progress      = EALREADY,
-    connection_refused                  = ECONNREFUSED,
-    connection_reset                    = ECONNRESET,
-    cross_device_link                   = EXDEV,
-    destination_address_required        = EDESTADDRREQ,
-    device_or_resource_busy             = EBUSY,
-    directory_not_empty                 = ENOTEMPTY,
-    executable_format_error             = ENOEXEC,
-    file_exists                         = EEXIST,
-    file_too_large                      = EFBIG,
-    filename_too_long                   = ENAMETOOLONG,
-    function_not_supported              = ENOSYS,
-    host_unreachable                    = EHOSTUNREACH,
-    identifier_removed                  = EIDRM,
-    illegal_byte_sequence               = EILSEQ,
-    inappropriate_io_control_operation  = ENOTTY,
-    interrupted                         = EINTR,
-    invalid_argument                    = EINVAL,
-    invalid_seek                        = ESPIPE,
-    io_error                            = EIO,
-    is_a_directory                      = EISDIR,
-    message_size                        = EMSGSIZE,
-    network_down                        = ENETDOWN,
-    network_reset                       = ENETRESET,
-    network_unreachable                 = ENETUNREACH,
-    no_buffer_space                     = ENOBUFS,
-    no_child_process                    = ECHILD,
-    no_link                             = ENOLINK,
-    no_lock_available                   = ENOLCK,
-    no_message_available                = ENODATA,
-    no_message                          = ENOMSG,
-    no_protocol_option                  = ENOPROTOOPT,
-    no_space_on_device                  = ENOSPC,
-    no_stream_resources                 = ENOSR,
-    no_such_device_or_address           = ENXIO,
-    no_such_device                      = ENODEV,
-    no_such_file_or_directory           = ENOENT,
-    no_such_process                     = ESRCH,
-    not_a_directory                     = ENOTDIR,
-    not_a_socket                        = ENOTSOCK,
-    not_a_stream                        = ENOSTR,
-    not_connected                       = ENOTCONN,
-    not_enough_memory                   = ENOMEM,
-    not_supported                       = ENOTSUP,
-    operation_canceled                  = ECANCELED,
-    operation_in_progress               = EINPROGRESS,
-    operation_not_permitted             = EPERM,
-    operation_not_supported             = EOPNOTSUPP,
-    operation_would_block               = EWOULDBLOCK,
-    owner_dead                          = EOWNERDEAD,
-    permission_denied                   = EACCES,
-    protocol_error                      = EPROTO,
-    protocol_not_supported              = EPROTONOSUPPORT,
-    read_only_file_system               = EROFS,
-    resource_deadlock_would_occur       = EDEADLK,
-    resource_unavailable_try_again      = EAGAIN,
-    result_out_of_range                 = ERANGE,
-    state_not_recoverable               = ENOTRECOVERABLE,
-    stream_timeout                      = ETIME,
-    text_file_busy                      = ETXTBSY,
-    timed_out                           = ETIMEDOUT,
-    too_many_files_open_in_system       = ENFILE,
-    too_many_files_open                 = EMFILE,
-    too_many_links                      = EMLINK,
-    too_many_symbolic_link_levels       = ELOOP,
-    value_too_large                     = EOVERFLOW,
-    wrong_protocol_type                 = EPROTOTYPE
-  };
-}
-~~~
-
-As you will note, these are the standard POSIX error codes, and most of the time you'll find that
-whatever custom error code domain you are about to write can be adequately covered by `std::errc`.
+brought in by `#include <system_error>` and as you'll see, it contains the standard
+POSIX error codes, and most of the time you'll find that whatever custom error code
+domain you are about to write can be adequately covered by `std::errc`.
 In fact, let's try it:
 
 ~~~{.cpp}
 // Mathematical "errors" we want to catch
 using MathError = std::error_code;
-static constexpr MathError DivisionByZero = std::errc::result_out_of_range;
-static constexpr MathError NegativeLogarithm = std::errc::argument_out_of_domain;
-static constexpr MathError NegativeSquareRoot = std::errc::argument_out_of_domain;  
+static const MathError DivisionByZero = std::make_error_code(std::errc::result_out_of_range);
+static const MathError NegativeLogarithm = std::make_error_code(std::errc::argument_out_of_domain);
+static const MathError NegativeSquareRoot = std::make_error_code(std::errc::argument_out_of_domain);  
 
 using MathResult = outcome::expected<double, MathError>;
 ~~~
@@ -240,13 +96,46 @@ categories and error enumerations:
   <dd>The STL future-promise error code domain.</dd>
 </dl>
 
-But let's say you really, really wanted to have your own custom error
-code scheme, this is how you tell C++ 11's standard error code infrastructure about
-your custom error code domain:
+Because `std::error_code` is the C++ 11 standard way of doing error codes, `expected<T, E>`
+defaults `E` to `std::error_code` both in the proposed standard [1] and in Outcome's implementation.
+
+The big problem with directly using `std::error_code` as `E` is the loss of type safety because
+`std::error_code` will accept any input implicitly convertible. So you can write this code
+and the compiler won't complain:
+
+~~~{.cpp}
+// Not a valid MathError, yet the compiler won't stop you doing this
+return MathResult(make_unexpected(std::make_error_code(std::errc::executable_format_error)));
+~~~
+
+As is usually the case in C++, fixing this is straightforward but requires typing boilerplate
+to tell the C++ STL about your custom error type. As how to do this is not well documented [2],
+next follows a very quick howto guide.
+
+[1]: The current LEWG Expected proposal defaults `E` to `std::error_condition`. We believe this
+almost certainly to be a defect and it ought to be `std::error_code`.
+
+[2]: The only documentation I'm aware of is the quite old guide by Chris Kohlhoff, founder of
+ASIO and the Networking TS:
+- http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-1.html
+- http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-2.html
+- http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-3.html
+- http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-4.html
+- http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-5.html
+
+
+<hr><br>
+
+\section custom_error_codes Marking up your custom error code domain so the STL understands it
+
+Let's get into it! This is how you tell C++ 11's standard error code infrastructure about
+your custom `expected<T, E>` error code type so it works well with anything speaking
+`std::error_code`:
 
 \snippet error_code_registration.cpp error_code_registration
 
-This might look like an awful lot of extra boilerplate, but look at the advantages:
+This might look like a lot of extra boilerplate over simply using your custom
+error code enum directly, but look at the advantages:
 1. Any code which can speak `std::error_code` can now work with errors from your
 code, AND without being recompiled.
 2. `std::system_error` can now wrap your custom error codes seamlessly, allowing
@@ -260,65 +149,16 @@ boilerplate here.
 exclusively written to understand `std::errc` alone to examine your custom error
 code domain for equivalence to the standard error conditions, AND without being
 recompiled.
+5. Type safety is preserved, you cannot construct a `MathError` from anything but
+the officially sanctioned enums in `MathError`.
 
-So to sum up, if you are going to deploy `expected<T, E>` into your C++ codebase,
-I **urge** you do not use unrestricted `expected<T, E>` because that will tempt
-people into using custom error enums as type `E` which I've hopefully proven by
-now is a bad idea. Instead *restrict* `expected<T, E>` to a hard coded error type
-using something like:
-
-~~~{.cpp}
-namespace my_codes_namespace
-{
-  template<class T> using result = expected<T, std::error_code>;
-  
-  // Custom error code enum
-  enum class MathError {
-    DivisionByZero,
-    NegativeLogarithm,
-    NegativeSquareRoot
-  };
-  ... boilerplate to tell error_code about MathError ...
-  
-  template<class T> inline result<T> make_result(T &&v)
-  {
-    return make_expected(std::forward<T>(v));
-  }
-  inline unexpected_type<std::error_code> make_error(std::error_code ec)
-  {
-    return make_unexpected(ec);
-  }
-}
-~~~
-
-Now instead of directly calling Expected's factory functions, simply return all
-values from your functions using `make_result()`. Returning a value now becomes:
-
-~~~{.cpp}
-result<int> foo()
-{
-  return make_result(5);
-}
-~~~
-
-Returning an error now becomes:
-
-~~~{.cpp}
-result<int> foo()
-{
-  return make_error(MathError::DivisionByZero);
-}
-~~~
-
-... and note that you can feed `make_error()` any custom error code enum understood
-by `std::error_code`.
 
 <hr><br>
 
-\section expected_boilerplate Unrestricted use of expected<T, E> means typing more boilerplate
+\section expected_tension The tension between type safety and convenient programming
 
-If you weren't convinced by the previous section, let's look at another problem which
-unrestricted use of Expected has: the quantity of boilerplate it makes you write.
+Let's look at another problem which naive direct usage of custom error code enums
+has: the quantity of boilerplate it makes you write.
 
 \snippet expected_try1.cpp expected_try1
 
@@ -336,18 +176,48 @@ template parameter. I can tell you that it is far too easy in the real world to 
 mistype or forget to update the type caught in the catch statement leading to unintentional
 bugs which are quite tricky to track down.
 
-Again, restricting `expected<T, E>` to `E =  std::error_code` makes the code much more
-maintainable and easy to parse by humans:
+Let's try a different approach. What we do now is to hard code
+our use of `expected<T, E>` to `E = std::error_code` which is made easy for us by the fact
+it's already been defaulted to that for us by Expected's definition:
 
 \snippet expected_try2.cpp expected_try2
 
-You'll note the use of the convenience macro `BOOST_OUTCOME_TRY(var, expr)` which provides
-some of the `try` keyword in Swift or Rust. The try operation evaluates the expression and if
-the result returned is an unexpected value, it immediately returns from the current function
-with the same unexpected value - therefore your type `E` needs to be the same. If it is an
-expected value, that value is *unwrapped* and returned as the result from the try operation.
+This eliminates the fragile switch statements converting between error code domains in
+favour of a information loss free transmission. The cost is once again a loss of type safety
+because a function might return an error code it should never be able to return and the
+compiler will not complain.
 
-Unlike the `try` keyword, the macro is not an expression so you can't write statements like
+Mashing together both approaches we can solve the problem of type safety by making `MathError2`
+explicitly constructible from `MathError1`:
+
+\snippet expected_try3.cpp expected_try3
+
+This approach means that `MathError2` can contain an error code which has nothing to do with
+`MathError2`'s enumerations. This may be confusing initially, but you need to consider the
+compile time and run time separately - this approach comes with compile time safety but without
+run time safety.
+
+So which approach should you use in your code? It depends on the specific application. If your code base
+needs to tightly specify all the exact errors which can occur in some function call stack rather similarly
+to <a href="http://en.cppreference.com/w/cpp/language/except_spec">dynamic C++ exception specifications</a>,
+then the third example is the form you should use. If your code base is mostly a systems
+abstraction layer where errors from the OS ought to be returned exactly as from the OS,
+you should leave `E` default to `std::error_code` and return `std::system_category()` error
+codes from `errno` or `GetLastError()` as appropriate. If you don't care and/or you're in a rush,
+`E = std::error_code` and returning some enumeration from `std::errc` will get you working code
+the quickest (and be aware that Outcome's refinements of `expected<T, E>` `outcome<T>` and `result<T>`
+hard code the `E` and will save you typing a fair bit of boilerplate). As the latter two
+use patterns may be unclear, a worked example follows in the next section.
+
+\subsection try_operation The TRY operation
+
+You may have noted the earlier use of the convenience macro `BOOST_OUTCOME_TRY(var, expr)` which provides
+some of the `try` operator in Swift or Rust. The TRY operation evaluates the expression and if
+the result returned is an unexpected value, it immediately returns from the current function
+with the same unexpected value - therefore your type `E` needs to be identical. If it is an
+expected value, that value is *unwrapped* and returned as the result from the TRY operation.
+
+Unlike the `try` operator, the macro is not an expression so you can't write statements like
 `if(BOOST_OUTCOME_TRY(var, expr))` as you can in Rust or Swift, this is due to a limitation
 of the C++ language (you can't return from functions in an expression). What you can do is to
 initialise a variable `var` on the stack to the unwrapped return value from the expression,
@@ -371,13 +241,12 @@ expected<int, std::error_code> someotherfunc()
 
 <hr><br>
 
-\section error_codes_insufficient std::error_code CAN replace your custom error types
+\section expected_payload Sending payload with your custom error type
 
-The final reason that people say they need to use custom error types with Expected is because
-they need the custom error type to carry custom *payload* such as data directly relating to the error
-which occurred, and because `std::error_code` can only
-carry a situation-unspecific integer code and category, that it is therefore unsuited for
-their particular use case. Let's have a look at a typical custom error type carrying payload:
+One of the most common error types people write with `expected<T, E>` is `expected<T, std::string>`
+so they can return some arbitrary string explaining the error. This is the simplest example
+of sending runtime *payload* with the returned error explaining the error.
+Let's have a look at a typical naive custom error type carrying payload:
 
 \snippet expected_payload1.cpp expected_payload1
 
@@ -387,26 +256,25 @@ a custom error type with the path of the file which failed as its payload. As mu
 a simple example where the payload carried is just a pointer, you could actually transport any
 arbitrary data as your payload such as a stack backtrace etc.
 
-The thing is, `std::error_code` is exactly the right solution to this problem. A lot of people
-hung up on their custom error types aren't thinking the problem through using STL fundamentals
-as building blocks with which to compose better and more elegant solutions:
+Earlier we subclassed `std::error_code` to add in type safety to prevent the accidental return
+of errors not permitted by a function's specification. Here we take yet another approach, this
+time *embedding* a `std::error_code` inside our custom error type along with payload:
 
 \snippet expected_payload2.cpp expected_payload2
 
-As you can now see, we still have a custom error type, but it's now a `std::error_code` combined
-with payload. A big improvement with this design is that the errors returned by the system calls
-are now preserved perfectly rather than being converted into some generic "i/o failed" error code,
-and in fact because we use `system_category` for the error codes returned by the host OS, we lose
+A nice consequence of this design is that the errors returned by the system calls
+are preserved perfectly rather than being converted into some generic "i/o failed" error code,
+and because we use `system_category` for the error codes returned by the host OS, we lose
 no information whatsoever about the original error.
-The failure to allocate memory is now returned using the standard error code for that event, and
-the only error condition which is truly bespoke `format_corrupt` gets its own error code category.
+The failure to allocate memory is now returned using the standard error condition for that event, and
+the only error code which is truly bespoke `format_corrupt` gets its own custom error code category.
 
 As much as the second example is much better design, it still has a custom error type the use of which
 precludes using convenience macros like `BOOST_OUTCOME_TRY` across disjoint domains of error.
 If that's acceptable to you, then work away, but be aware that Outcome's refinements of `outcome<T>`
 and `result<T>` don't use a `std::error_code`, they instead use an `outcome::error_code_extended`
 which extends `std::error_code` with most of the common payloads that most people would want to
-transmit with their errors.
+transmit along with their errors, such as a custom string.
 
 `error_code_extended` won't of course cover truly bespoke needs, and if you are finding your
 custom error type is getting richly featured enough to require

@@ -1092,7 +1092,7 @@ for the type traits for basic_monad into namespace std.
 \ingroup expected
 \brief The exception type thrown when you try to access an errored expected
 */
-template <class E> class bad_expected_access : public std::logic_error
+template <class E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class bad_expected_access : public std::logic_error
 {
   E _error;
 

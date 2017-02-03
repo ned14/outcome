@@ -3,10 +3,16 @@
 #include <system_error>  // bring in std::error_code et al
 
 // This is the custom error code enum
-enum class MathError {
-  DivisionByZero,
-  NegativeLogarithm,
-  NegativeSquareRoot
+class MathError : public std::error_code {
+public:
+  enum valid_errors {
+    DivisionByZero,
+    NegativeLogarithm,
+    NegativeSquareRoot
+  };
+  MathError() = default;  // Expected requires E to be default constructible
+  // Only allow my construction from my enum
+  inline MathError(valid_errors c);
 };
 
 namespace detail
@@ -20,7 +26,7 @@ namespace detail
     // Return what each enum means in text
     virtual std::string message(int c) const override final
     {
-      switch (static_cast<MathError>(c))
+      switch (c)
       {
       case MathError::DivisionByZero:
         return "division by zero";
@@ -35,7 +41,7 @@ namespace detail
     // OPTIONAL: Allow generic error conditions to be compared to me
     virtual std::error_condition default_error_condition(int c) const noexcept override final
     {
-      switch (static_cast<MathError>(c))
+      switch (c)
       {
       case MathError::DivisionByZero:
         return make_error_condition(std::errc::result_out_of_range);
@@ -58,18 +64,21 @@ extern const detail::MathError_category &MathError_category()
   return c;
 }
 
+// Now we have the custom error code category, implement the MathError constructor
+inline MathError::MathError(MathError::valid_errors e) : std::error_code(e, MathError_category()) {}
+
 // Overload the global make_error_code() free function with our
 // custom enum. It will be found via ADL by the compiler if needed.
-inline std::error_code make_error_code(MathError e)
+inline MathError make_error_code(MathError::valid_errors e)
 {
-  return std::error_code(static_cast<int>(e), MathError_category());
+  return MathError(e);
 }
 
 namespace std
 {
-  // Tell the C++ 11 STL metaprogramming that enum MathError
+  // Tell the C++ 11 STL metaprogramming that enum MathError::valid_errors
   // is registered with the standard error code system
-  template <> struct is_error_code_enum<MathError> : std::true_type
+  template <> struct is_error_code_enum<MathError::valid_errors> : std::true_type
   {
   };
 }

@@ -1,4 +1,4 @@
-//! [expected_try2]
+//! [expected_try3]
 #include "../include/boost/outcome.hpp"
 
 #include <cfloat>
@@ -27,8 +27,10 @@ public:
     DivisionByZero
   };
   MathError2() = default;
-  // Only allow my construction from my enum
+  // Allow my construction from my enum
   inline MathError2(valid_errors c);
+  // And from MathError1
+  explicit MathError2(MathError1 e) : std::error_code(e) {}
 };
 
 namespace detail
@@ -138,13 +140,13 @@ namespace std
 }
 
 
-outcome::expected<double /*, std::error_code */> div(double x, double y) noexcept
+outcome::expected<double, MathError1> div(double x, double y) noexcept
 {
   if (::fabs(y) < FLT_EPSILON)
   {
     // This operation would fail, instead let's return the reason of
     // the failure wrapped in E
-    return outcome::make_unexpected<std::error_code>(MathError1::DivisionByZero);
+    return outcome::make_unexpected<MathError1>(MathError1::DivisionByZero);
   }
   else
   {
@@ -153,14 +155,18 @@ outcome::expected<double /*, std::error_code */> div(double x, double y) noexcep
   }
 }
 
-outcome::expected<long long /*, std::error_code */> div10mul3(double y) noexcept
+outcome::expected<long long, MathError2> div10mul3(double y) noexcept
 {
   // If calling div() fails, return the same error immediately,
-  // else unpack the T into r. REQUIRES type E to be identical!
-  BOOST_OUTCOME_TRY(r, div(10.0, y));
+  // else unpack the T into r. Note we cannot use BOOST_OUTCOME_TRY() here
+  // as the error types are different.
+  outcome::expected<double, MathError1> _r = div(10.0, y);
+  if (!_r)
+    return outcome::make_unexpected(MathError2(_r.error()));  // note explicit conversion needed
+  auto r = std::move(_r.value());
   if (r < 0.0)
   {
-    return outcome::make_unexpected<std::error_code>(MathError2::NegativeSquareRoot);
+    return outcome::make_unexpected<MathError2>(MathError2::NegativeSquareRoot);
   }
   return (long long)(sqrt(r * 3.0));
 }
@@ -171,8 +177,9 @@ int main(void)
   {
     std::cout << div10mul3(1.0).value() << std::endl;
   }
-  // NOTE: Much less likely to become stale accidentally
-  catch (const outcome::bad_expected_access</* std::error_code */> &e)
+  // NOTE: Back to becoming easily and silently stale, it's an unavoidable
+  //       consequence of type safety
+  catch (const outcome::bad_expected_access<MathError2> &e)
   {
     // Also note we can always print the error code because E is
     // always an error_code
@@ -180,4 +187,4 @@ int main(void)
   }
   return 0;
 }
-//! [expected_try2]
+//! [expected_try3]
