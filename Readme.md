@@ -19,9 +19,8 @@ Todo:
  - [x] Test relaxed constexpr in VS15 once that is released and delete the hack macro.
  - [x] Document the exception throwing macros in the tutorial
  - [x] Rejig `BOOST_OUTCOME_ENABLE_OPERATORS` to decide what ought to be in or out.
- - [ ] Break monad.hpp into separate files.
- - [ ] Wrap `std::generic_category()` etc with non-atomic fascades for error_code_extended.
- - [ ] `make install` needs to install dependency headers too
+ - [x] Wrap `std::generic_category()` etc with non-atomic fascades for error_code_extended.
+ - [x] Break monad.hpp into separate files.
  - [ ] Add config where in release mode the exception throwing macros generate link errors
 for symbols with the function name and line number in them.
  - [ ] Need to get boost-lite's cmake come up with a preprocessed edition as the master include header
@@ -30,6 +29,7 @@ for symbols with the function name and line number in them.
  
 Later:
  - [ ] error_or() ought to have rvalue ref etc overloads, and exception_or()
+ - [ ] `make install` needs to install dependency headers too
  - [ ] Add nothrow make functions for outcomes, maybe with error lvalue ref constructor editions for results.
  - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
  - [ ] Add tribool logic programming operator overloads

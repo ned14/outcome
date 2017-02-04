@@ -62,6 +62,7 @@ DEALINGS IN THE SOFTWARE.
 
 BOOST_AUTO_TEST_SUITE(all)
 
+#ifdef BOOST_OUTCOME_ENABLE_ADVANCED
 BOOST_AUTO_TEST_CASE(works / traits, "Tests that the traits work as intended")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE::traits;
@@ -149,6 +150,7 @@ BOOST_AUTO_TEST_CASE(works / traits, "Tests that the traits work as intended")
   }
 #endif
 }
+#endif
 
 BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
 {

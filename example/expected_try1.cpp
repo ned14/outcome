@@ -43,7 +43,11 @@ MathResult2 div10mul3(double y) noexcept
   MathResult1 result = div(10.0, y);
   // If successful, return the result
   if (result)
+  {
+    if(result.value() < 0)
+      return outcome::make_unexpected(MathError2::NegativeSquareRoot);
     return (long long)(result.value() * 3.0);
+  }
   // NOTE: If it failed, convert the MathError1 error code domain into
   //       the MathError2 error code domain
   switch (result.error())
