@@ -392,10 +392,10 @@ The program is a find regex in files utility written using C++ 14 and the Filesy
 <table>
 <tr>
 <td>
-\snippet find_regex_in_files.cpp find_regex_expected
+\snippet find_regex_expected.cpp find_regex_expected
 </td>
 <td>
-\snippet find_regex_in_files.cpp find_regex_result
+\snippet find_regex_result.cpp find_regex_result
 </td>
 </tr>
 </table>

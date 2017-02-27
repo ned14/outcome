@@ -139,7 +139,7 @@ static outcome::expected<std::vector<filesystem::path>> find_regex_in_files(cons
   }
   catch (const std::bad_alloc &)
   {
-    return outcome::make_unexpected(std::make_error_code(std::errc::out_of_memory));
+    return outcome::make_unexpected(std::make_error_code(std::errc::not_enough_memory));
   }
   catch (...)
   {

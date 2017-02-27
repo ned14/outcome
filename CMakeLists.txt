@@ -54,6 +54,12 @@ endif()
 # Set the library dependencies this library has
 target_link_libraries(outcome_hl INTERFACE boost-lite_hl)
 
+# On POSIX we need to patch linking to stdc++fs into the docs examples 
+if(GCC)
+  target_link_libraries(outcome-example_find_regex_expected stdc++fs)
+  target_link_libraries(outcome-example_find_regex_result stdc++fs)
+endif()
+
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   # For all possible configurations of this library, add each test
   list_filter(outcome_TESTS EXCLUDE REGEX "test_multiabi.cpp")
