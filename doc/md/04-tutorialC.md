@@ -3,8 +3,6 @@
 
 [TOC]
 
-\todo This section is not finished yet and may contain inaccurate or incorrect information.
-
 Outcome's design rationale and tutorial is split into three parts:
 1. The first part (\ref tutorial_expected "part A") provides a broad overview of error handling in
 C++ in general and how the `expected<T, E>` proposed for standardisation will contribute
@@ -21,36 +19,23 @@ more convenient extensions.
 
 <hr><br>
 
-Hopefully after part B you are persuaded to always *restrict* your use of `expected<T, E>` to
-one of:
+In the previous part of this tutorial, we saw how there is a tension between type
+safety and convenience of programming when using the `expected<T, E>` transport. Expected as a STL
+primitive reflects a trade off between those two use cases, and as something which can wear
+multiple hats it is close to optimal.
 
-~~~{.cpp}
-template<class T> using result = outcome::expected<T, std::error_code>;
-using bad_result_access = outcome::bad_expected_access<std::error_code>;
-~~~
+What is presented during this last part of Outcome's tutorial are Outcome's convenience
+extensions to Expected. We start by assuming that you have no need
+for type safety in your type `E`, and furthermore that you only have need for `E` to be
+either an error code or an exception pointer *and nothing else*. Such assumptions, as
+hopefully demonstrated in the previous part, are not wise for some code bases and use
+cases for Expected - in those use cases, do not use these convenience extensions because
+the loss of type safety is too big a trade off.
 
-... or ...
-
-~~~{.cpp}
-template<class T> using result = outcome::expected<T, std::exception_ptr>;
-using bad_result_access = outcome::bad_expected_access<std::exception_ptr>;
-~~~
-
-... where the latter is a superset of the former, because you can wrap any arbitrary
-`std::error_code` instance into a `std::exception_ptr` instance using the C++ 11 STL
-error code wrapping C++ exception type `std::system_error`:
-
-~~~{.cpp}
-std::error_code ec;
-std::exception_ptr e = std::make_exception_ptr(std::system_error(ec));
-
-// OR
-
-std::exception_ptr e = std::make_exception_ptr(std::system_error(ec, "custom what() string"));
-~~~
-
-If you have been persuaded, then Outcome's hardcoded refinements of `expected<T, E>` are definitely
-for you. The remainder of this tutorial covers those refinements.
+Rather, these convenience extensions are ideally suited for low level systems programming
+and other such use cases where errors exclusively come from outside your code and where
+therefore enforcing type safety on each particular error type is unnatural. Classic examples
+of such code bases would be the Networking TS, the Filesystem TS and so on.
 
 <hr><br>
 
@@ -63,7 +48,7 @@ They therefore reject the restriction to `std::error_code` as unsuitable for the
 
 Outcome provides an \ref boost::outcome::v1_xxx::error_code_extended "error_code_extended"
 refinement of `std::error_code` for exactly this situation. `error_code_extended` inherits publicly from `std::error_code`,
-adding three new member functionss: `extended_message()`, `raw_backtrace()` and `backtrace()`. These *may* provide
+adding three new member functions: `extended_message()`, `raw_backtrace()` and `backtrace()`. These *may* provide
 additional information about the error code like any `what()` message from the C++ exception
 the error code was constructed from (if any), or the stack backtrace of the point at which the
 `error_code_extended` was constructed.
@@ -176,7 +161,7 @@ template<class T> using outcome = std::optional<
 
 Outcome's `outcome<T>`, `result<T>` and `option<T>` assume the error type is hard coded
 to the C++ 11 standard error transport infrastructure, and because they hard code this they
-can make a series of optimisations in design for you the programmer to save boilerplate, at compile time and
+can make a series of optimisations in API design for you the programmer to save boilerplate, at compile time and
 at runtime which an `expected<T, E>` implementation can not. To spell it out:
 - `option<T>` can be empty, or hold an instance of a type `T`.
 - `result<T>` can be empty, or hold an instance of a type `T`, or hold an instance of `error_code_extended`.
@@ -210,11 +195,11 @@ returning a value OR empty OR an error makes a lot of sense and Outcome supports
 extension for ternary logics for those who need such a thing). Attempting to retrieve a value,
 error or exception from an empty transport throws a `monad_error::no_state` [1].
 - `.value()` on an errored transport directly throws a `std::system_error` with the error code [2]
-instead of throwing a wrapper type like `bad_expected_access` which you need to manually
-extract from later.
+instead of throwing a wrapper type like `bad_expected_access<E>` from which you need to manually
+extract the `E` instance later.
 - `.value()` on an excepted transport directly rethrows the contents of the exception pointer [3] instead of
-throwing a wrapper type like `bad_expected_access` which you need to manually
-extract from later.
+throwing a wrapper type like `bad_expected_access` from which you need to manually
+extract later.
 - `.error()` returns any `error_code_extended` as you'd expect, returning a default constructed
 (null) error code if the transport is valued, or `monad_errc::exception_present` if the
 transport is excepted.
@@ -258,7 +243,7 @@ result<Foo> somefunction()
 {
   ...
   if(bad)
-    return make_errored_result<>(...);  // Note we didn't specify <Foo>
+    return make_errored_result</* void */>(...);  // Note we didn't specify <Foo>
   else
     return Foo(...);
 }
@@ -267,7 +252,7 @@ result<Foo> somefunction()
 The full set of free functions is as follows:
 <dl>
   <dt>`make_(option|result|outcome)(T v)`</dt>
-  <dd>Makes a valued transport.</dd>
+  <dd>Makes a valued transport with value `v`.</dd>
   <dt>`make_(option|result|outcome)<T = void>()`</dt>
   <dd>Makes a valued transport default constructing a `T`.</dd>
   <dt>`make_empty_(option|result|outcome)<T = void>()`</dt>
@@ -281,7 +266,7 @@ very convenient for writing:
  ~~~{.cpp}
  result<Foo> somefunction()
  {
-   if(-1 == open(...))
+   if(-1 == open(...))  // Any POSIX system call setting errno on failure
      return make_errored_result<>(errno);
  }
  ~~~
@@ -294,7 +279,7 @@ very convenient for writing:
  ~~~{.cpp}
  result<Foo> somefunction()
  {
-   if(INVALID_HANDLE_VALUE == CreateFile(...))
+   if(INVALID_HANDLE_VALUE == CreateFile(...))  // Any Win32 call setting GetLastError() on failure
      return make_errored_result<>(GetLastError());
  }
  ~~~
@@ -310,7 +295,7 @@ very convenient for writing:
    }
    catch(...)  // catch all
    {
-     return make_excepted_outcome<>();  // Defaults to std::current_exception()
+     return make_excepted_outcome</* void */>(/* std::current_exception() */);
    }
  }
  ~~~
@@ -320,7 +305,7 @@ very convenient for writing:
   <dt>`as_void(const (option<T>|result<T>|outcome<T>|expected<T, E>) &)`</dt>
   <dd>Returns a copy of any input transport
 as a void version of the same transport, preserving any empty/errored/excepted state. If the input
-was valued, the returned copy will be valued void.</dd>
+was valued, the returned copy will be valued **void**.</dd>
 </dl>
 
 <hr><br>
@@ -328,11 +313,11 @@ was valued, the returned copy will be valued void.</dd>
 \section outcome_macros Outcome's helper macros
 
 We've already seen in part B the helper macro `BOOST_OUTCOME_TRY(var, expr)` which also works
-with `expected<T, E>` when the error type in the returned transport is the same. Something
+with `expected<T, E>` when the error type in the returned Expected is the same. Something
 unique to Outcome's refinements due to using `error_code_extended` is the convenience macro
 `BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT` which is a long
 sequence of STL exception type catch clauses converting STL exception types into their
-equivalent POSIX error codes, preserving any custom `what()` message:
+equivalent generic category error codes, preserving any custom `what()` message:
 
 ~~~{.cpp}
 catch(const std::invalid_argument &e)
@@ -383,10 +368,10 @@ catch(const std::exception &e)
 
 This macro is particularly useful when you are calling into the STL from a noexcept
 function which returns a `result<T>` and not an `outcome<T>`. So long as the code you
-call only ever will throw STL exception types, using this macro is safe and information
+call only **ever** will throw STL exception types, using this macro is safe and information
 loss free. Note that the above sequence does not include a catch all clause, so if
 you want one of those then use the `BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT` macro
-which adds:
+which adds to the end of the catch sequence:
 
 ~~~{.cpp}
 ... all the stuff from BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT and then ...
@@ -398,6 +383,6 @@ catch(...)
 
 <hr><br>
 
-\section outcome_usage Example of usage of the refinements
+\section outcome_usage Example of usage of Outcome's expected<T, E> refinements
 
 todo
