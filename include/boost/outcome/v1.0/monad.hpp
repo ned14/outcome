@@ -1169,9 +1169,9 @@ template <class T, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> const
   return expected<T, E>(v);
 }
 //! \brief Makes an unexpected from the type passed \ingroup expected
-template <class E> constexpr inline unexpected_type<E> make_unexpected(E &&v)
+template <class E> constexpr inline unexpected_type<typename std::decay<E>::type> make_unexpected(E &&v)
 {
-  return unexpected_type<E>(std::move(v));
+  return unexpected_type<typename std::decay<E>::type>(std::move(v));
 }
 //! \brief Makes an unexpected from the type passed \ingroup expected
 template <class E> constexpr inline unexpected_type<E> make_unexpected(const E &v)

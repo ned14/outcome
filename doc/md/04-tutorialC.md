@@ -385,4 +385,17 @@ catch(...)
 
 \section outcome_usage Example of usage of Outcome's expected<T, E> refinements
 
-todo
+The final code example is a reasonably long one which places, side by side, an
+implementation written using `expected<T, E>` beside one using `result<T>`.
+The program is a find regex in files utility written using C++ 14 and the Filesystem TS.
+
+<table>
+<tr>
+<td>
+\snippet find_regex_in_files.cpp find_regex_expected
+</td>
+<td>
+\snippet find_regex_in_files.cpp find_regex_result
+</td>
+</tr>
+</table>

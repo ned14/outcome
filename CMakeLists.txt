@@ -38,7 +38,6 @@ include(BoostLiteMakeDoxygen)
 include(BoostLiteApplyDefaultDefinitions)
 # Set the C++ features this library requires
 all_compile_features(PUBLIC
-  # cxx_exceptions                        ## Annoyingly not supported by cmake 3.6
   cxx_alias_templates
   cxx_variadic_templates
   cxx_noexcept
