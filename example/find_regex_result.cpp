@@ -16,7 +16,7 @@ namespace std
 #include <experimental/filesystem>
 namespace filesystem = std::experimental::filesystem;
 
-#include "boost/outcome.hpp"
+#include "../include/boost/outcome.hpp"
 namespace outcome = BOOST_OUTCOME_V1_NAMESPACE;
 
 #ifdef _WIN32
