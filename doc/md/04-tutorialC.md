@@ -391,11 +391,27 @@ The program is a find regex in files utility written using C++ 14 and the Filesy
 
 <table>
 <tr>
-<td>
+<td valign="top">
 \snippet find_regex_expected.cpp find_regex_expected
 </td>
-<td>
+<td valign="top">
 \snippet find_regex_result.cpp find_regex_result
 </td>
 </tr>
 </table>
+
+As you can see, in the above use case there is not much difference between using
+`expected<T, E = std::error_code>` or `result<T>`:
+
+1. Instead of typing `outcome::make_unexpected(std::error_code(GetLastError(), std::system_category()))`
+you can type `outcome::make_errored_result<>(GetLastError())`.
+2. Instead of typing out a sequence of exception catch clauses, you can use `BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT`.
+
+Much of the time, code using `expected<T, E = std::error_code>` and `result<T>`
+will look very similar, especially when you are avoiding "default actions" by
+being careful to always explicitly check state of a transport before using it.
+If on the other hand you don't bother with those manual checks and instead rely
+on the default actions performed when you try something not possible, you gets
+quite different code outcomes:
+
+\todo In progress
