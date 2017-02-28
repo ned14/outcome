@@ -26,7 +26,7 @@ The Outcome library provides an implementation of `expected<T, E>` (which is on 
 C++ 20 standardisation track), with the `expected<T, E>` refinements `outcome<T>` and
 `result<T>`.
 
-If you are familiar with Swift's error code throws or Rust's `Result<T>`,
+If you are familiar with Swift's error code throws or Rust's `Result<T, E>`,
 you will find almost identical semantics in the transports provided here.
 Outcome even has a `BOOST_OUTCOME_TRY` macro doing most of the
 `try` keyword in Rust and Swift!
