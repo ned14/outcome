@@ -385,9 +385,12 @@ catch(...)
 
 \section outcome_usage Example of usage of Outcome's expected<T, E> refinements
 
-The final code example is a reasonably long one which places, side by side, an
-implementation written using `expected<T, E>` beside one using `result<T>`.
-The program is a find regex in files utility written using C++ 14 and the Filesystem TS.
+The final set of code examples are reasonably long ones which place, side by side, an
+implementation written using `expected<T, E>` beside one using `result<T>` so you
+can both see usage of Outcome in real world code, and also the differences enabled by
+the refinements.
+
+The first program is a find regex in files utility written using C++ 14 and the Filesystem TS:
 
 <table>
 <tr>
@@ -407,11 +410,12 @@ As you can see, in the above use case there is not much difference between using
 you can type `outcome::make_errored_result<>(GetLastError())`.
 2. Instead of typing out a sequence of exception catch clauses, you can use `BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT`.
 
-Much of the time, code using `expected<T, E = std::error_code>` and `result<T>`
-will look very similar, especially when you are avoiding "default actions" by
+This similarity is because the above code avoids "default actions" by
 being careful to always explicitly check state of a transport before using it.
-If on the other hand you don't bother with those manual checks and instead rely
-on the default actions performed when you try something not possible, you gets
-quite different code outcomes:
+`result<T>` was also intentionally designed to be substitutable by automation for an
+`expected<T, E = std::error_code>` using find and replace regex in files. This ought
+to ease a retrofitting of an existing codebase using Expected to use Outcome's refinements.
+
+The second program demonstrates much more of Outcome's refinements in action:
 
 \todo In progress
