@@ -55,7 +55,7 @@ endif()
 target_link_libraries(outcome_hl INTERFACE boost-lite_hl)
 
 # On POSIX we need to patch linking to stdc++fs into the docs examples 
-if(GCC)
+if(DOXYGEN_FOUND AND GCC)
   target_link_libraries(outcome-example_find_regex_expected stdc++fs)
   target_link_libraries(outcome-example_find_regex_result stdc++fs)
 endif()
