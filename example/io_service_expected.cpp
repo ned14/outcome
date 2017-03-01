@@ -8,7 +8,7 @@
 #include "../include/boost/outcome.hpp"
 namespace outcome = BOOST_OUTCOME_V1_NAMESPACE;
 
-//! [io_service_outcome]
+//! [io_service_expected]
 /* This is an implementation of a futures based Executor as proposed by P0443R1
 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0443r1.html using the
 ASIO/Networking TS io_service as a model.
@@ -23,36 +23,31 @@ public:
   using io_handler = void(std::error_code &ec, size_t bytes_transferred);
 private:
   std::mutex _lock;
-  std::deque<std::packaged_task<outcome::outcome<void>(size_t)>> _work;
+  std::deque<std::packaged_task<outcome::expected<void>(size_t)>> _work;
   std::condition_variable _newwork;
 public:
 
   // Call the i/o handler at some future point in some future thread, returning immediately
-  outcome::result<std::future<outcome::outcome<void>>> post(std::function<io_handler> f) noexcept
+  outcome::expected<std::future<outcome::expected<void>>, std::exception_ptr> post(std::function<io_handler> f) noexcept
   {
     try
     {
       // Make a packaged task rebinding the completion handler
-      std::packaged_task<outcome::outcome<void>(size_t)> rebound([f = std::move(f)](size_t bytes_transferred)
-        ->outcome::outcome<void>
+      std::packaged_task<outcome::expected<void>(size_t)> rebound([f = std::move(f)](size_t bytes_transferred)
+        ->outcome::expected<void>
       {
-        try
-        {
-          std::error_code ec;
-          // Call the handler, if he returns an error code return that,
-          // if he throws return the exception thrown
-          f(ec, bytes_transferred);
-          if (ec)
-            return outcome::make_errored_outcome<>(ec);
-          return outcome::make_ready_outcome();
-        }
-        catch (...)
-        {
-          return outcome::make_exceptional_outcome<>();
-        }
+        // Note we let exception throws be handled by the packaged_task
+
+        std::error_code ec;
+        // Call the handler, if he returns an error code return that,
+        // if he throws return the exception thrown
+        f(ec, bytes_transferred);
+        if (ec)
+          return outcome::make_unexpected(ec);
+        return {};
       });
       // Fetching the future can throw a STL exception
-      std::future<outcome::outcome<void>> f(rebound.get_future());
+      std::future<outcome::expected<void>> f(rebound.get_future());
       {
         std::lock_guard<decltype(_lock)> g(_lock);
         // Extending the deque can throw a STL exception
@@ -61,37 +56,43 @@ public:
       }
       return f;
     }
-    // Catch all STL exception throws and return a corresponding result
-    BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT
+    catch (...)
+    {
+      // Return the exception thrown
+      return outcome::make_unexpected(std::current_exception());
+    }
   }
+
+
+
 
   /* Call the i/o handler in some thread, returning when it completes.
   Note that ASIO's io_service calls this dispatch(), but the Executors proposal calls it execute()
   */
-  outcome::outcome<void> execute(std::function<io_handler> f) noexcept
+  outcome::expected<void, outcome::expected<std::error_code, std::exception_ptr>> execute(std::function<io_handler> f) noexcept
   {
     try
     {
       // If post() returns a failure in its result, then this will throw
-      // a system_error with that error code
-      // The future.get() may throw too.
-      return post(std::move(f)).value().get();
+      std::future<outcome::expected<void>> fut = post(std::move(f)).value();
+      // Might rethrow any exception thrown by the handler, that will get caught below
+      outcome::expected<void> v = fut.get();
+      // If the handler succeeded, return success, else return its error code
+      if (v)
+        return {};
+      return outcome::make_unexpected(v.error());
     }
-    // Convert all STL exception throws into the equivalent error code
-    // such that the returned outcome will be errored, not excepted.
-    // Note if the result returned by post() was errored it will have
-    // been thrown as a system_error, this will convert it back to its
-    // original error code.
-    BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT
+    catch (const outcome::bad_expected_access<std::exception_ptr> &e)
+    {
+      // This called when post() failed internally to do the dispatch
+      return outcome::make_unexpected(outcome::make_unexpected(e.error()));
+    }
     catch (...)
     {
-      // For any non-STL exception throws, return as an excepted outcome
-      return outcome::make_exceptional_outcome<>();
+      // Return the exception thrown
+      return outcome::make_unexpected(outcome::make_unexpected(std::current_exception()));
     }
   }
-
-
-
 
   // If there are handlers pending, execute up to one of them
   size_t run_one() noexcept
@@ -100,7 +101,7 @@ public:
     if (_work.empty())
       return 0;
 
-    std::packaged_task<outcome::outcome<void>(size_t)> mywork(std::move(_work.front()));
+    std::packaged_task<outcome::expected<void>(size_t)> mywork(std::move(_work.front()));
     _work.pop_front();
     g.unlock();
     // Call the completion handler with some arbitrary bytes_transferred
@@ -161,4 +162,4 @@ int main(void)
     i.join();
   return 0;
 }
-//! [io_service_outcome]
+//! [io_service_expected]
