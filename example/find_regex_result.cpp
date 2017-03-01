@@ -123,7 +123,7 @@ static outcome::result<std::vector<filesystem::path>> find_regex_in_files(const 
         std::error_code ec;
         filesystem::directory_iterator nit(p.path(), ec);
         if (ec)
-          return outcome::make_errored_result<>(outcome::error_code_extended(ec));
+          return outcome::make_errored_result<>(ec);
         BOOST_OUTCOME_TRY(results, find_regex_in_files(re, std::move(nit), depth + 1));
         // Merge found results from subdirectory into me
         ret.reserve(ret.size() + results.size());

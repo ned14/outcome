@@ -418,4 +418,14 @@ to ease a retrofitting of an existing codebase using Expected to use Outcome's r
 
 The second program demonstrates much more of Outcome's refinements in action:
 
+<table>
+<tr>
+<td valign="top">
 \todo In progress
+</td>
+<td valign="top">
+\snippet io_service_outcome.cpp io_service_outcome
+</td>
+</tr>
+</table>
+

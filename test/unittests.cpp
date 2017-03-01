@@ -841,7 +841,7 @@ BOOST_AUTO_TEST_CASE(works / monad / upconvert, "Tests that the monad converts i
     BOOST_CHECK(c10.get() == 5);
     BOOST_CHECK(c11.get() == 5);
   }
-  // void
+  // Explicit upconversion of void
   {
     option<void> a1, a10(make_ready_option<void>());
     result<void> b1(a1), b10(a10);
@@ -854,6 +854,15 @@ BOOST_AUTO_TEST_CASE(works / monad / upconvert, "Tests that the monad converts i
     BOOST_CHECK(b10.is_ready());
     BOOST_CHECK(c10.is_ready());
     BOOST_CHECK(c11.is_ready());
+  }
+  // Implicit upconversion of void
+  {
+    auto t0 = []() -> result<int> { return make_result<void>(); };
+    auto t1 = []() -> outcome<void> { return make_result<void>(); };
+    auto t2 = []() -> outcome<int> { return make_result<void>(); };
+    (void)t0;
+    (void)t1;
+    (void)t2;
   }
 }
 
