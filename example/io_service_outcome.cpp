@@ -59,7 +59,7 @@ public:
         _work.push_back(std::move(rebound));
         _newwork.notify_one();
       }
-      return f;
+      return std::move(f);
     }
     // Catch all STL exception throws and return a corresponding result
     BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT
@@ -135,8 +135,9 @@ struct work
     ++count;
     if (count < 10000000)
     {
-      // Call myself again
-      ios->post(std::ref(*this));
+      // Call myself again. Note I can simply call value() to
+      // cause the result to throw a system_error with any error code
+      ios->post(std::ref(*this)).value();
     }
   }
 };
@@ -155,7 +156,9 @@ int main(void)
   std::this_thread::sleep_for(std::chrono::seconds(1));
   for (size_t n = 0; n < std::thread::hardware_concurrency(); n++)
   {
-    ios.post(works[n]);
+    // Note I can simply call value() to cause the result to throw
+    // a system_error with any error code
+    ios.post(works[n]).value();
   }
   for (auto &i : threads)
     i.join();

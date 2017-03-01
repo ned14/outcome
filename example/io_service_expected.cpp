@@ -54,7 +54,7 @@ public:
         _work.push_back(std::move(rebound));
         _newwork.notify_one();
       }
-      return f;
+      return std::move(f);
     }
     catch (...)
     {
@@ -137,7 +137,9 @@ struct work
     if (count < 10000000)
     {
       // Call myself again
-      ios->post(std::ref(*this));
+      auto ret = ios->post(std::ref(*this));
+      if (!ret)
+        std::rethrow_exception(ret.error());
     }
   }
 };
@@ -156,7 +158,9 @@ int main(void)
   std::this_thread::sleep_for(std::chrono::seconds(1));
   for (size_t n = 0; n < std::thread::hardware_concurrency(); n++)
   {
-    ios.post(works[n]);
+    auto ret = ios.post(works[n]);
+    if (!ret)
+      std::rethrow_exception(ret.error());
   }
   for (auto &i : threads)
     i.join();
