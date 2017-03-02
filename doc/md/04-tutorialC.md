@@ -393,12 +393,13 @@ the refinements.
 The first program is a find regex in files utility written using C++ 14 and the Filesystem TS:
 
 <table>
+<tr><th>Outcome refinements</th><th>Expected</th></tr>
 <tr>
 <td valign="top">
-\snippet find_regex_expected.cpp find_regex_expected
+\snippet find_regex_result.cpp find_regex_result
 </td>
 <td valign="top">
-\snippet find_regex_result.cpp find_regex_result
+\snippet find_regex_expected.cpp find_regex_expected
 </td>
 </tr>
 </table>
@@ -412,10 +413,48 @@ you can type `outcome::make_errored_result<>(GetLastError())`.
 
 This similarity is because the above code avoids "default actions" by
 being careful to always explicitly check state of a transport before using it.
-`result<T>` was also intentionally designed to be substitutable by automation for an
+`result<T>` was intentionally designed to be substitutable by automation for an
 `expected<T, E = std::error_code>` using find and replace regex in files. This ought
 to ease a retrofitting of an existing codebase using Expected to use Outcome's refinements.
 
-The second program demonstrates much more of Outcome's refinements in action:
+The second program demonstrates much more of Outcome's refinements in action.
+It is a simple Executor implementation modelled on the Networking TS/ASIO's
+i/o completion handlers and i/o service. When work is posted to the service,
+the next available thread worker will execute that work. Handlers
+are permitted to return a lightweight error code to indicate a routine error,
+or throw an exception to indicate an abortable situation has occurred.
 
-\todo In progress
+<table>
+<tr><th>Outcome refinements</th><th>Expected</th></tr>
+<tr>
+<td valign="top">
+\snippet io_service_outcome.cpp io_service_outcome
+</td>
+<td valign="top">
+\snippet io_service_expected.cpp io_service_expected
+</td>
+</tr>
+</table>
+
+You'll note how more convoluted the Expected implementation is, in particular the
+public API with the signature:
+~~~{.cpp}
+outcome::expected<void, outcome::expected<std::error_code, std::exception_ptr>> execute(std::function<io_handler> f) noexcept;
+~~~
+This is a nested Expected used to transport one of two unexpected values. In real
+world usage of Expected you'll find yourself writing this more than you'd prefer
+and indeed a historical edition of the Expected proposal had special convenience
+semantics for them. The current proposal does not however, so you end up writing
+clunky code.
+
+Indeed, it would be worse again if it weren't for the `std::future` being used
+to carry any exception throws for us which lets us skip a nested Expected. One
+could entirely and legitimately argue that the Expected implementation should
+simply rethrow any transported exceptions instead of messing around with nested
+Expected, however the "sea of noexcept" public API design would then be lost and the
+two examples no longer equivalent.
+
+To conclude, this aspect of simplifying the programmer's effort to write
+"sea of noexcept" API designs is precisely what Outcome's refinements are
+intended for. If Outcome's refinements suit well your code base, they should
+let you write clearer, more maintainable and less buggy code. *Buen provecho!*

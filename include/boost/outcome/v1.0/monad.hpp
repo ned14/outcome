@@ -230,7 +230,7 @@ public:
   static constexpr bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
   //! \brief This monad does not implement a destructor
   static constexpr bool is_trivially_destructible = value_storage_type::is_trivially_destructible;
-#if defined(DOXYGEN_IS_IN_THE_HOUSE) || defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 191024728 /* VS2017 RC1*/)
+#if defined(DOXYGEN_IS_IN_THE_HOUSE) || defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 191024930 /* VS2017 RC2 */)
   //! \brief This monad is constructible from the monad specified
   template <class OtherMonad> static constexpr bool is_constructible = value_storage_type::template is_constructible_from<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
   //! \brief This monad is comparable to the monad specified. Note this is as if ThisMonad::operator==(OtherMonad), so without associativity i.e. is this monad comparable to the other monad which != the other monad is comparable to this monad.
@@ -334,6 +334,7 @@ error_type, an exception_type nor an empty_type.
   {
   }
 #endif
+  struct explicit_conversion_from_different_policy {};
   /*! \brief Explicit move constructor from a basic_monad with a differing implementation policy.
   For this constructor to be available, value_type, error_type and exception_type must be identical
   or constructible.
@@ -341,18 +342,29 @@ error_type, an exception_type nor an empty_type.
   template <class Policy, typename = typename std::enable_if<std::is_same<typename implementation_policy::value_type, typename Policy::value_type>::value || std::is_void<typename Policy::value_type>::value || std::is_constructible<typename implementation_policy::value_type, typename Policy::value_type>::value>::type,
             typename = typename std::enable_if<std::is_same<typename implementation_policy::error_type, typename Policy::error_type>::value || std::is_constructible<typename implementation_policy::error_type, typename Policy::error_type>::value>::type,
             typename = typename std::enable_if<std::is_same<typename implementation_policy::exception_type, typename Policy::exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename Policy::exception_type>::value>::type>
-  constexpr explicit basic_monad(basic_monad<Policy> &&o)
+  constexpr explicit basic_monad(basic_monad<Policy> &&o, explicit_conversion_from_different_policy = explicit_conversion_from_different_policy())
       : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(o))
   {
   }
-  /*! \brief Explicit conversion constructor from a basic_monad with a differening implementation
+  /*! \brief Explicit conversion constructor from a basic_monad with a differing implementation
   policy. For this conversion to be available, value_type must be identical or constructible, error_type must be
   identical, constructible or the source monad must have no error_type, and exception_type must be identical,
   constructible or the source monad must have no exception_type.
   */
-  template <class Policy, typename = typename std::enable_if<_is_constructible<basic_monad<Policy>>::value>::type>
-  constexpr explicit basic_monad(const basic_monad<Policy> &o)
+  template <class Policy, typename = typename std::enable_if<!std::is_void<typename Policy::value_type>::value && _is_constructible<basic_monad<Policy>>::value>::type>
+  constexpr explicit basic_monad(const basic_monad<Policy> &o, explicit_conversion_from_different_policy = explicit_conversion_from_different_policy())
       : implementation_policy::base(typename implementation_policy::base::passthru_t(), o)
+  {
+  }
+  struct implicit_conversion_from_different_policy {};
+  /*! \brief Implicit conversion constructor from a void basic_monad with a differing implementation policy.
+  For this constructor to be available, source monad's value_type must be void, error_type must be
+  identical, constructible or the source monad must have no error_type, and exception_type must be identical,
+  constructible or the source monad must have no exception_type.
+  */
+  template <class Policy, typename = typename std::enable_if<std::is_void<typename Policy::value_type>::value && _is_constructible<basic_monad<Policy>>::value>::type>
+  constexpr basic_monad(const basic_monad<Policy> &o, implicit_conversion_from_different_policy = implicit_conversion_from_different_policy())
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), o)
   {
   }
   //! \brief Move constructor
@@ -813,6 +825,11 @@ template <class T = void> inline outcome<T> make_outcome(error_code_extended v)
 {
   return outcome<T>(std::move(v));
 }
+//! \brief Makes an errored outcome of type T \ingroup monad
+template <class T = void> inline outcome<T> make_outcome(std::error_code v)
+{
+  return outcome<T>(error_code_extended(std::move(v)));
+}
 //! \brief Makes an excepted outcome of type T \ingroup monad
 template <class T = void> inline outcome<T> make_outcome(std::exception_ptr v)
 {
@@ -853,6 +870,11 @@ template <class T = void> inline outcome<T> make_errored_outcome(error_code_exte
 {
   return outcome<T>(std::move(v));
 }
+//! \brief Make an errored outcome from the type passed \ingroup monad
+template <class T = void> inline outcome<T> make_errored_outcome(std::error_code v)
+{
+  return outcome<T>(error_code_extended(std::move(v)));
+}
 //! \brief Make a generic errored outcome from the errno passed \ingroup monad
 template <class T = void> inline outcome<T> make_errored_outcome(int e, const char *extended = nullptr)
 {
@@ -891,6 +913,11 @@ template <class T = void> inline result<T> make_result(error_code_extended v)
 {
   return result<T>(std::move(v));
 }
+//! \brief Makes an errored result of type T \ingroup monad
+template <class T = void> inline result<T> make_result(std::error_code v)
+{
+  return result<T>(error_code_extended(std::move(v)));
+}
 //! \brief Makes an empty result of type T \ingroup monad
 template <class T = void> constexpr inline result<T> make_result()
 {
@@ -925,6 +952,11 @@ template <> inline result<void> make_ready_result<void>()
 template <class T = void> inline result<T> make_errored_result(error_code_extended v)
 {
   return result<T>(std::move(v));
+}
+//! \brief Make an errored result from the type passed \ingroup monad
+template <class T = void> inline result<T> make_errored_result(std::error_code v)
+{
+  return result<T>(error_code_extended(std::move(v)));
 }
 //! \brief Make a generic errored outcome from the errno passed \ingroup monad
 template <class T = void> constexpr inline result<T> make_errored_result(int e, const char *extended = nullptr)
