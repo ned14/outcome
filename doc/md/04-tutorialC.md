@@ -231,7 +231,7 @@ the `std::exception_ptr` contained by the monad.
 \section outcome_helpers Outcome's helper free functions
 
 As with Expected, Outcome supplies helper free functions to make your life writing code with
-`option<T>`, `result<T>` and `expected<T>` easier. They are named a bit differently however,
+`option<T>`, `result<T>` and `outcome<T>` easier. They are named a bit differently however,
 though the naming convention is straightforward.
 As with `expected<void, E>`, it is legal to be valued and of type `void`. Because a
 transport of type `void` is always considered less representative than any type `T`, any
@@ -243,7 +243,7 @@ result<Foo> somefunction()
 {
   ...
   if(bad)
-    return make_errored_result</* void */>(...);  // Note we didn't specify <Foo>
+    return make_errored_result</*void*/>(...);  // Note we didn't specify <Foo>
   else
     return Foo(...);
 }
@@ -295,7 +295,7 @@ very convenient for writing:
    }
    catch(...)  // catch all
    {
-     return make_excepted_outcome</* void */>(/* std::current_exception() */);
+     return make_excepted_outcome</*void*/>(/* std::current_exception() */);
    }
  }
  ~~~
