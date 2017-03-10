@@ -55,7 +55,7 @@ DEALINGS IN THE SOFTWARE.
 #if defined(_MSC_VER) && !defined(__clang__)
 //! \brief The Outcome C++ module name
 #define BOOST_OUTCOME_MODULE_NAME BOOST_OUTCOME_VERSION_GLUE(outcome_v, BOOST_OUTCOME_NAMESPACE_VERSION, )
-#else
+#elif !__PCPP_ALWAYS_FALSE__
 //! \brief The Outcome C++ module name
 #define BOOST_OUTCOME_MODULE_NAME BOOST_OUTCOME_VERSION_GLUE(outcome_v, BOOST_OUTCOME_NAMESPACE_VERSION, )
 #endif
@@ -334,7 +334,9 @@ error_type, an exception_type nor an empty_type.
   {
   }
 #endif
+private:
   struct explicit_conversion_from_different_policy {};
+public:
   /*! \brief Explicit move constructor from a basic_monad with a differing implementation policy.
   For this constructor to be available, value_type, error_type and exception_type must be identical
   or constructible.
@@ -356,7 +358,9 @@ error_type, an exception_type nor an empty_type.
       : implementation_policy::base(typename implementation_policy::base::passthru_t(), o)
   {
   }
+private:
   struct implicit_conversion_from_different_policy {};
+public:
   /*! \brief Implicit conversion constructor from a void basic_monad with a differing implementation policy.
   For this constructor to be available, source monad's value_type must be void, error_type must be
   identical, constructible or the source monad must have no error_type, and exception_type must be identical,
@@ -693,9 +697,13 @@ template <class Policy1, class Policy2> constexpr inline typename std::enable_if
   return b.__storage() != a.__storage();
 }
 
-namespace detail
+namespace policy
 {
-  // The struct is at the base of the inheritance hierarchy, and simply keeps some storage for the monad
+  /*! \struct basic_monad_storage
+  \brief A basic_monad storage policy which defines how the basic_monad is represented in memory.
+
+  The struct is at the base of the inheritance hierarchy, and simply keeps some storage for the monad.
+  */
   template <class _implementation_policy> struct basic_monad_storage
   {
     template <class P> friend struct basic_monad_storage;
@@ -795,6 +803,9 @@ namespace detail
     constexpr T operator()(T v) const { return v; }
   };
 }
+//! \brief Contains the basic_monad policy definitions
+namespace policy {}
+
 #define BOOST_OUTCOME_MONAD_NAME monad
 #define BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE error_code_extended
 #define BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE std::exception_ptr
@@ -809,7 +820,7 @@ namespace detail
 heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`,
 `tribool::true_`, `tribool::false_` and `tribool::false_` respectively. \ingroup monad
 */
-template <typename R> using outcome = basic_monad<detail::monad_policy<R>>;
+template <typename R> using outcome = basic_monad<policy::monad_policy<R>>;
 //! \brief Makes an outcome from the type passed \ingroup monad
 template <class T> constexpr inline outcome<T> make_outcome(T &&v)
 {
@@ -897,7 +908,7 @@ template <class T = void> inline outcome<T> make_exceptional_outcome(std::except
 space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `tribool::true_` and
 `tribool::false_` respectively. This specialisation looks deliberately like Rust's `Result<T>`. \ingroup monad
 */
-template <typename R> using result = basic_monad<detail::result_policy<R>>;
+template <typename R> using result = basic_monad<policy::result_policy<R>>;
 //! \brief Makes a result from the type passed \ingroup monad
 template <class T> constexpr inline result<T> make_result(T &&v)
 {
@@ -976,7 +987,7 @@ which is usually `sizeof(R)+8`, but may be smaller if `value_storage<R>` is spec
 corresponds to `tribool::unknown` and `tribool::true_` respectively. This specialisation looks deliberately
 like Rust's `Option<T>`. \ingroup monad
 */
-template <typename R> using option = basic_monad<detail::option_policy<R>>;
+template <typename R> using option = basic_monad<policy::option_policy<R>>;
 //! \brief Makes a option from the type passed \ingroup monad
 template <class T> constexpr inline option<T> make_option(T &&v)
 {
@@ -1176,9 +1187,9 @@ inline bad_expected_access<void> make_bad_expected_access() noexcept
 space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `tribool::true_` and
 `tribool::false_` respectively. This specialisation matches the proposed Expected implementation before standards. \ingroup expected
 */
-template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> using expected = basic_monad<detail::expected_policy<R, E>>;
+template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> using expected = basic_monad<policy::expected_policy<R, E>>;
 //! \brief Type sugar to indicate type E is an unexpected value \ingroup expected
-template <typename E> using unexpected_type = basic_monad<detail::expected_policy<void, E>>;
+template <typename E> using unexpected_type = basic_monad<policy::expected_policy<void, E>>;
 //! \brief Tag type for unexpected \ingroup expected
 using unexpect_t = error_t;
 //! \brief Tag value for unexpected \ingroup expected

@@ -41,14 +41,14 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_OUTCOME_MONAD_POLICY_BASE_NAME BOOST_OUTCOME_GLUE(BOOST_OUTCOME_MONAD_NAME, _policy_base)
 #endif
 
-namespace detail
+namespace policy
 {
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4800)  // forcing value to bool
 #pragma warning(disable : 4702)  // unreachable code
 #endif
-  // Inherited from publicly by basic_monad, so whatever you expose here you expose in basic_monad
+  //! \brief outcome<T>, result<T> and option<T> personalisation of basic_monad
   template <class monad_storage, class value_type, class error_type = void, class exception_type = void> struct BOOST_OUTCOME_MONAD_POLICY_BASE_NAME : public monad_storage
   {
   protected:
@@ -286,7 +286,7 @@ namespace detail
 #endif
   };
 
-  // An implementation policy for basic_monad
+  //! \brief An implementation policy for basic_monad implementing outcome<T>, result<T> and option<T>
   template <typename R> struct BOOST_OUTCOME_MONAD_POLICY_NAME
   {
     // The final resulting implementation type

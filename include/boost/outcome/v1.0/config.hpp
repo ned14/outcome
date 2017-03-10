@@ -36,7 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_OUTCOME_CONFIGURED
 
 // Pull in detection of __MINGW64_VERSION_MAJOR
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !defined(DOXYGEN_IS_IN_THE_HOUSE)
 #include <_mingw.h>
 #endif
 
@@ -55,7 +55,7 @@ DEALINGS IN THE SOFTWARE.
 #error Boost.Outcome needs variable template support in the compiler
 #endif
 #ifndef __cpp_generic_lambdas
-#error Boost.AFIO needs generic lambda support in the compiler
+#error Boost.Outcome needs generic lambda support in the compiler
 #endif
 
 
