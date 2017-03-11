@@ -220,18 +220,22 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 #endif
 
 #include <cassert>  // for asserting :)
+#ifndef BOOST_OUTCOME_DISABLE_IOSTREAMS
 #include <ostream>  // for printing
+#endif
+
+// Bring this in now because error_code_extended uses it via ringbuffer_log
+#ifdef _WIN32
+#include "../boost-lite/include/execinfo_win64.h"
+#else
+#include <execinfo.h>
+#endif
 
 #ifndef BOOST_OUTCOME_THROW
 #ifdef __cpp_exceptions
 #define BOOST_OUTCOME_THROW(expr) throw expr
 #else
 #include <stdio.h>
-#ifdef _WIN32
-#include "../boost-lite/include/execinfo_win64.h"
-#else
-#include <execinfo.h>
-#endif
 BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 namespace detail
 {
