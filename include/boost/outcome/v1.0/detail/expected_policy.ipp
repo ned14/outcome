@@ -29,14 +29,14 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-namespace detail
+namespace policy
 {
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4800)  // forcing value to bool
 #pragma warning(disable : 4702)  // unreachable code
 #endif
-  // Inherited from publicly by basic_monad, so whatever you expose here you expose in basic_monad
+  //! \brief expected<R, EC> personalisation of basic_monad
   template <class monad_storage, class value_type, class error_type, class exception_type> struct expected_policy_base : public monad_storage
   {
     static_assert(!std::is_constructible<value_type, error_type>::value, "value_type cannot be constructible from error_type");
@@ -262,8 +262,7 @@ namespace detail
 #endif
   };
 
-  //! [monad_policy]
-  // An implementation policy for basic_monad
+  //! \brief An implementation policy for basic_monad implementing expected<R, EC>
   template <typename R, typename EC> struct expected_policy
   {
     // The final resulting implementation type
@@ -292,7 +291,6 @@ namespace detail
     // The type which rebinding myself produces
     template <typename U> using rebind_policy = expected_policy<U, EC>;
   };
-  //! [monad_policy]
   template <typename EC> struct expected_policy<void, EC>
   {
     // The final resulting implementation type
