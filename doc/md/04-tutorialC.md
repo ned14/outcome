@@ -4,15 +4,15 @@
 [TOC]
 
 Outcome's design rationale and tutorial is split into three parts:
-1. The first part (\ref tutorial_expected "part A") provides a broad overview of error handling in
+1. The \ref tutorial_expected "first part" provides a broad overview of error handling in
 C++ in general and how the `expected<T, E>` proposed for standardisation will contribute
 to that big menu of error handling design patterns available to the C++ programmer.
 This part places Outcome the library in context.
-2. The second part (\ref tutorial_whynot "part B") describes some design anti-patterns common
+2. The \ref tutorial_whynot "second part" describes some design anti-patterns common
 with inexperienced usage of `expected<T, E>` in C++ which you ought to avoid.
 It shows you how to use `expected<T, E>` in a way which integrates well with the
 C++ 11 STL's standard error code facilities `std::error_code` and `std::error_category`.
-3. The third part (part C, this part) walks you through using Outcome's
+3. The third part (this part) walks you through using Outcome's
 `expected<T, E>` refinements `outcome<T>` and `result<T>`, plus its `extended_error_code`.
 Usage is very similar to Expected, but with less typing, less runtime overhead and
 more convenient extensions.
