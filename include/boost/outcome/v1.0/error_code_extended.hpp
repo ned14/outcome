@@ -36,10 +36,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include "../boost-lite/include/ringbuffer_log.hpp"
 
-/*! \file error_code_extended.hpp
-\brief Provides error_code_extended, an extended std::error_code
-*/
-
 BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN
 
 // Slight misuse of ringbuffer_log to keep extended error code information

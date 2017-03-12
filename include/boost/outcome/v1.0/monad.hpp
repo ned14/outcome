@@ -101,12 +101,6 @@ import BOOST_OUTCOME_MODULE_NAME;
 
 #include "../boost-lite/include/tribool.hpp"
 
-/*! \file monad.hpp
-\brief Provides a lightweight simple monadic value transport
-
-\headerfile include/boost/outcome/outcome.hpp ""
-*/
-
 /*! \defgroup macro_helpers Useful preprocessor macros which expand into commonly written boilerplate
 \ingroup monad
 */

@@ -1,4 +1,3 @@
-//! \file outcome/outcome.hpp The master *latest version* Outcome include file. All Outcome consuming libraries should include this header only.
 #include "version.hpp"
 
 #if defined(_MSC_VER) && !defined(__clang__)

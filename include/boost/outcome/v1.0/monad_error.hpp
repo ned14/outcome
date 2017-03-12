@@ -34,10 +34,6 @@ DEALINGS IN THE SOFTWARE.
 #ifndef BOOST_OUTCOME_MONAD_ERROR_H
 #define BOOST_OUTCOME_MONAD_ERROR_H
 
-/*! \file monad_error.hpp
-\brief Provides a custom monad_error error code
-*/
-
 BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN
 
 //! \brief Enumeration of the ways in which a monad operation may fail \ingroup monad
