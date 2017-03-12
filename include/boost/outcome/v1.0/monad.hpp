@@ -150,7 +150,11 @@ template <class M> struct is_monad : detail::is_monad<typename std::decay<M>::ty
 \ingroup monad
 
 */
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+template <class implementation_policy> class BOOSTLITE_NODISCARD basic_monad : public implementation_policy
+#else
 template <class implementation_policy> class BOOSTLITE_NODISCARD basic_monad : public implementation_policy::base
+#endif
 {
   // Allow my policy unfettered acces
   friend implementation_policy;
@@ -820,7 +824,11 @@ namespace policy {}
 heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`,
 `tribool::true_`, `tribool::false_` and `tribool::false_` respectively. \ingroup monad
 */
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+template<typename R> class outcome : public basic_monad<policy::monad_policy_base<policy::basic_monad_storage<policy::monad_policy<R>>, R, error_code_extended, std::exception_ptr>> {};
+#else
 template <typename R> using outcome = basic_monad<policy::monad_policy<R>>;
+#endif
 //! \brief Makes an outcome from the type passed \ingroup monad
 template <class T> constexpr inline outcome<T> make_outcome(T &&v)
 {
@@ -908,7 +916,11 @@ template <class T = void> inline outcome<T> make_exceptional_outcome(std::except
 space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `tribool::true_` and
 `tribool::false_` respectively. This specialisation looks deliberately like Rust's `Result<T>`. \ingroup monad
 */
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+template<typename R> class result : public basic_monad<policy::result_policy_base<policy::basic_monad_storage<policy::result_policy<R>>, R, error_code_extended>> {};
+#else
 template <typename R> using result = basic_monad<policy::result_policy<R>>;
+#endif
 //! \brief Makes a result from the type passed \ingroup monad
 template <class T> constexpr inline result<T> make_result(T &&v)
 {
@@ -987,7 +999,11 @@ which is usually `sizeof(R)+8`, but may be smaller if `value_storage<R>` is spec
 corresponds to `tribool::unknown` and `tribool::true_` respectively. This specialisation looks deliberately
 like Rust's `Option<T>`. \ingroup monad
 */
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+template<typename R> class option : public basic_monad<policy::option_policy_base<policy::basic_monad_storage<policy::option_policy<R>>, R>> {};
+#else
 template <typename R> using option = basic_monad<policy::option_policy<R>>;
+#endif
 //! \brief Makes a option from the type passed \ingroup monad
 template <class T> constexpr inline option<T> make_option(T &&v)
 {
@@ -1187,7 +1203,11 @@ inline bad_expected_access<void> make_bad_expected_access() noexcept
 space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `tribool::true_` and
 `tribool::false_` respectively. This specialisation matches the proposed Expected implementation before standards. \ingroup expected
 */
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+template<typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class expected : public basic_monad<policy::expected_policy_base<policy::basic_monad_storage<policy::expected_policy<R, E>>, R, E>> {};
+#else
 template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> using expected = basic_monad<policy::expected_policy<R, E>>;
+#endif
 //! \brief Type sugar to indicate type E is an unexpected value \ingroup expected
 template <typename E> using unexpected_type = basic_monad<policy::expected_policy<void, E>>;
 //! \brief Tag type for unexpected \ingroup expected
