@@ -79,77 +79,93 @@ namespace policy
     using const_rvalue_type = const value_type &&;
 
   public:
+    //! \brief Returns a pointer to any value in the transport, throwing an exception if none present
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const auto *operator-> () const
     {
       _pre_get_value();
       return &monad_storage::_storage.value;
     }
+    //! \brief Returns a pointer to any value in the transport, throwing an exception if none present
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE auto *operator-> ()
     {
       _pre_get_value();
       return &monad_storage::_storage.value;
     }
 
+    //! \brief Returns a reference to any value in the transport, throwing an exception if none present
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE lvalue_type operator*() &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
+    //! \brief Returns a reference to any value in the transport, throwing an exception if none present
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE lvalue_type get() &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
+    //! \brief Returns a reference to any value in the transport, throwing an exception if none present
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE lvalue_type value() &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
+    //! \brief Returns a reference to any value in the transport, throwing an exception if none present
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_lvalue_type operator*() const &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
+    //! \brief Returns a reference to any value in the transport, throwing an exception if none present
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_lvalue_type get() const &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
+    //! \brief Returns a reference to any value in the transport, throwing an exception if none present
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_lvalue_type value() const &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
+    //! \brief Returns a reference to any value in the transport, throwing an exception if none present
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE rvalue_type operator*() &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
+    //! \brief Returns a reference to any value in the transport, throwing an exception if none present
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE rvalue_type get() &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
+    //! \brief Returns a reference to any value in the transport, throwing an exception if none present
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE rvalue_type value() &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
+    //! \brief Returns a reference to any value in the transport, throwing an exception if none present
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_rvalue_type operator*() const &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
+    //! \brief Returns a reference to any value in the transport, throwing an exception if none present
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_rvalue_type get() const &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
+    //! \brief Returns a reference to any value in the transport, throwing an exception if none present
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_rvalue_type value() const &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
+#ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
+    //! \brief Returns any errored state in the transport, throwing an exception if empty
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type get_error() const
     {
       if(!monad_storage::is_ready())
@@ -164,8 +180,11 @@ namespace policy
 #endif
       return error_type();
     }
+    //! \brief Returns any errored state in the transport, throwing an exception if empty
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
-#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
+#endif
+#ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
+    //! \brief Returns any excepted state in the transport, throwing an exception if empty
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type get_exception() const
     {
       if(!monad_storage::is_ready())
@@ -180,6 +199,7 @@ namespace policy
         return monad_storage::_storage.exception;
       return exception_type();
     }
+    //! \brief Returns any excepted state in the transport, throwing an exception if empty
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type exception() const { return get_exception(); }
 #endif
   };
