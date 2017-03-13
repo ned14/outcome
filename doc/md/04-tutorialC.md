@@ -213,14 +213,14 @@ This means the compiler ought to warn if you forget to examine transports return
 If you really mean to throw away a returned transport, make sure you cast it to `(void)` to tell
 the compiler you specifically intend to throw it away.
 
-[1]: Actually the `BOOST_OUTCOME_THROW_MONAD_ERROR(monad_error(monad_errc::no_state))` macro is executed
+[1]: Actually the `BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(monad_errc::no_state))` macro is executed
 where `ec` is the `std::error_code` contained by the monad. This can be user redefined to do anything,
 but the default implementation throws a C++ exception of type
 \ref boost::outcome::v1_xxx::monad_error "monad_error" with code
 \ref boost::outcome::v1_xxx::monad_errc "monad_errc::no_state" if C++ exceptions are enabled
 by the compiler. If they are not, it prints a stack backtrace to stderr and aborts the process.
 
-[2]: Similarly the `BOOST_OUTCOME_THROW_SYSTEM_ERROR(std::system_error(ec))` macro is actually
+[2]: Similarly the `BOOST_OUTCOME_THROW_SYSTEM_ERROR(ec, std::system_error(ec))` macro is actually
 executed where `ec` is the `error_code_extended` contained by the monad.
 
 [3]: Similarly the `BOOST_OUTCOME_RETHROW_EXCEPTION(e)` macro is actually executed where `e` is
