@@ -29,10 +29,10 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "config.hpp"
-
 #ifndef BOOST_OUTCOME_ADVANCED_SUPPORT_H
 #define BOOST_OUTCOME_ADVANCED_SUPPORT_H
+
+#include "config.hpp"
 
 #ifndef BOOST_OUTCOME_ENABLE_ADVANCED
 #error This file should not be included without BOOST_OUTCOME_ENABLE_ADVANCED being defined

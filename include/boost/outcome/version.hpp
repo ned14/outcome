@@ -1,12 +1,3 @@
-#undef BOOST_OUTCOME_VERSION_MAJOR
-#undef BOOST_OUTCOME_VERSION_MINOR
-#undef BOOST_OUTCOME_VERSION_PATCH
-#undef BOOST_OUTCOME_VERSION_REVISION
-#undef BOOST_OUTCOME_VERSION_GLUE2
-#undef BOOST_OUTCOME_VERSION_GLUE
-#undef BOOST_OUTCOME_HEADERS_VERSION
-#undef BOOST_OUTCOME_NAMESPACE_VERSION
-
 //! \brief Major version for cmake and DLL version stamping \ingroup config
 #define BOOST_OUTCOME_VERSION_MAJOR    1
 //! \brief Minor version for cmake and DLL version stamping \ingroup config

@@ -29,9 +29,10 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-//! \defgroup config Configuration macros
+#ifndef BOOST_OUTCOME_CONFIG_HPP
+#define BOOST_OUTCOME_CONFIG_HPP
 
-#define BOOST_OUTCOME_CONFIGURED
+//! \defgroup config Configuration macros
 
 // Pull in detection of __MINGW64_VERSION_MAJOR
 #if defined(__MINGW32__) && !defined(DOXYGEN_IS_IN_THE_HOUSE)
@@ -291,3 +292,5 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 
 
 #endif  // BOOST_OUTCOME_NEED_DEFINE
+
+#endif

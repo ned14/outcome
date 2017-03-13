@@ -1,3 +1,5 @@
+// Deliberately without include guard to attempt to include differing versions
+// in same translation unit will produce compiler errors
 #include "version.hpp"
 
 #if defined(_MSC_VER) && !defined(__clang__)
