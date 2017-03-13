@@ -164,7 +164,7 @@ namespace policy
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
-#ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
+
     //! \brief Returns any errored state in the transport, throwing an exception if empty
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type get_error() const
     {
@@ -182,7 +182,7 @@ namespace policy
     }
     //! \brief Returns any errored state in the transport, throwing an exception if empty
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
-#endif
+
 #ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
     //! \brief Returns any excepted state in the transport, throwing an exception if empty
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type get_exception() const
