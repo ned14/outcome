@@ -34,10 +34,6 @@ DEALINGS IN THE SOFTWARE.
 #ifndef BOOST_OUTCOME_VALUE_STORAGE_H
 #define BOOST_OUTCOME_VALUE_STORAGE_H
 
-/*! \file value_storage.hpp
-\brief Provides a fixed four state variant
-*/
-
 BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN
 
 //! \brief Type tag for an empty monad \ingroup monad

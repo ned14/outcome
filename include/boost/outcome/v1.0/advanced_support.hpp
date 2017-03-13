@@ -38,10 +38,6 @@ DEALINGS IN THE SOFTWARE.
 #error This file should not be included without BOOST_OUTCOME_ENABLE_ADVANCED being defined
 #endif
 
-/*! \file advanced_support.hpp
-\brief Support code for BOOST_OUTCOME_ENABLE_ADVANCED
-*/
-
 BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN
 
 namespace traits

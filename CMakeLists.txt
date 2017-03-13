@@ -33,7 +33,27 @@ find_boostish_library(boost-lite "include/boost/outcome" 1.0 REQUIRED)
 include(BoostLiteMakeHeaderOnlyLibrary)
 
 # Create a custom doxygen generation target
+include(FindPythonInterp)
+if(PYTHONINTERP_FOUND)
+  # Preprocess Outcome into a single file for doxygen to grok
+  add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"
+    COMMAND ${PYTHON_EXECUTABLE} ${BoostLiteCMakePath}/../pcpp/pcpp/cmd.py
+    -o "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"
+    "include/${outcome_INTERFACE}"
+    -I ../../..
+    --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs  --passthru-comments
+    -U BOOSTLITE_ENABLE_VALGRIND -U __cpp_modules -U GENERATING_OUTCOME_MODULE_INTERFACE -U BOOST_OUTCOME_MONAD_H -U __MINGW32__ -U __MINGW64__ -U __MINGW64_VERSION_MAJOR
+    -U BOOST_OUTCOME_MONAD_POLICY_NAME -U BOOST_OUTCOME_MONAD_POLICY_BASE_NAME -U BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE -U BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
+    -D BOOST_OUTCOME_USE_BOOST_THREAD=0 -D BOOST_OUTCOME_USE_BOOST_ERROR_CODE=0
+#    DEPENDS ${outcome_INTERFACE}
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    COMMENT "Preprocessing Outcome into a single include file ..."
+  )
+  set(outcome_DOXYGEN_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp")
+  set(outcome_DOXYGEN_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp")
+endif()
 include(BoostLiteMakeDoxygen)
+
 # Set the standard definitions for these libraries and bring in the all_* helper functions
 include(BoostLiteApplyDefaultDefinitions)
 # Set the C++ features this library requires

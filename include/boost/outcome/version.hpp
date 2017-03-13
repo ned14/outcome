@@ -1,4 +1,3 @@
-//! \file version.hpp Controls the version of Outcome for cmake, shared library and C++ namespace mangling
 #undef BOOST_OUTCOME_VERSION_MAJOR
 #undef BOOST_OUTCOME_VERSION_MINOR
 #undef BOOST_OUTCOME_VERSION_PATCH

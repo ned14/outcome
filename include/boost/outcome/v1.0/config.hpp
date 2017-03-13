@@ -29,8 +29,6 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-//! \file config.hpp Configures a compiler environment for Outcome header code
-
 //! \defgroup config Configuration macros
 
 #define BOOST_OUTCOME_CONFIGURED
