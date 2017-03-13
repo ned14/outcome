@@ -36,7 +36,7 @@ include(BoostLiteMakeHeaderOnlyLibrary)
 include(FindPythonInterp)
 if(PYTHONINTERP_FOUND)
   # Preprocess Outcome into a single file for doxygen to grok
-  add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome_.hpp"
+  add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"
     COMMAND ${PYTHON_EXECUTABLE} ${BoostLiteCMakePath}/../pcpp/pcpp/cmd.py
     -o "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"
     "include/${outcome_INTERFACE}"
@@ -49,7 +49,7 @@ if(PYTHONINTERP_FOUND)
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     COMMENT "Preprocessing Outcome into a single include file ..."
   )
-  set(outcome_DOXYGEN_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome_.hpp")
+  set(outcome_DOXYGEN_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp")
   set(outcome_DOXYGEN_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp")
 endif()
 include(BoostLiteMakeDoxygen)
