@@ -239,150 +239,9 @@ public:
   template <class OtherMonad> using _is_constructible = typename value_storage_type::template _is_constructible_from<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
   template <class OtherMonad> using _is_comparable = typename value_storage_type::template _is_comparable_to<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
 
-  //! \brief Default constructor
-  // template<bool enabled = is_default_constructible, typename = typename std::enable_if<enabled>::type> constexpr basic_monad() noexcept(is_nothrow_default_constructible)
-  //    : implementation_policy::base(typename implementation_policy::base::passthru_t())
-  constexpr basic_monad() noexcept(is_nothrow_default_constructible)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t())
-  {
-  }
-  //! \brief Implicit constructor of an empty monad
-  constexpr basic_monad(empty_type) noexcept : implementation_policy::base(typename implementation_policy::base::passthru_t()) {}
-  //! \brief Implicit constructor of an empty monad
-  constexpr basic_monad(empty_t _) noexcept : implementation_policy::base(typename implementation_policy::base::passthru_t(), _) {}
-  //! \brief Implicit constructor of a valued monad (default constructed)
-  constexpr basic_monad(value_t _) noexcept(std::is_nothrow_default_constructible<value_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), _)
-  {
-  }
-#if 0
-  //! \brief Implicit constructor of an errored monad (default constructed)
-  constexpr basic_monad(error_t _) noexcept(std::is_nothrow_default_constructible<error_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), _)
-  {
-  }
-  //! \brief Implicit constructor of an excepted monad (default constructed)
-  constexpr basic_monad(exception_t _) noexcept(std::is_nothrow_default_constructible<exception_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), _)
-  {
-  }
-#endif
-  //! \brief Implicit constructor from a value_type by copy
-  // template<bool enabled = std::is_copy_constructible<value_type>::value, typename = typename std::enable_if<enabled>::type> constexpr basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
-  //    : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
-  constexpr basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
-  {
-  }
-  //! \brief Implicit constructor from a value_type by move
-  // template<bool enabled = std::is_move_constructible<value_type>::value, typename = typename std::enable_if<enabled>::type> constexpr basic_monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
-  //    : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
-  constexpr basic_monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
-  {
-  }
-/*! \brief Explicit constructor of a value_type allowing emplacement with no other means of construction. Only available
-if value_type which can't be a monad can be constructed from Args and if either there is more than one Arg or the Arg is not a value_type, an
-error_type, an exception_type nor an empty_type.
-*/
-#ifdef DOXYGEN_IS_IN_THE_HOUSE
-  template <class... Args> explicit constexpr basic_monad(in_place_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value);
-#else
-  template <class Arg, class... Args>
-  constexpr explicit basic_monad(in_place_t, Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...)
-  {
-  }
-#endif
-  //! \brief Implicit constructor from an initializer list
-  template <class U>
-  constexpr basic_monad(in_place_t, std::initializer_list<U> l) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), typename value_storage_type::emplace_t(), std::move(l))
-  {
-  }
-  //! \brief Implicit constructor from an identically configured basic_monad<void> by copy
-  constexpr basic_monad(const void_rebound &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
-  {
-  }
-  //! \brief Implicit constructor from an identically configured basic_monad<void> by move
-  constexpr basic_monad(void_rebound &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
-  {
-  }
-#if 1  // Seems safe to leave these turned on
-  //! \brief Implicit constructor from a error_type by copy
-  constexpr basic_monad(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
-  {
-  }
-  //! \brief Implicit constructor from a error_type by move
-  constexpr basic_monad(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
-  {
-  }
-  //! \brief Implicit constructor from a exception_type by copy
-  constexpr basic_monad(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
-  {
-  }
-  //! \brief Implicit constructor from a exception_type by move
-  constexpr basic_monad(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
-  {
-  }
-#endif
-private:
-  struct explicit_conversion_from_different_policy {};
-public:
-  /*! \brief Explicit move constructor from a basic_monad with a differing implementation policy.
-  For this constructor to be available, value_type, error_type and exception_type must be identical
-  or constructible.
-  */
-  template <class Policy, typename = typename std::enable_if<std::is_same<typename implementation_policy::value_type, typename Policy::value_type>::value || std::is_void<typename Policy::value_type>::value || std::is_constructible<typename implementation_policy::value_type, typename Policy::value_type>::value>::type,
-            typename = typename std::enable_if<std::is_same<typename implementation_policy::error_type, typename Policy::error_type>::value || std::is_constructible<typename implementation_policy::error_type, typename Policy::error_type>::value>::type,
-            typename = typename std::enable_if<std::is_same<typename implementation_policy::exception_type, typename Policy::exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename Policy::exception_type>::value>::type>
-  constexpr explicit basic_monad(basic_monad<Policy> &&o, explicit_conversion_from_different_policy = explicit_conversion_from_different_policy())
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(o))
-  {
-  }
-  /*! \brief Explicit conversion constructor from a basic_monad with a differing implementation
-  policy. For this conversion to be available, value_type must be identical or constructible, error_type must be
-  identical, constructible or the source monad must have no error_type, and exception_type must be identical,
-  constructible or the source monad must have no exception_type.
-  */
-  template <class Policy, typename = typename std::enable_if<!std::is_void<typename Policy::value_type>::value && _is_constructible<basic_monad<Policy>>::value>::type>
-  constexpr explicit basic_monad(const basic_monad<Policy> &o, explicit_conversion_from_different_policy = explicit_conversion_from_different_policy())
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), o)
-  {
-  }
-private:
-  struct implicit_conversion_from_different_policy {};
-public:
-  /*! \brief Implicit conversion constructor from a void basic_monad with a differing implementation policy.
-  For this constructor to be available, source monad's value_type must be void, error_type must be
-  identical, constructible or the source monad must have no error_type, and exception_type must be identical,
-  constructible or the source monad must have no exception_type.
-  */
-  template <class Policy, typename = typename std::enable_if<std::is_void<typename Policy::value_type>::value && _is_constructible<basic_monad<Policy>>::value>::type>
-  constexpr basic_monad(const basic_monad<Policy> &o, implicit_conversion_from_different_policy = implicit_conversion_from_different_policy())
-    : implementation_policy::base(typename implementation_policy::base::passthru_t(), o)
-  {
-  }
-  //! \brief Move constructor
-  constexpr basic_monad(basic_monad &&o) noexcept(is_nothrow_move_constructible)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(o))
-  {
-  }
-  //! \brief Copy constructor
-  constexpr basic_monad(const basic_monad &o) noexcept(is_nothrow_copy_constructible)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), o)
-  {
-  }
-  // \brief Move assignment
-  BOOST_OUTCOME_CONSTEXPR basic_monad &operator=(basic_monad &&) = default;
-  // \brief Copy assignment
-  BOOST_OUTCOME_CONSTEXPR basic_monad &operator=(const basic_monad &) = default;
+  // Define all my constructors, this is reused below later
+#define BOOST_OUTCOME_BASIC_MONAD_NAME basic_monad
+#include "detail/basic_monad.ipp"
 
   //! \brief Same as `true_(tribool(*this))`
   constexpr explicit operator bool() const noexcept { return has_value(); }
@@ -819,7 +678,11 @@ heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+8)`. This cor
 `tribool::true_`, `tribool::false_` and `tribool::false_` respectively. \ingroup monad
 */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-template<typename R> class outcome : public basic_monad<policy::monad_policy_base<policy::basic_monad_storage<policy::monad_policy<R>>, R, error_code_extended, std::exception_ptr>> {};
+template<typename R> class outcome : public basic_monad<policy::monad_policy_base<policy::basic_monad_storage<policy::monad_policy<R>>, R, error_code_extended, std::exception_ptr>>
+{
+#define BOOST_OUTCOME_BASIC_MONAD_NAME outcome
+#include "detail/basic_monad.ipp"
+};
 #else
 template <typename R> using outcome = basic_monad<policy::monad_policy<R>>;
 #endif
@@ -911,7 +774,11 @@ space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `t
 `tribool::false_` respectively. This specialisation looks deliberately like Rust's `Result<T>`. \ingroup monad
 */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-template<typename R> class result : public basic_monad<policy::result_policy_base<policy::basic_monad_storage<policy::result_policy<R>>, R, error_code_extended>> {};
+template<typename R> class result : public basic_monad<policy::result_policy_base<policy::basic_monad_storage<policy::result_policy<R>>, R, error_code_extended>>
+{
+#define BOOST_OUTCOME_BASIC_MONAD_NAME result
+#include "detail/basic_monad.ipp"
+};
 #else
 template <typename R> using result = basic_monad<policy::result_policy<R>>;
 #endif
@@ -994,7 +861,11 @@ corresponds to `tribool::unknown` and `tribool::true_` respectively. This specia
 like Rust's `Option<T>`. \ingroup monad
 */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-template<typename R> class option : public basic_monad<policy::option_policy_base<policy::basic_monad_storage<policy::option_policy<R>>, R>> {};
+template<typename R> class option : public basic_monad<policy::option_policy_base<policy::basic_monad_storage<policy::option_policy<R>>, R>>
+{
+#define BOOST_OUTCOME_BASIC_MONAD_NAME option
+#include "detail/basic_monad.ipp"
+};
 #else
 template <typename R> using option = basic_monad<policy::option_policy<R>>;
 #endif
@@ -1198,7 +1069,11 @@ space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `t
 `tribool::false_` respectively. This specialisation matches the proposed Expected implementation before standards. \ingroup expected
 */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-template<typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class expected : public basic_monad<policy::expected_policy_base<policy::basic_monad_storage<policy::expected_policy<R, E>>, R, E>> {};
+template<typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class expected : public basic_monad<policy::expected_policy_base<policy::basic_monad_storage<policy::expected_policy<R, E>>, R, E>>
+{
+#define BOOST_OUTCOME_BASIC_MONAD_NAME expected
+#include "detail/basic_monad.ipp"
+};
 #else
 template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> using expected = basic_monad<policy::expected_policy<R, E>>;
 #endif

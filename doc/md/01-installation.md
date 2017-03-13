@@ -21,6 +21,8 @@ Simply download and untar this tarball</a> and you can use Outcome via:
 If you need a slightly older Outcome, https://dedi4.nedprod.com/static/files/boost.outcome
 retains the last month of CI passing tarballs.
 
+\note On Visual Studio, linking the file "boost.outcome/include/boost/outcome/v1.0/monad.natvis"
+into your project consuming Outcome will add debugger visualisation of Outcome's transports.
 
 <br><hr><br>
 
