@@ -1161,11 +1161,21 @@ namespace std
   if(!unique.has_value())                                                                                                                                                                                                                                                                                                      \
     return BOOST_OUTCOME_V1_NAMESPACE::as_void(unique);                                                                                                                                                                                                                                                                        \
   auto v(std::move(std::move(unique).get()))
-//! \brief If the monad returned by expression \em m is empty, erroneous or excepted, propagate that by immediately returning a void immediately, else return the unwrapped value
+/*! \brief If the monad returned by expression \em m is empty, erroneous or excepted, propagate that by immediately returning a void immediately, else return the unwrapped value
+\ingroup macro_helpers
+*/
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+#define BOOST_OUTCOME_TRY(v, m) ...
+#else
 #define BOOST_OUTCOME_TRY(v, m) BOOST_OUTCOME_TRY2(BOOST_OUTCOME_UNIQUE_NAME, v, m)
+#endif
 
-
-//! \brief A boilerplate sequence of `catch(exceptions...)` returning those exceptions as their equivalent `result<void>` \ingroup macro_helpers
+/*! \brief A boilerplate sequence of `catch(exceptions...)` returning those exceptions as their equivalent `result<void>`
+\ingroup macro_helpers
+*/
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+#define BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT ...
+#else
 #define BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT                                                                                                                                                                                                                                                                                \
   \
 catch(const std::invalid_argument &e)                                                                                                                                                                                                                                                                                          \
@@ -1223,14 +1233,21 @@ catch(const std::bad_alloc &e)                                                  
 catch(const std::exception &e)                                                                                                                                                                                                                                                                                                 \
   {                                                                                                                                                                                                                                                                                                                            \
     return BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EINVAL, e.what());                                                                                                                                                                                                                                            \
-  }                                                                                                                                                                                                                                                                                                                            \
-//! \brief A boilerplate sequence of `catch(exceptions...)` plus a catch all returning those exceptions as their equivalent `result<void>` \ingroup macro_helpers
+  }
+#endif
+/*! \brief A boilerplate sequence of `catch(exceptions...)` plus a catch all returning those exceptions as their equivalent `result<void>`
+\ingroup macro_helpers
+*/
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+#define BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT ...
+#else
 #define BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT                                                                                                                                                                                                                                    \
   \
 catch(...)                                                                                                                                                                                                                                                                                                                     \
   {                                                                                                                                                                                                                                                                                                                            \
     return BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EAGAIN, "unknown exception");                                                                                                                                                                                                                                 \
   }
+#endif
 
 #ifdef _MSC_VER
 #pragma warning(pop)
