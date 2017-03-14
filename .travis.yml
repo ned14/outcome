@@ -100,6 +100,7 @@ script:
    fi
  -
    if [ "$__" = "Documentation" ]; then
+     pip install ply;
      git config --global push.default simple;
      git config --global user.name "Jenkins nedprod CI";
      git config --global user.email "foo@nowhere";

@@ -29,10 +29,10 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "config.hpp"
-
 #ifndef BOOST_OUTCOME_ERROR_CODE_EXTENDED_H
 #define BOOST_OUTCOME_ERROR_CODE_EXTENDED_H
+
+#include "config.hpp"
 
 #include "../boost-lite/include/ringbuffer_log.hpp"
 
