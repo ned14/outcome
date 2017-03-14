@@ -94,32 +94,32 @@ class error_code_extended : public stl11::error_code
 public:
   //! Default construction
   error_code_extended()
-    : _unique_id((size_t)-1)
+      : _unique_id((size_t) -1)
   {
     BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK;
   }
   //! Construct from the usual int and error_category, but with optional additional message, two 32 bit codes and backtrace
   error_code_extended(int ec, const stl11::error_category &cat, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false)
-    : error_code_extended(stl11::error_code(ec, cat), msg, code1, code2, backtrace)
+      : error_code_extended(stl11::error_code(ec, cat), msg, code1, code2, backtrace)
   {
   }
   //! Construct from error code enum
   template <class ErrorCodeEnum, typename = typename std::enable_if<stl11::is_error_code_enum<ErrorCodeEnum>::value>::type>
   error_code_extended(ErrorCodeEnum e)
-    : stl11::error_code(e)
-    , _unique_id((size_t)-1)
+      : stl11::error_code(e)
+      , _unique_id((size_t) -1)
   {
     BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK;
   }
   //! Explicit copy construction from error_code
   explicit error_code_extended(const stl11::error_code &e, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false)
-    : error_code_extended(stl11::error_code(e), msg, code1, code2, backtrace)
+      : error_code_extended(stl11::error_code(e), msg, code1, code2, backtrace)
   {
   }
   //! Explicit move construction from error_code
   explicit error_code_extended(stl11::error_code &&e, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false)
-    : stl11::error_code(std::move(e))
-    , _unique_id(msg ? extended_error_code_log().emplace_back(boost_lite::ringbuffer_log::level::error, msg, code1, code2, backtrace ? nullptr : "", 0) : (size_t)-1)
+      : stl11::error_code(std::move(e))
+      , _unique_id(msg ? extended_error_code_log().emplace_back(boost_lite::ringbuffer_log::level::error, msg, code1, code2, backtrace ? nullptr : "", 0) : (size_t) -1)
   {
     BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK;
   }
@@ -129,20 +129,20 @@ public:
   void clear()
   {
     stl11::error_code::clear();
-    _unique_id = (size_t)-1;
+    _unique_id = (size_t) -1;
   }
   //! Fill a buffer with any extended error message and codes, returning bytes of buffer filled (zero if no extended message).
   size_t extended_message(char *buffer, size_t len, unsigned &code1, unsigned &code2) const noexcept
   {
     auto &log = extended_error_code_log();
-    if (!log.valid(unique_id(_unique_id)))
+    if(!log.valid(unique_id(_unique_id)))
       return 0;
     auto &item = log[unique_id(_unique_id)];
     strncpy(buffer, item.message, len - 1);
     buffer[len - 1] = 0;
     code1 = item.code32[0];
     code2 = item.code32[1];
-    if (!log.valid(unique_id(_unique_id)))
+    if(!log.valid(unique_id(_unique_id)))
     {
       buffer[0] = 0;
       return 0;
@@ -153,12 +153,12 @@ public:
   size_t raw_backtrace(void **buffer, size_t len) const noexcept
   {
     auto &log = extended_error_code_log();
-    if (!log.valid(unique_id(_unique_id)))
+    if(!log.valid(unique_id(_unique_id)))
       return 0;
     auto &item = log[unique_id(_unique_id)];
     size_t written = 0;
-    void ** _backtrace = (void **)item.backtrace;
-    for (size_t n = 0; n < len && n < sizeof(item.backtrace) / sizeof(item.backtrace[0]); n++)
+    void **_backtrace = (void **) item.backtrace;
+    for(size_t n = 0; n < len && n < sizeof(item.backtrace) / sizeof(item.backtrace[0]); n++)
     {
       buffer[n] = _backtrace[n];
       written++;
@@ -169,22 +169,22 @@ public:
   char **backtrace() const noexcept
   {
     auto &log = extended_error_code_log();
-    if (!log.valid(unique_id(_unique_id)))
+    if(!log.valid(unique_id(_unique_id)))
       return 0;
     auto &item = log[unique_id(_unique_id)];
     char **ret = nullptr;
-    if (!item.using_backtrace)
+    if(!item.using_backtrace)
     {
-      ret = (char **)calloc(2 * sizeof(char *) + sizeof(item.function) + 1, 1);
-      if (!ret)
+      ret = (char **) calloc(2 * sizeof(char *) + sizeof(item.function) + 1, 1);
+      if(!ret)
         return nullptr;
-      ret[0] = (char *)ret + 2 * sizeof(char *);
+      ret[0] = (char *) ret + 2 * sizeof(char *);
       strncpy(ret[0], item.function, sizeof(item.function));
       return ret;
     }
     else
-      ret = backtrace_symbols((void **)item.backtrace, sizeof(item.backtrace) / sizeof(item.backtrace[0]));
-    if (!log.valid(unique_id(_unique_id)))
+      ret = backtrace_symbols((void **) item.backtrace, sizeof(item.backtrace) / sizeof(item.backtrace[0]));
+    if(!log.valid(unique_id(_unique_id)))
     {
       free(ret);
       return 0;
@@ -197,7 +197,7 @@ inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec)
 {
   s << ec.category().name() << " code " << ec.value() << ": " << ec.message();
   auto &log = extended_error_code_log();
-  if (log.valid(error_code_extended::unique_id(ec._unique_id)))
+  if(log.valid(error_code_extended::unique_id(ec._unique_id)))
   {
     auto &item = log[error_code_extended::unique_id(ec._unique_id)];
     s << " { " << item.message << ", " << item.code32[0] << ", " << item.code32[1] << " }";

@@ -21,13 +21,15 @@ Todo:
  - [x] Rejig `BOOST_OUTCOME_ENABLE_OPERATORS` to decide what ought to be in or out.
  - [x] Wrap `std::generic_category()` etc with non-atomic fascades for error_code_extended.
  - [x] Break monad.hpp into separate files.
+ - [x] Get that clang format plugin working for VS2017 and do a clang format pass
+ - [x] Do a clang tidy pass with very latest clang tidy
+ 
+Later:
  - [ ] Add config where in release mode the exception throwing macros generate link errors
 for symbols with the function name and line number in them.
  - [ ] Need to get boost-lite's cmake come up with a preprocessed edition as the master include header
    - Need two editions, one with `BOOST_OUTCOME_ENABLE_ADVANCED` and one without.
    - Preprocessed edition ought to include the SHA in the namespace!
- 
-Later:
  - [ ] error_or() ought to have rvalue ref etc overloads, and exception_or()
  - [ ] `make install` needs to install dependency headers too
  - [ ] Add nothrow make functions for outcomes, maybe with error lvalue ref constructor editions for results.
