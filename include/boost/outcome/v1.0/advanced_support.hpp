@@ -112,21 +112,21 @@ namespace traits
       using return_type = typename get_return_type<F, A>::type;
       using arg_type = typename std::decay<A>::type;
 
-      static arg_form<true, false, true, true> test(return_type(F::*)(const arg_type &), rank<1>);
-      static arg_form<false, false, true, true> test(return_type(F::*)(arg_type &), rank<2>);
-      static arg_form<false, true, false, true> test(return_type(F::*)(arg_type &&), rank<3>);
-      static arg_form<false, false, false, true> test(return_type(F::*)(arg_type), rank<4>);
-      static arg_form<true, false, true, true> test(return_type(F::*)(const arg_type &) const, rank<5>);
-      static arg_form<false, false, true, true> test(return_type(F::*)(arg_type &) const, rank<6>);
-      static arg_form<false, true, false, true> test(return_type(F::*)(arg_type &&) const, rank<7>);
-      static arg_form<false, false, false, true> test(return_type(F::*)(arg_type) const, rank<8>);
+      static arg_form<true, false, true, true> test(return_type (F::*)(const arg_type &), rank<1>);
+      static arg_form<false, false, true, true> test(return_type (F::*)(arg_type &), rank<2>);
+      static arg_form<false, true, false, true> test(return_type (F::*)(arg_type &&), rank<3>);
+      static arg_form<false, false, false, true> test(return_type (F::*)(arg_type), rank<4>);
+      static arg_form<true, false, true, true> test(return_type (F::*)(const arg_type &) const, rank<5>);
+      static arg_form<false, false, true, true> test(return_type (F::*)(arg_type &) const, rank<6>);
+      static arg_form<false, true, false, true> test(return_type (F::*)(arg_type &&) const, rank<7>);
+      static arg_form<false, false, false, true> test(return_type (F::*)(arg_type) const, rank<8>);
 
-      template <class T> static arg_form<false, false, false, false, T> test(return_type(F::*)(T), rank<9>);
-      template <class T> static arg_form<false, false, true, false, T> test(return_type(F::*)(T &), rank<10>);
-      template <class T> static arg_form<false, true, false, false, T> test(return_type(F::*)(T &&), rank<11>);
-      template <class T> static arg_form<false, false, false, false, T> test(return_type(F::*)(T) const, rank<12>);
-      template <class T> static arg_form<false, false, true, false, T> test(return_type(F::*)(T &) const, rank<13>);
-      template <class T> static arg_form<false, true, false, false, T> test(return_type(F::*)(T &&) const, rank<14>);
+      template <class T> static arg_form<false, false, false, false, T> test(return_type (F::*)(T), rank<9>);
+      template <class T> static arg_form<false, false, true, false, T> test(return_type (F::*)(T &), rank<10>);
+      template <class T> static arg_form<false, true, false, false, T> test(return_type (F::*)(T &&), rank<11>);
+      template <class T> static arg_form<false, false, false, false, T> test(return_type (F::*)(T) const, rank<12>);
+      template <class T> static arg_form<false, false, true, false, T> test(return_type (F::*)(T &) const, rank<13>);
+      template <class T> static arg_form<false, true, false, false, T> test(return_type (F::*)(T &&) const, rank<14>);
 
       using result = decltype(test(&F::operator(), rank<15>()));
 
@@ -142,20 +142,20 @@ namespace traits
       using arg_type = typename std::decay<A>::type;
 
       // static arg_form<true , false, true , true> test(return_type(F::*)(const arg_type&)      , rank<1>);
-      static arg_form<false, false, true, true> test(return_type(F::*)(arg_type &), rank<2>);
-      static arg_form<false, true, false, true> test(return_type(F::*)(arg_type &&), rank<3>);
-      static arg_form<false, false, false, true> test(return_type(F::*)(arg_type), rank<4>);
+      static arg_form<false, false, true, true> test(return_type (F::*)(arg_type &), rank<2>);
+      static arg_form<false, true, false, true> test(return_type (F::*)(arg_type &&), rank<3>);
+      static arg_form<false, false, false, true> test(return_type (F::*)(arg_type), rank<4>);
       // static arg_form<true , false, true , true> test(return_type(F::*)(const arg_type&) const, rank<5>);
-      static arg_form<false, false, true, true> test(return_type(F::*)(arg_type &) const, rank<6>);
-      static arg_form<false, true, false, true> test(return_type(F::*)(arg_type &&) const, rank<7>);
-      static arg_form<false, false, false, true> test(return_type(F::*)(arg_type) const, rank<8>);
+      static arg_form<false, false, true, true> test(return_type (F::*)(arg_type &) const, rank<6>);
+      static arg_form<false, true, false, true> test(return_type (F::*)(arg_type &&) const, rank<7>);
+      static arg_form<false, false, false, true> test(return_type (F::*)(arg_type) const, rank<8>);
 
-      template <class T> static arg_form<false, false, false, false, T> test(return_type(F::*)(T), rank<9>);
-      template <class T> static arg_form<false, false, true, false, T> test(return_type(F::*)(T &), rank<10>);
-      template <class T> static arg_form<false, true, false, false, T> test(return_type(F::*)(T &&), rank<11>);
-      template <class T> static arg_form<false, false, false, false, T> test(return_type(F::*)(T) const, rank<12>);
-      template <class T> static arg_form<false, false, true, false, T> test(return_type(F::*)(T &) const, rank<13>);
-      template <class T> static arg_form<false, true, false, false, T> test(return_type(F::*)(T &&) const, rank<14>);
+      template <class T> static arg_form<false, false, false, false, T> test(return_type (F::*)(T), rank<9>);
+      template <class T> static arg_form<false, false, true, false, T> test(return_type (F::*)(T &), rank<10>);
+      template <class T> static arg_form<false, true, false, false, T> test(return_type (F::*)(T &&), rank<11>);
+      template <class T> static arg_form<false, false, false, false, T> test(return_type (F::*)(T) const, rank<12>);
+      template <class T> static arg_form<false, false, true, false, T> test(return_type (F::*)(T &) const, rank<13>);
+      template <class T> static arg_form<false, true, false, false, T> test(return_type (F::*)(T &&) const, rank<14>);
 
       using result = decltype(test(&F::operator(), rank<15>()));
 
@@ -174,14 +174,14 @@ namespace traits
       using return_type = typename get_return_type<F, A>::type;
       using arg_type = typename std::decay<A>::type;
 
-      static arg_form<true, false, true, true> test(return_type(*)(const arg_type &), rank<1>);
-      static arg_form<false, false, true, true> test(return_type(*)(arg_type &), rank<2>);
-      static arg_form<false, true, false, true> test(return_type(*)(arg_type &&), rank<3>);
-      static arg_form<false, false, false, true> test(return_type(*)(arg_type), rank<4>);
+      static arg_form<true, false, true, true> test(return_type (*)(const arg_type &), rank<1>);
+      static arg_form<false, false, true, true> test(return_type (*)(arg_type &), rank<2>);
+      static arg_form<false, true, false, true> test(return_type (*)(arg_type &&), rank<3>);
+      static arg_form<false, false, false, true> test(return_type (*)(arg_type), rank<4>);
 
-      template <class T> static arg_form<false, false, false, false, T> test(return_type(*)(T), rank<5>);
-      template <class T> static arg_form<false, false, true, false, T> test(return_type(*)(T &), rank<6>);
-      template <class T> static arg_form<false, true, false, false, T> test(return_type(*)(T &&), rank<7>);
+      template <class T> static arg_form<false, false, false, false, T> test(return_type (*)(T), rank<5>);
+      template <class T> static arg_form<false, false, true, false, T> test(return_type (*)(T &), rank<6>);
+      template <class T> static arg_form<false, true, false, false, T> test(return_type (*)(T &&), rank<7>);
 
       using result = decltype(test(F(), rank<10>()));
 
@@ -197,13 +197,13 @@ namespace traits
       using arg_type = typename std::decay<A>::type;
 
       // static arg_form<true , false, true , true> test(return_type(*)(const arg_type&)      , rank<1>);
-      static arg_form<false, false, true, true> test(return_type(*)(arg_type &), rank<2>);
-      static arg_form<false, true, false, true> test(return_type(*)(arg_type &&), rank<3>);
-      static arg_form<false, false, false, true> test(return_type(*)(arg_type), rank<4>);
+      static arg_form<false, false, true, true> test(return_type (*)(arg_type &), rank<2>);
+      static arg_form<false, true, false, true> test(return_type (*)(arg_type &&), rank<3>);
+      static arg_form<false, false, false, true> test(return_type (*)(arg_type), rank<4>);
 
-      template <class T> static arg_form<false, false, false, false, T> test(return_type(*)(T), rank<5>);
-      template <class T> static arg_form<false, false, true, false, T> test(return_type(*)(T &), rank<6>);
-      template <class T> static arg_form<false, true, false, false, T> test(return_type(*)(T &&), rank<7>);
+      template <class T> static arg_form<false, false, false, false, T> test(return_type (*)(T), rank<5>);
+      template <class T> static arg_form<false, false, true, false, T> test(return_type (*)(T &), rank<6>);
+      template <class T> static arg_form<false, true, false, false, T> test(return_type (*)(T &&), rank<7>);
 
       using result = decltype(test(F(), rank<10>()));
 
@@ -251,7 +251,7 @@ namespace traits
     };
     template <class F, class A>
     struct callable_argument_traits<true, F, A>
-      : public std::conditional<!std::is_function<F>::value && has_call_operator<std::is_class<F>::value, F, A>::value, detail::call_operator_argument_form<true, is_callable_is_well_formed<F, const A>::value, F, A>, detail::function_argument_form<true, is_callable_is_well_formed<F, const A>::value, F, A>>::type
+    : public std::conditional<!std::is_function<F>::value && has_call_operator<std::is_class<F>::value, F, A>::value, detail::call_operator_argument_form<true, is_callable_is_well_formed<F, const A>::value, F, A>, detail::function_argument_form<true, is_callable_is_well_formed<F, const A>::value, F, A>>::type
     {
       static constexpr bool valid = true;
     };
@@ -306,7 +306,7 @@ namespace detail
     callable_type _c;
     template <class U>
     constexpr do_simple_continuation(U &&c)
-      : _c(std::forward<U>(c))
+        : _c(std::forward<U>(c))
     {
     }
     BOOST_OUTCOME_CONSTEXPR output_type operator()(input_type &&v)
@@ -325,7 +325,7 @@ namespace detail
     callable_type _c;
     template <class U>
     constexpr do_simple_continuation(U &&c)
-      : _c(std::forward<U>(c))
+        : _c(std::forward<U>(c))
     {
     }
     BOOST_OUTCOME_CONSTEXPR output_type operator()(input_type &&v)
@@ -343,7 +343,7 @@ namespace detail
     callable_type _c;
     template <class U>
     constexpr do_simple_continuation(U &&c)
-      : _c(std::forward<U>(c))
+        : _c(std::forward<U>(c))
     {
     }
     BOOST_OUTCOME_CONSTEXPR output_type operator()(input_type &&v)
@@ -370,22 +370,22 @@ namespace detail
     typedef typename do_unwrap<unwrapped_type>::output_type output_type;
     BOOST_OUTCOME_CONSTEXPR output_type operator()(const input_type &v) const
     {
-      if (v.has_error())
+      if(v.has_error())
         return do_unwrap<unwrapped_type>()(v.get_error());
-      else if (v.has_exception())
+      else if(v.has_exception())
         return do_unwrap<unwrapped_type>()(v.get_exception());
-      else if (v.has_value())
+      else if(v.has_value())
         return do_unwrap<unwrapped_type>()(v.get());
       else
         return do_unwrap<unwrapped_type>()(unwrapped_type());
     }
     BOOST_OUTCOME_CONSTEXPR output_type operator()(input_type &&v) const
     {
-      if (v.has_error())
+      if(v.has_error())
         return do_unwrap<unwrapped_type>()(std::move(v).get_error());
-      else if (v.has_exception())
+      else if(v.has_exception())
         return do_unwrap<unwrapped_type>()(std::move(v).get_exception());
-      else if (v.has_value())
+      else if(v.has_value())
         return do_unwrap<unwrapped_type>()(std::move(v).get());
       else
         return do_unwrap<unwrapped_type>()(unwrapped_type());
@@ -430,8 +430,8 @@ namespace detail
 
     // Figure out what the callable returns
     using return_type = typename std::conditional<
-      f_value_traits::valid, typename f_value_traits::return_type,
-      typename std::conditional<f_error_traits::valid, typename f_error_traits::return_type, typename std::conditional<f_exception_traits::valid, typename f_exception_traits::return_type, typename std::conditional<f_empty_traits::valid, typename f_empty_traits::return_type, void>::type>::type>::type>::type;
+    f_value_traits::valid, typename f_value_traits::return_type,
+    typename std::conditional<f_error_traits::valid, typename f_error_traits::return_type, typename std::conditional<f_exception_traits::valid, typename f_exception_traits::return_type, typename std::conditional<f_empty_traits::valid, typename f_empty_traits::return_type, void>::type>::type>::type>::type;
 
     // Error out common mistakes in the return type
     static_assert(!f_error_traits::valid || callable_takes_anything || std::is_same<void, return_type>::value || is_monad_constructible<M, return_type>::value, "An error_type consuming callable must return a type convertible to the monad type");
@@ -464,15 +464,15 @@ namespace detail
     typedef typename std::conditional<std::is_same<R, typename basic_monad<Policy>::error_type>::value || std::is_same<R, typename basic_monad<Policy>::exception_type>::value || std::is_void<R>::value, basic_monad<Policy>, typename basic_monad<Policy>::template rebind<R>>::type output_type;
     callable_type _c;
     constexpr do_continuation(const callable_type &c)
-      : _c(c)
+        : _c(c)
     {
     }
     constexpr do_continuation(callable_type &c)
-      : _c(c)
+        : _c(c)
     {
     }
     constexpr do_continuation(callable_type &&c)
-      : _c(std::move(c))
+        : _c(std::move(c))
     {
     }
     template <class U, typename = typename enable_if_callable_valid<callable_type, U, typename basic_monad<Policy>::value_type, !std::is_void<R>::value>::type> constexpr output_type operator()(U &&v, traits::detail::rank<4>) const
@@ -494,15 +494,15 @@ namespace detail
     typedef basic_monad<Policy2> input_type;
     callable_type _c;
     constexpr do_continuation(const callable_type &c)
-      : _c(c)
+        : _c(c)
     {
     }
     constexpr do_continuation(callable_type &c)
-      : _c(c)
+        : _c(c)
     {
     }
     constexpr do_continuation(callable_type &&c)
-      : _c(std::move(c))
+        : _c(std::move(c))
     {
     }
     template <class U, typename = typename enable_if_callable_valid<callable_type, U, input_type, !std::is_void<typename output_type::value_type>::value, typename input_type::value_type>::type> constexpr output_type operator()(U &&v, traits::detail::rank<4>) const

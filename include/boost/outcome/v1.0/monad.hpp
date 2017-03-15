@@ -89,7 +89,7 @@ import BOOST_OUTCOME_MODULE_NAME;
 
 BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN
 
-template<class implementation_policy> class basic_monad;
+template <class implementation_policy> class basic_monad;
 
 namespace detail
 {
@@ -221,7 +221,7 @@ public:
   template <class OtherMonad> using _is_constructible = typename value_storage_type::template _is_constructible_from<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
   template <class OtherMonad> using _is_comparable = typename value_storage_type::template _is_comparable_to<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
 
-  // Define all my constructors, this is reused below later
+// Define all my constructors, this is reused below later
 #define BOOST_OUTCOME_BASIC_MONAD_NAME basic_monad
 #include "detail/basic_monad.ipp"
 
@@ -643,7 +643,9 @@ namespace policy
   };
 }
 //! \brief Contains the basic_monad policy definitions
-namespace policy {}
+namespace policy
+{
+}
 
 #define BOOST_OUTCOME_MONAD_NAME monad
 #define BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE error_code_extended
@@ -660,7 +662,7 @@ heavier `std::exception_ptr` at a space cost of `max(24, sizeof(R)+8)`. This cor
 `tribool::true_`, `tribool::false_` and `tribool::false_` respectively. \ingroup monad
 */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-template<typename R> class outcome : public basic_monad<policy::monad_policy_base<policy::basic_monad_storage<policy::monad_policy<R>>, R, error_code_extended, std::exception_ptr>>
+template <typename R> class outcome : public basic_monad<policy::monad_policy_base<policy::basic_monad_storage<policy::monad_policy<R>>, R, error_code_extended, std::exception_ptr>>
 {
 #define BOOST_OUTCOME_BASIC_MONAD_NAME outcome
 #include "detail/basic_monad.ipp"
@@ -756,7 +758,7 @@ space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `t
 `tribool::false_` respectively. This specialisation looks deliberately like Rust's `Result<T>`. \ingroup monad
 */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-template<typename R> class result : public basic_monad<policy::result_policy_base<policy::basic_monad_storage<policy::result_policy<R>>, R, error_code_extended>>
+template <typename R> class result : public basic_monad<policy::result_policy_base<policy::basic_monad_storage<policy::result_policy<R>>, R, error_code_extended>>
 {
 #define BOOST_OUTCOME_BASIC_MONAD_NAME result
 #include "detail/basic_monad.ipp"
@@ -843,7 +845,7 @@ corresponds to `tribool::unknown` and `tribool::true_` respectively. This specia
 like Rust's `Option<T>`. \ingroup monad
 */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-template<typename R> class option : public basic_monad<policy::option_policy_base<policy::basic_monad_storage<policy::option_policy<R>>, R>>
+template <typename R> class option : public basic_monad<policy::option_policy_base<policy::basic_monad_storage<policy::option_policy<R>>, R>>
 {
 #define BOOST_OUTCOME_BASIC_MONAD_NAME option
 #include "detail/basic_monad.ipp"
@@ -1006,17 +1008,13 @@ public:
   //! \brief The type of error
   using error_type = E;
   //! \brief Constructs an instance taking a copy
-  explicit bad_expected_access(const error_type &e) noexcept
-      : std::logic_error("Bad expected access of value when error was present")
-      , _error(e)
-  {
-  }
+  explicit bad_expected_access(const error_type &e) noexcept : std::logic_error("Bad expected access of value when error was present"), _error(e) {}
   //! \brief Returns the error
-  const error_type &error() const & noexcept { return _error; }
+  const error_type &error() const &noexcept { return _error; }
   //! \brief Returns the error
   error_type &error() & noexcept { return _error; }
   //! \brief Returns the error
-  const error_type &&error() const && noexcept { return _error; }
+  const error_type &&error() const &&noexcept { return _error; }
   //! \brief Returns the error
   error_type &&error() && noexcept { return _error; }
 };
@@ -1027,10 +1025,7 @@ public:
   //! \brief The type of error
   using error_type = void;
   //! \brief Constructs an instance
-  explicit bad_expected_access() noexcept
-      : std::logic_error("Bad expected access of value when valueless due to exception")
-  {
-  }
+  explicit bad_expected_access() noexcept : std::logic_error("Bad expected access of value when valueless due to exception") {}
 };
 template <class E> inline bad_expected_access<E> make_bad_expected_access(const E &v) noexcept
 {
@@ -1051,7 +1046,7 @@ space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `t
 `tribool::false_` respectively. This specialisation matches the proposed Expected implementation before standards. \ingroup expected
 */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-template<typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class expected : public basic_monad<policy::expected_policy_base<policy::basic_monad_storage<policy::expected_policy<R, E>>, R, E>>
+template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class expected : public basic_monad<policy::expected_policy_base<policy::basic_monad_storage<policy::expected_policy<R, E>>, R, E>>
 {
 #define BOOST_OUTCOME_BASIC_MONAD_NAME expected
 #include "detail/basic_monad.ipp"
@@ -1115,9 +1110,9 @@ template <class T, class E, class U> constexpr inline expected<T, E> make_expect
 //! \brief Makes a void expected from an input expected, forwarding any emptiness or error \ingroup expected
 template <class T, class E> inline expected<void, E> as_void(const expected<T, E> &v)
 {
-  if (v.has_error())
+  if(v.has_error())
     return expected<void, E>(v.get_error());
-  if (v.has_value())
+  if(v.has_value())
     return expected<void, E>();
   return expected<void, E>(empty);
 }
@@ -1223,7 +1218,8 @@ catch(const std::exception &e)                                                  
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
 #define BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT ...
 #else
-#define BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT                                                                                                                                                                                                                                    \
+#define BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT                                                                                                                                                                                                                                                                            \
+  BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT                                                                                                                                                                                                                                                                                      \
   \
 catch(...)                                                                                                                                                                                                                                                                                                                     \
   {                                                                                                                                                                                                                                                                                                                            \

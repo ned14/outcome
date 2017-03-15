@@ -860,9 +860,9 @@ BOOST_AUTO_TEST_CASE(works / monad / upconvert, "Tests that the monad converts i
     auto t0 = []() -> result<int> { return make_result<void>(); };
     auto t1 = []() -> outcome<void> { return make_result<void>(); };
     auto t2 = []() -> outcome<int> { return make_result<void>(); };
-    (void)t0;
-    (void)t1;
-    (void)t2;
+    (void) t0;
+    (void) t1;
+    (void) t2;
   }
 }
 

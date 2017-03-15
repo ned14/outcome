@@ -39,7 +39,7 @@ BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN
 //! \brief Enumeration of the ways in which a monad operation may fail \ingroup monad
 enum class monad_errc
 {
-  //already_set = 1,        //!< Attempt to store a value into the monad twice
+  // already_set = 1,        //!< Attempt to store a value into the monad twice
   no_state = 2,           //!< Attempt to use without a state
   exception_present = 3,  //!< Attempt to fetch an error state when the monad is in an exceptioned state
 };
@@ -52,7 +52,7 @@ namespace _detail
     virtual const char *name() const noexcept { return "basic_monad"; }
     virtual std::string message(int c) const
     {
-      switch (c)
+      switch(c)
       {
       case 1:
         return "already set";
@@ -82,7 +82,7 @@ class BOOSTLITE_SYMBOL_VISIBLE monad_error : public stl11::system_error
 {
 public:
   monad_error(stl11::error_code ec)
-    : std::system_error(ec)
+      : std::system_error(ec)
   {
   }
 };
