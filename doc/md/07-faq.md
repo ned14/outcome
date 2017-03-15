@@ -1,6 +1,41 @@
 # Frequently Asked Questions
 \anchor faq
 
+\section abi_stability Is Outcome safe to use in extern APIs? Does it have a stable ABI?
+
+Unlike most Boost libraries, Outcome is able to enforce a stable ABI checked per commit by
+<a href="https://lvc.github.io/abi-compliance-checker/">the ABI Compliance Checker</a>.
+All symbols in Outcome are namespaced as follows:
+
+~~~{.cpp}
+namespace boost {
+  namespace outcome {
+    inline namespace _1_std_std {
+      ...
+    }
+  }
+}
+~~~
+
+(the first "std" in "std_std" means this Outcome's unit tests use the C++ 11 STL for atomic,
+chrono etc; the second "std" means this Outcome uses the C++ 11 STL for `std::error_code`,
+`std::generic_category()` etc. Note Outcome *always* uses `std::exception_ptr` as
+`std::current_exception()` is much more reliable than `boost::current_exception()`)
+
+If a future version of Outcome needs to break ABI, the inline namespace will become 2, 3
+and so on.
+
+\warning ABI stability promises ONLY apply to Outcome's refinements `outcome<T>`, `result<T>` and
+`option<T>`. Until the LEWG Expected proposal is finalised, `expected<T, E>` comes with no
+ABI promises at all.
+
+\note Because Outcome is still pending peer review, the inline namespace is currently
+regularly permuted to the SHA of a recent commit e.g. `inline namespace _v1_std_std_e3bc60d4`.
+If it passes review and enters Boost, it is intended to choose some Boost release thereafter
+to set the v1 ABI in stone forever. Until then, you can safely mix old and new Outcome
+editions in the same process as they always have a unique namespace.
+
+
 <hr><br>
 
 \section error_chains How do I implement chains of errors to transport errors happening whilst handling another error?

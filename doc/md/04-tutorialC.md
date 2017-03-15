@@ -37,6 +37,11 @@ and other such use cases where errors exclusively come from outside your code an
 therefore enforcing type safety on each particular error type is unnatural. Classic examples
 of such code bases would be the Networking TS, the Filesystem TS and so on.
 
+As these refinements are within our control, we can also provide
+\ref abi_stability "**ABI stability promises**" for these refinements that we can not for
+`expected<T, E>`. This lets you use the refinements in your public extern APIs with a
+guarantee that code compiled with future versions of Outcome will not cause misoperation.
+
 <hr><br>
 
 \section error_code_extended Outcome's extended std::error_code
