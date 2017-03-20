@@ -22,18 +22,44 @@ ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/ve
 project(outcome VERSION ${VERSIONSTRING} LANGUAGES C CXX)
 # Also set a *cmake* namespace for this project
 set(PROJECT_NAMESPACE boost--)
-# This file should be updated with the last git SHA next commit
-UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/revision.hpp")
 # Setup this cmake environment for this project
 include(BoostLiteSetupProject)
+if(NOT PROJECT_IS_DEPENDENCY)
+  # This file should be updated with the last git SHA next commit
+  UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/revision.hpp")
+endif()
 # Find my library dependencies
 find_boostish_library(boost-lite "include/boost/outcome" 1.0 REQUIRED)
 
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(BoostLiteMakeHeaderOnlyLibrary)
 
+# Make a preprocessed edition of this library target
+if(PYTHONINTERP_FOUND)
+  add_partial_preprocess(outcome_hl-pp
+                         "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/outcome_v${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.hpp"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/${PROJECT_NAME}.hpp"
+                         -I .
+                         --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
+                         --line-directive --debug
+                         -U BOOSTLITE_ENABLE_VALGRIND
+                         -U __cpp_modules
+                         -U GENERATING_OUTCOME_MODULE_INTERFACE
+                         -U __MINGW32__ -U __MINGW64__ -U __MINGW64_VERSION_MAJOR
+                         -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
+                         -U BOOST_OUTCOME_MONAD_POLICY_NAME
+                         -U BOOST_OUTCOME_MONAD_POLICY_BASE_NAME
+                         -U BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
+                         -U BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
+                         -D BOOST_OUTCOME_DISABLE_PREPROCESSED_INTERFACE_FILE
+                         -D BOOST_OUTCOME_USE_BOOST_THREAD=0
+                         -D BOOST_OUTCOME_USE_BOOST_ERROR_CODE=0
+                         -U BOOST_OUTCOME_ENABLE_ADVANCED
+                         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                        )
+endif()
+
 # Create a custom doxygen generation target
-include(FindPythonInterp)
 if(PYTHONINTERP_FOUND)
   # Preprocess Outcome into a single file for doxygen to grok
   add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"

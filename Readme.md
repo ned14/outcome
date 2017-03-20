@@ -23,6 +23,8 @@ Todo:
  - [x] Break monad.hpp into separate files.
  - [x] Get that clang format plugin working for VS2017 and do a clang format pass
  - [x] Do a clang tidy pass with very latest clang tidy
+ - [ ] Get preprocessed edition generation working
+ - [ ] See if MSVC C++ Modules is working yet
  
 Later:
  - [ ] Add config where in release mode the exception throwing macros generate link errors
