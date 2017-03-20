@@ -8,6 +8,8 @@
 #include "../boost-lite/include/bitfield.hpp"
 #include <filesystem>
 
+#include <Windows.h>
+
 namespace minimal_afio
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
@@ -137,7 +139,7 @@ namespace file_create
   //! [file_create_example]
   using namespace minimal_afio;
   using boost_lite::ringbuffer_log::last190;
-  extern BOOST_SYMBOL_EXPORT result<file_handle> file_create(              //
+  extern BOOSTLITE_SYMBOL_EXPORT result<file_handle> file_create(          //
   file_handle::path_type _path,                                            //
   file_handle::mode _mode = file_handle::mode::read,                       //
   file_handle::creation _creation = file_handle::creation::open_existing,  //

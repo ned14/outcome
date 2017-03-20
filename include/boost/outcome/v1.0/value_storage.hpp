@@ -109,10 +109,16 @@ namespace detail
 #undef BOOST_OUTCOME_VALUE_STORAGE_IMPL
 #undef BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 6287)  // the left and right sub expressions are identical
+#endif
   template <class _value_type, class _error_type, class _exception_type>
   static constexpr bool can_have_trivial_destructor = (std::is_literal_type<_value_type>::value || std::is_trivially_destructible<_value_type>::value) && (std::is_literal_type<_error_type>::value || std::is_trivially_destructible<_error_type>::value) &&
                                                       (std::is_literal_type<_exception_type>::value || std::is_trivially_destructible<_exception_type>::value);
-
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
   template <bool enable> struct emplace_value_if
   {
     template <class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_value_if(U *v, V &&o) { v->emplace_value(std::forward<V>(o)); }
@@ -190,7 +196,7 @@ public:
   static constexpr bool is_nothrow_copy_assignable = base::is_nothrow_copy_assignable;
   static constexpr bool is_nothrow_destructible = base::is_nothrow_destructible;
 
-#if(defined(_MSC_VER) && _MSC_FULL_VER > 191024930 /* VS2017 RC2 */) || __clang_major__ >= 4 || (__clang_major__ == 3 && __clang_minor__ >= 8)
+#if(defined(_MSC_VER) && _MSC_FULL_VER > 191025017 /* VS2017 RTM */) || __clang_major__ >= 4 || (__clang_major__ == 3 && __clang_minor__ >= 8)
   template <class _value_type2> static constexpr bool value_type_is_constructible_from = std::is_same<_value_type, _value_type2>::value || std::is_void<_value_type2>::value || std::is_constructible<_value_type, _value_type2>::value;
   template <class _error_type2> static constexpr bool error_type_is_constructible_from = std::is_void<_error_type2>::value || std::is_same<_error_type, _error_type2>::value || std::is_constructible<_error_type, _error_type2>::value;
   template <class _exception_type2> static constexpr bool exception_type_is_constructible_from = std::is_void<_exception_type2>::value || std::is_same<_exception_type, _exception_type2>::value || std::is_constructible<_exception_type, _exception_type2>::value;
