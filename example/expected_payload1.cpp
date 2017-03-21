@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #ifdef _MSC_VER
 #include <io.h>
+using ssize_t = long long;
 #else
 #include <unistd.h>
 #endif

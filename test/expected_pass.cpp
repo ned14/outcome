@@ -455,7 +455,7 @@ void except_valid_constexpr_int()
 }
 void except_value_constexpr_int()
 {
-#if !defined(_MSC_VER) || _MSC_VER > 1900 /* VS2015 */
+#if !defined(_MSC_VER) || _MSC_VER > 1910 /* VS2017 */
   // From value constructor.
   BOOST_CONSTEXPR stde::expected<int, void> e(1);
   BOOST_CONSTEXPR int x = e.value();

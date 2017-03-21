@@ -22,32 +22,66 @@ ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/ve
 project(outcome VERSION ${VERSIONSTRING} LANGUAGES C CXX)
 # Also set a *cmake* namespace for this project
 set(PROJECT_NAMESPACE boost--)
-# This file should be updated with the last git SHA next commit
-UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/revision.hpp")
 # Setup this cmake environment for this project
 include(BoostLiteSetupProject)
+if(NOT PROJECT_IS_DEPENDENCY)
+  # This file should be updated with the last git SHA next commit
+  UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/revision.hpp")
+endif()
 # Find my library dependencies
 find_boostish_library(boost-lite "include/boost/outcome" 1.0 REQUIRED)
 
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(BoostLiteMakeHeaderOnlyLibrary)
 
-# Create a custom doxygen generation target
-include(FindPythonInterp)
+# Make preprocessed editions of this library target
 if(PYTHONINTERP_FOUND)
+  add_partial_preprocess(outcome_hl-pp
+                         "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/outcome_v${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.hpp"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/${PROJECT_NAME}.hpp"
+                         -I .
+                         --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
+#                         --line-directive --debug
+                         -U BOOSTLITE_ENABLE_VALGRIND
+                         -U __cpp_modules
+                         -U GENERATING_OUTCOME_MODULE_INTERFACE
+                         -U __MINGW32__ -U __MINGW64__ -U __MINGW64_VERSION_MAJOR
+                         -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
+                         -U BOOST_OUTCOME_MONAD_POLICY_NAME
+                         -U BOOST_OUTCOME_MONAD_POLICY_BASE_NAME
+                         -U BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
+                         -U BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
+                         -D BOOST_OUTCOME_DISABLE_PREPROCESSED_INTERFACE_FILE
+                         -D BOOST_OUTCOME_USE_BOOST_THREAD=0
+                         -D BOOST_OUTCOME_USE_BOOST_ERROR_CODE=0
+                         -U BOOST_OUTCOME_ENABLE_ADVANCED
+                         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                         ALL
+                        )
   # Preprocess Outcome into a single file for doxygen to grok
   add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"
     COMMAND ${PYTHON_EXECUTABLE} ${BoostLiteCMakePath}/../pcpp/pcpp/cmd.py
     -o "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"
-    "include/${outcome_INTERFACE}"
-    -I ../../..
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/${PROJECT_NAME}.hpp"
+    -I .
     --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs  --passthru-comments
-    -U BOOSTLITE_ENABLE_VALGRIND -U __cpp_modules -U GENERATING_OUTCOME_MODULE_INTERFACE -U BOOST_OUTCOME_MONAD_H -U __MINGW32__ -U __MINGW64__ -U __MINGW64_VERSION_MAJOR
-    -U BOOST_OUTCOME_MONAD_POLICY_NAME -U BOOST_OUTCOME_MONAD_POLICY_BASE_NAME -U BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE -U BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
-    -D BOOST_OUTCOME_USE_BOOST_THREAD=0 -D BOOST_OUTCOME_USE_BOOST_ERROR_CODE=0 -D DOXYGEN_IS_IN_THE_HOUSE -D DOXYGEN_SHOULD_SKIP_THIS
+#    --line-directive --debug
+    -U BOOSTLITE_ENABLE_VALGRIND
+    -U __cpp_modules
+    -U GENERATING_OUTCOME_MODULE_INTERFACE
+    -U __MINGW32__ -U __MINGW64__ -U __MINGW64_VERSION_MAJOR
+    -U BOOST_OUTCOME_MONAD_POLICY_NAME
+    -U BOOST_OUTCOME_MONAD_POLICY_BASE_NAME
+    -U BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
+    -U BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
+    -D BOOST_OUTCOME_DISABLE_PREPROCESSED_INTERFACE_FILE
+    -D BOOST_OUTCOME_USE_BOOST_THREAD=0
+    -D BOOST_OUTCOME_USE_BOOST_ERROR_CODE=0
+    -U BOOST_OUTCOME_ENABLE_ADVANCED
+    -D DOXYGEN_IS_IN_THE_HOUSE -D DOXYGEN_SHOULD_SKIP_THIS
 #    DEPENDS ${outcome_INTERFACE}
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    COMMENT "Preprocessing Outcome into a single include file ..."
+    COMMENT "Preprocessing Outcome into a single include file for doxygen ..."
   )
   set(outcome_DOXYGEN_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp")
   set(outcome_DOXYGEN_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp")
@@ -89,6 +123,11 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   endif()
   foreach(test_target ${outcome_TEST_TARGETS} ${outcome_EXAMPLE_TARGETS})
     target_compile_definitions(${test_target} PUBLIC BOOST_OUTCOME_ENABLE_ADVANCED=1)
+    if(MSVC AND NOT CLANG)
+      target_compile_options(${test_target} PUBLIC /std:c++latest)
+    else()
+      target_compile_options(${test_target} PUBLIC -std=c++17)
+    endif()
   endforeach()
 
   # Add the unit tests but with exceptions and RTTI disabled
