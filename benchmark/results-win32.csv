@@ -1,3 +1,4 @@
-"Compiler","integer-returns","exception-throw"
-"msvc19",11.275897,1498.087587
-"msvc19-ltcg",11.153077,1601.038614
+"Compiler","integer-returns","exception-throw","expected-error-value","expected-error-error","expected-excpt-value","expected-excpt-error"
+"msvc19-noexcept",91.200184,,93.824259,86.833987,82.250023,1234.403638
+"msvc19",86.648887,18426.944945,87.117080,94.847758,81.868932,1360.544294
+"msvc19-ltcg",92.626548,17725.380778,97.907360,98.821976,88.870095,1288.540138
