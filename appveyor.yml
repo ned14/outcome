@@ -21,6 +21,7 @@ configuration: Release
 before_build:
   - git checkout develop
   - git submodule update --init --recursive
+  - pip install ply
 build_script:
   - ctest -S .ci.cmake -V
 after_build:

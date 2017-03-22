@@ -56,8 +56,10 @@ if(PYTHONINTERP_FOUND)
                          -D BOOST_OUTCOME_USE_BOOST_ERROR_CODE=0
                          -U BOOST_OUTCOME_ENABLE_ADVANCED
                          WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-                         ALL
                         )
+  if(NOT CMAKE_VERSION VERSION_LESS 3.3)
+    add_dependencies(outcome_hl outcome_hl-pp)
+  endif()
   # Preprocess Outcome into a single file for doxygen to grok
   add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"
     COMMAND ${PYTHON_EXECUTABLE} ${BoostLiteCMakePath}/../pcpp/pcpp/cmd.py

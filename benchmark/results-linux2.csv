@@ -1,0 +1,4 @@
+"Compiler","integer-returns"
+"gcc62",10.995046
+"gcc62-lto",12.018371
+"clang40",10.905339
