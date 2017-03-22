@@ -49,8 +49,16 @@ struct RAII { RAII() { ++counter; } ~RAII() { --counter; } };
             oh.write("#define FUNCTION funct%04d\n" % (no-1))
             oh.write("#define NESTING %d\n" % (no))
 
+class ExceptionThrow(ErrorHandlingSystem):
+    def preamble(self, idx):
+        return '#include <exception>\n' if idx == 0 else ''
+    def function_final(self):
+        return r'''{ throw std::exception(); }'''
+
+        
 matrix = [
     ('integer-returns', ErrorHandlingSystem),
+    ('exception-throw', ExceptionThrow),
 ]
 
 if sys.platform == 'win32':

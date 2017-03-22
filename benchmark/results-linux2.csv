@@ -1,4 +1,4 @@
-"Compiler","integer-returns"
-"gcc62",10.995046
-"gcc62-lto",12.018371
-"clang40",10.905339
+"Compiler","integer-returns","exception-throw"
+"gcc62",13.549214,3799.587884
+"gcc62-lto",10.889278,52.188076
+"clang40",10.882694,3548.489267
