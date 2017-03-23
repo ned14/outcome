@@ -50,8 +50,10 @@ of stack depth might be unwound. This is not a particularly realistic test, but 
 should at least give one an idea of the performance impact of using Outcome's transports
 over say a plain integer or an exception throw.
 
-<center><img src="../../benchmark/results_log.png" width="50%" height="50%"/> 
-<img src="../../benchmark/results_linear.png" width="50%" height="50%"/></center>
+<center>
+\image html results_log_sm.png
+\image html results_linear_sm.png
+</center>
 
 The columns on the left are for Linux, those in the middle are for VS2017, the one on
 the right Apple XCode 8.2. As you can see, throwing and catching an exception is
