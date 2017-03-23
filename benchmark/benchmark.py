@@ -94,6 +94,10 @@ if sys.platform == 'win32':
         ('msvc19', r'cl /nologo /O2 /MD /Z7 /EHsc /volatile:iso /Fe%s'),
         ('msvc19-ltcg', r'cl /nologo /O2 /GL /MD /Z7 /volatile:iso /EHsc /Fe%s'),
     ]
+elif sys.platform == 'darwin':
+    compilers = [
+        ('xcode82', r'clang++ -std=c++14 -O3 -g -o %s'),
+    ]
 else:
     compilers = [
         ('gcc62-noexcept', r'g++-6 -std=c++14 -fno-exceptions -O3 -g -o %s'),
