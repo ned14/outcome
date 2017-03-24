@@ -38,6 +38,45 @@ editions in the same process as they always have a unique namespace.
 
 <hr><br>
 
+\section performance_overhead What is the performance impact of using Outcome in my code?
+
+It is very hard to say anything definitive about performance impacts in codebases one
+has never seen. Each codebase is unique. However to come up with some form of measure,
+we timed returning an error via each of the main mechanisms for doing so over ten stack
+frames where a stack frame is defined to be something called by the compiler whilst
+unwinding the stack between the point of returning the error and the thing which handles
+the error, so for example ten stack allocated objects might be destructed, or ten levels
+of stack depth might be unwound. This is not a particularly realistic test, but it
+should at least give one an idea of the performance impact of using Outcome's transports
+over say a plain integer or an exception throw.
+
+<center>
+\image html results_log_sm.png
+\image html results_linear_sm.png
+</center>
+
+The columns on the left are for Linux, those in the middle are for VS2017, the one on
+the right Apple XCode 8.2. As you can see, throwing and catching an exception is
+expensive on table-based exception handling implementations such as these, anywhere
+between 16,000 and 36,000 CPU cycles. Simple integer returns are always going to be
+the fastest as they do the least work, and that costs 90 to 100 CPU cycles.
+
+Note that returning an `expected<int, std::error_code>` with an int (expected-error-value)
+is no additional runtime overhead over returning an int on most compilers.
+
+Returning with an error code (expected-error-error) shows a slight increase over returning
+an int due to the cost of constructing an error code.
+
+You might wonder what happens if type `E` has a non-trivial destructor, thus making the
+`expected<T, E>` have a non-trivial destructor? We tested `E = std::exception_ptr` and
+found, surprisingly, no performance difference for returning a value. Returning an error
+was obviously much slower at anywhere between 1,300 and 5,000 CPU cycles due to returning
+an exception pointer being at least two atomic operations per stack frame, but that is
+still nearly an order of magnitude better than throwing an exception.
+
+
+<hr><br>
+
 \section error_chains How do I implement chains of errors to transport errors happening whilst handling another error?
 
 C++ 11 already has you covered. <a href="http://en.cppreference.com/w/cpp/error/nested_exception">`std::nested_exception`</a>

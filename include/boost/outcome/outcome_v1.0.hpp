@@ -21,12 +21,12 @@
 #endif
 
 #define BOOST_OUTCOME_NAMESPACE_VERSION BOOST_OUTCOME_VERSION_GLUE(BOOST_OUTCOME_VERSION_MAJOR, _, BOOST_OUTCOME_VERSION_MINOR)
-#line 5 "C:/Users/ned/Documents/boostish/outcome/include/boost/outcome/outcome.hpp"
+#line 5 "/home/ned/boostish/outcome/include/boost/outcome/outcome.hpp"
 #undef BOOST_OUTCOME_HEADERS_PATH
 #undef BOOST_OUTCOME_HEADERS_PATH2
 #define BOOST_OUTCOME_HEADERS_PATH4(a) #a
 #define BOOST_OUTCOME_HEADERS_PATH3(a) BOOST_OUTCOME_HEADERS_PATH4(a)
-#line 27 "C:/Users/ned/Documents/boostish/outcome/include/boost/outcome/outcome.hpp"
+#line 27 "/home/ned/boostish/outcome/include/boost/outcome/outcome.hpp"
 #if defined(_MSC_VER) && !defined(__clang__)
 #define BOOST_OUTCOME_HEADERS_PATH2 BOOST_OUTCOME_VERSION_GLUE(v, BOOST_OUTCOME_HEADERS_VERSION, /monad.hpp)
 #elif 1
@@ -816,9 +816,9 @@ extern "C" void _mm_pause();
 #line 90 "config.hpp"
 #define BOOST_OUTCOME_V1_ERROR_CODE_IMPL std
 #line 2 "../revision.hpp"
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_REF f291beed5fb03ae59afd29ec6f6abdfe7ca95b74
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_DATE "2017-03-20 23:51:33 +00:00"
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE f291beed
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_REF 95eb507b7cfce48b3d4b6d86b9cf358b0a448e61
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_DATE "2017-03-23 14:01:04 +00:00"
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE 95eb507b
 #line 95 "config.hpp"
 #define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL, BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE), inline)
 #line 158 "config.hpp"
@@ -907,7 +907,7 @@ using ::std::generic_category;
 
 #endif
 #line 206 "config.hpp"
-namespace boost { namespace outcome { inline namespace _1_0_std_std_f291beed {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_95eb507b {
 namespace stl11
 {
   using namespace boost_lite::bind::std::system_error;
@@ -1174,7 +1174,7 @@ _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(l
 #define BOOST_OUTCOME_THROW(expr) throw expr
 #else
 #include <stdio.h>
-namespace boost { namespace outcome { inline namespace _1_0_std_std_f291beed {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_95eb507b {
 namespace detail
 {
   BOOSTLITE_NORETURN inline void do_fatal_exit(const char *expr)
@@ -2027,7 +2027,7 @@ namespace ringbuffer_log
 
 #endif
 #line 39 "error_code_extended.hpp"
-namespace boost { namespace outcome { inline namespace _1_0_std_std_f291beed {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_95eb507b {
 
 
 inline boost_lite::ringbuffer_log::simple_ringbuffer_log<4096> &extended_error_code_log()
@@ -2206,7 +2206,7 @@ inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec)
 
 
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_f291beed {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_95eb507b {
 
 
 enum class monad_errc
@@ -2276,11 +2276,11 @@ inline stl11::error_condition make_error_condition(monad_errc e)
 namespace std
 {
 
-  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_f291beed::monad_errc> : std::true_type
+  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_95eb507b::monad_errc> : std::true_type
   {
   };
 
-  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_f291beed::monad_errc> : std::true_type
+  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_95eb507b::monad_errc> : std::true_type
   {
   };
 }
@@ -2293,7 +2293,7 @@ namespace std
 
 
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_f291beed {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_95eb507b {
 
 
 struct empty_t
@@ -3436,9 +3436,9 @@ public:
 namespace std
 {
 
-  template <class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, boost ::outcome ::_1_0_std_std_f291beed::value_storage<_value_type, _error_type, _exception_type> &v)
+  template <class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, boost ::outcome ::_1_0_std_std_95eb507b::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_f291beed;
+    using namespace boost ::outcome ::_1_0_std_std_95eb507b;
     switch(v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::value:
@@ -3448,9 +3448,9 @@ namespace std
     }
   }
 
-  template <class _value_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_f291beed::value_storage<_value_type, void, void> &v)
+  template <class _value_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_95eb507b::value_storage<_value_type, void, void> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_f291beed;
+    using namespace boost ::outcome ::_1_0_std_std_95eb507b;
     using _error_type = void;
     using _exception_type = void;
     switch(v.type)
@@ -3463,9 +3463,9 @@ namespace std
       return s << "(unknown)";
     }
   }
-  template <class _value_type, class _error_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_f291beed::value_storage<_value_type, _error_type, void> &v)
+  template <class _value_type, class _error_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_95eb507b::value_storage<_value_type, _error_type, void> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_f291beed;
+    using namespace boost ::outcome ::_1_0_std_std_95eb507b;
     using _exception_type = void;
     switch(v.type)
     {
@@ -3479,9 +3479,9 @@ namespace std
       return s << "(unknown)";
     }
   }
-  template <class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_f291beed::value_storage<_value_type, _error_type, _exception_type> &v)
+  template <class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_95eb507b::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_f291beed;
+    using namespace boost ::outcome ::_1_0_std_std_95eb507b;
     switch(v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::empty:
@@ -3584,7 +3584,7 @@ namespace std
 
 #endif
 #line 90 "v1.0/monad.hpp"
-namespace boost { namespace outcome { inline namespace _1_0_std_std_f291beed {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_95eb507b {
 
 template <class implementation_policy> class basic_monad;
 
@@ -5647,7 +5647,7 @@ template <class T, class E> inline expected<void, E> as_void(const expected<T, E
 namespace std
 {
 
-  template <class Impl> inline void swap(boost ::outcome ::_1_0_std_std_f291beed::basic_monad<Impl> &a, boost ::outcome ::_1_0_std_std_f291beed::basic_monad<Impl> &b) { a.swap(b); }
+  template <class Impl> inline void swap(boost ::outcome ::_1_0_std_std_95eb507b::basic_monad<Impl> &a, boost ::outcome ::_1_0_std_std_95eb507b::basic_monad<Impl> &b) { a.swap(b); }
 }
 
 #define BOOST_OUTCOME__GLUE2(x, y) x##y
@@ -5669,6 +5669,6 @@ namespace std
 
 
 #endif
-#line 40 "C:/Users/ned/Documents/boostish/outcome/include/boost/outcome/outcome.hpp"
+#line 40 "/home/ned/boostish/outcome/include/boost/outcome/outcome.hpp"
 #undef BOOST_OUTCOME_HEADERS_PATH
 #undef BOOST_OUTCOME_HEADERS_PATH2

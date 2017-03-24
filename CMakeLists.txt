@@ -35,58 +35,67 @@ find_boostish_library(boost-lite "include/boost/outcome" 1.0 REQUIRED)
 include(BoostLiteMakeHeaderOnlyLibrary)
 
 # Make preprocessed editions of this library target
-if(PYTHONINTERP_FOUND)
-  add_partial_preprocess(outcome_hl-pp
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/outcome_v${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.hpp"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/${PROJECT_NAME}.hpp"
-                         -I .
-                         --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
-#                         --line-directive --debug
-                         -U BOOSTLITE_ENABLE_VALGRIND
-                         -U __cpp_modules
-                         -U GENERATING_OUTCOME_MODULE_INTERFACE
-                         -U __MINGW32__ -U __MINGW64__ -U __MINGW64_VERSION_MAJOR
-                         -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
-                         -U BOOST_OUTCOME_MONAD_POLICY_NAME
-                         -U BOOST_OUTCOME_MONAD_POLICY_BASE_NAME
-                         -U BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
-                         -U BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
-                         -D BOOST_OUTCOME_DISABLE_PREPROCESSED_INTERFACE_FILE
-                         -D BOOST_OUTCOME_USE_BOOST_THREAD=0
-                         -D BOOST_OUTCOME_USE_BOOST_ERROR_CODE=0
-                         -U BOOST_OUTCOME_ENABLE_ADVANCED
-                         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-                        )
-  if(NOT CMAKE_VERSION VERSION_LESS 3.3)
-    add_dependencies(outcome_hl outcome_hl-pp)
+if(NOT PYTHONINTERP_FOUND)
+  indented_message(WARNING "NOT rebuilding precompiled edition of library due to python not being installed")
+else()
+  # See if the ply package is installed so pcpp can run
+  execute_process(COMMAND python -c "import ply" RESULT_VARIABLE python_has_ply)
+  if(NOT python_has_ply EQUAL 0)
+    indented_message(WARNING "NOT rebuilding precompiled edition of library due to installed python not having the ply package installed. "
+      "Do 'pip install ply' to fix. NOTE that doxygen docs will NOT build without the precompiled edition.")
+  else()
+    add_partial_preprocess(outcome_hl-pp
+                          "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/outcome_v${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.hpp"
+                          "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/${PROJECT_NAME}.hpp"
+                          -I .
+                          --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
+#                          --line-directive --debug
+                          -U BOOSTLITE_ENABLE_VALGRIND
+                          -U __cpp_modules
+                          -U GENERATING_OUTCOME_MODULE_INTERFACE
+                          -U __MINGW32__ -U __MINGW64__ -U __MINGW64_VERSION_MAJOR
+                          -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
+                          -U BOOST_OUTCOME_MONAD_POLICY_NAME
+                          -U BOOST_OUTCOME_MONAD_POLICY_BASE_NAME
+                          -U BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
+                          -U BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
+                          -D BOOST_OUTCOME_DISABLE_PREPROCESSED_INTERFACE_FILE
+                          -D BOOST_OUTCOME_USE_BOOST_THREAD=0
+                          -D BOOST_OUTCOME_USE_BOOST_ERROR_CODE=0
+                          -U BOOST_OUTCOME_ENABLE_ADVANCED
+                          WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                          )
+    if(NOT CMAKE_VERSION VERSION_LESS 3.3)
+      add_dependencies(outcome_hl outcome_hl-pp)
+    endif()
+    # Preprocess Outcome into a single file for doxygen to grok
+    add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"
+      COMMAND ${PYTHON_EXECUTABLE} ${BoostLiteCMakePath}/../pcpp/pcpp/cmd.py
+      -o "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"
+      "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/${PROJECT_NAME}.hpp"
+      -I .
+      --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs  --passthru-comments
+#      --line-directive --debug
+      -U BOOSTLITE_ENABLE_VALGRIND
+      -U __cpp_modules
+      -U GENERATING_OUTCOME_MODULE_INTERFACE
+      -U __MINGW32__ -U __MINGW64__ -U __MINGW64_VERSION_MAJOR
+      -U BOOST_OUTCOME_MONAD_POLICY_NAME
+      -U BOOST_OUTCOME_MONAD_POLICY_BASE_NAME
+      -U BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
+      -U BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
+      -D BOOST_OUTCOME_DISABLE_PREPROCESSED_INTERFACE_FILE
+      -D BOOST_OUTCOME_USE_BOOST_THREAD=0
+      -D BOOST_OUTCOME_USE_BOOST_ERROR_CODE=0
+      -U BOOST_OUTCOME_ENABLE_ADVANCED
+      -D DOXYGEN_IS_IN_THE_HOUSE -D DOXYGEN_SHOULD_SKIP_THIS
+#      DEPENDS ${outcome_INTERFACE}
+      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+      COMMENT "Preprocessing Outcome into a single include file for doxygen ..."
+    )
+    set(outcome_DOXYGEN_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp")
+    set(outcome_DOXYGEN_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp")
   endif()
-  # Preprocess Outcome into a single file for doxygen to grok
-  add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"
-    COMMAND ${PYTHON_EXECUTABLE} ${BoostLiteCMakePath}/../pcpp/pcpp/cmd.py
-    -o "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/${PROJECT_NAME}.hpp"
-    -I .
-    --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs  --passthru-comments
-#    --line-directive --debug
-    -U BOOSTLITE_ENABLE_VALGRIND
-    -U __cpp_modules
-    -U GENERATING_OUTCOME_MODULE_INTERFACE
-    -U __MINGW32__ -U __MINGW64__ -U __MINGW64_VERSION_MAJOR
-    -U BOOST_OUTCOME_MONAD_POLICY_NAME
-    -U BOOST_OUTCOME_MONAD_POLICY_BASE_NAME
-    -U BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
-    -U BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
-    -D BOOST_OUTCOME_DISABLE_PREPROCESSED_INTERFACE_FILE
-    -D BOOST_OUTCOME_USE_BOOST_THREAD=0
-    -D BOOST_OUTCOME_USE_BOOST_ERROR_CODE=0
-    -U BOOST_OUTCOME_ENABLE_ADVANCED
-    -D DOXYGEN_IS_IN_THE_HOUSE -D DOXYGEN_SHOULD_SKIP_THIS
-#    DEPENDS ${outcome_INTERFACE}
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    COMMENT "Preprocessing Outcome into a single include file for doxygen ..."
-  )
-  set(outcome_DOXYGEN_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp")
-  set(outcome_DOXYGEN_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp")
 endif()
 include(BoostLiteMakeDoxygen)
 
