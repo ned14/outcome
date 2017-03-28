@@ -34,8 +34,11 @@ class mapped_string_view : public std::string_view
   bool _disabled;
 public:
   constexpr mapped_string_view() noexcept : _disabled(true) {}
-  mapped_string_view(char *s, size_t l) noexcept : std::string_view(s, l), _disabled(false) {}
-  mapped_string_view(mapped_string_view &&o) noexcept : std::string_view(std::move(o)), _disabled(o._disabled) { o._disabled = true; }
+  mapped_string_view(char *s, size_t l) noexcept :
+    std::string_view(s, l), _disabled(false) {}
+  mapped_string_view(mapped_string_view &&o) noexcept :
+    std::string_view(std::move(o)), _disabled(o._disabled)
+    { o._disabled = true; }
   mapped_string_view &operator=(mapped_string_view &&) = delete;
   ~mapped_string_view()
   {
@@ -49,16 +52,19 @@ public:
     }
   }
 };
-static outcome::expected<mapped_string_view> map_file_into_memory(filesystem::path p) noexcept
+static outcome::expected<mapped_string_view>
+  map_file_into_memory(filesystem::path p) noexcept
 {
 #ifdef _WIN32
   HANDLE fh, mh;
   DWORD ec;
-  fh = CreateFile(p.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-    nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+  fh = CreateFile(p.c_str(),
+                  GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                  nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
   if (INVALID_HANDLE_VALUE == fh)
   {
-    return outcome::make_unexpected(std::error_code(GetLastError(), std::system_category()));
+    return outcome::make_unexpected(std::error_code(GetLastError(),
+                                                    std::system_category()));
   }
   BY_HANDLE_FILE_INFORMATION bhfi;
   memset(&bhfi, 0, sizeof(bhfi));
@@ -89,7 +95,8 @@ static outcome::expected<mapped_string_view> map_file_into_memory(filesystem::pa
   fh = open(p.c_str(), O_RDONLY);
   if (-1 == fh)
   {
-    return outcome::make_unexpected(std::error_code(errno, std::system_category()));
+    return outcome::make_unexpected(
+      std::error_code(errno, std::system_category()));
   }
   struct stat st;
   memset(&st, 0, sizeof(st));
@@ -97,7 +104,8 @@ static outcome::expected<mapped_string_view> map_file_into_memory(filesystem::pa
   {
     ec = errno;
     close(fh);
-    return outcome::make_unexpected(std::error_code(ec, std::system_category()));
+    return outcome::make_unexpected(
+      std::error_code(ec, std::system_category()));
   }
   uint64_t length = st.st_size;
   char *addr = (char *)mmap(nullptr, length, PROT_READ, MAP_SHARED, fh, 0);
@@ -105,13 +113,17 @@ static outcome::expected<mapped_string_view> map_file_into_memory(filesystem::pa
   close(fh);
   if (!addr)
   {
-    return outcome::make_unexpected(std::error_code(ec, std::system_category()));
+    return outcome::make_unexpected(
+      std::error_code(ec, std::system_category()));
   }
   return mapped_string_view(addr, (size_t)length);
 #endif
 }
 
-static outcome::expected<std::vector<filesystem::path>> find_regex_in_files(const std::regex &re, filesystem::directory_iterator dit, size_t depth = 0) noexcept
+static outcome::expected<std::vector<filesystem::path>>
+  find_regex_in_files(const std::regex &re,
+                      filesystem::directory_iterator dit,
+                      size_t depth = 0) noexcept
 {
   std::vector<filesystem::path> ret;
   try
@@ -124,10 +136,13 @@ static outcome::expected<std::vector<filesystem::path>> find_regex_in_files(cons
         filesystem::directory_iterator nit(p.path(), ec);
         if (ec)
           return outcome::make_unexpected(ec);
-        BOOST_OUTCOME_TRY(results, find_regex_in_files(re, std::move(nit), depth + 1));
+        BOOST_OUTCOME_TRY(results, find_regex_in_files(re,
+                                                       std::move(nit),
+                                                       depth + 1));
         // Merge found results from subdirectory into me
         ret.reserve(ret.size() + results.size());
-        std::move(results.begin(), results.end(), std::back_inserter(ret));
+        std::move(results.begin(), results.end(),
+                  std::back_inserter(ret));
       }
       // Try to map the file into memory
       BOOST_OUTCOME_TRY(view, map_file_into_memory(p.path()));
@@ -139,11 +154,13 @@ static outcome::expected<std::vector<filesystem::path>> find_regex_in_files(cons
   }
   catch (const std::bad_alloc &)
   {
-    return outcome::make_unexpected(std::make_error_code(std::errc::not_enough_memory));
+    return outcome::make_unexpected(
+      std::make_error_code(std::errc::not_enough_memory));
   }
   catch (...)
   {
-    return outcome::make_unexpected(std::make_error_code(std::errc::resource_unavailable_try_again));
+    return outcome::make_unexpected(
+      std::make_error_code(std::errc::resource_unavailable_try_again));
   }
 }
 //! [find_regex_expected]
@@ -177,14 +194,16 @@ int main(int argc, char *argv[])
     std::cerr << e.what() << std::endl;
     return 1;
   }
-  std::cout << "Searching for regular expression " << argv[1] << " in path " << path << " ..." << std::endl;
+  std::cout << "Searching for regular expression " << argv[1]
+            << " in path " << path << " ..." << std::endl;
   auto res = find_regex_in_files(regex, dit);
   if (!res)
   {
     std::cerr << "\nERROR: " << res.error() << std::endl;
     return 1;
   }
-  std::cout << "\nFound " << res.value().size() << " files containing " << argv[1] << ":\n";
+  std::cout << "\nFound " << res.value().size()
+            << " files containing " << argv[1] << ":\n";
   for (const auto &i : res.value())
     std::cout << "  " << i << "\n";
   std::cout << std::flush;

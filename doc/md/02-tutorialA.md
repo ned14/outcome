@@ -218,6 +218,12 @@ invert. This makes writing correct exception safe code much easier, plus
 unpredictable execution times due to exception throws cannot occur. The
 compiler can also reduce executable bloat by not generating stack unwind tables
 around that call which is useful for some C++ users.
+
+ (By "execution flow inverting", we mean that the normal "top to bottom" execution
+flow of code where the stack grows as one goes deeper into a call stack is
+inverted, causing stack frames to be popped off of the stack and their cleanup
+handlers executed. This is usually achieved in C++ by throwing an exception)
+
 2. Simple usage of the API will default to the throwing (i.e. abort this operation)
 overload which is probably what most users *think* they want. This does have
 the advantage that the error won't be lost, however in practice aborting partially
@@ -423,6 +429,13 @@ if(fh_)
 You'll note we've changed the error type from a `std::error_code` to a `std::exception_ptr`
 in order to transport, without losing information, all possible C++ exception throws.
 
+\warning Be careful of using the catch all clause `catch(...)` in the presence of constructs
+which overload the C++ exception handling system with additional functionality. For example,
+thread cancellation in Boost.Thread threads may be implemented by throwing a special magic
+exception type, in this circumstance the catch all clause will prevent thread cancellation
+from working correctly.
+
+
 \subsubsection sea_of_noexcept Sea of noexcept, islands of exception throw
 
 The "sea of noexcept, islands of exception throw" design pattern is characterised by
@@ -450,7 +463,7 @@ of the function via the normal value return mechanism as an unexpected Expected 
 \note Old hands would consider any use of `exception_ptr` to be similarly heavyweight to
 any use of `std::shared_ptr` as they need to be implemented the same way (i.e. with malloc and atomics) according to the
 C++ standard. For most code this is an acceptable overhead, if that is not the case in your
-code then Tutorial part B is for you.
+code then \ref tutorial_outcome "the final part of this tutorial" is for you.
 
 Finally, within any translation unit you do NOT mark non-extern functions with `noexcept`
 unless the function cannot fail. Because the compiler can see an entire translation unit
@@ -631,9 +644,10 @@ The `BOOST_OUTCOME_V1_NAMESPACE` macro encodes a unique hexadecimal value per re
 that the linker will not substitute a different version of Outcome than the Outcome you compiled against.
 It is therefore recommended that you use the `BOOST_OUTCOME_V1_NAMESPACE` macro.
 
-This example program using `expected<T, E>` replicates <a href="http://rustbyexample.com/std/result.html">the use example in
-the documentation for Rust's `Result<T, E>`</a>. As you will see in Tutorial part B, you
-would be unwise to use `expected<T, E>` like this in large C++ programs.
+This example program using `expected<T, E>` replicates
+<a href="http://rustbyexample.com/std/result.html">the use example in the documentation
+for Rust's `Result<T, E>`</a>. As you will see in \ref tutorial_whynot "the second part of this tutorial",
+you would be unwise to use `expected<T, E>` like this in large C++ programs.
 
 \snippet expected_example.cpp expected_example
 

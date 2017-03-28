@@ -20,7 +20,8 @@ more convenient extensions.
 <hr><br>
 
 In the previous part of this tutorial, we saw how there is a tension between type
-safety and convenience of programming when using the `expected<T, E>` transport. Expected as a STL
+safety and convenience of programming when using the `expected<T, E>` transport (where
+a transport is a class which *transports* some other type like a `T` or an `E`). Expected as a STL
 primitive reflects a trade off between those two use cases, and as something which can wear
 multiple hats it is close to optimal.
 
@@ -38,7 +39,7 @@ therefore enforcing type safety on each particular error type is unnatural. Clas
 of such code bases would be the Networking TS, the Filesystem TS and so on.
 
 As these refinements are within our control, we can also provide
-\ref abi_stability "**ABI stability promises**" for these refinements that we can not for
+\ref abi_stability "ABI stability promises" for these refinements that we can not for
 `expected<T, E>`. This lets you use the refinements in your public extern APIs with a
 guarantee that code compiled with future versions of Outcome will not cause misoperation.
 
@@ -108,8 +109,9 @@ member functions can be used the same way. You can supply a `std::error_code` to
 extended error code, or else construct an extended error code the same way you would a
 STL error code. You should note that it is **always safe** to slice `error_code_extended`
 into an `std::error_code`, so you can safely feed `error_code_extended` to anything
-consuming a `std::error_code`. The important-to-optimisation implicit destructor of
-`std::error_code` is retained in `error_code_extended`.
+consuming a `std::error_code`. The important-to-optimisation trivial destructor of
+`std::error_code` is retained in `error_code_extended`. The size of `error_code_extended`
+is `sizeof(std::error_code) + sizeof(size_t)`.
 
 The main big additions are obviously the ability to add a custom string message to an extended
 error code, this allows the preservation of the original `what()` message when converting a
@@ -140,8 +142,9 @@ is no additional overhead over `std::error_code`.
 
 Outcome provides additional refinements of `expected<T, E>` designed to make your programming
 life easier if you are willing to accept the hard coding of `E` to one of `error_code_extended`
-or `std::exception_ptr`. As a rough **semantic** map onto `optional<T>`, `variant<...>` and
-`expected<T, E>`:
+or `std::exception_ptr`. For those familiar with the STL transports `optional<T>`, `variant<...>` and
+`expected<T, E>`, conceptually `option<T>`, `result<T>` and `outcome<T>` could
+be considered as similar to:
 
 \code{.cpp}
 template<class T> using option = std::optional<T>;
@@ -256,15 +259,15 @@ result<Foo> somefunction()
 
 The full set of free functions is as follows:
 <dl>
-  <dt>`make_(option|result|outcome)(T v)`</dt>
+  <dt>`make_[option|result|outcome](T v)`</dt>
   <dd>Makes a valued transport with value `v`.</dd>
-  <dt>`make_(option|result|outcome)<T = void>()`</dt>
+  <dt>`make_[option|result|outcome]<T = void>()`</dt>
   <dd>Makes a valued transport default constructing a `T`.</dd>
-  <dt>`make_empty_(option|result|outcome)<T = void>()`</dt>
+  <dt>`make_empty_[option|result|outcome]<T = void>()`</dt>
   <dd>Makes an empty transport.</dd>
-  <dt>`make_errored_(result|outcome)<T = void>(error_code_extended ec)`</dt>
+  <dt>`make_errored_[result|outcome]<T = void>(error_code_extended ec)`</dt>
   <dd>Makes an errored transport.</dd>
-  <dt>`make_errored_(result|outcome)<T = void>(int code, const char *extendedmsg = nullptr)`</dt>
+  <dt>`make_errored_[result|outcome]<T = void>(int code, const char *extendedmsg = nullptr)`</dt>
   <dd>Makes an errored transport with the given error code of generic POSIX category and optionally some
 extended custom message which is copied into storage as per `error_code_extended`. This is
 very convenient for writing:
@@ -276,7 +279,7 @@ very convenient for writing:
  }
  ~~~
  </dd>
-  <dt>`make_errored_(result|outcome)<T = void>(DWORD code, const char *extendedmsg = nullptr)`
+  <dt>`make_errored_[result|outcome]<T = void>(DWORD code, const char *extendedmsg = nullptr)`
 (Windows only)</dt>
   <dd>Makes an errored transport with the given error code of Win32 system category and optionally some
 extended custom message which is copied into storage as per `error_code_extended`. This is
@@ -289,7 +292,7 @@ very convenient for writing:
  }
  ~~~
  </dd>
-  <dt>`make_excepted_outcome<T = void>(std::exception_ptr v = std::current_exception())`</dt>
+  <dt>`make_exceptional_outcome<T = void>(std::exception_ptr v = std::current_exception())`</dt>
   <dd>Makes an excepted transport. This lets you conveniently write:
  ~~~{.cpp}
  outcome<Foo> somefunction()
@@ -300,14 +303,14 @@ very convenient for writing:
    }
    catch(...)  // catch all
    {
-     return make_excepted_outcome</*void*/>(/* std::current_exception() */);
+     return make_exceptional_outcome</*void*/>(/* std::current_exception() */);
    }
  }
  ~~~
   </dd>
-  <dt>`as_(result|outcome)(option|result)`</dt>
+  <dt>`as_[result|outcome](option|result)`</dt>
   <dd>Lets you formally annotate an implicit conversion from less representative to more representative.</dd>
-  <dt>`as_void(const (option<T>|result<T>|outcome<T>|expected<T, E>) &)`</dt>
+  <dt>`as_void(const [option<T>|result<T>|outcome<T>|expected<T, E>] &)`</dt>
   <dd>Returns a copy of any input transport
 as a void version of the same transport, preserving any empty/errored/excepted state. If the input
 was valued, the returned copy will be valued **void**.</dd>
