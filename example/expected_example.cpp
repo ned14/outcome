@@ -49,7 +49,7 @@ namespace checked
   }
 }
 
-double op(double x, double y)
+double op(double x, double y) noexcept
 {
   // Outcome provides a .match() extension, but this is 100% standard Expected
   // Also using outcome::result<T> instead of expected<T, E> would enable

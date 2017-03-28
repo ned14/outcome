@@ -28,11 +28,11 @@ C++ 20 standardisation track), with the `expected<T, E>` refinements `outcome<T>
 
 If you are familiar with Swift's error code throws or Rust's `Result<T, E>`,
 you will find almost identical semantics in the transports provided here.
-Outcome even has a `BOOST_OUTCOME_TRY` macro doing most of the
+Outcome even has a \ref try_operation "`BOOST_OUTCOME_TRY`" macro doing most of the
 `try` keyword in Rust and Swift!
 
 \note Outcome has not been peer reviewed and is not part of the Boost libraries
-(yet). It is hoped it will enter the peer review queue in Q1 2017.
+(yet). It is in the peer review queue awaiting a peer review manager.
 
 \snippet simple_example.cpp simple_example
 
@@ -58,7 +58,8 @@ affect some applications. In this situation, use LLVM clang targeting the MSVC A
 
 \page support Support
 
-<a href="https://stackoverflow.com/">StackOverflow</a> with the boost-outcome tag is the preferred place to ask questions on usage.
+<a href="https://stackoverflow.com/">StackOverflow</a> with the boost-outcome tag is the
+preferred place to ask questions on usage.
 
 If you have a problem, please review the FAQ and the wiki. Searching
 <a href="https://github.com/ned14/boost.outcome/issues">the issues</a>

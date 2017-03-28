@@ -9,9 +9,9 @@
 namespace outcome = BOOST_OUTCOME_V1_NAMESPACE;
 
 //! [io_service_outcome]
-/* This is an implementation of a futures based Executor as proposed by P0443R1
-http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0443r1.html using the
-ASIO/Networking TS io_service as a model.
+/* This is an implementation of a futures based Executor as proposed by
+P0443R1 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0443r1.html
+using the ASIO/Networking TS io_service as a model.
 
 ASIO propagates exception throws by handlers out of the corresponding run().
 Executors don't do that, and neither does this implementation.
@@ -27,13 +27,16 @@ private:
   std::condition_variable _newwork;
 public:
 
-  // Call the i/o handler at some future point in some future thread, returning immediately
-  outcome::result<std::future<outcome::outcome<void>>> post(std::function<io_handler> f) noexcept
+  // Call the i/o handler at some future point in some future thread,
+  // returning immediately
+  outcome::result<std::future<outcome::outcome<void>>>
+    post(std::function<io_handler> f) noexcept
   {
     try
     {
       // Make a packaged task rebinding the completion handler
-      std::packaged_task<outcome::outcome<void>(size_t)> rebound([f = std::move(f)](size_t bytes_transferred)
+      std::packaged_task<outcome::outcome<void>(size_t)>
+        rebound([f = std::move(f)](size_t bytes_transferred)
         ->outcome::outcome<void>
       {
         try
@@ -63,12 +66,17 @@ public:
     }
     // Catch all STL exception throws and return a corresponding result
     BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT
+    
+    
+    
   }
 
   /* Call the i/o handler in some thread, returning when it completes.
-  Note that ASIO's io_service calls this dispatch(), but the Executors proposal calls it execute()
+  Note that ASIO's io_service calls this dispatch(), but the Executors
+  proposal calls it execute()
   */
-  outcome::outcome<void> execute(std::function<io_handler> f) noexcept
+  outcome::outcome<void>
+    execute(std::function<io_handler> f) noexcept
   {
     try
     {
@@ -88,10 +96,10 @@ public:
       // For any non-STL exception throws, return as an excepted outcome
       return outcome::make_exceptional_outcome<>();
     }
+
+
+    
   }
-
-
-
 
   // If there are handlers pending, execute up to one of them
   size_t run_one() noexcept
@@ -100,7 +108,8 @@ public:
     if (_work.empty())
       return 0;
 
-    std::packaged_task<outcome::outcome<void>(size_t)> mywork(std::move(_work.front()));
+    std::packaged_task<outcome::outcome<void>(size_t)>
+      mywork(std::move(_work.front()));
     _work.pop_front();
     g.unlock();
     // Call the completion handler with some arbitrary bytes_transferred
@@ -108,7 +117,8 @@ public:
     return 1;
   }
 
-  // If there is no work, sleep until work arrives, else execute as much work as possible
+  // If there is no work, sleep until work arrives, else execute as much
+  // work as possible
   size_t run() noexcept
   {
     {
@@ -138,6 +148,7 @@ struct work
       // Call myself again. Note I can simply call value() to
       // cause the result to throw a system_error with any error code
       ios->post(std::ref(*this)).value();
+      
     }
   }
 };

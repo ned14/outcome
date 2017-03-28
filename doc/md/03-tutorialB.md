@@ -206,8 +206,8 @@ you should leave `E` default to `std::error_code` and return `std::system_catego
 codes from `errno` or `GetLastError()` as appropriate. If you don't care and/or you're in a rush,
 `E = std::error_code` and returning some enumeration from `std::errc` will get you working code
 the quickest (and be aware that Outcome's refinements of `expected<T, E>` `outcome<T>` and `result<T>`
-hard code the `E` and will save you typing a fair bit of boilerplate). As the latter two
-use patterns may be unclear, a worked example follows in the next section.
+hard code the `E` to an enhanced `error_code_extended` and will save you typing a fair bit of boilerplate).
+As the latter two use patterns may be unclear, a worked example follows in the next section.
 
 \subsection try_operation The TRY operation
 

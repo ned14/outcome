@@ -72,7 +72,8 @@ My thanks to those on boost-dev, Reddit and SG14 for extensive and often very de
 feedback on the library pretty much from its beginning. You are all too numerous to
 remember, but certainly Tongari and Andrzej Krzemienski come to mind as having engaged
 in particularly long discussion threads with tons of useful feedback which clarified my
-thinking.
+thinking. Andrzej also went through the documentation with a fine toothed comb before the
+review, finding many small errata and confusing wording.
 
 Finally, my thanks to Vicente for driving Expected from its beginnings to hopefully
 standardisation before 2020. It's many years of work getting something standardised, even
