@@ -28,7 +28,7 @@ C++ 20 standardisation track), with the `expected<T, E>` refinements `outcome<T>
 
 If you are familiar with Swift's error code throws or Rust's `Result<T, E>`,
 you will find almost identical semantics in the transports provided here.
-Outcome even has a \ref try_operation "`BOOST_OUTCOME_TRY`" macro doing most of the
+Outcome even has a \ref try_operation "BOOST_OUTCOME_TRY" macro doing most of the
 `try` keyword in Rust and Swift!
 
 \note Outcome has not been peer reviewed and is not part of the Boost libraries
