@@ -121,12 +121,18 @@ fetched using the new member functions, though note that the storage for these i
 statically allocated threadsafe ring buffer and so may vanish at some arbitrary later point
 when the storage gets recycled. If this happens, `extended_message()` will return zero characters
 written, `raw_backtrace()` will return zero items filled and `backtrace()` will return a null pointer.
+With the current implementation, for performance no locking is performed to prevent storage recycling
+caused by other threads while you are using it, so also do not rely on the extended data being free
+of corruption (the extended data is all POD - Plain Old Data - and therefore recycling it is not racy).
 
-Because the storage for the extended information may be recycled at any arbitrary future
+(Because the storage for the extended information may be recycled at any arbitrary future
 point, you ought to make sure that you copy the extended information as soon as possible
 after the `error_code_extended` is constructed. In other words, don't store `error_code_extended`
 as-is into say a vector, instead extract the information into a custom struct as soon as you
-can.
+can. The default is to use 4Kb globally, this provides sixteen extended error code slots
+which will be enough for all but the most demanding multithreaded use cases. The 4Kb default
+can be changed by predefining `BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE` to a larger
+two's power value)
 
 \note Construction of an extended error code with extended message or codes takes a worst
 case maximum of a microsecond on recent hardware. That's a worst case, almost

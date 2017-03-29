@@ -36,12 +36,16 @@ DEALINGS IN THE SOFTWARE.
 
 #include "../boost-lite/include/ringbuffer_log.hpp"
 
+#ifndef BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE
+#define BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE 4096
+#endif
+
 BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN
 
 // Slight misuse of ringbuffer_log to keep extended error code information
-inline boost_lite::ringbuffer_log::simple_ringbuffer_log<4096> &extended_error_code_log()
+inline boost_lite::ringbuffer_log::simple_ringbuffer_log<BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE> &extended_error_code_log()
 {
-  static boost_lite::ringbuffer_log::simple_ringbuffer_log<4096> log(boost_lite::ringbuffer_log::level::error);
+  static boost_lite::ringbuffer_log::simple_ringbuffer_log<BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE> log(boost_lite::ringbuffer_log::level::error);
   return log;
 }
 
