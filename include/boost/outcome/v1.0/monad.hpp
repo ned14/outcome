@@ -705,17 +705,17 @@ template <class T = void> constexpr inline outcome<T> make_empty_outcome()
 {
   return outcome<T>();
 }
-//! \brief Make a ready outcome from the type passed \ingroup monad
+//! \brief Make an outcome from the type passed \ingroup monad
 template <class T> constexpr inline outcome<T> make_valued_outcome(T &&v)
 {
   return outcome<T>(std::move(v));
 }
-//! \brief Make a ready outcome from the type passed \ingroup monad
+//! \brief Make an outcome from the type passed \ingroup monad
 template <class T> constexpr inline outcome<T> make_valued_outcome(const T &v)
 {
   return outcome<T>(v);
 }
-//! \brief Make a ready outcome from the type passed \ingroup monad
+//! \brief Make an outcome from the type passed \ingroup monad
 template <class T = void> constexpr inline outcome<T> make_valued_outcome()
 {
   static_assert(!std::is_same<T, T>::value, "Empty make_valued_outcome<T> not specialised");
