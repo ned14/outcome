@@ -17,64 +17,65 @@ namespace Library4 {
 int inspect_exception_to_your_liking(const std::exception &) { return 5; }
 
 //! [simple_example]
-// Imagine the libraries you depend on each use different
-// mechanisms for returning errors
+// Imagine the libraries you depend on each use different mechanisms for returning errors
 
 namespace outcome = BOOST_OUTCOME_V1_NAMESPACE;
 
-// Like the Filesystem and Networking TS, returns errors via
-// lvalue ref to an error_code. Never throws exceptions.
-auto Library1::fun(std::error_code &) noexcept
-  -> int;
+namespace Library1
+{                                         // Like the Filesystem and Networking TS,
+  auto fun(std::error_code &) noexcept    // returns errors via lvalue ref to an error_code.
+    -> int;                               // Never throws exceptions.
+}
 
-// Throws some exception on error
-auto Library2::fun()
-  -> int;
-
-// The Expected proposed for standardisation in C++ 20
-// Returns an int (expected) or some custom error code (unexpected)
-// Never throws exceptions.
-auto Library3::fun() noexcept
-  -> outcome::expected<int, Library3::error_code>;
-
-// Result is an int (not error) or an outcome::error_code_extended (error)
-// Never throws exceptions.
-auto Library4::fun() noexcept
-  -> outcome::result<int>;
-
+namespace Library2
+{                                         // Throws some exception on error
+  auto fun()
+    -> int;
+}
   
-// signalling uniform error
-// Outcome is an int, or an outcome::error_code_extended,
+namespace Library3                        // The Expected proposed for standardisation in C++ 20
+{                                         // Returns an int (expected) or some custom 
+  auto fun() noexcept                     // error code (unexpected). Never throws exceptions.
+    -> outcome::expected<int, error_code>; 
+}  
+  
+namespace Library4                        // Result is an int (not error)
+{                                         // or an outcome::error_code_extended (error)
+  auto fun() noexcept                     // Never throws exceptions.
+    -> outcome::result<int>;
+}
+  
+// signalling uniform error Outcome is an int, or an outcome::error_code_extended,
 // or a std::exception_ptr
 
-auto my_fun()
+auto my_fun() noexcept
   -> outcome::outcome<int>
-{
-  try
-  {
-    std::error_code ec;
+{                                                          // all noexcept functions which could call
+  try {                                                    // throwing code should always have their
+    std::error_code ec;                                    // bodies wrapped in a try...catch
     int i = Library1::fun(ec);
-
     if (ec)
-      return outcome::make_errored_outcome(ec);
-
+      return outcome::make_errored_outcome(ec);            // error code returned inside outcome
+      
     try {
       i += Library2::fun();
     }
-    BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT
-
-    if (outcome::expected<int, Library3::error_code> rslt1 = Library3::fun())
+    catch (...) {
+      return outcome::make_exceptional_outcome<>();        // exception_ptr returned inside outcome
+    }
+    
+    if (auto rslt1 = Library3::fun())
       i += *rslt1;
     else
-      return outcome::make_errored_outcome(rslt1.error());
+      return outcome::make_errored_outcome(rslt1.error()); // error code returned inside outcome
    
-    BOOST_OUTCOME_TRY(rslt2, Library4::fun());
-    return i + rslt2;
+    BOOST_OUTCOME_TRY(rslt2, Library4::fun());             // this may return an outcome with an
+                                                           // error code, iff fun() reports failure
+
+    return i + rslt2;                                      // return outcome with a value
   }
-  catch(...)
-  {
-    // Defaults to constructing from std::current_exception()
-    return outcome::make_exceptional_outcome<>();
+  catch (...) {
+    return outcome::make_exceptional_outcome<>();          // construct from std::current_exception()
   }
 };
 
@@ -83,11 +84,11 @@ auto my_fun()
 int test()
 {
   try {
-    int i = my_fun().value();  // throws if not valued
+    int i = my_fun().value();                              // throws if not valued
     return i;
   }
-  catch(std::exception const& e) {
-    return inspect_exception_to_your_liking(e);
+  catch (std::exception const& e) {                        // e can be used to retrieve
+    return inspect_exception_to_your_liking(e);            // initial error condition
   }
 }
 //! [simple_example]
