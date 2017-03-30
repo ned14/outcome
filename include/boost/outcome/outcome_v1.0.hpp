@@ -21,12 +21,12 @@
 #endif
 
 #define BOOST_OUTCOME_NAMESPACE_VERSION BOOST_OUTCOME_VERSION_GLUE(BOOST_OUTCOME_VERSION_MAJOR, _, BOOST_OUTCOME_VERSION_MINOR)
-#line 5 "/home/ned/boostish/outcome/include/boost/outcome/outcome.hpp"
+#line 5 "C:/Users/ned/Documents/boostish/outcome/include/boost/outcome/outcome.hpp"
 #undef BOOST_OUTCOME_HEADERS_PATH
 #undef BOOST_OUTCOME_HEADERS_PATH2
 #define BOOST_OUTCOME_HEADERS_PATH4(a) #a
 #define BOOST_OUTCOME_HEADERS_PATH3(a) BOOST_OUTCOME_HEADERS_PATH4(a)
-#line 27 "/home/ned/boostish/outcome/include/boost/outcome/outcome.hpp"
+#line 27 "C:/Users/ned/Documents/boostish/outcome/include/boost/outcome/outcome.hpp"
 #if defined(_MSC_VER) && !defined(__clang__)
 #define BOOST_OUTCOME_HEADERS_PATH2 BOOST_OUTCOME_VERSION_GLUE(v, BOOST_OUTCOME_HEADERS_VERSION, /monad.hpp)
 #elif 1
@@ -49,9 +49,9 @@
 #ifndef BOOSTLITE_CONFIG_HPP
 #define BOOSTLITE_CONFIG_HPP
 #line 2 "revision.hpp"
-#define BOOSTLITE_PREVIOUS_COMMIT_REF aaef145bdd7fa2d8c886bc662a666f51fbc74aef
-#define BOOSTLITE_PREVIOUS_COMMIT_DATE "2017-03-20 00:38:55 +00:00"
-#define BOOSTLITE_PREVIOUS_COMMIT_UNIQUE aaef145b
+#define BOOSTLITE_PREVIOUS_COMMIT_REF faea95cc1f39dcca6e6382a72480cbd7dc662bbd
+#define BOOSTLITE_PREVIOUS_COMMIT_DATE "2017-03-20 23:30:41 +00:00"
+#define BOOSTLITE_PREVIOUS_COMMIT_UNIQUE faea95cc
 #line 32 "cpp_feature.h"
 #ifndef BOOSTLITE_HAS_FEATURE_H
 #define BOOSTLITE_HAS_FEATURE_H
@@ -816,9 +816,9 @@ extern "C" void _mm_pause();
 #line 90 "config.hpp"
 #define BOOST_OUTCOME_V1_ERROR_CODE_IMPL std
 #line 2 "../revision.hpp"
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_REF 95eb507b7cfce48b3d4b6d86b9cf358b0a448e61
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_DATE "2017-03-23 14:01:04 +00:00"
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE 95eb507b
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_REF 960faf556d8722fe3f4e761acc3bee7f7c8713f3
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_DATE "2017-03-30 08:56:14 +00:00"
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE 960faf55
 #line 95 "config.hpp"
 #define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL, BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE), inline)
 #line 158 "config.hpp"
@@ -907,7 +907,7 @@ using ::std::generic_category;
 
 #endif
 #line 206 "config.hpp"
-namespace boost { namespace outcome { inline namespace _1_0_std_std_95eb507b {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_960faf55 {
 namespace stl11
 {
   using namespace boost_lite::bind::std::system_error;
@@ -1174,7 +1174,7 @@ _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(l
 #define BOOST_OUTCOME_THROW(expr) throw expr
 #else
 #include <stdio.h>
-namespace boost { namespace outcome { inline namespace _1_0_std_std_95eb507b {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_960faf55 {
 namespace detail
 {
   BOOSTLITE_NORETURN inline void do_fatal_exit(const char *expr)
@@ -1286,7 +1286,7 @@ namespace detail
 #include <execinfo.h>
 #endif
 
-namespace boost_lite { inline namespace _aaef145b {
+namespace boost_lite { inline namespace _faea95cc {
 
 namespace ringbuffer_log
 {
@@ -2027,12 +2027,16 @@ namespace ringbuffer_log
 
 #endif
 #line 39 "error_code_extended.hpp"
-namespace boost { namespace outcome { inline namespace _1_0_std_std_95eb507b {
+#ifndef BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE
+#define BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE 4096
+#endif
+
+namespace boost { namespace outcome { inline namespace _1_0_std_std_960faf55 {
 
 
-inline boost_lite::ringbuffer_log::simple_ringbuffer_log<4096> &extended_error_code_log()
+inline boost_lite::ringbuffer_log::simple_ringbuffer_log<BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE> &extended_error_code_log()
 {
-  static boost_lite::ringbuffer_log::simple_ringbuffer_log<4096> log(boost_lite::ringbuffer_log::level::error);
+  static boost_lite::ringbuffer_log::simple_ringbuffer_log<BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE> log(boost_lite::ringbuffer_log::level::error);
   return log;
 }
 
@@ -2206,7 +2210,7 @@ inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec)
 
 
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_95eb507b {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_960faf55 {
 
 
 enum class monad_errc
@@ -2276,11 +2280,11 @@ inline stl11::error_condition make_error_condition(monad_errc e)
 namespace std
 {
 
-  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_95eb507b::monad_errc> : std::true_type
+  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_960faf55::monad_errc> : std::true_type
   {
   };
 
-  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_95eb507b::monad_errc> : std::true_type
+  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_960faf55::monad_errc> : std::true_type
   {
   };
 }
@@ -2293,7 +2297,7 @@ namespace std
 
 
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_95eb507b {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_960faf55 {
 
 
 struct empty_t
@@ -3436,9 +3440,9 @@ public:
 namespace std
 {
 
-  template <class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, boost ::outcome ::_1_0_std_std_95eb507b::value_storage<_value_type, _error_type, _exception_type> &v)
+  template <class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, boost ::outcome ::_1_0_std_std_960faf55::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_95eb507b;
+    using namespace boost ::outcome ::_1_0_std_std_960faf55;
     switch(v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::value:
@@ -3448,9 +3452,9 @@ namespace std
     }
   }
 
-  template <class _value_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_95eb507b::value_storage<_value_type, void, void> &v)
+  template <class _value_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_960faf55::value_storage<_value_type, void, void> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_95eb507b;
+    using namespace boost ::outcome ::_1_0_std_std_960faf55;
     using _error_type = void;
     using _exception_type = void;
     switch(v.type)
@@ -3463,9 +3467,9 @@ namespace std
       return s << "(unknown)";
     }
   }
-  template <class _value_type, class _error_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_95eb507b::value_storage<_value_type, _error_type, void> &v)
+  template <class _value_type, class _error_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_960faf55::value_storage<_value_type, _error_type, void> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_95eb507b;
+    using namespace boost ::outcome ::_1_0_std_std_960faf55;
     using _exception_type = void;
     switch(v.type)
     {
@@ -3479,9 +3483,9 @@ namespace std
       return s << "(unknown)";
     }
   }
-  template <class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_95eb507b::value_storage<_value_type, _error_type, _exception_type> &v)
+  template <class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_960faf55::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_95eb507b;
+    using namespace boost ::outcome ::_1_0_std_std_960faf55;
     switch(v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::empty:
@@ -3527,7 +3531,7 @@ namespace std
 #line 41 "../boost-lite/include/tribool.hpp"
 #include <istream>
 
-namespace boost_lite { inline namespace _aaef145b {
+namespace boost_lite { inline namespace _faea95cc {
 
 namespace tribool
 {
@@ -3568,23 +3572,23 @@ namespace tribool
 
 namespace std
 {
-  inline istream &operator>>(istream &s, boost_lite::_aaef145b::tribool::tribool &a)
+  inline istream &operator>>(istream &s, boost_lite::_faea95cc::tribool::tribool &a)
   {
     char c;
     s >> c;
-    a = (c == '1') ? boost_lite::_aaef145b::tribool::tribool::true_ : (c == '0') ? boost_lite::_aaef145b::tribool::tribool::false_ : boost_lite::_aaef145b::tribool::tribool::other;
+    a = (c == '1') ? boost_lite::_faea95cc::tribool::tribool::true_ : (c == '0') ? boost_lite::_faea95cc::tribool::tribool::false_ : boost_lite::_faea95cc::tribool::tribool::other;
     return s;
   }
-  inline ostream &operator<<(ostream &s, boost_lite::_aaef145b::tribool::tribool a)
+  inline ostream &operator<<(ostream &s, boost_lite::_faea95cc::tribool::tribool a)
   {
-    char c = (a == boost_lite::_aaef145b::tribool::tribool::true_) ? '1' : (a == boost_lite::_aaef145b::tribool::tribool::false_) ? '0' : '?';
+    char c = (a == boost_lite::_faea95cc::tribool::tribool::true_) ? '1' : (a == boost_lite::_faea95cc::tribool::tribool::false_) ? '0' : '?';
     return s << c;
   }
 }
 
 #endif
 #line 90 "v1.0/monad.hpp"
-namespace boost { namespace outcome { inline namespace _1_0_std_std_95eb507b {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_960faf55 {
 
 template <class implementation_policy> class basic_monad;
 
@@ -4983,22 +4987,22 @@ template <class T = void> constexpr inline outcome<T> make_empty_outcome()
   return outcome<T>();
 }
 
-template <class T> constexpr inline outcome<T> make_ready_outcome(T &&v)
+template <class T> constexpr inline outcome<T> make_valued_outcome(T &&v)
 {
   return outcome<T>(std::move(v));
 }
 
-template <class T> constexpr inline outcome<T> make_ready_outcome(const T &v)
+template <class T> constexpr inline outcome<T> make_valued_outcome(const T &v)
 {
   return outcome<T>(v);
 }
 
-template <class T = void> constexpr inline outcome<T> make_ready_outcome()
+template <class T = void> constexpr inline outcome<T> make_valued_outcome()
 {
-  static_assert(!std::is_same<T, T>::value, "Empty make_ready_outcome<T> not specialised");
+  static_assert(!std::is_same<T, T>::value, "Empty make_valued_outcome<T> not specialised");
   return outcome<T>();
 }
-template <> inline outcome<void> make_ready_outcome<void>()
+template <> inline outcome<void> make_valued_outcome<void>()
 {
   return outcome<void>(value);
 }
@@ -5063,22 +5067,22 @@ template <class T = void> constexpr inline result<T> make_empty_result()
   return result<T>();
 }
 
-template <class T> constexpr inline result<T> make_ready_result(T &&v)
+template <class T> constexpr inline result<T> make_valued_result(T &&v)
 {
   return result<T>(std::move(v));
 }
 
-template <class T> constexpr inline result<T> make_ready_result(const T &v)
+template <class T> constexpr inline result<T> make_valued_result(const T &v)
 {
   return result<T>(v);
 }
 
-template <class T = void> constexpr inline result<T> make_ready_result()
+template <class T = void> constexpr inline result<T> make_valued_result()
 {
-  static_assert(!std::is_same<T, T>::value, "Empty make_ready_result<T> not specialised");
+  static_assert(!std::is_same<T, T>::value, "Empty make_valued_result<T> not specialised");
   return result<T>();
 }
-template <> inline result<void> make_ready_result<void>()
+template <> inline result<void> make_valued_result<void>()
 {
   return result<void>(value);
 }
@@ -5128,22 +5132,22 @@ template <class T = void> constexpr inline option<T> make_empty_option()
   return option<T>();
 }
 
-template <class T> constexpr inline option<T> make_ready_option(T &&v)
+template <class T> constexpr inline option<T> make_valued_option(T &&v)
 {
   return option<T>(std::move(v));
 }
 
-template <class T> constexpr inline option<T> make_ready_option(const T &v)
+template <class T> constexpr inline option<T> make_valued_option(const T &v)
 {
   return option<T>(v);
 }
 
-template <class T = void> constexpr inline option<T> make_ready_option()
+template <class T = void> constexpr inline option<T> make_valued_option()
 {
-  static_assert(!std::is_same<T, T>::value, "Empty make_ready_option<T> not specialised");
+  static_assert(!std::is_same<T, T>::value, "Empty make_valued_option<T> not specialised");
   return option<T>();
 }
-template <> constexpr inline option<void> make_ready_option<void>()
+template <> constexpr inline option<void> make_valued_option<void>()
 {
   return option<void>(value);
 }
@@ -5188,7 +5192,7 @@ template <class T> inline outcome<void> as_void(const outcome<T> &v)
   if(v.has_error())
     return v.get_error();
   if(v.has_value())
-    return make_ready_outcome<void>();
+    return make_valued_outcome<void>();
   return make_empty_outcome<void>();
 }
 
@@ -5197,14 +5201,14 @@ template <class T> inline result<void> as_void(const result<T> &v)
   if(v.has_error())
     return v.get_error();
   if(v.has_value())
-    return make_ready_result<void>();
+    return make_valued_result<void>();
   return make_empty_result<void>();
 }
 
 template <class T> BOOSTLITE_CONSTEXPR inline option<void> as_void(const option<T> &v)
 {
   if(v.has_value())
-    return make_ready_option<void>();
+    return make_valued_option<void>();
   return make_empty_option<void>();
 }
 
@@ -5647,7 +5651,7 @@ template <class T, class E> inline expected<void, E> as_void(const expected<T, E
 namespace std
 {
 
-  template <class Impl> inline void swap(boost ::outcome ::_1_0_std_std_95eb507b::basic_monad<Impl> &a, boost ::outcome ::_1_0_std_std_95eb507b::basic_monad<Impl> &b) { a.swap(b); }
+  template <class Impl> inline void swap(boost ::outcome ::_1_0_std_std_960faf55::basic_monad<Impl> &a, boost ::outcome ::_1_0_std_std_960faf55::basic_monad<Impl> &b) { a.swap(b); }
 }
 
 #define BOOST_OUTCOME__GLUE2(x, y) x##y
@@ -5669,6 +5673,6 @@ namespace std
 
 
 #endif
-#line 40 "/home/ned/boostish/outcome/include/boost/outcome/outcome.hpp"
+#line 40 "C:/Users/ned/Documents/boostish/outcome/include/boost/outcome/outcome.hpp"
 #undef BOOST_OUTCOME_HEADERS_PATH
 #undef BOOST_OUTCOME_HEADERS_PATH2

@@ -705,23 +705,23 @@ template <class T = void> constexpr inline outcome<T> make_empty_outcome()
 {
   return outcome<T>();
 }
-//! \brief Make a ready outcome from the type passed \ingroup monad
-template <class T> constexpr inline outcome<T> make_ready_outcome(T &&v)
+//! \brief Make an outcome from the type passed \ingroup monad
+template <class T> constexpr inline outcome<T> make_valued_outcome(T &&v)
 {
   return outcome<T>(std::move(v));
 }
-//! \brief Make a ready outcome from the type passed \ingroup monad
-template <class T> constexpr inline outcome<T> make_ready_outcome(const T &v)
+//! \brief Make an outcome from the type passed \ingroup monad
+template <class T> constexpr inline outcome<T> make_valued_outcome(const T &v)
 {
   return outcome<T>(v);
 }
-//! \brief Make a ready outcome from the type passed \ingroup monad
-template <class T = void> constexpr inline outcome<T> make_ready_outcome()
+//! \brief Make an outcome from the type passed \ingroup monad
+template <class T = void> constexpr inline outcome<T> make_valued_outcome()
 {
-  static_assert(!std::is_same<T, T>::value, "Empty make_ready_outcome<T> not specialised");
+  static_assert(!std::is_same<T, T>::value, "Empty make_valued_outcome<T> not specialised");
   return outcome<T>();
 }
-template <> inline outcome<void> make_ready_outcome<void>()
+template <> inline outcome<void> make_valued_outcome<void>()
 {
   return outcome<void>(value);
 }
@@ -797,22 +797,22 @@ template <class T = void> constexpr inline result<T> make_empty_result()
   return result<T>();
 }
 //! \brief Makes a result from the type passed \ingroup monad
-template <class T> constexpr inline result<T> make_ready_result(T &&v)
+template <class T> constexpr inline result<T> make_valued_result(T &&v)
 {
   return result<T>(std::move(v));
 }
 //! \brief Makes a result from the type passed \ingroup monad
-template <class T> constexpr inline result<T> make_ready_result(const T &v)
+template <class T> constexpr inline result<T> make_valued_result(const T &v)
 {
   return result<T>(v);
 }
 //! \brief Makes a result from the type passed \ingroup monad
-template <class T = void> constexpr inline result<T> make_ready_result()
+template <class T = void> constexpr inline result<T> make_valued_result()
 {
-  static_assert(!std::is_same<T, T>::value, "Empty make_ready_result<T> not specialised");
+  static_assert(!std::is_same<T, T>::value, "Empty make_valued_result<T> not specialised");
   return result<T>();
 }
-template <> inline result<void> make_ready_result<void>()
+template <> inline result<void> make_valued_result<void>()
 {
   return result<void>(value);
 }
@@ -874,22 +874,22 @@ template <class T = void> constexpr inline option<T> make_empty_option()
   return option<T>();
 }
 //! \brief Makes a option from the type passed \ingroup monad
-template <class T> constexpr inline option<T> make_ready_option(T &&v)
+template <class T> constexpr inline option<T> make_valued_option(T &&v)
 {
   return option<T>(std::move(v));
 }
 //! \brief Makes a option from the type passed \ingroup monad
-template <class T> constexpr inline option<T> make_ready_option(const T &v)
+template <class T> constexpr inline option<T> make_valued_option(const T &v)
 {
   return option<T>(v);
 }
 //! \brief Makes a option from the type passed \ingroup monad
-template <class T = void> constexpr inline option<T> make_ready_option()
+template <class T = void> constexpr inline option<T> make_valued_option()
 {
-  static_assert(!std::is_same<T, T>::value, "Empty make_ready_option<T> not specialised");
+  static_assert(!std::is_same<T, T>::value, "Empty make_valued_option<T> not specialised");
   return option<T>();
 }
-template <> constexpr inline option<void> make_ready_option<void>()
+template <> constexpr inline option<void> make_valued_option<void>()
 {
   return option<void>(value);
 }
@@ -934,7 +934,7 @@ template <class T> inline outcome<void> as_void(const outcome<T> &v)
   if(v.has_error())
     return v.get_error();
   if(v.has_value())
-    return make_ready_outcome<void>();
+    return make_valued_outcome<void>();
   return make_empty_outcome<void>();
 }
 //! \brief Makes a void result from an input result, forwarding any emptiness or error \ingroup monad
@@ -943,14 +943,14 @@ template <class T> inline result<void> as_void(const result<T> &v)
   if(v.has_error())
     return v.get_error();
   if(v.has_value())
-    return make_ready_result<void>();
+    return make_valued_result<void>();
   return make_empty_result<void>();
 }
 //! \brief Makes a void option from an input option, forwarding any emptiness \ingroup monad
 template <class T> BOOSTLITE_CONSTEXPR inline option<void> as_void(const option<T> &v)
 {
   if(v.has_value())
-    return make_ready_option<void>();
+    return make_valued_option<void>();
   return make_empty_option<void>();
 }
 

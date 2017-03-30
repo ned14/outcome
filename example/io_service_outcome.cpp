@@ -47,7 +47,7 @@ public:
           f(ec, bytes_transferred);
           if (ec)
             return outcome::make_errored_outcome<>(ec);
-          return outcome::make_ready_outcome();
+          return outcome::make_valued_outcome();
         }
         catch (...)
         {

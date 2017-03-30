@@ -1,6 +1,8 @@
 # Frequently Asked Questions
 \anchor faq
 
+[TOC]
+
 \section abi_stability Is Outcome safe to use in extern APIs? Does it have a stable ABI?
 
 Unlike most Boost libraries, Outcome is able to enforce a stable ABI checked per commit by

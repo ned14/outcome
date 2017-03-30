@@ -360,7 +360,7 @@ BOOST_AUTO_TEST_CASE(works / monad / comparison, "Tests that the monad can compa
     BOOST_CHECK(b == c);
     BOOST_CHECK(c == a);
     BOOST_CHECK(c == b);
-    outcome<void> d, e(make_ready_outcome<void>());
+    outcome<void> d, e(make_valued_outcome<void>());
     outcome<unsigned short> f(make_errored_outcome<unsigned short>(EINVAL));
     outcome<double> g(make_exceptional_outcome<double>(p));
     BOOST_CHECK(a != d);
@@ -383,7 +383,7 @@ BOOST_AUTO_TEST_CASE(works / monad / comparison, "Tests that the monad can compa
     BOOST_CHECK(b == c);
     BOOST_CHECK(c == a);
     BOOST_CHECK(c == b);
-    result<void> d, e(make_ready_result<void>()), f(make_errored_result<void>(EINVAL));
+    result<void> d, e(make_valued_result<void>()), f(make_errored_result<void>(EINVAL));
     option<bool> g, h(true);
     BOOST_CHECK(a != d);
     BOOST_CHECK(a != e);
@@ -412,7 +412,7 @@ static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::value_storage<void, void, vo
 static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::option<int> test_constexpr3a(int f)
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  return make_ready_option<int>(f);
+  return make_valued_option<int>(f);
 }
 // Test option<bool> for constexpr
 static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::option<bool> test_constexpr3b()
@@ -770,7 +770,7 @@ BOOST_AUTO_TEST_CASE(works / monad / void, "Tests that the monad works as intend
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
   // Can't construct a void
   {
-    outcome<void> a, b(empty), c(value), d(make_ready_outcome<void>());
+    outcome<void> a, b(empty), c(value), d(make_valued_outcome<void>());
     BOOST_CHECK(a == b);
     BOOST_CHECK(c == d);
     BOOST_CHECK(a != c);
@@ -843,7 +843,7 @@ BOOST_AUTO_TEST_CASE(works / monad / upconvert, "Tests that the monad converts i
   }
   // Explicit upconversion of void
   {
-    option<void> a1, a10(make_ready_option<void>());
+    option<void> a1, a10(make_valued_option<void>());
     result<void> b1(a1), b10(a10);
     outcome<void> c1(a1), c2(b1), c10(a10), c11(b10);
     BOOST_CHECK(a1.empty());
@@ -885,7 +885,7 @@ BOOST_AUTO_TEST_CASE(works / monad / propagate, "Tests that the monad propagates
     };
     BOOST_CHECK(t3(5).get_error().value() == 5);
     result<int> a1(make_empty_result<void>());
-    result<int> a2(make_ready_result<void>());
+    result<int> a2(make_valued_result<void>());
     result<int> a3(make_errored_result<void>(5));
     BOOST_CHECK(a1.empty());
     BOOST_CHECK(!a1.has_value());

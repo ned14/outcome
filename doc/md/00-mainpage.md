@@ -5,7 +5,6 @@
 <td align="center"> <a href="http://my.cdash.org/index.php?project=Boost.Outcome">CTest summary</a><br><a href="http://my.cdash.org/index.php?project=Boost.Outcome">dashboard</a> </td>
 <td align="center"> <a href="https://travis-ci.org/ned14/boost.outcome">Linux and MacOS CI:</a><img src="https://travis-ci.org/ned14/boost.outcome.svg?branch=master"/> </td>
 <td align="center"> <a href="https://ci.appveyor.com/project/ned14/boost-outcome/branch/master">Windows CI:</a><img src="https://ci.appveyor.com/api/projects/status/roe4dacos4gnlu66/branch/master?svg=true"/> </td>
-<td align="center"> <a href="https://coveralls.io/r/ned14/boost.outcome?branch=master">Coverage:</a><img src="https://coveralls.io/repos/ned14/boost.outcome/badge.svg?branch=master"/> </td>
 </tr>
 </table></center>
 
@@ -33,6 +32,10 @@ Outcome even has a \ref try_operation "BOOST_OUTCOME_TRY" macro doing most of th
 
 \note Outcome has not been peer reviewed and is not part of the Boost libraries
 (yet). It is in the peer review queue awaiting a peer review manager.
+
+One motivation for this library is to manage errors reported by different means
+using a single \ref performance_overhead "minimum overhead" framework. This
+motivating example should clarify:
 
 \snippet simple_example.cpp simple_example
 
