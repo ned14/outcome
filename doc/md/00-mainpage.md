@@ -5,7 +5,6 @@
 <td align="center"> <a href="http://my.cdash.org/index.php?project=Boost.Outcome">CTest summary</a><br><a href="http://my.cdash.org/index.php?project=Boost.Outcome">dashboard</a> </td>
 <td align="center"> <a href="https://travis-ci.org/ned14/boost.outcome">Linux and MacOS CI:</a><img src="https://travis-ci.org/ned14/boost.outcome.svg?branch=master"/> </td>
 <td align="center"> <a href="https://ci.appveyor.com/project/ned14/boost-outcome/branch/master">Windows CI:</a><img src="https://ci.appveyor.com/api/projects/status/roe4dacos4gnlu66/branch/master?svg=true"/> </td>
-<td align="center"> <a href="https://coveralls.io/r/ned14/boost.outcome?branch=master">Coverage:</a><img src="https://coveralls.io/repos/ned14/boost.outcome/badge.svg?branch=master"/> </td>
 </tr>
 </table></center>
 

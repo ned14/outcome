@@ -3,8 +3,6 @@ master branch unit test status: Linux & MacOS: [![Build Status](https://travis-c
 
 develop branch unit test status: Linux & MacOS: [![Build Status](https://travis-ci.org/ned14/boost.outcome.svg?branch=develop)](https://travis-ci.org/ned14/boost.outcome) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/roe4dacos4gnlu66/branch/develop?svg=true)](https://ci.appveyor.com/project/ned14/boost-outcome/branch/develop)
 
-Coverage: [![Coverage Status](https://coveralls.io/repos/ned14/boost.outcome/badge.svg?branch=master)](https://coveralls.io/r/ned14/boost.outcome?branch=master)
-
 CTest dashboard: http://my.cdash.org/index.php?project=Boost.Outcome
 
 Documentation: https://ned14.github.io/boost.outcome/

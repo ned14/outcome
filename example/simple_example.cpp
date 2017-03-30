@@ -22,26 +22,26 @@ int inspect_exception_to_your_liking(const std::exception &) { return 5; }
 namespace outcome = BOOST_OUTCOME_V1_NAMESPACE;
 
 namespace Library1
-{                                         // Like the Filesystem and Networking TS,
-  auto fun(std::error_code &) noexcept    // returns errors via lvalue ref to an error_code.
-    -> int;                               // Never throws exceptions.
+{                                                          // Like the Filesystem and Networking TS,
+  auto fun(std::error_code &) noexcept                     // returns errors via lvalue ref to an error_code.
+    -> int;                                                // Never throws exceptions.
 }
 
 namespace Library2
-{                                         // Throws some exception on error
+{                                                          // Throws some exception on error
   auto fun()
     -> int;
 }
   
-namespace Library3                        // The Expected proposed for standardisation in C++ 20
-{                                         // Returns an int (expected) or some custom 
-  auto fun() noexcept                     // error code (unexpected). Never throws exceptions.
+namespace Library3                                         // The Expected proposed for standardisation in C++ 20
+{                                                          // Returns an int (expected) or some custom 
+  auto fun() noexcept                                      // error code (unexpected). Never throws exceptions.
     -> outcome::expected<int, error_code>; 
 }  
   
-namespace Library4                        // Result is an int (not error)
-{                                         // or an outcome::error_code_extended (error)
-  auto fun() noexcept                     // Never throws exceptions.
+namespace Library4                                         // Result is an int (not error)
+{                                                          // or an outcome::error_code_extended (error)
+  auto fun() noexcept                                      // Never throws exceptions.
     -> outcome::result<int>;
 }
   
