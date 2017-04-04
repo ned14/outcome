@@ -238,6 +238,9 @@ expected<int, std::error_code> someotherfunc()
 }
 ~~~
 
+\note If you wish to `try` a function call but not unwrap any returned value, use the
+`BOOST_OUTCOME_TRYV(expr)` macro instead.
+
 
 <hr><br>
 

@@ -1133,11 +1133,23 @@ namespace std
 #define BOOST_OUTCOME_UNIQUE_NAME BOOST_OUTCOME__GLUE(__t, __COUNTER__)
 //#define BOOST_OUTCOME_UNIQUE_NAME __t
 
-#define BOOST_OUTCOME_TRY2(unique, v, m)                                                                                                                                                                                                                                                                                       \
+#define BOOST_OUTCOME_TRYV2(unique, m)                                                                                                                                                                                                                                                                                       \
   auto &&unique = (m);                                                                                                                                                                                                                                                                                                         \
   if(!unique.has_value())                                                                                                                                                                                                                                                                                                      \
-    return BOOST_OUTCOME_V1_NAMESPACE::as_void(unique);                                                                                                                                                                                                                                                                        \
+    return BOOST_OUTCOME_V1_NAMESPACE::as_void(unique);                                                                                                                                                                                                                                                                        
+#define BOOST_OUTCOME_TRY2(unique, v, m)                                                                                                                                                                                                                                                                                       \
+  BOOST_OUTCOME_TRYV2(unique, m); \
   auto v(std::move(std::move(unique).get()))
+
+/*! \brief If the monad returned by expression \em m is empty, erroneous or excepted, propagate that by immediately returning a void immediately
+\ingroup macro_helpers
+*/
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+#define BOOST_OUTCOME_TRYV(m) ...
+#else
+#define BOOST_OUTCOME_TRYV(m) BOOST_OUTCOME_TRYV2(BOOST_OUTCOME_UNIQUE_NAME, m)
+#endif
+
 /*! \brief If the monad returned by expression \em m is empty, erroneous or excepted, propagate that by immediately returning a void immediately, else return the unwrapped value
 \ingroup macro_helpers
 */
