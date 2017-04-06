@@ -309,6 +309,25 @@ public:
       break;
     }
   }
+  struct valueless_t {};  // used to tag when incoming storage cannot have a value
+  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<base::is_referenceable && _is_constructible_from<_value_type2, _error_type2, _exception_type2>::value>::type>
+  BOOST_OUTCOME_CONSTEXPR explicit value_storage(valueless_t, value_storage<_value_type2, _error_type2, _exception_type2> &&o)
+      : base()
+  {
+    switch(o.type)
+    {
+    case storage_type::empty:
+      break;
+    case storage_type::value:
+      break;
+    case storage_type::error:
+      detail::emplace_error_if<has_error_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_error_type>(this, std::move(o.error));
+      break;
+    case storage_type::exception:
+      detail::emplace_exception_if<has_exception_type && value_storage<_value_type2, _error_type2, _exception_type2>::has_exception_type>(this, std::move(o.exception));
+      break;
+    }
+  }
   BOOST_OUTCOME_CONSTEXPR void set_state(value_storage &&o) noexcept(is_nothrow_destructible &&is_nothrow_move_constructible)
   {
     clear();
