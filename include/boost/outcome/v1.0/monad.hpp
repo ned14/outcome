@@ -235,7 +235,7 @@ public:
 #include "detail/basic_monad.ipp"
 
   // Deliberately don't document this constructor
-  constexpr basic_monad(detail::tagged_valueless<void_rebound> &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value)
+  template<class OtherMonad> constexpr basic_monad(detail::tagged_valueless<OtherMonad> &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value)
     : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
   {}
 

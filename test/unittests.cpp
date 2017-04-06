@@ -908,6 +908,22 @@ BOOST_AUTO_TEST_CASE(works / monad / propagate, "Tests that the monad propagates
     };
     BOOST_CHECK(t1(5).get() == "5");
   }
+  {
+    auto t0 = [&](int a) { return make_result<long>(a); };
+    auto t1 = [&](int a) -> outcome<std::string> {
+      BOOST_OUTCOME_TRY(f, t0(a));
+      return std::to_string(f);
+    };
+    BOOST_CHECK(t1(5).get() == "5");
+  }
+  {
+    auto t0 = [&](int a) -> result<long> { return make_result<long>(a); };
+    auto t1 = [&](int a) -> outcome<void> {
+      BOOST_OUTCOME_TRYV(t0(a));
+      return make_outcome<void>();
+    };
+    t1(5);
+  }
 }
 
 BOOST_AUTO_TEST_CASE(works / monad / serialisation, "Tests that the monad serialises and deserialises as intended")

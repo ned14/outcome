@@ -21,12 +21,12 @@
 #endif
 
 #define BOOST_OUTCOME_NAMESPACE_VERSION BOOST_OUTCOME_VERSION_GLUE(BOOST_OUTCOME_VERSION_MAJOR, _, BOOST_OUTCOME_VERSION_MINOR)
-#line 5 "/home/ned/boostish/outcome/include/boost/outcome/outcome.hpp"
+#line 5 "C:/Users/ned/Documents/boostish/outcome/include/boost/outcome/outcome.hpp"
 #undef BOOST_OUTCOME_HEADERS_PATH
 #undef BOOST_OUTCOME_HEADERS_PATH2
 #define BOOST_OUTCOME_HEADERS_PATH4(a) #a
 #define BOOST_OUTCOME_HEADERS_PATH3(a) BOOST_OUTCOME_HEADERS_PATH4(a)
-#line 27 "/home/ned/boostish/outcome/include/boost/outcome/outcome.hpp"
+#line 27 "C:/Users/ned/Documents/boostish/outcome/include/boost/outcome/outcome.hpp"
 #if defined(_MSC_VER) && !defined(__clang__)
 #define BOOST_OUTCOME_HEADERS_PATH2 BOOST_OUTCOME_VERSION_GLUE(v, BOOST_OUTCOME_HEADERS_VERSION, /monad.hpp)
 #elif 1
@@ -49,9 +49,9 @@
 #ifndef BOOSTLITE_CONFIG_HPP
 #define BOOSTLITE_CONFIG_HPP
 #line 2 "revision.hpp"
-#define BOOSTLITE_PREVIOUS_COMMIT_REF b4237fa85f19c6737fb072424d648374e830d0a5
-#define BOOSTLITE_PREVIOUS_COMMIT_DATE "2017-04-04 21:54:56 +00:00"
-#define BOOSTLITE_PREVIOUS_COMMIT_UNIQUE b4237fa8
+#define BOOSTLITE_PREVIOUS_COMMIT_REF cd110dac7e7eee8c2b10bd394d0f92f306f90218
+#define BOOSTLITE_PREVIOUS_COMMIT_DATE "2017-04-04 22:02:03 +00:00"
+#define BOOSTLITE_PREVIOUS_COMMIT_UNIQUE cd110dac
 #line 32 "cpp_feature.h"
 #ifndef BOOSTLITE_HAS_FEATURE_H
 #define BOOSTLITE_HAS_FEATURE_H
@@ -1007,13 +1007,17 @@ namespace
 
   typedef int(__stdcall *SymGetLineFromAddr64_t)(_In_ void *hProcess, _In_ unsigned long long int dwAddr, _Out_ unsigned long *pdwDisplacement, _Out_ PIMAGEHLP_LINE64 Line);
 
+#if defined(__cplusplus) && !defined(__clang__)
   static void *dbghelp;
+#else
+  static HMODULE dbghelp;
+#endif
   static SymInitialize_t SymInitialize;
   static SymGetLineFromAddr64_t SymGetLineFromAddr64;
 
   static void load_dbghelp()
   {
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(__clang__)
     using win32::LoadLibraryA;
     using win32::GetProcAddress;
 #endif
@@ -1043,7 +1047,7 @@ extern "C" {
 
 _Check_return_ size_t backtrace(_Out_writes_(len) void **bt, _In_ size_t len)
 {
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(__clang__)
   using win32::RtlCaptureStackBackTrace;
 #endif
   return RtlCaptureStackBackTrace(1, (unsigned long) len, bt, NULL);
@@ -1055,7 +1059,7 @@ _Check_return_ size_t backtrace(_Out_writes_(len) void **bt, _In_ size_t len)
 #endif
 _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(len) void *const *bt, _In_ size_t len)
 {
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(__clang__)
   using win32::WideCharToMultiByte;
 #endif
   size_t bytes = (len + 1) * sizeof(void *) + 256, n;
@@ -1286,7 +1290,7 @@ namespace detail
 #include <execinfo.h>
 #endif
 
-namespace boost_lite { inline namespace _b4237fa8 {
+namespace boost_lite { inline namespace _cd110dac {
 
 namespace ringbuffer_log
 {
@@ -3550,7 +3554,7 @@ namespace std
 #line 41 "../boost-lite/include/tribool.hpp"
 #include <istream>
 
-namespace boost_lite { inline namespace _b4237fa8 {
+namespace boost_lite { inline namespace _cd110dac {
 
 namespace tribool
 {
@@ -3591,16 +3595,16 @@ namespace tribool
 
 namespace std
 {
-  inline istream &operator>>(istream &s, boost_lite::_b4237fa8::tribool::tribool &a)
+  inline istream &operator>>(istream &s, boost_lite::_cd110dac::tribool::tribool &a)
   {
     char c;
     s >> c;
-    a = (c == '1') ? boost_lite::_b4237fa8::tribool::tribool::true_ : (c == '0') ? boost_lite::_b4237fa8::tribool::tribool::false_ : boost_lite::_b4237fa8::tribool::tribool::other;
+    a = (c == '1') ? boost_lite::_cd110dac::tribool::tribool::true_ : (c == '0') ? boost_lite::_cd110dac::tribool::tribool::false_ : boost_lite::_cd110dac::tribool::tribool::other;
     return s;
   }
-  inline ostream &operator<<(ostream &s, boost_lite::_b4237fa8::tribool::tribool a)
+  inline ostream &operator<<(ostream &s, boost_lite::_cd110dac::tribool::tribool a)
   {
-    char c = (a == boost_lite::_b4237fa8::tribool::tribool::true_) ? '1' : (a == boost_lite::_b4237fa8::tribool::tribool::false_) ? '0' : '?';
+    char c = (a == boost_lite::_cd110dac::tribool::tribool::true_) ? '1' : (a == boost_lite::_cd110dac::tribool::tribool::false_) ? '0' : '?';
     return s << c;
   }
 }
@@ -3865,7 +3869,7 @@ public:
 
 #undef BOOST_OUTCOME_BASIC_MONAD_NAME
 #line 238 "v1.0/monad.hpp"
-  constexpr basic_monad(detail::tagged_valueless<void_rebound> &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value)
+  template<class OtherMonad> constexpr basic_monad(detail::tagged_valueless<OtherMonad> &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value)
     : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
   {}
 
@@ -5717,6 +5721,6 @@ namespace std
 
 
 #endif
-#line 40 "/home/ned/boostish/outcome/include/boost/outcome/outcome.hpp"
+#line 40 "C:/Users/ned/Documents/boostish/outcome/include/boost/outcome/outcome.hpp"
 #undef BOOST_OUTCOME_HEADERS_PATH
 #undef BOOST_OUTCOME_HEADERS_PATH2
