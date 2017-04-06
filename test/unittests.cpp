@@ -1195,6 +1195,32 @@ BOOST_AUTO_TEST_CASE(works / monad / operators, "Tests that the monad custom ope
 }
 #endif
 
+
+/****************************************************** Tests for issues reported ***********************************************************/
+
+BOOST_AUTO_TEST_CASE(issues/7, "https://github.com/ned14/boost.outcome/issues/7")
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  struct udt
+  {
+    udt(int) {}
+//    udt() = delete;
+    udt(const udt &) = default;
+    udt(udt &&) = default;
+  };
+  auto f = []() -> result<udt>
+  {
+    auto g = [] { return result<int>(5); };
+    /* This fails because BOOST_OUTCOME_TRYV() returns a result<void>
+    which if it were valued void, would implicitly convert into a
+    default constructed udt which is not possible, hence the compile error.
+    */
+    BOOST_OUTCOME_TRYV(g());
+    return udt(5);
+  };
+  BOOST_CHECK((std::is_same<decltype(f()), udt>::value));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 #ifndef BOOST_MEMORY_TRANSACTIONS_DISABLE_CATCH

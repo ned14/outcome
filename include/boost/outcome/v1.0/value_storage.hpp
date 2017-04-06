@@ -181,6 +181,7 @@ public:
   using error_type = typename base::error_type;
   using exception_type = typename base::exception_type;
   using storage_type = typename base::storage_type;
+  using valueless_t = typename base::valueless_t;
   using base::clear;
   static_assert(!std::is_same<value_type, error_type>::value, "value_type and error_type cannot be the same type");
   static_assert(!std::is_same<value_type, exception_type>::value, "value_type and exception_type cannot be the same type");
@@ -223,6 +224,7 @@ public:
   constexpr value_storage() = default;
   constexpr value_storage(const value_storage &) = default;
   constexpr value_storage(value_storage &&) = default;
+  constexpr explicit value_storage(valueless_t _, value_storage &&o) : base(_, std::move(o)) {};
   BOOST_OUTCOME_CONSTEXPR value_storage &operator=(const value_storage &) = default;
   BOOST_OUTCOME_CONSTEXPR value_storage &operator=(value_storage &&) = default;
   constexpr value_storage(empty_t _) noexcept : base(_) {}

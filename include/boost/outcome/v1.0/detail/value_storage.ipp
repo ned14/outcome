@@ -304,7 +304,31 @@ public:
   {
     clear();
   }
-#endif
+#else  // BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
+//  BOOST_OUTCOME_VALUE_STORAGE_IMPL(const BOOST_OUTCOME_VALUE_STORAGE_IMPL &o) = default;
+//  BOOST_OUTCOME_VALUE_STORAGE_IMPL &operator=(const BOOST_OUTCOME_VALUE_STORAGE_IMPL &o) = default;
+//  BOOST_OUTCOME_VALUE_STORAGE_IMPL(BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o) = default;
+//  BOOST_OUTCOME_VALUE_STORAGE_IMPL &operator=(BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o) = default;
+#endif  // BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
+  struct valueless_t {};
+  explicit BOOST_OUTCOME_VALUE_STORAGE_IMPL(valueless_t, BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o) noexcept(is_nothrow_move_constructible) : _empty(empty_type()), type(storage_type::empty)
+  {
+    switch(o.type)
+    {
+    case storage_type::empty:
+      break;
+    case storage_type::value:
+      //new(&value) value_type(std::move(o.value));
+      break;
+    case storage_type::error:
+      new(&error) error_type(std::move(o.error));
+      break;
+    case storage_type::exception:
+      new(&exception) exception_type(std::move(o.exception));
+      break;
+    }
+    type = o.type;
+  }
   template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args&&... args)
   {
     clear();
@@ -480,6 +504,8 @@ public:
 #if BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
   ~BOOST_OUTCOME_VALUE_STORAGE_IMPL() noexcept(is_nothrow_destructible) { clear(); }
 #endif
+  struct valueless_t {};
+  explicit BOOST_OUTCOME_VALUE_STORAGE_IMPL(valueless_t, BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o) noexcept(is_nothrow_move_constructible) : BOOST_OUTCOME_VALUE_STORAGE_IMPL(std::move(o)) { }
   template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args&&... args)
   {
     clear();

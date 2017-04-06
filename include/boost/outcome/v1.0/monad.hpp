@@ -99,6 +99,15 @@ namespace detail
   template <class Impl> struct is_monad<basic_monad<Impl>> : std::true_type
   {
   };
+  // Internal type sugar to indicate that a monad is guaranteed to be valueless
+  template<class M> struct tagged_valueless
+  {
+    M value;
+  };
+  template<class M> tagged_valueless<M> tag_valueless(M && m)
+  {
+    return tagged_valueless<M>{std::forward<M>(m) };
+  }
 }
 
 #ifdef BOOST_OUTCOME_ENABLE_ADVANCED
@@ -224,6 +233,11 @@ public:
 // Define all my constructors, this is reused below later
 #define BOOST_OUTCOME_BASIC_MONAD_NAME basic_monad
 #include "detail/basic_monad.ipp"
+
+  // Deliberately don't document this constructor
+  constexpr basic_monad(detail::tagged_valueless<void_rebound> &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
+  {}
 
   //! \brief Same as `true_(tribool(*this))`
   constexpr explicit operator bool() const noexcept { return has_value(); }
@@ -567,6 +581,11 @@ namespace policy
     constexpr basic_monad_storage(basic_monad_storage &&) = default;
     BOOST_OUTCOME_CONSTEXPR basic_monad_storage &operator=(const basic_monad_storage &) = default;
     BOOST_OUTCOME_CONSTEXPR basic_monad_storage &operator=(basic_monad_storage &&) = default;
+    template <class Policy>
+    constexpr basic_monad_storage(detail::tagged_valueless<basic_monad<Policy>> &&o)
+      : _storage(typename value_storage_type::valueless_t(), std::move(o.value._storage))
+    {
+    }
     template <class Policy>
     constexpr basic_monad_storage(basic_monad_storage<Policy> &&o)
         : _storage(std::move(o._storage))
@@ -1136,7 +1155,7 @@ namespace std
 #define BOOST_OUTCOME_TRYV2(unique, m)                                                                                                                                                                                                                                                                                       \
   auto &&unique = (m);                                                                                                                                                                                                                                                                                                         \
   if(!unique.has_value())                                                                                                                                                                                                                                                                                                      \
-    return BOOST_OUTCOME_V1_NAMESPACE::as_void(unique);                                                                                                                                                                                                                                                                        
+    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::as_void(unique));                                                                                                                                                                                                                                                                        
 #define BOOST_OUTCOME_TRY2(unique, v, m)                                                                                                                                                                                                                                                                                       \
   BOOST_OUTCOME_TRYV2(unique, m); \
   auto v(std::move(std::move(unique).get()))
