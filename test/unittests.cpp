@@ -152,6 +152,15 @@ BOOST_AUTO_TEST_CASE(works / traits, "Tests that the traits work as intended")
 }
 #endif
 
+BOOST_AUTO_TEST_CASE(works / error_code_extended, "Tests that error_code_extended works as intended")
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  // This was actually broken for a long time and nobody noticed :(
+  static_assert(!stl11::is_error_code_enum<stl11::errc>::value, "std::errc is an error code enum!");
+  static_assert(stl11::is_error_condition_enum<stl11::errc>::value, "std::errc is not an error condition enum!");
+  BOOST_CHECK(make_errored_result(stl11::errc::file_exists).error() == stl11::errc::file_exists);
+}
+
 BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
