@@ -43,4 +43,20 @@ and only push if additionally it passes with all latest master branches as well 
  - [ ] Create new Win32 and NT error code categories and have make_errored_outcome() use those.
  Have a python script auto generate the code into separate header files. Add those to boost-lite.
 
+
+## Commits and tags in this git repository can be verified using:
+<pre>
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v2
+
+mDMEVvMacRYJKwYBBAHaRw8BAQdAp+Qn6djfxWQYtAEvDmv4feVmGALEQH/pYpBC
+llaXNQe0WE5pYWxsIERvdWdsYXMgKHMgW3VuZGVyc2NvcmVdIHNvdXJjZWZvcmdl
+IHthdH0gbmVkcHJvZCBbZG90XSBjb20pIDxzcGFtdHJhcEBuZWRwcm9kLmNvbT6I
+eQQTFggAIQUCVvMacQIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgAAKCRCELDV4
+Zvkgx4vwAP9gxeQUsp7ARMFGxfbR0xPf6fRbH+miMUg2e7rYNuHtLQD9EUoR32We
+V8SjvX4r/deKniWctvCi5JccgfUwXkVzFAk=
+=puFk
+-----END PGP PUBLIC KEY BLOCK-----
+</pre>
+
 </center>
