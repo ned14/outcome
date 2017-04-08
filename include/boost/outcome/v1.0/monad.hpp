@@ -754,6 +754,12 @@ template <class T = void> inline outcome<T> make_errored_outcome(std::error_code
 {
   return outcome<T>(error_code_extended(std::move(v)));
 }
+//! \brief Make an errored outcome from the type passed \ingroup monad
+template <class T = void, class ErrorCondEnum, typename = typename std::enable_if<stl11::is_error_condition_enum<ErrorCondEnum>::value>::type>
+inline outcome<T> make_errored_outcome(ErrorCondEnum v)
+{
+  return outcome<T>(error_code_extended(make_error_code(v)));
+}
 //! \brief Make a generic errored outcome from the errno passed \ingroup monad
 template <class T = void> inline outcome<T> make_errored_outcome(int e, const char *extended = nullptr)
 {
@@ -844,6 +850,12 @@ template <class T = void> inline result<T> make_errored_result(error_code_extend
 template <class T = void> inline result<T> make_errored_result(std::error_code v)
 {
   return result<T>(error_code_extended(std::move(v)));
+}
+//! \brief Make an errored result from the type passed \ingroup monad
+template <class T = void, class ErrorCondEnum, typename = typename std::enable_if<stl11::is_error_condition_enum<ErrorCondEnum>::value>::type>
+inline result<T> make_errored_result(ErrorCondEnum v)
+{
+  return result<T>(error_code_extended(make_error_code(v)));
 }
 //! \brief Make a generic errored outcome from the errno passed \ingroup monad
 template <class T = void> constexpr inline result<T> make_errored_result(int e, const char *extended = nullptr)
