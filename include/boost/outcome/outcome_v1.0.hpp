@@ -21,12 +21,12 @@
 #endif
 
 #define BOOST_OUTCOME_NAMESPACE_VERSION BOOST_OUTCOME_VERSION_GLUE(BOOST_OUTCOME_VERSION_MAJOR, _, BOOST_OUTCOME_VERSION_MINOR)
-#line 5 "C:/Users/ned/Documents/boostish/outcome/include/boost/outcome/outcome.hpp"
+#line 5 "/home/ned/boostish/outcome/include/boost/outcome/outcome.hpp"
 #undef BOOST_OUTCOME_HEADERS_PATH
 #undef BOOST_OUTCOME_HEADERS_PATH2
 #define BOOST_OUTCOME_HEADERS_PATH4(a) #a
 #define BOOST_OUTCOME_HEADERS_PATH3(a) BOOST_OUTCOME_HEADERS_PATH4(a)
-#line 27 "C:/Users/ned/Documents/boostish/outcome/include/boost/outcome/outcome.hpp"
+#line 27 "/home/ned/boostish/outcome/include/boost/outcome/outcome.hpp"
 #if defined(_MSC_VER) && !defined(__clang__)
 #define BOOST_OUTCOME_HEADERS_PATH2 BOOST_OUTCOME_VERSION_GLUE(v, BOOST_OUTCOME_HEADERS_VERSION, /monad.hpp)
 #elif 1
@@ -49,9 +49,9 @@
 #ifndef BOOSTLITE_CONFIG_HPP
 #define BOOSTLITE_CONFIG_HPP
 #line 2 "revision.hpp"
-#define BOOSTLITE_PREVIOUS_COMMIT_REF 5e7563f4ad7704ed965baadf53c10f6dc8314a4e
-#define BOOSTLITE_PREVIOUS_COMMIT_DATE "2017-04-06 13:27:27 +00:00"
-#define BOOSTLITE_PREVIOUS_COMMIT_UNIQUE 5e7563f4
+#define BOOSTLITE_PREVIOUS_COMMIT_REF f7a19f6a8e0f51a8d47197e7b76d102bc12b1676
+#define BOOSTLITE_PREVIOUS_COMMIT_DATE "2017-04-08 13:11:10 +00:00"
+#define BOOSTLITE_PREVIOUS_COMMIT_UNIQUE f7a19f6a
 #line 32 "cpp_feature.h"
 #ifndef BOOSTLITE_HAS_FEATURE_H
 #define BOOSTLITE_HAS_FEATURE_H
@@ -816,9 +816,9 @@ extern "C" void _mm_pause();
 #line 90 "config.hpp"
 #define BOOST_OUTCOME_V1_ERROR_CODE_IMPL std
 #line 2 "../revision.hpp"
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_REF 25e89e4c453ccf3b02dd452e143b95f07325dbbd
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_DATE "2017-04-06 13:46:45 +00:00"
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE 25e89e4c
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_REF ad136750f6134fbe8576d65b1141a0d1ad888e10
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_DATE "2017-04-08 13:11:16 +00:00"
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE ad136750
 #line 95 "config.hpp"
 #define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL, BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE), inline)
 #line 158 "config.hpp"
@@ -914,7 +914,7 @@ using ::std::generic_category;
 
 #endif
 #line 206 "config.hpp"
-namespace boost { namespace outcome { inline namespace _1_0_std_std_25e89e4c {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_ad136750 {
 namespace stl11
 {
   using namespace boost_lite::bind::std::system_error;
@@ -1185,7 +1185,7 @@ _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(l
 #define BOOST_OUTCOME_THROW(expr) throw expr
 #else
 #include <stdio.h>
-namespace boost { namespace outcome { inline namespace _1_0_std_std_25e89e4c {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_ad136750 {
 namespace detail
 {
   BOOSTLITE_NORETURN inline void do_fatal_exit(const char *expr)
@@ -1297,7 +1297,7 @@ namespace detail
 #include <execinfo.h>
 #endif
 
-namespace boost_lite { inline namespace _5e7563f4 {
+namespace boost_lite { inline namespace _f7a19f6a {
 
 namespace ringbuffer_log
 {
@@ -2042,7 +2042,7 @@ namespace ringbuffer_log
 #define BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE 4096
 #endif
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_25e89e4c {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_ad136750 {
 
 
 inline boost_lite::ringbuffer_log::simple_ringbuffer_log<BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE> &extended_error_code_log()
@@ -2221,7 +2221,7 @@ inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec)
 
 
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_25e89e4c {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_ad136750 {
 
 
 enum class monad_errc
@@ -2291,11 +2291,11 @@ inline stl11::error_condition make_error_condition(monad_errc e)
 namespace std
 {
 
-  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_25e89e4c::monad_errc> : std::true_type
+  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_ad136750::monad_errc> : std::true_type
   {
   };
 
-  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_25e89e4c::monad_errc> : std::true_type
+  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_ad136750::monad_errc> : std::true_type
   {
   };
 }
@@ -2308,7 +2308,7 @@ namespace std
 
 
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_25e89e4c {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_ad136750 {
 
 
 struct empty_t
@@ -3470,9 +3470,9 @@ public:
 namespace std
 {
 
-  template <class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, boost ::outcome ::_1_0_std_std_25e89e4c::value_storage<_value_type, _error_type, _exception_type> &v)
+  template <class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, boost ::outcome ::_1_0_std_std_ad136750::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_25e89e4c;
+    using namespace boost ::outcome ::_1_0_std_std_ad136750;
     switch(v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::value:
@@ -3482,9 +3482,9 @@ namespace std
     }
   }
 
-  template <class _value_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_25e89e4c::value_storage<_value_type, void, void> &v)
+  template <class _value_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_ad136750::value_storage<_value_type, void, void> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_25e89e4c;
+    using namespace boost ::outcome ::_1_0_std_std_ad136750;
     using _error_type = void;
     using _exception_type = void;
     switch(v.type)
@@ -3497,9 +3497,9 @@ namespace std
       return s << "(unknown)";
     }
   }
-  template <class _value_type, class _error_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_25e89e4c::value_storage<_value_type, _error_type, void> &v)
+  template <class _value_type, class _error_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_ad136750::value_storage<_value_type, _error_type, void> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_25e89e4c;
+    using namespace boost ::outcome ::_1_0_std_std_ad136750;
     using _exception_type = void;
     switch(v.type)
     {
@@ -3513,9 +3513,9 @@ namespace std
       return s << "(unknown)";
     }
   }
-  template <class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_25e89e4c::value_storage<_value_type, _error_type, _exception_type> &v)
+  template <class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_ad136750::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_25e89e4c;
+    using namespace boost ::outcome ::_1_0_std_std_ad136750;
     switch(v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::empty:
@@ -3561,7 +3561,7 @@ namespace std
 #line 41 "../boost-lite/include/tribool.hpp"
 #include <istream>
 
-namespace boost_lite { inline namespace _5e7563f4 {
+namespace boost_lite { inline namespace _f7a19f6a {
 
 namespace tribool
 {
@@ -3602,23 +3602,23 @@ namespace tribool
 
 namespace std
 {
-  inline istream &operator>>(istream &s, boost_lite::_5e7563f4::tribool::tribool &a)
+  inline istream &operator>>(istream &s, boost_lite::_f7a19f6a::tribool::tribool &a)
   {
     char c;
     s >> c;
-    a = (c == '1') ? boost_lite::_5e7563f4::tribool::tribool::true_ : (c == '0') ? boost_lite::_5e7563f4::tribool::tribool::false_ : boost_lite::_5e7563f4::tribool::tribool::other;
+    a = (c == '1') ? boost_lite::_f7a19f6a::tribool::tribool::true_ : (c == '0') ? boost_lite::_f7a19f6a::tribool::tribool::false_ : boost_lite::_f7a19f6a::tribool::tribool::other;
     return s;
   }
-  inline ostream &operator<<(ostream &s, boost_lite::_5e7563f4::tribool::tribool a)
+  inline ostream &operator<<(ostream &s, boost_lite::_f7a19f6a::tribool::tribool a)
   {
-    char c = (a == boost_lite::_5e7563f4::tribool::tribool::true_) ? '1' : (a == boost_lite::_5e7563f4::tribool::tribool::false_) ? '0' : '?';
+    char c = (a == boost_lite::_f7a19f6a::tribool::tribool::true_) ? '1' : (a == boost_lite::_f7a19f6a::tribool::tribool::false_) ? '0' : '?';
     return s << c;
   }
 }
 
 #endif
 #line 90 "v1.0/monad.hpp"
-namespace boost { namespace outcome { inline namespace _1_0_std_std_25e89e4c {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_ad136750 {
 
 template <class implementation_policy> class basic_monad;
 
@@ -5065,7 +5065,7 @@ template <class T = void> inline outcome<T> make_errored_outcome(std::error_code
 {
   return outcome<T>(error_code_extended(std::move(v)));
 }
-
+#line 764 "v1.0/monad.hpp"
 template <class T = void, class ErrorCondEnum, typename = typename std::enable_if<stl11::is_error_condition_enum<ErrorCondEnum>::value>::type>
 inline outcome<T> make_errored_outcome(ErrorCondEnum v)
 {
@@ -5088,7 +5088,7 @@ template <class T = void> inline outcome<T> make_exceptional_outcome(std::except
 {
   return outcome<T>(std::move(v));
 }
-#line 792 "v1.0/monad.hpp"
+#line 798 "v1.0/monad.hpp"
 template <typename R> using result = basic_monad<policy::result_policy<R>>;
 
 
@@ -5151,7 +5151,7 @@ template <class T = void> inline result<T> make_errored_result(std::error_code v
 {
   return result<T>(error_code_extended(std::move(v)));
 }
-
+#line 867 "v1.0/monad.hpp"
 template <class T = void, class ErrorCondEnum, typename = typename std::enable_if<stl11::is_error_condition_enum<ErrorCondEnum>::value>::type>
 inline result<T> make_errored_result(ErrorCondEnum v)
 {
@@ -5169,7 +5169,7 @@ template <class T = void> constexpr inline result<T> make_errored_result(unsigne
   return result<T>(error_code_extended(e, deatomiced_categories::system_category(), extended));
 }
 #endif
-#line 885 "v1.0/monad.hpp"
+#line 897 "v1.0/monad.hpp"
 template <typename R> using option = basic_monad<policy::option_policy<R>>;
 
 
@@ -5275,7 +5275,7 @@ template <class T> BOOSTLITE_CONSTEXPR inline option<void> as_void(const option<
 
 
 #ifndef BOOST_OUTCOME_LEAN_AND_MEAN
-#line 1021 "v1.0/monad.hpp"
+#line 1033 "v1.0/monad.hpp"
 #ifndef BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE
 
 #define BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE std::error_code
@@ -5642,7 +5642,7 @@ namespace policy
 #pragma warning(pop)
 #endif
 }
-#line 1086 "v1.0/monad.hpp"
+#line 1098 "v1.0/monad.hpp"
 template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> using expected = basic_monad<policy::expected_policy<R, E>>;
 
 
@@ -5694,7 +5694,7 @@ template <class T, class E, class U> constexpr inline expected<T, E> make_expect
   static_assert(std::is_constructible<E, U>::value, "An E must be constructible from a U");
   return expected<T, E>(std::forward<U>(v));
 }
-#line 1142 "v1.0/monad.hpp"
+#line 1154 "v1.0/monad.hpp"
 template <class T, class E> inline expected<void, E> as_void(const expected<T, E> &v)
 {
   if(v.has_error())
@@ -5712,7 +5712,7 @@ template <class T, class E> inline expected<void, E> as_void(const expected<T, E
 namespace std
 {
 
-  template <class Impl> inline void swap(boost ::outcome ::_1_0_std_std_25e89e4c::basic_monad<Impl> &a, boost ::outcome ::_1_0_std_std_25e89e4c::basic_monad<Impl> &b) { a.swap(b); }
+  template <class Impl> inline void swap(boost ::outcome ::_1_0_std_std_ad136750::basic_monad<Impl> &a, boost ::outcome ::_1_0_std_std_ad136750::basic_monad<Impl> &b) { a.swap(b); }
 }
 
 #define BOOST_OUTCOME__GLUE2(x, y) x##y
@@ -5725,21 +5725,21 @@ namespace std
 
 
 #define BOOST_OUTCOME_TRY2(unique, v, m) BOOST_OUTCOME_TRYV2(unique, m); auto v(std::move(std::move(unique).get()))
-#line 1181 "v1.0/monad.hpp"
+#line 1193 "v1.0/monad.hpp"
 #define BOOST_OUTCOME_TRYV(m) BOOST_OUTCOME_TRYV2(BOOST_OUTCOME_UNIQUE_NAME, m)
-#line 1190 "v1.0/monad.hpp"
+#line 1202 "v1.0/monad.hpp"
 #define BOOST_OUTCOME_TRY(v, m) BOOST_OUTCOME_TRY2(BOOST_OUTCOME_UNIQUE_NAME, v, m)
-#line 1199 "v1.0/monad.hpp"
+#line 1211 "v1.0/monad.hpp"
 #define BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT catch(const std::invalid_argument &e) { return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EINVAL, e.what())); } catch(const std::domain_error &e) { return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EDOM, e.what())); } catch(const std::length_error &e) { return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(E2BIG, e.what())); } catch(const std::out_of_range &e) { return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(ERANGE, e.what())); } catch(const std::logic_error &e) { return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EINVAL, e.what())); } catch(const std::system_error &e) { return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(BOOST_OUTCOME_V1_NAMESPACE::error_code_extended(e.code(), e.what()))); } catch(const std::overflow_error &e) { return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EOVERFLOW, e.what())); } catch(const std::range_error &e) { return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(ERANGE, e.what())); } catch(const std::runtime_error &e) { return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EAGAIN, e.what())); } catch(const std::bad_alloc &e) { return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(ENOMEM, e.what())); } catch(const std::exception &e) { return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EINVAL, e.what())); }
-#line 1264 "v1.0/monad.hpp"
+#line 1276 "v1.0/monad.hpp"
 #define BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT catch(...) { return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EAGAIN, "unknown exception")); }
-#line 1273 "v1.0/monad.hpp"
+#line 1285 "v1.0/monad.hpp"
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
 
 #endif
-#line 40 "C:/Users/ned/Documents/boostish/outcome/include/boost/outcome/outcome.hpp"
+#line 40 "/home/ned/boostish/outcome/include/boost/outcome/outcome.hpp"
 #undef BOOST_OUTCOME_HEADERS_PATH
 #undef BOOST_OUTCOME_HEADERS_PATH2

@@ -931,7 +931,7 @@ BOOST_AUTO_TEST_CASE(works / monad / propagate, "Tests that the monad propagates
       BOOST_OUTCOME_TRYV(t0(a));
       return make_outcome<void>();
     };
-    t1(5);
+    (void) t1(5);
   }
 }
 
