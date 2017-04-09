@@ -754,7 +754,13 @@ template <class T = void> inline outcome<T> make_errored_outcome(std::error_code
 {
   return outcome<T>(error_code_extended(std::move(v)));
 }
-//! \brief Make an errored outcome from the type passed \ingroup monad
+/*! \brief Make an errored outcome from the type passed \ingroup monad
+\note This makes an error code in generic category matching the error condition.
+It does NOT preserve the "semantic equivalence" of error conditions during comparisons,
+if you want that then test `.error()` against the `default_error_condition()` of the
+error code. This overload is purely to save you typing `make_error_code()` around every
+time you use `errc::something`.
+*/
 template <class T = void, class ErrorCondEnum, typename = typename std::enable_if<stl11::is_error_condition_enum<ErrorCondEnum>::value>::type>
 inline outcome<T> make_errored_outcome(ErrorCondEnum v)
 {
@@ -851,7 +857,13 @@ template <class T = void> inline result<T> make_errored_result(std::error_code v
 {
   return result<T>(error_code_extended(std::move(v)));
 }
-//! \brief Make an errored result from the type passed \ingroup monad
+/*! \brief Make an errored result from the type passed \ingroup monad
+\note This makes an error code in generic category matching the error condition.
+It does NOT preserve the "semantic equivalence" of error conditions during comparisons,
+if you want that then test `.error()` against the `default_error_condition()` of the
+error code. This overload is purely to save you typing `make_error_code()` around every
+time you use `errc::something`.
+*/
 template <class T = void, class ErrorCondEnum, typename = typename std::enable_if<stl11::is_error_condition_enum<ErrorCondEnum>::value>::type>
 inline result<T> make_errored_result(ErrorCondEnum v)
 {
