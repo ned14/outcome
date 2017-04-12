@@ -361,7 +361,7 @@ public:
 #pragma warning(push)
 #pragma warning(disable : 4297)  // use of throw within a noexcept function
 #endif
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 6
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wterminate"
 #endif
@@ -394,7 +394,7 @@ public:
         else
           throw;
       }
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 6
 #pragma GCC diagnostic pop
 #endif
 #ifdef _MSC_VER
