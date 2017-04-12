@@ -49,9 +49,9 @@
 #ifndef BOOSTLITE_CONFIG_HPP
 #define BOOSTLITE_CONFIG_HPP
 #line 2 "revision.hpp"
-#define BOOSTLITE_PREVIOUS_COMMIT_REF f7a19f6a8e0f51a8d47197e7b76d102bc12b1676
-#define BOOSTLITE_PREVIOUS_COMMIT_DATE "2017-04-08 13:11:10 +00:00"
-#define BOOSTLITE_PREVIOUS_COMMIT_UNIQUE f7a19f6a
+#define BOOSTLITE_PREVIOUS_COMMIT_REF 2d6bd410a553a1588c1a09148a5c54758e691232
+#define BOOSTLITE_PREVIOUS_COMMIT_DATE "2017-04-11 12:27:28 +00:00"
+#define BOOSTLITE_PREVIOUS_COMMIT_UNIQUE 2d6bd410
 #line 32 "cpp_feature.h"
 #ifndef BOOSTLITE_HAS_FEATURE_H
 #define BOOSTLITE_HAS_FEATURE_H
@@ -498,11 +498,11 @@
 #line 7 "../boost-lite/include/config.hpp"
 #define BOOSTLITE_VERSION_GLUE2(a, b) a##b
 #define BOOSTLITE_VERSION_GLUE(a, b) BOOSTLITE_VERSION_GLUE2(a, b)
-
-
+#line 24 "../boost-lite/include/config.hpp"
 #define BOOSTLITE_NAMESPACE boost_lite::BOOSTLITE_VERSION_GLUE(_, BOOSTLITE_PREVIOUS_COMMIT_UNIQUE)
 #define BOOSTLITE_NAMESPACE_BEGIN namespace boost_lite { inline namespace BOOSTLITE_VERSION_GLUE(_, BOOSTLITE_PREVIOUS_COMMIT_UNIQUE) {
 #define BOOSTLITE_NAMESPACE_END } }
+
 
 
 #ifdef _MSC_VER
@@ -523,7 +523,7 @@
 #define BOOSTLITE_WARNING(msg) BOOSTLITE_BIND_MESSAGE_(GCC warning, BOOSTLITE_BIND_MESSAGE_PREFIX("warning"), msg)
 
 #define BOOSTLITE_ERROR(msg) BOOSTLITE_BIND_MESSAGE_(GCC error, BOOSTLITE_BIND_MESSAGE_PREFIX("error"), msg)
-#line 50 "../boost-lite/include/config.hpp"
+#line 64 "../boost-lite/include/config.hpp"
 #define BOOSTLITE_ANNOTATE_RWLOCK_CREATE(p)
 #define BOOSTLITE_ANNOTATE_RWLOCK_DESTROY(p)
 #define BOOSTLITE_ANNOTATE_RWLOCK_ACQUIRED(p, s)
@@ -618,7 +618,7 @@ extern "C" void _mm_pause();
 #elif defined(_MSC_VER)
 
 #define BOOSTLITE_NODISCARD __declspec("SAL_name" "(" "\"_Must_inspect_result_\"" "," "\"\"" "," "\"2\"" ")") __declspec("SAL_begin") __declspec("SAL_post") __declspec("SAL_mustInspect") __declspec("SAL_post") __declspec("SAL_checkReturn") __declspec("SAL_end")
-#line 152 "../boost-lite/include/config.hpp"
+#line 166 "../boost-lite/include/config.hpp"
 #endif
 #endif
 #ifndef BOOSTLITE_NODISCARD
@@ -816,9 +816,9 @@ extern "C" void _mm_pause();
 #line 90 "config.hpp"
 #define BOOST_OUTCOME_V1_ERROR_CODE_IMPL std
 #line 2 "../revision.hpp"
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_REF ad136750f6134fbe8576d65b1141a0d1ad888e10
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_DATE "2017-04-08 13:11:16 +00:00"
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE ad136750
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_REF ac242bb745aee5d31ff689c6353ef28d9e9272b3
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_DATE "2017-04-12 10:28:12 +00:00"
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE ac242bb7
 #line 95 "config.hpp"
 #define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL, BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE), inline)
 #line 158 "config.hpp"
@@ -914,7 +914,7 @@ using ::std::generic_category;
 
 #endif
 #line 206 "config.hpp"
-namespace boost { namespace outcome { inline namespace _1_0_std_std_ad136750 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_ac242bb7 {
 namespace stl11
 {
   using namespace boost_lite::bind::std::system_error;
@@ -1185,7 +1185,7 @@ _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(l
 #define BOOST_OUTCOME_THROW(expr) throw expr
 #else
 #include <stdio.h>
-namespace boost { namespace outcome { inline namespace _1_0_std_std_ad136750 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_ac242bb7 {
 namespace detail
 {
   BOOSTLITE_NORETURN inline void do_fatal_exit(const char *expr)
@@ -1297,7 +1297,7 @@ namespace detail
 #include <execinfo.h>
 #endif
 
-namespace boost_lite { inline namespace _f7a19f6a {
+namespace boost_lite { inline namespace _2d6bd410 {
 
 namespace ringbuffer_log
 {
@@ -2042,7 +2042,7 @@ namespace ringbuffer_log
 #define BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE 4096
 #endif
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_ad136750 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_ac242bb7 {
 
 
 inline boost_lite::ringbuffer_log::simple_ringbuffer_log<BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE> &extended_error_code_log()
@@ -2221,7 +2221,7 @@ inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec)
 
 
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_ad136750 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_ac242bb7 {
 
 
 enum class monad_errc
@@ -2291,11 +2291,11 @@ inline stl11::error_condition make_error_condition(monad_errc e)
 namespace std
 {
 
-  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_ad136750::monad_errc> : std::true_type
+  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_ac242bb7::monad_errc> : std::true_type
   {
   };
 
-  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_ad136750::monad_errc> : std::true_type
+  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_ac242bb7::monad_errc> : std::true_type
   {
   };
 }
@@ -2308,7 +2308,7 @@ namespace std
 
 
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_ad136750 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_ac242bb7 {
 
 
 struct empty_t
@@ -2903,7 +2903,7 @@ public:
 #pragma warning(push)
 #pragma warning(disable: 4297)
 #endif
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 6
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wterminate"
 #endif
@@ -2950,7 +2950,7 @@ public:
     }
     return *this;
   }
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 6
 #pragma GCC diagnostic pop
 #endif
 #ifdef _MSC_VER
@@ -3396,7 +3396,7 @@ public:
 #pragma warning(push)
 #pragma warning(disable : 4297)
 #endif
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 6
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wterminate"
 #endif
@@ -3429,7 +3429,7 @@ public:
         else
           throw;
       }
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 6
 #pragma GCC diagnostic pop
 #endif
 #ifdef _MSC_VER
@@ -3470,9 +3470,9 @@ public:
 namespace std
 {
 
-  template <class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, boost ::outcome ::_1_0_std_std_ad136750::value_storage<_value_type, _error_type, _exception_type> &v)
+  template <class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, boost ::outcome ::_1_0_std_std_ac242bb7::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_ad136750;
+    using namespace boost ::outcome ::_1_0_std_std_ac242bb7;
     switch(v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::value:
@@ -3482,9 +3482,9 @@ namespace std
     }
   }
 
-  template <class _value_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_ad136750::value_storage<_value_type, void, void> &v)
+  template <class _value_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_ac242bb7::value_storage<_value_type, void, void> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_ad136750;
+    using namespace boost ::outcome ::_1_0_std_std_ac242bb7;
     using _error_type = void;
     using _exception_type = void;
     switch(v.type)
@@ -3497,9 +3497,9 @@ namespace std
       return s << "(unknown)";
     }
   }
-  template <class _value_type, class _error_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_ad136750::value_storage<_value_type, _error_type, void> &v)
+  template <class _value_type, class _error_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_ac242bb7::value_storage<_value_type, _error_type, void> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_ad136750;
+    using namespace boost ::outcome ::_1_0_std_std_ac242bb7;
     using _exception_type = void;
     switch(v.type)
     {
@@ -3513,9 +3513,9 @@ namespace std
       return s << "(unknown)";
     }
   }
-  template <class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_ad136750::value_storage<_value_type, _error_type, _exception_type> &v)
+  template <class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_ac242bb7::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_ad136750;
+    using namespace boost ::outcome ::_1_0_std_std_ac242bb7;
     switch(v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::empty:
@@ -3561,7 +3561,7 @@ namespace std
 #line 41 "../boost-lite/include/tribool.hpp"
 #include <istream>
 
-namespace boost_lite { inline namespace _f7a19f6a {
+namespace boost_lite { inline namespace _2d6bd410 {
 
 namespace tribool
 {
@@ -3602,23 +3602,23 @@ namespace tribool
 
 namespace std
 {
-  inline istream &operator>>(istream &s, boost_lite::_f7a19f6a::tribool::tribool &a)
+  inline istream &operator>>(istream &s, boost_lite::_2d6bd410::tribool::tribool &a)
   {
     char c;
     s >> c;
-    a = (c == '1') ? boost_lite::_f7a19f6a::tribool::tribool::true_ : (c == '0') ? boost_lite::_f7a19f6a::tribool::tribool::false_ : boost_lite::_f7a19f6a::tribool::tribool::other;
+    a = (c == '1') ? boost_lite::_2d6bd410::tribool::tribool::true_ : (c == '0') ? boost_lite::_2d6bd410::tribool::tribool::false_ : boost_lite::_2d6bd410::tribool::tribool::other;
     return s;
   }
-  inline ostream &operator<<(ostream &s, boost_lite::_f7a19f6a::tribool::tribool a)
+  inline ostream &operator<<(ostream &s, boost_lite::_2d6bd410::tribool::tribool a)
   {
-    char c = (a == boost_lite::_f7a19f6a::tribool::tribool::true_) ? '1' : (a == boost_lite::_f7a19f6a::tribool::tribool::false_) ? '0' : '?';
+    char c = (a == boost_lite::_2d6bd410::tribool::tribool::true_) ? '1' : (a == boost_lite::_2d6bd410::tribool::tribool::false_) ? '0' : '?';
     return s << c;
   }
 }
 
 #endif
 #line 90 "v1.0/monad.hpp"
-namespace boost { namespace outcome { inline namespace _1_0_std_std_ad136750 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_ac242bb7 {
 
 template <class implementation_policy> class basic_monad;
 
@@ -5712,7 +5712,7 @@ template <class T, class E> inline expected<void, E> as_void(const expected<T, E
 namespace std
 {
 
-  template <class Impl> inline void swap(boost ::outcome ::_1_0_std_std_ad136750::basic_monad<Impl> &a, boost ::outcome ::_1_0_std_std_ad136750::basic_monad<Impl> &b) { a.swap(b); }
+  template <class Impl> inline void swap(boost ::outcome ::_1_0_std_std_ac242bb7::basic_monad<Impl> &a, boost ::outcome ::_1_0_std_std_ac242bb7::basic_monad<Impl> &b) { a.swap(b); }
 }
 
 #define BOOST_OUTCOME__GLUE2(x, y) x##y
