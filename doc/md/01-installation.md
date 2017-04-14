@@ -5,8 +5,19 @@
 Each commit to develop branch is tested by Travis and Appveyor on Linux with GCC and clang,
 OS X with Xcode and on Windows with VS2015.
 A nightly cronjob figures out for which latest commit all tests passed on all those platforms and
-merges that commit to master branch. From that master branch, a distribution is made to the following package
-repositories.
+merges that commit to master branch. From that master branch, a source tarball is generated.
+
+Under a default configuration, when you `#include "boost.outcome/include/boost/outcome.hpp"`
+you will include a preprocessed single file edition for maximum build performance in
+downstream projects. This can interfere with accurate bug reporting in Outcome, so if you
+are diagnosing a problem in Outcome itself, predefine
+the macro `BOOST_OUTCOME_DISABLE_PREPROCESSED_INTERFACE_FILE` globally. This will cause
+the Outcome master include header to include Outcome's constituent files the traditional way.
+
+If you are using CMake, you almost certainly want to use Outcome's
+\ref modular_cmake "modular cmake" build support instead, as that will use Outcome as a
+C++ Module on supporting compilers.
+
 
 <br><hr><br>
 
@@ -69,3 +80,32 @@ ctest -C Release
 In case you are curious why there is a "noexcept" edition of the unit tests, this is
 the unit test suite compiled with C++ exceptions and RTTI disabled and apart from not
 including the C++ exception specific tests, is otherwise identical.
+
+
+<br><hr><br>
+
+\section modular_cmake Modular CMake build support
+
+If you are using Outcome in a CMake project, Outcome is a "modular cmake" project
+using only modern cmake 3 throughout. This lets you add the Outcome directory as a
+cmake module with no unexpected consequence on the rest of your cmake. You will need
+to be using cmake 3.1 or better, and cmake 3.5 or better if you want C++ Modules to work.
+
+\code
+add_subdirectory(
+  "${CMAKE_CURRENT_SOURCE_DIR}/boost.outcome"  # path to outcome source
+  "${CMAKE_CURRENT_BINARY_DIR}/boost.outcome"  # your choice of where to put binaries
+  EXCLUDE_FROM_ALL                             # please only lazy build outcome on demand
+)
+\endcode
+
+Outcome's cmake has the following useful products:
+- `outcome_hl` (target): the Outcome header only library. Add this to any
+`target_link_libraries()` in your cmake to bring in Outcome as a C++ Module where
+available, or as a precompilable preprocessed header only library. This will also
+add to your link (via `PUBLIC`) any debugger visualisation support files, any system library
+dependencies and also force all consuming executables to be configured with a minimum
+of C++ 14 as Outcome requires a minimum of that.
+- `outcome_TEST_TARGETS` (list): a list of targets which generate Outcome's test
+suite. You can append this to your own test suite if you wish to run Outcome's test
+suite along with your own.

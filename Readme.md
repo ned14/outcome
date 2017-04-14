@@ -12,12 +12,15 @@ Latest tarball of source with all tests passing on Linux and Windows: https://de
 Past tarballs of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/boost.outcome
 
 Todo before Boost peer review:
- - [ ] Add docs page on using Outcome from cmake
+ - [x] Add docs page on using Outcome from cmake
  - [ ] Write some python scripting which injects the licence boilerplate at the top
  of each source file, along with a list of contributors to that file as gleaned from
  the git history
    - [ ] Change licence to dual Apache 2.0 + Boost
- - [ ] `make install` needs to install dependency headers too.
+ - [ ] `make install` needs to install dependency headers too. Once this is working,
+ get cmake exports working
+ (https://cmake.org/Wiki/CMake/Tutorials/Exporting_and_Importing_Targets#Exporting_Targets)
+ and update the modular cmake docs.
 
  
 Later:
