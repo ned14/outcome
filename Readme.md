@@ -11,27 +11,25 @@ Latest tarball of source with all tests passing on Linux and Windows: https://de
 
 Past tarballs of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/boost.outcome
 
-Todo:
- - [x] Use "clean" method for getting cmake to not specify /EHsc, eliminate those annoying warnings.
- - [x] Don't define BOOST_* C++ feature macros so we don't collide with Boost anymore.
- - [x] Test relaxed constexpr in VS15 once that is released and delete the hack macro.
- - [x] Document the exception throwing macros in the tutorial
- - [x] Rejig `BOOST_OUTCOME_ENABLE_OPERATORS` to decide what ought to be in or out.
- - [x] Wrap `std::generic_category()` etc with non-atomic fascades for error_code_extended.
- - [x] Break monad.hpp into separate files.
- - [x] Get that clang format plugin working for VS2017 and do a clang format pass
- - [x] Do a clang tidy pass with very latest clang tidy
- - [x] Get preprocessed edition generation working
- - [x] See if MSVC C++ Modules is working in VS2017 RTM (it isn't)
+Todo before Boost peer review:
+ - [x] Add docs page on using Outcome from cmake
+ - [ ] Write some python scripting which injects the licence boilerplate at the top
+ of each source file, along with a list of contributors to that file as gleaned from
+ the git history
+   - [ ] Change licence to dual Apache 2.0 + Boost
+ - [ ] `make install` needs to install dependency headers too. Once this is working,
+ get cmake exports working
+ (https://cmake.org/Wiki/CMake/Tutorials/Exporting_and_Importing_Targets#Exporting_Targets)
+ and update the modular cmake docs.
+
  
 Later:
+ - [ ] Create new Win32 and NT error code categories and have make_errored_outcome() use those.
+ Have a python script auto generate the code into separate header files. Add those to boost-lite.
  - [ ] Add config where in release mode the exception throwing macros generate link errors
-for symbols with the function name and line number in them.
- - [ ] Need to get boost-lite's cmake come up with a preprocessed edition as the master include header
-   - Need two editions, one with `BOOST_OUTCOME_ENABLE_ADVANCED` and one without.
-   - Preprocessed edition ought to include the SHA in the namespace!
+for symbols with the function name and line number in them. This lets you track down all
+potentially throwing code.
  - [ ] error_or() ought to have rvalue ref etc overloads, and exception_or()
- - [ ] `make install` needs to install dependency headers too
  - [ ] Add nothrow make functions for outcomes, maybe with error lvalue ref constructor editions for results.
  - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
  - [ ] Add tribool logic programming operator overloads
@@ -40,8 +38,6 @@ like constructors, and convert said exceptions/TLS back into outcomes.
   - Make use of `std::system_error(errno, system_category, "custom error message");`
  - [ ] Latest version push script really ought to test library in flat boost-lite configuration
 and only push if additionally it passes with all latest master branches as well as stamped branches
- - [ ] Create new Win32 and NT error code categories and have make_errored_outcome() use those.
- Have a python script auto generate the code into separate header files. Add those to boost-lite.
 
 
 ## Commits and tags in this git repository can be verified using:
