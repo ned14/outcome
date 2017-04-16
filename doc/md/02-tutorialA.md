@@ -313,7 +313,7 @@ is an apparently hanged program. Far better would be if the `openfile()` functio
 could return the cause of its failure, and we could then treat all errors which are different
 to file-not-found as reason to **abort**.
 
-This where the proposed `expected<T, E>` comes in. It refines `optional<T>` with
+This is where the proposed `expected<T, E>` comes in. It refines `optional<T>` with
 variant storage which can hold either an expected value of
 type `T` or an unexpected value of type `E`. Like `variant<T, E>`, `expected<T, E>`
 is a discriminated union storing either `T` or `E` in the same storage space, but
