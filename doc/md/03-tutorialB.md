@@ -219,7 +219,7 @@ expected value, that value is *unwrapped* and returned as the result from the TR
 
 Unlike the `try` operator, the macro is not an expression so you can't write statements like
 `if(BOOST_OUTCOME_TRY(var, expr))` as you can in Rust or Swift, this is due to a limitation
-of the C++ language (you can't return from functions in an expression). What you can do is to
+of the C++ language (you can't return from functions in an expression) [1]. What you can do is to
 initialise a variable `var` on the stack to the unwrapped return value from the expression,
 so you might write:
 
@@ -240,6 +240,11 @@ expected<int, std::error_code> someotherfunc()
 
 \note If you wish to `try` a function call but not unwrap any returned value, use the
 `BOOST_OUTCOME_TRYV(expr)` macro instead.
+
+[1]: GCC and clang provide a proprietary extension to the language letting you encode a sequence
+of statements into an expression, so on those compilers only a `BOOST_OUTCOME_TRYX(expr)` macro
+behaves exactly like the `try` operator in Swift or Rust. The `BOOST_OUTCOME_TRYX` macro is not
+defined on compilers not supporting that proprietary extension.
 
 
 <hr><br>

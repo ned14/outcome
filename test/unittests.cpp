@@ -1246,6 +1246,27 @@ BOOST_AUTO_TEST_CASE(issues/7, "https://github.com/ned14/boost.outcome/issues/7"
   (void) f();
 }
 
+#ifdef BOOST_OUTCOME_TRYX
+BOOST_AUTO_TEST_CASE(issues/9, "https://github.com/ned14/boost.outcome/issues/9")
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  struct udt
+  {
+    udt(int) {}
+//    udt() = delete;
+    udt(const udt &) = default;
+    udt(udt &&) = default;
+  };
+  auto f = []() -> result<udt>
+  {
+    auto g = [] { return result<int>(5); };
+    return udt(BOOST_OUTCOME_TRYX(g()));
+  };
+  (void) f();
+}
+#endif
+
+
 BOOST_AUTO_TEST_SUITE_END()
 
 #ifndef BOOST_MEMORY_TRANSACTIONS_DISABLE_CATCH

@@ -1193,6 +1193,28 @@ namespace std
 #define BOOST_OUTCOME_TRYV(m) BOOST_OUTCOME_TRYV2(BOOST_OUTCOME_UNIQUE_NAME, m)
 #endif
 
+#if defined(DOXYGEN_IS_IN_THE_HOUSE) || defined(__GNUC__) || defined(__clang__)
+
+/*! \brief If the monad returned by expression \em m is empty, erroneous or excepted, propagate that by immediately returning a void immediately, else become the unwrapped value as an expression. This makes `BOOST_OUTCOME_TRYX(expr)` an expression which can be used exactly like the `try` operator in other languages.
+
+\note This macro makes use of a proprietary extension in GCC and clang and is not portable. The macro is not made available on unsupported compilers,
+so you can test for its presence using `#ifdef BOOST_OUTCOME_TRYX`.
+\ingroup macro_helpers
+*/
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+#define BOOST_OUTCOME_TRYX(m) ...
+#else
+#define BOOST_OUTCOME_TRYX(m) ({ \
+\
+  auto &&res = (m); \
+  if(!res.has_value()) \
+    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::as_void(res)); \
+  std::move(res.value()); \
+  \
+})
+#endif
+#endif
+
 /*! \brief If the monad returned by expression \em m is empty, erroneous or excepted, propagate that by immediately returning a void immediately, else return the unwrapped value
 \ingroup macro_helpers
 */
