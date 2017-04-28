@@ -21,7 +21,7 @@ ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/ve
 # Sets the usual PROJECT_NAME etc
 project(outcome VERSION ${VERSIONSTRING} LANGUAGES C CXX)
 # Also set a *cmake* namespace for this project
-set(PROJECT_NAMESPACE boost--)
+set(PROJECT_NAMESPACE boost::)
 # Setup this cmake environment for this project
 include(BoostLiteSetupProject)
 if(NOT PROJECT_IS_DEPENDENCY)
@@ -119,7 +119,7 @@ if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
   )
 endif()
 # Set the library dependencies this library has
-target_link_libraries(outcome_hl INTERFACE boost-lite_hl)
+target_link_libraries(outcome_hl INTERFACE boost-lite::hl)
 
 # On POSIX we need to patch linking to stdc++fs into the docs examples 
 if(DOXYGEN_FOUND AND GCC)

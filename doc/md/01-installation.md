@@ -100,7 +100,7 @@ add_subdirectory(
 \endcode
 
 Outcome's cmake has the following useful products:
-- `outcome_hl` (target): the Outcome header only library. Add this to any
+- `boost::outcome::hl` (target): the Outcome header only library. Add this to any
 `target_link_libraries()` in your cmake to bring in Outcome as a C++ Module where
 available, or as a precompilable preprocessed header only library. This will also
 add to your link (via `PUBLIC`) any debugger visualisation support files, any system library
