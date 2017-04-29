@@ -173,6 +173,7 @@ class handle_ref;  // Some sort of smart pointer managing a handle *
 // Non-throwing overload
 extern handle_ref openfile(const char *path, std::error_code &ec) noexcept
 {
+  ec.clear();  // reset the error code
   int fd = open(path, O_RDONLY);
   if(fd == -1)
   {
