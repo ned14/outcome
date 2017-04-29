@@ -1,0 +1,4 @@
+20170429 ACCU Mongrel Monads, Dirty, dirty, dirty
+Covers the history of error handling in C++, and how the LEWG Expected works.
+Slides: https://docs.google.com/presentation/d/1X_3VOxb8PMGXHBzjmzl5oVnwYVIyBpZHcY0Idv_9tSc/edit?usp=sharing
+Video: TBD
