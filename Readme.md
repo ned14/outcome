@@ -10,20 +10,8 @@ Documentation: https://ned14.github.io/boost.outcome/
 Latest tarball of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/boost.outcome-v1.0-source-latest.tar.xz
 
 Past tarballs of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/boost.outcome
-
-Todo before Boost peer review:
- - [x] Add docs page on using Outcome from cmake
- - [ ] Write some python scripting which injects the licence boilerplate at the top
- of each source file, along with a list of contributors to that file as gleaned from
- the git history
-   - [ ] Change licence to dual Apache 2.0 + Boost
- - [ ] `make install` needs to install dependency headers too. Once this is working,
- get cmake exports working
- (https://cmake.org/Wiki/CMake/Tutorials/Exporting_and_Importing_Targets#Exporting_Targets)
- and update the modular cmake docs.
-
  
-Later:
+Later after Boost peer review:
  - [ ] Create new Win32 and NT error code categories and have make_errored_outcome() use those.
  Have a python script auto generate the code into separate header files. Add those to boost-lite.
  - [ ] Add config where in release mode the exception throwing macros generate link errors
@@ -36,8 +24,6 @@ potentially throwing code.
  - [ ] Add macro helpers to Outcome for returning outcomes out of things which cannot return values
 like constructors, and convert said exceptions/TLS back into outcomes.
   - Make use of `std::system_error(errno, system_category, "custom error message");`
- - [ ] Latest version push script really ought to test library in flat boost-lite configuration
-and only push if additionally it passes with all latest master branches as well as stamped branches
 
 
 ## Commits and tags in this git repository can be verified using:

@@ -50,7 +50,8 @@ if(NOT PROJECT_IS_DEPENDENCY)
                             "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/${PROJECT_NAME}.hpp"
                             -I .
                             --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
-  #                          --line-directive --debug
+                            --line-directive
+  #                          --debug
                             -U BOOSTLITE_ENABLE_VALGRIND
                             -U __cpp_modules
                             -U GENERATING_OUTCOME_MODULE_INTERFACE
