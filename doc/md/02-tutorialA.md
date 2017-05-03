@@ -19,6 +19,13 @@ more convenient extensions.
 
 <hr><br>
 
+\note The material in this section of the tutorial was presented at the ACCU 2017 conference.
+The recording of that talk can be viewed at https://youtu.be/XVofgKH-uu4.
+
+<center><iframe width="853" height="480" src="https://www.youtube.com/embed/XVofgKH-uu4?rel=0" frameborder="0" allowfullscreen></iframe><center>
+
+<hr><br>
+
 
 \section c-style C style error handling: integer returns
 
