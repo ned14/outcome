@@ -31,7 +31,7 @@ Outcome even has a \ref try_operation "BOOST_OUTCOME_TRY" macro doing most of th
 `try` keyword in Rust and Swift!
 
 \note Outcome has not been peer reviewed and is not part of the Boost libraries
-(yet). It is in the peer review queue awaiting a peer review manager.
+(yet). It will undergo its first round of peer review end of May 2017.
 
 One motivation for this library is to manage errors reported by different means
 using a single \ref performance_overhead "minimum overhead" framework. This
