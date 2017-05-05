@@ -22,21 +22,26 @@ it is missing, it is either because we feel its presence is a defect in the LEWG
 it not worth implementing.
 
 A summary of the main differences:
-- P0323R1 doesn't yet specify what will be done if you try accessing an expected
-which is valueless due to exception. We throw a `bad_expected_access<void>` in
-this situation as that seemed logical. If the LEWG proposal decides on something
-different, this implementation will change to track the LEWG proposal.
+- P0323R1 avoids any potential for a valueless due to exception state by using the double
+buffer design as proposed by
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0110r0.html">P0110R0</a>
+(I understand that a future `std::variant<...>` will do the same). Outcome has not
+implemented support for the double buffer design yet due to its significant implementation
+complexity, and until it does we throw a `bad_expected_access<void>` in a valueless due to
+exception situation as that seemed logical.
 - Types `T` and `E` cannot be constructible into one another. This is a fundamental
 design choice in basic_monad to significantly reduce compile times so it won't be
 fixed.
 - `unexpected_type<E>` is implemented as an `expected<void, E>` and it lets
 the basic_monad machinery do the implicit conversion to some `expected<T, E>`
-through the less representative to more representative conversion rules.
+through the less representative to more representative conversion rules. Note
+that our Expected passes the LEWG Expected test suite just fine, so you probably
+won't notice this implementation detail in your code.
 - Our `expected<T, E>` defaults E to `std::error_code` rather than `std::error_condition`
-(the LEWG proposal is almost certainly wrong on this, it should be `std::error_code`).
-If you don't like this, predefine the `BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE` macro.
+(the LEWG proposal fixes this in P0323R2).
 - We don't implement the ordering and hashing operator overloads due to https://akrzemi1.wordpress.com/2014/12/02/a-gotcha-with-optional/.
-The fact the LEWG proposal does as currently proposed is a defect.
+The fact the LEWG proposal does as currently proposed is a defect (it will be discussed
+with P0323R2 in Toronto).
 - We don't implement `make_expected_from_call()` as we think it highly likely to be
 removed from the next version of the proposal due to it conferring little value.
 - Our Expected always defines the default, copy and move constructors even if the

@@ -93,14 +93,11 @@ namespace detail
   {
   };
   // Internal type sugar to indicate that a monad is guaranteed to be valueless
-  template<class M> struct tagged_valueless
+  template <class M> struct tagged_valueless
   {
     M value;
   };
-  template<class M> tagged_valueless<M> tag_valueless(M && m)
-  {
-    return tagged_valueless<M>{std::forward<M>(m) };
-  }
+  template <class M> tagged_valueless<M> tag_valueless(M &&m) { return tagged_valueless<M>{std::forward<M>(m)}; }
 }
 
 #ifdef BOOST_OUTCOME_ENABLE_ADVANCED
@@ -228,9 +225,11 @@ public:
 #include "detail/basic_monad.ipp"
 
   // Deliberately don't document this constructor
-  template<class OtherMonad> constexpr basic_monad(detail::tagged_valueless<OtherMonad> &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value)
-    : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
-  {}
+  template <class OtherMonad>
+  constexpr basic_monad(detail::tagged_valueless<OtherMonad> &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value)
+      : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
+  {
+  }
 
   //! \brief Same as `true_(tribool(*this))`
   constexpr explicit operator bool() const noexcept { return has_value(); }
@@ -576,7 +575,7 @@ namespace policy
     BOOST_OUTCOME_CONSTEXPR basic_monad_storage &operator=(basic_monad_storage &&) = default;
     template <class Policy>
     constexpr basic_monad_storage(detail::tagged_valueless<basic_monad<Policy>> &&o)
-      : _storage(typename value_storage_type::valueless_t(), std::move(o.value._storage))
+        : _storage(typename value_storage_type::valueless_t(), std::move(o.value._storage))
     {
     }
     template <class Policy>
@@ -754,8 +753,7 @@ if you want that then test `.error()` against the `default_error_condition()` of
 error code. This overload is purely to save you typing `make_error_code()` around every
 time you use `errc::something`.
 */
-template <class T = void, class ErrorCondEnum, typename = typename std::enable_if<stl11::is_error_condition_enum<ErrorCondEnum>::value>::type>
-inline outcome<T> make_errored_outcome(ErrorCondEnum v)
+template <class T = void, class ErrorCondEnum, typename = typename std::enable_if<stl11::is_error_condition_enum<ErrorCondEnum>::value>::type> inline outcome<T> make_errored_outcome(ErrorCondEnum v)
 {
   return outcome<T>(error_code_extended(make_error_code(v)));
 }
@@ -857,8 +855,7 @@ if you want that then test `.error()` against the `default_error_condition()` of
 error code. This overload is purely to save you typing `make_error_code()` around every
 time you use `errc::something`.
 */
-template <class T = void, class ErrorCondEnum, typename = typename std::enable_if<stl11::is_error_condition_enum<ErrorCondEnum>::value>::type>
-inline result<T> make_errored_result(ErrorCondEnum v)
+template <class T = void, class ErrorCondEnum, typename = typename std::enable_if<stl11::is_error_condition_enum<ErrorCondEnum>::value>::type> inline result<T> make_errored_result(ErrorCondEnum v)
 {
   return result<T>(error_code_extended(make_error_code(v)));
 }
@@ -1028,6 +1025,22 @@ for the type traits for basic_monad into namespace std.
 #define BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE std::error_code
 #endif
 
+/*! \class bad_expected_access_base
+\ingroup expected
+\brief The base exception type thrown when you try to access an errored expected
+*/
+class bad_expected_access_base : public std::logic_error
+{
+public:
+  //! \brief The type of error
+  using error_type = void;
+  //! \brief Constructs an instance
+  bad_expected_access_base(const char *what)
+      : std::logic_error(what)
+  {
+  }
+};
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4814)
@@ -1036,7 +1049,7 @@ for the type traits for basic_monad into namespace std.
 \ingroup expected
 \brief The exception type thrown when you try to access an errored expected
 */
-template <class E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class bad_expected_access : public std::logic_error
+template <class E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class bad_expected_access : public bad_expected_access_base
 {
   E _error;
 
@@ -1044,7 +1057,7 @@ public:
   //! \brief The type of error
   using error_type = E;
   //! \brief Constructs an instance taking a copy
-  explicit bad_expected_access(const error_type &e) noexcept : std::logic_error("Bad expected access of value when error was present"), _error(e) {}
+  explicit bad_expected_access(const error_type &e) noexcept : bad_expected_access_base("Bad expected access of value when error was present"), _error(e) {}
   //! \brief Returns the error
   const error_type &error() const &noexcept { return _error; }
   //! \brief Returns the error
@@ -1055,13 +1068,13 @@ public:
   error_type &&error() && noexcept { return _error; }
 };
 //! \brief Type thrown due to valueless by exception state
-template <> class bad_expected_access<void> : public std::logic_error
+template <> class bad_expected_access<void> : public bad_expected_access_base
 {
 public:
   //! \brief The type of error
   using error_type = void;
   //! \brief Constructs an instance
-  explicit bad_expected_access() noexcept : std::logic_error("Bad expected access of value when valueless due to exception") {}
+  explicit bad_expected_access() noexcept : bad_expected_access_base("Bad expected access of value when valueless due to exception") {}
 };
 template <class E> inline bad_expected_access<E> make_bad_expected_access(const E &v) noexcept
 {
@@ -1169,12 +1182,12 @@ namespace std
 #define BOOST_OUTCOME_UNIQUE_NAME BOOST_OUTCOME__GLUE(__t, __COUNTER__)
 //#define BOOST_OUTCOME_UNIQUE_NAME __t
 
-#define BOOST_OUTCOME_TRYV2(unique, m)                                                                                                                                                                                                                                                                                       \
+#define BOOST_OUTCOME_TRYV2(unique, m)                                                                                                                                                                                                                                                                                         \
   auto &&unique = (m);                                                                                                                                                                                                                                                                                                         \
   if(!unique.has_value())                                                                                                                                                                                                                                                                                                      \
-    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::as_void(unique));                                                                                                                                                                                                                                                                        
+    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::as_void(unique));
 #define BOOST_OUTCOME_TRY2(unique, v, m)                                                                                                                                                                                                                                                                                       \
-  BOOST_OUTCOME_TRYV2(unique, m); \
+  BOOST_OUTCOME_TRYV2(unique, m);                                                                                                                                                                                                                                                                                              \
   auto v(std::move(std::move(unique).get()))
 
 /*! \brief If the monad returned by expression \em m is empty, erroneous or excepted, propagate that by immediately returning a void immediately
@@ -1197,12 +1210,13 @@ so you can test for its presence using `#ifdef BOOST_OUTCOME_TRYX`.
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
 #define BOOST_OUTCOME_TRYX(m) ...
 #else
-#define BOOST_OUTCOME_TRYX(m) ({ \
-\
-  auto &&res = (m); \
-  if(!res.has_value()) \
-    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::as_void(res)); \
-  std::move(res.value()); \
+#define BOOST_OUTCOME_TRYX(m)                                                                                                                                                                                                                                                                                                  \
+  ({                                                                                                                                                                                                                                                                                                                           \
+                                                                                                                                                                                                                                                                                                                               \
+    auto &&res = (m);                                                                                                                                                                                                                                                                                                          \
+    if(!res.has_value())                                                                                                                                                                                                                                                                                                       \
+      return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::as_void(res));                                                                                                                                                                                                                      \
+    std::move(res.value());                                                                                                                                                                                                                                                                                                    \
   \
 })
 #endif
@@ -1227,59 +1241,59 @@ so you can test for its presence using `#ifdef BOOST_OUTCOME_TRYX`.
   \
 catch(const std::invalid_argument &e)                                                                                                                                                                                                                                                                                          \
   {                                                                                                                                                                                                                                                                                                                            \
-    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EINVAL, e.what()));                                                                                                                                                                                                                                            \
+    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EINVAL, e.what()));                                                                                                                                                                                         \
   }                                                                                                                                                                                                                                                                                                                            \
   \
 catch(const std::domain_error &e)                                                                                                                                                                                                                                                                                              \
   {                                                                                                                                                                                                                                                                                                                            \
-    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EDOM, e.what()));                                                                                                                                                                                                                                              \
+    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EDOM, e.what()));                                                                                                                                                                                           \
   }                                                                                                                                                                                                                                                                                                                            \
   \
 catch(const std::length_error &e)                                                                                                                                                                                                                                                                                              \
   {                                                                                                                                                                                                                                                                                                                            \
-    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(E2BIG, e.what()));                                                                                                                                                                                                                                             \
+    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(E2BIG, e.what()));                                                                                                                                                                                          \
   }                                                                                                                                                                                                                                                                                                                            \
   \
 catch(const std::out_of_range &e)                                                                                                                                                                                                                                                                                              \
   {                                                                                                                                                                                                                                                                                                                            \
-    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(ERANGE, e.what()));                                                                                                                                                                                                                                            \
+    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(ERANGE, e.what()));                                                                                                                                                                                         \
   }                                                                                                                                                                                                                                                                                                                            \
   \
 catch(const std::logic_error &e) /* base class for this group */                                                                                                                                                                                                                                                               \
   {                                                                                                                                                                                                                                                                                                                            \
-    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EINVAL, e.what()));                                                                                                                                                                                                                                            \
+    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EINVAL, e.what()));                                                                                                                                                                                         \
   }                                                                                                                                                                                                                                                                                                                            \
   \
 \
 catch(const std::system_error &e) /* also catches ios::failure */                                                                                                                                                                                                                                                              \
   {                                                                                                                                                                                                                                                                                                                            \
-    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(BOOST_OUTCOME_V1_NAMESPACE::error_code_extended(e.code(), e.what())));                                                                                                                                                                                         \
+    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(BOOST_OUTCOME_V1_NAMESPACE::error_code_extended(e.code(), e.what())));                                                                                                                                      \
   }                                                                                                                                                                                                                                                                                                                            \
   \
 catch(const std::overflow_error &e)                                                                                                                                                                                                                                                                                            \
   {                                                                                                                                                                                                                                                                                                                            \
-    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EOVERFLOW, e.what()));                                                                                                                                                                                                                                         \
+    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EOVERFLOW, e.what()));                                                                                                                                                                                      \
   }                                                                                                                                                                                                                                                                                                                            \
   \
 catch(const std::range_error &e)                                                                                                                                                                                                                                                                                               \
   {                                                                                                                                                                                                                                                                                                                            \
-    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(ERANGE, e.what()));                                                                                                                                                                                                                                            \
+    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(ERANGE, e.what()));                                                                                                                                                                                         \
   }                                                                                                                                                                                                                                                                                                                            \
   \
 catch(const std::runtime_error &e) /* base class for this group */                                                                                                                                                                                                                                                             \
   {                                                                                                                                                                                                                                                                                                                            \
-    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EAGAIN, e.what()));                                                                                                                                                                                                                                            \
+    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EAGAIN, e.what()));                                                                                                                                                                                         \
   }                                                                                                                                                                                                                                                                                                                            \
   \
 \
 catch(const std::bad_alloc &e)                                                                                                                                                                                                                                                                                                 \
   {                                                                                                                                                                                                                                                                                                                            \
-    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(ENOMEM, e.what()));                                                                                                                                                                                                                                            \
+    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(ENOMEM, e.what()));                                                                                                                                                                                         \
   }                                                                                                                                                                                                                                                                                                                            \
   \
 catch(const std::exception &e)                                                                                                                                                                                                                                                                                                 \
   {                                                                                                                                                                                                                                                                                                                            \
-    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EINVAL, e.what()));                                                                                                                                                                                                                                            \
+    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EINVAL, e.what()));                                                                                                                                                                                         \
   }
 #endif
 /*! \brief A boilerplate sequence of `catch(exceptions...)` plus a catch all returning those exceptions as their equivalent `result<void>`
@@ -1293,7 +1307,7 @@ catch(const std::exception &e)                                                  
   \
 catch(...)                                                                                                                                                                                                                                                                                                                     \
   {                                                                                                                                                                                                                                                                                                                            \
-    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EAGAIN, "unknown exception"));                                                                                                                                                                                                                                 \
+    return BOOST_OUTCOME_V1_NAMESPACE::detail::tag_valueless(BOOST_OUTCOME_V1_NAMESPACE::make_errored_result<void>(EAGAIN, "unknown exception"));                                                                                                                                                                              \
   }
 #endif
 
