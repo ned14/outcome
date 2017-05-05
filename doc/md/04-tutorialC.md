@@ -203,7 +203,7 @@ code from an excepted transport.
 
 This leads to the following differences to `expected<T, E>`:
 - Outcome's refinements constexpr default construct to **empty**, not to a default constructed
-`T`. There is no "almost never empty" guarantee like with `expected<T, E>` or `variant<...>`,
+`T`. There is no never empty guarantee like with `expected<T, E>` or `variant<...>`,
 instead there is a formal empty state to do with as you please (in some situations, a function
 returning a value OR empty OR an error makes a lot of sense and Outcome supports a `tribool`
 extension for ternary logics for those who need such a thing). Attempting to retrieve a value,

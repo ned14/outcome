@@ -97,7 +97,7 @@ categories and error enumerations:
 </dl>
 
 Because `std::error_code` is the C++ 11 standard way of doing error codes, `expected<T, E>`
-defaults `E` to `std::error_code` both in the proposed standard [1] and in Outcome's implementation.
+defaults `E` to `std::error_code` both in the proposed standard and in Outcome's implementation.
 
 The big problem with directly using `std::error_code` as `E` is the loss of type safety because
 `std::error_code` will accept any input implicitly convertible. So you can write this code
@@ -109,13 +109,10 @@ return MathResult(make_unexpected(std::make_error_code(std::errc::executable_for
 ~~~
 
 As is usually the case in C++, fixing this is straightforward but requires typing boilerplate
-to tell the C++ STL about your custom error type. As how to do this is not well documented [2],
+to tell the C++ STL about your custom error type. As how to do this is not well documented [1],
 next follows a very quick howto guide.
 
-[1]: The current LEWG Expected proposal defaults `E` to `std::error_condition`. We believe this
-almost certainly to be a defect and it ought to be `std::error_code`.
-
-[2]: The only documentation I'm aware of is the quite old guide by Chris Kohlhoff, founder of
+[1]: The only documentation I'm aware of is the quite old guide by Chris Kohlhoff, founder of
 ASIO and the Networking TS:
 - http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-1.html
 - http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-2.html

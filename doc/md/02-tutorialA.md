@@ -269,8 +269,7 @@ new error handling design patterns in addition to those already covered above:
   <dd>Utility class managing an optional contained value i.e. a value which may or may
   not be present. Available in C++ 17.</dd>
   <dt><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf">`std::experimental::expected<T, E>` (P0323R1)</a></dt>
-  <dd>Utility class managing one of three variant states, an expected `T` or an unexpected `E`
-  or valueless due to exception (with the valueless semantics matching <a href="http://en.cppreference.com/w/cpp/utility/variant">`std::variant<...>`</a>).
+  <dd>Utility class managing one of two variant states, an expected `T` or an unexpected `E`.
   Currently expected to be available in C++ 20, if not then very likely in the following C++ standard.</dd>
 </dl>
 
@@ -329,7 +328,7 @@ type `T` or an unexpected value of type `E`. Like `variant<T, E>`, `expected<T, 
 is a discriminated union storing either `T` or `E` in the same storage space, but
 unlike the variant, expected treats the `T` as a positive thing (fetchable via a
 `.value()`) and `E` as a negative thing (fetchable via an `.error()`). Because
-`expected<T, E>` provides an "almost never empty" guarantee similar to variant,
+`expected<T, E>` provides a never empty guarantee stronger than variant,
 it currently requires type `E` to be nothrow copy and move constructible and assignable
 and default constructing an `expected<T, E>` will set its variant storage to a default
 constructed `T`, so `T` must be default constructible.
@@ -507,8 +506,8 @@ public:
   error_type &&error() && noexcept;
 };
 
-// This is currently an extension to the proposal by Outcome, but we think it highly
-// likely to be in the next revision of the proposal
+// This is implemented by Outcome to handle valueless due to exception as we currently
+// do not implement the strong never empty guarantees of Expected
 template <> class bad_expected_access<void> : public std::logic_error
 {
 public:
@@ -535,14 +534,13 @@ catch(const std::experimental::bad_expected_access<std::error_code> &e)
 }
 ~~~
 
-The <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf">most recent proposal for Expected (P0323R1)</a>
-added the valueless by exception state from Variant,
-so if a move or copy constructor or assignment throws, like Variant Expected is left in an
-intermediate "valueless" state. The current proposal isn't clear what ought to happen when
-you try to get a value or error from such a valueless Expected instance, so Outcome has chosen to
-throw a `bad_expected_access<void>` exception when Expected is valueless. We expect the
-standards proposal to do something similar next revision, if not we will update Outcome's Expected
-implementation to match.
+The standards proposal for Expected implements the <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0110r0.html">P0110R0</a>
+technique for making `std::variant<...>` never have the potential for a valueless state.
+Outcome's Expected implementation does not currently implement this technique due to its
+significant implementation complexity, but may do so in the future. Until then, if a
+valueless due to exception state ever appears, we throw a `bad_expected_access<void>`
+exception when you try to access an Expected which is valueless as an `expected<T, E = void>`
+is not a possible Expected configuration.
 
 \subsubsection expected_observers Expected's observers
 
@@ -611,12 +609,6 @@ has an expected value via a simple test for boolean true or more explicitly via 
 before retrieving the value using `.value()`. A useful shortcut can be `.value_or()`
 where you would otherwise write a ternary operation selecting on the Expected having
 an expected value.
-
-Finally, the current proposal before WG21 has not yet added a mechanism for testing if
-the Expected is valueless or not, so you currently have no way of testing for that
-except by catching the exception thrown. It *may* mirror `std::variant<...>`'s `valueless_by_exception()`
-observer function, or it may choose something else. Outcome's implementation of
-Expected implements a '.empty()' extension, this seemed to fit the rest of STL the best.
 
 
 <hr><br>
