@@ -493,7 +493,10 @@ The proposed Expected implementation defines this exception type to represent wh
 to use an `expected<T, E>` in a way not compatible with its current state:
 
 ~~~{.cpp}
-template <class E> class bad_expected_access : public std::logic_error
+// Used to let you catch all throws of bad_expected_access<...>
+class bad_expected_access_base : public std::logic_error { ... };
+
+template <class E> class bad_expected_access : public bad_expected_access_base
 {
 public:
   using error_type = E;
@@ -508,7 +511,7 @@ public:
 
 // This is implemented by Outcome to handle valueless due to exception as we currently
 // do not implement the strong never empty guarantees of Expected
-template <> class bad_expected_access<void> : public std::logic_error
+template <> class bad_expected_access<void> : public bad_expected_access_base
 {
 public:
   using error_type = void;
@@ -539,8 +542,8 @@ technique for making `std::variant<...>` never have the potential for a valueles
 Outcome's Expected implementation does not currently implement this technique due to its
 significant implementation complexity, but may do so in the future. Until then, if a
 valueless due to exception state ever appears, we throw a `bad_expected_access<void>`
-exception when you try to access an Expected which is valueless as an `expected<T, E = void>`
-is not a possible Expected configuration.
+exception when you try to access an Expected which is valueless, as an `expected<T, E = void>`
+is not a possible Expected configuration due to requiring E to be constructible.
 
 \subsubsection expected_observers Expected's observers
 
