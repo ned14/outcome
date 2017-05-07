@@ -90,12 +90,7 @@ struct Oracle
       , val(o.val)
   {
   }
-  Oracle(Oracle &&o)
-      : s(sMoveConstructed)
-      , val(std::move(o.val))
-  {
-    o.s = sMovedFrom;
-  }
+  Oracle(Oracle &&o) noexcept : s(sMoveConstructed), val(std::move(o.val)) { o.s = sMovedFrom; }
 
   Oracle &operator=(const OracleVal &v)
   {
@@ -103,7 +98,7 @@ struct Oracle
     val = v;
     return *this;
   }
-  Oracle &operator=(OracleVal &&v)
+  Oracle &operator=(OracleVal &&v) noexcept
   {
     s = sValueMoveConstructed;
     val = std::move(v);

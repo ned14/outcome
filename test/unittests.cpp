@@ -31,6 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4714)  // function marked __forceinline not inlined
 #endif
 
+#define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES 1
 #include "../include/boost/outcome/outcome.hpp"
 
 #define BOOSTLITE_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
@@ -1216,18 +1217,17 @@ BOOST_AUTO_TEST_CASE(works / monad / operators, "Tests that the monad custom ope
 
 /****************************************************** Tests for issues reported ***********************************************************/
 
-BOOST_AUTO_TEST_CASE(issues/7, "https://github.com/ned14/boost.outcome/issues/7")
+BOOST_AUTO_TEST_CASE(issues / 7, "https://github.com/ned14/boost.outcome/issues/7")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
   struct udt
   {
     udt(int) {}
-//    udt() = delete;
+    //    udt() = delete;
     udt(const udt &) = default;
     udt(udt &&) = default;
   };
-  auto f = []() -> result<udt>
-  {
+  auto f = []() -> result<udt> {
     auto g = [] { return result<int>(5); };
     /* This fails because BOOST_OUTCOME_TRYV() returns a result<void>
     which if it were valued void, would implicitly convert into a
@@ -1240,18 +1240,17 @@ BOOST_AUTO_TEST_CASE(issues/7, "https://github.com/ned14/boost.outcome/issues/7"
 }
 
 #ifdef BOOST_OUTCOME_TRYX
-BOOST_AUTO_TEST_CASE(issues/9, "https://github.com/ned14/boost.outcome/issues/9")
+BOOST_AUTO_TEST_CASE(issues / 9, "https://github.com/ned14/boost.outcome/issues/9")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
   struct udt
   {
     udt(int) {}
-//    udt() = delete;
+    //    udt() = delete;
     udt(const udt &) = default;
     udt(udt &&) = default;
   };
-  auto f = []() -> result<udt>
-  {
+  auto f = []() -> result<udt> {
     auto g = [] { return result<int>(5); };
     return udt(BOOST_OUTCOME_TRYX(g()));
   };
