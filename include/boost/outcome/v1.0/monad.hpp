@@ -186,19 +186,19 @@ public:
 #if !BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES
   // If types are move constructible, make sure they are nothrow move constructible
   static_assert(!std::is_move_constructible<value_type>::value || std::is_nothrow_move_constructible<value_type>::value,
-                "WARNING: value_type used in basic_monad is not nothrow move constructible which is unwise as std::terminate could be called in many places. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this assertion.");
+                "WARNING: value_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this check.");
   static_assert(!std::is_move_constructible<error_type>::value || std::is_nothrow_move_constructible<error_type>::value,
-                "WARNING: error_type used in basic_monad is not nothrow move constructible which is unwise as std::terminate could be called in many places. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this assertion.");
+                "WARNING: error_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this check.");
   static_assert(!std::is_move_constructible<exception_type>::value || std::is_nothrow_move_constructible<exception_type>::value,
-                "WARNING: exception_type used in basic_monad is not nothrow move constructible which is unwise as std::terminate could be called in many places. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this assertion.");
+                "WARNING: exception_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this check.");
 
   // If types are copy constructible but not move constructible then we fall back to copy construction, make sure copy construction is nothrow
   static_assert(!std::is_copy_constructible<value_type>::value || std::is_move_constructible<value_type>::value || std::is_nothrow_copy_constructible<value_type>::value,
-                "WARNING: value_type used in basic_monad is not move constructible and not nothrow copy constructible which is unwise as std::terminate could be called in many places. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this assertion.");
+                "WARNING: value_type used in basic_monad is not move constructible and not nothrow copy constructible which means you must write code to handle valueless by exception. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this check.");
   static_assert(!std::is_copy_constructible<error_type>::value || std::is_move_constructible<error_type>::value || std::is_nothrow_copy_constructible<error_type>::value,
-                "WARNING: error_type used in basic_monad is not move constructible and not nothrow copy constructible which is unwise as std::terminate could be called in many places. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this assertion.");
+                "WARNING: error_type used in basic_monad is not move constructible and not nothrow copy constructible which means you must write code to handle valueless by exception. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this check.");
   static_assert(!std::is_copy_constructible<exception_type>::value || std::is_move_constructible<exception_type>::value || std::is_nothrow_copy_constructible<exception_type>::value,
-                "WARNING: exception_type used in basic_monad is not move constructible and not nothrow copy constructible which is unwise as std::terminate could be called in many places. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this assertion.");
+                "WARNING: exception_type used in basic_monad is not move constructible and not nothrow copy constructible which means you must write code to handle valueless by exception. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this check.");
 #endif
 private:
   struct implicit_conversion_from_void_disabled
