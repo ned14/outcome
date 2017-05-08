@@ -2,8 +2,10 @@
 \anchor acknowledgements
 
 Outcome has had an interesting history, and it is worth summarising it here to show how a
-Boost library comes to life. The git repo
-began life as a "Boost.Spinlock" in June 2014 hived out of Boost.AFIO v1 where it had existed
+Boost library comes to life. The following recollections are by Niall Douglas, and may be
+faulty due to his aging memory.
+
+The git repo began life as a "Boost.Spinlock" in June 2014 hived out of Boost.AFIO v1 where it had existed
 for some time as an internal library. In October 2014 I added in the original prototype
 Boost.Expected reference library as a git submodule, and began developing a non-allocating
 `future<T>`/`promise<T>` as an extension of `expected<T, std::exception_ptr>` as a faster,
@@ -68,7 +70,12 @@ period of name bikeshedding on boost-dev. I had been minded to call the library 
 just to shut everyone up because the name bike shedding was getting ridiculous. But
 Outcome is a lot nicer, so thank you to whomever it was.
 
-My thanks to those on boost-dev, Reddit and SG14 for extensive and often very detailed
+My heartfelt thanks to Charley Bay for acting as review manager for Outcome in May 2017.
+It is becoming ever harder to find a Boost review manager, so thank you! My thanks also
+to the CppCast team Rob Irving and Jason Turner for so quickly getting me on to CppCast
+to discuss `expected<T, E>` during the Outcome peer review to help publicise the review.
+
+More general thanks are due to those on boost-dev, Reddit and SG14 for extensive and often very detailed
 feedback on the library pretty much from its beginning. You are all too numerous to
 remember, but certainly Tongari and Andrzej Krzemienski come to mind as having engaged
 in particularly long discussion threads with tons of useful feedback which clarified my
