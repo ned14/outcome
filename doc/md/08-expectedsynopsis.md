@@ -29,6 +29,11 @@ buffer design as proposed by
 implemented support for the double buffer design yet due to its significant implementation
 complexity, and until it does we throw a `bad_expected_access<void>` in a valueless due to
 exception situation as that seemed logical.
+ \note By default Outcome static asserts if you use any `basic_monad` with a type or types
+which have throwing move constructors, warning you that in that use case you must write code
+to cope with valueless due to exception. These static asserts can be disabled using a macro,
+but this default will prevent accidental surprises when using Outcome's non-conforming
+Expected implementation.
 - Types `T` and `E` cannot be constructible into one another. This is a fundamental
 design choice in basic_monad to significantly reduce compile times so it won't be
 fixed.
@@ -41,7 +46,7 @@ won't notice this implementation detail in your code.
 (the LEWG proposal fixes this in P0323R2).
 - We don't implement the ordering and hashing operator overloads due to https://akrzemi1.wordpress.com/2014/12/02/a-gotcha-with-optional/.
 The fact the LEWG proposal does as currently proposed is a defect (it will be discussed
-with P0323R2 in Toronto).
+by LEWG with P0323R2 in Toronto).
 - We don't implement `make_expected_from_call()` as we think it highly likely to be
 removed from the next version of the proposal due to it conferring little value.
 - Our Expected always defines the default, copy and move constructors even if the
@@ -50,9 +55,9 @@ etc returns true when they should return false. The reason why is again to
 significantly improve compile times by hugely reducing the number of templates
 which need to be instantiated during routine basic_monad usage, and again
 this won't be fixed. Instead use the static constexpr bools at:
-  - `expected<T, E>::is_default_constructible`
-  - `expected<T, E>::is_copy_constructible`
-  - `expected<T, E>::is_move_constructible`
+  - <pre>expected<T, E>::is_default_constructible</pre>
+  - <pre>expected<T, E>::is_copy_constructible</pre>
+  - <pre>expected<T, E>::is_move_constructible</pre>
  \note Depending on what any Boost peer review thinks, we may inject correct answers
 for the type traits for basic_monad into namespace std.
 

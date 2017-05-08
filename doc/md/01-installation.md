@@ -27,12 +27,12 @@ Outcome is a header only C++ library with no external dependencies and therefore
 compilation. <a href="https://dedi4.nedprod.com/static/files/boost.outcome-v1.0-source-latest.tar.xz">
 Simply download and untar this tarball</a> and you can use Outcome via:
 
-\code #include "boost.outcome/include/boost/outcome.hpp" \endcode
+<pre>\#include "boost.outcome/include/boost/outcome.hpp"</pre>
 
 If you need a slightly older Outcome, https://dedi4.nedprod.com/static/files/boost.outcome
 retains the last month of CI passing tarballs.
 
-\note On Visual Studio, linking the file "boost.outcome/include/boost/outcome/v1.0/monad.natvis"
+\note On Visual Studio, linking the file `"boost.outcome/include/boost/outcome/v1.0/monad.natvis"`
 into your project consuming Outcome will add debugger visualisation of Outcome's transports.
 
 <br><hr><br>
@@ -49,7 +49,7 @@ git submodule update --init --recursive
 
 After this you can find Outcome in your code using:
 
-\code #include "boost.outcome/include/boost/outcome.hpp" \endcode
+<pre>\#include "boost.outcome/include/boost/outcome.hpp"</pre>
 
 
 <br><hr><br>
@@ -91,13 +91,13 @@ using only modern cmake 3 throughout. This lets you add the Outcome directory as
 cmake module with no unexpected consequence on the rest of your cmake. You will need
 to be using cmake 3.1 or better, and cmake 3.5 or better if you want C++ Modules to work.
 
-\code
+<pre>
 add_subdirectory(
   "${CMAKE_CURRENT_SOURCE_DIR}/boost.outcome"  # path to outcome source
   "${CMAKE_CURRENT_BINARY_DIR}/boost.outcome"  # your choice of where to put binaries
   EXCLUDE_FROM_ALL                             # please only lazy build outcome on demand
 )
-\endcode
+</pre>
 
 Outcome's cmake has the following useful products:
 - `boost::outcome::hl` (target): the Outcome header only library. Add this to any

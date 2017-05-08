@@ -291,4 +291,4 @@ generate a lot of code bloat. Again, if that's acceptable to you for your use ca
 But if that worries or bothers you, then you had best stick to trivial custom error types or
 better still, use Outcome's refinements of `outcome<T>` and `result<T>` which remove that
 choice entirely and give you in return a less boilerplate and more powerful programming
-experience. That is exactly the subject of Part C of this tutorial, next.
+experience. That is exactly the subject of the third and final part of this tutorial, next.
