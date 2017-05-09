@@ -115,9 +115,11 @@ struct in_place_t
 constexpr in_place_t in_place;
 
 //! \brief True if the type passed is a monad or a reference to a monad
-template <class M> struct is_monad : detail::is_monad<typename std::decay<M>::type>
-{
-};
+template <class M> static constexpr bool is_monad = detail::is_monad<typename std::decay<M>::type>::value;
+
+//! \brief Specialise to whitelist a type with throwing move constructors for use with basic monad
+template <class T>
+static constexpr bool enable_move_throwing_type = (std::is_move_constructible<T>::value && std::is_nothrow_move_constructible<T>::value) || (std::is_copy_constructible<T>::value && std::is_nothrow_copy_constructible<T>::value) || (!std::is_move_constructible<T>::value && !std::is_copy_constructible<T>::value);
 
 /*! \class basic_monad
 \brief Implements a configurable lightweight simple monadic value transport with the same semantics and API as a future
@@ -182,24 +184,14 @@ public:
   //! \brief Rebind this monad type into a different value_type
   template <typename U> using rebind = typename implementation_policy::template rebind<U>;
 
-// This is only a (strong) warning, we work perfectly well if moves throw
-#if !BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES
   // If types are move constructible, make sure they are nothrow move constructible
-  static_assert(!std::is_move_constructible<value_type>::value || std::is_nothrow_move_constructible<value_type>::value,
-                "WARNING: value_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this check.");
-  static_assert(!std::is_move_constructible<error_type>::value || std::is_nothrow_move_constructible<error_type>::value,
-                "WARNING: error_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this check.");
-  static_assert(!std::is_move_constructible<exception_type>::value || std::is_nothrow_move_constructible<exception_type>::value,
-                "WARNING: exception_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this check.");
+  static_assert(enable_move_throwing_type<value_type>,
+                "WARNING: value_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception every time a move happens. Either make your type never throw during moves, or specialise enable_move_throwing_type<T> to disable this check.");
+  static_assert(enable_move_throwing_type<error_type>,
+                "WARNING: error_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception every time a move happens. Either make your type never throw during moves, or specialise enable_move_throwing_type<T> to disable this check.");
+  static_assert(enable_move_throwing_type<exception_type>,
+                "WARNING: exception_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception every time a move happens. Either make your type never throw during moves, or specialise enable_move_throwing_type<T> to disable this check.");
 
-  // If types are copy constructible but not move constructible then we fall back to copy construction, make sure copy construction is nothrow
-  static_assert(!std::is_copy_constructible<value_type>::value || std::is_move_constructible<value_type>::value || std::is_nothrow_copy_constructible<value_type>::value,
-                "WARNING: value_type used in basic_monad is not move constructible and not nothrow copy constructible which means you must write code to handle valueless by exception. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this check.");
-  static_assert(!std::is_copy_constructible<error_type>::value || std::is_move_constructible<error_type>::value || std::is_nothrow_copy_constructible<error_type>::value,
-                "WARNING: error_type used in basic_monad is not move constructible and not nothrow copy constructible which means you must write code to handle valueless by exception. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this check.");
-  static_assert(!std::is_copy_constructible<exception_type>::value || std::is_move_constructible<exception_type>::value || std::is_nothrow_copy_constructible<exception_type>::value,
-                "WARNING: exception_type used in basic_monad is not move constructible and not nothrow copy constructible which means you must write code to handle valueless by exception. Define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES=1 to disable this check.");
-#endif
 private:
   struct implicit_conversion_from_void_disabled
   {
@@ -1012,30 +1004,9 @@ template <class T> BOOSTLITE_CONSTEXPR inline option<void> as_void(const option<
 /*! \defgroup expected Implementation of LEWG proposed expected<T, E>
 
 For your convenience, Outcome implements the LEWG Expected proposal as per
-http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf. To our knowledge,
-this implementation is very close to the proposal with these exceptions:
-- P0323R1 doesn't yet specify what will be done if you try accessing an expected
-which is valueless due to exception. We throw a `bad_expected_access<void>` in
-this situation as that seemed sensible. If the LEWG proposal decides on something
-different, this implementation will change to track the LEWG proposal.
-- `unexpected_type<E>` is implemented as an `expected<void, E>` and it lets
-the basic_monad machinery do the implicit conversion to some `expected<T, E>`.
-- Types `T` and `E` cannot be constructible into one another. This is a fundamental
-design choice in basic_monad to significantly reduce compile times so it won't be
-fixed.
-- `expected<T, E>` defaults E to `std::error_code`. If you don't like this,
-predefine the `BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE` macro.
-- Our Expected always defines the default, copy and move constructors even if the
-the type configured is not capable of it. That means `std::is_copy_constructible`
-etc returns true when they should return false. The reason why is again to
-significantly improve compile times by hugely reducing the number of templates
-which need to be instantiated during routine basic_monad usage, and again
-this won't be fixed. Instead use the static constexpr bools at:
-  - `expected<T, E>::is_default_constructible`
-  - `expected<T, E>::is_copy_constructible`
-  - `expected<T, E>::is_move_constructible`
- Depending on what any Boost peer review thinks, we may inject correct answers
-for the type traits for basic_monad into namespace std.
+http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf.
+
+See https://ned14.github.io/boost.outcome/md_doc_md_08-expectedsynopsis.html for detail.
 */
 
 #ifndef BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE
@@ -1165,9 +1136,8 @@ template <class T, class E> constexpr inline expected<T, E> make_expected_from_e
   return expected<T, E>(v);
 }
 //! \brief Make an errored expected from the type passed \ingroup expected
-template <class T, class E, class U> constexpr inline expected<T, E> make_expected_from_error(U &&v)
+template <class T, class E, class U, typename = typename std::enable_if<!std::is_same<E, U>::value && std::is_constructible<E, U>::value>::type> constexpr inline expected<T, E> make_expected_from_error(U &&v)
 {
-  static_assert(std::is_constructible<E, U>::value, "An E must be constructible from a U");
   return expected<T, E>(std::forward<U>(v));
 }
 // Not implementing this as I think it redundant and highly likely to disappear from the next P-paper

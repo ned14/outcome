@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #error Please do not include this directly, include value_storage.hpp
 #endif
 
-template <class _value_type, class _error_type, class _exception_type, bool use_single_byte = enable_single_byte_value_storage<_value_type>::value> class BOOST_OUTCOME_VALUE_STORAGE_IMPL
+template <class _value_type, class _error_type, class _exception_type, bool use_single_byte = _enable_single_byte_value_storage<_value_type>::value> class BOOST_OUTCOME_VALUE_STORAGE_IMPL
 {
   // Define stand in types for when these are void. As they are private, they
   // are disabled for SFINAE and any attempt to use them yields a useful error message.
@@ -149,9 +149,12 @@ public:
       , type(storage_type::value)
   {
   }
-  // If it has a non trivial destructor, we actively need to copy and move as well as destroy
+// If it has a non trivial destructor, we actively need to copy and move as well as destroy
 #if BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
-  BOOST_OUTCOME_VALUE_STORAGE_IMPL(const BOOST_OUTCOME_VALUE_STORAGE_IMPL &o) noexcept(is_nothrow_copy_constructible) : _empty(empty_type()), type(storage_type::empty)
+  BOOST_OUTCOME_VALUE_STORAGE_IMPL(const BOOST_OUTCOME_VALUE_STORAGE_IMPL &o)
+  noexcept(is_nothrow_copy_constructible)
+      : _empty(empty_type())
+      , type(storage_type::empty)
   {
     switch(o.type)
     {
@@ -171,17 +174,17 @@ public:
   }
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable: 4297)  // use of throw within a noexcept function
+#pragma warning(disable : 4297)  // use of throw within a noexcept function
 #endif
   BOOST_OUTCOME_VALUE_STORAGE_IMPL &operator=(const BOOST_OUTCOME_VALUE_STORAGE_IMPL &o) noexcept(is_nothrow_copy_assignable)
   {
-    if (type == o.type)
+    if(type == o.type)
     {
 #ifdef __cpp_exceptions
       try
       {
 #endif
-        switch (o.type)
+        switch(o.type)
         {
         case storage_type::empty:
           break;
@@ -197,7 +200,7 @@ public:
         }
 #ifdef __cpp_exceptions
       }
-      catch (...)
+      catch(...)
       {
         // If copy assignment threw, reset to empty
         clear();
@@ -215,7 +218,10 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-  BOOST_OUTCOME_VALUE_STORAGE_IMPL(BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o) noexcept(is_nothrow_move_constructible) : _empty(empty_type()), type(storage_type::empty)
+  BOOST_OUTCOME_VALUE_STORAGE_IMPL(BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o)
+  noexcept(is_nothrow_move_constructible)
+      : _empty(empty_type())
+      , type(storage_type::empty)
   {
     switch(o.type)
     {
@@ -235,7 +241,7 @@ public:
   }
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable: 4297)  // use of throw within a noexcept function
+#pragma warning(disable : 4297)  // use of throw within a noexcept function
 #endif
 #if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 6
 #pragma GCC diagnostic push
@@ -243,13 +249,13 @@ public:
 #endif
   BOOST_OUTCOME_VALUE_STORAGE_IMPL &operator=(BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o) noexcept(is_nothrow_move_assignable)
   {
-    if (type == o.type)
+    if(type == o.type)
     {
 #ifdef __cpp_exceptions
       try
       {
 #endif
-        switch (o.type)
+        switch(o.type)
         {
         case storage_type::empty:
           break;
@@ -265,12 +271,12 @@ public:
         }
 #ifdef __cpp_exceptions
       }
-      catch (...)
+      catch(...)
       {
         // If move assignment threw, reset to empty
         clear();
         // Shush static analysers
-        if (is_nothrow_move_assignable)
+        if(is_nothrow_move_assignable)
           std::terminate();
         else
           throw;
@@ -298,19 +304,19 @@ public:
     clear();
   }
 #endif
-  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args&&... args)
+  template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args &&... args)
   {
     clear();
     new(&value) value_type(std::forward<Args>(args)...);
     type = storage_type::value;
   }
-  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_error(Args&&... args)
+  template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_error(Args &&... args)
   {
     clear();
     new(&error) error_type(std::forward<Args>(args)...);
     type = storage_type::error;
   }
-  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_exception(Args&&... args)
+  template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_exception(Args &&... args)
   {
     clear();
     new(&exception) exception_type(std::forward<Args>(args)...);
@@ -473,7 +479,7 @@ public:
 #if BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
   ~BOOST_OUTCOME_VALUE_STORAGE_IMPL() noexcept(is_nothrow_destructible) { clear(); }
 #endif
-  template<class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args&&... args)
+  template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args &&... args)
   {
     clear();
     value = value_type(std::forward<Args>(args)...);

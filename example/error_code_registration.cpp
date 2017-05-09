@@ -1,5 +1,6 @@
 //! [error_code_registration]
 #include <iostream>
+#include <string>        // for string printing
 #include <system_error>  // bring in std::error_code et al
 
 // This is the custom error code enum

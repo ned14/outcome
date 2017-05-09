@@ -31,7 +31,6 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4714)  // function marked __forceinline not inlined
 #endif
 
-#define BOOST_OUTCOME_ALLOW_THROWING_MOVE_TYPES 1
 #include "../include/boost/outcome/outcome.hpp"
 
 #define BOOSTLITE_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
@@ -556,6 +555,43 @@ BOOST_AUTO_TEST_CASE(works / monad / fileopen, "Tests that the monad semanticall
 #endif
 
 #ifdef __cpp_exceptions
+BOOST_AUTO_TEST_SUITE_END()
+struct Except
+{
+  int n;
+  Except() = delete;
+  Except(const Except & /*unused*/) noexcept(false)
+      : n(0)
+  {
+  }
+  Except(Except && /*unused*/) noexcept(false)
+      : n(0)
+  {
+  }
+  Except &operator=(const Except & /*unused*/) noexcept(false) { return *this; }
+  Except &operator=(Except && /*unused*/) noexcept(false) { return *this; }
+  ~Except() noexcept(false) { n = 0; }
+};
+struct throwing_udt
+{
+  std::string a;
+  explicit throwing_udt(std::string _a)
+      : a(std::move(_a))
+  {
+  }
+  throwing_udt() = delete;
+  throwing_udt(const throwing_udt & /*unused*/) { throw std::logic_error("copy"); }
+  throwing_udt(throwing_udt && /*unused*/) noexcept(false) { throw std::logic_error("move"); }
+  throwing_udt &operator=(const throwing_udt & /*unused*/) { throw std::logic_error("copy"); }
+  throwing_udt &operator=(throwing_udt && /*unused*/) noexcept(false) { throw std::logic_error("move"); }
+  ~throwing_udt() { a.clear(); }
+};
+BOOST_OUTCOME_V1_NAMESPACE_BEGIN
+template <> constexpr bool enable_move_throwing_type<Except> = true;
+template <> constexpr bool enable_move_throwing_type<throwing_udt> = true;
+BOOST_OUTCOME_V1_NAMESPACE_END
+BOOST_AUTO_TEST_SUITE(all)
+
 // std nothrow traits seem to return random values if exceptions are disabled on MSVC
 BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly inherits noexcept from its type R")
 {
@@ -608,22 +644,6 @@ BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly i
     BOOST_CHECK(std::is_nothrow_destructible<type>::value == std::is_nothrow_destructible<std::string>::value);
   }
   {
-    struct Except
-    {
-      int n;
-      Except() = delete;
-      Except(const Except & /*unused*/) noexcept(false)
-          : n(0)
-      {
-      }
-      Except(Except && /*unused*/) noexcept(false)
-          : n(0)
-      {
-      }
-      Except &operator=(const Except & /*unused*/) noexcept(false) { return *this; }
-      Except &operator=(Except && /*unused*/) noexcept(false) { return *this; }
-      ~Except() noexcept(false) { n = 0; }
-    };
     using type = outcome<Except>;
     std::cout << "outcome<Except> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
     std::cout << "outcome<Except> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
@@ -669,20 +689,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
 #ifdef __cpp_exceptions
   // Emplace construct, throws during move and copy
   {
-    struct udt
-    {
-      std::string a;
-      explicit udt(std::string _a)
-          : a(std::move(_a))
-      {
-      }
-      udt() = delete;
-      udt(const udt & /*unused*/) { throw std::logic_error("copy"); }
-      udt(udt && /*unused*/) noexcept(false) { throw std::logic_error("move"); }
-      udt &operator=(const udt & /*unused*/) { throw std::logic_error("copy"); }
-      udt &operator=(udt && /*unused*/) noexcept(false) { throw std::logic_error("move"); }
-      ~udt() { a.clear(); }
-    };
+    using udt = throwing_udt;
     static_assert(!std::is_default_constructible<udt>::value, "udt is default constructible");
     static_assert(std::is_copy_constructible<udt>::value, "udt is not copy constructible");
     static_assert(std::is_move_constructible<udt>::value, "udt is not move constructible");

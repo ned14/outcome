@@ -22,7 +22,7 @@ it is missing, it is either because we feel its presence is a defect in the LEWG
 it not worth implementing.
 
 A summary of the main differences:
-- P0323R1 avoids any potential for a valueless due to exception state by using the double
+- LEWG Expected avoids any potential for a valueless due to exception state by using the double
 buffer design as proposed by
 <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0110r0.html">P0110R0</a>
 (I understand that a future `std::variant<...>` will do the same). Outcome has not
@@ -31,7 +31,7 @@ complexity, and until it does we throw a `bad_expected_access<void>` in a valuel
 exception situation as that seemed logical.
  \note By default Outcome static asserts if you use any `basic_monad` with a type or types
 which have throwing move constructors, warning you that in that use case you must write code
-to cope with valueless due to exception. These static asserts can be disabled using a macro,
+to cope with valueless due to exception. These static asserts can be disabled using a type trait,
 but this default will prevent accidental surprises when using Outcome's non-conforming
 Expected implementation.
 - Types `T` and `E` cannot be constructible into one another. This is a fundamental
@@ -66,7 +66,7 @@ for the type traits for basic_monad into namespace std.
 \section synopsis_unexpected_type unexpected_type<E>
 
 <table width="100%">
-<tr><th width="38%">LEWG's Expected implementation</th><th width="62%">Outcome's Expected implementation</th></tr>
+<tr><th width="38%">P0323R1's Expected implementation</th><th width="62%">Outcome's Expected implementation</th></tr>
 <tr><td width="38%" valign="top">
 ~~~{.cpp}
 namespace std {
@@ -177,7 +177,7 @@ private:
 \section synopsis_expected expected<T, E>
 
 <table width="100%">
-<tr><th width="38%">LEWG's Expected implementation</th><th width="62%">Outcome's Expected implementation</th></tr>
+<tr><th width="38%">P0323R1's Expected implementation</th><th width="62%">Outcome's Expected implementation</th></tr>
 <tr><td width="38%" valign="top">
 ~~~{.cpp}
 namespace std {
@@ -565,11 +565,11 @@ public:
   constexpr T& value() &;
   constexpr const T&& value() const &&;
   constexpr T&& value() &&;
-  constexpr const E& error() const&;
-  constexpr E& error() &;
-  constexpr E&& error() &&;
-  constexpr const E&& error() const &&;
-  // get_unexpected() not implemented
+  constexpr E error() const;           // prevent probable defect in LEWG Expected proposal
+
+  
+
+  constexpr E get_unexpected() const;  // unexpected_type<E> = expected<void, E>, so this implicitly converts
   constexpr const value_type &value_or(const value_type &) noexcept const&;
   constexpr value_type& value_or(value_type&) noexcept &;
   constexpr const value_type&& value_or(const value_type&&) noexcept const&&;
@@ -643,9 +643,11 @@ public:              // Outcome extensions
 \section synopsis_bad_expected_access bad_expected_access<E>
 
 <table width="100%">
-<tr><th width="38%">LEWG's Expected implementation</th><th width="62%">Outcome's Expected implementation</th></tr>
+<tr><th width="38%">P0323R1's Expected implementation</th><th width="62%">Outcome's Expected implementation</th></tr>
 <tr><td width="38%" valign="top">
 ~~~{.cpp}
+// This is P0323R1, P0323R2 adds intermediate bad_expected_access_base
+
 template <class E>
 class bad_expected_access : public logic_error {
 public:
@@ -657,8 +659,10 @@ public:
 ~~~
 </td><td width="62%" valign="top">
 ~~~{.cpp}
+class bad_expected_access_base : public logic_error { ... };  // from P0323R2
+
 template <class E>
-class bad_expected_access : public logic_error {
+class bad_expected_access : public bad_expected_access_base {
 public:
   explicit bad_expected_access(E) noexcept;       // noexcept as this type is thrown as a C++ exception
 
