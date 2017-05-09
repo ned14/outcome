@@ -47,6 +47,13 @@ won't notice this implementation detail in your code.
 - We don't implement the ordering and hashing operator overloads due to https://akrzemi1.wordpress.com/2014/12/02/a-gotcha-with-optional/.
 The fact the LEWG proposal does as currently proposed is a defect (it will be discussed
 by LEWG with P0323R2 in Toronto).
+- LEWG Expected defines `operator*()` and `.error()` to be silent undefined behaviour
+and assumed to be a reinterpret cast if they don't match the current state of the
+Expected. Outcome's Expected implements `operator*()` exactly the same as `.value()`
+(i.e. throw if the state is errored) and implements `.error()` solely as a by-value
+return instead of by-reference return. This lets it return a default constructed `E`
+when the Expected is not errored (and LEWG Expected does require `E` to be default
+constructible, so this is okay).
 - We don't implement `make_expected_from_call()` as we think it highly likely to be
 removed from the next version of the proposal due to it conferring little value.
 - Our Expected always defines the default, copy and move constructors even if the
