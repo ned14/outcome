@@ -1004,30 +1004,9 @@ template <class T> BOOSTLITE_CONSTEXPR inline option<void> as_void(const option<
 /*! \defgroup expected Implementation of LEWG proposed expected<T, E>
 
 For your convenience, Outcome implements the LEWG Expected proposal as per
-http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf. To our knowledge,
-this implementation is very close to the proposal with these exceptions:
-- P0323R1 doesn't yet specify what will be done if you try accessing an expected
-which is valueless due to exception. We throw a `bad_expected_access<void>` in
-this situation as that seemed sensible. If the LEWG proposal decides on something
-different, this implementation will change to track the LEWG proposal.
-- `unexpected_type<E>` is implemented as an `expected<void, E>` and it lets
-the basic_monad machinery do the implicit conversion to some `expected<T, E>`.
-- Types `T` and `E` cannot be constructible into one another. This is a fundamental
-design choice in basic_monad to significantly reduce compile times so it won't be
-fixed.
-- `expected<T, E>` defaults E to `std::error_code`. If you don't like this,
-predefine the `BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE` macro.
-- Our Expected always defines the default, copy and move constructors even if the
-the type configured is not capable of it. That means `std::is_copy_constructible`
-etc returns true when they should return false. The reason why is again to
-significantly improve compile times by hugely reducing the number of templates
-which need to be instantiated during routine basic_monad usage, and again
-this won't be fixed. Instead use the static constexpr bools at:
-  - `expected<T, E>::is_default_constructible`
-  - `expected<T, E>::is_copy_constructible`
-  - `expected<T, E>::is_move_constructible`
- Depending on what any Boost peer review thinks, we may inject correct answers
-for the type traits for basic_monad into namespace std.
+http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf.
+
+See https://ned14.github.io/boost.outcome/md_doc_md_08-expectedsynopsis.html for detail.
 */
 
 #ifndef BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE
