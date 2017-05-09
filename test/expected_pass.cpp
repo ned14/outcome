@@ -600,7 +600,7 @@ void expected_from_error()
 void expected_from_error_U()
 {
   // From stde::unexpected_type constructor.
-  auto e = stde::make_expected_from_error<std::string, short>(42);
+  auto e = stde::make_expected_from_error<std::string, short>((short) 42);
   static_assert(std::is_same<decltype(e), stde::expected<std::string, short>>{}, "");
   BOOST_CHECK_EQ(static_cast<bool>(e), false);
 }

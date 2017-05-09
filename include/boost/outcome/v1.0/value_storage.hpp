@@ -66,9 +66,7 @@ struct exception_t
 constexpr exception_t exception = exception_t();
 
 //! \brief Specialise to indicate that this type should use the single byte storage layout. You get six bits of storage.
-template <class _value_type> struct enable_single_byte_value_storage : std::false_type
-{
-};
+template <class _value_type> static constexpr bool enable_single_byte_value_storage = false;
 //! \def BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE
 //! \brief Define to disable coercing option<void> and option<bool> into a single byte of storage
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
@@ -80,12 +78,8 @@ template <class _value_type> struct enable_single_byte_value_storage : std::fals
 #define BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE
 #endif
 #ifndef BOOST_OUTCOME_DISABLE_DEFAULT_SINGLE_BYTE_VALUE_STORAGE
-template <> struct enable_single_byte_value_storage<void> : std::true_type
-{
-};
-template <> struct enable_single_byte_value_storage<bool> : std::true_type
-{
-};
+template <> constexpr bool enable_single_byte_value_storage<void> = true;
+template <> constexpr bool enable_single_byte_value_storage<bool> = true;
 #endif
 
 namespace detail
@@ -157,7 +151,7 @@ namespace detail
 
 This fixed variant list of empty, a type `value_type`, a lightweight `error_type` or a
 heavier `exception_type` typically has a space cost of `max(24, sizeof(R)+8)`. If however
-you specialise `enable_single_byte_value_storage<T>` with `true_type`, and both `error_type`
+you specialise `enable_single_byte_value_storage<T>` with `true`, and both `error_type`
 and `exception_type` are disabled (void), a special single byte storage implementation is
 enabled. Both `bool` and `void` are already specialised.
 */
@@ -302,7 +296,9 @@ public:
       break;
     }
   }
-  struct valueless_t {};  // used to tag when incoming storage cannot have a value
+  struct valueless_t
+  {
+  };  // used to tag when incoming storage cannot have a value
   template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<base::is_referenceable && _is_constructible_from<_value_type2, _error_type2, _exception_type2>::value>::type>
   BOOST_OUTCOME_CONSTEXPR explicit value_storage(valueless_t, value_storage<_value_type2, _error_type2, _exception_type2> &&o)
       : base()
