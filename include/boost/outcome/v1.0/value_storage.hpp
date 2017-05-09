@@ -84,6 +84,11 @@ template <> constexpr bool enable_single_byte_value_storage<bool> = true;
 
 namespace detail
 {
+  // Older clangs have a bug where you can't use a templated variable to default template args, so indirect
+  template <class _value_type> struct _enable_single_byte_value_storage
+  {
+    static constexpr bool value = enable_single_byte_value_storage<_value_type>;
+  };
 #define BOOST_OUTCOME_VALUE_STORAGE_IMPL value_storage_impl_trivial
 #define BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR 0
 #include "detail/value_storage.ipp"

@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #error Please do not include this directly, include value_storage.hpp
 #endif
 
-template <class _value_type, class _error_type, class _exception_type, bool use_single_byte = enable_single_byte_value_storage<_value_type>> class BOOST_OUTCOME_VALUE_STORAGE_IMPL
+template <class _value_type, class _error_type, class _exception_type, bool use_single_byte = _enable_single_byte_value_storage<_value_type>::value> class BOOST_OUTCOME_VALUE_STORAGE_IMPL
 {
   // Define stand in types for when these are void. As they are private, they
   // are disabled for SFINAE and any attempt to use them yields a useful error message.
