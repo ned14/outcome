@@ -3,8 +3,9 @@
 
 You should read <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf">P0323R1</a>
 if you want a C++ standards level of detail regarding exactly what each member function's
-preconditions, effects and postconditions are. Unless otherwise indicated, Outcome's Expected behaves
-exactly the same. Outcome uses the **exact same** unit test suite
+preconditions, effects and postconditions are. Unless otherwise indicated, Outcome's Expected has
+the same semantics and API, even if not necessarily exactly the reference signature.
+Outcome uses the **exact same** unit test suite
 as the LEWG Expected reference implementation, and passes it handily. As the LEWG
 reference implementation updates its unit test suite, we shall keep pace.
 
@@ -21,22 +22,31 @@ precludes manufacturing `expected<const T>` which we have found to be in practic
 it is missing, it is either because we feel its presence is a defect in the LEWG Expected or we think
 it not worth implementing.
 
-A summary of the main differences:
-- LEWG Expected avoids any potential for a valueless due to exception state by using the double
+Some of Outcome's Expected deviations from P0323R1 have entered P0323R2 which will be presented at
+the Toronto WG21 meeting in July 2017. Once P0323R2 has been published, Outcome's Expected
+implementation will be changed to match the new proposal. The following changes
+are planned (more may be added by the Boost peer review):
+1. LEWG Expected avoids any potential for a valueless due to exception state by using the double
 buffer design as proposed by
 <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0110r0.html">P0110R0</a>
 (I understand that a future `std::variant<...>` will do the same). Outcome has not
 implemented support for the double buffer design yet due to its significant implementation
-complexity, and until it does we throw a `bad_expected_access<void>` in a valueless due to
-exception situation as that seemed logical.
+complexity (especially around alignment), and until it does we throw a `bad_expected_access<void>`
+in a valueless due to exception situation as that seemed logical. [<a href="https://github.com/ned14/boost.outcome/issues/11">issue #11</a>]
  \note By default Outcome static asserts if you use any `basic_monad` with a type or types
 which have throwing move constructors, warning you that in that use case you must write code
 to cope with valueless due to exception. These static asserts can be disabled using a type trait,
 but this default will prevent accidental surprises when using Outcome's non-conforming
 Expected implementation.
+2. Some new interesting tests have been added to the LEWG Expected test suite since
+P0323R1. These will be added to Outcome's copy of the same.
+
+Some deviations from P0323R1 are not expected to be changed any time soon:
 - Types `T` and `E` cannot be constructible into one another. This is a fundamental
 design choice in basic_monad to significantly reduce compile times so it won't be
 fixed.
+  - Note though that `expected<void, void>` is permitted (which is legal in the LEWG
+proposal).
 - `unexpected_type<E>` is implemented as an `expected<void, E>` and it lets
 the basic_monad machinery do the implicit conversion to some `expected<T, E>`
 through the less representative to more representative conversion rules. Note
@@ -49,6 +59,11 @@ The fact the LEWG proposal does as currently proposed is a defect (it will be di
 by LEWG with P0323R2 in Toronto).
 - We don't implement `make_expected_from_call()` as we think it highly likely to be
 removed from the next version of the proposal due to it conferring little value.
+- Our `make_expected()` and `make_unexpected()` functions deviate significantly as
+we believe the LEWG ones to be defective in various ways. This topic will be discussed
+in Toronto and reconciliation later is highly likely.
+- Our `value_or()` member functions pass through the reference rather than returning by
+value (which we don't understand why the LEWG proposal does).
 - Our Expected always defines the default, copy and move constructors even if the
 the type configured is not capable of it. That means `std::is_copy_constructible`
 etc returns true when they should return false. The reason why is again to
@@ -152,6 +167,8 @@ public:
   constexpr explicit unexpected_type(E&&);
   constexpr const E& value() const;
   constexpr E & value();
+  
+  
 private:
   E val; // exposition only
 };
@@ -164,8 +181,10 @@ public:
   unexpected_type() = default;
   constexpr explicit unexpected_type(const E&);
   constexpr explicit unexpected_type(E&&);
-  constexpr const E& value() const;
-  constexpr E & value();
+  constexpr const E& value() const &;
+  constexpr E & value() &;
+  constexpr const E&& value() const &&;
+  constexpr E && value() &&;
 private:
   E val; // exposition only
 };
@@ -421,6 +440,12 @@ class expected
 
 
 
+
+
+
+
+
+
 public:
   typedef T value_type;
   typedef E error_type;
@@ -503,10 +528,16 @@ private:
 template <class T, class E>
 class expected
 {
-  static_assert(!std::is_constructible<T, E>::value, "value_type cannot be constructible from error_type");
-  static_assert(!std::is_constructible<E, T>::value, "error_type cannot be constructible from value_type");
-  static_assert(std::is_void<E>::value || std::is_nothrow_copy_constructible<E>::value, "error_type must be nothrow copy constructible");
-  static_assert(std::is_void<E>::value || std::is_nothrow_move_constructible<E>::value, "error_type must be nothrow move constructible");
+  static_assert(!std::is_constructible<value_type, error_type>::value,
+    "value_type cannot be constructible from error_type (Outcome requirement)");
+  static_assert(!std::is_constructible<error_type, value_type>::value,
+    "error_type cannot be constructible from value_type (Outcome requirement)");
+  static_assert(std::is_default_constructible<value_type>::value,
+    "value_type must be default constructible (LEWG Expected requirement)");
+  static_assert(std::is_void<error_type>::value || std::is_nothrow_copy_constructible<error_type>::value,
+    "error_type must be nothrow copy constructible (LEWG Expected requirement)");
+  static_assert(std::is_void<error_type>::value || std::is_nothrow_move_constructible<error_type>::value,
+    "error_type must be nothrow move constructible (LEWG Expected requirement)");
 public:
   using value_type = devoid<T>;  // If T is void, an unusable but helpfully named type
   using error_type = devoid<E>;  // This traps attempts to use with a useful compiler error
@@ -565,11 +596,11 @@ public:
   constexpr T& value() &;
   constexpr const T&& value() const &&;
   constexpr T&& value() &&;
-  constexpr E error() const;           // prevent probable defect in LEWG Expected proposal
-
-  
-
-  constexpr E get_unexpected() const;  // unexpected_type<E> = expected<void, E>, so this implicitly converts
+  constexpr const E& error() const&;
+  E& error() &;
+  constexpr E&& error() &&;
+  constexpr const E&& error() const &&;
+  constexpr const E &get_unexpected() const;  // unexpected_type<E> = expected<void, E>, so this implicitly converts
   constexpr const value_type &value_or(const value_type &) noexcept const&;
   constexpr value_type& value_or(value_type&) noexcept &;
   constexpr const value_type&& value_or(const value_type&&) noexcept const&&;

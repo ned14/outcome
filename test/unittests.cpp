@@ -654,12 +654,16 @@ BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly i
     BOOST_CHECK(type::is_nothrow_move_constructible == std::is_nothrow_move_constructible<type>::value);
     BOOST_CHECK(type::is_nothrow_copy_assignable == std::is_nothrow_copy_assignable<type>::value);
     BOOST_CHECK(type::is_nothrow_move_assignable == std::is_nothrow_move_assignable<type>::value);
+#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER != 191025017 /* VS2017 RTM */)
     BOOST_CHECK(type::is_nothrow_destructible == std::is_nothrow_destructible<type>::value);
+#endif
     BOOST_CHECK(!std::is_nothrow_copy_constructible<type>::value);
     BOOST_CHECK(!std::is_nothrow_move_constructible<type>::value);
     BOOST_CHECK(!std::is_nothrow_copy_assignable<type>::value);
     BOOST_CHECK(!std::is_nothrow_move_assignable<type>::value);
+#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER != 191025017 /* VS2017 RTM */)
     BOOST_CHECK(!std::is_nothrow_destructible<type>::value);
+#endif
   }
 }
 #endif
@@ -1224,7 +1228,7 @@ BOOST_AUTO_TEST_CASE(works / monad / operators, "Tests that the monad custom ope
 
 /****************************************************** Tests for issues reported ***********************************************************/
 
-BOOST_AUTO_TEST_CASE(issues / 7, "https://github.com/ned14/boost.outcome/issues/7")
+BOOST_AUTO_TEST_CASE(issues / 7, "BOOST_OUTCOME_TRYV(expr) in a function whose return monad's type has no default constructor fails to compile")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
   struct udt
@@ -1247,7 +1251,7 @@ BOOST_AUTO_TEST_CASE(issues / 7, "https://github.com/ned14/boost.outcome/issues/
 }
 
 #ifdef BOOST_OUTCOME_TRYX
-BOOST_AUTO_TEST_CASE(issues / 9, "https://github.com/ned14/boost.outcome/issues/9")
+BOOST_AUTO_TEST_CASE(issues / 9, "Alternative TRY macros?")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
   struct udt
@@ -1265,6 +1269,95 @@ BOOST_AUTO_TEST_CASE(issues / 9, "https://github.com/ned14/boost.outcome/issues/
 }
 #endif
 
+BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .error() throw exceptions when they should not")
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  const char *a = "hi", *b = "bye";
+  struct udt1
+  {
+    const char *_v;
+    constexpr udt1() noexcept : _v(nullptr) {}
+    constexpr udt1(const char *v) noexcept : _v(v) {}
+    BOOST_OUTCOME_CONSTEXPR udt1(udt1 &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    udt1(const udt1 &) = default;
+    BOOST_OUTCOME_CONSTEXPR udt1 &operator=(udt1 &&o) noexcept
+    {
+      _v = o._v;
+      o._v = nullptr;
+      return *this;
+    }
+    udt1 &operator=(const udt1 &) = delete;
+    constexpr const char *operator*() const noexcept { return _v; }
+  };
+  struct udt2
+  {
+    const char *_v;
+    constexpr udt2() noexcept : _v(nullptr) {}
+    constexpr udt2(const char *v) noexcept : _v(v) {}
+    BOOST_OUTCOME_CONSTEXPR udt2(udt2 &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    udt2(const udt2 &) = default;
+    BOOST_OUTCOME_CONSTEXPR udt2 &operator=(udt2 &&o) noexcept
+    {
+      _v = o._v;
+      o._v = nullptr;
+      return *this;
+    }
+    udt1 &operator=(const udt1 &) = delete;
+    constexpr const char *operator*() const noexcept { return _v; }
+  };
+  expected<udt1, udt2> p{udt1(a)}, n(make_unexpected(udt2(b)));
+  // State check
+  BOOST_CHECK(p.has_value());
+  BOOST_CHECK(!n.has_value());
+  // These should behave as expected (!)
+  BOOST_CHECK_NO_THROW(p.value());
+  BOOST_CHECK_THROW(n.value(), const bad_expected_access<udt2> &);
+  // And state is not destroyed
+  BOOST_CHECK(p.has_value() && **p == a);
+  BOOST_CHECK(!n.has_value() && *n.error() == b);
+  // LEWG Expected requires these to work as if reinterpret_cast irrespective of state
+  BOOST_CHECK_NO_THROW(p.error());  // error from valued state
+  BOOST_CHECK_NO_THROW(*n);         // value from errored state
+  // LEWG Expected provides rvalue ref semantics for operator*(), error() and error_or()
+  udt1 a1(std::move(*p));
+  BOOST_CHECK(*a1 == a);
+  BOOST_CHECK(**p == nullptr);
+  udt2 e2(std::move(n).error());
+  BOOST_CHECK(*e2 == b);
+  BOOST_CHECK(*n.error() == nullptr);
+  n.set_error(udt2(b));
+  e2 = std::move(n).error_or(udt2(a));
+  BOOST_CHECK(*e2 == b);
+  BOOST_CHECK(*n.error() == nullptr);
+}
+
+#if 0  // Known bug, will be fixed when we refactor Expected storage to never have empty state
+BOOST_AUTO_TEST_CASE(issues / 12, "basic_monad's copy assignment gets instantiated even when type T cannot be copied")
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  const char *s = "hi";
+  struct udt
+  {
+    const char *_v;
+    constexpr udt() noexcept : _v(nullptr) {}
+    constexpr udt(const char *v) noexcept : _v(v) {}
+    BOOST_OUTCOME_CONSTEXPR udt(udt &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    udt(const udt &) = delete;
+    BOOST_OUTCOME_CONSTEXPR udt &operator=(udt &&o) noexcept
+    {
+      _v = o._v;
+      o._v = nullptr;
+      return *this;
+    }
+    udt &operator=(const udt &) = delete;
+    constexpr const char *operator*() const noexcept { return _v; }
+  };
+  static_assert(expected<udt>::is_move_constructible, "expected<udt> is not move constructible!");
+  static_assert(!expected<udt>::is_copy_constructible, "expected<udt> is copy constructible!");
+  expected<udt> p(s), n(make_unexpected(std::error_code(ENOMEM, std::generic_category())));
+  n = make_unexpected(std::error_code(EINVAL, std::generic_category()));
+}
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()
 

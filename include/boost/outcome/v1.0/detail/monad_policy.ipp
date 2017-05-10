@@ -50,10 +50,12 @@ namespace policy
     BOOST_OUTCOME_MONAD_POLICY_BASE_NAME(BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &&) = delete;
     BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &operator=(const BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &) = default;
     BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &operator=(BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &&) = default;
-    struct passthru_t {};
+    struct passthru_t
+    {
+    };
     template <class... Args>
     constexpr BOOST_OUTCOME_MONAD_POLICY_BASE_NAME(passthru_t, Args &&... args)
-      : monad_storage(std::forward<Args>(args)...)
+        : monad_storage(std::forward<Args>(args)...)
     {
     }
     // Must handle error situation ec. Can return false to cancel the calling operation.
@@ -188,6 +190,10 @@ namespace policy
     }
     //! \brief Returns any errored state in the transport, throwing an exception if empty
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
+    //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
+    BOOST_OUTCOME_CONSTEXPR error_type get_error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
+    //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
+    BOOST_OUTCOME_CONSTEXPR error_type error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
 #endif
 #ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
     //! \brief Returns any excepted state in the transport, throwing an exception if empty
@@ -208,6 +214,10 @@ namespace policy
     }
     //! \brief Returns any excepted state in the transport, throwing an exception if empty
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type exception() const { return get_exception(); }
+    //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
+    BOOST_OUTCOME_CONSTEXPR exception_type get_exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
+    //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
+    BOOST_OUTCOME_CONSTEXPR exception_type exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
 #endif
   };
   template <class monad_storage, class error_type, class exception_type> struct BOOST_OUTCOME_MONAD_POLICY_BASE_NAME<monad_storage, void, error_type, exception_type> : public monad_storage
@@ -218,10 +228,12 @@ namespace policy
     BOOST_OUTCOME_MONAD_POLICY_BASE_NAME(BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &&) = delete;
     BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &operator=(const BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &) = default;
     BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &operator=(BOOST_OUTCOME_MONAD_POLICY_BASE_NAME &&) = default;
-    struct passthru_t {};
+    struct passthru_t
+    {
+    };
     template <class... Args>
     constexpr BOOST_OUTCOME_MONAD_POLICY_BASE_NAME(passthru_t, Args &&... args)
-      : monad_storage(std::forward<Args>(args)...)
+        : monad_storage(std::forward<Args>(args)...)
     {
     }
     // Must handle error situation ec. Can return false to cancel the calling operation.
@@ -276,6 +288,8 @@ namespace policy
       return error_type();
     }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
+    BOOST_OUTCOME_CONSTEXPR error_type get_error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
+    BOOST_OUTCOME_CONSTEXPR error_type error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
 #endif
 #ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type get_exception() const
@@ -294,6 +308,8 @@ namespace policy
       return exception_type();
     }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type exception() const { return get_exception(); }
+    BOOST_OUTCOME_CONSTEXPR exception_type get_exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
+    BOOST_OUTCOME_CONSTEXPR exception_type exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
 #endif
   };
 

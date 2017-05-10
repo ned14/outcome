@@ -211,8 +211,12 @@ public:
   static constexpr bool is_move_constructible = value_storage_type::is_move_constructible;
   //! \brief This monad will never throw exceptions during move construction
   static constexpr bool is_nothrow_move_constructible = value_storage_type::is_nothrow_move_constructible;
+  //! \brief This monad can be copy assigned
+  static constexpr bool is_copy_assignable = value_storage_type::is_copy_assignable;
   //! \brief This monad will never throw exceptions during copy assignment
   static constexpr bool is_nothrow_copy_assignable = value_storage_type::is_nothrow_copy_assignable;
+  //! \brief This monad can be move assigned
+  static constexpr bool is_move_assignable = value_storage_type::is_move_assignable;
   //! \brief This monad will never throw exceptions during move assignment
   static constexpr bool is_nothrow_move_assignable = value_storage_type::is_nothrow_move_assignable;
   //! \brief This monad will never throw exceptions during destruction
@@ -286,17 +290,9 @@ public:
   //! \brief Disposes of any existing state, setting the monad to an emplaced construction
   template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace(Args &&... args) { implementation_policy::base::_storage.emplace_value(std::forward<Args>(args)...); }
 
-  //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
-  BOOST_OUTCOME_CONSTEXPR error_type get_error_or(error_type e) const noexcept { return has_error() ? implementation_policy::base::_storage.error : std::move(e); }
-  //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
-  BOOST_OUTCOME_CONSTEXPR error_type error_or(error_type e) const noexcept { return has_error() ? implementation_policy::base::_storage.error : std::move(e); }
   //! \brief Disposes of any existing state, setting the monad to the error_type
   BOOST_OUTCOME_CONSTEXPR void set_error(error_type v) { implementation_policy::base::_storage.emplace_error(std::move(v)); }
 
-  //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
-  BOOST_OUTCOME_CONSTEXPR exception_type get_exception_or(exception_type e) const noexcept { return has_exception() ? implementation_policy::base::_storage.exception : std::move(e); }
-  //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
-  BOOST_OUTCOME_CONSTEXPR exception_type exception_or(exception_type e) const noexcept { return has_exception() ? implementation_policy::base::_storage.exception : std::move(e); }
   //! \brief Disposes of any existing state, setting the monad to the exception_type
   BOOST_OUTCOME_CONSTEXPR void set_exception(exception_type v) { implementation_policy::base::_storage.emplace_exception(std::move(v)); }
   //! \brief Disposes of any existing state, setting the monad to make_exception_type(forward<E>(e))
