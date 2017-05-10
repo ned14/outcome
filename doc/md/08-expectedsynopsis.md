@@ -3,8 +3,9 @@
 
 You should read <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf">P0323R1</a>
 if you want a C++ standards level of detail regarding exactly what each member function's
-preconditions, effects and postconditions are. Unless otherwise indicated, Outcome's Expected behaves
-exactly the same. Outcome uses the **exact same** unit test suite
+preconditions, effects and postconditions are. Unless otherwise indicated, Outcome's Expected has
+the same semantics and API, even if not necessarily exactly the reference signature.
+Outcome uses the **exact same** unit test suite
 as the LEWG Expected reference implementation, and passes it handily. As the LEWG
 reference implementation updates its unit test suite, we shall keep pace.
 
@@ -21,19 +22,33 @@ precludes manufacturing `expected<const T>` which we have found to be in practic
 it is missing, it is either because we feel its presence is a defect in the LEWG Expected or we think
 it not worth implementing.
 
-A summary of the main differences:
-- LEWG Expected avoids any potential for a valueless due to exception state by using the double
+Some of Outcome's Expected deviations from P0323R1 have entered P0323R2 which will be presented at
+the Toronto WG21 meeting in July 2017. Once P0323R2 has been published, Outcome's Expected
+implementation will be changed to match the new proposal. The following changes
+are planned (more may be added by the Boost peer review):
+1. LEWG Expected avoids any potential for a valueless due to exception state by using the double
 buffer design as proposed by
 <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0110r0.html">P0110R0</a>
 (I understand that a future `std::variant<...>` will do the same). Outcome has not
 implemented support for the double buffer design yet due to its significant implementation
-complexity, and until it does we throw a `bad_expected_access<void>` in a valueless due to
-exception situation as that seemed logical.
+complexity (especially around alignment), and until it does we throw a `bad_expected_access<void>`
+in a valueless due to exception situation as that seemed logical.
  \note By default Outcome static asserts if you use any `basic_monad` with a type or types
 which have throwing move constructors, warning you that in that use case you must write code
 to cope with valueless due to exception. These static asserts can be disabled using a type trait,
 but this default will prevent accidental surprises when using Outcome's non-conforming
 Expected implementation.
+2. LEWG Expected implies `operator*()`, `operator->()` and `.error()` to be a reinterpret cast if they
+don't match the current state of the Expected, same as `std::optional<T>` does.
+Outcome's Expected implements `operator*()` exactly the same as `.value()`
+(i.e. throw if the state is errored) and implements `.error()` solely as a by-value
+return instead of by-reference return. This lets it return a default constructed `E`
+when the Expected is not errored (and LEWG Expected does require `E` to be default
+constructible, so this is okay). This is a big deviation, and will be rectified.
+3. Some new interesting tests have been added to the LEWG Expected test suite since
+P0323R1. These will be added to Outcome's copy of the same.
+
+Some deviations from P0323R1 are not expected to be changed any time soon:
 - Types `T` and `E` cannot be constructible into one another. This is a fundamental
 design choice in basic_monad to significantly reduce compile times so it won't be
 fixed.
@@ -47,15 +62,11 @@ won't notice this implementation detail in your code.
 - We don't implement the ordering and hashing operator overloads due to https://akrzemi1.wordpress.com/2014/12/02/a-gotcha-with-optional/.
 The fact the LEWG proposal does as currently proposed is a defect (it will be discussed
 by LEWG with P0323R2 in Toronto).
-- LEWG Expected defines `operator*()` and `.error()` to be silent undefined behaviour
-and assumed to be a reinterpret cast if they don't match the current state of the
-Expected. Outcome's Expected implements `operator*()` exactly the same as `.value()`
-(i.e. throw if the state is errored) and implements `.error()` solely as a by-value
-return instead of by-reference return. This lets it return a default constructed `E`
-when the Expected is not errored (and LEWG Expected does require `E` to be default
-constructible, so this is okay).
 - We don't implement `make_expected_from_call()` as we think it highly likely to be
 removed from the next version of the proposal due to it conferring little value.
+- Our `make_expected()` and `make_unexpected()` functions deviate significantly as
+we believe the LEWG ones to be defective in various ways. This topic will be discussed
+in Toronto and reconciliation later is highly likely.
 - Our Expected always defines the default, copy and move constructors even if the
 the type configured is not capable of it. That means `std::is_copy_constructible`
 etc returns true when they should return false. The reason why is again to
