@@ -1009,9 +1009,9 @@ extern "C" void _mm_pause();
 
 
 #define BOOST_OUTCOME_V1_ERROR_CODE_IMPL std
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_REF daa5d0f4f36f54a379ef436e1d78d54998430b9d
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_DATE "2017-05-09 14:31:38 +00:00"
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE daa5d0f4
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_REF f661ee8303496a77adcaa09aca4670f27b6edaad
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_DATE "2017-05-10 11:02:35 +00:00"
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE f661ee83
 #define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL, BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE), inline)
 
 
@@ -1184,7 +1184,7 @@ using ::std::generic_category;
 } } } }
 
 #endif
-namespace boost { namespace outcome { inline namespace _1_0_std_std_daa5d0f4 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_f661ee83 {
 namespace stl11
 {
   using namespace boost_lite::bind::std::system_error;
@@ -1451,7 +1451,7 @@ _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(l
 #define BOOST_OUTCOME_THROW(expr) throw expr
 #else
 #include <stdio.h>
-namespace boost { namespace outcome { inline namespace _1_0_std_std_daa5d0f4 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_f661ee83 {
 namespace detail
 {
   BOOSTLITE_NORETURN inline void do_fatal_exit(const char *expr)
@@ -2332,7 +2332,7 @@ namespace ringbuffer_log
 #define BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE 4096
 #endif
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_daa5d0f4 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_f661ee83 {
 
 
 inline boost_lite::ringbuffer_log::simple_ringbuffer_log<BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE> &extended_error_code_log()
@@ -2510,7 +2510,7 @@ inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec)
 
 
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_daa5d0f4 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_f661ee83 {
 
 
 enum class monad_errc
@@ -2596,11 +2596,11 @@ inline stl11::error_condition make_error_condition(monad_errc e)
 namespace std
 {
 
-  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_daa5d0f4::monad_errc> : std::true_type
+  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_f661ee83::monad_errc> : std::true_type
   {
   };
 
-  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_daa5d0f4::monad_errc> : std::true_type
+  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_f661ee83::monad_errc> : std::true_type
   {
   };
 }
@@ -2612,7 +2612,7 @@ namespace std
 
 
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_daa5d0f4 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_f661ee83 {
 
 
 struct empty_t
@@ -3954,9 +3954,9 @@ public:
 namespace std
 {
 
-  template <class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, boost ::outcome ::_1_0_std_std_daa5d0f4::value_storage<_value_type, _error_type, _exception_type> &v)
+  template <class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, boost ::outcome ::_1_0_std_std_f661ee83::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_daa5d0f4;
+    using namespace boost ::outcome ::_1_0_std_std_f661ee83;
     switch(v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::value:
@@ -3966,9 +3966,9 @@ namespace std
     }
   }
 
-  template <class _value_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_daa5d0f4::value_storage<_value_type, void, void> &v)
+  template <class _value_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_f661ee83::value_storage<_value_type, void, void> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_daa5d0f4;
+    using namespace boost ::outcome ::_1_0_std_std_f661ee83;
     using _error_type = void;
     using _exception_type = void;
     switch(v.type)
@@ -3981,9 +3981,9 @@ namespace std
       return s << "(unknown)";
     }
   }
-  template <class _value_type, class _error_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_daa5d0f4::value_storage<_value_type, _error_type, void> &v)
+  template <class _value_type, class _error_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_f661ee83::value_storage<_value_type, _error_type, void> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_daa5d0f4;
+    using namespace boost ::outcome ::_1_0_std_std_f661ee83;
     using _exception_type = void;
     switch(v.type)
     {
@@ -3997,9 +3997,9 @@ namespace std
       return s << "(unknown)";
     }
   }
-  template <class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_daa5d0f4::value_storage<_value_type, _error_type, _exception_type> &v)
+  template <class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_f661ee83::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_daa5d0f4;
+    using namespace boost ::outcome ::_1_0_std_std_f661ee83;
     switch(v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::empty:
@@ -4123,7 +4123,7 @@ namespace std
 }
 
 #endif
-namespace boost { namespace outcome { inline namespace _1_0_std_std_daa5d0f4 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_f661ee83 {
 
 template <class implementation_policy> class basic_monad;
 
@@ -4255,7 +4255,11 @@ public:
 
   static constexpr bool is_nothrow_move_constructible = value_storage_type::is_nothrow_move_constructible;
 
+  static constexpr bool is_copy_assignable = value_storage_type::is_copy_assignable;
+
   static constexpr bool is_nothrow_copy_assignable = value_storage_type::is_nothrow_copy_assignable;
+
+  static constexpr bool is_move_assignable = value_storage_type::is_move_assignable;
 
   static constexpr bool is_nothrow_move_assignable = value_storage_type::is_nothrow_move_assignable;
 
@@ -4279,25 +4283,23 @@ public:
 
 
 
-  constexpr basic_monad() noexcept(is_nothrow_default_constructible)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t())
-  {
-  }
+constexpr basic_monad() noexcept(is_nothrow_default_constructible)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t())
+{
+}
 
-  constexpr basic_monad(empty_type) noexcept : implementation_policy::base(typename implementation_policy::base::passthru_t()) {}
+constexpr basic_monad(empty_type) noexcept : implementation_policy::base(typename implementation_policy::base::passthru_t())
+{
+}
 
-  constexpr basic_monad(empty_t _) noexcept : implementation_policy::base(typename implementation_policy::base::passthru_t(), _) {}
+constexpr basic_monad(empty_t _) noexcept : implementation_policy::base(typename implementation_policy::base::passthru_t(), _)
+{
+}
 
-  constexpr basic_monad(value_t _) noexcept(std::is_nothrow_default_constructible<value_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), _)
-  {
-  }
-
-
-
-
-
-
+constexpr basic_monad(value_t _) noexcept(std::is_nothrow_default_constructible<value_type>::value)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), _)
+{
+}
 
 
 
@@ -4307,119 +4309,132 @@ public:
 
 
 
-  constexpr basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
-  {
-  }
-
-
-
-  constexpr basic_monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
-  {
-  }
 
 
 
 
 
 
-
-  template <class Arg, class... Args>
-  constexpr explicit basic_monad(in_place_t, Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...)
-  {
-  }
+constexpr basic_monad(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
+{
+}
 
 
-  template <class U>
-  constexpr basic_monad(in_place_t, std::initializer_list<U> l) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), typename value_storage_type::emplace_t(), std::move(l))
-  {
-  }
 
-  constexpr basic_monad(const void_rebound &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
-  {
-  }
-
-  constexpr basic_monad(void_rebound &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
-  {
-  }
+constexpr basic_monad(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
+{
+}
 
 
-  constexpr basic_monad(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
-  {
-  }
 
-  constexpr basic_monad(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
-  {
-  }
 
-  constexpr basic_monad(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
-  {
-  }
 
-  constexpr basic_monad(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
-  {
-  }
+
+
+template <class Arg, class... Args>
+constexpr explicit basic_monad(in_place_t, Arg &&arg, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Arg, Args...>::value)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), typename value_storage_type::emplace_t(), std::forward<Arg>(arg), std::forward<Args>(args)...)
+{
+}
+
+
+template <class U>
+constexpr basic_monad(in_place_t, std::initializer_list<U> l) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>>::value)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), typename value_storage_type::emplace_t(), std::move(l))
+{
+}
+
+constexpr basic_monad(const void_rebound &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
+{
+}
+
+constexpr basic_monad(void_rebound &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
+{
+}
+
+
+constexpr basic_monad(const error_type &v) noexcept(std::is_nothrow_copy_constructible<error_type>::value)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
+{
+}
+
+constexpr basic_monad(error_type &&v) noexcept(std::is_nothrow_move_constructible<error_type>::value)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
+{
+}
+
+constexpr basic_monad(const exception_type &v) noexcept(std::is_nothrow_copy_constructible<exception_type>::value)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), v)
+{
+}
+
+constexpr basic_monad(exception_type &&v) noexcept(std::is_nothrow_move_constructible<exception_type>::value)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(v))
+{
+}
 
 private:
-  struct explicit_conversion_from_different_policy {};
+struct explicit_conversion_from_different_policy
+{
+};
+
 public:
 
 
 
 
-  template <class Policy, typename = typename std::enable_if<std::is_same<typename implementation_policy::value_type, typename Policy::value_type>::value || std::is_void<typename Policy::value_type>::value || std::is_constructible<typename implementation_policy::value_type, typename Policy::value_type>::value>::type,
-            typename = typename std::enable_if<std::is_same<typename implementation_policy::error_type, typename Policy::error_type>::value || std::is_constructible<typename implementation_policy::error_type, typename Policy::error_type>::value>::type,
-            typename = typename std::enable_if<std::is_same<typename implementation_policy::exception_type, typename Policy::exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename Policy::exception_type>::value>::type>
-  constexpr explicit basic_monad(basic_monad<Policy> &&o, explicit_conversion_from_different_policy = explicit_conversion_from_different_policy())
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(o))
-  {
-  }
+template <class Policy, typename = typename std::enable_if<std::is_same<typename implementation_policy::value_type, typename Policy::value_type>::value || std::is_void<typename Policy::value_type>::value || std::is_constructible<typename implementation_policy::value_type, typename Policy::value_type>::value>::type,
+          typename = typename std::enable_if<std::is_same<typename implementation_policy::error_type, typename Policy::error_type>::value || std::is_constructible<typename implementation_policy::error_type, typename Policy::error_type>::value>::type,
+          typename = typename std::enable_if<std::is_same<typename implementation_policy::exception_type, typename Policy::exception_type>::value || std::is_constructible<typename implementation_policy::exception_type, typename Policy::exception_type>::value>::type>
+constexpr explicit basic_monad(basic_monad<Policy> &&o, explicit_conversion_from_different_policy = explicit_conversion_from_different_policy())
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(o))
+{
+}
 
 
 
 
 
-  template <class Policy, typename = typename std::enable_if<!std::is_void<typename Policy::value_type>::value && _is_constructible<basic_monad<Policy>>::value>::type>
-  constexpr explicit basic_monad(const basic_monad<Policy> &o, explicit_conversion_from_different_policy = explicit_conversion_from_different_policy())
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), o)
-  {
-  }
-private:
-  struct implicit_conversion_from_different_policy {};
-public:
-
-
-
-
-
-  template <class Policy, typename = typename std::enable_if<std::is_void<typename Policy::value_type>::value && _is_constructible<basic_monad<Policy>>::value>::type>
-  constexpr basic_monad(const basic_monad<Policy> &o, implicit_conversion_from_different_policy = implicit_conversion_from_different_policy())
+template <class Policy, typename = typename std::enable_if<!std::is_void<typename Policy::value_type>::value && _is_constructible<basic_monad<Policy>>::value>::type>
+constexpr explicit basic_monad(const basic_monad<Policy> &o, explicit_conversion_from_different_policy = explicit_conversion_from_different_policy())
     : implementation_policy::base(typename implementation_policy::base::passthru_t(), o)
-  {
-  }
+{
+}
 
-  constexpr basic_monad(basic_monad &&o) noexcept(is_nothrow_move_constructible)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(o))
-  {
-  }
+private:
+struct implicit_conversion_from_different_policy
+{
+};
 
-  constexpr basic_monad(const basic_monad &o) noexcept(is_nothrow_copy_constructible)
-      : implementation_policy::base(typename implementation_policy::base::passthru_t(), o)
-  {
-  }
+public:
 
-  BOOST_OUTCOME_CONSTEXPR basic_monad &operator=(basic_monad &&) = default;
 
-  BOOST_OUTCOME_CONSTEXPR basic_monad &operator=(const basic_monad &) = default;
+
+
+
+template <class Policy, typename = typename std::enable_if<std::is_void<typename Policy::value_type>::value && _is_constructible<basic_monad<Policy>>::value>::type>
+constexpr basic_monad(const basic_monad<Policy> &o, implicit_conversion_from_different_policy = implicit_conversion_from_different_policy())
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), o)
+{
+}
+
+constexpr basic_monad(basic_monad &&o) noexcept(is_nothrow_move_constructible)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), std::move(o))
+{
+}
+
+constexpr basic_monad(const basic_monad &o) noexcept(is_nothrow_copy_constructible)
+    : implementation_policy::base(typename implementation_policy::base::passthru_t(), o)
+{
+}
+
+BOOST_OUTCOME_CONSTEXPR basic_monad &operator=(basic_monad &&) = default;
+
+BOOST_OUTCOME_CONSTEXPR basic_monad &operator=(const basic_monad &) = default;
 
 #undef BOOST_OUTCOME_BASIC_MONAD_NAME
   template <class OtherMonad>
@@ -4474,16 +4489,8 @@ public:
   template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace(Args &&... args) { implementation_policy::base::_storage.emplace_value(std::forward<Args>(args)...); }
 
 
-  BOOST_OUTCOME_CONSTEXPR error_type get_error_or(error_type e) const noexcept { return has_error() ? implementation_policy::base::_storage.error : std::move(e); }
-
-  BOOST_OUTCOME_CONSTEXPR error_type error_or(error_type e) const noexcept { return has_error() ? implementation_policy::base::_storage.error : std::move(e); }
-
   BOOST_OUTCOME_CONSTEXPR void set_error(error_type v) { implementation_policy::base::_storage.emplace_error(std::move(v)); }
 
-
-  BOOST_OUTCOME_CONSTEXPR exception_type get_exception_or(exception_type e) const noexcept { return has_exception() ? implementation_policy::base::_storage.exception : std::move(e); }
-
-  BOOST_OUTCOME_CONSTEXPR exception_type exception_or(exception_type e) const noexcept { return has_exception() ? implementation_policy::base::_storage.exception : std::move(e); }
 
   BOOST_OUTCOME_CONSTEXPR void set_exception(exception_type v) { implementation_policy::base::_storage.emplace_exception(std::move(v)); }
 
@@ -4883,10 +4890,12 @@ namespace policy
     monad_policy_base(monad_policy_base &&) = delete;
     monad_policy_base &operator=(const monad_policy_base &) = default;
     monad_policy_base &operator=(monad_policy_base &&) = default;
-    struct passthru_t {};
+    struct passthru_t
+    {
+    };
     template <class... Args>
     constexpr monad_policy_base(passthru_t, Args &&... args)
-      : monad_storage(std::forward<Args>(args)...)
+        : monad_storage(std::forward<Args>(args)...)
     {
     }
 
@@ -5022,6 +5031,10 @@ namespace policy
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
 
+    BOOST_OUTCOME_CONSTEXPR error_type get_error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
+
+    BOOST_OUTCOME_CONSTEXPR error_type error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
+
 
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type get_exception() const
@@ -5042,6 +5055,10 @@ namespace policy
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type exception() const { return get_exception(); }
 
+    BOOST_OUTCOME_CONSTEXPR exception_type get_exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
+
+    BOOST_OUTCOME_CONSTEXPR exception_type exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
+
   };
   template <class monad_storage, class error_type, class exception_type> struct monad_policy_base<monad_storage, void, error_type, exception_type> : public monad_storage
   {
@@ -5051,10 +5068,12 @@ namespace policy
     monad_policy_base(monad_policy_base &&) = delete;
     monad_policy_base &operator=(const monad_policy_base &) = default;
     monad_policy_base &operator=(monad_policy_base &&) = default;
-    struct passthru_t {};
+    struct passthru_t
+    {
+    };
     template <class... Args>
     constexpr monad_policy_base(passthru_t, Args &&... args)
-      : monad_storage(std::forward<Args>(args)...)
+        : monad_storage(std::forward<Args>(args)...)
     {
     }
 
@@ -5109,6 +5128,8 @@ namespace policy
       return error_type();
     }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
+    BOOST_OUTCOME_CONSTEXPR error_type get_error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
+    BOOST_OUTCOME_CONSTEXPR error_type error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
 
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type get_exception() const
@@ -5127,6 +5148,8 @@ namespace policy
       return exception_type();
     }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type exception() const { return get_exception(); }
+    BOOST_OUTCOME_CONSTEXPR exception_type get_exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
+    BOOST_OUTCOME_CONSTEXPR exception_type exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
 
   };
 
@@ -5234,10 +5257,12 @@ namespace policy
     result_policy_base(result_policy_base &&) = delete;
     result_policy_base &operator=(const result_policy_base &) = default;
     result_policy_base &operator=(result_policy_base &&) = default;
-    struct passthru_t {};
+    struct passthru_t
+    {
+    };
     template <class... Args>
     constexpr result_policy_base(passthru_t, Args &&... args)
-      : monad_storage(std::forward<Args>(args)...)
+        : monad_storage(std::forward<Args>(args)...)
     {
     }
 
@@ -5373,6 +5398,14 @@ namespace policy
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
 
+    BOOST_OUTCOME_CONSTEXPR error_type get_error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
+
+    BOOST_OUTCOME_CONSTEXPR error_type error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
+
+
+
+
+
 
 
 
@@ -5402,10 +5435,12 @@ namespace policy
     result_policy_base(result_policy_base &&) = delete;
     result_policy_base &operator=(const result_policy_base &) = default;
     result_policy_base &operator=(result_policy_base &&) = default;
-    struct passthru_t {};
+    struct passthru_t
+    {
+    };
     template <class... Args>
     constexpr result_policy_base(passthru_t, Args &&... args)
-      : monad_storage(std::forward<Args>(args)...)
+        : monad_storage(std::forward<Args>(args)...)
     {
     }
 
@@ -5460,6 +5495,10 @@ namespace policy
       return error_type();
     }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
+    BOOST_OUTCOME_CONSTEXPR error_type get_error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
+    BOOST_OUTCOME_CONSTEXPR error_type error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
+
+
 
 
 
@@ -5584,10 +5623,12 @@ namespace policy
     option_policy_base(option_policy_base &&) = delete;
     option_policy_base &operator=(const option_policy_base &) = default;
     option_policy_base &operator=(option_policy_base &&) = default;
-    struct passthru_t {};
+    struct passthru_t
+    {
+    };
     template <class... Args>
     constexpr option_policy_base(passthru_t, Args &&... args)
-      : monad_storage(std::forward<Args>(args)...)
+        : monad_storage(std::forward<Args>(args)...)
     {
     }
 
@@ -5743,6 +5784,14 @@ namespace policy
 
 
 
+
+
+
+
+
+
+
+
   };
   template <class monad_storage, class error_type, class exception_type> struct option_policy_base<monad_storage, void, error_type, exception_type> : public monad_storage
   {
@@ -5752,10 +5801,12 @@ namespace policy
     option_policy_base(option_policy_base &&) = delete;
     option_policy_base &operator=(const option_policy_base &) = default;
     option_policy_base &operator=(option_policy_base &&) = default;
-    struct passthru_t {};
+    struct passthru_t
+    {
+    };
     template <class... Args>
     constexpr option_policy_base(passthru_t, Args &&... args)
-      : monad_storage(std::forward<Args>(args)...)
+        : monad_storage(std::forward<Args>(args)...)
     {
     }
 
@@ -5793,6 +5844,10 @@ namespace policy
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() const && { _pre_get_value(); }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get() const && { _pre_get_value(); }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void value() const && { _pre_get_value(); }
+
+
+
+
 
 
 
@@ -6303,12 +6358,13 @@ namespace policy
 #pragma warning(disable : 4702)
 #endif
 
-  template <class monad_storage, class value_type, class error_type, class exception_type> struct expected_policy_base : public monad_storage
+  template <class monad_storage, class value_type, class error_type> struct expected_policy_base : public monad_storage
   {
-    static_assert(!std::is_constructible<value_type, error_type>::value, "value_type cannot be constructible from error_type");
-    static_assert(!std::is_constructible<error_type, value_type>::value, "error_type cannot be constructible from value_type");
-    static_assert(std::is_void<error_type>::value || std::is_nothrow_copy_constructible<error_type>::value, "error_type must be nothrow copy constructible");
-    static_assert(std::is_void<error_type>::value || std::is_nothrow_move_constructible<error_type>::value, "error_type must be nothrow move constructible");
+    static_assert(!std::is_constructible<value_type, error_type>::value, "value_type cannot be constructible from error_type (Outcome requirement)");
+    static_assert(!std::is_constructible<error_type, value_type>::value, "error_type cannot be constructible from value_type (Outcome requirement)");
+    static_assert(std::is_default_constructible<value_type>::value, "value_type must be default constructible (LEWG Expected requirement)");
+    static_assert(std::is_void<error_type>::value || std::is_nothrow_copy_constructible<error_type>::value, "error_type must be nothrow copy constructible (LEWG Expected requirement)");
+    static_assert(std::is_void<error_type>::value || std::is_nothrow_move_constructible<error_type>::value, "error_type must be nothrow move constructible (LEWG Expected requirement)");
 
   protected:
     expected_policy_base() = delete;
@@ -6345,31 +6401,19 @@ namespace policy
       }
     }
 
-    using lvalue_type = value_type &;
-    using const_lvalue_type = const value_type &;
-    using rvalue_type = value_type &&;
-    using const_rvalue_type = const value_type &&;
+    using lvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, value_type &, value_type>::type;
+    using const_lvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, const value_type &, value_type>::type;
+    using rvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, value_type &&, value_type>::type;
+    using const_rvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, const value_type &&, value_type>::type;
 
   public:
 
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const auto *operator-> () const
-    {
-      _pre_get_value();
-      return &monad_storage::_storage.value;
-    }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const auto *operator-> () const { return &monad_storage::_storage.value; }
 
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE auto *operator-> ()
-    {
-      _pre_get_value();
-      return &monad_storage::_storage.value;
-    }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE auto *operator-> () { return &monad_storage::_storage.value; }
 
 
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE lvalue_type operator*() &
-    {
-      _pre_get_value();
-      return monad_storage::_storage.value;
-    }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE lvalue_type operator*() & { return monad_storage::_storage.value; }
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE lvalue_type get() &
     {
@@ -6383,11 +6427,7 @@ namespace policy
       return monad_storage::_storage.value;
     }
 
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_lvalue_type operator*() const &
-    {
-      _pre_get_value();
-      return monad_storage::_storage.value;
-    }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_lvalue_type operator*() const & { return monad_storage::_storage.value; }
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_lvalue_type get() const &
     {
@@ -6401,11 +6441,7 @@ namespace policy
       return monad_storage::_storage.value;
     }
 
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE rvalue_type operator*() &&
-    {
-      _pre_get_value();
-      return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
-    }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE rvalue_type operator*() && { return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value); }
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE rvalue_type get() &&
     {
@@ -6419,11 +6455,7 @@ namespace policy
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
 
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_rvalue_type operator*() const &&
-    {
-      _pre_get_value();
-      return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
-    }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_rvalue_type operator*() const && { return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value); }
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_rvalue_type get() const &&
     {
@@ -6438,47 +6470,214 @@ namespace policy
     }
 
 
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type get_error() const
-    {
-      if(!monad_storage::is_ready())
-      {
-        BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS();
-      }
-      if(monad_storage::has_error())
-        return monad_storage::_storage.error;
-#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
-      if(monad_storage::has_exception())
-        return error_type((int) monad_errc::exception_present, monad_category());
-#endif
-      return error_type();
-    }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type &get_error() & { return monad_storage::_storage.error; }
 
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type &error() & { return monad_storage::_storage.error; }
 
-#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
+    BOOST_OUTCOME_CONSTEXPR error_type &get_error_or(error_type &e) & noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : e; }
 
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type get_exception() const
-    {
-      if(!monad_storage::is_ready())
-      {
-        BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS();
-      }
-      if(!monad_storage::has_error() && !monad_storage::has_exception())
-        return exception_type();
-      if(monad_storage::has_error())
-        return std::make_exception_ptr(stl11::system_error(monad_storage::_storage.error));
-      if(monad_storage::has_exception())
-        return monad_storage::_storage.exception;
-      return exception_type();
-    }
+    BOOST_OUTCOME_CONSTEXPR error_type &error_or(error_type &e) & noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : e; }
 
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type exception() const { return get_exception(); }
-#endif
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const error_type &get_error() const & { return monad_storage::_storage.error; }
 
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type get_unexpected() const { return get_error(); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const error_type &error() const & { return monad_storage::_storage.error; }
+
+    BOOST_OUTCOME_CONSTEXPR const error_type &get_error_or(const error_type &e) const &noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : e; }
+
+    BOOST_OUTCOME_CONSTEXPR const error_type &error_or(const error_type &e) const &noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : e; }
+
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type &&get_error() && { return std::move(monad_storage::_storage.error); }
+
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type &&error() && { return std::move(monad_storage::_storage.error); }
+
+    BOOST_OUTCOME_CONSTEXPR error_type &&get_error_or(error_type &&e) && noexcept { return std::move(monad_storage::has_error() ? monad_storage::_storage.error : e); }
+
+    BOOST_OUTCOME_CONSTEXPR error_type &&error_or(error_type &&e) && noexcept { return std::move(monad_storage::has_error() ? monad_storage::_storage.error : e); }
+
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const error_type &&get_error() const && { return std::move(monad_storage::_storage.error); }
+
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const error_type &&error() const && { return std::move(monad_storage::_storage.error); }
+
+    BOOST_OUTCOME_CONSTEXPR const error_type &&get_error_or(const error_type &&e) const &&noexcept { return std::move(monad_storage::has_error() ? monad_storage::_storage.error : e); }
+
+    BOOST_OUTCOME_CONSTEXPR const error_type &&error_or(const error_type &&e) const &&noexcept { return std::move(monad_storage::has_error() ? monad_storage::_storage.error : e); }
+
+
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const error_type &get_unexpected() const { return get_error(); }
   };
-  template <class monad_storage, class error_type, class exception_type> struct expected_policy_base<monad_storage, void, error_type, exception_type> : public monad_storage
+
+  template <class monad_storage, class error_type> struct expected_policy_base_valueless : public monad_storage
   {
+    static_assert(std::is_void<error_type>::value || std::is_nothrow_copy_constructible<error_type>::value, "error_type must be nothrow copy constructible (LEWG Expected requirement)");
+    static_assert(std::is_void<error_type>::value || std::is_nothrow_move_constructible<error_type>::value, "error_type must be nothrow move constructible (LEWG Expected requirement)");
+
+  protected:
+    expected_policy_base_valueless() = delete;
+    expected_policy_base_valueless(const expected_policy_base_valueless &) = delete;
+    expected_policy_base_valueless(expected_policy_base_valueless &&) = delete;
+    expected_policy_base_valueless &operator=(const expected_policy_base_valueless &) = default;
+    expected_policy_base_valueless &operator=(expected_policy_base_valueless &&) = default;
+    struct passthru_t
+    {
+    };
+    template <class... Args>
+    constexpr expected_policy_base_valueless(passthru_t, Args &&... args)
+        : monad_storage(std::forward<Args>(args)...)
+    {
+    }
+
+    constexpr expected_policy_base_valueless(passthru_t)
+        : monad_storage(value_t())
+    {
+    }
+
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
+    {
+      if(!monad_storage::is_ready())
+        BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS();
+      if(monad_storage::has_error() || monad_storage::has_exception())
+      {
+        if(monad_storage::has_error())
+          BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS(monad_storage::_storage.error);
+#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
+        if(monad_storage::has_exception())
+          BOOST_OUTCOME_RETHROW_EXCEPTION(monad_storage::_storage.exception);
+#endif
+      }
+    }
+
+  public:
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() & {}
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get() & { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void value() & { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() const & {}
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get() const & { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void value() const & { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() && {}
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get() && { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void value() && { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() const && {}
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get() const && { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void value() const && { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type &get_error() & { return monad_storage::_storage.error; }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type &error() & { return monad_storage::_storage.error; }
+    BOOST_OUTCOME_CONSTEXPR error_type &get_error_or(error_type &e) & noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : e; }
+    BOOST_OUTCOME_CONSTEXPR error_type &error_or(error_type &e) & noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : e; }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const error_type &get_error() const & { return monad_storage::_storage.error; }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const error_type &error() const & { return monad_storage::_storage.error; }
+    BOOST_OUTCOME_CONSTEXPR const error_type &get_error_or(const error_type &e) const &noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : e; }
+    BOOST_OUTCOME_CONSTEXPR const error_type &error_or(const error_type &e) const &noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : e; }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type &&get_error() && { return std::move(monad_storage::_storage.error); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type &&error() && { return std::move(monad_storage::_storage.error); }
+    BOOST_OUTCOME_CONSTEXPR error_type &&get_error_or(error_type &&e) && noexcept { return std::move(monad_storage::has_error() ? monad_storage::_storage.error : e); }
+    BOOST_OUTCOME_CONSTEXPR error_type &&error_or(error_type &&e) && noexcept { return std::move(monad_storage::has_error() ? monad_storage::_storage.error : e); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const error_type &&get_error() const && { return std::move(monad_storage::_storage.error); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const error_type &&error() const && { return std::move(monad_storage::_storage.error); }
+    BOOST_OUTCOME_CONSTEXPR const error_type &&get_error_or(const error_type &&e) const &&noexcept { return std::move(monad_storage::has_error() ? monad_storage::_storage.error : e); }
+    BOOST_OUTCOME_CONSTEXPR const error_type &&error_or(const error_type &&e) const &&noexcept { return std::move(monad_storage::has_error() ? monad_storage::_storage.error : e); }
+
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const error_type &get_unexpected() const { return get_error(); }
+  };
+
+  template <class monad_storage, class value_type> struct expected_policy_base<monad_storage, value_type, void> : public monad_storage
+  {
+    static_assert(std::is_default_constructible<value_type>::value, "value_type must be default constructible (LEWG Expected requirement)");
+
+  protected:
+    expected_policy_base() = delete;
+    expected_policy_base(const expected_policy_base &) = delete;
+    expected_policy_base(expected_policy_base &&) = delete;
+    expected_policy_base &operator=(const expected_policy_base &) = default;
+    expected_policy_base &operator=(expected_policy_base &&) = default;
+    struct passthru_t
+    {
+    };
+    template <class... Args>
+    constexpr expected_policy_base(passthru_t, Args &&... args)
+        : monad_storage(std::forward<Args>(args)...)
+    {
+    }
+
+    constexpr expected_policy_base(passthru_t)
+        : monad_storage(value_t())
+    {
+    }
+
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
+    {
+      if(!monad_storage::is_ready())
+        BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS();
+      if(monad_storage::has_error() || monad_storage::has_exception())
+      {
+        if(monad_storage::has_error())
+          BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS(monad_storage::_storage.error);
+#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
+        if(monad_storage::has_exception())
+          BOOST_OUTCOME_RETHROW_EXCEPTION(monad_storage::_storage.exception);
+#endif
+      }
+    }
+
+    using lvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, value_type &, value_type>::type;
+    using const_lvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, const value_type &, value_type>::type;
+    using rvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, value_type &&, value_type>::type;
+    using const_rvalue_type = typename std::conditional<monad_storage::value_storage_type::is_referenceable, const value_type &&, value_type>::type;
+
+  public:
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const auto *operator-> () const { return &monad_storage::_storage.value; }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE auto *operator-> () { return &monad_storage::_storage.value; }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE lvalue_type operator*() & { return monad_storage::_storage.value; }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE lvalue_type get() &
+    {
+      _pre_get_value();
+      return monad_storage::_storage.value;
+    }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE lvalue_type value() &
+    {
+      _pre_get_value();
+      return monad_storage::_storage.value;
+    }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_lvalue_type operator*() const & { return monad_storage::_storage.value; }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_lvalue_type get() const &
+    {
+      _pre_get_value();
+      return monad_storage::_storage.value;
+    }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_lvalue_type value() const &
+    {
+      _pre_get_value();
+      return monad_storage::_storage.value;
+    }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE rvalue_type operator*() && { return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE rvalue_type get() &&
+    {
+      _pre_get_value();
+      return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
+    }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE rvalue_type value() &&
+    {
+      _pre_get_value();
+      return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
+    }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_rvalue_type operator*() const && { return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_rvalue_type get() const &&
+    {
+      _pre_get_value();
+      return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
+    }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_rvalue_type value() const &&
+    {
+      _pre_get_value();
+      return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
+    }
+
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get_error() const {}
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void error() const {}
+  };
+
+  template <class monad_storage> struct expected_policy_base<monad_storage, void, void> : public monad_storage
+  {
+
   protected:
     expected_policy_base() = delete;
     expected_policy_base(const expected_policy_base &) = delete;
@@ -6515,51 +6714,21 @@ namespace policy
     }
 
   public:
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() & { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() & {}
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get() & { _pre_get_value(); }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void value() & { _pre_get_value(); }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() const & { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() const & {}
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get() const & { _pre_get_value(); }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void value() const & { _pre_get_value(); }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() && { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() && {}
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get() && { _pre_get_value(); }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void value() && { _pre_get_value(); }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() const && { _pre_get_value(); }
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() const && {}
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get() const && { _pre_get_value(); }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void value() const && { _pre_get_value(); }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type get_error() const
-    {
-      if(!monad_storage::is_ready())
-      {
-        BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS();
-      }
-      if(monad_storage::has_error())
-        return monad_storage::_storage.error;
-#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
-      if(monad_storage::has_exception())
-        return error_type((int) monad_errc::exception_present, monad_category());
-#endif
-      return error_type();
-    }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
-#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type get_exception() const
-    {
-      if(!monad_storage::is_ready())
-      {
-        BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS();
-      }
-      if(!monad_storage::has_error() && !monad_storage::has_exception())
-        return exception_type();
-      if(monad_storage::has_error())
-        return std::make_exception_ptr(stl11::system_error(monad_storage::_storage.error));
-      if(monad_storage::has_exception())
-        return monad_storage::_storage.exception;
-      return exception_type();
-    }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type exception() const { return get_exception(); }
-#endif
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type get_unexpected() const { return get_error(); }
+
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get_error() const {}
+    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void error() const {}
   };
 
 
@@ -6584,13 +6753,14 @@ namespace policy
     static constexpr bool is_nothrow_default_constructible = std::is_nothrow_default_constructible<value_type>::value;
 
 
-    typedef expected_policy_base<basic_monad_storage<expected_policy>, value_type, error_type, exception_type> base;
+    typedef expected_policy_base<basic_monad_storage<expected_policy>, value_type, error_type> base;
 
 
     template <typename U> using rebind = basic_monad<expected_policy<U, EC>>;
 
     template <typename U> using rebind_policy = expected_policy<U, EC>;
   };
+
   template <typename EC> struct expected_policy<void, EC>
   {
 
@@ -6612,12 +6782,41 @@ namespace policy
     static constexpr bool is_nothrow_default_constructible = true;
 
 
-    typedef expected_policy_base<basic_monad_storage<expected_policy>, value_type, error_type, exception_type> base;
+    typedef expected_policy_base_valueless<basic_monad_storage<expected_policy>, error_type> base;
 
 
     template <typename U> using rebind = basic_monad<expected_policy<U, EC>>;
 
     template <typename U> using rebind_policy = expected_policy<U, EC>;
+  };
+
+  template <> struct expected_policy<void, void>
+  {
+
+    typedef basic_monad<expected_policy> implementation_type;
+
+    typedef void value_type;
+
+    typedef void error_type;
+
+#ifdef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE
+    typedef BOOST_OUTCOME_EXPECTED_POLICY_EXCEPTION_TYPE exception_type;
+#else
+    typedef void exception_type;
+#endif
+
+
+    static constexpr bool is_default_constructible = true;
+
+    static constexpr bool is_nothrow_default_constructible = true;
+
+
+    typedef expected_policy_base<basic_monad_storage<expected_policy>, void, void> base;
+
+
+    template <typename U> using rebind = basic_monad<expected_policy<U, void>>;
+
+    template <typename U> using rebind_policy = expected_policy<U, void>;
   };
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -6695,7 +6894,7 @@ template <class T, class E> inline expected<void, E> as_void(const expected<T, E
 namespace std
 {
 
-  template <class Impl> inline void swap(boost ::outcome ::_1_0_std_std_daa5d0f4::basic_monad<Impl> &a, boost ::outcome ::_1_0_std_std_daa5d0f4::basic_monad<Impl> &b) { a.swap(b); }
+  template <class Impl> inline void swap(boost ::outcome ::_1_0_std_std_f661ee83::basic_monad<Impl> &a, boost ::outcome ::_1_0_std_std_f661ee83::basic_monad<Impl> &b) { a.swap(b); }
 }
 
 #define BOOST_OUTCOME__GLUE2(x, y) x##y

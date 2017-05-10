@@ -32,26 +32,21 @@ buffer design as proposed by
 (I understand that a future `std::variant<...>` will do the same). Outcome has not
 implemented support for the double buffer design yet due to its significant implementation
 complexity (especially around alignment), and until it does we throw a `bad_expected_access<void>`
-in a valueless due to exception situation as that seemed logical.
+in a valueless due to exception situation as that seemed logical. [<a href="https://github.com/ned14/boost.outcome/issues/11">issue #11</a>]
  \note By default Outcome static asserts if you use any `basic_monad` with a type or types
 which have throwing move constructors, warning you that in that use case you must write code
 to cope with valueless due to exception. These static asserts can be disabled using a type trait,
 but this default will prevent accidental surprises when using Outcome's non-conforming
 Expected implementation.
-2. LEWG Expected implies `operator*()`, `operator->()` and `.error()` to be a reinterpret cast if they
-don't match the current state of the Expected, same as `std::optional<T>` does.
-Outcome's Expected implements `operator*()` exactly the same as `.value()`
-(i.e. throw if the state is errored) and implements `.error()` solely as a by-value
-return instead of by-reference return. This lets it return a default constructed `E`
-when the Expected is not errored (and LEWG Expected does require `E` to be default
-constructible, so this is okay). This is a big deviation, and will be rectified.
-3. Some new interesting tests have been added to the LEWG Expected test suite since
+2. Some new interesting tests have been added to the LEWG Expected test suite since
 P0323R1. These will be added to Outcome's copy of the same.
 
 Some deviations from P0323R1 are not expected to be changed any time soon:
 - Types `T` and `E` cannot be constructible into one another. This is a fundamental
 design choice in basic_monad to significantly reduce compile times so it won't be
 fixed.
+  - Note though that `expected<void, void>` is permitted (which is legal in the LEWG
+proposal).
 - `unexpected_type<E>` is implemented as an `expected<void, E>` and it lets
 the basic_monad machinery do the implicit conversion to some `expected<T, E>`
 through the less representative to more representative conversion rules. Note
@@ -67,6 +62,8 @@ removed from the next version of the proposal due to it conferring little value.
 - Our `make_expected()` and `make_unexpected()` functions deviate significantly as
 we believe the LEWG ones to be defective in various ways. This topic will be discussed
 in Toronto and reconciliation later is highly likely.
+- Our `value_or()` member functions pass through the reference rather than returning by
+value (which we don't understand why the LEWG proposal does).
 - Our Expected always defines the default, copy and move constructors even if the
 the type configured is not capable of it. That means `std::is_copy_constructible`
 etc returns true when they should return false. The reason why is again to
@@ -170,6 +167,8 @@ public:
   constexpr explicit unexpected_type(E&&);
   constexpr const E& value() const;
   constexpr E & value();
+  
+  
 private:
   E val; // exposition only
 };
@@ -182,8 +181,10 @@ public:
   unexpected_type() = default;
   constexpr explicit unexpected_type(const E&);
   constexpr explicit unexpected_type(E&&);
-  constexpr const E& value() const;
-  constexpr E & value();
+  constexpr const E& value() const &;
+  constexpr E & value() &;
+  constexpr const E&& value() const &&;
+  constexpr E && value() &&;
 private:
   E val; // exposition only
 };
@@ -439,6 +440,12 @@ class expected
 
 
 
+
+
+
+
+
+
 public:
   typedef T value_type;
   typedef E error_type;
@@ -521,10 +528,16 @@ private:
 template <class T, class E>
 class expected
 {
-  static_assert(!std::is_constructible<T, E>::value, "value_type cannot be constructible from error_type");
-  static_assert(!std::is_constructible<E, T>::value, "error_type cannot be constructible from value_type");
-  static_assert(std::is_void<E>::value || std::is_nothrow_copy_constructible<E>::value, "error_type must be nothrow copy constructible");
-  static_assert(std::is_void<E>::value || std::is_nothrow_move_constructible<E>::value, "error_type must be nothrow move constructible");
+  static_assert(!std::is_constructible<value_type, error_type>::value,
+    "value_type cannot be constructible from error_type (Outcome requirement)");
+  static_assert(!std::is_constructible<error_type, value_type>::value,
+    "error_type cannot be constructible from value_type (Outcome requirement)");
+  static_assert(std::is_default_constructible<value_type>::value,
+    "value_type must be default constructible (LEWG Expected requirement)");
+  static_assert(std::is_void<error_type>::value || std::is_nothrow_copy_constructible<error_type>::value,
+    "error_type must be nothrow copy constructible (LEWG Expected requirement)");
+  static_assert(std::is_void<error_type>::value || std::is_nothrow_move_constructible<error_type>::value,
+    "error_type must be nothrow move constructible (LEWG Expected requirement)");
 public:
   using value_type = devoid<T>;  // If T is void, an unusable but helpfully named type
   using error_type = devoid<E>;  // This traps attempts to use with a useful compiler error
@@ -583,11 +596,11 @@ public:
   constexpr T& value() &;
   constexpr const T&& value() const &&;
   constexpr T&& value() &&;
-  constexpr E error() const;           // prevent probable defect in LEWG Expected proposal
-
-  
-
-  constexpr E get_unexpected() const;  // unexpected_type<E> = expected<void, E>, so this implicitly converts
+  constexpr const E& error() const&;
+  E& error() &;
+  constexpr E&& error() &&;
+  constexpr const E&& error() const &&;
+  constexpr const E &get_unexpected() const;  // unexpected_type<E> = expected<void, E>, so this implicitly converts
   constexpr const value_type &value_or(const value_type &) noexcept const&;
   constexpr value_type& value_or(value_type&) noexcept &;
   constexpr const value_type&& value_or(const value_type&&) noexcept const&&;
