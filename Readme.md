@@ -10,14 +10,18 @@ Documentation: https://ned14.github.io/boost.outcome/
 Latest tarball of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/boost.outcome-v1.0-source-latest.tar.xz
 
 Past tarballs of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/boost.outcome
- 
+
+Before Boost peer review:
+ - [ ] Write up errata for ACCU talk for under the video.
+ - [ ] Fix operator*(), operator->() and .error() in Expected.
+ - [ ] error_or() ought to have rvalue ref etc overloads, and exception_or()
+
 Later after Boost peer review:
  - [ ] Create new Win32 and NT error code categories and have make_errored_outcome() use those.
  Have a python script auto generate the code into separate header files. Add those to boost-lite.
  - [ ] Add config where in release mode the exception throwing macros generate link errors
 for symbols with the function name and line number in them. This lets you track down all
 potentially throwing code.
- - [ ] error_or() ought to have rvalue ref etc overloads, and exception_or()
  - [ ] Add nothrow make functions for outcomes, maybe with error lvalue ref constructor editions for results.
  - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
  - [ ] Add tribool logic programming operator overloads
