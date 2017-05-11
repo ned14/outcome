@@ -61,7 +61,7 @@ affect some applications. In this situation, use LLVM clang targeting the MSVC A
 
 \page support Support
 
-<a href="https://stackoverflow.com/">StackOverflow</a> with the boost-outcome tag is the
+<a href="https://stackoverflow.com/">StackOverflow</a> with the <tt>boost-outcome</tt> tag is the
 preferred place to ask questions on usage.
 
 If you have a problem, please review the FAQ and the wiki. Searching

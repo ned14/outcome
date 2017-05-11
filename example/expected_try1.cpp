@@ -25,7 +25,7 @@ using MathResult2 = outcome::expected<long long, MathError2>;
 
 MathResult1 div(double x, double y) noexcept
 {
-  if (::fabs(y) < FLT_EPSILON)
+  if (::fabs(y) < DBL_EPSILON)
   {
     // This operation would fail, instead let's return the reason of
     // the failure wrapped in E

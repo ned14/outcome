@@ -208,6 +208,9 @@ instead there is a formal empty state to do with as you please (in some situatio
 returning a value OR empty OR an error makes a lot of sense and Outcome supports a `tribool`
 extension for ternary logics for those who need such a thing). Attempting to retrieve a value,
 error or exception from an empty transport throws a `monad_error::no_state` [1].
+  - Implied in this design is that unlike in Expected, your type `T` need not be default
+  constructible, nor movable, nor copyable. If your type `T` throws during a switch between
+  states, we adopt the formal empty state.
 - `.value()` on an errored transport directly throws a `std::system_error` with the error code [2]
 instead of throwing a wrapper type like `bad_expected_access<E>` from which you need to manually
 extract the `E` instance later.
@@ -217,15 +220,29 @@ extract later.
 - `.error()` returns any `error_code_extended` as you'd expect, returning a default constructed
 (null) error code if the transport is valued, or `monad_errc::exception_present` if the
 transport is excepted.
+  - Unlike Expected, this is always a by-value return instead of by-reference via
+`reinterpret_cast<error_type>`. This is low cost, because we know what our error type always is.
 - `.exception()` returns any `std::exception_ptr` as you'd expect. If the transport is valued,
 it returns a default constructed (null) exception pointer. If the transport is errored, it
 returns an exception pointer to a `std::system_error` wrapping the error code.
+- `operator->()` and `operator*()` both alias `.value()` i.e. they do not implicitly do
+`reinterpret_cast<value_type>` like Expected does. In fact, Outcome's refinements **never ever**
+implicitly call `reinterpret_cast<>`, and you can make use of this to save writing considerable
+boilerplate by letting these throwing semantics just described activate as needed instead of
+you having to manually check state before access as you must do with Expected.
+- Due to historically also providing a monadic future-promise implementation, we also provide `.get()`,
+`.get_error()`, `.get_exception()` and so on. These are aliases to `.value()`, `.error()` and
+`.exception()`. We have found the aliases useful in our own code where we use the convention of
+`.value()` when we make use of the value returned, and `.get()` to indicate we are purely
+retrieving the value to cause the rethrow of any errors or exceptions. We have found this makes
+code clearer. You may find using the same convention useful in your own code too.
 
-And finally, if your compiler is in C++ 17 mode or later, transports are marked with the
+Additionally, if your compiler is in C++ 17 mode or later, transports are marked with the
 <a href="http://en.cppreference.com/w/cpp/language/attributes">`[[nodiscard]]`</a> attribute.
 This means the compiler ought to warn if you forget to examine transports returned by functions.
 If you really mean to throw away a returned transport, make sure you cast it to `(void)` to tell
-the compiler you specifically intend to throw it away.
+the compiler you specifically intend to throw it away. This solves a big pain point when using
+`error_code &ec` pass back overloads from C++ 11 where you forget to check `ec`.
 
 [1]: Actually the `BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(monad_errc::no_state))` macro is executed
 where `ec` is the `std::error_code` contained by the monad. This can be user redefined to do anything,
@@ -265,12 +282,12 @@ result<Foo> somefunction()
 
 The full set of free functions is as follows:
 <dl>
-  <dt>`make_[option|result|outcome](T v)`</dt>
-  <dd>Makes a valued transport with value `v`.</dd>
-  <dt>`make_[option|result|outcome]<T = void>()`</dt>
-  <dd>Makes a valued transport default constructing a `T`.</dd>
   <dt>`make_empty_[option|result|outcome]<T = void>()`</dt>
   <dd>Makes an empty transport.</dd>
+  <dt>`make_valued_[option|result|outcome](T v)`</dt>
+  <dd>Makes a valued transport with value `v`.</dd>
+  <dt>`make_valued_[option|result|outcome]<T = void>()`</dt>
+  <dd>Makes a valued transport default constructing a `T`.</dd>
   <dt>`make_errored_[result|outcome]<T = void>(error_code_extended ec)`</dt>
   <dd>Makes an errored transport.</dd>
   <dt>`make_errored_[result|outcome]<T = void>(int code, const char *extendedmsg = nullptr)`</dt>
@@ -281,7 +298,7 @@ very convenient for writing:
  result<Foo> somefunction()
  {
    if(-1 == open(...))  // Any POSIX system call setting errno on failure
-     return make_errored_result<>(errno);
+     return make_errored_result(errno);
  }
  ~~~
  </dd>
@@ -294,7 +311,7 @@ very convenient for writing:
  result<Foo> somefunction()
  {
    if(INVALID_HANDLE_VALUE == CreateFile(...))  // Any Win32 call setting GetLastError() on failure
-     return make_errored_result<>(GetLastError());
+     return make_errored_result(GetLastError());
  }
  ~~~
  </dd>
@@ -309,7 +326,7 @@ very convenient for writing:
    }
    catch(...)  // catch all
    {
-     return make_exceptional_outcome</*void*/>(/* std::current_exception() */);
+     return make_exceptional_outcome/*<void>*/(/* std::current_exception() */);
    }
  }
  ~~~
@@ -322,11 +339,54 @@ as a void version of the same transport, preserving any empty/errored/excepted s
 was valued, the returned copy will be valued **void**.</dd>
 </dl>
 
+Outcome's refinements do not permit `T` to be constructible from an `error_code_extended`
+or `std::exception_ptr` and vice versa for much improved compile times. This allows us
+to offer implicit construction from all three types, so you can entirely avoid any of the
+`make_xxx()` functions just described and just return the state you desire directly.
+
+We have however been using these in our own code for two years now, and we recommend that
+you always use the `make_xxx()` functions in code intended for a long life span
+because they make code correctness auditing so much easier - with a single glance you can
+tell a function's error handling is correct or not. If the code
+is written to rely on the implicit construction, any function of any complexity requires in
+depth study to determine correctness.
+
+All that just said, in a small function, particularly in boilerplate functions, it's
+enormously less cluttered to not have to write `make_xxx()` all the time. So choose which
+form you use carefully on a function by function basis.
+
+Finally, it may not be obvious that the above syntax also allows contract programming e.g. this is a style used throughout
+AFIO v2 which proven to be very useful for self-documenting the function's contract with
+the caller:
+
+~~~{.cpp}
+result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type newsize) noexcept
+{
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  if(ftruncate(_v.fd, newsize) < 0)
+    return make_errored_result<extent_type>(errno, last190(_path.native()));
+  if(are_safety_fsyncs_issued())
+    ::fsync(_v.fd);  // deliberately ignore failure
+  return make_valued_result<extent_type>(newsize);
+}
+~~~
+
+The paths taken for success and failure are extremely obvious and jump immediately to
+the eye. We manually specify the exact result type returned rather than letting Outcome
+perform automatic upconversion, partially for improved compile times as we avoid the
+upconversion metaprogramming, but also because in a longer function the exact type
+being returned is usually off the top of the screen, and manually specifying it is
+useful documentation. Obviously each code base will be different, but consider using the
+style above if code correctness and fast auditing is particularly important to you for
+a project you expect to be maintaining for many years.
+
+
 <hr><br>
 
 \section outcome_macros Outcome's helper macros
 
-We've already seen in part B the helper macro `BOOST_OUTCOME_TRY(var, expr)` which also works
+We have already seen in the previous part of this tutorial that the helper macro
+`BOOST_OUTCOME_TRY(var, expr)` which also works
 with `expected<T, E>` when the error type in the returned Expected is the same. Something
 unique to Outcome's refinements due to using `error_code_extended` is the convenience macro
 `BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT` which is a long
@@ -381,9 +441,12 @@ catch(const std::exception &e)
 ~~~
 
 This macro is particularly useful when you are calling into the STL from a noexcept
-function which returns a `result<T>` and not an `outcome<T>`. So long as the code you
+function (e.g. "island of exception throw in a sea of noexcept") which returns a
+`result<T>` and not an `outcome<T>`. So long as the code you
 call only **ever** will throw STL exception types, using this macro is safe and information
-loss free. Note that the above sequence does not include a catch all clause, so if
+loss free, plus some compiler optimisers will elide the costly exception throw and catch
+machinery and replace it with a simple return of the result, thus effectively doing "de-exception-throw"
+to the C++ STL which is very, very useful. Note that the above sequence does not include a catch all clause, so if
 you want one of those then use the `BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT` macro
 which adds to the end of the catch sequence:
 
@@ -456,10 +519,10 @@ public API with the signature:
 outcome::expected<void, outcome::expected<std::error_code, std::exception_ptr>> execute(std::function<io_handler> f) noexcept;
 ~~~
 This is a nested Expected used to transport one of two unexpected values. In real
-world usage of Expected you'll find yourself writing this more than you'd prefer
+world usage of Expected you'll find yourself writing this more than you'd prefer,
 and indeed a historical edition of the Expected proposal had special convenience
 semantics for them. The current proposal does not however, so you end up writing
-clunky code.
+clunky code, which isn't necessary with Outcome's refinements.
 
 Indeed, it would be worse again if it weren't for the `std::future` being used
 to carry any exception throws for us which lets us skip a nested Expected. One
@@ -468,7 +531,17 @@ simply rethrow any transported exceptions instead of messing around with nested
 Expected, however the "sea of noexcept" public API design would then be lost and the
 two examples no longer equivalent.
 
-To conclude, this aspect of simplifying the programmer's effort to write
+Another thing which may or may not seem neat to you is that in the Outcome edition,
+`outcome<T>` is errored not excepted when it was a known C++ exception type, and
+only excepted if it was an unknown C++ exception throw. This is a very powerful
+segmentation in practice because it lets you separate the truly unexpected and
+unknown failures from the less serious ones. One can therefore employ an abort
+on the truly unknown failure strategy quite like Rust does with its `panic!`
+approach, yet retain normal C++ exception throws and unwinds where the failure
+is not as unknown. Lots of design flexibility and potential lies here, it all
+depends on your design and your code base.
+
+To conclude, this aspect of simplifying the programmer's effort to write various
 "sea of noexcept" API designs is precisely what Outcome's refinements are
 intended for. If Outcome's refinements suit well your code base, they should
-let you write clearer, more maintainable and less buggy code. *Buen provecho!*
+let you write clearer, less verbose, more maintainable and less buggy code. *Buen provecho!*

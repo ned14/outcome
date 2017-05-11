@@ -18,9 +18,7 @@ As you will note, there are technically speaking quite a lot of deviations. Most
 and will present no effect in code using Expected. Occasionally a function is missing or implemented
 significantly differently. If it has a significantly different signature, it is usually because we
 feel the LEWG Expected is defective in that area (e.g. the use of `decay<>` for the factory functions
-precludes manufacturing `expected<const T>` which we have found to be in practice very useful). If
-it is missing, it is either because we feel its presence is a defect in the LEWG Expected or we think
-it not worth implementing.
+precludes manufacturing `expected<const T>` which we have found to be in practice very useful).
 
 Some of Outcome's Expected deviations from P0323R1 have entered P0323R2 which will be presented at
 the Toronto WG21 meeting in July 2017. Once P0323R2 has been published, Outcome's Expected
@@ -63,16 +61,23 @@ removed from the next version of the proposal due to it conferring little value.
 we believe the LEWG ones to be defective in various ways. This topic will be discussed
 in Toronto and reconciliation later is highly likely.
 - Our `value_or()` member functions pass through the reference rather than returning by
-value (which we don't understand why the LEWG proposal does).
+value (we don't understand why the LEWG proposal does except that `std::optional<T>`
+does, which itself is a bad design choice and it should be changed).
+- Rather than `void`, our `value_type` and `error_type` typedefs are set to a descriptive
+compiler error generating type if the Expected is configured with `void`. If you want
+to know if no type was configured, use the static constexpr bools at
+<tt>expected<T, E>::has_value_type</tt> and <tt>expected<T, E>::has_error_type</tt>
+or use `raw_value_type` and `raw_error_type`. The reason for this deviation is to
+make metaprogramming using Outcome's transports much easier and less error prone.
 - Our Expected always defines the default, copy and move constructors even if the
 the type configured is not capable of it. That means `std::is_copy_constructible`
 etc returns true when they should return false. The reason why is again to
 significantly improve compile times by hugely reducing the number of templates
 which need to be instantiated during routine basic_monad usage, and again
 this won't be fixed. Instead use the static constexpr bools at:
-  - <pre>expected<T, E>::is_default_constructible</pre>
-  - <pre>expected<T, E>::is_copy_constructible</pre>
-  - <pre>expected<T, E>::is_move_constructible</pre>
+  - <tt>expected<T, E>::is_default_constructible</tt>
+  - <tt>expected<T, E>::is_copy_constructible</tt>
+  - <tt>expected<T, E>::is_move_constructible</tt>
  \note Depending on what any Boost peer review thinks, we may inject correct answers
 for the type traits for basic_monad into namespace std.
 

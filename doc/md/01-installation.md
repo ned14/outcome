@@ -7,7 +7,7 @@ OS X with Xcode and on Windows with VS2015.
 A nightly cronjob figures out for which latest commit all tests passed on all those platforms and
 merges that commit to master branch. From that master branch, a source tarball is generated.
 
-Under a default configuration, when you `#include "boost.outcome/include/boost/outcome.hpp"`
+Under a default configuration, when you <tt>\#include "boost.outcome/include/boost/outcome.hpp"</tt>
 you will include a preprocessed single file edition for maximum build performance in
 downstream projects. This can interfere with accurate bug reporting in Outcome, so if you
 are diagnosing a problem in Outcome itself, predefine

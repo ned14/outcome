@@ -545,6 +545,18 @@ valueless due to exception state ever appears, we throw a `bad_expected_access<v
 exception when you try to access an Expected which is valueless, as an `expected<T, E = void>`
 is not a possible Expected configuration due to requiring E to be constructible.
 
+\note By default Outcome static asserts if you use any its transports with a type or types
+which have throwing move constructors, warning you that in that use case you must write code
+to cope with valueless due to exception. These static asserts can be disabled using a type trait
+on a type by type basis, but this default behaviour will prevent accidental surprises when using
+Outcome's non-conforming Expected implementation.
+
+\warning These sorts of monadic transport are particularly sensitive to generating code and memory
+bloat if their move constructor can throw due to all the extra work Outcome must do to ensure
+exception safety. Try, whenever possible, to only use types in these transports with
+non-throwing move semantics (i.e. don't quickly disable the static assert above unless there
+is no other option available).
+
 \subsubsection expected_observers Expected's observers
 
 Generally speaking you will not want Expected to throw `bad_expected_access<E>` as a
@@ -566,10 +578,10 @@ public:
       using type = expected<U, error_type>;
     };
 
-  // As if &value()
+  // As if reinterpret_cast<value_type *>, no runtime checking performed!
   constexpr const T* operator ->() const;
   T* operator ->();
-  // As if value()
+  // As if reinterpret_cast<value_type>, no runtime checking performed!
   constexpr const T& operator *() const&;
   T& operator *() &;
   constexpr const T&& operator *() const &&;
@@ -585,7 +597,7 @@ public:
   constexpr const T&& value() const &&;
   constexpr T&& value() &&;
   
-  // Returns a lvalue or rvalue ref to the stored error_type if there is one, else undefined behaviour
+  // As if reinterpret_cast<error_type>, no runtime checking performed!
   constexpr const E& error() const&;
   E& error() &;
   constexpr E&& error() &&;
