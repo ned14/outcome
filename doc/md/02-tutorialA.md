@@ -26,6 +26,36 @@ The recording of that talk can be viewed at https://youtu.be/XVofgKH-uu4.
 <center><iframe width="853" height="480" src="https://www.youtube.com/embed/XVofgKH-uu4?rel=0" frameborder="0" allowfullscreen></iframe></center>
 \endhtmlonly
 
+ACCU talk errata:
+ - 17:50 I state that back converting an error condition to an error code with
+`std::make_error_code()` will generate a system-specific code matching that condition
+in `std::system_category()`. In fact it generates the matching POSIX error code in
+`std::generic_category()` on all platforms anyone seems to be aware of, so one cannot
+actually fully undo a conversion from a system error code into a portable error condition
+and back into a system error code again.
+ - 26:40 Same erratum as for 17:50
+ - 36:45 As is pretty clear in everything I say from now on, I was not aware at that time
+that Anthony's http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0110r0.html proposal
+for eliminating the valueless by exception state in `std::variant<...>` was actively
+being considered for a future C++ standard (Anthony was in the audience at the back).
+The LEWG Expected makes use of P0110R0 to also eliminate any possibility of a valueless
+state, so an `expected<T, E>` can never be valueless. My apologies for being so wrong in
+everything I say on this topic in the talk.
+ - 42:05 Accessing `.error()` when the Expected is valued DOES NOT throw an exception.
+It is as if `reinterpret_cast<error_type>`, exactly the same as `std::optional<T>`. Sorry.
+ - 48:11 The code example should be using `DBL_EPSILON` not `FLT_EPSILON`. The Outcome
+documentation repeating the same mistake has been fixed.
+ - 1:06:08 I say the range of overhead is one or two CPU cycles when the graph clearly
+shows about 12 CPU cycles. I meant one or two CPU cycles overhead difference *per frame*
+not overall, and yes that is strictly speaking possibly a 10% overhead over C integer return
+codes for some of the compiler and flags settings. In any real world code base however,
+one or two CPU cycles extra overhead per stack frame is not significant to the code
+executed in that stack frame.
+ - 1:22:25 I say the words Visual Studio 2015 when I meant Visual Studio 2017, and that
+Update 1 to VS2017 should let me remove the MSVC-specific workarounds in Outcome.
+ - 1:22:50 Same erratum as for 36:45.
+
+
 <hr><br>
 
 

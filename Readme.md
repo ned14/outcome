@@ -12,7 +12,7 @@ Latest tarball of source with all tests passing on Linux and Windows: https://de
 Past tarballs of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/boost.outcome
 
 Before Boost peer review:
- - [ ] Write up errata for ACCU talk for under the video.
+ - [x] Write up errata for ACCU talk for under the video.
  - [x] Fix operator*(), operator->() and .error() in Expected [issus #10].
  - [x] error_or() ought to have rvalue ref etc overloads, and exception_or() [issue #10].
 
