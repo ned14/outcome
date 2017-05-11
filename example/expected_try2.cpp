@@ -140,7 +140,7 @@ namespace std
 
 outcome::expected<double /*, std::error_code */> div(double x, double y) noexcept
 {
-  if (::fabs(y) < FLT_EPSILON)
+  if (::fabs(y) < DBL_EPSILON)
   {
     // This operation would fail, instead let's return the reason of
     // the failure wrapped in E

@@ -58,7 +58,7 @@ maintenance burden over time is obvious, and a further worked example follows be
 The third reason is that the C++ 11 standard library already provides an enum of the
 most common error codes for you so you don't feel like going off and reinventing
 the wheel. It's called <a href="http://en.cppreference.com/w/cpp/error/errc">`std::errc`</a>
-brought in by `#include <system_error>` and as you'll see, it contains the standard
+brought in by <tt>\#include <system_error></tt> and as you'll see, it contains the standard
 POSIX error codes, and most of the time you'll find that whatever custom error code
 domain you are about to write can be adequately covered by `std::errc`.
 In fact, let's try it:
@@ -202,7 +202,7 @@ abstraction layer where errors from the OS ought to be returned exactly as from 
 you should leave `E` default to `std::error_code` and return `std::system_category()` error
 codes from `errno` or `GetLastError()` as appropriate. If you don't care and/or you're in a rush,
 `E = std::error_code` and returning some enumeration from `std::errc` will get you working code
-the quickest (and be aware that Outcome's refinements of `expected<T, E>` `outcome<T>` and `result<T>`
+the quickest (and be aware that Outcome's refinements of `expected<T, E>`, `outcome<T>` and `result<T>`
 hard code the `E` to an enhanced `error_code_extended` and will save you typing a fair bit of boilerplate).
 As the latter two use patterns may be unclear, a worked example follows in the next section.
 

@@ -13,8 +13,8 @@ Past tarballs of source with all tests passing on Linux and Windows: https://ded
 
 Before Boost peer review:
  - [ ] Write up errata for ACCU talk for under the video.
- - [x] Fix operator*(), operator->() and .error() in Expected.
- - [x] error_or() ought to have rvalue ref etc overloads, and exception_or()
+ - [x] Fix operator*(), operator->() and .error() in Expected [issus #10].
+ - [x] error_or() ought to have rvalue ref etc overloads, and exception_or() [issue #10].
 
 Later after Boost peer review:
  - [ ] Create new Win32 and NT error code categories and have make_errored_outcome() use those.
