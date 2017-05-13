@@ -1,49 +1,40 @@
-   0:	53                   	push   %rbx
-   1:	48 83 ec 20          	sub    $0x20,%rsp
-   5:	48 89 fb             	mov    %rdi,%rbx
-   8:	48 8d 3c 24          	lea    (%rsp),%rdi
-   c:	e8 00 00 00 00       	callq  11 <_Z5test1v+0x11>
-  11:	0f b6 44 24 18       	movzbl 0x18(%rsp),%eax
-  16:	83 f8 03             	cmp    $0x3,%eax
-  19:	74 19                	je     34 <_Z5test1v+0x34>
-  1b:	0f b6 c8             	movzbl %al,%ecx
-  1e:	83 f9 02             	cmp    $0x2,%ecx
-  21:	74 26                	je     49 <_Z5test1v+0x49>
-  23:	83 f9 01             	cmp    $0x1,%ecx
-  26:	75 37                	jne    5f <_Z5test1v+0x5f>
-  28:	6b 0c 24 03          	imul   $0x3,(%rsp),%ecx
-  2c:	89 0b                	mov    %ecx,(%rbx)
-  2e:	c6 43 18 01          	movb   $0x1,0x18(%rbx)
-  32:	eb 35                	jmp    69 <_Z5test1v+0x69>
-  34:	48 8b 0c 24          	mov    (%rsp),%rcx
-  38:	48 89 0b             	mov    %rcx,(%rbx)
-  3b:	48 c7 04 24 00 00 00 	movq   $0x0,(%rsp)
-  42:	00 
-  43:	c6 43 18 03          	movb   $0x3,0x18(%rbx)
-  47:	eb 20                	jmp    69 <_Z5test1v+0x69>
-  49:	48 8b 4c 24 10       	mov    0x10(%rsp),%rcx
-  4e:	48 89 4b 10          	mov    %rcx,0x10(%rbx)
-  52:	0f 10 04 24          	movups (%rsp),%xmm0
-  56:	0f 11 03             	movups %xmm0,(%rbx)
-  59:	c6 43 18 02          	movb   $0x2,0x18(%rbx)
-  5d:	eb 0a                	jmp    69 <_Z5test1v+0x69>
-  5f:	0f 57 c0             	xorps  %xmm0,%xmm0
-  62:	0f 11 43 10          	movups %xmm0,0x10(%rbx)
-  66:	0f 11 03             	movups %xmm0,(%rbx)
-  69:	83 f8 03             	cmp    $0x3,%eax
-  6c:	74 0c                	je     7a <_Z5test1v+0x7a>
-  6e:	83 f8 02             	cmp    $0x2,%eax
-  71:	74 10                	je     83 <_Z5test1v+0x83>
-  73:	83 f8 01             	cmp    $0x1,%eax
-  76:	74 0b                	je     83 <_Z5test1v+0x83>
-  78:	eb 0e                	jmp    88 <_Z5test1v+0x88>
-  7a:	48 8d 3c 24          	lea    (%rsp),%rdi
-  7e:	e8 00 00 00 00       	callq  83 <_Z5test1v+0x83>
-  83:	c6 44 24 18 00       	movb   $0x0,0x18(%rsp)
-  88:	48 89 d8             	mov    %rbx,%rax
-  8b:	48 83 c4 20          	add    $0x20,%rsp
-  8f:	5b                   	pop    %rbx
-  90:	c3                   	retq   
-  91:	66 66 66 66 66 66 2e 	data16 data16 data16 data16 data16 nopw %cs:0x0(%rax,%rax,1)
-  98:	0f 1f 84 00 00 00 00 
-  9f:	00 
+  400630:	53                   	push   %rbx
+  400631:	48 83 ec 20          	sub    $0x20,%rsp
+  400635:	48 89 fb             	mov    %rdi,%rbx
+  400638:	48 89 e7             	mov    %rsp,%rdi
+  40063b:	e8 c0 f9 bf ff       	callq  0 <_init-0x4004d0>
+  400640:	8a 44 24 18          	mov    0x18(%rsp),%al
+  400644:	3c 03                	cmp    $0x3,%al
+  400646:	74 14                	je     40065c <test1()+0x2c>
+  400648:	3c 02                	cmp    $0x2,%al
+  40064a:	74 2d                	je     400679 <test1()+0x49>
+  40064c:	3c 01                	cmp    $0x1,%al
+  40064e:	75 44                	jne    400694 <test1()+0x64>
+  400650:	6b 04 24 03          	imul   $0x3,(%rsp),%eax
+  400654:	89 03                	mov    %eax,(%rbx)
+  400656:	c6 43 18 01          	movb   $0x1,0x18(%rbx)
+  40065a:	eb 31                	jmp    40068d <test1()+0x5d>
+  40065c:	48 8b 04 24          	mov    (%rsp),%rax
+  400660:	48 89 03             	mov    %rax,(%rbx)
+  400663:	48 c7 04 24 00 00 00 	movq   $0x0,(%rsp)
+  40066b:	c6 43 18 03          	movb   $0x3,0x18(%rbx)
+  40066f:	48 89 e7             	mov    %rsp,%rdi
+  400520:	ff 25 02 0b 20 00    	jmpq   *0x200b02(%rip)        # 601028 <_GLOBAL_OFFSET_TABLE_+0x28>
+  400526:	68 02 00 00 00       	pushq  $0x2
+  40052b:	e9 c0 ff ff ff       	jmpq   4004f0 <_init+0x20>
+  400677:	eb 14                	jmp    40068d <test1()+0x5d>
+  400679:	48 8b 44 24 10       	mov    0x10(%rsp),%rax
+  40067e:	48 89 43 10          	mov    %rax,0x10(%rbx)
+  400682:	0f 10 04 24          	movups (%rsp),%xmm0
+  400686:	0f 11 03             	movups %xmm0,(%rbx)
+  400689:	c6 43 18 02          	movb   $0x2,0x18(%rbx)
+  40068d:	c6 44 24 18 00       	movb   $0x0,0x18(%rsp)
+  400692:	eb 0a                	jmp    40069e <test1()+0x6e>
+  400694:	0f 57 c0             	xorps  %xmm0,%xmm0
+  400697:	0f 11 43 10          	movups %xmm0,0x10(%rbx)
+  40069b:	0f 11 03             	movups %xmm0,(%rbx)
+  40069e:	48 89 d8             	mov    %rbx,%rax
+  4006a1:	48 83 c4 20          	add    $0x20,%rsp
+  4006a5:	5b                   	pop    %rbx
+  4006a6:	c3                   	retq
+  4006a7:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)

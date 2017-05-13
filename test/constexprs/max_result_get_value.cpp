@@ -1,7 +1,13 @@
 #include "../../include/boost/outcome.hpp"
 
+#ifdef __GNUC__
+#define WEAK __attribute__((weak))
+#else
+#define WEAK
+#endif
+
 using namespace boost::outcome;
-extern result<int> unknown();
+extern result<int> unknown() WEAK;
 extern BOOSTLITE_NOINLINE int test1()
 {
   return unknown().get();
