@@ -45,7 +45,18 @@ _disassemble_info_ = \
 # , ...
 # }
 #
-limits = {}
+limits = {
+"min_monad_bind"                               : { 'gcc' :  5, 'clang' :  5, 'msvc' : 100 },
+"min_monad_construct_destruct"                 : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
+"min_monad_construct_error_move_destruct"      : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
+"min_monad_construct_exception_move_destruct"  : { 'gcc' : 30, 'clang' : 40, 'msvc' : 1000 },
+"min_monad_construct_value_move_destruct"      : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
+"min_monad_next"                               : { 'gcc' :  5, 'clang' :  5, 'msvc' : 1000 },
+"min_option_construct_value_move_destruct"     : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
+"min_option_next"                              : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
+"min_result_construct_value_move_destruct"     : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
+"min_result_next"                              : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
+}
 
 
 
@@ -118,9 +129,9 @@ def test_single(func : str, src_file : str, compiler : str, indent : int):
     output = "<![CDATA[\n" + "\n".join(opcodes) + "\n]]>"
     xml_string = '  '*indent + '<testcase name="' + test_name + '.' + \
         compiler + '">\n'
-    if test_name in limits and limits[test_name][compiler] < count:
+    if test_name in limits and compiler in limits[test_name] and limits[test_name][compiler] < count:
         xml_string += '  '*(indent+1) + '<failure message="Opcodes generated ' + \
-            count + ' exceeds limit"/>\n'
+            str(count) + ' exceeds limit ' + str(limits[test_name][compiler]) + '"/>\n'
     xml_string += '  '*(indent+2) + '<system-out>\n' + output + '\n' + \
                   '  '*(indent+2) + '</system-out>\n' + \
                   '  '*indent + '</testcase>\n'

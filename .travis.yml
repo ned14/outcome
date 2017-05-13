@@ -85,9 +85,9 @@ script:
  -
    if [ "$__" = "Code bloat tests" ]; then
      cd test/constexprs;
-     ./with_clang_gcc.sh;
-     cat results.xml;
-     if grep -q "failure message" results.xml; then
+     ./compile_and_count.py;
+     cat results.posix.xml;
+     if grep -q "failure message" results.posix.xml; then
        exit 1;
      fi;
    fi

@@ -1,4 +1,4 @@
-# Changelog
+# Recent changes
 \anchor changelog
 
 ## Next release boost_peer_review4:
