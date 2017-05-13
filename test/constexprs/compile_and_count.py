@@ -24,10 +24,10 @@ _compilers_ = \
 _compile_info_ = \
     { "gcc"        : (_mk_f("g++-6 -std=c++14 -DBOOST_OUTCOME_ENABLE_ADVANCED=1 -DNDEBUG -I../.. -O3 {} -o {}"), _mk_o("cpp", "out"))
     , "clang"      : (_mk_f("clang++-4.0 -std=c++14 -DBOOST_OUTCOME_ENABLE_ADVANCED=1 -DNDEBUG -I../.. -O3 {} -o {}"), _mk_o("cpp", "out"))
-    , "msvc"       : (_mk_f("cl /EHsc /c /DBOOST_OUTCOME_ENABLE_ADVANCED=1 /DNDEBUG /I../.. /O2 /GS- /GR /Gy /Zc:inline "
+    , "msvc"       : (_mk_f("cl /EHsc /c /DBOOST_OUTCOME_ENABLE_ADVANCED=1 /DNDEBUG /I../.. /O2 /GS- /GR /Gy /Zc:inline /MT "
                            + "/D_UNICODE=1 /DUNICODE=1 {} /Fo{}"), _mk_o("cpp", "obj"))
     , "msvc_clang" : (_mk_f("clang -std=c++14 -c -DBOOST_OUTCOME_ENABLE_ADVANCED=1 -DNDEBUG -I../.. -O3 -fexceptions "
-                           + "-D_UNICODE=1 -DUNICODE=1 {} -o {}"), _mk_o("cpp", "out"))
+                           + "-D_UNICODE=1 -DUNICODE=1 {} -o {} -fms-compatibility-version=19"), _mk_o("cpp", "out"))
     }
 
 _disassemble_info_ = \

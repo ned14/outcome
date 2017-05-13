@@ -88,7 +88,7 @@ _get_call_target_ = \
 
 _is_our_function_ = \
     { 'objdump' : lambda f: lambda l: (f in l) and ('-0x' not in l)
-    , 'dumpbin' : lambda f: lambda l: f in l
+    , 'dumpbin' : lambda f: lambda l: (f in l) and ('?dtor' not in l)
     }
 
 
