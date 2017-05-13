@@ -1010,145 +1010,126 @@ See https://ned14.github.io/boost.outcome/md_doc_md_08-expectedsynopsis.html for
 #define BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE std::error_code
 #endif
 
-/*! \class bad_expected_access_base
-\ingroup expected
-\brief The base exception type thrown when you try to access an errored expected
-*/
-class bad_expected_access_base : public std::logic_error
+namespace experimental
 {
-public:
-  //! \brief The type of error
-  using error_type = void;
-  //! \brief Constructs an instance
-  bad_expected_access_base(const char *what)
-      : std::logic_error(what)
+  //! \brief Constexpr instance of in_place construction tag type
+  constexpr in_place_t in_place;
+
+  /*! \class bad_expected_access_base
+  \ingroup expected
+  \brief The base exception type thrown when you try to access an errored expected
+  */
+  class bad_expected_access_base : public std::logic_error
   {
-  }
-};
+  public:
+    //! \brief The type of error
+    using error_type = void;
+    //! \brief Constructs an instance
+    bad_expected_access_base(const char *what)
+        : std::logic_error(what)
+    {
+    }
+  };
 
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4814)
 #endif
-/*! \class bad_expected_access
-\ingroup expected
-\brief The exception type thrown when you try to access an errored expected
-*/
-template <class E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class bad_expected_access : public bad_expected_access_base
-{
-  E _error;
+  /*! \class bad_expected_access
+  \ingroup expected
+  \brief The exception type thrown when you try to access an errored expected
+  */
+  template <class E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class bad_expected_access : public bad_expected_access_base
+  {
+    E _error;
 
-public:
-  //! \brief The type of error
-  using error_type = E;
-  //! \brief Constructs an instance taking a copy
-  explicit bad_expected_access(const error_type &e) noexcept : bad_expected_access_base("Bad expected access of value when error was present"), _error(e) {}
-  //! \brief Returns the error
-  const error_type &error() const &noexcept { return _error; }
-  //! \brief Returns the error
-  error_type &error() & noexcept { return _error; }
-  //! \brief Returns the error
-  const error_type &&error() const &&noexcept { return _error; }
-  //! \brief Returns the error
-  error_type &&error() && noexcept { return _error; }
-};
-//! \brief Type thrown due to valueless by exception state
-template <> class bad_expected_access<void> : public bad_expected_access_base
-{
-public:
-  //! \brief The type of error
-  using error_type = void;
-  //! \brief Constructs an instance
-  explicit bad_expected_access() noexcept : bad_expected_access_base("Bad expected access of value when valueless due to exception") {}
-};
-template <class E> inline bad_expected_access<E> make_bad_expected_access(const E &v) noexcept
-{
-  return bad_expected_access<E>(v);
-}
-inline bad_expected_access<void> make_bad_expected_access() noexcept
-{
-  return bad_expected_access<void>();
-}
+  public:
+    //! \brief The type of error
+    using error_type = E;
+    //! \brief Constructs an instance taking a copy
+    explicit bad_expected_access(const error_type &e) noexcept : bad_expected_access_base("Bad expected access of value when error was present"), _error(e) {}
+    //! \brief Returns the error
+    const error_type &error() const &noexcept { return _error; }
+    //! \brief Returns the error
+    error_type &error() & noexcept { return _error; }
+    //! \brief Returns the error
+    const error_type &&error() const &&noexcept { return _error; }
+    //! \brief Returns the error
+    error_type &&error() && noexcept { return _error; }
+  };
+  //! \brief Type thrown due to valueless by exception state
+  template <> class bad_expected_access<void> : public bad_expected_access_base
+  {
+  public:
+    //! \brief The type of error
+    using error_type = void;
+    //! \brief Constructs an instance
+    explicit bad_expected_access() noexcept : bad_expected_access_base("Bad expected access of value when valueless due to exception") {}
+  };
+  template <class E> inline bad_expected_access<E> make_bad_expected_access(const E &v) noexcept { return bad_expected_access<E>(v); }
+  inline bad_expected_access<void> make_bad_expected_access() noexcept { return bad_expected_access<void>(); }
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
+}  // namespace
 
 #include "detail/expected_policy.ipp"
+
+namespace experimental
+{
 
 /*! \brief `expected<R>` can hold a fixed variant list of empty, a type `R` or a lightweight `std::error_code` at a
 space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `tribool::true_` and
 `tribool::false_` respectively. This specialisation matches the proposed Expected implementation before standards. \ingroup expected
 */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class expected : public basic_monad<policy::expected_policy_base<policy::basic_monad_storage<policy::expected_policy<R, E>>, R, E>>
-{
+  template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class expected : public basic_monad<policy::expected_policy_base<policy::basic_monad_storage<policy::expected_policy<R, E>>, R, E>>
+  {
 #define BOOST_OUTCOME_BASIC_MONAD_NAME expected
 #include "detail/basic_monad.ipp"
-};
+  };
 #else
-template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> using expected = basic_monad<policy::expected_policy<R, E>>;
+  template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> using expected = basic_monad<policy::expected_policy<R, E>>;
 #endif
-//! \brief Type sugar to indicate type E is an unexpected value \ingroup expected
-template <typename E> using unexpected_type = basic_monad<policy::expected_policy<void, E>>;
-//! \brief Tag type for unexpected \ingroup expected
-using unexpect_t = error_t;
-//! \brief Tag value for unexpected \ingroup expected
-constexpr unexpect_t unexpect = unexpect_t();
+  //! \brief Type sugar to indicate type E is an unexpected value \ingroup expected
+  template <typename E> using unexpected_type = basic_monad<policy::expected_policy<void, E>>;
+  //! \brief Tag type for unexpected \ingroup expected
+  using unexpect_t = error_t;
+  //! \brief Tag value for unexpected \ingroup expected
+  constexpr unexpect_t unexpect = unexpect_t();
 
 
-//! \brief Makes an expected<void> \ingroup expected
-inline expected<void> make_expected()
-{
-  return expected<void>();
-}
-//! \brief Makes an expected from the type passed \ingroup expected
-template <class T, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> constexpr inline expected<T, E> make_expected(T &&v)
-{
-  return expected<T, E>(std::move(v));
-}
-//! \brief Makes an expected from the type passed \ingroup expected
-template <class T, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> constexpr inline expected<T, E> make_expected(const T &v)
-{
-  return expected<T, E>(v);
-}
-//! \brief Makes an unexpected from the type passed \ingroup expected
-template <class E> constexpr inline unexpected_type<typename std::decay<E>::type> make_unexpected(E &&v)
-{
-  return unexpected_type<typename std::decay<E>::type>(std::move(v));
-}
-//! \brief Makes an unexpected from the type passed \ingroup expected
-template <class E> constexpr inline unexpected_type<E> make_unexpected(const E &v)
-{
-  return unexpected_type<E>(v);
-}
-//! \brief Make an errored expected from the type passed \ingroup expected
-template <class T, class E> constexpr inline expected<T, E> make_expected_from_error(E &&v)
-{
-  return expected<T, E>(std::move(v));
-}
-//! \brief Make an errored expected from the type passed \ingroup expected
-template <class T, class E> constexpr inline expected<T, E> make_expected_from_error(const E &v)
-{
-  return expected<T, E>(v);
-}
-//! \brief Make an errored expected from the type passed \ingroup expected
-template <class T, class E, class U, typename = typename std::enable_if<!std::is_same<E, U>::value && std::is_constructible<E, U>::value>::type> constexpr inline expected<T, E> make_expected_from_error(U &&v)
-{
-  return expected<T, E>(std::forward<U>(v));
-}
-// Not implementing this as I think it redundant and highly likely to disappear from the next P-paper
-// template <class F> constexpr expected<typename result_type<F>::type> make_expected_from_call(F f);
+  //! \brief Makes an expected<void> \ingroup expected
+  inline expected<void> make_expected() { return expected<void>(); }
+  //! \brief Makes an expected from the type passed \ingroup expected
+  template <class T, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> constexpr inline expected<T, E> make_expected(T &&v) { return expected<T, E>(std::move(v)); }
+  //! \brief Makes an expected from the type passed \ingroup expected
+  template <class T, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> constexpr inline expected<T, E> make_expected(const T &v) { return expected<T, E>(v); }
+  //! \brief Makes an unexpected from the type passed \ingroup expected
+  template <class E> constexpr inline unexpected_type<typename std::decay<E>::type> make_unexpected(E &&v) { return unexpected_type<typename std::decay<E>::type>(std::move(v)); }
+  //! \brief Makes an unexpected from the type passed \ingroup expected
+  template <class E> constexpr inline unexpected_type<E> make_unexpected(const E &v) { return unexpected_type<E>(v); }
+  //! \brief Make an errored expected from the type passed \ingroup expected
+  template <class T, class E> constexpr inline expected<T, E> make_expected_from_error(E &&v) { return expected<T, E>(std::move(v)); }
+  //! \brief Make an errored expected from the type passed \ingroup expected
+  template <class T, class E> constexpr inline expected<T, E> make_expected_from_error(const E &v) { return expected<T, E>(v); }
+  //! \brief Make an errored expected from the type passed \ingroup expected
+  template <class T, class E, class U, typename = typename std::enable_if<!std::is_same<E, U>::value && std::is_constructible<E, U>::value>::type> constexpr inline expected<T, E> make_expected_from_error(U &&v) { return expected<T, E>(std::forward<U>(v)); }
+  // Not implementing this as I think it redundant and highly likely to disappear from the next P-paper
+  // template <class F> constexpr expected<typename result_type<F>::type> make_expected_from_call(F f);
 
 
-//! \brief Makes a void expected from an input expected, forwarding any emptiness or error \ingroup expected
-template <class T, class E> inline expected<void, E> as_void(const expected<T, E> &v)
-{
-  if(v.has_error())
-    return expected<void, E>(v.get_error());
-  if(v.has_value())
-    return expected<void, E>();
-  return expected<void, E>(empty);
-}
+  //! \brief Makes a void expected from an input expected, forwarding any emptiness or error \ingroup expected
+  template <class T, class E> inline expected<void, E> as_void(const expected<T, E> &v)
+  {
+    if(v.has_error())
+      return expected<void, E>(v.get_error());
+    if(v.has_value())
+      return expected<void, E>();
+    return expected<void, E>(empty);
+  }
+
+}  // namespace
 
 /********************************************************** LEWG Expected implementation  ***********************************************************/
 #endif  // BOOST_OUTCOME_LEAN_AND_MEAN

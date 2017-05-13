@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(m.get() == "NIALL");
     auto temp(std::move(m).get());
     BOOST_CHECK(temp == "NIALL");
-    BOOST_CHECK(m.get().empty());
+    BOOST_CHECK(m.get().empty());  // NOLINT
     BOOST_CHECK(!m.get_error());
     BOOST_CHECK(!m.get_exception());
     m.clear();
@@ -402,13 +402,13 @@ BOOST_AUTO_TEST_CASE(works / monad / comparison, "Tests that the monad can compa
 static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::value_storage<int, void, void> test_constexpr2a(int f)
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  return value_storage<int, void, void>(f);
+  return value_storage<int, void, void>(f);  // NOLINT
 }
 // Test the underlying storage for constexpr
 static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::value_storage<void, void, void> test_constexpr2b()
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  return value_storage<void, void, void>();
+  return value_storage<void, void, void>();  // NOLINT
 }
 // Test option<int> for constexpr
 static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::option<int> test_constexpr3a(int f)
@@ -736,7 +736,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
     {
       BOOST_CHECK(false);
     }
-    BOOST_CHECK("niall" == foo.get().a);
+    BOOST_CHECK("niall" == foo.get().a);  // NOLINT
     // Does throwing during copy assignment work?
     {
       outcome<udt> foo2(in_place, "douglas");
@@ -773,7 +773,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
       {
         BOOST_CHECK(false);
       }
-      BOOST_CHECK("niall" == foo.get().a);
+      BOOST_CHECK("niall" == foo.get().a);  // NOLINT
     }
   }
 #endif
@@ -1021,7 +1021,7 @@ BOOST_AUTO_TEST_CASE(works / monad / unwrap, "Tests that the monad unwraps as in
   BOOST_CHECK((std::is_same<decltype(b), decltype(l)>::value));
   BOOST_CHECK(k.get() == "niall");
   BOOST_CHECK(l.get_error() == ec);
-  BOOST_CHECK(g.get().get().get().get().empty());
+  BOOST_CHECK(g.get().get().get().get().empty());  // NOLINT
 }
 
 BOOST_AUTO_TEST_CASE(works / monad / bind, "Tests that the monad continues with bind() as intended")
@@ -1153,16 +1153,12 @@ BOOST_AUTO_TEST_CASE(works / monad / match, "Tests that the monad matches as int
   //! [monad_match_example]
   struct o_type
   {
-    int expected;
+    int expected{0};
     // monad.match() will call an overload for each possible content it might have
     void operator()(int /*unused*/) const { BOOST_CHECK(expected == 1); }
     void operator()(error_code_extended /*unused*/) const { BOOST_CHECK(expected == 2); }
     void operator()(std::exception_ptr /*unused*/) const { BOOST_CHECK(expected == 3); }  // NOLINT
     void operator()(outcome<int>::empty_type /*unused*/) const { BOOST_CHECK(expected == 4); }
-    o_type()
-        : expected(0)
-    {
-    }
   } o;
   error_code_extended ec;
   std::exception_ptr e;
@@ -1231,9 +1227,9 @@ BOOST_AUTO_TEST_CASE(works / monad / operators, "Tests that the monad custom ope
 BOOST_AUTO_TEST_CASE(issues / 7, "BOOST_OUTCOME_TRYV(expr) in a function whose return monad's type has no default constructor fails to compile")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  struct udt
+  struct udt  // NOLINT
   {
-    udt(int) {}
+    explicit udt(int /*unused*/) {}
     //    udt() = delete;
     udt(const udt &) = default;
     udt(udt &&) = default;
@@ -1254,9 +1250,9 @@ BOOST_AUTO_TEST_CASE(issues / 7, "BOOST_OUTCOME_TRYV(expr) in a function whose r
 BOOST_AUTO_TEST_CASE(issues / 9, "Alternative TRY macros?")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  struct udt
+  struct udt  // NOLINT
   {
-    udt(int) {}
+    explicit udt(int /*unused*/) {}
     //    udt() = delete;
     udt(const udt &) = default;
     udt(udt &&) = default;
@@ -1271,13 +1267,13 @@ BOOST_AUTO_TEST_CASE(issues / 9, "Alternative TRY macros?")
 
 BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .error() throw exceptions when they should not")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::experimental;
   const char *a = "hi", *b = "bye";
-  struct udt1
+  struct udt1  // NOLINT
   {
-    const char *_v;
-    constexpr udt1() noexcept : _v(nullptr) {}
-    constexpr udt1(const char *v) noexcept : _v(v) {}
+    const char *_v{nullptr};
+    constexpr udt1() noexcept = default;
+    constexpr explicit udt1(const char *v) noexcept : _v(v) {}
     BOOST_OUTCOME_CONSTEXPR udt1(udt1 &&o) noexcept : _v(o._v) { o._v = nullptr; }
     udt1(const udt1 &) = default;
     BOOST_OUTCOME_CONSTEXPR udt1 &operator=(udt1 &&o) noexcept
@@ -1289,11 +1285,11 @@ BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .err
     udt1 &operator=(const udt1 &) = delete;
     constexpr const char *operator*() const noexcept { return _v; }
   };
-  struct udt2
+  struct udt2  // NOLINT
   {
-    const char *_v;
-    constexpr udt2() noexcept : _v(nullptr) {}
-    constexpr udt2(const char *v) noexcept : _v(v) {}
+    const char *_v{nullptr};
+    constexpr udt2() noexcept = default;
+    constexpr explicit udt2(const char *v) noexcept : _v(v) {}
     BOOST_OUTCOME_CONSTEXPR udt2(udt2 &&o) noexcept : _v(o._v) { o._v = nullptr; }
     udt2(const udt2 &) = default;
     BOOST_OUTCOME_CONSTEXPR udt2 &operator=(udt2 &&o) noexcept
@@ -1324,11 +1320,11 @@ BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .err
   BOOST_CHECK(**p == nullptr);
   udt2 e2(std::move(n).error());
   BOOST_CHECK(*e2 == b);
-  BOOST_CHECK(*n.error() == nullptr);
+  BOOST_CHECK(*n.error() == nullptr);  // NOLINT
   n.set_error(udt2(b));
   e2 = std::move(n).error_or(udt2(a));
   BOOST_CHECK(*e2 == b);
-  BOOST_CHECK(*n.error() == nullptr);
+  BOOST_CHECK(*n.error() == nullptr);  // NOLINT
 }
 
 #if 0  // Known bug, will be fixed when we refactor Expected storage to never have empty state

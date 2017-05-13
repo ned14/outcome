@@ -14,7 +14,7 @@
 #define BOOSTLITE_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
 #include "../boost-lite/include/boost/test/unit_test.hpp"
 
-namespace stde = BOOST_OUTCOME_V1_NAMESPACE;
+namespace stde = BOOST_OUTCOME_V1_NAMESPACE::experimental;
 
 #define BOOST_CONSTEXPR constexpr
 

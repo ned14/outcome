@@ -106,6 +106,10 @@ namespace boost
     //! Inline namespace for this version of Outcome
     inline namespace v1_xxx
     {
+      //! Contains ABI and API unstable things
+      namespace experimental
+      {
+      }
     }
   }
 }
@@ -280,7 +284,7 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 
 #ifndef BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS
 //! \brief Predefine to what you want the Expected implementation to when throwing a bad_expected_access
-#define BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS(...) BOOST_OUTCOME_THROW(make_bad_expected_access(__VA_ARGS__))
+#define BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS(...) BOOST_OUTCOME_THROW(experimental::make_bad_expected_access(__VA_ARGS__))
 #endif
 
 

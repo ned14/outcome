@@ -1075,6 +1075,10 @@ extern "C" void _mm_pause();
 
 
 
+
+
+
+
 #define BOOST_OUTCOME_V1_NAMESPACE BOOSTLITE_BIND_NAMESPACE(BOOST_OUTCOME_V1)
 #define BOOST_OUTCOME_V1_NAMESPACE_BEGIN BOOSTLITE_BIND_NAMESPACE_BEGIN(BOOST_OUTCOME_V1)
 #define BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN BOOSTLITE_BIND_NAMESPACE_BEGIN(BOOST_OUTCOME_V1)
@@ -1503,7 +1507,7 @@ namespace detail
 
 #ifndef BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS
 
-#define BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS(...) BOOST_OUTCOME_THROW(make_bad_expected_access(__VA_ARGS__))
+#define BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS(...) BOOST_OUTCOME_THROW(experimental::make_bad_expected_access(__VA_ARGS__))
 #endif
 
 
@@ -6288,21 +6292,26 @@ template <class T> BOOSTLITE_CONSTEXPR inline option<void> as_void(const option<
 #define BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE std::error_code
 #endif
 
-
-
-
-
-class bad_expected_access_base : public std::logic_error
+namespace experimental
 {
-public:
 
-  using error_type = void;
+  constexpr in_place_t in_place;
 
-  bad_expected_access_base(const char *what)
-      : std::logic_error(what)
+
+
+
+
+  class bad_expected_access_base : public std::logic_error
   {
-  }
-};
+  public:
+
+    using error_type = void;
+
+    bad_expected_access_base(const char *what)
+        : std::logic_error(what)
+    {
+    }
+  };
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -6312,44 +6321,39 @@ public:
 
 
 
-template <class E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class bad_expected_access : public bad_expected_access_base
-{
-  E _error;
+  template <class E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class bad_expected_access : public bad_expected_access_base
+  {
+    E _error;
 
-public:
+  public:
 
-  using error_type = E;
+    using error_type = E;
 
-  explicit bad_expected_access(const error_type &e) noexcept : bad_expected_access_base("Bad expected access of value when error was present"), _error(e) {}
+    explicit bad_expected_access(const error_type &e) noexcept : bad_expected_access_base("Bad expected access of value when error was present"), _error(e) {}
 
-  const error_type &error() const &noexcept { return _error; }
+    const error_type &error() const &noexcept { return _error; }
 
-  error_type &error() & noexcept { return _error; }
+    error_type &error() & noexcept { return _error; }
 
-  const error_type &&error() const &&noexcept { return _error; }
+    const error_type &&error() const &&noexcept { return _error; }
 
-  error_type &&error() && noexcept { return _error; }
-};
+    error_type &&error() && noexcept { return _error; }
+  };
 
-template <> class bad_expected_access<void> : public bad_expected_access_base
-{
-public:
+  template <> class bad_expected_access<void> : public bad_expected_access_base
+  {
+  public:
 
-  using error_type = void;
+    using error_type = void;
 
-  explicit bad_expected_access() noexcept : bad_expected_access_base("Bad expected access of value when valueless due to exception") {}
-};
-template <class E> inline bad_expected_access<E> make_bad_expected_access(const E &v) noexcept
-{
-  return bad_expected_access<E>(v);
-}
-inline bad_expected_access<void> make_bad_expected_access() noexcept
-{
-  return bad_expected_access<void>();
-}
+    explicit bad_expected_access() noexcept : bad_expected_access_base("Bad expected access of value when valueless due to exception") {}
+  };
+  template <class E> inline bad_expected_access<E> make_bad_expected_access(const E &v) noexcept { return bad_expected_access<E>(v); }
+  inline bad_expected_access<void> make_bad_expected_access() noexcept { return bad_expected_access<void>(); }
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
+}
 namespace policy
 {
 #ifdef _MSC_VER
@@ -6822,68 +6826,60 @@ namespace policy
 #pragma warning(pop)
 #endif
 }
-template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> using expected = basic_monad<policy::expected_policy<R, E>>;
-
-
-template <typename E> using unexpected_type = basic_monad<policy::expected_policy<void, E>>;
-
-using unexpect_t = error_t;
-
-constexpr unexpect_t unexpect = unexpect_t();
-
-
-
-inline expected<void> make_expected()
+namespace experimental
 {
-  return expected<void>();
-}
-
-template <class T, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> constexpr inline expected<T, E> make_expected(T &&v)
-{
-  return expected<T, E>(std::move(v));
-}
-
-template <class T, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> constexpr inline expected<T, E> make_expected(const T &v)
-{
-  return expected<T, E>(v);
-}
-
-template <class E> constexpr inline unexpected_type<typename std::decay<E>::type> make_unexpected(E &&v)
-{
-  return unexpected_type<typename std::decay<E>::type>(std::move(v));
-}
-
-template <class E> constexpr inline unexpected_type<E> make_unexpected(const E &v)
-{
-  return unexpected_type<E>(v);
-}
-
-template <class T, class E> constexpr inline expected<T, E> make_expected_from_error(E &&v)
-{
-  return expected<T, E>(std::move(v));
-}
-
-template <class T, class E> constexpr inline expected<T, E> make_expected_from_error(const E &v)
-{
-  return expected<T, E>(v);
-}
-
-template <class T, class E, class U, typename = typename std::enable_if<!std::is_same<E, U>::value && std::is_constructible<E, U>::value>::type> constexpr inline expected<T, E> make_expected_from_error(U &&v)
-{
-  return expected<T, E>(std::forward<U>(v));
-}
 
 
 
 
 
-template <class T, class E> inline expected<void, E> as_void(const expected<T, E> &v)
-{
-  if(v.has_error())
-    return expected<void, E>(v.get_error());
-  if(v.has_value())
-    return expected<void, E>();
-  return expected<void, E>(empty);
+
+
+
+
+
+
+
+  template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> using expected = basic_monad<policy::expected_policy<R, E>>;
+
+
+  template <typename E> using unexpected_type = basic_monad<policy::expected_policy<void, E>>;
+
+  using unexpect_t = error_t;
+
+  constexpr unexpect_t unexpect = unexpect_t();
+
+
+
+  inline expected<void> make_expected() { return expected<void>(); }
+
+  template <class T, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> constexpr inline expected<T, E> make_expected(T &&v) { return expected<T, E>(std::move(v)); }
+
+  template <class T, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> constexpr inline expected<T, E> make_expected(const T &v) { return expected<T, E>(v); }
+
+  template <class E> constexpr inline unexpected_type<typename std::decay<E>::type> make_unexpected(E &&v) { return unexpected_type<typename std::decay<E>::type>(std::move(v)); }
+
+  template <class E> constexpr inline unexpected_type<E> make_unexpected(const E &v) { return unexpected_type<E>(v); }
+
+  template <class T, class E> constexpr inline expected<T, E> make_expected_from_error(E &&v) { return expected<T, E>(std::move(v)); }
+
+  template <class T, class E> constexpr inline expected<T, E> make_expected_from_error(const E &v) { return expected<T, E>(v); }
+
+  template <class T, class E, class U, typename = typename std::enable_if<!std::is_same<E, U>::value && std::is_constructible<E, U>::value>::type> constexpr inline expected<T, E> make_expected_from_error(U &&v) { return expected<T, E>(std::forward<U>(v)); }
+
+
+
+
+
+  template <class T, class E> inline expected<void, E> as_void(const expected<T, E> &v)
+  {
+    if(v.has_error())
+      return expected<void, E>(v.get_error());
+    if(v.has_value())
+      return expected<void, E>();
+    return expected<void, E>(empty);
+  }
+
 }
 
 
