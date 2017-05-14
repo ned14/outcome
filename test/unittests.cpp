@@ -1272,7 +1272,7 @@ BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .err
   struct udt1  // NOLINT
   {
     const char *_v{nullptr};
-    constexpr udt1() noexcept = default;
+    udt1() = default;
     constexpr explicit udt1(const char *v) noexcept : _v(v) {}
     BOOST_OUTCOME_CONSTEXPR udt1(udt1 &&o) noexcept : _v(o._v) { o._v = nullptr; }
     udt1(const udt1 &) = default;
@@ -1288,7 +1288,7 @@ BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .err
   struct udt2  // NOLINT
   {
     const char *_v{nullptr};
-    constexpr udt2() noexcept = default;
+    udt2() = default;
     constexpr explicit udt2(const char *v) noexcept : _v(v) {}
     BOOST_OUTCOME_CONSTEXPR udt2(udt2 &&o) noexcept : _v(o._v) { o._v = nullptr; }
     udt2(const udt2 &) = default;
@@ -1301,7 +1301,8 @@ BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .err
     udt1 &operator=(const udt1 &) = delete;
     constexpr const char *operator*() const noexcept { return _v; }
   };
-  expected<udt1, udt2> p{udt1(a)}, n(make_unexpected(udt2(b)));
+  expected<udt1, udt2> p(udt1{a});
+  expected<udt1, udt2> n(make_unexpected(udt2(b)));
   // State check
   BOOST_CHECK(p.has_value());
   BOOST_CHECK(!n.has_value());
@@ -1330,13 +1331,13 @@ BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .err
 #if 0  // Known bug, will be fixed when we refactor Expected storage to never have empty state
 BOOST_AUTO_TEST_CASE(issues / 12, "basic_monad's copy assignment gets instantiated even when type T cannot be copied")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::experimental;
   const char *s = "hi";
   struct udt
   {
-    const char *_v;
-    constexpr udt() noexcept : _v(nullptr) {}
-    constexpr udt(const char *v) noexcept : _v(v) {}
+    const char *_v{ null[tr };
+    udt() = default;
+    constexpr explicit udt(const char *v) noexcept : _v(v) {}
     BOOST_OUTCOME_CONSTEXPR udt(udt &&o) noexcept : _v(o._v) { o._v = nullptr; }
     udt(const udt &) = delete;
     BOOST_OUTCOME_CONSTEXPR udt &operator=(udt &&o) noexcept
@@ -1352,6 +1353,28 @@ BOOST_AUTO_TEST_CASE(issues / 12, "basic_monad's copy assignment gets instantiat
   static_assert(!expected<udt>::is_copy_constructible, "expected<udt> is copy constructible!");
   expected<udt> p(s), n(make_unexpected(std::error_code(ENOMEM, std::generic_category())));
   n = make_unexpected(std::error_code(EINVAL, std::generic_category()));
+}
+
+BOOST_AUTO_TEST_CASE(issues / 16, "Default constructor of T is sometimes compiled when T has no default constructor")
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::experimental;
+  struct udt
+  {
+    const char *_v{ nullptr };
+    udt() = delete;
+    constexpr explicit udt(const char *v) noexcept : _v(v) {}
+    BOOST_OUTCOME_CONSTEXPR udt(udt &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    udt(const udt &) = delete;
+    BOOST_OUTCOME_CONSTEXPR udt &operator=(udt &&o) noexcept
+    {
+      _v = o._v;
+      o._v = nullptr;
+      return *this;
+    }
+    udt &operator=(const udt &) = delete;
+    constexpr const char *operator*() const noexcept { return _v; }
+  };
+  expected<udt> n(make_unexpected(std::error_code(ENOMEM, std::generic_category())));
 }
 #endif
 
