@@ -174,6 +174,8 @@ namespace policy
     //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
     BOOST_OUTCOME_CONSTEXPR const error_type &&error_or(const error_type &&e) const &&noexcept { return std::move(monad_storage::has_error() ? monad_storage::_storage.error : e); }
 
+    //! \brief Disposes of any existing state, setting the monad to the error_type
+    BOOST_OUTCOME_CONSTEXPR void set_error(error_type v) { monad_storage::_storage.emplace_error(std::move(v)); }
     //! \brief As if make_unexpected<E>(this->error())
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const error_type &get_unexpected() const { return get_error(); }
   };
@@ -249,6 +251,7 @@ namespace policy
     BOOST_OUTCOME_CONSTEXPR const error_type &&get_error_or(const error_type &&e) const &&noexcept { return std::move(monad_storage::has_error() ? monad_storage::_storage.error : e); }
     BOOST_OUTCOME_CONSTEXPR const error_type &&error_or(const error_type &&e) const &&noexcept { return std::move(monad_storage::has_error() ? monad_storage::_storage.error : e); }
 
+    BOOST_OUTCOME_CONSTEXPR void set_error(error_type v) { monad_storage::_storage.emplace_error(std::move(v)); }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const error_type &get_unexpected() const { return get_error(); }
   };
   // Specialisation for E = void
@@ -345,6 +348,7 @@ namespace policy
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get_error() const {}
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void error() const {}
+    BOOST_OUTCOME_CONSTEXPR void set_error() { monad_storage::_storage.emplace_error(); }
   };
   // Specialisation for T = void E = void
   template <class monad_storage> struct expected_policy_base<monad_storage, void, void> : public monad_storage
@@ -401,6 +405,7 @@ namespace policy
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get_error() const {}
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void error() const {}
+    BOOST_OUTCOME_CONSTEXPR void set_error() { monad_storage::_storage.emplace_error(); }
   };
 
   //! \brief An implementation policy for basic_monad implementing expected<R, EC>

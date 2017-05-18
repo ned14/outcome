@@ -290,14 +290,6 @@ public:
   //! \brief Disposes of any existing state, setting the monad to an emplaced construction
   template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace(Args &&... args) { implementation_policy::base::_storage.emplace_value(std::forward<Args>(args)...); }
 
-  //! \brief Disposes of any existing state, setting the monad to the error_type
-  BOOST_OUTCOME_CONSTEXPR void set_error(error_type v) { implementation_policy::base::_storage.emplace_error(std::move(v)); }
-
-  //! \brief Disposes of any existing state, setting the monad to the exception_type
-  BOOST_OUTCOME_CONSTEXPR void set_exception(exception_type v) { implementation_policy::base::_storage.emplace_exception(std::move(v)); }
-  //! \brief Disposes of any existing state, setting the monad to make_exception_type(forward<E>(e))
-  template <typename E, typename = typename std::enable_if<std::is_same<E, E>::value && has_exception_type>::type> BOOST_OUTCOME_CONSTEXPR void set_exception(E &&e) { set_exception(make_exception_type(std::forward<E>(e))); }
-
   //! \brief Swaps one monad for another
   BOOST_OUTCOME_CONSTEXPR void swap(basic_monad &o) noexcept(is_nothrow_move_constructible) { implementation_policy::base::_storage.swap(o._storage); }
   //! \brief Destructs any state stored, resetting to empty
