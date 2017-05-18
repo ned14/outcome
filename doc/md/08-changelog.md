@@ -10,6 +10,8 @@ Vicente J. Botet Escriba for persuading me to do this.
 - Issue #14 Removed all the static asserts in the Expected implementation apart from the nothrow
 move constructor check, which is now correct unlike the incorrect assert from before. Thanks to
 Vicente J. Botet Escriba for explaining Expected's semantics.
+- Issue #21 Correct misspelling of `extended_error_code` with `error_code_extended` in the docs.
+Thanks to Deniz Bahadir for reporting this.
 
 
 ## 20170511 boost_peer_review3:

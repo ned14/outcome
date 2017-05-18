@@ -13,7 +13,7 @@ with inexperienced usage of `expected<T, E>` in C++ which you ought to avoid.
 It shows you how to use `expected<T, E>` in a way which integrates well with the
 C++ 11 STL's standard error code facilities `std::error_code` and `std::error_category`.
 3. The third part (this part) walks you through using Outcome's
-`expected<T, E>` refinements `outcome<T>` and `result<T>`, plus its `extended_error_code`.
+`expected<T, E>` refinements `outcome<T>` and `result<T>`, plus its `error_code_extended`.
 Usage is very similar to Expected, but with less typing, less runtime overhead and
 more convenient extensions.
 
