@@ -249,8 +249,6 @@ public:
   constexpr explicit operator bool() const noexcept { return has_value(); }
   //! \brief True if monad contains a value_type, unknown if monad is empty, else false if monad is errored/excepted.
   constexpr explicit operator boost_lite::tribool::tribool() const noexcept { return has_value() ? boost_lite::tribool::tribool::true_ : empty() ? boost_lite::tribool::tribool::unknown : boost_lite::tribool::tribool::false_; }
-  //! \brief True if monad is not empty
-  constexpr bool is_ready() const noexcept { return implementation_policy::base::_storage.type != value_storage_type::storage_type::empty; }
   //! \brief True if monad is empty
   constexpr bool empty() const noexcept { return implementation_policy::base::_storage.type == value_storage_type::storage_type::empty; }
   //! \brief True if monad contains a value_type

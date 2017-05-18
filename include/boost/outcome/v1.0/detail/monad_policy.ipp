@@ -191,8 +191,6 @@ namespace policy
     //! \brief Returns any errored state in the transport, throwing an exception if empty
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
     //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
-    BOOST_OUTCOME_CONSTEXPR error_type get_error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
-    //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
     BOOST_OUTCOME_CONSTEXPR error_type error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
     //! \brief Disposes of any existing state, setting the monad to the error_type
     BOOST_OUTCOME_CONSTEXPR void set_error(error_type v) { monad_storage::_storage.emplace_error(std::move(v)); }
@@ -216,8 +214,6 @@ namespace policy
     }
     //! \brief Returns any excepted state in the transport, throwing an exception if empty
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type exception() const { return get_exception(); }
-    //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
-    BOOST_OUTCOME_CONSTEXPR exception_type get_exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
     //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
     BOOST_OUTCOME_CONSTEXPR exception_type exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
     //! \brief Disposes of any existing state, setting the monad to the exception_type
@@ -294,7 +290,6 @@ namespace policy
       return error_type();
     }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
-    BOOST_OUTCOME_CONSTEXPR error_type get_error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
     BOOST_OUTCOME_CONSTEXPR error_type error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
     BOOST_OUTCOME_CONSTEXPR void set_error(error_type v) { monad_storage::_storage.emplace_error(std::move(v)); }
 #endif
@@ -315,7 +310,6 @@ namespace policy
       return exception_type();
     }
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type exception() const { return get_exception(); }
-    BOOST_OUTCOME_CONSTEXPR exception_type get_exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
     BOOST_OUTCOME_CONSTEXPR exception_type exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
     BOOST_OUTCOME_CONSTEXPR void set_exception(exception_type v) { monad_storage::_storage.emplace_exception(std::move(v)); }
     template <typename E, typename = typename std::enable_if<std::is_same<E, E>::value && !std::is_void<exception_type>::value>::type> BOOST_OUTCOME_CONSTEXPR void set_exception(E &&e) { set_exception(make_exception_type(std::forward<E>(e))); }
