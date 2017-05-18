@@ -1484,11 +1484,11 @@ namespace detail
 #define BOOST_OUTCOME_THROW_DESERIALISATION_FAILURE(m, expr) BOOST_OUTCOME_THROW(expr)
 #endif
 
-#ifndef BOOST_OUTCOME_THROW_MONAD_ERROR
+#ifndef BOOST_OUTCOME_THROW_BAD_OUTCOME
 
 
 
-#define BOOST_OUTCOME_THROW_MONAD_ERROR(ec, expr) BOOST_OUTCOME_THROW(expr), false
+#define BOOST_OUTCOME_THROW_BAD_OUTCOME(ec, expr) BOOST_OUTCOME_THROW(expr), false
 #endif
 
 #ifndef BOOST_OUTCOME_THROW_SYSTEM_ERROR
@@ -1518,6 +1518,108 @@ namespace detail
 #pragma warning(push)
 #pragma warning(disable : 4714)
 #pragma warning(disable : 4996)
+#endif
+#ifndef BOOST_OUTCOME_MONAD_ERROR_H
+#define BOOST_OUTCOME_MONAD_ERROR_H
+
+
+
+namespace boost { namespace outcome { inline namespace _1_0_std_std_9274c0d4 {
+
+
+enum class bad_outcome_errc
+{
+
+  no_state = 2,
+  exception_present = 3,
+};
+
+namespace _detail
+{
+  class bad_outcome_category : public stl11::error_category
+  {
+  public:
+    virtual const char *name() const noexcept { return "basic_monad"; }
+    virtual std::string message(int c) const
+    {
+      switch(c)
+      {
+      case 1:
+        return "already set";
+      case 2:
+        return "no state";
+      case 3:
+        return "exception present";
+      default:
+        return "unknown";
+      }
+    }
+  };
+}
+
+
+
+
+
+inline const _detail::bad_outcome_category &bad_outcome_category()
+{
+  static _detail::bad_outcome_category c;
+  return c;
+}
+
+
+class BOOSTLITE_SYMBOL_VISIBLE bad_outcome : public stl11::system_error
+{
+public:
+  bad_outcome(stl11::error_code ec)
+      : std::system_error(ec)
+  {
+  }
+};
+
+
+inline stl11::error_code make_error_code(bad_outcome_errc e)
+{
+  return stl11::error_code(static_cast<int>(e), bad_outcome_category());
+}
+
+
+inline stl11::error_condition make_error_condition(bad_outcome_errc e)
+{
+  return stl11::error_condition(static_cast<int>(e), bad_outcome_category());
+}
+
+} } }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+namespace std
+{
+
+  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_9274c0d4::bad_outcome_errc> : std::true_type
+  {
+  };
+
+  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_9274c0d4::bad_outcome_errc> : std::true_type
+  {
+  };
+}
+
+
 #endif
 #ifndef BOOST_OUTCOME_ERROR_CODE_EXTENDED_H
 #define BOOST_OUTCOME_ERROR_CODE_EXTENDED_H
@@ -2507,108 +2609,6 @@ inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec)
 #endif
 
 } } }
-
-#endif
-#ifndef BOOST_OUTCOME_MONAD_ERROR_H
-#define BOOST_OUTCOME_MONAD_ERROR_H
-
-
-
-namespace boost { namespace outcome { inline namespace _1_0_std_std_9274c0d4 {
-
-
-enum class monad_errc
-{
-
-  no_state = 2,
-  exception_present = 3,
-};
-
-namespace _detail
-{
-  class monad_category : public stl11::error_category
-  {
-  public:
-    virtual const char *name() const noexcept { return "basic_monad"; }
-    virtual std::string message(int c) const
-    {
-      switch(c)
-      {
-      case 1:
-        return "already set";
-      case 2:
-        return "no state";
-      case 3:
-        return "exception present";
-      default:
-        return "unknown";
-      }
-    }
-  };
-}
-
-
-
-
-
-inline const _detail::monad_category &monad_category()
-{
-  static _detail::monad_category c;
-  return c;
-}
-
-
-class BOOSTLITE_SYMBOL_VISIBLE monad_error : public stl11::system_error
-{
-public:
-  monad_error(stl11::error_code ec)
-      : std::system_error(ec)
-  {
-  }
-};
-
-
-inline stl11::error_code make_error_code(monad_errc e)
-{
-  return stl11::error_code(static_cast<int>(e), monad_category());
-}
-
-
-inline stl11::error_condition make_error_condition(monad_errc e)
-{
-  return stl11::error_condition(static_cast<int>(e), monad_category());
-}
-
-} } }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-namespace std
-{
-
-  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_9274c0d4::monad_errc> : std::true_type
-  {
-  };
-
-  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_9274c0d4::monad_errc> : std::true_type
-  {
-  };
-}
-
 
 #endif
 #ifndef BOOST_OUTCOME_VALUE_STORAGE_H
@@ -4893,12 +4893,12 @@ namespace policy
     {
     }
 
-    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(bad_outcome_errc ec) { return BOOST_OUTCOME_THROW_BAD_OUTCOME(ec, bad_outcome(ec)); }
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
-        _throw_error(monad_errc::no_state);
+        _throw_error(bad_outcome_errc::no_state);
 
       if(monad_storage::has_error() || monad_storage::has_exception())
       {
@@ -5011,14 +5011,14 @@ namespace policy
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
+        if(!_throw_error(bad_outcome_errc::no_state))
           return error_type();
       }
       if(monad_storage::has_error())
         return monad_storage::_storage.error;
 
       if(monad_storage::has_exception())
-        return error_type((int) monad_errc::exception_present, monad_category());
+        return error_type((int) bad_outcome_errc::exception_present, bad_outcome_category());
 
       return error_type();
     }
@@ -5035,7 +5035,7 @@ namespace policy
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
+        if(!_throw_error(bad_outcome_errc::no_state))
           return exception_type();
       }
       if(!monad_storage::has_error() && !monad_storage::has_exception())
@@ -5073,12 +5073,12 @@ namespace policy
     {
     }
 
-    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(bad_outcome_errc ec) { return BOOST_OUTCOME_THROW_BAD_OUTCOME(ec, bad_outcome(ec)); }
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
-        _throw_error(monad_errc::no_state);
+        _throw_error(bad_outcome_errc::no_state);
 
       if(monad_storage::has_error() || monad_storage::has_exception())
       {
@@ -5112,14 +5112,14 @@ namespace policy
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
+        if(!_throw_error(bad_outcome_errc::no_state))
           return error_type();
       }
       if(monad_storage::has_error())
         return monad_storage::_storage.error;
 
       if(monad_storage::has_exception())
-        return error_type((int) monad_errc::exception_present, monad_category());
+        return error_type((int) bad_outcome_errc::exception_present, bad_outcome_category());
 
       return error_type();
     }
@@ -5132,7 +5132,7 @@ namespace policy
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
+        if(!_throw_error(bad_outcome_errc::no_state))
           return exception_type();
       }
       if(!monad_storage::has_error() && !monad_storage::has_exception())
@@ -5263,12 +5263,12 @@ namespace policy
     {
     }
 
-    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(bad_outcome_errc ec) { return BOOST_OUTCOME_THROW_BAD_OUTCOME(ec, bad_outcome(ec)); }
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
-        _throw_error(monad_errc::no_state);
+        _throw_error(bad_outcome_errc::no_state);
 
       if(monad_storage::has_error() || monad_storage::has_exception())
       {
@@ -5381,7 +5381,7 @@ namespace policy
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
+        if(!_throw_error(bad_outcome_errc::no_state))
           return error_type();
       }
       if(monad_storage::has_error())
@@ -5443,12 +5443,12 @@ namespace policy
     {
     }
 
-    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(bad_outcome_errc ec) { return BOOST_OUTCOME_THROW_BAD_OUTCOME(ec, bad_outcome(ec)); }
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
-        _throw_error(monad_errc::no_state);
+        _throw_error(bad_outcome_errc::no_state);
 
       if(monad_storage::has_error() || monad_storage::has_exception())
       {
@@ -5482,7 +5482,7 @@ namespace policy
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
+        if(!_throw_error(bad_outcome_errc::no_state))
           return error_type();
       }
       if(monad_storage::has_error())
@@ -5632,12 +5632,12 @@ namespace policy
     {
     }
 
-    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(bad_outcome_errc ec) { return BOOST_OUTCOME_THROW_BAD_OUTCOME(ec, bad_outcome(ec)); }
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
-        _throw_error(monad_errc::no_state);
+        _throw_error(bad_outcome_errc::no_state);
 
 
 
@@ -5812,12 +5812,12 @@ namespace policy
     {
     }
 
-    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(bad_outcome_errc ec) { return BOOST_OUTCOME_THROW_BAD_OUTCOME(ec, bad_outcome(ec)); }
 
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
-        _throw_error(monad_errc::no_state);
+        _throw_error(bad_outcome_errc::no_state);
 
 
 

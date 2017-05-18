@@ -261,11 +261,11 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 #define BOOST_OUTCOME_THROW_DESERIALISATION_FAILURE(m, expr) BOOST_OUTCOME_THROW(expr)
 #endif
 
-#ifndef BOOST_OUTCOME_THROW_MONAD_ERROR
-/*! \brief Predefine to have something else occur when Outcome throws a monad_error due to being asked to do something not possible
+#ifndef BOOST_OUTCOME_THROW_BAD_OUTCOME
+/*! \brief Predefine to have something else occur when Outcome throws a `bad_outcome` due to being asked to do something not possible
 \return Can return false to cancel the calling operation (see `_throw_error()` in monad_policy.ipp).
 */
-#define BOOST_OUTCOME_THROW_MONAD_ERROR(ec, expr) BOOST_OUTCOME_THROW(expr), false
+#define BOOST_OUTCOME_THROW_BAD_OUTCOME(ec, expr) BOOST_OUTCOME_THROW(expr), false
 #endif
 
 #ifndef BOOST_OUTCOME_THROW_SYSTEM_ERROR

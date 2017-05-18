@@ -16,7 +16,14 @@ Thanks to Deniz Bahadir for reporting this.
 for finding the correct person.
 - Issue #18 `result<T>` had a `.set_exception()` which it should not have had. Thanks to Peter Dimov
 for reporting this.
-- Issue #19 Remove observers `.is_ready()`, `.get_error_or()`, `.get_exception_or()`.
+- Issue #19 Remove observers `.is_ready()`, `.get_error_or()`, `.get_exception_or()`. Thanks to Peter
+Dimov and Andrzej Krzemienski for suggesting this.
+- Issue #20 Rename:
+  - `monad_error` to `bad_outcome`
+  - `monad_errc` to `bad_outcome_errc`
+  - `monad_category` to `bad_outcome_category`
+  - `BOOST_OUTCOME_THROW_MONAD_ERROR` to `BOOST_OUTCOME_THROW_BAD_OUTCOME`
+ Thanks to Peter Dimov, Andrzej Krzemienski and Paul Bristow for suggesting this.
 
 ## 20170511 boost_peer_review3:
 - First release for Boost peer review. If you want changelog before this, please consult the git log.

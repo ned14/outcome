@@ -199,9 +199,9 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.get(), const monad_error &);
-    BOOST_CHECK_THROW(m.get_error(), const monad_error &);
-    BOOST_CHECK_THROW(m.get_exception(), const monad_error &);
+    BOOST_CHECK_THROW(m.get(), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_error(), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_exception(), const bad_outcome &);
   }
   {
     outcome<void> m;
@@ -211,9 +211,9 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(([&m]() -> void { return m.get(); }()), const monad_error &);
-    BOOST_CHECK_THROW(m.get_error(), const monad_error &);
-    BOOST_CHECK_THROW(m.get_exception(), const monad_error &);
+    BOOST_CHECK_THROW(([&m]() -> void { return m.get(); }()), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_error(), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_exception(), const bad_outcome &);
   }
   {
     outcome<int> m(5);
@@ -234,9 +234,9 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.get(), const monad_error &);
-    BOOST_CHECK_THROW(m.get_error(), const monad_error &);
-    BOOST_CHECK_THROW(m.get_exception(), const monad_error &);
+    BOOST_CHECK_THROW(m.get(), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_error(), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_exception(), const bad_outcome &);
   }
   {
     outcome<std::string> m("niall");
@@ -274,9 +274,9 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.get(), const monad_error &);
-    BOOST_CHECK_THROW(m.get_error(), const monad_error &);
-    BOOST_CHECK_THROW(m.get_exception(), const monad_error &);
+    BOOST_CHECK_THROW(m.get(), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_error(), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_exception(), const bad_outcome &);
   }
   {
     error_code_extended ec(5, stl11::system_category());
@@ -497,7 +497,7 @@ BOOST_AUTO_TEST_CASE(works / monad / optional, "Tests that the monad acts as an 
   };
   auto a = maybe_getenv("SHOULDNEVEREXIST");
   BOOST_CHECK(!a);
-  BOOST_CHECK_THROW(a.value(), const monad_error &);
+  BOOST_CHECK_THROW(a.value(), const bad_outcome &);
   BOOST_CHECK(a.value_or(nullptr) == nullptr);
 #ifdef _WIN32
   auto b = maybe_getenv("HOMEPATH");

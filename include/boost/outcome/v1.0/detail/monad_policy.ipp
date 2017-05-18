@@ -59,12 +59,12 @@ namespace policy
     {
     }
     // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(bad_outcome_errc ec) { return BOOST_OUTCOME_THROW_BAD_OUTCOME(ec, bad_outcome(ec)); }
     // Common preamble to the below
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
-        _throw_error(monad_errc::no_state);
+        _throw_error(bad_outcome_errc::no_state);
 #if defined(BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE) || defined(BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE)
       if(monad_storage::has_error() || monad_storage::has_exception())
       {
@@ -177,14 +177,14 @@ namespace policy
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
+        if(!_throw_error(bad_outcome_errc::no_state))
           return error_type();
       }
       if(monad_storage::has_error())
         return monad_storage::_storage.error;
 #ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
       if(monad_storage::has_exception())
-        return error_type((int) monad_errc::exception_present, monad_category());
+        return error_type((int) bad_outcome_errc::exception_present, bad_outcome_category());
 #endif
       return error_type();
     }
@@ -201,7 +201,7 @@ namespace policy
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
+        if(!_throw_error(bad_outcome_errc::no_state))
           return exception_type();
       }
       if(!monad_storage::has_error() && !monad_storage::has_exception())
@@ -239,12 +239,12 @@ namespace policy
     {
     }
     // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(bad_outcome_errc ec) { return BOOST_OUTCOME_THROW_BAD_OUTCOME(ec, bad_outcome(ec)); }
     // Common preamble to the below
     BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
-        _throw_error(monad_errc::no_state);
+        _throw_error(bad_outcome_errc::no_state);
 #if defined(BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE) || defined(BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE)
       if(monad_storage::has_error() || monad_storage::has_exception())
       {
@@ -278,14 +278,14 @@ namespace policy
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
+        if(!_throw_error(bad_outcome_errc::no_state))
           return error_type();
       }
       if(monad_storage::has_error())
         return monad_storage::_storage.error;
 #ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
       if(monad_storage::has_exception())
-        return error_type((int) monad_errc::exception_present, monad_category());
+        return error_type((int) bad_outcome_errc::exception_present, bad_outcome_category());
 #endif
       return error_type();
     }
@@ -298,7 +298,7 @@ namespace policy
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
+        if(!_throw_error(bad_outcome_errc::no_state))
           return exception_type();
       }
       if(!monad_storage::has_error() && !monad_storage::has_exception())

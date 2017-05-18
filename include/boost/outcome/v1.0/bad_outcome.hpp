@@ -1,4 +1,4 @@
-/* Provides a custom monad_error error code
+/* Provides a custom bad_outcome error code
 (C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Jan 2017
 
@@ -30,7 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN
 
 //! \brief Enumeration of the ways in which a monad operation may fail \ingroup monad
-enum class monad_errc
+enum class bad_outcome_errc
 {
   // already_set = 1,        //!< Attempt to store a value into the monad twice
   no_state = 2,           //!< Attempt to use without a state
@@ -39,7 +39,7 @@ enum class monad_errc
 
 namespace _detail
 {
-  class monad_category : public stl11::error_category
+  class bad_outcome_category : public stl11::error_category
   {
   public:
     virtual const char *name() const noexcept { return "basic_monad"; }
@@ -64,32 +64,32 @@ namespace _detail
 of one of these may not be constant throughout the process as per the ISO spec.
 \ingroup monad
 */
-inline const _detail::monad_category &monad_category()
+inline const _detail::bad_outcome_category &bad_outcome_category()
 {
-  static _detail::monad_category c;
+  static _detail::bad_outcome_category c;
   return c;
 }
 
 //! \brief A monad exception object \ingroup monad
-class BOOSTLITE_SYMBOL_VISIBLE monad_error : public stl11::system_error
+class BOOSTLITE_SYMBOL_VISIBLE bad_outcome : public stl11::system_error
 {
 public:
-  monad_error(stl11::error_code ec)
+  bad_outcome(stl11::error_code ec)
       : std::system_error(ec)
   {
   }
 };
 
-//! \brief ADL looked up by the STL to convert a monad_errc into an error_code. \ingroup monad
-inline stl11::error_code make_error_code(monad_errc e)
+//! \brief ADL looked up by the STL to convert a bad_outcome_errc into an error_code. \ingroup monad
+inline stl11::error_code make_error_code(bad_outcome_errc e)
 {
-  return stl11::error_code(static_cast<int>(e), monad_category());
+  return stl11::error_code(static_cast<int>(e), bad_outcome_category());
 }
 
-//! \brief ADL looked up by the STL to convert a monad_errc into an error_condition. \ingroup monad
-inline stl11::error_condition make_error_condition(monad_errc e)
+//! \brief ADL looked up by the STL to convert a bad_outcome_errc into an error_condition. \ingroup monad
+inline stl11::error_condition make_error_condition(bad_outcome_errc e)
 {
-  return stl11::error_condition(static_cast<int>(e), monad_category());
+  return stl11::error_condition(static_cast<int>(e), bad_outcome_category());
 }
 
 BOOST_OUTCOME_V1_NAMESPACE_END
@@ -100,11 +100,11 @@ namespace boost
   namespace system
   {
     //! \brief Tells the STL this is an error code enum \ingroup monad
-    template <> struct is_error_code_enum<BOOST_OUTCOME_V1_NAMESPACE::monad_errc> : std::true_type
+    template <> struct is_error_code_enum<BOOST_OUTCOME_V1_NAMESPACE::bad_outcome_errc> : std::true_type
     {
     };
     //! \brief Tells the STL this is an error condition enum \ingroup monad
-    template <> struct is_error_condition_enum<BOOST_OUTCOME_V1_NAMESPACE::monad_errc> : std::true_type
+    template <> struct is_error_condition_enum<BOOST_OUTCOME_V1_NAMESPACE::bad_outcome_errc> : std::true_type
     {
     };
   }
@@ -113,11 +113,11 @@ namespace boost
 namespace std
 {
   //! \brief Tells the STL this is an error code enum \ingroup monad
-  template <> struct is_error_code_enum<BOOST_OUTCOME_V1_NAMESPACE::monad_errc> : std::true_type
+  template <> struct is_error_code_enum<BOOST_OUTCOME_V1_NAMESPACE::bad_outcome_errc> : std::true_type
   {
   };
   //! \brief Tells the STL this is an error condition enum \ingroup monad
-  template <> struct is_error_condition_enum<BOOST_OUTCOME_V1_NAMESPACE::monad_errc> : std::true_type
+  template <> struct is_error_condition_enum<BOOST_OUTCOME_V1_NAMESPACE::bad_outcome_errc> : std::true_type
   {
   };
 }
