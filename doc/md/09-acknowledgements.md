@@ -65,10 +65,11 @@ I hope users of Outcome will agree.
 
 # Acknowledgements
 
-To whomever it was who proposed the name "Outcome" for the library after a very extended
+To Paul Bristow who <a href="https://lists.boost.org/Archives/boost/2015/05/222687.php">
+proposed the name "Outcome"</a> for the library after a very extended
 period of name bikeshedding on boost-dev. I had been minded to call the library "Boost.Donkey"
 just to shut everyone up because the name bike shedding was getting ridiculous. But
-Outcome is a lot nicer, so thank you to whomever it was.
+Outcome is a lot nicer, so thank you Paul.
 
 My heartfelt thanks to Charley Bay for acting as review manager for Outcome in May 2017.
 It is becoming ever harder to find a Boost review manager, so thank you! My thanks also

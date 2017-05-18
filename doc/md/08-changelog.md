@@ -12,7 +12,7 @@ move constructor check, which is now correct unlike the incorrect assert from be
 Vicente J. Botet Escriba for explaining Expected's semantics.
 - Issue #21 Correct misspelling of `extended_error_code` with `error_code_extended` in the docs.
 Thanks to Deniz Bahadir for reporting this.
-
+- Issue #17 Give credit to Paul Bristow for the name "Outcome".
 
 ## 20170511 boost_peer_review3:
 - First release for Boost peer review. If you want changelog before this, please consult the git log.
