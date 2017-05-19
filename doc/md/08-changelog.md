@@ -1,7 +1,9 @@
 # Recent changes
 \anchor changelog
 
-## Next release boost_peer_review4:
+## Next release v1.00:
+
+## 20170519 boost_peer_review4:
 - Issue #13 The opcode counting CI tests in test/constexprs was severely broken on POSIX.
 Thanks to Tom Westerhout for finding the problem and supplying its fix.
 - unittests.cpp had become clang-tidy unclean, fixed.
@@ -23,7 +25,8 @@ Dimov and Andrzej Krzemienski for suggesting this.
   - `monad_errc` to `bad_outcome_errc`
   - `monad_category` to `bad_outcome_category`
   - `BOOST_OUTCOME_THROW_MONAD_ERROR` to `BOOST_OUTCOME_THROW_BAD_OUTCOME`
- Thanks to Peter Dimov, Andrzej Krzemienski and Paul Bristow for suggesting this.
+
+  Thanks to Peter Dimov, Andrzej Krzemienski and Paul Bristow for suggesting this.
 
 ## 20170511 boost_peer_review3:
 - First release for Boost peer review. If you want changelog before this, please consult the git log.
