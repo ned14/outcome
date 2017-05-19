@@ -223,7 +223,7 @@ public:
   static constexpr bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
   //! \brief This monad does not implement a destructor
   static constexpr bool is_trivially_destructible = value_storage_type::is_trivially_destructible;
-#if defined(DOXYGEN_IS_IN_THE_HOUSE) || defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 191025017 /* VS2017 RTM */)
+#if defined(DOXYGEN_IS_IN_THE_HOUSE) || defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 191025019 /* VS2017 Update 1 */)
   //! \brief This monad is constructible from the monad specified
   template <class OtherMonad> static constexpr bool is_constructible = value_storage_type::template is_constructible_from<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
   //! \brief This monad is comparable to the monad specified. Note this is as if ThisMonad::operator==(OtherMonad), so without associativity i.e. is this monad comparable to the other monad which != the other monad is comparable to this monad.

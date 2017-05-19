@@ -2,6 +2,7 @@
 \anchor changelog
 
 ## Next release v1.00:
+- Issue #23 Get Outcome working on VS2017 Update 1. Thanks to Vinnie Falco for reporting this.
 
 ## 20170519 boost_peer_review4:
 - Issue #13 The opcode counting CI tests in test/constexprs was severely broken on POSIX.

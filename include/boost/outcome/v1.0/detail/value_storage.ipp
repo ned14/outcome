@@ -297,7 +297,7 @@ public:
 #pragma warning(pop)
 #endif
   ~BOOST_OUTCOME_VALUE_STORAGE_IMPL()
-#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER != 191025017 /* VS2017 RTM */)
+#if defined(__c2__) || (!defined(_MSC_VER) || (_MSC_FULL_VER != 191025017 /* VS2017 RTM */ && _MSC_FULL_VER != 191025019 /* VS2017 Update 1 */))
   noexcept(is_nothrow_destructible)
 #endif
   {

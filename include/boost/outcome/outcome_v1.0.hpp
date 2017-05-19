@@ -3427,7 +3427,7 @@ public:
 #pragma warning(pop)
 #endif
   ~value_storage_impl_nontrivial()
-#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER != 191025017 )
+#if defined(__c2__) || (!defined(_MSC_VER) || (_MSC_FULL_VER != 191025017 && _MSC_FULL_VER != 191025019 ))
   noexcept(is_nothrow_destructible)
 #endif
   {
@@ -3717,7 +3717,7 @@ public:
   static constexpr bool is_nothrow_copy_assignable = base::is_nothrow_copy_assignable;
   static constexpr bool is_nothrow_destructible = base::is_nothrow_destructible;
 
-#if (defined(_MSC_VER) && _MSC_FULL_VER > 191025017 ) || __clang_major__ >= 4 || (__clang_major__ == 3 && __clang_minor__ >= 8)
+#if (defined(_MSC_VER) && _MSC_FULL_VER > 191025019 ) || __clang_major__ >= 4 || (__clang_major__ == 3 && __clang_minor__ >= 8)
   template <class _value_type2> static constexpr bool value_type_is_constructible_from = std::is_same<_value_type, _value_type2>::value || std::is_void<_value_type2>::value || std::is_constructible<_value_type, _value_type2>::value;
   template <class _error_type2> static constexpr bool error_type_is_constructible_from = std::is_void<_error_type2>::value || std::is_same<_error_type, _error_type2>::value || std::is_constructible<_error_type, _error_type2>::value;
   template <class _exception_type2> static constexpr bool exception_type_is_constructible_from = std::is_void<_exception_type2>::value || std::is_same<_exception_type, _exception_type2>::value || std::is_constructible<_exception_type, _exception_type2>::value;
@@ -4270,7 +4270,7 @@ public:
   static constexpr bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
 
   static constexpr bool is_trivially_destructible = value_storage_type::is_trivially_destructible;
-#if 0 || defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 191025017 )
+#if 0 || defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 191025019 )
 
   template <class OtherMonad> static constexpr bool is_constructible = value_storage_type::template is_constructible_from<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
 
