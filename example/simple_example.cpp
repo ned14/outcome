@@ -8,7 +8,7 @@ namespace Library2 {
 }
 namespace Library3 {
   using error_code = boost::outcome::error_code_extended;
-  boost::outcome::expected<int, Library3::error_code> fun() noexcept { return 5; }
+  boost::outcome::experimental::expected<int, Library3::error_code> fun() noexcept { return 5; }
 }
 namespace Library4 {
   boost::outcome::result<int> fun() noexcept { return 5; }
@@ -36,7 +36,7 @@ namespace Library2
 namespace Library3                                         // The Expected proposed for standardisation in C++ 20
 {                                                          // Returns an int (expected) or some custom 
   auto fun() noexcept                                      // error code (unexpected). Never throws exceptions.
-    -> outcome::expected<int, error_code>; 
+    -> outcome::experimental::expected<int, error_code>; 
 }  
   
 namespace Library4                                         // Result is an int (not error)

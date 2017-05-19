@@ -193,12 +193,12 @@ using `outcome<T>` and C++ exception throws.
 In Outcome's refinements which we shall call *transports*, an *empty* transport is empty,
 a *valued* transport contains a `T`, an *errored* transport contains an `error_code_extended` and
 an *excepted* transport contains a `std::exception_ptr`. All transports will throw a
-\ref boost::outcome::v1_xxx::monad_error "monad_error" type if you try doing something wrong
-instead of a `bad_expected_access<E>`. `monad_error` subclasses `std::system_error` with an error
-code of custom category `monad_category()`, with corresponding enumeration
-\ref boost::outcome::v1_xxx::monad_errc "monad_errc", which can have one of two values:
-- `monad_errc::no_state` means you attempted to fetch a value, error or exception from an empty transport.
-- `monad_errc::exception_present` is returned as the error code if you retrieve an error
+\ref boost::outcome::v1_xxx::bad_outcome "bad_outcome" type if you try doing something wrong
+instead of a `bad_expected_access<E>`. `bad_outcome` subclasses `std::system_error` with an error
+code of custom category `bad_outcome_category()`, with corresponding enumeration
+\ref boost::outcome::v1_xxx::bad_outcome_errc "bad_outcome_errc", which can have one of two values:
+- `bad_outcome_errc::no_state` means you attempted to fetch a value, error or exception from an empty transport.
+- `bad_outcome_errc::exception_present` is returned as the error code if you retrieve an error
 code from an excepted transport.
 
 This leads to the following differences to `expected<T, E>`:
@@ -207,7 +207,7 @@ This leads to the following differences to `expected<T, E>`:
 instead there is a formal empty state to do with as you please (in some situations, a function
 returning a value OR empty OR an error makes a lot of sense and Outcome supports a `tribool`
 extension for ternary logics for those who need such a thing). Attempting to retrieve a value,
-error or exception from an empty transport throws a `monad_error::no_state` [1].
+error or exception from an empty transport throws a `bad_outcome::no_state` [1].
   - Implied in this design is that unlike in Expected, your type `T` need not be default
   constructible, nor movable, nor copyable. If your type `T` throws during a switch between
   states, we adopt the formal empty state.
@@ -218,7 +218,7 @@ extract the `E` instance later.
 throwing a wrapper type like `bad_expected_access` from which you need to manually
 extract later.
 - `.error()` returns any `error_code_extended` as you'd expect, returning a default constructed
-(null) error code if the transport is valued, or `monad_errc::exception_present` if the
+(null) error code if the transport is valued, or `bad_outcome_errc::exception_present` if the
 transport is excepted.
   - Unlike Expected, this is always a by-value return instead of by-reference via
 `reinterpret_cast<error_type>`. This is low cost, because we know what our error type always is.
@@ -244,11 +244,11 @@ If you really mean to throw away a returned transport, make sure you cast it to 
 the compiler you specifically intend to throw it away. This solves a big pain point when using
 `error_code &ec` pass back overloads from C++ 11 where you forget to check `ec`.
 
-[1]: Actually the `BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(monad_errc::no_state))` macro is executed
+[1]: Actually the `BOOST_OUTCOME_THROW_BAD_OUTCOME(ec, bad_outcome(bad_outcome_errc::no_state))` macro is executed
 where `ec` is the `std::error_code` contained by the monad. This can be user redefined to do anything,
 but the default implementation throws a C++ exception of type
-\ref boost::outcome::v1_xxx::monad_error "monad_error" with code
-\ref boost::outcome::v1_xxx::monad_errc "monad_errc::no_state" if C++ exceptions are enabled
+\ref boost::outcome::v1_xxx::bad_outcome "bad_outcome" with code
+\ref boost::outcome::v1_xxx::bad_outcome_errc "bad_outcome_errc::no_state" if C++ exceptions are enabled
 by the compiler. If they are not, it prints a stack backtrace to stderr and aborts the process.
 
 [2]: Similarly the `BOOST_OUTCOME_THROW_SYSTEM_ERROR(ec, std::system_error(ec))` macro is actually

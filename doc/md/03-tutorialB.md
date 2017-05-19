@@ -58,7 +58,7 @@ maintenance burden over time is obvious, and a further worked example follows be
 The third reason is that the C++ 11 standard library already provides an enum of the
 most common error codes for you so you don't feel like going off and reinventing
 the wheel. It's called <a href="http://en.cppreference.com/w/cpp/error/errc">`std::errc`</a>
-brought in by <tt>\#include <system_error></tt> and as you'll see, it contains the standard
+brought in by <tt>\#include &lt;system_error&gt;</tt> and as you'll see, it contains the standard
 POSIX error codes, and most of the time you'll find that whatever custom error code
 domain you are about to write can be adequately covered by `std::errc`.
 In fact, let's try it:

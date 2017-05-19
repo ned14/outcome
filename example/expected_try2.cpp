@@ -138,13 +138,13 @@ namespace std
 }
 
 
-outcome::expected<double /*, std::error_code */> div(double x, double y) noexcept
+outcome::experimental::expected<double /*, std::error_code */> div(double x, double y) noexcept
 {
   if (::fabs(y) < DBL_EPSILON)
   {
     // This operation would fail, instead let's return the reason of
     // the failure wrapped in E
-    return outcome::make_unexpected<std::error_code>(MathError1::DivisionByZero);
+    return outcome::experimental::make_unexpected<std::error_code>(MathError1::DivisionByZero);
   }
   else
   {
@@ -153,14 +153,14 @@ outcome::expected<double /*, std::error_code */> div(double x, double y) noexcep
   }
 }
 
-outcome::expected<long long /*, std::error_code */> div10mul3(double y) noexcept
+outcome::experimental::expected<long long /*, std::error_code */> div10mul3(double y) noexcept
 {
   // If calling div() fails, return the same error immediately,
   // else unpack the T into r. REQUIRES type E to be identical!
   BOOST_OUTCOME_TRY(r, div(10.0, y));
   if (r < 0.0)
   {
-    return outcome::make_unexpected<std::error_code>(MathError2::NegativeSquareRoot);
+    return outcome::experimental::make_unexpected<std::error_code>(MathError2::NegativeSquareRoot);
   }
   return (long long)(sqrt(r * 3.0));
 }
@@ -172,7 +172,7 @@ int main(void)
     std::cout << div10mul3(1.0).value() << std::endl;
   }
   // NOTE: Much less likely to become stale accidentally
-  catch (const outcome::bad_expected_access</* std::error_code */> &e)
+  catch (const outcome::experimental::bad_expected_access</* std::error_code */> &e)
   {
     // Also note we can always print the error code because E is
     // always an error_code

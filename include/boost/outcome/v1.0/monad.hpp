@@ -297,11 +297,11 @@ public:
   const value_storage_type &__storage() const noexcept { return this->_storage; }
 
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-//! \brief If contains a value_type, returns a lvalue reference to it, else throws an exception of bad_outcome(no_state), system_error or the exception_type.
-//! \brief If contains a value_type, returns a const lvalue reference to it, else throws an exception of bad_outcome(no_state), system_error or the exception_type.
-//! \brief If contains a value_type, returns a rvalue reference to it, else throws an exception of bad_outcome(no_state), system_error or the exception_type.
-//! \brief If contains an error_type, returns that error_type. If contains an error, returns an error code of `bad_outcome_errc::exception_present`. Otherwise returns a null error_type. Can only throw the exception bad_outcome(no_state) if empty.
-//! \brief If contains an exception_type, returns that exception_type. If contains an error_type, returns system_error(error_type). If contains a value_type, returns a null exception_type. Can only throw the exception bad_outcome(no_state) if empty.
+//! \brief If contains a value_type, returns a lvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
+//! \brief If contains a value_type, returns a const lvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
+//! \brief If contains a value_type, returns a rvalue reference to it, else throws an exception of monad_error(no_state), system_error or the exception_type.
+//! \brief If contains an error_type, returns that error_type. If contains an error, returns an error code of `monad_errc::exception_present`. Otherwise returns a null error_type. Can only throw the exception monad_error(no_state) if empty.
+//! \brief If contains an exception_type, returns that exception_type. If contains an error_type, returns system_error(error_type). If contains a value_type, returns a null exception_type. Can only throw the exception monad_error(no_state) if empty.
 #endif
 
 #ifdef BOOST_OUTCOME_ENABLE_ADVANCED
@@ -1120,6 +1120,9 @@ space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `t
   }
 
 }  // namespace
+
+// inject experimental::as_void into this namespace
+using experimental::as_void;
 
 /********************************************************** LEWG Expected implementation  ***********************************************************/
 #endif  // BOOST_OUTCOME_LEAN_AND_MEAN

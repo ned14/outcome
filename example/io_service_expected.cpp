@@ -23,21 +23,21 @@ public:
   using io_handler = void(std::error_code &ec, size_t bytes_transferred);
 private:
   std::mutex _lock;
-  std::deque<std::packaged_task<outcome::expected<void>(size_t)>> _work;
+  std::deque<std::packaged_task<outcome::experimental::expected<void>(size_t)>> _work;
   std::condition_variable _newwork;
 public:
 
   // Call the i/o handler at some future point in some future thread,
   // returning immediately
-  outcome::expected<std::future<outcome::expected<void>>, std::exception_ptr>
+  outcome::experimental::expected<std::future<outcome::experimental::expected<void>>, std::exception_ptr>
     post(std::function<io_handler> f) noexcept
   {
     try
     {
       // Make a packaged task rebinding the completion handler
-      std::packaged_task<outcome::expected<void>(size_t)>
+      std::packaged_task<outcome::experimental::expected<void>(size_t)>
         rebound([f = std::move(f)](size_t bytes_transferred)
-        ->outcome::expected<void>
+        ->outcome::experimental::expected<void>
       {
         // Note we let exception throws be handled by the packaged_task
 
@@ -46,7 +46,7 @@ public:
         // if he throws return the exception thrown
         f(ec, bytes_transferred);
         if (ec)
-          return outcome::make_unexpected(ec);
+          return outcome::experimental::make_unexpected(ec);
         return {};
         
         
@@ -55,7 +55,7 @@ public:
         
       });
       // Fetching the future can throw a STL exception
-      std::future<outcome::expected<void>> f(rebound.get_future());
+      std::future<outcome::experimental::expected<void>> f(rebound.get_future());
       {
         std::lock_guard<decltype(_lock)> g(_lock);
         // Extending the deque can throw a STL exception
@@ -67,7 +67,7 @@ public:
     catch (...)
     {
       // Return the exception thrown
-      return outcome::make_unexpected(std::current_exception());
+      return outcome::experimental::make_unexpected(std::current_exception());
     }
   }
 
@@ -75,29 +75,29 @@ public:
   Note that ASIO's io_service calls this dispatch(), but the Executors
   proposal calls it execute()
   */
-  outcome::expected<void, outcome::expected<std::error_code, std::exception_ptr>>
+  outcome::experimental::expected<void, outcome::experimental::expected<std::error_code, std::exception_ptr>>
     execute(std::function<io_handler> f) noexcept
   {
     try
     {
       // If post() returns a failure in its result, then this will throw
-      std::future<outcome::expected<void>> fut = post(std::move(f)).value();
+      std::future<outcome::experimental::expected<void>> fut = post(std::move(f)).value();
       // Might rethrow any exception thrown by the handler, that will get caught below
-      outcome::expected<void> v = fut.get();
+      outcome::experimental::expected<void> v = fut.get();
       // If the handler succeeded, return success, else return its error code
       if (v)
         return {};
-      return outcome::make_unexpected(v.error());
+      return outcome::experimental::make_unexpected(v.error());
     }
-    catch (const outcome::bad_expected_access<std::exception_ptr> &e)
+    catch (const outcome::experimental::bad_expected_access<std::exception_ptr> &e)
     {
       // This called when post() failed internally to do the dispatch
-      return outcome::make_unexpected(outcome::make_unexpected(e.error()));
+      return outcome::experimental::make_unexpected(outcome::experimental::make_unexpected(e.error()));
     }
     catch (...)
     {
       // Return the exception thrown
-      return outcome::make_unexpected(outcome::make_unexpected(std::current_exception()));
+      return outcome::experimental::make_unexpected(outcome::experimental::make_unexpected(std::current_exception()));
     }
   }
 
@@ -108,7 +108,7 @@ public:
     if (_work.empty())
       return 0;
 
-    std::packaged_task<outcome::expected<void>(size_t)>
+    std::packaged_task<outcome::experimental::expected<void>(size_t)>
       mywork(std::move(_work.front()));
     _work.pop_front();
     g.unlock();

@@ -74,13 +74,13 @@ struct file_error
   file_error(extended_error ec, const char *_path) : code(static_cast<int>(ec), detail::extended_error_category()), path(_path) {}
 };
 
-extern outcome::expected<handle_ref, file_error> openfile(const char *path)
+extern outcome::experimental::expected<handle_ref, file_error> openfile(const char *path)
 {
   int fd = open(path, O_RDONLY);
   if (fd == -1)
   {
     // NOTE that we lose no information here, whatever error the system returned is what we return
-    return outcome::make_unexpected(file_error(errno, path));
+    return outcome::experimental::make_unexpected(file_error(errno, path));
   }
   try
   {
@@ -89,15 +89,15 @@ extern outcome::expected<handle_ref, file_error> openfile(const char *path)
     ssize_t read = h->read(temp, 1024);
     // NOTE that we lose no information here, whatever error the system returned is what we return
     if(-1 == read)
-      return outcome::make_unexpected(file_error(errno, path));
+      return outcome::experimental::make_unexpected(file_error(errno, path));
     temp[read] = 0;
     if(strchr(temp, 13) != nullptr)
-      return outcome::make_unexpected(file_error(extended_error::format_corrupt, path));
+      return outcome::experimental::make_unexpected(file_error(extended_error::format_corrupt, path));
     return h;
   }
   catch (const std::bad_alloc &)
   {
-    return outcome::make_unexpected(file_error(std::errc::not_enough_memory, nullptr));
+    return outcome::experimental::make_unexpected(file_error(std::errc::not_enough_memory, nullptr));
   }
   // All other exceptions thrown upwards to abort
 }

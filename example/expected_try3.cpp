@@ -140,13 +140,13 @@ namespace std
 }
 
 
-outcome::expected<double, MathError1> div(double x, double y) noexcept
+outcome::experimental::expected<double, MathError1> div(double x, double y) noexcept
 {
   if (::fabs(y) < DBL_EPSILON)
   {
     // This operation would fail, instead let's return the reason of
     // the failure wrapped in E
-    return outcome::make_unexpected<MathError1>(MathError1::DivisionByZero);
+    return outcome::experimental::make_unexpected<MathError1>(MathError1::DivisionByZero);
   }
   else
   {
@@ -155,18 +155,18 @@ outcome::expected<double, MathError1> div(double x, double y) noexcept
   }
 }
 
-outcome::expected<long long, MathError2> div10mul3(double y) noexcept
+outcome::experimental::expected<long long, MathError2> div10mul3(double y) noexcept
 {
   // If calling div() fails, return the same error immediately,
   // else unpack the T into r. Note we cannot use BOOST_OUTCOME_TRY() here
   // as the error types are different.
-  outcome::expected<double, MathError1> _r = div(10.0, y);
+  outcome::experimental::expected<double, MathError1> _r = div(10.0, y);
   if (!_r)
-    return outcome::make_unexpected(MathError2(_r.error()));  // note explicit conversion needed
+    return outcome::experimental::make_unexpected(MathError2(_r.error()));  // note explicit conversion needed
   auto r = std::move(_r.value());
   if (r < 0.0)
   {
-    return outcome::make_unexpected<MathError2>(MathError2::NegativeSquareRoot);
+    return outcome::experimental::make_unexpected<MathError2>(MathError2::NegativeSquareRoot);
   }
   return (long long)(sqrt(r * 3.0));
 }
@@ -179,7 +179,7 @@ int main(void)
   }
   // NOTE: Back to becoming easily and silently stale, it's an unavoidable
   //       consequence of type safety
-  catch (const outcome::bad_expected_access<MathError2> &e)
+  catch (const outcome::experimental::bad_expected_access<MathError2> &e)
   {
     // Also note we can always print the error code because E is
     // always an error_code
