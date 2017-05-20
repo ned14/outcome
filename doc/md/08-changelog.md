@@ -8,6 +8,7 @@ not lose previous state during assignment or emplacement if the existing state's
 move or copy constructor. It does this by moving the existing state onto the stack before trying to
 set the new state, and if that throws it restores the previous state. This new code path only activates
 if any of the types stored have throwing move constructors.
+- Issue #12 basic_monad's copy assignment no longer gets instantiated when type T cannot be copied.
 
 ## 20170519 boost_peer_review4:
 - Issue #13 The opcode counting CI tests in test/constexprs was severely broken on POSIX.

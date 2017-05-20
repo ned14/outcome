@@ -1395,14 +1395,13 @@ BOOST_AUTO_TEST_CASE(issues / 11, "Changing state should never cause an empty st
 }
 #endif
 
-#if 0  // Known bug, will be fixed when we refactor Expected storage to never have empty state
 BOOST_AUTO_TEST_CASE(issues / 12, "basic_monad's copy assignment gets instantiated even when type T cannot be copied")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE::experimental;
   const char *s = "hi";
-  struct udt
+  struct udt  // NOLINT
   {
-    const char *_v{ null[tr };
+    const char *_v{nullptr};
     udt() = default;
     constexpr explicit udt(const char *v) noexcept : _v(v) {}
     BOOST_OUTCOME_CONSTEXPR udt(udt &&o) noexcept : _v(o._v) { o._v = nullptr; }
@@ -1418,10 +1417,11 @@ BOOST_AUTO_TEST_CASE(issues / 12, "basic_monad's copy assignment gets instantiat
   };
   static_assert(expected<udt>::is_move_constructible, "expected<udt> is not move constructible!");
   static_assert(!expected<udt>::is_copy_constructible, "expected<udt> is copy constructible!");
-  expected<udt> p(s), n(make_unexpected(std::error_code(ENOMEM, std::generic_category())));
+  expected<udt> p(udt{s}), n(make_unexpected(std::error_code(ENOMEM, std::generic_category())));
   n = make_unexpected(std::error_code(EINVAL, std::generic_category()));
 }
 
+#if 0  // Known bug, will be fixed when we refactor Expected storage to never have empty state
 BOOST_AUTO_TEST_CASE(issues / 16, "Default constructor of T is sometimes compiled when T has no default constructor")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE::experimental;
