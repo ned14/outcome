@@ -117,10 +117,6 @@ constexpr in_place_t in_place;
 //! \brief True if the type passed is a monad or a reference to a monad
 template <class M> static constexpr bool is_monad = detail::is_monad<typename std::decay<M>::type>::value;
 
-//! \brief Specialise to whitelist a type with throwing move constructors for use with basic monad
-template <class T>
-static constexpr bool enable_move_throwing_type = (std::is_move_constructible<T>::value && std::is_nothrow_move_constructible<T>::value) || (std::is_copy_constructible<T>::value && std::is_nothrow_copy_constructible<T>::value) || (!std::is_move_constructible<T>::value && !std::is_copy_constructible<T>::value);
-
 /*! \class basic_monad
 \brief Implements a configurable lightweight simple monadic value transport with the same semantics and API as a future
 \tparam implementation_policy An implementation policy type
@@ -183,14 +179,6 @@ public:
   };
   //! \brief Rebind this monad type into a different value_type
   template <typename U> using rebind = typename implementation_policy::template rebind<U>;
-
-  // If types are move constructible, make sure they are nothrow move constructible
-  static_assert(enable_move_throwing_type<value_type>,
-                "WARNING: value_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception every time a move happens. Either make your type never throw during moves, or specialise enable_move_throwing_type<T> to disable this check.");
-  static_assert(enable_move_throwing_type<error_type>,
-                "WARNING: error_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception every time a move happens. Either make your type never throw during moves, or specialise enable_move_throwing_type<T> to disable this check.");
-  static_assert(enable_move_throwing_type<exception_type>,
-                "WARNING: exception_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception every time a move happens. Either make your type never throw during moves, or specialise enable_move_throwing_type<T> to disable this check.");
 
 private:
   struct implicit_conversion_from_void_disabled

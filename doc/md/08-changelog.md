@@ -3,6 +3,11 @@
 
 ## Next release v1.00:
 - Issue #23 Get Outcome working on VS2017 Update 1. Thanks to Vinnie Falco for reporting this.
+- Issue #11 Changing state should never cause an empty state if avoidable. Outcomes and Expected will now
+not lose previous state during assignment or emplacement if the existing state's type has a nothrow
+move or copy constructor. It does this by moving the existing state onto the stack before trying to
+set the new state, and if that throws it restores the previous state. This new code path only activates
+if any of the types stored have throwing move constructors.
 
 ## 20170519 boost_peer_review4:
 - Issue #13 The opcode counting CI tests in test/constexprs was severely broken on POSIX.

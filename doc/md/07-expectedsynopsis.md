@@ -24,19 +24,7 @@ Some of Outcome's Expected deviations from P0323R1 have entered P0323R2 which wi
 the Toronto WG21 meeting in July 2017. Once P0323R2 has been published, Outcome's Expected
 implementation will be changed to match the new proposal. The following changes
 are planned (more may be added by the Boost peer review):
-1. LEWG Expected avoids any potential for a valueless due to exception state by using the double
-buffer design as proposed by
-<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0110r0.html">P0110R0</a>
-(I understand that a future `std::variant<...>` will do the same). Outcome has not
-implemented support for the double buffer design yet due to its significant implementation
-complexity (especially around alignment), and until it does we throw a `bad_expected_access<void>`
-in a valueless due to exception situation as that seemed logical. [<a href="https://github.com/ned14/boost.outcome/issues/11">issue #11</a>]
- \note By default Outcome static asserts if you use any `basic_monad` with a type or types
-which have throwing move constructors, warning you that in that use case you must write code
-to cope with valueless due to exception. These static asserts can be disabled using a type trait,
-but this default will prevent accidental surprises when using Outcome's non-conforming
-Expected implementation.
-2. Some new interesting tests have been added to the LEWG Expected test suite since
+1. Some new interesting tests have been added to the LEWG Expected test suite since
 P0323R1. These will be added to Outcome's copy of the same.
 
 Some deviations from P0323R1 are not expected to be changed any time soon:

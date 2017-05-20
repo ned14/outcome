@@ -555,43 +555,6 @@ BOOST_AUTO_TEST_CASE(works / monad / fileopen, "Tests that the monad semanticall
 #endif
 
 #ifdef __cpp_exceptions
-BOOST_AUTO_TEST_SUITE_END()
-struct Except
-{
-  int n;
-  Except() = delete;
-  Except(const Except & /*unused*/) noexcept(false)
-      : n(0)
-  {
-  }
-  Except(Except && /*unused*/) noexcept(false)
-      : n(0)
-  {
-  }
-  Except &operator=(const Except & /*unused*/) noexcept(false) { return *this; }
-  Except &operator=(Except && /*unused*/) noexcept(false) { return *this; }
-  ~Except() noexcept(false) { n = 0; }
-};
-struct throwing_udt
-{
-  std::string a;
-  explicit throwing_udt(std::string _a)
-      : a(std::move(_a))
-  {
-  }
-  throwing_udt() = delete;
-  throwing_udt(const throwing_udt & /*unused*/) { throw std::logic_error("copy"); }
-  throwing_udt(throwing_udt && /*unused*/) noexcept(false) { throw std::logic_error("move"); }
-  throwing_udt &operator=(const throwing_udt & /*unused*/) { throw std::logic_error("copy"); }
-  throwing_udt &operator=(throwing_udt && /*unused*/) noexcept(false) { throw std::logic_error("move"); }
-  ~throwing_udt() { a.clear(); }
-};
-BOOST_OUTCOME_V1_NAMESPACE_BEGIN
-template <> constexpr bool enable_move_throwing_type<Except> = true;
-template <> constexpr bool enable_move_throwing_type<throwing_udt> = true;
-BOOST_OUTCOME_V1_NAMESPACE_END
-BOOST_AUTO_TEST_SUITE(all)
-
 // std nothrow traits seem to return random values if exceptions are disabled on MSVC
 BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly inherits noexcept from its type R")
 {
@@ -644,6 +607,22 @@ BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly i
     BOOST_CHECK(std::is_nothrow_destructible<type>::value == std::is_nothrow_destructible<std::string>::value);
   }
   {
+    struct Except
+    {
+      int n;
+      Except() = delete;
+      Except(const Except & /*unused*/) noexcept(false)
+          : n(0)
+      {
+      }
+      Except(Except && /*unused*/) noexcept(false)
+          : n(0)
+      {
+      }
+      Except &operator=(const Except & /*unused*/) noexcept(false) { return *this; }
+      Except &operator=(Except && /*unused*/) noexcept(false) { return *this; }
+      ~Except() noexcept(false) { n = 0; }
+    };
     using type = outcome<Except>;
     std::cout << "outcome<Except> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
     std::cout << "outcome<Except> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
@@ -654,14 +633,14 @@ BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly i
     BOOST_CHECK(type::is_nothrow_move_constructible == std::is_nothrow_move_constructible<type>::value);
     BOOST_CHECK(type::is_nothrow_copy_assignable == std::is_nothrow_copy_assignable<type>::value);
     BOOST_CHECK(type::is_nothrow_move_assignable == std::is_nothrow_move_assignable<type>::value);
-#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER != 191025017 /* VS2017 RTM */)
+#if defined(__c2__) || (!defined(_MSC_VER) || (_MSC_FULL_VER != 191025017 /* VS2017 RTM */ && _MSC_FULL_VER != 191025019 /* VS2017 Update 1 */))
     BOOST_CHECK(type::is_nothrow_destructible == std::is_nothrow_destructible<type>::value);
 #endif
     BOOST_CHECK(!std::is_nothrow_copy_constructible<type>::value);
     BOOST_CHECK(!std::is_nothrow_move_constructible<type>::value);
     BOOST_CHECK(!std::is_nothrow_copy_assignable<type>::value);
     BOOST_CHECK(!std::is_nothrow_move_assignable<type>::value);
-#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER != 191025017 /* VS2017 RTM */)
+#if defined(__c2__) || (!defined(_MSC_VER) || (_MSC_FULL_VER != 191025017 /* VS2017 RTM */ && _MSC_FULL_VER != 191025019 /* VS2017 Update 1 */))
     BOOST_CHECK(!std::is_nothrow_destructible<type>::value);
 #endif
   }
@@ -693,7 +672,20 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
 #ifdef __cpp_exceptions
   // Emplace construct, throws during move and copy
   {
-    using udt = throwing_udt;
+    struct udt
+    {
+      std::string a;
+      explicit udt(std::string _a)
+          : a(std::move(_a))
+      {
+      }
+      udt() = delete;
+      udt(const udt & /*unused*/) { throw std::logic_error("copy"); }
+      udt(udt && /*unused*/) noexcept(false) { throw std::logic_error("move"); }
+      udt &operator=(const udt & /*unused*/) { throw std::logic_error("copy"); }
+      udt &operator=(udt && /*unused*/) noexcept(false) { throw std::logic_error("move"); }
+      ~udt() { a.clear(); }
+    };
     static_assert(!std::is_default_constructible<udt>::value, "udt is default constructible");
     static_assert(std::is_copy_constructible<udt>::value, "udt is not copy constructible");
     static_assert(std::is_move_constructible<udt>::value, "udt is not move constructible");
@@ -748,7 +740,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
       catch(const std::logic_error &e)
       {
         BOOST_CHECK(!strcmp(e.what(), "copy"));
-        BOOST_CHECK(foo2.empty());
+        BOOST_CHECK(foo2.get().a == "douglas");
       }
       catch(...)
       {
@@ -767,7 +759,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
       catch(const std::logic_error &e)
       {
         BOOST_CHECK(!strcmp(e.what(), "move"));
-        BOOST_CHECK(foo2.empty());
+        BOOST_CHECK(foo2.get().a == "douglas");
       }
       catch(...)
       {
@@ -1327,6 +1319,81 @@ BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .err
   BOOST_CHECK(*e2 == b);
   BOOST_CHECK(*n.error() == nullptr);  // NOLINT
 }
+
+#ifdef __cpp_exceptions
+BOOST_AUTO_TEST_CASE(issues / 11, "Changing state should never cause an empty state")
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::experimental;
+  const char *a = "hi", *b = "bye";
+  // A value type which behaves normally
+  struct value  // NOLINT
+  {
+    const char *_v{nullptr};
+    value() = default;
+    constexpr explicit value(const char *v) noexcept : _v(v) {}
+    value(value &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    value(const value &) = default;
+    value &operator=(value &&o) noexcept
+    {
+      _v = o._v;
+      o._v = nullptr;
+      return *this;
+    }
+    value &operator=(const value &o) = default;
+    constexpr const char *operator*() const noexcept { return _v; }
+  };
+  // An error type which throws on move
+  struct error  // NOLINT
+  {
+    const char *_v{nullptr};
+    error() = default;
+    constexpr explicit error(const char *v) noexcept : _v(v) {}
+    error(error &&o)  // NOLINT
+    {
+      if(o._v == nullptr)
+      {
+        throw std::runtime_error("error move constructor");
+      }
+    }
+    error(const error & /*unused*/) { throw std::runtime_error("error copy constructor"); }
+    error &operator=(error && /*unused*/) { throw std::runtime_error("error move assignment"); }  // NOLINT
+    error &operator=(const error & /*unused*/) { throw std::runtime_error("error copy assignment"); }
+    constexpr const char *operator*() const noexcept { return _v; }
+  };
+  {
+    expected<value, error> x(in_place, a), y(error{b});
+    BOOST_CHECK(x && *x.value() == a);
+    BOOST_CHECK(!y && *y.error() == nullptr);
+    try
+    {
+      x = y;  // invokes copy constructor as changing state
+      BOOST_REQUIRE(false);
+    }
+    catch(const std::runtime_error &e)
+    {
+      BOOST_CHECK(std::string(e.what()) == "error copy constructor");
+    }
+    BOOST_CHECK(x && *x.value() == a);
+    BOOST_CHECK(!y && *y.error() == nullptr);
+  }
+  {
+    expected<value, error> x(in_place, a), y(error{b});
+    BOOST_CHECK(x && *x.value() == a);
+    BOOST_CHECK(!y && *y.error() == nullptr);
+    try
+    {
+      x = std::move(y);  // invokes move constructor as changing state
+      BOOST_REQUIRE(false);
+    }
+    catch(const std::runtime_error &e)
+    {
+      BOOST_CHECK(std::string(e.what()) == "error move constructor");
+    }
+    BOOST_CHECK(x && *x.value() == a);
+    BOOST_CHECK(!y && *y.error() == nullptr);  // NOLINT
+  }
+}
+#endif
 
 #if 0  // Known bug, will be fixed when we refactor Expected storage to never have empty state
 BOOST_AUTO_TEST_CASE(issues / 12, "basic_monad's copy assignment gets instantiated even when type T cannot be copied")

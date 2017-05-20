@@ -89,6 +89,45 @@ namespace detail
   {
     static constexpr bool value = enable_single_byte_value_storage<_value_type>;
   };
+  // Helper to change the state of the value storage in a never-empty fashion where possible
+  template <bool enable, class P, class T, class S> struct do_change_state
+  {
+    BOOST_OUTCOME_CONSTEXPR do_change_state(P * /*unused*/, T && /*unused*/, S /*unused*/) {}
+    void dismiss() {}
+  };
+  template <class P, class T, class S> struct do_change_state<true, P, T, S>
+  {
+    // existing has a nothrow move or copy constructor, so preserve here before changing state
+    P *_parent;
+    T _old, *_prev;
+    S _state;
+    bool _success;
+    BOOST_OUTCOME_CONSTEXPR do_change_state(P *parent, T &&existing, S state)
+        : _parent(parent)
+        , _old(std::move(existing))
+        , _prev(&existing)
+        , _state(state)
+        , _success(false)
+    {
+    }
+    void dismiss() { _success = true; }
+    ~do_change_state()
+    {
+      if(!_success)
+      {
+        // An exception threw during the op, so restore previous state
+        new(_prev) T(std::move(_old));
+        _parent->type = _state;
+      }
+    }
+  };
+  template <bool disable, class P, class T, class U> void change_state(P *self, T &&existing, U &op)
+  {
+    auto state = self->type;
+    do_change_state<!disable && ((std::is_move_constructible<T>::value && std::is_nothrow_move_constructible<T>::value) || (!std::is_move_constructible<T>::value && std::is_copy_constructible<T>::value && std::is_nothrow_copy_constructible<T>::value)), P, T, decltype(state)> restore(self, std::move(existing), state);
+    op();
+    restore.dismiss();
+  }
 #define BOOST_OUTCOME_VALUE_STORAGE_IMPL value_storage_impl_trivial
 #define BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR 0
 #include "detail/value_storage.ipp"

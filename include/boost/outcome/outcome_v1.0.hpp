@@ -1009,9 +1009,9 @@ extern "C" void _mm_pause();
 
 
 #define BOOST_OUTCOME_V1_ERROR_CODE_IMPL std
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_REF 0c73108cf6f30893a087eb5024f9c7021af38cf2
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_DATE "2017-05-18 23:47:56 +00:00"
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE 0c73108c
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_REF 51d08d35ca0437c14934afbc5df011e03baf1949
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_DATE "2017-05-19 18:21:32 +00:00"
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE 51d08d35
 #define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL, BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE), inline)
 
 
@@ -1188,7 +1188,7 @@ using ::std::generic_category;
 } } } }
 
 #endif
-namespace boost { namespace outcome { inline namespace _1_0_std_std_0c73108c {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_51d08d35 {
 namespace stl11
 {
   using namespace boost_lite::bind::std::system_error;
@@ -1455,7 +1455,7 @@ _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(l
 #define BOOST_OUTCOME_THROW(expr) throw expr
 #else
 #include <stdio.h>
-namespace boost { namespace outcome { inline namespace _1_0_std_std_0c73108c {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_51d08d35 {
 namespace detail
 {
   BOOSTLITE_NORETURN inline void do_fatal_exit(const char *expr)
@@ -1524,7 +1524,7 @@ namespace detail
 
 
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_0c73108c {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_51d08d35 {
 
 
 enum class bad_outcome_errc
@@ -1610,11 +1610,11 @@ inline stl11::error_condition make_error_condition(bad_outcome_errc e)
 namespace std
 {
 
-  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_0c73108c::bad_outcome_errc> : std::true_type
+  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_51d08d35::bad_outcome_errc> : std::true_type
   {
   };
 
-  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_0c73108c::bad_outcome_errc> : std::true_type
+  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_51d08d35::bad_outcome_errc> : std::true_type
   {
   };
 }
@@ -2438,7 +2438,7 @@ namespace ringbuffer_log
 #define BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE 4096
 #endif
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_0c73108c {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_51d08d35 {
 
 
 inline boost_lite::ringbuffer_log::simple_ringbuffer_log<BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE> &extended_error_code_log()
@@ -2616,7 +2616,7 @@ inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec)
 
 
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_0c73108c {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_51d08d35 {
 
 
 struct empty_t
@@ -2678,6 +2678,45 @@ namespace detail
   {
     static constexpr bool value = enable_single_byte_value_storage<_value_type>;
   };
+
+  template <bool enable, class P, class T, class S> struct do_change_state
+  {
+    BOOST_OUTCOME_CONSTEXPR do_change_state(P * , T && , S ) {}
+    void dismiss() {}
+  };
+  template <class P, class T, class S> struct do_change_state<true, P, T, S>
+  {
+
+    P *_parent;
+    T _old, *_prev;
+    S _state;
+    bool _success;
+    BOOST_OUTCOME_CONSTEXPR do_change_state(P *parent, T &&existing, S state)
+        : _parent(parent)
+        , _old(std::move(existing))
+        , _prev(&existing)
+        , _state(state)
+        , _success(false)
+    {
+    }
+    void dismiss() { _success = true; }
+    ~do_change_state()
+    {
+      if(!_success)
+      {
+
+        new(_prev) T(std::move(_old));
+        _parent->type = _state;
+      }
+    }
+  };
+  template <bool disable, class P, class T, class U> void change_state(P *self, T &&existing, U &op)
+  {
+    auto state = self->type;
+    do_change_state<!disable && ((std::is_move_constructible<T>::value && std::is_nothrow_move_constructible<T>::value) || (!std::is_move_constructible<T>::value && std::is_copy_constructible<T>::value && std::is_nothrow_copy_constructible<T>::value)), P, T, decltype(state)> restore(self, std::move(existing), state);
+    op();
+    restore.dismiss();
+  }
 #define BOOST_OUTCOME_VALUE_STORAGE_IMPL value_storage_impl_trivial
 #define BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR 0
 template <class _value_type, class _error_type, class _exception_type, bool use_single_byte = _enable_single_byte_value_storage<_value_type>::value> class value_storage_impl_trivial
@@ -2813,168 +2852,203 @@ public:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  BOOST_OUTCOME_CONSTEXPR value_storage_impl_trivial(const value_storage_impl_trivial &o) noexcept(is_nothrow_copy_constructible)
+      : _empty(empty_type())
+      , type(storage_type::empty)
+  {
+    switch(o.type)
+    {
+    case storage_type::empty:
+      break;
+    case storage_type::value:
+      new(&value) value_type(o.value);
+      break;
+    case storage_type::error:
+      new(&error) error_type(o.error);
+      break;
+    case storage_type::exception:
+      new(&exception) exception_type(o.exception);
+      break;
+    }
+    type = o.type;
+  }
+  BOOST_OUTCOME_CONSTEXPR value_storage_impl_trivial(value_storage_impl_trivial &&o) noexcept(is_nothrow_move_constructible)
+      : _empty(empty_type())
+      , type(storage_type::empty)
+  {
+    switch(o.type)
+    {
+    case storage_type::empty:
+      break;
+    case storage_type::value:
+      new(&value) value_type(std::move(o.value));
+      break;
+    case storage_type::error:
+      new(&error) error_type(std::move(o.error));
+      break;
+    case storage_type::exception:
+      new(&exception) exception_type(std::move(o.exception));
+      break;
+    }
+    type = o.type;
+  }
+  BOOST_OUTCOME_CONSTEXPR value_storage_impl_trivial &operator=(const value_storage_impl_trivial &o) noexcept(is_nothrow_copy_assignable)
+  {
+    if(type == o.type)
+    {
+
+      switch(o.type)
+      {
+      case storage_type::empty:
+        break;
+      case storage_type::value:
+        value = o.value;
+        break;
+      case storage_type::error:
+        error = o.error;
+        break;
+      case storage_type::exception:
+        exception = o.exception;
+        break;
+      }
+    }
+    else
+    {
+      auto do_op = [&] {
+        clear();
+        new(this) value_storage_impl_trivial(o);
+      };
+      switch(type)
+      {
+      case storage_type::empty:
+        do_op();
+        break;
+      case storage_type::value:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(value), do_op);
+        break;
+      case storage_type::error:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(error), do_op);
+        break;
+      case storage_type::exception:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(exception), do_op);
+        break;
+      }
+    }
+    return *this;
+  }
+  BOOST_OUTCOME_CONSTEXPR value_storage_impl_trivial &operator=(value_storage_impl_trivial &&o) noexcept(is_nothrow_move_assignable)
+  {
+    if(type == o.type)
+    {
+
+      switch(o.type)
+      {
+      case storage_type::empty:
+        break;
+      case storage_type::value:
+        value = std::move(o.value);
+        break;
+      case storage_type::error:
+        error = std::move(o.error);
+        break;
+      case storage_type::exception:
+        exception = std::move(o.exception);
+        break;
+      }
+    }
+    else
+    {
+      auto do_op = [&] {
+        clear();
+        new(this) value_storage_impl_trivial(std::move(o));
+      };
+      switch(type)
+      {
+      case storage_type::empty:
+        do_op();
+        break;
+      case storage_type::value:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(value), do_op);
+        break;
+      case storage_type::error:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(error), do_op);
+        break;
+      case storage_type::exception:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(exception), do_op);
+        break;
+      }
+    }
+    return *this;
+  }
 
   template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args &&... args)
   {
-    clear();
-    new(&value) value_type(std::forward<Args>(args)...);
-    type = storage_type::value;
+    auto do_op = [&] {
+      clear();
+      new(&value) value_type(std::forward<Args>(args)...);
+      type = storage_type::value;
+    };
+    switch(type)
+    {
+    case storage_type::empty:
+      do_op();
+      break;
+    case storage_type::value:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(value), do_op);
+      break;
+    case storage_type::error:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(error), do_op);
+      break;
+    case storage_type::exception:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(exception), do_op);
+      break;
+    }
   }
   template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_error(Args &&... args)
   {
-    clear();
-    new(&error) error_type(std::forward<Args>(args)...);
-    type = storage_type::error;
+    auto do_op = [&] {
+      clear();
+      new(&error) error_type(std::forward<Args>(args)...);
+      type = storage_type::error;
+    };
+    switch(type)
+    {
+    case storage_type::empty:
+      do_op();
+      break;
+    case storage_type::value:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(value), do_op);
+      break;
+    case storage_type::error:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(error), do_op);
+      break;
+    case storage_type::exception:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(exception), do_op);
+      break;
+    }
   }
   template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_exception(Args &&... args)
   {
-    clear();
-    new(&exception) exception_type(std::forward<Args>(args)...);
-    type = storage_type::exception;
+    auto do_op = [&] {
+      clear();
+      new(&exception) exception_type(std::forward<Args>(args)...);
+      type = storage_type::exception;
+    };
+    switch(type)
+    {
+    case storage_type::empty:
+      do_op();
+      break;
+    case storage_type::value:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(value), do_op);
+      break;
+    case storage_type::error:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(error), do_op);
+      break;
+    case storage_type::exception:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(exception), do_op);
+      break;
+    }
   }
   BOOST_OUTCOME_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
   {
@@ -3280,9 +3354,16 @@ public:
   {
   }
 
+  ~value_storage_impl_nontrivial()
+#if defined(__c2__) || (!defined(_MSC_VER) || (_MSC_FULL_VER != 191025017 && _MSC_FULL_VER != 191025019 ))
+  noexcept(is_nothrow_destructible)
+#endif
+  {
+    clear();
+  }
 
-  value_storage_impl_nontrivial(const value_storage_impl_nontrivial &o)
-  noexcept(is_nothrow_copy_constructible)
+
+  BOOST_OUTCOME_CONSTEXPR value_storage_impl_nontrivial(const value_storage_impl_nontrivial &o) noexcept(is_nothrow_copy_constructible)
       : _empty(empty_type())
       , type(storage_type::empty)
   {
@@ -3302,54 +3383,7 @@ public:
     }
     type = o.type;
   }
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4297)
-#endif
-  value_storage_impl_nontrivial &operator=(const value_storage_impl_nontrivial &o) noexcept(is_nothrow_copy_assignable)
-  {
-    if(type == o.type)
-    {
-#ifdef __cpp_exceptions
-      try
-      {
-#endif
-        switch(o.type)
-        {
-        case storage_type::empty:
-          break;
-        case storage_type::value:
-          value = o.value;
-          break;
-        case storage_type::error:
-          error = o.error;
-          break;
-        case storage_type::exception:
-          exception = o.exception;
-          break;
-        }
-#ifdef __cpp_exceptions
-      }
-      catch(...)
-      {
-
-        clear();
-        throw;
-      }
-#endif
-    }
-    else
-    {
-      clear();
-      new(this) value_storage_impl_nontrivial(o);
-    }
-    return *this;
-  }
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-  value_storage_impl_nontrivial(value_storage_impl_nontrivial &&o)
-  noexcept(is_nothrow_move_constructible)
+  BOOST_OUTCOME_CONSTEXPR value_storage_impl_nontrivial(value_storage_impl_nontrivial &&o) noexcept(is_nothrow_move_constructible)
       : _empty(empty_type())
       , type(storage_type::empty)
   {
@@ -3369,88 +3403,163 @@ public:
     }
     type = o.type;
   }
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4297)
-#endif
-#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 6
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wterminate"
-#endif
-  value_storage_impl_nontrivial &operator=(value_storage_impl_nontrivial &&o) noexcept(is_nothrow_move_assignable)
+  BOOST_OUTCOME_CONSTEXPR value_storage_impl_nontrivial &operator=(const value_storage_impl_nontrivial &o) noexcept(is_nothrow_copy_assignable)
   {
     if(type == o.type)
     {
-#ifdef __cpp_exceptions
-      try
-      {
-#endif
-        switch(o.type)
-        {
-        case storage_type::empty:
-          break;
-        case storage_type::value:
-          value = std::move(o.value);
-          break;
-        case storage_type::error:
-          error = std::move(o.error);
-          break;
-        case storage_type::exception:
-          exception = std::move(o.exception);
-          break;
-        }
-#ifdef __cpp_exceptions
-      }
-      catch(...)
-      {
 
-        clear();
-
-        if(is_nothrow_move_assignable)
-          std::terminate();
-        else
-          throw;
+      switch(o.type)
+      {
+      case storage_type::empty:
+        break;
+      case storage_type::value:
+        value = o.value;
+        break;
+      case storage_type::error:
+        error = o.error;
+        break;
+      case storage_type::exception:
+        exception = o.exception;
+        break;
       }
-#endif
     }
     else
     {
-      clear();
-      new(this) value_storage_impl_nontrivial(std::move(o));
+      auto do_op = [&] {
+        clear();
+        new(this) value_storage_impl_nontrivial(o);
+      };
+      switch(type)
+      {
+      case storage_type::empty:
+        do_op();
+        break;
+      case storage_type::value:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(value), do_op);
+        break;
+      case storage_type::error:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(error), do_op);
+        break;
+      case storage_type::exception:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(exception), do_op);
+        break;
+      }
     }
     return *this;
   }
-#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 6
-#pragma GCC diagnostic pop
-#endif
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-  ~value_storage_impl_nontrivial()
-#if defined(__c2__) || (!defined(_MSC_VER) || (_MSC_FULL_VER != 191025017 && _MSC_FULL_VER != 191025019 ))
-  noexcept(is_nothrow_destructible)
-#endif
+  BOOST_OUTCOME_CONSTEXPR value_storage_impl_nontrivial &operator=(value_storage_impl_nontrivial &&o) noexcept(is_nothrow_move_assignable)
   {
-    clear();
+    if(type == o.type)
+    {
+
+      switch(o.type)
+      {
+      case storage_type::empty:
+        break;
+      case storage_type::value:
+        value = std::move(o.value);
+        break;
+      case storage_type::error:
+        error = std::move(o.error);
+        break;
+      case storage_type::exception:
+        exception = std::move(o.exception);
+        break;
+      }
+    }
+    else
+    {
+      auto do_op = [&] {
+        clear();
+        new(this) value_storage_impl_nontrivial(std::move(o));
+      };
+      switch(type)
+      {
+      case storage_type::empty:
+        do_op();
+        break;
+      case storage_type::value:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(value), do_op);
+        break;
+      case storage_type::error:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(error), do_op);
+        break;
+      case storage_type::exception:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(exception), do_op);
+        break;
+      }
+    }
+    return *this;
   }
 
   template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args &&... args)
   {
-    clear();
-    new(&value) value_type(std::forward<Args>(args)...);
-    type = storage_type::value;
+    auto do_op = [&] {
+      clear();
+      new(&value) value_type(std::forward<Args>(args)...);
+      type = storage_type::value;
+    };
+    switch(type)
+    {
+    case storage_type::empty:
+      do_op();
+      break;
+    case storage_type::value:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(value), do_op);
+      break;
+    case storage_type::error:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(error), do_op);
+      break;
+    case storage_type::exception:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(exception), do_op);
+      break;
+    }
   }
   template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_error(Args &&... args)
   {
-    clear();
-    new(&error) error_type(std::forward<Args>(args)...);
-    type = storage_type::error;
+    auto do_op = [&] {
+      clear();
+      new(&error) error_type(std::forward<Args>(args)...);
+      type = storage_type::error;
+    };
+    switch(type)
+    {
+    case storage_type::empty:
+      do_op();
+      break;
+    case storage_type::value:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(value), do_op);
+      break;
+    case storage_type::error:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(error), do_op);
+      break;
+    case storage_type::exception:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(exception), do_op);
+      break;
+    }
   }
   template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_exception(Args &&... args)
   {
-    clear();
-    new(&exception) exception_type(std::forward<Args>(args)...);
-    type = storage_type::exception;
+    auto do_op = [&] {
+      clear();
+      new(&exception) exception_type(std::forward<Args>(args)...);
+      type = storage_type::exception;
+    };
+    switch(type)
+    {
+    case storage_type::empty:
+      do_op();
+      break;
+    case storage_type::value:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(value), do_op);
+      break;
+    case storage_type::error:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(error), do_op);
+      break;
+    case storage_type::exception:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(exception), do_op);
+      break;
+    }
   }
   BOOST_OUTCOME_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
   {
@@ -3958,9 +4067,9 @@ public:
 namespace std
 {
 
-  template <class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, boost ::outcome ::_1_0_std_std_0c73108c::value_storage<_value_type, _error_type, _exception_type> &v)
+  template <class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, boost ::outcome ::_1_0_std_std_51d08d35::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_0c73108c;
+    using namespace boost ::outcome ::_1_0_std_std_51d08d35;
     switch(v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::value:
@@ -3970,9 +4079,9 @@ namespace std
     }
   }
 
-  template <class _value_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_0c73108c::value_storage<_value_type, void, void> &v)
+  template <class _value_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_51d08d35::value_storage<_value_type, void, void> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_0c73108c;
+    using namespace boost ::outcome ::_1_0_std_std_51d08d35;
     using _error_type = void;
     using _exception_type = void;
     switch(v.type)
@@ -3985,9 +4094,9 @@ namespace std
       return s << "(unknown)";
     }
   }
-  template <class _value_type, class _error_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_0c73108c::value_storage<_value_type, _error_type, void> &v)
+  template <class _value_type, class _error_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_51d08d35::value_storage<_value_type, _error_type, void> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_0c73108c;
+    using namespace boost ::outcome ::_1_0_std_std_51d08d35;
     using _exception_type = void;
     switch(v.type)
     {
@@ -4001,9 +4110,9 @@ namespace std
       return s << "(unknown)";
     }
   }
-  template <class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_0c73108c::value_storage<_value_type, _error_type, _exception_type> &v)
+  template <class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_51d08d35::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_0c73108c;
+    using namespace boost ::outcome ::_1_0_std_std_51d08d35;
     switch(v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::empty:
@@ -4127,7 +4236,7 @@ namespace std
 }
 
 #endif
-namespace boost { namespace outcome { inline namespace _1_0_std_std_0c73108c {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_51d08d35 {
 
 template <class implementation_policy> class basic_monad;
 
@@ -4163,10 +4272,6 @@ constexpr in_place_t in_place;
 
 
 template <class M> static constexpr bool is_monad = detail::is_monad<typename std::decay<M>::type>::value;
-
-
-template <class T>
-static constexpr bool enable_move_throwing_type = (std::is_move_constructible<T>::value && std::is_nothrow_move_constructible<T>::value) || (std::is_copy_constructible<T>::value && std::is_nothrow_copy_constructible<T>::value) || (!std::is_move_constructible<T>::value && !std::is_copy_constructible<T>::value);
 
 
 
@@ -4230,14 +4335,6 @@ public:
   };
 
   template <typename U> using rebind = typename implementation_policy::template rebind<U>;
-
-
-  static_assert(enable_move_throwing_type<value_type>,
-                "WARNING: value_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception every time a move happens. Either make your type never throw during moves, or specialise enable_move_throwing_type<T> to disable this check.");
-  static_assert(enable_move_throwing_type<error_type>,
-                "WARNING: error_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception every time a move happens. Either make your type never throw during moves, or specialise enable_move_throwing_type<T> to disable this check.");
-  static_assert(enable_move_throwing_type<exception_type>,
-                "WARNING: exception_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception every time a move happens. Either make your type never throw during moves, or specialise enable_move_throwing_type<T> to disable this check.");
 
 private:
   struct implicit_conversion_from_void_disabled
@@ -6365,9 +6462,6 @@ namespace policy
   {
     static_assert(!std::is_constructible<value_type, error_type>::value, "value_type cannot be constructible from error_type (Outcome requirement)");
     static_assert(!std::is_constructible<error_type, value_type>::value, "error_type cannot be constructible from value_type (Outcome requirement)");
-    static_assert((!std::is_copy_constructible<error_type>::value && !std::is_move_constructible<error_type>::value) || (std::is_move_constructible<error_type>::value && std::is_nothrow_move_constructible<error_type>::value) ||
-                  (std::is_copy_constructible<error_type>::value && std::is_nothrow_copy_constructible<error_type>::value),
-                  "error_type must be nothrow move constructible (LEWG Expected requirement)");
 
   protected:
     expected_policy_base() = delete;
@@ -6505,10 +6599,6 @@ namespace policy
 
   template <class monad_storage, class error_type> struct expected_policy_base_valueless : public monad_storage
   {
-    static_assert((!std::is_copy_constructible<error_type>::value && !std::is_move_constructible<error_type>::value) || (std::is_move_constructible<error_type>::value && std::is_nothrow_move_constructible<error_type>::value) ||
-                  (std::is_copy_constructible<error_type>::value && std::is_nothrow_copy_constructible<error_type>::value),
-                  "error_type must be nothrow move constructible (LEWG Expected requirement)");
-
   protected:
     expected_policy_base_valueless() = delete;
     expected_policy_base_valueless(const expected_policy_base_valueless &) = delete;
@@ -6885,7 +6975,7 @@ using experimental::as_void;
 namespace std
 {
 
-  template <class Impl> inline void swap(boost ::outcome ::_1_0_std_std_0c73108c::basic_monad<Impl> &a, boost ::outcome ::_1_0_std_std_0c73108c::basic_monad<Impl> &b) { a.swap(b); }
+  template <class Impl> inline void swap(boost ::outcome ::_1_0_std_std_51d08d35::basic_monad<Impl> &a, boost ::outcome ::_1_0_std_std_51d08d35::basic_monad<Impl> &b) { a.swap(b); }
 }
 
 #define BOOST_OUTCOME__GLUE2(x, y) x##y

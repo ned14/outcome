@@ -34,9 +34,6 @@ namespace policy
   {
     static_assert(!std::is_constructible<value_type, error_type>::value, "value_type cannot be constructible from error_type (Outcome requirement)");
     static_assert(!std::is_constructible<error_type, value_type>::value, "error_type cannot be constructible from value_type (Outcome requirement)");
-    static_assert((!std::is_copy_constructible<error_type>::value && !std::is_move_constructible<error_type>::value) || (std::is_move_constructible<error_type>::value && std::is_nothrow_move_constructible<error_type>::value) ||
-                  (std::is_copy_constructible<error_type>::value && std::is_nothrow_copy_constructible<error_type>::value),
-                  "error_type must be nothrow move constructible (LEWG Expected requirement)");
 
   protected:
     expected_policy_base() = delete;
@@ -174,10 +171,6 @@ namespace policy
   // Specialisation for T = void
   template <class monad_storage, class error_type> struct expected_policy_base_valueless : public monad_storage
   {
-    static_assert((!std::is_copy_constructible<error_type>::value && !std::is_move_constructible<error_type>::value) || (std::is_move_constructible<error_type>::value && std::is_nothrow_move_constructible<error_type>::value) ||
-                  (std::is_copy_constructible<error_type>::value && std::is_nothrow_copy_constructible<error_type>::value),
-                  "error_type must be nothrow move constructible (LEWG Expected requirement)");
-
   protected:
     expected_policy_base_valueless() = delete;
     expected_policy_base_valueless(const expected_policy_base_valueless &) = delete;
