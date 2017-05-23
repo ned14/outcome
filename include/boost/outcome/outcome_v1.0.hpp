@@ -1009,9 +1009,9 @@ extern "C" void _mm_pause();
 
 
 #define BOOST_OUTCOME_V1_ERROR_CODE_IMPL std
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_REF b507c466b259b740c7106b3e71704e3d42500f45
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_DATE "2017-05-20 01:15:19 +00:00"
-#define BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE b507c466
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_REF e8c262fa470d0b0bd6f42806833f86051f3b322e
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_DATE "2017-05-20 10:34:14 +00:00"
+#define BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE e8c262fa
 #define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL, BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE), inline)
 
 
@@ -1188,7 +1188,7 @@ using ::std::generic_category;
 } } } }
 
 #endif
-namespace boost { namespace outcome { inline namespace _1_0_std_std_b507c466 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_e8c262fa {
 namespace stl11
 {
   using namespace boost_lite::bind::std::system_error;
@@ -1247,6 +1247,9 @@ EXECINFO_DECL _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbol
 
 #if (!defined(BOOSTLITE_HEADERS_ONLY) || BOOSTLITE_HEADERS_ONLY == 1) && !0
 #define BOOSTLITE_INCLUDED_BY_HEADER 1
+#include <string.h>
+
+
 #if defined(__cplusplus) && !defined(__clang__)
 namespace win32
 {
@@ -1289,7 +1292,7 @@ namespace
 #if defined(__cplusplus) && !defined(__clang__)
   static void *dbghelp;
 #else
-  static HMODULE dbghelp;
+static HMODULE dbghelp;
 #endif
   static SymInitialize_t SymInitialize;
   static SymGetLineFromAddr64_t SymGetLineFromAddr64;
@@ -1455,7 +1458,7 @@ _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(l
 #define BOOST_OUTCOME_THROW(expr) throw expr
 #else
 #include <stdio.h>
-namespace boost { namespace outcome { inline namespace _1_0_std_std_b507c466 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_e8c262fa {
 namespace detail
 {
   BOOSTLITE_NORETURN inline void do_fatal_exit(const char *expr)
@@ -1524,7 +1527,7 @@ namespace detail
 
 
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_b507c466 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_e8c262fa {
 
 
 enum class bad_outcome_errc
@@ -1610,11 +1613,11 @@ inline stl11::error_condition make_error_condition(bad_outcome_errc e)
 namespace std
 {
 
-  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_b507c466::bad_outcome_errc> : std::true_type
+  template <> struct is_error_code_enum<boost ::outcome ::_1_0_std_std_e8c262fa::bad_outcome_errc> : std::true_type
   {
   };
 
-  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_b507c466::bad_outcome_errc> : std::true_type
+  template <> struct is_error_condition_enum<boost ::outcome ::_1_0_std_std_e8c262fa::bad_outcome_errc> : std::true_type
   {
   };
 }
@@ -2438,7 +2441,7 @@ namespace ringbuffer_log
 #define BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE 4096
 #endif
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_b507c466 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_e8c262fa {
 
 
 inline boost_lite::ringbuffer_log::simple_ringbuffer_log<BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE> &extended_error_code_log()
@@ -2616,7 +2619,7 @@ inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec)
 
 
 
-namespace boost { namespace outcome { inline namespace _1_0_std_std_b507c466 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_e8c262fa {
 
 
 struct empty_t
@@ -4067,9 +4070,9 @@ public:
 namespace std
 {
 
-  template <class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, boost ::outcome ::_1_0_std_std_b507c466::value_storage<_value_type, _error_type, _exception_type> &v)
+  template <class _value_type, class _error_type, class _exception_type> inline istream &operator>>(istream &s, boost ::outcome ::_1_0_std_std_e8c262fa::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_b507c466;
+    using namespace boost ::outcome ::_1_0_std_std_e8c262fa;
     switch(v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::value:
@@ -4079,9 +4082,9 @@ namespace std
     }
   }
 
-  template <class _value_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_b507c466::value_storage<_value_type, void, void> &v)
+  template <class _value_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_e8c262fa::value_storage<_value_type, void, void> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_b507c466;
+    using namespace boost ::outcome ::_1_0_std_std_e8c262fa;
     using _error_type = void;
     using _exception_type = void;
     switch(v.type)
@@ -4094,9 +4097,9 @@ namespace std
       return s << "(unknown)";
     }
   }
-  template <class _value_type, class _error_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_b507c466::value_storage<_value_type, _error_type, void> &v)
+  template <class _value_type, class _error_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_e8c262fa::value_storage<_value_type, _error_type, void> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_b507c466;
+    using namespace boost ::outcome ::_1_0_std_std_e8c262fa;
     using _exception_type = void;
     switch(v.type)
     {
@@ -4110,9 +4113,9 @@ namespace std
       return s << "(unknown)";
     }
   }
-  template <class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_b507c466::value_storage<_value_type, _error_type, _exception_type> &v)
+  template <class _value_type, class _error_type, class _exception_type> inline ostream &operator<<(ostream &s, const boost ::outcome ::_1_0_std_std_e8c262fa::value_storage<_value_type, _error_type, _exception_type> &v)
   {
-    using namespace boost ::outcome ::_1_0_std_std_b507c466;
+    using namespace boost ::outcome ::_1_0_std_std_e8c262fa;
     switch(v.type)
     {
     case value_storage<_value_type, _error_type, _exception_type>::storage_type::empty:
@@ -4236,7 +4239,7 @@ namespace std
 }
 
 #endif
-namespace boost { namespace outcome { inline namespace _1_0_std_std_b507c466 {
+namespace boost { namespace outcome { inline namespace _1_0_std_std_e8c262fa {
 
 template <class implementation_policy> class basic_monad;
 
@@ -6975,7 +6978,7 @@ using experimental::as_void;
 namespace std
 {
 
-  template <class Impl> inline void swap(boost ::outcome ::_1_0_std_std_b507c466::basic_monad<Impl> &a, boost ::outcome ::_1_0_std_std_b507c466::basic_monad<Impl> &b) { a.swap(b); }
+  template <class Impl> inline void swap(boost ::outcome ::_1_0_std_std_e8c262fa::basic_monad<Impl> &a, boost ::outcome ::_1_0_std_std_e8c262fa::basic_monad<Impl> &b) { a.swap(b); }
 }
 
 #define BOOST_OUTCOME__GLUE2(x, y) x##y
