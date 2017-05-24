@@ -180,8 +180,8 @@ it's already been defaulted to that for us by Expected's definition:
 \snippet expected_try2.cpp expected_try2
 
 This eliminates the fragile switch statements converting between error code domains in
-favour of a information loss free transmission. The cost is once again a loss of type safety
-because a function might return an error code it should never be able to return and the
+favour of an information loss-free transmission. The cost is once again a loss of type safety
+because if a function might return an error code, it should never be able to return and the
 compiler will not complain.
 
 Mashing together both approaches we can solve the problem of type safety by making `MathError2`
