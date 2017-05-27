@@ -42,12 +42,12 @@ motivating example should clarify:
 
 \page prerequisites Prerequisites
 
-Outcome is a header only C++ 14 library known to work on these compilers or better:
-- clang 3.5 (LLVM)
-- clang 3.7 (with Microsoft Codegen)
-- GCC 5.4
-- VS2015 Update 2
-- Xcode 7.3
+Outcome is a header only C++ 14 library known to work on these compiler-platform combinations or better:
+- clang 3.5 (LLVM) [FreeBSD, Linux, OS X]
+- clang 3.7 (with Microsoft Codegen) [Windows]
+- GCC 5.4 [Linux]
+- VS2015 Update 2 [Windows]
+- Xcode 7.3 [OS X]
 
 **A copy of Boost is not required to use this library**. You can simply drop Outcome into
 your project and go.

@@ -162,7 +162,7 @@ public:
     }
     return written;
   }
-  //! Returns an array of strings describing the backtrace. You must free() this after use.
+  //! Returns an array of strings describing the backtrace. You must free() the pointer returned, not the individual char *'s, after use.
   char **backtrace() const noexcept
   {
     auto &log = extended_error_code_log();
