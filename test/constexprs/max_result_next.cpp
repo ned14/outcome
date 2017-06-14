@@ -1,12 +1,18 @@
 #include "../../include/boost/outcome.hpp"
 
+#ifdef __GNUC__
+#define WEAK __attribute__((weak))
+#else
+#define WEAK
+#endif
+
 using namespace boost::outcome;
-extern result<int> unknown();
-extern BOOSTLITE_NOINLINE result<int> test1()
+extern result<int> unknown() WEAK;
+extern QUICKCPPLIB_NOINLINE result<int> test1()
 {
   return unknown().next([](result<int> m) { return m.get()*3; });
 }
-extern BOOSTLITE_NOINLINE void test2()
+extern QUICKCPPLIB_NOINLINE void test2()
 {
 }
 

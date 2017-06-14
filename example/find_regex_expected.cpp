@@ -52,7 +52,7 @@ public:
     }
   }
 };
-static outcome::expected<mapped_string_view>
+static outcome::experimental::expected<mapped_string_view>
   map_file_into_memory(filesystem::path p) noexcept
 {
 #ifdef _WIN32
@@ -63,7 +63,7 @@ static outcome::expected<mapped_string_view>
                   nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
   if (INVALID_HANDLE_VALUE == fh)
   {
-    return outcome::make_unexpected(std::error_code(GetLastError(),
+    return outcome::experimental::make_unexpected(std::error_code(GetLastError(),
                                                     std::system_category()));
   }
   BY_HANDLE_FILE_INFORMATION bhfi;
@@ -72,7 +72,7 @@ static outcome::expected<mapped_string_view>
   {
     ec = GetLastError();
     CloseHandle(fh);
-    return outcome::make_unexpected(std::error_code(ec, std::system_category()));
+    return outcome::experimental::make_unexpected(std::error_code(ec, std::system_category()));
   }
   uint64_t length = ((uint64_t) bhfi.nFileSizeHigh << 32) | bhfi.nFileSizeLow;
   mh = CreateFileMapping(fh, nullptr, PAGE_READONLY, 0, 0, nullptr);
@@ -80,14 +80,14 @@ static outcome::expected<mapped_string_view>
   CloseHandle(fh);
   if (INVALID_HANDLE_VALUE == mh)
   {
-    return outcome::make_unexpected(std::error_code(ec, std::system_category()));
+    return outcome::experimental::make_unexpected(std::error_code(ec, std::system_category()));
   }
   char *addr = (char *) MapViewOfFile(mh, FILE_MAP_READ, 0, 0, 0);
   ec = GetLastError();
   CloseHandle(mh);
   if (!addr)
   {
-    return outcome::make_unexpected(std::error_code(ec, std::system_category()));
+    return outcome::experimental::make_unexpected(std::error_code(ec, std::system_category()));
   }
   return mapped_string_view(addr, (size_t) length);
 #else
@@ -95,7 +95,7 @@ static outcome::expected<mapped_string_view>
   fh = open(p.c_str(), O_RDONLY);
   if (-1 == fh)
   {
-    return outcome::make_unexpected(
+    return outcome::experimental::make_unexpected(
       std::error_code(errno, std::system_category()));
   }
   struct stat st;
@@ -104,7 +104,7 @@ static outcome::expected<mapped_string_view>
   {
     ec = errno;
     close(fh);
-    return outcome::make_unexpected(
+    return outcome::experimental::make_unexpected(
       std::error_code(ec, std::system_category()));
   }
   uint64_t length = st.st_size;
@@ -113,14 +113,14 @@ static outcome::expected<mapped_string_view>
   close(fh);
   if (!addr)
   {
-    return outcome::make_unexpected(
+    return outcome::experimental::make_unexpected(
       std::error_code(ec, std::system_category()));
   }
   return mapped_string_view(addr, (size_t)length);
 #endif
 }
 
-static outcome::expected<std::vector<filesystem::path>>
+static outcome::experimental::expected<std::vector<filesystem::path>>
   find_regex_in_files(const std::regex &re,
                       filesystem::directory_iterator dit,
                       size_t depth = 0) noexcept
@@ -135,7 +135,7 @@ static outcome::expected<std::vector<filesystem::path>>
         std::error_code ec;
         filesystem::directory_iterator nit(p.path(), ec);
         if (ec)
-          return outcome::make_unexpected(ec);
+          return outcome::experimental::make_unexpected(ec);
         BOOST_OUTCOME_TRY(results, find_regex_in_files(re,
                                                        std::move(nit),
                                                        depth + 1));
@@ -154,12 +154,12 @@ static outcome::expected<std::vector<filesystem::path>>
   }
   catch (const std::bad_alloc &)
   {
-    return outcome::make_unexpected(
+    return outcome::experimental::make_unexpected(
       std::make_error_code(std::errc::not_enough_memory));
   }
   catch (...)
   {
-    return outcome::make_unexpected(
+    return outcome::experimental::make_unexpected(
       std::make_error_code(std::errc::resource_unavailable_try_again));
   }
 }

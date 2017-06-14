@@ -33,8 +33,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../include/boost/outcome/outcome.hpp"
 
-#define BOOSTLITE_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
-#include "../boost-lite/include/boost/test/unit_test.hpp"
+#define QUICKCPPLIB_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
+#include "../quickcpplib/include/boost/test/unit_test.hpp"
 
 #include <algorithm>
 #include <cstdio>
@@ -50,7 +50,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 #ifdef __cpp_exceptions
-#include "../boost-lite/include/allocator_testing.hpp"
+#include "../quickcpplib/include/allocator_testing.hpp"
 #endif
 
 BOOST_AUTO_TEST_SUITE(all)
@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE(works / error_code_extended, "Tests that error_code_extende
 BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  using namespace boost_lite::tribool;
+  using namespace QUICKCPPLIB_NAMESPACE::tribool;
   static_assert(std::is_constructible<outcome<long>, int>::value, "Sanity check that monad can be constructed from a value_type");
   static_assert(std::is_constructible<outcome<outcome<long>>, int>::value, "Sanity check that outer monad can be constructed from an inner monad's value_type");
   static_assert(!std::is_constructible<outcome<outcome<outcome<long>>>, int>::value, "Sanity check that outer monad can not be constructed from an inner inner monad's value_type");
@@ -199,9 +199,9 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.get(), const monad_error &);
-    BOOST_CHECK_THROW(m.get_error(), const monad_error &);
-    BOOST_CHECK_THROW(m.get_exception(), const monad_error &);
+    BOOST_CHECK_THROW(m.get(), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_error(), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_exception(), const bad_outcome &);
   }
   {
     outcome<void> m;
@@ -211,9 +211,9 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(([&m]() -> void { return m.get(); }()), const monad_error &);
-    BOOST_CHECK_THROW(m.get_error(), const monad_error &);
-    BOOST_CHECK_THROW(m.get_exception(), const monad_error &);
+    BOOST_CHECK_THROW(([&m]() -> void { return m.get(); }()), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_error(), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_exception(), const bad_outcome &);
   }
   {
     outcome<int> m(5);
@@ -234,9 +234,9 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.get(), const monad_error &);
-    BOOST_CHECK_THROW(m.get_error(), const monad_error &);
-    BOOST_CHECK_THROW(m.get_exception(), const monad_error &);
+    BOOST_CHECK_THROW(m.get(), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_error(), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_exception(), const bad_outcome &);
   }
   {
     outcome<std::string> m("niall");
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(m.get() == "NIALL");
     auto temp(std::move(m).get());
     BOOST_CHECK(temp == "NIALL");
-    BOOST_CHECK(m.get().empty());
+    BOOST_CHECK(m.get().empty());  // NOLINT
     BOOST_CHECK(!m.get_error());
     BOOST_CHECK(!m.get_exception());
     m.clear();
@@ -274,9 +274,9 @@ BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.get(), const monad_error &);
-    BOOST_CHECK_THROW(m.get_error(), const monad_error &);
-    BOOST_CHECK_THROW(m.get_exception(), const monad_error &);
+    BOOST_CHECK_THROW(m.get(), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_error(), const bad_outcome &);
+    BOOST_CHECK_THROW(m.get_exception(), const bad_outcome &);
   }
   {
     error_code_extended ec(5, stl11::system_category());
@@ -402,13 +402,13 @@ BOOST_AUTO_TEST_CASE(works / monad / comparison, "Tests that the monad can compa
 static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::value_storage<int, void, void> test_constexpr2a(int f)
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  return value_storage<int, void, void>(f);
+  return value_storage<int, void, void>(f);  // NOLINT
 }
 // Test the underlying storage for constexpr
 static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::value_storage<void, void, void> test_constexpr2b()
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  return value_storage<void, void, void>();
+  return value_storage<void, void, void>();  // NOLINT
 }
 // Test option<int> for constexpr
 static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::option<int> test_constexpr3a(int f)
@@ -426,7 +426,7 @@ static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::option<bool> test_constexpr3
 BOOST_AUTO_TEST_CASE(works / monad / constexpr, "Tests that the monad works as intended in a constexpr evaluation context")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  using namespace boost_lite::tribool;
+  using namespace QUICKCPPLIB_NAMESPACE::tribool;
 
   static_assert(std::is_literal_type<value_storage<int, void, void>>::value, "value_storage<int, void, void> is not a literal type!");
   static_assert(std::is_literal_type<value_storage<void, void, void>>::value, "value_storage<void, void, void> is not a literal type!");
@@ -457,7 +457,7 @@ BOOST_AUTO_TEST_CASE(works / monad / constexpr, "Tests that the monad works as i
 BOOST_AUTO_TEST_CASE(works / monad / optional, "Tests that the monad acts as an optional R")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  using boost_lite::tribool::tribool;
+  using QUICKCPPLIB_NAMESPACE::tribool::tribool;
   std::cout << "sizeof(outcome<bool>) = " << sizeof(outcome<bool>) << std::endl;
   std::cout << "sizeof(result<bool>) = " << sizeof(result<bool>) << std::endl;
   std::cout << "sizeof(option<bool>) = " << sizeof(option<bool>) << std::endl;
@@ -497,7 +497,7 @@ BOOST_AUTO_TEST_CASE(works / monad / optional, "Tests that the monad acts as an 
   };
   auto a = maybe_getenv("SHOULDNEVEREXIST");
   BOOST_CHECK(!a);
-  BOOST_CHECK_THROW(a.value(), const monad_error &);
+  BOOST_CHECK_THROW(a.value(), const bad_outcome &);
   BOOST_CHECK(a.value_or(nullptr) == nullptr);
 #ifdef _WIN32
   auto b = maybe_getenv("HOMEPATH");
@@ -555,43 +555,6 @@ BOOST_AUTO_TEST_CASE(works / monad / fileopen, "Tests that the monad semanticall
 #endif
 
 #ifdef __cpp_exceptions
-BOOST_AUTO_TEST_SUITE_END()
-struct Except
-{
-  int n;
-  Except() = delete;
-  Except(const Except & /*unused*/) noexcept(false)
-      : n(0)
-  {
-  }
-  Except(Except && /*unused*/) noexcept(false)
-      : n(0)
-  {
-  }
-  Except &operator=(const Except & /*unused*/) noexcept(false) { return *this; }
-  Except &operator=(Except && /*unused*/) noexcept(false) { return *this; }
-  ~Except() noexcept(false) { n = 0; }
-};
-struct throwing_udt
-{
-  std::string a;
-  explicit throwing_udt(std::string _a)
-      : a(std::move(_a))
-  {
-  }
-  throwing_udt() = delete;
-  throwing_udt(const throwing_udt & /*unused*/) { throw std::logic_error("copy"); }
-  throwing_udt(throwing_udt && /*unused*/) noexcept(false) { throw std::logic_error("move"); }
-  throwing_udt &operator=(const throwing_udt & /*unused*/) { throw std::logic_error("copy"); }
-  throwing_udt &operator=(throwing_udt && /*unused*/) noexcept(false) { throw std::logic_error("move"); }
-  ~throwing_udt() { a.clear(); }
-};
-BOOST_OUTCOME_V1_NAMESPACE_BEGIN
-template <> constexpr bool enable_move_throwing_type<Except> = true;
-template <> constexpr bool enable_move_throwing_type<throwing_udt> = true;
-BOOST_OUTCOME_V1_NAMESPACE_END
-BOOST_AUTO_TEST_SUITE(all)
-
 // std nothrow traits seem to return random values if exceptions are disabled on MSVC
 BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly inherits noexcept from its type R")
 {
@@ -644,6 +607,22 @@ BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly i
     BOOST_CHECK(std::is_nothrow_destructible<type>::value == std::is_nothrow_destructible<std::string>::value);
   }
   {
+    struct Except
+    {
+      int n;
+      Except() = delete;
+      Except(const Except & /*unused*/) noexcept(false)
+          : n(0)
+      {
+      }
+      Except(Except && /*unused*/) noexcept(false)
+          : n(0)
+      {
+      }
+      Except &operator=(const Except & /*unused*/) noexcept(false) { return *this; }
+      Except &operator=(Except && /*unused*/) noexcept(false) { return *this; }
+      ~Except() noexcept(false) { n = 0; }
+    };
     using type = outcome<Except>;
     std::cout << "outcome<Except> is_nothrow_copy_constructible=" << type::is_nothrow_copy_constructible << std::endl;
     std::cout << "outcome<Except> is_nothrow_move_constructible=" << type::is_nothrow_move_constructible << std::endl;
@@ -654,14 +633,14 @@ BOOST_AUTO_TEST_CASE(works / monad / noexcept, "Tests that the monad correctly i
     BOOST_CHECK(type::is_nothrow_move_constructible == std::is_nothrow_move_constructible<type>::value);
     BOOST_CHECK(type::is_nothrow_copy_assignable == std::is_nothrow_copy_assignable<type>::value);
     BOOST_CHECK(type::is_nothrow_move_assignable == std::is_nothrow_move_assignable<type>::value);
-#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER != 191025017 /* VS2017 RTM */)
+#if defined(__c2__) || (!defined(_MSC_VER) || (_MSC_FULL_VER != 191025017 /* VS2017 RTM */ && _MSC_FULL_VER != 191025019 /* VS2017 Update 1 */))
     BOOST_CHECK(type::is_nothrow_destructible == std::is_nothrow_destructible<type>::value);
 #endif
     BOOST_CHECK(!std::is_nothrow_copy_constructible<type>::value);
     BOOST_CHECK(!std::is_nothrow_move_constructible<type>::value);
     BOOST_CHECK(!std::is_nothrow_copy_assignable<type>::value);
     BOOST_CHECK(!std::is_nothrow_move_assignable<type>::value);
-#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER != 191025017 /* VS2017 RTM */)
+#if defined(__c2__) || (!defined(_MSC_VER) || (_MSC_FULL_VER != 191025017 /* VS2017 RTM */ && _MSC_FULL_VER != 191025019 /* VS2017 Update 1 */))
     BOOST_CHECK(!std::is_nothrow_destructible<type>::value);
 #endif
   }
@@ -693,7 +672,20 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
 #ifdef __cpp_exceptions
   // Emplace construct, throws during move and copy
   {
-    using udt = throwing_udt;
+    struct udt
+    {
+      std::string a;
+      explicit udt(std::string _a)
+          : a(std::move(_a))
+      {
+      }
+      udt() = delete;
+      udt(const udt & /*unused*/) { throw std::logic_error("copy"); }
+      udt(udt && /*unused*/) noexcept(false) { throw std::logic_error("move"); }
+      udt &operator=(const udt & /*unused*/) { throw std::logic_error("copy"); }
+      udt &operator=(udt && /*unused*/) noexcept(false) { throw std::logic_error("move"); }
+      ~udt() { a.clear(); }
+    };
     static_assert(!std::is_default_constructible<udt>::value, "udt is default constructible");
     static_assert(std::is_copy_constructible<udt>::value, "udt is not copy constructible");
     static_assert(std::is_move_constructible<udt>::value, "udt is not move constructible");
@@ -736,7 +728,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
     {
       BOOST_CHECK(false);
     }
-    BOOST_CHECK("niall" == foo.get().a);
+    BOOST_CHECK("niall" == foo.get().a);  // NOLINT
     // Does throwing during copy assignment work?
     {
       outcome<udt> foo2(in_place, "douglas");
@@ -748,7 +740,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
       catch(const std::logic_error &e)
       {
         BOOST_CHECK(!strcmp(e.what(), "copy"));
-        BOOST_CHECK(foo2.empty());
+        BOOST_CHECK(foo2.get().a == "douglas");
       }
       catch(...)
       {
@@ -767,13 +759,13 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
       catch(const std::logic_error &e)
       {
         BOOST_CHECK(!strcmp(e.what(), "move"));
-        BOOST_CHECK(foo2.empty());
+        BOOST_CHECK(foo2.get().a == "douglas");
       }
       catch(...)
       {
         BOOST_CHECK(false);
       }
-      BOOST_CHECK("niall" == foo.get().a);
+      BOOST_CHECK("niall" == foo.get().a);  // NOLINT
     }
   }
 #endif
@@ -1021,7 +1013,7 @@ BOOST_AUTO_TEST_CASE(works / monad / unwrap, "Tests that the monad unwraps as in
   BOOST_CHECK((std::is_same<decltype(b), decltype(l)>::value));
   BOOST_CHECK(k.get() == "niall");
   BOOST_CHECK(l.get_error() == ec);
-  BOOST_CHECK(g.get().get().get().get().empty());
+  BOOST_CHECK(g.get().get().get().get().empty());  // NOLINT
 }
 
 BOOST_AUTO_TEST_CASE(works / monad / bind, "Tests that the monad continues with bind() as intended")
@@ -1153,16 +1145,12 @@ BOOST_AUTO_TEST_CASE(works / monad / match, "Tests that the monad matches as int
   //! [monad_match_example]
   struct o_type
   {
-    int expected;
+    int expected{0};
     // monad.match() will call an overload for each possible content it might have
     void operator()(int /*unused*/) const { BOOST_CHECK(expected == 1); }
     void operator()(error_code_extended /*unused*/) const { BOOST_CHECK(expected == 2); }
     void operator()(std::exception_ptr /*unused*/) const { BOOST_CHECK(expected == 3); }  // NOLINT
     void operator()(outcome<int>::empty_type /*unused*/) const { BOOST_CHECK(expected == 4); }
-    o_type()
-        : expected(0)
-    {
-    }
   } o;
   error_code_extended ec;
   std::exception_ptr e;
@@ -1231,9 +1219,9 @@ BOOST_AUTO_TEST_CASE(works / monad / operators, "Tests that the monad custom ope
 BOOST_AUTO_TEST_CASE(issues / 7, "BOOST_OUTCOME_TRYV(expr) in a function whose return monad's type has no default constructor fails to compile")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  struct udt
+  struct udt  // NOLINT
   {
-    udt(int) {}
+    explicit udt(int /*unused*/) {}
     //    udt() = delete;
     udt(const udt &) = default;
     udt(udt &&) = default;
@@ -1254,9 +1242,9 @@ BOOST_AUTO_TEST_CASE(issues / 7, "BOOST_OUTCOME_TRYV(expr) in a function whose r
 BOOST_AUTO_TEST_CASE(issues / 9, "Alternative TRY macros?")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  struct udt
+  struct udt  // NOLINT
   {
-    udt(int) {}
+    explicit udt(int /*unused*/) {}
     //    udt() = delete;
     udt(const udt &) = default;
     udt(udt &&) = default;
@@ -1271,16 +1259,16 @@ BOOST_AUTO_TEST_CASE(issues / 9, "Alternative TRY macros?")
 
 BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .error() throw exceptions when they should not")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::experimental;
   const char *a = "hi", *b = "bye";
-  struct udt1
+  struct udt1  // NOLINT
   {
-    const char *_v;
-    constexpr udt1() noexcept : _v(nullptr) {}
-    constexpr udt1(const char *v) noexcept : _v(v) {}
-    BOOST_OUTCOME_CONSTEXPR udt1(udt1 &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    const char *_v{nullptr};
+    udt1() = default;
+    constexpr explicit udt1(const char *v) noexcept : _v(v) {}
+    QUICKCPPLIB_CONSTEXPR udt1(udt1 &&o) noexcept : _v(o._v) { o._v = nullptr; }
     udt1(const udt1 &) = default;
-    BOOST_OUTCOME_CONSTEXPR udt1 &operator=(udt1 &&o) noexcept
+    QUICKCPPLIB_CONSTEXPR udt1 &operator=(udt1 &&o) noexcept
     {
       _v = o._v;
       o._v = nullptr;
@@ -1289,14 +1277,14 @@ BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .err
     udt1 &operator=(const udt1 &) = delete;
     constexpr const char *operator*() const noexcept { return _v; }
   };
-  struct udt2
+  struct udt2  // NOLINT
   {
-    const char *_v;
-    constexpr udt2() noexcept : _v(nullptr) {}
-    constexpr udt2(const char *v) noexcept : _v(v) {}
-    BOOST_OUTCOME_CONSTEXPR udt2(udt2 &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    const char *_v{nullptr};
+    udt2() = default;
+    constexpr explicit udt2(const char *v) noexcept : _v(v) {}
+    QUICKCPPLIB_CONSTEXPR udt2(udt2 &&o) noexcept : _v(o._v) { o._v = nullptr; }
     udt2(const udt2 &) = default;
-    BOOST_OUTCOME_CONSTEXPR udt2 &operator=(udt2 &&o) noexcept
+    QUICKCPPLIB_CONSTEXPR udt2 &operator=(udt2 &&o) noexcept
     {
       _v = o._v;
       o._v = nullptr;
@@ -1305,7 +1293,8 @@ BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .err
     udt1 &operator=(const udt1 &) = delete;
     constexpr const char *operator*() const noexcept { return _v; }
   };
-  expected<udt1, udt2> p{udt1(a)}, n(make_unexpected(udt2(b)));
+  expected<udt1, udt2> p(udt1{a});
+  expected<udt1, udt2> n(make_unexpected(udt2(b)));
   // State check
   BOOST_CHECK(p.has_value());
   BOOST_CHECK(!n.has_value());
@@ -1324,26 +1313,100 @@ BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .err
   BOOST_CHECK(**p == nullptr);
   udt2 e2(std::move(n).error());
   BOOST_CHECK(*e2 == b);
-  BOOST_CHECK(*n.error() == nullptr);
+  BOOST_CHECK(*n.error() == nullptr);  // NOLINT
   n.set_error(udt2(b));
   e2 = std::move(n).error_or(udt2(a));
   BOOST_CHECK(*e2 == b);
-  BOOST_CHECK(*n.error() == nullptr);
+  BOOST_CHECK(*n.error() == nullptr);  // NOLINT
 }
 
-#if 0  // Known bug, will be fixed when we refactor Expected storage to never have empty state
+#ifdef __cpp_exceptions
+BOOST_AUTO_TEST_CASE(issues / 11, "Changing state should never cause an empty state")
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::experimental;
+  const char *a = "hi", *b = "bye";
+  // A value type which behaves normally
+  struct value  // NOLINT
+  {
+    const char *_v{nullptr};
+    value() = default;
+    constexpr explicit value(const char *v) noexcept : _v(v) {}
+    value(value &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    value(const value &) = default;
+    value &operator=(value &&o) noexcept
+    {
+      _v = o._v;
+      o._v = nullptr;
+      return *this;
+    }
+    value &operator=(const value &o) = default;
+    constexpr const char *operator*() const noexcept { return _v; }
+  };
+  // An error type which throws on move
+  struct error  // NOLINT
+  {
+    const char *_v{nullptr};
+    error() = default;
+    constexpr explicit error(const char *v) noexcept : _v(v) {}
+    error(error &&o)  // NOLINT
+    {
+      if(o._v == nullptr)
+      {
+        throw std::runtime_error("error move constructor");
+      }
+    }
+    error(const error & /*unused*/) { throw std::runtime_error("error copy constructor"); }
+    error &operator=(error && /*unused*/) { throw std::runtime_error("error move assignment"); }  // NOLINT
+    error &operator=(const error & /*unused*/) { throw std::runtime_error("error copy assignment"); }
+    constexpr const char *operator*() const noexcept { return _v; }
+  };
+  {
+    expected<value, error> x(in_place, a), y(error{b});
+    BOOST_CHECK(x && *x.value() == a);
+    BOOST_CHECK(!y && *y.error() == nullptr);
+    try
+    {
+      x = y;  // invokes copy constructor as changing state
+      BOOST_REQUIRE(false);
+    }
+    catch(const std::runtime_error &e)
+    {
+      BOOST_CHECK(std::string(e.what()) == "error copy constructor");
+    }
+    BOOST_CHECK(x && *x.value() == a);
+    BOOST_CHECK(!y && *y.error() == nullptr);
+  }
+  {
+    expected<value, error> x(in_place, a), y(error{b});
+    BOOST_CHECK(x && *x.value() == a);
+    BOOST_CHECK(!y && *y.error() == nullptr);
+    try
+    {
+      x = std::move(y);  // invokes move constructor as changing state
+      BOOST_REQUIRE(false);
+    }
+    catch(const std::runtime_error &e)
+    {
+      BOOST_CHECK(std::string(e.what()) == "error move constructor");
+    }
+    BOOST_CHECK(x && *x.value() == a);
+    BOOST_CHECK(!y && *y.error() == nullptr);  // NOLINT
+  }
+}
+#endif
+
 BOOST_AUTO_TEST_CASE(issues / 12, "basic_monad's copy assignment gets instantiated even when type T cannot be copied")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::experimental;
   const char *s = "hi";
-  struct udt
+  struct udt  // NOLINT
   {
-    const char *_v;
-    constexpr udt() noexcept : _v(nullptr) {}
-    constexpr udt(const char *v) noexcept : _v(v) {}
-    BOOST_OUTCOME_CONSTEXPR udt(udt &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    const char *_v{nullptr};
+    udt() = default;
+    constexpr explicit udt(const char *v) noexcept : _v(v) {}
+    QUICKCPPLIB_CONSTEXPR udt(udt &&o) noexcept : _v(o._v) { o._v = nullptr; }
     udt(const udt &) = delete;
-    BOOST_OUTCOME_CONSTEXPR udt &operator=(udt &&o) noexcept
+    QUICKCPPLIB_CONSTEXPR udt &operator=(udt &&o) noexcept
     {
       _v = o._v;
       o._v = nullptr;
@@ -1354,8 +1417,31 @@ BOOST_AUTO_TEST_CASE(issues / 12, "basic_monad's copy assignment gets instantiat
   };
   static_assert(expected<udt>::is_move_constructible, "expected<udt> is not move constructible!");
   static_assert(!expected<udt>::is_copy_constructible, "expected<udt> is copy constructible!");
-  expected<udt> p(s), n(make_unexpected(std::error_code(ENOMEM, std::generic_category())));
+  expected<udt> p(udt{s}), n(make_unexpected(std::error_code(ENOMEM, std::generic_category())));
   n = make_unexpected(std::error_code(EINVAL, std::generic_category()));
+}
+
+#if 0  // Known bug, will be fixed when we refactor Expected storage to never have empty state
+BOOST_AUTO_TEST_CASE(issues / 16, "Default constructor of T is sometimes compiled when T has no default constructor")
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE::experimental;
+  struct udt
+  {
+    const char *_v{ nullptr };
+    udt() = delete;
+    constexpr explicit udt(const char *v) noexcept : _v(v) {}
+    QUICKCPPLIB_CONSTEXPR udt(udt &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    udt(const udt &) = delete;
+    QUICKCPPLIB_CONSTEXPR udt &operator=(udt &&o) noexcept
+    {
+      _v = o._v;
+      o._v = nullptr;
+      return *this;
+    }
+    udt &operator=(const udt &) = delete;
+    constexpr const char *operator*() const noexcept { return _v; }
+  };
+  expected<udt> n(make_unexpected(std::error_code(ENOMEM, std::generic_category())));
 }
 #endif
 
@@ -1385,7 +1471,7 @@ int main(int argc, char *argv[])
   CPU_SET_S(1, 2, cpuset);
   pthread_setaffinity_np(pthread_self(), CPU_ALLOC_SIZE(2), cpuset);
 #endif
-  int result = BOOSTLITE_BOOST_UNIT_TEST_RUN_TESTS(argc, argv);
+  int result = QUICKCPPLIB_BOOST_UNIT_TEST_RUN_TESTS(argc, argv);
   return result;
 }
 #endif

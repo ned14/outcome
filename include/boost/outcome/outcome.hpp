@@ -7,10 +7,11 @@
 #define BOOST_OUTCOME_HEADERS_PATH4(a) #a
 #define BOOST_OUTCOME_HEADERS_PATH3(a) BOOST_OUTCOME_HEADERS_PATH4(a)
 
-#if 0 // cmake's Makefiles and Ninja generators won't pick up dependent headers without this
+#if 0  // cmake's Makefiles and Ninja generators won't pick up dependent headers without this
 #include "v1.0/monad.hpp"
 #endif
 
+// clang-format off
 #if !defined(BOOST_OUTCOME_DISABLE_PREPROCESSED_INTERFACE_FILE) \
   && BOOST_OUTCOME_USE_BOOST_THREAD == 0 && BOOST_OUTCOME_USE_BOOST_ERROR_CODE == 0 \
   && !defined(BOOST_OUTCOME_ENABLE_ADVANCED) && !defined(__cpp_modules) && !defined(GENERATING_OUTCOME_MODULE_INTERFACE)
@@ -40,6 +41,7 @@
 #define BOOST_OUTCOME_HEADERS_PATH BOOST_OUTCOME_HEADERS_PATH3(BOOST_OUTCOME_HEADERS_PATH2)
 #include BOOST_OUTCOME_HEADERS_PATH
 #endif
+// clang-format on
 
 #undef BOOST_OUTCOME_HEADERS_PATH
 #undef BOOST_OUTCOME_HEADERS_PATH2

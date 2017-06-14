@@ -1,135 +1,219 @@
 #!/usr/bin/python3
 # Parse x64 assembler dumps and figure out how many opcodes something takes
-# (C) 2015 Niall Douglas http://www.nedprod.com/
+#
+# File created: (C) 2015 Niall Douglas http://www.nedprod.com/
 # File created: June 2015
+# File edited by Tom Westerhout in May 2017
 
-import sys, os
-debug=False
-inputfile=None #'max_monad_bind.msvc_clang.S'
+import sys, os, re
 
-try:
-    os.remove(sys.argv[1]+'.test1.s')
-except:
-    pass
 
-# Map of function offset (objdump)/name (dumpbin) to opcodes
-functions={}
-isObjDump=False
-isDumpBin=False
+debug = False
 
-if inputfile is None:
-    if len(sys.argv)<2:
-        print('Usage: '+sys.argv[0]+' <assembler file containing test1()>', file=sys.stderr)
-        sys.exit(1)
-    inputfile=sys.argv[1]
+# if len(sys.argv) < 2:
+#     print('Usage: ' + sys.argv[0] + ' <assembler file containing test1()>', 
+#         file=sys.stderr)
+#     sys.exit(1)
+# input_file = sys.argv[1]
 
-# objdump has format:
+
+# objdump format example:
 # 0000000000000000 <_Z5test1v>:
-# callq  23 <_Z5test1v+0x23>
+#    0:	55                   	push   %rbp
+#    1:	48 89 e5             	mov    %rsp,%rbp
+#    4:	be 00 00 00 00       	mov    $0x0,%esi
+#    9:	bf 00 00 00 00       	mov    $0x0,%edi
+#    e:	e8 00 00 00 00       	callq  13 <_Z5test1v+0x13>
+#   13:	be 0a 00 00 00       	mov    $0xa,%esi
+#   18:	48 89 c7             	mov    %rax,%rdi
+#   1b:	e8 00 00 00 00       	callq  20 <_Z5test1v+0x20>
+#   20:	90                   	nop
+#   21:	5d                   	pop    %rbp
+#   22:	c3                   	retq   
 
-# dumpbin has format:
-# ?test1@@YAHXZ (int __cdecl test1(void)):
-# call        ?get_future@?$promise@H@lightweight_futures@v1_std@spinlock@boost@@QEAA?AV?$future@H@2345@XZ
+def get_call_target_objdump(l):
+  r = re.match(r".*callq\s+[0-9a-f]+\s+<(.+)>$", l)
+  if r:
+    return r.group(1)
+  return None
 
-thisfunction=None
-linecount=0
-with open(inputfile, 'rt') as ih:
-    for line in ih:
-        line2=line.rstrip()
-        linecount=linecount+1
-        #print("Line "+str(linecount)+" is '"+line2+"'")
-        while True:
-            if thisfunction is None:
-                if len(line2)==0:
-                    pass
-                elif line[:4]=='0000':
-                    isObjDump=True
-                    thisfunction=line[18:-3]
-                    thisfunctionopcodes=""
-                    if debug:
-                        print("\nLine "+str(linecount)+" new objdump function "+thisfunction)
-                elif line2[0]!=' ' and line2[0]!='$' and line2[-1]==':':
-                    isDumpBin=True
-                    thisfunction=line[:line.find(' ')]
-                    thisfunctionopcodes=""
-                    if debug:
-                        print("\nLine "+str(linecount)+" new dumpbin function "+thisfunction)
-            elif len(line2)==0 or (line2[0]!=' ' and line2[0]!='$' and line2[-1]==':'):
-                if debug:
-                    print("Storing function "+str(thisfunction)+" with "+str(thisfunctionopcodes.count('\n'))+" lines")
-                functions[thisfunction]=thisfunctionopcodes
-                thisfunction=None
-                continue
+_is_new_function_ = \
+    { # ---> 4 zeros in the begining
+      # ---> then some unknown number of lower case HEX numbers
+      # ---> a space
+      # ---> function name enclosed in <>
+      # ---> colon :
+      'objdump' : lambda l: re.match(r"^0{4}[0-9a-f]+ <.+>:$", l) is not None 
+
+      # ---> line starts with a non-space character
+      # ---> something
+      # ---> line ends with a colon :
+    , 'dumpbin' : lambda l: re.match(r"^[^ ].*:$", l) is not None
+    }
+
+_get_function_name_ = \
+    { 'objdump' : lambda l: re.match(r"^0{4}[0-9a-f]+ <(.+)>:$", l).group(1)
+    , 'dumpbin' : lambda l: re.match(r"^([^ ]+).*:$", l).group(1)
+    }
+
+_is_instruction_ = \
+    { # ---> at least 2 spaces
+      # ---> address, i.e. some HEX numbers
+      # ---> colon :
+      # ---> more HEX numbers and spaces
+      # ---> asm instruction, i.e. a word of latin characters
+      # ---> arguments
+      'objdump' : lambda l: re.match(r"^[ ]{2,}[0-9a-f]+:\s*[0-9a-f ]+\s+[a-z]+.*$", l) \
+                                is not None 
+
+      # the same, except that the line starts with exactly two spaces
+    , 'dumpbin' : lambda l: re.match(r"^[ ]{2,}[0-9A-F]+:[0-9A-F ]+[a-z]+.*$", l) \
+                                is not None
+    }
+
+_is_normal_instruction_ = \
+    { 'objdump' : lambda l: _is_instruction_['objdump'](l) and 'retq' not in l and 'nop' not in l
+    , 'dumpbin' : lambda l: _is_instruction_['dumpbin'](l) and 'ret' not in l and 'nop' not in l
+    }
+
+_is_call_instruction_ = \
+    { 'objdump' : lambda l: "callq" in l
+    , 'dumpbin' : lambda l: "call" in l
+    }
+
+_get_call_target_ = \
+    { 'objdump' : get_call_target_objdump
+    , 'dumpbin' : lambda l: re.match(r".*call\s+(.+)$", l).group(1)
+    }
+
+_is_our_function_ = \
+    { 'objdump' : lambda f: lambda l: (f in l) and ('-0x' not in l)
+    , 'dumpbin' : lambda f: lambda l: (f in l) and ('?dtor' not in l)
+    }
+
+
+def parse(input_file : str, file_type : str) -> dict:
+    functions = {}
+    f   = None
+    ops = []
+
+    def save():
+        nonlocal f
+        nonlocal ops
+        if f is not None:
+            debug and print("[*] Storing function " + str(f) + " with " 
+                + str(len(ops)) + " lines", file=sys.stderr)
+            functions[f] = ops
+            f   = None
+            ops = []
+    def append(l : str):
+        nonlocal ops
+        if f is not None:
+            ops.append(l)
+    def skip():
+        pass
+
+    is_func  = _is_new_function_[file_type]
+    is_op    = _is_instruction_[file_type]
+    get_name = _get_function_name_[file_type]
+
+    for i, line in filter( lambda t: len(t[1]) > 0, 
+                   map(    lambda t: (t[0], t[1].rstrip()), 
+                   enumerate(input_file, start=1) )):
+        debug and print("[*] Line " + str(i) + " is '" + line + "'", 
+            file=sys.stderr)
+        if is_func(line):
+            save()
+            f = get_name(line)
+            debug and print("[*] Line " + str(i) 
+                + ": new objdump function: " + f, file=sys.stderr)
+        elif is_op(line):
+            if f is not None:
+                append(line)
             else:
-                thisfunctionopcodes+=line
-            break
-if thisfunction is not None:
-    functions[thisfunction]=thisfunctionopcodes
+                skip()
+        else:
+            skip()
+    save()
+    return functions
 
-opcodes=None
-for function, _opcodes in functions.items():
-    if function[:8]=='?test1@@' or (function[:8]=='_Z5test1' and not '-0x' in function):
-        opcodes=_opcodes
-        break
-if opcodes is None:
-    print("-1")
-    sys.exit(0)
 
-done=False
-loops=0
-while not done:
-    done=True
-    if debug:
-        print("Function "+function+" has "+str(opcodes.count('\n'))+" lines")
-    callop=opcodes.find(" call " if isDumpBin else "callq ")
-    while callop!=-1:
-        loops+=1
-        if loops > 1000:
-#            print(opcodes)
-            assert loops <= 1000
-        if isObjDump:
-            idx=opcodes.find('<', callop)
-            offset=opcodes.find('+', idx)
-            if opcodes[idx+1:offset].startswith('_Z5test1'):
-                idx=-1
-            elif offset!=-1:
-                calltarget=opcodes[idx+1:offset]
-            else:
-                calltarget=opcodes[idx+1:opcodes.find('>', idx)]
-        if isDumpBin:
-            idx=opcodes.find('?', callop);
-            calltarget=opcodes[idx:opcodes.find('\n', idx)]
-            if calltarget.startswith('?test1@@'):
-                idx=-1
-        if idx!=-1:
-            if debug:
-                print("   contains call to "+str(calltarget)+" which has found="+str(calltarget in functions))
-            if calltarget in functions:
-                done=False
-                expansion=functions[calltarget]
-                # Replace calltarget string
-                opcodes=opcodes[:idx]+"replaced\n"+expansion+opcodes[opcodes.find('\n', idx):]
-                #print(opcodes)
+def find_opcodes(name : str, functions : dict, file_type : str) -> tuple:
+    is_match = _is_our_function_[file_type](name)
+    all_matches = list(filter(lambda t: is_match(t[0]), functions.items()))
+    if len(all_matches) == 0:
+        return name, None
+    if len(all_matches) > 1:
+        print("[*] Matching functions: ", list(map(lambda t: t[0], 
+            all_matches)), file=sys.stderr)
+    assert len(all_matches) == 1
+    return all_matches[0]
 
-        callop=opcodes.find(" call " if isDumpBin else "callq ", callop+1)
-    functions[function]=opcodes
 
-#print("\n\n")
-#for function, opcodes in functions.items():
-#    print("Function "+function+" has "+str(opcodes.count('\n'))+" opcodes")
+def _inline_all_impl_(operation : str, functions : dict, 
+    black_list : set, is_a_call, get_target,
+    allow_recursion : bool):
 
-with open(inputfile+'.test1.s', "wt") as oh:
-    oh.write(opcodes)
-    # Count instructions
-    count=0
-    for line in opcodes.splitlines():
-        if isObjDump:
-            # If the line has two tab chars, it's an instruction
-            if line.startswith('  ') and "data32" not in line and "nopw" not in line and "retq" not in line:
-                count+=1
-        if isDumpBin:
-            # If the line is two spaces and some zeros, it's an instruction
-            if line[:6]=='  0000' and "ret" not in line:
-                count+=1
-    print(str(count))
+    if not is_a_call(operation):
+        debug and print("[*] '" + operation + "' is not a call operation.",
+            file=sys.stderr)
+        return [operation]
 
+    debug and print("[*] '" + operation + "'...", file=sys.stderr)
+    target = get_target(operation) 
+    debug and print("[*] Expanding " + repr(target) + "...", file=sys.stderr)
+
+    if (not allow_recursion) and (target in black_list):
+        debug and print("[*] '" + target + "' in black list.", file=sys.stderr)
+        return [operation]
+
+    if (target not in functions):
+        print("[*] No info on " + repr(target) + ".", file=sys.stderr)
+        return [operation]
+
+    black_list.add(target)
+    opcodes = functions[target]
+    return sum(map(lambda op: _inline_all_impl_(op, functions, black_list,
+        is_a_call, get_target, allow_recursion), opcodes), [])
+
+
+def inline_all(name : str, functions : dict, file_type : str,
+    allow_recursion : bool = False):
+
+    is_a_call  = _is_call_instruction_[file_type]
+    get_target = _get_call_target_[file_type]
+    debug and print("Initially: ", functions[name], file=sys.stderr)
+    return sum(map(lambda op: _inline_all_impl_(op, functions, {name},
+        is_a_call, get_target, allow_recursion), functions[name]), [])
+
+
+def count_opcodes(input_file : str, func : str):
+    functions = {}
+    file_type = 'objdump' if os.name == 'posix' else 'dumpbin'
+
+    # Read all the functions
+    with open(input_file, "rt") as ih:
+        functions = parse(ih, file_type)
+
+    # Find the one we're interested in
+    name, opcodes = find_opcodes(func, functions, file_type)
+    if opcodes is None:
+        return -1, None
+
+    # Inline as much as possible
+    opcodes = inline_all(name, functions, file_type, False)
+
+    # Save results
+    output_file = input_file + '.' + func + '.s'
+    try:
+        os.remove(output_file)
+    except:
+        pass
+    with open(output_file, "wt") as oh:
+        oh.write('\n'.join(opcodes) + '\n')
+
+    # Calculate number of operations
+    is_normal = _is_normal_instruction_[file_type]
+    count = sum(map(is_normal, opcodes))
+
+    return count, opcodes

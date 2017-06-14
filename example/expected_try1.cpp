@@ -20,8 +20,8 @@ enum class MathError2 {
   DivisionByZero
 };
 
-using MathResult1 = outcome::expected<double, MathError1>;
-using MathResult2 = outcome::expected<long long, MathError2>;
+using MathResult1 = outcome::experimental::expected<double, MathError1>;
+using MathResult2 = outcome::experimental::expected<long long, MathError2>;
 
 MathResult1 div(double x, double y) noexcept
 {
@@ -29,7 +29,7 @@ MathResult1 div(double x, double y) noexcept
   {
     // This operation would fail, instead let's return the reason of
     // the failure wrapped in E
-    return outcome::make_unexpected(MathError1::DivisionByZero);
+    return outcome::experimental::make_unexpected(MathError1::DivisionByZero);
   }
   else
   {
@@ -45,7 +45,7 @@ MathResult2 div10mul3(double y) noexcept
   if (result)
   {
     if(result.value() < 0)
-      return outcome::make_unexpected(MathError2::NegativeSquareRoot);
+      return outcome::experimental::make_unexpected(MathError2::NegativeSquareRoot);
     return (long long)(result.value() * 3.0);
   }
   // NOTE: If it failed, convert the MathError1 error code domain into
@@ -71,7 +71,7 @@ int main(void)
   //       of type E and therefore its template signature must
   //       be the correct type E. If we accidentally used MathError1
   //       here the exception would not be caught!
-  catch (const outcome::bad_expected_access<MathError2> &e)
+  catch (const outcome::experimental::bad_expected_access<MathError2> &e)
   {
     std::cout << "div10mul3().value() threw an exception" << std::endl;
   }

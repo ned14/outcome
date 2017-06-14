@@ -89,6 +89,45 @@ namespace detail
   {
     static constexpr bool value = enable_single_byte_value_storage<_value_type>;
   };
+  // Helper to change the state of the value storage in a never-empty fashion where possible
+  template <bool enable, class P, class T, class S> struct do_change_state
+  {
+    QUICKCPPLIB_CONSTEXPR do_change_state(P * /*unused*/, T && /*unused*/, S /*unused*/) {}
+    void dismiss() {}
+  };
+  template <class P, class T, class S> struct do_change_state<true, P, T, S>
+  {
+    // existing has a nothrow move or copy constructor, so preserve here before changing state
+    P *_parent;
+    T _old, *_prev;
+    S _state;
+    bool _success;
+    QUICKCPPLIB_CONSTEXPR do_change_state(P *parent, T &&existing, S state)
+        : _parent(parent)
+        , _old(std::move(existing))
+        , _prev(&existing)
+        , _state(state)
+        , _success(false)
+    {
+    }
+    void dismiss() { _success = true; }
+    ~do_change_state()
+    {
+      if(!_success)
+      {
+        // An exception threw during the op, so restore previous state
+        new(_prev) T(std::move(_old));
+        _parent->type = _state;
+      }
+    }
+  };
+  template <bool disable, class P, class T, class U> void change_state(P *self, T &&existing, U &op)
+  {
+    auto state = self->type;
+    do_change_state<!disable && ((std::is_move_constructible<T>::value && std::is_nothrow_move_constructible<T>::value) || (!std::is_move_constructible<T>::value && std::is_copy_constructible<T>::value && std::is_nothrow_copy_constructible<T>::value)), P, T, decltype(state)> restore(self, std::move(existing), state);
+    op();
+    restore.dismiss();
+  }
 #define BOOST_OUTCOME_VALUE_STORAGE_IMPL value_storage_impl_trivial
 #define BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR 0
 #include "detail/value_storage.ipp"
@@ -113,27 +152,27 @@ namespace detail
 #endif
   template <bool enable> struct emplace_value_if
   {
-    template <class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_value_if(U *v, V &&o) { v->emplace_value(std::forward<V>(o)); }
+    template <class U, class V> QUICKCPPLIB_CONSTEXPR emplace_value_if(U *v, V &&o) { v->emplace_value(std::forward<V>(o)); }
   };
   template <> struct emplace_value_if<false>
   {
-    template <class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_value_if(U *v, V &&) { v->emplace_value(); }
+    template <class U, class V> QUICKCPPLIB_CONSTEXPR emplace_value_if(U *v, V &&) { v->emplace_value(); }
   };
   template <bool enable> struct emplace_error_if
   {
-    template <class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_error_if(U *v, V &&o) { v->emplace_error(std::forward<V>(o)); }
+    template <class U, class V> QUICKCPPLIB_CONSTEXPR emplace_error_if(U *v, V &&o) { v->emplace_error(std::forward<V>(o)); }
   };
   template <> struct emplace_error_if<false>
   {
-    template <class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_error_if(U *v, V &&) { v->emplace_error(); }
+    template <class U, class V> QUICKCPPLIB_CONSTEXPR emplace_error_if(U *v, V &&) { v->emplace_error(); }
   };
   template <bool enable> struct emplace_exception_if
   {
-    template <class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_exception_if(U *v, V &&o) { v->emplace_exception(std::forward<V>(o)); }
+    template <class U, class V> QUICKCPPLIB_CONSTEXPR emplace_exception_if(U *v, V &&o) { v->emplace_exception(std::forward<V>(o)); }
   };
   template <> struct emplace_exception_if<false>
   {
-    template <class U, class V> BOOST_OUTCOME_CONSTEXPR emplace_exception_if(U *v, V &&) { v->emplace_exception(); }
+    template <class U, class V> QUICKCPPLIB_CONSTEXPR emplace_exception_if(U *v, V &&) { v->emplace_exception(); }
   };
 
   template <bool enable, class U, class V> struct compare_if_impl
@@ -188,7 +227,7 @@ public:
   static constexpr bool is_nothrow_copy_assignable = base::is_nothrow_copy_assignable;
   static constexpr bool is_nothrow_destructible = base::is_nothrow_destructible;
 
-#if(defined(_MSC_VER) && _MSC_FULL_VER > 191025017 /* VS2017 RTM */) || __clang_major__ >= 4 || (__clang_major__ == 3 && __clang_minor__ >= 8)
+#if(defined(_MSC_VER) && _MSC_FULL_VER > 191025019 /* VS2017 Update 1 */) || __clang_major__ >= 4 || (__clang_major__ == 3 && __clang_minor__ >= 8)
   template <class _value_type2> static constexpr bool value_type_is_constructible_from = std::is_same<_value_type, _value_type2>::value || std::is_void<_value_type2>::value || std::is_constructible<_value_type, _value_type2>::value;
   template <class _error_type2> static constexpr bool error_type_is_constructible_from = std::is_void<_error_type2>::value || std::is_same<_error_type, _error_type2>::value || std::is_constructible<_error_type, _error_type2>::value;
   template <class _exception_type2> static constexpr bool exception_type_is_constructible_from = std::is_void<_exception_type2>::value || std::is_same<_exception_type, _exception_type2>::value || std::is_constructible<_exception_type, _exception_type2>::value;
@@ -215,8 +254,8 @@ public:
   constexpr value_storage() = default;
   constexpr value_storage(const value_storage &) = default;
   constexpr value_storage(value_storage &&) = default;
-  BOOST_OUTCOME_CONSTEXPR value_storage &operator=(const value_storage &) = default;
-  BOOST_OUTCOME_CONSTEXPR value_storage &operator=(value_storage &&) = default;
+  QUICKCPPLIB_CONSTEXPR value_storage &operator=(const value_storage &) = default;
+  QUICKCPPLIB_CONSTEXPR value_storage &operator=(value_storage &&) = default;
   constexpr value_storage(empty_t _) noexcept : base(_) {}
   constexpr value_storage(value_t _) noexcept(std::is_nothrow_default_constructible<value_type>::value)
       : base(_)
@@ -264,7 +303,7 @@ public:
   {
   }
   template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<_is_constructible_from<_value_type2, _error_type2, _exception_type2>::value>::type>
-  BOOST_OUTCOME_CONSTEXPR explicit value_storage(const value_storage<_value_type2, _error_type2, _exception_type2> &o)
+  QUICKCPPLIB_CONSTEXPR explicit value_storage(const value_storage<_value_type2, _error_type2, _exception_type2> &o)
       : base()
   {
     switch(o.type)
@@ -283,7 +322,7 @@ public:
     }
   }
   template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<base::is_referenceable && _is_constructible_from<_value_type2, _error_type2, _exception_type2>::value>::type>
-  BOOST_OUTCOME_CONSTEXPR explicit value_storage(value_storage<_value_type2, _error_type2, _exception_type2> &&o)
+  QUICKCPPLIB_CONSTEXPR explicit value_storage(value_storage<_value_type2, _error_type2, _exception_type2> &&o)
       : base()
   {
     switch(o.type)
@@ -305,7 +344,7 @@ public:
   {
   };  // used to tag when incoming storage cannot have a value
   template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<base::is_referenceable && _is_constructible_from<_value_type2, _error_type2, _exception_type2>::value>::type>
-  BOOST_OUTCOME_CONSTEXPR explicit value_storage(valueless_t, value_storage<_value_type2, _error_type2, _exception_type2> &&o)
+  QUICKCPPLIB_CONSTEXPR explicit value_storage(valueless_t, value_storage<_value_type2, _error_type2, _exception_type2> &&o)
       : base()
   {
     switch(o.type)
@@ -322,7 +361,7 @@ public:
       break;
     }
   }
-  BOOST_OUTCOME_CONSTEXPR void set_state(value_storage &&o) noexcept(is_nothrow_destructible &&is_nothrow_move_constructible)
+  QUICKCPPLIB_CONSTEXPR void set_state(value_storage &&o) noexcept(is_nothrow_destructible &&is_nothrow_move_constructible)
   {
     clear();
     new(this) value_storage(std::move(o));
@@ -400,7 +439,7 @@ public:
 #endif
     }
   }
-  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<_is_comparable_to<_value_type2, _error_type2, _exception_type2>::value>::type> BOOST_OUTCOME_CONSTEXPR bool operator==(const value_storage<_value_type2, _error_type2, _exception_type2> &o) const
+  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<_is_comparable_to<_value_type2, _error_type2, _exception_type2>::value>::type> QUICKCPPLIB_CONSTEXPR bool operator==(const value_storage<_value_type2, _error_type2, _exception_type2> &o) const
   {
     if(this->type != o.type)
       return false;
@@ -417,7 +456,7 @@ public:
     }
     return false;
   }
-  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<_is_comparable_to<_value_type2, _error_type2, _exception_type2>::value>::type> BOOST_OUTCOME_CONSTEXPR bool operator!=(const value_storage<_value_type2, _error_type2, _exception_type2> &o) const
+  template <class _value_type2, class _error_type2, class _exception_type2, typename = typename std::enable_if<_is_comparable_to<_value_type2, _error_type2, _exception_type2>::value>::type> QUICKCPPLIB_CONSTEXPR bool operator!=(const value_storage<_value_type2, _error_type2, _exception_type2> &o) const
   {
     return !(*this == o);
   }

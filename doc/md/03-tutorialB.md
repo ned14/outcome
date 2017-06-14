@@ -13,7 +13,7 @@ with inexperienced usage of `expected<T, E>` in C++ which you ought to avoid.
 It shows you how to use `expected<T, E>` in a way which integrates well with the
 C++ 11 STL's standard error code facilities `std::error_code` and `std::error_category`.
 3. The \ref tutorial_outcome "third part" walks you through using Outcome's
-`expected<T, E>` refinements `outcome<T>` and `result<T>`, plus its `extended_error_code`.
+`expected<T, E>` refinements `outcome<T>` and `result<T>`, plus its `error_code_extended`.
 Usage is very similar to Expected, but with less typing, less runtime overhead and
 more convenient extensions.
 
@@ -58,7 +58,7 @@ maintenance burden over time is obvious, and a further worked example follows be
 The third reason is that the C++ 11 standard library already provides an enum of the
 most common error codes for you so you don't feel like going off and reinventing
 the wheel. It's called <a href="http://en.cppreference.com/w/cpp/error/errc">`std::errc`</a>
-brought in by <tt>\#include <system_error></tt> and as you'll see, it contains the standard
+brought in by <tt>\#include &lt;system_error&gt;</tt> and as you'll see, it contains the standard
 POSIX error codes, and most of the time you'll find that whatever custom error code
 domain you are about to write can be adequately covered by `std::errc`.
 In fact, let's try it:
@@ -180,8 +180,8 @@ it's already been defaulted to that for us by Expected's definition:
 \snippet expected_try2.cpp expected_try2
 
 This eliminates the fragile switch statements converting between error code domains in
-favour of a information loss free transmission. The cost is once again a loss of type safety
-because a function might return an error code it should never be able to return and the
+favour of an information loss-free transmission. The cost is once again a loss of type safety
+because if a function might return an error code, it should never be able to return and the
 compiler will not complain.
 
 Mashing together both approaches we can solve the problem of type safety by making `MathError2`

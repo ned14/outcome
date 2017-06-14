@@ -149,10 +149,17 @@ public:
       , type(storage_type::value)
   {
   }
-// If it has a non trivial destructor, we actively need to copy and move as well as destroy
 #if BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
-  BOOST_OUTCOME_VALUE_STORAGE_IMPL(const BOOST_OUTCOME_VALUE_STORAGE_IMPL &o)
-  noexcept(is_nothrow_copy_constructible)
+  ~BOOST_OUTCOME_VALUE_STORAGE_IMPL()
+#if defined(__c2__) || (!defined(_MSC_VER) || (_MSC_FULL_VER != 191025017 /* VS2017 RTM */ && _MSC_FULL_VER != 191025019 /* VS2017 Update 1 */))
+  noexcept(is_nothrow_destructible)
+#endif
+  {
+    clear();
+  }
+#endif
+
+  QUICKCPPLIB_CONSTEXPR BOOST_OUTCOME_VALUE_STORAGE_IMPL(const BOOST_OUTCOME_VALUE_STORAGE_IMPL &o) noexcept(is_nothrow_copy_constructible)
       : _empty(empty_type())
       , type(storage_type::empty)
   {
@@ -172,54 +179,7 @@ public:
     }
     type = o.type;
   }
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4297)  // use of throw within a noexcept function
-#endif
-  BOOST_OUTCOME_VALUE_STORAGE_IMPL &operator=(const BOOST_OUTCOME_VALUE_STORAGE_IMPL &o) noexcept(is_nothrow_copy_assignable)
-  {
-    if(type == o.type)
-    {
-#ifdef __cpp_exceptions
-      try
-      {
-#endif
-        switch(o.type)
-        {
-        case storage_type::empty:
-          break;
-        case storage_type::value:
-          value = o.value;
-          break;
-        case storage_type::error:
-          error = o.error;
-          break;
-        case storage_type::exception:
-          exception = o.exception;
-          break;
-        }
-#ifdef __cpp_exceptions
-      }
-      catch(...)
-      {
-        // If copy assignment threw, reset to empty
-        clear();
-        throw;
-      }
-#endif
-    }
-    else
-    {
-      clear();
-      new(this) BOOST_OUTCOME_VALUE_STORAGE_IMPL(o);
-    }
-    return *this;
-  }
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-  BOOST_OUTCOME_VALUE_STORAGE_IMPL(BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o)
-  noexcept(is_nothrow_move_constructible)
+  QUICKCPPLIB_CONSTEXPR BOOST_OUTCOME_VALUE_STORAGE_IMPL(BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o) noexcept(is_nothrow_move_constructible)
       : _empty(empty_type())
       , type(storage_type::empty)
   {
@@ -239,90 +199,165 @@ public:
     }
     type = o.type;
   }
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4297)  // use of throw within a noexcept function
-#endif
-#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 6
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wterminate"
-#endif
-  BOOST_OUTCOME_VALUE_STORAGE_IMPL &operator=(BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o) noexcept(is_nothrow_move_assignable)
+  QUICKCPPLIB_CONSTEXPR BOOST_OUTCOME_VALUE_STORAGE_IMPL &operator=(const BOOST_OUTCOME_VALUE_STORAGE_IMPL &o) noexcept(is_nothrow_copy_assignable)
   {
     if(type == o.type)
     {
-#ifdef __cpp_exceptions
-      try
+      // If type's operator=() throws, it's on them what state it's left in
+      switch(o.type)
       {
-#endif
-        switch(o.type)
-        {
-        case storage_type::empty:
-          break;
-        case storage_type::value:
-          value = std::move(o.value);
-          break;
-        case storage_type::error:
-          error = std::move(o.error);
-          break;
-        case storage_type::exception:
-          exception = std::move(o.exception);
-          break;
-        }
-#ifdef __cpp_exceptions
+      case storage_type::empty:
+        break;
+      case storage_type::value:
+        value = o.value;
+        break;
+      case storage_type::error:
+        error = o.error;
+        break;
+      case storage_type::exception:
+        exception = o.exception;
+        break;
       }
-      catch(...)
-      {
-        // If move assignment threw, reset to empty
-        clear();
-        // Shush static analysers
-        if(is_nothrow_move_assignable)
-          std::terminate();
-        else
-          throw;
-      }
-#endif
     }
     else
     {
-      clear();
-      new(this) BOOST_OUTCOME_VALUE_STORAGE_IMPL(std::move(o));
+      auto do_op = [&] {
+        clear();
+        new(this) BOOST_OUTCOME_VALUE_STORAGE_IMPL(o);
+      };
+      switch(type)
+      {
+      case storage_type::empty:
+        do_op();
+        break;
+      case storage_type::value:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(value), do_op);
+        break;
+      case storage_type::error:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(error), do_op);
+        break;
+      case storage_type::exception:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(exception), do_op);
+        break;
+      }
     }
     return *this;
   }
-#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 6
-#pragma GCC diagnostic pop
-#endif
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-  ~BOOST_OUTCOME_VALUE_STORAGE_IMPL()
-#if defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER != 191025017 /* VS2017 RTM */)
-  noexcept(is_nothrow_destructible)
-#endif
+  QUICKCPPLIB_CONSTEXPR BOOST_OUTCOME_VALUE_STORAGE_IMPL &operator=(BOOST_OUTCOME_VALUE_STORAGE_IMPL &&o) noexcept(is_nothrow_move_assignable)
   {
-    clear();
+    if(type == o.type)
+    {
+      // If type's operator=() throws, it's on them what state it's left in
+      switch(o.type)
+      {
+      case storage_type::empty:
+        break;
+      case storage_type::value:
+        value = std::move(o.value);
+        break;
+      case storage_type::error:
+        error = std::move(o.error);
+        break;
+      case storage_type::exception:
+        exception = std::move(o.exception);
+        break;
+      }
+    }
+    else
+    {
+      auto do_op = [&] {
+        clear();
+        new(this) BOOST_OUTCOME_VALUE_STORAGE_IMPL(std::move(o));
+      };
+      switch(type)
+      {
+      case storage_type::empty:
+        do_op();
+        break;
+      case storage_type::value:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(value), do_op);
+        break;
+      case storage_type::error:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(error), do_op);
+        break;
+      case storage_type::exception:
+        detail::change_state<is_nothrow_move_constructible>(this, std::move(exception), do_op);
+        break;
+      }
+    }
+    return *this;
   }
-#endif
-  template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args &&... args)
+
+  template <class... Args> QUICKCPPLIB_CONSTEXPR void emplace_value(Args &&... args)
   {
-    clear();
-    new(&value) value_type(std::forward<Args>(args)...);
-    type = storage_type::value;
+    auto do_op = [&] {
+      clear();
+      new(&value) value_type(std::forward<Args>(args)...);
+      type = storage_type::value;
+    };
+    switch(type)
+    {
+    case storage_type::empty:
+      do_op();
+      break;
+    case storage_type::value:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(value), do_op);
+      break;
+    case storage_type::error:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(error), do_op);
+      break;
+    case storage_type::exception:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(exception), do_op);
+      break;
+    }
   }
-  template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_error(Args &&... args)
+  template <class... Args> QUICKCPPLIB_CONSTEXPR void emplace_error(Args &&... args)
   {
-    clear();
-    new(&error) error_type(std::forward<Args>(args)...);
-    type = storage_type::error;
+    auto do_op = [&] {
+      clear();
+      new(&error) error_type(std::forward<Args>(args)...);
+      type = storage_type::error;
+    };
+    switch(type)
+    {
+    case storage_type::empty:
+      do_op();
+      break;
+    case storage_type::value:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(value), do_op);
+      break;
+    case storage_type::error:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(error), do_op);
+      break;
+    case storage_type::exception:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(exception), do_op);
+      break;
+    }
   }
-  template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_exception(Args &&... args)
+  template <class... Args> QUICKCPPLIB_CONSTEXPR void emplace_exception(Args &&... args)
   {
-    clear();
-    new(&exception) exception_type(std::forward<Args>(args)...);
-    type = storage_type::exception;
+    auto do_op = [&] {
+      clear();
+      new(&exception) exception_type(std::forward<Args>(args)...);
+      type = storage_type::exception;
+    };
+    switch(type)
+    {
+    case storage_type::empty:
+      do_op();
+      break;
+    case storage_type::value:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(value), do_op);
+      break;
+    case storage_type::error:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(error), do_op);
+      break;
+    case storage_type::exception:
+      detail::change_state<is_nothrow_move_constructible>(this, std::move(exception), do_op);
+      break;
+    }
   }
-  BOOST_OUTCOME_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
+  QUICKCPPLIB_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
   {
     switch(type)
     {
@@ -471,7 +506,7 @@ public:
   {
   };
   template <class... Args>
-  BOOST_OUTCOME_CONSTEXPR explicit BOOST_OUTCOME_VALUE_STORAGE_IMPL(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+  QUICKCPPLIB_CONSTEXPR explicit BOOST_OUTCOME_VALUE_STORAGE_IMPL(emplace_t, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
       : value(std::forward<Args>(args)...)
   {
     type = storage_type::value;
@@ -479,13 +514,13 @@ public:
 #if BOOST_OUTCOME_VALUE_STORAGE_NON_TRIVIAL_DESTRUCTOR
   ~BOOST_OUTCOME_VALUE_STORAGE_IMPL() noexcept(is_nothrow_destructible) { clear(); }
 #endif
-  template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace_value(Args &&... args)
+  template <class... Args> QUICKCPPLIB_CONSTEXPR void emplace_value(Args &&... args)
   {
     clear();
     value = value_type(std::forward<Args>(args)...);
     type = storage_type::value;
   }
-  BOOST_OUTCOME_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
+  QUICKCPPLIB_CONSTEXPR void clear() noexcept(is_nothrow_destructible)
   {
     switch(type)
     {

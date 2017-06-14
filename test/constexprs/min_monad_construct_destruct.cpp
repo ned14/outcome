@@ -1,11 +1,11 @@
 #include "../../include/boost/outcome.hpp"
 
-extern BOOSTLITE_NOINLINE void test1()
+extern QUICKCPPLIB_NOINLINE void test1()
 {
   using namespace boost::outcome;
   outcome<int> m;
 }
-extern BOOSTLITE_NOINLINE void test2()
+extern QUICKCPPLIB_NOINLINE void test2()
 {
 }
 

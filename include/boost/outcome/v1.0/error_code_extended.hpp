@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "config.hpp"
 
-#include "../boost-lite/include/ringbuffer_log.hpp"
+#include "../quickcpplib/include/ringbuffer_log.hpp"
 
 #ifndef BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE
 #define BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE 4096
@@ -36,9 +36,9 @@ Distributed under the Boost Software License, Version 1.0.
 BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN
 
 // Slight misuse of ringbuffer_log to keep extended error code information
-inline boost_lite::ringbuffer_log::simple_ringbuffer_log<BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE> &extended_error_code_log()
+inline QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE> &extended_error_code_log()
 {
-  static boost_lite::ringbuffer_log::simple_ringbuffer_log<BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE> log(boost_lite::ringbuffer_log::level::error);
+  static QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<BOOST_OUTCOME_DEFAULT_EXTENDED_ERROR_CODE_LOG_SIZE> log(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::error);
   return log;
 }
 
@@ -48,13 +48,13 @@ namespace deatomiced_categories
 {
   namespace detail
   {
-    BOOSTLITE_NOINLINE inline const std::error_category &_generic_category()
+    QUICKCPPLIB_NOINLINE inline const std::error_category &_generic_category()
     {
       const std::error_category &c = stl11::generic_category();
       return c;
     }
 
-    BOOSTLITE_NOINLINE inline const std::error_category &_system_category()
+    QUICKCPPLIB_NOINLINE inline const std::error_category &_system_category()
     {
       const std::error_category &c = stl11::system_category();
       return c;
@@ -86,7 +86,7 @@ backtrace etc. Can be safely type sliced into a std::error_code.
 class error_code_extended : public stl11::error_code
 {
   friend inline std::ostream &operator<<(std::ostream &s, const error_code_extended &ec);
-  using unique_id = boost_lite::ringbuffer_log::simple_ringbuffer_log<4096>::unique_id;
+  using unique_id = QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<4096>::unique_id;
   size_t _unique_id;  // into extended_error_code_log
 public:
   //! Default construction
@@ -116,7 +116,7 @@ public:
   //! Explicit move construction from error_code
   explicit error_code_extended(stl11::error_code &&e, const char *msg = nullptr, unsigned code1 = 0, unsigned code2 = 0, bool backtrace = false)
       : stl11::error_code(std::move(e))
-      , _unique_id(msg ? extended_error_code_log().emplace_back(boost_lite::ringbuffer_log::level::error, msg, code1, code2, backtrace ? nullptr : "", 0) : (size_t) -1)
+      , _unique_id(msg ? extended_error_code_log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::error, msg, code1, code2, backtrace ? nullptr : "", 0) : (size_t) -1)
   {
     BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK;
   }
@@ -162,7 +162,7 @@ public:
     }
     return written;
   }
-  //! Returns an array of strings describing the backtrace. You must free() this after use.
+  //! Returns an array of strings describing the backtrace. You must free() the pointer returned, not the individual char *'s, after use.
   char **backtrace() const noexcept
   {
     auto &log = extended_error_code_log();

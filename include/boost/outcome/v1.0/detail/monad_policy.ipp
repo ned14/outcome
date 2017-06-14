@@ -59,12 +59,12 @@ namespace policy
     {
     }
     // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    static QUICKCPPLIB_CONSTEXPR bool _throw_error(bad_outcome_errc ec) { return BOOST_OUTCOME_THROW_BAD_OUTCOME(ec, bad_outcome(ec)); }
     // Common preamble to the below
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
-        _throw_error(monad_errc::no_state);
+        _throw_error(bad_outcome_errc::no_state);
 #if defined(BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE) || defined(BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE)
       if(monad_storage::has_error() || monad_storage::has_exception())
       {
@@ -87,121 +87,121 @@ namespace policy
 
   public:
     //! \brief Returns a pointer to any value in the transport, throwing an exception if none present
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const auto *operator-> () const
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE const auto *operator-> () const
     {
       _pre_get_value();
       return &monad_storage::_storage.value;
     }
     //! \brief Returns a pointer to any value in the transport, throwing an exception if none present
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE auto *operator-> ()
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE auto *operator-> ()
     {
       _pre_get_value();
       return &monad_storage::_storage.value;
     }
 
     //! \brief Returns a reference to any value in the transport, throwing an exception if none present
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE lvalue_type operator*() &
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE lvalue_type operator*() &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
     //! \brief Returns a reference to any value in the transport, throwing an exception if none present
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE lvalue_type get() &
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE lvalue_type get() &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
     //! \brief Returns a reference to any value in the transport, throwing an exception if none present
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE lvalue_type value() &
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE lvalue_type value() &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
     //! \brief Returns a reference to any value in the transport, throwing an exception if none present
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_lvalue_type operator*() const &
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE const_lvalue_type operator*() const &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
     //! \brief Returns a reference to any value in the transport, throwing an exception if none present
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_lvalue_type get() const &
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE const_lvalue_type get() const &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
     //! \brief Returns a reference to any value in the transport, throwing an exception if none present
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_lvalue_type value() const &
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE const_lvalue_type value() const &
     {
       _pre_get_value();
       return monad_storage::_storage.value;
     }
     //! \brief Returns a reference to any value in the transport, throwing an exception if none present
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE rvalue_type operator*() &&
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE rvalue_type operator*() &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
     //! \brief Returns a reference to any value in the transport, throwing an exception if none present
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE rvalue_type get() &&
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE rvalue_type get() &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
     //! \brief Returns a reference to any value in the transport, throwing an exception if none present
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE rvalue_type value() &&
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE rvalue_type value() &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
     //! \brief Returns a reference to any value in the transport, throwing an exception if none present
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_rvalue_type operator*() const &&
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE const_rvalue_type operator*() const &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
     //! \brief Returns a reference to any value in the transport, throwing an exception if none present
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_rvalue_type get() const &&
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE const_rvalue_type get() const &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
     //! \brief Returns a reference to any value in the transport, throwing an exception if none present
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE const_rvalue_type value() const &&
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE const_rvalue_type value() const &&
     {
       _pre_get_value();
       return move_if<monad_storage::value_storage_type::is_referenceable, value_type>()(monad_storage::_storage.value);
     }
 #ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
     //! \brief Returns any errored state in the transport, throwing an exception if empty
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type get_error() const
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE error_type get_error() const
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
+        if(!_throw_error(bad_outcome_errc::no_state))
           return error_type();
       }
       if(monad_storage::has_error())
         return monad_storage::_storage.error;
 #ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
       if(monad_storage::has_exception())
-        return error_type((int) monad_errc::exception_present, monad_category());
+        return error_type((int) bad_outcome_errc::exception_present, bad_outcome_category());
 #endif
       return error_type();
     }
     //! \brief Returns any errored state in the transport, throwing an exception if empty
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE error_type error() const { return get_error(); }
     //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
-    BOOST_OUTCOME_CONSTEXPR error_type get_error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
-    //! \brief If contains an error_type, returns that error_type else returns the error_type supplied
-    BOOST_OUTCOME_CONSTEXPR error_type error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
+    QUICKCPPLIB_CONSTEXPR error_type error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
+    //! \brief Disposes of any existing state, setting the monad to the error_type
+    QUICKCPPLIB_CONSTEXPR void set_error(error_type v) { monad_storage::_storage.emplace_error(std::move(v)); }
 #endif
 #ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
     //! \brief Returns any excepted state in the transport, throwing an exception if empty
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type get_exception() const
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE exception_type get_exception() const
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
+        if(!_throw_error(bad_outcome_errc::no_state))
           return exception_type();
       }
       if(!monad_storage::has_error() && !monad_storage::has_exception())
@@ -213,11 +213,13 @@ namespace policy
       return exception_type();
     }
     //! \brief Returns any excepted state in the transport, throwing an exception if empty
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type exception() const { return get_exception(); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE exception_type exception() const { return get_exception(); }
     //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
-    BOOST_OUTCOME_CONSTEXPR exception_type get_exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
-    //! \brief If contains an exception_type, returns that exception_type else returns the exception_type supplied
-    BOOST_OUTCOME_CONSTEXPR exception_type exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
+    QUICKCPPLIB_CONSTEXPR exception_type exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
+    //! \brief Disposes of any existing state, setting the monad to the exception_type
+    QUICKCPPLIB_CONSTEXPR void set_exception(exception_type v) { monad_storage::_storage.emplace_exception(std::move(v)); }
+    //! \brief Disposes of any existing state, setting the monad to make_exception_type(forward<E>(e))
+    template <typename E, typename = typename std::enable_if<std::is_same<E, E>::value && !std::is_void<exception_type>::value>::type> QUICKCPPLIB_CONSTEXPR void set_exception(E &&e) { set_exception(make_exception_type(std::forward<E>(e))); }
 #endif
   };
   template <class monad_storage, class error_type, class exception_type> struct BOOST_OUTCOME_MONAD_POLICY_BASE_NAME<monad_storage, void, error_type, exception_type> : public monad_storage
@@ -237,12 +239,12 @@ namespace policy
     {
     }
     // Must handle error situation ec. Can return false to cancel the calling operation.
-    static BOOST_OUTCOME_CONSTEXPR bool _throw_error(monad_errc ec) { return BOOST_OUTCOME_THROW_MONAD_ERROR(ec, monad_error(ec)); }
+    static QUICKCPPLIB_CONSTEXPR bool _throw_error(bad_outcome_errc ec) { return BOOST_OUTCOME_THROW_BAD_OUTCOME(ec, bad_outcome(ec)); }
     // Common preamble to the below
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void _pre_get_value() const
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE void _pre_get_value() const
     {
       if(!monad_storage::is_ready())
-        _throw_error(monad_errc::no_state);
+        _throw_error(bad_outcome_errc::no_state);
 #if defined(BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE) || defined(BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE)
       if(monad_storage::has_error() || monad_storage::has_exception())
       {
@@ -259,44 +261,44 @@ namespace policy
     }
 
   public:
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() & { _pre_get_value(); }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get() & { _pre_get_value(); }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void value() & { _pre_get_value(); }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() const & { _pre_get_value(); }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get() const & { _pre_get_value(); }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void value() const & { _pre_get_value(); }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() && { _pre_get_value(); }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get() && { _pre_get_value(); }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void value() && { _pre_get_value(); }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void operator*() const && { _pre_get_value(); }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void get() const && { _pre_get_value(); }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE void value() const && { _pre_get_value(); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE void operator*() & { _pre_get_value(); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE void get() & { _pre_get_value(); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE void value() & { _pre_get_value(); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE void operator*() const & { _pre_get_value(); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE void get() const & { _pre_get_value(); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE void value() const & { _pre_get_value(); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE void operator*() && { _pre_get_value(); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE void get() && { _pre_get_value(); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE void value() && { _pre_get_value(); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE void operator*() const && { _pre_get_value(); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE void get() const && { _pre_get_value(); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE void value() const && { _pre_get_value(); }
 #ifdef BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type get_error() const
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE error_type get_error() const
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
+        if(!_throw_error(bad_outcome_errc::no_state))
           return error_type();
       }
       if(monad_storage::has_error())
         return monad_storage::_storage.error;
 #ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
       if(monad_storage::has_exception())
-        return error_type((int) monad_errc::exception_present, monad_category());
+        return error_type((int) bad_outcome_errc::exception_present, bad_outcome_category());
 #endif
       return error_type();
     }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE error_type error() const { return get_error(); }
-    BOOST_OUTCOME_CONSTEXPR error_type get_error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
-    BOOST_OUTCOME_CONSTEXPR error_type error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE error_type error() const { return get_error(); }
+    QUICKCPPLIB_CONSTEXPR error_type error_or(error_type e) const noexcept { return monad_storage::has_error() ? monad_storage::_storage.error : std::move(e); }
+    QUICKCPPLIB_CONSTEXPR void set_error(error_type v) { monad_storage::_storage.emplace_error(std::move(v)); }
 #endif
 #ifdef BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type get_exception() const
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE exception_type get_exception() const
     {
       if(!monad_storage::is_ready())
       {
-        if(!_throw_error(monad_errc::no_state))
+        if(!_throw_error(bad_outcome_errc::no_state))
           return exception_type();
       }
       if(!monad_storage::has_error() && !monad_storage::has_exception())
@@ -307,9 +309,10 @@ namespace policy
         return monad_storage::_storage.exception;
       return exception_type();
     }
-    BOOST_OUTCOME_CONSTEXPR BOOSTLITE_FORCEINLINE exception_type exception() const { return get_exception(); }
-    BOOST_OUTCOME_CONSTEXPR exception_type get_exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
-    BOOST_OUTCOME_CONSTEXPR exception_type exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
+    QUICKCPPLIB_CONSTEXPR QUICKCPPLIB_FORCEINLINE exception_type exception() const { return get_exception(); }
+    QUICKCPPLIB_CONSTEXPR exception_type exception_or(exception_type e) const noexcept { return monad_storage::has_exception() ? monad_storage::_storage.exception : std::move(e); }
+    QUICKCPPLIB_CONSTEXPR void set_exception(exception_type v) { monad_storage::_storage.emplace_exception(std::move(v)); }
+    template <typename E, typename = typename std::enable_if<std::is_same<E, E>::value && !std::is_void<exception_type>::value>::type> QUICKCPPLIB_CONSTEXPR void set_exception(E &&e) { set_exception(make_exception_type(std::forward<E>(e))); }
 #endif
   };
 

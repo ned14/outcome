@@ -17,7 +17,7 @@ namespace checked
     NegativeSquareRoot
   };
   
-  using MathResult = outcome::expected<double, MathError>;
+  using MathResult = outcome::experimental::expected<double, MathError>;
   
   MathResult div(double x, double y) noexcept
   {
@@ -25,7 +25,7 @@ namespace checked
     {
       // This operation would fail, instead let's return the reason of
       // the failure wrapped in E
-      return outcome::make_unexpected(MathError::DivisionByZero);
+      return outcome::experimental::make_unexpected(MathError::DivisionByZero);
     }
     else
     {
@@ -37,14 +37,14 @@ namespace checked
   MathResult sqrt(double x) noexcept
   {
     if(x < 0.0)
-      return outcome::make_unexpected(MathError::NegativeSquareRoot);
+      return outcome::experimental::make_unexpected(MathError::NegativeSquareRoot);
     return ::sqrt(x);
   }
 
   MathResult ln(double x) noexcept
   {
     if(x < 0.0)
-      return outcome::make_unexpected(MathError::NegativeLogarithm);
+      return outcome::experimental::make_unexpected(MathError::NegativeLogarithm);
     return ::log(x);
   }
 }

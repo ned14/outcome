@@ -32,7 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <_mingw.h>
 #endif
 
-#include "../boost-lite/include/config.hpp"
+#include "../quickcpplib/include/config.hpp"
 
 #ifndef __cpp_attributes
 #error Boost.Outcome needs attributes support in the compiler
@@ -51,45 +51,19 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 
-#include "../boost-lite/include/import.h"
-#undef BOOST_OUTCOME_V1_STL11_IMPL
-#undef BOOST_OUTCOME_V1_ERROR_CODE_IMPL
+#include "../quickcpplib/include/import.h"
 #undef BOOST_OUTCOME_V1
 #undef BOOST_OUTCOME_V1_NAMESPACE
 #undef BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 #undef BOOST_OUTCOME_V1_NAMESPACE_END
 
-// Default to the C++ 11 STL for atomic, chrono, mutex and thread except on Mingw32
-#if(defined(BOOST_OUTCOME_USE_BOOST_THREAD) && BOOST_OUTCOME_USE_BOOST_THREAD) || (defined(__MINGW32__) && !defined(__MINGW64__) && !defined(__MINGW64_VERSION_MAJOR))
-#define BOOST_OUTCOME_V1_STL11_IMPL boost
-#ifndef BOOST_THREAD_VERSION
-#define BOOST_THREAD_VERSION 3
-#endif
-#if BOOST_THREAD_VERSION < 3
-#error Boost.Outcome requires that Boost.Thread be configured to v3 or later
-#endif
-#else
-//! \brief The C++ 11 STL to use (std|boost). Defaults to std. \ingroup config
-#define BOOST_OUTCOME_V1_STL11_IMPL std
-#ifndef BOOST_OUTCOME_USE_BOOST_THREAD
-//! \brief Whether to use Boost.Thread instead of the C++ 11 STL `std::thread`. Defaults to the C++ 11 STL thread. \ingroup config
-#define BOOST_OUTCOME_USE_BOOST_THREAD 0
-#endif
-#endif
-#if BOOST_OUTCOME_USE_BOOST_ERROR_CODE
-#define BOOST_OUTCOME_V1_ERROR_CODE_IMPL boost
-#else
-//! \brief The C++ 11 `error_code` to use (std|boost). Defaults to std. \ingroup config
-#define BOOST_OUTCOME_V1_ERROR_CODE_IMPL std
-#endif
-
 #ifdef BOOST_OUTCOME_UNSTABLE_VERSION
 #include "../revision.hpp"
-#define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL, BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE), inline)
+#define BOOST_OUTCOME_V1 (boost), (outcome), (QUICKCPPLIB_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_PREVIOUS_COMMIT_UNIQUE), inline)
 #elif BOOST_OUTCOME_LATEST_VERSION == 1
-#define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL), inline)
+#define BOOST_OUTCOME_V1 (boost), (outcome), (QUICKCPPLIB_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION), inline)
 #else
-#define BOOST_OUTCOME_V1 (boost), (outcome), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION, BOOST_OUTCOME_V1_STL11_IMPL, BOOST_OUTCOME_V1_ERROR_CODE_IMPL))
+#define BOOST_OUTCOME_V1 (boost), (outcome), (QUICKCPPLIB_BIND_NAMESPACE_VERSION(, BOOST_OUTCOME_NAMESPACE_VERSION))
 #endif
 /*! \def BOOST_OUTCOME_V1
 \ingroup config
@@ -106,6 +80,10 @@ namespace boost
     //! Inline namespace for this version of Outcome
     inline namespace v1_xxx
     {
+      //! Contains ABI and API unstable things
+      namespace experimental
+      {
+      }
     }
   }
 }
@@ -143,82 +121,28 @@ exported Outcome v1 namespace.
   }                                                                                                                                                                                                                                                                                                                            \
   }
 #elif defined(GENERATING_OUTCOME_MODULE_INTERFACE)
-#define BOOST_OUTCOME_V1_NAMESPACE BOOSTLITE_BIND_NAMESPACE(BOOST_OUTCOME_V1)
-#define BOOST_OUTCOME_V1_NAMESPACE_BEGIN BOOSTLITE_BIND_NAMESPACE_BEGIN(BOOST_OUTCOME_V1)
-#define BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN BOOSTLITE_BIND_NAMESPACE_EXPORT_BEGIN(BOOST_OUTCOME_V1)
-#define BOOST_OUTCOME_V1_NAMESPACE_END BOOSTLITE_BIND_NAMESPACE_END(BOOST_OUTCOME_V1)
+#define BOOST_OUTCOME_V1_NAMESPACE QUICKCPPLIB_BIND_NAMESPACE(BOOST_OUTCOME_V1)
+#define BOOST_OUTCOME_V1_NAMESPACE_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(BOOST_OUTCOME_V1)
+#define BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN(BOOST_OUTCOME_V1)
+#define BOOST_OUTCOME_V1_NAMESPACE_END QUICKCPPLIB_BIND_NAMESPACE_END(BOOST_OUTCOME_V1)
 #else
-#define BOOST_OUTCOME_V1_NAMESPACE BOOSTLITE_BIND_NAMESPACE(BOOST_OUTCOME_V1)
-#define BOOST_OUTCOME_V1_NAMESPACE_BEGIN BOOSTLITE_BIND_NAMESPACE_BEGIN(BOOST_OUTCOME_V1)
-#define BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN BOOSTLITE_BIND_NAMESPACE_BEGIN(BOOST_OUTCOME_V1)
-#define BOOST_OUTCOME_V1_NAMESPACE_END BOOSTLITE_BIND_NAMESPACE_END(BOOST_OUTCOME_V1)
-#endif
-
-#undef BOOST_OUTCOME_NEED_DEFINE
-#undef BOOST_OUTCOME_NEED_DEFINE_DESCRIPTION
-#if !BOOST_OUTCOME_USE_BOOST_THREAD && !BOOST_OUTCOME_USE_BOOST_ERROR_CODE
-#ifndef BOOST_OUTCOME_NEED_DEFINE_00
-#define BOOST_OUTCOME_NEED_DEFINE_DESCRIPTION "BOOST_OUTCOME_USE_BOOST_THREAD=0 BOOST_OUTCOME_USE_BOOST_ERROR_CODE=0"
-#define BOOST_OUTCOME_NEED_DEFINE_00
-#define BOOST_OUTCOME_NEED_DEFINE 1
-#endif
-#elif BOOST_OUTCOME_USE_BOOST_THREAD && !BOOST_OUTCOME_USE_BOOST_ERROR_CODE
-#ifndef BOOST_OUTCOME_NEED_DEFINE_10
-#define BOOST_OUTCOME_NEED_DEFINE_DESCRIPTION "BOOST_OUTCOME_USE_BOOST_THREAD=1 BOOST_OUTCOME_USE_BOOST_ERROR_CODE=0"
-#define BOOST_OUTCOME_NEED_DEFINE_10
-#define BOOST_OUTCOME_NEED_DEFINE 1
-#endif
-#elif !BOOST_OUTCOME_USE_BOOST_THREAD && BOOST_OUTCOME_USE_BOOST_ERROR_CODE
-#ifndef BOOST_OUTCOME_NEED_DEFINE_01
-#define BOOST_OUTCOME_NEED_DEFINE_DESCRIPTION "BOOST_OUTCOME_USE_BOOST_THREAD=0 BOOST_OUTCOME_USE_BOOST_ERROR_CODE=1"
-#define BOOST_OUTCOME_NEED_DEFINE_01
-#define BOOST_OUTCOME_NEED_DEFINE 1
-#endif
-#elif BOOST_OUTCOME_USE_BOOST_THREAD && BOOST_OUTCOME_USE_BOOST_ERROR_CODE
-#ifndef BOOST_OUTCOME_NEED_DEFINE_11
-#define BOOST_OUTCOME_NEED_DEFINE_DESCRIPTION "BOOST_OUTCOME_USE_BOOST_THREAD=1 BOOST_OUTCOME_USE_BOOST_ERROR_CODE=1"
-#define BOOST_OUTCOME_NEED_DEFINE_11
-#define BOOST_OUTCOME_NEED_DEFINE 1
-#endif
-#endif
-
-#ifdef BOOST_OUTCOME_NEED_DEFINE
-#undef BOOST_OUTCOME_MONAD_H
-#undef BOOST_OUTCOME_VALUE_STORAGE_H
-
-#if BOOST_OUTCOME_USE_BOOST_ERROR_CODE
-#include "../boost-lite/include/bind/stl11/boost/system_error"
-BOOST_OUTCOME_V1_NAMESPACE_BEGIN
-namespace stl11
-{
-  using namespace boost_lite::bind::boost::system_error;
-}
-BOOST_OUTCOME_V1_NAMESPACE_END
-#else
-#include "../boost-lite/include/bind/stl11/std/system_error"
-BOOST_OUTCOME_V1_NAMESPACE_BEGIN
-namespace stl11
-{
-  using namespace boost_lite::bind::std::system_error;
-}
-BOOST_OUTCOME_V1_NAMESPACE_END
-#endif
-
-// If we have relaxed constexpr on this compiler, use that
-#if __cpp_constexpr >= 201304
-#define BOOST_OUTCOME_CONSTEXPR constexpr
-#else
-#define BOOST_OUTCOME_CONSTEXPR
+#define BOOST_OUTCOME_V1_NAMESPACE QUICKCPPLIB_BIND_NAMESPACE(BOOST_OUTCOME_V1)
+#define BOOST_OUTCOME_V1_NAMESPACE_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(BOOST_OUTCOME_V1)
+#define BOOST_OUTCOME_V1_NAMESPACE_EXPORT_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(BOOST_OUTCOME_V1)
+#define BOOST_OUTCOME_V1_NAMESPACE_END QUICKCPPLIB_BIND_NAMESPACE_END(BOOST_OUTCOME_V1)
 #endif
 
 #include <cassert>  // for asserting :)
 #ifndef BOOST_OUTCOME_DISABLE_IOSTREAMS
 #include <ostream>  // for printing
 #endif
+#include <system_error>
+
+namespace stl11 = std;
 
 // Bring this in now because error_code_extended uses it via ringbuffer_log
 #ifdef _WIN32
-#include "../boost-lite/include/execinfo_win64.h"
+#include "../quickcpplib/include/execinfo_win64.h"
 #else
 #include <execinfo.h>
 #endif
@@ -231,7 +155,7 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 namespace detail
 {
-  BOOSTLITE_NORETURN inline void do_fatal_exit(const char *expr)
+  QUICKCPPLIB_NORETURN inline void do_fatal_exit(const char *expr)
   {
     void *bt[16];
     size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0]));
@@ -257,11 +181,11 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 #define BOOST_OUTCOME_THROW_DESERIALISATION_FAILURE(m, expr) BOOST_OUTCOME_THROW(expr)
 #endif
 
-#ifndef BOOST_OUTCOME_THROW_MONAD_ERROR
-/*! \brief Predefine to have something else occur when Outcome throws a monad_error due to being asked to do something not possible
+#ifndef BOOST_OUTCOME_THROW_BAD_OUTCOME
+/*! \brief Predefine to have something else occur when Outcome throws a `bad_outcome` due to being asked to do something not possible
 \return Can return false to cancel the calling operation (see `_throw_error()` in monad_policy.ipp).
 */
-#define BOOST_OUTCOME_THROW_MONAD_ERROR(ec, expr) BOOST_OUTCOME_THROW(expr), false
+#define BOOST_OUTCOME_THROW_BAD_OUTCOME(ec, expr) BOOST_OUTCOME_THROW(expr), false
 #endif
 
 #ifndef BOOST_OUTCOME_THROW_SYSTEM_ERROR
@@ -280,10 +204,7 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 
 #ifndef BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS
 //! \brief Predefine to what you want the Expected implementation to when throwing a bad_expected_access
-#define BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS(...) BOOST_OUTCOME_THROW(make_bad_expected_access(__VA_ARGS__))
+#define BOOST_OUTCOME_THROW_BAD_EXPECTED_ACCESS(...) BOOST_OUTCOME_THROW(experimental::make_bad_expected_access(__VA_ARGS__))
 #endif
-
-
-#endif  // BOOST_OUTCOME_NEED_DEFINE
 
 #endif

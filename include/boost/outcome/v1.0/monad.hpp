@@ -44,7 +44,7 @@ Distributed under the Boost Software License, Version 1.0.
 #if defined(__cpp_modules)
 #if defined(GENERATING_OUTCOME_MODULE_INTERFACE)
 // We are generating this module's interface
-#define BOOSTLITE_HEADERS_ONLY 0
+#define QUICKCPPLIB_HEADERS_ONLY 0
 #define BOOST_OUTCOME_HEADERS_ONLY 0
 #define BOOST_OUTCOME_INCLUDE_ALL
 #elif defined(BOOST_OUTCOME_SOURCE)
@@ -70,11 +70,11 @@ import BOOST_OUTCOME_MODULE_NAME;
 #pragma warning(disable : 4996)  // use of strncpy
 #endif
 
+#include "bad_outcome.hpp"
 #include "error_code_extended.hpp"
-#include "monad_error.hpp"
 #include "value_storage.hpp"
 
-#include "../boost-lite/include/tribool.hpp"
+#include "../quickcpplib/include/tribool.hpp"
 
 /*! \defgroup macro_helpers Useful preprocessor macros which expand into commonly written boilerplate
 \ingroup monad
@@ -117,10 +117,6 @@ constexpr in_place_t in_place;
 //! \brief True if the type passed is a monad or a reference to a monad
 template <class M> static constexpr bool is_monad = detail::is_monad<typename std::decay<M>::type>::value;
 
-//! \brief Specialise to whitelist a type with throwing move constructors for use with basic monad
-template <class T>
-static constexpr bool enable_move_throwing_type = (std::is_move_constructible<T>::value && std::is_nothrow_move_constructible<T>::value) || (std::is_copy_constructible<T>::value && std::is_nothrow_copy_constructible<T>::value) || (!std::is_move_constructible<T>::value && !std::is_copy_constructible<T>::value);
-
 /*! \class basic_monad
 \brief Implements a configurable lightweight simple monadic value transport with the same semantics and API as a future
 \tparam implementation_policy An implementation policy type
@@ -128,9 +124,9 @@ static constexpr bool enable_move_throwing_type = (std::is_move_constructible<T>
 
 */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-template <class implementation_policy> class BOOSTLITE_NODISCARD basic_monad : public implementation_policy
+template <class implementation_policy> class QUICKCPPLIB_NODISCARD basic_monad : public implementation_policy
 #else
-template <class implementation_policy> class BOOSTLITE_NODISCARD basic_monad : public implementation_policy::base
+template <class implementation_policy> class QUICKCPPLIB_NODISCARD basic_monad : public implementation_policy::base
 #endif
 {
   // Allow my policy unfettered acces
@@ -184,14 +180,6 @@ public:
   //! \brief Rebind this monad type into a different value_type
   template <typename U> using rebind = typename implementation_policy::template rebind<U>;
 
-  // If types are move constructible, make sure they are nothrow move constructible
-  static_assert(enable_move_throwing_type<value_type>,
-                "WARNING: value_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception every time a move happens. Either make your type never throw during moves, or specialise enable_move_throwing_type<T> to disable this check.");
-  static_assert(enable_move_throwing_type<error_type>,
-                "WARNING: error_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception every time a move happens. Either make your type never throw during moves, or specialise enable_move_throwing_type<T> to disable this check.");
-  static_assert(enable_move_throwing_type<exception_type>,
-                "WARNING: exception_type used in basic_monad is not nothrow move constructible which means you must write code to handle valueless by exception every time a move happens. Either make your type never throw during moves, or specialise enable_move_throwing_type<T> to disable this check.");
-
 private:
   struct implicit_conversion_from_void_disabled
   {
@@ -223,7 +211,7 @@ public:
   static constexpr bool is_nothrow_destructible = value_storage_type::is_nothrow_destructible;
   //! \brief This monad does not implement a destructor
   static constexpr bool is_trivially_destructible = value_storage_type::is_trivially_destructible;
-#if defined(DOXYGEN_IS_IN_THE_HOUSE) || defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 191025017 /* VS2017 RTM */)
+#if defined(DOXYGEN_IS_IN_THE_HOUSE) || defined(__c2__) || (!defined(_MSC_VER) || _MSC_FULL_VER > 191025019 /* VS2017 Update 1 */)
   //! \brief This monad is constructible from the monad specified
   template <class OtherMonad> static constexpr bool is_constructible = value_storage_type::template is_constructible_from<typename OtherMonad::raw_value_type, typename OtherMonad::raw_error_type, typename OtherMonad::raw_exception_type>;
   //! \brief This monad is comparable to the monad specified. Note this is as if ThisMonad::operator==(OtherMonad), so without associativity i.e. is this monad comparable to the other monad which != the other monad is comparable to this monad.
@@ -248,9 +236,7 @@ public:
   //! \brief Same as `true_(tribool(*this))`
   constexpr explicit operator bool() const noexcept { return has_value(); }
   //! \brief True if monad contains a value_type, unknown if monad is empty, else false if monad is errored/excepted.
-  constexpr explicit operator boost_lite::tribool::tribool() const noexcept { return has_value() ? boost_lite::tribool::tribool::true_ : empty() ? boost_lite::tribool::tribool::unknown : boost_lite::tribool::tribool::false_; }
-  //! \brief True if monad is not empty
-  constexpr bool is_ready() const noexcept { return implementation_policy::base::_storage.type != value_storage_type::storage_type::empty; }
+  constexpr explicit operator QUICKCPPLIB_NAMESPACE::tribool::tribool() const noexcept { return has_value() ? QUICKCPPLIB_NAMESPACE::tribool::tribool::true_ : empty() ? QUICKCPPLIB_NAMESPACE::tribool::tribool::unknown : QUICKCPPLIB_NAMESPACE::tribool::tribool::false_; }
   //! \brief True if monad is empty
   constexpr bool empty() const noexcept { return implementation_policy::base::_storage.type == value_storage_type::storage_type::empty; }
   //! \brief True if monad contains a value_type
@@ -264,44 +250,36 @@ public:
   constexpr bool has_exception(bool only_exception = false) const noexcept { return implementation_policy::base::_storage.type == value_storage_type::storage_type::exception || (!only_exception && implementation_policy::base::_storage.type == value_storage_type::storage_type::error); }
 
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
-  BOOST_OUTCOME_CONSTEXPR value_type &get_or(value_type &v) & noexcept { return has_value() ? implementation_policy::base::_storage.value : v; }
+  QUICKCPPLIB_CONSTEXPR value_type &get_or(value_type &v) & noexcept { return has_value() ? implementation_policy::base::_storage.value : v; }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
-  BOOST_OUTCOME_CONSTEXPR value_type &value_or(value_type &v) & noexcept { return has_value() ? implementation_policy::base::_storage.value : v; }
+  QUICKCPPLIB_CONSTEXPR value_type &value_or(value_type &v) & noexcept { return has_value() ? implementation_policy::base::_storage.value : v; }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
   constexpr const value_type &get_or(const value_type &v) const &noexcept { return has_value() ? implementation_policy::base::_storage.value : v; }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
   constexpr const value_type &value_or(const value_type &v) const &noexcept { return has_value() ? implementation_policy::base::_storage.value : v; }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
-  BOOST_OUTCOME_CONSTEXPR value_type &&get_or(value_type &&v) && noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
+  QUICKCPPLIB_CONSTEXPR value_type &&get_or(value_type &&v) && noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
-  BOOST_OUTCOME_CONSTEXPR value_type &&value_or(value_type &&v) && noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
+  QUICKCPPLIB_CONSTEXPR value_type &&value_or(value_type &&v) && noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
-  BOOST_OUTCOME_CONSTEXPR const value_type &&get_or(const value_type &&v) const &&noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
+  QUICKCPPLIB_CONSTEXPR const value_type &&get_or(const value_type &&v) const &&noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
   //! \brief If contains a value_type, return that value type, else return the supplied value_type
-  BOOST_OUTCOME_CONSTEXPR const value_type &&value_or(const value_type &&v) const &&noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
+  QUICKCPPLIB_CONSTEXPR const value_type &&value_or(const value_type &&v) const &&noexcept { return has_value() ? std::move(implementation_policy::base::_storage.value) : std::move(v); }
   //! \brief Disposes of any existing state, setting the monad to the value storage
-  BOOST_OUTCOME_CONSTEXPR void set_state(value_storage_type &&v) { implementation_policy::base::_storage.set_state(std::move(v)); }
+  QUICKCPPLIB_CONSTEXPR void set_state(value_storage_type &&v) { implementation_policy::base::_storage.set_state(std::move(v)); }
   //! \brief Disposes of any existing state, setting the monad to a copy of the value_type
-  BOOST_OUTCOME_CONSTEXPR void set_value(const value_type &v) { implementation_policy::base::_storage.emplace_value(v); }
+  QUICKCPPLIB_CONSTEXPR void set_value(const value_type &v) { implementation_policy::base::_storage.emplace_value(v); }
   //! \brief Disposes of any existing state, setting the monad to a move of the value_type
-  BOOST_OUTCOME_CONSTEXPR void set_value(value_type &&v) { implementation_policy::base::_storage.emplace_value(std::move(v)); }
+  QUICKCPPLIB_CONSTEXPR void set_value(value_type &&v) { implementation_policy::base::_storage.emplace_value(std::move(v)); }
   //! \brief Disposes of any existing state, setting the monad to a default value
-  BOOST_OUTCOME_CONSTEXPR void set_value() { implementation_policy::base::_storage.emplace_value(value_type()); }
+  QUICKCPPLIB_CONSTEXPR void set_value() { implementation_policy::base::_storage.emplace_value(value_type()); }
   //! \brief Disposes of any existing state, setting the monad to an emplaced construction
-  template <class... Args> BOOST_OUTCOME_CONSTEXPR void emplace(Args &&... args) { implementation_policy::base::_storage.emplace_value(std::forward<Args>(args)...); }
-
-  //! \brief Disposes of any existing state, setting the monad to the error_type
-  BOOST_OUTCOME_CONSTEXPR void set_error(error_type v) { implementation_policy::base::_storage.emplace_error(std::move(v)); }
-
-  //! \brief Disposes of any existing state, setting the monad to the exception_type
-  BOOST_OUTCOME_CONSTEXPR void set_exception(exception_type v) { implementation_policy::base::_storage.emplace_exception(std::move(v)); }
-  //! \brief Disposes of any existing state, setting the monad to make_exception_type(forward<E>(e))
-  template <typename E, typename = typename std::enable_if<std::is_same<E, E>::value && has_exception_type>::type> BOOST_OUTCOME_CONSTEXPR void set_exception(E &&e) { set_exception(make_exception_type(std::forward<E>(e))); }
+  template <class... Args> QUICKCPPLIB_CONSTEXPR void emplace(Args &&... args) { implementation_policy::base::_storage.emplace_value(std::forward<Args>(args)...); }
 
   //! \brief Swaps one monad for another
-  BOOST_OUTCOME_CONSTEXPR void swap(basic_monad &o) noexcept(is_nothrow_move_constructible) { implementation_policy::base::_storage.swap(o._storage); }
+  QUICKCPPLIB_CONSTEXPR void swap(basic_monad &o) noexcept(is_nothrow_move_constructible) { implementation_policy::base::_storage.swap(o._storage); }
   //! \brief Destructs any state stored, resetting to empty
-  BOOST_OUTCOME_CONSTEXPR void clear() noexcept(is_nothrow_destructible) { implementation_policy::base::_storage.clear(); }
+  QUICKCPPLIB_CONSTEXPR void clear() noexcept(is_nothrow_destructible) { implementation_policy::base::_storage.clear(); }
 
   // Accessor for underlying storage. Used by the comparison functions
   const value_storage_type &__storage() const noexcept { return this->_storage; }
@@ -412,7 +390,7 @@ allows a very easy way of converting between different configurations of monad c
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
   template <class F> basic_monad<...> next(F &&f);
 #else
-  template <class _F> BOOST_OUTCOME_CONSTEXPR typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_monad>::type, typename std::decay<_F>::type, implementation_policy>::output_type next(_F &&f)
+  template <class _F> QUICKCPPLIB_CONSTEXPR typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, basic_monad>::type, typename std::decay<_F>::type, implementation_policy>::output_type next(_F &&f)
   {
     typedef typename std::decay<_F>::type F;
     typedef traits::callable_argument_traits<F, basic_monad> f_traits;
@@ -425,20 +403,20 @@ allows a very easy way of converting between different configurations of monad c
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
   basic_monad<...> unwrap() const &;
 #else
-  BOOST_OUTCOME_CONSTEXPR typename detail::do_unwrap<basic_monad>::output_type unwrap() const & { return detail::do_unwrap<basic_monad>()(*this); }
+  QUICKCPPLIB_CONSTEXPR typename detail::do_unwrap<basic_monad>::output_type unwrap() const & { return detail::do_unwrap<basic_monad>()(*this); }
 #endif
 //! \brief If I am a basic_monad<basic_monad<...>>, return move of most nested basic_monad<...>, else return move of *this
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
   basic_monad<...> unwrap() &&;
 #else
-  BOOST_OUTCOME_CONSTEXPR typename detail::do_unwrap<basic_monad>::output_type unwrap() && { return detail::do_unwrap<basic_monad>()(std::move(*this)); }
+  QUICKCPPLIB_CONSTEXPR typename detail::do_unwrap<basic_monad>::output_type unwrap() && { return detail::do_unwrap<basic_monad>()(std::move(*this)); }
 #endif
 
 //! \brief If bool(*this), return basic_monad(F(get())).unwrap, else return basic_monad<result_of<F(get())>>(error)
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
   template <class F> basic_monad<...> bind(F &&f);
 #else
-  template <class _F> BOOST_OUTCOME_CONSTEXPR typename detail::do_bind<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type bind(_F &&f)
+  template <class _F> QUICKCPPLIB_CONSTEXPR typename detail::do_bind<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type bind(_F &&f)
   {
     typedef typename std::decay<_F>::type F;
     typedef detail::do_bind<typename detail::bind_map_parameter_validation<F, basic_monad>::return_type, F, basic_monad> impl;
@@ -456,14 +434,14 @@ allows a very easy way of converting between different configurations of monad c
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
   template <class F> basic_monad<...> operator>>(F &&f);
 #else
-  template <class _F> BOOST_OUTCOME_CONSTEXPR typename detail::do_bind<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type operator>>(_F &&f) { return bind(std::forward<_F>(f)); }
+  template <class _F> QUICKCPPLIB_CONSTEXPR typename detail::do_bind<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type operator>>(_F &&f) { return bind(std::forward<_F>(f)); }
 #endif
 
 //! \brief If bool(*this), return basic_monad(F(get())), else return basic_monad<result_of<F(get())>>(error)
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
   template <class F> basic_monad<...> map(F &&f);
 #else
-  template <class _F> BOOST_OUTCOME_CONSTEXPR typename detail::do_map<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type map(_F &&f)
+  template <class _F> QUICKCPPLIB_CONSTEXPR typename detail::do_map<typename detail::bind_map_parameter_validation<typename std::decay<_F>::type, basic_monad>::return_type, typename std::decay<_F>::type, basic_monad>::output_type map(_F &&f)
   {
     typedef typename std::decay<_F>::type F;
     typedef detail::do_map<typename detail::bind_map_parameter_validation<F, basic_monad>::return_type, F, basic_monad> impl;
@@ -483,7 +461,7 @@ allows a very easy way of converting between different configurations of monad c
   template <class F> basic_monad(F(contents)).unwrap() match(F &&f);
 #else
   template <class _F>
-  BOOST_OUTCOME_CONSTEXPR typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, value_type>::type, typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, value_type>::type(basic_monad &&), implementation_policy>::output_type match(_F &&f)
+  QUICKCPPLIB_CONSTEXPR typename detail::do_next<typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, value_type>::type, typename traits::is_callable_is_well_formed<typename std::decay<_F>::type, value_type>::type(basic_monad &&), implementation_policy>::output_type match(_F &&f)
   {
     typedef typename std::decay<_F>::type F;
     typedef traits::callable_argument_traits<F, value_type> f_traits_value;
@@ -503,24 +481,24 @@ allows a very easy way of converting between different configurations of monad c
   }
 
   //! \brief If contains a value_type, invoke the call operator on that type. Return type must be default constructible.
-  template <class... Args, typename = typename std::result_of<value_type(Args...)>::type> BOOST_OUTCOME_CONSTEXPR auto operator()(Args &&... args) -> decltype(this->get()(std::forward<Args>(args)...))
+  template <class... Args, typename = typename std::result_of<value_type(Args...)>::type> QUICKCPPLIB_CONSTEXPR auto operator()(Args &&... args) -> decltype(this->get()(std::forward<Args>(args)...))
   {
     typedef decltype(this->get()(std::forward<Args>(args)...)) rettype;
     return has_value() ? this->get()(std::forward<Args>(args)...) : rettype();
   }
 
   //! \brief If contains a value_type, return that value type, else return the supplied type
-  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_CONSTEXPR basic_monad operator|(U &&v) & { return has_value() ? *this : basic_monad(std::forward<U>(v)); }
+  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> QUICKCPPLIB_CONSTEXPR basic_monad operator|(U &&v) & { return has_value() ? *this : basic_monad(std::forward<U>(v)); }
   //! \brief If contains a value_type, return that value type, else return the supplied type
-  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_CONSTEXPR basic_monad operator|(U &&v) const & { return has_value() ? *this : basic_monad(std::forward<U>(v)); }
+  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> QUICKCPPLIB_CONSTEXPR basic_monad operator|(U &&v) const & { return has_value() ? *this : basic_monad(std::forward<U>(v)); }
   //! \brief If contains a value_type, return that value type, else return the supplied type
-  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_CONSTEXPR basic_monad operator|(U &&v) && { return has_value() ? std::move(*this) : basic_monad(std::forward<U>(v)); }
+  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> QUICKCPPLIB_CONSTEXPR basic_monad operator|(U &&v) && { return has_value() ? std::move(*this) : basic_monad(std::forward<U>(v)); }
   //! \brief If contains a value_type, return the supplied type else the value_type
-  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_CONSTEXPR basic_monad operator&(U &&v) & { return has_value() ? basic_monad(std::forward<U>(v)) : *this; }
+  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> QUICKCPPLIB_CONSTEXPR basic_monad operator&(U &&v) & { return has_value() ? basic_monad(std::forward<U>(v)) : *this; }
   //! \brief If contains a value_type, return the supplied type else the value_type
-  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_CONSTEXPR basic_monad operator&(U &&v) const & { return has_value() ? basic_monad(std::forward<U>(v)) : *this; }
+  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> QUICKCPPLIB_CONSTEXPR basic_monad operator&(U &&v) const & { return has_value() ? basic_monad(std::forward<U>(v)) : *this; }
   //! \brief If contains a value_type, return the supplied type else the value_type
-  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> BOOST_OUTCOME_CONSTEXPR basic_monad operator&(U &&v) && { return has_value() ? basic_monad(std::forward<U>(v)) : std::move(*this); }
+  template <class U, typename = typename std::enable_if<std::is_constructible<basic_monad, U>::value>::type> QUICKCPPLIB_CONSTEXPR basic_monad operator&(U &&v) && { return has_value() ? basic_monad(std::forward<U>(v)) : std::move(*this); }
 
 
 #endif
@@ -577,8 +555,8 @@ namespace policy
     constexpr basic_monad_storage() = default;
     constexpr basic_monad_storage(const basic_monad_storage &) = default;
     constexpr basic_monad_storage(basic_monad_storage &&) = default;
-    BOOST_OUTCOME_CONSTEXPR basic_monad_storage &operator=(const basic_monad_storage &) = default;
-    BOOST_OUTCOME_CONSTEXPR basic_monad_storage &operator=(basic_monad_storage &&) = default;
+    QUICKCPPLIB_CONSTEXPR basic_monad_storage &operator=(const basic_monad_storage &) = default;
+    QUICKCPPLIB_CONSTEXPR basic_monad_storage &operator=(basic_monad_storage &&) = default;
     template <class Policy>
     constexpr basic_monad_storage(detail::tagged_valueless<basic_monad<Policy>> &&o)
         : _storage(typename value_storage_type::valueless_t(), std::move(o.value._storage))
@@ -986,7 +964,7 @@ template <class T> inline result<void> as_void(const result<T> &v)
   return make_empty_result<void>();
 }
 //! \brief Makes a void option from an input option, forwarding any emptiness \ingroup monad
-template <class T> BOOSTLITE_CONSTEXPR inline option<void> as_void(const option<T> &v)
+template <class T> QUICKCPPLIB_CONSTEXPR inline option<void> as_void(const option<T> &v)
 {
   if(v.has_value())
     return make_valued_option<void>();
@@ -1010,145 +988,129 @@ See https://ned14.github.io/boost.outcome/md_doc_md_08-expectedsynopsis.html for
 #define BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE std::error_code
 #endif
 
-/*! \class bad_expected_access_base
-\ingroup expected
-\brief The base exception type thrown when you try to access an errored expected
-*/
-class bad_expected_access_base : public std::logic_error
+namespace experimental
 {
-public:
-  //! \brief The type of error
-  using error_type = void;
-  //! \brief Constructs an instance
-  bad_expected_access_base(const char *what)
-      : std::logic_error(what)
+  //! \brief Constexpr instance of in_place construction tag type
+  constexpr in_place_t in_place;
+
+  /*! \class bad_expected_access_base
+  \ingroup expected
+  \brief The base exception type thrown when you try to access an errored expected
+  */
+  class bad_expected_access_base : public std::logic_error
   {
-  }
-};
+  public:
+    //! \brief The type of error
+    using error_type = void;
+    //! \brief Constructs an instance
+    bad_expected_access_base(const char *what)
+        : std::logic_error(what)
+    {
+    }
+  };
 
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4814)
 #endif
-/*! \class bad_expected_access
-\ingroup expected
-\brief The exception type thrown when you try to access an errored expected
-*/
-template <class E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class bad_expected_access : public bad_expected_access_base
-{
-  E _error;
+  /*! \class bad_expected_access
+  \ingroup expected
+  \brief The exception type thrown when you try to access an errored expected
+  */
+  template <class E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class bad_expected_access : public bad_expected_access_base
+  {
+    E _error;
 
-public:
-  //! \brief The type of error
-  using error_type = E;
-  //! \brief Constructs an instance taking a copy
-  explicit bad_expected_access(const error_type &e) noexcept : bad_expected_access_base("Bad expected access of value when error was present"), _error(e) {}
-  //! \brief Returns the error
-  const error_type &error() const &noexcept { return _error; }
-  //! \brief Returns the error
-  error_type &error() & noexcept { return _error; }
-  //! \brief Returns the error
-  const error_type &&error() const &&noexcept { return _error; }
-  //! \brief Returns the error
-  error_type &&error() && noexcept { return _error; }
-};
-//! \brief Type thrown due to valueless by exception state
-template <> class bad_expected_access<void> : public bad_expected_access_base
-{
-public:
-  //! \brief The type of error
-  using error_type = void;
-  //! \brief Constructs an instance
-  explicit bad_expected_access() noexcept : bad_expected_access_base("Bad expected access of value when valueless due to exception") {}
-};
-template <class E> inline bad_expected_access<E> make_bad_expected_access(const E &v) noexcept
-{
-  return bad_expected_access<E>(v);
-}
-inline bad_expected_access<void> make_bad_expected_access() noexcept
-{
-  return bad_expected_access<void>();
-}
+  public:
+    //! \brief The type of error
+    using error_type = E;
+    //! \brief Constructs an instance taking a copy
+    explicit bad_expected_access(const error_type &e) noexcept : bad_expected_access_base("Bad expected access of value when error was present"), _error(e) {}
+    //! \brief Returns the error
+    const error_type &error() const &noexcept { return _error; }
+    //! \brief Returns the error
+    error_type &error() & noexcept { return _error; }
+    //! \brief Returns the error
+    const error_type &&error() const &&noexcept { return _error; }
+    //! \brief Returns the error
+    error_type &&error() && noexcept { return _error; }
+  };
+  //! \brief Type thrown due to valueless by exception state
+  template <> class bad_expected_access<void> : public bad_expected_access_base
+  {
+  public:
+    //! \brief The type of error
+    using error_type = void;
+    //! \brief Constructs an instance
+    explicit bad_expected_access() noexcept : bad_expected_access_base("Bad expected access of value when valueless due to exception") {}
+  };
+  template <class E> inline bad_expected_access<E> make_bad_expected_access(const E &v) noexcept { return bad_expected_access<E>(v); }
+  inline bad_expected_access<void> make_bad_expected_access() noexcept { return bad_expected_access<void>(); }
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
+}  // namespace
 
 #include "detail/expected_policy.ipp"
+
+namespace experimental
+{
 
 /*! \brief `expected<R>` can hold a fixed variant list of empty, a type `R` or a lightweight `std::error_code` at a
 space cost of `max(24, sizeof(R)+8)`. This corresponds to `tribool::unknown`, `tribool::true_` and
 `tribool::false_` respectively. This specialisation matches the proposed Expected implementation before standards. \ingroup expected
 */
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
-template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class expected : public basic_monad<policy::expected_policy_base<policy::basic_monad_storage<policy::expected_policy<R, E>>, R, E>>
-{
+  template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> class expected : public basic_monad<policy::expected_policy_base<policy::basic_monad_storage<policy::expected_policy<R, E>>, R, E>>
+  {
 #define BOOST_OUTCOME_BASIC_MONAD_NAME expected
 #include "detail/basic_monad.ipp"
-};
+  };
 #else
-template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> using expected = basic_monad<policy::expected_policy<R, E>>;
+  template <typename R, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> using expected = basic_monad<policy::expected_policy<R, E>>;
 #endif
-//! \brief Type sugar to indicate type E is an unexpected value \ingroup expected
-template <typename E> using unexpected_type = basic_monad<policy::expected_policy<void, E>>;
-//! \brief Tag type for unexpected \ingroup expected
-using unexpect_t = error_t;
-//! \brief Tag value for unexpected \ingroup expected
-constexpr unexpect_t unexpect = unexpect_t();
+  //! \brief Type sugar to indicate type E is an unexpected value \ingroup expected
+  template <typename E> using unexpected_type = basic_monad<policy::expected_policy<void, E>>;
+  //! \brief Tag type for unexpected \ingroup expected
+  using unexpect_t = error_t;
+  //! \brief Tag value for unexpected \ingroup expected
+  constexpr unexpect_t unexpect = unexpect_t();
 
 
-//! \brief Makes an expected<void> \ingroup expected
-inline expected<void> make_expected()
-{
-  return expected<void>();
-}
-//! \brief Makes an expected from the type passed \ingroup expected
-template <class T, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> constexpr inline expected<T, E> make_expected(T &&v)
-{
-  return expected<T, E>(std::move(v));
-}
-//! \brief Makes an expected from the type passed \ingroup expected
-template <class T, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> constexpr inline expected<T, E> make_expected(const T &v)
-{
-  return expected<T, E>(v);
-}
-//! \brief Makes an unexpected from the type passed \ingroup expected
-template <class E> constexpr inline unexpected_type<typename std::decay<E>::type> make_unexpected(E &&v)
-{
-  return unexpected_type<typename std::decay<E>::type>(std::move(v));
-}
-//! \brief Makes an unexpected from the type passed \ingroup expected
-template <class E> constexpr inline unexpected_type<E> make_unexpected(const E &v)
-{
-  return unexpected_type<E>(v);
-}
-//! \brief Make an errored expected from the type passed \ingroup expected
-template <class T, class E> constexpr inline expected<T, E> make_expected_from_error(E &&v)
-{
-  return expected<T, E>(std::move(v));
-}
-//! \brief Make an errored expected from the type passed \ingroup expected
-template <class T, class E> constexpr inline expected<T, E> make_expected_from_error(const E &v)
-{
-  return expected<T, E>(v);
-}
-//! \brief Make an errored expected from the type passed \ingroup expected
-template <class T, class E, class U, typename = typename std::enable_if<!std::is_same<E, U>::value && std::is_constructible<E, U>::value>::type> constexpr inline expected<T, E> make_expected_from_error(U &&v)
-{
-  return expected<T, E>(std::forward<U>(v));
-}
-// Not implementing this as I think it redundant and highly likely to disappear from the next P-paper
-// template <class F> constexpr expected<typename result_type<F>::type> make_expected_from_call(F f);
+  //! \brief Makes an expected<void> \ingroup expected
+  inline expected<void> make_expected() { return expected<void>(); }
+  //! \brief Makes an expected from the type passed \ingroup expected
+  template <class T, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> constexpr inline expected<T, E> make_expected(T &&v) { return expected<T, E>(std::move(v)); }
+  //! \brief Makes an expected from the type passed \ingroup expected
+  template <class T, typename E = BOOST_OUTCOME_EXPECTED_DEFAULT_ERROR_TYPE> constexpr inline expected<T, E> make_expected(const T &v) { return expected<T, E>(v); }
+  //! \brief Makes an unexpected from the type passed \ingroup expected
+  template <class E> constexpr inline unexpected_type<typename std::decay<E>::type> make_unexpected(E &&v) { return unexpected_type<typename std::decay<E>::type>(std::move(v)); }
+  //! \brief Makes an unexpected from the type passed \ingroup expected
+  template <class E> constexpr inline unexpected_type<E> make_unexpected(const E &v) { return unexpected_type<E>(v); }
+  //! \brief Make an errored expected from the type passed \ingroup expected
+  template <class T, class E> constexpr inline expected<T, E> make_expected_from_error(E &&v) { return expected<T, E>(std::move(v)); }
+  //! \brief Make an errored expected from the type passed \ingroup expected
+  template <class T, class E> constexpr inline expected<T, E> make_expected_from_error(const E &v) { return expected<T, E>(v); }
+  //! \brief Make an errored expected from the type passed \ingroup expected
+  template <class T, class E, class U, typename = typename std::enable_if<!std::is_same<E, U>::value && std::is_constructible<E, U>::value>::type> constexpr inline expected<T, E> make_expected_from_error(U &&v) { return expected<T, E>(std::forward<U>(v)); }
+  // Not implementing this as I think it redundant and highly likely to disappear from the next P-paper
+  // template <class F> constexpr expected<typename result_type<F>::type> make_expected_from_call(F f);
 
 
-//! \brief Makes a void expected from an input expected, forwarding any emptiness or error \ingroup expected
-template <class T, class E> inline expected<void, E> as_void(const expected<T, E> &v)
-{
-  if(v.has_error())
-    return expected<void, E>(v.get_error());
-  if(v.has_value())
-    return expected<void, E>();
-  return expected<void, E>(empty);
-}
+  //! \brief Makes a void expected from an input expected, forwarding any emptiness or error \ingroup expected
+  template <class T, class E> inline expected<void, E> as_void(const expected<T, E> &v)
+  {
+    if(v.has_error())
+      return expected<void, E>(v.get_error());
+    if(v.has_value())
+      return expected<void, E>();
+    return expected<void, E>(empty);
+  }
+
+}  // namespace
+
+// inject experimental::as_void into this namespace
+using experimental::as_void;
 
 /********************************************************** LEWG Expected implementation  ***********************************************************/
 #endif  // BOOST_OUTCOME_LEAN_AND_MEAN
