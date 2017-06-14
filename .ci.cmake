@@ -2,7 +2,7 @@
 # building and testing
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 include(cmake/QuickCppLibBootstrap.cmake)
-include(BoostLiteUtils)
+include(QuickCppLibUtils)
 
 
 CONFIGURE_CTEST_SCRIPT_FOR_CDASH("outcome" "cmake_ci")

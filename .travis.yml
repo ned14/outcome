@@ -99,21 +99,21 @@ script:
    if [ "$__" = "cmake tests osx" ]; then
      ctest -S .ci.cmake -V -E noexcept;
    fi
-# -
-#   if [ "$__" = "Documentation" ]; then
-#     git config --global push.default simple;
-#     git config --global user.name "Jenkins nedprod CI";
-#     git config --global user.email "foo@nowhere";
-#     cd doc/html;
-#     git checkout gh-pages;
-#     cd ../..;
-#     ctest -S .docs.cmake -V;
-#     cd doc/html;
-#     git add . || true;
-#     git commit -a -m "Travis CI updates documentation" || true;
-#     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost.outcome gh-pages;
-#     cd ../..;
-#   fi
+ -
+   if [ "$__" = "Documentation" ]; then
+     git config --global push.default simple;
+     git config --global user.name "Jenkins nedprod CI";
+     git config --global user.email "foo@nowhere";
+     cd doc/html;
+     git checkout gh-pages;
+     cd ../..;
+     ctest -S .docs.cmake -V;
+     cd doc/html;
+     git add . || true;
+     git commit -a -m "Travis CI updates documentation" || true;
+     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost.outcome gh-pages;
+     cd ../..;
+   fi
  
 after_success:
  - bash -x ./update_coveralls.sh `pwd`
