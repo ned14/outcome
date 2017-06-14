@@ -11,8 +11,8 @@
 
 #include "../include/boost/outcome/outcome.hpp"
 
-#define BOOSTLITE_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
-#include "../boost-lite/include/boost/test/unit_test.hpp"
+#define QUICKCPPLIB_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
+#include "../quickcpplib/include/boost/test/unit_test.hpp"
 
 namespace stde = BOOST_OUTCOME_V1_NAMESPACE::experimental;
 
@@ -884,7 +884,7 @@ int main()
   expected_swap_exception();
   expected_swap_function_value();
 
-  return (int) BOOSTLITE_NAMESPACE::unit_test::current_test_case()->fails;
+  return (int) QUICKCPPLIB_NAMESPACE::unit_test::current_test_case()->fails;
 }
 
 #if 0

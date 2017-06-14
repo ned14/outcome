@@ -275,11 +275,11 @@ namespace detail
   // Call C with A either by rvalue or lvalue ref
   template <bool with_rvalue> struct do_invoke
   {
-    template <class C, class A> BOOST_OUTCOME_CONSTEXPR auto operator()(C &&c, A &&a) -> decltype(c(static_cast<typename to_lvalue_ref<A>::type>(a))) { return c(static_cast<typename to_lvalue_ref<A>::type>(a)); }
+    template <class C, class A> QUICKCPPLIB_CONSTEXPR auto operator()(C &&c, A &&a) -> decltype(c(static_cast<typename to_lvalue_ref<A>::type>(a))) { return c(static_cast<typename to_lvalue_ref<A>::type>(a)); }
   };
   template <> struct do_invoke<true>
   {
-    template <class C, class A> BOOST_OUTCOME_CONSTEXPR auto operator()(C &&c, A &&a) -> decltype(c(std::move(a))) { return c(std::move(a)); }
+    template <class C, class A> QUICKCPPLIB_CONSTEXPR auto operator()(C &&c, A &&a) -> decltype(c(std::move(a))) { return c(std::move(a)); }
   };
   /* Invokes the callable passed to next() folding any monad return type
   R is the type returned by the callable
@@ -302,7 +302,7 @@ namespace detail
         : _c(std::forward<U>(c))
     {
     }
-    BOOST_OUTCOME_CONSTEXPR output_type operator()(input_type &&v)
+    QUICKCPPLIB_CONSTEXPR output_type operator()(input_type &&v)
     {
       using c_traits = traits::callable_argument_traits<callable_type, input_type>;
       return output_type(do_invoke<c_traits::is_rvalue>()(_c, std::move(v)));
@@ -321,7 +321,7 @@ namespace detail
         : _c(std::forward<U>(c))
     {
     }
-    BOOST_OUTCOME_CONSTEXPR output_type operator()(input_type &&v)
+    QUICKCPPLIB_CONSTEXPR output_type operator()(input_type &&v)
     {
       using c_traits = traits::callable_argument_traits<callable_type, input_type>;
       return do_invoke<c_traits::is_rvalue>()(_c, std::move(v)), output_type();
@@ -339,7 +339,7 @@ namespace detail
         : _c(std::forward<U>(c))
     {
     }
-    BOOST_OUTCOME_CONSTEXPR output_type operator()(input_type &&v)
+    QUICKCPPLIB_CONSTEXPR output_type operator()(input_type &&v)
     {
       using c_traits = traits::callable_argument_traits<callable_type, input_type>;
       return output_type(do_invoke<c_traits::is_rvalue>()(_c, std::move(v)));
@@ -353,15 +353,15 @@ namespace detail
   {
     typedef M input_type;
     typedef input_type output_type;
-    BOOST_OUTCOME_CONSTEXPR output_type operator()(const input_type &v) const { return v; }
-    BOOST_OUTCOME_CONSTEXPR output_type operator()(input_type &&v) const { return std::move(v); }
+    QUICKCPPLIB_CONSTEXPR output_type operator()(const input_type &v) const { return v; }
+    QUICKCPPLIB_CONSTEXPR output_type operator()(input_type &&v) const { return std::move(v); }
   };
   template <class M> struct do_unwrap2<true, M>
   {
     typedef M input_type;
     typedef typename input_type::value_type unwrapped_type;
     typedef typename do_unwrap<unwrapped_type>::output_type output_type;
-    BOOST_OUTCOME_CONSTEXPR output_type operator()(const input_type &v) const
+    QUICKCPPLIB_CONSTEXPR output_type operator()(const input_type &v) const
     {
       if(v.has_error())
         return do_unwrap<unwrapped_type>()(v.get_error());
@@ -372,7 +372,7 @@ namespace detail
       else
         return do_unwrap<unwrapped_type>()(unwrapped_type());
     }
-    BOOST_OUTCOME_CONSTEXPR output_type operator()(input_type &&v) const
+    QUICKCPPLIB_CONSTEXPR output_type operator()(input_type &&v) const
     {
       if(v.has_error())
         return do_unwrap<unwrapped_type>()(std::move(v).get_error());

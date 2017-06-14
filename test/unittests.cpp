@@ -33,8 +33,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../include/boost/outcome/outcome.hpp"
 
-#define BOOSTLITE_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
-#include "../boost-lite/include/boost/test/unit_test.hpp"
+#define QUICKCPPLIB_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
+#include "../quickcpplib/include/boost/test/unit_test.hpp"
 
 #include <algorithm>
 #include <cstdio>
@@ -50,7 +50,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 #ifdef __cpp_exceptions
-#include "../boost-lite/include/allocator_testing.hpp"
+#include "../quickcpplib/include/allocator_testing.hpp"
 #endif
 
 BOOST_AUTO_TEST_SUITE(all)
@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE(works / error_code_extended, "Tests that error_code_extende
 BOOST_AUTO_TEST_CASE(works / monad, "Tests that the monad works as intended")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  using namespace boost_lite::tribool;
+  using namespace QUICKCPPLIB_NAMESPACE::tribool;
   static_assert(std::is_constructible<outcome<long>, int>::value, "Sanity check that monad can be constructed from a value_type");
   static_assert(std::is_constructible<outcome<outcome<long>>, int>::value, "Sanity check that outer monad can be constructed from an inner monad's value_type");
   static_assert(!std::is_constructible<outcome<outcome<outcome<long>>>, int>::value, "Sanity check that outer monad can not be constructed from an inner inner monad's value_type");
@@ -426,7 +426,7 @@ static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::option<bool> test_constexpr3
 BOOST_AUTO_TEST_CASE(works / monad / constexpr, "Tests that the monad works as intended in a constexpr evaluation context")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  using namespace boost_lite::tribool;
+  using namespace QUICKCPPLIB_NAMESPACE::tribool;
 
   static_assert(std::is_literal_type<value_storage<int, void, void>>::value, "value_storage<int, void, void> is not a literal type!");
   static_assert(std::is_literal_type<value_storage<void, void, void>>::value, "value_storage<void, void, void> is not a literal type!");
@@ -457,7 +457,7 @@ BOOST_AUTO_TEST_CASE(works / monad / constexpr, "Tests that the monad works as i
 BOOST_AUTO_TEST_CASE(works / monad / optional, "Tests that the monad acts as an optional R")
 {
   using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  using boost_lite::tribool::tribool;
+  using QUICKCPPLIB_NAMESPACE::tribool::tribool;
   std::cout << "sizeof(outcome<bool>) = " << sizeof(outcome<bool>) << std::endl;
   std::cout << "sizeof(result<bool>) = " << sizeof(result<bool>) << std::endl;
   std::cout << "sizeof(option<bool>) = " << sizeof(option<bool>) << std::endl;
@@ -1266,9 +1266,9 @@ BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .err
     const char *_v{nullptr};
     udt1() = default;
     constexpr explicit udt1(const char *v) noexcept : _v(v) {}
-    BOOST_OUTCOME_CONSTEXPR udt1(udt1 &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    QUICKCPPLIB_CONSTEXPR udt1(udt1 &&o) noexcept : _v(o._v) { o._v = nullptr; }
     udt1(const udt1 &) = default;
-    BOOST_OUTCOME_CONSTEXPR udt1 &operator=(udt1 &&o) noexcept
+    QUICKCPPLIB_CONSTEXPR udt1 &operator=(udt1 &&o) noexcept
     {
       _v = o._v;
       o._v = nullptr;
@@ -1282,9 +1282,9 @@ BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .err
     const char *_v{nullptr};
     udt2() = default;
     constexpr explicit udt2(const char *v) noexcept : _v(v) {}
-    BOOST_OUTCOME_CONSTEXPR udt2(udt2 &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    QUICKCPPLIB_CONSTEXPR udt2(udt2 &&o) noexcept : _v(o._v) { o._v = nullptr; }
     udt2(const udt2 &) = default;
-    BOOST_OUTCOME_CONSTEXPR udt2 &operator=(udt2 &&o) noexcept
+    QUICKCPPLIB_CONSTEXPR udt2 &operator=(udt2 &&o) noexcept
     {
       _v = o._v;
       o._v = nullptr;
@@ -1404,9 +1404,9 @@ BOOST_AUTO_TEST_CASE(issues / 12, "basic_monad's copy assignment gets instantiat
     const char *_v{nullptr};
     udt() = default;
     constexpr explicit udt(const char *v) noexcept : _v(v) {}
-    BOOST_OUTCOME_CONSTEXPR udt(udt &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    QUICKCPPLIB_CONSTEXPR udt(udt &&o) noexcept : _v(o._v) { o._v = nullptr; }
     udt(const udt &) = delete;
-    BOOST_OUTCOME_CONSTEXPR udt &operator=(udt &&o) noexcept
+    QUICKCPPLIB_CONSTEXPR udt &operator=(udt &&o) noexcept
     {
       _v = o._v;
       o._v = nullptr;
@@ -1430,9 +1430,9 @@ BOOST_AUTO_TEST_CASE(issues / 16, "Default constructor of T is sometimes compile
     const char *_v{ nullptr };
     udt() = delete;
     constexpr explicit udt(const char *v) noexcept : _v(v) {}
-    BOOST_OUTCOME_CONSTEXPR udt(udt &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    QUICKCPPLIB_CONSTEXPR udt(udt &&o) noexcept : _v(o._v) { o._v = nullptr; }
     udt(const udt &) = delete;
-    BOOST_OUTCOME_CONSTEXPR udt &operator=(udt &&o) noexcept
+    QUICKCPPLIB_CONSTEXPR udt &operator=(udt &&o) noexcept
     {
       _v = o._v;
       o._v = nullptr;
@@ -1471,7 +1471,7 @@ int main(int argc, char *argv[])
   CPU_SET_S(1, 2, cpuset);
   pthread_setaffinity_np(pthread_self(), CPU_ALLOC_SIZE(2), cpuset);
 #endif
-  int result = BOOSTLITE_BOOST_UNIT_TEST_RUN_TESTS(argc, argv);
+  int result = QUICKCPPLIB_BOOST_UNIT_TEST_RUN_TESTS(argc, argv);
   return result;
 }
 #endif

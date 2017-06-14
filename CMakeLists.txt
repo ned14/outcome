@@ -40,7 +40,7 @@ if(NOT PROJECT_IS_DEPENDENCY)
                             --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
                             --line-directive
   #                          --debug
-                            -U BOOSTLITE_ENABLE_VALGRIND
+                            -U QUICKCPPLIB_ENABLE_VALGRIND
                             -U __cpp_modules
                             -U GENERATING_OUTCOME_MODULE_INTERFACE
                             -U __MINGW32__ -U __MINGW64__ -U __MINGW64_VERSION_MAJOR
@@ -66,7 +66,7 @@ if(NOT PROJECT_IS_DEPENDENCY)
         -I .
         --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs  --passthru-comments
   #      --line-directive --debug
-        -U BOOSTLITE_ENABLE_VALGRIND
+        -U QUICKCPPLIB_ENABLE_VALGRIND
         -U __cpp_modules
         -U GENERATING_OUTCOME_MODULE_INTERFACE
         -U __MINGW32__ -U __MINGW64__ -U __MINGW64_VERSION_MAJOR
@@ -118,7 +118,7 @@ endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   # For all possible configurations of this library, add each test
-  list_filter(outcome_TESTS EXCLUDE REGEX "test_multiabi.cpp")
+  list_filter(outcome_TESTS EXCLUDE REGEX "constexprs|test_multiabi.cpp")
   include(QuickCppLibMakeStandardTests)
   if(TARGET outcome_hl_pch)
     target_compile_definitions(outcome_hl_pch PUBLIC BOOST_OUTCOME_ENABLE_ADVANCED=1)

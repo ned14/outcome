@@ -8,11 +8,11 @@
 
 using namespace boost::outcome;
 extern outcome<int> unknown() WEAK;
-extern BOOSTLITE_NOINLINE outcome<int> test1()
+extern QUICKCPPLIB_NOINLINE outcome<int> test1()
 {
   return unknown().bind([](int m) { return m * 3; });
 }
-extern BOOSTLITE_NOINLINE void test2()
+extern QUICKCPPLIB_NOINLINE void test2()
 {
 }
 

@@ -8,11 +8,11 @@
 
 using namespace boost::outcome;
 extern option<bool> unknown() WEAK;
-extern BOOSTLITE_NOINLINE int test1()
+extern QUICKCPPLIB_NOINLINE int test1()
 {
   return unknown().get();
 }
-extern BOOSTLITE_NOINLINE void test2()
+extern QUICKCPPLIB_NOINLINE void test2()
 {
 }
 

@@ -1,4 +1,4 @@
-// Deliberately without include guard so attempt to include differing versions
+// Deliberately without include guard to attempt to include differing versions
 // in same translation unit will produce compiler errors
 #include "version.hpp"
 
@@ -11,13 +11,16 @@
 #include "v1.0/monad.hpp"
 #endif
 
-#if !defined(BOOST_OUTCOME_DISABLE_PREPROCESSED_INTERFACE_FILE) && BOOST_OUTCOME_USE_BOOST_THREAD == 0 && BOOST_OUTCOME_USE_BOOST_ERROR_CODE == 0 && !defined(BOOST_OUTCOME_ENABLE_ADVANCED) && !defined(__cpp_modules) && !defined(GENERATING_OUTCOME_MODULE_INTERFACE)
+// clang-format off
+#if !defined(BOOST_OUTCOME_DISABLE_PREPROCESSED_INTERFACE_FILE) \
+  && BOOST_OUTCOME_USE_BOOST_THREAD == 0 && BOOST_OUTCOME_USE_BOOST_ERROR_CODE == 0 \
+  && !defined(BOOST_OUTCOME_ENABLE_ADVANCED) && !defined(__cpp_modules) && !defined(GENERATING_OUTCOME_MODULE_INTERFACE)
 
 // Use the preprocessed edition
 #if defined(_MSC_VER) && !defined(__clang__)
 #define BOOST_OUTCOME_HEADERS_PATH2 BOOST_OUTCOME_VERSION_GLUE(outcome_v, BOOST_OUTCOME_HEADERS_VERSION, .hpp)
 #elif !__PCPP_ALWAYS_FALSE__
-#define BOOST_OUTCOME_HEADERS_PATH2 BOOST_OUTCOME_VERSION_GLUE(outcome_v, BOOST_OUTCOME_HEADERS_VERSION, ).hpp
+#define BOOST_OUTCOME_HEADERS_PATH2 BOOST_OUTCOME_VERSION_GLUE(outcome_v, BOOST_OUTCOME_HEADERS_VERSION,).hpp
 #endif
 
 #define BOOST_OUTCOME_HEADERS_PATH BOOST_OUTCOME_HEADERS_PATH3(BOOST_OUTCOME_HEADERS_PATH2)
@@ -27,9 +30,9 @@
 
 // Use the original sources
 #if defined(_MSC_VER) && !defined(__clang__)
-#define BOOST_OUTCOME_HEADERS_PATH2 BOOST_OUTCOME_VERSION_GLUE(v, BOOST_OUTCOME_HEADERS_VERSION, / monad.hpp)
+#define BOOST_OUTCOME_HEADERS_PATH2 BOOST_OUTCOME_VERSION_GLUE(v, BOOST_OUTCOME_HEADERS_VERSION, /monad.hpp)
 #elif !__PCPP_ALWAYS_FALSE__
-#define BOOST_OUTCOME_HEADERS_PATH2 BOOST_OUTCOME_VERSION_GLUE(v, BOOST_OUTCOME_HEADERS_VERSION, ) / monad.hpp
+#define BOOST_OUTCOME_HEADERS_PATH2 BOOST_OUTCOME_VERSION_GLUE(v, BOOST_OUTCOME_HEADERS_VERSION,)/monad.hpp
 #endif
 
 #define BOOST_OUTCOME_HEADERS_PATH4(a) #a
@@ -38,6 +41,7 @@
 #define BOOST_OUTCOME_HEADERS_PATH BOOST_OUTCOME_HEADERS_PATH3(BOOST_OUTCOME_HEADERS_PATH2)
 #include BOOST_OUTCOME_HEADERS_PATH
 #endif
+// clang-format on
 
 #undef BOOST_OUTCOME_HEADERS_PATH
 #undef BOOST_OUTCOME_HEADERS_PATH2

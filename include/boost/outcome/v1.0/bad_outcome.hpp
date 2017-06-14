@@ -71,7 +71,7 @@ inline const _detail::bad_outcome_category &bad_outcome_category()
 }
 
 //! \brief A monad exception object \ingroup monad
-class BOOSTLITE_SYMBOL_VISIBLE bad_outcome : public stl11::system_error
+class QUICKCPPLIB_SYMBOL_VISIBLE bad_outcome : public stl11::system_error
 {
 public:
   bad_outcome(stl11::error_code ec)

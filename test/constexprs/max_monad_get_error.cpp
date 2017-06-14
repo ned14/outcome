@@ -8,11 +8,11 @@
 
 using namespace boost::outcome;
 extern outcome<int> unknown() WEAK;
-extern BOOSTLITE_NOINLINE std::error_code test1()
+extern QUICKCPPLIB_NOINLINE std::error_code test1()
 {
   return unknown().get_error();
 }
-extern BOOSTLITE_NOINLINE void test2()
+extern QUICKCPPLIB_NOINLINE void test2()
 {
 }
 
