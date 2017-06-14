@@ -1,20 +1,17 @@
-<center>
-master branch unit test status: Linux & MacOS: [![Build Status](https://travis-ci.org/ned14/boost.outcome.svg?branch=master)](https://travis-ci.org/ned14/boost.outcome) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/roe4dacos4gnlu66/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-outcome/branch/master)
+master branch unit test status: Linux & MacOS: [![Build Status](https://travis-ci.org/ned14/outcome.svg?branch=master)](https://travis-ci.org/ned14/outcome) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/roe4dacos4gnlu66/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/outcome/branch/master)
 
-develop branch unit test status: Linux & MacOS: [![Build Status](https://travis-ci.org/ned14/boost.outcome.svg?branch=develop)](https://travis-ci.org/ned14/boost.outcome) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/roe4dacos4gnlu66/branch/develop?svg=true)](https://ci.appveyor.com/project/ned14/boost-outcome/branch/develop)
+develop branch unit test status: Linux & MacOS: [![Build Status](https://travis-ci.org/ned14/outcome.svg?branch=develop)](https://travis-ci.org/ned14/outcome) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/roe4dacos4gnlu66/branch/develop?svg=true)](https://ci.appveyor.com/project/ned14/outcome/branch/develop)
 
-CTest dashboard: http://my.cdash.org/index.php?project=Boost.Outcome
+CTest dashboard: http://my.cdash.org/index.php?project=Outcome
 
-Documentation: https://ned14.github.io/boost.outcome/
+Documentation: https://ned14.github.io/outcome/
 
-Latest tarball of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/boost.outcome-v1.0-source-latest.tar.xz
+Latest tarball of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/outcome-v2.0-source-latest.tar.xz
 
-Past tarballs of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/boost.outcome
+Past tarballs of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/outcome
 
-Before Boost peer review:
- - [x] Write up errata for ACCU talk for under the video.
- - [x] Fix operator*(), operator->() and .error() in Expected [issus #10].
- - [x] error_or() ought to have rvalue ref etc overloads, and exception_or() [issue #10].
+Post peer review todo:
+ - ?
 
 Later after Boost peer review:
  - [ ] Create new Win32 and NT error code categories and have make_errored_outcome() use those.
