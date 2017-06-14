@@ -1,20 +1,8 @@
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-# If necessary bring in the Boost lite cmake tooling
-list(FIND CMAKE_MODULE_PATH "boost-lite" boost_lite_idx)
-if(${boost_lite_idx} EQUAL -1)
-  if(EXISTS "${CMAKE_SOURCE_DIR}/../.use_boostish_siblings")
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../boost-lite/cmake")
-  elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../.use_boostish_siblings")
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../boost-lite/cmake")
-  elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/boost-lite/cmake")
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/boost-lite/cmake")
-  else()
-    message(FATAL_ERROR "FATAL: A copy of boost-lite cannot be found. Try running 'git submodule update --init --recursive'")
-  endif()
-endif()
-include(BoostLiteRequireOutOfSourceBuild)
-include(BoostLiteUtils)
-include(BoostLitePolicies)
+include(cmake/QuickCppLibBootstrap.cmake)
+include(QuickCppLibRequireOutOfSourceBuild)
+include(QuickCppLibUtils)
+include(QuickCppLibPolicies)
 
 # Parse the version we tell cmake directly from the version header file
 ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/version.hpp" VERSIONSTRING)
@@ -23,16 +11,16 @@ project(outcome VERSION ${VERSIONSTRING} LANGUAGES C CXX)
 # Also set a *cmake* namespace for this project
 set(PROJECT_NAMESPACE boost::)
 # Setup this cmake environment for this project
-include(BoostLiteSetupProject)
+include(QuickCppLibSetupProject)
 if(NOT PROJECT_IS_DEPENDENCY)
   # This file should be updated with the last git SHA next commit
   UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/revision.hpp")
 endif()
 # Find my library dependencies
-find_boostish_library(boost-lite "include/boost/outcome" 1.0 REQUIRED)
+find_quickcpplib_library(quickcpplib 1.0 REQUIRED)
 
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
-include(BoostLiteMakeHeaderOnlyLibrary)
+include(QuickCppLibMakeHeaderOnlyLibrary)
 
 # Make preprocessed editions of this library target
 if(NOT PROJECT_IS_DEPENDENCY)
@@ -72,7 +60,7 @@ if(NOT PROJECT_IS_DEPENDENCY)
       endif()
       # Preprocess Outcome into a single file for doxygen to grok
       add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"
-        COMMAND ${PYTHON_EXECUTABLE} ${BoostLiteCMakePath}/../pcpp/pcpp/cmd.py
+        COMMAND ${PYTHON_EXECUTABLE} ${QuickCppLibCMakePath}/../pcpp/pcpp/cmd.py
         -o "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/${PROJECT_NAME}.hpp"
         -I .
@@ -100,10 +88,10 @@ if(NOT PROJECT_IS_DEPENDENCY)
     endif()
   endif()
 endif()
-include(BoostLiteMakeDoxygen)
+include(QuickCppLibMakeDoxygen)
 
 # Set the standard definitions for these libraries and bring in the all_* helper functions
-include(BoostLiteApplyDefaultDefinitions)
+include(QuickCppLibApplyDefaultDefinitions)
 # Set the C++ features this library requires
 all_compile_features(PUBLIC
   cxx_alias_templates
@@ -120,7 +108,7 @@ if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
   )
 endif()
 # Set the library dependencies this library has
-target_link_libraries(outcome_hl INTERFACE boost-lite::hl)
+target_link_libraries(outcome_hl INTERFACE quickcpplib::hl)
 
 # On POSIX we need to patch linking to stdc++fs into the docs examples 
 if(DOXYGEN_FOUND AND GCC)
@@ -131,7 +119,7 @@ endif()
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   # For all possible configurations of this library, add each test
   list_filter(outcome_TESTS EXCLUDE REGEX "test_multiabi.cpp")
-  include(BoostLiteMakeStandardTests)
+  include(QuickCppLibMakeStandardTests)
   if(TARGET outcome_hl_pch)
     target_compile_definitions(outcome_hl_pch PUBLIC BOOST_OUTCOME_ENABLE_ADVANCED=1)
   endif()
@@ -165,5 +153,5 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
 endif()
 
 # Make available this library for install and export
-include(BoostLiteMakeInstall)
-include(BoostLiteMakeExport)
+include(QuickCppLibMakeInstall)
+include(QuickCppLibMakeExport)
