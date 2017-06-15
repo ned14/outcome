@@ -16,7 +16,7 @@ namespace outcome
   {
     explicit in_place_type_t() = default;
   };
-  template <class T> inline constexpr std::in_place_type_t<T> in_place_type{};
+  template <class T> constexpr in_place_type_t<T> in_place_type{};
 #endif
   namespace detail
   {
@@ -97,11 +97,11 @@ namespace outcome
 
   /* \class result
   \brief Provides the result of a success and/or a failure
-  \tparam T The type of the successful result. Needs to be DefaultConstructible.
+  \tparam R The type of the successful result. Needs to be DefaultConstructible.
   \tparam EC The type of the failure result. Needs to be DefaultConstructible and be boolean testable e.g. `if(ec)`
   \tparam ECPolicy Policy on how to interpret type EC.
   */
-  template <class T, class EC = error_code_extended, class ECPolicy =
+  template <class R, class EC = error_code_extended, class ECPolicy =
 #ifdef __cpp_exceptions
                                                      policy::error_code_throw_as_system_error<EC>
 #else
@@ -110,19 +110,26 @@ namespace outcome
             >
   class result
   {
-    static_assert(std::is_default_constructible<T>::value, "value_type must be default constructible");
+    static_assert(std::is_default_constructible<R>::value, "value_type must be default constructible");
     static_assert(std::is_default_constructible<EC>::value, "error_type must be default constructible");
     static_assert(std::is_constructible<bool, EC>::value, "error_type must implement boolean testability");
 
   public:
     //! The result type
-    using value_type = T;
+    using value_type = R;
     //! The failure type
     using error_type = EC;
 
   private:
     value_type _value;
     error_type _error;
+
+    struct value_converting_constructor_tag
+    {
+    };
+    struct error_converting_constructor_tag
+    {
+    };
 
   public:
     //! Default constructor
@@ -137,43 +144,43 @@ namespace outcome
     result &operator=(const result & /*unused*/) = default;
 
     //! Converting constructor to value_type
-    template <class T, typename = typename std::enable_if<                                  //
-                       !std::is_same<typename std::decay_t<T>::type, result>::value         // not my type
-                       && !detail::is_in_place_type_t<typename std::decay<T>::type>::value  // not in place construction
-                       && std::is_constructible<value_type, T>::value && !std::is_constructible<error_type, T>::value>::type>
-    constexpr result(T &&t) noexcept(noexcept(value_type(std::forward<T>(t))))
+    template <class T, typename enable_value_converting_constructor = std::enable_if_t<  //
+                       !std::is_same<std::decay_t<T>, result>::value                     // not my type
+                       && !detail::is_in_place_type_t<std::decay_t<T>>::value            // not in place construction
+                       && std::is_constructible<value_type, T>::value && !std::is_constructible<error_type, T>::value>>
+    constexpr result(T &&t, value_converting_constructor_tag = value_converting_constructor_tag()) noexcept(noexcept(value_type(std::forward<T>(t))))
         : _value(std::forward<T>(t))
     {
     }
     //! Converting constructor to error_type
-    template <class T, typename = typename std::enable_if<                                  //
-                       !std::is_same<typename std::decay_t<T>::type, result>::value         // not my type
-                       && !detail::is_in_place_type_t<typename std::decay<T>::type>::value  // not in place construction
-                       && !std::is_constructible<value_type, T>::value && std::is_constructible<error_type, T>::value>::type>
-    constexpr result(T &&t) noexcept(noexcept(error_type(std::forward<T>(t))))
+    template <class T, typename enable_error_converting_constructor = std::enable_if_t<  //
+                       !std::is_same<std::decay_t<T>, result>::value                     // not my type
+                       && !detail::is_in_place_type_t<std::decay_t<T>>::value            // not in place construction
+                       && !std::is_constructible<value_type, T>::value && std::is_constructible<error_type, T>::value>>
+    constexpr result(T &&t, error_converting_constructor_tag = error_converting_constructor_tag()) noexcept(noexcept(error_type(std::forward<T>(t))))
         : _error(std::forward<T>(t))
     {
     }
     //! In place constructor to value_type
-    template <class... Args, typename = typename std::enable_if<std::is_constructible<value_type, Args...>::value>::type>
+    template <class... Args, typename = std::enable_if_t<std::is_constructible<value_type, Args...>::value>>
     constexpr explicit result(in_place_type_t<value_type>, Args &&... args) noexcept(noexcept(value_type(std::forward<Args>(args)...)))
         : _value(std::forward<Args>(args)...)
     {
     }
     //! In place constructor to value_type
-    template <class U, class... Args, typename = typename std::enable_if<std::is_constructible<value_type, std::initializer_list<U>>::value>::type>
+    template <class U, class... Args, typename = std::enable_if_t<std::is_constructible<value_type, std::initializer_list<U>>::value>>
     constexpr explicit result(in_place_type_t<value_type>, std::initializer_list<U> il, Args &&... args) noexcept(noexcept(value_type(il, std::forward<Args>(args)...)))
         : _value(il, std::forward<Args>(args)...)
     {
     }
     //! In place constructor to error_type
-    template <class... Args, typename = typename std::enable_if<std::is_constructible<error_type, Args...>::value>::type>
+    template <class... Args, typename = std::enable_if_t<std::is_constructible<error_type, Args...>::value>>
     constexpr explicit result(in_place_type_t<error_type>, Args &&... args) noexcept(noexcept(error_type(std::forward<Args>(args)...)))
         : _error(std::forward<Args>(args)...)
     {
     }
     //! In place constructor to error_type
-    template <class U, class... Args, typename = typename std::enable_if<std::is_constructible<error_type, std::initializer_list<U>>::value>::type>
+    template <class U, class... Args, typename = std::enable_if_t<std::is_constructible<error_type, std::initializer_list<U>>::value>>
     constexpr explicit result(in_place_type_t<error_type>, std::initializer_list<U> il, Args &&... args) noexcept(noexcept(error_type(il, std::forward<Args>(args)...)))
         : _value(il, std::forward<Args>(args)...)
     {
