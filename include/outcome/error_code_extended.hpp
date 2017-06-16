@@ -11,6 +11,11 @@ namespace outcome
 
   public:
     using std::error_code::error_code;
+    error_code_extended() = default;
+    error_code_extended(std::error_code ec)
+        : std::error_code(ec)
+    {
+    }
   };
 }
 #endif
