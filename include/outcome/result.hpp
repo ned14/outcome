@@ -509,12 +509,12 @@ namespace outcome
       //! Performs a wide check of state, used in the value() functions
       template <class Impl> static constexpr void wide_value_check(Impl *self)
       {
-        if((self->_state._status & detail::status_have_error) != 0)
-        {
-          throw std::system_error(self->_error);
-        }
         if((self->_state._status & detail::status_have_value) == 0)
         {
+          if((self->_state._status & detail::status_have_error) != 0)
+          {
+            throw std::system_error(self->_error);
+          }
           throw bad_result("no value");
         }
       }
@@ -554,12 +554,12 @@ namespace outcome
       //! Performs a wide check of state, used in the value() functions
       template <class Impl> static constexpr void wide_value_check(Impl *self)
       {
-        if((self->_state._status & detail::status_have_error) != 0)
-        {
-          std::terminate();
-        }
         if((self->_state._status & detail::status_have_value) == 0)
         {
+          if((self->_state._status & detail::status_have_error) != 0)
+          {
+            std::terminate();
+          }
           std::terminate();
         }
       }
