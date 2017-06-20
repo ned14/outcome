@@ -94,7 +94,7 @@ int main(void)
   static_assert(!std::is_nothrow_move_assignable<decltype(e)>::value, "");
 
   // Test value + error code info works, and in constexpr
-  using cresult_type = outcome::result<int, const char *, outcome::policy::throw_directly<const char *>>;
+  using cresult_type = outcome::result<int, const char *>;
   constexpr const char *niall = "niall";
   constexpr cresult_type f(5, niall);
   constexpr cresult_type f2(f);

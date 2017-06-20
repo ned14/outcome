@@ -8,6 +8,10 @@
 
 #define QUICKCPPLIB_SYMBOL_VISIBLE
 
+#if !defined(__cpp_exceptions) && defined(_CPPUNWIND)
+#define __cpp_exceptions 1
+#endif
+
 namespace outcome
 {
 #if __cplusplus >= 201700
@@ -68,13 +72,13 @@ namespace outcome
       {
       }
       template <class... Args>
-      constexpr value_storage_trivial(in_place_type_t<value_type>, Args &&... args) noexcept(noexcept(T(std::forward<Args>(args)...)))
+      constexpr value_storage_trivial(in_place_type_t<value_type>, Args &&... args) noexcept(noexcept(value_type(std::forward<Args>(args)...)))
           : _value(std::forward<Args>(args)...)
           , _status(status_have_value)
       {
       }
       template <class U, class... Args>
-      constexpr value_storage_trivial(in_place_type_t<value_type>, std::initializer_list<U> il, Args &&... args) noexcept(noexcept(T(il, std::forward<Args>(args)...)))
+      constexpr value_storage_trivial(in_place_type_t<value_type>, std::initializer_list<U> il, Args &&... args) noexcept(noexcept(value_type(il, std::forward<Args>(args)...)))
           : _value(il, std::forward<Args>(args)...)
           , _status(status_have_value)
       {
@@ -114,13 +118,13 @@ namespace outcome
       {
       }
       template <class... Args>
-      value_storage_nontrivial(in_place_type_t<value_type>, Args &&... args) noexcept(noexcept(T(std::forward<Args>(args)...)))
+      value_storage_nontrivial(in_place_type_t<value_type>, Args &&... args) noexcept(noexcept(value_type(std::forward<Args>(args)...)))
           : _value(std::forward<Args>(args)...)
           , _status(status_have_value)
       {
       }
       template <class U, class... Args>
-      value_storage_nontrivial(in_place_type_t<value_type>, std::initializer_list<U> il, Args &&... args) noexcept(noexcept(T(il, std::forward<Args>(args)...)))
+      value_storage_nontrivial(in_place_type_t<value_type>, std::initializer_list<U> il, Args &&... args) noexcept(noexcept(value_type(il, std::forward<Args>(args)...)))
           : _value(il, std::forward<Args>(args)...)
           , _status(status_have_value)
       {
@@ -543,7 +547,7 @@ namespace outcome
     */
     template <class EC> struct error_code_throw_as_system_error
     {
-      static_assert(std::is_convertible<std::error_code, EC>::value, "error_type must be convertible into a std::error_code to be used with this ECPolicy");
+      static_assert(std::is_convertible<std::error_code, EC>::value, "error_type must be convertible into a std::error_code to be used with this policy");
       //! Performs a narrow check of state, used in the assume_value() functions
       template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
       {
@@ -581,14 +585,13 @@ namespace outcome
         }
       }
     };
-#endif
-    /* \struct error_code_terminate
-    \brief Policy interpreting EC as a type implementing the `std::error_code` contract
-    and any wide attempt to access the successful state calls `std::terminate`
+    /* \struct exception_ptr_rethrow
+    \brief Policy interpreting EC as a type implementing the `std::exception_ptr` contract
+    and any wide attempt to access the successful state calls `std::rethrow_exception()`.
     */
-    template <class EC> struct error_code_terminate
+    template <class EC> struct exception_ptr_rethrow
     {
-      static_assert(std::is_convertible<std::error_code, EC>::value, "error_type must be convertible into a std::error_code to be used with this ECPolicy");
+      static_assert(std::is_convertible<std::exception_ptr, EC>::value, "error_type must be convertible into a std::exception_ptr to be used with this policy");
       //! Performs a narrow check of state, used in the assume_value() functions
       template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
       {
@@ -612,8 +615,47 @@ namespace outcome
         {
           if((self->_state._status & detail::status_have_error) != 0)
           {
-            std::terminate();
+            std::rethrow_exception(self->_error);
           }
+          throw bad_result("no value");
+        }
+      }
+      //! Performs a wide check of state, used in the error() functions
+      template <class Impl> static constexpr void wide_error_check(Impl *self)
+      {
+        if((self->_state._status & detail::status_have_error) == 0)
+        {
+          throw bad_result("no error");
+        }
+      }
+    };
+#endif
+    /* \struct terminate
+    \brief Policy implementing any wide attempt to access the successful state as calling `std::terminate`
+    */
+    template <class EC> struct terminate
+    {
+      //! Performs a narrow check of state, used in the assume_value() functions
+      template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
+      {
+#if defined(__GNUC__) || defined(__clang__)
+        if((self->_state._status & detail::status_have_value) == 0)
+          __builtin_unreachable();
+#endif
+      }
+      //! Performs a narrow check of state, used in the assume_error() functions
+      template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
+      {
+#if defined(__GNUC__) || defined(__clang__)
+        if((self->_state._status & detail::status_have_error) == 0)
+          __builtin_unreachable();
+#endif
+      }
+      //! Performs a wide check of state, used in the value() functions
+      template <class Impl> static constexpr void wide_value_check(Impl *self)
+      {
+        if((self->_state._status & detail::status_have_value) == 0)
+        {
           std::terminate();
         }
       }
@@ -626,25 +668,31 @@ namespace outcome
         }
       }
     };
+
+//! \brief Default result policy selector
+#ifdef __cpp_exceptions
+    template <class EC>
+    using default_result_policy = std::conditional_t<                                         //
+    std::is_constructible<std::error_code, EC>::value, error_code_throw_as_system_error<EC>,  //
+    std::conditional_t<                                                                       //
+    std::is_constructible<std::exception_ptr, EC>::value, exception_ptr_rethrow<EC>,          //
+    throw_directly<EC>                                                                        //
+    >>;
+#else
+    template <class EC> using default_result_policy = terminate<EC>;
+#endif
   }
 
   /* \class result
   \brief Provides the result of a success and/or a failure
   \tparam R The type of the successful result.
-  \tparam EC The type of the failure result. Needs to be DefaultConstructible and be boolean testable e.g. `if(ec)`
-  \tparam ECPolicy Policy on how to interpret type EC.
+  \tparam EC The type of the failure/info result. Needs to be DefaultConstructible and be boolean testable e.g. `if(ec)`
+  \tparam ECPolicy Policy on how to interpret type EC. Defaults to a trait determined policy based on types R and EC.
   */
-  template <class R, class EC = error_code_extended, class ECPolicy =
-#ifdef __cpp_exceptions
-                                                     policy::error_code_throw_as_system_error<EC>
-#else
-                                                     policy::error_code_terminate<EC>
-#endif
-            >
-  class result : public detail::result_impl<R, EC, ECPolicy>
+  template <class R, class EC = error_code_extended, class NoValuePolicy = policy::default_result_policy<EC>> class result : public detail::result_impl<R, EC, NoValuePolicy>
   {
-    friend ECPolicy;
-    using base = detail::result_impl<R, EC, ECPolicy>;
+    friend NoValuePolicy;
+    using base = detail::result_impl<R, EC, NoValuePolicy>;
     struct value_converting_constructor_tag
     {
     };
