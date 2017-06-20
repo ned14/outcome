@@ -222,6 +222,18 @@ namespace outcome
       detail::value_storage_select_impl<value_type> _state;
       error_type _error;
 
+      struct value_plus_error_tag
+      {
+      };
+      // Constructor to value_type with error_type info
+      template <class T, class U>
+      constexpr result_impl_base(value_plus_error_tag, T &&v, U &&e) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value)
+          : _state(in_place_type<value_type>, std::forward<T>(v))
+          , _error(std::forward<U>(e))
+      {
+        _state._status |= detail::status_have_error;
+      }
+
     public:
       //! Default constructor
       result_impl_base() = default;
@@ -268,86 +280,86 @@ namespace outcome
       using result_impl_base<R, EC, ECPolicy>::result_impl_base;
 
       //! Access value directly
-      value_type &assume_value() & noexcept
+      constexpr value_type &assume_value() & noexcept
       {
         ECPolicy::narrow_value_check(this);
         return this->_state._value;
       }
-      const value_type &assume_value() const &noexcept
+      constexpr const value_type &assume_value() const &noexcept
       {
         ECPolicy::narrow_value_check(this);
         return this->_state._value;
       }
-      value_type &&assume_value() && noexcept
+      constexpr value_type &&assume_value() && noexcept
       {
         ECPolicy::narrow_value_check(this);
         return this->_state._value;
       }
-      const value_type &&assume_value() const &&noexcept
+      constexpr const value_type &&assume_value() const &&noexcept
       {
         ECPolicy::narrow_value_check(this);
         return this->_state._value;
       }
       //! Access error directly
-      error_type &assume_error() & noexcept
+      constexpr error_type &assume_error() & noexcept
       {
         ECPolicy::narrow_error_check(this);
         return this->_error;
       }
-      const error_type &assume_error() const &noexcept
+      constexpr const error_type &assume_error() const &noexcept
       {
         ECPolicy::narrow_error_check(this);
         return this->_error;
       }
-      error_type &&assume_error() && noexcept
+      constexpr error_type &&assume_error() && noexcept
       {
         ECPolicy::narrow_error_check(this);
         return this->_error;
       }
-      const error_type &&assume_error() const &&noexcept
+      constexpr const error_type &&assume_error() const &&noexcept
       {
         ECPolicy::narrow_error_check(this);
         return this->_error;
       }
 
       //! Access value if no error
-      value_type &value() &
+      constexpr value_type &value() &
       {
         ECPolicy::wide_value_check(this);
         return this->_state._value;
       }
-      const value_type &value() const &
+      constexpr const value_type &value() const &
       {
         ECPolicy::wide_value_check(this);
         return this->_state._value;
       }
-      value_type &&value() &&
+      constexpr value_type &&value() &&
       {
         ECPolicy::wide_value_check(this);
         return this->_state._value;
       }
-      const value_type &&value() const &&
+      constexpr const value_type &&value() const &&
       {
         ECPolicy::wide_value_check(this);
         return this->_state._value;
       }
       //! Access error
-      error_type &error() &
+      constexpr error_type &error() &
       {
         ECPolicy::wide_error_check(this);
         return this->_error;
       }
-      const error_type &error() const &
+      constexpr const error_type &error() const &
       {
         ECPolicy::wide_error_check(this);
         return this->_error;
       }
-      error_type &&error() &&
+      constexpr error_type &&error() &&
       {
         ECPolicy::wide_error_check(this);
         return this->_error;
       }
-      const error_type &&error() const &&
+      constexpr const error_type &&error() const &&
       {
         ECPolicy::wide_error_check(this);
         return this->_error;
@@ -360,48 +372,48 @@ namespace outcome
       using result_impl_base<void, EC, ECPolicy>::result_impl_base;
 
       //! Access value directly
-      void assume_value() noexcept { ECPolicy::narrow_value_check(this); }
+      constexpr void assume_value() noexcept { ECPolicy::narrow_value_check(this); }
       //! Access error directly
-      error_type &assume_error() & noexcept
+      constexpr error_type &assume_error() & noexcept
       {
         ECPolicy::narrow_error_check(this);
         return this->_error;
       }
-      const error_type &assume_error() const &noexcept
+      constexpr const error_type &assume_error() const &noexcept
       {
         ECPolicy::narrow_error_check(this);
         return this->_error;
       }
-      error_type &&assume_error() && noexcept
+      constexpr error_type &&assume_error() && noexcept
       {
         ECPolicy::narrow_error_check(this);
         return this->_error;
       }
-      const error_type &&assume_error() const &&noexcept
+      constexpr const error_type &&assume_error() const &&noexcept
       {
         ECPolicy::narrow_error_check(this);
         return this->_error;
       }
 
       //! Access value if no error
-      void value() { ECPolicy::wide_value_check(this); }
+      constexpr void value() { ECPolicy::wide_value_check(this); }
       //! Access error
-      error_type &error() &
+      constexpr error_type &error() &
       {
         ECPolicy::wide_error_check(this);
         return this->_error;
       }
-      const error_type &error() const &
+      constexpr const error_type &error() const &
       {
         ECPolicy::wide_error_check(this);
         return this->_error;
       }
-      error_type &&error() &&
+      constexpr error_type &&error() &&
       {
         ECPolicy::wide_error_check(this);
         return this->_error;
       }
-      const error_type &&error() const &&
+      constexpr const error_type &&error() const &&
       {
         ECPolicy::wide_error_check(this);
         return this->_error;
@@ -414,52 +426,52 @@ namespace outcome
       using result_impl_base<R, void, ECPolicy>::result_impl_base;
 
       //! Access value directly
-      value_type &assume_value() & noexcept
+      constexpr value_type &assume_value() & noexcept
       {
         ECPolicy::narrow_value_check(this);
         return this->_state._value;
       }
-      const value_type &assume_value() const &noexcept
+      constexpr const value_type &assume_value() const &noexcept
       {
         ECPolicy::narrow_value_check(this);
         return this->_state._value;
       }
-      value_type &&assume_value() && noexcept
+      constexpr value_type &&assume_value() && noexcept
       {
         ECPolicy::narrow_value_check(this);
         return this->_state._value;
       }
-      const value_type &&assume_value() const &&noexcept
+      constexpr const value_type &&assume_value() const &&noexcept
       {
         ECPolicy::narrow_value_check(this);
         return this->_state._value;
       }
       //! Access error directly
-      void assume_error() noexcept { ECPolicy::narrow_error_check(this); }
+      constexpr void assume_error() noexcept { ECPolicy::narrow_error_check(this); }
 
       //! Access value if no error
-      value_type &value() &
+      constexpr value_type &value() &
       {
         ECPolicy::wide_value_check(this);
         return this->_state._value;
       }
-      const value_type &value() const &
+      constexpr const value_type &value() const &
       {
         ECPolicy::wide_value_check(this);
         return this->_state._value;
       }
-      value_type &&value() &&
+      constexpr value_type &&value() &&
       {
         ECPolicy::wide_value_check(this);
         return this->_state._value;
       }
-      const value_type &&value() const &&
+      constexpr const value_type &&value() const &&
       {
         ECPolicy::wide_value_check(this);
         return this->_state._value;
       }
       //! Access error
-      void error() { ECPolicy::wide_error_check(this); }
+      constexpr void error() { ECPolicy::wide_error_check(this); }
     };
     template <class ECPolicy> struct result_impl<void, void, ECPolicy> : result_impl_base<void, void, ECPolicy>
     {
@@ -468,20 +480,62 @@ namespace outcome
       using result_impl_base<void, void, ECPolicy>::result_impl_base;
 
       //! Access value directly
-      void assume_value() noexcept { ECPolicy::narrow_value_check(this); }
+      constexpr void assume_value() noexcept { ECPolicy::narrow_value_check(this); }
       //! Access error directly
-      void assume_error() noexcept { ECPolicy::narrow_error_check(this); }
+      constexpr void assume_error() noexcept { ECPolicy::narrow_error_check(this); }
 
       //! Access value if no error
-      void value() { ECPolicy::wide_value_check(this); }
+      constexpr void value() { ECPolicy::wide_value_check(this); }
       //! Access error
-      void error() { ECPolicy::wide_error_check(this); }
+      constexpr void error() { ECPolicy::wide_error_check(this); }
     };
   }
 
   namespace policy
   {
 #ifdef __cpp_exceptions
+    /* \struct throw_directly
+    \brief Policy interpreting EC as a type to be thrown directly during wide checks
+    */
+    template <class EC> struct throw_directly
+    {
+      //! Performs a narrow check of state, used in the assume_value() functions
+      template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
+      {
+#if defined(__GNUC__) || defined(__clang__)
+        if((self->_state._status & detail::status_have_value) == 0)
+          __builtin_unreachable();
+#endif
+      }
+      //! Performs a narrow check of state, used in the assume_error() functions
+      template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
+      {
+#if defined(__GNUC__) || defined(__clang__)
+        if((self->_state._status & detail::status_have_error) == 0)
+          __builtin_unreachable();
+#endif
+      }
+      //! Performs a wide check of state, used in the value() functions
+      template <class Impl> static constexpr void wide_value_check(Impl *self)
+      {
+        if((self->_state._status & detail::status_have_value) == 0)
+        {
+          if((self->_state._status & detail::status_have_error) != 0)
+          {
+            throw self->_error;
+          }
+          throw bad_result("no value");
+        }
+      }
+      //! Performs a wide check of state, used in the error() functions
+      template <class Impl> static constexpr void wide_error_check(Impl *self)
+      {
+        if((self->_state._status & detail::status_have_error) == 0)
+        {
+          throw bad_result("no error");
+        }
+      }
+    };
     /* \struct error_code_throw_as_system_error
     \brief Policy interpreting EC as a type implementing the `std::error_code` contract
     and any wide attempt to access the successful state throws the `error_code` wrapped into
@@ -597,6 +651,9 @@ namespace outcome
     struct error_converting_constructor_tag
     {
     };
+    struct value_error_converting_constructor_tag
+    {
+    };
 
   public:
     //! The result type
@@ -632,6 +689,15 @@ namespace outcome
                        && !std::is_constructible<value_type, T>::value && std::is_constructible<error_type, T>::value>>
     constexpr result(T &&t, error_converting_constructor_tag = error_converting_constructor_tag()) noexcept(noexcept(error_type(std::forward<T>(t))))
         : base(in_place_type<error_type>, std::forward<T>(t))
+    {
+    }
+    //! Converting constructor to value_type + error_type
+    template <class T, class U, typename enable_error_converting_constructor = std::enable_if_t<  //
+                                !std::is_same<std::decay_t<T>, result>::value                     // not my type
+                                && !detail::is_in_place_type_t<std::decay_t<T>>::value            // not in place construction
+                                && std::is_constructible<value_type, T>::value && !std::is_constructible<error_type, T>::value && std::is_constructible<error_type, U>::value && !std::is_constructible<value_type, U>::value>>
+    constexpr result(T &&t, U &&u, value_error_converting_constructor_tag = value_error_converting_constructor_tag()) noexcept(noexcept(value_type(std::forward<T>(t))) && noexcept(error_type(std::forward<U>(u))))
+        : base(typename base::value_plus_error_tag(), std::forward<T>(t), std::forward<U>(u))
     {
     }
 

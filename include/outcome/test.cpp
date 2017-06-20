@@ -26,6 +26,7 @@ struct udt
   }
   ~udt() { _v = 0; }
 };
+// No default construction, no copy nor move
 struct udt2
 {
   udt2() = delete;
@@ -53,6 +54,8 @@ int main(void)
   static_assert(std::is_copy_assignable<decltype(a)>::value, "");
   static_assert(std::is_trivially_copy_assignable<decltype(a)>::value, "");
   static_assert(std::is_nothrow_copy_assignable<decltype(a)>::value, "");
+  static_assert(std::is_trivially_destructible<decltype(a)>::value, "");
+  static_assert(std::is_nothrow_destructible<decltype(a)>::value, "");
 
   // Test void compiles
   outcome::result<void> c(outcome::in_place_type<void>);
@@ -72,6 +75,8 @@ int main(void)
   static_assert(std::is_move_assignable<decltype(d)>::value, "");
   static_assert(!std::is_trivially_move_assignable<decltype(d)>::value, "");
   static_assert(std::is_nothrow_move_assignable<decltype(d)>::value, "");
+  static_assert(!std::is_trivially_destructible<decltype(d)>::value, "");
+  static_assert(std::is_nothrow_destructible<decltype(d)>::value, "");
 
   // Test a highly pathological udt compiles
   outcome::result<udt2> e(outcome::in_place_type<udt2>, 5);
@@ -87,5 +92,19 @@ int main(void)
   static_assert(!std::is_move_assignable<decltype(e)>::value, "");
   static_assert(!std::is_trivially_move_assignable<decltype(e)>::value, "");
   static_assert(!std::is_nothrow_move_assignable<decltype(e)>::value, "");
+
+  // Test value + error code info works, and in constexpr
+  using cresult_type = outcome::result<int, const char *, outcome::policy::throw_directly<const char *>>;
+  constexpr const char *niall = "niall";
+  constexpr cresult_type f(5, niall);
+  constexpr cresult_type f2(f);
+  static_assert(f, "");
+  static_assert(f.has_value(), "");
+  static_assert(f.has_error(), "");
+  static_assert(f.assume_value() == 5, "");
+  static_assert(f.assume_error() == niall, "");
+  static_assert(f.value() == 5, "");
+  static_assert(f.error() == niall, "");
+
   return 0;
 }
