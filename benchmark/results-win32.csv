@@ -1,4 +1,4 @@
-"Compiler","integer-returns","exception-throw","expected-error-value","expected-error-error","expected-excpt-value","expected-excpt-error"
-"msvc19-noexcept",91.200184,,93.824259,86.833987,82.250023,1234.403638
-"msvc19",86.648887,18426.944945,87.117080,94.847758,81.868932,1360.544294
-"msvc19-ltcg",92.626548,17725.380778,97.907360,98.821976,88.870095,1288.540138
+"Compiler","integer-returns","exception-throw","result-error-value","result-error-error","result-excpt-value","result-excpt-error"
+"msvc19-noexcept",94.096434,,89.305593,94.782396,94.205317,1195.575657
+"msvc19",83.763464,16639.618355,93.356032,101.576675,99.290139,1246.445658
+"msvc19-ltcg",100.368078,16770.963563,100.694727,94.379529,90.535969,1200.823805
