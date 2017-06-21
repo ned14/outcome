@@ -217,10 +217,12 @@ namespace outcome
     template <class T> using value_storage_select_impl = value_storage_select_copy_assignment<T>;
   }
 
+  //! Namespace for policies
   namespace policy
   {
 #ifdef __cpp_exceptions
     /*! Policy interpreting EC as a type to be thrown directly during wide checks.
+    \module Error code interpretation policy
     */
     template <class EC> struct throw_directly
     {
@@ -264,6 +266,7 @@ namespace outcome
     /*! Policy interpreting EC as a type implementing the `std::error_code` contract
     and any wide attempt to access the successful state throws the `error_code` wrapped into
     a `std::system_error`
+    \module Error code interpretation policy
     */
     template <class EC> struct error_code_throw_as_system_error
     {
@@ -307,6 +310,7 @@ namespace outcome
     };
     /*! Policy interpreting EC as a type implementing the `std::exception_ptr` contract
     and any wide attempt to access the successful state calls `std::rethrow_exception()`.
+    \module Error code interpretation policy
     */
     template <class EC> struct exception_ptr_rethrow
     {
@@ -350,6 +354,7 @@ namespace outcome
     };
 #endif
     /*! Policy implementing any wide attempt to access the successful state as calling `std::terminate`
+    \module Error code interpretation policy
     */
     template <class EC> struct terminate
     {
@@ -388,7 +393,9 @@ namespace outcome
     };
 
 #ifdef __cpp_exceptions
-    //! Default result policy selector
+    /*! Default `result<T, EC>` policy selector.
+    \module Error code interpretation policy
+    */
     template <class EC>
     using default_result_policy = std::conditional_t<                                         //
     std::is_void<EC>::value,                                                                  //
@@ -405,7 +412,8 @@ namespace outcome
   }
 
   /*! The base implementation of `result<R, EC>`. You should not construct this directly.
-  \see [result]()
+  \module result<R, EC> implementation
+  \see [outcome::result<R, EC, NoValuePolicy>]()
   */
   template <class Impl, class R, class EC, class NoValuePolicy> class result_base
   {
@@ -413,7 +421,7 @@ namespace outcome
 
   public:
     /// \output_section Member types
-    //! The result type.
+    //! The success type.
     using value_type = R;
     //! The failure type.
     using error_type = EC;
@@ -451,14 +459,15 @@ namespace outcome
 
     /// \output_section Converting constructors
     /*! Converting constructor to a successful result.
-    \param enable_value_converting_constructor
+    \tparam enable_value_converting_constructor
     \exclude
     \param 1
     \exclude
     \param t The value from which to initialise the `value_type`.
+
     \effects Initialises the result with a `value_type`.
     \requires Type T is constructible to `value_type`, is not constructible to `error_type`, and is not `result<R, EC>` and not `in_place_type<>`.
-    \throws Any exception the move or copy construction of `value_type(T)` might throw.
+    \throws Any exception the construction of `value_type(T)` might throw.
     */
     template <class T, typename enable_value_converting_constructor = std::enable_if_t<  //
                        !std::is_same<std::decay_t<T>, Impl>::value                       // not my type
@@ -468,7 +477,17 @@ namespace outcome
         : _state(in_place_type<value_type>, std::forward<T>(t))
     {
     }
-    //! Converting constructor to error_type
+    /*! Converting constructor to a failure result.
+    \tparam enable_error_converting_constructor
+    \exclude
+    \param 1
+    \exclude
+    \param t The value from which to initialise the `error_type`.
+
+    \effects Initialises the result with a `error_type`.
+    \requires Type T is constructible to `error_type`, is not constructible to `value_type`, and is not `result<R, EC>` and not `in_place_type<>`.
+    \throws Any exception the construction of `error_type(T)` might throw.
+    */
     template <class T, typename enable_error_converting_constructor = std::enable_if_t<  //
                        !std::is_same<std::decay_t<T>, Impl>::value                       // not my type
                        && !detail::is_in_place_type_t<std::decay_t<T>>::value            // not in place construction
@@ -478,10 +497,22 @@ namespace outcome
         , _error(std::forward<T>(t))
     {
     }
-    //! Converting constructor to value_type + error_type
-    template <class T, class U, typename enable_error_converting_constructor = std::enable_if_t<  //
-                                !std::is_same<std::decay_t<T>, Impl>::value                       // not my type
-                                && !detail::is_in_place_type_t<std::decay_t<T>>::value            // not in place construction
+    /*! Converting constructor to a successful result plus additional information.
+    \tparam enable_value_error_converting_constructor
+    \exclude
+    \param 2
+    \exclude
+    \param t The value from which to initialise the `value_type`.
+    \param u The value from which to initialise the `error_type`.
+
+    \effects Initialises the result with both a `value_type` and an `error_type`.
+    \requires Type `T` is constructible to `value_type`, is not constructible to `error_type`, and is not `result<R, EC>` and not `in_place_type<>`;
+    Type `U` is constructible to `error_type`, is not constructible to `value_type`.
+    \throws Any exception the construction of `value_type(T)` and `error_type(U)` might throw.
+    */
+    template <class T, class U, typename enable_value_error_converting_constructor = std::enable_if_t<  //
+                                !std::is_same<std::decay_t<T>, Impl>::value                             // not my type
+                                && !detail::is_in_place_type_t<std::decay_t<T>>::value                  // not in place construction
                                 && std::is_constructible<value_type, T>::value && !std::is_constructible<error_type, T>::value && std::is_constructible<error_type, U>::value && !std::is_constructible<value_type, U>::value>>
     constexpr result_base(T &&t, U &&u, value_error_converting_constructor_tag = value_error_converting_constructor_tag()) noexcept(noexcept(value_type(std::forward<T>(t))) && noexcept(error_type(std::forward<U>(u))))
         : _state(in_place_type<value_type>, std::forward<T>(t))
@@ -491,26 +522,64 @@ namespace outcome
     }
 
     /// \output_section In place constructors
-    //! In place constructor to value_type
+    /*! Inplace constructor to a successful result.
+    \tparam 1
+    \exclude
+    \param _ Tag type to indicate we are doing in place construction of `value_type`.
+    \param args Arguments with which to in place construct.
+
+    \effects Initialises the result with a `value_type`.
+    \requires `value_type` is void or `Args...` are constructible to `value_type`.
+    \throws Any exception the construction of `value_type(Args...)` might throw.
+    */
     template <class... Args, typename = std::enable_if_t<std::is_void<value_type>::value || std::is_constructible<value_type, Args...>::value>>
     constexpr explicit result_base(in_place_type_t<value_type> _, Args &&... args) noexcept(noexcept(value_type(std::forward<Args>(args)...)))
         : _state(_, std::forward<Args>(args)...)
     {
     }
-    //! In place constructor to value_type
+    /*! Inplace constructor to a successful result.
+    \tparam 2
+    \exclude
+    \param _ Tag type to indicate we are doing in place construction of `value_type`.
+    \param il An initializer list with which to in place construct.
+    \param args Arguments with which to in place construct.
+
+    \effects Initialises the result with a `value_type`.
+    \requires The initializer list + `Args...` are constructible to `value_type`.
+    \throws Any exception the construction of `value_type(il, Args...)` might throw.
+    */
     template <class U, class... Args, typename = std::enable_if_t<std::is_constructible<value_type, std::initializer_list<U>, Args...>::value>>
     constexpr explicit result_base(in_place_type_t<value_type> _, std::initializer_list<U> il, Args &&... args) noexcept(noexcept(value_type(il, std::forward<Args>(args)...)))
         : _state(_, il, std::forward<Args>(args)...)
     {
     }
-    //! In place constructor to error_type
+    /*! Inplace constructor to a failure result.
+    \tparam 1
+    \exclude
+    \param _ Tag type to indicate we are doing in place construction of `error_type`.
+    \param args Arguments with which to in place construct.
+
+    \effects Initialises the result with a `error_type`.
+    \requires `error_type` is void or `Args...` are constructible to `error_type`.
+    \throws Any exception the construction of `error_type(Args...)` might throw.
+    */
     template <class... Args, typename = std::enable_if_t<std::is_void<error_type>::value || std::is_constructible<error_type, Args...>::value>>
     constexpr explicit result_base(in_place_type_t<error_type>, Args &&... args) noexcept(noexcept(error_type(std::forward<Args>(args)...)))
         : _state(detail::status_have_error)
         , _error(std::forward<Args>(args)...)
     {
     }
-    //! In place constructor to error_type
+    /*! Inplace constructor to a failure result.
+    \tparam 2
+    \exclude
+    \param _ Tag type to indicate we are doing in place construction of `error_type`.
+    \param il An initializer list with which to in place construct.
+    \param args Arguments with which to in place construct.
+
+    \effects Initialises the result with a `error_type`.
+    \requires The initializer list + `Args...` are constructible to `error_type`.
+    \throws Any exception the construction of `error_type(il, Args...)` might throw.
+    */
     template <class U, class... Args, typename = std::enable_if_t<std::is_constructible<error_type, std::initializer_list<U>, Args...>::value>>
     constexpr explicit result_base(in_place_type_t<error_type>, std::initializer_list<U> il, Args &&... args) noexcept(noexcept(error_type(il, std::forward<Args>(args)...)))
         : _state(detail::status_have_error)
@@ -519,26 +588,42 @@ namespace outcome
     }
 
     /// \output_section State check observers
-    //! True if has value
+    /*! Checks if has value.
+    \returns True if has value.
+    */
     constexpr explicit operator bool() const noexcept { return (_state._status & detail::status_have_value) != 0; }
-    //! True if has value
+    /*! Checks if has value.
+    \returns True if has value.
+    */
     constexpr bool has_value() const noexcept { return (_state._status & detail::status_have_value) != 0; }
-    //! True if has error
+    /*! Checks if has error.
+    \returns True if has error.
+    */
     constexpr bool has_error() const noexcept { return (_state._status & detail::status_have_error) != 0; }
+    /*! Checks if has information in addition to value.
+    \returns True if has value + error.
+    */
+    constexpr bool has_info() const noexcept { return (_state._status & detail::status_have_value) != 0 && (_state._status & detail::status_have_error) != 0; }
   };
 
   /*! Provides the result of a success, a success with additional information, or a failure.
-  \group result
+  \module result<R, EC> implementation
   \tparam R The type of the successful result.
-  \tparam EC The type of the failure/info result.
-  \requires Must be DefaultConstructible and BooleanTestable e.g. `if(ec)`
+  \tparam EC The type of the failure/info result. Must be DefaultConstructible and BooleanTestable e.g. `if(ec)`
   \tparam NoValuePolicy Policy on how to interpret type `EC` when a wide observation of a not present value occurs.
-  Default is:
+
+  Default for `NoValuePolicy` is:
   - If C++ exceptions are enabled:
-      - If `EC` convertible to a `std::error_code`, `throw std::system_error(error())`.
-      - If `EC` convertible to a `std::exception_ptr`, `std::rethrow_exception(error())`.
-      - If `EC` is `void`, call `std::terminate()`.
-      - Else `throw error()`.
+      1. If `.value()` called when there is no `value_type` but there is an `error_type`:
+          - If `EC` convertible to a `std::error_code`, then `throw std::system_error(error())`.
+          - If `EC` convertible to a `std::exception_ptr`, then `std::rethrow_exception(error())`.
+          - If `EC` is `void`, call `std::terminate()`.
+          - Else `throw error()`.
+      2. If `.value()` called when there is no `value_type` and no `error_type`:
+          - `throw bad_result_access()`.
+      3. If `.error()` called when there is no `error_type`:
+          - `throw bad_result_access()`.
+
   - If C++ exceptions are not enabled, call `std::terminate()`.
   */
   template <class R, class EC = error_code_extended, class NoValuePolicy = policy::default_result_policy<EC>> class result : public result_base<result<R, EC, NoValuePolicy>, R, EC, NoValuePolicy>
@@ -549,8 +634,10 @@ namespace outcome
     using result_base<result<R, EC, NoValuePolicy>, R, EC, NoValuePolicy>::result_base;
 
     /// \output_section Narrow state observers
-    /// \group assume_value
-    //! Access value directly
+    /*! Access value without runtime checks.
+    \returns Reference to the held `value_type` according to overload.
+    \group assume_value
+    */
     constexpr value_type &assume_value() & noexcept
     {
       NoValuePolicy::narrow_value_check(this);
@@ -574,8 +661,10 @@ namespace outcome
       NoValuePolicy::narrow_value_check(this);
       return this->_state._value;
     }
-    /// \group assume_error
-    //! Access error directly
+    /*! Access error without runtime checks.
+    \returns Reference to the held `error_type` according to overload.
+    \group assume_error
+    */
     constexpr error_type &assume_error() & noexcept
     {
       NoValuePolicy::narrow_error_check(this);
@@ -601,8 +690,11 @@ namespace outcome
     }
 
     /// \output_section Wide state observers
-    /// \group value
-    //! Access value if no error
+    /*! Access value with runtime checks.
+    \returns Reference to the held `value_type` according to overload.
+    \requires The result to have a successful state, else whatever `NoValuePolicy` says ought to happen.
+    \group value
+    */
     constexpr value_type &value() &
     {
       NoValuePolicy::wide_value_check(this);
@@ -626,8 +718,11 @@ namespace outcome
       NoValuePolicy::wide_value_check(this);
       return this->_state._value;
     }
-    /// \group error
-    //! Access error
+    /*! Access error with runtime checks.
+    \returns Reference to the held `error_type` according to overload.
+    \requires The result to have a failed or success + info state, else whatever `NoValuePolicy` says ought to happen.
+    \group error
+    */
     constexpr error_type &error() &
     {
       NoValuePolicy::wide_error_check(this);
@@ -653,7 +748,10 @@ namespace outcome
     }
   };
 
-  //! \group result
+  /*! `result<void, void>` specialisation.
+  \see [outcome::result<R, EC, NoValuePolicy>]()
+  \module result<R, EC> implementation
+  */
   template <class NoValuePolicy> struct result<void, void, NoValuePolicy> : result_base<result<void, void, NoValuePolicy>, void, void, NoValuePolicy>
   {
   public:
@@ -662,19 +760,32 @@ namespace outcome
     using result_base<result<void, void, NoValuePolicy>, void, void, NoValuePolicy>::result_base;
 
     /// \output_section Narrow state observers
-    //! Access value directly
-    constexpr void assume_value() noexcept { NoValuePolicy::narrow_value_check(this); }
-    //! Access error directly
-    constexpr void assume_error() noexcept { NoValuePolicy::narrow_error_check(this); }
+    /*! Access value without runtime checks.
+    \returns Nothing.
+    */
+    constexpr void assume_value() const noexcept { NoValuePolicy::narrow_value_check(this); }
+    /*! Access error without runtime checks.
+    \returns Nothing.
+    */
+    constexpr void assume_error() const noexcept { NoValuePolicy::narrow_error_check(this); }
 
     /// \output_section Wide state observers
-    //! Access value if no error
-    constexpr void value() { NoValuePolicy::wide_value_check(this); }
-    //! Access error
-    constexpr void error() { NoValuePolicy::wide_error_check(this); }
+    /*! Access value with runtime checks.
+    \returns Nothing.
+    \requires The result to have a successful state, else whatever `NoValuePolicy` says ought to happen.
+    */
+    constexpr void value() const { NoValuePolicy::wide_value_check(this); }
+    /*! Access error with runtime checks.
+    \returns Nothing.
+    \requires The result to have a failed or success + info state, else whatever `NoValuePolicy` says ought to happen.
+    */
+    constexpr void error() const { NoValuePolicy::wide_error_check(this); }
   };
 
-  //! \group result
+  /*! `result<void, EC>` specialisation.
+  \see [outcome::result<R, EC, NoValuePolicy>]()
+  \module result<R, EC> implementation
+  */
   template <class EC, class NoValuePolicy> class result<void, EC, NoValuePolicy> : public result_base<result<void, EC, NoValuePolicy>, void, EC, NoValuePolicy>
   {
   public:
@@ -683,8 +794,14 @@ namespace outcome
     using result_base<result<void, EC, NoValuePolicy>, void, EC, NoValuePolicy>::result_base;
 
     /// \output_section Narrow state observers
-    /// \group assume_error
-    //! Access error directly
+    /*! Access value without runtime checks.
+    \returns Nothing.
+    */
+    constexpr void assume_value() const noexcept { NoValuePolicy::narrow_value_check(this); }
+    /*! Access error without runtime checks.
+    \returns Reference to the held `error_type` according to overload.
+    \group assume_error
+    */
     constexpr error_type &assume_error() & noexcept
     {
       NoValuePolicy::narrow_error_check(this);
@@ -710,8 +827,16 @@ namespace outcome
     }
 
     /// \output_section Wide state observers
-    /// \group error
-    //! Access error
+    /*! Access value with runtime checks.
+    \returns Nothing.
+    \requires The result to have a successful state, else whatever `NoValuePolicy` says ought to happen.
+    */
+    constexpr void value() const { NoValuePolicy::wide_value_check(this); }
+    /*! Access error with runtime checks.
+    \returns Reference to the held `error_type` according to overload.
+    \requires The result to have a failed or success + info state, else whatever `NoValuePolicy` says ought to happen.
+    \group error
+    */
     constexpr error_type &error() &
     {
       NoValuePolicy::wide_error_check(this);
@@ -737,7 +862,10 @@ namespace outcome
     }
   };
 
-  //! \group result
+  /*! `result<R, void>` specialisation.
+  \see [outcome::result<R, EC, NoValuePolicy>]()
+  \module result<R, EC> implementation
+  */
   template <class R, class NoValuePolicy> struct result<R, void, NoValuePolicy> : public result_base<result<R, void, NoValuePolicy>, R, void, NoValuePolicy>
   {
   public:
@@ -746,8 +874,10 @@ namespace outcome
     using result_base<result<R, void, NoValuePolicy>, R, void, NoValuePolicy>::result_base;
 
     /// \output_section Narrow state observers
-    /// \group assume_value
-    //! Access value directly
+    /*! Access value without runtime checks.
+    \returns Reference to the held `value_type` according to overload.
+    \group assume_value
+    */
     constexpr value_type &assume_value() & noexcept
     {
       NoValuePolicy::narrow_value_check(this);
@@ -771,10 +901,17 @@ namespace outcome
       NoValuePolicy::narrow_value_check(this);
       return this->_state._value;
     }
+    /*! Access error without runtime checks.
+    \returns Nothing.
+    */
+    constexpr void assume_error() const noexcept { NoValuePolicy::narrow_error_check(this); }
 
     /// \output_section Wide state observers
-    /// \group value
-    //! Access value if no error
+    /*! Access value with runtime checks.
+    \returns Reference to the held `value_type` according to overload.
+    \requires The result to have a successful state, else whatever `NoValuePolicy` says ought to happen.
+    \group value
+    */
     constexpr value_type &value() &
     {
       NoValuePolicy::wide_value_check(this);
@@ -798,6 +935,11 @@ namespace outcome
       NoValuePolicy::wide_value_check(this);
       return this->_state._value;
     }
+    /*! Access error with runtime checks.
+    \returns Nothing.
+    \requires The result to have a failed or success + info state, else whatever `NoValuePolicy` says ought to happen.
+    */
+    constexpr void error() const { NoValuePolicy::wide_error_check(this); }
   };
 }
 #endif
