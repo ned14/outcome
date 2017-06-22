@@ -107,5 +107,15 @@ int main(void)
   static_assert(f.value() == 5, "");
   static_assert(f.status() == niall, "");
 
+  // Test compatible results can be constructed from one another
+  constexpr outcome::result<int, long> g(outcome::in_place_type<int>, 5);
+  constexpr outcome::result<long, int> g2(g);
+  static_assert(g.has_value(), "");
+  static_assert(!g.has_error(), "");
+  static_assert(g.value() == 5, "");
+  static_assert(g2.has_value(), "");
+  static_assert(!g2.has_error(), "");
+  static_assert(g2.value() == 5, "");
+
   return 0;
 }

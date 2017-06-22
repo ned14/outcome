@@ -87,6 +87,18 @@ namespace outcome
           , _status(status_have_value)
       {
       }
+      template <class U, typename = std::enable_if_t<!std::is_same<std::decay_t<U>, value_type>::value && std::is_constructible<value_type, U>::value>>
+      constexpr explicit value_storage_trivial(const value_storage_trivial<U> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
+          : value_storage_trivial(((o._status & status_have_value) != 0) ? value_storage_trivial(in_place_type<value_type>, o._value) : value_storage_trivial())
+      {
+        _status = o._status;
+      }
+      template <class U, typename = std::enable_if_t<!std::is_same<std::decay_t<U>, value_type>::value && std::is_constructible<value_type, U>::value>>
+      constexpr explicit value_storage_trivial(value_storage_trivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
+          : value_storage_trivial(((o._status & status_have_value) != 0) ? value_storage_trivial(in_place_type<value_type>, std::move(o._value)) : value_storage_trivial())
+      {
+        _status = o._status;
+      }
     };
     // Used if T is non-trivial
     template <class T> struct value_storage_nontrivial
@@ -132,6 +144,18 @@ namespace outcome
           : _value(il, std::forward<Args>(args)...)
           , _status(status_have_value)
       {
+      }
+      template <class U, typename = std::enable_if_t<!std::is_same<std::decay_t<U>, value_type>::value && std::is_constructible<value_type, U>::value>>
+      constexpr explicit value_storage_nontrivial(const value_storage_nontrivial<U> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
+          : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, o._value) : value_storage_nontrivial())
+      {
+        _status = o._status;
+      }
+      template <class U, typename = std::enable_if_t<!std::is_same<std::decay_t<U>, value_type>::value && std::is_constructible<value_type, U>::value>>
+      constexpr explicit value_storage_nontrivial(value_storage_nontrivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
+          : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, std::move(o._value)) : value_storage_nontrivial())
+      {
+        _status = o._status;
       }
       ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<T>::value)
       {
@@ -223,6 +247,7 @@ namespace outcome
     template <class R, class EC, class NoValuePolicy> class result_storage
     {
       friend NoValuePolicy;
+      template <class T, class U, class V> friend class result_storage;
       static_assert(std::is_default_constructible<EC>::value, "error_type must be default constructible");
       static_assert(std::is_constructible<bool, EC>::value, "error_type must implement boolean testability");
 
@@ -237,11 +262,13 @@ namespace outcome
       template <class... Args>
       constexpr result_storage(in_place_type_t<value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
           : _state(_, std::forward<Args>(args)...)
+          , _error()
       {
       }
       template <class U, class... Args>
       constexpr result_storage(in_place_type_t<value_type> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
           : _state(_, il, std::forward<Args>(args)...)
+          , _error()
       {
       }
       template <class... Args>
@@ -265,6 +292,21 @@ namespace outcome
           , _error(std::forward<U>(u))
       {
         _state._status |= detail::status_have_status;
+      }
+      struct compatible_conversion_tag
+      {
+      };
+      template <class T, class U, class V>
+      constexpr result_storage(compatible_conversion_tag, const result_storage<T, U, V> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value)
+          : _state(o._state)
+          , _error(o._error)
+      {
+      }
+      template <class T, class U, class V>
+      constexpr result_storage(compatible_conversion_tag, result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value)
+          : _state(std::move(o._state))
+          , _error(std::move(o._error))
+      {
       }
 
       /// \output_section Narrow state observers
@@ -812,17 +854,19 @@ namespace outcome
 
   Default for `NoValuePolicy` is:
   - If C++ exceptions are enabled:
-  1. If `.value()` called when there is no `value_type` but there is an `error_type`:
-  - If `EC` convertible to a `std::error_code`, then `throw std::system_error(error())`.
-  - If `EC` convertible to a `std::exception_ptr`, then `std::rethrow_exception(error())`.
-  - If `EC` is `void`, call `std::terminate()`.
-  - Else `throw error()`.
-  2. If `.value()` called when there is no `value_type` and no `error_type`:
-  - `throw bad_result_access()`.
-  3. If `.error()` called when there is no `error_type`:
-  - `throw bad_result_access()`.
-
+    1. If `.value()` called when there is no `value_type` but there is an `error_type`:
+      - If `EC` convertible to a `std::error_code`, then `throw std::system_error(error())`.
+      - If `EC` convertible to a `std::exception_ptr`, then `std::rethrow_exception(error())`.
+      - If `EC` is `void`, call `std::terminate()`.
+      - Else `throw error()`.
+    2. If `.value()` called when there is no `value_type` and no `error_type`:
+      - `throw bad_result_access()`.
+    3. If `.error()` called when there is no `error_type`:
+      - `throw bad_result_access()`.
   - If C++ exceptions are not enabled, call `std::terminate()`.
+
+  http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0262r0.html (A Class for Status and Optional Value) is implemented
+  by this class, albeit with types `Status` and `Value` reversed.
   */
   template <class R, class EC = error_code_extended, class NoValuePolicy = policy::default_result_policy<EC>> class result : public impl::result_error_observers<impl::result_value_observers<impl::result_storage<R, EC, NoValuePolicy>, R, NoValuePolicy>, EC, NoValuePolicy>
   {
@@ -917,6 +961,34 @@ namespace outcome
                                 && std::is_constructible<value_type, T>::value && !std::is_constructible<status_type, T>::value && std::is_constructible<status_type, U>::value && !std::is_constructible<value_type, U>::value>>
     constexpr result(T &&t, U &&u, value_status_converting_constructor_tag = value_status_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_type, U>::value)
         : base(typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u))
+    {
+    }
+    /*! Converting copy constructor from a compatible result type.
+    \tparam enable_compatible_conversion
+    \exclude
+    \param o The compatible result.
+
+    \effects Initialises the result with a copy of the compatible result.
+    \requires Type `T` is constructible to `value_type` and type `U` is constructible to `error_type`.
+    \throws Any exception the construction of `value_type(T)` and `error_type(U)` might throw.
+    */
+    template <class T, class U, class V, typename enable_compatible_conversion = std::enable_if_t<!std::is_same<result<T, U, V>, result>::value && std::is_constructible<value_type, T>::value && std::is_constructible<error_type, U>::value>>
+    constexpr explicit result(const result<T, U, V> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_type, U>::value)
+        : base(typename base::compatible_conversion_tag(), o)
+    {
+    }
+    /*! Converting move constructor from a compatible result type.
+    \tparam enable_compatible_conversion
+    \exclude
+    \param o The compatible result.
+
+    \effects Initialises the result with a move of the compatible result.
+    \requires Type `T` is constructible to `value_type` and type `U` is constructible to `error_type`.
+    \throws Any exception the construction of `value_type(T)` and `error_type(U)` might throw.
+    */
+    template <class T, class U, class V, typename enable_compatible_conversion = std::enable_if_t<!std::is_same<result<T, U, V>, result>::value && std::is_constructible<value_type, T>::value && std::is_constructible<error_type, U>::value>>
+    constexpr explicit result(result<T, U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_type, U>::value)
+        : base(typename base::compatible_conversion_tag(), std::move(o))
     {
     }
 
