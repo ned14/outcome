@@ -93,18 +93,19 @@ int main(void)
   static_assert(!std::is_trivially_move_assignable<decltype(e)>::value, "");
   static_assert(!std::is_nothrow_move_assignable<decltype(e)>::value, "");
 
-  // Test value + error code info works, and in constexpr
+  // Test value + status info works, and in constexpr
   using cresult_type = outcome::result<int, const char *>;
   constexpr const char *niall = "niall";
   constexpr cresult_type f(5, niall);
   constexpr cresult_type f2(f);
   static_assert(f, "");
   static_assert(f.has_value(), "");
-  static_assert(f.has_error(), "");
+  static_assert(!f.has_error(), "");
+  static_assert(f.has_status(), "");
   static_assert(f.assume_value() == 5, "");
-  static_assert(f.assume_error() == niall, "");
+  static_assert(f.assume_status() == niall, "");
   static_assert(f.value() == 5, "");
-  static_assert(f.error() == niall, "");
+  static_assert(f.status() == niall, "");
 
   return 0;
 }
