@@ -73,6 +73,17 @@ namespace outcome
     };
   }
 
+  //! Placeholder type to indicate there is no status type
+  struct no_status_type
+  {
+    no_status_type() = delete;
+  };
+  //! Placeholder type to indicate there is no error type
+  struct no_error_type
+  {
+    no_error_type() = delete;
+  };
+
   namespace detail
   {
     // Test if type is an in_place_type_t
@@ -99,8 +110,8 @@ namespace outcome
     static constexpr status_bitfield_type status_have_value = (1 << 0);
     static constexpr status_bitfield_type status_have_error = (1 << 1);
     static constexpr status_bitfield_type status_have_status = (1 << 2);
-    static constexpr status_bitfield_type status_have_exception = (1 << 3);
-    static constexpr status_bitfield_type status_have_payload = (1 << 4);
+    static constexpr status_bitfield_type status_have_payload = (1 << 3);
+    static constexpr status_bitfield_type status_have_exception = (1 << 4);
     static constexpr status_bitfield_type status_result_last = (1 << 5);
 
     // Used if T is trivial
@@ -292,7 +303,7 @@ namespace outcome
     {
       friend NoValuePolicy;
       template <class T, class U, class V> friend class result_storage;
-      static_assert(std::is_default_constructible<EC>::value, "error_type must be default constructible");
+      static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "error_type must be default constructible");
 
       using value_type = R;
       using error_type = EC;
@@ -300,7 +311,9 @@ namespace outcome
 
     protected:
       detail::value_storage_select_impl<value_type> _state;
-      error_type _error;
+      detail::devoid<error_type> _error;
+
+      result_storage() = default;
 
       template <class... Args>
       constexpr result_storage(in_place_type_t<value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
@@ -345,10 +358,34 @@ namespace outcome
           , _error(o._error)
       {
       }
+      template <class U, class V>
+      constexpr result_storage(compatible_conversion_tag, const result_storage<void, U, V> &o) noexcept(std::is_nothrow_constructible<error_type, U>::value)
+          : _state(value_type())
+          , _error(o._error)
+      {
+      }
+      template <class T, class V>
+      constexpr result_storage(compatible_conversion_tag, const result_storage<T, void, V> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value)
+          : _state(o._state)
+          , _error(error_type())
+      {
+      }
       template <class T, class U, class V>
       constexpr result_storage(compatible_conversion_tag, result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value)
           : _state(std::move(o._state))
           , _error(std::move(o._error))
+      {
+      }
+      template <class U, class V>
+      constexpr result_storage(compatible_conversion_tag, result_storage<void, U, V> &&o) noexcept(std::is_nothrow_constructible<error_type, U>::value)
+          : _state(value_type())
+          , _error(std::move(o._error))
+      {
+      }
+      template <class T, class V>
+      constexpr result_storage(compatible_conversion_tag, result_storage<T, void, V> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value)
+          : _state(std::move(o._state))
+          , _error(error_type())
       {
       }
     };
@@ -605,6 +642,46 @@ namespace outcome
       */
       constexpr void status() const { NoValuePolicy::wide_status_check(this); }
     };
+
+    template <class Base, class EC, class NoValuePolicy> using select_result_observers_error_or_status = std::conditional_t<trait::status_type_is_negative<std::decay_t<EC>>::value, result_error_observers<Base, EC, NoValuePolicy>, result_status_observers<Base, EC, NoValuePolicy>>;
+    template <class R, class EC, class NoValuePolicy> using select_result_impl = select_result_observers_error_or_status<result_value_observers<result_storage<R, EC, NoValuePolicy>, R, NoValuePolicy>, EC, NoValuePolicy>;
+
+    //! The assembled implementation type of `result<R, EC, NoValuePolicy>`. Only appears separate due to standardese limitations.
+    template <class R, class S, class NoValuePolicy> class result_final : public select_result_impl<R, S, NoValuePolicy>
+    {
+      using base = select_result_impl<R, S, NoValuePolicy>;
+
+    public:
+      /// \output_section Member types
+      //! The success type.
+      using value_type = R;
+      //! The S type configured
+      using status_error_type = S;
+      //! The status type, always `no_status_type` if `trait::status_type_is_negative<S>` is true.
+      using status_type = std::conditional_t<!trait::status_type_is_negative<S>::value, S, no_status_type>;
+      //! The failure type, always `no_error_type` if `trait::status_type_is_negative<S>` is false.
+      using error_type = std::conditional_t<trait::status_type_is_negative<S>::value, S, no_error_type>;
+
+      using base::base;
+
+      /// \output_section State check observers
+      /*! Checks if has value.
+      \returns True if has value.
+      */
+      constexpr explicit operator bool() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
+      /*! Checks if has value.
+      \returns True if has value.
+      */
+      constexpr bool has_value() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
+      /*! Checks if has error.
+      \returns True if has error.
+      */
+      constexpr bool has_error() const noexcept { return (this->_state._status & detail::status_have_error) != 0; }
+      /*! Checks if has status information.
+      \returns True if has status.
+      */
+      constexpr bool has_status() const noexcept { return (this->_state._status & detail::status_have_status) != 0; }
+    };
   }
 
   //! Namespace for policies
@@ -830,7 +907,7 @@ namespace outcome
     /*! Policy implementing any wide attempt to access the successful state as calling `std::terminate`
     \module Error code interpretation policy
     */
-    template <class EC> struct terminate
+    struct terminate
     {
       /*! Performs a narrow check of state, used in the assume_value() functions.
       \effects None.
@@ -859,6 +936,26 @@ namespace outcome
       {
 #if defined(__GNUC__) || defined(__clang__)
         if((self->_state._status & detail::status_have_status) == 0)
+          __builtin_unreachable();
+#endif
+      }
+      /*! Performs a narrow check of state, used in the assume_payload() functions
+      \effects None.
+      */
+      template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
+      {
+#if defined(__GNUC__) || defined(__clang__)
+        if((self->_state._status & detail::status_have_payload) == 0)
+          __builtin_unreachable();
+#endif
+      }
+      /*! Performs a narrow check of state, used in the assume_exception() functions
+      \effects None.
+      */
+      template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
+      {
+#if defined(__GNUC__) || defined(__clang__)
+        if((self->_state._status & detail::status_have_exception) == 0)
           __builtin_unreachable();
 #endif
       }
@@ -892,6 +989,26 @@ namespace outcome
           std::terminate();
         }
       }
+      /*! Performs a wide check of state, used in the payload() functions
+      \effects If outcome does not have an exception, calls `std::terminate()`.
+      */
+      template <class Impl> static constexpr void wide_payload_check(Impl *self)
+      {
+        if((self->_state._status & detail::status_have_payload) == 0)
+        {
+          std::terminate();
+        }
+      }
+      /*! Performs a wide check of state, used in the exception() functions
+      \effects If outcome does not have an exception, calls `std::terminate()`.
+      */
+      template <class Impl> static constexpr void wide_exception_check(Impl *self)
+      {
+        if((self->_state._status & detail::status_have_exception) == 0)
+        {
+          std::terminate();
+        }
+      }
     };
 
 #ifdef __cpp_exceptions
@@ -901,7 +1018,7 @@ namespace outcome
     template <class EC>
     using default_result_policy = std::conditional_t<                                             //
     std::is_void<EC>::value,                                                                      //
-    terminate<EC>,                                                                                //
+    terminate,                                                                                    //
     std::conditional_t<                                                                           //
     detail::is_same_or_constructible<std::error_code, EC>, error_code_throw_as_system_error<EC>,  //
     std::conditional_t<                                                                           //
@@ -909,14 +1026,8 @@ namespace outcome
     throw_directly<EC>                                                                            //
     >>>;
 #else
-    template <class EC> using default_result_policy = terminate<EC>;
+    template <class EC> using default_result_policy = terminate;
 #endif
-  }
-
-  namespace detail
-  {
-    template <class Base, class EC, class NoValuePolicy> using select_result_observers_error_or_status = std::conditional_t<trait::status_type_is_negative<std::decay_t<EC>>::value, impl::result_error_observers<Base, EC, NoValuePolicy>, impl::result_status_observers<Base, EC, NoValuePolicy>>;
-    template <class R, class EC, class NoValuePolicy> using select_result_impl = select_result_observers_error_or_status<impl::result_value_observers<impl::result_storage<R, EC, NoValuePolicy>, R, NoValuePolicy>, EC, NoValuePolicy>;
   }
 
   /*! Used to return from functions (i) a value (ii) a value and a positive status or (iii) no value and a negative status. `constexpr` capable.
@@ -954,9 +1065,13 @@ namespace outcome
       - `throw bad_result_access()` if C++ exceptions are enabled, else call `std::terminate()`.
 
   */
-  template <class R, class S = error_code_extended, class NoValuePolicy = policy::default_result_policy<S>> class OUTCOME_NODISCARD result : public detail::select_result_impl<R, S, NoValuePolicy>
+  template <class R,                                                //
+            class S = error_code_extended,                          //
+            class NoValuePolicy = policy::default_result_policy<S>  //
+            >
+  class OUTCOME_NODISCARD result : public impl::result_final<R, S, NoValuePolicy>
   {
-    using base = detail::select_result_impl<R, S, NoValuePolicy>;
+    using base = impl::result_final<R, S, NoValuePolicy>;
 
     struct value_converting_constructor_tag
     {
@@ -974,10 +1089,10 @@ namespace outcome
     using value_type = R;
     //! The S type configured
     using status_error_type = S;
-    //! The status type, always `void` if `trait::status_type_is_negative<S>` is true.
-    using status_type = std::conditional_t<!trait::status_type_is_negative<S>::value, S, void>;
-    //! The failure type, always `void` if `trait::status_type_is_negative<S>` is false.
-    using error_type = std::conditional_t<trait::status_type_is_negative<S>::value, S, void>;
+    //! The status type, always `no_status_type` if `trait::status_type_is_negative<S>` is true.
+    using status_type = typename base::status_type;
+    //! The failure type, always `no_error_type` if `trait::status_type_is_negative<S>` is false.
+    using error_type = typename base::error_type;
 
     /// \output_section Default, copy/move constructors and assignment
     //! Default construction is not permitted.
@@ -1011,26 +1126,6 @@ namespace outcome
         : base(in_place_type<value_type>, std::forward<T>(t))
     {
     }
-    /*! Converting constructor to a failure result.
-    \tparam enable_error_converting_constructor
-    \exclude
-    \param 1
-    \exclude
-    \param t The value from which to initialise the `error_type`.
-
-    \effects Initialises the result with a `error_type`.
-    \requires `trait::status_type_is_negative<EC>` must be true; Type T is constructible to `error_type`,
-    is not constructible to `value_type`, and is not `result<R, S>` and not `in_place_type<>`.
-    \throws Any exception the construction of `error_type(T)` might throw.
-    */
-    template <class T, typename enable_error_converting_constructor = std::enable_if_t<  //
-                       !std::is_same<std::decay_t<T>, result>::value                     // not my type
-                       && !detail::is_in_place_type_t<std::decay_t<T>>::value            // not in place construction
-                       && !std::is_constructible<value_type, T>::value && detail::is_same_or_constructible<error_type, T>>>
-    constexpr result(T &&t, error_converting_constructor_tag = error_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)
-        : base(in_place_type<error_type>, std::forward<T>(t))
-    {
-    }
     /*! Converting constructor to a successful result + status.
     \tparam enable_value_status_converting_constructor
     \exclude
@@ -1052,20 +1147,41 @@ namespace outcome
         : base(typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u))
     {
     }
+    /*! Converting constructor to a failure result.
+    \tparam enable_error_converting_constructor
+    \exclude
+    \param 1
+    \exclude
+    \param t The value from which to initialise the `error_type`.
+
+    \effects Initialises the result with a `error_type`.
+    \requires `trait::status_type_is_negative<EC>` must be true; Type T is constructible to `error_type`,
+    is not constructible to `value_type`, and is not `result<R, S>` and not `in_place_type<>`.
+    \throws Any exception the construction of `error_type(T)` might throw.
+    */
+    template <class T, typename enable_error_converting_constructor = std::enable_if_t<  //
+                       !std::is_same<std::decay_t<T>, result>::value                     // not my type
+                       && !detail::is_in_place_type_t<std::decay_t<T>>::value            // not in place construction
+                       && !std::is_constructible<value_type, T>::value && detail::is_same_or_constructible<error_type, T>>>
+    constexpr result(T &&t, error_converting_constructor_tag = error_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)
+        : base(in_place_type<error_type>, std::forward<T>(t))
+    {
+    }
+
     /*! Converting copy constructor from a compatible result type.
     \tparam enable_compatible_conversion
     \exclude
     \param o The compatible result.
 
     \effects Initialises the result with a copy of the compatible result.
-    \requires Both result's `value_type`, `error_type` and `status_type` need to be constructible.
+    \requires Both result's `value_type`, `error_type` and `status_type` need to be constructible, or the source `void`.
     \throws Any exception the construction of `value_type(T)` and `status_error_type(U)` might throw.
     */
-    template <class T, class U, class V, typename enable_compatible_conversion = std::enable_if_t<                                //
-                                         !std::is_same<result<T, U, V>, result>::value                                            // not my type
-                                         && detail::is_same_or_constructible<value_type, typename result<T, U, V>::value_type>    // if our value types are constructible
-                                         && detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>    // if our error types are constructible
-                                         && detail::is_same_or_constructible<status_type, typename result<T, U, V>::status_type>  // if our status types are constructible
+    template <class T, class U, class V, typename enable_compatible_conversion = std::enable_if_t<                                                           //
+                                         !std::is_same<result<T, U, V>, result>::value                                                                       // not my type
+                                         && (std::is_void<T>::value || detail::is_same_or_constructible<value_type, typename result<T, U, V>::value_type>)   // if our value types are constructible
+                                         &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>)    // if our error types are constructible
+                                         &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename result<T, U, V>::status_type>)  // if our status types are constructible
                                          >>
     constexpr explicit result(const result<T, U, V> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
         : base(typename base::compatible_conversion_tag(), o)
@@ -1077,14 +1193,14 @@ namespace outcome
     \param o The compatible result.
 
     \effects Initialises the result with a move of the compatible result.
-    \requires Both result's `value_type`, `error_type` and `status_type` need to be constructible.
+    \requires Both result's `value_type`, `error_type` and `status_type` need to be constructible, or the source `void`.
     \throws Any exception the construction of `value_type(T)` and `status_error_type(U)` might throw.
     */
-    template <class T, class U, class V, typename enable_compatible_conversion = std::enable_if_t<                                //
-                                         !std::is_same<result<T, U, V>, result>::value                                            // not my type
-                                         && detail::is_same_or_constructible<value_type, typename result<T, U, V>::value_type>    // if our value types are constructible
-                                         && detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>    // if our error types are constructible
-                                         && detail::is_same_or_constructible<status_type, typename result<T, U, V>::status_type>  // if our status types are constructible
+    template <class T, class U, class V, typename enable_compatible_conversion = std::enable_if_t<                                                           //
+                                         !std::is_same<result<T, U, V>, result>::value                                                                       // not my type
+                                         && (std::is_void<T>::value || detail::is_same_or_constructible<value_type, typename result<T, U, V>::value_type>)   // if our value types are constructible
+                                         &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>)    // if our error types are constructible
+                                         &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename result<T, U, V>::status_type>)  // if our status types are constructible
                                          >>
     constexpr explicit result(result<T, U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
         : base(typename base::compatible_conversion_tag(), std::move(o))
@@ -1154,24 +1270,65 @@ namespace outcome
         : base(_, il, std::forward<Args>(args)...)
     {
     }
+  };
+  //! `result<void, void>` specialisation.
+  template <class NoValuePolicy> class OUTCOME_NODISCARD result<void, void, NoValuePolicy>
+  {
+  public:
+    /// \output_section Member types
+    //! The success type.
+    using value_type = void;
+    //! The S type configured
+    using status_error_type = void;
+    //! The status type, always `no_status_type`.
+    using status_type = no_status_type;
+    //! The failure type.
+    using error_type = void;
+
+    /// \output_section Narrow state observers
+    /*! Does nothing
+    \returns Nothing.
+    */
+    constexpr void assume_value() const noexcept {}
+    /*! Does nothing
+    \returns Nothing.
+    */
+    constexpr void assume_status() const noexcept {}
+    /*! Does nothing
+    \returns Nothing.
+    */
+    constexpr void assume_error() const noexcept {}
+    /// \output_section Wide state observers
+    /*! Does nothing.
+    \returns Nothing.
+    */
+    constexpr void value() const {}
+    /*! Does nothing.
+    \returns Nothing.
+    */
+    constexpr void status() const {}
+    /*! Does nothing.
+    \returns Nothing.
+    */
+    constexpr void error() const {}
 
     /// \output_section State check observers
     /*! Checks if has value.
-    \returns True if has value.
+    \returns False.
     */
-    constexpr explicit operator bool() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
+    constexpr explicit operator bool() const noexcept { return false; }
     /*! Checks if has value.
-    \returns True if has value.
+    \returns False.
     */
-    constexpr bool has_value() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
+    constexpr bool has_value() const noexcept { return false; }
     /*! Checks if has error.
-    \returns True if has error.
+    \returns False.
     */
-    constexpr bool has_error() const noexcept { return (this->_state._status & detail::status_have_error) != 0; }
+    constexpr bool has_error() const noexcept { return false; }
     /*! Checks if has status information.
-    \returns True if has status.
+    \returns False.
     */
-    constexpr bool has_status() const noexcept { return (this->_state._status & detail::status_have_status) != 0; }
+    constexpr bool has_status() const noexcept { return false; }
   };
 }
 #endif
