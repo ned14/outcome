@@ -278,8 +278,10 @@ namespace outcome
     using value_type = typename base::value_type;
     //! The S type configured
     using status_error_type = typename base::status_error_type;
+#if OUTCOME_ENABLE_POSITIVE_STATUS
     //! The status type, always `no_status_type` if `trait::status_type_is_negative<S>` is true.
     using status_type = typename base::status_type;
+#endif
     //! The failure type, always `no_error_type` if `trait::status_type_is_negative<S>` is false.
     using error_type = typename base::error_type;
     //! The pointer type.
@@ -314,20 +316,21 @@ namespace outcome
         , _ptr()
     {
     }
+#if OUTCOME_ENABLE_POSITIVE_STATUS
     /*! Converting constructor to a successful outcome + status.
-    \tparam enable_value_status_converting_constructor
-    \exclude
-    \param 2
-    \exclude
-    \param t The value from which to initialise the `value_type`.
-    \param u The value from which to initialise the `status_type`.
+\tparam enable_value_status_converting_constructor
+\exclude
+\param 2
+\exclude
+\param t The value from which to initialise the `value_type`.
+\param u The value from which to initialise the `status_type`.
 
-    \effects Initialises the outcome with a `value_type` and an additional `status_type`.
-    \requires `trait::status_type_is_negative<EC>` must be false; Type `T` is constructible to `value_type`, is not constructible to `status_type`
-    is not constructible to `pointer_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
-    Type `U` is constructible to `status_type`, is not constructible to `value_type`, and is not constructible to `pointer_type`.
-    \throws Any exception the construction of `value_type(T)` and `status_type(U)` might throw.
-    */
+\effects Initialises the outcome with a `value_type` and an additional `status_type`.
+\requires `trait::status_type_is_negative<EC>` must be false; Type `T` is constructible to `value_type`, is not constructible to `status_type`
+is not constructible to `pointer_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
+Type `U` is constructible to `status_type`, is not constructible to `value_type`, and is not constructible to `pointer_type`.
+\throws Any exception the construction of `value_type(T)` and `status_type(U)` might throw.
+*/
     template <class T, class U, typename enable_value_status_converting_constructor = std::enable_if_t<                                                                                //
                                 !std::is_same<std::decay_t<T>, outcome>::value                                                                                                         // not my type
                                 && !detail::is_in_place_type_t<std::decay_t<T>>::value                                                                                                 // not in place construction
@@ -367,6 +370,7 @@ namespace outcome
     {
       this->_state._status |= detail::status_have_payload;
     }
+#endif
     /*! Converting constructor to an errored outcome.
     \tparam enable_error_converting_constructor
     \exclude
@@ -591,9 +595,10 @@ namespace outcome
           __builtin_unreachable();
 #endif
       }
+#if OUTCOME_ENABLE_POSITIVE_STATUS
       /*! Performs a narrow check of state, used in the assume_status() functions
-      \effects None.
-      */
+  \effects None.
+  */
       template <class Impl> static constexpr void narrow_status_check(Impl *self) noexcept
       {
 #if defined(__GNUC__) || defined(__clang__)
@@ -601,6 +606,7 @@ namespace outcome
           __builtin_unreachable();
 #endif
       }
+#endif
       /*! Performs a narrow check of state, used in the assume_payload() functions.
       \effects None.
       */
@@ -651,9 +657,10 @@ namespace outcome
           throw bad_outcome_access("no error");
         }
       }
+#if OUTCOME_ENABLE_POSITIVE_STATUS
       /*! Performs a wide check of state, used in the status() functions
-      \effects If outcome does not have an status, it throws `bad_outcome_access`.
-      */
+  \effects If outcome does not have an status, it throws `bad_outcome_access`.
+  */
       template <class Impl> static constexpr void wide_status_check(Impl *self)
       {
         if((self->_state._status & detail::status_have_status) == 0)
@@ -661,6 +668,7 @@ namespace outcome
           throw bad_outcome_access("no status");
         }
       }
+#endif
       /*! Performs a wide check of state, used in the pointer() functions
       \effects If outcome does not have a pointer, it throws `bad_outcome_access`.
       */
