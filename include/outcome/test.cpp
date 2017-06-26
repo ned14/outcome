@@ -102,6 +102,7 @@ int main(void)
     static_assert(!std::is_trivially_move_assignable<decltype(e)>::value, "");
     static_assert(!std::is_nothrow_move_assignable<decltype(e)>::value, "");
 
+#if OUTCOME_ENABLE_POSITIVE_STATUS
     // Test value + status info works, and in constexpr
     using cresult_type = outcome::result<int, const char *>;
     constexpr const char *niall = "niall";
@@ -115,7 +116,7 @@ int main(void)
     static_assert(f.assume_status() == niall, "");
     static_assert(f.value() == 5, "");
     static_assert(f.status() == niall, "");
-
+#endif
     // Test compatible results can be constructed from one another
     constexpr outcome::result<int, long> g(outcome::in_place_type<int>, 5);
     constexpr outcome::result<long, int> g2(g);
@@ -133,7 +134,9 @@ int main(void)
     // Test void
     constexpr outcome::result<void, int> h(outcome::in_place_type<void>);
     static_assert(h.has_value(), "");
+#if OUTCOME_ENABLE_POSITIVE_STATUS
     static_assert(!h.has_status(), "");
+#endif
     constexpr outcome::result<int, void> h2(outcome::in_place_type<void>);
     static_assert(!h2.has_value(), "");
     static_assert(h2.has_error(), "");
@@ -177,16 +180,41 @@ int main(void)
     outcome::outcome<void> c2(c);
     // Test int, void compiles
     outcome::outcome<int, void> d(outcome::in_place_type<std::exception_ptr>);
+#if OUTCOME_ENABLE_POSITIVE_STATUS
     // Test void, status, void compiles
     constexpr outcome::outcome<int, std::errc, void> e(5, std::errc::bad_message);
+#endif
   }
 
   {
+    constexpr const char *niall = "niall";
     // error code + matching exception
     outcome::outcome<int> a(std::make_error_code(std::errc::not_enough_memory), std::make_exception_ptr(std::bad_alloc()));
+    a.error();
+    a.exception();
+    // value + payload
+    outcome::outcome<int, std::error_code, const char *> b(5, niall);
+    b.error();
+    b.payload();
+#if OUTCOME_ENABLE_POSITIVE_STATUS
     // value + status + payload, constexpr
-    constexpr const char *niall = "niall";
-    constexpr outcome::outcome<int, std::errc, const char *> b(5, std::errc::bad_message, niall);
+    constexpr outcome::outcome<int, std::errc, const char *> c(5, std::errc::bad_message, niall);
+#endif
+    // Test compatible outcomes can be constructed from one another
+    constexpr outcome::outcome<int, long, char *> g(outcome::in_place_type<int>, 5);
+    constexpr outcome::outcome<long, int, const char *> g2(g);
+    static_assert(g.has_value(), "");
+    static_assert(!g.has_error(), "");
+    static_assert(!g.has_payload(), "");
+    static_assert(g.value() == 5, "");
+    static_assert(g2.has_value(), "");
+    static_assert(!g2.has_error(), "");
+    static_assert(!g2.has_payload(), "");
+    static_assert(g2.value() == 5, "");
+    constexpr outcome::outcome<void, int, char *> g3(outcome::in_place_type<void>);
+    constexpr outcome::outcome<long, int, const char *> g4(g3);
+    constexpr outcome::outcome<int, void, char *> g5(outcome::in_place_type<void>);
+    constexpr outcome::outcome<long, int, const char *> g6(g5);
   }
   return 0;
 }
