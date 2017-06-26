@@ -704,6 +704,14 @@ namespace outcome
   */
       constexpr bool has_status() const noexcept { return (this->_state._status & detail::status_have_status) != 0; }
 #endif
+      /*! Checks if has payload.
+      \returns True if has payload.
+      */
+      constexpr bool has_payload() const noexcept { return (this->_state._status & detail::status_have_payload) != 0; }
+      /*! Checks if has exception.
+      \returns True if has exception.
+      */
+      constexpr bool has_exception() const noexcept { return (this->_state._status & detail::status_have_exception) != 0; }
     };
   }
 

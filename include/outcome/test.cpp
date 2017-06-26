@@ -200,6 +200,21 @@ int main(void)
     // value + status + payload, constexpr
     constexpr outcome::outcome<int, std::errc, const char *> c(5, std::errc::bad_message, niall);
 #endif
+    // Test compatible outcomes can be constructed from one another
+    constexpr outcome::outcome<int, long, char *> g(outcome::in_place_type<int>, 5);
+    constexpr outcome::outcome<long, int, const char *> g2(g);
+    static_assert(g.has_value(), "");
+    static_assert(!g.has_error(), "");
+    static_assert(!g.has_payload(), "");
+    static_assert(g.value() == 5, "");
+    static_assert(g2.has_value(), "");
+    static_assert(!g2.has_error(), "");
+    static_assert(!g2.has_payload(), "");
+    static_assert(g2.value() == 5, "");
+    constexpr outcome::outcome<void, int, char *> g3(outcome::in_place_type<void>);
+    constexpr outcome::outcome<long, int, const char *> g4(g3);
+    constexpr outcome::outcome<int, void, char *> g5(outcome::in_place_type<void>);
+    constexpr outcome::outcome<long, int, const char *> g6(g5);
   }
   return 0;
 }

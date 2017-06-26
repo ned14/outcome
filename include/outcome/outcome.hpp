@@ -188,6 +188,7 @@ namespace outcome
     friend NoValuePolicy;
     using base = detail::select_outcome_impl<R, S, P, NoValuePolicy>;
     friend base;
+    template <class T, class U, class V, class W> friend class outcome;
     static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "payload_type/exception_type must be default constructible");
 
     struct value_converting_constructor_tag
@@ -382,24 +383,28 @@ is not constructible to `value_type`, is not constructible to `payload_exception
     {
       this->_state._status |= trait::is_exception_ptr<payload_exception_type>::value ? detail::status_have_exception : detail::status_have_payload;
     }
-#if 0
     /*! Converting copy constructor from a compatible outcome type.
     \tparam enable_compatible_conversion
     \exclude
     \param o The compatible outcome.
 
     \effects Initialises the outcome with a copy of the compatible outcome.
-    \requires Both outcome's `value_type`, `error_type` and `status_type` need to be constructible, or the source `void`.
-    \throws Any exception the construction of `value_type(T)` and `status_error_type(U)` might throw.
+    \requires Both outcome's `value_type`, `error_type`, `status_type`, `payload_type` and `exception_type` need to be constructible, or the source `void`.
+    \throws Any exception the construction of `value_type(T)`, `status_error_type(U)` or `payload_exception_type(V)` might throw.
     */
-    template <class T, class U, class V, typename enable_compatible_conversion = std::enable_if_t<                                                            //
-                                         !std::is_same<outcome<T, U, V>, outcome>::value                                                                      // not my type
-                                         && (std::is_void<T>::value || detail::is_same_or_constructible<value_type, typename outcome<T, U, V>::value_type>)   // if our value types are constructible
-                                         &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename outcome<T, U, V>::error_type>)    // if our error types are constructible
-                                         &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename outcome<T, U, V>::status_type>)  // if our status types are constructible
-                                         >>
-    constexpr explicit outcome(const outcome<T, U, V> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
+    template <class T, class U, class V, class W, typename enable_compatible_conversion = std::enable_if_t<                                                              //
+                                                  !std::is_same<outcome<T, U, V, W>, outcome>::value                                                                     // not my type
+                                                  && (std::is_void<T>::value || detail::is_same_or_constructible<value_type, typename outcome<T, U, V, W>::value_type>)  // if our value types are constructible
+                                                  &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename outcome<T, U, V, W>::error_type>)   // if our error types are constructible
+#if OUTCOME_ENABLE_POSITIVE_STATUS
+                                                  &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename outcome<T, U, V, W>::status_type>)  // if our status types are constructible
+#endif
+                                                  &&(std::is_void<V>::value || detail::is_same_or_constructible<payload_type, typename outcome<T, U, V, W>::payload_type>)      // if our payload types are constructible
+                                                  &&(std::is_void<V>::value || detail::is_same_or_constructible<exception_type, typename outcome<T, U, V, W>::exception_type>)  // if our exception types are constructible
+                                                  >>
+    constexpr explicit outcome(const outcome<T, U, V, W> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type, V>::value)
         : base(typename base::compatible_conversion_tag(), o)
+        , _ptr(o._ptr)
     {
     }
     /*! Converting move constructor from a compatible outcome type.
@@ -408,20 +413,66 @@ is not constructible to `value_type`, is not constructible to `payload_exception
     \param o The compatible outcome.
 
     \effects Initialises the outcome with a move of the compatible outcome.
-    \requires Both outcome's `value_type`, `error_type` and `status_type` need to be constructible, or the source `void`.
-    \throws Any exception the construction of `value_type(T)` and `status_error_type(U)` might throw.
-    */
-    template <class T, class U, class V, typename enable_compatible_conversion = std::enable_if_t<                                                            //
-                                         !std::is_same<outcome<T, U, V>, outcome>::value                                                                      // not my type
-                                         && (std::is_void<T>::value || detail::is_same_or_constructible<value_type, typename outcome<T, U, V>::value_type>)   // if our value types are constructible
-                                         &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename outcome<T, U, V>::error_type>)    // if our error types are constructible
-                                         &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename outcome<T, U, V>::status_type>)  // if our status types are constructible
-                                         >>
-    constexpr explicit outcome(outcome<T, U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
+        \requires Both outcome's `value_type`, `error_type`, `status_type`, `payload_type` and `exception_type` need to be constructible, or the source `void`.
+        \throws Any exception the construction of `value_type(T)`, `status_error_type(U)` or `payload_exception_type(V)` might throw.
+        */
+    template <class T, class U, class V, class W, typename enable_compatible_conversion = std::enable_if_t<                                                              //
+                                                  !std::is_same<outcome<T, U, V, W>, outcome>::value                                                                     // not my type
+                                                  && (std::is_void<T>::value || detail::is_same_or_constructible<value_type, typename outcome<T, U, V, W>::value_type>)  // if our value types are constructible
+                                                  &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename outcome<T, U, V, W>::error_type>)   // if our error types are constructible
+#if OUTCOME_ENABLE_POSITIVE_STATUS
+                                                  &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename outcome<T, U, V, W>::status_type>)  // if our status types are constructible
+#endif
+                                                  &&(std::is_void<V>::value || detail::is_same_or_constructible<payload_type, typename outcome<T, U, V, W>::payload_type>)      // if our payload types are constructible
+                                                  &&(std::is_void<V>::value || detail::is_same_or_constructible<exception_type, typename outcome<T, U, V, W>::exception_type>)  // if our exception types are constructible
+                                                  >>
+    constexpr explicit outcome(outcome<T, U, V, W> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type, V>::value)
         : base(typename base::compatible_conversion_tag(), std::move(o))
+        , _ptr(std::move(o._ptr))
     {
     }
+    /*! Converting copy constructor from a compatible result type.
+    \tparam enable_compatible_conversion
+    \exclude
+    \param o The compatible result.
+
+    \effects Initialises the outcome with a copy of the compatible result.
+    \requires Both outcome's `value_type`, `error_type` and `status_type` need to be constructible, or the source `void`.
+    \throws Any exception the construction of `value_type(T)`, `status_error_type(U)` or `payload_exception_type()` might throw.
+    */
+    template <class T, class U, class V, typename enable_compatible_conversion = std::enable_if_t<                                                         //
+                                         (std::is_void<T>::value || detail::is_same_or_constructible<value_type, typename result<T, U, V>::value_type>)    // if our value types are constructible
+                                         &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>)  // if our error types are constructible
+#if OUTCOME_ENABLE_POSITIVE_STATUS
+                                         &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename result<T, U, V>::status_type>)  // if our status types are constructible
 #endif
+                                         >>
+    constexpr explicit outcome(const result<T, U, V> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type>::value)
+        : base(typename base::compatible_conversion_tag(), o)
+        , _ptr()
+    {
+    }
+    /*! Converting move constructor from a compatible result type.
+    \tparam enable_compatible_conversion
+    \exclude
+    \param o The compatible result.
+
+    \effects Initialises the outcome with a move of the compatible result.
+    \requires Both outcome's `value_type`, `error_type` and `status_type` need to be constructible, or the source `void`.
+    \throws Any exception the construction of `value_type(T)`, `status_error_type(U)` or `payload_exception_type()` might throw.
+    */
+    template <class T, class U, class V, typename enable_compatible_conversion = std::enable_if_t<                                                         //
+                                         (std::is_void<T>::value || detail::is_same_or_constructible<value_type, typename result<T, U, V>::value_type>)    // if our value types are constructible
+                                         &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>)  // if our error types are constructible
+#if OUTCOME_ENABLE_POSITIVE_STATUS
+                                         &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename result<T, U, V>::status_type>)  // if our status types are constructible
+#endif
+                                         >>
+    constexpr explicit outcome(result<T, U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type>::value)
+        : base(typename base::compatible_conversion_tag(), std::move(o))
+        , _ptr()
+    {
+    }
 
     /// \output_section In place constructors
     /*! Inplace constructor to a successful value.
