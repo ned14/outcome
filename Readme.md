@@ -14,9 +14,9 @@ Past tarballs of source with all tests passing on Linux and Windows: https://ded
 
 Post peer review todo:
  - [x] Implement `result<T, EC>` as per peer review feedback
- - [ ] Write up each API with C++ standardese and feed to Standardese
+ - [x] Write up each API with C++ standardese and feed to Standardese
  - [ ] Replace doxygen with Standardese + Hugo
- - [ ] Implement `outcome<T, EC, E>` as per peer review feedback
+ - [x] Implement `outcome<T, EC, E>` as per peer review feedback
  - [ ] Replace existing Outcome with peer review Outcome
  - [ ] Retarget unit test suite at peer review Outcome
 

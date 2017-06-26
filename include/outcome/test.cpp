@@ -187,12 +187,18 @@ int main(void)
   }
 
   {
+    constexpr const char *niall = "niall";
     // error code + matching exception
     outcome::outcome<int> a(std::make_error_code(std::errc::not_enough_memory), std::make_exception_ptr(std::bad_alloc()));
-    // value + status + payload, constexpr
-    constexpr const char *niall = "niall";
+    a.error();
+    a.exception();
+    // value + payload
+    outcome::outcome<int, std::error_code, const char *> b(5, niall);
+    b.error();
+    b.payload();
 #if OUTCOME_ENABLE_POSITIVE_STATUS
-    constexpr outcome::outcome<int, std::errc, const char *> b(5, std::errc::bad_message, niall);
+    // value + status + payload, constexpr
+    constexpr outcome::outcome<int, std::errc, const char *> c(5, std::errc::bad_message, niall);
 #endif
   }
   return 0;
