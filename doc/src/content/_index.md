@@ -2,6 +2,8 @@
 title = "Home"
 +++
 
+# Outcome 2.0 library
+
 This is the Outcome library. It is a C++ 14 library intended to aid ultra-lightweight
 error handling in large C++ codebases, providing a more expressive and type safe
 alternative to integer error codes or enums.
