@@ -43,7 +43,7 @@ at least four complete rewrites currently at the time of writing.
 In parallel to all this development on Outcome, Expected went before the LEWG and entered
 the C++ standards track. As the WG21 meetings went by, Expected experienced a period
 of being stripped back and much of the complexity which had so murdered compile and
-link times in 2014/2015 fell away, thus the Expected proposed in P0323R1 ended up landing
+link times in 2014-2015 fell away, thus the Expected proposed in P0323R1 ended up landing
 so close to Outcome that in January 2017 it was just a few hours work to implement
 Expected using the core `basic_monad` infrastructure in Outcome. That highly flexible
 policy based design which made monadic future-promise possible made it similarly easy
@@ -68,12 +68,13 @@ rejected, [with substantial feedback on what to do instead](https://lists.boost.
 
 ## Outcome v2
 
-During the very lengthy peer review roughly three groups of opinion emerged as to what
-a value OR error transporting class ought to look like:
+During the very lengthy peer review, roughly three groups of opinion emerged as to what
+a `value|error` transporting class ought to look like:
 
 <dl>
 <dt><b>1. Lightweight</b></dt>
-<dd>A simple-as-possible <code>T</code> and/or <code>E</code> transport without any implementation complexity.</dd>
+<dd>A simple-as-possible <code>T</code> and/or <code>E</code> transport without any
+implementation complexity.</dd>
 <dt><b>2. Medium</b></dt>
 <dd>A variant stored <code>T</code> or <code>E1</code> ... <code>E<i>n</i></code>
 where <code>T</code> is the expected value and <code>E1 ...</code>
@@ -81,9 +82,13 @@ are the potential unexpected values. This implemention really ought to be implem
 using C++ 17's <code>std::variant<...></code> except with stronger never-empty guarantees.
 </dd>
 <dt><b>3. Heavy</b></dt>
-<dd>An Either monad participating fully in a wider monadic programming framework for C++.</dd>
+<dd>A full fat Either monad participating fully in a wider monadic programming framework for C++.</dd>
 </dl>
 
 Peter Dimov was very quickly able to implement an `expected<T, E1, ...>` using his
 [variant2](https://github.com/pdimov/variant2) library, and thus there seemed little
-point in replicating his work in an Outcome v2.
+point in replicating his work in an Outcome v2. The lightweight choice seemed to be the
+best path forwards, so in June 2017 the bare minimum `result<T, E>` and `outcome<T, EC, P>`
+as presented in this library was built, using the same constructor design as `std::variant<...>`.
+
+To finish later ...

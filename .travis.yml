@@ -111,7 +111,7 @@ script:
      cd doc/html;
      git add . || true;
      git commit -a -m "Travis CI updates documentation" || true;
-     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost.outcome gh-pages;
+     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/outcome gh-pages;
      cd ../..;
    fi
  
