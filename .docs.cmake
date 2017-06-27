@@ -27,7 +27,7 @@ checked_execute_process("git reset"
 #  COMMAND "${GIT_EXECUTABLE}" push -f origin gh-pages
 #  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/doc/html"
 #)
-checked_execute_process("hugo"
+checked_execute_process(COMMAND "hugo"
   WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/doc/src"
 )
 ctest_submit()
