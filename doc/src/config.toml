@@ -5,11 +5,11 @@ publishDir = "../html"
 pygmentsStyle = "vs"
 pygmentsUseClasses = true
 
+[outputs]
+  home = [ "HTML", "RSS", "JSON"]
+  
 [params]
   editURL = "https://github.com/ned14/outcome/edit/develop/doc/src/content/"
-  Subtitle = "v2.0"
-  AuthorName = "Niall Douglas"
-  GitHubUser = "ned14"
   
 [[menu.shortcuts]]
   pre = "<h3>More</h3>"
@@ -19,6 +19,6 @@ pygmentsUseClasses = true
   weight = 10
   
 [[menu.shortcuts]]
-  name = "<i class='fa fa-bullhorn'></i> History and Acknowledgements"
+  name = "<i class='fa fa-bullhorn'></i> Acknowledgements"
   url = "/credits"
   weight = 30

@@ -20,11 +20,14 @@ checked_execute_process("git reset"
   COMMAND "${GIT_EXECUTABLE}" checkout gh-pages
   WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/doc/html"
 )
-ctest_configure()
-ctest_build(TARGET outcome_docs)
+#ctest_configure()
+#ctest_build(TARGET outcome_docs)
 #checked_execute_process("git commit"
 #  COMMAND "${GIT_EXECUTABLE}" commit -a -m "upd"
 #  COMMAND "${GIT_EXECUTABLE}" push -f origin gh-pages
 #  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/doc/html"
 #)
+checked_execute_process("hugo"
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/doc/src"
+)
 ctest_submit()

@@ -28,10 +28,9 @@ addons:
     - python3
     - cmake
     - cmake-data
-    - doxygen
+    - python-pygments
 
 env:
- - __="Unit tests"
  - __="Code bloat tests"
  - __="Documentation" NAME=TravisDocumentation
  - __="cmake tests" NAME=TravisLinuxWorker
@@ -42,17 +41,16 @@ matrix:
   - os: linux
     env: __="cmake tests osx" NAME=TravisOSXWorker
   - os: osx
-    env: __="Unit tests"
-  - os: osx
     env: __="Code bloat tests"
   - os: osx
     env: __="Documentation" NAME=TravisDocumentation
   - os: osx
     env: __="cmake tests" NAME=TravisLinuxWorker
  
-#cache:
-#  apt: true
+cache:
+  apt: true
 #  directories:
+#     - hugo
 #    - llvm-3.9.1
     
 before_install:
@@ -71,17 +69,18 @@ before_install:
 #      export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
 #      export PATH="$PWD/llvm-$LLVM_VERSION/bin:$PATH";
 #    fi
+ - if [ -z "hugo" ]; then
+     wget -O hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.24.1/hugo_0.24.1_Linux-64bit.tar.gz;
+     mkdir hugo;
+     tar xf hugo.tar.gz hugo/;
+   fi;
+ - export PATH=$PATH:`pwd`/hugo
+ - env
+ - hugo help
  - if [ "$CXX" = "g++" ]; then export CXX=g++-6; fi
  - pip install ply
 
 script:
- -
-   if [ "$__" = "Unit tests" ]; then
-     cd test;
-     BUILD_EXTRA=1 ./withgcc.sh || true;
-     ./unittests_1 || exit 1;
-     ./unittests_coverage || exit 1;
-   fi
  -
    if [ "$__" = "Code bloat tests" ]; then
      cd test/constexprs;
