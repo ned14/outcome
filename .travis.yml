@@ -69,14 +69,16 @@ before_install:
 #      export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
 #      export PATH="$PWD/llvm-$LLVM_VERSION/bin:$PATH";
 #    fi
- - if [ -z "hugo_bin" ]; then
-     wget -O hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.24.1/hugo_0.24.1_Linux-64bit.tar.gz;
-     mkdir hugo_bin;
-     tar xf hugo.tar.gz hugo_bin/;
-   fi;
- - ls -l hugo_bin
- - export PATH=$PATH:`pwd`/hugo_bin
- - hugo help
+ - if [ "$__" = "Documentation" ]; then
+     if [ ! -d "hugo_bin" ]; then
+       wget -O hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.24.1/hugo_0.24.1_Linux-64bit.tar.gz;
+       mkdir hugo_bin;
+       tar xf hugo.tar.gz hugo_bin/;
+     fi;
+     ls -l hugo_bin;
+     export PATH=$PATH:`pwd`/hugo_bin;
+     hugo help;
+   fi
  - if [ "$CXX" = "g++" ]; then export CXX=g++-6; fi
  - pip install ply
 
