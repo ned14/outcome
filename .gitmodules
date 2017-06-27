@@ -11,3 +11,6 @@
 	branch = master
 	fetchRecurseSubmodules = true
 	ignore = untracked
+[submodule "doc/src/themes/docdock"]
+	path = doc/src/themes/docdock
+	url = https://github.com/vjeantet/hugo-theme-docdock.git

@@ -28,10 +28,9 @@ addons:
     - python3
     - cmake
     - cmake-data
-    - doxygen
+    - python-pygments
 
 env:
- - __="Unit tests"
  - __="Code bloat tests"
  - __="Documentation" NAME=TravisDocumentation
  - __="cmake tests" NAME=TravisLinuxWorker
@@ -42,17 +41,16 @@ matrix:
   - os: linux
     env: __="cmake tests osx" NAME=TravisOSXWorker
   - os: osx
-    env: __="Unit tests"
-  - os: osx
     env: __="Code bloat tests"
   - os: osx
     env: __="Documentation" NAME=TravisDocumentation
   - os: osx
     env: __="cmake tests" NAME=TravisLinuxWorker
  
-#cache:
-#  apt: true
-#  directories:
+cache:
+  apt: true
+  directories:
+    - hugo_bin
 #    - llvm-3.9.1
     
 before_install:
@@ -71,17 +69,19 @@ before_install:
 #      export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
 #      export PATH="$PWD/llvm-$LLVM_VERSION/bin:$PATH";
 #    fi
+ - if [ "$__" = "Documentation" ]; then
+     if [ ! -f "hugo_bin/hugo" ]; then
+       wget -O hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.24.1/hugo_0.24.1_Linux-64bit.tar.gz;
+       mkdir hugo_bin;
+       tar xf hugo.tar.gz -C hugo_bin;
+     fi;
+     ls -l hugo_bin;
+     export PATH=$PATH:`pwd`/hugo_bin;
+   fi
  - if [ "$CXX" = "g++" ]; then export CXX=g++-6; fi
  - pip install ply
 
 script:
- -
-   if [ "$__" = "Unit tests" ]; then
-     cd test;
-     BUILD_EXTRA=1 ./withgcc.sh || true;
-     ./unittests_1 || exit 1;
-     ./unittests_coverage || exit 1;
-   fi
  -
    if [ "$__" = "Code bloat tests" ]; then
      cd test/constexprs;
@@ -111,7 +111,7 @@ script:
      cd doc/html;
      git add . || true;
      git commit -a -m "Travis CI updates documentation" || true;
-     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost.outcome gh-pages;
+     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/outcome gh-pages;
      cd ../..;
    fi
  

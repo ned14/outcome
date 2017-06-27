@@ -1,4 +1,4 @@
-#include "../include/boost/outcome.hpp"
+#include "../include/outcome/outcome.hpp"
 
 namespace Library1 {
   int fun(std::error_code &) noexcept { return 5; }
@@ -7,19 +7,19 @@ namespace Library2 {
   int fun() { return 5; }
 }
 namespace Library3 {
-  using error_code = boost::outcome::error_code_extended;
-  boost::outcome::experimental::expected<int, Library3::error_code> fun() noexcept { return 5; }
+  using error_code = std::exception_ptr;
+  outcome::result<int, Library3::error_code> fun() noexcept { return 5; }
 }
 namespace Library4 {
-  boost::outcome::result<int> fun() noexcept { return 5; }
+  outcome::result<int> fun() noexcept { return 5; }
 }
 
 int inspect_exception_to_your_liking(const std::exception &) { return 5; }
 
-//! [simple_example]
+//! [motivating_example]
 // Imagine the libraries you depend on each use different mechanisms for returning errors
 
-namespace outcome = BOOST_OUTCOME_V1_NAMESPACE;
+namespace outcome = OUTCOME_V2_NAMESPACE;
 
 namespace Library1
 {                                                          // Like the Filesystem and Networking TS,
@@ -33,10 +33,10 @@ namespace Library2
     -> int;
 }
   
-namespace Library3                                         // The Expected proposed for standardisation in C++ 20
-{                                                          // Returns an int (expected) or some custom 
-  auto fun() noexcept                                      // error code (unexpected). Never throws exceptions.
-    -> outcome::experimental::expected<int, error_code>; 
+namespace Library3
+{                                                          // Returns an int (expected) or some exception 
+  auto fun() noexcept                                      // pointer (unexpected). Never throws exceptions.
+    -> outcome::result<int, std::exception_ptr>; 
 }  
   
 namespace Library4                                         // Result is an int (not error)
@@ -55,27 +55,27 @@ auto my_fun() noexcept
     std::error_code ec;                                    // bodies wrapped in a try...catch
     int i = Library1::fun(ec);
     if (ec)
-      return outcome::make_errored_outcome(ec);            // error code returned inside outcome
+      return {outcome::in_place<outcome::error_code_extended>, ec};  // error code returned inside outcome
       
     try {
       i += Library2::fun();
     }
     catch (...) {
-      return outcome::make_exceptional_outcome<>();        // exception_ptr returned inside outcome
+      return std::current_exception();                     // exception_ptr returned inside outcome
     }
     
     if (auto rslt1 = Library3::fun())
       i += *rslt1;
     else
-      return outcome::make_errored_outcome(rslt1.error()); // error code returned inside outcome
+      return rslt1.error();                                // error code returned inside outcome
    
-    BOOST_OUTCOME_TRY(rslt2, Library4::fun());             // this may return an outcome with an
+    OUTCOME_TRY(rslt2, Library4::fun());                   // this may return an outcome with an
                                                            // error code, iff fun() reports failure
 
     return i + rslt2;                                      // return outcome with a value
   }
   catch (...) {
-    return outcome::make_exceptional_outcome<>();          // construct from std::current_exception()
+    return std::current_exception();                       // construct from std::current_exception()
   }
 };
 
@@ -91,7 +91,7 @@ int test()
     return inspect_exception_to_your_liking(e);            // initial error condition
   }
 }
-//! [simple_example]
+//! [motivating_example]
 
 int main(void)
 {

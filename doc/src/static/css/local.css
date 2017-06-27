@@ -1,0 +1,59 @@
+body {
+  text-align: justify;
+}
+h2 {
+  text-transform: none;
+}
+code, pre {
+  background: none;
+  border: none;
+}
+code + span.copy-to-clipboard {
+  display: none;
+}
+
+pre .copy-to-clipboard {
+  background-color: transparent;
+}
+pre .copy-to-clipboard:hover {
+  background-color: #fff7dd;
+}
+
+.highlight pre {
+  #border: 2px dashed;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px #000000;
+}
+.highlight code + span.copy-to-clipboard {
+  display: inline-block;
+}
+
+.hljs {
+  background: inherit;
+  color: inherit;
+}
+/* keywords */
+.highlight .cpp .hljs-keyword, .language-cpp .hljs-keyword {
+  color: #0000ff;
+}
+/* type/namespace name */
+/* span.o + span.n, span.k + span.n, .language-cpp .hljs-function { */
+.highlight .cpp .n, .language-cpp .hljs-function {
+  color: #2b91af;
+}
+/* function name */
+.highlight .cpp .hljs-title, .language-cpp .hljs-title {
+  color: black;
+}
+/* comment */
+.highlight .cpp .hljs-comment, .language-cpp .hljs-comment {
+  color: #008000;
+}
+/* strings */
+.highlight .cpp .hljs-string, .language-cpp .hljs-string {
+  color: #a31515;
+}
+/* namespace std */
+.highlight .cpp .hljs-built_in, .language-cpp .hljs-built_in {
+  color: black;
+}
