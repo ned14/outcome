@@ -13,7 +13,7 @@ hence being named "Outcome".
 
 If you are familiar with Swift's error code throws or Rust's `Result<T, E>`,
 you will find almost identical semantics in the transports provided here.
-Outcome even has a \ref try_operation "OUTCOME_TRY" macro doing most of the
+Outcome even has a `OUTCOME_TRY` macro doing most of the
 `try` keyword in Rust and Swift!
 
 {{% notice note %}}
@@ -24,7 +24,7 @@ into the standard C++ library.
 {{% /notice %}}
 
 One motivation for this library is to manage errors reported by different means
-using a single \ref performance_overhead "minimum overhead" framework. This
+using a single minimum overhead framework. This
 motivating example should clarify:
 
-{{% snippet motivating_example.cpp motivating_example %}}
+{{% snippet "motivating_example.cpp" "motivating_example" %}}

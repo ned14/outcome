@@ -2,6 +2,8 @@ theme = "docdock"
 baseURL = "https://ned14.github.io/outcome/"
 title = "Outcome documentation"
 publishDir = "../html"
+pygmentsStyle = "vs"
+pygmentsUseClasses = true
 
 [params]
   editURL = "https://github.com/ned14/outcome/edit/develop/doc/src/content/"
