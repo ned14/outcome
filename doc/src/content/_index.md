@@ -4,6 +4,18 @@ title = "Home"
 
 # Outcome 2.0 library
 
+{{<mermaid>}}
+graph TD
+    A1{"result#lt;T, E#gt;"} --"Success"--> B1["T value()"]
+    A1 --"Failure"--> C1["E error()"]
+    A2{"outcome#lt;T, EC, E|P#gt;"} --"Success"--> B2["T value()"]
+    A2 --"Failure"--> C2["EC error()"]
+    A2 --> D2(("Either"))
+    D2 --"Abort"--> E2["E exception()"]
+    D2 --"Payload"--> F2["P payload()"]
+{{</mermaid>}}
+
+
 This is the Outcome library. It is a C++ 14 library intended to aid ultra-lightweight
 error handling in large C++ codebases, providing a more expressive and type safe
 alternative to integer error codes or enums.

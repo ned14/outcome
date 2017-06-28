@@ -7,6 +7,23 @@ Outcome has had an interesting history, and it is worth summarising it here to s
 Boost library comes to life. The following recollections are by Niall Douglas, and may be
 faulty due to his aging memory.
 
+{{<mermaid>}}
+gantt
+  dateFormat YYYY-MM
+  title History of the Outcome library
+  Outcome v1: done, des1, 2014-06,2017-05
+  Boost peer review of v1: done, des2, after des1, 30d
+  Outcome v2: active, des3, after des2, 365d
+  section Events
+  Separated from AFIO v1: crit, done, 2014-06,2d
+  Boost.Expected added: crit, done, 2014-10,2d
+  Boost.Expected replaced with feature complete basic_monad: crit, done, 2015-08,2d
+  Non-allocating future-promise implementation dropped: crit, done, 2016-05,2d
+  C++ 11 support dropped: crit, done, 2016-06,2d
+  Implemented LEWG expected&lt;T, E&gt; using basic_monad: crit, done, 2017-02,2d
+  Outcome v1 replaced with prototype v2 in git repo: crit, done, 2017-07,2d
+{{</mermaid>}}
+
 ## The genesis of Outcome v1
 
 The git repo began life as a "Boost.Spinlock" in June 2014 hived out of Boost.AFIO v1 where it had existed
