@@ -1,0 +1,41 @@
+/* Unit testing for outcomes
+(C) 2013-2017 Niall Douglas <http://www.nedproductions.biz/> (149 commits)
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+#include "../../include/outcome/outcome.hpp"
+#include "../quickcpplib/include/boost/test/unit_test.hpp"
+
+BOOST_AUTO_TEST_CASE(works / monad / containers, "Tests that the monad works as intended inside containers")
+{
+  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  std::vector<outcome<std::vector<int>>> vect;
+  vect.push_back(std::vector<int>{5, 6, 7, 8});
+  vect.push_back(std::vector<int>{1, 2, 3, 4});
+  BOOST_REQUIRE(vect.size() == 2U);
+  BOOST_CHECK(vect[0].get().size() == 4U);
+  BOOST_CHECK(vect[1].get().size() == 4U);
+  BOOST_CHECK(vect[0].get().front() == 5);
+  BOOST_CHECK(vect[0].get().back() == 8);
+  BOOST_CHECK(vect[1].get().front() == 1);
+  BOOST_CHECK(vect[1].get().back() == 4);
+}
+
