@@ -37,27 +37,27 @@ pre .copy-to-clipboard:hover {
   color: inherit;
 }
 /* keywords */
-.highlight .cpp .hljs-keyword, .language-cpp .hljs-keyword {
+.highlight .k, .highlight .kt, .language-cpp .hljs-keyword {
   color: #0000ff;
 }
 /* type/namespace name */
 /* span.o + span.n, span.k + span.n, .language-cpp .hljs-function { */
-.highlight .cpp .n, .language-cpp .hljs-function {
+.highlight .n, .language-cpp .hljs-function {
   color: #2b91af;
 }
 /* function name */
-.highlight .cpp .hljs-title, .language-cpp .hljs-title {
+.highlight .nf, .language-cpp .hljs-title {
   color: black;
 }
 /* comment */
-.highlight .cpp .hljs-comment, .language-cpp .hljs-comment {
+.highlight .c1, .language-cpp .hljs-comment {
   color: #008000;
 }
 /* strings */
-.highlight .cpp .hljs-string, .language-cpp .hljs-string {
+.highlight .s, .language-cpp .hljs-string {
   color: #a31515;
 }
 /* namespace std */
-.highlight .cpp .hljs-built_in, .language-cpp .hljs-built_in {
+.highlight .o, .language-cpp .hljs-built_in {
   color: black;
 }
