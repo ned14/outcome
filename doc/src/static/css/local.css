@@ -11,6 +11,10 @@ code, pre {
 code + span.copy-to-clipboard {
   display: none;
 }
+/* Fix Firefox */
+#body a.highlight {
+  vertical-align: middle;
+}
 
 pre .copy-to-clipboard {
   background-color: transparent;
