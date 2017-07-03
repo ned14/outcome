@@ -50,6 +50,19 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_NODISCARD
 #define OUTCOME_NODISCARD QUICKCPPLIB_NODISCARD
 #endif
+#ifndef OUTCOME_MSVC_WORKAROUNDS
+// Older MSVC's constexpr isn't up to Outcome v2 and it ICEs, so don't use constexpr in those situations
+#if defined(_MSC_VER) && !defined(__clang__) && _MSC_FULL_VER <= 191025019 /* VS2017 Update 2*/
+#define OUTCOME_MSVC_WORKAROUNDS 1
+#endif
+#endif
+#ifndef OUTCOME_MSVC_CONSTEXPR
+#if OUTCOME_MSVC_WORKAROUNDS
+#define OUTCOME_MSVC_CONSTEXPR
+#else
+#define OUTCOME_MSVC_CONSTEXPR constexpr
+#endif
+#endif
 
 #include "quickcpplib/include/import.h"
 

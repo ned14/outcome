@@ -5,90 +5,23 @@ include(QuickCppLibUtils)
 include(QuickCppLibPolicies)
 
 # Parse the version we tell cmake directly from the version header file
-ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/version.hpp" VERSIONSTRING)
+ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/version.hpp" VERSIONSTRING)
 # Sets the usual PROJECT_NAME etc
 project(outcome VERSION ${VERSIONSTRING} LANGUAGES C CXX)
 # Also set a *cmake* namespace for this project
-set(PROJECT_NAMESPACE boost::)
+set(PROJECT_NAMESPACE)
+
 # Setup this cmake environment for this project
 include(QuickCppLibSetupProject)
 if(NOT PROJECT_IS_DEPENDENCY)
   # This file should be updated with the last git SHA next commit
-  UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/outcome/revision.hpp")
+  UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/revision.hpp")
 endif()
 # Find my library dependencies
 find_quickcpplib_library(quickcpplib 1.0 REQUIRED)
 
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(QuickCppLibMakeHeaderOnlyLibrary)
-
-# Make preprocessed editions of this library target
-if(NOT PROJECT_IS_DEPENDENCY)
-  if(NOT PYTHONINTERP_FOUND)
-    indented_message(WARNING "NOT rebuilding precompiled edition of library due to python not being installed")
-  else()
-    # See if the ply package is installed so pcpp can run
-    execute_process(COMMAND python -c "import ply" RESULT_VARIABLE python_has_ply)
-    if(NOT python_has_ply EQUAL 0)
-      indented_message(WARNING "NOT rebuilding precompiled edition of library due to installed python not having the ply package installed. "
-        "Do 'pip install ply' to fix. NOTE that doxygen docs will NOT build without the precompiled edition.")
-    else()
-      add_partial_preprocess(outcome_hl-pp
-                            "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/outcome_v${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.hpp"
-                            "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/${PROJECT_NAME}.hpp"
-                            -I .
-                            --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
-                            --line-directive
-  #                          --debug
-                            -U QUICKCPPLIB_ENABLE_VALGRIND
-                            -U __cpp_modules
-                            -U GENERATING_OUTCOME_MODULE_INTERFACE
-                            -U __MINGW32__ -U __MINGW64__ -U __MINGW64_VERSION_MAJOR
-                            -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
-                            -U BOOST_OUTCOME_MONAD_POLICY_NAME
-                            -U BOOST_OUTCOME_MONAD_POLICY_BASE_NAME
-                            -U BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
-                            -U BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
-                            -D BOOST_OUTCOME_DISABLE_PREPROCESSED_INTERFACE_FILE
-                            -D BOOST_OUTCOME_USE_BOOST_THREAD=0
-                            -D BOOST_OUTCOME_USE_BOOST_ERROR_CODE=0
-                            -U BOOST_OUTCOME_ENABLE_ADVANCED
-                            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-                            )
-      if(NOT CMAKE_VERSION VERSION_LESS 3.3)
-        add_dependencies(outcome_hl outcome_hl-pp)
-      endif()
-      # Preprocess Outcome into a single file for doxygen to grok
-      add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"
-        COMMAND ${PYTHON_EXECUTABLE} ${QuickCppLibCMakePath}/../pcpp/pcpp/cmd.py
-        -o "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_DIR}/${PROJECT_NAME}.hpp"
-        -I .
-        --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs  --passthru-comments
-  #      --line-directive --debug
-        -U QUICKCPPLIB_ENABLE_VALGRIND
-        -U __cpp_modules
-        -U GENERATING_OUTCOME_MODULE_INTERFACE
-        -U __MINGW32__ -U __MINGW64__ -U __MINGW64_VERSION_MAJOR
-        -U BOOST_OUTCOME_MONAD_POLICY_NAME
-        -U BOOST_OUTCOME_MONAD_POLICY_BASE_NAME
-        -U BOOST_OUTCOME_MONAD_POLICY_EXCEPTION_TYPE
-        -U BOOST_OUTCOME_MONAD_POLICY_ERROR_TYPE
-        -D BOOST_OUTCOME_DISABLE_PREPROCESSED_INTERFACE_FILE
-        -D BOOST_OUTCOME_USE_BOOST_THREAD=0
-        -D BOOST_OUTCOME_USE_BOOST_ERROR_CODE=0
-        -U BOOST_OUTCOME_ENABLE_ADVANCED
-        -D DOXYGEN_IS_IN_THE_HOUSE -D DOXYGEN_SHOULD_SKIP_THIS
-  #      DEPENDS ${outcome_INTERFACE}
-        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        COMMENT "Preprocessing Outcome into a single include file for doxygen ..."
-      )
-      set(outcome_DOXYGEN_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp")
-      set(outcome_DOXYGEN_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/doc/outcome.hpp")
-    endif()
-  endif()
-endif()
-include(QuickCppLibMakeDoxygen)
 
 # Set the standard definitions for these libraries and bring in the all_* helper functions
 include(QuickCppLibApplyDefaultDefinitions)
@@ -118,39 +51,19 @@ endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   # For all possible configurations of this library, add each test
-  list_filter(outcome_TESTS EXCLUDE REGEX "constexprs|test_multiabi.cpp")
+  list_filter(outcome_TESTS EXCLUDE REGEX "constexprs")
   include(QuickCppLibMakeStandardTests)
-  if(TARGET outcome_hl_pch)
-    target_compile_definitions(outcome_hl_pch PUBLIC BOOST_OUTCOME_ENABLE_ADVANCED=1)
-  endif()
   foreach(test_target ${outcome_TEST_TARGETS} ${outcome_EXAMPLE_TARGETS})
-    target_compile_definitions(${test_target} PUBLIC BOOST_OUTCOME_ENABLE_ADVANCED=1)
     if(MSVC AND NOT CLANG)
       target_compile_options(${test_target} PUBLIC /std:c++latest)
     else()
       target_compile_options(${test_target} PUBLIC -std=c++17)
     endif()
   endforeach()
-
-  # Add the unit tests but with exceptions and RTTI disabled
-  add_executable(outcome_hl--unittests_noexcept "test/unittests.cpp")
-  set_target_properties(outcome_hl--unittests_noexcept PROPERTIES EXCLUDE_FROM_ALL ON)
-  add_dependencies(_hl outcome_hl--unittests_noexcept)
-  if(WIN32)
-    target_compile_definitions(outcome_hl--unittests_noexcept PUBLIC _UNICODE)
-  endif()
-  list(APPEND outcome_TEST_TARGETS outcome_hl--unittests_noexcept)
-  set_target_properties(outcome_hl--unittests_noexcept PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    POSITION_INDEPENDENT_CODE ON
-    CXX_EXCEPTIONS OFF
-    CXX_RTTI OFF
-    CXX_STANDARD 14
-  )
-  add_test(NAME outcome_hl--unittests_noexcept CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
-    COMMAND $<TARGET_FILE:outcome_hl--unittests_noexcept> --reporter junit --out $<TARGET_FILE:outcome_hl--unittests_noexcept>.junit.xml
-  )
 endif()
+
+# Cache this library's auto scanned sources for later reuse
+include(QuickCppLibCacheLibrarySources)
 
 # Make available this library for install and export
 include(QuickCppLibMakeInstall)
