@@ -272,6 +272,10 @@ class OUTCOME_NODISCARD outcome : public detail::select_outcome_impl<R, S, P, No
   {
   };
 
+  struct disable_in_place_payload_exception_type
+  {
+  };
+
 public:
   /// \output_section Member types
   //! The success type.
@@ -294,12 +298,12 @@ public:
   //! The exception type, always `no_exception_type` if `trait::is_exception_ptr<P>` is false.
   using exception_type = std::conditional_t<!trait::is_exception_ptr<P>::value, no_exception_type, P>;
 
-  //! The success type, always `no_value_type` if any two of `value_type`, `status_error_type` and `payload_exception_type` are `void`. Used to disable in place type construction.
-  using _value_type = std::conditional_t<(static_cast<int>(std::is_void<value_type>::value) + static_cast<int>(std::is_void<status_error_type>::value) + static_cast<int>(std::is_void<payload_exception_type>::value)) >= 2, no_value_type, value_type>;
-  //! The failure type, always `no_error_type` if any two of `value_type`, `status_error_type` and `payload_exception_type` are `void`. Used to disable in place type construction.
-  using _error_type = std::conditional_t<(static_cast<int>(std::is_void<value_type>::value) + static_cast<int>(std::is_void<status_error_type>::value) + static_cast<int>(std::is_void<payload_exception_type>::value)) >= 2, no_error_type, error_type>;
-  //! The P type configured, always `no_exception_type` if any two of `value_type`, `status_error_type` and `payload_exception_type` are `void`. Used to disable in place type construction.
-  using _payload_exception_type = std::conditional_t<(static_cast<int>(std::is_void<value_type>::value) + static_cast<int>(std::is_void<status_error_type>::value) + static_cast<int>(std::is_void<payload_exception_type>::value)) >= 2, no_exception_type, payload_exception_type>;
+  //! Used to disable in place type construction when `value_type` is ambiguous with `error_type` or `payload_exception_type`.
+  using value_type_if_enabled = std::conditional_t<std::is_same<value_type, error_type>::value || std::is_same<value_type, payload_exception_type>::value, typename base::_value_type, value_type>;
+  //! Used to disable in place type construction when `error_type` is ambiguous with `value_type` or `payload_exception_type`.
+  using error_type_if_enabled = std::conditional_t<std::is_same<error_type, value_type>::value || std::is_same<error_type, payload_exception_type>::value, typename base::_error_type, error_type>;
+  //! Used to disable in place type construction when `payload_exception_type` is ambiguous with `value_type` or `error_type`.
+  using payload_exception_type_if_enabled = std::conditional_t<std::is_same<payload_exception_type, value_type>::value || std::is_same<payload_exception_type, error_type>::value, disable_in_place_payload_exception_type, payload_exception_type>;
 
 protected:
   detail::devoid<payload_exception_type> _ptr;
@@ -437,15 +441,15 @@ is not constructible to `value_type`, is not constructible to `payload_exception
 
   \effects Initialises the outcome with a `error_type` and a `payload_exception_type`.
   \requires `trait::status_type_is_negative<EC>` must be true; Type T is constructible to `error_type`,
-  is not constructible to `value_type`, is not constructible to `payload_exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
-  Type `U` is constructible to `payload_exception_type`, is not constructible to `value_type`, and is not constructible to `error_type`.
+  is not constructible to `value_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
+  Type `U` is constructible to `payload_exception_type`, is not constructible to `value_type`.
   \throws Any exception the construction of `error_type(T)` and `payload_exception_type(U)` might throw.
   */
-  template <class T, class U, typename enable_error_payload_converting_constructor = std::enable_if_t<                                                                                        //
-                              !std::is_same<std::decay_t<T>, outcome>::value                                                                                                                  // not my type
-                              && !detail::is_in_place_type_t<std::decay_t<T>>::value                                                                                                          // not in place construction
-                              && !std::is_constructible<value_type, T>::value && detail::is_same_or_constructible<error_type, T> && !std::is_constructible<payload_exception_type, T>::value  //
-                              && detail::is_same_or_constructible<payload_exception_type, U> && !std::is_constructible<value_type, U>::value && !std::is_constructible<error_type, U>::value>>
+  template <class T, class U, typename enable_error_payload_converting_constructor = std::enable_if_t<                            //
+                              !std::is_same<std::decay_t<T>, outcome>::value                                                      // not my type
+                              && !detail::is_in_place_type_t<std::decay_t<T>>::value                                              // not in place construction
+                              && !std::is_constructible<value_type, T>::value && detail::is_same_or_constructible<error_type, T>  //
+                              && detail::is_same_or_constructible<payload_exception_type, U> && !std::is_constructible<value_type, U>::value>>
   constexpr outcome(T &&t, U &&u, error_payload_converting_constructor_tag = error_payload_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<payload_exception_type, U>::value)
       : base(in_place_type<typename base::error_type>, std::forward<T>(t))
       , _ptr(std::forward<U>(u))
@@ -605,8 +609,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \throws Any exception the construction of `value_type(Args...)` might throw.
   */
   template <class... Args, typename = std::enable_if_t<std::is_void<value_type>::value || std::is_constructible<value_type, Args...>::value>>
-  constexpr explicit outcome(in_place_type_t<_value_type>, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
-      : base(in_place_type<typename base::value_type>, std::forward<Args>(args)...)
+  constexpr explicit outcome(in_place_type_t<value_type_if_enabled> _, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+      : base(_, std::forward<Args>(args)...)
       , _ptr()
   {
   }
@@ -622,8 +626,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \throws Any exception the construction of `value_type(il, Args...)` might throw.
   */
   template <class U, class... Args, typename = std::enable_if_t<std::is_constructible<value_type, std::initializer_list<U>, Args...>::value>>
-  constexpr explicit outcome(in_place_type_t<_value_type>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
-      : base(in_place_type<typename base::value_type>, il, std::forward<Args>(args)...)
+  constexpr explicit outcome(in_place_type_t<value_type_if_enabled> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
+      : base(_, il, std::forward<Args>(args)...)
       , _ptr()
   {
   }
@@ -638,8 +642,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \throws Any exception the construction of `error_type(Args...)` might throw.
   */
   template <class... Args, typename = std::enable_if_t<std::is_void<error_type>::value || std::is_constructible<error_type, Args...>::value>>
-  constexpr explicit outcome(in_place_type_t<_error_type>, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
-      : base(in_place_type<typename base::error_type>, std::forward<Args>(args)...)
+  constexpr explicit outcome(in_place_type_t<error_type_if_enabled> _, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
+      : base(_, std::forward<Args>(args)...)
       , _ptr()
   {
   }
@@ -655,8 +659,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \throws Any exception the construction of `error_type(il, Args...)` might throw.
   */
   template <class U, class... Args, typename = std::enable_if_t<std::is_constructible<error_type, std::initializer_list<U>, Args...>::value>>
-  constexpr explicit outcome(in_place_type_t<_error_type>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
-      : base(in_place_type<typename base::error_type>, il, std::forward<Args>(args)...)
+  constexpr explicit outcome(in_place_type_t<error_type_if_enabled> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
+      : base(_, il, std::forward<Args>(args)...)
       , _ptr()
   {
   }
@@ -671,7 +675,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \throws Any exception the construction of `payload_exception_type(Args...)` might throw.
   */
   template <class... Args, typename = std::enable_if_t<std::is_void<payload_exception_type>::value || std::is_constructible<payload_exception_type, Args...>::value>>
-  constexpr explicit outcome(in_place_type_t<_payload_exception_type>, Args &&... args) noexcept(std::is_nothrow_constructible<payload_exception_type, Args...>::value)
+  constexpr explicit outcome(in_place_type_t<payload_exception_type_if_enabled>, Args &&... args) noexcept(std::is_nothrow_constructible<payload_exception_type, Args...>::value)
       : base()
       , _ptr(std::forward<Args>(args)...)
   {
@@ -689,7 +693,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \throws Any exception the construction of `payload_exception_type(il, Args...)` might throw.
   */
   template <class U, class... Args, typename = std::enable_if_t<std::is_constructible<payload_exception_type, std::initializer_list<U>, Args...>::value>>
-  constexpr explicit outcome(in_place_type_t<_payload_exception_type>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<payload_exception_type, std::initializer_list<U>, Args...>::value)
+  constexpr explicit outcome(in_place_type_t<payload_exception_type_if_enabled>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<payload_exception_type, std::initializer_list<U>, Args...>::value)
       : base()
       , _ptr(il, std::forward<Args>(args)...)
   {

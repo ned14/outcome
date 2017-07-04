@@ -175,4 +175,20 @@ BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended"
     BOOST_CHECK_THROW(m.error(), const bad_outcome_access &);
     BOOST_CHECK(m.exception() == e);
   }
+  {  // outcome<void, void> should work
+    std::error_code ec(5, std::system_category());
+    auto e = std::make_exception_ptr(std::system_error(ec));
+    outcome<void, void> m(e);
+    BOOST_CHECK(!m);
+    BOOST_CHECK(!m.has_value());
+    BOOST_CHECK(!m.has_error());
+    BOOST_CHECK(m.has_exception());
+  }
+  {  // outcome<void, int, int> should work
+    outcome<void, int, int> m(5, 6);
+    BOOST_CHECK(!m);
+    BOOST_CHECK(!m.has_value());
+    BOOST_CHECK(m.has_error());
+    BOOST_CHECK(m.has_payload());
+  }
 }
