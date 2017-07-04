@@ -17,7 +17,7 @@ Post peer review todo:
  - [x] Write up each API with C++ standardese and feed to Standardese
  - [x] Replace doxygen with Standardese + Hugo
  - [x] Implement `outcome<T, EC, E>` as per peer review feedback
- - [ ] Replace existing Outcome with peer review Outcome
+ - [x] Replace existing Outcome with peer review Outcome
  - [ ] Retarget unit test suite at peer review Outcome
 
 

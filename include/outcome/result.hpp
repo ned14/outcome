@@ -92,6 +92,11 @@ namespace trait
 }
 #endif
 
+//! Placeholder type to indicate there is no value type
+struct no_value_type
+{
+  no_value_type() = delete;
+};
 #if OUTCOME_ENABLE_POSITIVE_STATUS
 //! Placeholder type to indicate there is no status type
 struct no_status_type
@@ -326,13 +331,13 @@ namespace impl
     template <class T, class U, class V> friend class result_storage;
     static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "error_type must be default constructible");
 
-    using value_type = R;
-    using error_type = EC;
+  protected:
+    using value_type = std::conditional_t<std::is_void<R>::value && std::is_void<EC>::value, no_value_type, R>;
+    using error_type = std::conditional_t<std::is_void<R>::value && std::is_void<EC>::value, no_error_type, EC>;
 #if OUTCOME_ENABLE_POSITIVE_STATUS
-    using status_type = EC;
+    using status_type = std::conditional_t<std::is_void<EC>::value, no_status_type, EC>;
 #endif
 
-  protected:
     detail::value_storage_select_impl<value_type> _state;
     detail::devoid<error_type> _error;
 
@@ -442,13 +447,13 @@ namespace impl
     constexpr value_type &&assume_value() && noexcept
     {
       NoValuePolicy::narrow_value_check(this);
-      return this->_state._value;
+      return std::move(this->_state._value);
     }
     /// \group assume_value
     constexpr const value_type &&assume_value() const &&noexcept
     {
       NoValuePolicy::narrow_value_check(this);
-      return this->_state._value;
+      return std::move(this->_state._value);
     }
 
     /// \output_section Wide state observers
@@ -472,13 +477,13 @@ namespace impl
     constexpr value_type &&value() &&
     {
       NoValuePolicy::wide_value_check(this);
-      return this->_state._value;
+      return std::move(this->_state._value);
     }
     /// \group value
     constexpr const value_type &&value() const &&
     {
       NoValuePolicy::wide_value_check(this);
-      return this->_state._value;
+      return std::move(this->_state._value);
     }
   };
   template <class Base, class NoValuePolicy> class result_value_observers<Base, void, NoValuePolicy> : public Base
@@ -527,13 +532,13 @@ namespace impl
     constexpr error_type &&assume_error() && noexcept
     {
       NoValuePolicy::narrow_error_check(this);
-      return this->_error;
+      return std::move(this->_error);
     }
     /// \group assume_error
     constexpr const error_type &&assume_error() const &&noexcept
     {
       NoValuePolicy::narrow_error_check(this);
-      return this->_error;
+      return std::move(this->_error);
     }
 
     /// \output_section Wide state observers
@@ -557,13 +562,13 @@ namespace impl
     constexpr error_type &&error() &&
     {
       NoValuePolicy::wide_error_check(this);
-      return this->_error;
+      return std::move(this->_error);
     }
     /// \group error
     constexpr const error_type &&error() const &&
     {
       NoValuePolicy::wide_error_check(this);
-      return this->_error;
+      return std::move(this->_error);
     }
   };
   template <class Base, class NoValuePolicy> class result_error_observers<Base, void, NoValuePolicy> : public Base
@@ -612,13 +617,13 @@ namespace impl
     constexpr status_type &&assume_status() && noexcept
     {
       NoValuePolicy::narrow_status_check(this);
-      return this->_error;
+      return std::move(this->_error);
     }
     /// \group assume_status
     constexpr const status_type &&assume_status() const &&noexcept
     {
       NoValuePolicy::narrow_status_check(this);
-      return this->_error;
+      return std::move(this->_error);
     }
 
     /// \output_section Wide state observers
@@ -642,13 +647,13 @@ namespace impl
     constexpr status_type &&status() &&
     {
       NoValuePolicy::wide_status_check(this);
-      return this->_error;
+      return std::move(this->_error);
     }
     /// \group status
     constexpr const status_type &&status() const &&
     {
       NoValuePolicy::wide_status_check(this);
-      return this->_error;
+      return std::move(this->_error);
     }
   };
   template <class Base, class NoValuePolicy> class result_status_observers<Base, void, NoValuePolicy> : public Base
@@ -680,21 +685,6 @@ namespace impl
     using base = select_result_impl<R, S, NoValuePolicy>;
 
   public:
-    /// \output_section Member types
-    //! The success type.
-    using value_type = R;
-    //! The S type configured
-    using status_error_type = S;
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-    //! The status type, always `no_status_type` if `trait::status_type_is_negative<S>` is true.
-    using status_type = std::conditional_t<!trait::status_type_is_negative<S>::value, S, no_status_type>;
-    //! The failure type, always `no_error_type` if `trait::status_type_is_negative<S>` is false.
-    using error_type = std::conditional_t<trait::status_type_is_negative<S>::value, S, no_error_type>;
-#else
-    //! The failure type.
-    using error_type = S;
-#endif
-
     using base::base;
 
     /// \output_section State check observers
@@ -1137,6 +1127,9 @@ class OUTCOME_NODISCARD result : public impl::result_final<R, S, NoValuePolicy>
   struct error_converting_constructor_tag
   {
   };
+  struct error_condition_converting_constructor_tag
+  {
+  };
   struct value_status_converting_constructor_tag
   {
   };
@@ -1154,19 +1147,24 @@ public:
   using error_type = typename base::error_type;
 #else
   //! The failure type.
-  using error_type = typename base::error_type;
+  using error_type = S;
 #endif
+
+  //! The success type, always `no_value_type` if both `value_type` and `status_error_type` are `void`. Used to disable in place type construction.
+  using _value_type = std::conditional_t<std::is_void<value_type>::value && std::is_void<status_error_type>::value, no_value_type, value_type>;
+  //! The failure type, always `no_error_type` if both `value_type` and `status_error_type` are `void`. Used to disable in place type construction.
+  using _error_type = std::conditional_t<std::is_void<value_type>::value && std::is_void<status_error_type>::value, no_error_type, error_type>;
 
   /// \output_section Default, copy/move constructors and assignment
   //! Default construction is not permitted.
   result() = delete;
-  //! Move construction available if `value_type` and `status_type`/`error_type` implement it.
+  //! Move construction available if `value_type` and `status_error_type` implement it.
   result(result && /*unused*/) = default;
-  //! Copy construction available if `value_type` and `status_type`/`error_type` implement it.
+  //! Copy construction available if `value_type` and `status_error_type` implement it.
   result(const result & /*unused*/) = default;
-  //! Move assignment available if `value_type` and `status_type`/`error_type` implement it.
+  //! Move assignment available if `value_type` and `status_error_type` implement it.
   result &operator=(result && /*unused*/) = default;
-  //! Copy assignment available if `value_type` and `status_type`/`error_type` implement it.
+  //! Copy assignment available if `value_type` and `status_error_type` implement it.
   result &operator=(const result & /*unused*/) = default;
 
   /// \output_section Converting constructors
@@ -1186,7 +1184,7 @@ public:
                      && !detail::is_in_place_type_t<std::decay_t<T>>::value            // not in place construction
                      && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<status_error_type, T>::value>>
   constexpr result(T &&t, value_converting_constructor_tag = value_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value)
-      : base(in_place_type<value_type>, std::forward<T>(t))
+      : base(in_place_type<typename base::value_type>, std::forward<T>(t))
   {
   }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
@@ -1229,7 +1227,32 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
                      && !detail::is_in_place_type_t<std::decay_t<T>>::value            // not in place construction
                      && !std::is_constructible<value_type, T>::value && detail::is_same_or_constructible<error_type, T>>>
   constexpr result(T &&t, error_converting_constructor_tag = error_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)
-      : base(in_place_type<error_type>, std::forward<T>(t))
+      : base(in_place_type<typename base::error_type>, std::forward<T>(t))
+  {
+  }
+  /*! Special error condition converting constructor to a failure result.
+  \tparam enable_error_condition_converting_constructor
+  \exclude
+  \param 1
+  \exclude
+  \param t The error condition from which to initialise the `error_type`.
+
+  \effects Initialises the result with a `error_type` constructed via `make_error_code(t)`.
+  \requires `trait::status_type_is_negative<EC>` must be true; `std::is_error_condition_enum<ErrorCondEnum>` must be true,
+  `ErrorCondEnum` is not constructible to `value_type` nor `error_type`, and is not `result<R, S>` and not `in_place_type<>`;
+  Finally, the expression `error_type(make_error_code(ErrorCondEnum()))` must be valid.
+  \throws Any exception the construction of `error_type(make_error_code(t))` might throw.
+  */
+  template <class ErrorCondEnum, typename enable_error_condition_converting_constructor = std::enable_if_t<                                               //
+                                 !std::is_same<std::decay_t<ErrorCondEnum>, result>::value                                                                // not my type
+                                 && !detail::is_in_place_type_t<std::decay_t<ErrorCondEnum>>::value                                                       // not in place construction
+                                 && std::is_error_condition_enum<ErrorCondEnum>::value                                                                    // is an error condition enum
+                                 && !std::is_constructible<value_type, ErrorCondEnum>::value && !std::is_constructible<error_type, ErrorCondEnum>::value  // not constructible via any other means
+                                 >,
+            typename = decltype(error_type(make_error_code(ErrorCondEnum())))  // is a valid expression
+            >
+  constexpr result(ErrorCondEnum &&t, error_condition_converting_constructor_tag = error_condition_converting_constructor_tag()) noexcept(noexcept(error_type(make_error_code(std::forward<ErrorCondEnum>(t)))))
+      : base(in_place_type<typename base::error_type>, make_error_code(t))
   {
   }
 
@@ -1288,8 +1311,8 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   \throws Any exception the construction of `value_type(Args...)` might throw.
   */
   template <class... Args, typename = std::enable_if_t<std::is_void<value_type>::value || std::is_constructible<value_type, Args...>::value>>
-  constexpr explicit result(in_place_type_t<value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
-      : base(_, std::forward<Args>(args)...)
+  constexpr explicit result(in_place_type_t<_value_type>, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+      : base(in_place_type<typename base::value_type>, std::forward<Args>(args)...)
   {
   }
   /*! Inplace constructor to a successful result.
@@ -1304,8 +1327,8 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   \throws Any exception the construction of `value_type(il, Args...)` might throw.
   */
   template <class U, class... Args, typename = std::enable_if_t<std::is_constructible<value_type, std::initializer_list<U>, Args...>::value>>
-  constexpr explicit result(in_place_type_t<value_type> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
-      : base(_, il, std::forward<Args>(args)...)
+  constexpr explicit result(in_place_type_t<_value_type>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
+      : base(in_place_type<typename base::value_type>, il, std::forward<Args>(args)...)
   {
   }
   /*! Inplace constructor to a failure result.
@@ -1319,8 +1342,8 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   \throws Any exception the construction of `error_type(Args...)` might throw.
   */
   template <class... Args, typename = std::enable_if_t<std::is_void<error_type>::value || std::is_constructible<error_type, Args...>::value>>
-  constexpr explicit result(in_place_type_t<error_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
-      : base(_, std::forward<Args>(args)...)
+  constexpr explicit result(in_place_type_t<_error_type>, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
+      : base(in_place_type<typename base::error_type>, std::forward<Args>(args)...)
   {
   }
   /*! Inplace constructor to a failure result.
@@ -1335,11 +1358,12 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   \throws Any exception the construction of `error_type(il, Args...)` might throw.
   */
   template <class U, class... Args, typename = std::enable_if_t<std::is_constructible<error_type, std::initializer_list<U>, Args...>::value>>
-  constexpr explicit result(in_place_type_t<error_type> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
-      : base(_, il, std::forward<Args>(args)...)
+  constexpr explicit result(in_place_type_t<_error_type>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
+      : base(in_place_type<typename base::error_type>, il, std::forward<Args>(args)...)
   {
   }
 };
+#if 0
 //! `result<void, void>` specialisation.
 template <class NoValuePolicy> class OUTCOME_NODISCARD result<void, void, NoValuePolicy>
 {
@@ -1407,6 +1431,7 @@ public:
   constexpr bool has_status() const noexcept { return false; }
 #endif
 };
+#endif
 
 OUTCOME_V2_NAMESPACE_END
 
