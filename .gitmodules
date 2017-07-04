@@ -1,12 +1,15 @@
 [submodule "doc/html"]
 	path = doc/html
-	url = https://github.com/ned14/boost.outcome.git
+	url = https://github.com/ned14/outcome.git
 	branch = gh-pages
 	fetchRecurseSubmodules = true
 	ignore = none
 #	shallow = true  ## master repo is always somewhat behind
-[submodule "include/boost/outcome/quickcpplib"]
-	path = include/boost/outcome/quickcpplib
+[submodule "doc/src/themes/docdock"]
+	path = doc/src/themes/docdock
+	url = https://github.com/vjeantet/hugo-theme-docdock.git
+[submodule "include/outcome/quickcpplib"]
+	path = include/outcome/quickcpplib
 	url = https://github.com/ned14/quickcpplib
 	branch = master
 	fetchRecurseSubmodules = true

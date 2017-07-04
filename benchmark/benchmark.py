@@ -55,37 +55,37 @@ class ExceptionThrow(ErrorHandlingSystem):
     def function_final(self):
         return r'''{ throw std::exception(); }'''
 
-class ExpectedErrorValue(ErrorHandlingSystem):
+class ResultErrorValue(ErrorHandlingSystem):
     def preamble(self, idx):
-        return '#include "../include/boost/outcome/outcome.hpp"\n'
+        return '#include "../include/outcome/result.hpp"\n'
     def function_cont(self, name):
-        return 'extern boost::outcome::expected<int> %s(int par)' % name
+        return 'extern outcome::result<int> %s(int par)' % name
     def function_final(self):
         return r'''{ return par; }'''
 
-class ExpectedErrorError(ExpectedErrorValue):
+class ResultErrorError(ResultErrorValue):
     def function_final(self):
-        return r'''{ return boost::outcome::make_unexpected(std::error_code(5, std::generic_category())); }'''
+        return r'''{ return std::error_code(5, std::generic_category()); }'''
 
-class ExpectedExceptionValue(ExpectedErrorValue):
+class ResultExceptionValue(ResultErrorValue):
     def function_cont(self, name):
-        return 'extern boost::outcome::expected<int, std::exception_ptr> %s(int par)' % name
+        return 'extern outcome::result<int, std::exception_ptr> %s(int par)' % name
     def function_final(self):
         return r'''{ return par; }'''
         
-class ExpectedExceptionError(ExpectedExceptionValue):
+class ResultExceptionError(ResultExceptionValue):
     def function_cont(self, name):
-        return 'extern boost::outcome::expected<int, std::exception_ptr> %s(int par)' % name
+        return 'extern outcome::result<int, std::exception_ptr> %s(int par)' % name
     def function_final(self):
-        return r'''{ return boost::outcome::make_unexpected(std::make_exception_ptr(std::exception())); }'''
+        return r'''{ return std::make_exception_ptr(std::exception()); }'''
         
 matrix = [
     ('integer-returns', ErrorHandlingSystem),
     ('exception-throw', ExceptionThrow),
-    ('expected-error-value', ExpectedErrorValue),
-    ('expected-error-error', ExpectedErrorError),
-    ('expected-excpt-value', ExpectedExceptionValue),
-    ('expected-excpt-error', ExpectedExceptionError),
+    ('result-error-value', ResultErrorValue),
+    ('result-error-error', ResultErrorError),
+    ('result-excpt-value', ResultExceptionValue),
+    ('result-excpt-error', ResultExceptionError),
 ]
 
 if sys.platform == 'win32':

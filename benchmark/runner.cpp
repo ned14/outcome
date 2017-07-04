@@ -1,5 +1,5 @@
 #include "../test/timing.h"
-#include "../include/boost/outcome/outcome.hpp"
+#include "../include/outcome/result.hpp"
 #include <stdio.h>
 #include <exception>
 #include "function.h"

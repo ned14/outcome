@@ -1,0 +1,63 @@
+body {
+  text-align: justify;
+}
+h2 {
+  text-transform: none;
+}
+code, pre {
+  background: none;
+  border: none;
+}
+code + span.copy-to-clipboard {
+  display: none;
+}
+/* Fix Firefox */
+#body a.highlight {
+  vertical-align: middle;
+}
+
+pre .copy-to-clipboard {
+  background-color: transparent;
+}
+pre .copy-to-clipboard:hover {
+  background-color: #fff7dd;
+}
+
+.highlight pre {
+  #border: 2px dashed;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px #000000;
+}
+.highlight code + span.copy-to-clipboard {
+  display: inline-block;
+}
+
+.hljs {
+  background: inherit;
+  color: inherit;
+}
+/* keywords */
+.highlight .k, .highlight .kt, .language-cpp .hljs-keyword {
+  color: #0000ff;
+}
+/* type/namespace name */
+/* span.o + span.n, span.k + span.n, .language-cpp .hljs-function { */
+.highlight .n, .language-cpp .hljs-function {
+  color: #2b91af;
+}
+/* function name */
+.highlight .nf, .language-cpp .hljs-title {
+  color: black;
+}
+/* comment */
+.highlight .c1, .language-cpp .hljs-comment {
+  color: #008000;
+}
+/* strings */
+.highlight .s, .language-cpp .hljs-string {
+  color: #a31515;
+}
+/* namespace std */
+.highlight .o, .language-cpp .hljs-built_in {
+  color: black;
+}

@@ -10,21 +10,15 @@ Latest tarball of source with all tests passing on Linux and Windows: https://de
 
 Past tarballs of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/outcome
 
-Post peer review todo:
- - ?
+**WARNING: This library is undergoing serious refactoring to meet the Boost peer review feedback**
 
-Later after Boost peer review:
- - [ ] Create new Win32 and NT error code categories and have make_errored_outcome() use those.
- Have a python script auto generate the code into separate header files. Add those to boost-lite.
- - [ ] Add config where in release mode the exception throwing macros generate link errors
-for symbols with the function name and line number in them. This lets you track down all
-potentially throwing code.
- - [ ] Add nothrow make functions for outcomes, maybe with error lvalue ref constructor editions for results.
- - [ ] Add monad_errc error code for when a move or copy constructor throws? If so, what about option<T>?
- - [ ] Add tribool logic programming operator overloads
- - [ ] Add macro helpers to Outcome for returning outcomes out of things which cannot return values
-like constructors, and convert said exceptions/TLS back into outcomes.
-  - Make use of `std::system_error(errno, system_category, "custom error message");`
+Post peer review todo:
+ - [x] Implement `result<T, EC>` as per peer review feedback
+ - [x] Write up each API with C++ standardese and feed to Standardese
+ - [x] Replace doxygen with Standardese + Hugo
+ - [x] Implement `outcome<T, EC, E>` as per peer review feedback
+ - [x] Replace existing Outcome with peer review Outcome
+ - [ ] Retarget unit test suite at peer review Outcome
 
 
 ## Commits and tags in this git repository can be verified using:
