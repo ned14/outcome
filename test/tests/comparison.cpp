@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 BOOST_AUTO_TEST_CASE(works / outcome / comparison, "Tests that the outcome can compare to compatible outcomes")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  using namespace OUTCOME_V2_NAMESPACE;
   auto p = std::make_exception_ptr(std::runtime_error("hi"));
   // value comparison
   {
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(works / outcome / comparison, "Tests that the outcome can c
   }
   // homogeneous outcome comparison
   {
-    outcome<int> a, b(2), c(make_errored_outcome<int>(EINVAL)), d(make_exceptional_outcome<int>(p));
+    outcome<int> a(1), b(2), c(std::errc::invalid_argument), d(p);
     BOOST_CHECK(a == a);
     BOOST_CHECK(a != b);
     BOOST_CHECK(a != c);
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(works / outcome / comparison, "Tests that the outcome can c
     BOOST_CHECK(c == c);
     BOOST_CHECK(c != d);
     BOOST_CHECK(d == d);
-    outcome<int> e(make_errored_outcome<int>(EINVAL)), f(make_exceptional_outcome<int>(p));
+    outcome<int> e(std::errc::invalid_argument), f(p);
     BOOST_CHECK(c == e);
     BOOST_CHECK(d == f);
   }
@@ -65,36 +65,24 @@ BOOST_AUTO_TEST_CASE(works / outcome / comparison, "Tests that the outcome can c
     BOOST_CHECK(b == c);
     BOOST_CHECK(c == a);
     BOOST_CHECK(c == b);
-    outcome<void> d, e(make_valued_outcome<void>());
-    outcome<unsigned short> f(make_errored_outcome<unsigned short>(EINVAL));
-    outcome<double> g(make_exceptional_outcome<double>(p));
-    BOOST_CHECK(a != d);
-    BOOST_CHECK(a != e);
+    // outcome<void> e(in_place_type<void>);
+    outcome<unsigned short> f(std::errc::invalid_argument);
+    outcome<double> g(p);
+    // BOOST_CHECK(a != e);
     BOOST_CHECK(a != f);
     BOOST_CHECK(a != g);
-    BOOST_CHECK(d != e);
-    BOOST_CHECK(d != f);
-    BOOST_CHECK(e != f);
+    // BOOST_CHECK(e != f);
     BOOST_CHECK(f != g);
   }
   // upconverting outcome comparison, so outcome<int>==result<int> etc
   {
     outcome<int> a(1);
     result<int> b(1);
-    option<int> c(1);
     BOOST_CHECK(a == b);
-    BOOST_CHECK(a == c);
     BOOST_CHECK(b == a);
-    BOOST_CHECK(b == c);
-    BOOST_CHECK(c == a);
-    BOOST_CHECK(c == b);
-    result<void> d, e(make_valued_result<void>()), f(make_errored_result<void>(EINVAL));
-    option<bool> g, h(true);
-    BOOST_CHECK(a != d);
-    BOOST_CHECK(a != e);
-    BOOST_CHECK(a != f);
-    BOOST_CHECK(a != g);
-    BOOST_CHECK(a == h);
+    // result<void> e(in_place_type<void>), f(std::errc::invalid_argument);
+    // BOOST_CHECK(a != e);
+    // BOOST_CHECK(a != f);
   }
   // Should I do outcome<int>(5) == 5? Unsure if it's wise
 }

@@ -324,11 +324,13 @@ namespace detail
 
 namespace impl
 {
+  template <class R, class S, class NoValuePolicy> class result_final;
   //! The base implementation type of `result<R, EC, NoValuePolicy>`. Only appears separate due to standardese limitations.
   template <class R, class EC, class NoValuePolicy> class result_storage
   {
     friend NoValuePolicy;
     template <class T, class U, class V> friend class result_storage;
+    template <class T, class U, class V> friend class result_final;
     static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "error_type must be default constructible");
 
     struct disable_in_place_value_type
@@ -721,6 +723,67 @@ namespace impl
     \returns True if has exception.
     */
     constexpr bool has_exception() const noexcept { return (this->_state._status & detail::status_have_exception) != 0; }
+
+    /// \output_section Comparison operators
+    /*! True if equal to the other result.
+    \tparam 4
+    \exclude
+    \tparam 5
+    \exclude
+    \param o The other result to compare to.
+
+    \effects Calls the `operator==` operation on each of the two stored items until one returns false.
+    \requires That the expression of calling `operator==` on each of the two stored items is a valid expression.
+    \throws Any exception the individual `operator==` operations might throw.
+    */
+    template <class T, class U, class V,                                    //
+              typename = decltype(std::declval<R>() == std::declval<T>()),  //
+              typename = decltype(std::declval<S>() == std::declval<U>())   //
+              >
+    constexpr bool operator==(const result_final<T, U, V> &o) const noexcept(  //
+    noexcept(std::declval<R>() == std::declval<T>())                           //
+    && noexcept(std::declval<S>() == std::declval<U>()))
+    {
+      if(this->_state._status == o._state._status)
+      {
+        if(this->_state._status & detail::status_have_value)
+        {
+          return this->_state._value == o._state._value && this->_error == o._error;
+        }
+        return this->_error == o._error;
+      }
+      return false;
+    }
+    /*! True if not equal to the other result.
+    \tparam 4
+    \exclude
+    \tparam 5
+    \exclude
+    \param o The other result to compare to.
+
+    \effects Calls the `operator!=` operation on each of the two stored items until one returns true.
+    \requires That the expression of calling `operator!=` on each of the two stored items is a valid expression.
+    \throws Any exception the individual `operator!=` operations might throw.
+    */
+    template <class T, class U, class V,                                    //
+              typename = decltype(std::declval<R>() != std::declval<T>()),  //
+              typename = decltype(std::declval<S>() != std::declval<U>())   //
+              >
+    constexpr bool operator!=(const result_final<T, U, V> &o) const noexcept(  //
+    noexcept(std::declval<R>() != std::declval<T>())                           //
+    && noexcept(std::declval<S>() != std::declval<U>()))
+    {
+      if(this->_state._status != o._state._status)
+      {
+        return true;
+      }
+      if(this->_state._status & detail::status_have_value)
+      {
+        if(this->_state._value != o._state._value)
+          return true;
+      }
+      return this->_error != o._error;
+    }
   };
 }
 

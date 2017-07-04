@@ -699,7 +699,139 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   {
     this->_state._status |= trait::is_exception_ptr<payload_exception_type>::value ? detail::status_have_exception : detail::status_have_payload;
   }
+
+  /// \output_section Comparison operators
+  /*! True if equal to the other outcome.
+  \tparam 4
+  \exclude
+  \tparam 5
+  \exclude
+  \tparam 6
+  \exclude
+  \param o The other outcome to compare to.
+
+  \effects Calls the `operator==` operation on each of the three stored items until one returns false.
+  \requires That the expression of calling `operator==` on each of the three stored items is a valid expression.
+  \throws Any exception the individual `operator==` operations might throw.
+  */
+  template <class T, class U, class V, class W,                           //
+            typename = decltype(std::declval<R>() == std::declval<T>()),  //
+            typename = decltype(std::declval<S>() == std::declval<U>()),  //
+            typename = decltype(std::declval<P>() == std::declval<V>())   //
+            >
+  constexpr bool operator==(const outcome<T, U, V, W> &o) const noexcept(  //
+  noexcept(std::declval<R>() == std::declval<T>())                         //
+  && noexcept(std::declval<S>() == std::declval<U>())                      //
+  && noexcept(std::declval<P>() == std::declval<V>()))
+  {
+    return base::operator==(o) && this->_ptr == o._ptr;
+  }
+  /*! True if not equal to the other outcome.
+  \tparam 4
+  \exclude
+  \tparam 5
+  \exclude
+  \tparam 6
+  \exclude
+  \param o The other outcome to compare to.
+
+  \effects Calls the `operator!=` operation on each of the three stored items until one returns true.
+  \requires That the expression of calling `operator!=` on each of the three stored items is a valid expression.
+  \throws Any exception the individual `operator!=` operations might throw.
+  */
+  template <class T, class U, class V, class W,                           //
+            typename = decltype(std::declval<R>() != std::declval<T>()),  //
+            typename = decltype(std::declval<S>() != std::declval<U>()),  //
+            typename = decltype(std::declval<P>() != std::declval<V>())   //
+            >
+  constexpr bool operator!=(const outcome<T, U, V, W> &o) const noexcept(  //
+  noexcept(std::declval<R>() != std::declval<T>())                         //
+  && noexcept(std::declval<S>() != std::declval<U>())                      //
+  && noexcept(std::declval<P>() != std::declval<V>()))
+  {
+    return base::operator!=(o) || this->_ptr != o._ptr;
+  }
+  /*! True if equal to the other result.
+  \tparam 4
+  \exclude
+  \tparam 5
+  \exclude
+  \param o The other result to compare to.
+
+  \effects Calls the `operator==` operation on each of the two stored items until one returns false.
+  \requires That the expression of calling `operator==` on each of the two stored items is a valid expression.
+  \throws Any exception the individual `operator==` operations might throw.
+  */
+  template <class T, class U, class V,                                    //
+            typename = decltype(std::declval<R>() == std::declval<T>()),  //
+            typename = decltype(std::declval<S>() == std::declval<U>())   //
+            >
+  constexpr bool operator==(const result<T, U, V> &o) const noexcept(  //
+  noexcept(std::declval<R>() == std::declval<T>())                     //
+  && noexcept(std::declval<S>() == std::declval<U>()))
+  {
+    return base::operator==(o);
+  }
+  /*! True if not equal to the other result.
+  \tparam 4
+  \exclude
+  \tparam 5
+  \exclude
+  \param o The other result to compare to.
+
+  \effects Calls the `operator!=` operation on each of the two stored items until one returns true.
+  \requires That the expression of calling `operator!=` on each of the two stored items is a valid expression.
+  \throws Any exception the individual `operator!=` operations might throw.
+  */
+  template <class T, class U, class V,                                    //
+            typename = decltype(std::declval<R>() != std::declval<T>()),  //
+            typename = decltype(std::declval<S>() != std::declval<U>())   //
+            >
+  constexpr bool operator!=(const result<T, U, V> &o) const noexcept(  //
+  noexcept(std::declval<R>() != std::declval<T>())                     //
+  && noexcept(std::declval<S>() != std::declval<U>()))
+  {
+    return base::operator!=(o);
+  }
 };
+/*! True if the result is equal to the outcome
+\tparam 7
+\exclude
+\param a The result to compare.
+\param b The outcome to compare.
+
+\effects Calls `b == a`.
+\requires That the expression `b == a` is a valid expression.
+\throws Any exception that `b == a` might throw.
+*/
+template <class T, class U, class V,                                                                   //
+          class R, class S, class P, class N,                                                          //
+          typename = decltype(std::declval<outcome<R, S, P, N>>() == std::declval<result<T, U, V>>())  //
+          >
+constexpr inline bool operator==(const result<T, U, V> &a, const outcome<R, S, P, N> &b) noexcept(  //
+noexcept(std::declval<outcome<R, S, P, N>>() == std::declval<result<T, U, V>>()))
+{
+  return b == a;
+}
+/*! True if the result is not equal to the outcome
+\tparam 7
+\exclude
+\param a The result to compare.
+\param b The outcome to compare.
+
+\effects Calls `b != a`.
+\requires That the expression `b != a` is a valid expression.
+\throws Any exception that `b != a` might throw.
+*/
+template <class T, class U, class V,                                                                   //
+          class R, class S, class P, class N,                                                          //
+          typename = decltype(std::declval<outcome<R, S, P, N>>() != std::declval<result<T, U, V>>())  //
+          >
+constexpr inline bool operator!=(const result<T, U, V> &a, const outcome<R, S, P, N> &b) noexcept(  //
+noexcept(std::declval<outcome<R, S, P, N>>() != std::declval<result<T, U, V>>()))
+{
+  return b != a;
+}
 
 namespace policy
 {
