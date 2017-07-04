@@ -32,7 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <_mingw.h>
 #endif
 
-#include "quickcpplib/include/config.hpp"
+#include "../quickcpplib/include/config.hpp"
 
 #ifndef __cpp_variadic_templates
 #error Outcome needs variadic template support in the compiler
@@ -64,7 +64,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #endif
 
-#include "quickcpplib/include/import.h"
+#include "../quickcpplib/include/import.h"
 
 #ifdef STANDARDESE_IS_IN_THE_HOUSE
 /*! The namespace configuration of this Outcome v2. Consists of a sequence
@@ -72,54 +72,35 @@ of bracketed tokens later fused by the preprocessor into namespace and C++ modul
 */
 #define OUTCOME_V2
 //! The Outcome namespace
-namespace outcome
+namespace outcome_v2_xxx
 {
-  //! Inline namespace for this version of Outcome
-  inline namespace v2_xxx
-  {
-  }
 }
 }
-/*! The namespace of this Boost.Outcome v2 which will be some unknown inline
-namespace starting with `v2_` inside the `outcome` namespace.
+/*! The namespace of this Boost.Outcome v2.
 */
-#define OUTCOME_V2_NAMESPACE outcome::v2_xxx
+#define OUTCOME_V2_NAMESPACE outcome_v2_xxx
 /*! Expands into the appropriate namespace markup to enter the Outcome v2 namespace.
 */
 #define OUTCOME_V2_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                             \
-  namespace outcome                                                                                                                                                                                                                                                                                                            \
-  {                                                                                                                                                                                                                                                                                                                            \
-    namespace v2_xxx                                                                                                                                                                                                                                                                                                           \
-    {
+  namespace outcome_v2_xxx                                                                                                                                                                                                                                                                                                     \
+  {
 /*! Expands into the appropriate namespace markup to enter the C++ module
 exported Outcome v2 namespace.
 */
 #define OUTCOME_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                      \
-  export namespace outcome                                                                                                                                                                                                                                                                                                     \
-  {                                                                                                                                                                                                                                                                                                                            \
-    inline namespace v2_xxx                                                                                                                                                                                                                                                                                                    \
-    {
+  export namespace outcome_v2_xxx                                                                                                                                                                                                                                                                                              \
+  {
 /*! \brief Expands into the appropriate namespace markup to exit the Outcome v2 namespace.
 \ingroup config
 */
-#define OUTCOME_V2_NAMESPACE_END                                                                                                                                                                                                                                                                                               \
-  }                                                                                                                                                                                                                                                                                                                            \
-  }
+#define OUTCOME_V2_NAMESPACE_END }
 #else
 
 #if defined(OUTCOME_UNSTABLE_VERSION)
 #include "revision.hpp"
-#ifdef OUTCOME_DISABLE_INLINE_NAMESPACE
-#define OUTCOME_V2 (outcome), (QUICKCPPLIB_BIND_NAMESPACE_VERSION(, OUTCOME_NAMESPACE_VERSION, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
+#define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
-#define OUTCOME_V2 (outcome), (QUICKCPPLIB_BIND_NAMESPACE_VERSION(, OUTCOME_NAMESPACE_VERSION, OUTCOME_PREVIOUS_COMMIT_UNIQUE), inline)
-#endif
-#else
-#ifdef OUTCOME_DISABLE_INLINE_NAMESPACE
-#define OUTCOME_V2 (outcome), (QUICKCPPLIB_BIND_NAMESPACE_VERSION(, OUTCOME_NAMESPACE_VERSION))
-#else
-#define OUTCOME_V2 (outcome), (QUICKCPPLIB_BIND_NAMESPACE_VERSION(, OUTCOME_NAMESPACE_VERSION), inline)
-#endif
+#define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_NAMESPACE_VERSION))
 #endif
 
 #if defined(GENERATING_OUTCOME_MODULE_INTERFACE)
@@ -137,7 +118,7 @@ exported Outcome v2 namespace.
 
 #ifndef OUTCOME_DO_FATAL_EXIT
 #ifdef _WIN32
-#include "quickcpplib/include/execinfo_win64.h"
+#include "../quickcpplib/include/execinfo_win64.h"
 #else
 #include <execinfo.h>
 #endif
