@@ -26,8 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 
-//! [extended_error_coding1]
-namespace extended_error_coding
+namespace hook_test
 {
   using OUTCOME_V2_NAMESPACE::in_place_type;
   // Use static storage to convey extended error info from result construction to outcome conversion
@@ -56,20 +55,19 @@ namespace extended_error_coding
     // Write the value in the result into the static storage
     snprintf(extended_error_info, sizeof(extended_error_info), "%s", res->assume_value().c_str());
   }
-}  // namespace extended_error_coding
-//! [extended_error_coding1]
+}  // namespace hook_test
 
 BOOST_AUTO_TEST_CASE(works / result / hooks, "Tests that you can hook result's construction")
 {
-  using namespace OUTCOME_V2_NAMESPACE;
-  extended_error_coding::result<int> a(5);
-  BOOST_CHECK(!strcmp(extended_error_coding::extended_error_info, "5"));
-  extended_error_coding::result<std::string> b("niall");
-  BOOST_CHECK(!strcmp(extended_error_coding::extended_error_info, "niall"));
+  using namespace hook_test;
+  result<int> a(5);
+  BOOST_CHECK(!strcmp(extended_error_info, "5"));
+  result<std::string> b("niall");
+  BOOST_CHECK(!strcmp(extended_error_info, "niall"));
 }
 
 //! [extended_error_coding2]
-namespace extended_error_coding
+namespace hook_test
 {
   // Localise outcome to using the local error_code so this namespace gets looked up for the hooks
   template <class R> using outcome = OUTCOME_V2_NAMESPACE::outcome<R, error_code, std::string>;
@@ -78,7 +76,7 @@ namespace extended_error_coding
     // Use inheritance to gain access to state
     template <class R> struct outcome_payload_poker : public outcome<R>
     {
-      void _poke_payload(typename extended_error_coding::outcome<R>::payload_exception_type &&p)
+      void _poke_payload(typename hook_test::outcome<R>::payload_exception_type &&p)
       {
         this->_ptr = std::move(p);
         this->_state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_payload;
@@ -97,12 +95,11 @@ namespace extended_error_coding
     // when move constructing from a result<T>, place extended_error_coding::extended_error_info into the payload
     static_cast<detail::outcome_payload_poker<R> *>(res)->_poke_payload(extended_error_info);
   }
-}  // namespace extended_error_coding
-//! [extended_error_coding2]
+}  // namespace hook_test
 
 BOOST_AUTO_TEST_CASE(works / outcome / hooks, "Tests that you can hook outcome's conversion from a result")
 {
-  using namespace extended_error_coding;
+  using namespace hook_test;
   outcome<int> a(result<int>(5));
   BOOST_CHECK(a.payload() == "5");
   outcome<std::string> b(result<std::string>("niall"));
