@@ -227,6 +227,43 @@ namespace detail
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl = impl::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>;
 }
 
+/*! The default instantiation hook implementation called when a `outcome` is first created
+by conversion from one of its possible types. Does nothing.
+\tparam T One of `value_type`, `error_type`, `std::pair<error_type, payload_type>` or `exception_type`.
+
+WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
+*/
+template <class T, class U> constexpr inline void hook_outcome_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept
+{
+}
+/*! The default instantiation hook implementation called when a `outcome` is created by copying
+from another `outcome` or `result`. Does nothing.
+\tparam T The type of the source.
+
+WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
+*/
+template <class T, class U> constexpr inline void hook_outcome_copy_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept
+{
+}
+/*! The default instantiation hook implementation called when a `outcome` is created by moving
+from another `outcome` or `result`. Does nothing.
+\tparam T The type of the source.
+
+WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
+*/
+template <class T, class U> constexpr inline void hook_outcome_move_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept
+{
+}
+/*! The default instantiation hook implementation called when a `outcome` is created by in place
+construction. Does nothing.
+\tparam T One of `value_type`, `error_type`, `std::pair<error_type, payload_type>` or `exception_type`.
+
+WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
+*/
+template <class T, class U> constexpr inline void hook_outcome_in_place_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept
+{
+}
+
 /*! Used to return from functions (i) a value and (a positive status and/or a payload) or
 (ii) no value and (a negative status and/or a payload). `constexpr` capable.
 \module outcome<R, S, P> implementation
@@ -327,17 +364,18 @@ public:
   \param t The value from which to initialise the `value_type`.
 
   \effects Initialises the outcome with a `value_type`.
-  \requires Type T is constructible to `value_type`, is not constructible to `status_error_type`, is not constructible to `payload_exception_type` and is not `outcome<R, S, P>` and not `in_place_type<>`.
+  \requires Type T is constructible to `value_type`, is not constructible to `status_error_type`, is not constructible to `exception_type` and is not `outcome<R, S, P>` and not `in_place_type<>`.
   \throws Any exception the construction of `value_type(T)` might throw.
   */
   template <class T, typename enable_value_converting_constructor = std::enable_if_t<  //
                      !std::is_same<std::decay_t<T>, outcome>::value                    // not my type
                      && !detail::is_in_place_type_t<std::decay_t<T>>::value            // not in place construction
-                     && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<status_error_type, T>::value && !std::is_constructible<payload_exception_type, T>::value>>
+                     && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<status_error_type, T>::value && !std::is_constructible<exception_type, T>::value>>
   constexpr outcome(T &&t, value_converting_constructor_tag = value_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value)
       : base(in_place_type<typename base::value_type>, std::forward<T>(t))
       , _ptr()
   {
+    hook_outcome_construction(in_place_type<value_type>, this);
   }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
   /*! Converting constructor to a successful outcome + status.
@@ -349,43 +387,44 @@ public:
 \param u The value from which to initialise the `status_type`.
 
 \effects Initialises the outcome with a `value_type` and an additional `status_type`.
-\requires `trait::status_type_is_negative<EC>` must be false; Type `T` is constructible to `value_type`, is not constructible to `status_type`
-is not constructible to `payload_exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
-Type `U` is constructible to `status_type`, is not constructible to `value_type`, and is not constructible to `payload_exception_type`.
+\requires `trait::status_type_is_negative<EC>` must be false; Type `T` is constructible to `value_type`,
+is not constructible to `exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
+Type `U` is constructible to `status_type`, is not constructible to `value_type`, and is not constructible to `exception_type`.
 \throws Any exception the construction of `value_type(T)` and `status_type(U)` might throw.
 */
-  template <class T, class U, typename enable_value_status_converting_constructor = std::enable_if_t<                                                                                          //
-                              !std::is_same<std::decay_t<T>, outcome>::value                                                                                                                   // not my type
-                              && !detail::is_in_place_type_t<std::decay_t<T>>::value                                                                                                           // not in place construction
-                              && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<status_type, T>::value && !std::is_constructible<payload_exception_type, T>::value  //
-                              && detail::is_same_or_constructible<status_type, U> && !std::is_constructible<value_type, U>::value && !std::is_constructible<payload_exception_type, U>::value>>
+  template <class T, class U, typename enable_value_status_converting_constructor = std::enable_if_t<                                 //
+                              !std::is_same<std::decay_t<T>, outcome>::value                                                          // not my type
+                              && !detail::is_in_place_type_t<std::decay_t<T>>::value                                                  // not in place construction
+                              && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<exception_type, T>::value  //
+                              && detail::is_same_or_constructible<status_type, U> && !std::is_constructible<exception_type, U>::value>>
   constexpr outcome(T &&t, U &&u, value_status_converting_constructor_tag = value_status_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_type, U>::value)
       : base(typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u))
       , _ptr()
   {
+    hook_outcome_construction(in_place_type<std::pair<value_type, status_type>>, this);
   }
-  /*! Converting constructor to a successful outcome + status + payload/exception_ptr.
+  /*! Converting constructor to a successful outcome + status + payload.
   \tparam enable_value_status_payload_converting_constructor
   \exclude
   \param 3
   \exclude
   \param t The value from which to initialise the `value_type`.
   \param u The value from which to initialise the `status_type`.
-  \param v The value from which to initialise the `payload_exception_type`.
+  \param v The value from which to initialise the `payload_type`.
 
-  \effects Initialises the outcome with a `value_type`, a `status_type` and a `payload_exception_type`.
-  \requires `trait::status_type_is_negative<EC>` must be false; Type `T` is constructible to `value_type`, is not constructible to `status_type`
-  is not constructible to `payload_exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
-  Type `U` is constructible to `status_type`, is not constructible to `value_type`, and is not constructible to `payload_exception_type`;
-  Type `V` is constructible to `payload_exception_type`, is not constructible to `value_type`, and is not constructible to `status_type`.
+  \effects Initialises the outcome with a `value_type`, a `status_type` and a `payload_type`.
+  \requires `trait::status_type_is_negative<EC>` must be false; Type `T` is constructible to `value_type`, and is not `outcome<R, S, P>`
+  and not `in_place_type<>`;
+  Type `U` is constructible to `status_type`;
+  Type `V` is constructible to `payload_exception_type`.
   \throws Any exception the construction of `value_type(T)`, `status_type(U)` and `payload_exception_type(V)` might throw.
   */
-  template <class T, class U, class V, typename enable_value_status_payload_converting_constructor = std::enable_if_t<                                                                                  //
-                                       !std::is_same<std::decay_t<T>, outcome>::value                                                                                                                   // not my type
-                                       && !detail::is_in_place_type_t<std::decay_t<T>>::value                                                                                                           // not in place construction
-                                       && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<status_type, T>::value && !std::is_constructible<payload_exception_type, T>::value  //
-                                       && detail::is_same_or_constructible<status_type, U> && !std::is_constructible<value_type, U>::value && !std::is_constructible<payload_exception_type, U>::value  //
-                                       && detail::is_same_or_constructible<payload_exception_type, V> && !std::is_constructible<value_type, V>::value && !std::is_constructible<status_type, V>::value  //
+  template <class T, class U, class V, typename enable_value_status_payload_converting_constructor = std::enable_if_t<  //
+                                       !std::is_same<std::decay_t<T>, outcome>::value                                   // not my type
+                                       && !detail::is_in_place_type_t<std::decay_t<T>>::value                           // not in place construction
+                                       && detail::is_same_or_constructible<value_type, T>                               //
+                                       && detail::is_same_or_constructible<status_type, U>                              //
+                                       && detail::is_same_or_constructible<payload_exception_type, V>                   //
                                        >>
   constexpr outcome(T &&t, U &&u, V &&v,
                     value_status_payload_converting_constructor_tag = value_status_payload_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_type, U>::value &&std::is_nothrow_constructible<payload_exception_type, V>::value)
@@ -393,8 +432,8 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
       , _ptr(std::forward<V>(v))
   {
     this->_state._status |= detail::status_have_payload;
+    hook_outcome_construction(in_place_type<std::tuple<value_type, status_type, payload_type>>, this);
   }
-#endif
   /*! Converting constructor to a successful outcome + payload.
   \tparam enable_value_payload_converting_constructor_tag
   \exclude
@@ -405,20 +444,22 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
 
   \effects Initialises the outcome with a `value_type` and a `payload_type`.
   \requires `trait::is_exception_ptr<P>` must be false; Type `T` is constructible to `value_type`, is not constructible to `status_error_type`,
-  is not constructible to `payload_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
-  Type `U` is constructible to `payload_type`, is not constructible to `value_type`, and is not constructible to `status_error_type`.
+  and is not `outcome<R, S, P>` and not `in_place_type<>`;
+  Type `U` is constructible to `payload_type`, and is not constructible to `status_error_type`.
   \throws Any exception the construction of `value_type(T)` and `payload_type(U)` might throw.
   */
-  template <class T, class U, typename enable_value_payload_converting_constructor_tag = std::enable_if_t<                                                                                           //
-                              !std::is_same<std::decay_t<T>, outcome>::value                                                                                                                         // not my type
-                              && !detail::is_in_place_type_t<std::decay_t<T>>::value                                                                                                                 // not in place construction
-                              && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<status_error_type, T>::value && !std::is_constructible<payload_exception_type, T>::value  //
-                              && detail::is_same_or_constructible<payload_exception_type, U> && !std::is_constructible<value_type, U>::value && !std::is_constructible<status_error_type, U>::value>>
+  template <class T, class U, typename enable_value_payload_converting_constructor_tag = std::enable_if_t<                               //
+                              !std::is_same<std::decay_t<T>, outcome>::value                                                             // not my type
+                              && !detail::is_in_place_type_t<std::decay_t<T>>::value                                                     // not in place construction
+                              && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<status_error_type, T>::value  //
+                              && detail::is_same_or_constructible<payload_type, U> && !std::is_constructible<status_error_type, U>::value>>
   constexpr outcome(T &&t, U &&u, value_payload_converting_constructor_tag = value_payload_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<payload_exception_type, U>::value)
       : base(in_place_type<typename base::value_type>, std::forward<T>(t))
       , _ptr(std::forward<U>(u))
   {
+    hook_outcome_construction(in_place_type<std::pair<value_type, payload_type>>, this);
   }
+#endif
   /*! Converting constructor to an errored outcome.
 \tparam enable_error_converting_constructor
 \exclude
@@ -439,6 +480,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(in_place_type<typename base::error_type>, std::forward<T>(t))
       , _ptr()
   {
+    hook_outcome_construction(in_place_type<error_type>, this);
   }
   /*! Converting constructor to an errored outcome + payload/exception.
   \tparam enable_error_payload_converting_constructor
@@ -451,19 +493,20 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \effects Initialises the outcome with a `error_type` and a `payload_exception_type`.
   \requires `trait::status_type_is_negative<EC>` must be true; Type T is constructible to `error_type`,
   is not constructible to `value_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
-  Type `U` is constructible to `payload_exception_type`, is not constructible to `value_type`.
+  Type `U` is constructible to `payload_exception_type`, is not constructible to `status_error_type`.
   \throws Any exception the construction of `error_type(T)` and `payload_exception_type(U)` might throw.
   */
   template <class T, class U, typename enable_error_payload_converting_constructor = std::enable_if_t<                            //
                               !std::is_same<std::decay_t<T>, outcome>::value                                                      // not my type
                               && !detail::is_in_place_type_t<std::decay_t<T>>::value                                              // not in place construction
                               && !std::is_constructible<value_type, T>::value && detail::is_same_or_constructible<error_type, T>  //
-                              && detail::is_same_or_constructible<payload_exception_type, U> && !std::is_constructible<value_type, U>::value>>
+                              && detail::is_same_or_constructible<payload_exception_type, U> && !std::is_constructible<status_error_type, U>::value>>
   constexpr outcome(T &&t, U &&u, error_payload_converting_constructor_tag = error_payload_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<payload_exception_type, U>::value)
       : base(in_place_type<typename base::error_type>, std::forward<T>(t))
       , _ptr(std::forward<U>(u))
   {
     this->_state._status |= trait::is_exception_ptr<payload_exception_type>::value ? detail::status_have_exception : detail::status_have_payload;
+    hook_outcome_construction(in_place_type<std::pair<error_type, payload_exception_type>>, this);
   }
   /*! Special error condition converting constructor to an errored outcome.
   \tparam enable_error_condition_converting_constructor
@@ -490,6 +533,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   constexpr outcome(ErrorCondEnum &&t, error_condition_converting_constructor_tag = error_condition_converting_constructor_tag()) noexcept(noexcept(error_type(make_error_code(std::forward<ErrorCondEnum>(t)))))
       : base(in_place_type<typename base::error_type>, make_error_code(t))
   {
+    hook_outcome_construction(in_place_type<error_type>, this);
   }
   /*! Converting constructor to an excepted outcome.
   \tparam enable_exception_converting_constructor
@@ -512,6 +556,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       , _ptr(std::forward<T>(t))
   {
     this->_state._status |= detail::status_have_exception;
+    hook_outcome_construction(in_place_type<exception_type>, this);
   }
 
   /*! Explicit converting copy constructor from a compatible outcome type.
@@ -540,6 +585,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(typename base::compatible_conversion_tag(), o)
       , _ptr(o._ptr)
   {
+    hook_outcome_copy_construction(in_place_type<decltype(o)>, this);
   }
   /*! Implicit converting copy constructor from a compatible outcome type.
   \tparam enable_implicit_compatible_conversion
@@ -565,6 +611,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(typename base::compatible_conversion_tag(), o)
       , _ptr(o._ptr)
   {
+    hook_outcome_copy_construction(in_place_type<decltype(o)>, this);
   }
   /*! Explicit converting move constructor from a compatible outcome type.
   \tparam enable_explicit_compatible_conversion
@@ -591,6 +638,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(typename base::compatible_conversion_tag(), std::move(o))
       , _ptr(std::move(o._ptr))
   {
+    hook_outcome_move_construction(in_place_type<decltype(o)>, this);
   }
   /*! Implicit converting move constructor from a compatible outcome type.
   \tparam enable_implicit_compatible_conversion
@@ -616,6 +664,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(typename base::compatible_conversion_tag(), std::move(o))
       , _ptr(std::move(o._ptr))
   {
+    hook_outcome_move_construction(in_place_type<decltype(o)>, this);
   }
   /*! Explicit converting copy constructor from a compatible result type.
   \tparam enable_explicit_compatible_conversion
@@ -639,6 +688,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(typename base::compatible_conversion_tag(), o)
       , _ptr()
   {
+    hook_outcome_copy_construction(in_place_type<decltype(o)>, this);
   }
   /*! Implicit converting copy constructor from a compatible result type.
   \tparam enable_implicit_compatible_conversion
@@ -661,6 +711,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(typename base::compatible_conversion_tag(), o)
       , _ptr()
   {
+    hook_outcome_copy_construction(in_place_type<decltype(o)>, this);
   }
   /*! Explicit converting move constructor from a compatible result type.
   \tparam enable_explicit_compatible_conversion
@@ -684,6 +735,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(typename base::compatible_conversion_tag(), std::move(o))
       , _ptr()
   {
+    hook_outcome_move_construction(in_place_type<decltype(o)>, this);
   }
   /*! Implicit converting move constructor from a compatible result type.
   \tparam enable_implicit_compatible_conversion
@@ -706,6 +758,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(typename base::compatible_conversion_tag(), std::move(o))
       , _ptr()
   {
+    hook_outcome_move_construction(in_place_type<decltype(o)>, this);
   }
 
 
@@ -725,6 +778,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(_, std::forward<Args>(args)...)
       , _ptr()
   {
+    hook_outcome_in_place_construction(in_place_type<value_type>, this);
   }
   /*! Inplace constructor to a successful value.
   \tparam 2
@@ -742,6 +796,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(_, il, std::forward<Args>(args)...)
       , _ptr()
   {
+    hook_outcome_in_place_construction(in_place_type<value_type>, this);
   }
   /*! Inplace constructor to an unsuccessful error.
   \tparam 1
@@ -758,6 +813,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(_, std::forward<Args>(args)...)
       , _ptr()
   {
+    hook_outcome_in_place_construction(in_place_type<error_type>, this);
   }
   /*! Inplace constructor to an unsuccessful error.
   \tparam 2
@@ -775,6 +831,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(_, il, std::forward<Args>(args)...)
       , _ptr()
   {
+    hook_outcome_in_place_construction(in_place_type<error_type>, this);
   }
   /*! Inplace constructor to an unsuccessful payload/exception.
   \tparam 1
@@ -792,6 +849,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       , _ptr(std::forward<Args>(args)...)
   {
     this->_state._status |= trait::is_exception_ptr<payload_exception_type>::value ? detail::status_have_exception : detail::status_have_payload;
+    hook_outcome_in_place_construction(in_place_type<payload_exception_type>, this);
   }
   /*! Inplace constructor to an unsuccessful payload/exception.
   \tparam 2
@@ -810,6 +868,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       , _ptr(il, std::forward<Args>(args)...)
   {
     this->_state._status |= trait::is_exception_ptr<payload_exception_type>::value ? detail::status_have_exception : detail::status_have_payload;
+    hook_outcome_in_place_construction(in_place_type<payload_exception_type>, this);
   }
 
   /// \output_section Comparison operators
@@ -983,6 +1042,7 @@ noexcept(std::declval<outcome<R, S, P, N>>() != std::declval<result<T, U, V>>())
 {
   return b != a;
 }
+
 
 namespace policy
 {

@@ -948,6 +948,43 @@ namespace policy
 #endif
 }
 
+/*! The default instantiation hook implementation called when a `result` is first created
+by conversion from one of its possible types. Does nothing.
+\tparam T One of `value_type` or `error_type`.
+
+WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
+*/
+template <class T, class U> constexpr inline void hook_result_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept
+{
+}
+/*! The default instantiation hook implementation called when a `result` is created by copying
+from another `result`. Does nothing.
+\tparam T The type of the source.
+
+WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
+*/
+template <class T, class U> constexpr inline void hook_result_copy_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept
+{
+}
+/*! The default instantiation hook implementation called when a `result` is created by moving
+from another `result`. Does nothing.
+\tparam T The type of the source.
+
+WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
+*/
+template <class T, class U> constexpr inline void hook_result_move_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept
+{
+}
+/*! The default instantiation hook implementation called when a `result` is created by in place
+construction. Does nothing.
+\tparam T One of `value_type` or `error_type`.
+
+WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
+*/
+template <class T, class U> constexpr inline void hook_result_in_place_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept
+{
+}
+
 /*! Used to return from functions (i) a value (ii) a value and a positive status or (iii) no value and a negative status. `constexpr` capable.
 \module result<R, S> implementation
 \tparam R The optional type of the successful result (use `void` to disable).
@@ -1064,6 +1101,7 @@ public:
   constexpr result(T &&t, value_converting_constructor_tag = value_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value)
       : base(in_place_type<typename base::value_type>, std::forward<T>(t))
   {
+    hook_result_construction(in_place_type<value_type>, this);
   }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
   /*! Converting constructor to a successful result + status.
@@ -1086,6 +1124,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   constexpr result(T &&t, U &&u, value_status_converting_constructor_tag = value_status_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_type, U>::value)
       : base(typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u))
   {
+    hook_result_construction(in_place_type<std::pair<value_type, status_type>>, this);
   }
 #endif
   /*! Converting constructor to a failure result.
@@ -1107,6 +1146,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   constexpr result(T &&t, error_converting_constructor_tag = error_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)
       : base(in_place_type<typename base::error_type>, std::forward<T>(t))
   {
+    hook_result_construction(in_place_type<error_type>, this);
   }
   /*! Special error condition converting constructor to a failure result.
   \tparam enable_error_condition_converting_constructor
@@ -1132,6 +1172,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   constexpr result(ErrorCondEnum &&t, error_condition_converting_constructor_tag = error_condition_converting_constructor_tag()) noexcept(noexcept(error_type(make_error_code(std::forward<ErrorCondEnum>(t)))))
       : base(in_place_type<typename base::error_type>, make_error_code(t))
   {
+    hook_result_construction(in_place_type<error_type>, this);
   }
 
   /*! Explicit converting copy constructor from a compatible result type.
@@ -1156,6 +1197,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   constexpr explicit result(const result<T, U, V> &o, explicit_compatible_conversion_tag = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
       : base(typename base::compatible_conversion_tag(), o)
   {
+    hook_result_copy_construction(in_place_type<decltype(o)>, this);
   }
   /*! Implicit converting copy constructor from a compatible result type.
   \tparam enable_implicit_compatible_conversion
@@ -1177,6 +1219,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   constexpr result(const result<T, U, V> &o, implicit_compatible_conversion_tag = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<status_error_type, U>::value)
       : base(typename base::compatible_conversion_tag(), o)
   {
+    hook_result_copy_construction(in_place_type<decltype(o)>, this);
   }
   /*! Explicit converting move constructor from a compatible result type.
   \tparam enable_explicit_compatible_conversion
@@ -1200,6 +1243,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   constexpr explicit result(result<T, U, V> &&o, explicit_compatible_conversion_tag = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
       : base(typename base::compatible_conversion_tag(), std::move(o))
   {
+    hook_result_move_construction(in_place_type<decltype(o)>, this);
   }
   /*! Implicit converting move constructor from a compatible result type.
   \tparam enable_implicit_compatible_conversion
@@ -1221,6 +1265,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   constexpr result(result<T, U, V> &&o, implicit_compatible_conversion_tag = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<status_error_type, U>::value)
       : base(typename base::compatible_conversion_tag(), std::move(o))
   {
+    hook_result_move_construction(in_place_type<decltype(o)>, this);
   }
 
   /// \output_section In place constructors
@@ -1238,6 +1283,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   constexpr explicit result(in_place_type_t<value_type_if_enabled>, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
       : base(in_place_type<typename base::_value_type>, std::forward<Args>(args)...)
   {
+    hook_result_in_place_construction(in_place_type<value_type>, this);
   }
   /*! Inplace constructor to a successful result.
   \tparam 2
@@ -1254,6 +1300,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   constexpr explicit result(in_place_type_t<value_type_if_enabled>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
       : base(in_place_type<typename base::_value_type>, il, std::forward<Args>(args)...)
   {
+    hook_result_in_place_construction(in_place_type<value_type>, this);
   }
   /*! Inplace constructor to a failure result.
   \tparam 1
@@ -1269,6 +1316,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   constexpr explicit result(in_place_type_t<error_type_if_enabled>, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
       : base(in_place_type<typename base::_error_type>, std::forward<Args>(args)...)
   {
+    hook_result_in_place_construction(in_place_type<error_type>, this);
   }
   /*! Inplace constructor to a failure result.
   \tparam 2
@@ -1285,6 +1333,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   constexpr explicit result(in_place_type_t<error_type_if_enabled>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
       : base(in_place_type<typename base::_error_type>, il, std::forward<Args>(args)...)
   {
+    hook_result_in_place_construction(in_place_type<error_type>, this);
   }
 
   /// \output_section Converters

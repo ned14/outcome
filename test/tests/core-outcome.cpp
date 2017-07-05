@@ -232,14 +232,14 @@ BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended"
   }
 
   {
-    constexpr const char *niall = "niall";
+    // constexpr const char *niall = "niall";
     // error code + matching exception
     outcome<int> a(std::make_error_code(std::errc::not_enough_memory), std::make_exception_ptr(std::bad_alloc()));
     a.error();
     a.exception();
     // value + payload
-    outcome<int, std::error_code, const char *> b(5, niall);
-    b.error();
-    b.payload();
+    // outcome<int, std::error_code, const char *> b(5, niall);
+    // b.error();
+    // b.payload();
   }
 }
