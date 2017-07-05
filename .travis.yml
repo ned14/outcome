@@ -1,8 +1,8 @@
 dist: trusty
 language: cpp
 compiler:
- - g++
- - clang
+ - g++-6
+ - clang-4.0
 sudo: false
 os:
  - linux
@@ -21,11 +21,10 @@ addons:
     - ubuntu-toolchain-r-test
 #    - george-edison55-precise-backports
 #    - george-edison55-cmake-3.x
-    - llvm-toolchain-trusty
+    - llvm-toolchain-trusty-4.0
     packages:
     - g++-6
     - clang-4.0
-    - python3
     - cmake
     - cmake-data
     - python-pygments
@@ -39,7 +38,10 @@ env:
 matrix:
   exclude:
   - os: osx
-    compiler: g++
+    compiler: g++-6
+  - os: linux
+    compiler: clang-4.0
+    env: __="Documentation" NAME=TravisDocumentation
   - os: linux
     env: __="cmake tests osx" NAME=TravisOSXWorker
 #  - os: osx
@@ -80,8 +82,6 @@ before_install:
      ls -l hugo_bin;
      export PATH=$PATH:`pwd`/hugo_bin;
    fi
- - if [ "$CXX" = "g++" ]; then export CXX=g++-6; fi
- - pip install ply
 
 script:
  -
@@ -99,7 +99,7 @@ script:
    fi
  -
    if [ "$__" = "cmake tests osx" ]; then
-     ctest -S .ci.cmake -V -E noexcept -E error_code_extended;
+     CXX=clang ctest -S .ci.cmake -V -E noexcept -E error_code_extended;
    fi
  -
    if [ "$__" = "Documentation" ]; then
