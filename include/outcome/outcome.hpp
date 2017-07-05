@@ -851,6 +851,7 @@ namespace policy
     */
     template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
     {
+      (void) self;
 #if defined(__GNUC__) || defined(__clang__)
       if((self->_state._status & detail::status_have_value) == 0)
         __builtin_unreachable();
@@ -861,6 +862,7 @@ namespace policy
     */
     template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
     {
+      (void) self;
 #if defined(__GNUC__) || defined(__clang__)
       if((self->_state._status & detail::status_have_error) == 0)
         __builtin_unreachable();
@@ -872,6 +874,7 @@ namespace policy
 */
     template <class Impl> static constexpr void narrow_status_check(Impl *self) noexcept
     {
+      (void) self;
 #if defined(__GNUC__) || defined(__clang__)
       if((self->_state._status & detail::status_have_status) == 0)
         __builtin_unreachable();
@@ -883,6 +886,7 @@ namespace policy
     */
     template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
     {
+      (void) self;
 #if defined(__GNUC__) || defined(__clang__)
       if((self->_state._status & detail::status_have_payload) == 0)
         __builtin_unreachable();
@@ -893,6 +897,7 @@ namespace policy
     */
     template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
     {
+      (void) self;
 #if defined(__GNUC__) || defined(__clang__)
       if((self->_state._status & detail::status_have_exception) == 0)
         __builtin_unreachable();

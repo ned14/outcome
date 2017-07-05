@@ -24,18 +24,17 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 
-BOOST_AUTO_TEST_CASE(works / monad / containers, "Tests that the monad works as intended inside containers")
+BOOST_AUTO_TEST_CASE(works / outcome / containers, "Tests that outcome works as intended inside containers")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  using namespace OUTCOME_V2_NAMESPACE;
   std::vector<outcome<std::vector<int>>> vect;
   vect.push_back(std::vector<int>{5, 6, 7, 8});
   vect.push_back(std::vector<int>{1, 2, 3, 4});
   BOOST_REQUIRE(vect.size() == 2U);
-  BOOST_CHECK(vect[0].get().size() == 4U);
-  BOOST_CHECK(vect[1].get().size() == 4U);
-  BOOST_CHECK(vect[0].get().front() == 5);
-  BOOST_CHECK(vect[0].get().back() == 8);
-  BOOST_CHECK(vect[1].get().front() == 1);
-  BOOST_CHECK(vect[1].get().back() == 4);
+  BOOST_CHECK(vect[0].assume_value().size() == 4U);
+  BOOST_CHECK(vect[1].assume_value().size() == 4U);
+  BOOST_CHECK(vect[0].assume_value().front() == 5);
+  BOOST_CHECK(vect[0].assume_value().back() == 8);
+  BOOST_CHECK(vect[1].assume_value().front() == 1);
+  BOOST_CHECK(vect[1].assume_value().back() == 4);
 }
-
