@@ -27,8 +27,6 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "outcome.hpp"
 
-OUTCOME_V2_NAMESPACE_BEGIN
-
 #define OUTCOME_TRY_GLUE2(x, y) x##y
 #define OUTCOME_TRY_GLUE(x, y) OUTCOME_TRY_GLUE2(x, y)
 #define OUTCOME_TRY_UNIQUE_NAME OUTCOME_TRY_GLUE(__t, __COUNTER__)
@@ -71,8 +69,5 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 failure by immediately returning that failure immediately, else set *v( to the unwrapped value
 */
 #define OUTCOME_TRY(v, m) OUTCOME_TRY2(OUTCOME_TRY_UNIQUE_NAME, v, m)
-
-
-OUTCOME_V2_NAMESPACE_END
 
 #endif

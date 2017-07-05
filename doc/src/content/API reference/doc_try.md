@@ -20,11 +20,7 @@ slug = "doc_try.md"
 
 #define <a href='doc_try.md#OUTCOME_TRYX'>OUTCOME_TRYX</a>(m)
 
-#define <a href='doc_try.md#OUTCOME_TRY'>OUTCOME_TRY</a>(v, m)
-
-namespace <a href='doc_try.md#try.hpp'>outcome_v2_156a3156</a>
-{
-}</code></pre>
+#define <a href='doc_try.md#OUTCOME_TRY'>OUTCOME_TRY</a>(v, m)</code></pre>
 
 ## Macro `OUTCOME_TRYV`<a id="OUTCOME_TRYV"></a>
 
