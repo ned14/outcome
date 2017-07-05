@@ -21,30 +21,32 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "../../include/outcome/outcome.hpp"
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 
 #ifdef __cpp_exceptions
 
 #ifdef _MSC_VER
-#define BOOST_OUTCOME_POSIX_OPEN ::_open
+#define OUTCOME_POSIX_OPEN ::_open
 #include <io.h>
 #else
-#define BOOST_OUTCOME_POSIX_OPEN ::open
+#define OUTCOME_POSIX_OPEN ::open
 #include <fcntl.h>
 #endif
 
-BOOST_AUTO_TEST_CASE(works / monad / fileopen, "Tests that the monad semantically represents opening a file")
+BOOST_AUTO_TEST_CASE(works / outcome / fileopen, "Tests that the outcome semantically represents opening a file")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  using namespace OUTCOME_V2_NAMESPACE;
 
-  //! [monad_example]
+  //! [file_open_example]
   auto openfile = [](std::string path) noexcept->outcome<int>
   {
     int fd;
     do
     {
-      fd = BOOST_OUTCOME_POSIX_OPEN(path.c_str(), 0);
+      fd = OUTCOME_POSIX_OPEN(path.c_str(), 0);
     } while(-1 == fd && EINTR == errno);
     try
     {
@@ -54,10 +56,10 @@ BOOST_AUTO_TEST_CASE(works / monad / fileopen, "Tests that the monad semanticall
         // If a temporary failure, this is an expected unexpected outcome
         if(EBUSY == code || EISDIR == code || ELOOP == code || ENOENT == code || ENOTDIR == code || EPERM == code || EACCES == code)
         {
-          return error_code_extended(code, stl11::generic_category());
+          return std::error_code(code, std::generic_category());
         }
         // If a non-temporary failure, this is an unexpected outcome
-        return std::make_exception_ptr(stl11::system_error(code, stl11::generic_category(), strerror(code)));
+        return std::make_exception_ptr(std::system_error(code, std::generic_category(), strerror(code)));
       }
       return fd;
     }
@@ -69,12 +71,10 @@ BOOST_AUTO_TEST_CASE(works / monad / fileopen, "Tests that the monad semanticall
   };
   auto a = openfile("shouldneverexistnotever");
   BOOST_CHECK(!a);
-  BOOST_CHECK(!a.empty());
   BOOST_CHECK(!a.has_value());
   BOOST_CHECK(a.has_exception());
   BOOST_CHECK(a.has_error());
-  BOOST_CHECK(a.get_error() == error_code_extended(ENOENT, stl11::generic_category()));
-  //! [monad_example]
+  BOOST_CHECK(a.error() == std::error_code(ENOENT, std::generic_category()));
+  //! [file_open_example]
 }
 #endif
-

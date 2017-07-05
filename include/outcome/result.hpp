@@ -399,9 +399,10 @@ namespace impl
     }
     template <class U, class V>
     constexpr result_storage(compatible_conversion_tag, const result_storage<void, U, V> &o) noexcept(std::is_nothrow_constructible<_error_type, U>::value)
-        : _state(_value_type())
+        : _state(/* no value type */)
         , _error(o._error)
     {
+      _state._status = o._state._status & ~detail::status_have_value;
     }
     template <class T, class V>
     constexpr result_storage(compatible_conversion_tag, const result_storage<T, void, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
@@ -417,9 +418,10 @@ namespace impl
     }
     template <class U, class V>
     constexpr result_storage(compatible_conversion_tag, result_storage<void, U, V> &&o) noexcept(std::is_nothrow_constructible<_error_type, U>::value)
-        : _state(_value_type())
+        : _state(/* no value type */)
         , _error(std::move(o._error))
     {
+      _state._status = o._state._status & ~detail::status_have_value;
     }
     template <class T, class V>
     constexpr result_storage(compatible_conversion_tag, result_storage<T, void, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
@@ -1217,6 +1219,12 @@ class OUTCOME_NODISCARD result : public impl::result_final<R, S, NoValuePolicy>
   struct value_status_converting_constructor_tag
   {
   };
+  struct explicit_compatible_conversion_tag
+  {
+  };
+  struct implicit_compatible_conversion_tag
+  {
+  };
 
 public:
   /// \output_section Member types
@@ -1238,6 +1246,9 @@ public:
   using value_type_if_enabled = typename base::_value_type;
   //! Used to disable in place type construction when `value_type` and `error_type` are ambiguous.
   using error_type_if_enabled = typename base::_error_type;
+
+  //! Used to rebind this result to a different result type
+  template <class T, class U = S> using rebind = result<T, U>;
 
   /// \output_section Default, copy/move constructors and assignment
   //! Default construction is not permitted.
@@ -1340,45 +1351,91 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   {
   }
 
-  /*! Converting copy constructor from a compatible result type.
-  \tparam enable_compatible_conversion
+  /*! Explicit converting copy constructor from a compatible result type.
+  \tparam enable_explicit_compatible_conversion
   \exclude
   \param o The compatible result.
 
   \effects Initialises the result with a copy of the compatible result.
-  \requires Both result's `value_type`, `error_type` and `status_type` need to be constructible, or the source `void`.
+  \requires Both result's `value_type`, `error_type` and `status_type` need to be constructible, or the source `status_error_type` can be `void`.
+  The source `value_type` cannot be `void`.
   \throws Any exception the construction of `value_type(T)` and `status_error_type(U)` might throw.
   */
-  template <class T, class U, class V, typename enable_compatible_conversion = std::enable_if_t<                                                          //
-                                       !std::is_same<result<T, U, V>, result>::value                                                                      // not my type
-                                       && (std::is_void<T>::value || detail::is_same_or_constructible<value_type, typename result<T, U, V>::value_type>)  // if our value types are constructible
-                                       &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>)   // if our error types are constructible
+  template <class T, class U, class V, typename enable_explicit_compatible_conversion = std::enable_if_t<                                                //
+                                       !std::is_same<result<T, U, V>, result>::value                                                                     // not my type
+                                       && !std::is_void<T>::value                                                                                        // other value type must not be void
+                                       && (detail::is_same_or_constructible<value_type, typename result<T, U, V>::value_type>)                           // if our value types are constructible
+                                       &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>)  // if our error types are constructible
 #if OUTCOME_ENABLE_POSITIVE_STATUS
                                        &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename result<T, U, V>::status_type>)  // if our status types are constructible
 #endif
                                        >>
-  constexpr explicit result(const result<T, U, V> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
+  constexpr explicit result(const result<T, U, V> &o, explicit_compatible_conversion_tag = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
       : base(typename base::compatible_conversion_tag(), o)
   {
   }
-  /*! Converting move constructor from a compatible result type.
-  \tparam enable_compatible_conversion
+  /*! Implicit converting copy constructor from a compatible result type.
+  \tparam enable_implicit_compatible_conversion
+  \exclude
+  \param o The compatible result.
+
+  \effects Initialises the result with a copy of the compatible result.
+  \requires Both result's `error_type` and `status_type` need to be constructible, and the source `value_type` must be `void`.
+  \throws Any exception the construction of `status_error_type(U)` might throw.
+  */
+  template <class T, class U, class V, typename enable_implicit_compatible_conversion = std::enable_if_t<                                                 //
+                                       !std::is_same<result<T, U, V>, result>::value                                                                      // not my type
+                                       && std::is_void<T>::value                                                                                          // other value type must be void
+                                       && (std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>)  // if our error types are constructible
+#if OUTCOME_ENABLE_POSITIVE_STATUS
+                                       &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename result<T, U, V>::status_type>)  // if our status types are constructible
+#endif
+                                       >>
+  constexpr result(const result<T, U, V> &o, implicit_compatible_conversion_tag = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<status_error_type, U>::value)
+      : base(typename base::compatible_conversion_tag(), o)
+  {
+  }
+  /*! Explicit converting move constructor from a compatible result type.
+  \tparam enable_explicit_compatible_conversion
   \exclude
   \param o The compatible result.
 
   \effects Initialises the result with a move of the compatible result.
-  \requires Both result's `value_type`, `error_type` and `status_type` need to be constructible, or the source `void`.
+  \requires Both result's `value_type`, `error_type` and `status_type` need to be constructible, or the source `status_error_type` can be `void`.
+  The source `value_type` cannot be `void`.
   \throws Any exception the construction of `value_type(T)` and `status_error_type(U)` might throw.
   */
-  template <class T, class U, class V, typename enable_compatible_conversion = std::enable_if_t<                                                          //
-                                       !std::is_same<result<T, U, V>, result>::value                                                                      // not my type
-                                       && (std::is_void<T>::value || detail::is_same_or_constructible<value_type, typename result<T, U, V>::value_type>)  // if our value types are constructible
-                                       &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>)   // if our error types are constructible
+  template <class T, class U, class V, typename enable_explicit_compatible_conversion = std::enable_if_t<                                                //
+                                       !std::is_same<result<T, U, V>, result>::value                                                                     // not my type
+                                       && !std::is_void<T>::value                                                                                        // other value type must not be void
+                                       && (detail::is_same_or_constructible<value_type, typename result<T, U, V>::value_type>)                           // if our value types are constructible
+                                       &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>)  // if our error types are constructible
 #if OUTCOME_ENABLE_POSITIVE_STATUS
                                        &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename result<T, U, V>::status_type>)  // if our status types are constructible
 #endif
                                        >>
-  constexpr explicit result(result<T, U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
+  constexpr explicit result(result<T, U, V> &&o, explicit_compatible_conversion_tag = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
+      : base(typename base::compatible_conversion_tag(), std::move(o))
+  {
+  }
+  /*! Implicit converting move constructor from a compatible result type.
+  \tparam enable_implicit_compatible_conversion
+  \exclude
+  \param o The compatible result.
+
+  \effects Initialises the result with a move of the compatible result.
+  \requires Both result's `error_type` and `status_type` need to be constructible, and the source `value_type` must be `void`.
+  \throws Any exception the construction of `status_error_type(U)` might throw.
+  */
+  template <class T, class U, class V, typename enable_explicit_compatible_conversion = std::enable_if_t<                                                 //
+                                       !std::is_same<result<T, U, V>, result>::value                                                                      // not my type
+                                       && std::is_void<T>::value                                                                                          // other value type must be void
+                                       && (std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>)  // if our error types are constructible
+#if OUTCOME_ENABLE_POSITIVE_STATUS
+                                       &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename result<T, U, V>::status_type>)  // if our status types are constructible
+#endif
+                                       >>
+  constexpr result(result<T, U, V> &&o, implicit_compatible_conversion_tag = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<status_error_type, U>::value)
       : base(typename base::compatible_conversion_tag(), std::move(o))
   {
   }
@@ -1446,6 +1503,16 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
       : base(in_place_type<typename base::_error_type>, il, std::forward<Args>(args)...)
   {
   }
+
+  /// \output_section Converters
+  /*! Returns this result rebound to void with any errored state copied.
+  \requires This result to have a failed state, else whatever `assume_error()` would do.
+  */
+  rebind<void> as_void() const & { return rebind<void>(in_place_type<error_type>, this->assume_error()); }
+  /*! Returns this result rebound to void with any errored state moved.
+  \requires This result to have a failed state, else whatever `assume_error()` would do.
+  */
+  rebind<void> as_void() && { return rebind<void>(in_place_type<error_type>, std::move(this->assume_error())); }
 };
 
 OUTCOME_V2_NAMESPACE_END

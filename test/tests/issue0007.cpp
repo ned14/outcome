@@ -21,12 +21,13 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../include/outcome/outcome.hpp"
+#include "../../include/outcome/result.hpp"
+#include "../../include/outcome/try.hpp"
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 
-BOOST_AUTO_TEST_CASE(issues / 7, "BOOST_OUTCOME_TRYV(expr) in a function whose return monad's type has no default constructor fails to compile")
+BOOST_AUTO_TEST_CASE(issues / 7, "OUTCOME_TRYV(expr) in a function whose return outcome's type has no default constructor fails to compile")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  using namespace OUTCOME_V2_NAMESPACE;
   struct udt  // NOLINT
   {
     explicit udt(int /*unused*/) {}
@@ -34,15 +35,40 @@ BOOST_AUTO_TEST_CASE(issues / 7, "BOOST_OUTCOME_TRYV(expr) in a function whose r
     udt(const udt &) = default;
     udt(udt &&) = default;
   };
-  auto f = []() -> result<udt> {
-    auto g = [] { return result<int>(5); };
-    /* This fails because BOOST_OUTCOME_TRYV() returns a result<void>
-    which if it were valued void, would implicitly convert into a
-    default constructed udt which is not possible, hence the compile error.
-    */
-    BOOST_OUTCOME_TRYV(g());
-    return udt(5);
-  };
-  (void) f();
+  {
+    auto f = []() -> result<udt> {
+      auto g = [] { return result<int>(5); };
+      /* This fails because BOOST_OUTCOME_TRYV() returns a result<void>
+      which if it were valued void, would implicitly convert into a
+      default constructed udt which is not possible, hence the compile error.
+      */
+      OUTCOME_TRYV(g());
+      return udt(5);
+    };
+    (void) f();
+  }
+  {
+    auto f = []() -> outcome<udt> {
+      auto g = [] { return outcome<int>(5); };
+      /* This fails because BOOST_OUTCOME_TRYV() returns a result<void>
+      which if it were valued void, would implicitly convert into a
+      default constructed udt which is not possible, hence the compile error.
+      */
+      OUTCOME_TRYV(g());
+      return udt(5);
+    };
+    (void) f();
+  }
+  {
+    auto f = []() -> outcome<udt> {
+      auto g = [] { return result<int>(5); };
+      /* This fails because BOOST_OUTCOME_TRYV() returns a result<void>
+      which if it were valued void, would implicitly convert into a
+      default constructed udt which is not possible, hence the compile error.
+      */
+      OUTCOME_TRYV(g());
+      return udt(5);
+    };
+    (void) f();
+  }
 }
-
