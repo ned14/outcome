@@ -30,6 +30,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include "../quickcpplib/include/execinfo_win64.h"
 #endif
 
+//! [error_code_extended]
 /* Outcome's hook mechanism works vis ADL, so we will need a custom namespace
 */
 namespace error_code_extended
@@ -39,7 +40,7 @@ namespace error_code_extended
   struct extended_error_info
   {
     std::string detail;
-    std::vector<void *> backtrace;
+    std::vector<void *> backtrace{64};
   };
   // Use thread local storage to convey a stacktrace from result construction to outcome conversion
   static thread_local std::vector<extended_error_info> extended_error_info_stack;
@@ -74,12 +75,14 @@ namespace error_code_extended
         char **symbols = ::backtrace_symbols(eei.backtrace.data(), eei.backtrace.size());
         for(size_t n = 0; n < eei.backtrace.size(); n++)
         {
-          if(n)
+          if(n > 0)
+          {
             str.append("; ");
-          str.append(symbols[n]);
+          }
+          str.append(symbols[n]);  // NOLINT
         }
         str.append("]");
-        this->_ptr = std::make_exception_ptr(std::runtime_error(std::move(str)));
+        this->_ptr = std::make_exception_ptr(std::runtime_error(str));
         this->_state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_exception;
       }
     };
@@ -88,22 +91,22 @@ namespace error_code_extended
   // Specialise the result construction hook for our localised result
   // We hook any non-copy, non-move, non-inplace construction, capturing a stack backtrace
   // if the result is errored.
-  template <class T, class R> constexpr inline void hook_result_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<T>, result<R> *res) noexcept
+  template <class T, class R> inline void hook_result_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<T>, result<R> *res) noexcept
   {
     if(res->has_error())
     {
-      extended_error_info eei{"this is a custom message", 64};
+      extended_error_info eei{"this is a custom message"};
       eei.backtrace.resize(::backtrace(eei.backtrace.data(), eei.backtrace.size()));
       extended_error_info_stack.push_back(std::move(eei));
     }
   }
   // Specialise the outcome copy and move conversion hook for our localised result
-  template <class T, class R> constexpr inline void hook_outcome_copy_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<const result<T> &>, outcome<R> *res) noexcept
+  template <class T, class R> inline void hook_outcome_copy_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<const result<T> &>, outcome<R> *res) noexcept
   {
     // when copy constructing from a result<T>, poke in an exception
     static_cast<detail::outcome_payload_poker<R> *>(res)->_poke_exception();
   }
-  template <class T, class R> constexpr inline void hook_outcome_move_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<result<T> &&>, outcome<R> *res) noexcept
+  template <class T, class R> inline void hook_outcome_move_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<result<T> &&>, outcome<R> *res) noexcept
   {
     // when move constructing from a result<T>, poke in an exception
     static_cast<detail::outcome_payload_poker<R> *>(res)->_poke_exception();
@@ -113,12 +116,15 @@ namespace error_code_extended
 extern error_code_extended::result<int> func2()
 {
   using namespace error_code_extended;
-  return result<int>(std::errc::operation_not_permitted);
+  // At here the stack backtrace is collected and custom message stored in TLS
+  return {std::errc::operation_not_permitted};
 }
 
 extern error_code_extended::outcome<int> func1()
 {
-  return func2();
+  using namespace error_code_extended;
+  // At here the custom message and backtrace is assembled into a custom exception_ptr
+  return outcome<int>(func2());
 }
 
 int main()
@@ -148,3 +154,4 @@ int main()
   }
   return 1;
 }
+//! [error_code_extended]

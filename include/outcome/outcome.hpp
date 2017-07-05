@@ -493,14 +493,14 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \effects Initialises the outcome with a `error_type` and a `payload_exception_type`.
   \requires `trait::status_type_is_negative<EC>` must be true; Type T is constructible to `error_type`,
   is not constructible to `value_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
-  Type `U` is constructible to `payload_exception_type`, is not constructible to `status_error_type`.
+  Type `U` is constructible to `payload_exception_type`, is not constructible to `value_type`.
   \throws Any exception the construction of `error_type(T)` and `payload_exception_type(U)` might throw.
   */
   template <class T, class U, typename enable_error_payload_converting_constructor = std::enable_if_t<                            //
                               !std::is_same<std::decay_t<T>, outcome>::value                                                      // not my type
                               && !detail::is_in_place_type_t<std::decay_t<T>>::value                                              // not in place construction
                               && !std::is_constructible<value_type, T>::value && detail::is_same_or_constructible<error_type, T>  //
-                              && detail::is_same_or_constructible<payload_exception_type, U> && !std::is_constructible<status_error_type, U>::value>>
+                              && detail::is_same_or_constructible<payload_exception_type, U> && !std::is_constructible<value_type, U>::value>>
   constexpr outcome(T &&t, U &&u, error_payload_converting_constructor_tag = error_payload_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<payload_exception_type, U>::value)
       : base(in_place_type<typename base::error_type>, std::forward<T>(t))
       , _ptr(std::forward<U>(u))
