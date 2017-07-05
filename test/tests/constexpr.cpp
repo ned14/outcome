@@ -24,59 +24,69 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 
-#if __cpp_constexpr >= 201304
-// Test the underlying storage for constexpr
-static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::value_storage<int, void, void> test_constexpr2a(int f)
+BOOST_AUTO_TEST_CASE(works / outcome / constexpr, "Tests that outcome works as intended in a constexpr evaluation context")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  return value_storage<int, void, void>(f);  // NOLINT
-}
-// Test the underlying storage for constexpr
-static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::value_storage<void, void, void> test_constexpr2b()
-{
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  return value_storage<void, void, void>();  // NOLINT
-}
-// Test option<int> for constexpr
-static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::option<int> test_constexpr3a(int f)
-{
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  return make_valued_option<int>(f);
-}
-// Test option<bool> for constexpr
-static constexpr inline BOOST_OUTCOME_V1_NAMESPACE::option<bool> test_constexpr3b()
-{
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  return make_empty_option<bool>();
-}
+  using namespace OUTCOME_V2_NAMESPACE;
 
-BOOST_AUTO_TEST_CASE(works / monad / constexpr, "Tests that the monad works as intended in a constexpr evaluation context")
-{
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  using namespace QUICKCPPLIB_NAMESPACE::tribool;
+  static_assert(std::is_literal_type<result<int, void, void>>::value, "result<int, void, void> is not a literal type!");
+  static_assert(std::is_literal_type<outcome<int, void, void>>::value, "outcome<int, void, void> is not a literal type!");
 
-  static_assert(std::is_literal_type<value_storage<int, void, void>>::value, "value_storage<int, void, void> is not a literal type!");
-  static_assert(std::is_literal_type<value_storage<void, void, void>>::value, "value_storage<void, void, void> is not a literal type!");
-  static_assert(std::is_literal_type<option<int>>::value, "option<int> is not a literal type!");
-  static_assert(std::is_literal_type<option<bool>>::value, "option<bool> is not a literal type!");
   // Unfortunately result<T> can never be a literal type as error_code can never be literal
   //
   // It can however be trivially destructible as error_code is trivially destructible. That
   // makes possible lots of compiler optimisations
   static_assert(!std::is_literal_type<result<int>>::value, "result<int> is a literal type!");
-  static_assert(result<int>::is_trivially_destructible, "result<int> is not trivially destructible!");
   static_assert(std::is_trivially_destructible<result<int>>::value, "result<int> is not trivially destructible!");
-  static_assert(result<void>::is_trivially_destructible, "result<void> is not trivially destructible!");
   static_assert(std::is_trivially_destructible<result<void>>::value, "result<void> is not trivially destructible!");
 
-  constexpr auto c = test_constexpr2a(5);
-  constexpr auto d = test_constexpr2b();
-  constexpr auto e = test_constexpr3a(5);
-  constexpr auto f = test_constexpr3b();
-  (void) c;
-  (void) d;
-  (void) e;
-  (void) f;
-}
-#endif
+  // outcome<T> default has no trivial operations, but if configured it can become so
+  static_assert(std::is_trivially_destructible<outcome<int, std::error_code, void>>::value, "outcome<int, std::error_code, void> is not trivially destructible!");
 
+  {
+    // Test compatible results can be constructed from one another
+    constexpr result<int, long> g(in_place_type<int>, 5);
+    constexpr result<long, int> g2(g);
+    static_assert(g.has_value(), "");
+    static_assert(!g.has_error(), "");
+    static_assert(g.value() == 5, "");
+    static_assert(g2.has_value(), "");
+    static_assert(!g2.has_error(), "");
+    static_assert(g2.value() == 5, "");
+    constexpr result<void, int> g3(in_place_type<void>);
+    constexpr result<long, int> g4(g3);
+    constexpr result<int, void> g5(in_place_type<void>);
+    constexpr result<long, int> g6(g5);
+
+    // Test void
+    constexpr result<void, int> h(in_place_type<void>);
+    static_assert(h.has_value(), "");
+#if OUTCOME_ENABLE_POSITIVE_STATUS
+    static_assert(!h.has_status(), "");
+#endif
+    constexpr result<int, void> h2(in_place_type<void>);
+    static_assert(!h2.has_value(), "");
+    static_assert(h2.has_error(), "");
+
+    // Test const
+    constexpr result<const int, void> i(5);
+    constexpr result<const int, void> i2(i);
+    (void) i2;
+  }
+  {
+    // Test compatible outcomes can be constructed from one another
+    constexpr outcome<int, long, char *> g(in_place_type<int>, 5);
+    constexpr outcome<long, int, const char *> g2(g);
+    static_assert(g.has_value(), "");
+    static_assert(!g.has_error(), "");
+    static_assert(!g.has_payload(), "");
+    static_assert(g.value() == 5, "");
+    static_assert(g2.has_value(), "");
+    static_assert(!g2.has_error(), "");
+    static_assert(!g2.has_payload(), "");
+    static_assert(g2.value() == 5, "");
+    constexpr outcome<void, int, char *> g3(in_place_type<void>);
+    constexpr outcome<long, int, const char *> g4(g3);
+    constexpr outcome<int, void, char *> g5(in_place_type<void>);
+    constexpr outcome<long, int, const char *> g6(g5);
+  }
+}

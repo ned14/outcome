@@ -35,7 +35,7 @@ int main() {
 if (auto rslt = read_int_from_file("config.cfg"))
   use_int(rslt.value());
 else
-  report_error(rslt.error()); // returns error_code_extended
+  report_error(rslt.error()); // returns std::error_code
 //! [inspect]
 }
 
