@@ -4,5 +4,6 @@ set(outcome_HEADERS
   "include/outcome/outcome.hpp"
   "include/outcome/result.hpp"
   "include/outcome/revision.hpp"
+  "include/outcome/try.hpp"
   "include/outcome/version.hpp"
 )
