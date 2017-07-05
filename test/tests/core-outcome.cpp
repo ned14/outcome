@@ -191,4 +191,55 @@ BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended"
     BOOST_CHECK(m.has_error());
     BOOST_CHECK(m.has_payload());
   }
+
+
+  {
+    outcome<int> a(5);
+    outcome<int> b(std::make_error_code(std::errc::invalid_argument));
+    std::cout << sizeof(a) << std::endl;  // 40 bytes
+    b.assume_value();
+    a.assume_error();
+    try
+    {
+      b.value();
+      std::cerr << "fail" << std::endl;
+      std::terminate();
+    }
+    catch(const std::system_error &e)
+    {
+    }
+    static_assert(!std::is_default_constructible<decltype(a)>::value, "");
+    static_assert(!std::is_nothrow_default_constructible<decltype(a)>::value, "");
+    static_assert(std::is_copy_constructible<decltype(a)>::value, "");
+    static_assert(!std::is_trivially_copy_constructible<decltype(a)>::value, "");
+    static_assert(std::is_nothrow_copy_constructible<decltype(a)>::value, "");
+    static_assert(std::is_copy_assignable<decltype(a)>::value, "");
+    static_assert(!std::is_trivially_copy_assignable<decltype(a)>::value, "");
+    static_assert(std::is_nothrow_copy_assignable<decltype(a)>::value, "");
+    static_assert(!std::is_trivially_destructible<decltype(a)>::value, "");
+    static_assert(std::is_nothrow_destructible<decltype(a)>::value, "");
+
+    // Test void compiles
+    outcome<void> c(in_place_type<void>);
+    outcome<void> c2(c);
+    (void) c2;
+    // Test int, void compiles
+    outcome<int, void> d(in_place_type<std::exception_ptr>);
+#if OUTCOME_ENABLE_POSITIVE_STATUS
+    // Test void, status, void compiles
+    constexpr outcome<int, std::errc, void> e(5, std::errc::bad_message);
+#endif
+  }
+
+  {
+    constexpr const char *niall = "niall";
+    // error code + matching exception
+    outcome<int> a(std::make_error_code(std::errc::not_enough_memory), std::make_exception_ptr(std::bad_alloc()));
+    a.error();
+    a.exception();
+    // value + payload
+    outcome<int, std::error_code, const char *> b(5, niall);
+    b.error();
+    b.payload();
+  }
 }
