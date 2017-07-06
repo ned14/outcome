@@ -72,7 +72,8 @@ namespace detail
   static constexpr status_bitfield_type status_have_status = (1 << 2);
   static constexpr status_bitfield_type status_have_payload = (1 << 3);
   static constexpr status_bitfield_type status_have_exception = (1 << 4);
-  static constexpr status_bitfield_type status_result_last = (1 << 5);
+  static constexpr status_bitfield_type status_2byte_shift = 16;
+  static constexpr status_bitfield_type status_2byte_mask = (0xffff << status_2byte_shift);
 
   // Used if T is trivial
   template <class T> struct value_storage_trivial
