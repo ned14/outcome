@@ -40,14 +40,46 @@ namespace error_code_extended
   struct extended_error_info
   {
     std::string detail;
-    std::vector<void *> backtrace{64};
+    std::vector<void *> backtrace;
   };
-  // Use thread local storage to convey a stacktrace from result construction to outcome conversion
-  static thread_local std::vector<extended_error_info> extended_error_info_stack;
+  struct mythreadlocaldata_t
+  {
+    // Keep 16 slots of extended error info
+    extended_error_info slots[16];
+    uint16_t current{0};
+    extended_error_info &next()
+    {
+      return slots[(current++) % 16];  // NOLINT
+    }
+    extended_error_info *get(uint16_t idx)
+    {
+      // If the idx is stale, return not found
+      if(idx - current >= 16)
+      {
+        return nullptr;
+      }
+      return slots + (idx % 16);  // NOLINT
+    }
+  };
+  inline mythreadlocaldata_t &mythreadlocaldata()
+  {
+    // Use thread local storage to keep my out of band data. Note C++ 11 thread_local still isn't
+    // working on OS X on Travis, else we'd use that, this leaks memory.
+    static OUTCOME_THREAD_LOCAL mythreadlocaldata_t *v;
+    if(v == nullptr)
+    {
+      v = new mythreadlocaldata_t;
+    }
+    return *v;
+  }
 
   // Use the error_code type as the ADL bridge for the hooks by creating a type here
+  // It can be any type that your localised result uses, including the value type but
+  // by localising the error code type here you prevent nasty surprises later when the
+  // value type you use doesn't trigger the ADL bridge.
   struct error_code : public std::error_code
   {
+    // literally passthrough
     using std::error_code::error_code;
     error_code() = default;
     error_code(std::error_code ec)  // NOLINT
@@ -63,27 +95,37 @@ namespace error_code_extended
   namespace detail
   {
     // Use inheritance to gain access to state
+    template <class R> struct result_byte_poker : public result<R>
+    {
+      void _set_extended_error_info_index(uint16_t v) noexcept { this->_state._status |= (v << OUTCOME_V2_NAMESPACE::detail::status_2byte_shift); }
+    };
     template <class R> struct outcome_payload_poker : public outcome<R>
     {
+      uint16_t _extended_error_info_index() const noexcept { return (this->_state._status >> OUTCOME_V2_NAMESPACE::detail::status_2byte_shift) & 0xffff; }
       void _poke_exception()
       {
-        extended_error_info eei(std::move(extended_error_info_stack.back()));
-        extended_error_info_stack.pop_back();
-        // Make a custom string for the exception
-        std::string str(std::move(eei.detail));
-        str.append(" [");
-        char **symbols = ::backtrace_symbols(eei.backtrace.data(), eei.backtrace.size());
-        for(size_t n = 0; n < eei.backtrace.size(); n++)
+        if(this->has_error())
         {
-          if(n > 0)
+          extended_error_info *eei = mythreadlocaldata().get(_extended_error_info_index());
+          if(eei != nullptr)
           {
-            str.append("; ");
+            // Make a custom string for the exception
+            std::string str(std::move(eei->detail));
+            str.append(" [");
+            char **symbols = ::backtrace_symbols(eei->backtrace.data(), eei->backtrace.size());
+            for(size_t n = 0; n < eei->backtrace.size(); n++)
+            {
+              if(n > 0)
+              {
+                str.append("; ");
+              }
+              str.append(symbols[n]);  // NOLINT
+            }
+            str.append("]");
+            this->_ptr = std::make_exception_ptr(std::runtime_error(str));
+            this->_state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_exception;
           }
-          str.append(symbols[n]);  // NOLINT
         }
-        str.append("]");
-        this->_ptr = std::make_exception_ptr(std::runtime_error(str));
-        this->_state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_exception;
       }
     };
   }  // namespace detail
@@ -95,9 +137,13 @@ namespace error_code_extended
   {
     if(res->has_error())
     {
-      extended_error_info eei{"this is a custom message"};
+      // Grab the next extended info slot in the TLS
+      extended_error_info &eei = mythreadlocaldata().next();
+      // Write the index just grabbed into the spare uint16_t
+      static_cast<detail::result_byte_poker<R> *>(res)->_set_extended_error_info_index(mythreadlocaldata().current - 1);
+      eei.detail = "this is a custom message";
+      eei.backtrace.resize(64);
       eei.backtrace.resize(::backtrace(eei.backtrace.data(), eei.backtrace.size()));
-      extended_error_info_stack.push_back(std::move(eei));
     }
   }
   // Specialise the outcome copy and move conversion hook for our localised result

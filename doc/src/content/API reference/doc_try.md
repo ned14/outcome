@@ -22,8 +22,10 @@ slug = "doc_try.md"
 
 #define <a href='doc_try.md#OUTCOME_TRY'>OUTCOME_TRY</a>(v, m)
 
-namespace <a href='doc_try.md#try.hpp'>outcome_v2_156a3156</a>
+namespace <a href='doc_try.md#try.hpp'>outcome_v2_6f6309a5</a>
 {
+    template &lt;class T&gt;
+    typename T::template rebind&lt;void&gt; <a href='doc_try.md#outcome_v2_6f6309a5::try_operation_return_as(T&&)'>try_operation_return_as</a>(T&amp;&amp; v);
 }</code></pre>
 
 ## Macro `OUTCOME_TRYV`<a id="OUTCOME_TRYV"></a>
@@ -46,3 +48,15 @@ portable. The macro is not made available on unsupported compilers, so you can t
 
 If the outcome returned by expression *m* is not valued, propagate any failure by immediately returning that failure immediately, else set \*v( to the unwrapped value
 
+## Function template `outcome_v2_6f6309a5::try_operation_return_as`<a id="outcome_v2_6f6309a5::try_operation_return_as(T&&)"></a>
+
+<pre><code class="language-cpp">template &lt;class T&gt;
+typename T::template rebind&lt;void&gt; try_operation_return_as(T&amp;&amp; v);</code></pre>
+
+Customisation point for changing what the `OUTCOME_TRY` macros do. This function defaults to returning `std::move(v).as_void()`.
+
+*Effects*: Extracts any state apart from value into a `void` rebound equivalent.
+
+*Requires*: The input value to have a `.as_void()` member function.
+
+-----

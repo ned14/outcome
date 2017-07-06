@@ -21,7 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../include/outcome/result.hpp"
+#include "../../include/outcome/outcome.hpp"
 #include "../../include/outcome/try.hpp"
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 

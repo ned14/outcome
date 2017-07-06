@@ -27,14 +27,25 @@ Distributed under the Boost Software License, Version 1.0.
 BOOST_AUTO_TEST_CASE(works / outcome / containers, "Tests that outcome works as intended inside containers")
 {
   using namespace OUTCOME_V2_NAMESPACE;
+  outcome<std::vector<int>> a(std::vector<int>{5, 6, 7, 8});
+  BOOST_CHECK(a.has_value());
+  BOOST_CHECK(a.value().size() == 4U);
+  auto b(a);
+  BOOST_CHECK(a.has_value());
+  BOOST_CHECK(a.value().size() == 4U);
+  BOOST_CHECK(b.has_value());
+  BOOST_CHECK(b.value().size() == 4U);
+
   std::vector<outcome<std::vector<int>>> vect;
   vect.push_back(std::vector<int>{5, 6, 7, 8});
   vect.push_back(std::vector<int>{1, 2, 3, 4});
   BOOST_REQUIRE(vect.size() == 2U);
-  BOOST_CHECK(vect[0].assume_value().size() == 4U);
-  BOOST_CHECK(vect[1].assume_value().size() == 4U);
-  BOOST_CHECK(vect[0].assume_value().front() == 5);
-  BOOST_CHECK(vect[0].assume_value().back() == 8);
-  BOOST_CHECK(vect[1].assume_value().front() == 1);
-  BOOST_CHECK(vect[1].assume_value().back() == 4);
+  BOOST_CHECK(vect[0].has_value());
+  BOOST_CHECK(vect[1].has_value());
+  BOOST_CHECK(vect[0].value().size() == 4U);
+  BOOST_CHECK(vect[1].value().size() == 4U);
+  BOOST_CHECK(vect[0].value().front() == 5);
+  BOOST_CHECK(vect[0].value().back() == 8);
+  BOOST_CHECK(vect[1].value().front() == 1);
+  BOOST_CHECK(vect[1].value().back() == 4);
 }

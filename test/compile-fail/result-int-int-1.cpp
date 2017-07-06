@@ -1,5 +1,5 @@
 /* clang-format off
-(error: no matching function for call to .+::result<int, int>::result(int)|error: no matching constructor for initialization of 'result<int, int>'|cannot convert argument 1 from 'int')
+(error: no matching function for call to .+::result<int, int>::result|error: no matching constructor for initialization of 'result<int, int>'|cannot convert argument 1 from 'int')
 clang-format on
 */
 
