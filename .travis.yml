@@ -95,12 +95,13 @@ script:
    fi
  -
    if [ "$__" = "cmake tests" ]; then
-     echo $CXX;
+     if [ "$CXX" = "g++" ]; then export CXX=g++-6; fi;
+     if [ "$CXX" = "clang" ]; then export CXX=clang++-4.0; fi;
      ctest -S .ci.cmake -V;
    fi
  -
    if [ "$__" = "cmake tests osx" ]; then
-     CXX=clang ctest -S .ci.cmake -V -E "noexcept|error_code_extended";
+     ctest -S .ci.cmake -V -E "noexcept|error_code_extended";
    fi
  -
    if [ "$__" = "Documentation" ]; then
