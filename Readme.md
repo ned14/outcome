@@ -19,6 +19,7 @@ Post peer review todo:
  - [x] Implement `outcome<T, EC, E>` as per peer review feedback
  - [x] Replace existing Outcome with peer review Outcome
  - [ ] Retarget unit test suite at peer review Outcome
+ - [ ] Replace SFINAEd constructors with Concepts instead.
 
 
 ## Commits and tags in this git repository can be verified using:

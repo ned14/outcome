@@ -965,6 +965,50 @@ is not constructible to `value_type`, is not constructible to `payload_exception
     return base::operator!=(o);
   }
 
+  /// \output_section Swap
+  /*! Swaps this result with another result
+  \effects Any `R` and/or `S` is swapped along with the metadata tracking them.
+  */
+  void swap(outcome &o) noexcept(detail::is_nothrow_swappable<value_type>::value           //
+                                 &&detail::is_nothrow_swappable<status_error_type>::value  //
+                                 &&detail::is_nothrow_swappable<payload_exception_type>::value)
+  {
+    using std::swap;
+#ifdef __cpp_exceptions
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4297)  // use of throw in noexcept function
+#endif
+    this->_state.swap(o._state);
+    try
+    {
+      swap(this->_error, o._error);
+      try
+      {
+        swap(this->_ptr, o._ptr);
+      }
+      catch(...)
+      {
+        swap(this->_state, o._state);
+        swap(this->_error, o._error);
+        throw;
+      }
+    }
+    catch(...)
+    {
+      swap(this->_state, o._state);
+      throw;
+    }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+#else
+    swap(this->_state, o._state);
+    swap(this->_error, o._error);
+    swap(this->_ptr, o._ptr);
+#endif
+  }
+
   /// \output_section Converters
   /*! Returns this outcome rebound to void with any errored and payload state copied.
   \requires This outcome to have a failed state, else whatever `assume_error()` would do.
@@ -1041,6 +1085,13 @@ constexpr inline bool operator!=(const result<T, U, V> &a, const outcome<R, S, P
 noexcept(std::declval<outcome<R, S, P, N>>() != std::declval<result<T, U, V>>()))
 {
   return b != a;
+}
+/*! Specialise swap for outcome.
+\effects Calls `a.swap(b)`.
+*/
+template <class R, class S, class P, class N> inline void swap(outcome<R, S, P, N> &a, outcome<R, S, P, N> &b) noexcept(noexcept(a.swap(b)))
+{
+  a.swap(b);
 }
 
 
