@@ -97,6 +97,8 @@ script:
    if [ "$__" = "cmake tests" ]; then
      if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
      if [ "$CXX" = "clang" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
+     echo $CXX;
+     echo $NAME;
      ctest -S .ci.cmake -V;
    fi
  -

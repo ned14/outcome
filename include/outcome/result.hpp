@@ -130,6 +130,10 @@ namespace impl
     detail::devoid<_error_type> _error;
 
     result_storage() = default;
+    result_storage(const result_storage &) = default;
+    result_storage(result_storage &&) = default;
+    result_storage &operator=(const result_storage &) = default;
+    result_storage &operator=(result_storage &&) = default;
 
     template <class... Args>
     constexpr result_storage(in_place_type_t<_value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)

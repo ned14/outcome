@@ -73,7 +73,7 @@ namespace detail
   static constexpr status_bitfield_type status_have_payload = (1 << 3);
   static constexpr status_bitfield_type status_have_exception = (1 << 4);
   static constexpr status_bitfield_type status_2byte_shift = 16;
-  static constexpr status_bitfield_type status_2byte_mask = (0xffff << status_2byte_shift);
+  static constexpr status_bitfield_type status_2byte_mask = (0xffffU << status_2byte_shift);
 
   // Used if T is trivial
   template <class T> struct value_storage_trivial
@@ -125,8 +125,10 @@ namespace detail
     };
     status_bitfield_type _status;
     value_storage_nontrivial() noexcept : _empty{}, _status(0) {}
+    value_storage_nontrivial &operator=(const value_storage_nontrivial &) = delete;
+    value_storage_nontrivial &operator=(value_storage_nontrivial &&) = delete;
     value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(std::is_nothrow_move_constructible<value_type>::value)
-        : value_storage_nontrivial()
+        : _status(o._status)
     {
       if(this->_status & status_have_value)
       {
@@ -135,7 +137,7 @@ namespace detail
       }
     }
     value_storage_nontrivial(const value_storage_nontrivial &o) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
-        : value_storage_nontrivial()
+        : _status(o._status)
     {
       if(this->_status & status_have_value)
       {
