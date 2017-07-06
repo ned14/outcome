@@ -22,12 +22,13 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include "../../include/outcome/outcome.hpp"
+#include "../../include/outcome/try.hpp"
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 
-#ifdef BOOST_OUTCOME_TRYX
+#ifdef OUTCOME_TRYX
 BOOST_AUTO_TEST_CASE(issues / 9, "Alternative TRY macros?")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  using namespace OUTCOME_V2_NAMESPACE;
   struct udt  // NOLINT
   {
     explicit udt(int /*unused*/) {}
@@ -37,9 +38,8 @@ BOOST_AUTO_TEST_CASE(issues / 9, "Alternative TRY macros?")
   };
   auto f = []() -> result<udt> {
     auto g = [] { return result<int>(5); };
-    return udt(BOOST_OUTCOME_TRYX(g()));
+    return udt(OUTCOME_TRYX(g()));
   };
   (void) f();
 }
 #endif
-

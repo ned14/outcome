@@ -24,9 +24,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 
-BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intended with user-defined types")
+BOOST_AUTO_TEST_CASE(works / outcome / udts, "Tests that the outcome works as intended with user-defined types")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  using namespace OUTCOME_V2_NAMESPACE;
   // No default constructor, no copy/move, no assignment
   {
     struct udt
@@ -43,8 +43,8 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
       udt &operator=(udt &&) = delete;
       ~udt() = default;
     };
-    outcome<udt> foo(in_place, 5);
-    BOOST_CHECK(5 == foo.get().a);
+    outcome<udt> foo(in_place_type<udt>, 5);
+    BOOST_CHECK(5 == foo.value().a);
   }
 #ifdef __cpp_exceptions
   // Emplace construct, throws during move and copy
@@ -66,18 +66,12 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
     static_assert(!std::is_default_constructible<udt>::value, "udt is default constructible");
     static_assert(std::is_copy_constructible<udt>::value, "udt is not copy constructible");
     static_assert(std::is_move_constructible<udt>::value, "udt is not move constructible");
-    static_assert(value_storage<udt, void, void>::is_copy_constructible, "value_storage<udt> is not copy constructible");
-    static_assert(value_storage<udt, void, void>::is_move_constructible, "value_storage<udt> is not move constructible");
-    static_assert(std::is_copy_constructible<value_storage<udt, void, void>>::value, "value_storage<udt> is not copy constructible");
-    static_assert(std::is_move_constructible<value_storage<udt, void, void>>::value, "value_storage<udt> is not move constructible");
-    static_assert(std::is_default_constructible<outcome<udt>>::value, "outcome<udt> is not default constructible");
+    static_assert(!std::is_default_constructible<outcome<udt>>::value, "outcome<udt> is default constructible");
     static_assert(std::is_copy_constructible<outcome<udt>>::value, "outcome<udt> is not copy constructible");
     static_assert(std::is_move_constructible<outcome<udt>>::value, "outcome<udt> is not move constructible");
     // Emplace constructs
-    outcome<udt> foo(in_place, "douglas");
-    BOOST_CHECK("douglas" == foo.get().a);
-    foo.emplace("niall");
-    BOOST_CHECK("niall" == foo.get().a);
+    outcome<udt> foo(in_place_type<udt>, "niall");
+    BOOST_CHECK("niall" == foo.value().a);
     try
     {
       auto foo2(foo);  // NOLINT
@@ -91,7 +85,7 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
     {
       BOOST_CHECK(false);
     }
-    BOOST_CHECK("niall" == foo.get().a);
+    BOOST_CHECK("niall" == foo.value().a);
     try
     {
       auto foo2(std::move(foo));
@@ -105,10 +99,10 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
     {
       BOOST_CHECK(false);
     }
-    BOOST_CHECK("niall" == foo.get().a);  // NOLINT
+    BOOST_CHECK("niall" == foo.value().a);  // NOLINT
     // Does throwing during copy assignment work?
     {
-      outcome<udt> foo2(in_place, "douglas");
+      outcome<udt> foo2(in_place_type<udt>, "douglas");
       try
       {
         foo2 = foo;
@@ -117,17 +111,17 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
       catch(const std::logic_error &e)
       {
         BOOST_CHECK(!strcmp(e.what(), "copy"));
-        BOOST_CHECK(foo2.get().a == "douglas");
+        BOOST_CHECK(foo2.value().a == "douglas");
       }
       catch(...)
       {
         BOOST_CHECK(false);
       }
-      BOOST_CHECK("niall" == foo.get().a);
+      BOOST_CHECK("niall" == foo.value().a);
     }
     // Does throwing during move assignment work?
     {
-      outcome<udt> foo2(in_place, "douglas");
+      outcome<udt> foo2(in_place_type<udt>, "douglas");
       try
       {
         foo2 = std::move(foo);
@@ -136,13 +130,13 @@ BOOST_AUTO_TEST_CASE(works / monad / udts, "Tests that the monad works as intend
       catch(const std::logic_error &e)
       {
         BOOST_CHECK(!strcmp(e.what(), "move"));
-        BOOST_CHECK(foo2.get().a == "douglas");
+        BOOST_CHECK(foo2.value().a == "douglas");
       }
       catch(...)
       {
         BOOST_CHECK(false);
       }
-      BOOST_CHECK("niall" == foo.get().a);  // NOLINT
+      BOOST_CHECK("niall" == foo.value().a);  // NOLINT
     }
   }
 #endif

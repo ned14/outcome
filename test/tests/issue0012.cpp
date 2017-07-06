@@ -24,17 +24,18 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 
-BOOST_AUTO_TEST_CASE(issues / 16, "Default constructor of T is sometimes compiled when T has no default constructor")
+BOOST_AUTO_TEST_CASE(issues / 12, "outcome's copy assignment gets instantiated even when type T cannot be copied")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE::experimental;
-  struct udt
+  using namespace OUTCOME_V2_NAMESPACE;
+  const char *s = "hi";
+  struct udt  // NOLINT
   {
-    const char *_v{ nullptr };
-    udt() = delete;
+    const char *_v{nullptr};
+    udt() = default;
     constexpr explicit udt(const char *v) noexcept : _v(v) {}
-    QUICKCPPLIB_CONSTEXPR udt(udt &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    constexpr udt(udt &&o) noexcept : _v(o._v) { o._v = nullptr; }
     udt(const udt &) = delete;
-    QUICKCPPLIB_CONSTEXPR udt &operator=(udt &&o) noexcept
+    constexpr udt &operator=(udt &&o) noexcept
     {
       _v = o._v;
       o._v = nullptr;
@@ -43,5 +44,9 @@ BOOST_AUTO_TEST_CASE(issues / 16, "Default constructor of T is sometimes compile
     udt &operator=(const udt &) = delete;
     constexpr const char *operator*() const noexcept { return _v; }
   };
-  expected<udt> n(make_unexpected(std::error_code(ENOMEM, std::generic_category())));
+  static_assert(std::is_move_constructible<outcome<udt>>::value, "expected<udt> is not move constructible!");
+  static_assert(!std::is_copy_constructible<outcome<udt>>::value, "expected<udt> is copy constructible!");
+  outcome<udt> p(udt{s}), n(std::error_code(ENOMEM, std::generic_category()));
+  n = std::error_code(EINVAL, std::generic_category());
+  BOOST_CHECK(n.error().value() == EINVAL);
 }

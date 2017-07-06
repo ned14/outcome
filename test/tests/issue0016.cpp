@@ -24,20 +24,26 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 
-BOOST_AUTO_TEST_CASE(works / monad / void, "Tests that the monad works as intended with void")
+BOOST_AUTO_TEST_CASE(issues / 16, "Default constructor of T is sometimes compiled when T has no default constructor")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  // Can't construct a void
+  using namespace OUTCOME_V2_NAMESPACE;
+  struct udt
   {
-    outcome<void> a, b(empty), c(value), d(make_valued_outcome<void>()), e{};
-    BOOST_CHECK(a == b);
-    BOOST_CHECK(b == e);
-    BOOST_CHECK(c == d);
-    BOOST_CHECK(a != c);
-    BOOST_CHECK(b != c);
-    BOOST_CHECK(e != c);
-    BOOST_CHECK(a != d);
-    BOOST_CHECK(b != d);
-    BOOST_CHECK(e != d);
-  }
+    const char *_v{nullptr};
+    udt() = delete;
+    constexpr explicit udt(const char *v) noexcept : _v(v) {}
+    constexpr udt(udt &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    udt(const udt &) = delete;
+    constexpr udt &operator=(udt &&o) noexcept
+    {
+      _v = o._v;
+      o._v = nullptr;
+      return *this;
+    }
+    udt &operator=(const udt &) = delete;
+    ~udt() = default;
+    constexpr const char *operator*() const noexcept { return _v; }
+  };
+  result<udt> n(std::error_code(ENOMEM, std::generic_category()));
+  (void) n;
 }
