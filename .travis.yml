@@ -95,11 +95,12 @@ script:
    fi
  -
    if [ "$__" = "cmake tests" ]; then
+     echo $CXX;
      ctest -S .ci.cmake -V;
    fi
  -
    if [ "$__" = "cmake tests osx" ]; then
-     CXX=clang ctest -S .ci.cmake -V -E noexcept -E error_code_extended;
+     CXX=clang ctest -S .ci.cmake -V -E "noexcept|error_code_extended";
    fi
  -
    if [ "$__" = "Documentation" ]; then

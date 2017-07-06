@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(works / outcome / fileopen, "Tests that the outcome semanti
   auto a = openfile("shouldneverexistnotever");
   BOOST_CHECK(!a);
   BOOST_CHECK(!a.has_value());
-  BOOST_CHECK(a.has_exception());
+  BOOST_CHECK(!a.has_exception());
   BOOST_CHECK(a.has_error());
   BOOST_CHECK(a.error() == std::error_code(ENOENT, std::generic_category()));
   //! [file_open_example]
