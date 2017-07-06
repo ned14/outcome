@@ -25,7 +25,21 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_TRY_HPP
 #define OUTCOME_TRY_HPP
 
-#include "outcome.hpp"
+#include "config.hpp"
+
+OUTCOME_V2_NAMESPACE_BEGIN
+
+/*! Customisation point for changing what the `OUTCOME_TRY` macros
+do. This function defaults to returning `std::move(v).as_void()`.
+\effects Extracts any state apart from value into a `void` rebound equivalent.
+\requires The input value to have a `.as_void()` member function.
+*/
+template <class T> typename T::template rebind<void> try_operation_return_as(T &&v)
+{
+  return std::move(v).as_void();
+}
+
+OUTCOME_V2_NAMESPACE_END
 
 #define OUTCOME_TRY_GLUE2(x, y) x##y
 #define OUTCOME_TRY_GLUE(x, y) OUTCOME_TRY_GLUE2(x, y)
@@ -34,7 +48,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define OUTCOME_TRYV2(unique, m)                                                                                                                                                                                                                                                                                               \
   decltype(auto) unique = (m);                                                                                                                                                                                                                                                                                                 \
   if(!unique.has_value())                                                                                                                                                                                                                                                                                                      \
-  return unique.as_void()
+  return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::move(unique))
 #define OUTCOME_TRY2(unique, v, m)                                                                                                                                                                                                                                                                                             \
   OUTCOME_TRYV2(unique, m);                                                                                                                                                                                                                                                                                                    \
   auto v(std::move(std::move(unique).value()))
@@ -59,7 +73,7 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
   ({                                                                                                                                                                                                                                                                                                                           \
     decltype(auto) res = (m);                                                                                                                                                                                                                                                                                                  \
     if(!res.has_value())                                                                                                                                                                                                                                                                                                       \
-      return res.as_void();                                                                                                                                                                                                                                                                                                    \
+      return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::move(res));                                                                                                                                                                                                                                                    \
     std::move(res.value());                                                                                                                                                                                                                                                                                                    \
   \
 })
