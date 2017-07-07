@@ -21,7 +21,47 @@ Post peer review todo:
  - [ ] Replace SFINAEd constructors with Concepts instead.
 
 # Changes since v1:
- - todo
+As per the Boost peer review feedback, v2 Outcome has been pared down to
+no more than the barest of bare essentials.
+- Major changes:
+   - You can now customise types, so `result<T, EC = std::error_code>`
+   and `outcome<T, EC = std::error_code, P|E = std::exception_ptr>`
+   - Default construction no longer permitted
+   - Empty state no longer possible
+   - Variant storage gone, it's now an aggregate. This enables returning
+   an error code with additional exception ptr as per Peter Dimov's request.
+   It also very considerably simplifies implementation.
+     - You can choose between a payload type `P` or an exception ptr `E`, so
+   an error code with additional arbitrary non-exception ptr payload `P` is also possible.
+   - Types `EC`, `P` and `E` must be default constructible. `T` need not be so.
+   - Constructors now follow those of `std::variant`, so it will implicitly
+   convert from any input so long as it is not ambiguous. As with  `std::variant`, in place construction
+   is achieved via `in_place_type<T>` tagging. Explicit conversion construction also works,
+   we replicate `std::variant`'s constructors very closely despite not having variant storage.
+   - `.has_value()`, `.has_error()` and `.has_exception()` now only return true
+   if that specific member is present. A new `.has_failure()` is true if errored
+   or excepted.
+   - `.value()` throws exception or `std::system_error(EC)` if no value or returns a reference to the value.
+   - `.error()` throws `bad_result_access|bad_outcome_access` if no error or returns a reference to the error.
+   - `.payload()` throws `bad_result_access|bad_outcome_access` if no payload or returns a reference to the payload.
+   - `.exception()` throws `bad_result_access|bad_outcome_access` if no exception or returns a reference to the exception.
+   - `.failure()` returns the exception if present, else a synthesised `exception_ptr` from the error, else a null `exception_ptr`.
+ - Stuff removed:
+   - Anything even faintly smelling of monads.
+   - All preprocessor assembly of code fragments. You now have an equally complex rabbit warren of policy and trait driven composited fragments of template into implementation. Standardese (the documentation tool) really struggles with this. Doxygen simply blows up.
+   - Any operators apart from strict equality and inequality comparison.
+   - Any ability to change state after construction.
+   - LEWG `expected<T, E>` is gone. The new templatised `result<T, E>` is a much slimmer edition of Expected providing pretty much all the same functionality but in a much smaller package and with `std::variant<>`'s look and feel instead of innovating.
+ - Stuff retained:
+   - `OUTCOME_TRY`, `OUTCOME_TRYV`, `OUTCOME_TRYX` all work as before.
+   - noexcept propagation from types chosen works correctly.
+   - Triviality of construction, assignment and destruction from types chosen is propagated correctly.
+   - v1 unit test has been almost entirely ported over to v2 without much change other than what was needed.
+ - Stuff gained:
+   - Type traits now work natively on all member functions. Member variable traits are no longer necessary, and so have been removed.
+ - Stuff lost:
+   - Outcome v2 needs a much newer compiler than before: clang 4 or better, GCC 6 or better. Sorry, no MSVC support, I've submitted repros of the ICEs for VS2017.3.
+   - Compile time load may now be higher. Almost every function is SFINAEd with calculated noexcept. It'll get a lot, lot better with Concepts available, I deliberately designed it assuming Concepts will be available next year.   
 
 ## Commits and tags in this git repository can be verified using:
 <pre>
