@@ -22,16 +22,24 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include "../../include/outcome/outcome.hpp"
+#include "../../include/outcome/try.hpp"
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 
-BOOST_AUTO_TEST_CASE(works / monad / serialisation, "Tests that the monad serialises and deserialises as intended")
+#ifdef OUTCOME_TRYX
+BOOST_AUTO_TEST_CASE(issues / 9, "Alternative TRY macros?")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  outcome<std::string> a("niall"), b(error_code_extended(5, stl11::generic_category())), c(std::make_exception_ptr(std::ios_base::failure("A test failure message")));
-  std::cout << "a contains " << a << " and b contains " << b << " and c contains " << c << std::endl;
-  std::string buffer("hello");
-  std::stringstream ss(buffer);
-  ss >> a;
-  BOOST_CHECK(a.get() == "hello");
+  using namespace OUTCOME_V2_NAMESPACE;
+  struct udt  // NOLINT
+  {
+    explicit udt(int /*unused*/) {}
+    //    udt() = delete;
+    udt(const udt &) = default;
+    udt(udt &&) = default;
+  };
+  auto f = []() -> result<udt> {
+    auto g = [] { return result<int>(5); };
+    return udt(OUTCOME_TRYX(g()));
+  };
+  (void) f();
 }
-
+#endif

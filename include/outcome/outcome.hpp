@@ -282,6 +282,8 @@ class OUTCOME_NODISCARD outcome : public detail::select_outcome_impl<R, S, P, No
   using base = detail::select_outcome_impl<R, S, P, NoValuePolicy>;
   friend detail::select_outcome_impl2<R, S, P, NoValuePolicy>;
   template <class T, class U, class V, class W> friend class outcome;
+  template <class T, class U, class V, class W> friend inline std::istream &operator>>(std::istream &s, outcome<T, U, V, W> &v);
+  template <class T, class U, class V, class W> friend inline std::ostream &operator<<(std::ostream &s, const outcome<T, U, V, W> &v);
   static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "payload_type/exception_type must be default constructible");
 
   struct value_converting_constructor_tag
@@ -965,6 +967,50 @@ is not constructible to `value_type`, is not constructible to `payload_exception
     return base::operator!=(o);
   }
 
+  /// \output_section Swap
+  /*! Swaps this result with another result
+  \effects Any `R` and/or `S` is swapped along with the metadata tracking them.
+  */
+  void swap(outcome &o) noexcept(detail::is_nothrow_swappable<value_type>::value           //
+                                 &&detail::is_nothrow_swappable<status_error_type>::value  //
+                                 &&detail::is_nothrow_swappable<payload_exception_type>::value)
+  {
+    using std::swap;
+#ifdef __cpp_exceptions
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4297)  // use of throw in noexcept function
+#endif
+    this->_state.swap(o._state);
+    try
+    {
+      swap(this->_error, o._error);
+      try
+      {
+        swap(this->_ptr, o._ptr);
+      }
+      catch(...)
+      {
+        swap(this->_state, o._state);
+        swap(this->_error, o._error);
+        throw;
+      }
+    }
+    catch(...)
+    {
+      swap(this->_state, o._state);
+      throw;
+    }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+#else
+    swap(this->_state, o._state);
+    swap(this->_error, o._error);
+    swap(this->_ptr, o._ptr);
+#endif
+  }
+
   /// \output_section Converters
   /*! Returns this outcome rebound to void with any errored and payload state copied.
   \requires This outcome to have a failed state, else whatever `assume_error()` would do.
@@ -1041,6 +1087,13 @@ constexpr inline bool operator!=(const result<T, U, V> &a, const outcome<R, S, P
 noexcept(std::declval<outcome<R, S, P, N>>() != std::declval<result<T, U, V>>()))
 {
   return b != a;
+}
+/*! Specialise swap for outcome.
+\effects Calls `a.swap(b)`.
+*/
+template <class R, class S, class P, class N> inline void swap(outcome<R, S, P, N> &a, outcome<R, S, P, N> &b) noexcept(noexcept(a.swap(b)))
+{
+  a.swap(b);
 }
 
 

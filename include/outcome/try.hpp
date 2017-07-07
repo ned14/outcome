@@ -32,7 +32,8 @@ OUTCOME_V2_NAMESPACE_BEGIN
 /*! Customisation point for changing what the `OUTCOME_TRY` macros
 do. This function defaults to returning `std::move(v).as_void()`.
 \effects Extracts any state apart from value into a `void` rebound equivalent.
-\requires The input value to have a `.as_void()` member function.
+\requires The input value to have a `.as_void()` member function, and a `rebind`
+member template alias.
 */
 template <class T> typename T::template rebind<void> try_operation_return_as(T &&v)
 {

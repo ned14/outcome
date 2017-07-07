@@ -21,23 +21,20 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../include/outcome/outcome.hpp"
+#include "../../include/outcome/iostream_support.hpp"
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 
-BOOST_AUTO_TEST_CASE(works / monad / void, "Tests that the monad works as intended with void")
+BOOST_AUTO_TEST_CASE(works / outcome / serialisation, "Tests that the outcome serialises and deserialises as intended")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  // Can't construct a void
-  {
-    outcome<void> a, b(empty), c(value), d(make_valued_outcome<void>()), e{};
-    BOOST_CHECK(a == b);
-    BOOST_CHECK(b == e);
-    BOOST_CHECK(c == d);
-    BOOST_CHECK(a != c);
-    BOOST_CHECK(b != c);
-    BOOST_CHECK(e != c);
-    BOOST_CHECK(a != d);
-    BOOST_CHECK(b != d);
-    BOOST_CHECK(e != d);
-  }
+  using namespace OUTCOME_V2_NAMESPACE;
+  outcome<std::string> a("niall"), b(std::error_code(5, std::generic_category())), c(std::make_exception_ptr(std::ios_base::failure("A test failure message")));
+  std::cout << "a contains " << print(a) << " and b contains " << print(b) << " and c contains " << print(c) << std::endl;
+
+  std::stringstream ss;
+  outcome<int, std::string, long> d(5);
+  ss << d;
+  ss.seekg(0);
+  outcome<int, std::string, long> e("");
+  ss >> e;
+  BOOST_CHECK(d == e);
 }

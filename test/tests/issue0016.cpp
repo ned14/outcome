@@ -24,22 +24,26 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 
-#ifdef BOOST_OUTCOME_TRYX
-BOOST_AUTO_TEST_CASE(issues / 9, "Alternative TRY macros?")
+BOOST_AUTO_TEST_CASE(issues / 16, "Default constructor of T is sometimes compiled when T has no default constructor")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
-  struct udt  // NOLINT
+  using namespace OUTCOME_V2_NAMESPACE;
+  struct udt
   {
-    explicit udt(int /*unused*/) {}
-    //    udt() = delete;
-    udt(const udt &) = default;
-    udt(udt &&) = default;
+    const char *_v{nullptr};
+    udt() = delete;
+    constexpr explicit udt(const char *v) noexcept : _v(v) {}
+    constexpr udt(udt &&o) noexcept : _v(o._v) { o._v = nullptr; }
+    udt(const udt &) = delete;
+    constexpr udt &operator=(udt &&o) noexcept
+    {
+      _v = o._v;
+      o._v = nullptr;
+      return *this;
+    }
+    udt &operator=(const udt &) = delete;
+    ~udt() = default;
+    constexpr const char *operator*() const noexcept { return _v; }
   };
-  auto f = []() -> result<udt> {
-    auto g = [] { return result<int>(5); };
-    return udt(BOOST_OUTCOME_TRYX(g()));
-  };
-  (void) f();
+  result<udt> n(std::error_code(ENOMEM, std::generic_category()));
+  (void) n;
 }
-#endif
-

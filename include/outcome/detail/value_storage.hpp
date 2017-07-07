@@ -29,6 +29,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include <cstdint>  // for uint32_t etc
 #include <initializer_list>
+#include <iosfwd>  // for serialisation
 #include <type_traits>
 #include <utility>  // for in_place_type_t
 
@@ -114,6 +115,12 @@ namespace detail
     {
       _status = o._status;
     }
+    constexpr void swap(value_storage_trivial &o)
+    {
+      // storage is trivial, so just use assignment
+      using std::swap;
+      swap(*this, o);
+    }
   };
   // Used if T is non-trivial
   template <class T> struct value_storage_nontrivial
@@ -178,8 +185,38 @@ namespace detail
     {
       if(this->_status & status_have_value)
       {
-        this->_value.~T();
+        this->_value.~value_type();
         this->_status &= ~status_have_value;
+      }
+    }
+    constexpr void swap(value_storage_nontrivial &o)
+    {
+      using std::swap;
+      if((_status & status_have_value) == 0 && (o._status & status_have_value) == 0)
+      {
+        swap(_status, o._status);
+        return;
+      }
+      if((_status & status_have_value) != 0 && (o._status & status_have_value) != 0)
+      {
+        swap(_value, o._value);
+        swap(_status, o._status);
+        return;
+      }
+      // One must be empty and the other non-empty, so use move construction
+      if((_status & status_have_value) != 0)
+      {
+        // Move construct me into other
+        new(&o._value) value_type(std::move(_value));
+        this->_value.~value_type();
+        swap(_status, o._status);
+      }
+      else
+      {
+        // Move construct other into me
+        new(&_value) value_type(std::move(o._value));
+        o._value.~value_type();
+        swap(_status, o._status);
       }
     }
   };

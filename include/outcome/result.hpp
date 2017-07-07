@@ -99,6 +99,15 @@ namespace detail
 {
   // True if type is the same or constructible
   template <class T, class U, class... Args> static constexpr bool is_same_or_constructible = std::is_same<T, U>::value || std::is_constructible<T, U, Args...>::value;
+// True if type is nothrow swappable
+#if __cplusplus >= 201700 || defined(_MSC_VER)
+  template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
+#else
+  template <class T> constexpr inline T &ldeclval();
+  template <class T> struct is_nothrow_swappable : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
+  {
+  };
+#endif
 }
 
 namespace impl
@@ -1030,6 +1039,8 @@ template <class R,                                                //
 class OUTCOME_NODISCARD result : public impl::result_final<R, S, NoValuePolicy>
 {
   using base = impl::result_final<R, S, NoValuePolicy>;
+  template <class T, class U, class V> friend inline std::istream &operator>>(std::istream &s, result<T, U, V> &v);
+  template <class T, class U, class V> friend inline std::ostream &operator<<(std::ostream &s, const result<T, U, V> &v);
 
   struct value_converting_constructor_tag
   {
@@ -1340,6 +1351,38 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
     hook_result_in_place_construction(in_place_type<error_type>, this);
   }
 
+  /// \output_section Swap
+  /*! Swaps this result with another result
+  \effects Any `R` and/or `S` is swapped along with the metadata tracking them.
+  */
+  void swap(result &o) noexcept(detail::is_nothrow_swappable<value_type>::value  //
+                                &&detail::is_nothrow_swappable<status_error_type>::value)
+  {
+    using std::swap;
+#ifdef __cpp_exceptions
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4297)  // use of throw in noexcept function
+#endif
+    this->_state.swap(o._state);
+    try
+    {
+      swap(this->_error, o._error);
+    }
+    catch(...)
+    {
+      swap(this->_state, o._state);
+      throw;
+    }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+#else
+    swap(this->_state, o._state);
+    swap(this->_error, o._error);
+#endif
+  }
+
   /// \output_section Converters
   /*! Returns this result rebound to void with any errored state copied.
   \requires This result to have a failed state, else whatever `assume_error()` would do.
@@ -1350,6 +1393,14 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   */
   rebind<void> as_void() && { return rebind<void>(in_place_type<error_type>, std::move(this->assume_error())); }
 };
+
+/*! Specialise swap for result.
+\effects Calls `a.swap(b)`.
+*/
+template <class R, class S, class P> inline void swap(result<R, S, P> &a, result<R, S, P> &b) noexcept(noexcept(a.swap(b)))
+{
+  a.swap(b);
+}
 
 OUTCOME_V2_NAMESPACE_END
 

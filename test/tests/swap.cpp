@@ -25,17 +25,17 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 
 
-BOOST_AUTO_TEST_CASE(works / monad / swap, "Tests that the monad swaps as intended")
+BOOST_AUTO_TEST_CASE(works / outcome / swap, "Tests that the outcome swaps as intended")
 {
-  using namespace BOOST_OUTCOME_V1_NAMESPACE;
+  using namespace OUTCOME_V2_NAMESPACE;
   outcome<std::string> a("niall"), b("douglas");
-  BOOST_CHECK(a.get() == "niall");
-  BOOST_CHECK(b.get() == "douglas");
-  std::swap(a, b);
-  BOOST_CHECK(a.get() == "douglas");
-  BOOST_CHECK(b.get() == "niall");
-  a.set_error(error_code_extended());
-  std::swap(a, b);
-  BOOST_CHECK(a.get() == "niall");
-  BOOST_CHECK(b.get_error() == error_code_extended());
+  BOOST_CHECK(a.value() == "niall");
+  BOOST_CHECK(b.value() == "douglas");
+  swap(a, b);
+  BOOST_CHECK(a.value() == "douglas");
+  BOOST_CHECK(b.value() == "niall");
+  a = std::errc::not_enough_memory;
+  swap(a, b);
+  BOOST_CHECK(a.value() == "niall");
+  BOOST_CHECK(b.error() == std::errc::not_enough_memory);
 }
