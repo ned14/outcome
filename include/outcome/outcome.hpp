@@ -282,6 +282,8 @@ class OUTCOME_NODISCARD outcome : public detail::select_outcome_impl<R, S, P, No
   using base = detail::select_outcome_impl<R, S, P, NoValuePolicy>;
   friend detail::select_outcome_impl2<R, S, P, NoValuePolicy>;
   template <class T, class U, class V, class W> friend class outcome;
+  template <class T, class U, class V, class W> friend inline std::istream &operator>>(std::istream &s, outcome<T, U, V, W> &v);
+  template <class T, class U, class V, class W> friend inline std::ostream &operator<<(std::ostream &s, const outcome<T, U, V, W> &v);
   static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "payload_type/exception_type must be default constructible");
 
   struct value_converting_constructor_tag

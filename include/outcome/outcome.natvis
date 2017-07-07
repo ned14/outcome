@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010"> 
+  <Type Name="outcome_v2_1737b49b::outcome&lt;*&gt;">
+    <DisplayString Condition="(_state._status &amp; 0xff) == 0">empty</DisplayString>
+    <DisplayString Condition="(_state._status &amp; 1) == 1">value {{{_state._value}}}</DisplayString>
+    <DisplayString Condition="(_state._status &amp; 2) == 2">error {{{_error}}}</DisplayString>
+    <DisplayString Condition="(_state._status &amp; 4) == 4">status {{{_error}}}</DisplayString>
+    <DisplayString Condition="(_state._status &amp; 8) == 8">payload {{{_ptr}}}</DisplayString>
+    <DisplayString Condition="(_state._status &amp; 16) == 16">exception {{{_ptr}}}</DisplayString>
+    <DisplayString>unknown</DisplayString>
+    <Expand>
+      <Item Condition="(_state._status &amp; 1) == 1" Name="[value]">_state._value</Item>
+      <Item Condition="(_state._status &amp; 2) == 2" Name="[error]">_error</Item>
+      <Item Condition="(_state._status &amp; 8) == 8" Name="[payload]">_ptr</Item>
+      <Item Condition="(_state._status &amp; 16) == 16" Name="[exception]">_ptr</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>

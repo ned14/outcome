@@ -29,6 +29,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include <cstdint>  // for uint32_t etc
 #include <initializer_list>
+#include <iosfwd>  // for serialisation
 #include <type_traits>
 #include <utility>  // for in_place_type_t
 

@@ -10,17 +10,18 @@ Latest tarball of source with all tests passing on Linux and Windows: https://de
 
 Past tarballs of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/outcome
 
-**WARNING: This library is undergoing serious refactoring to meet the Boost peer review feedback**
-
 Post peer review todo:
  - [x] Implement `result<T, EC>` as per peer review feedback
  - [x] Write up each API with C++ standardese and feed to Standardese
  - [x] Replace doxygen with Standardese + Hugo
  - [x] Implement `outcome<T, EC, E>` as per peer review feedback
  - [x] Replace existing Outcome with peer review Outcome
- - [ ] Retarget unit test suite at peer review Outcome
+ - [x] Retarget unit test suite at peer review Outcome
+ - [x] Redo .natvis
  - [ ] Replace SFINAEd constructors with Concepts instead.
 
+# Changes since v1:
+ - todo
 
 ## Commits and tags in this git repository can be verified using:
 <pre>

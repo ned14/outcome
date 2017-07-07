@@ -1039,6 +1039,8 @@ template <class R,                                                //
 class OUTCOME_NODISCARD result : public impl::result_final<R, S, NoValuePolicy>
 {
   using base = impl::result_final<R, S, NoValuePolicy>;
+  template <class T, class U, class V> friend inline std::istream &operator>>(std::istream &s, result<T, U, V> &v);
+  template <class T, class U, class V> friend inline std::ostream &operator<<(std::ostream &s, const result<T, U, V> &v);
 
   struct value_converting_constructor_tag
   {
