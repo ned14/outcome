@@ -276,6 +276,7 @@ template <class R,                       //
           class S = std::error_code,     //
           class P = std::exception_ptr,  //
           class NoValuePolicy = policy::default_outcome_policy<R, S, P>>
+OUTCOME_REQUIRES(std::is_void<P>::value || std::is_default_constructible<P>::value)
 class OUTCOME_NODISCARD outcome : public detail::select_outcome_impl<R, S, P, NoValuePolicy>
 {
   friend NoValuePolicy;

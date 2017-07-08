@@ -19,8 +19,13 @@ Post peer review todo:
  - [x] Retarget unit test suite at peer review Outcome
  - [x] Redo .natvis
  - [ ] Replace SFINAEd constructors with Concepts instead.
+ 
+Maybe?
+ - [ ] Make `result`'s explicit converting constructors accept any type providing a
+ `.has_value()`, `.value()` and `.error()` (i.e. Expected)
 
 # Changes since v1:
+
 As per the Boost peer review feedback, v2 Outcome has been pared down to
 no more than the barest of bare essentials.
 - Major changes:
@@ -33,10 +38,11 @@ no more than the barest of bare essentials.
    It also very considerably simplifies implementation.
      - You can choose between a payload type `P` or an exception ptr `E`, so
    an error code with additional arbitrary non-exception ptr payload `P` is also possible.
+   - Concepts TS is used when available, otherwise a partial SFINAE-based emulation is used.
    - Types `EC`, `P` and `E` must be default constructible. `T` need not be so.
    - Constructors now follow those of `std::variant`, so it will implicitly
    convert from any input convertible to any of its types so long as it is
-   not ambiguous. As with  `std::variant`, in place construction
+   not ambiguous. As with `std::variant`, in place construction
    is achieved via `in_place_type<T>` tagging. Explicit conversion construction also works,
    we replicate `std::variant`'s value semantics very closely despite not having variant storage.
    - `.has_value()`, `.has_error()` and `.has_exception()` now only return true
@@ -58,7 +64,9 @@ no more than the barest of bare essentials.
    customisation point design, 100% C++.
    - `error_code_extended` is gone for now. It is believed that via the
    ADL customisation points you can easily implement your own. There is a
-   worked example at https://github.com/ned14/outcome/blob/develop/example/error_code_extended.cpp
+   worked example at https://github.com/ned14/outcome/blob/develop/example/error_code_extended.cpp.
+   **WARNING**: Any interfaces used in that example which refer to a `detail`
+   namespace are going to change in the near future.
    - Any operators apart from boolean test, strict equality and inequality comparison.
    - Any ability to change state after construction.
    - LEWG `expected<T, E>` is gone. The new templatised `result<T, E>` is a
@@ -84,13 +92,14 @@ no more than the barest of bare essentials.
 
  - Stuff lost:
    - Outcome v2 needs a much newer compiler than before: clang 4 or better,
-   GCC 6 or better. Sorry, no MSVC support, I've submitted repros of the ICEs
+   GCC 6 or better, ideally with Concepts enabled. Sorry, no MSVC support,
+   I've submitted repros of the ICEs
    for VS2017.3. I've been careful to keep MSVC's frontend happy, the ICEs
    are all in the backend, so it'll likely start working soon.
-   - Compile time load may now be higher. Almost every function is SFINAEd
-   with calculated noexcept. It'll get a lot, lot better with Concepts available,
-   I deliberately designed v2 assuming Concepts will be available in all major
-   compilers next year.   
+   - Compile time load may now be higher than with v1. Almost every function
+   is compile time enabled depending on input types (we do use template variables
+   to cache previously calculated results) with calculated noexcept. It'll get a
+   lot better as compilers make better use of the boolean logic supplied by Concepts.
 
 ## Commits and tags in this git repository can be verified using:
 <pre>

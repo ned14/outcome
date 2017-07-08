@@ -114,6 +114,7 @@ template <class R, class S, class P> inline std::string print(const result<R, S,
 //! Deserialise an outcome
 template <class R, class S, class P, class N> inline std::istream &operator>>(std::istream &s, outcome<R, S, P, N> &v)
 {
+  static_assert(!trait::is_exception_ptr<P>::value, "Cannot call operator>> on an outcome with an exception_ptr in it");
   s >> v._state;
   if(v.has_error())
   {
