@@ -28,106 +28,106 @@ weight = 20
 
   - [OUTCOME\_TRY\_UNIQUE\_NAME](doc_try.md#try.hpp "OUTCOME_TRY_UNIQUE_NAME")
 
-  - `outcome_v2_1737b49b`
+  - `outcome_v2_xxx`
     
-      - [bad\_outcome\_access](doc_outcome.md#outcome_v2_1737b49b::bad_outcome_access "outcome_v2_1737b49b::bad_outcome_access") - Thrown when you try to access state in a `outcome<T, EC, E>` which isn't present.
+      - [bad\_outcome\_access](doc_outcome.md#outcome_v2_xxx::bad_outcome_access "outcome_v2_xxx::bad_outcome_access") - Thrown when you try to access state in a `outcome<T, EC, E>` which isn't present.
     
-      - [bad\_result\_access](doc_result.md#outcome_v2_1737b49b::bad_result_access "outcome_v2_1737b49b::bad_result_access") - Thrown when you try to access state in a `result<R, S>` which isn't present.
+      - [bad\_result\_access](doc_result.md#outcome_v2_xxx::bad_result_access "outcome_v2_xxx::bad_result_access") - Thrown when you try to access state in a `result<R, S>` which isn't present.
     
-      - [hook\_outcome\_construction(in\_place\_type\_t\<T\>, U \*)](doc_outcome.md#outcome_v2_1737b49b::hook_outcome_construction(in_place_type_t-T-,U*) "outcome_v2_1737b49b::hook_outcome_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `outcome` is first created by conversion from one of its possible types. Does nothing.
+      - [hook\_outcome\_construction(in\_place\_type\_t\<T\>, U \*)](doc_outcome.md#outcome_v2_xxx::hook_outcome_construction(in_place_type_t-T-,U*) "outcome_v2_xxx::hook_outcome_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `outcome` is first created by conversion from one of its possible types. Does nothing.
     
-      - [hook\_outcome\_copy\_construction(in\_place\_type\_t\<T\>, U \*)](doc_outcome.md#outcome_v2_1737b49b::hook_outcome_copy_construction(in_place_type_t-T-,U*) "outcome_v2_1737b49b::hook_outcome_copy_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `outcome` is created by copying from another `outcome` or `result`. Does nothing.
+      - [hook\_outcome\_copy\_construction(in\_place\_type\_t\<T\>, U \*)](doc_outcome.md#outcome_v2_xxx::hook_outcome_copy_construction(in_place_type_t-T-,U*) "outcome_v2_xxx::hook_outcome_copy_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `outcome` is created by copying from another `outcome` or `result`. Does nothing.
     
-      - [hook\_outcome\_in\_place\_construction(in\_place\_type\_t\<T\>, U \*)](doc_outcome.md#outcome_v2_1737b49b::hook_outcome_in_place_construction(in_place_type_t-T-,U*) "outcome_v2_1737b49b::hook_outcome_in_place_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `outcome` is created by in place construction. Does nothing.
+      - [hook\_outcome\_in\_place\_construction(in\_place\_type\_t\<T\>, U \*)](doc_outcome.md#outcome_v2_xxx::hook_outcome_in_place_construction(in_place_type_t-T-,U*) "outcome_v2_xxx::hook_outcome_in_place_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `outcome` is created by in place construction. Does nothing.
     
-      - [hook\_outcome\_move\_construction(in\_place\_type\_t\<T\>, U \*)](doc_outcome.md#outcome_v2_1737b49b::hook_outcome_move_construction(in_place_type_t-T-,U*) "outcome_v2_1737b49b::hook_outcome_move_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `outcome` is created by moving from another `outcome` or `result`. Does nothing.
+      - [hook\_outcome\_move\_construction(in\_place\_type\_t\<T\>, U \*)](doc_outcome.md#outcome_v2_xxx::hook_outcome_move_construction(in_place_type_t-T-,U*) "outcome_v2_xxx::hook_outcome_move_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `outcome` is created by moving from another `outcome` or `result`. Does nothing.
     
-      - [hook\_result\_construction(in\_place\_type\_t\<T\>, U \*)](doc_result.md#outcome_v2_1737b49b::hook_result_construction(in_place_type_t-T-,U*) "outcome_v2_1737b49b::hook_result_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `result` is first created by conversion from one of its possible types. Does nothing.
+      - [hook\_result\_construction(in\_place\_type\_t\<T\>, U \*)](doc_result.md#outcome_v2_xxx::hook_result_construction(in_place_type_t-T-,U*) "outcome_v2_xxx::hook_result_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `result` is first created by conversion from one of its possible types. Does nothing.
     
-      - [hook\_result\_copy\_construction(in\_place\_type\_t\<T\>, U \*)](doc_result.md#outcome_v2_1737b49b::hook_result_copy_construction(in_place_type_t-T-,U*) "outcome_v2_1737b49b::hook_result_copy_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `result` is created by copying from another `result`. Does nothing.
+      - [hook\_result\_copy\_construction(in\_place\_type\_t\<T\>, U \*)](doc_result.md#outcome_v2_xxx::hook_result_copy_construction(in_place_type_t-T-,U*) "outcome_v2_xxx::hook_result_copy_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `result` is created by copying from another `result`. Does nothing.
     
-      - [hook\_result\_in\_place\_construction(in\_place\_type\_t\<T\>, U \*)](doc_result.md#outcome_v2_1737b49b::hook_result_in_place_construction(in_place_type_t-T-,U*) "outcome_v2_1737b49b::hook_result_in_place_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `result` is created by in place construction. Does nothing.
+      - [hook\_result\_in\_place\_construction(in\_place\_type\_t\<T\>, U \*)](doc_result.md#outcome_v2_xxx::hook_result_in_place_construction(in_place_type_t-T-,U*) "outcome_v2_xxx::hook_result_in_place_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `result` is created by in place construction. Does nothing.
     
-      - [hook\_result\_move\_construction(in\_place\_type\_t\<T\>, U \*)](doc_result.md#outcome_v2_1737b49b::hook_result_move_construction(in_place_type_t-T-,U*) "outcome_v2_1737b49b::hook_result_move_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `result` is created by moving from another `result`. Does nothing.
+      - [hook\_result\_move\_construction(in\_place\_type\_t\<T\>, U \*)](doc_result.md#outcome_v2_xxx::hook_result_move_construction(in_place_type_t-T-,U*) "outcome_v2_xxx::hook_result_move_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `result` is created by moving from another `result`. Does nothing.
     
-      - [no\_error\_type](doc_result.md#outcome_v2_1737b49b::no_error_type "outcome_v2_1737b49b::no_error_type") - Placeholder type to indicate there is no error type
+      - [no\_error\_type](doc_result.md#outcome_v2_xxx::no_error_type "outcome_v2_xxx::no_error_type") - Placeholder type to indicate there is no error type
     
-      - [no\_exception\_type](doc_outcome.md#outcome_v2_1737b49b::no_exception_type "outcome_v2_1737b49b::no_exception_type") - Placeholder type to indicate there is no exception type
+      - [no\_exception\_type](doc_outcome.md#outcome_v2_xxx::no_exception_type "outcome_v2_xxx::no_exception_type") - Placeholder type to indicate there is no exception type
     
-      - [no\_payload\_type](doc_outcome.md#outcome_v2_1737b49b::no_payload_type "outcome_v2_1737b49b::no_payload_type") - Placeholder type to indicate there is no payload type
+      - [no\_payload\_type](doc_outcome.md#outcome_v2_xxx::no_payload_type "outcome_v2_xxx::no_payload_type") - Placeholder type to indicate there is no payload type
     
-      - [no\_value\_type](doc_result.md#outcome_v2_1737b49b::no_value_type "outcome_v2_1737b49b::no_value_type") - Placeholder type to indicate there is no value type
+      - [no\_value\_type](doc_result.md#outcome_v2_xxx::no_value_type "outcome_v2_xxx::no_value_type") - Placeholder type to indicate there is no value type
     
-      - [operator\!=(const result\<T, U, V\> &, const outcome\<R, S, P, N\> &)](doc_outcome.md#outcome_v2_1737b49b::operator!=(constresult-T,U,V-&,constoutcome-R,S,P,N-&) "outcome_v2_1737b49b::operator!=(const result\<T, U, V\> &, const outcome\<R, S, P, N\> &)") - True if the result is not equal to the outcome
+      - [operator\!=(const result\<T, U, V\> &, const outcome\<R, S, P, N\> &)](doc_outcome.md#outcome_v2_xxx::operator!=(constresult-T,U,V-&,constoutcome-R,S,P,N-&) "outcome_v2_xxx::operator!=(const result\<T, U, V\> &, const outcome\<R, S, P, N\> &)") - True if the result is not equal to the outcome
     
-      - [operator\<\<(std::ostream &, const outcome\<R, S, P, N\> &)](doc_iostream_support.md#outcome_v2_1737b49b::operator--(std::ostream&,constoutcome-R,S,P,N-&) "outcome_v2_1737b49b::operator\<\<(std::ostream &, const outcome\<R, S, P, N\> &)") - Serialise an outcome
+      - [operator\<\<(std::ostream &, const outcome\<R, S, P, N\> &)](doc_iostream_support.md#outcome_v2_xxx::operator--(std::ostream&,constoutcome-R,S,P,N-&) "outcome_v2_xxx::operator\<\<(std::ostream &, const outcome\<R, S, P, N\> &)") - Serialise an outcome
     
-      - [operator\<\<(std::ostream &, const result\<R, S, P\> &)](doc_iostream_support.md#outcome_v2_1737b49b::operator--(std::ostream&,constresult-R,S,P-&) "outcome_v2_1737b49b::operator\<\<(std::ostream &, const result\<R, S, P\> &)") - Serialise a result
+      - [operator\<\<(std::ostream &, const result\<R, S, P\> &)](doc_iostream_support.md#outcome_v2_xxx::operator--(std::ostream&,constresult-R,S,P-&) "outcome_v2_xxx::operator\<\<(std::ostream &, const result\<R, S, P\> &)") - Serialise a result
     
-      - [operator==(const result\<T, U, V\> &, const outcome\<R, S, P, N\> &)](doc_outcome.md#outcome_v2_1737b49b::operator==(constresult-T,U,V-&,constoutcome-R,S,P,N-&) "outcome_v2_1737b49b::operator==(const result\<T, U, V\> &, const outcome\<R, S, P, N\> &)") - True if the result is equal to the outcome
+      - [operator==(const result\<T, U, V\> &, const outcome\<R, S, P, N\> &)](doc_outcome.md#outcome_v2_xxx::operator==(constresult-T,U,V-&,constoutcome-R,S,P,N-&) "outcome_v2_xxx::operator==(const result\<T, U, V\> &, const outcome\<R, S, P, N\> &)") - True if the result is equal to the outcome
     
-      - [operator\>\>(std::istream &, outcome\<R, S, P, N\> &)](doc_iostream_support.md#outcome_v2_1737b49b::operator--(std::istream&,outcome-R,S,P,N-&) "outcome_v2_1737b49b::operator\>\>(std::istream &, outcome\<R, S, P, N\> &)") - Deserialise an outcome
+      - [operator\>\>(std::istream &, outcome\<R, S, P, N\> &)](doc_iostream_support.md#outcome_v2_xxx::operator--(std::istream&,outcome-R,S,P,N-&) "outcome_v2_xxx::operator\>\>(std::istream &, outcome\<R, S, P, N\> &)") - Deserialise an outcome
     
-      - [operator\>\>(std::istream &, result\<R, S, P\> &)](doc_iostream_support.md#outcome_v2_1737b49b::operator--(std::istream&,result-R,S,P-&) "outcome_v2_1737b49b::operator\>\>(std::istream &, result\<R, S, P\> &)") - Deserialise a result
+      - [operator\>\>(std::istream &, result\<R, S, P\> &)](doc_iostream_support.md#outcome_v2_xxx::operator--(std::istream&,result-R,S,P-&) "outcome_v2_xxx::operator\>\>(std::istream &, result\<R, S, P\> &)") - Deserialise a result
     
-      - [outcome](doc_outcome.md#outcome_v2_1737b49b::outcome-R,S,P,NoValuePolicy- "outcome_v2_1737b49b::outcome\<R, S, P, NoValuePolicy\>") - Used to return from functions (i) a value and (a positive status and/or a payload) or (ii) no value and (a negative status and/or a payload). `constexpr` capable.
+      - [outcome](doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy- "outcome_v2_xxx::outcome\<R, S, P, NoValuePolicy\>") - Used to return from functions (i) a value and (a positive status and/or a payload) or (ii) no value and (a negative status and/or a payload). `constexpr` capable.
     
-      - [print(const outcome\<R, S, P, N\> &)](doc_iostream_support.md#outcome_v2_1737b49b::print(constoutcome-R,S,P,N-&) "outcome_v2_1737b49b::print(const outcome\<R, S, P, N\> &)") - Debug print an outcome
+      - [print(const outcome\<R, S, P, N\> &)](doc_iostream_support.md#outcome_v2_xxx::print(constoutcome-R,S,P,N-&) "outcome_v2_xxx::print(const outcome\<R, S, P, N\> &)") - Debug print an outcome
     
-      - [print(const result\<R, S, P\> &)](doc_iostream_support.md#outcome_v2_1737b49b::print(constresult-R,S,P-&) "outcome_v2_1737b49b::print(const result\<R, S, P\> &)") - Debug print a result
+      - [print(const result\<R, S, P\> &)](doc_iostream_support.md#outcome_v2_xxx::print(constresult-R,S,P-&) "outcome_v2_xxx::print(const result\<R, S, P\> &)") - Debug print a result
     
-      - [result](doc_result.md#outcome_v2_1737b49b::result-R,S,NoValuePolicy- "outcome_v2_1737b49b::result\<R, S, NoValuePolicy\>") - Used to return from functions (i) a value (ii) a value and a positive status or (iii) no value and a negative status. `constexpr` capable.
+      - [result](doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy- "outcome_v2_xxx::result\<R, S, NoValuePolicy\>") - Used to return from functions (i) a value (ii) a value and a positive status or (iii) no value and a negative status. `constexpr` capable.
     
-      - [swap(outcome\<R, S, P, N\> &, outcome\<R, S, P, N\> &)](doc_outcome.md#outcome_v2_1737b49b::swap(outcome-R,S,P,N-&,outcome-R,S,P,N-&) "outcome_v2_1737b49b::swap(outcome\<R, S, P, N\> &, outcome\<R, S, P, N\> &)") - Specialise swap for outcome.
+      - [swap(outcome\<R, S, P, N\> &, outcome\<R, S, P, N\> &)](doc_outcome.md#outcome_v2_xxx::swap(outcome-R,S,P,N-&,outcome-R,S,P,N-&) "outcome_v2_xxx::swap(outcome\<R, S, P, N\> &, outcome\<R, S, P, N\> &)") - Specialise swap for outcome.
     
-      - [swap(result\<R, S, P\> &, result\<R, S, P\> &)](doc_result.md#outcome_v2_1737b49b::swap(result-R,S,P-&,result-R,S,P-&) "outcome_v2_1737b49b::swap(result\<R, S, P\> &, result\<R, S, P\> &)") - Specialise swap for result.
+      - [swap(result\<R, S, P\> &, result\<R, S, P\> &)](doc_result.md#outcome_v2_xxx::swap(result-R,S,P-&,result-R,S,P-&) "outcome_v2_xxx::swap(result\<R, S, P\> &, result\<R, S, P\> &)") - Specialise swap for result.
     
-      - [try\_operation\_return\_as(T &&)](doc_try.md#outcome_v2_1737b49b::try_operation_return_as(T&&) "outcome_v2_1737b49b::try_operation_return_as(T &&)") - Customisation point for changing what the `OUTCOME_TRY` macros do. This function defaults to returning `std::move(v).as_void()`.
+      - [try\_operation\_return\_as(T &&)](doc_try.md#outcome_v2_xxx::try_operation_return_as(T&&) "outcome_v2_xxx::try_operation_return_as(T &&)") - Customisation point for changing what the `OUTCOME_TRY` macros do. This function defaults to returning `std::move(v).as_void()`.
 
-  - `outcome_v2_1737b49b::impl`
+  - `outcome_v2_xxx::impl`
     
-      - [outcome\_exception\_observers](doc_outcome.md#outcome_v2_1737b49b::impl::outcome_exception_observers-Base,R,S,P,NoValuePolicy- "outcome_v2_1737b49b::impl::outcome_exception_observers\<Base, R, S, P, NoValuePolicy\>") - The exception observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
+      - [outcome\_exception\_observers](doc_outcome.md#outcome_v2_xxx::impl::outcome_exception_observers-Base,R,S,P,NoValuePolicy- "outcome_v2_xxx::impl::outcome_exception_observers\<Base, R, S, P, NoValuePolicy\>") - The exception observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
     
-      - [outcome\_exception\_observers\<Base, R, S, void, NoValuePolicy\>](doc_outcome.md#outcome.hpp "outcome_v2_1737b49b::impl::outcome_exception_observers\<Base, R, S, void, NoValuePolicy\>")
+      - [outcome\_exception\_observers\<Base, R, S, void, NoValuePolicy\>](doc_outcome.md#outcome.hpp "outcome_v2_xxx::impl::outcome_exception_observers\<Base, R, S, void, NoValuePolicy\>")
     
-      - [outcome\_failure\_observers](doc_outcome.md#outcome_v2_1737b49b::impl::outcome_failure_observers-Base,R,S,P,NoValuePolicy- "outcome_v2_1737b49b::impl::outcome_failure_observers\<Base, R, S, P, NoValuePolicy\>") - The failure observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
+      - [outcome\_failure\_observers](doc_outcome.md#outcome_v2_xxx::impl::outcome_failure_observers-Base,R,S,P,NoValuePolicy- "outcome_v2_xxx::impl::outcome_failure_observers\<Base, R, S, P, NoValuePolicy\>") - The failure observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
     
-      - [outcome\_failure\_observers\<Base, R, std::error\_code, std::exception\_ptr, NoValuePolicy\>](doc_outcome.md#outcome.hpp "outcome_v2_1737b49b::impl::outcome_failure_observers\<Base, R, std::error_code, std::exception_ptr, NoValuePolicy\>")
+      - [outcome\_failure\_observers\<Base, R, std::error\_code, std::exception\_ptr, NoValuePolicy\>](doc_outcome.md#outcome.hpp "outcome_v2_xxx::impl::outcome_failure_observers\<Base, R, std::error_code, std::exception_ptr, NoValuePolicy\>")
     
-      - [outcome\_payload\_observers](doc_outcome.md#outcome_v2_1737b49b::impl::outcome_payload_observers-Base,R,S,P,NoValuePolicy- "outcome_v2_1737b49b::impl::outcome_payload_observers\<Base, R, S, P, NoValuePolicy\>") - The payload observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
+      - [outcome\_payload\_observers](doc_outcome.md#outcome_v2_xxx::impl::outcome_payload_observers-Base,R,S,P,NoValuePolicy- "outcome_v2_xxx::impl::outcome_payload_observers\<Base, R, S, P, NoValuePolicy\>") - The payload observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
     
-      - [outcome\_payload\_observers\<Base, R, S, void, NoValuePolicy\>](doc_outcome.md#outcome.hpp "outcome_v2_1737b49b::impl::outcome_payload_observers\<Base, R, S, void, NoValuePolicy\>")
+      - [outcome\_payload\_observers\<Base, R, S, void, NoValuePolicy\>](doc_outcome.md#outcome.hpp "outcome_v2_xxx::impl::outcome_payload_observers\<Base, R, S, void, NoValuePolicy\>")
     
-      - [result\_error\_observers](doc_result.md#outcome_v2_1737b49b::impl::result_error_observers-Base,EC,NoValuePolicy- "outcome_v2_1737b49b::impl::result_error_observers\<Base, EC, NoValuePolicy\>") - The error observers implementation of `result<R, EC, NoValuePolicy>`. Only appears separate due to standardese limitations.
+      - [result\_error\_observers](doc_result.md#outcome_v2_xxx::impl::result_error_observers-Base,EC,NoValuePolicy- "outcome_v2_xxx::impl::result_error_observers\<Base, EC, NoValuePolicy\>") - The error observers implementation of `result<R, EC, NoValuePolicy>`. Only appears separate due to standardese limitations.
     
-      - [result\_error\_observers\<Base, void, NoValuePolicy\>](doc_result.md#result.hpp "outcome_v2_1737b49b::impl::result_error_observers\<Base, void, NoValuePolicy\>")
+      - [result\_error\_observers\<Base, void, NoValuePolicy\>](doc_result.md#result.hpp "outcome_v2_xxx::impl::result_error_observers\<Base, void, NoValuePolicy\>")
     
-      - [result\_final](doc_result.md#outcome_v2_1737b49b::impl::result_final-R,S,NoValuePolicy- "outcome_v2_1737b49b::impl::result_final\<R, S, NoValuePolicy\>") - The assembled implementation type of `result<R, EC, NoValuePolicy>`. Only appears separate due to standardese limitations.
+      - [result\_final](doc_result.md#outcome_v2_xxx::impl::result_final-R,S,NoValuePolicy- "outcome_v2_xxx::impl::result_final\<R, S, NoValuePolicy\>") - The assembled implementation type of `result<R, EC, NoValuePolicy>`. Only appears separate due to standardese limitations.
     
-      - [result\_storage](doc_result.md#outcome_v2_1737b49b::impl::result_storage-R,EC,NoValuePolicy- "outcome_v2_1737b49b::impl::result_storage\<R, EC, NoValuePolicy\>") - The base implementation type of `result<R, EC, NoValuePolicy>`. Only appears separate due to standardese limitations.
+      - [result\_storage](doc_result.md#outcome_v2_xxx::impl::result_storage-R,EC,NoValuePolicy- "outcome_v2_xxx::impl::result_storage\<R, EC, NoValuePolicy\>") - The base implementation type of `result<R, EC, NoValuePolicy>`. Only appears separate due to standardese limitations.
     
-      - [result\_value\_observers](doc_result.md#outcome_v2_1737b49b::impl::result_value_observers-Base,R,NoValuePolicy- "outcome_v2_1737b49b::impl::result_value_observers\<Base, R, NoValuePolicy\>") - The value observers implementation of `result<R, EC, NoValuePolicy>`. Only appears separate due to standardese limitations.
+      - [result\_value\_observers](doc_result.md#outcome_v2_xxx::impl::result_value_observers-Base,R,NoValuePolicy- "outcome_v2_xxx::impl::result_value_observers\<Base, R, NoValuePolicy\>") - The value observers implementation of `result<R, EC, NoValuePolicy>`. Only appears separate due to standardese limitations.
     
-      - [result\_value\_observers\<Base, void, NoValuePolicy\>](doc_result.md#result.hpp "outcome_v2_1737b49b::impl::result_value_observers\<Base, void, NoValuePolicy\>")
+      - [result\_value\_observers\<Base, void, NoValuePolicy\>](doc_result.md#result.hpp "outcome_v2_xxx::impl::result_value_observers\<Base, void, NoValuePolicy\>")
     
-      - [select\_result\_impl](doc_result.md#result.hpp "outcome_v2_1737b49b::impl::select_result_impl\<R, EC, NoValuePolicy\>")
+      - [select\_result\_impl](doc_result.md#result.hpp "outcome_v2_xxx::impl::select_result_impl\<R, EC, NoValuePolicy\>")
 
-  - `outcome_v2_1737b49b::policy`
+  - `outcome_v2_xxx::policy`
     
-      - [default\_outcome\_policy](doc_outcome.md#outcome_v2_1737b49b::policy::default_outcome_policy-R,S,P- "outcome_v2_1737b49b::policy::default_outcome_policy\<R, S, P\>") - Default `outcome<R, S, P>` policy selector.
+      - [default\_outcome\_policy](doc_outcome.md#outcome_v2_xxx::policy::default_outcome_policy-R,S,P- "outcome_v2_xxx::policy::default_outcome_policy\<R, S, P\>") - Default `outcome<R, S, P>` policy selector.
     
-      - [default\_result\_policy](doc_result.md#outcome_v2_1737b49b::policy::default_result_policy-EC- "outcome_v2_1737b49b::policy::default_result_policy\<EC\>") - Default `result<R, S>` policy selector.
+      - [default\_result\_policy](doc_result.md#outcome_v2_xxx::policy::default_result_policy-EC- "outcome_v2_xxx::policy::default_result_policy\<EC\>") - Default `result<R, S>` policy selector.
     
-      - [error\_code\_throw\_as\_system\_error](doc_result.md#outcome_v2_1737b49b::policy::error_code_throw_as_system_error-EC- "outcome_v2_1737b49b::policy::error_code_throw_as_system_error\<EC\>") - Policy interpreting EC as a type implementing the `std::error_code` contract and any wide attempt to access the successful state throws the `error_code` wrapped into a `std::system_error`
+      - [error\_code\_throw\_as\_system\_error](doc_result.md#outcome_v2_xxx::policy::error_code_throw_as_system_error-EC- "outcome_v2_xxx::policy::error_code_throw_as_system_error\<EC\>") - Policy interpreting EC as a type implementing the `std::error_code` contract and any wide attempt to access the successful state throws the `error_code` wrapped into a `std::system_error`
     
-      - [error\_code\_throw\_as\_system\_error\_exception\_rethrow](doc_outcome.md#outcome_v2_1737b49b::policy::error_code_throw_as_system_error_exception_rethrow-R,S,P- "outcome_v2_1737b49b::policy::error_code_throw_as_system_error_exception_rethrow\<R, S, P\>") - Policy interpreting S as a type implementing the `std::error_code` contract, E as a type implementing the `std::exception_ptr` contract, and any wide attempt to access the successful state throws the `exception_ptr` if available, then the `error_code` wrapped into a `std::system_error`.
+      - [error\_code\_throw\_as\_system\_error\_exception\_rethrow](doc_outcome.md#outcome_v2_xxx::policy::error_code_throw_as_system_error_exception_rethrow-R,S,P- "outcome_v2_xxx::policy::error_code_throw_as_system_error_exception_rethrow\<R, S, P\>") - Policy interpreting S as a type implementing the `std::error_code` contract, E as a type implementing the `std::exception_ptr` contract, and any wide attempt to access the successful state throws the `exception_ptr` if available, then the `error_code` wrapped into a `std::system_error`.
     
-      - [exception\_ptr\_rethrow](doc_result.md#outcome_v2_1737b49b::policy::exception_ptr_rethrow-EC- "outcome_v2_1737b49b::policy::exception_ptr_rethrow\<EC\>") - Policy interpreting EC as a type implementing the `std::exception_ptr` contract and any wide attempt to access the successful state calls `std::rethrow_exception()`.
+      - [exception\_ptr\_rethrow](doc_result.md#outcome_v2_xxx::policy::exception_ptr_rethrow-EC- "outcome_v2_xxx::policy::exception_ptr_rethrow\<EC\>") - Policy interpreting EC as a type implementing the `std::exception_ptr` contract and any wide attempt to access the successful state calls `std::rethrow_exception()`.
     
-      - [terminate](doc_result.md#outcome_v2_1737b49b::policy::terminate "outcome_v2_1737b49b::policy::terminate") - Policy implementing any wide attempt to access the successful state as calling `std::terminate`
+      - [terminate](doc_result.md#outcome_v2_xxx::policy::terminate "outcome_v2_xxx::policy::terminate") - Policy implementing any wide attempt to access the successful state as calling `std::terminate`
     
-      - [throw\_directly](doc_result.md#outcome_v2_1737b49b::policy::throw_directly-EC- "outcome_v2_1737b49b::policy::throw_directly\<EC\>") - Policy interpreting EC as a type to be thrown directly during wide checks.
+      - [throw\_directly](doc_result.md#outcome_v2_xxx::policy::throw_directly-EC- "outcome_v2_xxx::policy::throw_directly\<EC\>") - Policy interpreting EC as a type to be thrown directly during wide checks.
 
-  - `outcome_v2_1737b49b::trait` - Namespace for traits
+  - `outcome_v2_xxx::trait` - Namespace for traits
     
-      - [is\_exception\_ptr](doc_outcome.md#outcome_v2_1737b49b::trait::is_exception_ptr-P- "outcome_v2_1737b49b::trait::is_exception_ptr\<P\>") - Trait for whether type `P` is to be considered a payload to an exception.
+      - [is\_exception\_ptr](doc_outcome.md#outcome_v2_xxx::trait::is_exception_ptr-P- "outcome_v2_xxx::trait::is_exception_ptr\<P\>") - Trait for whether type `P` is to be considered a payload to an exception.

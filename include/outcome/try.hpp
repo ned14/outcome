@@ -35,7 +35,14 @@ do. This function defaults to returning `std::move(v).as_void()`.
 \requires The input value to have a `.as_void()` member function, and a `rebind`
 member template alias.
 */
-template <class T> typename T::template rebind<void> try_operation_return_as(T &&v)
+template <class T>
+OUTCOME_REQUIRES(requires(T &&v) {
+  {
+    v.as_void()
+  }
+  ->typename T::template rebind<void>;
+})
+typename T::template rebind<void> try_operation_return_as(T &&v)
 {
   return std::move(v).as_void();
 }

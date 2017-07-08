@@ -53,6 +53,21 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_THREAD_LOCAL
 #define OUTCOME_THREAD_LOCAL QUICKCPPLIB_THREAD_LOCAL
 #endif
+#ifndef OUTCOME_TEMPLATE
+#define OUTCOME_TEMPLATE(...) QUICKCPPLIB_TEMPLATE(__VA_ARGS__)
+#endif
+#ifndef OUTCOME_TREQUIRES
+#define OUTCOME_TREQUIRES(...) QUICKCPPLIB_TREQUIRES(__VA_ARGS__)
+#endif
+#ifndef OUTCOME_TEXPR
+#define OUTCOME_TEXPR(...) QUICKCPPLIB_TEXPR(__VA_ARGS__)
+#endif
+#ifndef OUTCOME_TPRED
+#define OUTCOME_TPRED(...) QUICKCPPLIB_TPRED(__VA_ARGS__)
+#endif
+#ifndef OUTCOME_REQUIRES
+#define OUTCOME_REQUIRES(...) QUICKCPPLIB_REQUIRES(__VA_ARGS__)
+#endif
 #ifndef OUTCOME_MSVC_WORKAROUNDS
 // Older MSVC's constexpr isn't up to Outcome v2 and it ICEs, so don't use constexpr in those situations
 #if defined(_MSC_VER) && !defined(__clang__) && _MSC_FULL_VER <= 191025019 /* VS2017 Update 2*/

@@ -22,10 +22,10 @@ slug = "doc_try.md"
 
 #define <a href='doc_try.md#OUTCOME_TRY'>OUTCOME_TRY</a>(v, m)
 
-namespace <a href='doc_try.md#try.hpp'>outcome_v2_1737b49b</a>
+namespace <a href='doc_try.md#try.hpp'>outcome_v2_xxx</a>
 {
     template &lt;class T&gt;
-    typename T::template rebind&lt;void&gt; <a href='doc_try.md#outcome_v2_1737b49b::try_operation_return_as(T&&)'>try_operation_return_as</a>(T&amp;&amp; v);
+    typename T::template rebind&lt;void&gt; <a href='doc_try.md#outcome_v2_xxx::try_operation_return_as(T&&)'>try_operation_return_as</a>(T&amp;&amp; v);
 }</code></pre>
 
 ## Macro `OUTCOME_TRYV`<a id="OUTCOME_TRYV"></a>
@@ -48,7 +48,7 @@ portable. The macro is not made available on unsupported compilers, so you can t
 
 If the outcome returned by expression *m* is not valued, propagate any failure by immediately returning that failure immediately, else set \*v( to the unwrapped value
 
-## Function template `outcome_v2_1737b49b::try_operation_return_as`<a id="outcome_v2_1737b49b::try_operation_return_as(T&&)"></a>
+## Function template `outcome_v2_xxx::try_operation_return_as`<a id="outcome_v2_xxx::try_operation_return_as(T&&)"></a>
 
 <pre><code class="language-cpp">template &lt;class T&gt;
 typename T::template rebind&lt;void&gt; try_operation_return_as(T&amp;&amp; v);</code></pre>
