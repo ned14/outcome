@@ -27,79 +27,102 @@ Maybe?
 # Changes since v1:
 
 As per the Boost peer review feedback, v2 Outcome has been pared down to
-no more than the barest of bare essentials.
+no more than the barest of bare essentials. The plan is to occupy the lowest
+level in a generalised [C++ Monadic interface (P0650R0)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0650r0.pdf)
+as an adjunct to the [primary C++ monad object (P0323R2)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0323r2.pdf).
+
 - Major changes:
-   - You can now customise types directly, so `result<T, EC = std::error_code>`
-   and `outcome<T, EC = std::error_code, P|E = std::exception_ptr>`.
+   - You can now customise types directly, so `result<T, EC =
+   std::error_code>` and `outcome<T, EC = std::error_code, P|E =
+   std::exception_ptr>`.
    - Default construction no longer permitted.
    - Empty state no longer possible.
    - Variant storage gone, it's now an aggregate. This enables returning
-   an error code with additional exception ptr as per Peter Dimov's request.
-   It also very considerably simplifies implementation.
-     - You can choose between a payload type `P` or an exception ptr `E`, so
-   an error code with additional arbitrary non-exception ptr payload `P` is also possible.
-   - Concepts TS is used when available, otherwise a partial SFINAE-based emulation is used.
-   - Types `EC`, `P` and `E` must be default constructible. `T` need not be so.
-   - Constructors now follow those of `std::variant`, so it will implicitly
-   convert from any input convertible to any of its types so long as it is
-   not ambiguous. As with `std::variant`, in place construction
-   is achieved via `in_place_type<T>` tagging. Explicit conversion construction also works,
-   we replicate `std::variant`'s value semantics very closely despite not having variant storage.
-   - `.has_value()`, `.has_error()` and `.has_exception()` now only return true
-   if that specific member is present. A new `.has_failure()` is true if errored
-   or excepted.
-   - `.value()` throws exception or `std::system_error(EC)` if no value or returns a reference to the value.
-   - `.error()` throws `bad_result_access|bad_outcome_access` if no error or returns a reference to the error.
-   - `.payload()` throws `bad_result_access|bad_outcome_access` if no payload or returns a reference to the payload.
-   - `.exception()` throws `bad_result_access|bad_outcome_access` if no exception or returns a reference to the exception.
-   - `.failure()` returns the exception if present, else a synthesised `exception_ptr` from the error, else a null `exception_ptr`.
+   an error code with additional exception ptr as per Peter Dimov's
+   request. It also very considerably simplifies implementation.
+     - You can choose between a payload type `P` or an exception ptr
+     `E`, so  an error code with additional arbitrary non-exception ptr
+     payload `P` is also possible.
+   - Concepts TS is used when available, otherwise a partial
+   SFINAE-based emulation is used.
+   - Types `EC`, `P` and `E` must be default constructible. `T` need not
+   be so.
+   - Constructors now follow those of `std::variant`, so it will
+   implicitly convert from any input convertible to any of its types so
+   long as it is not ambiguous. As with `std::variant`, in place
+   construction is achieved via `in_place_type<T>` tagging. Explicit
+   conversion construction also works, we replicate `std::variant`'s
+   value semantics very closely despite not having variant storage.
+   - `.has_value()`, `.has_error()` and `.has_exception()` now only
+   return true if that specific member is present. A new
+   `.has_failure()` is true if errored or excepted.
+   - `.value()` throws exception or `std::system_error(EC)` if no value
+   or returns a reference to the value.
+   - `.error()` throws `bad_result_access|bad_outcome_access` if no
+   error or returns a reference to the error.
+   - `.payload()` throws `bad_result_access|bad_outcome_access` if no
+   payload or returns a reference to the payload.
+   - `.exception()` throws `bad_result_access|bad_outcome_access` if no
+   exception or returns a reference to the exception.
+   - `.failure()` returns the exception if present, else a synthesised
+   `exception_ptr` from the error, else a null `exception_ptr`.
+   - `.assume_value()`, `.assume_error()`, `.assume_payload()` and
+   `.assume_exception()` all provide runtime unchecked access to the
+   underlying storage.
+   - The doxygen docs which were widely criticised have been replaced
+   with an experimental Standardese + Hugo based solution instead.
 
  - Stuff removed:
    - Anything even faintly smelling of monads.
-   - All preprocessor assembly of code fragments. You now have an equally
-   complex rabbit warren of policy and trait driven composited fragments
-   of template into implementation. Standardese (the documentation tool)
-   really struggles with this. Doxygen simply blows up.
-   - All macro based customisation points. We now use an ADL function based
-   customisation point design, 100% C++.
+   - All preprocessor assembly of code fragments. You now have an
+   equally complex rabbit warren of policy and trait driven composited
+   fragments of template into implementation. Standardese (the
+   documentation tool) really struggles with this. Doxygen simply blows
+   up.
+   - All macro based customisation points. We now use an ADL function
+   based customisation point design, 100% C++.
    - `error_code_extended` is gone for now. It is believed that via the
-   ADL customisation points you can easily implement your own. There is a
-   worked example at https://github.com/ned14/outcome/blob/develop/example/error_code_extended.cpp.
-   **WARNING**: Any interfaces used in that example which refer to a `detail`
-   namespace are going to change in the near future.
-   - Any operators apart from boolean test, strict equality and inequality comparison.
+   ADL customisation points you can easily implement your own. There is
+   a worked example at
+   https://github.com/ned14/outcome/blob/develop/example/error_code_extended.cpp.
+   **WARNING**: Any interfaces used in that example which refer to a
+   `detail` namespace are going to change in the near future.
+   - Any operators apart from boolean test, strict equality and
+   inequality comparison.
    - Any ability to change state after construction.
-   - LEWG `expected<T, E>` is gone. The new templatised `result<T, E>` is a
-   much slimmer edition of Expected providing pretty much all the same
-   functionality but in a much smaller package and with `std::variant<>`'s
-   look and feel instead of innovating the API with extra type sugar.
+   - LEWG `expected<T, E>` is gone. The new templatised `result<T, E>`
+   is a much slimmer edition of Expected providing the same core
+   functionality but in a much smaller package and with
+   `std::variant<>`'s look and feel instead of new type sugar like
+   `make_unexpected`.
 
  - Stuff retained:
    - `OUTCOME_TRY`, `OUTCOME_TRYV`, `OUTCOME_TRYX` all work as before.
    - `noexcept` propagation from types chosen works correctly.
-   - Triviality of construction, assignment and destruction from types chosen
-   is propagated correctly.
-   - v1 unit test has been almost entirely ported over to v2 without much
-   change other than what was needed. Porting v1 based code to v2 should be
-   95% possible using find regex in files and replace.
+   - Triviality of construction, assignment and destruction from types
+   chosen is propagated correctly.
+   - v1 unit test has been almost entirely ported over to v2 without
+   much change other than what was needed. Porting v1 based code to v2
+   should be 95% possible using find regex in files and replace.
 
  - Stuff gained:
-   - Type traits now work direct on all member functions. Member variable
-   traits are no longer necessary, and so have been removed.
-   - Outcome v2 now conforms in every way to a typical STL vocabulary type.
-   No unusual design tradeoffs or changes. v2 ought to be immediately
-   standardisable into C++ as-is in v2 without controversy.
+   - Type traits now work direct on all member functions. Member
+   variable traits are no longer necessary, and so have been removed.
+   - Outcome v2 now conforms in every way to a typical STL vocabulary
+   type. No unusual design tradeoffs or changes. v2 ought to be
+   immediately standardisable into C++ as-is in v2 without controversy.
 
  - Stuff lost:
-   - Outcome v2 needs a much newer compiler than before: clang 4 or better,
-   GCC 6 or better, ideally with Concepts enabled. Sorry, no MSVC support,
-   I've submitted repros of the ICEs
-   for VS2017.3. I've been careful to keep MSVC's frontend happy, the ICEs
-   are all in the backend, so it'll likely start working soon.
-   - Compile time load may now be higher than with v1. Almost every function
-   is compile time enabled depending on input types (we do use template variables
-   to cache previously calculated results) with calculated noexcept. It'll get a
-   lot better as compilers make better use of the boolean logic supplied by Concepts.
+   - Outcome v2 needs a much newer compiler than before: clang 4 or
+   better, GCC 6 or better, ideally with Concepts enabled. Sorry, no
+   MSVC support, I've submitted repros of the ICEs for VS2017.3. I've
+   been careful to keep MSVC's frontend happy, the ICEs are all in the
+   backend, so it'll likely start working soon.
+   - Compile time load may now be higher than with v1. Almost every
+   function is compile time enabled depending on input types (we do use
+   template variables to cache previously calculated results) with
+   calculated noexcept. It'll get a lot better as compilers make better
+   use of the boolean logic supplied by Concepts.
 
 ## Commits and tags in this git repository can be verified using:
 <pre>
