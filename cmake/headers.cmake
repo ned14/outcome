@@ -8,6 +8,7 @@ set(outcome_HEADERS
   "include/outcome/result.hpp"
   "include/outcome/revision.hpp"
   "include/outcome/try.hpp"
+  "include/outcome/utils.hpp"
   "include/outcome/version.hpp"
   "include/outcome/outcome.natvis"
 )

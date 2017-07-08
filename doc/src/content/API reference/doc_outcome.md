@@ -1,6 +1,7 @@
 +++
 title = "outcome<R, S, P>"
 slug = "doc_outcome.md"
+weight = 10
 +++
 # Header file `outcome.hpp`<a id="outcome.hpp"></a>
 
@@ -20,7 +21,7 @@ namespace <a href='doc_try.md#try.hpp'>outcome_v2_xxx</a>
     
     struct <a href='doc_outcome.md#outcome_v2_xxx::no_exception_type'>no_exception_type</a>;
     
-    namespace <a href='doc_outcome.md#outcome.hpp'>impl</a>
+    namespace <a href='doc_result.md#result.hpp'>impl</a>
     {
         template &lt;class Base, class R, class S, class P, class NoValuePolicy&gt;
         class <a href='doc_outcome.md#outcome_v2_xxx::impl::outcome_payload_observers-Base,R,S,P,NoValuePolicy-'>outcome_payload_observers</a>;
@@ -41,7 +42,7 @@ namespace <a href='doc_try.md#try.hpp'>outcome_v2_xxx</a>
         class <a href='doc_outcome.md#outcome.hpp'>outcome_failure_observers&lt;Base, R, std::error_code, std::exception_ptr, NoValuePolicy&gt;</a>;
     }
     
-    namespace <a href='doc_outcome.md#outcome.hpp'>policy</a>
+    namespace <a href='doc_result.md#outcome_v2_xxx::policy'>policy</a>
     {
         template &lt;class R, class S, class P&gt;
         using <a href='doc_outcome.md#outcome_v2_xxx::policy::default_outcome_policy-R,S,P-'>default_outcome_policy</a> = <a href='http://en.cppreference.com/mwiki/index.php?title=Special%3ASearch&search=std::conditional_t%3c//detail::is_same_or_constructible%3cstd::error_code,S%3e&&trait::is_exception_ptr%3cP%3e::value,error_code_throw_as_system_error_exception_rethrow%3cR,S,P%3e,//terminate//%3e'>std::conditional_t&lt;//detail::is_same_or_constructible&lt;std::error_code, S&gt;&amp;&amp;trait::is_exception_ptr&lt;P&gt;::value, error_code_throw_as_system_error_exception_rethrow&lt;R, S, P&gt;, //terminate//&gt;</a>;
@@ -63,21 +64,21 @@ namespace <a href='doc_try.md#try.hpp'>outcome_v2_xxx</a>
     class <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-'>outcome</a>;
     
     template &lt;class T, class U, class V, class R, class S, class P, class N&gt;
-    constexpr )//&gt;bool <a href='doc_outcome.md#outcome_v2_xxx::operator==(constresult-T,U,V-&,constoutcome-R,S,P,N-&)'>operator==</a>(const result&lt;T, U, V&gt;&amp; a, const <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-'>outcome&lt;R, S, P, N&gt;</a>&amp; b) noexcept(//noexcept(std::declval&lt;outcome&lt;R, S, P, N&gt;&gt;()==std::declval&lt;result&lt;T, U, V&gt;&gt;()));
+    constexpr )//&gt;bool <a href='doc_outcome.md#outcome_v2_xxx::operator==(constresult-T,U,V-&,constoutcome-R,S,P,N-&)'>operator==</a>(const <a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp; a, const <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-'>outcome&lt;R, S, P, N&gt;</a>&amp; b) noexcept(//noexcept(std::declval&lt;outcome&lt;R, S, P, N&gt;&gt;()==std::declval&lt;result&lt;T, U, V&gt;&gt;()));
     
     template &lt;class T, class U, class V, class R, class S, class P, class N&gt;
-    constexpr )//&gt;bool <a href='doc_outcome.md#outcome_v2_xxx::operator!=(constresult-T,U,V-&,constoutcome-R,S,P,N-&)'>operator!=</a>(const result&lt;T, U, V&gt;&amp; a, const <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-'>outcome&lt;R, S, P, N&gt;</a>&amp; b) noexcept(//noexcept(std::declval&lt;outcome&lt;R, S, P, N&gt;&gt;()!=std::declval&lt;result&lt;T, U, V&gt;&gt;()));
+    constexpr )//&gt;bool <a href='doc_outcome.md#outcome_v2_xxx::operator!=(constresult-T,U,V-&,constoutcome-R,S,P,N-&)'>operator!=</a>(const <a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp; a, const <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-'>outcome&lt;R, S, P, N&gt;</a>&amp; b) noexcept(//noexcept(std::declval&lt;outcome&lt;R, S, P, N&gt;&gt;()!=std::declval&lt;result&lt;T, U, V&gt;&gt;()));
     
     template &lt;class R, class S, class P, class N&gt;
     void <a href='doc_outcome.md#outcome_v2_xxx::swap(outcome-R,S,P,N-&,outcome-R,S,P,N-&)'>swap</a>(<a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-'>outcome&lt;R, S, P, N&gt;</a>&amp; a, <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-'>outcome&lt;R, S, P, N&gt;</a>&amp; b) noexcept(noexcept(a.swap(b)));
     
-    namespace <a href='doc_outcome.md#outcome.hpp'>policy</a>
+    namespace <a href='doc_result.md#outcome_v2_xxx::policy'>policy</a>
     {
         template &lt;class R, class S, class P&gt;
         struct <a href='doc_outcome.md#outcome_v2_xxx::policy::error_code_throw_as_system_error_exception_rethrow-R,S,P-'>error_code_throw_as_system_error_exception_rethrow</a>;
     }
     
-    namespace <a href='doc_outcome.md#outcome.hpp'>impl</a>
+    namespace <a href='doc_result.md#result.hpp'>impl</a>
     {
     }
 }</code></pre>
@@ -378,16 +379,16 @@ public:
     constexpr <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::outcome(outcome-T,U,V,W-&&,outcome_v2_xxx::outcome::implicit_compatible_conversion_tag)'>outcome</a>(<a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-'>outcome&lt;T, U, V, W&gt;</a>&amp;&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::implicit_compatible_conversion_tag/'>implicit_compatible_conversion_tag</a> = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type, V&gt;::value);
     
     template &lt;class T, class U, class V&gt;
-    constexpr <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::outcome(constresult-T,U,V-&,outcome_v2_xxx::outcome::explicit_compatible_conversion_tag)'>outcome</a>(const result&lt;T, U, V&gt;&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::explicit_compatible_conversion_tag/'>explicit_compatible_conversion_tag</a> = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;value_type, T&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);
+    constexpr <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::outcome(constresult-T,U,V-&,outcome_v2_xxx::outcome::explicit_compatible_conversion_tag)'>outcome</a>(const <a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::explicit_compatible_conversion_tag/'>explicit_compatible_conversion_tag</a> = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;value_type, T&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);
     
     template &lt;class T, class U, class V&gt;
-    constexpr <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::outcome(constresult-T,U,V-&,outcome_v2_xxx::outcome::implicit_compatible_conversion_tag)'>outcome</a>(const result&lt;T, U, V&gt;&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::implicit_compatible_conversion_tag/'>implicit_compatible_conversion_tag</a> = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);
+    constexpr <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::outcome(constresult-T,U,V-&,outcome_v2_xxx::outcome::implicit_compatible_conversion_tag)'>outcome</a>(const <a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::implicit_compatible_conversion_tag/'>implicit_compatible_conversion_tag</a> = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);
     
     template &lt;class T, class U, class V&gt;
-    constexpr <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::outcome(result-T,U,V-&&,outcome_v2_xxx::outcome::explicit_compatible_conversion_tag)'>outcome</a>(result&lt;T, U, V&gt;&amp;&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::explicit_compatible_conversion_tag/'>explicit_compatible_conversion_tag</a> = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;value_type, T&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);
+    constexpr <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::outcome(result-T,U,V-&&,outcome_v2_xxx::outcome::explicit_compatible_conversion_tag)'>outcome</a>(<a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp;&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::explicit_compatible_conversion_tag/'>explicit_compatible_conversion_tag</a> = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;value_type, T&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);
     
     template &lt;class T, class U, class V&gt;
-    constexpr <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::outcome(result-T,U,V-&&,outcome_v2_xxx::outcome::implicit_compatible_conversion_tag)'>outcome</a>(result&lt;T, U, V&gt;&amp;&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::implicit_compatible_conversion_tag/'>implicit_compatible_conversion_tag</a> = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);
+    constexpr <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::outcome(result-T,U,V-&&,outcome_v2_xxx::outcome::implicit_compatible_conversion_tag)'>outcome</a>(<a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp;&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::implicit_compatible_conversion_tag/'>implicit_compatible_conversion_tag</a> = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);
     
     template &lt;class ... Args&gt;
     constexpr <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::outcome(in_place_type_t-value_type_if_enabled-,Args&&...)'>outcome</a>(in_place_type_t&lt;value_type_if_enabled&gt; _, Args&amp;&amp;... args) noexcept(std::is_nothrow_constructible&lt;value_type, Args...&gt;::value);
@@ -414,10 +415,10 @@ public:
     constexpr )//&gt;bool <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::operator!=(constoutcome-T,U,V,W-&)const'>operator!=</a>(const <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-'>outcome&lt;T, U, V, W&gt;</a>&amp; o) const noexcept(//noexcept(std::declval&lt;R&gt;()!=std::declval&lt;T&gt;())//&amp;&amp;noexcept(std::declval&lt;S&gt;()!=std::declval&lt;U&gt;())//&amp;&amp;noexcept(std::declval&lt;P&gt;()!=std::declval&lt;V&gt;()));
     
     template &lt;class T, class U, class V, typename = decltype(std::declval&lt;R&gt;()==std::declval&lt;T&gt;()&gt;
-    constexpr )//&gt;bool <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::operator==(constresult-T,U,V-&)const'>operator==</a>(const result&lt;T, U, V&gt;&amp; o) const noexcept(//noexcept(std::declval&lt;R&gt;()==std::declval&lt;T&gt;())//&amp;&amp;noexcept(std::declval&lt;S&gt;()==std::declval&lt;U&gt;()));
+    constexpr )//&gt;bool <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::operator==(constresult-T,U,V-&)const'>operator==</a>(const <a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp; o) const noexcept(//noexcept(std::declval&lt;R&gt;()==std::declval&lt;T&gt;())//&amp;&amp;noexcept(std::declval&lt;S&gt;()==std::declval&lt;U&gt;()));
     
     template &lt;class T, class U, class V, typename = decltype(std::declval&lt;R&gt;()!=std::declval&lt;T&gt;()&gt;
-    constexpr )//&gt;bool <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::operator!=(constresult-T,U,V-&)const'>operator!=</a>(const result&lt;T, U, V&gt;&amp; o) const noexcept(//noexcept(std::declval&lt;R&gt;()!=std::declval&lt;T&gt;())//&amp;&amp;noexcept(std::declval&lt;S&gt;()!=std::declval&lt;U&gt;()));
+    constexpr )//&gt;bool <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::operator!=(constresult-T,U,V-&)const'>operator!=</a>(const <a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp; o) const noexcept(//noexcept(std::declval&lt;R&gt;()!=std::declval&lt;T&gt;())//&amp;&amp;noexcept(std::declval&lt;S&gt;()!=std::declval&lt;U&gt;()));
     
     void <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::swap(outcome-R,S,P,NoValuePolicy-&)'>swap</a>(<a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-'>outcome</a>&amp; o) noexcept(detail::is_nothrow_swappable&lt;value_type&gt;::value//&amp;&amp;detail::is_nothrow_swappable&lt;status_error_type&gt;::value//&amp;&amp;detail::is_nothrow_swappable&lt;payload_exception_type&gt;::value);
     
@@ -640,7 +641,7 @@ Implicit converting move constructor from a compatible outcome type.
 ### Function template `outcome_v2_xxx::outcome::outcome`<a id="outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::outcome(constresult-T,U,V-&,outcome_v2_xxx::outcome::explicit_compatible_conversion_tag)"></a>
 
 <pre><code class="language-cpp">template &lt;class T, class U, class V&gt;
-constexpr outcome(const result&lt;T, U, V&gt;&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::explicit_compatible_conversion_tag/'>explicit_compatible_conversion_tag</a> = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;value_type, T&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);</code></pre>
+constexpr outcome(const <a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::explicit_compatible_conversion_tag/'>explicit_compatible_conversion_tag</a> = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;value_type, T&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);</code></pre>
 
 Explicit converting copy constructor from a compatible result type.
 
@@ -657,7 +658,7 @@ Explicit converting copy constructor from a compatible result type.
 ### Function template `outcome_v2_xxx::outcome::outcome`<a id="outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::outcome(constresult-T,U,V-&,outcome_v2_xxx::outcome::implicit_compatible_conversion_tag)"></a>
 
 <pre><code class="language-cpp">template &lt;class T, class U, class V&gt;
-constexpr outcome(const result&lt;T, U, V&gt;&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::implicit_compatible_conversion_tag/'>implicit_compatible_conversion_tag</a> = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);</code></pre>
+constexpr outcome(const <a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::implicit_compatible_conversion_tag/'>implicit_compatible_conversion_tag</a> = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);</code></pre>
 
 Implicit converting copy constructor from a compatible result type.
 
@@ -674,7 +675,7 @@ Implicit converting copy constructor from a compatible result type.
 ### Function template `outcome_v2_xxx::outcome::outcome`<a id="outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::outcome(result-T,U,V-&&,outcome_v2_xxx::outcome::explicit_compatible_conversion_tag)"></a>
 
 <pre><code class="language-cpp">template &lt;class T, class U, class V&gt;
-constexpr outcome(result&lt;T, U, V&gt;&amp;&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::explicit_compatible_conversion_tag/'>explicit_compatible_conversion_tag</a> = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;value_type, T&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);</code></pre>
+constexpr outcome(<a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp;&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::explicit_compatible_conversion_tag/'>explicit_compatible_conversion_tag</a> = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;value_type, T&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);</code></pre>
 
 Explicit converting move constructor from a compatible result type.
 
@@ -691,7 +692,7 @@ Explicit converting move constructor from a compatible result type.
 ### Function template `outcome_v2_xxx::outcome::outcome`<a id="outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::outcome(result-T,U,V-&&,outcome_v2_xxx::outcome::implicit_compatible_conversion_tag)"></a>
 
 <pre><code class="language-cpp">template &lt;class T, class U, class V&gt;
-constexpr outcome(result&lt;T, U, V&gt;&amp;&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::implicit_compatible_conversion_tag/'>implicit_compatible_conversion_tag</a> = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);</code></pre>
+constexpr outcome(<a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp;&amp; o, <a href='standardese://outcome_v2_xxx::outcome<R, S, P, NoValuePolicy>::implicit_compatible_conversion_tag/'>implicit_compatible_conversion_tag</a> = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible&lt;status_error_type, U&gt;::value&amp;&amp;std::is_nothrow_constructible&lt;payload_exception_type&gt;::value);</code></pre>
 
 Implicit converting move constructor from a compatible result type.
 
@@ -858,7 +859,7 @@ True if not equal to the other outcome.
 ### Comparison operator `outcome_v2_xxx::outcome::operator==`<a id="outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::operator==(constresult-T,U,V-&)const"></a>
 
 <pre><code class="language-cpp">template &lt;class T, class U, class V, typename = decltype(std::declval&lt;R&gt;()==std::declval&lt;T&gt;()&gt;
-constexpr )//&gt;bool operator==(const result&lt;T, U, V&gt;&amp; o) const noexcept(//noexcept(std::declval&lt;R&gt;()==std::declval&lt;T&gt;())//&amp;&amp;noexcept(std::declval&lt;S&gt;()==std::declval&lt;U&gt;()));</code></pre>
+constexpr )//&gt;bool operator==(const <a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp; o) const noexcept(//noexcept(std::declval&lt;R&gt;()==std::declval&lt;T&gt;())//&amp;&amp;noexcept(std::declval&lt;S&gt;()==std::declval&lt;U&gt;()));</code></pre>
 
 True if equal to the other result.
 
@@ -875,7 +876,7 @@ True if equal to the other result.
 ### Comparison operator `outcome_v2_xxx::outcome::operator!=`<a id="outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-::operator!=(constresult-T,U,V-&)const"></a>
 
 <pre><code class="language-cpp">template &lt;class T, class U, class V, typename = decltype(std::declval&lt;R&gt;()!=std::declval&lt;T&gt;()&gt;
-constexpr )//&gt;bool operator!=(const result&lt;T, U, V&gt;&amp; o) const noexcept(//noexcept(std::declval&lt;R&gt;()!=std::declval&lt;T&gt;())//&amp;&amp;noexcept(std::declval&lt;S&gt;()!=std::declval&lt;U&gt;()));</code></pre>
+constexpr )//&gt;bool operator!=(const <a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp; o) const noexcept(//noexcept(std::declval&lt;R&gt;()!=std::declval&lt;T&gt;())//&amp;&amp;noexcept(std::declval&lt;S&gt;()!=std::declval&lt;U&gt;()));</code></pre>
 
 True if not equal to the other result.
 
@@ -918,7 +919,7 @@ Returns this outcome rebound to void with any errored and payload state moved.
 ## Comparison operator `outcome_v2_xxx::operator==`<a id="outcome_v2_xxx::operator==(constresult-T,U,V-&,constoutcome-R,S,P,N-&)"></a>
 
 <pre><code class="language-cpp">template &lt;class T, class U, class V, class R, class S, class P, class N&gt;
-constexpr )//&gt;bool operator==(const result&lt;T, U, V&gt;&amp; a, const <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-'>outcome&lt;R, S, P, N&gt;</a>&amp; b) noexcept(//noexcept(std::declval&lt;outcome&lt;R, S, P, N&gt;&gt;()==std::declval&lt;result&lt;T, U, V&gt;&gt;()));</code></pre>
+constexpr )//&gt;bool operator==(const <a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp; a, const <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-'>outcome&lt;R, S, P, N&gt;</a>&amp; b) noexcept(//noexcept(std::declval&lt;outcome&lt;R, S, P, N&gt;&gt;()==std::declval&lt;result&lt;T, U, V&gt;&gt;()));</code></pre>
 
 True if the result is equal to the outcome
 
@@ -937,7 +938,7 @@ True if the result is equal to the outcome
 ## Comparison operator `outcome_v2_xxx::operator!=`<a id="outcome_v2_xxx::operator!=(constresult-T,U,V-&,constoutcome-R,S,P,N-&)"></a>
 
 <pre><code class="language-cpp">template &lt;class T, class U, class V, class R, class S, class P, class N&gt;
-constexpr )//&gt;bool operator!=(const result&lt;T, U, V&gt;&amp; a, const <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-'>outcome&lt;R, S, P, N&gt;</a>&amp; b) noexcept(//noexcept(std::declval&lt;outcome&lt;R, S, P, N&gt;&gt;()!=std::declval&lt;result&lt;T, U, V&gt;&gt;()));</code></pre>
+constexpr )//&gt;bool operator!=(const <a href='doc_result.md#outcome_v2_xxx::result-R,S,NoValuePolicy-'>result&lt;T, U, V&gt;</a>&amp; a, const <a href='doc_outcome.md#outcome_v2_xxx::outcome-R,S,P,NoValuePolicy-'>outcome&lt;R, S, P, N&gt;</a>&amp; b) noexcept(//noexcept(std::declval&lt;outcome&lt;R, S, P, N&gt;&gt;()!=std::declval&lt;result&lt;T, U, V&gt;&gt;()));</code></pre>
 
 True if the result is not equal to the outcome
 

@@ -1,6 +1,7 @@
 +++
 title = "result<R, S>"
 slug = "doc_result.md"
+weight = 20
 +++
 # Header file `result.hpp`<a id="result.hpp"></a>
 
@@ -16,7 +17,7 @@ namespace <a href='doc_try.md#try.hpp'>outcome_v2_xxx</a>
     
     struct <a href='doc_result.md#outcome_v2_xxx::no_error_type'>no_error_type</a>;
     
-    namespace <a href='doc_outcome.md#outcome.hpp'>impl</a>
+    namespace <a href='doc_result.md#result.hpp'>impl</a>
     {
         template &lt;class R, class EC, class NoValuePolicy&gt;
         class <a href='doc_result.md#outcome_v2_xxx::impl::result_storage-R,EC,NoValuePolicy-'>result_storage</a>;
@@ -40,7 +41,7 @@ namespace <a href='doc_try.md#try.hpp'>outcome_v2_xxx</a>
         class <a href='doc_result.md#outcome_v2_xxx::impl::result_final-R,S,NoValuePolicy-'>result_final</a>;
     }
     
-    namespace <a href='doc_outcome.md#outcome.hpp'>policy</a>
+    namespace <a href='doc_result.md#outcome_v2_xxx::policy'>policy</a>
     {
         template &lt;class EC&gt;
         struct <a href='doc_result.md#outcome_v2_xxx::policy::throw_directly-EC-'>throw_directly</a>;

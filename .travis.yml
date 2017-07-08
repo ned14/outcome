@@ -6,7 +6,7 @@ compiler:
 sudo: false
 os:
  - linux
- - osx
+# - osx
 branches:
   only:
     - develop
@@ -33,23 +33,23 @@ env:
 # - __="Code bloat tests"
  - __="Documentation" NAME=TravisDocumentation
  - __="cmake tests" NAME=TravisLinuxWorker
- - __="cmake tests osx" NAME=TravisOSXWorker
+# - __="cmake tests osx" NAME=TravisOSXWorker
  
 matrix:
   exclude:
-  - os: osx
-    compiler: g++-6
+#  - os: osx
+#    compiler: g++-6
   - os: linux
     compiler: clang-4.0
     env: __="Documentation" NAME=TravisDocumentation
-  - os: linux
-    env: __="cmake tests osx" NAME=TravisOSXWorker
+#  - os: linux
+#    env: __="cmake tests osx" NAME=TravisOSXWorker
 #  - os: osx
 #    env: __="Code bloat tests"
-  - os: osx
-    env: __="Documentation" NAME=TravisDocumentation
-  - os: osx
-    env: __="cmake tests" NAME=TravisLinuxWorker
+#  - os: osx
+#    env: __="Documentation" NAME=TravisDocumentation
+#  - os: osx
+#    env: __="cmake tests" NAME=TravisLinuxWorker
  
 cache:
   apt: true

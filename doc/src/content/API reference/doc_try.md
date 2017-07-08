@@ -1,6 +1,7 @@
 +++
 title = "Try operations"
 slug = "doc_try.md"
+weight = 30
 +++
 # Header file `try.hpp`<a id="try.hpp"></a>
 

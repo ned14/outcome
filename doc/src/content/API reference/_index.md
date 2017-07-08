@@ -4,6 +4,8 @@ weight = 20
 +++
   - [OUTCOME\_ENABLE\_POSITIVE\_STATUS](doc_result.md#result.hpp "OUTCOME_ENABLE_POSITIVE_STATUS")
 
+  - [OUTCOME\_ERROR\_FROM\_EXCEPTION\_HPP](doc_utils.md#utils.hpp "OUTCOME_ERROR_FROM_EXCEPTION_HPP")
+
   - [OUTCOME\_IOSTREAM\_SUPPORT\_HPP](doc_iostream_support.md#iostream_support.hpp "OUTCOME_IOSTREAM_SUPPORT_HPP")
 
   - [OUTCOME\_OUTCOME\_HPP](doc_outcome.md#outcome.hpp "OUTCOME_OUTCOME_HPP")
@@ -33,6 +35,8 @@ weight = 20
       - [bad\_outcome\_access](doc_outcome.md#outcome_v2_xxx::bad_outcome_access "outcome_v2_xxx::bad_outcome_access") - Thrown when you try to access state in a `outcome<T, EC, E>` which isn't present.
     
       - [bad\_result\_access](doc_result.md#outcome_v2_xxx::bad_result_access "outcome_v2_xxx::bad_result_access") - Thrown when you try to access state in a `result<R, S>` which isn't present.
+    
+      - [error\_from\_exception(std::exception\_ptr &&, std::error\_code)](doc_utils.md#outcome_v2_xxx::error_from_exception(std::exception_ptr&&,std::error_code) "outcome_v2_xxx::error_from_exception(std::exception_ptr &&, std::error_code)") - Utility function which tries to match the exception in the pointer provided to an equivalent error code. Ought to work for all standard STL types. param e The pointer to an exception to convert. If matched, on exit this is reset to a null pointer. param not\_matched The error code to return if we could not match the exception. Note that a null pointer in returns a null error code.
     
       - [hook\_outcome\_construction(in\_place\_type\_t\<T\>, U \*)](doc_outcome.md#outcome_v2_xxx::hook_outcome_construction(in_place_type_t-T-,U*) "outcome_v2_xxx::hook_outcome_construction(in_place_type_t\<T\>, U *)") - The default instantiation hook implementation called when a `outcome` is first created by conversion from one of its possible types. Does nothing.
     
