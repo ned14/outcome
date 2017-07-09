@@ -220,8 +220,69 @@ namespace policy
 #endif
 }
 
+template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_outcome_policy<R, S, P>> OUTCOME_REQUIRES(std::is_void<P>::value || std::is_default_constructible<P>::value) class outcome;
+
 namespace detail
 {
+  // May be reused by outcome subclasses to save load on the compiler
+  template <class value_type, class status_error_type, class error_type, class payload_exception_type, class payload_type, class exception_type> struct outcome_predicates
+  {
+    using result = result_predicates<value_type, status_error_type, error_type>;
+
+    // Predicate for the value converting constructor to be available.
+    template <class T>
+    static constexpr bool enable_value_converting_constructor = result::template enable_value_converting_constructor<T>  //
+                                                                && !std::is_constructible<exception_type, T>::value;
+
+    // Predicate for the error converting constructor to be available.
+    template <class T>
+    static constexpr bool enable_error_converting_constructor = result::template enable_error_converting_constructor<T>  //
+                                                                && !std::is_constructible<payload_exception_type, T>::value;
+
+    // Predicate for the error + payload/exception constructor to be available.
+    template <class T, class U>
+    static constexpr bool enable_error_payload_converting_constructor =                                 //
+    !is_in_place_type_t<std::decay_t<T>>::value                                                         // not in place construction
+    && !std::is_constructible<value_type, T>::value && detail::is_same_or_constructible<error_type, T>  //
+    && detail::is_same_or_constructible<payload_exception_type, U> && !std::is_constructible<value_type, U>::value;
+
+    // Predicate for the error condition converting constructor to be available.
+    template <class ErrorCondEnum>
+    static constexpr bool enable_error_condition_converting_constructor = result::template enable_error_condition_converting_constructor<ErrorCondEnum>  //
+                                                                          && !std::is_constructible<payload_exception_type, ErrorCondEnum>::value;
+
+    // Predicate for the exception converting constructor to be available.
+    template <class T>
+    static constexpr bool enable_exception_converting_constructor =  //
+    !is_in_place_type_t<std::decay_t<T>>::value                      // not in place construction
+    && !std::is_constructible<value_type, T>::value && !std::is_constructible<status_error_type, T>::value && detail::is_same_or_constructible<exception_type, T>;
+
+    // Predicate for the explicit converting copy constructor from a compatible outcome to be available.
+    template <class T, class U, class V, class W>
+    static constexpr bool enable_explicit_compatible_conversion =                                                         //
+    !std::is_void<T>::value                                                                                               // other value type must not be void
+    && (detail::is_same_or_constructible<value_type, typename outcome<T, U, V, W>::value_type>)                           // if our value types are constructible
+    &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename outcome<T, U, V, W>::error_type>)  // if our error types are constructible
+#if OUTCOME_ENABLE_POSITIVE_STATUS
+    &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename outcome<T, U, V, W>::status_type>)  // if our status types are constructible
+#endif
+    &&(std::is_void<V>::value || detail::is_same_or_constructible<payload_type, typename outcome<T, U, V, W>::payload_type>)      // if our payload types are constructible
+    &&(std::is_void<V>::value || detail::is_same_or_constructible<exception_type, typename outcome<T, U, V, W>::exception_type>)  // if our exception types are constructible
+    ;
+
+    // Predicate for the implicit converting copy constructor from a compatible outcome to be available.
+    template <class T, class U, class V, class W>
+    static constexpr bool enable_implicit_compatible_conversion =                                                          //
+    std::is_void<T>::value                                                                                                 // other value type must be void
+    && (std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename outcome<T, U, V, W>::error_type>)  // if our error types are constructible
+#if OUTCOME_ENABLE_POSITIVE_STATUS
+    &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename outcome<T, U, V, W>::status_type>)  // if our status types are constructible
+#endif
+    &&(std::is_void<V>::value || detail::is_same_or_constructible<payload_type, typename outcome<T, U, V, W>::payload_type>)      // if our payload types are constructible
+    &&(std::is_void<V>::value || detail::is_same_or_constructible<exception_type, typename outcome<T, U, V, W>::exception_type>)  // if our exception types are constructible
+    ;
+  };
+
   template <class Base, class R, class S, class P, class NoValuePolicy> using select_outcome_observers_payload_or_exception = std::conditional_t<trait::is_exception_ptr<P>::value, impl::outcome_exception_observers<Base, R, S, P, NoValuePolicy>, impl::outcome_payload_observers<Base, R, S, P, NoValuePolicy>>;
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl2 = select_outcome_observers_payload_or_exception<impl::result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>;
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl = impl::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>;
@@ -272,11 +333,8 @@ template <class T, class U> constexpr inline void hook_outcome_in_place_construc
 \tparam P The optional type of the payload/exception result (use `void` to disable). Must be either `void` or DefaultConstructible.
 \tparam NoValuePolicy Policy on how to interpret types `S` and `P` when a wide observation of a not present value occurs.
 */
-template <class R,                       //
-          class S = std::error_code,     //
-          class P = std::exception_ptr,  //
-          class NoValuePolicy = policy::default_outcome_policy<R, S, P>>
-OUTCOME_REQUIRES(std::is_void<P>::value || std::is_default_constructible<P>::value)
+template <class R, class S, class P, class NoValuePolicy>                            //
+OUTCOME_REQUIRES(std::is_void<P>::value || std::is_default_constructible<P>::value)  //
 class OUTCOME_NODISCARD outcome : public detail::select_outcome_impl<R, S, P, NoValuePolicy>
 {
   friend NoValuePolicy;
@@ -347,12 +405,80 @@ public:
   //! Used to rebind this outcome to a different outcome type
   template <class T, class U = S, class V = P> using rebind = outcome<T, U, P>;
 
+protected:
+  //! Requirement predicates for outcome.
+  struct predicate
+  {
+    using base = detail::outcome_predicates<value_type, status_error_type, error_type, payload_exception_type, payload_type, exception_type>;
+
+    //! Predicate for the value converting constructor to be available.
+    template <class T>
+    static constexpr bool enable_value_converting_constructor =  //
+    !std::is_same<std::decay_t<T>, outcome>::value               // not my type
+    && base::template enable_value_converting_constructor<T>;
+
+    //! Predicate for the error converting constructor to be available.
+    template <class T>
+    static constexpr bool enable_error_converting_constructor =  //
+    !std::is_same<std::decay_t<T>, outcome>::value               // not my type
+    && base::template enable_error_converting_constructor<T>;
+
+    // Predicate for the error + payload/exception constructor to be available.
+    template <class T, class U>
+    static constexpr bool enable_error_payload_converting_constructor =  //
+    !std::is_same<std::decay_t<T>, outcome>::value                       // not my type
+    && base::template enable_error_payload_converting_constructor<T, U>;
+
+    //! Predicate for the error condition converting constructor to be available.
+    template <class ErrorCondEnum>
+    static constexpr bool enable_error_condition_converting_constructor =  //
+    !std::is_same<std::decay_t<ErrorCondEnum>, outcome>::value             // not my type
+    && base::template enable_error_condition_converting_constructor<ErrorCondEnum>;
+
+    // Predicate for the exception converting constructor to be available.
+    template <class T>
+    static constexpr bool enable_exception_converting_constructor =  //
+    !std::is_same<std::decay_t<T>, outcome>::value                   // not my type
+    && base::template enable_exception_converting_constructor<T>;
+
+    //! Predicate for the explicit converting copy constructor from a compatible input to be available.
+    template <class T, class U, class V, class W>
+    static constexpr bool enable_explicit_compatible_conversion =  //
+    !std::is_same<outcome<T, U, V, W>, outcome>::value             // not my type
+    && base::template enable_explicit_compatible_conversion<T, U, V, W>;
+
+    //! Predicate for the implicit converting copy constructor from a compatible input to be available.
+    template <class T, class U, class V, class W>
+    static constexpr bool enable_implicit_compatible_conversion =  //
+    !std::is_same<outcome<T, U, V, W>, outcome>::value             // not my type
+    && base::template enable_implicit_compatible_conversion<T, U, V, W>;
+
+    //! Predicate for the inplace construction of value to be available.
+    template <class... Args>
+    static constexpr bool enable_inplace_value_constructor =  //
+    std::is_void<value_type>::value                           //
+    || std::is_constructible<value_type, Args...>::value;
+
+    //! Predicate for the inplace construction of error to be available.
+    template <class... Args>
+    static constexpr bool enable_inplace_error_constructor =  //
+    std::is_void<error_type>::value                           //
+    || std::is_constructible<error_type, Args...>::value;
+
+    //! Predicate for the inplace construction of exception to be available.
+    template <class... Args>
+    static constexpr bool enable_inplace_exception_constructor =  //
+    std::is_void<exception_type>::value                           //
+    || std::is_constructible<exception_type, Args...>::value;
+  };
+
+public:
   //! Used to disable in place type construction when `value_type` is ambiguous with `error_type` or `payload_exception_type`.
   using value_type_if_enabled = std::conditional_t<std::is_same<value_type, error_type>::value || std::is_same<value_type, payload_exception_type>::value, typename base::_value_type, value_type>;
   //! Used to disable in place type construction when `error_type` is ambiguous with `value_type` or `payload_exception_type`.
   using error_type_if_enabled = std::conditional_t<std::is_same<error_type, value_type>::value || std::is_same<error_type, payload_exception_type>::value, typename base::_error_type, error_type>;
   //! Used to disable in place type construction when `payload_exception_type` is ambiguous with `value_type` or `error_type`.
-  using payload_exception_type_if_enabled = std::conditional_t<std::is_same<payload_exception_type, value_type>::value || std::is_same<payload_exception_type, error_type>::value, disable_in_place_payload_exception_type, payload_exception_type>;
+  using exception_type_if_enabled = std::conditional_t<std::is_same<exception_type, value_type>::value || std::is_same<exception_type, error_type>::value, disable_in_place_payload_exception_type, exception_type>;
 
 protected:
   detail::devoid<payload_exception_type> _ptr;
@@ -370,10 +496,8 @@ public:
   \requires Type T is constructible to `value_type`, is not constructible to `status_error_type`, is not constructible to `exception_type` and is not `outcome<R, S, P>` and not `in_place_type<>`.
   \throws Any exception the construction of `value_type(T)` might throw.
   */
-  template <class T, typename enable_value_converting_constructor = std::enable_if_t<  //
-                     !std::is_same<std::decay_t<T>, outcome>::value                    // not my type
-                     && !detail::is_in_place_type_t<std::decay_t<T>>::value            // not in place construction
-                     && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<status_error_type, T>::value && !std::is_constructible<exception_type, T>::value>>
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_value_converting_constructor<T>))
   constexpr outcome(T &&t, value_converting_constructor_tag = value_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value)
       : base(in_place_type<typename base::value_type>, std::forward<T>(t))
       , _ptr()
@@ -475,10 +599,8 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
 is not constructible to `value_type`, is not constructible to `payload_exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
 \throws Any exception the construction of `error_type(T)` might throw.
 */
-  template <class T, typename enable_error_converting_constructor = std::enable_if_t<  //
-                     !std::is_same<std::decay_t<T>, outcome>::value                    // not my type
-                     && !detail::is_in_place_type_t<std::decay_t<T>>::value            // not in place construction
-                     && !std::is_constructible<value_type, T>::value && detail::is_same_or_constructible<error_type, T> && !std::is_constructible<payload_exception_type, T>::value>>
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_error_converting_constructor<T>))
   constexpr outcome(T &&t, error_converting_constructor_tag = error_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)
       : base(in_place_type<typename base::error_type>, std::forward<T>(t))
       , _ptr()
@@ -499,11 +621,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   Type `U` is constructible to `payload_exception_type`, is not constructible to `value_type`.
   \throws Any exception the construction of `error_type(T)` and `payload_exception_type(U)` might throw.
   */
-  template <class T, class U, typename enable_error_payload_converting_constructor = std::enable_if_t<                            //
-                              !std::is_same<std::decay_t<T>, outcome>::value                                                      // not my type
-                              && !detail::is_in_place_type_t<std::decay_t<T>>::value                                              // not in place construction
-                              && !std::is_constructible<value_type, T>::value && detail::is_same_or_constructible<error_type, T>  //
-                              && detail::is_same_or_constructible<payload_exception_type, U> && !std::is_constructible<value_type, U>::value>>
+  OUTCOME_TEMPLATE(class T, class U)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_error_payload_converting_constructor<T, U>))
   constexpr outcome(T &&t, U &&u, error_payload_converting_constructor_tag = error_payload_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<payload_exception_type, U>::value)
       : base(in_place_type<typename base::error_type>, std::forward<T>(t))
       , _ptr(std::forward<U>(u))
@@ -524,15 +643,9 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   Finally, the expression `error_type(make_error_code(ErrorCondEnum()))` must be valid.
   \throws Any exception the construction of `error_type(make_error_code(t))` might throw.
   */
-  template <class ErrorCondEnum, typename enable_error_condition_converting_constructor = std::enable_if_t<                                                                                                                       //
-                                 !std::is_same<std::decay_t<ErrorCondEnum>, outcome>::value                                                                                                                                       // not my type
-                                 && !detail::is_in_place_type_t<std::decay_t<ErrorCondEnum>>::value                                                                                                                               // not in place construction
-                                 && std::is_error_condition_enum<ErrorCondEnum>::value                                                                                                                                            // is an error condition enum
-                                 && !std::is_constructible<value_type, ErrorCondEnum>::value && !std::is_constructible<error_type, ErrorCondEnum>::value && !std::is_constructible<payload_exception_type, ErrorCondEnum>::value  // not constructible via any other means
-
-                                 >,
-            typename = decltype(error_type(make_error_code(ErrorCondEnum())))  // is a valid expression
-            >
+  OUTCOME_TEMPLATE(class ErrorCondEnum)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))),  //
+                    OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor<ErrorCondEnum>))
   constexpr outcome(ErrorCondEnum &&t, error_condition_converting_constructor_tag = error_condition_converting_constructor_tag()) noexcept(noexcept(error_type(make_error_code(std::forward<ErrorCondEnum>(t)))))
       : base(in_place_type<typename base::error_type>, make_error_code(t))
   {
@@ -550,10 +663,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   is not constructible to `value_type`, is not constructible to `status_error_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
   \throws Any exception the construction of `exception_type(T)` might throw.
   */
-  template <class T, typename enable_exception_converting_constructor = std::enable_if_t<  //
-                     !std::is_same<std::decay_t<T>, outcome>::value                        // not my type
-                     && !detail::is_in_place_type_t<std::decay_t<T>>::value                // not in place construction
-                     && !std::is_constructible<value_type, T>::value && !std::is_constructible<status_error_type, T>::value && detail::is_same_or_constructible<exception_type, T>>>
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_exception_converting_constructor<T>))
   constexpr outcome(T &&t, exception_converting_constructor_tag = exception_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<exception_type, T>::value)
       : base()
       , _ptr(std::forward<T>(t))
@@ -572,17 +683,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   The source `value_type` cannot be `void`.
   \throws Any exception the construction of `value_type(T)`, `status_error_type(U)` or `payload_exception_type(V)` might throw.
   */
-  template <class T, class U, class V, class W, typename enable_explicit_compatible_conversion = std::enable_if_t<                                                    //
-                                                !std::is_same<outcome<T, U, V, W>, outcome>::value                                                                    // not my type
-                                                && !std::is_void<T>::value                                                                                            // other value type must not be void
-                                                && (detail::is_same_or_constructible<value_type, typename outcome<T, U, V, W>::value_type>)                           // if our value types are constructible
-                                                &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename outcome<T, U, V, W>::error_type>)  // if our error types are constructible
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-                                                &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename outcome<T, U, V, W>::status_type>)  // if our status types are constructible
-#endif
-                                                &&(std::is_void<V>::value || detail::is_same_or_constructible<payload_type, typename outcome<T, U, V, W>::payload_type>)      // if our payload types are constructible
-                                                &&(std::is_void<V>::value || detail::is_same_or_constructible<exception_type, typename outcome<T, U, V, W>::exception_type>)  // if our exception types are constructible
-                                                >>
+  OUTCOME_TEMPLATE(class T, class U, class V, class W)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_explicit_compatible_conversion<T, U, V, W>))
   constexpr explicit outcome(const outcome<T, U, V, W> &o,
                              explicit_compatible_conversion_tag = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type, V>::value)
       : base(typename base::compatible_conversion_tag(), o)
@@ -600,16 +702,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   The source `value_type` must be `void`.
   \throws Any exception the construction of `status_error_type(U)` or `payload_exception_type(V)` might throw.
   */
-  template <class T, class U, class V, class W, typename enable_implicit_compatible_conversion = std::enable_if_t<                                                     //
-                                                !std::is_same<outcome<T, U, V, W>, outcome>::value                                                                     // not my type
-                                                && std::is_void<T>::value                                                                                              // other value type must be void
-                                                && (std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename outcome<T, U, V, W>::error_type>)  // if our error types are constructible
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-                                                &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename outcome<T, U, V, W>::status_type>)  // if our status types are constructible
-#endif
-                                                &&(std::is_void<V>::value || detail::is_same_or_constructible<payload_type, typename outcome<T, U, V, W>::payload_type>)      // if our payload types are constructible
-                                                &&(std::is_void<V>::value || detail::is_same_or_constructible<exception_type, typename outcome<T, U, V, W>::exception_type>)  // if our exception types are constructible
-                                                >>
+  OUTCOME_TEMPLATE(class T, class U, class V, class W)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_implicit_compatible_conversion<T, U, V, W>))
   constexpr outcome(const outcome<T, U, V, W> &o, implicit_compatible_conversion_tag = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<payload_exception_type, V>::value)
       : base(typename base::compatible_conversion_tag(), o)
       , _ptr(o._ptr)
@@ -626,17 +720,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   The source `value_type` cannot be `void`.
   \throws Any exception the construction of `value_type(T)`, `status_error_type(U)` or `payload_exception_type(V)` might throw.
   */
-  template <class T, class U, class V, class W, typename enable_explicit_compatible_conversion = std::enable_if_t<                                                    //
-                                                !std::is_same<outcome<T, U, V, W>, outcome>::value                                                                    // not my type
-                                                && !std::is_void<T>::value                                                                                            // other value type must not be void
-                                                && (detail::is_same_or_constructible<value_type, typename outcome<T, U, V, W>::value_type>)                           // if our value types are constructible
-                                                &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename outcome<T, U, V, W>::error_type>)  // if our error types are constructible
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-                                                &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename outcome<T, U, V, W>::status_type>)  // if our status types are constructible
-#endif
-                                                &&(std::is_void<V>::value || detail::is_same_or_constructible<payload_type, typename outcome<T, U, V, W>::payload_type>)      // if our payload types are constructible
-                                                &&(std::is_void<V>::value || detail::is_same_or_constructible<exception_type, typename outcome<T, U, V, W>::exception_type>)  // if our exception types are constructible
-                                                >>
+  OUTCOME_TEMPLATE(class T, class U, class V, class W)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_explicit_compatible_conversion<T, U, V, W>))
   constexpr explicit outcome(outcome<T, U, V, W> &&o, explicit_compatible_conversion_tag = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type, V>::value)
       : base(typename base::compatible_conversion_tag(), std::move(o))
       , _ptr(std::move(o._ptr))
@@ -653,16 +738,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   The source `value_type` must be `void`.
   \throws Any exception the construction of `status_error_type(U)` or `payload_exception_type(V)` might throw.
   */
-  template <class T, class U, class V, class W, typename enable_implicit_compatible_conversion = std::enable_if_t<                                                     //
-                                                !std::is_same<outcome<T, U, V, W>, outcome>::value                                                                     // not my type
-                                                && std::is_void<T>::value                                                                                              // other value type must be void
-                                                && (std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename outcome<T, U, V, W>::error_type>)  // if our error types are constructible
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-                                                &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename outcome<T, U, V, W>::status_type>)  // if our status types are constructible
-#endif
-                                                &&(std::is_void<V>::value || detail::is_same_or_constructible<payload_type, typename outcome<T, U, V, W>::payload_type>)      // if our payload types are constructible
-                                                &&(std::is_void<V>::value || detail::is_same_or_constructible<exception_type, typename outcome<T, U, V, W>::exception_type>)  // if our exception types are constructible
-                                                >>
+  OUTCOME_TEMPLATE(class T, class U, class V, class W)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_implicit_compatible_conversion<T, U, V, W>))
   constexpr outcome(outcome<T, U, V, W> &&o, implicit_compatible_conversion_tag = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type, V>::value)
       : base(typename base::compatible_conversion_tag(), std::move(o))
       , _ptr(std::move(o._ptr))
@@ -679,14 +756,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   The source `value_type` cannot be `void`.
   \throws Any exception the construction of `value_type(T)`, `status_error_type(U)` or `payload_exception_type()` might throw.
   */
-  template <class T, class U, class V, typename enable_explicit_compatible_conversion = std::enable_if_t<                                                //
-                                       !std::is_void<T>::value                                                                                           // other value type must not be void
-                                       && (detail::is_same_or_constructible<value_type, typename result<T, U, V>::value_type>)                           // if our value types are constructible
-                                       &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>)  // if our error types are constructible
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-                                       &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename result<T, U, V>::status_type>)  // if our status types are constructible
-#endif
-                                       >>
+  OUTCOME_TEMPLATE(class T, class U, class V)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, status_error_type, error_type>::template enable_explicit_compatible_conversion<T, U, V>))
   constexpr explicit outcome(const result<T, U, V> &o, explicit_compatible_conversion_tag = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type>::value)
       : base(typename base::compatible_conversion_tag(), o)
       , _ptr()
@@ -703,13 +774,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   The source `value_type` must be `void`.
   \throws Any exception the construction of`status_error_type(U)` or `payload_exception_type()` might throw.
   */
-  template <class T, class U, class V, typename enable_implicit_compatible_conversion = std::enable_if_t<                                                 //
-                                       std::is_void<T>::value                                                                                             // other value type must be void
-                                       && (std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>)  // if our error types are constructible
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-                                       &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename result<T, U, V>::status_type>)  // if our status types are constructible
-#endif
-                                       >>
+  OUTCOME_TEMPLATE(class T, class U, class V)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, status_error_type, error_type>::template enable_implicit_compatible_conversion<T, U, V>))
   constexpr outcome(const result<T, U, V> &o, implicit_compatible_conversion_tag = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type>::value)
       : base(typename base::compatible_conversion_tag(), o)
       , _ptr()
@@ -726,14 +792,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   The source `value_type` cannot be `void`.
   \throws Any exception the construction of `value_type(T)`, `status_error_type(U)` or `payload_exception_type()` might throw.
   */
-  template <class T, class U, class V, typename enable_explicit_compatible_conversion = std::enable_if_t<                                                //
-                                       !std::is_void<T>::value                                                                                           // other value type must not be void
-                                       && (detail::is_same_or_constructible<value_type, typename result<T, U, V>::value_type>)                           // if our value types are constructible
-                                       &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>)  // if our error types are constructible
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-                                       &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename result<T, U, V>::status_type>)  // if our status types are constructible
-#endif
-                                       >>
+  OUTCOME_TEMPLATE(class T, class U, class V)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, status_error_type, error_type>::template enable_explicit_compatible_conversion<T, U, V>))
   constexpr explicit outcome(result<T, U, V> &&o, explicit_compatible_conversion_tag = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type>::value)
       : base(typename base::compatible_conversion_tag(), std::move(o))
       , _ptr()
@@ -750,13 +810,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   The source `value_type` must be `void`.
   \throws Any exception the construction of `status_error_type(U)` or `payload_exception_type()` might throw.
   */
-  template <class T, class U, class V, typename enable_implicit_compatible_conversion = std::enable_if_t<                                                 //
-                                       std::is_void<T>::value                                                                                             // other value type must be void
-                                       && (std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename result<T, U, V>::error_type>)  // if our error types are constructible
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-                                       &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename result<T, U, V>::status_type>)  // if our status types are constructible
-#endif
-                                       >>
+  OUTCOME_TEMPLATE(class T, class U, class V)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, status_error_type, error_type>::template enable_implicit_compatible_conversion<T, U, V>))
   constexpr outcome(result<T, U, V> &&o, implicit_compatible_conversion_tag = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type>::value)
       : base(typename base::compatible_conversion_tag(), std::move(o))
       , _ptr()
@@ -776,7 +831,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \requires `value_type` is void or `Args...` are constructible to `value_type`.
   \throws Any exception the construction of `value_type(Args...)` might throw.
   */
-  template <class... Args, typename = std::enable_if_t<std::is_void<value_type>::value || std::is_constructible<value_type, Args...>::value>>
+  OUTCOME_TEMPLATE(class... Args)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<Args...>))
   constexpr explicit outcome(in_place_type_t<value_type_if_enabled> _, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
       : base(_, std::forward<Args>(args)...)
       , _ptr()
@@ -794,7 +850,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \requires The initializer list + `Args...` are constructible to `value_type`.
   \throws Any exception the construction of `value_type(il, Args...)` might throw.
   */
-  template <class U, class... Args, typename = std::enable_if_t<std::is_constructible<value_type, std::initializer_list<U>, Args...>::value>>
+  OUTCOME_TEMPLATE(class U, class... Args)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<std::initializer_list<U>, Args...>))
   constexpr explicit outcome(in_place_type_t<value_type_if_enabled> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
       : base(_, il, std::forward<Args>(args)...)
       , _ptr()
@@ -811,7 +868,8 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \requires `trait::status_type_is_negative<EC>` must be true; `error_type` is void or `Args...` are constructible to `error_type`.
   \throws Any exception the construction of `error_type(Args...)` might throw.
   */
-  template <class... Args, typename = std::enable_if_t<std::is_void<error_type>::value || std::is_constructible<error_type, Args...>::value>>
+  OUTCOME_TEMPLATE(class... Args)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<Args...>))
   constexpr explicit outcome(in_place_type_t<error_type_if_enabled> _, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
       : base(_, std::forward<Args>(args)...)
       , _ptr()
@@ -829,49 +887,52 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \requires `trait::status_type_is_negative<EC>` must be true; The initializer list + `Args...` are constructible to `error_type`.
   \throws Any exception the construction of `error_type(il, Args...)` might throw.
   */
-  template <class U, class... Args, typename = std::enable_if_t<std::is_constructible<error_type, std::initializer_list<U>, Args...>::value>>
+  OUTCOME_TEMPLATE(class U, class... Args)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<std::initializer_list<U>, Args...>))
   constexpr explicit outcome(in_place_type_t<error_type_if_enabled> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
       : base(_, il, std::forward<Args>(args)...)
       , _ptr()
   {
     hook_outcome_in_place_construction(in_place_type<error_type>, this);
   }
-  /*! Inplace constructor to an unsuccessful payload/exception.
+  /*! Inplace constructor to an unsuccessful exception.
   \tparam 1
   \exclude
-  \param _ Tag type to indicate we are doing in place construction of `payload_exception_type`.
+  \param _ Tag type to indicate we are doing in place construction of `exception_type`.
   \param args Arguments with which to in place construct.
 
-  \effects Initialises the outcome with a `payload_exception_type`.
-  \requires `payload_exception_type` is void or `Args...` are constructible to `payload_exception_type`.
-  \throws Any exception the construction of `payload_exception_type(Args...)` might throw.
+  \effects Initialises the outcome with an `exception_type`.
+  \requires `exception_type` is void or `Args...` are constructible to `exception_type`.
+  \throws Any exception the construction of `exception_type(Args...)` might throw.
   */
-  template <class... Args, typename = std::enable_if_t<std::is_void<payload_exception_type>::value || std::is_constructible<payload_exception_type, Args...>::value>>
-  constexpr explicit outcome(in_place_type_t<payload_exception_type_if_enabled>, Args &&... args) noexcept(std::is_nothrow_constructible<payload_exception_type, Args...>::value)
+  OUTCOME_TEMPLATE(class... Args)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_exception_constructor<Args...>))
+  constexpr explicit outcome(in_place_type_t<exception_type_if_enabled>, Args &&... args) noexcept(std::is_nothrow_constructible<exception_type, Args...>::value)
       : base()
       , _ptr(std::forward<Args>(args)...)
   {
-    this->_state._status |= trait::is_exception_ptr<payload_exception_type>::value ? detail::status_have_exception : detail::status_have_payload;
-    hook_outcome_in_place_construction(in_place_type<payload_exception_type>, this);
+    this->_state._status |= detail::status_have_exception;
+    hook_outcome_in_place_construction(in_place_type<exception_type>, this);
   }
-  /*! Inplace constructor to an unsuccessful payload/exception.
+  /*! Inplace constructor to an unsuccessful exception.
   \tparam 2
   \exclude
-  \param _ Tag type to indicate we are doing in place construction of `payload_exception_type`.
+  \param _ Tag type to indicate we are doing in place construction of `exception_type`.
   \param il An initializer list with which to in place construct.
   \param args Arguments with which to in place construct.
 
-  \effects Initialises the outcome with a `payload_exception_type`.
-  \requires The initializer list + `Args...` are constructible to `payload_exception_type`.
-  \throws Any exception the construction of `payload_exception_type(il, Args...)` might throw.
+  \effects Initialises the outcome with an `exception_type`.
+  \requires The initializer list + `Args...` are constructible to `exception_type`.
+  \throws Any exception the construction of `exception_type(il, Args...)` might throw.
   */
-  template <class U, class... Args, typename = std::enable_if_t<std::is_constructible<payload_exception_type, std::initializer_list<U>, Args...>::value>>
-  constexpr explicit outcome(in_place_type_t<payload_exception_type_if_enabled>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<payload_exception_type, std::initializer_list<U>, Args...>::value)
+  OUTCOME_TEMPLATE(class U, class... Args)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_exception_constructor<std::initializer_list<U>, Args...>))
+  constexpr explicit outcome(in_place_type_t<exception_type_if_enabled>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<exception_type, std::initializer_list<U>, Args...>::value)
       : base()
       , _ptr(il, std::forward<Args>(args)...)
   {
-    this->_state._status |= trait::is_exception_ptr<payload_exception_type>::value ? detail::status_have_exception : detail::status_have_payload;
-    hook_outcome_in_place_construction(in_place_type<payload_exception_type>, this);
+    this->_state._status |= detail::status_have_exception;
+    hook_outcome_in_place_construction(in_place_type<exception_type>, this);
   }
 
   /// \output_section Comparison operators
@@ -888,11 +949,12 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \requires That the expression of calling `operator==` on each of the three stored items is a valid expression.
   \throws Any exception the individual `operator==` operations might throw.
   */
-  template <class T, class U, class V, class W,                           //
-            typename = decltype(std::declval<R>() == std::declval<T>()),  //
-            typename = decltype(std::declval<S>() == std::declval<U>()),  //
-            typename = decltype(std::declval<P>() == std::declval<V>())   //
-            >
+  OUTCOME_TEMPLATE(class T, class U, class V, class W)
+  OUTCOME_TREQUIRES(                                      //
+  OUTCOME_TEXPR(std::declval<R>() == std::declval<T>()),  //
+  OUTCOME_TEXPR(std::declval<S>() == std::declval<U>()),  //
+  OUTCOME_TEXPR(std::declval<P>() == std::declval<V>())   //
+  )
   constexpr bool operator==(const outcome<T, U, V, W> &o) const noexcept(  //
   noexcept(std::declval<R>() == std::declval<T>())                         //
   && noexcept(std::declval<S>() == std::declval<U>())                      //
@@ -913,11 +975,12 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \requires That the expression of calling `operator!=` on each of the three stored items is a valid expression.
   \throws Any exception the individual `operator!=` operations might throw.
   */
-  template <class T, class U, class V, class W,                           //
-            typename = decltype(std::declval<R>() != std::declval<T>()),  //
-            typename = decltype(std::declval<S>() != std::declval<U>()),  //
-            typename = decltype(std::declval<P>() != std::declval<V>())   //
-            >
+  OUTCOME_TEMPLATE(class T, class U, class V, class W)
+  OUTCOME_TREQUIRES(                                      //
+  OUTCOME_TEXPR(std::declval<R>() != std::declval<T>()),  //
+  OUTCOME_TEXPR(std::declval<S>() != std::declval<U>()),  //
+  OUTCOME_TEXPR(std::declval<P>() != std::declval<V>())   //
+  )
   constexpr bool operator!=(const outcome<T, U, V, W> &o) const noexcept(  //
   noexcept(std::declval<R>() != std::declval<T>())                         //
   && noexcept(std::declval<S>() != std::declval<U>())                      //
@@ -936,10 +999,11 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \requires That the expression of calling `operator==` on each of the two stored items is a valid expression.
   \throws Any exception the individual `operator==` operations might throw.
   */
-  template <class T, class U, class V,                                    //
-            typename = decltype(std::declval<R>() == std::declval<T>()),  //
-            typename = decltype(std::declval<S>() == std::declval<U>())   //
-            >
+  OUTCOME_TEMPLATE(class T, class U, class V)
+  OUTCOME_TREQUIRES(                                      //
+  OUTCOME_TEXPR(std::declval<R>() == std::declval<T>()),  //
+  OUTCOME_TEXPR(std::declval<S>() == std::declval<U>())   //
+  )
   constexpr bool operator==(const result<T, U, V> &o) const noexcept(  //
   noexcept(std::declval<R>() == std::declval<T>())                     //
   && noexcept(std::declval<S>() == std::declval<U>()))
@@ -957,10 +1021,11 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \requires That the expression of calling `operator!=` on each of the two stored items is a valid expression.
   \throws Any exception the individual `operator!=` operations might throw.
   */
-  template <class T, class U, class V,                                    //
-            typename = decltype(std::declval<R>() != std::declval<T>()),  //
-            typename = decltype(std::declval<S>() != std::declval<U>())   //
-            >
+  OUTCOME_TEMPLATE(class T, class U, class V)
+  OUTCOME_TREQUIRES(                                      //
+  OUTCOME_TEXPR(std::declval<R>() != std::declval<T>()),  //
+  OUTCOME_TEXPR(std::declval<S>() != std::declval<U>())   //
+  )
   constexpr bool operator!=(const result<T, U, V> &o) const noexcept(  //
   noexcept(std::declval<R>() != std::declval<T>())                     //
   && noexcept(std::declval<S>() != std::declval<U>()))
@@ -1061,10 +1126,9 @@ is not constructible to `value_type`, is not constructible to `payload_exception
 \requires That the expression `b == a` is a valid expression.
 \throws Any exception that `b == a` might throw.
 */
-template <class T, class U, class V,                                                                   //
-          class R, class S, class P, class N,                                                          //
-          typename = decltype(std::declval<outcome<R, S, P, N>>() == std::declval<result<T, U, V>>())  //
-          >
+OUTCOME_TEMPLATE(class T, class U, class V,  //
+                 class R, class S, class P, class N)
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<outcome<R, S, P, N>>() == std::declval<result<T, U, V>>()))
 constexpr inline bool operator==(const result<T, U, V> &a, const outcome<R, S, P, N> &b) noexcept(  //
 noexcept(std::declval<outcome<R, S, P, N>>() == std::declval<result<T, U, V>>()))
 {
@@ -1080,10 +1144,9 @@ noexcept(std::declval<outcome<R, S, P, N>>() == std::declval<result<T, U, V>>())
 \requires That the expression `b != a` is a valid expression.
 \throws Any exception that `b != a` might throw.
 */
-template <class T, class U, class V,                                                                   //
-          class R, class S, class P, class N,                                                          //
-          typename = decltype(std::declval<outcome<R, S, P, N>>() != std::declval<result<T, U, V>>())  //
-          >
+OUTCOME_TEMPLATE(class T, class U, class V,  //
+                 class R, class S, class P, class N)
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<outcome<R, S, P, N>>() != std::declval<result<T, U, V>>()))
 constexpr inline bool operator!=(const result<T, U, V> &a, const outcome<R, S, P, N> &b) noexcept(  //
 noexcept(std::declval<outcome<R, S, P, N>>() != std::declval<result<T, U, V>>()))
 {

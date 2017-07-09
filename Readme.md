@@ -18,7 +18,10 @@ Post peer review todo:
  - [x] Replace existing Outcome with peer review Outcome
  - [x] Retarget unit test suite at peer review Outcome
  - [x] Redo .natvis
- - [ ] Replace SFINAEd constructors with Concepts instead.
+ - [x] Replace SFINAEd constructors with Concepts instead.
+ - [ ] Manually copy & paste together a basic synopsis of result and outcome
+ to serve as "the docs" until Standardese can be persuaded to produce better
+ output.
  
 Maybe?
  - [ ] Make `result`'s explicit converting constructors accept any type providing a
@@ -29,7 +32,7 @@ Maybe?
 As per the Boost peer review feedback, v2 Outcome has been pared down to
 no more than the barest of bare essentials. The plan is to occupy the lowest
 level in a generalised [C++ Monadic interface (P0650R0)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0650r0.pdf)
-as an adjunct to the [primary C++ monad object (P0323R2)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0323r2.pdf).
+as an adjunct to the [primary C++ monad object Expected (P0323R2)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0323r2.pdf).
 
 - Major changes:
    - You can now customise types directly, so `result<T, EC =
@@ -74,6 +77,8 @@ as an adjunct to the [primary C++ monad object (P0323R2)](http://www.open-std.or
 
  - Stuff removed:
    - Anything even faintly smelling of monads.
+   - All the `make_XXX()` functions. The `std::variant` based constructor
+   interface make them no longer necessary.
    - All preprocessor assembly of code fragments. You now have an
    equally complex rabbit warren of policy and trait driven composited
    fragments of template into implementation. Standardese (the
