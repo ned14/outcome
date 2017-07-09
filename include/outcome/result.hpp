@@ -1270,7 +1270,8 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   \throws Any exception the construction of `error_type(make_error_code(t))` might throw.
   */
   OUTCOME_TEMPLATE(class ErrorCondEnum)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))), OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor<ErrorCondEnum>))
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))),  //
+                    OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor<ErrorCondEnum>))
   constexpr result(ErrorCondEnum &&t, error_condition_converting_constructor_tag = error_condition_converting_constructor_tag()) noexcept(noexcept(error_type(make_error_code(std::forward<ErrorCondEnum>(t)))))
       : base(in_place_type<typename base::error_type>, make_error_code(t))
   {
