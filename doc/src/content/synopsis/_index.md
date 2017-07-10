@@ -3,4 +3,5 @@ title = "Synopsis"
 weight = 20
 +++
 
-todo
+- [`result<T, EC>`](result)
+- [`outcome<T, EC, E>`](outcome)
