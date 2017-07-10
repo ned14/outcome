@@ -4,10 +4,10 @@ title = "Home"
 
 # Outcome 2.0 library
 
-Outcome is a C++14 library for reporting and handling function failures
-in contexts where using C++ exception handling is unsuitable.
+Outcome is a C++14 library for reporting and handling function failures.
+It can be used as a substitute for, or a complement to, exception handling mechanism.
 
-The reasons for not using exceptions may be different:
+One use case is for contexts where using C++ exception handling is unsuitable for different reasons:
 
    - The high relative cost of throwing and catching a C++ exception,
    - Making some or all control paths explicitly detailed to aid code correctness auditing,
@@ -16,9 +16,17 @@ The reasons for not using exceptions may be different:
    - Maintaining a code base that was never designed with exception-safety in mind,
    - Parts of the programs/frameworks that themselves implement exception handling and cannot
      afford to use exceptions, like propagating failure reports across threads, tasks, fibers...
-   
+
+Another use case is to replace 'dual' interfaces,
+like ones in [Boost.Filesystem](http://www.boost.org/doc/libs/1_64_0/libs/filesystem/doc/index.htm), 
+where almost each function comes in two overloads, one throwing an exception,
+the other populating an `error_code` output argument. With Outcome, you can have only one function
+returning a composite return type, and it is through using this return value that you decide whether
+to handle failures locally, or to launch stack unwinding.	 
+
 Outcome can also be used to plug components that potentially throw exceptions into parts of the program
 that are not exception-safe while retaining all information from the thrown exception objects.
+
 
 ## Sample usage
 
