@@ -19,7 +19,7 @@ Post peer review todo:
  - [x] Retarget unit test suite at peer review Outcome
  - [x] Redo .natvis
  - [x] Replace SFINAEd constructors with Concepts instead.
- - [ ] Manually copy & paste together a basic synopsis of result and outcome
+ - [x] Manually copy & paste together a basic synopsis of result and outcome
  to serve as "the docs" until Standardese can be persuaded to produce better
  output.
  

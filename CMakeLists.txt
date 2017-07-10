@@ -13,7 +13,7 @@ set(PROJECT_NAMESPACE)
 
 # Setup this cmake environment for this project
 include(QuickCppLibSetupProject)
-if(GCC AND NOT CLANG)
+if(NOT CLANG AND CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.9)
   option(ENABLE_CXX_CONCEPTS "Enable the Concepts TS in the compiler (defaults to ON if GCC)" ON)
 else()
   option(ENABLE_CXX_CONCEPTS "Enable the Concepts TS in the compiler (defaults to ON if GCC)" OFF)

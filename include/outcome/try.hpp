@@ -27,6 +27,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "config.hpp"
 
+#include <utility>  // for move
+
 OUTCOME_V2_NAMESPACE_BEGIN
 
 /*! Customisation point for changing what the `OUTCOME_TRY` macros

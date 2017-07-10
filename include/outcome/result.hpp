@@ -534,10 +534,11 @@ namespace impl
     \requires That the expression of calling `operator==` on each of the two stored items is a valid expression.
     \throws Any exception the individual `operator==` operations might throw.
     */
-    template <class T, class U, class V,                                    //
-              typename = decltype(std::declval<R>() == std::declval<T>()),  //
-              typename = decltype(std::declval<S>() == std::declval<U>())   //
-              >
+    OUTCOME_TEMPLATE(class T, class U, class V)
+    OUTCOME_TREQUIRES(                                      //
+    OUTCOME_TEXPR(std::declval<R>() == std::declval<T>()),  //
+    OUTCOME_TEXPR(std::declval<S>() == std::declval<U>())   //
+    )
     constexpr bool operator==(const result_final<T, U, V> &o) const noexcept(  //
     noexcept(std::declval<R>() == std::declval<T>())                           //
     && noexcept(std::declval<S>() == std::declval<U>()))
@@ -563,10 +564,11 @@ namespace impl
     \requires That the expression of calling `operator!=` on each of the two stored items is a valid expression.
     \throws Any exception the individual `operator!=` operations might throw.
     */
-    template <class T, class U, class V,                                    //
-              typename = decltype(std::declval<R>() != std::declval<T>()),  //
-              typename = decltype(std::declval<S>() != std::declval<U>())   //
-              >
+    OUTCOME_TEMPLATE(class T, class U, class V)
+    OUTCOME_TREQUIRES(                                      //
+    OUTCOME_TEXPR(std::declval<R>() != std::declval<T>()),  //
+    OUTCOME_TEXPR(std::declval<S>() != std::declval<U>())   //
+    )
     constexpr bool operator!=(const result_final<T, U, V> &o) const noexcept(  //
     noexcept(std::declval<R>() != std::declval<T>())                           //
     && noexcept(std::declval<S>() != std::declval<U>()))

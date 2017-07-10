@@ -4,6 +4,7 @@ title = "Outcome documentation"
 publishDir = "../html"
 pygmentsStyle = "vs"
 pygmentsUseClasses = true
+PygmentsCodeFences = true
 
 [outputs]
   home = [ "HTML", "RSS", "JSON"]

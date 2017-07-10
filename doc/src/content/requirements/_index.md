@@ -8,6 +8,9 @@ Outcome is a header only C++ 14 library known to work on these compiler-platform
 - clang 4.0.1 (LLVM) [FreeBSD, Linux, OS X, Windows]
 - GCC 6.3 [Linux]
 
+If your compiler implements the Concepts TS, it is worth turning support on. Support is automatically
+detected and used.
+
 Partially working compilers:
 
 - GCC 5.4.1 is highly usable so long as you don't use Outcome in a `constexpr` evaluation context.
