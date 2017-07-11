@@ -12,6 +12,26 @@ quality and subject change if a second review demands it.
 That said, the essentials here are the same as they were in v1. Indeed most code
 written for v1 should be convertible to v2 without too much effort.
 
+## Usage as a single header file
+
+Outcome v2 comes in single header file form. This is regenerated per commit. To fetch
+on Linux:
+
+```
+wget https://github.com/ned14/outcome/tree/develop/single-header/outcome.hpp
+```
+
+On BSD and OS X:
+
+```
+fetch https://github.com/ned14/outcome/tree/develop/single-header/outcome.hpp
+```
+
+On Windows, simply download the raw file from above and place it wherever it suits you.
+
+
+## Usage as a git submodule
+
 Given that v2 is still under development, it is currently best used as a git
 submodule to your project so you can keep abreast of bug fixes. Here is how:
 
