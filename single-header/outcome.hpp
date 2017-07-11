@@ -1393,9 +1393,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF c818e4d7e4bfd2c3647bbb42365d5c58778d440b
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-10 12:38:57 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c818e4d7
+#define OUTCOME_PREVIOUS_COMMIT_REF 0310607bd68a7b345383ce715f3c347642373643
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-11 00:33:43 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 0310607b
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -3187,6 +3187,21 @@ namespace detail
     &&(std::is_void<U>::value || is_same_or_constructible<status_type, typename result<T, U, V>::status_type>) // if our status types are constructible
 #endif
     ;
+
+    // Predicate for the implicit converting inplace constructor from a compatible input to be available.
+    struct disable_inplace_value_error_constructor;
+    template <class... Args>
+    using choose_inplace_value_error_constructor = std::conditional_t< //
+    std::is_constructible<value_type, Args...>::value && std::is_constructible<error_type, Args...>::value, //
+    disable_inplace_value_error_constructor, //
+    std::conditional_t< //
+    std::is_constructible<value_type, Args...>::value, //
+    value_type, //
+    std::conditional_t< //
+    std::is_constructible<error_type, Args...>::value, //
+    error_type, //
+    disable_inplace_value_error_constructor>>>;
+    template <class... Args> static constexpr bool enable_inplace_value_error_constructor = !std::is_same<choose_inplace_value_error_constructor<Args...>, disable_inplace_value_error_constructor>::value;
   };
 }
 
@@ -3410,6 +3425,12 @@ protected:
     static constexpr bool enable_inplace_error_constructor = //
     std::is_void<error_type>::value //
     || std::is_constructible<error_type, Args...>::value;
+
+    // Predicate for the implicit converting inplace constructor to be available.
+    template <class... Args>
+    static constexpr bool enable_inplace_value_error_constructor = //
+    base::template enable_inplace_value_error_constructor<Args...>;
+    template <class... Args> using choose_inplace_value_error_constructor = typename base::template choose_inplace_value_error_constructor<Args...>;
   };
 
 public:
@@ -3426,7 +3447,7 @@ public:
   result &operator=(const result & /*unused*/) = default;
 
   /// \output_section Converting constructors
-  /*! Converting constructor to a successful result.
+  /*! Implicit converting constructor to a successful result.
   \tparam 1
   \exclude
   \param 1
@@ -3455,7 +3476,7 @@ public:
     hook_result_construction(in_place_type<value_type>, this);
   }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
-  /*! Converting constructor to a successful result + status.
+  /*! Implicit converting constructor to a successful result + status.
 \tparam enable_value_status_converting_constructor
 \exclude
 \param 2
@@ -3490,7 +3511,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
     hook_result_construction(in_place_type<std::pair<value_type, status_type>>, this);
   }
 #endif
-  /*! Converting constructor to a failure result.
+  /*! Implicit converting constructor to a failure result.
   \tparam 1
   \exclude
   \param 1
@@ -3520,7 +3541,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   {
     hook_result_construction(in_place_type<error_type>, this);
   }
-  /*! Special error condition converting constructor to a failure result.
+  /*! Implicit special error condition converting constructor to a failure result.
   \tparam 1
   \exclude
   \tparam 2
@@ -3660,7 +3681,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   }
 
   /// \output_section In place constructors
-  /*! Inplace constructor to a successful result.
+  /*! Explicit inplace constructor to a successful result.
   \tparam 1
   \exclude
   \param _ Tag type to indicate we are doing in place construction of `value_type`.
@@ -3686,7 +3707,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   {
     hook_result_in_place_construction(in_place_type<value_type>, this);
   }
-  /*! Inplace constructor to a successful result.
+  /*! Explicit inplace constructor to a successful result.
   \tparam 2
   \exclude
   \param _ Tag type to indicate we are doing in place construction of `value_type`.
@@ -3714,7 +3735,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   {
     hook_result_in_place_construction(in_place_type<value_type>, this);
   }
-  /*! Inplace constructor to a failure result.
+  /*! Explicit inplace constructor to a failure result.
   \tparam 1
   \exclude
   \param _ Tag type to indicate we are doing in place construction of `error_type`.
@@ -3740,7 +3761,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   {
     hook_result_in_place_construction(in_place_type<error_type>, this);
   }
-  /*! Inplace constructor to a failure result.
+  /*! Explicit inplace constructor to a failure result.
   \tparam 2
   \exclude
   \param _ Tag type to indicate we are doing in place construction of `error_type`.
@@ -3767,6 +3788,29 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
       : base(in_place_type<typename base::_error_type>, il, std::forward<Args>(args)...)
   {
     hook_result_in_place_construction(in_place_type<error_type>, this);
+  }
+  /*! Implicit inplace constructor to successful or failure result.
+  \tparam 2
+  \exclude
+  \param args Arguments with which to in place construct.
+
+  \effects Calls the appropriate `in_place_type_t<...>` constructor depending on constructibility of args.
+  \requires That the args can construct exactly one of `value_type` or `error_type`.
+  \throws Any exception the `in_place_type_t<...>` constructor might throw.
+  */
+
+
+
+
+
+
+
+
+  OUTCOME_TEMPLATE(class A1, class A2, class... Args)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_error_constructor<A1, A2, Args...>))
+  constexpr result(A1 &&a1, A2 &&a2, Args &&... args) noexcept(noexcept(typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>(std::declval<A1>(), std::declval<A2>(), std::declval<Args>()...)))
+      : result(in_place_type<typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>>, std::forward<A1>(a1), std::forward<A2>(a2), std::forward<Args>(args)...)
+  {
   }
 
   /// \output_section Swap
