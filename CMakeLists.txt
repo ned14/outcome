@@ -29,6 +29,35 @@ find_quickcpplib_library(quickcpplib 1.0 REQUIRED)
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(QuickCppLibMakeHeaderOnlyLibrary)
 
+# Make preprocessed edition of this library target
+if(NOT PROJECT_IS_DEPENDENCY)
+  if(NOT PYTHONINTERP_FOUND)
+    indented_message(WARNING "NOT rebuilding precompiled edition of library due to python not being installed")
+  else()
+    # See if the ply package is installed so pcpp can run
+    execute_process(COMMAND python -c "import ply" RESULT_VARIABLE python_has_ply)
+    if(NOT python_has_ply EQUAL 0)
+      indented_message(WARNING "NOT rebuilding precompiled edition of library due to installed python not having the ply package installed. "
+        "Do 'pip install ply' to fix. NOTE that doxygen docs will NOT build without the precompiled edition.")
+    else()
+      add_partial_preprocess(outcome_hl-pp
+                            "${CMAKE_CURRENT_SOURCE_DIR}/single-header/${PROJECT_NAME}.hpp"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}.hpp"
+                            -I .
+                            --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
+                            --passthru-comments --line-directive # --debug
+                            -U QUICKCPPLIB_ENABLE_VALGRIND
+                            -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
+                            -U STANDARDESE_IS_IN_THE_HOUSE
+                            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                            )
+      if(NOT CMAKE_VERSION VERSION_LESS 3.3)
+        add_dependencies(outcome_hl outcome_hl-pp)
+      endif()
+    endif()
+  endif()
+endif()
+
 # Set the standard definitions for these libraries and bring in the all_* helper functions
 include(QuickCppLibApplyDefaultDefinitions)
 # Set the C++ features this library requires
