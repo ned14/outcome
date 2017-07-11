@@ -3790,7 +3790,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
     hook_result_in_place_construction(in_place_type<error_type>, this);
   }
   /*! Implicit inplace constructor to successful or failure result.
-  \tparam 2
+  \tparam 3
   \exclude
   \param args Arguments with which to in place construct.
 
@@ -4162,6 +4162,24 @@ namespace detail
     &&(std::is_void<V>::value || detail::is_same_or_constructible<payload_type, typename outcome<T, U, V, W>::payload_type>) // if our payload types are constructible
     &&(std::is_void<V>::value || detail::is_same_or_constructible<exception_type, typename outcome<T, U, V, W>::exception_type>) // if our exception types are constructible
     ;
+
+    // Predicate for the implicit converting inplace constructor from a compatible input to be available.
+    struct disable_inplace_value_error_exception_constructor;
+    template <class... Args>
+    using choose_inplace_value_error_exception_constructor = std::conditional_t< //
+    ((static_cast<int>(std::is_constructible<value_type, Args...>::value) + static_cast<int>(std::is_constructible<error_type, Args...>::value) + static_cast<int>(std::is_constructible<exception_type, Args...>::value)) > 1), //
+    disable_inplace_value_error_exception_constructor, //
+    std::conditional_t< //
+    std::is_constructible<value_type, Args...>::value, //
+    value_type, //
+    std::conditional_t< //
+    std::is_constructible<error_type, Args...>::value, //
+    error_type, //
+    std::conditional_t< //
+    std::is_constructible<exception_type, Args...>::value, //
+    exception_type, //
+    disable_inplace_value_error_exception_constructor>>>>;
+    template <class... Args> static constexpr bool enable_inplace_value_error_exception_constructor = !std::is_same<choose_inplace_value_error_exception_constructor<Args...>, disable_inplace_value_error_exception_constructor>::value;
   };
 
   template <class Base, class R, class S, class P, class NoValuePolicy> using select_outcome_observers_payload_or_exception = std::conditional_t<trait::is_exception_ptr<P>::value, impl::outcome_exception_observers<Base, R, S, P, NoValuePolicy>, impl::outcome_payload_observers<Base, R, S, P, NoValuePolicy>>;
@@ -4378,6 +4396,12 @@ protected:
     static constexpr bool enable_inplace_exception_constructor = //
     std::is_void<exception_type>::value //
     || std::is_constructible<exception_type, Args...>::value;
+
+    // Predicate for the implicit converting inplace constructor to be available.
+    template <class... Args>
+    static constexpr bool enable_inplace_value_error_exception_constructor = //
+    base::template enable_inplace_value_error_exception_constructor<Args...>;
+    template <class... Args> using choose_inplace_value_error_exception_constructor = typename base::template choose_inplace_value_error_exception_constructor<Args...>;
   };
 
 public:
@@ -5068,6 +5092,29 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   {
     this->_state._status |= detail::status_have_exception;
     hook_outcome_in_place_construction(in_place_type<exception_type>, this);
+  }
+  /*! Implicit inplace constructor to successful value, or unsuccessful error, or unsuccessful exception.
+  \tparam 3
+  \exclude
+  \param args Arguments with which to in place construct.
+
+  \effects Calls the appropriate `in_place_type_t<...>` constructor depending on constructibility of args.
+  \requires That the args can construct exactly one of `value_type` or `error_type` or `exception_type`.
+  \throws Any exception the `in_place_type_t<...>` constructor might throw.
+  */
+
+
+
+
+
+
+
+
+  OUTCOME_TEMPLATE(class A1, class A2, class... Args)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_error_exception_constructor<A1, A2, Args...>))
+  constexpr outcome(A1 &&a1, A2 &&a2, Args &&... args) noexcept(noexcept(typename predicate::template choose_inplace_value_error_exception_constructor<A1, A2, Args...>(std::declval<A1>(), std::declval<A2>(), std::declval<Args>()...)))
+      : outcome(in_place_type<typename predicate::template choose_inplace_value_error_exception_constructor<A1, A2, Args...>>, std::forward<A1>(a1), std::forward<A2>(a2), std::forward<Args>(args)...)
+  {
   }
 
   /// \output_section Comparison operators

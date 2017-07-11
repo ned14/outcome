@@ -242,4 +242,24 @@ BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended"
     // b.error();
     // b.payload();
   }
+  {
+    // Can only be constructed via multiple args
+    struct udt3
+    {
+      udt3() = delete;
+      udt3(udt3 &&) = delete;
+      udt3(const udt3 &) = delete;
+      udt3 &operator=(udt3 &&) = delete;
+      udt3 &operator=(const udt3 &) = delete;
+      explicit udt3(int /*unused*/, const char * /*unused*/, std::nullptr_t /*unused*/) {}
+      ~udt3() = default;
+    };
+    // Test a udt which can only be constructed in place compiles
+    outcome<udt3> g(in_place_type<udt3>, 5, (const char *) "niall", nullptr);
+    // Does converting inplace construction also work?
+    outcome<udt3> h(5, (const char *) "niall", nullptr);
+    outcome<udt3> i(ENOMEM, std::generic_category());
+    BOOST_CHECK(h.has_value());
+    BOOST_CHECK(i.has_error());
+  }
 }

@@ -220,6 +220,19 @@ public:
   constexpr explicit result(in_place_type_t<error_type_if_enabled>, std::initializer_list<U> il, Args &&... args) 
   noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value);
 
+  /*! Implicit inplace constructor to successful or failure result.
+  \tparam 3
+  \exclude
+  \param args Arguments with which to in place construct.
+
+  \effects Calls the appropriate `in_place_type_t<...>` constructor depending on constructibility of args.
+  \requires That the args can construct exactly one of `value_type` or `error_type`.
+  \throws Any exception the `in_place_type_t<...>` constructor might throw.
+  */
+  OUTCOME_TEMPLATE(class A1, class A2, class... Args)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_error_constructor<A1, A2, Args...>))
+  constexpr result(A1 &&a1, A2 &&a2, Args &&... args) noexcept(noexcept(typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>(std::declval<A1>(), std::declval<A2>(), std::declval<Args>()...)));
+
   
   /// \output_section Swap
   /*! Swaps this result with another result

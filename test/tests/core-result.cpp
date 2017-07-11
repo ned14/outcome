@@ -273,5 +273,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     // Does converting inplace construction also work?
     result<udt3> h(5, (const char *) "niall", nullptr);
     result<udt3> i(ENOMEM, std::generic_category());
+    BOOST_CHECK(h.has_value());
+    BOOST_CHECK(i.has_error());
   }
 }
