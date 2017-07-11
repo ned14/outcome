@@ -6,11 +6,25 @@ CTest dashboard: http://my.cdash.org/index.php?project=Boost.Outcome
 
 Documentation: https://ned14.github.io/outcome/
 
-Latest tarball of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/outcome-v2.0-source-latest.tar.xz
+## Usage as a single header file
 
-Past tarballs of source with all tests passing on Linux and Windows: https://dedi4.nedprod.com/static/files/outcome
+Outcome v2 comes in single header file form. This is regenerated per commit. To fetch
+on Linux:
 
-Post peer review todo:
+```
+wget https://github.com/ned14/outcome/tree/develop/single-header/outcome.hpp
+```
+
+On BSD and OS X:
+
+```
+fetch https://github.com/ned14/outcome/tree/develop/single-header/outcome.hpp
+```
+
+On Windows, simply download the raw file from above and place it wherever it suits you.
+
+## Post peer review todo:
+
  - [x] Implement `result<T, EC>` as per peer review feedback
  - [x] Write up each API with C++ standardese and feed to Standardese
  - [x] Replace doxygen with Standardese + Hugo
