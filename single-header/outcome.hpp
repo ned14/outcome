@@ -1392,9 +1392,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 0d0883b058eea7bcb91b3d37d9cd23f49732dc64
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-11 22:38:34 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 0d0883b0
+#define OUTCOME_PREVIOUS_COMMIT_REF 4e3322f489338b0830366af35d2acda670bc319a
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-13 15:39:36 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4e3322f4
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -2135,13 +2135,18 @@ namespace detail
   // True if type is the same or constructible
   template <class T, class U, class... Args> static constexpr bool is_same_or_constructible = std::is_same<T, U>::value || std::is_constructible<T, U, Args...>::value;
 // True if type is nothrow swappable
-#if !0 && (__cplusplus >= 201700 || defined(_MSC_VER))
+#if !0 && __cplusplus >= 201700
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
 #else
-  template <class T> constexpr inline T &ldeclval();
-  template <class T> struct is_nothrow_swappable : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
+  namespace _is_nothrow_swappable
   {
-  };
+    using namespace std;
+    template <class T> constexpr inline T &ldeclval();
+    template <class T> struct is_nothrow_swappable : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
+    {
+    };
+  }
+  template <class T> using is_nothrow_swappable = _is_nothrow_swappable::is_nothrow_swappable<T>;
 #endif
 }
 
@@ -6076,27 +6081,27 @@ inline std::error_code error_from_exception(std::exception_ptr &&ep, std::error_
   {
     std::rethrow_exception(ep);
   }
-  catch(const std::invalid_argument &e)
+  catch(const std::invalid_argument &/*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::invalid_argument);
   }
-  catch(const std::domain_error &e)
+  catch(const std::domain_error &/*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::argument_out_of_domain);
   }
-  catch(const std::length_error &e)
+  catch(const std::length_error &/*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::argument_list_too_long);
   }
-  catch(const std::out_of_range &e)
+  catch(const std::out_of_range &/*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::result_out_of_range);
   }
-  catch(const std::logic_error &e) /* base class for this group */
+  catch(const std::logic_error &/*unused*/) /* base class for this group */
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::invalid_argument);
@@ -6106,22 +6111,22 @@ inline std::error_code error_from_exception(std::exception_ptr &&ep, std::error_
     ep = std::exception_ptr();
     return e.code();
   }
-  catch(const std::overflow_error &e)
+  catch(const std::overflow_error &/*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::value_too_large);
   }
-  catch(const std::range_error &e)
+  catch(const std::range_error &/*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::result_out_of_range);
   }
-  catch(const std::runtime_error &e) /* base class for this group */
+  catch(const std::runtime_error &/*unused*/) /* base class for this group */
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::resource_unavailable_try_again);
   }
-  catch(const std::bad_alloc &e)
+  catch(const std::bad_alloc &/*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::not_enough_memory);
