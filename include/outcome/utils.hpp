@@ -54,27 +54,27 @@ inline std::error_code error_from_exception(std::exception_ptr &&ep, std::error_
   {
     std::rethrow_exception(ep);
   }
-  catch(const std::invalid_argument &e)
+  catch(const std::invalid_argument &/*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::invalid_argument);
   }
-  catch(const std::domain_error &e)
+  catch(const std::domain_error &/*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::argument_out_of_domain);
   }
-  catch(const std::length_error &e)
+  catch(const std::length_error &/*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::argument_list_too_long);
   }
-  catch(const std::out_of_range &e)
+  catch(const std::out_of_range &/*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::result_out_of_range);
   }
-  catch(const std::logic_error &e) /* base class for this group */
+  catch(const std::logic_error &/*unused*/) /* base class for this group */
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::invalid_argument);
@@ -84,22 +84,22 @@ inline std::error_code error_from_exception(std::exception_ptr &&ep, std::error_
     ep = std::exception_ptr();
     return e.code();
   }
-  catch(const std::overflow_error &e)
+  catch(const std::overflow_error &/*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::value_too_large);
   }
-  catch(const std::range_error &e)
+  catch(const std::range_error &/*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::result_out_of_range);
   }
-  catch(const std::runtime_error &e) /* base class for this group */
+  catch(const std::runtime_error &/*unused*/) /* base class for this group */
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::resource_unavailable_try_again);
   }
-  catch(const std::bad_alloc &e)
+  catch(const std::bad_alloc &/*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::not_enough_memory);

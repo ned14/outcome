@@ -2,7 +2,9 @@
 
 int main(void)
 {
-  OUTCOME_V2_NAMESPACE::result<int> f(5);
+  using namespace OUTCOME_V2_NAMESPACE;
+  result<int> f(5);
+  outcome<void> m(in_place_type<void>);
   return 0;
 }
 

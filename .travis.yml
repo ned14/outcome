@@ -1,7 +1,7 @@
 dist: trusty
 language: cpp
 compiler:
- - g++-7
+ - g++-6
  - clang-4.0
 sudo: false
 os:
@@ -23,7 +23,7 @@ addons:
 #    - george-edison55-cmake-3.x
     - llvm-toolchain-trusty-4.0
     packages:
-    - g++-7
+    - g++-6
     - clang-4.0
     - cmake
     - cmake-data
@@ -38,7 +38,7 @@ env:
 matrix:
   exclude:
 #  - os: osx
-#    compiler: g++-7
+#    compiler: g++-6
   - os: linux
     compiler: clang-4.0
     env: __="Documentation" NAME=TravisDocumentation
@@ -95,7 +95,7 @@ script:
    fi
  -
    if [ "$__" = "cmake tests" ]; then
-     if [ "$CXX" = "g++" ]; then export CXX=g++-7; export NAME=TravisLinuxWorkerGCC; fi;
+     if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
      if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
      ctest -S .ci.cmake -V;
    fi

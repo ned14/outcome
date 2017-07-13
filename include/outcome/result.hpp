@@ -100,13 +100,18 @@ namespace detail
   // True if type is the same or constructible
   template <class T, class U, class... Args> static constexpr bool is_same_or_constructible = std::is_same<T, U>::value || std::is_constructible<T, U, Args...>::value;
 // True if type is nothrow swappable
-#if !defined(STANDARDESE_IS_IN_THE_HOUSE) && (__cplusplus >= 201700 || defined(_MSC_VER))
+#if !defined(STANDARDESE_IS_IN_THE_HOUSE) && __cplusplus >= 201700
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
 #else
-  template <class T> constexpr inline T &ldeclval();
-  template <class T> struct is_nothrow_swappable : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
+  namespace _is_nothrow_swappable
   {
-  };
+    using namespace std;
+    template <class T> constexpr inline T &ldeclval();
+    template <class T> struct is_nothrow_swappable : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
+    {
+    };
+  }
+  template <class T> using is_nothrow_swappable = _is_nothrow_swappable::is_nothrow_swappable<T>;
 #endif
 }
 
