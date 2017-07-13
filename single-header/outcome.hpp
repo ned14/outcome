@@ -1096,8 +1096,6 @@ extern "C" void _mm_pause();
 #error Unknown compiler, cannot set QUICKCPPLIB_THREAD_LOCAL
 #endif
 #endif
-
-#ifdef __cpp_concepts
 /* MSVC capable preprocessor macro overloading
 (C) 2014-2017 Niall Douglas <http://www.nedproductions.biz/> (3 commits)
 File Created: Aug 2014
@@ -1172,6 +1170,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_CALL_OVERLOAD_(name, ...) QUICKCPPLIB_GLUE_(QUICKCPPLIB_OVERLOAD_MACRO_(name, QUICKCPPLIB_COUNT_ARGS_MAX8_(__VA_ARGS__)), (__VA_ARGS__))
 
 #endif
+#ifdef __cpp_concepts
 #define QUICKCPPLIB_TREQUIRES_EXPAND8(a, b, c, d, e, f, g, h) a &&QUICKCPPLIB_TREQUIRES_EXPAND7(b, c, d, e, f, g, h)
 #define QUICKCPPLIB_TREQUIRES_EXPAND7(a, b, c, d, e, f, g) a &&QUICKCPPLIB_TREQUIRES_EXPAND6(b, c, d, e, f, g)
 #define QUICKCPPLIB_TREQUIRES_EXPAND6(a, b, c, d, e, f) a &&QUICKCPPLIB_TREQUIRES_EXPAND5(b, c, d, e, f)
@@ -1393,9 +1392,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 0310607bd68a7b345383ce715f3c347642373643
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-11 00:33:43 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 0310607b
+#define OUTCOME_PREVIOUS_COMMIT_REF 0d0883b058eea7bcb91b3d37d9cd23f49732dc64
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-11 22:38:34 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 0d0883b0
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
