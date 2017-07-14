@@ -1511,6 +1511,15 @@ template <class R, class S, class P> inline void swap(result<R, S, P> &a, result
   a.swap(b);
 }
 
+/*! Useful as a shorthand for returning success.
+\effects Returns a `result<void>(in_place_type<void>)`.
+*/
+inline result<void> success() noexcept
+{
+  static result<void> v(in_place_type<void>);
+  return v;
+}
+
 OUTCOME_V2_NAMESPACE_END
 
 #endif
