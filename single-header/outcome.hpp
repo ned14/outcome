@@ -887,9 +887,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 16f1d6e141a169971fd088062bcfe812bd39b6f4
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-07-05 21:27:22 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 16f1d6e1
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF bf6ae3a792630f65939f14e8117081bcecdc0378
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-07-15 10:31:56 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE bf6ae3a7
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
 
@@ -1392,9 +1392,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 4e3322f489338b0830366af35d2acda670bc319a
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-13 15:39:36 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4e3322f4
+#define OUTCOME_PREVIOUS_COMMIT_REF dfb2b5647dc0cc142bc121ef98d599678eeb651f
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-15 10:22:56 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE dfb2b564
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -3876,6 +3876,17 @@ template <class R, class S, class P> inline void swap(result<R, S, P> &a, result
   a.swap(b);
 }
 
+/*! Useful as a shorthand for returning success.
+\effects Returns a `result<void>(in_place_type<void>)`.
+*/
+
+
+inline result<void> success() noexcept
+{
+  static result<void> v(in_place_type<void>);
+  return v;
+}
+
 OUTCOME_V2_NAMESPACE_END
 
 #endif
@@ -6071,7 +6082,7 @@ and the pointer is left unmodified.
 
 
 
-inline std::error_code error_from_exception(std::exception_ptr &&ep, std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
+inline std::error_code error_from_exception(std::exception_ptr &&ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
 {
   if(!ep)
   {
@@ -6081,27 +6092,27 @@ inline std::error_code error_from_exception(std::exception_ptr &&ep, std::error_
   {
     std::rethrow_exception(ep);
   }
-  catch(const std::invalid_argument &/*unused*/)
+  catch(const std::invalid_argument & /*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::invalid_argument);
   }
-  catch(const std::domain_error &/*unused*/)
+  catch(const std::domain_error & /*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::argument_out_of_domain);
   }
-  catch(const std::length_error &/*unused*/)
+  catch(const std::length_error & /*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::argument_list_too_long);
   }
-  catch(const std::out_of_range &/*unused*/)
+  catch(const std::out_of_range & /*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::result_out_of_range);
   }
-  catch(const std::logic_error &/*unused*/) /* base class for this group */
+  catch(const std::logic_error & /*unused*/) /* base class for this group */
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::invalid_argument);
@@ -6111,22 +6122,22 @@ inline std::error_code error_from_exception(std::exception_ptr &&ep, std::error_
     ep = std::exception_ptr();
     return e.code();
   }
-  catch(const std::overflow_error &/*unused*/)
+  catch(const std::overflow_error & /*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::value_too_large);
   }
-  catch(const std::range_error &/*unused*/)
+  catch(const std::range_error & /*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::result_out_of_range);
   }
-  catch(const std::runtime_error &/*unused*/) /* base class for this group */
+  catch(const std::runtime_error & /*unused*/) /* base class for this group */
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::resource_unavailable_try_again);
   }
-  catch(const std::bad_alloc &/*unused*/)
+  catch(const std::bad_alloc & /*unused*/)
   {
     ep = std::exception_ptr();
     return std::make_error_code(std::errc::not_enough_memory);
