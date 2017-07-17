@@ -27,7 +27,7 @@ namespace detail
   {
   public:
     // Return a short descriptive name for the category
-    virtual const char *name() const noexcept override final { return "MathError"; }
+    virtual const char *name() const noexcept override final { return "ConversionError"; }
     // Return what each enum means in text
     virtual std::string message(int c) const override final
     {
