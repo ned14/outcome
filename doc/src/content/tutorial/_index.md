@@ -56,17 +56,21 @@ The implementation will do the following: if the integral number can be represnt
 
 {{% snippet "using_result.cpp" "half_impl" %}}
 
-1. You test if `result` object represents a cuccessful operation with contextual conversion to `bool`.
-2. Function `value` extracts the successfully returned result.
-3. Function `error` allows you to inspect the error sub-object, representing information about the reason for failure.
-4. Macro `OUTCOME_TRY` represents a control statement. It implies that function call in the second argument returns a `result<>`. It is defined as:
+#1. You test if `result` object represents a cuccessful operation with contextual conversion to `bool`.
+
+#2. Function `value` extracts the successfully returned result.
+
+#3. Function `error` allows you to inspect the error sub-object, representing information about the reason for failure.
+
+#4. Macro `OUTCOME_TRY` represents a control statement. It implies that function call in the second argument returns a `result<>`. It is defined as:
 
 {{% snippet "using_result.cpp" "from_string" %}}
 
    Our control statement means: if `fromString` returned failure, this same error information should be returned from `print_half`, even though the type of `result<>` is different. If `fromString` returned success, we create  variable `i` of type `int` with the value returned from `fromString`. If control goes to subsequent line, it means `fromString` succeeded and variable of type `int` is in scope.
 
-5. Function `as_void` must only be called on  a `result<>` object representing failure. It returns object of type `result<void>` containing the same error object, and can be converted to any `result<T>`, in particular to `result<void>`, while still preserving the same error information.
-6. Function `success` returns an object of type `result<foid>` representing success.
+#5. In the return statement we extract the error information and use it to initialize the return value from `print_half`.
+
+#6. Function `success` returns an object of type `result<foid>` representing success.
 
 ## TODO: more material will be provided in time...
 
