@@ -138,6 +138,8 @@ template <class EC, class P> struct failure_type<EC, P, false>
   using error_type = EC;
   //! The type of the payload
   using payload_type = P;
+  //! The type of the exception
+  using exception_type = void;
   //! The error code
   error_type error;
   //! The payload
@@ -149,6 +151,8 @@ template <class EC, class E> struct failure_type<EC, E, true>
 {
   //! The type of the error code
   using error_type = EC;
+  //! The type of the payload
+  using payload_type = void;
   //! The type of the exception
   using exception_type = E;
   //! The error code
@@ -162,6 +166,10 @@ template <class EC> struct failure_type<EC, void, false>
 {
   //! The type of the error code
   using error_type = EC;
+  //! The type of the payload
+  using payload_type = void;
+  //! The type of the exception
+  using exception_type = void;
   //! The error code
   error_type error;
 };
@@ -169,8 +177,12 @@ template <class EC> struct failure_type<EC, void, false>
 */
 template <class P> struct failure_type<void, P, false>
 {
+  //! The type of the error code
+  using error_type = void;
   //! The type of the payload
   using payload_type = P;
+  //! The type of the exception
+  using exception_type = void;
   //! The payload
   payload_type payload;
 };
@@ -178,6 +190,10 @@ template <class P> struct failure_type<void, P, false>
 */
 template <class E> struct failure_type<void, E, true>
 {
+  //! The type of the error code
+  using error_type = void;
+  //! The type of the payload
+  using payload_type = void;
   //! The type of the exception
   using exception_type = E;
   //! The exception
