@@ -42,17 +42,6 @@ public:
   }
 };
 
-//! Namespace for traits
-namespace trait
-{
-  /*! Trait for whether type `P` is to be considered a payload to an exception.
-  \module Error code interpretation policy
-  */
-  template <class P> struct is_exception_ptr : std::integral_constant<bool, std::is_constructible<std::exception_ptr, P>::value>
-  {
-  };
-}
-
 //! Placeholder type to indicate there is no payload type
 struct no_payload_type
 {

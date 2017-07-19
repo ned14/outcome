@@ -887,9 +887,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF bf6ae3a792630f65939f14e8117081bcecdc0378
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-07-15 10:31:56 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE bf6ae3a7
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF e9f675c6b88dc35c5a878f8cea870b83e7f3d28f
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-07-15 17:09:37 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE e9f675c6
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
 
@@ -1392,9 +1392,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF dfb2b5647dc0cc142bc121ef98d599678eeb651f
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-15 10:22:56 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE dfb2b564
+#define OUTCOME_PREVIOUS_COMMIT_REF 58d6d478775161d055550771b4ee8462531c951b
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-19 16:20:50 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 58d6d478
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -2054,8 +2054,251 @@ namespace detail
 OUTCOME_V2_NAMESPACE_END
 
 #endif
-#include <system_error>
+/* Type sugar for success and failure
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: July 2017
 
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_SUCCESS_FAILURE_HPP
+#define OUTCOME_SUCCESS_FAILURE_HPP
+
+
+
+#include <system_error>
+#include <type_traits>
+
+namespace std
+{
+  class exception_ptr;
+}
+
+OUTCOME_V2_NAMESPACE_BEGIN
+
+//! Namespace for traits
+namespace trait
+{
+  /*! Trait for whether type `P` is to be considered a payload to an exception.
+  \module Error code interpretation policy
+  */
+
+
+  template <class P> struct is_exception_ptr : std::integral_constant<bool, std::is_constructible<std::exception_ptr, P>::value>
+  {
+  };
+}
+
+// Do we have C++ 17 deduced templates?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*! Type sugar for implicitly constructing a `result<>` with a successful state.
+*/
+
+template <class T> struct success_type
+{
+  //! The type of the successful state.
+  using value_type = T;
+  //! The value of the successful state.
+  value_type value;
+};
+/*! Type sugar for implicitly constructing a `result<>` with a successful state.
+*/
+
+template <> struct success_type<void>
+{
+  //! The type of the successful state.
+  using value_type = void;
+};
+/*! Returns type sugar for implicitly constructing a `result<T>` with a successful state,
+default constructing `T` if necessary.
+*/
+
+
+inline constexpr success_type<void> success() noexcept
+{
+  return success_type<void>{};
+}
+/*! Returns type sugar for implicitly constructing a `result<T>` with a successful state.
+\effects Copies or moves the successful state supplied into the returned type sugar.
+*/
+
+
+template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v)
+{
+  return success_type<std::decay_t<T>>{std::forward<T>(v)};
+}
+
+/*! Type sugar for implicitly constructing a `result<>` with a failure state.
+*/
+
+template <class EC = std::error_code, class E = void, bool e_is_exception_ptr = trait::is_exception_ptr<E>::value> struct failure_type;
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and payload.
+*/
+
+template <class EC, class P> struct failure_type<EC, P, false>
+{
+  //! The type of the error code
+  using error_type = EC;
+  //! The type of the payload
+  using payload_type = P;
+  //! The error code
+  error_type error;
+  //! The payload
+  payload_type payload;
+};
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and exception.
+*/
+
+template <class EC, class E> struct failure_type<EC, E, true>
+{
+  //! The type of the error code
+  using error_type = EC;
+  //! The type of the exception
+  using exception_type = E;
+  //! The error code
+  error_type error;
+  //! The exception
+  exception_type exception;
+};
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code.
+*/
+
+template <class EC> struct failure_type<EC, void, false>
+{
+  //! The type of the error code
+  using error_type = EC;
+  //! The error code
+  error_type error;
+};
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of payload.
+*/
+
+template <class P> struct failure_type<void, P, false>
+{
+  //! The type of the payload
+  using payload_type = P;
+  //! The payload
+  payload_type payload;
+};
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of exception.
+*/
+
+template <class E> struct failure_type<void, E, true>
+{
+  //! The type of the exception
+  using exception_type = E;
+  //! The exception
+  exception_type exception;
+};
+/*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
+\effects Copies or moves the failure state supplied into the returned type sugar.
+*/
+
+
+template <class EC> inline constexpr failure_type<std::decay_t<EC>> failure(EC &&v)
+{
+  return failure_type<std::decay_t<EC>>{std::forward<EC>(v)};
+}
+/*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
+\effects Copies or moves the failure state supplied into the returned type sugar.
+*/
+
+
+template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, E &&w)
+{
+  return failure_type<std::decay_t<EC>, std::decay_t<E>>{std::forward<EC>(v), std::forward<E>(w)};
+}
+
+
+
+OUTCOME_V2_NAMESPACE_END
+
+#endif
 #ifndef OUTCOME_ENABLE_POSITIVE_STATUS
 //! Define to enable positive value + status returns
 #define OUTCOME_ENABLE_POSITIVE_STATUS 0
@@ -3171,22 +3414,11 @@ namespace detail
     && std::is_error_condition_enum<ErrorCondEnum>::value // is an error condition enum
     && !std::is_constructible<value_type, ErrorCondEnum>::value && !std::is_constructible<error_type, ErrorCondEnum>::value; // not constructible via any other means
 
-    // Predicate for the explicit converting copy constructor from a compatible input to be available.
+    // Predicate for the converting copy constructor from a compatible input to be available.
     template <class T, class U, class V>
-    static constexpr bool enable_explicit_compatible_conversion = //
-    !std::is_void<T>::value // other value type must not be void
-    && (is_same_or_constructible<value_type, typename result<T, U, V>::value_type>) // if our value types are constructible
+    static constexpr bool enable_compatible_conversion = //
+    (std::is_void<T>::value || is_same_or_constructible<value_type, typename result<T, U, V>::value_type>) // if our value types are constructible
     &&(std::is_void<U>::value || is_same_or_constructible<error_type, typename result<T, U, V>::error_type>) // if our error types are constructible
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-    &&(std::is_void<U>::value || is_same_or_constructible<status_type, typename result<T, U, V>::status_type>) // if our status types are constructible
-#endif
-    ;
-
-    // Predicate for the implicit converting copy constructor from a compatible input to be available.
-    template <class T, class U, class V>
-    static constexpr bool enable_implicit_compatible_conversion = //
-    std::is_void<T>::value // other value type must be void
-    && (std::is_void<U>::value || is_same_or_constructible<error_type, typename result<T, U, V>::error_type>) // if our error types are constructible
 #if OUTCOME_ENABLE_POSITIVE_STATUS
     &&(std::is_void<U>::value || is_same_or_constructible<status_type, typename result<T, U, V>::status_type>) // if our status types are constructible
 #endif
@@ -3207,6 +3439,10 @@ namespace detail
     disable_inplace_value_error_constructor>>>;
     template <class... Args> static constexpr bool enable_inplace_value_error_constructor = !std::is_same<choose_inplace_value_error_constructor<Args...>, disable_inplace_value_error_constructor>::value;
   };
+
+  template <class T, class U> const U &extract_value_from_success(const success_type<U> &v) { return v.value; }
+  template <class T, class U> U &&extract_value_from_success(success_type<U> &&v) { return std::move(v.value); }
+  template <class T, class U> T extract_value_from_success(success_type<void> v) { return T{}; }
 }
 
 /*! The default instantiation hook implementation called when a `result` is first created
@@ -3406,17 +3642,11 @@ protected:
     !std::is_same<std::decay_t<ErrorCondEnum>, result>::value // not my type
     && base::template enable_error_condition_converting_constructor<ErrorCondEnum>;
 
-    //! Predicate for the explicit converting copy constructor from a compatible input to be available.
+    //! Predicate for the converting copy constructor from a compatible input to be available.
     template <class T, class U, class V>
-    static constexpr bool enable_explicit_compatible_conversion = //
+    static constexpr bool enable_compatible_conversion = //
     !std::is_same<result<T, U, V>, result>::value // not my type
-    && base::template enable_explicit_compatible_conversion<T, U, V>;
-
-    //! Predicate for the implicit converting copy constructor from a compatible input to be available.
-    template <class T, class U, class V>
-    static constexpr bool enable_implicit_compatible_conversion = //
-    !std::is_same<result<T, U, V>, result>::value // not my type
-    && base::template enable_implicit_compatible_conversion<T, U, V>;
+    && base::template enable_compatible_conversion<T, U, V>;
 
     //! Predicate for the inplace construction of value to be available.
     template <class... Args>
@@ -3589,8 +3819,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   \param o The compatible result.
 
   \effects Initialises the result with a copy of the compatible result.
-  \requires Both result's `value_type`, `error_type` and `status_type` need to be constructible, or the source `status_error_type` can be `void`.
-  The source `value_type` cannot be `void`.
+  \requires Both result's `value_type`, `error_type` and `status_type` need to be constructible, or the source can be `void`.
   \throws Any exception the construction of `value_type(T)` and `status_error_type(U)` might throw.
   */
 
@@ -3601,34 +3830,9 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
 
 
 
-
   OUTCOME_TEMPLATE(class T, class U, class V)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_explicit_compatible_conversion<T, U, V>))
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V>))
   constexpr explicit result(const result<T, U, V> &o, explicit_compatible_conversion_tag = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
-      : base(typename base::compatible_conversion_tag(), o)
-  {
-    hook_result_copy_construction(in_place_type<decltype(o)>, this);
-  }
-  /*! Implicit converting copy constructor from a compatible result type.
-  \tparam 3
-  \exclude
-  \param o The compatible result.
-
-  \effects Initialises the result with a copy of the compatible result.
-  \requires Both result's `error_type` and `status_type` need to be constructible, and the source `value_type` must be `void`.
-  \throws Any exception the construction of `status_error_type(U)` might throw.
-  */
-
-
-
-
-
-
-
-
-  OUTCOME_TEMPLATE(class T, class U, class V)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_implicit_compatible_conversion<T, U, V>))
-  constexpr result(const result<T, U, V> &o, implicit_compatible_conversion_tag = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<status_error_type, U>::value)
       : base(typename base::compatible_conversion_tag(), o)
   {
     hook_result_copy_construction(in_place_type<decltype(o)>, this);
@@ -3639,8 +3843,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   \param o The compatible result.
 
   \effects Initialises the result with a move of the compatible result.
-  \requires Both result's `value_type`, `error_type` and `status_type` need to be constructible, or the source `status_error_type` can be `void`.
-  The source `value_type` cannot be `void`.
+  \requires Both result's `value_type`, `error_type` and `status_type` need to be constructible, or the source can be `void`.
   \throws Any exception the construction of `value_type(T)` and `status_error_type(U)` might throw.
   */
 
@@ -3651,34 +3854,9 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
 
 
 
-
   OUTCOME_TEMPLATE(class T, class U, class V)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_explicit_compatible_conversion<T, U, V>))
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V>))
   constexpr explicit result(result<T, U, V> &&o, explicit_compatible_conversion_tag = explicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
-      : base(typename base::compatible_conversion_tag(), std::move(o))
-  {
-    hook_result_move_construction(in_place_type<decltype(o)>, this);
-  }
-  /*! Implicit converting move constructor from a compatible result type.
-  \tparam 3
-  \exclude
-  \param o The compatible result.
-
-  \effects Initialises the result with a move of the compatible result.
-  \requires Both result's `error_type` and `status_type` need to be constructible, and the source `value_type` must be `void`.
-  \throws Any exception the construction of `status_error_type(U)` might throw.
-  */
-
-
-
-
-
-
-
-
-  OUTCOME_TEMPLATE(class T, class U, class V)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_implicit_compatible_conversion<T, U, V>))
-  constexpr result(result<T, U, V> &&o, implicit_compatible_conversion_tag = implicit_compatible_conversion_tag()) noexcept(std::is_nothrow_constructible<status_error_type, U>::value)
       : base(typename base::compatible_conversion_tag(), std::move(o))
   {
     hook_result_move_construction(in_place_type<decltype(o)>, this);
@@ -3817,6 +3995,104 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   {
   }
 
+  /// \output_section Tagged constructors
+  /*! Implicit tagged constructor of a successful result.
+  \tparam 1
+  \exclude
+  \param o The compatible success type sugar.
+
+  \effects Initialises the result with a copy of the value in the type sugar.
+  \requires Both result and success' `value_type` need to be constructible, or the source can be `void`.
+  \throws Any exception the construction of `value_type(T)` might throw.
+  */
+
+
+
+
+
+
+
+
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, void, void>))
+  constexpr result(const success_type<T> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value)
+      : base(in_place_type<typename base::value_type>, detail::extract_value_from_success<value_type>(o))
+  {
+    hook_result_copy_construction(in_place_type<decltype(o)>, this);
+  }
+  /*! Implicit tagged constructor of a successful result.
+  \tparam 1
+  \exclude
+  \param o The compatible success type sugar.
+
+  \effects Initialises the result with a move of the value in the type sugar.
+  \requires Both result and success' `value_type` need to be constructible, or the source can be `void`.
+  \throws Any exception the construction of `value_type(T)` might throw.
+  */
+
+
+
+
+
+
+
+
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, void, void>))
+  constexpr result(success_type<T> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value)
+      : base(in_place_type<typename base::value_type>, std::move(detail::extract_value_from_success<value_type>(std::move(o))))
+  {
+    hook_result_move_construction(in_place_type<decltype(o)>, this);
+  }
+  /*! Implicit tagged constructor of a failure result.
+  \tparam 1
+  \exclude
+  \param o The compatible failure type sugar.
+
+  \effects Initialises the result with a copy of the error in the type sugar.
+  \requires Both result and success' `error_type` need to be constructible, or the source can be `void`.
+  \throws Any exception the construction of `error_type(T)` might throw.
+  */
+
+
+
+
+
+
+
+
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, void>))
+  constexpr result(const failure_type<T> &o) noexcept(std::is_nothrow_constructible<error_type, T>::value)
+      : base(in_place_type<typename base::error_type>, o.error)
+  {
+    hook_result_copy_construction(in_place_type<decltype(o)>, this);
+  }
+  /*! Implicit tagged constructor of a failure result.
+  \tparam 1
+  \exclude
+  \param o The compatible failure type sugar.
+
+  \effects Initialises the result with a move of the error in the type sugar.
+  \requires Both result and success' `error_type` need to be constructible, or the source can be `void`.
+  \throws Any exception the construction of `error_type(T)` might throw.
+  */
+
+
+
+
+
+
+
+
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, void>))
+  constexpr result(failure_type<T> &&o) noexcept(std::is_nothrow_constructible<error_type, T>::value)
+      : base(in_place_type<typename base::error_type>, std::move(o.error))
+  {
+    hook_result_move_construction(in_place_type<decltype(o)>, this);
+  }
+
   /// \output_section Swap
   /*! Swaps this result with another result
   \effects Any `R` and/or `S` is swapped along with the metadata tracking them.
@@ -3852,18 +4128,18 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   }
 
   /// \output_section Converters
-  /*! Returns this result rebound to void with any errored state copied.
+  /*! Returns this result as a `failure_type` with any errored state copied.
   \requires This result to have a failed state, else whatever `assume_error()` would do.
   */
 
 
-  rebind<void> as_void() const & { return rebind<void>(in_place_type<error_type>, this->assume_error()); }
-  /*! Returns this result rebound to void with any errored state moved.
+  auto as_failure() const & { return failure(this->assume_error()); }
+  /*! Returns this result as a `failure_type` with any errored state moved.
   \requires This result to have a failed state, else whatever `assume_error()` would do.
   */
 
 
-  rebind<void> as_void() && { return rebind<void>(in_place_type<error_type>, std::move(this->assume_error())); }
+  auto as_failure() && { return failure(std::move(this->assume_error())); }
 };
 
 /*! Specialise swap for result.
@@ -3874,17 +4150,6 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
 template <class R, class S, class P> inline void swap(result<R, S, P> &a, result<R, S, P> &b) noexcept(noexcept(a.swap(b)))
 {
   a.swap(b);
-}
-
-/*! Useful as a shorthand for returning success.
-\effects Returns a `result<void>(in_place_type<void>)`.
-*/
-
-
-inline result<void> success() noexcept
-{
-  static result<void> v(in_place_type<void>);
-  return v;
 }
 
 OUTCOME_V2_NAMESPACE_END
@@ -3904,19 +4169,6 @@ public:
   {
   }
 };
-
-//! Namespace for traits
-namespace trait
-{
-  /*! Trait for whether type `P` is to be considered a payload to an exception.
-  \module Error code interpretation policy
-  */
-
-
-  template <class P> struct is_exception_ptr : std::integral_constant<bool, std::is_constructible<std::exception_ptr, P>::value>
-  {
-  };
-}
 
 //! Placeholder type to indicate there is no payload type
 struct no_payload_type
@@ -5918,31 +6170,20 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
-#include <utility> // for move
-
 OUTCOME_V2_NAMESPACE_BEGIN
 
 /*! Customisation point for changing what the `OUTCOME_TRY` macros
-do. This function defaults to returning `std::move(v).as_void()`.
-\effects Extracts any state apart from value into a `void` rebound equivalent.
-\requires The input value to have a `.as_void()` member function, and a `rebind`
-member template alias.
+do. This function defaults to returning `std::forward<T>(v).as_failure()`.
+\effects Extracts any state apart from value into a `failure_type`.
+\requires The input value to have a `.as_failure()` member function.
 */
 
 
 
 
-
-template <class T>
-OUTCOME_REQUIRES(requires(T &&v) {
-  {
-    v.as_void()
-  }
-  ->typename T::template rebind<void>;
-})
-typename T::template rebind<void> try_operation_return_as(T &&v)
+template <class T> OUTCOME_REQUIRES(requires(T &&v){{v.as_failure()}}) decltype(auto) try_operation_return_as(T &&v)
 {
-  return std::move(v).as_void();
+  return std::forward<T>(v).as_failure();
 }
 
 OUTCOME_V2_NAMESPACE_END
@@ -5951,11 +6192,11 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRY_GLUE(x, y) OUTCOME_TRY_GLUE2(x, y)
 #define OUTCOME_TRY_UNIQUE_NAME OUTCOME_TRY_GLUE(__t, __COUNTER__)
 
-#define OUTCOME_TRYV2(unique, m) decltype(auto) unique = (m); if(!unique.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::move(unique))
+#define OUTCOME_TRYV2(unique, m) decltype(auto) unique = (m); if(!unique.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(unique)>(unique))
 
 
 
-#define OUTCOME_TRY2(unique, v, m) OUTCOME_TRYV2(unique, m); auto v(std::move(std::move(unique).value()))
+#define OUTCOME_TRY2(unique, v, m) OUTCOME_TRYV2(unique, m); decltype(auto) v = std::forward<decltype(unique)>(unique).value()
 
 
 
@@ -5985,7 +6226,7 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 
 
 
-#define OUTCOME_TRYX(m) ({ decltype(auto) res = (m); if(!res.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::move(res)); std::move(res.value()); })
+#define OUTCOME_TRYX(m) ({ decltype(auto) res = (m); if(!res.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(res)>(res)); std::forward<decltype(res)>(res).value(); })
 
 
 

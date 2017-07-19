@@ -25,28 +25,18 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_TRY_HPP
 #define OUTCOME_TRY_HPP
 
-#include "config.hpp"
-
-#include <utility>  // for move
+#include "success_failure.hpp"
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
 /*! Customisation point for changing what the `OUTCOME_TRY` macros
-do. This function defaults to returning `std::move(v).as_void()`.
-\effects Extracts any state apart from value into a `void` rebound equivalent.
-\requires The input value to have a `.as_void()` member function, and a `rebind`
-member template alias.
+do. This function defaults to returning `std::forward<T>(v).as_failure()`.
+\effects Extracts any state apart from value into a `failure_type`.
+\requires The input value to have a `.as_failure()` member function.
 */
-template <class T>
-OUTCOME_REQUIRES(requires(T &&v) {
-  {
-    v.as_void()
-  }
-  ->typename T::template rebind<void>;
-})
-typename T::template rebind<void> try_operation_return_as(T &&v)
+template <class T> OUTCOME_REQUIRES(requires(T &&v){{v.as_failure()}}) decltype(auto) try_operation_return_as(T &&v)
 {
-  return std::move(v).as_void();
+  return std::forward<T>(v).as_failure();
 }
 
 OUTCOME_V2_NAMESPACE_END
@@ -58,10 +48,10 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRYV2(unique, m)                                                                                                                                                                                                                                                                                               \
   decltype(auto) unique = (m);                                                                                                                                                                                                                                                                                                 \
   if(!unique.has_value())                                                                                                                                                                                                                                                                                                      \
-  return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::move(unique))
+  return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(unique)>(unique))
 #define OUTCOME_TRY2(unique, v, m)                                                                                                                                                                                                                                                                                             \
   OUTCOME_TRYV2(unique, m);                                                                                                                                                                                                                                                                                                    \
-  auto v(std::move(std::move(unique).value()))
+  decltype(auto) v = std::forward<decltype(unique)>(unique).value()
 
 /*! If the outcome returned by expression *m* is not valued, propagate any
 failure by immediately returning that failure state immediately
@@ -83,8 +73,8 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
   ({                                                                                                                                                                                                                                                                                                                           \
     decltype(auto) res = (m);                                                                                                                                                                                                                                                                                                  \
     if(!res.has_value())                                                                                                                                                                                                                                                                                                       \
-      return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::move(res));                                                                                                                                                                                                                                                    \
-    std::move(res.value());                                                                                                                                                                                                                                                                                                    \
+      return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(res)>(res));                                                                                                                                                                                                                                  \
+    std::forward<decltype(res)>(res).value();                                                                                                                                                                                                                                                                                  \
   \
 })
 #endif

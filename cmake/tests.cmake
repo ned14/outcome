@@ -16,6 +16,7 @@ set(outcome_TESTS
   "test/tests/noexcept-propagation.cpp"
   "test/tests/propagate.cpp"
   "test/tests/serialisation.cpp"
+  "test/tests/success-failure.cpp"
   "test/tests/swap.cpp"
   "test/tests/udts.cpp"
 )
