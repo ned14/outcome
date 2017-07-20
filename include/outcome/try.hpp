@@ -80,7 +80,7 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 #endif
 
 /*! If the outcome returned by expression *m* is not valued, propagate any
-failure by immediately returning that failure immediately, else set *v( to the unwrapped value
+failure by immediately returning that failure immediately, else set *v* to the unwrapped value.
 */
 #define OUTCOME_TRY(v, m) OUTCOME_TRY2(OUTCOME_TRY_UNIQUE_NAME, v, m)
 

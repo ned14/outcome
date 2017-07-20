@@ -1019,13 +1019,13 @@ namespace detail
     template <class... Args> static constexpr bool enable_inplace_value_error_constructor = !std::is_same<choose_inplace_value_error_constructor<Args...>, disable_inplace_value_error_constructor>::value;
   };
 
-  template <class T, class U> const U &extract_value_from_success(const success_type<U> &v) { return v.value; }
-  template <class T, class U> U &&extract_value_from_success(success_type<U> &&v) { return std::move(v.value); }
-  template <class T, class U> T extract_value_from_success(const success_type<void> & /*unused*/) { return T{}; }
+  template <class T, class U> constexpr inline const U &extract_value_from_success(const success_type<U> &v) { return v.value; }
+  template <class T, class U> constexpr inline U &&extract_value_from_success(success_type<U> &&v) { return std::move(v.value); }
+  template <class T> constexpr inline T extract_value_from_success(const success_type<void> & /*unused*/) { return T{}; }
 
-  template <class T, class U, class V> const U &extract_error_from_failure(const failure_type<U, V> &v) { return v.error; }
-  template <class T, class U, class V> U &&extract_error_from_failure(failure_type<U, V> &&v) { return std::move(v.error); }
-  template <class T, class V> T extract_error_from_failure(const failure_type<void, V> & /*unused*/) { return T{}; }
+  template <class T, class U, class V> constexpr inline const U &extract_error_from_failure(const failure_type<U, V> &v) { return v.error; }
+  template <class T, class U, class V> constexpr inline U &&extract_error_from_failure(failure_type<U, V> &&v) { return std::move(v.error); }
+  template <class T, class V> constexpr inline T extract_error_from_failure(const failure_type<void, V> & /*unused*/) { return T{}; }
 }
 
 /*! The default instantiation hook implementation called when a `result` is first created
@@ -1337,7 +1337,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<Args...>))
   constexpr explicit result(in_place_type_t<value_type_if_enabled>, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
-      : base(in_place_type<typename base::_value_type>, std::forward<Args>(args)...)
+      : base(in_place_type<value_type_if_enabled>, std::forward<Args>(args)...)
   {
     hook_result_in_place_construction(in_place_type<value_type>, this);
   }
@@ -1355,7 +1355,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<std::initializer_list<U>, Args...>))
   constexpr explicit result(in_place_type_t<value_type_if_enabled>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
-      : base(in_place_type<typename base::_value_type>, il, std::forward<Args>(args)...)
+      : base(in_place_type<value_type_if_enabled>, il, std::forward<Args>(args)...)
   {
     hook_result_in_place_construction(in_place_type<value_type>, this);
   }
@@ -1372,7 +1372,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<Args...>))
   constexpr explicit result(in_place_type_t<error_type_if_enabled>, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
-      : base(in_place_type<typename base::_error_type>, std::forward<Args>(args)...)
+      : base(in_place_type<error_type_if_enabled>, std::forward<Args>(args)...)
   {
     hook_result_in_place_construction(in_place_type<error_type>, this);
   }
@@ -1390,7 +1390,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<std::initializer_list<U>, Args...>))
   constexpr explicit result(in_place_type_t<error_type_if_enabled>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
-      : base(in_place_type<typename base::_error_type>, il, std::forward<Args>(args)...)
+      : base(in_place_type<error_type_if_enabled>, il, std::forward<Args>(args)...)
   {
     hook_result_in_place_construction(in_place_type<error_type>, this);
   }
@@ -1412,6 +1412,18 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
 
   /// \output_section Tagged constructors
   /*! Implicit tagged constructor of a successful result.
+  \param o The compatible success type sugar.
+
+  \effects Initialises the result with a default constructed success type.
+  \requires `value_type` to be default constructible, or `void`.
+  \throws Any exception the construction of `value_type()` might throw.
+  */
+  constexpr result(const success_type<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
+      : base(in_place_type<value_type_if_enabled>)
+  {
+    hook_result_copy_construction(in_place_type<decltype(o)>, this);
+  }
+  /*! Implicit tagged constructor of a successful result.
   \tparam 1
   \exclude
   \param o The compatible success type sugar.
@@ -1423,7 +1435,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, void, void>))
   constexpr result(const success_type<T> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value)
-      : base(in_place_type<typename base::value_type>, detail::extract_value_from_success<value_type>(o))
+      : base(in_place_type<value_type_if_enabled>, detail::extract_value_from_success<value_type>(o))
   {
     hook_result_copy_construction(in_place_type<decltype(o)>, this);
   }
@@ -1433,13 +1445,13 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   \param o The compatible success type sugar.
 
   \effects Initialises the result with a move of the value in the type sugar.
-  \requires Both result and success' `value_type` need to be constructible, or the source can be `void`.
+  \requires Both result and success' `value_type` need to be constructible. The source cannot be `void`.
   \throws Any exception the construction of `value_type(T)` might throw.
   */
   OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, void, void>))
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<T, void, void>))
   constexpr result(success_type<T> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value)
-      : base(in_place_type<typename base::value_type>, std::move(detail::extract_value_from_success<value_type>(std::move(o))))
+      : base(in_place_type<value_type_if_enabled>, std::move(detail::extract_value_from_success<value_type>(std::move(o))))
   {
     hook_result_move_construction(in_place_type<decltype(o)>, this);
   }
@@ -1455,7 +1467,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, void>))
   constexpr result(const failure_type<T> &o) noexcept(std::is_nothrow_constructible<error_type, T>::value)
-      : base(in_place_type<typename base::error_type>, detail::extract_error_from_failure<error_type>(o))
+      : base(in_place_type<error_type_if_enabled>, detail::extract_error_from_failure<error_type>(o))
   {
     hook_result_copy_construction(in_place_type<decltype(o)>, this);
   }
@@ -1471,7 +1483,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, void>))
   constexpr result(failure_type<T> &&o) noexcept(std::is_nothrow_constructible<error_type, T>::value)
-      : base(in_place_type<typename base::error_type>, std::move(detail::extract_error_from_failure<error_type>(std::move(o))))
+      : base(in_place_type<error_type_if_enabled>, std::move(detail::extract_error_from_failure<error_type>(std::move(o))))
   {
     hook_result_move_construction(in_place_type<decltype(o)>, this);
   }
