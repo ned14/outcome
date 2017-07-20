@@ -194,16 +194,15 @@ namespace impl
     {
     }
     template <class U, class V>
-    constexpr result_storage(compatible_conversion_tag, const result_storage<void, U, V> &o) noexcept(std::is_nothrow_constructible<_error_type, U>::value)
-        : _state(/* no value type */)
+    constexpr result_storage(compatible_conversion_tag, const result_storage<void, U, V> &o) noexcept(std::is_nothrow_default_constructible<_value_type>::value &&std::is_nothrow_constructible<_error_type, U>::value)
+        : _state(in_place_type<_value_type>)
         , _error(o._error)
     {
-      _state._status = o._state._status & ~detail::status_have_value;
     }
     template <class T, class V>
     constexpr result_storage(compatible_conversion_tag, const result_storage<T, void, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
         : _state(o._state)
-        , _error(_error_type())
+        , _error(_error_type{})
     {
     }
     template <class T, class U, class V>
@@ -213,16 +212,15 @@ namespace impl
     {
     }
     template <class U, class V>
-    constexpr result_storage(compatible_conversion_tag, result_storage<void, U, V> &&o) noexcept(std::is_nothrow_constructible<_error_type, U>::value)
-        : _state(/* no value type */)
+    constexpr result_storage(compatible_conversion_tag, result_storage<void, U, V> &&o) noexcept(std::is_nothrow_default_constructible<_value_type>::value &&std::is_nothrow_constructible<_error_type, U>::value)
+        : _state(in_place_type<_value_type>)
         , _error(std::move(o._error))
     {
-      _state._status = o._state._status & ~detail::status_have_value;
     }
     template <class T, class V>
     constexpr result_storage(compatible_conversion_tag, result_storage<T, void, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
         : _state(std::move(o._state))
-        , _error(_error_type())
+        , _error(_error_type{})
     {
     }
   };

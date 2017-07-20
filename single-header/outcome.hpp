@@ -1392,9 +1392,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF df81e462f276f7a2f1668cfacc6903693f99cf90
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-19 23:26:22 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE df81e462
+#define OUTCOME_PREVIOUS_COMMIT_REF 0441fe3ee5b4d8a8ca9b9db1cd7b5dd6732600c8
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-20 00:11:36 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 0441fe3e
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -2485,16 +2485,15 @@ namespace impl
     {
     }
     template <class U, class V>
-    constexpr result_storage(compatible_conversion_tag, const result_storage<void, U, V> &o) noexcept(std::is_nothrow_constructible<_error_type, U>::value)
-        : _state(/* no value type */)
+    constexpr result_storage(compatible_conversion_tag, const result_storage<void, U, V> &o) noexcept(std::is_nothrow_default_constructible<_value_type>::value &&std::is_nothrow_constructible<_error_type, U>::value)
+        : _state(in_place_type<_value_type>)
         , _error(o._error)
     {
-      _state._status = o._state._status & ~detail::status_have_value;
     }
     template <class T, class V>
     constexpr result_storage(compatible_conversion_tag, const result_storage<T, void, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
         : _state(o._state)
-        , _error(_error_type())
+        , _error(_error_type{})
     {
     }
     template <class T, class U, class V>
@@ -2504,16 +2503,15 @@ namespace impl
     {
     }
     template <class U, class V>
-    constexpr result_storage(compatible_conversion_tag, result_storage<void, U, V> &&o) noexcept(std::is_nothrow_constructible<_error_type, U>::value)
-        : _state(/* no value type */)
+    constexpr result_storage(compatible_conversion_tag, result_storage<void, U, V> &&o) noexcept(std::is_nothrow_default_constructible<_value_type>::value &&std::is_nothrow_constructible<_error_type, U>::value)
+        : _state(in_place_type<_value_type>)
         , _error(std::move(o._error))
     {
-      _state._status = o._state._status & ~detail::status_have_value;
     }
     template <class T, class V>
     constexpr result_storage(compatible_conversion_tag, result_storage<T, void, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
         : _state(std::move(o._state))
-        , _error(_error_type())
+        , _error(_error_type{})
     {
     }
   };

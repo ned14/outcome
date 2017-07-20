@@ -6,6 +6,7 @@ set(outcome_TESTS
   "test/tests/containers.cpp"
   "test/tests/core-outcome.cpp"
   "test/tests/core-result.cpp"
+  "test/tests/default-construction.cpp"
   "test/tests/fileopen.cpp"
   "test/tests/hooks.cpp"
   "test/tests/issue0007.cpp"
