@@ -1,4 +1,4 @@
-#include "../test/timing.h"
+#include "timing.h"
 #include "../include/outcome/result.hpp"
 #include <stdio.h>
 #include <exception>

@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 # If necessary bring in the quickcpplib cmake tooling
-list(FIND CMAKE_MODULE_PATH "quickcpplib/cmakelib" quickcpplib_idx)
-if(${quickcpplib_idx} EQUAL -1)
+set(quickcpplib_done OFF)
+foreach(item ${CMAKE_MODULE_PATH})
+  if(item MATCHES "quickcpplib/cmakelib")
+    set(quickcpplib_done ON)
+  endif()
+endforeach()
+if(NOT quickcpplib_done)
   # CMAKE_SOURCE_DIR is the very topmost parent cmake project
   # CMAKE_CURRENT_SOURCE_DIR is the current cmake subproject
   
@@ -9,6 +14,9 @@ if(${quickcpplib_idx} EQUAL -1)
   if(EXISTS "${CMAKE_SOURCE_DIR}/../.quickcpplib_use_siblings")
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../quickcpplib/cmakelib")
     set(CTEST_QUICKCPPLIB_SCRIPTS "${CMAKE_SOURCE_DIR}/../quickcpplib/scripts")
+  elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../.quickcpplib_use_siblings")
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../quickcpplib/cmakelib")
+    set(CTEST_QUICKCPPLIB_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/../quickcpplib/scripts")
   elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.gitmodules")
     # Read in .gitmodules and look for myself
     file(READ "${CMAKE_CURRENT_SOURCE_DIR}/.gitmodules" GITMODULESCONTENTS)

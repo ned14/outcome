@@ -193,8 +193,11 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     result<int> a(5);
     result<int> b(std::make_error_code(std::errc::invalid_argument));
     std::cout << sizeof(a) << std::endl;  // 32 bytes
-    b.assume_value();
-    a.assume_error();
+    if(false)
+    {
+      b.assume_value();
+      a.assume_error();
+    }
     try
     {
       b.value();

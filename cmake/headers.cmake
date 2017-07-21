@@ -7,6 +7,7 @@ set(outcome_HEADERS
   "include/outcome/outcome.hpp"
   "include/outcome/result.hpp"
   "include/outcome/revision.hpp"
+  "include/outcome/success_failure.hpp"
   "include/outcome/try.hpp"
   "include/outcome/utils.hpp"
   "include/outcome/version.hpp"

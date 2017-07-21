@@ -15,9 +15,9 @@ outcome::result<int> convert(const std::string& str) noexcept;
 //! [enum]
 enum class ConversionErrc
 {
-  EmptyString = 1; // 0 is never an error
-  IllegalChar = 2;
-  TooLong     = 3;
+  EmptyString = 1, // 0 is never an error
+  IllegalChar = 2,
+  TooLong     = 3,
 };
 
 // all boilerplate necessary to plug ConversionErrc
@@ -58,9 +58,9 @@ namespace
     {
         switch (static_cast<ConversionErrc>(ev))
         {
-            case ConversionErrc::EmptyInput:
+            case ConversionErrc::EmptyString:
                 return "empty string provided";
-            case ConversionErrc::InvalidChar:
+            case ConversionErrc::IllegalChar:
                 return "non-digit char provided";
             case ConversionErrc::TooLong:
                 return "converted int would be too large";
@@ -76,10 +76,64 @@ std::error_code make_error_code(ConversionErrc e)
     return std::error_code{static_cast<int>(e), globalConversionErrorCategory};
 }
 
-int main()
+void explicit_construction()
 {
 //! [explicit]	
 outcome::result<int> r {outcome::in_place_type<std::error_code>, ConversionErrc::EmptyString};
 outcome::result<int> s {outcome::in_place_type<int>, 1};
 //! [explicit]
+}
+
+struct BigInt
+{
+    static outcome::result<BigInt> fromString(const std::string& s);
+    explicit BigInt(const std::string&) {}
+    BigInt half() const { return BigInt{""}; }
+    friend std::ostream& operator<<(std::ostream& o, const BigInt&) { return o << "big int half"; }
+};
+
+//! [from_string]
+/*static*/ outcome::result<BigInt> BigInt::fromString(const std::string& s)
+//! [from_string]
+{
+	return BigInt{s};
+}
+
+//! [half_decl]
+outcome::result<void> print_half(const std::string& text);
+//! [half_decl]
+
+//! [half_impl]
+outcome::result<void> print_half(const std::string& text)
+{
+    if (outcome::result<int> r = convert(text))
+    {
+        std::cout << (r.value() / 2) << std::endl;
+    }
+    else
+    {
+        if (r.error() == ConversionErrc::TooLong)
+        {
+            OUTCOME_TRY (i, BigInt::fromString(text));
+            std::cout << i.half() << std::endl;
+        }
+        else
+        {
+            return r.error();
+        }
+    }
+    return outcome::success();  
+}
+//! [half_impl]
+
+int main()
+{
+  if (outcome::result<void> r = print_half("1299999999999999999999999999"))
+  {
+      std::cout << "ok" << std::endl;
+  }
+  else
+  {
+      std::cout << r.error() << std::endl; 
+  }
 }
