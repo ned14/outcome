@@ -293,41 +293,38 @@ namespace detail
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl = impl::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>;
 }
 
-/*! The default instantiation hook implementation called when a `outcome` is first created
-by conversion from one of its possible types. Does nothing.
-\tparam T One of `value_type`, `error_type`, `std::pair<error_type, payload_type>` or `exception_type`.
-
-WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
-*/
-template <class T, class U> constexpr inline void hook_outcome_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept
+namespace hooks
 {
-}
-/*! The default instantiation hook implementation called when a `outcome` is created by copying
-from another `outcome` or `result`. Does nothing.
-\tparam T The type of the source.
+  /*! The default instantiation hook implementation called when a `outcome` is first created
+  by conversion from one of its possible types. Does nothing.
+  \tparam T One of `value_type`, `error_type`, `std::pair<error_type, payload_type>` or `exception_type`.
 
-WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
-*/
-template <class T, class U> constexpr inline void hook_outcome_copy_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept
-{
-}
-/*! The default instantiation hook implementation called when a `outcome` is created by moving
-from another `outcome` or `result`. Does nothing.
-\tparam T The type of the source.
+  WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
+  */
+  template <class T, class U> constexpr inline void hook_outcome_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept {}
+  /*! The default instantiation hook implementation called when a `outcome` is created by copying
+  from another `outcome` or `result`. Does nothing.
+  \tparam T The type of the source.
 
-WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
-*/
-template <class T, class U> constexpr inline void hook_outcome_move_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept
-{
-}
-/*! The default instantiation hook implementation called when a `outcome` is created by in place
-construction. Does nothing.
-\tparam T One of `value_type`, `error_type`, `std::pair<error_type, payload_type>` or `exception_type`.
+  WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
+  */
+  template <class T, class U> constexpr inline void hook_outcome_copy_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept {}
+  /*! The default instantiation hook implementation called when a `outcome` is created by moving
+  from another `outcome` or `result`. Does nothing.
+  \tparam T The type of the source.
 
-WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
-*/
-template <class T, class U> constexpr inline void hook_outcome_in_place_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept
-{
+  WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
+  */
+  template <class T, class U> constexpr inline void hook_outcome_move_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept {}
+  /*! The default instantiation hook implementation called when a `outcome` is created by in place
+  construction. Does nothing.
+  \tparam T One of `value_type`, `error_type`, `std::pair<error_type, payload_type>` or `exception_type`.
+
+  WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
+  */
+  template <class T, class U> constexpr inline void hook_outcome_in_place_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept {}
+
+  template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_payload_exception(outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept;
 }
 
 /*! Used to return from functions (i) a value and (a positive status and/or a payload) or
@@ -342,13 +339,14 @@ template <class R, class S, class P, class NoValuePolicy>                       
 OUTCOME_REQUIRES(std::is_void<P>::value || std::is_default_constructible<P>::value)  //
 class OUTCOME_NODISCARD outcome : public detail::select_outcome_impl<R, S, P, NoValuePolicy>
 {
-  friend NoValuePolicy;
+  static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "payload_type/exception_type must be default constructible");
   using base = detail::select_outcome_impl<R, S, P, NoValuePolicy>;
+  friend NoValuePolicy;
   friend detail::select_outcome_impl2<R, S, P, NoValuePolicy>;
   template <class T, class U, class V, class W> friend class outcome;
   template <class T, class U, class V, class W> friend inline std::istream &operator>>(std::istream &s, outcome<T, U, V, W> &v);
   template <class T, class U, class V, class W> friend inline std::ostream &operator<<(std::ostream &s, const outcome<T, U, V, W> &v);
-  static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "payload_type/exception_type must be default constructible");
+  template <class T, class U, class V, class W, class X> friend constexpr inline void hooks::override_outcome_payload_exception(outcome<T, U, V, W> *o, X &&v) noexcept;
 
   struct value_converting_constructor_tag
   {
@@ -507,6 +505,7 @@ public:
       : base(in_place_type<typename base::_value_type>, std::forward<T>(t))
       , _ptr()
   {
+    using namespace hooks;
     hook_outcome_construction(in_place_type<value_type>, this);
   }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
@@ -533,6 +532,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
       : base(typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u))
       , _ptr()
   {
+    using namespace hooks;
     hook_outcome_construction(in_place_type<std::pair<value_type, status_type>>, this);
   }
   /*! Converting constructor to a successful outcome + status + payload.
@@ -563,6 +563,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
       : base(typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u))
       , _ptr(std::forward<V>(v))
   {
+    using namespace hooks;
     this->_state._status |= detail::status_have_payload;
     hook_outcome_construction(in_place_type<std::tuple<value_type, status_type, payload_type>>, this);
   }
@@ -589,6 +590,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
       : base(in_place_type<typename base::value_type>, std::forward<T>(t))
       , _ptr(std::forward<U>(u))
   {
+    using namespace hooks;
     hook_outcome_construction(in_place_type<std::pair<value_type, payload_type>>, this);
   }
 #endif
@@ -610,6 +612,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(in_place_type<typename base::_error_type>, std::forward<T>(t))
       , _ptr()
   {
+    using namespace hooks;
     hook_outcome_construction(in_place_type<error_type>, this);
   }
   /*! Converting constructor to an errored outcome + payload/exception.
@@ -632,6 +635,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(in_place_type<typename base::_error_type>, std::forward<T>(t))
       , _ptr(std::forward<U>(u))
   {
+    using namespace hooks;
     this->_state._status |= trait::is_exception_ptr<payload_exception_type>::value ? detail::status_have_exception : detail::status_have_payload;
     hook_outcome_construction(in_place_type<std::pair<error_type, payload_exception_type>>, this);
   }
@@ -654,6 +658,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   constexpr outcome(ErrorCondEnum &&t, error_condition_converting_constructor_tag = error_condition_converting_constructor_tag()) noexcept(noexcept(error_type(make_error_code(std::forward<ErrorCondEnum>(t)))))
       : base(in_place_type<typename base::_error_type>, make_error_code(t))
   {
+    using namespace hooks;
     hook_outcome_construction(in_place_type<error_type>, this);
   }
   /*! Converting constructor to an excepted outcome.
@@ -674,6 +679,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base()
       , _ptr(std::forward<T>(t))
   {
+    using namespace hooks;
     this->_state._status |= detail::status_have_exception;
     hook_outcome_construction(in_place_type<exception_type>, this);
   }
@@ -693,6 +699,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(typename base::compatible_conversion_tag(), o)
       , _ptr(o._ptr)
   {
+    using namespace hooks;
     hook_outcome_copy_construction(in_place_type<decltype(o)>, this);
   }
   /*! Explicit converting move constructor from a compatible outcome type.
@@ -710,6 +717,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(typename base::compatible_conversion_tag(), std::move(o))
       , _ptr(std::move(o._ptr))
   {
+    using namespace hooks;
     hook_outcome_move_construction(in_place_type<decltype(o)>, this);
   }
   /*! Explicit converting copy constructor from a compatible result type.
@@ -727,6 +735,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(typename base::compatible_conversion_tag(), o)
       , _ptr()
   {
+    using namespace hooks;
     hook_outcome_copy_construction(in_place_type<decltype(o)>, this);
   }
   /*! Explicit converting move constructor from a compatible result type.
@@ -744,6 +753,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(typename base::compatible_conversion_tag(), std::move(o))
       , _ptr()
   {
+    using namespace hooks;
     hook_outcome_move_construction(in_place_type<decltype(o)>, this);
   }
 
@@ -765,6 +775,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(_, std::forward<Args>(args)...)
       , _ptr()
   {
+    using namespace hooks;
     hook_outcome_in_place_construction(in_place_type<value_type>, this);
   }
   /*! Inplace constructor to a successful value.
@@ -784,6 +795,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(_, il, std::forward<Args>(args)...)
       , _ptr()
   {
+    using namespace hooks;
     hook_outcome_in_place_construction(in_place_type<value_type>, this);
   }
   /*! Inplace constructor to an unsuccessful error.
@@ -802,6 +814,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(_, std::forward<Args>(args)...)
       , _ptr()
   {
+    using namespace hooks;
     hook_outcome_in_place_construction(in_place_type<error_type>, this);
   }
   /*! Inplace constructor to an unsuccessful error.
@@ -821,6 +834,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(_, il, std::forward<Args>(args)...)
       , _ptr()
   {
+    using namespace hooks;
     hook_outcome_in_place_construction(in_place_type<error_type>, this);
   }
   /*! Inplace constructor to an unsuccessful exception.
@@ -839,6 +853,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base()
       , _ptr(std::forward<Args>(args)...)
   {
+    using namespace hooks;
     this->_state._status |= detail::status_have_exception;
     hook_outcome_in_place_construction(in_place_type<exception_type>, this);
   }
@@ -859,6 +874,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base()
       , _ptr(il, std::forward<Args>(args)...)
   {
+    using namespace hooks;
     this->_state._status |= detail::status_have_exception;
     hook_outcome_in_place_construction(in_place_type<exception_type>, this);
   }
@@ -889,6 +905,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   constexpr outcome(const success_type<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
       : base(in_place_type<typename base::_value_type>)
   {
+    using namespace hooks;
     hook_outcome_copy_construction(in_place_type<decltype(o)>, this);
   }
   /*! Implicit tagged constructor of a successful outcome.
@@ -905,6 +922,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   constexpr outcome(const success_type<T> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value)
       : base(in_place_type<typename base::_value_type>, detail::extract_value_from_success<value_type>(o))
   {
+    using namespace hooks;
     hook_outcome_copy_construction(in_place_type<decltype(o)>, this);
   }
   /*! Implicit tagged constructor of a successful outcome.
@@ -921,6 +939,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   constexpr outcome(success_type<T> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value)
       : base(in_place_type<typename base::_value_type>, std::move(detail::extract_value_from_success<value_type>(std::move(o))))
   {
+    using namespace hooks;
     hook_outcome_move_construction(in_place_type<decltype(o)>, this);
   }
   /*! Implicit tagged constructor of a failure outcome.
@@ -938,6 +957,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(o))
       , _ptr(detail::extract_exception_payload_from_failure<exception_type>(o))
   {
+    using namespace hooks;
     hook_outcome_copy_construction(in_place_type<decltype(o)>, this);
   }
   /*! Implicit tagged constructor of a failure outcome.
@@ -955,6 +975,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(in_place_type<typename base::_error_type>, std::move(detail::extract_error_from_failure<error_type>(std::move(o))))
       , _ptr(std::move(detail::extract_exception_payload_from_failure<exception_type>(std::move(o))))
   {
+    using namespace hooks;
     hook_outcome_move_construction(in_place_type<decltype(o)>, this);
   }
 
@@ -1155,6 +1176,18 @@ template <class R, class S, class P, class N> inline void swap(outcome<R, S, P, 
   a.swap(b);
 }
 
+namespace hooks
+{
+  /*! Used to set/override a payload/exception during a construction hook implementation.
+  \param The outcome you wish to change.
+  \effects Sets the payload/exception of the outcome to the given value.
+  */
+  template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_payload_exception(outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept
+  {
+    o->_ptr = std::forward<U>(v);
+    o->_state._status |= detail::status_have_exception;
+  }
+}
 
 namespace policy
 {

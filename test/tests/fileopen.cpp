@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(works / outcome / fileopen, "Tests that the outcome semanti
     int fd;
     do
     {
-      fd = OUTCOME_POSIX_OPEN(path.c_str(), 0);
+      fd = OUTCOME_POSIX_OPEN(path.c_str(), 0);  // NOLINT
     } while(-1 == fd && EINTR == errno);
     try
     {
