@@ -71,29 +71,17 @@ namespace hook_test
 {
   // Localise outcome to using the local error_code so this namespace gets looked up for the hooks
   template <class R> using outcome = OUTCOME_V2_NAMESPACE::outcome<R, error_code, std::string>;
-  namespace detail
-  {
-    // Use inheritance to gain access to state
-    template <class R> struct outcome_payload_poker : public outcome<R>
-    {
-      void _poke_payload(typename hook_test::outcome<R>::payload_exception_type &&p)
-      {
-        this->_ptr = std::move(p);
-        this->_state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_payload;
-      }
-    };
-  }  // namespace detail
 
   // Specialise the outcome copy and move conversion hook for our localised result
   template <class T, class R> constexpr inline void hook_outcome_copy_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<const result<T> &>, outcome<R> *res) noexcept
   {
     // when copy constructing from a result<T>, place extended_error_coding::extended_error_info into the payload
-    static_cast<detail::outcome_payload_poker<R> *>(res)->_poke_payload(extended_error_info);
+    OUTCOME_V2_NAMESPACE::hooks::override_outcome_payload_exception(res, extended_error_info);
   }
   template <class T, class R> constexpr inline void hook_outcome_move_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<result<T> &&>, outcome<R> *res) noexcept
   {
     // when move constructing from a result<T>, place extended_error_coding::extended_error_info into the payload
-    static_cast<detail::outcome_payload_poker<R> *>(res)->_poke_payload(extended_error_info);
+    OUTCOME_V2_NAMESPACE::hooks::override_outcome_payload_exception(res, extended_error_info);
   }
 }  // namespace hook_test
 

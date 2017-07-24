@@ -92,43 +92,30 @@ namespace error_code_extended
   template <class R> using result = OUTCOME_V2_NAMESPACE::result<R, error_code>;
   template <class R> using outcome = OUTCOME_V2_NAMESPACE::outcome<R, error_code>;
 
-  namespace detail
+  template <class R> inline void poke_exception(outcome<R> *o)
   {
-    // Use inheritance to gain access to state
-    template <class R> struct result_byte_poker : public result<R>
+    if(o->has_error())
     {
-      void _set_extended_error_info_index(uint16_t v) noexcept { this->_state._status |= (v << OUTCOME_V2_NAMESPACE::detail::status_2byte_shift); }
-    };
-    template <class R> struct outcome_payload_poker : public outcome<R>
-    {
-      uint16_t _extended_error_info_index() const noexcept { return (this->_state._status >> OUTCOME_V2_NAMESPACE::detail::status_2byte_shift) & 0xffff; }
-      void _poke_exception()
+      extended_error_info *eei = mythreadlocaldata().get(OUTCOME_V2_NAMESPACE::hooks::spare_storage(o));
+      if(eei != nullptr)
       {
-        if(this->has_error())
+        // Make a custom string for the exception
+        std::string str(std::move(eei->detail));
+        str.append(" [");
+        char **symbols = ::backtrace_symbols(eei->backtrace.data(), eei->backtrace.size());
+        for(size_t n = 0; n < eei->backtrace.size(); n++)
         {
-          extended_error_info *eei = mythreadlocaldata().get(_extended_error_info_index());
-          if(eei != nullptr)
+          if(n > 0)
           {
-            // Make a custom string for the exception
-            std::string str(std::move(eei->detail));
-            str.append(" [");
-            char **symbols = ::backtrace_symbols(eei->backtrace.data(), eei->backtrace.size());
-            for(size_t n = 0; n < eei->backtrace.size(); n++)
-            {
-              if(n > 0)
-              {
-                str.append("; ");
-              }
-              str.append(symbols[n]);  // NOLINT
-            }
-            str.append("]");
-            this->_ptr = std::make_exception_ptr(std::runtime_error(str));
-            this->_state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_exception;
+            str.append("; ");
           }
+          str.append(symbols[n]);  // NOLINT
         }
+        str.append("]");
+        OUTCOME_V2_NAMESPACE::hooks::override_outcome_payload_exception(o, std::make_exception_ptr(std::runtime_error(str)));
       }
-    };
-  }  // namespace detail
+    }
+  }
 
   // Specialise the result construction hook for our localised result
   // We hook any non-copy, non-move, non-inplace construction, capturing a stack backtrace
@@ -140,7 +127,7 @@ namespace error_code_extended
       // Grab the next extended info slot in the TLS
       extended_error_info &eei = mythreadlocaldata().next();
       // Write the index just grabbed into the spare uint16_t
-      static_cast<detail::result_byte_poker<R> *>(res)->_set_extended_error_info_index(mythreadlocaldata().current - 1);
+      OUTCOME_V2_NAMESPACE::hooks::set_spare_storage(res, mythreadlocaldata().current - 1);
       eei.detail = "this is a custom message";
       eei.backtrace.resize(64);
       eei.backtrace.resize(::backtrace(eei.backtrace.data(), eei.backtrace.size()));
@@ -150,12 +137,12 @@ namespace error_code_extended
   template <class T, class R> inline void hook_outcome_copy_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<const result<T> &>, outcome<R> *res) noexcept
   {
     // when copy constructing from a result<T>, poke in an exception
-    static_cast<detail::outcome_payload_poker<R> *>(res)->_poke_exception();
+    poke_exception(res);
   }
   template <class T, class R> inline void hook_outcome_move_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<result<T> &&>, outcome<R> *res) noexcept
   {
     // when move constructing from a result<T>, poke in an exception
-    static_cast<detail::outcome_payload_poker<R> *>(res)->_poke_exception();
+    poke_exception(res);
   }
 }  // namespace error_code_extended
 
