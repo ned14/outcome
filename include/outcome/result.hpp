@@ -689,7 +689,7 @@ namespace policy
   */
   template <class EC> struct error_code_throw_as_system_error
   {
-    static_assert(std::is_convertible<std::error_code, EC>::value, "error_type must be convertible into a std::error_code to be used with this policy");
+    static_assert(std::is_base_of<std::error_code, EC>::value, "error_type must be a base of a std::error_code to be used with this policy");
     /*! Performs a narrow check of state, used in the assume_value() functions.
     \effects None.
     */
@@ -768,7 +768,7 @@ namespace policy
   */
   template <class EC> struct exception_ptr_rethrow
   {
-    static_assert(std::is_convertible<std::exception_ptr, EC>::value, "error_type must be convertible into a std::exception_ptr to be used with this policy");
+    static_assert(std::is_base_of<std::exception_ptr, EC>::value, "error_type must be a base of a std::exception_ptr to be used with this policy");
     /*! Performs a narrow check of state, used in the assume_value() functions.
     \effects None.
     */
