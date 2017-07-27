@@ -86,6 +86,11 @@ namespace detail
     };
     status_bitfield_type _status;
     constexpr value_storage_trivial() noexcept : _empty{}, _status(0) {}
+    explicit constexpr value_storage_trivial(value_storage_trivial<void> o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
+        : _value()
+        , _status(o._status)
+    {
+    }
     constexpr explicit value_storage_trivial(status_bitfield_type status)
         : _empty()
         , _status(status)
@@ -135,13 +140,14 @@ namespace detail
     };
     status_bitfield_type _status;
     value_storage_nontrivial() noexcept : _empty{}, _status(0) {}
-    value_storage_nontrivial &operator=(const value_storage_nontrivial &) = delete;
-    value_storage_nontrivial &operator=(value_storage_nontrivial &&) = delete;
+    value_storage_nontrivial &operator=(const value_storage_nontrivial &) = default;  // if reaches here, copy assignment is trivial
+    value_storage_nontrivial &operator=(value_storage_nontrivial &&) = default;       // if reaches here, move assignment is trivial
     value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(std::is_nothrow_move_constructible<value_type>::value)
         : _status(o._status)
     {
       if(this->_status & status_have_value)
       {
+        this->_status &= ~status_have_value;
         new(&_value) value_type(std::move(o._value));
         _status = o._status;
       }
@@ -151,7 +157,18 @@ namespace detail
     {
       if(this->_status & status_have_value)
       {
+        this->_status &= ~status_have_value;
         new(&_value) value_type(o._value);
+        _status = o._status;
+      }
+    }
+    explicit value_storage_nontrivial(value_storage_trivial<void> o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
+        : _status(o._status)
+    {
+      if(this->_status & status_have_value)
+      {
+        this->_status &= ~status_have_value;
+        new(&_value) value_type;
         _status = o._status;
       }
     }
@@ -234,6 +251,26 @@ namespace detail
     value_storage_delete_copy_constructor(const value_storage_delete_copy_constructor &) = delete;
     value_storage_delete_copy_constructor(value_storage_delete_copy_constructor &&) = default;
   };
+  template <class Base> struct value_storage_delete_copy_assignment : Base
+  {
+    using Base::Base;
+    using value_type = typename Base::value_type;
+    value_storage_delete_copy_assignment() = default;
+    value_storage_delete_copy_assignment(const value_storage_delete_copy_assignment &) = default;
+    value_storage_delete_copy_assignment(value_storage_delete_copy_assignment &&) = default;
+    value_storage_delete_copy_assignment &operator=(const value_storage_delete_copy_assignment &o) = delete;
+    value_storage_delete_copy_assignment &operator=(value_storage_delete_copy_assignment &&o) = default;
+  };
+  template <class Base> struct value_storage_delete_move_assignment : Base
+  {
+    using Base::Base;
+    using value_type = typename Base::value_type;
+    value_storage_delete_move_assignment() = default;
+    value_storage_delete_move_assignment(const value_storage_delete_move_assignment &) = default;
+    value_storage_delete_move_assignment(value_storage_delete_move_assignment &&) = default;
+    value_storage_delete_move_assignment &operator=(const value_storage_delete_move_assignment &o) = default;
+    value_storage_delete_move_assignment &operator=(value_storage_delete_move_assignment &&o) = delete;
+  };
   template <class Base> struct value_storage_delete_move_constructor : Base
   {
     using Base::Base;
@@ -294,12 +331,32 @@ namespace detail
       return *this;
     }
   };
-  template <class T> using value_storage_select_trivality = std::conditional_t<std::is_trivial<devoid<T>>::value, value_storage_trivial<T>, value_storage_nontrivial<T>>;
+
+  // We don't actually need all of std::is_trivial<>, std::is_trivially_copyable<> is sufficient
+  template <class T> using value_storage_select_trivality = std::conditional_t<std::is_trivially_copyable<devoid<T>>::value, value_storage_trivial<T>, value_storage_nontrivial<T>>;
   template <class T> using value_storage_select_move_constructor = std::conditional_t<std::is_move_constructible<devoid<T>>::value, value_storage_select_trivality<T>, value_storage_delete_move_constructor<value_storage_select_trivality<T>>>;
   template <class T> using value_storage_select_copy_constructor = std::conditional_t<std::is_copy_constructible<devoid<T>>::value, value_storage_select_move_constructor<T>, value_storage_delete_copy_constructor<value_storage_select_move_constructor<T>>>;
-  template <class T> using value_storage_select_move_assignment = std::conditional_t<!std::is_move_assignable<devoid<T>>::value || std::is_trivially_move_assignable<devoid<T>>::value, value_storage_select_copy_constructor<T>, value_storage_nontrivial_move_assignment<value_storage_select_copy_constructor<T>>>;
-  template <class T> using value_storage_select_copy_assignment = std::conditional_t<!std::is_copy_assignable<devoid<T>>::value || std::is_trivially_copy_assignable<devoid<T>>::value, value_storage_select_move_assignment<T>, value_storage_nontrivial_copy_assignment<value_storage_select_move_assignment<T>>>;
+  template <class T>
+  using value_storage_select_move_assignment = std::conditional_t<std::is_trivially_move_assignable<devoid<T>>::value, value_storage_select_copy_constructor<T>,
+                                                                  std::conditional_t<std::is_move_assignable<devoid<T>>::value, value_storage_nontrivial_move_assignment<value_storage_select_copy_constructor<T>>, value_storage_delete_copy_assignment<value_storage_select_copy_constructor<T>>>>;
+  template <class T>
+  using value_storage_select_copy_assignment = std::conditional_t<std::is_trivially_copy_assignable<devoid<T>>::value, value_storage_select_move_assignment<T>,
+                                                                  std::conditional_t<std::is_copy_assignable<devoid<T>>::value, value_storage_nontrivial_copy_assignment<value_storage_select_move_assignment<T>>, value_storage_delete_copy_assignment<value_storage_select_move_assignment<T>>>>;
   template <class T> using value_storage_select_impl = value_storage_select_copy_assignment<T>;
+#ifndef NDEBUG
+  // Check is trivial in all ways except default constructibility
+  // static_assert(std::is_trivial<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivial!");
+  // static_assert(std::is_trivially_default_constructible<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially default constructible!");
+  static_assert(std::is_trivially_copyable<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially copyable!");
+  static_assert(std::is_trivially_assignable<value_storage_select_impl<int>, value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially assignable!");
+  static_assert(std::is_trivially_destructible<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially destructible!");
+  static_assert(std::is_trivially_copy_constructible<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially copy constructible!");
+  static_assert(std::is_trivially_move_constructible<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially move constructible!");
+  static_assert(std::is_trivially_copy_assignable<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially copy assignable!");
+  static_assert(std::is_trivially_move_assignable<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially move assignable!");
+  // Also check is standard layout
+  static_assert(std::is_standard_layout<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not a standard layout type!");
+#endif
 }
 
 OUTCOME_V2_NAMESPACE_END

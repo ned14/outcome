@@ -205,12 +205,6 @@ namespace impl
         , _error(o._error)
     {
     }
-    template <class U, class V>
-    constexpr result_storage(compatible_conversion_tag, const result_storage<void, U, V> &o) noexcept(std::is_nothrow_default_constructible<_value_type>::value &&std::is_nothrow_constructible<_error_type, U>::value)
-        : _state(in_place_type<_value_type>)
-        , _error(o._error)
-    {
-    }
     template <class T, class V>
     constexpr result_storage(compatible_conversion_tag, const result_storage<T, void, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
         : _state(o._state)
@@ -220,12 +214,6 @@ namespace impl
     template <class T, class U, class V>
     constexpr result_storage(compatible_conversion_tag, result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
         : _state(std::move(o._state))
-        , _error(std::move(o._error))
-    {
-    }
-    template <class U, class V>
-    constexpr result_storage(compatible_conversion_tag, result_storage<void, U, V> &&o) noexcept(std::is_nothrow_default_constructible<_value_type>::value &&std::is_nothrow_constructible<_error_type, U>::value)
-        : _state(in_place_type<_value_type>)
         , _error(std::move(o._error))
     {
     }
@@ -689,7 +677,7 @@ namespace policy
   */
   template <class EC> struct error_code_throw_as_system_error
   {
-    static_assert(std::is_convertible<std::error_code, EC>::value, "error_type must be convertible into a std::error_code to be used with this policy");
+    static_assert(std::is_base_of<std::error_code, EC>::value, "error_type must be a base of a std::error_code to be used with this policy");
     /*! Performs a narrow check of state, used in the assume_value() functions.
     \effects None.
     */
@@ -768,7 +756,7 @@ namespace policy
   */
   template <class EC> struct exception_ptr_rethrow
   {
-    static_assert(std::is_convertible<std::exception_ptr, EC>::value, "error_type must be convertible into a std::exception_ptr to be used with this policy");
+    static_assert(std::is_base_of<std::exception_ptr, EC>::value, "error_type must be a base of a std::exception_ptr to be used with this policy");
     /*! Performs a narrow check of state, used in the assume_value() functions.
     \effects None.
     */
@@ -1562,6 +1550,21 @@ template <class R, class S, class P> inline void swap(result<R, S, P> &a, result
 {
   a.swap(b);
 }
+
+#ifndef NDEBUG
+// Check is trivial in all ways except default constructibility
+// static_assert(std::is_trivial<result<int>>::value, "result<int> is not trivial!");
+// static_assert(std::is_trivially_default_constructible<result<int>>::value, "result<int> is not trivially default constructible!");
+static_assert(std::is_trivially_copyable<result<int>>::value, "result<int> is not trivially copyable!");
+static_assert(std::is_trivially_assignable<result<int>, result<int>>::value, "result<int> is not trivially assignable!");
+static_assert(std::is_trivially_destructible<result<int>>::value, "result<int> is not trivially destructible!");
+static_assert(std::is_trivially_copy_constructible<result<int>>::value, "result<int> is not trivially copy constructible!");
+static_assert(std::is_trivially_move_constructible<result<int>>::value, "result<int> is not trivially move constructible!");
+static_assert(std::is_trivially_copy_assignable<result<int>>::value, "result<int> is not trivially copy assignable!");
+static_assert(std::is_trivially_move_assignable<result<int>>::value, "result<int> is not trivially move assignable!");
+// Also check is standard layout
+static_assert(std::is_standard_layout<result<int>>::value, "result<int> is not a standard layout type!");
+#endif
 
 OUTCOME_V2_NAMESPACE_END
 

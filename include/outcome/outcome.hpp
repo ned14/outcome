@@ -1185,7 +1185,10 @@ namespace hooks
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_payload_exception(outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept
   {
     o->_ptr = std::forward<U>(v);
-    o->_state._status |= detail::status_have_exception;
+    if(trait::is_exception_ptr<P>::value)
+      o->_state._status |= detail::status_have_exception;
+    else
+      o->_state._status |= detail::status_have_payload;
   }
 }
 
@@ -1200,8 +1203,8 @@ namespace policy
   */
   template <class R, class S, class P> struct error_code_throw_as_system_error_exception_rethrow
   {
-    static_assert(std::is_convertible<std::error_code, S>::value, "error_type must be convertible into a std::error_code to be used with this policy");
-    static_assert(std::is_convertible<std::exception_ptr, P>::value, "exception_type must be convertible into a std::exception_ptr to be used with this policy");
+    static_assert(std::is_base_of<std::error_code, S>::value, "error_type must be a base of std::error_code to be used with this policy");
+    static_assert(std::is_base_of<std::exception_ptr, P>::value, "exception_type must be a base of std::exception_ptr to be used with this policy");
     /*! Performs a narrow check of state, used in the assume_value() functions.
     \effects None.
     */

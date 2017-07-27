@@ -76,11 +76,13 @@ namespace hook_test
   template <class T, class R> constexpr inline void hook_outcome_copy_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<const result<T> &>, outcome<R> *res) noexcept
   {
     // when copy constructing from a result<T>, place extended_error_coding::extended_error_info into the payload
+    std::cout << "hook_outcome_copy_construction fires" << std::endl;
     OUTCOME_V2_NAMESPACE::hooks::override_outcome_payload_exception(res, extended_error_info);
   }
   template <class T, class R> constexpr inline void hook_outcome_move_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<result<T> &&>, outcome<R> *res) noexcept
   {
     // when move constructing from a result<T>, place extended_error_coding::extended_error_info into the payload
+    std::cout << "hook_outcome_move_construction fires" << std::endl;
     OUTCOME_V2_NAMESPACE::hooks::override_outcome_payload_exception(res, extended_error_info);
   }
 }  // namespace hook_test
@@ -89,6 +91,7 @@ BOOST_AUTO_TEST_CASE(works / outcome / hooks, "Tests that you can hook outcome's
 {
   using namespace hook_test;
   outcome<int> a(result<int>(5));
+  BOOST_REQUIRE(a.has_payload());
   BOOST_CHECK(a.payload() == "5");
   outcome<std::string> b(result<std::string>("niall"));
   BOOST_CHECK(b.payload() == "niall");
