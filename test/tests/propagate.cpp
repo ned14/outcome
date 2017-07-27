@@ -32,20 +32,26 @@ BOOST_AUTO_TEST_CASE(works / outcome / propagate, "Tests that the outcome propag
     auto t0 = [&](int a) { return result<long>(std::error_code(a, std::generic_category())); };
     auto t1 = [&](int a) {
       result<double> f(t0(a));  // double is constructible from long
+      BOOST_CHECK(!f.has_value());
+      BOOST_CHECK(f.has_error());
       return f;
     };
     auto t2 = [&](int a) {
       result<void> f(t1(a).error());
+      BOOST_CHECK(!f.has_value());
+      BOOST_CHECK(f.has_error());
       return f;
     };
     auto t3 = [&](int a) {
       outcome<std::string> f(t2(a));
+      BOOST_CHECK(!f.has_value());
+      BOOST_CHECK(f.has_error());
       return f;
     };
     BOOST_CHECK(t3(5).error().value() == 5);
-    result<int> a2(result<void>(in_place_type<void>));
-    result<int> a3(result<void>(std::error_code(5, std::generic_category())));
-    BOOST_CHECK(!a2.has_value());
+    result<int> a2{result<void>(in_place_type<void>)};
+    result<int> a3{result<void>(std::error_code(5, std::generic_category()))};
+    BOOST_CHECK(a2.has_value());
     BOOST_CHECK(!a2.has_error());
     BOOST_CHECK(!a3.has_value());
     BOOST_CHECK(a3.has_error());

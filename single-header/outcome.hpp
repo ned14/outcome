@@ -991,7 +991,7 @@ extern "C" void _mm_pause();
 
 // TO BE REMOVED SOON: C++ 14 constexpr macro
 #ifndef QUICKCPPLIB_CONSTEXPR
-#if __cpp_constexpr >= 201304
+#if __cpp_constexpr >= 201304 || _MSC_VER >= 1910
 #define QUICKCPPLIB_CONSTEXPR constexpr
 #endif
 #endif
@@ -1086,14 +1086,26 @@ extern "C" void _mm_pause();
 #endif
 
 #ifndef QUICKCPPLIB_THREAD_LOCAL
-#if __cplusplus >= 201103
+#if _MSC_VER >= 1800
+#define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
+#elif __cplusplus >= 201103
+#if defined(__has_feature)
+#if __has_feature(cxx_thread_local)
+#define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
+#endif
+#endif
+#endif
+#ifdef QUICKCPPLIB_THREAD_LOCAL_IS_CXX11
 #define QUICKCPPLIB_THREAD_LOCAL thread_local
-#elif defined(_MSC_VER)
+#endif
+#ifndef QUICKCPPLIB_THREAD_LOCAL
+#if defined(_MSC_VER)
 #define QUICKCPPLIB_THREAD_LOCAL __declspec(thread)
 #elif defined(__GNUC__)
 #define QUICKCPPLIB_THREAD_LOCAL __thread
 #else
 #error Unknown compiler, cannot set QUICKCPPLIB_THREAD_LOCAL
+#endif
 #endif
 #endif
 /* MSVC capable preprocessor macro overloading
@@ -1392,9 +1404,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 4be3573b2520998aaab3537dbc77dd9f5a28a628
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-20 23:43:06 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4be3573b
+#define OUTCOME_PREVIOUS_COMMIT_REF dca55f6fdb12aba34282b2fc5d09a09020be81ef
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-27 02:39:43 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE dca55f6f
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1835,6 +1847,11 @@ namespace detail
     };
     status_bitfield_type _status;
     constexpr value_storage_trivial() noexcept : _empty{}, _status(0) {}
+    explicit constexpr value_storage_trivial(value_storage_trivial<void> o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
+        : _value()
+        , _status(o._status)
+    {
+    }
     constexpr explicit value_storage_trivial(status_bitfield_type status)
         : _empty()
         , _status(status)
@@ -1884,13 +1901,14 @@ namespace detail
     };
     status_bitfield_type _status;
     value_storage_nontrivial() noexcept : _empty{}, _status(0) {}
-    value_storage_nontrivial &operator=(const value_storage_nontrivial &) = delete;
-    value_storage_nontrivial &operator=(value_storage_nontrivial &&) = delete;
+    value_storage_nontrivial &operator=(const value_storage_nontrivial &) = default; // if reaches here, copy assignment is trivial
+    value_storage_nontrivial &operator=(value_storage_nontrivial &&) = default; // if reaches here, move assignment is trivial
     value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(std::is_nothrow_move_constructible<value_type>::value)
         : _status(o._status)
     {
       if(this->_status & status_have_value)
       {
+        this->_status &= ~status_have_value;
         new(&_value) value_type(std::move(o._value));
         _status = o._status;
       }
@@ -1900,7 +1918,18 @@ namespace detail
     {
       if(this->_status & status_have_value)
       {
+        this->_status &= ~status_have_value;
         new(&_value) value_type(o._value);
+        _status = o._status;
+      }
+    }
+    explicit value_storage_nontrivial(value_storage_trivial<void> o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
+        : _status(o._status)
+    {
+      if(this->_status & status_have_value)
+      {
+        this->_status &= ~status_have_value;
+        new(&_value) value_type;
         _status = o._status;
       }
     }
@@ -1983,6 +2012,26 @@ namespace detail
     value_storage_delete_copy_constructor(const value_storage_delete_copy_constructor &) = delete;
     value_storage_delete_copy_constructor(value_storage_delete_copy_constructor &&) = default;
   };
+  template <class Base> struct value_storage_delete_copy_assignment : Base
+  {
+    using Base::Base;
+    using value_type = typename Base::value_type;
+    value_storage_delete_copy_assignment() = default;
+    value_storage_delete_copy_assignment(const value_storage_delete_copy_assignment &) = default;
+    value_storage_delete_copy_assignment(value_storage_delete_copy_assignment &&) = default;
+    value_storage_delete_copy_assignment &operator=(const value_storage_delete_copy_assignment &o) = delete;
+    value_storage_delete_copy_assignment &operator=(value_storage_delete_copy_assignment &&o) = default;
+  };
+  template <class Base> struct value_storage_delete_move_assignment : Base
+  {
+    using Base::Base;
+    using value_type = typename Base::value_type;
+    value_storage_delete_move_assignment() = default;
+    value_storage_delete_move_assignment(const value_storage_delete_move_assignment &) = default;
+    value_storage_delete_move_assignment(value_storage_delete_move_assignment &&) = default;
+    value_storage_delete_move_assignment &operator=(const value_storage_delete_move_assignment &o) = default;
+    value_storage_delete_move_assignment &operator=(value_storage_delete_move_assignment &&o) = delete;
+  };
   template <class Base> struct value_storage_delete_move_constructor : Base
   {
     using Base::Base;
@@ -2043,12 +2092,32 @@ namespace detail
       return *this;
     }
   };
-  template <class T> using value_storage_select_trivality = std::conditional_t<std::is_trivial<devoid<T>>::value, value_storage_trivial<T>, value_storage_nontrivial<T>>;
+
+  // We don't actually need all of std::is_trivial<>, std::is_trivially_copyable<> is sufficient
+  template <class T> using value_storage_select_trivality = std::conditional_t<std::is_trivially_copyable<devoid<T>>::value, value_storage_trivial<T>, value_storage_nontrivial<T>>;
   template <class T> using value_storage_select_move_constructor = std::conditional_t<std::is_move_constructible<devoid<T>>::value, value_storage_select_trivality<T>, value_storage_delete_move_constructor<value_storage_select_trivality<T>>>;
   template <class T> using value_storage_select_copy_constructor = std::conditional_t<std::is_copy_constructible<devoid<T>>::value, value_storage_select_move_constructor<T>, value_storage_delete_copy_constructor<value_storage_select_move_constructor<T>>>;
-  template <class T> using value_storage_select_move_assignment = std::conditional_t<!std::is_move_assignable<devoid<T>>::value || std::is_trivially_move_assignable<devoid<T>>::value, value_storage_select_copy_constructor<T>, value_storage_nontrivial_move_assignment<value_storage_select_copy_constructor<T>>>;
-  template <class T> using value_storage_select_copy_assignment = std::conditional_t<!std::is_copy_assignable<devoid<T>>::value || std::is_trivially_copy_assignable<devoid<T>>::value, value_storage_select_move_assignment<T>, value_storage_nontrivial_copy_assignment<value_storage_select_move_assignment<T>>>;
+  template <class T>
+  using value_storage_select_move_assignment = std::conditional_t<std::is_trivially_move_assignable<devoid<T>>::value, value_storage_select_copy_constructor<T>,
+                                                                  std::conditional_t<std::is_move_assignable<devoid<T>>::value, value_storage_nontrivial_move_assignment<value_storage_select_copy_constructor<T>>, value_storage_delete_copy_assignment<value_storage_select_copy_constructor<T>>>>;
+  template <class T>
+  using value_storage_select_copy_assignment = std::conditional_t<std::is_trivially_copy_assignable<devoid<T>>::value, value_storage_select_move_assignment<T>,
+                                                                  std::conditional_t<std::is_copy_assignable<devoid<T>>::value, value_storage_nontrivial_copy_assignment<value_storage_select_move_assignment<T>>, value_storage_delete_copy_assignment<value_storage_select_move_assignment<T>>>>;
   template <class T> using value_storage_select_impl = value_storage_select_copy_assignment<T>;
+#ifndef NDEBUG
+  // Check is trivial in all ways except default constructibility
+  // static_assert(std::is_trivial<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivial!");
+  // static_assert(std::is_trivially_default_constructible<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially default constructible!");
+  static_assert(std::is_trivially_copyable<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially copyable!");
+  static_assert(std::is_trivially_assignable<value_storage_select_impl<int>, value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially assignable!");
+  static_assert(std::is_trivially_destructible<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially destructible!");
+  static_assert(std::is_trivially_copy_constructible<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially copy constructible!");
+  static_assert(std::is_trivially_move_constructible<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially move constructible!");
+  static_assert(std::is_trivially_copy_assignable<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially copy assignable!");
+  static_assert(std::is_trivially_move_assignable<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially move assignable!");
+  // Also check is standard layout
+  static_assert(std::is_standard_layout<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not a standard layout type!");
+#endif
 }
 
 OUTCOME_V2_NAMESPACE_END
@@ -2496,12 +2565,6 @@ namespace impl
         , _error(o._error)
     {
     }
-    template <class U, class V>
-    constexpr result_storage(compatible_conversion_tag, const result_storage<void, U, V> &o) noexcept(std::is_nothrow_default_constructible<_value_type>::value &&std::is_nothrow_constructible<_error_type, U>::value)
-        : _state(in_place_type<_value_type>)
-        , _error(o._error)
-    {
-    }
     template <class T, class V>
     constexpr result_storage(compatible_conversion_tag, const result_storage<T, void, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
         : _state(o._state)
@@ -2511,12 +2574,6 @@ namespace impl
     template <class T, class U, class V>
     constexpr result_storage(compatible_conversion_tag, result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
         : _state(std::move(o._state))
-        , _error(std::move(o._error))
-    {
-    }
-    template <class U, class V>
-    constexpr result_storage(compatible_conversion_tag, result_storage<void, U, V> &&o) noexcept(std::is_nothrow_default_constructible<_value_type>::value &&std::is_nothrow_constructible<_error_type, U>::value)
-        : _state(in_place_type<_value_type>)
         , _error(std::move(o._error))
     {
     }
@@ -3071,7 +3128,7 @@ namespace policy
 
   template <class EC> struct error_code_throw_as_system_error
   {
-    static_assert(std::is_convertible<std::error_code, EC>::value, "error_type must be convertible into a std::error_code to be used with this policy");
+    static_assert(std::is_base_of<std::error_code, EC>::value, "error_type must be a base of a std::error_code to be used with this policy");
     /*! Performs a narrow check of state, used in the assume_value() functions.
     \effects None.
     */
@@ -3165,7 +3222,7 @@ namespace policy
 
   template <class EC> struct exception_ptr_rethrow
   {
-    static_assert(std::is_convertible<std::exception_ptr, EC>::value, "error_type must be convertible into a std::exception_ptr to be used with this policy");
+    static_assert(std::is_base_of<std::exception_ptr, EC>::value, "error_type must be a base of a std::exception_ptr to be used with this policy");
     /*! Performs a narrow check of state, used in the assume_value() functions.
     \effects None.
     */
@@ -4203,6 +4260,21 @@ template <class R, class S, class P> inline void swap(result<R, S, P> &a, result
 {
   a.swap(b);
 }
+
+#ifndef NDEBUG
+// Check is trivial in all ways except default constructibility
+// static_assert(std::is_trivial<result<int>>::value, "result<int> is not trivial!");
+// static_assert(std::is_trivially_default_constructible<result<int>>::value, "result<int> is not trivially default constructible!");
+static_assert(std::is_trivially_copyable<result<int>>::value, "result<int> is not trivially copyable!");
+static_assert(std::is_trivially_assignable<result<int>, result<int>>::value, "result<int> is not trivially assignable!");
+static_assert(std::is_trivially_destructible<result<int>>::value, "result<int> is not trivially destructible!");
+static_assert(std::is_trivially_copy_constructible<result<int>>::value, "result<int> is not trivially copy constructible!");
+static_assert(std::is_trivially_move_constructible<result<int>>::value, "result<int> is not trivially move constructible!");
+static_assert(std::is_trivially_copy_assignable<result<int>>::value, "result<int> is not trivially copy assignable!");
+static_assert(std::is_trivially_move_assignable<result<int>>::value, "result<int> is not trivially move assignable!");
+// Also check is standard layout
+static_assert(std::is_standard_layout<result<int>>::value, "result<int> is not a standard layout type!");
+#endif
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -5729,7 +5801,10 @@ namespace hooks
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_payload_exception(outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept
   {
     o->_ptr = std::forward<U>(v);
-    o->_state._status |= detail::status_have_exception;
+    if(trait::is_exception_ptr<P>::value)
+      o->_state._status |= detail::status_have_exception;
+    else
+      o->_state._status |= detail::status_have_payload;
   }
 }
 
@@ -5749,8 +5824,8 @@ namespace policy
 
   template <class R, class S, class P> struct error_code_throw_as_system_error_exception_rethrow
   {
-    static_assert(std::is_convertible<std::error_code, S>::value, "error_type must be convertible into a std::error_code to be used with this policy");
-    static_assert(std::is_convertible<std::exception_ptr, P>::value, "exception_type must be convertible into a std::exception_ptr to be used with this policy");
+    static_assert(std::is_base_of<std::error_code, S>::value, "error_type must be a base of std::error_code to be used with this policy");
+    static_assert(std::is_base_of<std::exception_ptr, P>::value, "exception_type must be a base of std::exception_ptr to be used with this policy");
     /*! Performs a narrow check of state, used in the assume_value() functions.
     \effects None.
     */
