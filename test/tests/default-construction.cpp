@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(works / outcome / default_construction, "Tests that outcome
     constexpr int operator*() const noexcept { return _v; }
   };
   // One path is via success_type<void>
-  outcome<udt> a = success();
+  outcome<udt> a(success());
   BOOST_CHECK(*a.value() == 78);
 
   // Other path is via explicit conversion from void
