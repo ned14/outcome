@@ -21,10 +21,10 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../include/outcome/result.hpp"
+#include "../../include/outcome/outcome.hpp"
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 
-BOOST_AUTO_TEST_CASE(issues / 61, "result<T1, E1> does not compare to incompatible result<T2, E2>")
+BOOST_AUTO_TEST_CASE(issues / 61 / result, "result<T1, E1> does not compare to incompatible result<T2, E2>")
 {
   using namespace OUTCOME_V2_NAMESPACE;
   struct udt1
@@ -66,6 +66,61 @@ BOOST_AUTO_TEST_CASE(issues / 61, "result<T1, E1> does not compare to incompatib
 
   result<void> c = success();
   result<void> d = success();
+  BOOST_CHECK(c == d);
+  BOOST_CHECK(!(c != d));
+  BOOST_CHECK(b != c);
+  BOOST_CHECK(!(b == c));
+  BOOST_CHECK(c != b);
+  BOOST_CHECK(!(c == b));
+
+  BOOST_CHECK(a == success());
+  BOOST_CHECK(success() == a);
+  BOOST_CHECK(a != failure(5));
+  BOOST_CHECK(failure(5) != a);
+}
+
+BOOST_AUTO_TEST_CASE(issues / 61 / outcome, "outcome<T1, E1, P1> does not compare to incompatible outcome<T2, E2, P2>")
+{
+  using namespace OUTCOME_V2_NAMESPACE;
+  struct udt1
+  {
+    const char *_v{nullptr};
+    udt1() = default;
+    constexpr explicit udt1(const char *v) noexcept : _v(v) {}
+    udt1(udt1 &&o) = delete;
+    udt1(const udt1 &) = delete;
+    udt1 &operator=(udt1 &&o) = delete;
+    udt1 &operator=(const udt1 &) = delete;
+    ~udt1() = default;
+    constexpr const char *operator*() const noexcept { return _v; }
+  };
+  struct udt2
+  {
+    const char *_v{nullptr};
+    udt2() = default;
+    constexpr explicit udt2(const char *v) noexcept : _v(v) {}
+    udt2(udt2 &&o) = delete;
+    udt2(const udt2 &) = delete;
+    udt2 &operator=(udt2 &&o) = delete;
+    udt2 &operator=(const udt2 &) = delete;
+    ~udt2() = default;
+    constexpr const char *operator*() const noexcept { return _v; }
+    bool operator==(const udt1 &o) const noexcept { return _v == *o; }
+    bool operator!=(const udt1 &o) const noexcept { return _v != *o; }
+  };
+  using outcome1 = outcome<int, udt1>;
+  using outcome2 = outcome<int, udt2>;
+
+  outcome1 a(5), _a(6);
+  outcome2 b(5);
+  BOOST_CHECK(b == a);     // udt2 will compare to udt1
+  BOOST_CHECK(!(b != a));  // udt2 will compare to udt1
+  BOOST_CHECK(a != _a);
+  BOOST_CHECK(a != b);     // udt1 will NOT compare to udt2, always say they differ
+  BOOST_CHECK(!(a == b));  // udt1 will NOT compare to udt2, always say they differ
+
+  outcome<void> c = success();
+  outcome<void> d = success();
   BOOST_CHECK(c == d);
   BOOST_CHECK(!(c != d));
   BOOST_CHECK(b != c);
