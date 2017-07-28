@@ -86,11 +86,20 @@ namespace detail
     };
     status_bitfield_type _status;
     constexpr value_storage_trivial() noexcept : _empty{}, _status(0) {}
-    explicit constexpr value_storage_trivial(value_storage_trivial<void> o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
+    // Special from-void catchall constructor, always constructs default T irrespective of whether void is valued or not (can do no better if T cannot be copied)
+    struct disable_void_catchall
+    {
+    };
+    using void_value_storage_trivial = std::conditional_t<std::is_void<T>::value, disable_void_catchall, value_storage_trivial<void>>;
+    explicit constexpr value_storage_trivial(const void_value_storage_trivial &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
         : _value()
         , _status(o._status)
     {
     }
+    value_storage_trivial(const value_storage_trivial &) = default;
+    value_storage_trivial(value_storage_trivial &&) = default;
+    value_storage_trivial &operator=(const value_storage_trivial &) = default;
+    value_storage_trivial &operator=(value_storage_trivial &&) = default;
     constexpr explicit value_storage_trivial(status_bitfield_type status)
         : _empty()
         , _status(status)
@@ -162,7 +171,8 @@ namespace detail
         _status = o._status;
       }
     }
-    explicit value_storage_nontrivial(value_storage_trivial<void> o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
+    // Special from-void constructor, constructs default T if void valued
+    explicit value_storage_nontrivial(const value_storage_trivial<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
         : _status(o._status)
     {
       if(this->_status & status_have_value)
