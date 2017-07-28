@@ -43,6 +43,11 @@ namespace detail
     }
     return s;
   }
+  inline std::ostream &operator<<(std::ostream &s, const value_storage_trivial<void> &v)
+  {
+    s << v._status << " ";
+    return s;
+  }
   template <class T> inline std::ostream &operator<<(std::ostream &s, const value_storage_nontrivial<T> &v)
   {
     s << v._status << " ";
@@ -61,6 +66,12 @@ namespace detail
       new(&v._value) decltype(v._value)();
       s >> v._value;
     }
+    return s;
+  }
+  inline std::istream &operator>>(std::istream &s, value_storage_trivial<devoid<void>> &v)
+  {
+    v = value_storage_trivial<devoid<void>>();
+    s >> v._status;
     return s;
   }
   template <class T> inline std::istream &operator>>(std::istream &s, value_storage_nontrivial<T> &v)
