@@ -1404,9 +1404,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF dca55f6fdb12aba34282b2fc5d09a09020be81ef
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-27 02:39:43 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE dca55f6f
+#define OUTCOME_PREVIOUS_COMMIT_REF b513914b1857d257bb5d20b0b76ff2dd2ad40246
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-28 00:33:54 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE b513914b
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1847,11 +1847,20 @@ namespace detail
     };
     status_bitfield_type _status;
     constexpr value_storage_trivial() noexcept : _empty{}, _status(0) {}
-    explicit constexpr value_storage_trivial(value_storage_trivial<void> o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
+    // Special from-void catchall constructor, always constructs default T irrespective of whether void is valued or not (can do no better if T cannot be copied)
+    struct disable_void_catchall
+    {
+    };
+    using void_value_storage_trivial = std::conditional_t<std::is_void<T>::value, disable_void_catchall, value_storage_trivial<void>>;
+    explicit constexpr value_storage_trivial(const void_value_storage_trivial &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
         : _value()
         , _status(o._status)
     {
     }
+    value_storage_trivial(const value_storage_trivial &) = default;
+    value_storage_trivial(value_storage_trivial &&) = default;
+    value_storage_trivial &operator=(const value_storage_trivial &) = default;
+    value_storage_trivial &operator=(value_storage_trivial &&) = default;
     constexpr explicit value_storage_trivial(status_bitfield_type status)
         : _empty()
         , _status(status)
@@ -1923,7 +1932,8 @@ namespace detail
         _status = o._status;
       }
     }
-    explicit value_storage_nontrivial(value_storage_trivial<void> o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
+    // Special from-void constructor, constructs default T if void valued
+    explicit value_storage_nontrivial(const value_storage_trivial<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
         : _status(o._status)
     {
       if(this->_status & status_have_value)
