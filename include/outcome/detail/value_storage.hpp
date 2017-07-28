@@ -86,11 +86,15 @@ namespace detail
     };
     status_bitfield_type _status;
     constexpr value_storage_trivial() noexcept : _empty{}, _status(0) {}
-    explicit constexpr value_storage_trivial(value_storage_trivial<void> o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
+    explicit constexpr value_storage_trivial(const value_storage_trivial<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
         : _value()
         , _status(o._status)
     {
     }
+    // value_storage_trivial(const value_storage_trivial &) = default;
+    // value_storage_trivial(value_storage_trivial &&) = default;
+    // value_storage_trivial &operator=(const value_storage_trivial &) = default;
+    // value_storage_trivial &operator=(value_storage_trivial &&) = default;
     constexpr explicit value_storage_trivial(status_bitfield_type status)
         : _empty()
         , _status(status)
