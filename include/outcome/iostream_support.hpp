@@ -121,6 +121,48 @@ template <class R, class S, class P> inline std::string print(const result<R, S,
   }
   return s.str();
 }
+//! Debug print a result
+template <class S, class P> inline std::string print(const result<void, S, P> &v)
+{
+  std::stringstream s;
+  if(v.has_value())
+  {
+    s << "(+void)";
+  }
+  if(v.has_error())
+  {
+    s << v.error();
+  }
+  return s.str();
+}
+//! Debug print a result
+template <class R, class P> inline std::string print(const result<R, void, P> &v)
+{
+  std::stringstream s;
+  if(v.has_value())
+  {
+    s << v.value();
+  }
+  if(v.has_error())
+  {
+    s << "(-void)";
+  }
+  return s.str();
+}
+//! Debug print a result
+template <class P> inline std::string print(const result<void, void, P> &v)
+{
+  std::stringstream s;
+  if(v.has_value())
+  {
+    s << "(+void)";
+  }
+  if(v.has_error())
+  {
+    s << "(-void)";
+  }
+  return s.str();
+}
 
 //! Deserialise an outcome
 template <class R, class S, class P, class N> inline std::istream &operator>>(std::istream &s, outcome<R, S, P, N> &v)
