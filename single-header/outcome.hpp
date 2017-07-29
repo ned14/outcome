@@ -1404,9 +1404,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 8207e4a16fa2e01711f4d5efd40ee619bf54fff6
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-28 01:10:43 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 8207e4a1
+#define OUTCOME_PREVIOUS_COMMIT_REF 9f79eb40ad16f90287d123c1b604490a6d276eda
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-28 22:59:31 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 9f79eb40
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1825,6 +1825,9 @@ namespace detail
   };
   struct void_type
   {
+    // We always compare true to another instance of me
+    constexpr bool operator==(void_type /*unused*/) const noexcept { return true; }
+    constexpr bool operator!=(void_type /*unused*/) const noexcept { return false; }
   };
   template <class T> using devoid = std::conditional_t<std::is_void<T>::value, void_type, T>;
 
@@ -2482,6 +2485,30 @@ namespace detail
   }
   template <class T> using is_nothrow_swappable = _is_nothrow_swappable::is_nothrow_swappable<T>;
 #endif
+  OUTCOME_TEMPLATE(class T, class U)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>() == std::declval<U>()))
+  inline bool safe_compare_equal(const T &a, const U &b) noexcept(noexcept(std::declval<T>() == std::declval<U>()))
+  {
+    // std::cout << "Taken " << typeid(T).name() << " == " << typeid(U).name() << " = " << (a == b) << std::endl;
+    return a == b;
+  }
+  template <class T, class U> inline bool safe_compare_equal(T && /*unused*/, U && /*unused*/) noexcept
+  {
+    // std::cout << "Fallback " << typeid(T).name() << " == " << typeid(U).name() << " = false" << std::endl;
+    return false;
+  }
+  OUTCOME_TEMPLATE(class T, class U)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>() != std::declval<U>()))
+  inline bool safe_compare_notequal(const T &a, const U &b) noexcept(noexcept(std::declval<T>() != std::declval<U>()))
+  {
+    // std::cout << "Taken " << typeid(T).name() << " != " << typeid(U).name() << " = " << (a != b) << std::endl;
+    return a != b;
+  }
+  template <class T, class U> inline bool safe_compare_notequal(T && /*unused*/, U && /*unused*/) noexcept
+  {
+    // std::cout << "Fallback " << typeid(T).name() << " != " << typeid(U).name() << " = true" << std::endl;
+    return true;
+  }
 }
 
 namespace impl
@@ -2949,14 +2976,10 @@ namespace impl
 
     /// \output_section Comparison operators
     /*! True if equal to the other result.
-    \tparam 4
-    \exclude
-    \tparam 5
-    \exclude
     \param o The other result to compare to.
 
-    \effects Calls the `operator==` operation on each of the two stored items until one returns false.
-    \requires That the expression of calling `operator==` on each of the two stored items is a valid expression.
+    \effects If a valid expression to do so, calls the `operator==` operation on each
+    of the two stored items returning true if both are true. Otherwise returns false.
     \throws Any exception the individual `operator==` operations might throw.
     */
 
@@ -2965,38 +2988,76 @@ namespace impl
 
 
 
-
-
-
-
-    OUTCOME_TEMPLATE(class T, class U, class V)
-    OUTCOME_TREQUIRES( //
-    OUTCOME_TEXPR(std::declval<R>() == std::declval<T>()), //
-    OUTCOME_TEXPR(std::declval<S>() == std::declval<U>()) //
-    )
+    template <class T, class U, class V>
     constexpr bool operator==(const result_final<T, U, V> &o) const noexcept( //
-    noexcept(std::declval<R>() == std::declval<T>()) //
-    && noexcept(std::declval<S>() == std::declval<U>()))
+    noexcept(detail::safe_compare_equal(std::declval<detail::devoid<R>>(), std::declval<detail::devoid<T>>())) //
+    && noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<U>>())))
     {
       if(this->_state._status == o._state._status)
       {
         if(this->_state._status & detail::status_have_value)
         {
-          return this->_state._value == o._state._value && this->_error == o._error;
+          return detail::safe_compare_equal(this->_state._value, o._state._value) && detail::safe_compare_equal(this->_error, o._error);
         }
-        return this->_error == o._error;
+        return detail::safe_compare_equal(this->_error, o._error);
       }
       return false;
     }
+    /*! True if equal to the success type sugar.
+    \param o The success type sugar to compare to.
+
+    \effects If a valid expression to do so, calls the `operator==` operation on the successful item returning true if equal. Otherwise returns false.
+    \throws Any exception the `operator==` operation might throw.
+    */
+
+
+
+
+
+    template <class T> constexpr bool operator==(const success_type<T> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<R>>(), std::declval<detail::devoid<T>>())))
+    {
+      if(this->_state._status & detail::status_have_value)
+      {
+        return detail::safe_compare_equal(this->_state._value, o.value);
+      }
+      return false;
+    }
+    /*! True if equal to the success type sugar.
+    \param o The success type sugar to compare to.
+
+    \effects If a valid expression to do so, calls the `operator==` operation on the successful item returning true if equal. Otherwise returns false.
+    \throws Any exception the `operator==` operation might throw.
+    */
+
+
+
+
+
+    constexpr bool operator==(const success_type<void> & /*unused*/) const noexcept
+    {
+      if(this->_state._status & detail::status_have_value)
+      {
+        return true;
+      }
+      return false;
+    }
+    /*! True if equal to the failure type sugar.
+    \param o The failure type sugar to compare to.
+
+    \effects If a valid expression to do so, calls the `operator==` operation on the failure item returning true if equal. Otherwise returns false.
+    \throws Any exception the `operator==` operation might throw.
+    */
+
+
+
+
+
+    template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->_error, o.error); }
     /*! True if not equal to the other result.
-    \tparam 4
-    \exclude
-    \tparam 5
-    \exclude
     \param o The other result to compare to.
 
-    \effects Calls the `operator!=` operation on each of the two stored items until one returns true.
-    \requires That the expression of calling `operator!=` on each of the two stored items is a valid expression.
+    \effects If a valid expression to do so, calls the `operator!=` operation on each
+    of the two stored items, returning true if any are not equal. Otherwise returns true.
     \throws Any exception the individual `operator!=` operations might throw.
     */
 
@@ -3005,18 +3066,10 @@ namespace impl
 
 
 
-
-
-
-
-    OUTCOME_TEMPLATE(class T, class U, class V)
-    OUTCOME_TREQUIRES( //
-    OUTCOME_TEXPR(std::declval<R>() != std::declval<T>()), //
-    OUTCOME_TEXPR(std::declval<S>() != std::declval<U>()) //
-    )
+    template <class T, class U, class V>
     constexpr bool operator!=(const result_final<T, U, V> &o) const noexcept( //
-    noexcept(std::declval<R>() != std::declval<T>()) //
-    && noexcept(std::declval<S>() != std::declval<U>()))
+    noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<R>>(), std::declval<detail::devoid<T>>())) //
+    && noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<U>>())))
     {
       if(this->_state._status != o._state._status)
       {
@@ -3024,12 +3077,70 @@ namespace impl
       }
       if(this->_state._status & detail::status_have_value)
       {
-        if(this->_state._value != o._state._value)
+        if(detail::safe_compare_notequal(this->_state._value, o._state._value))
           return true;
       }
-      return this->_error != o._error;
+      return detail::safe_compare_notequal(this->_error, o._error);
     }
+    /*! True if not equal to the success type sugar.
+    \param o The success type sugar to compare to.
+
+    \effects If a valid expression to do so, calls the `operator!=` operation on the successful item returning true if not equal. Otherwise returns false.
+    \throws Any exception the `operator!=` operation might throw.
+    */
+
+
+
+
+
+    template <class T> constexpr bool operator!=(const success_type<T> &o) const noexcept(noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<R>>(), std::declval<detail::devoid<T>>())))
+    {
+      if(this->_state._status & detail::status_have_value)
+      {
+        return detail::safe_compare_notequal(this->_state._value, o.value);
+      }
+      return true;
+    }
+    /*! True if not equal to the success type sugar.
+    \param o The success type sugar to compare to.
+
+    \effects If a valid expression to do so, calls the `operator!=` operation on the successful item returning true if not equal. Otherwise returns false.
+    \throws Any exception the `operator!=` operation might throw.
+    */
+
+
+
+
+
+    constexpr bool operator!=(const success_type<void> & /*unused*/) const noexcept
+    {
+      if(this->_state._status & detail::status_have_value)
+      {
+        return false;
+      }
+      return true;
+    }
+    /*! True if not equal to the failure type sugar.
+    \param o The failure type sugar to compare to.
+
+    \effects If a valid expression to do so, calls the `operator!=` operation on the failure item returning true if not equal. Otherwise returns false.
+    \throws Any exception the `operator!=` operation might throw.
+    */
+
+
+
+
+
+    template <class T> constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_notequal(this->_error, o.error); }
   };
+  //! Calls b == a
+  template <class T, class U, class V, class W> constexpr inline bool operator==(const success_type<W> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
+  //! Calls b == a
+  template <class T, class U, class V, class W> constexpr inline bool operator==(const failure_type<W, void> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
+  //! Calls b != a
+  template <class T, class U, class V, class W> constexpr inline bool operator!=(const success_type<W> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
+  //! Calls b != a
+  template <class T, class U, class V, class W> constexpr inline bool operator!=(const failure_type<W, void> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
 }
 
 //! Namespace for policies
@@ -5533,17 +5644,13 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   }
 
   /// \output_section Comparison operators
+  using base::operator==;
+  using base::operator!=;
   /*! True if equal to the other outcome.
-  \tparam 4
-  \exclude
-  \tparam 5
-  \exclude
-  \tparam 6
-  \exclude
   \param o The other outcome to compare to.
 
-  \effects Calls the `operator==` operation on each of the three stored items until one returns false.
-  \requires That the expression of calling `operator==` on each of the three stored items is a valid expression.
+  \effects If a valid expression to do so, calls the `operator==` operation on each
+  of the three stored items returning true if both are true. Otherwise returns false.
   \throws Any exception the individual `operator==` operations might throw.
   */
 
@@ -5552,36 +5659,63 @@ is not constructible to `value_type`, is not constructible to `payload_exception
 
 
 
-
-
-
-
-
-
-  OUTCOME_TEMPLATE(class T, class U, class V, class W)
-  OUTCOME_TREQUIRES( //
-  OUTCOME_TEXPR(std::declval<R>() == std::declval<T>()), //
-  OUTCOME_TEXPR(std::declval<S>() == std::declval<U>()), //
-  OUTCOME_TEXPR(std::declval<P>() == std::declval<V>()) //
-  )
+  template <class T, class U, class V, class W>
   constexpr bool operator==(const outcome<T, U, V, W> &o) const noexcept( //
-  noexcept(std::declval<R>() == std::declval<T>()) //
-  && noexcept(std::declval<S>() == std::declval<U>()) //
-  && noexcept(std::declval<P>() == std::declval<V>()))
+  noexcept(detail::safe_compare_equal(std::declval<detail::devoid<R>>(), std::declval<detail::devoid<T>>())) //
+  && noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<U>>())) //
+  && noexcept(detail::safe_compare_equal(std::declval<detail::devoid<P>>(), std::declval<detail::devoid<V>>())))
   {
-    return base::operator==(o) && this->_ptr == o._ptr;
+    return base::operator==(o) && detail::safe_compare_equal(this->_ptr, o._ptr);
+  }
+  /*! True if equal to the failure type sugar.
+  \param o The failure type sugar to compare to.
+
+  \effects If a valid expression to do so, calls the `operator==` operation on the failure items returning true if equal. Otherwise returns false.
+  \throws Any exception the `operator==` operations might throw.
+  */
+
+
+
+
+
+  template <class T, class U>
+  constexpr bool operator==(const failure_type<T, U, false> &o) const noexcept( //
+  noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>())) //
+  && noexcept(detail::safe_compare_equal(std::declval<detail::devoid<P>>(), std::declval<detail::devoid<U>>())))
+  {
+    if(!(this->_state._status & detail::status_have_payload))
+      return false;
+    if(!detail::safe_compare_equal(this->_error, o.error))
+      return false;
+    return detail::safe_compare_equal(this->_ptr, o.payload);
+  }
+  /*! True if equal to the failure type sugar.
+  \param o The failure type sugar to compare to.
+
+  \effects If a valid expression to do so, calls the `operator==` operation on the failure items returning true if equal. Otherwise returns false.
+  \throws Any exception the `operator==` operations might throw.
+  */
+
+
+
+
+
+  template <class T, class U>
+  constexpr bool operator==(const failure_type<T, U, true> &o) const noexcept( //
+  noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>())) //
+  && noexcept(detail::safe_compare_equal(std::declval<detail::devoid<P>>(), std::declval<detail::devoid<U>>())))
+  {
+    if(!(this->_state._status & detail::status_have_exception))
+      return false;
+    if(!detail::safe_compare_equal(this->_error, o.error))
+      return false;
+    return detail::safe_compare_equal(this->_ptr, o.exception);
   }
   /*! True if not equal to the other outcome.
-  \tparam 4
-  \exclude
-  \tparam 5
-  \exclude
-  \tparam 6
-  \exclude
   \param o The other outcome to compare to.
 
-  \effects Calls the `operator!=` operation on each of the three stored items until one returns true.
-  \requires That the expression of calling `operator!=` on each of the three stored items is a valid expression.
+  \effects If a valid expression to do so, calls the `operator!=` operation on each
+  of the three stored items, returning true if any are not equal. Otherwise returns true.
   \throws Any exception the individual `operator!=` operations might throw.
   */
 
@@ -5590,88 +5724,57 @@ is not constructible to `value_type`, is not constructible to `payload_exception
 
 
 
-
-
-
-
-
-
-  OUTCOME_TEMPLATE(class T, class U, class V, class W)
-  OUTCOME_TREQUIRES( //
-  OUTCOME_TEXPR(std::declval<R>() != std::declval<T>()), //
-  OUTCOME_TEXPR(std::declval<S>() != std::declval<U>()), //
-  OUTCOME_TEXPR(std::declval<P>() != std::declval<V>()) //
-  )
+  template <class T, class U, class V, class W>
   constexpr bool operator!=(const outcome<T, U, V, W> &o) const noexcept( //
-  noexcept(std::declval<R>() != std::declval<T>()) //
-  && noexcept(std::declval<S>() != std::declval<U>()) //
-  && noexcept(std::declval<P>() != std::declval<V>()))
+  noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<R>>(), std::declval<detail::devoid<T>>())) //
+  && noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<U>>())) //
+  && noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<P>>(), std::declval<detail::devoid<V>>())))
   {
-    return base::operator!=(o) || this->_ptr != o._ptr;
+    return base::operator!=(o) || detail::safe_compare_notequal(this->_ptr, o._ptr);
   }
-  /*! True if equal to the other result.
-  \tparam 4
-  \exclude
-  \tparam 5
-  \exclude
-  \param o The other result to compare to.
+  /*! True if not equal to the failure type sugar.
+  \param o The failure type sugar to compare to.
 
-  \effects Calls the `operator==` operation on each of the two stored items until one returns false.
-  \requires That the expression of calling `operator==` on each of the two stored items is a valid expression.
-  \throws Any exception the individual `operator==` operations might throw.
+  \effects If a valid expression to do so, calls the `operator!=` operation on the failure items returning true if not equal. Otherwise returns true.
+  \throws Any exception the `operator!=` operations might throw.
   */
 
 
 
 
 
-
-
-
-
-
-  OUTCOME_TEMPLATE(class T, class U, class V)
-  OUTCOME_TREQUIRES( //
-  OUTCOME_TEXPR(std::declval<R>() == std::declval<T>()), //
-  OUTCOME_TEXPR(std::declval<S>() == std::declval<U>()) //
-  )
-  constexpr bool operator==(const result<T, U, V> &o) const noexcept( //
-  noexcept(std::declval<R>() == std::declval<T>()) //
-  && noexcept(std::declval<S>() == std::declval<U>()))
+  template <class T, class U>
+  constexpr bool operator!=(const failure_type<T, U, false> &o) const noexcept( //
+  noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>())) //
+  && noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<P>>(), std::declval<detail::devoid<U>>())))
   {
-    return base::operator==(o);
+    if(!(this->_state._status & detail::status_have_payload))
+      return true;
+    if(detail::safe_compare_notequal(this->_error, o.error))
+      return true;
+    return detail::safe_compare_notequal(this->_ptr, o.payload);
   }
-  /*! True if not equal to the other result.
-  \tparam 4
-  \exclude
-  \tparam 5
-  \exclude
-  \param o The other result to compare to.
+  /*! True if not equal to the failure type sugar.
+  \param o The failure type sugar to compare to.
 
-  \effects Calls the `operator!=` operation on each of the two stored items until one returns true.
-  \requires That the expression of calling `operator!=` on each of the two stored items is a valid expression.
-  \throws Any exception the individual `operator!=` operations might throw.
+  \effects If a valid expression to do so, calls the `operator!=` operation on the failure items returning true if not equal. Otherwise returns false.
+  \throws Any exception the `operator!=` operations might throw.
   */
 
 
 
 
 
-
-
-
-
-
-  OUTCOME_TEMPLATE(class T, class U, class V)
-  OUTCOME_TREQUIRES( //
-  OUTCOME_TEXPR(std::declval<R>() != std::declval<T>()), //
-  OUTCOME_TEXPR(std::declval<S>() != std::declval<U>()) //
-  )
-  constexpr bool operator!=(const result<T, U, V> &o) const noexcept( //
-  noexcept(std::declval<R>() != std::declval<T>()) //
-  && noexcept(std::declval<S>() != std::declval<U>()))
+  template <class T, class U>
+  constexpr bool operator!=(const failure_type<T, U, true> &o) const noexcept( //
+  noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>())) //
+  && noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<P>>(), std::declval<detail::devoid<U>>())))
   {
-    return base::operator!=(o);
+    if(!(this->_state._status & detail::status_have_exception))
+      return true;
+    if(detail::safe_compare_notequal(this->_error, o.error))
+      return true;
+    return detail::safe_compare_notequal(this->_ptr, o.exception);
   }
 
   /// \output_section Swap
@@ -6100,6 +6203,11 @@ namespace detail
     }
     return s;
   }
+  inline std::ostream &operator<<(std::ostream &s, const value_storage_trivial<void> &v)
+  {
+    s << v._status << " ";
+    return s;
+  }
   template <class T> inline std::ostream &operator<<(std::ostream &s, const value_storage_nontrivial<T> &v)
   {
     s << v._status << " ";
@@ -6118,6 +6226,12 @@ namespace detail
       new(&v._value) decltype(v._value)();
       s >> v._value;
     }
+    return s;
+  }
+  inline std::istream &operator>>(std::istream &s, value_storage_trivial<devoid<void>> &v)
+  {
+    v = value_storage_trivial<devoid<void>>();
+    s >> v._status;
     return s;
   }
   template <class T> inline std::istream &operator>>(std::istream &s, value_storage_nontrivial<T> &v)
