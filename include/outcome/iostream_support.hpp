@@ -85,6 +85,10 @@ namespace detail
     }
     return s;
   }
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_constructible<std::error_code, T>::value))
+  inline std::string safe_message(T && /*unused*/) { return {}; }
+  inline std::string safe_message(const std::error_code &ec) { return " (" + ec.message() + ")"; }
 }
 
 //! Deserialise a result
@@ -117,7 +121,7 @@ template <class R, class S, class P> inline std::string print(const result<R, S,
   }
   if(v.has_error())
   {
-    s << v.error();
+    s << v.error() << detail::safe_message(v.error());
   }
   return s.str();
 }
@@ -131,7 +135,7 @@ template <class S, class P> inline std::string print(const result<void, S, P> &v
   }
   if(v.has_error())
   {
-    s << v.error();
+    s << v.error() << detail::safe_message(v.error());
   }
   return s.str();
 }
@@ -213,7 +217,8 @@ template <class R, class S, class P, class N> inline std::string print(const out
   }
   if(v.has_error())
   {
-    s << v.error();
+    s << v.error() << detail::safe_message(v.error());
+    ;
   }
   if(total > 1)
   {
