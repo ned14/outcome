@@ -47,9 +47,14 @@ namespace trait
 // Do we have C++ 17 deduced templates?
 #if 0  // def __cpp_deduction_guides
 
+/*! Type sugar for implicitly constructing a `result<>` with a successful state.
+*/
 template <class T> struct success
 {
-  T value;
+  //! The type of the successful state.
+  using value_type = T;
+  //! The value of the successful state.
+  value_type value;
   constexpr success(T &&v)
       : value(std::move(v))
   {
@@ -59,8 +64,12 @@ template <class T> struct success
   {
   }
 };
+/*! Type sugar for implicitly constructing a `result<>` with a successful state.
+*/
 template <> struct success<void>
 {
+  //! The type of the successful state.
+  using value_type = void;
 };
 template <class T> success(T /*unused*/)->success<T>;
 success()->success<void>;
@@ -68,27 +77,74 @@ template <class T> using success_type = success<T>;
 
 template <class EC, class E, bool e_is_exception_ptr = trait::is_exception_ptr<E>::value> struct failure;
 template <class EC, class E> using failure_type = failure<EC, E>;
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and payload.
+*/
 template <class EC, class P> struct failure<EC, P, false>
 {
-  EC error;
-  P payload;
+  //! The type of the error code
+  using error_type = EC;
+  //! The type of the payload
+  using payload_type = P;
+  //! The type of the exception
+  using exception_type = void;
+  //! The error code
+  error_type error;
+  //! The payload
+  payload_type payload;
 };
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and exception.
+*/
 template <class EC, class E> struct failure<EC, E, true>
 {
-  EC error;
-  E exception;
+  //! The type of the error code
+  using error_type = EC;
+  //! The type of the payload
+  using payload_type = void;
+  //! The type of the exception
+  using exception_type = E;
+  //! The error code
+  error_type error;
+  //! The exception
+  exception_type exception;
 };
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code.
+*/
 template <class EC> struct failure<EC, void, false>
 {
-  EC error;
+  //! The type of the error code
+  using error_type = EC;
+  //! The type of the payload
+  using payload_type = void;
+  //! The type of the exception
+  using exception_type = void;
+  //! The error code
+  error_type error;
 };
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of payload.
+*/
 template <class P> struct failure<void, P, false>
 {
-  P payload;
+  //! The type of the error code
+  using error_type = void;
+  //! The type of the payload
+  using payload_type = P;
+  //! The type of the exception
+  using exception_type = void;
+  //! The payload
+  payload_type payload;
 };
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of exception.
+*/
 template <class E> struct failure<void, E, true>
 {
-  E exception;
+  //! The type of the error code
+  using error_type = void;
+  //! The type of the payload
+  using payload_type = void;
+  //! The type of the exception
+  using exception_type = E;
+  //! The exception
+  exception_type exception;
 };
 #else
 
