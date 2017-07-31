@@ -18,13 +18,13 @@ Outcome v2 comes in single header file form. This is regenerated per commit. To 
 on Linux:
 
 ```
-wget https://github.com/ned14/outcome/tree/develop/single-header/outcome.hpp
+wget https://github.com/ned14/outcome/raw/develop/single-header/outcome.hpp
 ```
 
 On BSD and OS X:
 
 ```
-fetch https://github.com/ned14/outcome/tree/develop/single-header/outcome.hpp
+fetch https://github.com/ned14/outcome/raw/develop/single-header/outcome.hpp
 ```
 
 On Windows, simply download the raw file from above and place it wherever it suits you.
