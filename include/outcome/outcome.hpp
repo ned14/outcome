@@ -96,12 +96,10 @@ namespace impl
     using Base::Base;
     /// \output_section Narrow state observers
     /*! Access payload without runtime checks.
-    \returns Nothing.
     */
     constexpr void assume_payload() const noexcept { NoValuePolicy::narrow_payload_check(this); }
     /// \output_section Wide state observers
     /*! Access payload with runtime checks.
-    \returns Nothing.
     \requires The outcome to have an payload state, else whatever `NoValuePolicy` says ought to happen.
     */
     constexpr void payload() const { NoValuePolicy::wide_payload_check(this); }
@@ -148,12 +146,10 @@ namespace impl
     using Base::Base;
     /// \output_section Narrow state observers
     /*! Access exception without runtime checks.
-    \returns Nothing.
     */
     constexpr void assume_exception() const noexcept { NoValuePolicy::narrow_exception_check(this); }
     /// \output_section Wide state observers
     /*! Access exception with runtime checks.
-    \returns Nothing.
     \requires The outcome to have an exception state, else whatever `NoValuePolicy` says ought to happen.
     */
     constexpr void exception() const { NoValuePolicy::wide_exception_check(this); }
@@ -1183,7 +1179,8 @@ template <class R, class S, class P, class N> inline void swap(outcome<R, S, P, 
 namespace hooks
 {
   /*! Used to set/override a payload/exception during a construction hook implementation.
-  \param The outcome you wish to change.
+  \param o The outcome you wish to change.
+  \param v Payload/Exception to be set.
   \effects Sets the payload/exception of the outcome to the given value.
   */
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_payload_exception(outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept
