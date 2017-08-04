@@ -322,12 +322,10 @@ namespace impl
 
     /// \output_section Narrow state observers
     /*! Access value without runtime checks.
-    \returns Nothing.
     */
     constexpr void assume_value() const noexcept { NoValuePolicy::narrow_value_check(this); }
     /// \output_section Wide state observers
     /*! Access value with runtime checks.
-    \returns Nothing.
     \requires The result to have a successful state, else whatever `NoValuePolicy` says ought to happen.
     */
     constexpr void value() const { NoValuePolicy::wide_value_check(this); }
@@ -406,12 +404,10 @@ namespace impl
     using Base::Base;
     /// \output_section Narrow state observers
     /*! Access error without runtime checks.
-    \returns Nothing.
     */
     constexpr void assume_error() const noexcept { NoValuePolicy::narrow_error_check(this); }
     /// \output_section Wide state observers
     /*! Access error with runtime checks.
-    \returns Nothing.
     \requires The result to have a failed state, else whatever `NoValuePolicy` says ought to happen.
     */
     constexpr void error() const { NoValuePolicy::wide_error_check(this); }
@@ -591,8 +587,9 @@ namespace impl
     \effects If a valid expression to do so, calls the `operator==` operation on the successful item returning true if equal. Otherwise returns false.
     \throws Any exception the `operator==` operation might throw.
     */
-    constexpr bool operator==(const success_type<void> & /*unused*/) const noexcept
+    constexpr bool operator==(const success_type<void> &o) const noexcept
     {
+      (void) o;
       if(this->_state._status & detail::status_have_value)
       {
         return true;
@@ -649,8 +646,9 @@ namespace impl
     \effects If a valid expression to do so, calls the `operator!=` operation on the successful item returning true if not equal. Otherwise returns false.
     \throws Any exception the `operator!=` operation might throw.
     */
-    constexpr bool operator!=(const success_type<void> & /*unused*/) const noexcept
+    constexpr bool operator!=(const success_type<void> &o) const noexcept
     {
+      (void) o;
       if(this->_state._status & detail::status_have_value)
       {
         return false;

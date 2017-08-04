@@ -1404,9 +1404,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 9f79eb40ad16f90287d123c1b604490a6d276eda
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-28 22:59:31 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 9f79eb40
+#define OUTCOME_PREVIOUS_COMMIT_REF 5da364741db5935bf081d2c6c362bdbf27786b5b
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-31 17:17:17 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 5da36474
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -2254,6 +2254,62 @@ namespace trait
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*! Type sugar for implicitly constructing a `result<>` with a successful state.
 */
 
@@ -2703,17 +2759,13 @@ namespace impl
 
     /// \output_section Narrow state observers
     /*! Access value without runtime checks.
-    \returns Nothing.
     */
-
 
     constexpr void assume_value() const noexcept { NoValuePolicy::narrow_value_check(this); }
     /// \output_section Wide state observers
     /*! Access value with runtime checks.
-    \returns Nothing.
     \requires The result to have a successful state, else whatever `NoValuePolicy` says ought to happen.
     */
-
 
 
     constexpr void value() const { NoValuePolicy::wide_value_check(this); }
@@ -2800,17 +2852,13 @@ namespace impl
     using Base::Base;
     /// \output_section Narrow state observers
     /*! Access error without runtime checks.
-    \returns Nothing.
     */
-
 
     constexpr void assume_error() const noexcept { NoValuePolicy::narrow_error_check(this); }
     /// \output_section Wide state observers
     /*! Access error with runtime checks.
-    \returns Nothing.
     \requires The result to have a failed state, else whatever `NoValuePolicy` says ought to happen.
     */
-
 
 
     constexpr void error() const { NoValuePolicy::wide_error_check(this); }
@@ -3033,8 +3081,9 @@ namespace impl
 
 
 
-    constexpr bool operator==(const success_type<void> & /*unused*/) const noexcept
+    constexpr bool operator==(const success_type<void> &o) const noexcept
     {
+      (void) o;
       if(this->_state._status & detail::status_have_value)
       {
         return true;
@@ -3112,8 +3161,9 @@ namespace impl
 
 
 
-    constexpr bool operator!=(const success_type<void> & /*unused*/) const noexcept
+    constexpr bool operator!=(const success_type<void> &o) const noexcept
     {
+      (void) o;
       if(this->_state._status & detail::status_have_value)
       {
         return false;
@@ -4477,17 +4527,13 @@ namespace impl
     using Base::Base;
     /// \output_section Narrow state observers
     /*! Access payload without runtime checks.
-    \returns Nothing.
     */
-
 
     constexpr void assume_payload() const noexcept { NoValuePolicy::narrow_payload_check(this); }
     /// \output_section Wide state observers
     /*! Access payload with runtime checks.
-    \returns Nothing.
     \requires The outcome to have an payload state, else whatever `NoValuePolicy` says ought to happen.
     */
-
 
 
     constexpr void payload() const { NoValuePolicy::wide_payload_check(this); }
@@ -4542,17 +4588,13 @@ namespace impl
     using Base::Base;
     /// \output_section Narrow state observers
     /*! Access exception without runtime checks.
-    \returns Nothing.
     */
-
 
     constexpr void assume_exception() const noexcept { NoValuePolicy::narrow_exception_check(this); }
     /// \output_section Wide state observers
     /*! Access exception with runtime checks.
-    \returns Nothing.
     \requires The outcome to have an exception state, else whatever `NoValuePolicy` says ought to happen.
     */
-
 
 
     constexpr void exception() const { NoValuePolicy::wide_exception_check(this); }
@@ -5905,9 +5947,11 @@ template <class R, class S, class P, class N> inline void swap(outcome<R, S, P, 
 namespace hooks
 {
   /*! Used to set/override a payload/exception during a construction hook implementation.
-  \param The outcome you wish to change.
+  \param o The outcome you wish to change.
+  \param v Payload/Exception to be set.
   \effects Sets the payload/exception of the outcome to the given value.
   */
+
 
 
 
@@ -6245,6 +6289,10 @@ namespace detail
     }
     return s;
   }
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_constructible<std::error_code, T>::value))
+  inline std::string safe_message(T && /*unused*/) { return {}; }
+  inline std::string safe_message(const std::error_code &ec) { return " (" + ec.message() + ")"; }
 }
 
 //! Deserialise a result
@@ -6277,7 +6325,49 @@ template <class R, class S, class P> inline std::string print(const result<R, S,
   }
   if(v.has_error())
   {
-    s << v.error();
+    s << v.error() << detail::safe_message(v.error());
+  }
+  return s.str();
+}
+//! Debug print a result
+template <class S, class P> inline std::string print(const result<void, S, P> &v)
+{
+  std::stringstream s;
+  if(v.has_value())
+  {
+    s << "(+void)";
+  }
+  if(v.has_error())
+  {
+    s << v.error() << detail::safe_message(v.error());
+  }
+  return s.str();
+}
+//! Debug print a result
+template <class R, class P> inline std::string print(const result<R, void, P> &v)
+{
+  std::stringstream s;
+  if(v.has_value())
+  {
+    s << v.value();
+  }
+  if(v.has_error())
+  {
+    s << "(-void)";
+  }
+  return s.str();
+}
+//! Debug print a result
+template <class P> inline std::string print(const result<void, void, P> &v)
+{
+  std::stringstream s;
+  if(v.has_value())
+  {
+    s << "(+void)";
+  }
+  if(v.has_error())
+  {
+    s << "(-void)";
   }
   return s.str();
 }
@@ -6331,7 +6421,8 @@ template <class R, class S, class P, class N> inline std::string print(const out
   }
   if(v.has_error())
   {
-    s << v.error();
+    s << v.error() << detail::safe_message(v.error());
+    ;
   }
   if(total > 1)
   {
