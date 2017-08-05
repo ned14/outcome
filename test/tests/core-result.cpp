@@ -78,10 +78,8 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(!m);
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
-// BOOST_CHECK(!m.has_exception());
-#if __GNUC__ == 6  // fails on Travis, otherwise works everywhere else :(
+    // BOOST_CHECK(!m.has_exception());
     BOOST_CHECK_THROW(([&m]() -> void { return m.value(); }()), const std::system_error &);
-#endif
     BOOST_CHECK_NO_THROW(m.error());
   }
   {  // valued int

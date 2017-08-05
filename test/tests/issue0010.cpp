@@ -71,9 +71,6 @@ BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .err
   // And state is not destroyed
   BOOST_CHECK(p.has_value() && *p.assume_value() == a);
   BOOST_CHECK(!n.has_value() && *n.assume_error() == b);
-  // LEWG Expected requires these to work as if reinterpret_cast irrespective of state
-  BOOST_CHECK_NO_THROW(p.assume_error());  // error from valued state
-  BOOST_CHECK_NO_THROW(n.assume_value());  // value from errored state
   // LEWG Expected provides rvalue ref semantics for operator*(), error() and error_or()
   udt1 a1(std::move(p.assume_value()));
   BOOST_CHECK(*a1 == a);
