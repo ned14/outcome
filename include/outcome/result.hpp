@@ -160,7 +160,7 @@ namespace detail
       state._status |= status_error_is_errno;
     }
   }
-  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::errc &error) { state._status |= status_error_is_errno; }
+  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::errc & /*unused*/) { state._status |= status_error_is_errno; }
 }
 
 namespace impl
