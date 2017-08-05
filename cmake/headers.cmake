@@ -3,6 +3,7 @@ set(outcome_HEADERS
   "include/outcome.hpp"
   "include/outcome/config.hpp"
   "include/outcome/detail/value_storage.hpp"
+  "include/outcome/experimental/result.hpp"
   "include/outcome/iostream_support.hpp"
   "include/outcome/outcome.hpp"
   "include/outcome/result.hpp"

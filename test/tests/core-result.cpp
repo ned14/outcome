@@ -21,31 +21,42 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#ifdef TESTING_WG21_EXPERIMENTAL_RESULT
+#include "../../include/outcome/experimental/result.hpp"
+#else
 #include "../../include/outcome/result.hpp"
+#endif
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
 
 BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
 {
+#ifdef TESTING_WG21_EXPERIMENTAL_RESULT
+  using namespace std::experimental;
+  using std::in_place_type;
+#else
   using namespace OUTCOME_V2_NAMESPACE;
+#endif
 
   static_assert(std::is_constructible<result<long>, int>::value, "Sanity check that monad can be constructed from a value_type");
-  static_assert(std::is_constructible<result<result<long>>, int>::value, "Sanity check that outer monad can be constructed from an inner monad's value_type");
-  static_assert(std::is_constructible<result<result<result<long>>>, int>::value, "Sanity check that outer monad can be constructed from an inner inner monad's value_type");
-  static_assert(std::is_constructible<result<result<result<result<long>>>>, int>::value, "Sanity check that outer monad can be constructed from an inner inner monad's value_type");
+  static_assert(!std::is_constructible<result<result<long>>, int>::value, "Sanity check that outer monad can be constructed from an inner monad's value_type");
+  static_assert(!std::is_constructible<result<result<result<long>>>, int>::value, "Sanity check that outer monad can be constructed from an inner inner monad's value_type");
+  static_assert(!std::is_constructible<result<result<result<result<long>>>>, int>::value, "Sanity check that outer monad can be constructed from an inner inner monad's value_type");
 
   static_assert(std::is_constructible<result<int>, result<long>>::value, "Sanity check that compatible monads can be constructed from one another");
   static_assert(std::is_constructible<result<result<int>>, result<long>>::value, "Sanity check that outer monad can be constructed from a compatible monad");
   static_assert(std::is_constructible<result<result<result<int>>>, result<long>>::value, "Sanity check that outer monad can be constructed from a compatible monad up to two nestings deep");
-  static_assert(std::is_constructible<result<result<result<result<int>>>>, result<long>>::value, "Sanity check that outer monad can be constructed from a compatible monad three or more nestings deep");
+  static_assert(!std::is_constructible<result<result<result<result<int>>>>, result<long>>::value, "Sanity check that outer monad can be constructed from a compatible monad three or more nestings deep");
   static_assert(!std::is_constructible<result<std::string>, result<int>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
 
-  static_assert(std::is_constructible<result<int>, result<void>>::value, "Sanity check that all monads can be constructed from a void monad");
-  static_assert(std::is_constructible<result<result<int>>, result<void>>::value, "Sanity check that outer monad can be constructed from a compatible monad");
-  static_assert(std::is_constructible<result<result<result<int>>>, result<void>>::value, "Sanity check that outer monad can be constructed from a compatible monad up to two nestings deep");
+  static_assert(!std::is_constructible<result<int>, result<void>>::value, "Sanity check that all monads can be constructed from a void monad");
+  static_assert(!std::is_constructible<result<result<int>>, result<void>>::value, "Sanity check that outer monad can be constructed from a compatible monad");
+  static_assert(!std::is_constructible<result<result<result<int>>>, result<void>>::value, "Sanity check that outer monad can be constructed from a compatible monad up to two nestings deep");
   static_assert(!std::is_constructible<result<void>, result<int>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
 
   static_assert(std::is_void<result<void>::value_type>::value, "Sanity check that result<void> has a void value_type");
+#ifndef TESTING_WG21_EXPERIMENTAL_RESULT
   static_assert(std::is_void<result<void, void>::error_type>::value, "Sanity check that result<void, void> has a void error_type");
+#endif
 
   static_assert(std::is_same<result<int>::value_type, int>::value, "Sanity check that result<int> has a int value_type");
   static_assert(std::is_same<result<int>::error_type, std::error_code>::value, "Sanity check that result<int> has a error_code error_type");
@@ -56,7 +67,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(!m);
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
-    BOOST_CHECK(!m.has_exception());
+    // BOOST_CHECK(!m.has_exception());
     BOOST_CHECK_THROW(m.value(), const std::system_error &);
     BOOST_CHECK_NO_THROW(m.error());
   }
@@ -65,7 +76,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(!m);
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
-    BOOST_CHECK(!m.has_exception());
+// BOOST_CHECK(!m.has_exception());
 #if __GNUC__ == 6  // fails on Travis, otherwise works everywhere else :(
     BOOST_CHECK_THROW(([&m]() -> void { return m.value(); }()), const std::system_error &);
 #endif
@@ -76,7 +87,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(m);
     BOOST_CHECK(m.has_value());
     BOOST_CHECK(!m.has_error());
-    BOOST_CHECK(!m.has_exception());
+    // BOOST_CHECK(!m.has_exception());
     BOOST_CHECK(m.value() == 5);
     m.value() = 6;
     BOOST_CHECK(m.value() == 6);
@@ -87,7 +98,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(m);
     BOOST_CHECK(m.has_value());
     BOOST_CHECK(!m.has_error());
-    BOOST_CHECK(!m.has_exception());
+    // BOOST_CHECK(!m.has_exception());
     BOOST_CHECK(m.value() == "niall");
     m.value() = "NIALL";
     BOOST_CHECK(m.value() == "NIALL");
@@ -100,7 +111,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(m);
     BOOST_CHECK(m.has_value());
     BOOST_CHECK(!m.has_error());
-    BOOST_CHECK(!m.has_exception());
+    // BOOST_CHECK(!m.has_exception());
     BOOST_CHECK_NO_THROW(m.value());  // works, but type returned is unusable
     BOOST_CHECK_THROW(m.error(), const bad_result_access &);
   }
@@ -110,7 +121,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(!m);
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
-    BOOST_CHECK(!m.has_exception());
+    // BOOST_CHECK(!m.has_exception());
     BOOST_CHECK_THROW(m.value(), const std::system_error &);
     BOOST_CHECK(m.error() == ec);
   }
@@ -121,10 +132,11 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(!m);
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
-    BOOST_CHECK(!m.has_exception());
+    // BOOST_CHECK(!m.has_exception());
     BOOST_CHECK_THROW(m.value(), const std::system_error &);
     BOOST_CHECK(m.error() == e);
   }
+#ifndef TESTING_WG21_EXPERIMENTAL_RESULT
   {  // custom error type
     struct Foo
     {
@@ -133,7 +145,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(!m);
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
-    BOOST_CHECK(!m.has_exception());
+    // BOOST_CHECK(!m.has_exception());
     BOOST_CHECK_THROW(m.value(), const Foo &);
     BOOST_CHECK_NO_THROW(m.error());
   }
@@ -143,7 +155,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     m->value();
     m->error();
   }
-
+#endif
 
   {
     // Deliberately define non-trivial operations
@@ -212,11 +224,14 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     static_assert(!std::is_default_constructible<decltype(a)>::value, "");
     static_assert(!std::is_nothrow_default_constructible<decltype(a)>::value, "");
     static_assert(std::is_copy_constructible<decltype(a)>::value, "");
+// Quality of implementation of std::optional is poor :(
+#ifndef TESTING_WG21_EXPERIMENTAL_RESULT
     static_assert(std::is_trivially_copy_constructible<decltype(a)>::value, "");
     static_assert(std::is_nothrow_copy_constructible<decltype(a)>::value, "");
     static_assert(std::is_copy_assignable<decltype(a)>::value, "");
     static_assert(std::is_trivially_copy_assignable<decltype(a)>::value, "");
     static_assert(std::is_nothrow_copy_assignable<decltype(a)>::value, "");
+#endif
     static_assert(std::is_trivially_destructible<decltype(a)>::value, "");
     static_assert(std::is_nothrow_destructible<decltype(a)>::value, "");
 
@@ -280,5 +295,27 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     result<udt3> i(ENOMEM, std::generic_category());
     BOOST_CHECK(h.has_value());
     BOOST_CHECK(i.has_error());
+  }
+
+  // Test C compatibility
+  {
+    CXX_DECLARE_RESULT(int);
+    CXX_RESULT(int) c_result = {5, 1, 0, nullptr};
+    result<int> cxx_result{5};
+    static_assert(sizeof(c_result) == sizeof(cxx_result), "Sizes of C and C++ results do not match!");
+
+    union test_t {
+      result<int> cxx;
+      CXX_RESULT(int) c;
+    };
+    test_t a{5};
+    BOOST_CHECK(a.cxx.has_value());
+    BOOST_CHECK(CXX_RESULT_HAS_VALUE(a.c));
+    BOOST_CHECK(a.c.value == 5);
+
+    test_t b{std::errc::invalid_argument};
+    BOOST_CHECK(b.cxx.has_error());
+    BOOST_CHECK(CXX_RESULT_HAS_ERROR(b.c));
+    BOOST_CHECK(b.c.error == EINVAL);
   }
 }
