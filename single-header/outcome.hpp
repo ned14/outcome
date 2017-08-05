@@ -1404,9 +1404,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 5da364741db5935bf081d2c6c362bdbf27786b5b
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-07-31 17:17:17 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 5da36474
+#define OUTCOME_PREVIOUS_COMMIT_REF 2dadef712d9793618e45b15ed7d44cfde8d8c84a
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-08-05 01:05:28 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 2dadef71
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1835,8 +1835,13 @@ namespace detail
   static constexpr status_bitfield_type status_have_value = (1 << 0);
   static constexpr status_bitfield_type status_have_error = (1 << 1);
   static constexpr status_bitfield_type status_have_status = (1 << 2);
-  static constexpr status_bitfield_type status_have_payload = (1 << 3);
-  static constexpr status_bitfield_type status_have_exception = (1 << 4);
+  // bit 3 unused
+  static constexpr status_bitfield_type status_error_is_errno = (1 << 4); // can errno be set from this error?
+  static constexpr status_bitfield_type status_have_payload = (1 << 5);
+  static constexpr status_bitfield_type status_have_exception = (1 << 6);
+  // bit 7 unused
+  // bits 8-15 unused
+  // bits 16-31 used for user supplied 16 bit value
   static constexpr status_bitfield_type status_2byte_shift = 16;
   static constexpr status_bitfield_type status_2byte_mask = (0xffffU << status_2byte_shift);
 
@@ -1973,7 +1978,21 @@ namespace detail
     }
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
+    constexpr explicit value_storage_nontrivial(const value_storage_trivial<U> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
+        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, o._value) : value_storage_nontrivial())
+    {
+      _status = o._status;
+    }
+    OUTCOME_TEMPLATE(class U)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_nontrivial(value_storage_nontrivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
+        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, std::move(o._value)) : value_storage_nontrivial())
+    {
+      _status = o._status;
+    }
+    OUTCOME_TEMPLATE(class U)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
+    constexpr explicit value_storage_nontrivial(value_storage_trivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
         : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, std::move(o._value)) : value_storage_nontrivial())
     {
       _status = o._status;
@@ -2565,6 +2584,31 @@ namespace detail
     // std::cout << "Fallback " << typeid(T).name() << " != " << typeid(U).name() << " = true" << std::endl;
     return true;
   }
+
+  template <class State, class E> constexpr inline void _set_error_is_errno(State & /*unused*/, E & /*unused*/) {}
+  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::error_code &error)
+  {
+    if(error.category() == std::generic_category()
+#ifndef _WIN32
+       || error.category() == std::system_category()
+#endif
+       )
+    {
+      state._status |= status_error_is_errno;
+    }
+  }
+  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::error_condition &error)
+  {
+    if(error.category() == std::generic_category()
+#ifndef _WIN32
+       || error.category() == std::system_category()
+#endif
+       )
+    {
+      state._status |= status_error_is_errno;
+    }
+  }
+  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::errc &error) { state._status |= status_error_is_errno; }
 }
 
 namespace impl
@@ -2580,7 +2624,22 @@ namespace hooks
 namespace impl
 {
   //! The base implementation type of `result<R, EC, NoValuePolicy>`. Only appears separate due to standardese limitations.
-  template <class R, class EC, class NoValuePolicy> OUTCOME_REQUIRES(std::is_void<EC>::value || std::is_default_constructible<EC>::value) class result_storage
+  template <class R, class EC, class NoValuePolicy> //
+  OUTCOME_REQUIRES( //
+  (!std::is_reference<R>::value //
+   && !detail::is_in_place_type_t<std::decay_t<R>>::value //
+   && !std::is_array<R>::value //
+   && (std::is_void<R>::value || (std::is_object<R>::value //
+                                  && std::is_destructible<R>::value)) //
+   ) &&
+  (!std::is_reference<EC>::value //
+   && !detail::is_in_place_type_t<std::decay_t<EC>>::value //
+   && !std::is_array<EC>::value //
+   && (std::is_void<EC>::value || (std::is_object<EC>::value //
+                                   && std::is_destructible<EC>::value)) //
+   ) //
+  ) //
+  class result_storage
   {
     static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "error_type must be default constructible");
 
@@ -2630,12 +2689,14 @@ namespace impl
         : _state(detail::status_have_error)
         , _error(std::forward<Args>(args)...)
     {
+      detail::_set_error_is_errno(_state, _error);
     }
     template <class U, class... Args>
     constexpr result_storage(in_place_type_t<_error_type>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
         : _state(detail::status_have_error)
         , _error(il, std::forward<Args>(args)...)
     {
+      detail::_set_error_is_errno(_state, _error);
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
     struct value_status_construction_tag
@@ -3197,12 +3258,12 @@ namespace impl
 namespace policy
 {
 #ifdef __cpp_exceptions
-  /*! Policy interpreting EC as a type to be thrown directly during wide checks.
+  /*! Policy which throws `bad_result_access` during wide checks.
   \module Error code interpretation policy
   */
 
 
-  template <class EC> struct throw_directly
+  struct throw_bad_result_access
   {
     /*! Performs a narrow check of state, used in the assume_value() functions.
     \effects None.
@@ -3246,7 +3307,98 @@ namespace policy
     }
 #endif
     /*! Performs a wide check of state, used in the value() functions.
-    \effects If result does not have a value, if it has an error it throws that `error()`, else it throws `bad_result_access`.
+    \effects If result does not have a value, it throws `bad_result_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_value_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_value) == 0)
+      {
+        throw bad_result_access("no value");
+      }
+    }
+    /*! Performs a wide check of state, used in the error() functions
+    \effects If result does not have an error, it throws `bad_result_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_error_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_error) == 0)
+      {
+        throw bad_result_access("no error");
+      }
+    }
+#if OUTCOME_ENABLE_POSITIVE_STATUS
+    /*! Performs a wide check of state, used in the status() functions
+\effects If result does not have an status, it throws `bad_result_access`.
+*/
+
+
+    template <class Impl> static constexpr void wide_status_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_status) == 0)
+      {
+        throw bad_result_access("no status");
+      }
+    }
+#endif
+  };
+  /*! Policy interpreting EC as an enum convertible into the `std::error_code` contract
+  and any wide attempt to access the successful state throws the `error_code` wrapped into
+  a `std::system_error`
+  \module Error code interpretation policy
+  */
+
+
+
+
+  template <class EC> struct error_enum_throw_as_system_error
+  {
+    /*! Performs a narrow check of state, used in the assume_value() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_value) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a narrow check of state, used in the assume_error() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_error) == 0)
+        __builtin_unreachable();
+#endif
+    }
+#if OUTCOME_ENABLE_POSITIVE_STATUS
+    /*! Performs a narrow check of state, used in the assume_status() functions
+\effects None.
+*/
+
+
+    template <class Impl> static constexpr void narrow_status_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_status) == 0)
+        __builtin_unreachable();
+#endif
+    }
+#endif
+    /*! Performs a wide check of state, used in the value() functions.
+    \effects If result does not have a value, if it has an error it throws a `std::system_error(error())`, else it throws `bad_result_access`.
     */
 
 
@@ -3256,7 +3408,7 @@ namespace policy
       {
         if((self->_state._status & detail::status_have_error) != 0)
         {
-          throw self->_error;
+          throw std::system_error(make_error_code(self->_error));
         }
         throw bad_result_access("no value");
       }
@@ -3328,8 +3480,8 @@ namespace policy
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
     /*! Performs a narrow check of state, used in the assume_status() functions
-\effects None.
-*/
+    \effects None.
+    */
 
 
     template <class Impl> static constexpr void narrow_status_check(Impl *self) noexcept
@@ -3371,8 +3523,8 @@ namespace policy
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
     /*! Performs a wide check of state, used in the status() functions
-\effects If result does not have an status, it throws `bad_result_access`.
-*/
+    \effects If result does not have an status, it throws `bad_result_access`.
+    */
 
 
     template <class Impl> static constexpr void wide_status_check(Impl *self)
@@ -3628,11 +3780,14 @@ namespace policy
   std::is_void<EC>::value, //
   terminate, //
   std::conditional_t< //
+  std::is_error_code_enum<EC>::value || std::is_error_condition_enum<EC>::value, //
+  error_enum_throw_as_system_error<EC>, //
+  std::conditional_t< //
   detail::is_same_or_constructible<std::error_code, EC>, error_code_throw_as_system_error<EC>, //
   std::conditional_t< //
   detail::is_same_or_constructible<std::exception_ptr, EC>, exception_ptr_rethrow<EC>, //
-  throw_directly<EC> //
-  >>>;
+  throw_bad_result_access //
+  >>>>;
 #else
   template <class EC> using default_result_policy = terminate;
 #endif
@@ -3645,16 +3800,23 @@ namespace detail
   // These are reused by outcome to save load on the compiler
   template <class value_type, class status_error_type, class error_type> struct result_predicates
   {
+    // Predicate for the implicit constructors to be available
+    static constexpr bool implicit_constructors_enabled = //
+    !std::is_constructible<value_type, status_error_type>::value //
+    && !std::is_constructible<status_error_type, value_type>::value;
+
     // Predicate for the value converting constructor to be available.
     template <class T>
     static constexpr bool enable_value_converting_constructor = //
-    !is_in_place_type_t<std::decay_t<T>>::value // not in place construction
+    implicit_constructors_enabled //
+    && !is_in_place_type_t<std::decay_t<T>>::value // not in place construction
     && is_same_or_constructible<value_type, T> && !std::is_constructible<status_error_type, T>::value;
 
     // Predicate for the error converting constructor to be available.
     template <class T>
     static constexpr bool enable_error_converting_constructor = //
-    !is_in_place_type_t<std::decay_t<T>>::value // not in place construction
+    implicit_constructors_enabled //
+    && !is_in_place_type_t<std::decay_t<T>>::value // not in place construction
     && !std::is_constructible<value_type, T>::value && is_same_or_constructible<error_type, T>;
 
     // Predicate for the error condition converting constructor to be available.
@@ -3687,7 +3849,9 @@ namespace detail
     std::is_constructible<error_type, Args...>::value, //
     error_type, //
     disable_inplace_value_error_constructor>>>;
-    template <class... Args> static constexpr bool enable_inplace_value_error_constructor = !std::is_same<choose_inplace_value_error_constructor<Args...>, disable_inplace_value_error_constructor>::value;
+    template <class... Args>
+    static constexpr bool enable_inplace_value_error_constructor = implicit_constructors_enabled //
+                                                                   && !std::is_same<choose_inplace_value_error_constructor<Args...>, disable_inplace_value_error_constructor>::value;
   };
 
   template <class T, class U> constexpr inline const U &extract_value_from_success(const success_type<U> &v) { return v.value; }
@@ -3697,7 +3861,17 @@ namespace detail
   template <class T, class U, class V> constexpr inline const U &extract_error_from_failure(const failure_type<U, V> &v) { return v.error; }
   template <class T, class U, class V> constexpr inline U &&extract_error_from_failure(failure_type<U, V> &&v) { return std::move(v.error); }
   template <class T, class V> constexpr inline T extract_error_from_failure(const failure_type<void, V> & /*unused*/) { return T{}; }
+
+  template <class T> struct is_result : std::false_type
+  {
+  };
+  template <class R, class S, class T> struct is_result<result<R, S, T>> : std::true_type
+  {
+  };
 }
+
+//! True if a result
+template <class T> static constexpr bool is_result_v = detail::is_result<std::decay_t<T>>::value;
 
 namespace hooks
 {
@@ -4662,16 +4836,28 @@ namespace detail
   template <class value_type, class status_error_type, class error_type, class payload_exception_type, class payload_type, class exception_type> struct outcome_predicates
   {
     using result = result_predicates<value_type, status_error_type, error_type>;
+    // Predicate for the implicit constructors to be available
+    static constexpr bool implicit_constructors_enabled = //
+    !std::is_constructible<value_type, status_error_type>::value //
+    && !std::is_constructible<value_type, payload_exception_type>::value //
+    && !std::is_constructible<status_error_type, value_type>::value //
+    && !std::is_constructible<status_error_type, payload_exception_type>::value //
+    && !std::is_constructible<payload_exception_type, value_type>::value //
+    && !std::is_constructible<payload_exception_type, status_error_type>::value;
 
     // Predicate for the value converting constructor to be available.
     template <class T>
-    static constexpr bool enable_value_converting_constructor = result::template enable_value_converting_constructor<T> //
-                                                                && !std::is_constructible<exception_type, T>::value;
+    static constexpr bool enable_value_converting_constructor = //
+    implicit_constructors_enabled //
+    &&result::template enable_value_converting_constructor<T> //
+    && !std::is_constructible<exception_type, T>::value;
 
     // Predicate for the error converting constructor to be available.
     template <class T>
-    static constexpr bool enable_error_converting_constructor = result::template enable_error_converting_constructor<T> //
-                                                                && !std::is_constructible<payload_exception_type, T>::value;
+    static constexpr bool enable_error_converting_constructor = //
+    implicit_constructors_enabled //
+    &&result::template enable_error_converting_constructor<T> //
+    && !std::is_constructible<payload_exception_type, T>::value;
 
     // Predicate for the error + payload/exception constructor to be available.
     template <class T, class U>
@@ -4688,7 +4874,8 @@ namespace detail
     // Predicate for the exception converting constructor to be available.
     template <class T>
     static constexpr bool enable_exception_converting_constructor = //
-    !is_in_place_type_t<std::decay_t<T>>::value // not in place construction
+    implicit_constructors_enabled //
+    && !is_in_place_type_t<std::decay_t<T>>::value // not in place construction
     && !std::is_constructible<value_type, T>::value && !std::is_constructible<status_error_type, T>::value && detail::is_same_or_constructible<exception_type, T>;
 
     // Predicate for the converting copy constructor from a compatible outcome to be available.
@@ -4719,7 +4906,9 @@ namespace detail
     std::is_constructible<exception_type, Args...>::value, //
     exception_type, //
     disable_inplace_value_error_exception_constructor>>>>;
-    template <class... Args> static constexpr bool enable_inplace_value_error_exception_constructor = !std::is_same<choose_inplace_value_error_exception_constructor<Args...>, disable_inplace_value_error_exception_constructor>::value;
+    template <class... Args>
+    static constexpr bool enable_inplace_value_error_exception_constructor = //
+    implicit_constructors_enabled && !std::is_same<choose_inplace_value_error_exception_constructor<Args...>, disable_inplace_value_error_exception_constructor>::value;
   };
 
   struct enable_payload_from_failure
@@ -5679,7 +5868,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, U, void>))
   constexpr outcome(failure_type<T, U> &&o) noexcept(std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<exception_type, U>::value)
       : base(in_place_type<typename base::_error_type>, std::move(detail::extract_error_from_failure<error_type>(std::move(o))))
-      , _ptr(std::move(detail::extract_exception_payload_from_failure<exception_type>(std::move(o))))
+      , _ptr(std::move(detail::extract_exception_payload_from_failure<decltype(_ptr)>(std::move(o))))
   {
     using namespace hooks;
     hook_outcome_move_construction(in_place_type<decltype(o)>, this);
@@ -5707,7 +5896,18 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   && noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<U>>())) //
   && noexcept(detail::safe_compare_equal(std::declval<detail::devoid<P>>(), std::declval<detail::devoid<V>>())))
   {
-    return base::operator==(o) && detail::safe_compare_equal(this->_ptr, o._ptr);
+    if(this->_state._status == o._state._status)
+    {
+      if(!base::operator==(o))
+      {
+        return false;
+      }
+      if((this->_state._status & detail::status_have_exception) || (this->_state._status & detail::status_have_payload))
+      {
+        return detail::safe_compare_equal(this->_ptr, o._ptr);
+      }
+    }
+    return true;
   }
   /*! True if equal to the failure type sugar.
   \param o The failure type sugar to compare to.
@@ -5727,9 +5927,16 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   {
     if(!(this->_state._status & detail::status_have_payload))
       return false;
-    if(!detail::safe_compare_equal(this->_error, o.error))
-      return false;
-    return detail::safe_compare_equal(this->_ptr, o.payload);
+    if(this->_state._status & detail::status_have_error)
+    {
+      if(!detail::safe_compare_equal(this->_error, o.error))
+        return false;
+    }
+    if((this->_state._status & detail::status_have_exception) || (this->_state._status & detail::status_have_payload))
+    {
+      return detail::safe_compare_equal(this->_ptr, o.payload);
+    }
+    return true;
   }
   /*! True if equal to the failure type sugar.
   \param o The failure type sugar to compare to.
@@ -5749,9 +5956,16 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   {
     if(!(this->_state._status & detail::status_have_exception))
       return false;
-    if(!detail::safe_compare_equal(this->_error, o.error))
-      return false;
-    return detail::safe_compare_equal(this->_ptr, o.exception);
+    if(this->_state._status & detail::status_have_error)
+    {
+      if(!detail::safe_compare_equal(this->_error, o.error))
+        return false;
+    }
+    if((this->_state._status & detail::status_have_exception) || (this->_state._status & detail::status_have_payload))
+    {
+      return detail::safe_compare_equal(this->_ptr, o.exception);
+    }
+    return true;
   }
   /*! True if not equal to the other outcome.
   \param o The other outcome to compare to.
@@ -5772,7 +5986,19 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   && noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<U>>())) //
   && noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<P>>(), std::declval<detail::devoid<V>>())))
   {
-    return base::operator!=(o) || detail::safe_compare_notequal(this->_ptr, o._ptr);
+    if(this->_state._status != o._state._status)
+    {
+      return true;
+    }
+    if(base::operator!=(o))
+    {
+      return true;
+    }
+    if((this->_state._status & detail::status_have_exception) || (this->_state._status & detail::status_have_payload))
+    {
+      return detail::safe_compare_notequal(this->_ptr, o._ptr);
+    }
+    return false;
   }
   /*! True if not equal to the failure type sugar.
   \param o The failure type sugar to compare to.
@@ -5791,10 +6017,21 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   && noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<P>>(), std::declval<detail::devoid<U>>())))
   {
     if(!(this->_state._status & detail::status_have_payload))
+    {
       return true;
-    if(detail::safe_compare_notequal(this->_error, o.error))
-      return true;
-    return detail::safe_compare_notequal(this->_ptr, o.payload);
+    }
+    if(this->_state._status & detail::status_have_error)
+    {
+      if(detail::safe_compare_notequal(this->_error, o.error))
+      {
+        return true;
+      }
+    }
+    if((this->_state._status & detail::status_have_exception) || (this->_state._status & detail::status_have_payload))
+    {
+      return detail::safe_compare_notequal(this->_ptr, o.payload);
+    }
+    return false;
   }
   /*! True if not equal to the failure type sugar.
   \param o The failure type sugar to compare to.
@@ -5813,10 +6050,21 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   && noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<P>>(), std::declval<detail::devoid<U>>())))
   {
     if(!(this->_state._status & detail::status_have_exception))
+    {
       return true;
-    if(detail::safe_compare_notequal(this->_error, o.error))
-      return true;
-    return detail::safe_compare_notequal(this->_ptr, o.exception);
+    }
+    if(this->_state._status & detail::status_have_error)
+    {
+      if(detail::safe_compare_notequal(this->_error, o.error))
+      {
+        return true;
+      }
+    }
+    if((this->_state._status & detail::status_have_exception) || (this->_state._status & detail::status_have_payload))
+    {
+      return detail::safe_compare_notequal(this->_ptr, o.exception);
+    }
+    return false;
   }
 
   /// \output_section Swap

@@ -121,6 +121,11 @@ int main() {
       target_compile_features(wg21-reference-result PRIVATE cxx_std_17)
       target_compile_definitions(wg21-reference-result PRIVATE TESTING_WG21_EXPERIMENTAL_RESULT)
       target_compile_options(wg21-reference-result PRIVATE -fconcepts)
+      set_target_properties(wg21-reference-result PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+      )
       add_test(NAME wg21-reference-result
         COMMAND $<TARGET_FILE:wg21-reference-result>
       )

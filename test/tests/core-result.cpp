@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifdef TESTING_WG21_EXPERIMENTAL_RESULT
 #include "../../include/outcome/experimental/result.hpp"
 #else
+#include "../../include/outcome/result.h"
 #include "../../include/outcome/result.hpp"
 #endif
 #include "../quickcpplib/include/boost/test/unit_test.hpp"
@@ -48,11 +49,12 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
   static_assert(!std::is_constructible<result<result<result<result<int>>>>, result<long>>::value, "Sanity check that outer monad can be constructed from a compatible monad three or more nestings deep");
   static_assert(!std::is_constructible<result<std::string>, result<int>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
 
-  static_assert(!std::is_constructible<result<int>, result<void>>::value, "Sanity check that all monads can be constructed from a void monad");
-  static_assert(!std::is_constructible<result<result<int>>, result<void>>::value, "Sanity check that outer monad can be constructed from a compatible monad");
-  static_assert(!std::is_constructible<result<result<result<int>>>, result<void>>::value, "Sanity check that outer monad can be constructed from a compatible monad up to two nestings deep");
+#ifndef TESTING_WG21_EXPERIMENTAL_RESULT
+  static_assert(std::is_constructible<result<int>, result<void>>::value, "Sanity check that all monads can be constructed from a void monad");
+  static_assert(std::is_constructible<result<result<int>>, result<void>>::value, "Sanity check that outer monad can be constructed from a compatible monad");
+  static_assert(std::is_constructible<result<result<result<int>>>, result<void>>::value, "Sanity check that outer monad can be constructed from a compatible monad up to two nestings deep");
   static_assert(!std::is_constructible<result<void>, result<int>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
-
+#endif
   static_assert(std::is_void<result<void>::value_type>::value, "Sanity check that result<void> has a void value_type");
 #ifndef TESTING_WG21_EXPERIMENTAL_RESULT
   static_assert(std::is_void<result<void, void>::error_type>::value, "Sanity check that result<void, void> has a void error_type");
@@ -146,7 +148,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
     // BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.value(), const Foo &);
+    BOOST_CHECK_THROW(m.value(), const bad_result_access &);
     BOOST_CHECK_NO_THROW(m.error());
   }
   if(false)  // NOLINT
@@ -297,6 +299,14 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(i.has_error());
   }
 
+  // Test direct use of error code enum works
+  {
+    constexpr result<int, std::errc> a(5), b(std::errc::invalid_argument);
+    static_assert(a.value() == 5, "a is not 5");
+    static_assert(b.error() == std::errc::invalid_argument, "b is not errored");
+    BOOST_CHECK_THROW(b.value(), const std::system_error &);
+  }
+
   // Test C compatibility
   {
     CXX_DECLARE_RESULT(int);
@@ -309,13 +319,13 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
       CXX_RESULT(int) c;
     };
     test_t a{5};
-    BOOST_CHECK(a.cxx.has_value());
-    BOOST_CHECK(CXX_RESULT_HAS_VALUE(a.c));
-    BOOST_CHECK(a.c.value == 5);
+    BOOST_CHECK(a.cxx.has_value());          // NOLINT
+    BOOST_CHECK(CXX_RESULT_HAS_VALUE(a.c));  // NOLINT
+    BOOST_CHECK(a.c.value == 5);             // NOLINT
 
     test_t b{std::errc::invalid_argument};
-    BOOST_CHECK(b.cxx.has_error());
-    BOOST_CHECK(CXX_RESULT_HAS_ERROR(b.c));
-    BOOST_CHECK(b.c.error == EINVAL);
+    BOOST_CHECK(b.cxx.has_error());          // NOLINT
+    BOOST_CHECK(CXX_RESULT_HAS_ERROR(b.c));  // NOLINT
+    BOOST_CHECK(b.c.error == EINVAL);        // NOLINT
   }
 }

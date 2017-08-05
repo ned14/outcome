@@ -25,7 +25,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef WG21_EXPERIMENTAL_RESULT_HPP
 #define WG21_EXPERIMENTAL_RESULT_HPP
 
-// C compatibility
+/***************************** BEGIN WG14 C Programming Language standards part *******************************/
 #define CXX_DECLARE_RESULT(R)                                                                                                                                                                                                                                                                                                  \
   struct result_##R                                                                                                                                                                                                                                                                                                            \
   {                                                                                                                                                                                                                                                                                                                            \
@@ -37,7 +37,11 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define CXX_RESULT(R) struct result_##R
 #define CXX_RESULT_HAS_VALUE(r) (((r).flags & 1) == 1)
 #define CXX_RESULT_HAS_ERROR(r) (((r).flags & 1) == 0)
+// Unable to use this in std::optional based result
+//#define CXX_RESULT_ERROR_IS_ERRNO(r) (((r).flags & (1 << 4)) == (1 << 4))
+#define CXX_RESULT_SET_ERRNO(r) (errno = CXX_RESULT_HAS_ERROR(r) ? (CXX_RESULT_ERROR_IS_ERRNO(r) ? (r).error : EAGAIN) : 0)
 
+/***************************** END WG14 C Programming Language standards part *******************************/
 
 #ifdef __cplusplus
 
@@ -78,9 +82,23 @@ namespace std
         };
         template <class T> static constexpr bool is_in_place_type_v = is_in_place_type_t<T>::value;
 
+        // Used to make optional<void> work
+        struct void_type
+        {
+          // We always compare true to another instance of me
+          constexpr bool operator==(void_type /*unused*/) const noexcept { return true; }
+          constexpr bool operator!=(void_type /*unused*/) const noexcept { return false; }
+        };
+
         // How to throw an error type
         inline void throw_exception(const std::error_code &ec) { throw std::system_error(ec); }
         inline void throw_exception(const std::exception_ptr &e) { std::rethrow_exception(e); }
+        template <class T>                                                                   //
+        requires(is_error_code_enum_v<decay_t<T>> || is_error_condition_enum_v<decay_t<T>>)  //
+        inline void throw_exception(T &&v)
+        {
+          throw std::system_error(make_error_code(v));
+        }
       }
 
       // Type sugar to indicate success
@@ -105,49 +123,6 @@ namespace std
       template <class T> failure(T /*unused*/)->failure<T>;
       failure()->failure<void>;
 
-      // A constexpr error code category
-      struct cgeneric_category
-      {
-        const std::error_category &(*category)(){std::generic_category};
-      };
-      // A constexpr capable error code matching std::error_code with std::generic_category
-      template <class Category> class cerror_code;
-      template <> class cerror_code<cgeneric_category>
-      {
-        int _value;
-
-      public:
-        using category_type = cgeneric_category;
-
-        constexpr cerror_code()
-            : _value(0)
-        {
-        }
-        constexpr cerror_code(std::errc e)
-            : _value(static_cast<int>(e))
-        {
-        }
-        constexpr explicit operator bool() const noexcept { return _value != 0; }
-        constexpr void clear() { _value = 0; }
-        constexpr int value() const noexcept { return _value; }
-
-        const std::error_category &category() const noexcept { return category_type().category(); }
-        std::error_condition default_error_condition() const noexcept { return category().default_error_condition(value()); }
-        std::string message() const { return category().message(value()); }
-      };
-
-      namespace detail
-      {
-        // Test if type is a cerror_code
-        template <class T> struct is_cerror_code_t : std::false_type
-        {
-        };
-        template <class U> struct is_cerror_code_t<cerror_code<U>> : std::true_type
-        {
-        };
-        template <class T> static constexpr bool is_cerror_code_v = is_cerror_code_t<T>::value;
-      }
-
       // Thrown when you try to access state in a `result<R, S>` which isn't present.
       class WG21_EXPERIMENTAL_RESULT_SYMBOL_VISIBLE bad_result_access : public std::logic_error
       {
@@ -166,12 +141,24 @@ namespace std
       2. Due to `std::optional`, standard layout of `result<T>` is not propagated from `T` as per the spec.
       3. `value()` and `assume_value()` should return `void` when `R` is `void`, not `_void_type`.
       */
-      template <class R, class S = std::error_code>             //
-      requires(std::is_default_constructible_v<S>               //
-               && (std::is_base_of_v<std::error_code, S>        //
-                   || std::is_base_of_v<std::exception_ptr, S>  //
-                   || detail::is_cerror_code_v<S>)              //
-               )                                                //
+      template <class R, class S = std::error_code>               //
+      requires(                                                   //
+      (!std::is_reference_v<R>                                    //
+       && !std::is_same_v<nullopt_t, std::decay_t<R>>             //
+       && !std::is_same_v<in_place_t, std::decay_t<R>>            //
+       && !detail::is_in_place_type_v<std::decay_t<R>>            //
+       && !std::is_array_v<R>                                     //
+       && (std::is_void_v<R> || (std::is_object_v<R>              //
+                                 && std::is_destructible_v<R>) )  //
+       ) &&
+      (std::is_default_constructible_v<S>               //
+       && !std::is_reference_v<S>                       //
+       && (std::is_base_of_v<std::error_code, S>        //
+           || std::is_base_of_v<std::exception_ptr, S>  //
+           || std::is_error_code_enum_v<S>              //
+           || std::is_error_condition_enum_v<S>)        //
+       )                                                //
+      )                                                 //
       class[[nodiscard]] result
       {
         template <class T, class U> friend class result;
@@ -184,12 +171,10 @@ namespace std
         static constexpr bool _implicit_constructors_enabled =  //
         !std::is_constructible_v<value_type, error_type>        //
         && !std::is_constructible_v<error_type, value_type>;
-        struct _void_type
-        {
-        };
-        template <class T> using _devoid = std::conditional_t<std::is_void_v<T>, _void_type, T>;
+        template <class T> using _devoid = std::conditional_t<std::is_void_v<T>, detail::void_type, T>;
         using _value_type = _devoid<value_type>;
 
+        // All the deviations from proposed spec stem from the use of std::optional here, but it's close enough
         std::optional<_value_type> _value;
         error_type _error;
 
@@ -211,12 +196,12 @@ namespace std
         {
         }
         // Implicit in place construction, disables if ambiguous
-        template <class A, class... Args>                                                                                   //
-        requires(_implicit_constructors_enabled                                                                             //
-                 && (sizeof...(Args) > 0 || (!std::is_same_v<result, std::decay_t<A>> && !detail::is_in_place_type_v<A>) )  //
-                 && std::is_constructible_v<value_type, A, Args...>                                                         //
-                 && !std::is_constructible_v<error_type, A, Args...>)                                                       //
-        constexpr result(A && a, Args && ... args) noexcept(std::is_nothrow_constructible_v<value_type, A, Args...>)        //
+        template <class A, class... Args>                                                                                                 //
+        requires(_implicit_constructors_enabled                                                                                           //
+                 && (sizeof...(Args) > 0 || (!std::is_same_v<result, std::decay_t<A>> && !detail::is_in_place_type_v<std::decay_t<A>>) )  //
+                 && std::is_constructible_v<value_type, A, Args...>                                                                       //
+                 && !std::is_constructible_v<error_type, A, Args...>)                                                                     //
+        constexpr result(A && a, Args && ... args) noexcept(std::is_nothrow_constructible_v<value_type, A, Args...>)                      //
         : result(std::in_place_type<value_type>, std::forward<A>(a), std::forward<Args>(args)...)
         {
         }
@@ -247,12 +232,12 @@ namespace std
         {
         }
         // Implicit in place construction, disables if ambiguous
-        template <class A, class... Args>                                                                                   //
-        requires(_implicit_constructors_enabled                                                                             //
-                 && (sizeof...(Args) > 0 || (!std::is_same_v<result, std::decay_t<A>> && !detail::is_in_place_type_v<A>) )  //
-                 && std::is_constructible_v<error_type, A, Args...>                                                         //
-                 && !std::is_constructible_v<value_type, A, Args...>)                                                       //
-        constexpr result(A && a, Args && ... args) noexcept(std::is_nothrow_constructible_v<error_type, A, Args...>)        //
+        template <class A, class... Args>                                                                                                 //
+        requires(_implicit_constructors_enabled                                                                                           //
+                 && (sizeof...(Args) > 0 || (!std::is_same_v<result, std::decay_t<A>> && !detail::is_in_place_type_v<std::decay_t<A>>) )  //
+                 && std::is_constructible_v<error_type, A, Args...>                                                                       //
+                 && !std::is_constructible_v<value_type, A, Args...>)                                                                     //
+        constexpr result(A && a, Args && ... args) noexcept(std::is_nothrow_constructible_v<error_type, A, Args...>)                      //
         : result(std::in_place_type<error_type>, std::forward<A>(a), std::forward<Args>(args)...)
         {
         }

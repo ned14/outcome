@@ -47,6 +47,8 @@ As per the Boost peer review feedback, v2 Outcome has been pared down to
 no more than the barest of bare essentials. The plan is to occupy the lowest
 level in a generalised [C++ Monadic interface (P0650R0)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0650r0.pdf)
 as an adjunct to the [primary C++ monad object Expected (P0323R2)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0323r2.pdf).
+You can find a reference implemenetation for the proposed standardised Result
+at https://github.com/ned14/outcome/tree/develop/include/outcome/experimental/.
 
 - Major changes:
    - You can now customise types directly, so `result<T, EC =
@@ -54,12 +56,14 @@ as an adjunct to the [primary C++ monad object Expected (P0323R2)](http://www.op
    std::exception_ptr>`.
    - Default construction no longer permitted.
    - Empty state no longer possible.
-   - Variant storage gone, it's now an aggregate. This enables returning
+   - Variant storage gone, it's now a standard layout type. This enables returning
    an error code with additional exception ptr as per Peter Dimov's
    request. It also very considerably simplifies implementation.
      - You can choose between a payload type `P` or an exception ptr
      `E`, so  an error code with additional arbitrary non-exception ptr
      payload `P` is also possible.
+     - C interoperability is now available, and some C macros for
+     working with `struct result_TYPE` are available in result.h.
    - Concepts TS is used when available, otherwise a partial
    SFINAE-based emulation is used.
    - Types `EC`, `P` and `E` must be default constructible. `T` need not
@@ -70,6 +74,8 @@ as an adjunct to the [primary C++ monad object Expected (P0323R2)](http://www.op
    construction is achieved via `in_place_type<T>` tagging. Explicit
    conversion construction also works, we replicate `std::variant`'s
    value semantics very closely despite not having variant storage.
+   - New type sugar types `success<T>`, `failure<EC, E>` for being
+   explicit about which kind of `result` or `outcome` we are constructing.
    - `.has_value()`, `.has_error()` and `.has_exception()` now only
    return true if that specific member is present. A new
    `.has_failure()` is true if errored or excepted.
@@ -104,8 +110,6 @@ as an adjunct to the [primary C++ monad object Expected (P0323R2)](http://www.op
    ADL customisation points you can easily implement your own. There is
    a worked example at
    https://github.com/ned14/outcome/blob/develop/example/error_code_extended.cpp.
-   **WARNING**: Any interfaces used in that example which refer to a
-   `detail` namespace are going to change in the near future.
    - Any operators apart from boolean test, strict equality and
    inequality comparison.
    - Any ability to change state after construction.
@@ -118,7 +122,7 @@ as an adjunct to the [primary C++ monad object Expected (P0323R2)](http://www.op
  - Stuff retained:
    - `OUTCOME_TRY`, `OUTCOME_TRYV`, `OUTCOME_TRYX` all work as before.
    - `noexcept` propagation from types chosen works correctly.
-   - Triviality of construction, assignment and destruction from types
+   - Triviality of copy, move and destruction from types
    chosen is propagated correctly.
    - v1 unit test has been almost entirely ported over to v2 without
    much change other than what was needed. Porting v1 based code to v2
@@ -128,8 +132,7 @@ as an adjunct to the [primary C++ monad object Expected (P0323R2)](http://www.op
    - Type traits now work direct on all member functions. Member
    variable traits are no longer necessary, and so have been removed.
    - Outcome v2 now conforms in every way to a typical STL vocabulary
-   type. No unusual design tradeoffs or changes. v2 ought to be
-   immediately standardisable into C++ as-is in v2 without controversy.
+   type. No unusual design tradeoffs or changes.
 
  - Stuff lost:
    - Outcome v2 needs a much newer compiler than before: clang 4 or

@@ -212,16 +212,28 @@ namespace detail
   template <class value_type, class status_error_type, class error_type, class payload_exception_type, class payload_type, class exception_type> struct outcome_predicates
   {
     using result = result_predicates<value_type, status_error_type, error_type>;
+    // Predicate for the implicit constructors to be available
+    static constexpr bool implicit_constructors_enabled =                        //
+    !std::is_constructible<value_type, status_error_type>::value                 //
+    && !std::is_constructible<value_type, payload_exception_type>::value         //
+    && !std::is_constructible<status_error_type, value_type>::value              //
+    && !std::is_constructible<status_error_type, payload_exception_type>::value  //
+    && !std::is_constructible<payload_exception_type, value_type>::value         //
+    && !std::is_constructible<payload_exception_type, status_error_type>::value;
 
     // Predicate for the value converting constructor to be available.
     template <class T>
-    static constexpr bool enable_value_converting_constructor = result::template enable_value_converting_constructor<T>  //
-                                                                && !std::is_constructible<exception_type, T>::value;
+    static constexpr bool enable_value_converting_constructor =  //
+    implicit_constructors_enabled                                //
+    &&result::template enable_value_converting_constructor<T>    //
+    && !std::is_constructible<exception_type, T>::value;
 
     // Predicate for the error converting constructor to be available.
     template <class T>
-    static constexpr bool enable_error_converting_constructor = result::template enable_error_converting_constructor<T>  //
-                                                                && !std::is_constructible<payload_exception_type, T>::value;
+    static constexpr bool enable_error_converting_constructor =  //
+    implicit_constructors_enabled                                //
+    &&result::template enable_error_converting_constructor<T>    //
+    && !std::is_constructible<payload_exception_type, T>::value;
 
     // Predicate for the error + payload/exception constructor to be available.
     template <class T, class U>
@@ -238,7 +250,8 @@ namespace detail
     // Predicate for the exception converting constructor to be available.
     template <class T>
     static constexpr bool enable_exception_converting_constructor =  //
-    !is_in_place_type_t<std::decay_t<T>>::value                      // not in place construction
+    implicit_constructors_enabled                                    //
+    && !is_in_place_type_t<std::decay_t<T>>::value                   // not in place construction
     && !std::is_constructible<value_type, T>::value && !std::is_constructible<status_error_type, T>::value && detail::is_same_or_constructible<exception_type, T>;
 
     // Predicate for the converting copy constructor from a compatible outcome to be available.
@@ -269,7 +282,9 @@ namespace detail
     std::is_constructible<exception_type, Args...>::value,                                                                                                                                                                        //
     exception_type,                                                                                                                                                                                                               //
     disable_inplace_value_error_exception_constructor>>>>;
-    template <class... Args> static constexpr bool enable_inplace_value_error_exception_constructor = !std::is_same<choose_inplace_value_error_exception_constructor<Args...>, disable_inplace_value_error_exception_constructor>::value;
+    template <class... Args>
+    static constexpr bool enable_inplace_value_error_exception_constructor =  //
+    implicit_constructors_enabled && !std::is_same<choose_inplace_value_error_exception_constructor<Args...>, disable_inplace_value_error_exception_constructor>::value;
   };
 
   struct enable_payload_from_failure
@@ -969,7 +984,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, U, void>))
   constexpr outcome(failure_type<T, U> &&o) noexcept(std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<exception_type, U>::value)
       : base(in_place_type<typename base::_error_type>, std::move(detail::extract_error_from_failure<error_type>(std::move(o))))
-      , _ptr(std::move(detail::extract_exception_payload_from_failure<exception_type>(std::move(o))))
+      , _ptr(std::move(detail::extract_exception_payload_from_failure<decltype(_ptr)>(std::move(o))))
   {
     using namespace hooks;
     hook_outcome_move_construction(in_place_type<decltype(o)>, this);
@@ -991,7 +1006,18 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   && noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<U>>()))  //
   && noexcept(detail::safe_compare_equal(std::declval<detail::devoid<P>>(), std::declval<detail::devoid<V>>())))
   {
-    return base::operator==(o) && detail::safe_compare_equal(this->_ptr, o._ptr);
+    if(this->_state._status == o._state._status)
+    {
+      if(!base::operator==(o))
+      {
+        return false;
+      }
+      if((this->_state._status & detail::status_have_exception) || (this->_state._status & detail::status_have_payload))
+      {
+        return detail::safe_compare_equal(this->_ptr, o._ptr);
+      }
+    }
+    return true;
   }
   /*! True if equal to the failure type sugar.
   \param o The failure type sugar to compare to.
@@ -1006,9 +1032,16 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   {
     if(!(this->_state._status & detail::status_have_payload))
       return false;
-    if(!detail::safe_compare_equal(this->_error, o.error))
-      return false;
-    return detail::safe_compare_equal(this->_ptr, o.payload);
+    if(this->_state._status & detail::status_have_error)
+    {
+      if(!detail::safe_compare_equal(this->_error, o.error))
+        return false;
+    }
+    if((this->_state._status & detail::status_have_exception) || (this->_state._status & detail::status_have_payload))
+    {
+      return detail::safe_compare_equal(this->_ptr, o.payload);
+    }
+    return true;
   }
   /*! True if equal to the failure type sugar.
   \param o The failure type sugar to compare to.
@@ -1023,9 +1056,16 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   {
     if(!(this->_state._status & detail::status_have_exception))
       return false;
-    if(!detail::safe_compare_equal(this->_error, o.error))
-      return false;
-    return detail::safe_compare_equal(this->_ptr, o.exception);
+    if(this->_state._status & detail::status_have_error)
+    {
+      if(!detail::safe_compare_equal(this->_error, o.error))
+        return false;
+    }
+    if((this->_state._status & detail::status_have_exception) || (this->_state._status & detail::status_have_payload))
+    {
+      return detail::safe_compare_equal(this->_ptr, o.exception);
+    }
+    return true;
   }
   /*! True if not equal to the other outcome.
   \param o The other outcome to compare to.
@@ -1040,7 +1080,19 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   && noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<U>>()))  //
   && noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<P>>(), std::declval<detail::devoid<V>>())))
   {
-    return base::operator!=(o) || detail::safe_compare_notequal(this->_ptr, o._ptr);
+    if(this->_state._status != o._state._status)
+    {
+      return true;
+    }
+    if(base::operator!=(o))
+    {
+      return true;
+    }
+    if((this->_state._status & detail::status_have_exception) || (this->_state._status & detail::status_have_payload))
+    {
+      return detail::safe_compare_notequal(this->_ptr, o._ptr);
+    }
+    return false;
   }
   /*! True if not equal to the failure type sugar.
   \param o The failure type sugar to compare to.
@@ -1054,10 +1106,21 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   && noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<P>>(), std::declval<detail::devoid<U>>())))
   {
     if(!(this->_state._status & detail::status_have_payload))
+    {
       return true;
-    if(detail::safe_compare_notequal(this->_error, o.error))
-      return true;
-    return detail::safe_compare_notequal(this->_ptr, o.payload);
+    }
+    if(this->_state._status & detail::status_have_error)
+    {
+      if(detail::safe_compare_notequal(this->_error, o.error))
+      {
+        return true;
+      }
+    }
+    if((this->_state._status & detail::status_have_exception) || (this->_state._status & detail::status_have_payload))
+    {
+      return detail::safe_compare_notequal(this->_ptr, o.payload);
+    }
+    return false;
   }
   /*! True if not equal to the failure type sugar.
   \param o The failure type sugar to compare to.
@@ -1071,10 +1134,21 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   && noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<P>>(), std::declval<detail::devoid<U>>())))
   {
     if(!(this->_state._status & detail::status_have_exception))
+    {
       return true;
-    if(detail::safe_compare_notequal(this->_error, o.error))
-      return true;
-    return detail::safe_compare_notequal(this->_ptr, o.exception);
+    }
+    if(this->_state._status & detail::status_have_error)
+    {
+      if(detail::safe_compare_notequal(this->_error, o.error))
+      {
+        return true;
+      }
+    }
+    if((this->_state._status & detail::status_have_exception) || (this->_state._status & detail::status_have_payload))
+    {
+      return detail::safe_compare_notequal(this->_ptr, o.exception);
+    }
+    return false;
   }
 
   /// \output_section Swap

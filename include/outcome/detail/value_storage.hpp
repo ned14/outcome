@@ -74,8 +74,13 @@ namespace detail
   static constexpr status_bitfield_type status_have_value = (1 << 0);
   static constexpr status_bitfield_type status_have_error = (1 << 1);
   static constexpr status_bitfield_type status_have_status = (1 << 2);
-  static constexpr status_bitfield_type status_have_payload = (1 << 3);
-  static constexpr status_bitfield_type status_have_exception = (1 << 4);
+  // bit 3 unused
+  static constexpr status_bitfield_type status_error_is_errno = (1 << 4);  // can errno be set from this error?
+  static constexpr status_bitfield_type status_have_payload = (1 << 5);
+  static constexpr status_bitfield_type status_have_exception = (1 << 6);
+  // bit 7 unused
+  // bits 8-15 unused
+  // bits 16-31 used for user supplied 16 bit value
   static constexpr status_bitfield_type status_2byte_shift = 16;
   static constexpr status_bitfield_type status_2byte_mask = (0xffffU << status_2byte_shift);
 
@@ -212,7 +217,21 @@ namespace detail
     }
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
+    constexpr explicit value_storage_nontrivial(const value_storage_trivial<U> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
+        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, o._value) : value_storage_nontrivial())
+    {
+      _status = o._status;
+    }
+    OUTCOME_TEMPLATE(class U)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_nontrivial(value_storage_nontrivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
+        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, std::move(o._value)) : value_storage_nontrivial())
+    {
+      _status = o._status;
+    }
+    OUTCOME_TEMPLATE(class U)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
+    constexpr explicit value_storage_nontrivial(value_storage_trivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
         : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, std::move(o._value)) : value_storage_nontrivial())
     {
       _status = o._status;

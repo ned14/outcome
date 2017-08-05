@@ -31,14 +31,14 @@ BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended"
   static_assert(trait::is_exception_ptr<std::exception_ptr>::value, "Trait for detecting exception_ptr is broken");
 
   static_assert(std::is_constructible<outcome<long>, int>::value, "Sanity check that monad can be constructed from a value_type");
-  static_assert(std::is_constructible<outcome<outcome<long>>, int>::value, "Sanity check that outer monad can be constructed from an inner monad's value_type");
-  static_assert(std::is_constructible<outcome<outcome<outcome<long>>>, int>::value, "Sanity check that outer monad can be constructed from an inner inner monad's value_type");
-  static_assert(std::is_constructible<outcome<outcome<outcome<outcome<long>>>>, int>::value, "Sanity check that outer monad can be constructed from an inner inner monad's value_type");
+  static_assert(!std::is_constructible<outcome<outcome<long>>, int>::value, "Sanity check that outer monad can be constructed from an inner monad's value_type");
+  static_assert(!std::is_constructible<outcome<outcome<outcome<long>>>, int>::value, "Sanity check that outer monad can be constructed from an inner inner monad's value_type");
+  static_assert(!std::is_constructible<outcome<outcome<outcome<outcome<long>>>>, int>::value, "Sanity check that outer monad can be constructed from an inner inner monad's value_type");
 
   static_assert(std::is_constructible<outcome<int>, outcome<long>>::value, "Sanity check that compatible monads can be constructed from one another");
   static_assert(std::is_constructible<outcome<outcome<int>>, outcome<long>>::value, "Sanity check that outer monad can be constructed from a compatible monad");
   static_assert(std::is_constructible<outcome<outcome<outcome<int>>>, outcome<long>>::value, "Sanity check that outer monad can be constructed from a compatible monad up to two nestings deep");
-  static_assert(std::is_constructible<outcome<outcome<outcome<outcome<int>>>>, outcome<long>>::value, "Sanity check that outer monad can be constructed from a compatible monad three or more nestings deep");
+  static_assert(!std::is_constructible<outcome<outcome<outcome<outcome<int>>>>, outcome<long>>::value, "Sanity check that outer monad can be constructed from a compatible monad three or more nestings deep");
   static_assert(!std::is_constructible<outcome<std::string>, outcome<int>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
 
   static_assert(std::is_constructible<outcome<int>, outcome<void>>::value, "Sanity check that all monads can be constructed from a void monad");

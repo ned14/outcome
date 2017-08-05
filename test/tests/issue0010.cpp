@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(issues / 10, "Expected's operator->(), operator*() and .err
   BOOST_CHECK(!n.has_value());
   // These should behave as expected (!)
   BOOST_CHECK_NO_THROW(p.value());
-  BOOST_CHECK_THROW(n.value(), const udt2 &);
+  BOOST_CHECK_THROW(n.value(), const bad_result_access &);
   // And state is not destroyed
   BOOST_CHECK(p.has_value() && *p.assume_value() == a);
   BOOST_CHECK(!n.has_value() && *n.assume_error() == b);

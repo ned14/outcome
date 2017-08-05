@@ -31,10 +31,10 @@ BOOST_AUTO_TEST_CASE(works / outcome / serialisation, "Tests that the outcome se
   std::cout << "a contains " << print(a) << " and b contains " << print(b) << " and c contains " << print(c) << std::endl;
 
   std::stringstream ss;
-  outcome<int, std::string, long> d(5);
+  outcome<int, std::string, long> d(success(5));
   ss << d;
   ss.seekg(0);
-  outcome<int, std::string, long> e("");
+  outcome<int, std::string, long> e(failure(""));
   ss >> e;
   BOOST_CHECK(d == e);
 }
