@@ -96,8 +96,26 @@ struct no_error_type
 
 namespace detail
 {
-  // True if type is the same or constructible
-  template <class T, class U, class... Args> static constexpr bool is_same_or_constructible = std::is_same<T, U>::value || std::is_constructible<T, U, Args...>::value;
+  /* True if type is the same or constructible. Works around a bug where clang + libstdc++
+  pukes on std::is_constructible<filesystem::path, void> (this bug is fixed upstream).
+  */
+  template <class T, class U, class... Args> struct _is_same_or_constructible
+  {
+    static constexpr bool value = std::is_constructible<T, U, Args...>::value;
+  };
+  template <class T> struct _is_same_or_constructible<T, T>
+  {
+    static constexpr bool value = true;
+  };
+  template <class T> struct _is_same_or_constructible<T, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <> struct _is_same_or_constructible<void, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <class T, class U, class... Args> static constexpr bool is_same_or_constructible = _is_same_or_constructible<T, U>::value;
 // True if type is nothrow swappable
 #if !defined(STANDARDESE_IS_IN_THE_HOUSE) && __cplusplus >= 201700
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
@@ -1177,9 +1195,9 @@ namespace detail
   template <class value_type, class status_error_type, class error_type> struct result_predicates
   {
     // Predicate for the implicit constructors to be available
-    static constexpr bool implicit_constructors_enabled =                                                                  //
-    (std::is_same<bool, std::decay_t<value_type>>::value || !std::is_constructible<value_type, status_error_type>::value)  //
-    && !std::is_constructible<status_error_type, value_type>::value;
+    static constexpr bool implicit_constructors_enabled =                                                              //
+    (std::is_same<bool, std::decay_t<value_type>>::value || !is_same_or_constructible<value_type, status_error_type>)  //
+    &&!is_same_or_constructible<status_error_type, value_type>;
 
     // Predicate for the value converting constructor to be available.
     template <class T>
