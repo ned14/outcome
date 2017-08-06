@@ -887,9 +887,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF e9f675c6b88dc35c5a878f8cea870b83e7f3d28f
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-07-15 17:09:37 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE e9f675c6
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF b271c38263ed2202f093b918ce4a1081027df3e8
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-08-03 23:44:12 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE b271c382
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
 
@@ -1404,9 +1404,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 685ba575d7f97c15ce2ef53fc21390bbad13b73b
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-08-05 15:49:42 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 685ba575
+#define OUTCOME_PREVIOUS_COMMIT_REF 3f75c63fe549d4023febbdf750f6ea67f793c0ff
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-08-05 16:48:20 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 3f75c63f
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -3802,7 +3802,7 @@ namespace detail
   {
     // Predicate for the implicit constructors to be available
     static constexpr bool implicit_constructors_enabled = //
-    !std::is_constructible<value_type, status_error_type>::value //
+    (std::is_same<bool, std::decay_t<value_type>>::value || !std::is_constructible<value_type, status_error_type>::value) //
     && !std::is_constructible<status_error_type, value_type>::value;
 
     // Predicate for the value converting constructor to be available.
@@ -4838,8 +4838,8 @@ namespace detail
     using result = result_predicates<value_type, status_error_type, error_type>;
     // Predicate for the implicit constructors to be available
     static constexpr bool implicit_constructors_enabled = //
-    !std::is_constructible<value_type, status_error_type>::value //
-    && !std::is_constructible<value_type, payload_exception_type>::value //
+    (std::is_same<bool, std::decay_t<value_type>>::value || !std::is_constructible<value_type, status_error_type>::value) //
+    && (std::is_same<bool, std::decay_t<value_type>>::value || !std::is_constructible<value_type, payload_exception_type>::value) //
     && !std::is_constructible<status_error_type, value_type>::value //
     && !std::is_constructible<status_error_type, payload_exception_type>::value //
     && !std::is_constructible<payload_exception_type, value_type>::value //

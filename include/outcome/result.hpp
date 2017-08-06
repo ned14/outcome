@@ -1177,8 +1177,8 @@ namespace detail
   template <class value_type, class status_error_type, class error_type> struct result_predicates
   {
     // Predicate for the implicit constructors to be available
-    static constexpr bool implicit_constructors_enabled =         //
-    !std::is_constructible<value_type, status_error_type>::value  //
+    static constexpr bool implicit_constructors_enabled =                                                                  //
+    (std::is_same<bool, std::decay_t<value_type>>::value || !std::is_constructible<value_type, status_error_type>::value)  //
     && !std::is_constructible<status_error_type, value_type>::value;
 
     // Predicate for the value converting constructor to be available.

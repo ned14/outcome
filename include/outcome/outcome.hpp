@@ -213,12 +213,12 @@ namespace detail
   {
     using result = result_predicates<value_type, status_error_type, error_type>;
     // Predicate for the implicit constructors to be available
-    static constexpr bool implicit_constructors_enabled =                        //
-    !std::is_constructible<value_type, status_error_type>::value                 //
-    && !std::is_constructible<value_type, payload_exception_type>::value         //
-    && !std::is_constructible<status_error_type, value_type>::value              //
-    && !std::is_constructible<status_error_type, payload_exception_type>::value  //
-    && !std::is_constructible<payload_exception_type, value_type>::value         //
+    static constexpr bool implicit_constructors_enabled =                                                                          //
+    (std::is_same<bool, std::decay_t<value_type>>::value || !std::is_constructible<value_type, status_error_type>::value)          //
+    && (std::is_same<bool, std::decay_t<value_type>>::value || !std::is_constructible<value_type, payload_exception_type>::value)  //
+    && !std::is_constructible<status_error_type, value_type>::value                                                                //
+    && !std::is_constructible<status_error_type, payload_exception_type>::value                                                    //
+    && !std::is_constructible<payload_exception_type, value_type>::value                                                           //
     && !std::is_constructible<payload_exception_type, status_error_type>::value;
 
     // Predicate for the value converting constructor to be available.

@@ -168,9 +168,9 @@ namespace std
         using error_type = S;
 
       protected:
-        static constexpr bool _implicit_constructors_enabled =  //
-        !std::is_constructible_v<value_type, error_type>        //
-        && !std::is_constructible_v<error_type, value_type>;
+        static constexpr bool _implicit_constructors_enabled =                                                //
+        (std::is_same_v<bool, std::decay_t<value_type>> || !std::is_constructible_v<value_type, error_type>)  //
+        &&!std::is_constructible_v<error_type, value_type>;
         template <class T> using _devoid = std::conditional_t<std::is_void_v<T>, detail::void_type, T>;
         using _value_type = _devoid<value_type>;
 
