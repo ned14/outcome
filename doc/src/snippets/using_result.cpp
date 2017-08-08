@@ -106,25 +106,35 @@ outcome::result<void> print_half(const std::string& text);
 //! [half_impl]
 outcome::result<void> print_half(const std::string& text)
 {
-    if (outcome::result<int> r = convert(text))
+    if (outcome::result<int> r = convert(text))         // #1
     {
-        std::cout << (r.value() / 2) << std::endl;
+        std::cout << (r.value() / 2) << std::endl;      // #2
     }
     else
     {
-        if (r.error() == ConversionErrc::TooLong)
+        if (r.error() == ConversionErrc::TooLong)       // #3 
         {
-            OUTCOME_TRY (i, BigInt::fromString(text));
+            OUTCOME_TRY (i, BigInt::fromString(text));  // #4
             std::cout << i.half() << std::endl;
         }
         else
         {
-            return r.error();
+            return r.as_failure();                      // #5
         }
     }
-    return outcome::success();  
+    return outcome::success();                          // #6
 }
 //! [half_impl]
+
+//! [tryv]
+outcome::result<void> test()
+{
+  OUTCOME_TRYV (print_half("2"));
+  OUTCOME_TRYV (print_half("X"));
+  OUTCOME_TRYV (print_half("4")); // will not execute
+  return outcome::success();
+}
+//! [tryv]
 
 int main()
 {
@@ -136,4 +146,6 @@ int main()
   {
       std::cout << r.error() << std::endl; 
   }
+  
+  (void)test();
 }
