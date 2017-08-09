@@ -42,8 +42,8 @@ BOOST_AUTO_TEST_CASE(issues / 59, "result<NonMovable> supported?")
   };
   const char *niall = "niall";
   auto f = [niall]() -> result<void> {
-    result<udt> n(in_place_type<udt>, niall);
-    OUTCOME_TRY(v, n);  // this must never copy nor move
+    auto g = [niall]() -> result<udt> { return {niall}; };
+    OUTCOME_TRY(v, g());  // this must never copy nor move
     BOOST_CHECK(*v == niall);
     return success();
   };

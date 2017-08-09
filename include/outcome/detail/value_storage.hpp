@@ -35,7 +35,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
-#if __cplusplus >= 201700
+#if __cplusplus >= 201700 || _HAS_CXX17
 template <class T> using in_place_type_t = std::in_place_type_t<T>;
 using std::in_place_type;
 #else
