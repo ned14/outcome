@@ -220,7 +220,7 @@ namespace std
           _error()
         {
         }
-        constexpr result(const success<void> &v) noexcept : _value(_void_type{}), _error() {}
+        constexpr result(const success<void> &v) noexcept : _value(detail::void_type{}), _error() {}
 
         // Explicit in place construction
         template <class... Args>                                                       //

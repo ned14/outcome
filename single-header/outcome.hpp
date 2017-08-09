@@ -1404,9 +1404,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 3f75c63fe549d4023febbdf750f6ea67f793c0ff
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-08-05 16:48:20 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 3f75c63f
+#define OUTCOME_PREVIOUS_COMMIT_REF 20c995dc72e896bdf3cdb62b3b1691d51021c600
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-08-06 01:13:12 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 20c995dc
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1796,7 +1796,7 @@ OUTCOME_V2_NAMESPACE_END
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
-#if __cplusplus >= 201700
+#if __cplusplus >= 201700 || _HAS_CXX17
 template <class T> using in_place_type_t = std::in_place_type_t<T>;
 using std::in_place_type;
 #else
@@ -2544,8 +2544,28 @@ struct no_error_type
 
 namespace detail
 {
-  // True if type is the same or constructible
-  template <class T, class U, class... Args> static constexpr bool is_same_or_constructible = std::is_same<T, U>::value || std::is_constructible<T, U, Args...>::value;
+  /* True if type is the same or constructible. Works around a bug where clang + libstdc++
+  pukes on std::is_constructible<filesystem::path, void> (this bug is fixed upstream).
+  */
+
+
+  template <class T, class U, class... Args> struct _is_same_or_constructible
+  {
+    static constexpr bool value = std::is_constructible<T, U, Args...>::value;
+  };
+  template <class T> struct _is_same_or_constructible<T, T>
+  {
+    static constexpr bool value = true;
+  };
+  template <class T> struct _is_same_or_constructible<T, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <> struct _is_same_or_constructible<void, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <class T, class U, class... Args> static constexpr bool is_same_or_constructible = _is_same_or_constructible<T, U>::value;
 // True if type is nothrow swappable
 #if !0 && __cplusplus >= 201700
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
@@ -3802,8 +3822,8 @@ namespace detail
   {
     // Predicate for the implicit constructors to be available
     static constexpr bool implicit_constructors_enabled = //
-    (std::is_same<bool, std::decay_t<value_type>>::value || !std::is_constructible<value_type, status_error_type>::value) //
-    && !std::is_constructible<status_error_type, value_type>::value;
+    (std::is_same<bool, std::decay_t<value_type>>::value || !is_same_or_constructible<value_type, status_error_type>) //
+    &&!is_same_or_constructible<status_error_type, value_type>;
 
     // Predicate for the value converting constructor to be available.
     template <class T>
@@ -4838,12 +4858,12 @@ namespace detail
     using result = result_predicates<value_type, status_error_type, error_type>;
     // Predicate for the implicit constructors to be available
     static constexpr bool implicit_constructors_enabled = //
-    (std::is_same<bool, std::decay_t<value_type>>::value || !std::is_constructible<value_type, status_error_type>::value) //
-    && (std::is_same<bool, std::decay_t<value_type>>::value || !std::is_constructible<value_type, payload_exception_type>::value) //
-    && !std::is_constructible<status_error_type, value_type>::value //
-    && !std::is_constructible<status_error_type, payload_exception_type>::value //
-    && !std::is_constructible<payload_exception_type, value_type>::value //
-    && !std::is_constructible<payload_exception_type, status_error_type>::value;
+    (std::is_same<bool, std::decay_t<value_type>>::value || !is_same_or_constructible<value_type, status_error_type>) //
+    &&(std::is_same<bool, std::decay_t<value_type>>::value || !is_same_or_constructible<value_type, payload_exception_type>) //
+    &&!is_same_or_constructible<status_error_type, value_type> //
+    && !is_same_or_constructible<status_error_type, payload_exception_type> //
+    && !is_same_or_constructible<payload_exception_type, value_type> //
+    && !is_same_or_constructible<payload_exception_type, status_error_type>;
 
     // Predicate for the value converting constructor to be available.
     template <class T>
@@ -6783,11 +6803,11 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRY_GLUE(x, y) OUTCOME_TRY_GLUE2(x, y)
 #define OUTCOME_TRY_UNIQUE_NAME OUTCOME_TRY_GLUE(__t, __COUNTER__)
 
-#define OUTCOME_TRYV2(unique, m) decltype(auto) unique = (m); if(!unique.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(unique)>(unique))
+#define OUTCOME_TRYV2(unique, m) auto &&unique = (m); if(!unique.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(unique)>(unique))
 
 
 
-#define OUTCOME_TRY2(unique, v, m) OUTCOME_TRYV2(unique, m); decltype(auto) v = std::forward<decltype(unique)>(unique).value()
+#define OUTCOME_TRY2(unique, v, m) OUTCOME_TRYV2(unique, m); auto &&v = std::forward<decltype(unique)>(unique).value()
 
 
 
@@ -6817,7 +6837,7 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 
 
 
-#define OUTCOME_TRYX(m) ({ decltype(auto) res = (m); if(!res.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(res)>(res)); std::forward<decltype(res)>(res).value(); })
+#define OUTCOME_TRYX(m) ({ auto &&res = (m); if(!res.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(res)>(res)); std::forward<decltype(res)>(res).value(); })
 
 
 
