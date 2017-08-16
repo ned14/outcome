@@ -43,7 +43,7 @@ if(NOT PROJECT_IS_DEPENDENCY)
       add_partial_preprocess(outcome_hl-pp
                             "${CMAKE_CURRENT_SOURCE_DIR}/single-header/${PROJECT_NAME}.hpp"
                             "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}.hpp"
-                            -I .
+                            -I ..
                             --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
                             --passthru-comments --line-directive # --debug
                             -U QUICKCPPLIB_ENABLE_VALGRIND
