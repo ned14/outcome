@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include "../../include/outcome/iostream_support.hpp"
-#include "../quickcpplib/include/boost/test/unit_test.hpp"
+#include "quickcpplib/include/boost/test/unit_test.hpp"
 
 BOOST_AUTO_TEST_CASE(works / outcome / serialisation, "Tests that the outcome serialises and deserialises as intended")
 {

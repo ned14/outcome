@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include "../../include/outcome/outcome.hpp"
-#include "../quickcpplib/include/boost/test/unit_test.hpp"
+#include "quickcpplib/include/boost/test/unit_test.hpp"
 
 #ifdef __cpp_exceptions
 // std nothrow traits seem to return random values if exceptions are disabled on MSVC

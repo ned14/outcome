@@ -27,7 +27,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include <vector>
 
 #ifdef _WIN32
-#include "../quickcpplib/include/execinfo_win64.h"
+#include "quickcpplib/include/execinfo_win64.h"
 #endif
 
 //! [error_code_extended]

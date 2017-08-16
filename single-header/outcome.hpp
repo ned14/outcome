@@ -887,9 +887,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF b271c38263ed2202f093b918ce4a1081027df3e8
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-08-03 23:44:12 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE b271c382
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF a24674dfcb914b649bbbfe1981ffb155fc915efa
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-08-16 14:03:27 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE a24674df
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
 
@@ -987,16 +987,6 @@ extern "C" void _mm_pause();
 #elif !defined(__c2__) && defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
 #define QUICKCPPLIB_SMT_PAUSE __asm__ __volatile__("rep; nop" : : : "memory");
 #endif
-#endif
-
-// TO BE REMOVED SOON: C++ 14 constexpr macro
-#ifndef QUICKCPPLIB_CONSTEXPR
-#if __cpp_constexpr >= 201304 || _MSC_VER >= 1910
-#define QUICKCPPLIB_CONSTEXPR constexpr
-#endif
-#endif
-#ifndef QUICKCPPLIB_CONSTEXPR
-#define QUICKCPPLIB_CONSTEXPR
 #endif
 
 #ifndef QUICKCPPLIB_FORCEINLINE
@@ -1404,9 +1394,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 20c995dc72e896bdf3cdb62b3b1691d51021c600
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-08-06 01:13:12 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 20c995dc
+#define OUTCOME_PREVIOUS_COMMIT_REF d5af8b23e07c1140d97de8017d50ba97174a4e61
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-08-16 15:12:09 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE d5af8b23
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 

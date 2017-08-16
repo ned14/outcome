@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/result.h"
 #include "../../include/outcome/result.hpp"
 #endif
-#include "../quickcpplib/include/boost/test/unit_test.hpp"
+#include "quickcpplib/include/boost/test/unit_test.hpp"
 
 BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
 {
@@ -78,8 +78,10 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(!m);
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
-    // BOOST_CHECK(!m.has_exception());
+// BOOST_CHECK(!m.has_exception());
+#ifndef TESTING_WG21_EXPERIMENTAL_RESULT
     BOOST_CHECK_THROW(([&m]() -> void { return m.value(); }()), const std::system_error &);
+#endif
     BOOST_CHECK_NO_THROW(m.error());
   }
   {  // valued int

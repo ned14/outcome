@@ -32,7 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <_mingw.h>
 #endif
 
-#include "../quickcpplib/include/config.hpp"
+#include "quickcpplib/include/config.hpp"
 
 #ifndef __cpp_variadic_templates
 #error Outcome needs variadic template support in the compiler
@@ -82,7 +82,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #endif
 
-#include "../quickcpplib/include/import.h"
+#include "quickcpplib/include/import.h"
 
 #ifdef STANDARDESE_IS_IN_THE_HOUSE
 /*! The namespace configuration of this Outcome v2. Consists of a sequence
@@ -136,7 +136,7 @@ exported Outcome v2 namespace.
 
 #ifndef OUTCOME_DO_FATAL_EXIT
 #ifdef _WIN32
-#include "../quickcpplib/include/execinfo_win64.h"
+#include "quickcpplib/include/execinfo_win64.h"
 #else
 #include <execinfo.h>
 #endif
