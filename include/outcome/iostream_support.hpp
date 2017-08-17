@@ -89,6 +89,43 @@ namespace detail
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_constructible<std::error_code, T>::value))
   inline std::string safe_message(T && /*unused*/) { return {}; }
   inline std::string safe_message(const std::error_code &ec) { return " (" + ec.message() + ")"; }
+  template <bool is_exception> struct print_payload_exception
+  {
+    template <class R, class S, class P, class N> print_payload_exception(std::ostream &s, const outcome<R, S, P, N> &v)
+    {
+      if(v.has_payload())
+      {
+        s << v.payload();
+      }
+    }
+  };
+  template <> struct print_payload_exception<true>
+  {
+    template <class R, class S, class P, class N> print_payload_exception(std::ostream &s, const outcome<R, S, P, N> &v)
+    {
+      if(v.has_exception())
+      {
+#ifdef __cpp_exceptions
+        try
+        {
+          std::rethrow_exception(v.exception());
+        }
+        catch(const std::system_error &e)
+        {
+          s << "std::system_error code " << e.code() << ": " << e.what();
+        }
+        catch(const std::exception &e)
+        {
+          s << "std::exception: " << e.what();
+        }
+        catch(...)
+#endif
+        {
+          s << "unknown exception";
+        }
+      }
+    }
+  };
 }
 
 //! Deserialise a result
@@ -112,7 +149,7 @@ template <class R, class S, class P> inline std::ostream &operator<<(std::ostrea
   return s;
 }
 //! Debug print a result
-template <class R, class S, class P> inline std::string print(const result<R, S, P> &v)
+template <class R, class S, class P> inline std::string print(const impl::result_final<R, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -126,7 +163,7 @@ template <class R, class S, class P> inline std::string print(const result<R, S,
   return s.str();
 }
 //! Debug print a result
-template <class S, class P> inline std::string print(const result<void, S, P> &v)
+template <class S, class P> inline std::string print(const impl::result_final<void, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -140,7 +177,7 @@ template <class S, class P> inline std::string print(const result<void, S, P> &v
   return s.str();
 }
 //! Debug print a result
-template <class R, class P> inline std::string print(const result<R, void, P> &v)
+template <class R, class P> inline std::string print(const impl::result_final<R, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -154,7 +191,7 @@ template <class R, class P> inline std::string print(const result<R, void, P> &v
   return s.str();
 }
 //! Debug print a result
-template <class P> inline std::string print(const result<void, void, P> &v)
+template <class P> inline std::string print(const impl::result_final<void, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -207,48 +244,12 @@ template <class R, class S, class P, class N> inline std::string print(const out
   {
     s << "{ ";
   }
-  if(v.has_value())
-  {
-    s << v.value();
-  }
+  s << print(static_cast<const impl::result_final<R, S, N> &>(v));
   if(total > 1)
   {
     s << ", ";
   }
-  if(v.has_error())
-  {
-    s << v.error() << detail::safe_message(v.error());
-    ;
-  }
-  if(total > 1)
-  {
-    s << ", ";
-  }
-  if(v.has_payload())
-  {
-    s << v.has_payload();
-  }
-  else if(v.has_exception())
-  {
-#ifdef __cpp_exceptions
-    try
-    {
-      std::rethrow_exception(v.exception());
-    }
-    catch(const std::system_error &e)
-    {
-      s << "std::system_error code " << e.code() << ": " << e.what();
-    }
-    catch(const std::exception &e)
-    {
-      s << "std::exception: " << e.what();
-    }
-    catch(...)
-#endif
-    {
-      s << "unknown exception";
-    }
-  }
+  detail::print_payload_exception<trait::is_exception_ptr<P>::value>(s, v);
   if(total > 1)
   {
     s << " }";

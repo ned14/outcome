@@ -159,11 +159,6 @@ namespace impl
   template <class Base, class R, class S, class P, class NoValuePolicy> class outcome_failure_observers : public Base
   {
   public:
-    using Base::Base;
-  };
-  template <class Base, class R, class NoValuePolicy> class outcome_failure_observers<Base, R, std::error_code, std::exception_ptr, NoValuePolicy> : public Base
-  {
-  public:
     using exception_type = std::exception_ptr;
     using Base::Base;
 
@@ -301,7 +296,8 @@ namespace detail
 
   template <class Base, class R, class S, class P, class NoValuePolicy> using select_outcome_observers_payload_or_exception = std::conditional_t<trait::is_exception_ptr<P>::value, impl::outcome_exception_observers<Base, R, S, P, NoValuePolicy>, impl::outcome_payload_observers<Base, R, S, P, NoValuePolicy>>;
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl2 = select_outcome_observers_payload_or_exception<impl::result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>;
-  template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl = impl::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>;
+  template <class R, class S, class P, class NoValuePolicy>
+  using select_outcome_impl = std::conditional_t<std::is_base_of<std::error_code, S>::value && trait::is_exception_ptr<P>::value, impl::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>, select_outcome_impl2<R, S, P, NoValuePolicy>>;
 }
 
 namespace hooks
