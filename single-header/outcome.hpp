@@ -887,9 +887,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF a24674dfcb914b649bbbfe1981ffb155fc915efa
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-08-16 14:03:27 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE a24674df
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 451f0ee3eaf490903fa13b43feef2f0a512bbd59
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-08-23 03:07:06 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 451f0ee3
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
 
@@ -1394,9 +1394,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF d5af8b23e07c1140d97de8017d50ba97174a4e61
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-08-16 15:12:09 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE d5af8b23
+#define OUTCOME_PREVIOUS_COMMIT_REF 10a52a466bd42c28bb0ed0eaf97322a2ff3797a9
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-08-22 23:28:39 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 10a52a46
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -4788,11 +4788,6 @@ namespace impl
   template <class Base, class R, class S, class P, class NoValuePolicy> class outcome_failure_observers : public Base
   {
   public:
-    using Base::Base;
-  };
-  template <class Base, class R, class NoValuePolicy> class outcome_failure_observers<Base, R, std::error_code, std::exception_ptr, NoValuePolicy> : public Base
-  {
-  public:
     using exception_type = std::exception_ptr;
     using Base::Base;
 
@@ -4935,7 +4930,8 @@ namespace detail
 
   template <class Base, class R, class S, class P, class NoValuePolicy> using select_outcome_observers_payload_or_exception = std::conditional_t<trait::is_exception_ptr<P>::value, impl::outcome_exception_observers<Base, R, S, P, NoValuePolicy>, impl::outcome_payload_observers<Base, R, S, P, NoValuePolicy>>;
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl2 = select_outcome_observers_payload_or_exception<impl::result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>;
-  template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl = impl::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>;
+  template <class R, class S, class P, class NoValuePolicy>
+  using select_outcome_impl = std::conditional_t<std::is_base_of<std::error_code, S>::value && trait::is_exception_ptr<P>::value, impl::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>, select_outcome_impl2<R, S, P, NoValuePolicy>>;
 }
 
 namespace hooks
@@ -6129,13 +6125,36 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   */
 
 
-  auto as_failure() const & { return failure(this->assume_error(), _ptr); }
+  failure_type<error_type, payload_exception_type> as_failure() const &
+  {
+    if(this->has_error() && this->has_exception())
+    {
+      return OUTCOME_V2_NAMESPACE::failure(this->assume_error(), _ptr);
+    }
+    if(this->has_exception())
+    {
+      return OUTCOME_V2_NAMESPACE::failure(error_type(), _ptr);
+    }
+    return OUTCOME_V2_NAMESPACE::failure(this->assume_error(), payload_exception_type());
+  }
+
   /*! Returns this outcome as a `failure_type` with any errored and/or excepted state moved.
   \requires This outcome to have a failed state, else whatever `assume_error()` would do.
   */
 
 
-  auto as_failure() && { return failure(std::move(this->assume_error()), std::move(_ptr)); }
+  failure_type<error_type, payload_exception_type> as_failure() &&
+  {
+    if(this->has_error() && this->has_exception())
+    {
+      return OUTCOME_V2_NAMESPACE::failure(std::move(this->assume_error()), std::move(_ptr));
+    }
+    if(this->has_exception())
+    {
+      return OUTCOME_V2_NAMESPACE::failure(error_type(), std::move(_ptr));
+    }
+    return OUTCOME_V2_NAMESPACE::failure(std::move(this->assume_error()), payload_exception_type());
+  }
 };
 
 /*! True if the result is equal to the outcome
@@ -6551,6 +6570,43 @@ namespace detail
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_constructible<std::error_code, T>::value))
   inline std::string safe_message(T && /*unused*/) { return {}; }
   inline std::string safe_message(const std::error_code &ec) { return " (" + ec.message() + ")"; }
+  template <bool is_exception> struct print_payload_exception
+  {
+    template <class R, class S, class P, class N> print_payload_exception(std::ostream &s, const outcome<R, S, P, N> &v)
+    {
+      if(v.has_payload())
+      {
+        s << v.payload();
+      }
+    }
+  };
+  template <> struct print_payload_exception<true>
+  {
+    template <class R, class S, class P, class N> print_payload_exception(std::ostream &s, const outcome<R, S, P, N> &v)
+    {
+      if(v.has_exception())
+      {
+#ifdef __cpp_exceptions
+        try
+        {
+          std::rethrow_exception(v.exception());
+        }
+        catch(const std::system_error &e)
+        {
+          s << "std::system_error code " << e.code() << ": " << e.what();
+        }
+        catch(const std::exception &e)
+        {
+          s << "std::exception: " << e.what();
+        }
+        catch(...)
+#endif
+        {
+          s << "unknown exception";
+        }
+      }
+    }
+  };
 }
 
 //! Deserialise a result
@@ -6574,7 +6630,7 @@ template <class R, class S, class P> inline std::ostream &operator<<(std::ostrea
   return s;
 }
 //! Debug print a result
-template <class R, class S, class P> inline std::string print(const result<R, S, P> &v)
+template <class R, class S, class P> inline std::string print(const impl::result_final<R, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -6588,7 +6644,7 @@ template <class R, class S, class P> inline std::string print(const result<R, S,
   return s.str();
 }
 //! Debug print a result
-template <class S, class P> inline std::string print(const result<void, S, P> &v)
+template <class S, class P> inline std::string print(const impl::result_final<void, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -6602,7 +6658,7 @@ template <class S, class P> inline std::string print(const result<void, S, P> &v
   return s.str();
 }
 //! Debug print a result
-template <class R, class P> inline std::string print(const result<R, void, P> &v)
+template <class R, class P> inline std::string print(const impl::result_final<R, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -6616,7 +6672,7 @@ template <class R, class P> inline std::string print(const result<R, void, P> &v
   return s.str();
 }
 //! Debug print a result
-template <class P> inline std::string print(const result<void, void, P> &v)
+template <class P> inline std::string print(const impl::result_final<void, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -6669,48 +6725,12 @@ template <class R, class S, class P, class N> inline std::string print(const out
   {
     s << "{ ";
   }
-  if(v.has_value())
-  {
-    s << v.value();
-  }
+  s << print(static_cast<const impl::result_final<R, S, N> &>(v));
   if(total > 1)
   {
     s << ", ";
   }
-  if(v.has_error())
-  {
-    s << v.error() << detail::safe_message(v.error());
-    ;
-  }
-  if(total > 1)
-  {
-    s << ", ";
-  }
-  if(v.has_payload())
-  {
-    s << v.has_payload();
-  }
-  else if(v.has_exception())
-  {
-#ifdef __cpp_exceptions
-    try
-    {
-      std::rethrow_exception(v.exception());
-    }
-    catch(const std::system_error &e)
-    {
-      s << "std::system_error code " << e.code() << ": " << e.what();
-    }
-    catch(const std::exception &e)
-    {
-      s << "std::exception: " << e.what();
-    }
-    catch(...)
-#endif
-    {
-      s << "unknown exception";
-    }
-  }
+  detail::print_payload_exception<trait::is_exception_ptr<P>::value>(s, v);
   if(total > 1)
   {
     s << " }";

@@ -1195,11 +1195,34 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   /*! Returns this outcome as a `failure_type` with any errored and/or excepted state copied.
   \requires This outcome to have a failed state, else whatever `assume_error()` would do.
   */
-  auto as_failure() const & { return failure(this->assume_error(), _ptr); }
+  failure_type<error_type, payload_exception_type> as_failure() const &
+  {
+    if(this->has_error() && this->has_exception())
+    {
+      return OUTCOME_V2_NAMESPACE::failure(this->assume_error(), _ptr);
+    }
+    if(this->has_exception())
+    {
+      return OUTCOME_V2_NAMESPACE::failure(error_type(), _ptr);
+    }
+    return OUTCOME_V2_NAMESPACE::failure(this->assume_error(), payload_exception_type());
+  }
+
   /*! Returns this outcome as a `failure_type` with any errored and/or excepted state moved.
   \requires This outcome to have a failed state, else whatever `assume_error()` would do.
   */
-  auto as_failure() && { return failure(std::move(this->assume_error()), std::move(_ptr)); }
+  failure_type<error_type, payload_exception_type> as_failure() &&
+  {
+    if(this->has_error() && this->has_exception())
+    {
+      return OUTCOME_V2_NAMESPACE::failure(std::move(this->assume_error()), std::move(_ptr));
+    }
+    if(this->has_exception())
+    {
+      return OUTCOME_V2_NAMESPACE::failure(error_type(), std::move(_ptr));
+    }
+    return OUTCOME_V2_NAMESPACE::failure(std::move(this->assume_error()), payload_exception_type());
+  }
 };
 
 /*! True if the result is equal to the outcome
