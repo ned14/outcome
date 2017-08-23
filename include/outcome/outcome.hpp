@@ -1199,13 +1199,13 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   {
     if(this->has_error() && this->has_exception())
     {
-      return failure(this->assume_error(), _ptr);
+      return OUTCOME_V2_NAMESPACE::failure(this->assume_error(), _ptr);
     }
     if(this->has_exception())
     {
-      return failure(error_type(), _ptr);
+      return OUTCOME_V2_NAMESPACE::failure(error_type(), _ptr);
     }
-    return failure(this->assume_error(), payload_exception_type());
+    return OUTCOME_V2_NAMESPACE::failure(this->assume_error(), payload_exception_type());
   }
 
   /*! Returns this outcome as a `failure_type` with any errored and/or excepted state moved.
@@ -1215,13 +1215,13 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   {
     if(this->has_error() && this->has_exception())
     {
-      return failure(std::move(this->assume_error()), std::move(_ptr));
+      return OUTCOME_V2_NAMESPACE::failure(std::move(this->assume_error()), std::move(_ptr));
     }
     if(this->has_exception())
     {
-      return failure(error_type(), std::move(_ptr));
+      return OUTCOME_V2_NAMESPACE::failure(error_type(), std::move(_ptr));
     }
-    return failure(std::move(this->assume_error()), payload_exception_type());
+    return OUTCOME_V2_NAMESPACE::failure(std::move(this->assume_error()), payload_exception_type());
   }
 };
 
