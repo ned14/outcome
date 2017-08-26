@@ -1660,7 +1660,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
     But it turns out that ADL only fires on the first constructor for some reason.
     */
     using namespace hooks;
-    hook_result_in_place_construction(in_place_type<typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>>, this);
+    // hook_result_in_place_construction(in_place_type<typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>>, this);
   }
 
   /// \output_section Tagged constructors

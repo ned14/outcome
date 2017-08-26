@@ -903,7 +903,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
     But it turns out that ADL only fires on the first constructor for some reason.
     */
     using namespace hooks;
-    hook_outcome_in_place_construction(in_place_type<typename predicate::template choose_inplace_value_error_exception_constructor<A1, A2, Args...>>, this);
+    // hook_outcome_in_place_construction(in_place_type<typename predicate::template choose_inplace_value_error_exception_constructor<A1, A2, Args...>>, this);
   }
 
   /// \output_section Tagged constructors
