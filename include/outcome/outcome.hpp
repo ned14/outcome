@@ -899,6 +899,11 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   constexpr outcome(A1 &&a1, A2 &&a2, Args &&... args) noexcept(noexcept(typename predicate::template choose_inplace_value_error_exception_constructor<A1, A2, Args...>(std::declval<A1>(), std::declval<A2>(), std::declval<Args>()...)))
       : outcome(in_place_type<typename predicate::template choose_inplace_value_error_exception_constructor<A1, A2, Args...>>, std::forward<A1>(a1), std::forward<A2>(a2), std::forward<Args>(args)...)
   {
+    /* I was a little surprised that the below is needed given that we forward to another constructor.
+    But it turns out that ADL only fires on the first constructor for some reason.
+    */
+    using namespace hooks;
+    // hook_outcome_in_place_construction(in_place_type<typename predicate::template choose_inplace_value_error_exception_constructor<A1, A2, Args...>>, this);
   }
 
   /// \output_section Tagged constructors
@@ -964,6 +969,14 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(o))
       , _ptr(detail::extract_exception_payload_from_failure<exception_type>(o))
   {
+    if(this->_error == error_type())
+    {
+      this->_state._status &= ~detail::status_have_error;
+    }
+    if(_ptr != exception_type())
+    {
+      this->_state._status |= detail::status_have_exception;
+    }
     using namespace hooks;
     hook_outcome_copy_construction(in_place_type<decltype(o)>, this);
   }
@@ -982,6 +995,14 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(in_place_type<typename base::_error_type>, std::move(detail::extract_error_from_failure<error_type>(std::move(o))))
       , _ptr(std::move(detail::extract_exception_payload_from_failure<decltype(_ptr)>(std::move(o))))
   {
+    if(this->_error == error_type())
+    {
+      this->_state._status &= ~detail::status_have_error;
+    }
+    if(_ptr != exception_type())
+    {
+      this->_state._status |= detail::status_have_exception;
+    }
     using namespace hooks;
     hook_outcome_move_construction(in_place_type<decltype(o)>, this);
   }
