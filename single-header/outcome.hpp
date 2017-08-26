@@ -887,9 +887,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 451f0ee3eaf490903fa13b43feef2f0a512bbd59
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-08-23 03:07:06 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 451f0ee3
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF ad4644b1b276caaab63d7479f5208f01865ddd40
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-08-26 01:36:30 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE ad4644b1
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
 
@@ -1079,7 +1079,9 @@ extern "C" void _mm_pause();
 #if _MSC_VER >= 1800
 #define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
 #elif __cplusplus >= 201103
-#if defined(__has_feature)
+#if __GNUC__ >= 5 && !defined(__clang__)
+#define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
+#elif defined(__has_feature)
 #if __has_feature(cxx_thread_local)
 #define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
 #endif
@@ -1394,9 +1396,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 10a52a466bd42c28bb0ed0eaf97322a2ff3797a9
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-08-22 23:28:39 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 10a52a46
+#define OUTCOME_PREVIOUS_COMMIT_REF f863d85ca2fe8ad843636b5e0b1ec799934af33d
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-08-26 01:49:49 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f863d85c
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -4434,6 +4436,13 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   constexpr result(A1 &&a1, A2 &&a2, Args &&... args) noexcept(noexcept(typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>(std::declval<A1>(), std::declval<A2>(), std::declval<Args>()...)))
       : result(in_place_type<typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>>, std::forward<A1>(a1), std::forward<A2>(a2), std::forward<Args>(args)...)
   {
+    /* I was a little surprised that the below is needed given that we forward to another constructor.
+    But it turns out that ADL only fires on the first constructor for some reason.
+    */
+
+
+    using namespace hooks;
+    // hook_result_in_place_construction(in_place_type<typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>>, this);
   }
 
   /// \output_section Tagged constructors
@@ -5755,6 +5764,13 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   constexpr outcome(A1 &&a1, A2 &&a2, Args &&... args) noexcept(noexcept(typename predicate::template choose_inplace_value_error_exception_constructor<A1, A2, Args...>(std::declval<A1>(), std::declval<A2>(), std::declval<Args>()...)))
       : outcome(in_place_type<typename predicate::template choose_inplace_value_error_exception_constructor<A1, A2, Args...>>, std::forward<A1>(a1), std::forward<A2>(a2), std::forward<Args>(args)...)
   {
+    /* I was a little surprised that the below is needed given that we forward to another constructor.
+    But it turns out that ADL only fires on the first constructor for some reason.
+    */
+
+
+    using namespace hooks;
+    // hook_outcome_in_place_construction(in_place_type<typename predicate::template choose_inplace_value_error_exception_constructor<A1, A2, Args...>>, this);
   }
 
   /// \output_section Tagged constructors
@@ -5850,6 +5866,14 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(o))
       , _ptr(detail::extract_exception_payload_from_failure<exception_type>(o))
   {
+    if(this->_error == error_type())
+    {
+      this->_state._status &= ~detail::status_have_error;
+    }
+    if(_ptr != exception_type())
+    {
+      this->_state._status |= detail::status_have_exception;
+    }
     using namespace hooks;
     hook_outcome_copy_construction(in_place_type<decltype(o)>, this);
   }
@@ -5876,6 +5900,14 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(in_place_type<typename base::_error_type>, std::move(detail::extract_error_from_failure<error_type>(std::move(o))))
       , _ptr(std::move(detail::extract_exception_payload_from_failure<decltype(_ptr)>(std::move(o))))
   {
+    if(this->_error == error_type())
+    {
+      this->_state._status &= ~detail::status_have_error;
+    }
+    if(_ptr != exception_type())
+    {
+      this->_state._status |= detail::status_have_exception;
+    }
     using namespace hooks;
     hook_outcome_move_construction(in_place_type<decltype(o)>, this);
   }

@@ -969,6 +969,14 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(o))
       , _ptr(detail::extract_exception_payload_from_failure<exception_type>(o))
   {
+    if(this->_error == error_type())
+    {
+      this->_state._status &= ~detail::status_have_error;
+    }
+    if(_ptr != exception_type())
+    {
+      this->_state._status |= detail::status_have_exception;
+    }
     using namespace hooks;
     hook_outcome_copy_construction(in_place_type<decltype(o)>, this);
   }
@@ -987,6 +995,14 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(in_place_type<typename base::_error_type>, std::move(detail::extract_error_from_failure<error_type>(std::move(o))))
       , _ptr(std::move(detail::extract_exception_payload_from_failure<decltype(_ptr)>(std::move(o))))
   {
+    if(this->_error == error_type())
+    {
+      this->_state._status &= ~detail::status_have_error;
+    }
+    if(_ptr != exception_type())
+    {
+      this->_state._status |= detail::status_have_exception;
+    }
     using namespace hooks;
     hook_outcome_move_construction(in_place_type<decltype(o)>, this);
   }
