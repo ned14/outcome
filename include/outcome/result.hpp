@@ -1656,6 +1656,11 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   constexpr result(A1 &&a1, A2 &&a2, Args &&... args) noexcept(noexcept(typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>(std::declval<A1>(), std::declval<A2>(), std::declval<Args>()...)))
       : result(in_place_type<typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>>, std::forward<A1>(a1), std::forward<A2>(a2), std::forward<Args>(args)...)
   {
+    /* I was a little surprised that the below is needed given that we forward to another constructor.
+    But it turns out that ADL only fires on the first constructor for some reason.
+    */
+    using namespace hooks;
+    hook_result_in_place_construction(in_place_type<typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>>, this);
   }
 
   /// \output_section Tagged constructors
