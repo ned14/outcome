@@ -887,9 +887,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF ad4644b1b276caaab63d7479f5208f01865ddd40
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-08-26 01:36:30 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE ad4644b1
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF fe0d1d5ca722ce6197c1d2f9b6398a195939c1b8
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-08-27 00:19:02 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE fe0d1d5c
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
 
@@ -1396,9 +1396,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF f863d85ca2fe8ad843636b5e0b1ec799934af33d
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-08-26 01:49:49 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f863d85c
+#define OUTCOME_PREVIOUS_COMMIT_REF 5186c9b29de46081c995724866322d7297bf6973
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-08-27 00:20:43 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 5186c9b2
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -5866,11 +5866,11 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(o))
       , _ptr(detail::extract_exception_payload_from_failure<exception_type>(o))
   {
-    if(this->_error == error_type())
+    if(this->_error == decltype(this->_error){})
     {
       this->_state._status &= ~detail::status_have_error;
     }
-    if(_ptr != exception_type())
+    if(_ptr != decltype(_ptr){})
     {
       this->_state._status |= detail::status_have_exception;
     }
@@ -5900,11 +5900,11 @@ is not constructible to `value_type`, is not constructible to `payload_exception
       : base(in_place_type<typename base::_error_type>, std::move(detail::extract_error_from_failure<error_type>(std::move(o))))
       , _ptr(std::move(detail::extract_exception_payload_from_failure<decltype(_ptr)>(std::move(o))))
   {
-    if(this->_error == error_type())
+    if(this->_error == decltype(this->_error){})
     {
       this->_state._status &= ~detail::status_have_error;
     }
-    if(_ptr != exception_type())
+    if(_ptr != decltype(_ptr){})
     {
       this->_state._status |= detail::status_have_exception;
     }
