@@ -100,7 +100,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   endforeach()
 
   # If we are on a compiler capable of it, add in a test of the WG21 proposed result implementation
-  if(ENABLE_CXX_CONCEPTS)
+  if(ENABLE_CXX_CONCEPTS AND CMAKE_VERSION VERSION_GREATER 3.7.99)
     include(CheckCXXSourceCompiles)
     set(CMAKE_REQUIRED_FLAGS "-std=c++17")
     check_cxx_source_compiles("
