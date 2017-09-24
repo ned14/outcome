@@ -1,5 +1,5 @@
 # version format
-version: 0.01.{build}-{branch}
+version: 2.00.{build}-{branch}
  
 # branches to build
 branches:
