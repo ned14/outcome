@@ -9,8 +9,7 @@ branches:
     - gh-pages
 skip_tags: true
  
-# Operating system (build VM template)
-os: Visual Studio 2017
+image: Visual Studio 2017
 init:
   - git config --global core.longpaths true
 
@@ -23,7 +22,7 @@ before_build:
   - git submodule update --init --recursive
   - pip install ply
 build_script:
-  - ctest -S .ci.cmake -V --build-generator "Visual Studio 15 2017 Win64"
+  - ctest -S .ci.cmake -V
 after_build:
 
 before_test:
