@@ -244,27 +244,27 @@ namespace impl
 
     template <class... Args>
     constexpr result_storage(in_place_type_t<_value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
-        : _state(_, std::forward<Args>(args)...)
+        : _state{_, std::forward<Args>(args)...}
         , _error()
     {
     }
     template <class U, class... Args>
     constexpr result_storage(in_place_type_t<_value_type> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, std::initializer_list<U>, Args...>::value)
-        : _state(_, il, std::forward<Args>(args)...)
+        : _state{_, il, std::forward<Args>(args)...}
         , _error()
     {
     }
     template <class... Args>
     constexpr result_storage(in_place_type_t<_error_type>, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
-        : _state(detail::status_have_error)
-        , _error(std::forward<Args>(args)...)
+        : _state{detail::status_have_error}
+        , _error{std::forward<Args>(args)...}
     {
       detail::_set_error_is_errno(_state, _error);
     }
     template <class U, class... Args>
     constexpr result_storage(in_place_type_t<_error_type>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
-        : _state(detail::status_have_error)
-        , _error(il, std::forward<Args>(args)...)
+        : _state{detail::status_have_error}
+        , _error{il, std::forward<Args>(args)...}
     {
       detail::_set_error_is_errno(_state, _error);
     }
@@ -274,8 +274,8 @@ namespace impl
     };
     template <class T, class U>
     constexpr result_storage(value_status_construction_tag, T &&t, U &&u) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_status_type, U>::value)
-        : _state(in_place_type<_value_type>, std::forward<T>(t))
-        , _error(std::forward<U>(u))
+        : _state{in_place_type<_value_type>, std::forward<T>(t)}
+        , _error{std::forward<U>(u)}
     {
       _state._status |= detail::status_have_status;
     }
@@ -1457,7 +1457,7 @@ public:
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_value_converting_constructor<T>))
   constexpr result(T &&t, value_converting_constructor_tag = value_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value)
-      : base(in_place_type<typename base::value_type>, std::forward<T>(t))
+      : base{in_place_type<typename base::value_type>, std::forward<T>(t)}
   {
     using namespace hooks;
     hook_result_construction(in_place_type<value_type>, this);
@@ -1481,7 +1481,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
                               && !detail::is_in_place_type_t<std::decay_t<T>>::value                   // not in place construction
                               && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<status_type, T>::value && detail::is_same_or_constructible<status_type, U> && !std::is_constructible<value_type, U>::value>>
   constexpr result(T &&t, U &&u, value_status_converting_constructor_tag = value_status_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_type, U>::value)
-      : base(typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u))
+      : base{typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u)}
   {
     using namespace hooks;
     hook_result_construction(in_place_type<std::pair<value_type, status_type>>, this);
@@ -1502,7 +1502,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_error_converting_constructor<T>))
   constexpr result(T &&t, error_converting_constructor_tag = error_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)
-      : base(in_place_type<typename base::error_type>, std::forward<T>(t))
+      : base{in_place_type<typename base::error_type>, std::forward<T>(t)}
   {
     using namespace hooks;
     hook_result_construction(in_place_type<error_type>, this);
@@ -1526,7 +1526,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))),  //
                     OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor<ErrorCondEnum>))
   constexpr result(ErrorCondEnum &&t, error_condition_converting_constructor_tag = error_condition_converting_constructor_tag()) noexcept(noexcept(error_type(make_error_code(std::forward<ErrorCondEnum>(t)))))
-      : base(in_place_type<typename base::error_type>, make_error_code(t))
+      : base{in_place_type<typename base::error_type>, make_error_code(t)}
   {
     using namespace hooks;
     hook_result_construction(in_place_type<error_type>, this);
@@ -1544,7 +1544,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V>))
   constexpr explicit result(const result<T, U, V> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
-      : base(typename base::compatible_conversion_tag(), o)
+      : base{typename base::compatible_conversion_tag(), o}
   {
     using namespace hooks;
     hook_result_copy_construction(in_place_type<decltype(o)>, this);
@@ -1561,7 +1561,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V>))
   constexpr explicit result(result<T, U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
-      : base(typename base::compatible_conversion_tag(), std::move(o))
+      : base{typename base::compatible_conversion_tag(), std::move(o)}
   {
     using namespace hooks;
     hook_result_move_construction(in_place_type<decltype(o)>, this);
@@ -1581,7 +1581,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<Args...>))
   constexpr explicit result(in_place_type_t<value_type_if_enabled>, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
-      : base(in_place_type<value_type_if_enabled>, std::forward<Args>(args)...)
+      : base{in_place_type<value_type_if_enabled>, std::forward<Args>(args)...}
   {
     using namespace hooks;
     hook_result_in_place_construction(in_place_type<value_type>, this);
@@ -1600,7 +1600,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<std::initializer_list<U>, Args...>))
   constexpr explicit result(in_place_type_t<value_type_if_enabled>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
-      : base(in_place_type<value_type_if_enabled>, il, std::forward<Args>(args)...)
+      : base{in_place_type<value_type_if_enabled>, il, std::forward<Args>(args)...}
   {
     using namespace hooks;
     hook_result_in_place_construction(in_place_type<value_type>, this);
@@ -1618,7 +1618,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<Args...>))
   constexpr explicit result(in_place_type_t<error_type_if_enabled>, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
-      : base(in_place_type<error_type_if_enabled>, std::forward<Args>(args)...)
+      : base{in_place_type<error_type_if_enabled>, std::forward<Args>(args)...}
   {
     using namespace hooks;
     hook_result_in_place_construction(in_place_type<error_type>, this);
@@ -1637,7 +1637,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<std::initializer_list<U>, Args...>))
   constexpr explicit result(in_place_type_t<error_type_if_enabled>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
-      : base(in_place_type<error_type_if_enabled>, il, std::forward<Args>(args)...)
+      : base{in_place_type<error_type_if_enabled>, il, std::forward<Args>(args)...}
   {
     using namespace hooks;
     hook_result_in_place_construction(in_place_type<error_type>, this);
@@ -1672,7 +1672,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   \throws Any exception the construction of `value_type()` might throw.
   */
   constexpr result(const success_type<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
-      : base(in_place_type<value_type_if_enabled>)
+      : base{in_place_type<value_type_if_enabled>}
   {
     using namespace hooks;
     hook_result_copy_construction(in_place_type<decltype(o)>, this);
@@ -1689,7 +1689,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, void, void>))
   constexpr result(const success_type<T> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value)
-      : base(in_place_type<value_type_if_enabled>, detail::extract_value_from_success<value_type>(o))
+      : base{in_place_type<value_type_if_enabled>, detail::extract_value_from_success<value_type>(o)}
   {
     using namespace hooks;
     hook_result_copy_construction(in_place_type<decltype(o)>, this);
@@ -1706,7 +1706,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<T, void, void>))
   constexpr result(success_type<T> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value)
-      : base(in_place_type<value_type_if_enabled>, std::move(detail::extract_value_from_success<value_type>(std::move(o))))
+      : base{in_place_type<value_type_if_enabled>, std::move(detail::extract_value_from_success<value_type>(std::move(o)))}
   {
     using namespace hooks;
     hook_result_move_construction(in_place_type<decltype(o)>, this);
@@ -1723,7 +1723,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, void>))
   constexpr result(const failure_type<T> &o) noexcept(std::is_nothrow_constructible<error_type, T>::value)
-      : base(in_place_type<error_type_if_enabled>, detail::extract_error_from_failure<error_type>(o))
+      : base{in_place_type<error_type_if_enabled>, detail::extract_error_from_failure<error_type>(o)}
   {
     using namespace hooks;
     hook_result_copy_construction(in_place_type<decltype(o)>, this);
@@ -1740,7 +1740,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, void>))
   constexpr result(failure_type<T> &&o) noexcept(std::is_nothrow_constructible<error_type, T>::value)
-      : base(in_place_type<error_type_if_enabled>, std::move(detail::extract_error_from_failure<error_type>(std::move(o))))
+      : base{in_place_type<error_type_if_enabled>, std::move(detail::extract_error_from_failure<error_type>(std::move(o)))}
   {
     using namespace hooks;
     hook_result_move_construction(in_place_type<decltype(o)>, this);
