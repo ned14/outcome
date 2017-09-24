@@ -26,11 +26,11 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define WG21_EXPERIMENTAL_RESULT_HPP
 
 /***************************** BEGIN WG14 C Programming Language standards part *******************************/
-#define CXX_DECLARE_RESULT(R)                                                                                                                                                                                                                                                                                                  \
+#define CXX_DECLARE_RESULT(R, D)                                                                                                                                                                                                                                                                                               \
   struct result_##R                                                                                                                                                                                                                                                                                                            \
   {                                                                                                                                                                                                                                                                                                                            \
-    R value;                                                                                                                                                                                                                                                                                                                   \
-    char flags;                                                                                                                                                                                                                                                                                                                \
+    D value;                                                                                                                                                                                                                                                                                                                   \
+    unsigned char flags;                                                                                                                                                                                                                                                                                                       \
     int error;                                                                                                                                                                                                                                                                                                                 \
     void *category;                                                                                                                                                                                                                                                                                                            \
   }
@@ -135,11 +135,17 @@ namespace std
 
       /* The proposed result type for standardardisation.
 
-      NOTE: This reference implementation has these deviations from the proposed standard spec:
+         Requires:
 
-      1. Due to `std::optional`, triviality of copy and move is not propagated from `T` as per the spec.
-      2. Due to `std::optional`, standard layout of `result<T>` is not propagated from `T` as per the spec.
-      3. `value()` and `assume_value()` should return `void` when `R` is `void`, not `_void_type`.
+         1. `std::optional` must preserve triviality of copy and move from `T`.
+         2. `std::optional` must preserve standard layout of `T`.
+         3. `std::optional<T>` must have layout `struct { T value; unsigned char has_value; }`
+
+         NOTE: This reference implementation has these deviations from the proposed standard spec:
+
+         - `value()` and `assume_value()` should return `void` when `R` is `void`, not `_void_type`.
+         - We do not set bit 4 of the optional's has_value when error type is errno domain as any
+         STL optional implementation would misoperate.
       */
       template <class R, class S = std::error_code>               //
       requires(                                                   //
@@ -522,21 +528,111 @@ namespace std
       //! Calls b != a
       template <class T, class U, class V> constexpr inline bool operator!=(const failure<V> &a, const result<T, U> &b) noexcept(noexcept(b == a)) { return b != a; }
 
+      /*! Utility function which tries to match the exception in the pointer provided
+      to an equivalent error code. Ought to work for all standard STL types.
+      \param e The pointer to an exception to convert. If matched, on exit this is
+      reset to a null pointer.
+      \param not_matched The error code to return if we could not match the exception.
+      Note that a null pointer in returns a null error code.
+
+      \effects Rethrows the exception in the pointer, and via a long sequence of `catch`
+      clauses attempts to match the equivalent error code. If a match is found, the
+      pointer is reset to null. If a match is not found, *not_matched* is returned instead
+      and the pointer is left unmodified.
+      */
+      inline std::error_code error_from_exception(std::exception_ptr &&ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
+      {
+        if(!ep)
+        {
+          return {};
+        }
+        try
+        {
+          std::rethrow_exception(ep);
+        }
+        catch(const std::invalid_argument & /*unused*/)
+        {
+          ep = std::exception_ptr();
+          return std::make_error_code(std::errc::invalid_argument);
+        }
+        catch(const std::domain_error & /*unused*/)
+        {
+          ep = std::exception_ptr();
+          return std::make_error_code(std::errc::argument_out_of_domain);
+        }
+        catch(const std::length_error & /*unused*/)
+        {
+          ep = std::exception_ptr();
+          return std::make_error_code(std::errc::argument_list_too_long);
+        }
+        catch(const std::out_of_range & /*unused*/)
+        {
+          ep = std::exception_ptr();
+          return std::make_error_code(std::errc::result_out_of_range);
+        }
+        catch(const std::logic_error & /*unused*/) /* base class for this group */
+        {
+          ep = std::exception_ptr();
+          return std::make_error_code(std::errc::invalid_argument);
+        }
+        catch(const std::system_error &e) /* also catches ios::failure */
+        {
+          ep = std::exception_ptr();
+          return e.code();
+        }
+        catch(const std::overflow_error & /*unused*/)
+        {
+          ep = std::exception_ptr();
+          return std::make_error_code(std::errc::value_too_large);
+        }
+        catch(const std::range_error & /*unused*/)
+        {
+          ep = std::exception_ptr();
+          return std::make_error_code(std::errc::result_out_of_range);
+        }
+        catch(const std::runtime_error & /*unused*/) /* base class for this group */
+        {
+          ep = std::exception_ptr();
+          return std::make_error_code(std::errc::resource_unavailable_try_again);
+        }
+        catch(const std::bad_alloc & /*unused*/)
+        {
+          ep = std::exception_ptr();
+          return std::make_error_code(std::errc::not_enough_memory);
+        }
+        catch(...)
+        {
+        }
+        return not_matched;
+      }
+
 #if 0
-      // Sample default try operator
-      template <class T, class U> auto operator try(const std::exception_ptr &e)
+      /* Sample try operator overload (see Pxxxx)
+
+         result<int> foo();
+         result<std::string> func()
+         {
+           int g = try foo();  --> operator try(decltype(foo())) overload available?
+                                   If so then:
+                                   auto &&a = operator try(decltype(foo()));
+                                   if(a.return_immediately())
+                                     return a.return_value();
+                               g = std::move(a).value();
+           return std::to_string(g);
+         }
+      */
+      auto operator try(const std::exception_ptr &e)
       {
         struct tryer
         {
           const std::exception_ptr &e;
 
-          bool exits_immediately() noexcept { return static_cast<bool>(e); }
-          void value()
+          bool return_immediately() noexcept { return static_cast<bool>(e); }
+          void return_value()  // void return only causes compile error if this function can return
           {
-            if(!e)
-              return;
             std::rethrow_exception(e);
           }
+          void value() {}  // void return prevents assignment of try result
         };
         return tryer{std::move(e)};
       }
@@ -547,8 +643,12 @@ namespace std
         {
           const result<T, U> &v;
 
-          constexpr bool exits_immediately() noexcept { return true; }
-          constexpr failure<U> value() noexcept(noexcept(v.as_failure())) { return v.as_failure(); }
+          // Note the constexpr, this makes operator try constexpr too
+          constexpr bool return_immediately() noexcept { return v.has_error(); }
+          // Extract the error, return it wrapped in failure type sugar
+          constexpr failure<U> return_value() { return v.as_failure(); }
+          // Extract the value
+          constexpr const T &value() { return v.assume_value(); }
         };
         return tryer{v};
       }
@@ -558,10 +658,23 @@ namespace std
         {
           result<T, U> &&v;
 
-          constexpr bool exits_immediately() noexcept { return true; }
-          constexpr failure<U> value() noexcept(noexcept(v.as_failure())) { return std::move(v).as_failure(); }
+          constexpr bool return_immediately() noexcept { return v.has_error(); }
+          constexpr failure<U> return_value() { return std::move(v).as_failure(); }
+          constexpr T &&value() { return std::move(v).assume_value(); }
         };
-        return tryer{ std::move(v) };
+        return tryer{std::move(v)};
+      }
+      template <class T> constexpr auto operator try(optional<T> &&v) noexcept
+      {
+        struct tryer
+        {
+          optional<T> &&v;
+
+          constexpr bool return_immediately() noexcept { return !v.has_value(); }
+          constexpr failure<void> return_value() { return failure<void>{}; }
+          constexpr T &&value() { return *v; }
+        };
+        return tryer{std::move(v)};
       }
 #endif
     }

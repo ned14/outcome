@@ -509,7 +509,7 @@ public:
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_value_converting_constructor<T>))
   constexpr outcome(T &&t, value_converting_constructor_tag = value_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value)
-      : base(in_place_type<typename base::_value_type>, std::forward<T>(t))
+      : base{in_place_type<typename base::_value_type>, std::forward<T>(t)}
       , _ptr()
   {
     using namespace hooks;
@@ -536,7 +536,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
                               && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<exception_type, T>::value  //
                               && detail::is_same_or_constructible<status_type, U> && !std::is_constructible<exception_type, U>::value>>
   constexpr outcome(T &&t, U &&u, value_status_converting_constructor_tag = value_status_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_type, U>::value)
-      : base(typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u))
+      : base{typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u)}
       , _ptr()
   {
     using namespace hooks;
@@ -567,7 +567,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
                                        >>
   constexpr outcome(T &&t, U &&u, V &&v,
                     value_status_payload_converting_constructor_tag = value_status_payload_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_type, U>::value &&std::is_nothrow_constructible<payload_exception_type, V>::value)
-      : base(typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u))
+      : base{typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u)}
       , _ptr(std::forward<V>(v))
   {
     using namespace hooks;
@@ -594,7 +594,7 @@ Type `U` is constructible to `status_type`, is not constructible to `value_type`
                               && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<status_error_type, T>::value  //
                               && detail::is_same_or_constructible<payload_type, U> && !std::is_constructible<status_error_type, U>::value>>
   constexpr outcome(T &&t, U &&u, value_payload_converting_constructor_tag = value_payload_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<payload_exception_type, U>::value)
-      : base(in_place_type<typename base::value_type>, std::forward<T>(t))
+      : base{in_place_type<typename base::value_type>, std::forward<T>(t)}
       , _ptr(std::forward<U>(u))
   {
     using namespace hooks;
@@ -616,7 +616,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_error_converting_constructor<T>))
   constexpr outcome(T &&t, error_converting_constructor_tag = error_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)
-      : base(in_place_type<typename base::_error_type>, std::forward<T>(t))
+      : base{in_place_type<typename base::_error_type>, std::forward<T>(t)}
       , _ptr()
   {
     using namespace hooks;
@@ -639,7 +639,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TEMPLATE(class T, class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_error_payload_converting_constructor<T, U>))
   constexpr outcome(T &&t, U &&u, error_payload_converting_constructor_tag = error_payload_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<payload_exception_type, U>::value)
-      : base(in_place_type<typename base::_error_type>, std::forward<T>(t))
+      : base{in_place_type<typename base::_error_type>, std::forward<T>(t)}
       , _ptr(std::forward<U>(u))
   {
     using namespace hooks;
@@ -663,7 +663,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))),  //
                     OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor<ErrorCondEnum>))
   constexpr outcome(ErrorCondEnum &&t, error_condition_converting_constructor_tag = error_condition_converting_constructor_tag()) noexcept(noexcept(error_type(make_error_code(std::forward<ErrorCondEnum>(t)))))
-      : base(in_place_type<typename base::_error_type>, make_error_code(t))
+      : base{in_place_type<typename base::_error_type>, make_error_code(t)}
   {
     using namespace hooks;
     hook_outcome_construction(in_place_type<error_type>, this);
@@ -703,7 +703,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V, W>))
   constexpr explicit outcome(const outcome<T, U, V, W> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type, V>::value)
-      : base(typename base::compatible_conversion_tag(), o)
+      : base{typename base::compatible_conversion_tag(), o}
       , _ptr(o._ptr)
   {
     using namespace hooks;
@@ -721,7 +721,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V, W>))
   constexpr explicit outcome(outcome<T, U, V, W> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type, V>::value)
-      : base(typename base::compatible_conversion_tag(), std::move(o))
+      : base{typename base::compatible_conversion_tag(), std::move(o)}
       , _ptr(std::move(o._ptr))
   {
     using namespace hooks;
@@ -739,7 +739,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, status_error_type, error_type>::template enable_compatible_conversion<T, U, V>))
   constexpr explicit outcome(const result<T, U, V> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type>::value)
-      : base(typename base::compatible_conversion_tag(), o)
+      : base{typename base::compatible_conversion_tag(), o}
       , _ptr()
   {
     using namespace hooks;
@@ -757,7 +757,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, status_error_type, error_type>::template enable_compatible_conversion<T, U, V>))
   constexpr explicit outcome(result<T, U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type>::value)
-      : base(typename base::compatible_conversion_tag(), std::move(o))
+      : base{typename base::compatible_conversion_tag(), std::move(o)}
       , _ptr()
   {
     using namespace hooks;
@@ -779,7 +779,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<Args...>))
   constexpr explicit outcome(in_place_type_t<value_type_if_enabled> _, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
-      : base(_, std::forward<Args>(args)...)
+      : base{_, std::forward<Args>(args)...}
       , _ptr()
   {
     using namespace hooks;
@@ -799,7 +799,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<std::initializer_list<U>, Args...>))
   constexpr explicit outcome(in_place_type_t<value_type_if_enabled> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
-      : base(_, il, std::forward<Args>(args)...)
+      : base{_, il, std::forward<Args>(args)...}
       , _ptr()
   {
     using namespace hooks;
@@ -818,7 +818,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<Args...>))
   constexpr explicit outcome(in_place_type_t<error_type_if_enabled> _, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
-      : base(_, std::forward<Args>(args)...)
+      : base{_, std::forward<Args>(args)...}
       , _ptr()
   {
     using namespace hooks;
@@ -838,7 +838,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<std::initializer_list<U>, Args...>))
   constexpr explicit outcome(in_place_type_t<error_type_if_enabled> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
-      : base(_, il, std::forward<Args>(args)...)
+      : base{_, il, std::forward<Args>(args)...}
       , _ptr()
   {
     using namespace hooks;
@@ -915,7 +915,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   \throws Any exception the construction of `value_type()` might throw.
   */
   constexpr outcome(const success_type<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
-      : base(in_place_type<typename base::_value_type>)
+      : base{in_place_type<typename base::_value_type>}
   {
     using namespace hooks;
     hook_outcome_copy_construction(in_place_type<decltype(o)>, this);
@@ -932,7 +932,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<T, void, void, void>))
   constexpr outcome(const success_type<T> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value)
-      : base(in_place_type<typename base::_value_type>, detail::extract_value_from_success<value_type>(o))
+      : base{in_place_type<typename base::_value_type>, detail::extract_value_from_success<value_type>(o)}
   {
     using namespace hooks;
     hook_outcome_copy_construction(in_place_type<decltype(o)>, this);
@@ -949,7 +949,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<T, void, void, void>))
   constexpr outcome(success_type<T> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value)
-      : base(in_place_type<typename base::_value_type>, std::move(detail::extract_value_from_success<value_type>(std::move(o))))
+      : base{in_place_type<typename base::_value_type>, std::move(detail::extract_value_from_success<value_type>(std::move(o)))}
   {
     using namespace hooks;
     hook_outcome_move_construction(in_place_type<decltype(o)>, this);
@@ -966,7 +966,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TEMPLATE(class T, class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, U, void>))
   constexpr outcome(const failure_type<T, U> &o) noexcept(std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<exception_type, U>::value)
-      : base(in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(o))
+      : base{in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(o)}
       , _ptr(detail::extract_exception_payload_from_failure<exception_type>(o))
   {
     if(this->_error == decltype(this->_error){})
@@ -992,7 +992,7 @@ is not constructible to `value_type`, is not constructible to `payload_exception
   OUTCOME_TEMPLATE(class T, class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, U, void>))
   constexpr outcome(failure_type<T, U> &&o) noexcept(std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<exception_type, U>::value)
-      : base(in_place_type<typename base::_error_type>, std::move(detail::extract_error_from_failure<error_type>(std::move(o))))
+      : base{in_place_type<typename base::_error_type>, std::move(detail::extract_error_from_failure<error_type>(std::move(o)))}
       , _ptr(std::move(detail::extract_exception_payload_from_failure<decltype(_ptr)>(std::move(o))))
   {
     if(this->_error == decltype(this->_error){})

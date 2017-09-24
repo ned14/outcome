@@ -36,6 +36,7 @@ On Windows, simply download the raw file from above and place it wherever it sui
  - [x] Manually copy & paste together a basic synopsis of result and outcome
  to serve as "the docs" until Standardese can be persuaded to produce better
  output.
+ - [ ] Conan package support
  
 Maybe?
  - [ ] Make `result`'s explicit converting constructors accept any type providing a
