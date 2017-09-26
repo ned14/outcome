@@ -34,7 +34,7 @@ OUTCOME_V2_NAMESPACE_BEGIN
 
 /*! Utility function which tries to match the exception in the pointer provided
 to an equivalent error code. Ought to work for all standard STL types.
-\param e The pointer to an exception to convert. If matched, on exit this is
+\param ep The pointer to an exception to convert. If matched, on exit this is
 reset to a null pointer.
 \param not_matched The error code to return if we could not match the exception.
 Note that a null pointer in returns a null error code.
