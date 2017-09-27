@@ -1,0 +1,28 @@
+# Files to copy over
+include_files = [
+    (r'include/(.*)', r'include/boost/\1'),
+    r'example/.*',
+    r'test/.*',
+    r'.clang-.*',
+    r'.gitattributes',
+]
+exclude_files = [
+    r'.*quickcpplib.*',
+    r'.*\.natvis',
+    r'.*\.vs',
+    r'test/single-header-test.cpp'
+]
+
+
+# Regexs to replace
+macros = {
+    r'OUTCOME_': r'BOOST_OUTCOME_',
+    r'../include/outcome' : r'../include/boost/outcome',
+    r'"quickcpplib/include/boost/test/unit_test.hpp"' : r'<boost/test/unit_test.hpp>'
+}
+transforms = {
+    r'.*\.hpp' : macros,
+    r'.*\.ipp' : macros,
+    r'.*\.cpp' : macros,
+    r'.*\.h': macros
+}

@@ -887,9 +887,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 71fc27bbd98e04b97e6530a5892a6d64f766e7b5
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-09-24 03:23:05 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 71fc27bb
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF c7a2d31274ff5a8d7a1cac6cd6144e9130115e8d
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-09-24 18:33:07 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE c7a2d312
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
 
@@ -1396,9 +1396,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF c357b6d441c67520b67af8c79e4dd76f0f950d18
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-09-24 14:20:18 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c357b6d4
+#define OUTCOME_PREVIOUS_COMMIT_REF 6089de54751fd2be2bffdd99c86ed2385cb70c18
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-09-25 23:03:18 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 6089de54
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -2477,6 +2477,27 @@ public:
   }
 };
 
+//! Thrown when you try to access a vlue in a `result<R, S>` which isn't present.
+template <class S> class OUTCOME_SYMBOL_VISIBLE bad_result_access_with : public bad_result_access
+{
+  S _error;
+
+public:
+  bad_result_access_with(S v)
+      : bad_result_access("no value")
+      , _error(std::move(v))
+  {
+  }
+  //! Observes the error
+  const S &error() const & { return _error; }
+  //! Observes the error
+  S &error() & { return _error; }
+  //! Observes the error
+  const S &&error() const && { return _error; }
+  //! Observes the error
+  S &&error() && { return _error; }
+};
+
 #if OUTCOME_ENABLE_POSITIVE_STATUS
 //! Namespace for traits
 namespace trait
@@ -3270,12 +3291,12 @@ namespace impl
 namespace policy
 {
 #ifdef __cpp_exceptions
-  /*! Policy which throws `bad_result_access` during wide checks.
+  /*! Policy which throws `bad_result_access_with<EC>` or `bad_result_access` during wide checks.
   \module Error code interpretation policy
   */
 
 
-  struct throw_bad_result_access
+  template <class EC> struct throw_bad_result_access
   {
     /*! Performs a narrow check of state, used in the assume_value() functions.
     \effects None.
@@ -3327,7 +3348,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_value) == 0)
       {
-        throw bad_result_access("no value");
+        throw bad_result_access_with<EC>(self->_error);
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -3798,7 +3819,7 @@ namespace policy
   detail::is_same_or_constructible<std::error_code, EC>, error_code_throw_as_system_error<EC>, //
   std::conditional_t< //
   detail::is_same_or_constructible<std::exception_ptr, EC>, exception_ptr_rethrow<EC>, //
-  throw_bad_result_access //
+  throw_bad_result_access<EC> //
   >>>>;
 #else
   template <class EC> using default_result_policy = terminate;
@@ -6955,7 +6976,7 @@ OUTCOME_V2_NAMESPACE_BEGIN
 
 /*! Utility function which tries to match the exception in the pointer provided
 to an equivalent error code. Ought to work for all standard STL types.
-\param e The pointer to an exception to convert. If matched, on exit this is
+\param ep The pointer to an exception to convert. If matched, on exit this is
 reset to a null pointer.
 \param not_matched The error code to return if we could not match the exception.
 Note that a null pointer in returns a null error code.

@@ -45,6 +45,27 @@ public:
   }
 };
 
+//! Thrown when you try to access a vlue in a `result<R, S>` which isn't present.
+template <class S> class OUTCOME_SYMBOL_VISIBLE bad_result_access_with : public bad_result_access
+{
+  S _error;
+
+public:
+  bad_result_access_with(S v)
+      : bad_result_access("no value")
+      , _error(std::move(v))
+  {
+  }
+  //! Observes the error
+  const S &error() const & { return _error; }
+  //! Observes the error
+  S &error() & { return _error; }
+  //! Observes the error
+  const S &&error() const && { return _error; }
+  //! Observes the error
+  S &&error() && { return _error; }
+};
+
 #if OUTCOME_ENABLE_POSITIVE_STATUS
 //! Namespace for traits
 namespace trait
@@ -737,10 +758,10 @@ namespace impl
 namespace policy
 {
 #ifdef __cpp_exceptions
-  /*! Policy which throws `bad_result_access` during wide checks.
+  /*! Policy which throws `bad_result_access_with<EC>` or `bad_result_access` during wide checks.
   \module Error code interpretation policy
   */
-  struct throw_bad_result_access
+  template <class EC> struct throw_bad_result_access
   {
     /*! Performs a narrow check of state, used in the assume_value() functions.
     \effects None.
@@ -784,7 +805,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_value) == 0)
       {
-        throw bad_result_access("no value");
+        throw bad_result_access_with<EC>(self->_error);
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -1180,7 +1201,7 @@ namespace policy
   detail::is_same_or_constructible<std::error_code, EC>, error_code_throw_as_system_error<EC>,  //
   std::conditional_t<                                                                           //
   detail::is_same_or_constructible<std::exception_ptr, EC>, exception_ptr_rethrow<EC>,          //
-  throw_bad_result_access                                                                       //
+  throw_bad_result_access<EC>                                                                   //
   >>>>;
 #else
   template <class EC> using default_result_policy = terminate;
