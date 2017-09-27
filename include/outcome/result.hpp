@@ -138,14 +138,17 @@ namespace detail
   };
   template <class T, class U, class... Args> static constexpr bool is_same_or_constructible = _is_same_or_constructible<T, U>::value;
 // True if type is nothrow swappable
-#if !defined(STANDARDESE_IS_IN_THE_HOUSE) && __cplusplus >= 201700
+#if !defined(STANDARDESE_IS_IN_THE_HOUSE) && (_HAS_CXX17 || __cplusplus >= 201700)
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
 #else
   namespace _is_nothrow_swappable
   {
     using namespace std;
     template <class T> constexpr inline T &ldeclval();
-    template <class T> struct is_nothrow_swappable : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
+    template <class T, class = void> struct is_nothrow_swappable : std::integral_constant<bool, false>
+    {
+    };
+    template <class T> struct is_nothrow_swappable<T, decltype(swap(ldeclval<T>(), ldeclval<T>()))> : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
     {
     };
   }

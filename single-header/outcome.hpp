@@ -1396,9 +1396,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 6089de54751fd2be2bffdd99c86ed2385cb70c18
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-09-25 23:03:18 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 6089de54
+#define OUTCOME_PREVIOUS_COMMIT_REF 10d139b959551bead098534b6cd970aa5fcb2ff7
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-09-27 22:55:30 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 10d139b9
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -2580,14 +2580,17 @@ namespace detail
   };
   template <class T, class U, class... Args> static constexpr bool is_same_or_constructible = _is_same_or_constructible<T, U>::value;
 // True if type is nothrow swappable
-#if !0 && __cplusplus >= 201700
+#if !0 && (_HAS_CXX17 || __cplusplus >= 201700)
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
 #else
   namespace _is_nothrow_swappable
   {
     using namespace std;
     template <class T> constexpr inline T &ldeclval();
-    template <class T> struct is_nothrow_swappable : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
+    template <class T, class = void> struct is_nothrow_swappable : std::integral_constant<bool, false>
+    {
+    };
+    template <class T> struct is_nothrow_swappable<T, decltype(swap(ldeclval<T>(), ldeclval<T>()))> : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
     {
     };
   }

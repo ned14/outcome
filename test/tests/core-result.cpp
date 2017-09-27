@@ -309,7 +309,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
 
   // Test C compatibility
   {
-    CXX_DECLARE_RESULT(int);
+    CXX_DECLARE_RESULT(int, int);
     CXX_RESULT(int) c_result = {5, 1, 0, nullptr};
     result<int> cxx_result{5};
     static_assert(sizeof(c_result) == sizeof(cxx_result), "Sizes of C and C++ results do not match!");
