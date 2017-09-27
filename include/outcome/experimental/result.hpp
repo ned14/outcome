@@ -676,6 +676,23 @@ namespace std
         };
         return tryer{std::move(v)};
       }
+      template<typename T>
+      concept ValueOrError = requires(T a) {
+        { a.has_value(); a.value(); a.error(); };
+      };
+      template <ValueOrError T>
+      constexpr auto operator try(T &&v) noexcept
+      {
+        struct tryer
+        {
+          T &&v;
+
+          constexpr bool try_return_immediately() const noexcept { return !v.has_value(); }
+          constexpr auto try_return_value() { return std::move(v).error(); }
+          constexpr auto try_value() { return std::move(v).value(); }
+        };
+        return tryer{ std::move(v) };
+      }
 #endif
     }
   }
