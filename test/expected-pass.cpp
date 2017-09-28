@@ -39,6 +39,7 @@
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4127)  // conditional expression is constant
+#pragma warning(disable : 4244)  // conversion from int to short
 #endif
 
 namespace stde
