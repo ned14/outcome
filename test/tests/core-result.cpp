@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
       std::cerr << "fail" << std::endl;
       std::terminate();
     }
-    catch(const std::system_error &e)
+    catch(const std::system_error & /*unused*/)
     {
     }
     static_assert(!std::is_default_constructible<decltype(a)>::value, "");

@@ -24,6 +24,10 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4702)  // unreachable code
+#endif
+
 BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended")
 {
   using namespace OUTCOME_V2_NAMESPACE;
@@ -205,7 +209,7 @@ BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended"
       std::cerr << "fail" << std::endl;
       std::terminate();
     }
-    catch(const std::system_error &e)
+    catch(const std::system_error & /*unused*/)
     {
     }
     static_assert(!std::is_default_constructible<decltype(a)>::value, "");

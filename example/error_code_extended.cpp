@@ -30,6 +30,10 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include "quickcpplib/include/execinfo_win64.h"
 #endif
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4702)  // unreachable code
+#endif
+
 //! [error_code_extended]
 /* Outcome's hook mechanism works vis ADL, so we will need a custom namespace
 */

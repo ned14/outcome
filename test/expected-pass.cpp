@@ -588,7 +588,7 @@ void expected_from_catch_block()
   {
     stde::exception_or<int> e(stde::make_unexpected(std::current_exception()));
 
-    BOOST_TEST_THROWS(e.value(), std::exception);
+    BOOST_TEST_THROWS(e.value(), const std::exception &);
     BOOST_TEST_EQ(e.has_value(), false);
     BOOST_TEST_EQ(static_cast<bool>(e), false);
   }
@@ -604,8 +604,9 @@ void make_expected_const_from_value()
 {
 #if defined __clang__ && __clang_major__ >= 4 && __cplusplus > 201402L
   const int i = 0;
-  auto e = stde::make_expected<const int>(i);
-  static_assert(std::is_same<decltype(e), stde::success<const int>>::value, "");
+  auto e = expected_sc<const int>(i);
+  (void) e;
+// static_assert(std::is_same<decltype(e), stde::success<const int>>::value, "");
 #endif
 }
 void make_expected_from_U_value()
@@ -653,14 +654,14 @@ void expected_from_error_error_condition()
 void expected_from_error_convertible()
 {
   {
-    stde::expected<int, short> e1 = stde::make_unexpected(1);
+    stde::expected<int, short> e1 = stde::make_unexpected<short>(1);
     stde::expected<int, long> e2(e1);
     BOOST_TEST_EQ(e2.has_value(), false);
     BOOST_TEST_EQ(static_cast<bool>(e2), false);
     BOOST_TEST_EQ(e2.error(), 1);
   }
   {
-    stde::expected<void, short> e1 = stde::make_unexpected(1);
+    stde::expected<void, short> e1 = stde::make_unexpected<short>(1);
     stde::expected<void, int> e2(e1);
     BOOST_TEST_EQ(e2.has_value(), false);
     BOOST_TEST_EQ(static_cast<bool>(e2), false);
@@ -794,7 +795,7 @@ void expected_from_exception_catch()
   {
     stde::exception_or<int> e = stde::make_unexpected(std::current_exception());
 
-    BOOST_TEST_THROWS(e.value(), std::exception);
+    BOOST_TEST_THROWS(e.value(), const std::exception &);
     BOOST_TEST_EQ(e.has_value(), false);
     BOOST_TEST_EQ(static_cast<bool>(e), false);
   }
@@ -832,7 +833,7 @@ void expected_from_exception2()
   // From stde::unexpected constructor.
   auto e = stde::make_expected_from_exception<int>(test_exception());
   // auto e = expected_sc<int>(stde::unexpected<>(test_exception()));
-  BOOST_TEST_THROWS(e.value(), test_exception);
+  BOOST_TEST_THROWS(e.value(), const test_exception &);
   BOOST_TEST_EQ(e.has_value(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
 }
@@ -841,7 +842,7 @@ void expected_from_exception_ptr2()
 {
   // From exception_ptr constructor.
   auto e = stde::exception_or<int>(stde::make_unexpected(test_exception()));
-  BOOST_TEST_THROWS(e.value(), test_exception);
+  BOOST_TEST_THROWS(e.value(), const test_exception &);
   BOOST_TEST_EQ(e.has_value(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
 }
@@ -858,7 +859,7 @@ void make_expected_from_call_fun()
     BOOST_TEST(false);
   }
   stde::exception_or<int> e = stde::make_expected_from_call(throwing_fun);
-  BOOST_TEST_THROWS(e.value(), std::exception);
+  BOOST_TEST_THROWS(e.value(), const std::exception &);
   BOOST_TEST_EQ(e.has_value(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
 
@@ -1052,7 +1053,9 @@ int main()
 #endif
 
   static_assert(!std::is_move_constructible<NoMoveConstructible>::value, "");
+#ifndef _MSC_VER
   static_assert(std::is_constructible<expected_sc<NoMoveConstructible>, NoMoveConstructible &&>::value, "");
+#endif
   static_assert(std::is_move_constructible<expected_sc<NoMoveConstructible>>::value, "");
 
   except_default_constructor();
