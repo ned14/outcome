@@ -1396,9 +1396,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 7d8ee1bbc01dd63425bc32ff90e3be32ba32c889
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-09-27 23:40:20 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 7d8ee1bb
+#define OUTCOME_PREVIOUS_COMMIT_REF 04638284bf9fcfd4925dab375c6ac6f37bae1471
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-09-28 00:02:24 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 04638284
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -4663,6 +4663,20 @@ static_assert(std::is_trivially_move_assignable<result<int>>::value, "result<int
 // Also check is standard layout
 static_assert(std::is_standard_layout<result<int>>::value, "result<int> is not a standard layout type!");
 #endif
+
+/*! A "checked" edition of `result<T, E>` which does no special handling of specific `E` types at all.
+Attempting to access `T` when there is an `E` results in `bad_result_access<E>` being thrown. Nothing else.
+
+Note that this approximates the proposed `expected<T, E>` up for standardisation, see the FAQ for more
+detail.
+*/
+
+
+
+
+
+template <class R, class S = std::error_code> using checked = result<R, S, policy::throw_bad_result_access<S>>;
+
 
 OUTCOME_V2_NAMESPACE_END
 

@@ -46,7 +46,7 @@ conversion to `result<T, EC>` fails to compile. In this case you need to use one
 
 ## Inspecting `result<>`
 
-Suppose we will be wiriting function `print_halve` that takes an integral number (however big) represented as an `std::string` and outputs a number which is twice smaller:
+Suppose we will be writing function `print_halve` that takes an integral number (however big) represented as an `std::string` and outputs a number which is twice smaller:
 
 {{% snippet "using_result.cpp" "half_decl" %}}
 

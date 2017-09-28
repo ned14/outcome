@@ -1836,6 +1836,15 @@ static_assert(std::is_trivially_move_assignable<result<int>>::value, "result<int
 static_assert(std::is_standard_layout<result<int>>::value, "result<int> is not a standard layout type!");
 #endif
 
+/*! A "checked" edition of `result<T, E>` which does no special handling of specific `E` types at all.
+Attempting to access `T` when there is an `E` results in `bad_result_access<E>` being thrown. Nothing else.
+
+Note that this approximates the proposed `expected<T, E>` up for standardisation, see the FAQ for more
+detail.
+*/
+template <class R, class S = std::error_code> using checked = result<R, S, policy::throw_bad_result_access<S>>;
+
+
 OUTCOME_V2_NAMESPACE_END
 
 #endif
