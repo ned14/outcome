@@ -86,7 +86,7 @@ script:
    fi
  -
    if [ "$__" = "cmake tests osx" ]; then
-     ctest -S .ci.cmake -V";
+     ctest -S .ci.cmake -V;
    fi
  -
    if [ "$__" = "Documentation" ]; then
@@ -105,6 +105,16 @@ script:
    fi
  
 after_success:
+ -
+   if [ "$__" = "cmake tests" ]; then
+     git clone https://github.com/ned14/boost-outcome;
+     python include/outcome/quickcpplib/scripts/boostify.py boost-outcome;
+     cd boost-outcome;
+     git add . || true;
+     git commit -a -m "Travis CI updates Boost.Outcome from Outcome" || true;
+     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost-outcome master;  
+     cd ..;     
+   fi
  - bash -x ./update_coveralls.sh `pwd`
 
 after_failure:
