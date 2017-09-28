@@ -28,6 +28,12 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #ifdef _WIN32
 #include "quickcpplib/include/execinfo_win64.h"
+#else
+#include <execinfo.h>
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(disable : 4702)  // unreachable code
 #endif
 
 //! [error_code_extended]

@@ -138,14 +138,17 @@ namespace detail
   };
   template <class T, class U, class... Args> static constexpr bool is_same_or_constructible = _is_same_or_constructible<T, U>::value;
 // True if type is nothrow swappable
-#if !defined(STANDARDESE_IS_IN_THE_HOUSE) && __cplusplus >= 201700
+#if !defined(STANDARDESE_IS_IN_THE_HOUSE) && (_HAS_CXX17 || __cplusplus >= 201700)
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
 #else
   namespace _is_nothrow_swappable
   {
     using namespace std;
     template <class T> constexpr inline T &ldeclval();
-    template <class T> struct is_nothrow_swappable : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
+    template <class T, class = void> struct is_nothrow_swappable : std::integral_constant<bool, false>
+    {
+    };
+    template <class T> struct is_nothrow_swappable<T, decltype(swap(ldeclval<T>(), ldeclval<T>()))> : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
     {
     };
   }
@@ -805,7 +808,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_value) == 0)
       {
-        throw bad_result_access_with<EC>(self->_error);
+        OUTCOME_THROW_EXCEPTION(bad_result_access_with<EC>(self->_error));
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -815,7 +818,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_error) == 0)
       {
-        throw bad_result_access("no error");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
@@ -826,7 +829,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_status) == 0)
       {
-        throw bad_result_access("no status");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no status"));
       }
     }
 #endif
@@ -882,9 +885,9 @@ namespace policy
       {
         if((self->_state._status & detail::status_have_error) != 0)
         {
-          throw std::system_error(make_error_code(self->_error));
+          OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(self->_error)));
         }
-        throw bad_result_access("no value");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -894,7 +897,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_error) == 0)
       {
-        throw bad_result_access("no error");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
@@ -905,7 +908,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_status) == 0)
       {
-        throw bad_result_access("no status");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no status"));
       }
     }
 #endif
@@ -962,9 +965,9 @@ namespace policy
       {
         if((self->_state._status & detail::status_have_error) != 0)
         {
-          throw std::system_error(self->_error);
+          OUTCOME_THROW_EXCEPTION(std::system_error(self->_error));
         }
-        throw bad_result_access("no value");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -974,7 +977,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_error) == 0)
       {
-        throw bad_result_access("no error");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
@@ -985,7 +988,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_status) == 0)
       {
-        throw bad_result_access("no status");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no status"));
       }
     }
 #endif
@@ -1043,7 +1046,7 @@ namespace policy
         {
           std::rethrow_exception(self->_error);
         }
-        throw bad_result_access("no value");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
     }
     /*! Performs a wide check of state, used in the value() functions
@@ -1053,7 +1056,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_error) == 0)
       {
-        throw bad_result_access("no error");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
@@ -1064,7 +1067,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_status) == 0)
       {
-        throw bad_result_access("no status");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no status"));
       }
     }
 #endif
@@ -1832,6 +1835,15 @@ static_assert(std::is_trivially_move_assignable<result<int>>::value, "result<int
 // Also check is standard layout
 static_assert(std::is_standard_layout<result<int>>::value, "result<int> is not a standard layout type!");
 #endif
+
+/*! A "checked" edition of `result<T, E>` which does no special handling of specific `E` types at all.
+Attempting to access `T` when there is an `E` results in `bad_result_access<E>` being thrown. Nothing else.
+
+Note that this approximates the proposed `expected<T, E>` up for standardisation, see the FAQ for more
+detail.
+*/
+template <class R, class S = std::error_code> using checked = result<R, S, policy::throw_bad_result_access<S>>;
+
 
 OUTCOME_V2_NAMESPACE_END
 

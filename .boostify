@@ -3,22 +3,45 @@ include_files = [
     (r'include/(.*)', r'include/boost/\1'),
     r'example/.*',
     r'test/.*',
-    r'.clang-.*',
-    r'.gitattributes',
+    r'\.clang-.*',
+    r'\.gitattributes',
 ]
 exclude_files = [
     r'.*quickcpplib.*',
     r'.*\.natvis',
     r'.*\.vs',
-    r'test/single-header-test.cpp'
+    r'test/single-header-test.cpp',
+    r'test/constexprs/.*'
+]
+overlay_files = [
+    (r'boostify', r''),
 ]
 
+def fix_auto_test_case(x):
+    # Collapse spaces until comma found, replacing any / or - with _
+    ret = ''
+    remove_spaces = True
+    for l in x.group(0):
+        if l == ',':
+            remove_spaces = False
+        if remove_spaces:
+            if l == ' ':
+                continue;
+            if l == '/' or l == '-':
+                l = '_'
+        ret += l
+    ret += '\n'
+    return ret
 
 # Regexs to replace
 macros = {
-    r'OUTCOME_': r'BOOST_OUTCOME_',
+    r'^OUTCOME_': r'BOOST_OUTCOME_',
+    r'([^_])OUTCOME_': r'\1BOOST_OUTCOME_',
     r'../include/outcome' : r'../include/boost/outcome',
-    r'"quickcpplib/include/boost/test/unit_test.hpp"' : r'<boost/test/unit_test.hpp>'
+    r'#include "quickcpplib/include/boost/test/unit_test.hpp"' : r'#include <boost/test/unit_test.hpp>\n#include <boost/test/unit_test_monitor.hpp>',
+    r'BOOST_OUTCOME_AUTO_TEST_CASE\((.*)' : fix_auto_test_case,
+    r'#include "quickcpplib/include/execinfo_win64.h"' : r'#error This example can only compile on POSIX',
+    r'#ifdef __cpp_exceptions' : r'#ifndef BOOST_NO_EXCEPTIONS',
 }
 transforms = {
     r'.*\.hpp' : macros,

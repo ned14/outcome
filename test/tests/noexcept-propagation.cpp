@@ -24,9 +24,13 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4127)  // conditional expression is constant
+#endif
+
 #ifdef __cpp_exceptions
 // std nothrow traits seem to return random values if exceptions are disabled on MSVC
-BOOST_AUTO_TEST_CASE(works / outcome / noexcept, "Tests that the outcome correctly inherits noexcept from its type R")
+BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / noexcept, "Tests that the outcome correctly inherits noexcept from its type R")
 {
   using namespace OUTCOME_V2_NAMESPACE;
   {

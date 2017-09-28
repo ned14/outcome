@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
-BOOST_AUTO_TEST_CASE(issues / 61 / result, "result<T1, E1> does not compare to incompatible result<T2, E2>")
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 61 / result, "result<T1, E1> does not compare to incompatible result<T2, E2>")
 {
   using namespace OUTCOME_V2_NAMESPACE;
   struct udt1
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(issues / 61 / result, "result<T1, E1> does not compare to i
   BOOST_CHECK(failure(5) != a);
 }
 
-BOOST_AUTO_TEST_CASE(issues / 61 / outcome, "outcome<T1, E1, P1> does not compare to incompatible outcome<T2, E2, P2>")
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 61 / outcome, "outcome<T1, E1, P1> does not compare to incompatible outcome<T2, E2, P2>")
 {
   using namespace OUTCOME_V2_NAMESPACE;
   struct udt1

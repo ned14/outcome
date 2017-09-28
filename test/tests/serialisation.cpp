@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/iostream_support.hpp"
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
-BOOST_AUTO_TEST_CASE(works / outcome / serialisation, "Tests that the outcome serialises and deserialises as intended")
+BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / serialisation, "Tests that the outcome serialises and deserialises as intended")
 {
   using namespace OUTCOME_V2_NAMESPACE;
   outcome<std::string> a("niall"), b(std::error_code(5, std::generic_category())), c(std::make_exception_ptr(std::ios_base::failure("A test failure message")));

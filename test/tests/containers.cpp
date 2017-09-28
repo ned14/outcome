@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
-BOOST_AUTO_TEST_CASE(works / outcome / containers, "Tests that outcome works as intended inside containers")
+BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / containers, "Tests that outcome works as intended inside containers")
 {
   using namespace OUTCOME_V2_NAMESPACE;
   outcome<std::vector<int>> a(std::vector<int>{5, 6, 7, 8});

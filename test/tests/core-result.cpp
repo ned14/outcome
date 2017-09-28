@@ -29,7 +29,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
-BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
+#include <iostream>
+
+BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
 {
 #ifdef TESTING_WG21_EXPERIMENTAL_RESULT
   using namespace std::experimental;
@@ -70,7 +72,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
     // BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.value(), const std::system_error &);
+    BOOST_CHECK_THROW(m.value(), std::system_error);
     BOOST_CHECK_NO_THROW(m.error());
   }
   {  // errored void
@@ -80,7 +82,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(m.has_error());
 // BOOST_CHECK(!m.has_exception());
 #ifndef TESTING_WG21_EXPERIMENTAL_RESULT
-    BOOST_CHECK_THROW(([&m]() -> void { return m.value(); }()), const std::system_error &);
+    BOOST_CHECK_THROW(([&m]() -> void { return m.value(); }()), std::system_error);
 #endif
     BOOST_CHECK_NO_THROW(m.error());
   }
@@ -93,7 +95,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(m.value() == 5);
     m.value() = 6;
     BOOST_CHECK(m.value() == 6);
-    BOOST_CHECK_THROW(m.error(), const bad_result_access &);
+    BOOST_CHECK_THROW(m.error(), bad_result_access);
   }
   {  // moves do not clear state
     result<std::string> m("niall");
@@ -115,7 +117,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(!m.has_error());
     // BOOST_CHECK(!m.has_exception());
     BOOST_CHECK_NO_THROW(m.value());  // works, but type returned is unusable
-    BOOST_CHECK_THROW(m.error(), const bad_result_access &);
+    BOOST_CHECK_THROW(m.error(), bad_result_access);
   }
   {  // errored
     std::error_code ec(5, std::system_category());
@@ -124,7 +126,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
     // BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.value(), const std::system_error &);
+    BOOST_CHECK_THROW(m.value(), std::system_error);
     BOOST_CHECK(m.error() == ec);
   }
   {  // errored, custom
@@ -135,7 +137,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
     // BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.value(), const std::system_error &);
+    BOOST_CHECK_THROW(m.value(), std::system_error);
     BOOST_CHECK(m.error() == e);
   }
 #ifndef TESTING_WG21_EXPERIMENTAL_RESULT
@@ -148,7 +150,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
     // BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.value(), const bad_result_access &);
+    BOOST_CHECK_THROW(m.value(), bad_result_access);
     BOOST_CHECK_NO_THROW(m.error());
   }
   if(false)  // NOLINT
@@ -220,7 +222,7 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
       std::cerr << "fail" << std::endl;
       std::terminate();
     }
-    catch(const std::system_error &e)
+    catch(const std::system_error & /*unused*/)
     {
     }
     static_assert(!std::is_default_constructible<decltype(a)>::value, "");
@@ -304,12 +306,12 @@ BOOST_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
     constexpr result<int, std::errc> a(5), b(std::errc::invalid_argument);
     static_assert(a.value() == 5, "a is not 5");
     static_assert(b.error() == std::errc::invalid_argument, "b is not errored");
-    BOOST_CHECK_THROW(b.value(), const std::system_error &);
+    BOOST_CHECK_THROW(b.value(), std::system_error);
   }
 
   // Test C compatibility
   {
-    CXX_DECLARE_RESULT(int);
+    CXX_DECLARE_RESULT(int, int);
     CXX_RESULT(int) c_result = {5, 1, 0, nullptr};
     result<int> cxx_result{5};
     static_assert(sizeof(c_result) == sizeof(cxx_result), "Sizes of C and C++ results do not match!");

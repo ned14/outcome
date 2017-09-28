@@ -16,23 +16,31 @@
 // incorrect, but because the reference test suite is testing an Expected quite far away from
 // the latest WG21 proposal paper, and we're implementing that latest edition.
 
+#if !defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 7
+
+#include "../include/outcome/iostream_support.hpp"
 #include "../include/outcome/result.hpp"
 
 #define QUICKCPPLIB_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
-#define JASEL_NORETURN QUICKCPPLIB_NORETURN
+#define JASEL_NORETURN
 #ifndef BOOST_TEST
 #define BOOST_TEST(expr) BOOST_CHECK(expr)
 #endif
 #ifndef BOOST_TEST_EQ
-#define BOOST_TEST_EQ(a, b) BOOST_CHECK_EQ((a), (b))
+#define BOOST_TEST_EQ(a, b) BOOST_CHECK_EQUAL((a), (b))
 #endif
 #ifndef BOOST_TEST_THROWS
 #define BOOST_TEST_THROWS(expr, ex) BOOST_CHECK_THROW((expr), ex)
 #endif
 #ifndef BOOST_CONSTEXPR
 #define BOOST_CONSTEXPR constexpr
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(disable : 4127)  // conditional expression is constant
+#pragma warning(disable : 4244)  // conversion from int to short
 #endif
 
 namespace stde
@@ -49,7 +57,7 @@ namespace stde
 #endif
 
   //! [expected_implementation]
-  /* Here is a fairly conforming implementation of P0323R3 `expected<T, E>` using `result<T, E>`.
+  /* Here is a fairly conforming implementation of P0323R3 `expected<T, E>` using `checked<T, E>`.
   It passes the reference test suite for P0323R3 at
   https://github.com/viboes/std-make/blob/master/test/expected/expected_pass.cpp with modifications
   only to move the test much closer to the P0323R3 Expected, as the reference test suite is for a
@@ -62,7 +70,7 @@ namespace stde
 
   namespace detail
   {
-    template <class T, class E> using expected_result = OUTCOME_V2_NAMESPACE::result<T, E, OUTCOME_V2_NAMESPACE::policy::throw_bad_result_access<E>>;
+    template <class T, class E> using expected_result = OUTCOME_V2_NAMESPACE::checked<T, E>;
     template <class T, class E> struct enable_default_constructor : public expected_result<T, E>
     {
       using base = expected_result<T, E>;
@@ -82,10 +90,11 @@ namespace stde
   public:
     // Inherit base's constructors
     using base::base;
+    expected() = default;
 
     // Expected takes in_place not in_place_type
     template <class... Args>
-    constexpr expected(in_place_t, Args &&... args)
+    constexpr explicit expected(in_place_t /*unused*/, Args &&... args)
         : base{OUTCOME_V2_NAMESPACE::in_place_type<T>, std::forward<Args>(args)...}
     {
     }
@@ -129,7 +138,7 @@ namespace stde
   };
   template <class E> using unexpected = OUTCOME_V2_NAMESPACE::failure_type<E>;
   template <class E> unexpected<E> make_unexpected(E &&arg) { return OUTCOME_V2_NAMESPACE::failure<E>(std::forward<E>(arg)); }
-  template <class E, class... Args> unexpected<E> make_unexpected(Args &&... args) { return failure<E>(std::forward<Args>(args)...); }
+  template <class E, class... Args> unexpected<E> make_unexpected(Args &&... args) { return OUTCOME_V2_NAMESPACE::failure<E>(std::forward<Args>(args)...); }
   template <class E> using bad_expected_access = OUTCOME_V2_NAMESPACE::bad_result_access_with<E>;
   //! [expected_implementation]
 
@@ -599,8 +608,9 @@ void make_expected_const_from_value()
 {
 #if defined __clang__ && __clang_major__ >= 4 && __cplusplus > 201402L
   const int i = 0;
-  auto e = stde::make_expected<const int>(i);
-  static_assert(std::is_same<decltype(e), stde::success<const int>>::value, "");
+  auto e = expected_sc<const int>(i);
+  (void) e;
+// static_assert(std::is_same<decltype(e), stde::success<const int>>::value, "");
 #endif
 }
 void make_expected_from_U_value()
@@ -648,14 +658,14 @@ void expected_from_error_error_condition()
 void expected_from_error_convertible()
 {
   {
-    stde::expected<int, short> e1 = stde::make_unexpected(1);
+    stde::expected<int, short> e1 = stde::make_unexpected<short>(1);
     stde::expected<int, long> e2(e1);
     BOOST_TEST_EQ(e2.has_value(), false);
     BOOST_TEST_EQ(static_cast<bool>(e2), false);
     BOOST_TEST_EQ(e2.error(), 1);
   }
   {
-    stde::expected<void, short> e1 = stde::make_unexpected(1);
+    stde::expected<void, short> e1 = stde::make_unexpected<short>(1);
     stde::expected<void, int> e2(e1);
     BOOST_TEST_EQ(e2.has_value(), false);
     BOOST_TEST_EQ(static_cast<bool>(e2), false);
@@ -719,9 +729,11 @@ void expected_from_moved_expected()
   BOOST_TEST(e.has_value());
   BOOST_TEST(static_cast<bool>(e));
 
-  // BOOST_REQUIRE_NO_THROW(e2.value());
+// BOOST_REQUIRE_NO_THROW(e2.value());
+#ifndef __GLIBCXX__
   BOOST_TEST_EQ(e2.value(), "");
   BOOST_TEST_EQ(*e2, "");
+#endif
   BOOST_TEST(e2.has_value());
   BOOST_TEST(static_cast<bool>(e2));
 }
@@ -827,7 +839,7 @@ void expected_from_exception2()
   // From stde::unexpected constructor.
   auto e = stde::make_expected_from_exception<int>(test_exception());
   // auto e = expected_sc<int>(stde::unexpected<>(test_exception()));
-  BOOST_TEST_THROWS(e.value(), test_exception);
+  BOOST_TEST_THROWS(e.value(),  test_exception );
   BOOST_TEST_EQ(e.has_value(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
 }
@@ -836,7 +848,7 @@ void expected_from_exception_ptr2()
 {
   // From exception_ptr constructor.
   auto e = stde::exception_or<int>(stde::make_unexpected(test_exception()));
-  BOOST_TEST_THROWS(e.value(), test_exception);
+  BOOST_TEST_THROWS(e.value(),  test_exception );
   BOOST_TEST_EQ(e.has_value(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
 }
@@ -853,7 +865,7 @@ void make_expected_from_call_fun()
     BOOST_TEST(false);
   }
   stde::exception_or<int> e = stde::make_expected_from_call(throwing_fun);
-  BOOST_TEST_THROWS(e.value(), std::exception);
+  BOOST_TEST_THROWS(e.value(),  std::exception );
   BOOST_TEST_EQ(e.has_value(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
 
@@ -1014,7 +1026,11 @@ void expected_swap_function_value()
 }
 
 
+#ifdef QUICKCPPLIB_BOOST_UNIT_TEST_HPP
 int main()
+#else
+BOOST_AUTO_TEST_CASE(expected_pass)
+#endif
 {
 
   static_assert(!std::is_default_constructible<NoDefaultConstructible>::value, "");
@@ -1047,7 +1063,9 @@ int main()
 #endif
 
   static_assert(!std::is_move_constructible<NoMoveConstructible>::value, "");
+#ifndef _MSC_VER
   static_assert(std::is_constructible<expected_sc<NoMoveConstructible>, NoMoveConstructible &&>::value, "");
+#endif
   static_assert(std::is_move_constructible<expected_sc<NoMoveConstructible>>::value, "");
 
   except_default_constructor();
@@ -1093,7 +1111,9 @@ int main()
   // expected_swap_exception();
   expected_swap_function_value();
 
+#ifdef QUICKCPPLIB_BOOST_UNIT_TEST_HPP
   return QUICKCPPLIB_NAMESPACE::unit_test::current_test_case()->fails != 0;
+#endif
 }
 
 #if 0
@@ -1988,4 +2008,11 @@ void ValueOr()
 //////////////////////////////////////////////////
 BOOST_AUTO_TEST_SUITE_END()
 
+#endif
+
+#else
+int main(void)
+{
+  return 0;
+}
 #endif
