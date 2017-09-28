@@ -62,6 +62,7 @@ Expected permits `T` and `E` to be the same.
    `.assume_value()` and `.assume_error()` for narrow (UB causing) observers)
 8. `checked<T, E>` uses `success<T>` and `failure<E>` type sugars for disambiguation.
 Expected uses `unexpected<E>` only.
+9. `checked<T, E>` requires `E` to be default constructible.
 
 In fact, the two are sufficiently close in design that a highly conforming `expected<T, E>`
 can be implemented by wrapping up `checked<T, E>` with the missing functionality:
