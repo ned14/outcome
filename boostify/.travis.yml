@@ -2,7 +2,7 @@ dist: trusty
 language: cpp
 compiler:
  - g++-6
- - clang-4.0
+ - clang-5.0
 sudo: false
 os:
  - linux
@@ -21,10 +21,10 @@ addons:
     - ubuntu-toolchain-r-test
 #    - george-edison55-precise-backports
 #    - george-edison55-cmake-3.x
-    - llvm-toolchain-trusty-4.0
+    - llvm-toolchain-trusty-5.0
     packages:
     - g++-6
-    - clang-4.0
+    - clang-5.0
 
 env:
  - __="link=shared" FLAGS="link=shared"
@@ -71,7 +71,7 @@ before_install:
 
 script:
  - if [ "$CXX" = "g++" ]; then FLAGS="$FLAGS toolset=gcc-6"; fi;
- - if [ "$CXX" = "clang++" ]; then FLAGS="$FLAGS toolset=clang-4.0 cxxflags=--std=c++14"; fi;
+ - if [ "$CXX" = "clang++" ]; then FLAGS="$FLAGS toolset=clang-5.0 cxxflags=--std=c++14"; fi;
  - cd boost
  - ./b2 headers
  - ./b2 libs/outcome/test $FLAGS
