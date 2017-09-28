@@ -28,6 +28,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #ifdef _WIN32
 #include "quickcpplib/include/execinfo_win64.h"
+#else
+#include <execinfo.h>
 #endif
 
 #ifdef _MSC_VER

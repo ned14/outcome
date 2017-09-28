@@ -26,6 +26,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
+#include <iostream>
+
 namespace hook_test
 {
   using OUTCOME_V2_NAMESPACE::in_place_type;
@@ -57,7 +59,7 @@ namespace hook_test
   }
 }  // namespace hook_test
 
-BOOST_AUTO_TEST_CASE(works / result / hooks, "Tests that you can hook result's construction")
+BOOST_OUTCOME_AUTO_TEST_CASE(works / result / hooks, "Tests that you can hook result's construction")
 {
   using namespace hook_test;
   result<int> a(5);
@@ -87,7 +89,7 @@ namespace hook_test
   }
 }  // namespace hook_test
 
-BOOST_AUTO_TEST_CASE(works / outcome / hooks, "Tests that you can hook outcome's conversion from a result")
+BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / hooks, "Tests that you can hook outcome's conversion from a result")
 {
   using namespace hook_test;
   outcome<int> a(result<int>(5));

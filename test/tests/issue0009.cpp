@@ -25,9 +25,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/try.hpp"
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
-#ifdef OUTCOME_TRYX
-BOOST_AUTO_TEST_CASE(issues / 9, "Alternative TRY macros?")
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 9, "Alternative TRY macros?")
 {
+#ifdef OUTCOME_TRYX
   using namespace OUTCOME_V2_NAMESPACE;
   struct udt  // NOLINT
   {
@@ -41,5 +41,5 @@ BOOST_AUTO_TEST_CASE(issues / 9, "Alternative TRY macros?")
     return udt(OUTCOME_TRYX(g()));
   };
   (void) f();
-}
 #endif
+}

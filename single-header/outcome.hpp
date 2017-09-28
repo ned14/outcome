@@ -1205,8 +1205,8 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef __cpp_variadic_templates
 #error Outcome needs variadic template support in the compiler
 #endif
-#ifndef __cpp_constexpr
-#error Outcome needs constexpr (C++ 11) support in the compiler
+#if __cpp_constexpr < 201304 && _MSC_FULL_VER < 191100000
+#error Outcome needs constexpr (C++ 14) support in the compiler
 #endif
 #ifndef __cpp_variable_templates
 #error Outcome needs variable template support in the compiler
@@ -1235,19 +1235,6 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef OUTCOME_REQUIRES
 #define OUTCOME_REQUIRES(...) QUICKCPPLIB_REQUIRES(__VA_ARGS__)
-#endif
-#ifndef OUTCOME_MSVC_WORKAROUNDS
-// Older MSVC's constexpr isn't up to Outcome v2 and it ICEs, so don't use constexpr in those situations
-#if defined(_MSC_VER) && !defined(__clang__) && _MSC_FULL_VER <= 191025019 /* VS2017 Update 2*/
-#define OUTCOME_MSVC_WORKAROUNDS 1
-#endif
-#endif
-#ifndef OUTCOME_MSVC_CONSTEXPR
-#if OUTCOME_MSVC_WORKAROUNDS
-#define OUTCOME_MSVC_CONSTEXPR
-#else
-#define OUTCOME_MSVC_CONSTEXPR constexpr
-#endif
 #endif
 /* Convenience macros for importing local namespace binds
 (C) 2014-2017 Niall Douglas <http://www.nedproductions.biz/> (9 commits)
@@ -1417,7 +1404,11 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 
-#ifndef OUTCOME_DO_FATAL_EXIT
+#ifndef OUTCOME_THROW_EXCEPTION
+#ifdef __cpp_exceptions
+#define OUTCOME_THROW_EXCEPTION(expr) throw expr
+#else
+
 #ifdef _WIN32
 /* Implements backtrace() et al from glibc on win64
 (C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (4 commits)
@@ -1775,9 +1766,14 @@ namespace detail
   }
 }
 OUTCOME_V2_NAMESPACE_END
-#define OUTCOME_DO_FATAL_EXIT(expr) OUTCOME_V2_NAMESPACE::detail::do_fatal_exit(#expr)
+#define OUTCOME_THROW_EXCEPTION(expr) OUTCOME_V2_NAMESPACE::detail::do_fatal_exit(#expr)
+
+#endif
 #endif
 
+#ifndef BOOST_OUTCOME_AUTO_TEST_CASE
+#define BOOST_OUTCOME_AUTO_TEST_CASE(a, b) BOOST_AUTO_TEST_CASE(a, b)
+#endif
 
 #endif
 #include <cstdint> // for uint32_t etc
@@ -3351,7 +3347,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_value) == 0)
       {
-        throw bad_result_access_with<EC>(self->_error);
+        OUTCOME_THROW_EXCEPTION(bad_result_access_with<EC>(self->_error));
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -3363,7 +3359,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_error) == 0)
       {
-        throw bad_result_access("no error");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
@@ -3376,7 +3372,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_status) == 0)
       {
-        throw bad_result_access("no status");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no status"));
       }
     }
 #endif
@@ -3444,9 +3440,9 @@ namespace policy
       {
         if((self->_state._status & detail::status_have_error) != 0)
         {
-          throw std::system_error(make_error_code(self->_error));
+          OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(self->_error)));
         }
-        throw bad_result_access("no value");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -3458,7 +3454,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_error) == 0)
       {
-        throw bad_result_access("no error");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
@@ -3471,7 +3467,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_status) == 0)
       {
-        throw bad_result_access("no status");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no status"));
       }
     }
 #endif
@@ -3540,9 +3536,9 @@ namespace policy
       {
         if((self->_state._status & detail::status_have_error) != 0)
         {
-          throw std::system_error(self->_error);
+          OUTCOME_THROW_EXCEPTION(std::system_error(self->_error));
         }
-        throw bad_result_access("no value");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -3554,7 +3550,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_error) == 0)
       {
-        throw bad_result_access("no error");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
@@ -3567,7 +3563,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_status) == 0)
       {
-        throw bad_result_access("no status");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no status"));
       }
     }
 #endif
@@ -3636,7 +3632,7 @@ namespace policy
         {
           std::rethrow_exception(self->_error);
         }
-        throw bad_result_access("no value");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
     }
     /*! Performs a wide check of state, used in the value() functions
@@ -3648,7 +3644,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_error) == 0)
       {
-        throw bad_result_access("no error");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
@@ -3661,7 +3657,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_status) == 0)
       {
-        throw bad_result_access("no status");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no status"));
       }
     }
 #endif
@@ -6415,9 +6411,9 @@ namespace policy
         }
         if((self->_state._status & detail::status_have_error) != 0)
         {
-          throw std::system_error(self->_error);
+          OUTCOME_THROW_EXCEPTION(std::system_error(self->_error));
         }
-        throw bad_outcome_access("no value");
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -6429,7 +6425,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_error) == 0)
       {
-        throw bad_outcome_access("no error");
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
       }
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
@@ -6442,7 +6438,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_status) == 0)
       {
-        throw bad_outcome_access("no status");
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no status"));
       }
     }
 #endif
@@ -6455,7 +6451,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_payload) == 0)
       {
-        throw bad_outcome_access("no payload");
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no payload"));
       }
     }
     /*! Performs a wide check of state, used in the exception() functions
@@ -6467,7 +6463,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_exception) == 0)
       {
-        throw bad_outcome_access("no exception");
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
       }
     }
   };

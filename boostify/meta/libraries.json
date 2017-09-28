@@ -1,0 +1,11 @@
+{
+  "key": "outcome",
+  "name": "Outcome",
+  "authors": [ "Niall Douglas" ],
+  "maintainers": [ "Niall Douglas" ],
+  "description": "A function failure handling library.",
+  "std": [ "14" ],
+  "category": [
+    "Programming Interfaces"
+  ]
+}

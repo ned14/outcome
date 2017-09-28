@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
 
-BOOST_AUTO_TEST_CASE(works / outcome / swap, "Tests that the outcome swaps as intended")
+BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / swap, "Tests that the outcome swaps as intended")
 {
   using namespace OUTCOME_V2_NAMESPACE;
   outcome<std::string> a("niall"), b("douglas");

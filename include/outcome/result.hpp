@@ -808,7 +808,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_value) == 0)
       {
-        throw bad_result_access_with<EC>(self->_error);
+        OUTCOME_THROW_EXCEPTION(bad_result_access_with<EC>(self->_error));
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -818,7 +818,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_error) == 0)
       {
-        throw bad_result_access("no error");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
@@ -829,7 +829,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_status) == 0)
       {
-        throw bad_result_access("no status");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no status"));
       }
     }
 #endif
@@ -885,9 +885,9 @@ namespace policy
       {
         if((self->_state._status & detail::status_have_error) != 0)
         {
-          throw std::system_error(make_error_code(self->_error));
+          OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(self->_error)));
         }
-        throw bad_result_access("no value");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -897,7 +897,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_error) == 0)
       {
-        throw bad_result_access("no error");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
@@ -908,7 +908,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_status) == 0)
       {
-        throw bad_result_access("no status");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no status"));
       }
     }
 #endif
@@ -965,9 +965,9 @@ namespace policy
       {
         if((self->_state._status & detail::status_have_error) != 0)
         {
-          throw std::system_error(self->_error);
+          OUTCOME_THROW_EXCEPTION(std::system_error(self->_error));
         }
-        throw bad_result_access("no value");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -977,7 +977,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_error) == 0)
       {
-        throw bad_result_access("no error");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
@@ -988,7 +988,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_status) == 0)
       {
-        throw bad_result_access("no status");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no status"));
       }
     }
 #endif
@@ -1046,7 +1046,7 @@ namespace policy
         {
           std::rethrow_exception(self->_error);
         }
-        throw bad_result_access("no value");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
     }
     /*! Performs a wide check of state, used in the value() functions
@@ -1056,7 +1056,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_error) == 0)
       {
-        throw bad_result_access("no error");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
     }
 #if OUTCOME_ENABLE_POSITIVE_STATUS
@@ -1067,7 +1067,7 @@ namespace policy
     {
       if((self->_state._status & detail::status_have_status) == 0)
       {
-        throw bad_result_access("no status");
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no status"));
       }
     }
 #endif

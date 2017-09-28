@@ -18,17 +18,18 @@
 
 #if !defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 7
 
+#include "../include/outcome/iostream_support.hpp"
 #include "../include/outcome/result.hpp"
 
 #define QUICKCPPLIB_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
-#define JASEL_NORETURN QUICKCPPLIB_NORETURN
+#define JASEL_NORETURN
 #ifndef BOOST_TEST
 #define BOOST_TEST(expr) BOOST_CHECK(expr)
 #endif
 #ifndef BOOST_TEST_EQ
-#define BOOST_TEST_EQ(a, b) BOOST_CHECK_EQ((a), (b))
+#define BOOST_TEST_EQ(a, b) BOOST_CHECK_EQUAL((a), (b))
 #endif
 #ifndef BOOST_TEST_THROWS
 #define BOOST_TEST_THROWS(expr, ex) BOOST_CHECK_THROW((expr), ex)
@@ -591,7 +592,7 @@ void expected_from_catch_block()
   {
     stde::exception_or<int> e(stde::make_unexpected(std::current_exception()));
 
-    BOOST_TEST_THROWS(e.value(), const std::exception &);
+    BOOST_TEST_THROWS(e.value(), std::exception);
     BOOST_TEST_EQ(e.has_value(), false);
     BOOST_TEST_EQ(static_cast<bool>(e), false);
   }
@@ -800,7 +801,7 @@ void expected_from_exception_catch()
   {
     stde::exception_or<int> e = stde::make_unexpected(std::current_exception());
 
-    BOOST_TEST_THROWS(e.value(), const std::exception &);
+    BOOST_TEST_THROWS(e.value(), std::exception);
     BOOST_TEST_EQ(e.has_value(), false);
     BOOST_TEST_EQ(static_cast<bool>(e), false);
   }
@@ -838,7 +839,7 @@ void expected_from_exception2()
   // From stde::unexpected constructor.
   auto e = stde::make_expected_from_exception<int>(test_exception());
   // auto e = expected_sc<int>(stde::unexpected<>(test_exception()));
-  BOOST_TEST_THROWS(e.value(), const test_exception &);
+  BOOST_TEST_THROWS(e.value(),  test_exception );
   BOOST_TEST_EQ(e.has_value(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
 }
@@ -847,7 +848,7 @@ void expected_from_exception_ptr2()
 {
   // From exception_ptr constructor.
   auto e = stde::exception_or<int>(stde::make_unexpected(test_exception()));
-  BOOST_TEST_THROWS(e.value(), const test_exception &);
+  BOOST_TEST_THROWS(e.value(),  test_exception );
   BOOST_TEST_EQ(e.has_value(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
 }
@@ -864,7 +865,7 @@ void make_expected_from_call_fun()
     BOOST_TEST(false);
   }
   stde::exception_or<int> e = stde::make_expected_from_call(throwing_fun);
-  BOOST_TEST_THROWS(e.value(), const std::exception &);
+  BOOST_TEST_THROWS(e.value(),  std::exception );
   BOOST_TEST_EQ(e.has_value(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
 
@@ -1025,7 +1026,11 @@ void expected_swap_function_value()
 }
 
 
+#ifdef QUICKCPPLIB_BOOST_UNIT_TEST_HPP
 int main()
+#else
+BOOST_AUTO_TEST_CASE(expected_pass)
+#endif
 {
 
   static_assert(!std::is_default_constructible<NoDefaultConstructible>::value, "");
@@ -1106,7 +1111,9 @@ int main()
   // expected_swap_exception();
   expected_swap_function_value();
 
+#ifdef QUICKCPPLIB_BOOST_UNIT_TEST_HPP
   return QUICKCPPLIB_NAMESPACE::unit_test::current_test_case()->fails != 0;
+#endif
 }
 
 #if 0

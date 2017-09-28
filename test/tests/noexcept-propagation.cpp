@@ -30,7 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #ifdef __cpp_exceptions
 // std nothrow traits seem to return random values if exceptions are disabled on MSVC
-BOOST_AUTO_TEST_CASE(works / outcome / noexcept, "Tests that the outcome correctly inherits noexcept from its type R")
+BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / noexcept, "Tests that the outcome correctly inherits noexcept from its type R")
 {
   using namespace OUTCOME_V2_NAMESPACE;
   {
