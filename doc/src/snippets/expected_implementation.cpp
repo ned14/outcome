@@ -7,7 +7,8 @@ much older proposed Expected.
 
 Known differences from P0323R3 in this implementation:
 - `T` and `E` cannot be the same type.
-- No variant storage is implemented.
+- `E` must be default constructible.
+- No variant storage is implemented (note the Expected proposal does not actually require this).
 */
 
 namespace detail
