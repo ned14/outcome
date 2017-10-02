@@ -76,19 +76,19 @@ template <class R, class S = std::error_code, class NoValuePolicy = policy::defa
 namespace detail
 {
   // These are reused by outcome to save load on the compiler
-  template <class value_type, class status_error_type, class error_type> struct result_predicates
+  template <class value_type, class error_type> struct result_predicates
   {
     // Predicate for the implicit constructors to be available
-    static constexpr bool implicit_constructors_enabled =                                                              //
-    (std::is_same<bool, std::decay_t<value_type>>::value || !is_same_or_constructible<value_type, status_error_type>)  //
-    &&!is_same_or_constructible<status_error_type, value_type>;
+    static constexpr bool implicit_constructors_enabled =                                                       //
+    (std::is_same<bool, std::decay_t<value_type>>::value || !is_same_or_constructible<value_type, error_type>)  //
+    &&!is_same_or_constructible<error_type, value_type>;
 
     // Predicate for the value converting constructor to be available.
     template <class T>
     static constexpr bool enable_value_converting_constructor =  //
     implicit_constructors_enabled                                //
     && !is_in_place_type_t<std::decay_t<T>>::value               // not in place construction
-    && is_same_or_constructible<value_type, T> && !std::is_constructible<status_error_type, T>::value;
+    && is_same_or_constructible<value_type, T> && !std::is_constructible<error_type, T>::value;
 
     // Predicate for the error converting constructor to be available.
     template <class T>
@@ -146,6 +146,8 @@ namespace detail
 }
 
 //! True if a result
+template <class T> using is_result = detail::is_result<std::decay_t<T>>;
+//! True if a result
 template <class T> static constexpr bool is_result_v = detail::is_result<std::decay_t<T>>::value;
 
 namespace hooks
@@ -184,36 +186,24 @@ namespace hooks
   template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept { r->_state._status |= (v << detail::status_2byte_shift); }
 }
 
-/*! Used to return from functions (i) a value (ii) a value and a positive status or (iii) no value and a negative status. `constexpr` capable.
+/*! Used to return from functions either (i) a successful value (ii) a cause of failure. `constexpr` capable.
 \module result<R, S> implementation
 \tparam R The optional type of the successful result (use `void` to disable).
-\tparam S The optional type of the status result (use `void` to disable). Must be either `void` or DefaultConstructible.
+\tparam S The optional type of the failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
 \tparam NoValuePolicy Policy on how to interpret type `S` when a wide observation of a not present value occurs.
 
-This is a vocabulary type implementing [P0262R0 A Class for Status and Optional Value](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0262r0.html),
-albeit with types `Status` and `Value` reversed in lexical order. By default `S` is considered to be a *positive* status type used to supply
-additional information about the successful return of a type `R`. If however the trait `trait::status_type_is_negative<S>`
-has been specialised to be true, then `S` is considered to be a *negative* status type used to supply information about
-the cause of failure to return a type `R`.
-
-`trait::status_type_is_negative<S>` is already set to true for these types (you can specialise in your own types easily):
-- `std::error_code`
-- `std::exception_ptr`
-- `void`
-
-When `trait::status_type_is_negative<S>` is false, the default for `NoValuePolicy` is:
-  1. If `.status()` called when there is no `status_type`:
-    - `throw bad_result_access()` if C++ exceptions are enabled, else call `std::terminate()`.
-
-When `trait::status_type_is_negative<S>` is true, the default for `NoValuePolicy` is:
+`NoValuePolicy` defaults to a policy selected according to the characteristics of type `S`:
   1. If `.value()` called when there is no `value_type` but there is an `error_type`:
+    - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<EC>` is true,
+    then `throw std::system_error(make_error_code(error()))` [`policy::error_enum_throw_as_system_error<S>`]
+    if C++ exceptions are enabled, else call `std::terminate()`.
     - If `S` convertible to a `std::error_code`, then `throw std::system_error(error())` [`policy::error_code_throw_as_system_error<S>`]
     if C++ exceptions are enabled, else call `std::terminate()`.
     - If `S` convertible to a `std::exception_ptr`, then `std::rethrow_exception(error())` [`policy::exception_ptr_rethrow<S>`]
     if C++ exceptions are enabled, else call `std::terminate()`.
     - If `S` is `void`, call `std::terminate()` [`policy::terminate<S>`]
-    - If `S` is none of the above, then someone has enabled the negative status type trait but did not specify a custom policy.
-    We therefore simply `throw error()` [`policy::throw_directly<S>`] if C++ exceptions are enabled, else call `std::terminate`.
+    - If `S` is none of the above, then `throw bad_result_access_with<S>(error())` [`policy::throw_bad_result_access<S>`]
+    if C++ exceptions are enabled, else call `std::terminate`.
   2. If `.error()` called when there is no `error_type`:
     - `throw bad_result_access()` if C++ exceptions are enabled, else call `std::terminate()`.
 
@@ -241,8 +231,6 @@ public:
   /// \output_section Member types
   //! The success type.
   using value_type = R;
-  //! The S type configured
-  using status_error_type = S;
   //! The failure type.
   using error_type = S;
 
@@ -258,7 +246,7 @@ protected:
   //! Requirement predicates for result.
   struct predicate
   {
-    using base = detail::result_predicates<value_type, status_error_type, error_type>;
+    using base = detail::result_predicates<value_type, error_type>;
 
     //! Predicate for the value converting constructor to be available.
     template <class T>
@@ -307,13 +295,13 @@ public:
   /// \output_section Default, copy/move constructors and assignment
   //! Default construction is not permitted.
   result() = delete;
-  //! Move construction available if `value_type` and `status_error_type` implement it.
+  //! Move construction available if `value_type` and `error_type` implement it.
   result(result && /*unused*/) = default;
-  //! Copy construction available if `value_type` and `status_error_type` implement it.
+  //! Copy construction available if `value_type` and `error_type` implement it.
   result(const result & /*unused*/) = default;
-  //! Move assignment available if `value_type` and `status_error_type` implement it.
+  //! Move assignment available if `value_type` and `error_type` implement it.
   result &operator=(result && /*unused*/) = default;
-  //! Copy assignment available if `value_type` and `status_error_type` implement it.
+  //! Copy assignment available if `value_type` and `error_type` implement it.
   result &operator=(const result & /*unused*/) = default;
 
   /// \output_section Converting constructors
@@ -325,7 +313,7 @@ public:
   \param t The value from which to initialise the `value_type`.
 
   \effects Initialises the result with a `value_type`.
-  \requires Type T is constructible to `value_type`, is not constructible to `status_error_type`, and is not `result<R, S>` and not `in_place_type<>`.
+  \requires Type T is constructible to `value_type`, is not constructible to `error_type`, and is not `result<R, S>` and not `in_place_type<>`.
   \throws Any exception the construction of `value_type(T)` might throw.
   */
   OUTCOME_TEMPLATE(class T)
@@ -344,7 +332,7 @@ public:
   \param t The value from which to initialise the `error_type`.
 
   \effects Initialises the result with a `error_type`.
-  \requires `trait::status_type_is_negative<EC>` must be true; Type T is constructible to `error_type`,
+  \requires Type T is constructible to `error_type`,
   is not constructible to `value_type`, and is not `result<R, S>` and not `in_place_type<>`.
   \throws Any exception the construction of `error_type(T)` might throw.
   */
@@ -366,7 +354,7 @@ public:
   \param t The error condition from which to initialise the `error_type`.
 
   \effects Initialises the result with a `error_type` constructed via `make_error_code(t)`.
-  \requires `trait::status_type_is_negative<EC>` must be true; `std::is_error_condition_enum<ErrorCondEnum>` must be true,
+  \requires `std::is_error_condition_enum<ErrorCondEnum>` must be true,
   `ErrorCondEnum` is not constructible to `value_type` nor `error_type`, and is not `result<R, S>` and not `in_place_type<>`;
   Finally, the expression `error_type(make_error_code(ErrorCondEnum()))` must be valid.
   \throws Any exception the construction of `error_type(make_error_code(t))` might throw.
@@ -387,12 +375,12 @@ public:
   \param o The compatible result.
 
   \effects Initialises the result with a copy of the compatible result.
-  \requires Both result's `value_type`, `error_type` and `status_type` need to be constructible, or the source can be `void`.
-  \throws Any exception the construction of `value_type(T)` and `status_error_type(U)` might throw.
+  \requires Both result's `value_type` and `error_type` need to be constructible, or the source can be `void`.
+  \throws Any exception the construction of `value_type(T)` and `error_type(U)` might throw.
   */
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V>))
-  constexpr explicit result(const result<T, U, V> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
+  constexpr explicit result(const result<T, U, V> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value)
       : base{typename base::compatible_conversion_tag(), o}
   {
     using namespace hooks;
@@ -404,12 +392,12 @@ public:
   \param o The compatible result.
 
   \effects Initialises the result with a move of the compatible result.
-  \requires Both result's `value_type`, `error_type` and `status_type` need to be constructible, or the source can be `void`.
-  \throws Any exception the construction of `value_type(T)` and `status_error_type(U)` might throw.
+  \requires Both result's `value_type` and `error_type` need to be constructible, or the source can be `void`.
+  \throws Any exception the construction of `value_type(T)` and `error_type(U)` might throw.
   */
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V>))
-  constexpr explicit result(result<T, U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value)
+  constexpr explicit result(result<T, U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value)
       : base{typename base::compatible_conversion_tag(), std::move(o)}
   {
     using namespace hooks;
@@ -461,7 +449,7 @@ public:
   \param args Arguments with which to in place construct.
 
   \effects Initialises the result with a `error_type`.
-  \requires `trait::status_type_is_negative<EC>` must be true; `error_type` is void or `Args...` are constructible to `error_type`.
+  \requires `error_type` is void or `Args...` are constructible to `error_type`.
   \throws Any exception the construction of `error_type(Args...)` might throw.
   */
   OUTCOME_TEMPLATE(class... Args)
@@ -480,7 +468,7 @@ public:
   \param args Arguments with which to in place construct.
 
   \effects Initialises the result with a `error_type`.
-  \requires `trait::status_type_is_negative<EC>` must be true; The initializer list + `Args...` are constructible to `error_type`.
+  \requires The initializer list + `Args...` are constructible to `error_type`.
   \throws Any exception the construction of `error_type(il, Args...)` might throw.
   */
   OUTCOME_TEMPLATE(class U, class... Args)
@@ -600,7 +588,7 @@ public:
   \effects Any `R` and/or `S` is swapped along with the metadata tracking them.
   */
   void swap(result &o) noexcept(detail::is_nothrow_swappable<value_type>::value  //
-                                &&detail::is_nothrow_swappable<status_error_type>::value)
+                                &&detail::is_nothrow_swappable<error_type>::value)
   {
     using std::swap;
 #ifdef __cpp_exceptions
