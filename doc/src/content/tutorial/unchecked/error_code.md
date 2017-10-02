@@ -1,5 +1,5 @@
 +++
-title = "Custom error code"
+title = "Custom error codes"
 weight = 30
 +++
 

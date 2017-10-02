@@ -149,7 +149,7 @@ template <class R, class S, class P> inline std::ostream &operator<<(std::ostrea
   return s;
 }
 //! Debug print a result
-template <class R, class S, class P> inline std::string print(const impl::result_final<R, S, P> &v)
+template <class R, class S, class P> inline std::string print(const detail::result_final<R, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -163,7 +163,7 @@ template <class R, class S, class P> inline std::string print(const impl::result
   return s.str();
 }
 //! Debug print a result
-template <class S, class P> inline std::string print(const impl::result_final<void, S, P> &v)
+template <class S, class P> inline std::string print(const detail::result_final<void, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -177,7 +177,7 @@ template <class S, class P> inline std::string print(const impl::result_final<vo
   return s.str();
 }
 //! Debug print a result
-template <class R, class P> inline std::string print(const impl::result_final<R, void, P> &v)
+template <class R, class P> inline std::string print(const detail::result_final<R, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -191,7 +191,7 @@ template <class R, class P> inline std::string print(const impl::result_final<R,
   return s.str();
 }
 //! Debug print a result
-template <class P> inline std::string print(const impl::result_final<void, void, P> &v)
+template <class P> inline std::string print(const detail::result_final<void, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -244,7 +244,7 @@ template <class R, class S, class P, class N> inline std::string print(const out
   {
     s << "{ ";
   }
-  s << print(static_cast<const impl::result_final<R, S, N> &>(v));
+  s << print(static_cast<const detail::result_final<R, S, N> &>(v));
   if(total > 1)
   {
     s << ", ";
