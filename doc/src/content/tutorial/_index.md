@@ -9,7 +9,7 @@ It is recommended that you refer to entities from this Outcome 2.0 via the follo
 
 {{% snippet "using_result.cpp" "namespace" %}}
 
-As patches and modifications are applied to this library, namespaces get added in order
+As patches and modifications are applied to this library, namespaces get permuted in order
 not to break any backward compatibility. At some point namespace `outcome::v2` will be defined,
 and this will be the prefered namespace. Until then `OUTCOME_V2_NAMESPACE` denotes the most recently
 updated version, getting closer to `outcome::v2`.

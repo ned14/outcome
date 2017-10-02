@@ -3,7 +3,7 @@ baseURL = "https://ned14.github.io/outcome/"
 title = "Outcome documentation"
 publishDir = "../html"
 pygmentsStyle = "vs"
-pygmentsUseClasses = false
+pygmentsUseClasses = true
 PygmentsCodeFences = true
 
 [outputs]
