@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #ifdef TESTING_WG21_EXPERIMENTAL_RESULT
 #include "../../include/outcome/experimental/result.hpp"
+#define BOOST_OUTCOME_AUTO_TEST_CASE(...) BOOST_AUTO_TEST_CASE(__VA_ARGS__)
 #else
 #include "../../include/outcome/result.h"
 #include "../../include/outcome/result.hpp"
