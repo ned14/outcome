@@ -106,7 +106,7 @@ outcome::unchecked<void> print_half(const std::string& text);
 //! [half_impl]
 outcome::unchecked<void> print_half(const std::string& text)
 {
-    if (outcome::unchecked<int> r = convert(text))        // #1
+    if (outcome::unchecked<int> r = convert(text))      // #1
     {
         std::cout << (r.value() / 2) << std::endl;      // #2
     }

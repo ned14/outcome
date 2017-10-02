@@ -9,9 +9,6 @@ code, pre {
   border: none;
   text-align: left;
 }
-code + span.copy-to-clipboard {
-  display: none;
-}
 /* Fix Firefox */
 /*#body a.highlight {
   vertical-align: middle;
@@ -24,16 +21,6 @@ pre .copy-to-clipboard:hover {
   background-color: #fff7dd;
 }
 
-.highlight pre {
-  #border: 2px dashed;
-  border-radius: 5px;
-  box-shadow: 0px 0px 10px #000000;
-}
-.highlight code + span.copy-to-clipboard {
-  display: inline-block;
-  border: none;
-}
-
 .copy-to-clipboard {
   background-image: url(../images/clippy.svg);
   background-position: 50% 50%;
@@ -42,8 +29,21 @@ pre .copy-to-clipboard:hover {
   width: 27px;
   height: 1.45rem;
   top: -1px;
-  vertical-align: middle;
   margin-bottom: 1px;
+}
+.highlight pre {
+  #border: 2px dashed;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px #000000;
+}
+div.highlight code + span.copy-to-clipboard {
+  display: inline-block;
+  border: none;
+  vertical-align: unset;
+}
+
+code + span.copy-to-clipboard {
+  display: none;
 }
 
 
