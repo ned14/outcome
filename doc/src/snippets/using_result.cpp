@@ -9,7 +9,7 @@ namespace outcome = OUTCOME_V2_NAMESPACE;
 //! [namespace]
 
 //! [convert_decl]
-outcome::checked<int> convert(const std::string& str) noexcept;
+outcome::unchecked<int> convert(const std::string& str) noexcept;
 //! [convert_decl]
 
 //! [enum]
@@ -31,7 +31,7 @@ namespace std {
 }
 
 //! [convert]
-outcome::checked<int> convert(const std::string& str) noexcept
+outcome::unchecked<int> convert(const std::string& str) noexcept
 {
   if (str.empty())
     return ConversionErrc::EmptyString;
@@ -79,34 +79,34 @@ std::error_code make_error_code(ConversionErrc e)
 void explicit_construction()
 {
 //! [explicit]	
-outcome::checked<int> r {outcome::in_place_type<std::error_code>, ConversionErrc::EmptyString};
-outcome::checked<int> s {outcome::in_place_type<int>, 1};
+outcome::unchecked<int> r {outcome::in_place_type<std::error_code>, ConversionErrc::EmptyString};
+outcome::unchecked<int> s {outcome::in_place_type<int>, 1};
 //! [explicit]
 }
 
 struct BigInt
 {
-    static outcome::checked<BigInt> fromString(const std::string& s);
+    static outcome::unchecked<BigInt> fromString(const std::string& s);
     explicit BigInt(const std::string&) {}
     BigInt half() const { return BigInt{""}; }
     friend std::ostream& operator<<(std::ostream& o, const BigInt&) { return o << "big int half"; }
 };
 
 //! [from_string]
-/*static*/ outcome::checked<BigInt> BigInt::fromString(const std::string& s)
+/*static*/ outcome::unchecked<BigInt> BigInt::fromString(const std::string& s)
 //! [from_string]
 {
 	return BigInt{s};
 }
 
 //! [half_decl]
-outcome::checked<void> print_half(const std::string& text);
+outcome::unchecked<void> print_half(const std::string& text);
 //! [half_decl]
 
 //! [half_impl]
-outcome::checked<void> print_half(const std::string& text)
+outcome::unchecked<void> print_half(const std::string& text)
 {
-    if (outcome::checked<int> r = convert(text))        // #1
+    if (outcome::unchecked<int> r = convert(text))        // #1
     {
         std::cout << (r.value() / 2) << std::endl;      // #2
     }
@@ -127,7 +127,7 @@ outcome::checked<void> print_half(const std::string& text)
 //! [half_impl]
 
 //! [tryv]
-outcome::checked<void> test()
+outcome::unchecked<void> test()
 {
   OUTCOME_TRYV (print_half("2"));
   OUTCOME_TRYV (print_half("X"));
@@ -138,7 +138,7 @@ outcome::checked<void> test()
 
 int main()
 {
-  if (outcome::checked<void> r = print_half("1299999999999999999999999999"))
+  if (outcome::unchecked<void> r = print_half("1299999999999999999999999999"))
   {
       std::cout << "ok" << std::endl;
   }

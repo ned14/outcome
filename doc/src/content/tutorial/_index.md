@@ -14,23 +14,23 @@ not to break any backward compatibility. At some point namespace `outcome::v2` w
 and this will be the prefered namespace. Until then `OUTCOME_V2_NAMESPACE` denotes the most recently
 updated version, getting closer to `outcome::v2`.
 
-## Creating `checked<>`
+## Creating `unchecked<>`
 
 We will define a function that converts an `std::string` to an `int`. This function can fail for a number of reasons;
 if it does we want to communicate the failure reason.
 
 {{% snippet "using_result.cpp" "convert_decl" %}}
 
-Class template `checked<T, EC>` has two template parameters. The first (`T`) represents the type of the object
+Class template `unchecked<T, EC>` has two template parameters. The first (`T`) represents the type of the object
 returned from the function upon success; the second (`EC`) is the type of object containing information about the reason
-for failure when the function fails. A `checked<T, EC>` object either stores a `T` or an `EC` at any given moment,
+for failure when the function fails. A `unchecked<T, EC>` object either stores a `T` or an `EC` at any given moment,
 and is therefore conceptually similar to `variant<T, EC>`. `EC` is defaulted to `std::error_code`.
-If both `T` and `EC` are trivially copyable, `checked<T, EC>` is also trivially copyable.
+If both `T` and `EC` are trivially copyable, `unchecked<T, EC>` is also trivially copyable.
 
 {{% notice note %}}
 Both `unchecked<T, EC>` and `checked<T, EC>` are simplified typedefs for `result<T, EC>`, but are instances
-of `result<T, EC>`. Anything we say about `checked<>` can also be said about `unchecked<T, EC>` and
-`result<T, EC>` unless otherwise specified.
+of `result<T, EC>`. Anything we say about `unchecked<>` can also be said about `checked<T, EC>` and
+`result<T, EC>`, unless otherwise specified.
 {{% /notice %}}
 
 Now, we will define an enumeration describing different failure situations during conversion.
@@ -44,38 +44,38 @@ Now we can implement function `convert` as follows:
 
 {{% snippet "using_result.cpp" "convert" %}}
 
-`checked<T, EC>` is convertible from any `T2` convertible to `T` as well as any `EC2` convertible to `EC`,
+`unchecked<T, EC>` is convertible from any `T2` convertible to `T` as well as any `EC2` convertible to `EC`,
 provided that the conversion is not ambiguous. If some type `X` is both convertible to `T` and `EC`, 
-conversion to `checked<T, EC>` fails to compile. In this case you need to use one of the tagged constructors:
+conversion to `unchecked<T, EC>` fails to compile. In this case you need to use one of the tagged constructors:
 
 {{% snippet "using_result.cpp" "explicit" %}}
 
-## Inspecting `checked<>`
+## Inspecting `unchecked<>`
 
 Suppose we will be writing function `print_half` that takes an integral number (however big) represented as an `std::string` and outputs a number which is twice smaller:
 
 {{% snippet "using_result.cpp" "half_decl" %}}
 
-Type `checked<void>` means that there is no value to be retuned upon success, but that the operation might still fail, and we may be interested in inspecting the cause of the failure. Class template `checked<>` is declared with attribute `[[nodiscard]]`, which means compiler will warn you if you forget to inspect the returned object (in C++ 17 or later).
+Type `unchecked<void>` means that there is no value to be retuned upon success, but that the operation might still fail, and we may be interested in inspecting the cause of the failure. Class template `unchecked<>` is declared with attribute `[[nodiscard]]`, which means compiler will warn you if you forget to inspect the returned object (in C++ 17 or later).
 
 The implementation will do the following: if the integral number can be represnted by an `int`, we will convert to `int` and use its arithmetical operations. If the number is too large, we will fall back to using a custom `BigInt` implementation that needs to allocate memory. In the implementation we will use function `convert` defined in the previous section.
 
 {{% snippet "using_result.cpp" "half_impl" %}}
 
-#1. You test if `checked<>` object represents a successful operation with contextual conversion to `bool`.
+#1. You test if `unchecked<>` object represents a successful operation with contextual conversion to `bool`.
 
 #2. Function `.value()` extracts the successfully returned `BigInt`.
 
 #3. Function `.error()` allows you to inspect the error sub-object, representing information about the reason for failure.
 
-#4. Macro `OUTCOME_TRY` represents a control statement. It implies that the function call in the second argument returns a `checked<>`. It is defined as:
+#4. Macro `OUTCOME_TRY` represents a control statement. It implies that the function call in the second argument returns a `unchecked<>`. It is defined as:
 
 {{% snippet "using_result.cpp" "from_string" %}}
 
-   Our control statement means: if `fromString` returned failure, this same error information should be returned from `print_half`, even though the type of `checked<>` is different. If `fromString` returned success, we create  variable `i` of type `int` with the value returned from `fromString`. If control goes to subsequent line, it means `fromString` succeeded and variable of type `int` is in scope.
+   Our control statement means: if `fromString` returned failure, this same error information should be returned from `print_half`, even though the type of `unchecked<>` is different. If `fromString` returned success, we create  variable `i` of type `int` with the value returned from `fromString`. If control goes to subsequent line, it means `fromString` succeeded and variable of type `int` is in scope.
 
 #5. In the return statement we extract the error information and use it to initialize the return value from `print_half`. We could have written `return r.error();` instead,
-    and it would have the same effect, but it would not work if we were using `outcome<>` instead of `checked<>` -- this will be covered later.
+    and it would have the same effect, but it would not work if we were using `outcome<>` instead of `unchecked<>` -- this will be covered later.
 
 #6. Function `success()` returns an object of type `success<void>` representing success. This is implicitly converted by
 all `result` and `outcome` types into a successful return, default constructing any `T` if necessary.
@@ -130,11 +130,11 @@ Macro `OUTCOME_TRY` does two things:
 1. It extracts a `T` from `result<T>` (or `outcome<T>`).
 2. It declares a dependency between statements: If the "tried" statement fails, the next statement is not executed.
 
-When you are calling functions that return `checked<void>` the first of the two things does not make sense. You then have to use macro `OUTCOME_TRYV` instead. Let's use our function `print_half`:
+When you are calling functions that return `unchecked<void>` the first of the two things does not make sense. You then have to use macro `OUTCOME_TRYV` instead. Let's use our function `print_half`:
 
 {{% snippet "using_result.cpp" "tryv" %}}
 
-The first statement will succeed. The second statement will "fail", i.e. it will return an errored checked. This will cause an immediate return and the subsequent statements will be skipped.
+The first statement will succeed. The second statement will "fail", i.e. it will return an errored unchecked. This will cause an immediate return and the subsequent statements will be skipped.
 
 
 ## TODO: more material will be provided in time...
