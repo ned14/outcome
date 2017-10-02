@@ -13,9 +13,9 @@ code + span.copy-to-clipboard {
   display: none;
 }
 /* Fix Firefox */
-#body a.highlight {
+/*#body a.highlight {
   vertical-align: middle;
-}
+}*/
 
 pre .copy-to-clipboard {
   background-color: transparent;
@@ -31,6 +31,19 @@ pre .copy-to-clipboard:hover {
 }
 .highlight code + span.copy-to-clipboard {
   display: inline-block;
+  border: none;
+}
+
+.copy-to-clipboard {
+  background-image: url(../images/clippy.svg);
+  background-position: 50% 50%;
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  width: 27px;
+  height: 1.45rem;
+  top: -1px;
+  vertical-align: middle;
+  margin-bottom: 1px;
 }
 
 
