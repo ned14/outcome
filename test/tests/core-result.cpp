@@ -312,14 +312,14 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
 
   // Test C compatibility
   {
-    CXX_DECLARE_RESULT(int, int);
-    CXX_RESULT(int) c_result = {5, 1, 0, nullptr};
+    CXX_DECLARE_RESULT_EC(int, int);
+    CXX_RESULT_EC(int) c_result = {5, 1, {0, nullptr}};
     result<int> cxx_result{5};
     static_assert(sizeof(c_result) == sizeof(cxx_result), "Sizes of C and C++ results do not match!");
 
     union test_t {
       result<int> cxx;
-      CXX_RESULT(int) c;
+      CXX_RESULT_EC(int) c;
     };
     test_t a{5};
     BOOST_CHECK(a.cxx.has_value());          // NOLINT
@@ -329,6 +329,9 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
     test_t b{std::errc::invalid_argument};
     BOOST_CHECK(b.cxx.has_error());          // NOLINT
     BOOST_CHECK(CXX_RESULT_HAS_ERROR(b.c));  // NOLINT
-    BOOST_CHECK(b.c.error == EINVAL);        // NOLINT
+#ifndef TESTING_WG21_EXPERIMENTAL_RESULT
+    BOOST_CHECK(CXX_RESULT_ERROR_IS_ERRNO(b.c));  // NOLINT
+#endif
+    BOOST_CHECK(b.c.error.code == EINVAL);  // NOLINT
   }
 }
