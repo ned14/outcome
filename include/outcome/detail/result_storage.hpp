@@ -95,7 +95,7 @@ namespace detail
     return true;
   }
 
-  template <class State, class E> constexpr inline void _set_error_is_errno(State & /*unused*/, E & /*unused*/) {}
+  template <class State, class E> constexpr inline void _set_error_is_errno(State & /*unused*/, const E & /*unused*/) {}
   template <class State> constexpr inline void _set_error_is_errno(State &state, const std::error_code &error)
   {
     if(error.category() == std::generic_category()

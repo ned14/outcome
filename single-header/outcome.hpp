@@ -1431,9 +1431,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF be042a90c7870f67c4e477572e6e2b793299e8d5
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-03 21:00:09 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE be042a90
+#define OUTCOME_PREVIOUS_COMMIT_REF d86cfe3b940ad0cc7a5326dfca4afef50d49a148
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-03 22:57:51 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE d86cfe3b
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -2261,7 +2261,7 @@ namespace detail
     return true;
   }
 
-  template <class State, class E> constexpr inline void _set_error_is_errno(State & /*unused*/, E & /*unused*/) {}
+  template <class State, class E> constexpr inline void _set_error_is_errno(State & /*unused*/, const E & /*unused*/) {}
   template <class State> constexpr inline void _set_error_is_errno(State &state, const std::error_code &error)
   {
     if(error.category() == std::generic_category()
