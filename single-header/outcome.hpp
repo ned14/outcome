@@ -1431,9 +1431,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 36dc61eb46333b6fcf8a52dd577cef0de3f14539
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-09-28 23:59:50 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 36dc61eb
+#define OUTCOME_PREVIOUS_COMMIT_REF 82e85374c7635da77a18fa4d6ddab5a46959f1bb
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-03 02:19:59 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 82e85374
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -3875,7 +3875,7 @@ template <class S, class P> class OUTCOME_SYMBOL_VISIBLE bad_outcome_access_with
 
 public:
   bad_outcome_access_with(S x, P y)
-      : bad_result_access("no value")
+      : bad_outcome_access("no value")
       , _error(std::move(x))
       , _payload(std::move(y))
   {
