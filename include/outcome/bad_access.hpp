@@ -60,6 +60,49 @@ public:
   S &&error() && { return _error; }
 };
 
+//! Thrown when you try to access state in a `outcome<T, EC, E>` which isn't present.
+class OUTCOME_SYMBOL_VISIBLE bad_outcome_access : public std::logic_error
+{
+public:
+  bad_outcome_access(const char *what)
+      : std::logic_error(what)
+  {
+  }
+};
+
+//! Thrown when you try to access state in a `outcome<T, EC, E>` which isn't present.
+template <class S, class P> class OUTCOME_SYMBOL_VISIBLE bad_outcome_access_with : public bad_outcome_access
+{
+  S _error;
+  P _payload;
+
+public:
+  bad_outcome_access_with(S x, P y)
+      : bad_result_access("no value")
+      , _error(std::move(x))
+      , _payload(std::move(y))
+  {
+  }
+  //! Observes the error
+  const S &error() const & { return _error; }
+  //! Observes the error
+  S &error() & { return _error; }
+  //! Observes the error
+  const S &&error() const && { return _error; }
+  //! Observes the error
+  S &&error() && { return _error; }
+
+  //! Observes the payload
+  const P &payload() const & { return _payload; }
+  //! Observes the payload
+  P &payload() & { return _payload; }
+  //! Observes the payload
+  const P &&payload() const && { return _payload; }
+  //! Observes the payload
+  P &&payload() && { return _payload; }
+};
+
+
 OUTCOME_V2_NAMESPACE_END
 
 #endif
