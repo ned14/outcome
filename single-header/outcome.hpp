@@ -4203,9 +4203,17 @@ namespace detail
   // These are reused by outcome to save load on the compiler
   template <class value_type, class error_type> struct result_predicates
   {
+    // Is this a common error type?
+    static constexpr bool error_is_common_error_type = //
+    std::is_base_of<std::error_code, std::decay_t<error_type>>::value //
+    || std::is_base_of<std::exception_ptr, std::decay_t<error_type>>::value //
+    /* || std::is_error_code_enum<std::decay_t<error_type>>::value           //
+    || std::is_error_condition_enum<std::decay_t<error_type>>::value */;
+
+
     // Predicate for the implicit constructors to be available
     static constexpr bool implicit_constructors_enabled = //
-    (std::is_same<bool, std::decay_t<value_type>>::value || !is_same_or_constructible<value_type, error_type>) //
+    ((error_is_common_error_type && std::is_same<bool, std::decay_t<value_type>>::value) || !is_same_or_constructible<value_type, error_type>) //
     &&!is_same_or_constructible<error_type, value_type>;
 
     // Predicate for the value converting constructor to be available.
@@ -4339,7 +4347,7 @@ namespace hooks
 
 `NoValuePolicy` defaults to a policy selected according to the characteristics of type `S`:
   1. If `.value()` called when there is no `value_type` but there is an `error_type`:
-    - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<EC>` is true,
+    - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<S>` is true,
     then `throw std::system_error(make_error_code(error()))` [`policy::error_enum_throw_as_system_error<S>`]
     if C++ exceptions are enabled, else call `std::terminate()`.
     - If `S` convertible to a `std::error_code`, then `throw std::system_error(error())` [`policy::error_code_throw_as_system_error<S>`]
