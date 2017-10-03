@@ -25,21 +25,14 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_OUTCOME_HPP
 #define OUTCOME_OUTCOME_HPP
 
+#include "detail/outcome_exception_observers.hpp"
+#include "detail/outcome_failure_observers.hpp"
+#include "detail/outcome_payload_observers.hpp"
 #include "result.hpp"
 
 #include <memory>
 
 OUTCOME_V2_NAMESPACE_BEGIN
-
-//! Thrown when you try to access state in a `outcome<T, EC, E>` which isn't present.
-class OUTCOME_SYMBOL_VISIBLE bad_outcome_access : public std::logic_error
-{
-public:
-  bad_outcome_access(const char *what)
-      : std::logic_error(what)
-  {
-  }
-};
 
 //! Placeholder type to indicate there is no payload type
 struct no_payload_type
@@ -52,135 +45,6 @@ struct no_exception_type
   no_exception_type() = delete;
 };
 
-namespace impl
-{
-  //! The payload observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
-  template <class Base, class R, class S, class P, class NoValuePolicy> class outcome_payload_observers : public Base
-  {
-  public:
-    using payload_type = P;
-    using Base::Base;
-
-    /// \output_section Narrow state observers
-    /*! Access payload without runtime checks.
-    \preconditions The outcome to have an payload state, otherwise it is undefined behaviour.
-    \returns Reference to the held `payload_type` according to overload.
-    \group assume_payload
-    */
-    inline constexpr payload_type &assume_payload() & noexcept;
-    /// \group assume_payload
-    inline constexpr const payload_type &assume_payload() const &noexcept;
-    /// \group assume_payload
-    inline constexpr payload_type &&assume_payload() && noexcept;
-    /// \group assume_payload
-    inline constexpr const payload_type &&assume_payload() const &&noexcept;
-
-    /// \output_section Wide state observers
-    /*! Access payload with runtime checks.
-    \returns Reference to the held `payload_type` according to overload.
-    \requires The outcome to have an payload state, else whatever `NoValuePolicy` says ought to happen.
-    \group payload
-    */
-    inline constexpr payload_type &payload() &;
-    /// \group payload
-    inline constexpr const payload_type &payload() const &;
-    /// \group payload
-    inline constexpr payload_type &&payload() &&;
-    /// \group payload
-    inline constexpr const payload_type &&payload() const &&;
-  };
-
-  template <class Base, class R, class S, class NoValuePolicy> class outcome_payload_observers<Base, R, S, void, NoValuePolicy> : public Base
-  {
-  public:
-    using Base::Base;
-    /// \output_section Narrow state observers
-    /*! Access payload without runtime checks.
-    */
-    constexpr void assume_payload() const noexcept { NoValuePolicy::narrow_payload_check(this); }
-    /// \output_section Wide state observers
-    /*! Access payload with runtime checks.
-    \requires The outcome to have an payload state, else whatever `NoValuePolicy` says ought to happen.
-    */
-    constexpr void payload() const { NoValuePolicy::wide_payload_check(this); }
-  };
-
-  //! The exception observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
-  template <class Base, class R, class S, class P, class NoValuePolicy> class outcome_exception_observers : public Base
-  {
-  public:
-    using exception_type = P;
-    using Base::Base;
-
-    /// \output_section Narrow state observers
-    /*! Access exception without runtime checks.
-    \preconditions The outcome to have an exception state, otherwise it is undefined behaviour.
-    \returns Reference to the held `exception_type` according to overload.
-    \group assume_exception
-    */
-    constexpr inline exception_type &assume_exception() & noexcept;
-    /// \group assume_exception
-    constexpr inline const exception_type &assume_exception() const &noexcept;
-    /// \group assume_exception
-    constexpr inline exception_type &&assume_exception() && noexcept;
-    /// \group assume_exception
-    constexpr inline const exception_type &&assume_exception() const &&noexcept;
-
-    /// \output_section Wide state observers
-    /*! Access exception with runtime checks.
-    \returns Reference to the held `exception_type` according to overload.
-    \requires The outcome to have an exception state, else whatever `NoValuePolicy` says ought to happen.
-    \group exception
-    */
-    constexpr inline exception_type &exception() &;
-    /// \group exception
-    constexpr inline const exception_type &exception() const &;
-    /// \group exception
-    constexpr inline exception_type &&exception() &&;
-    /// \group exception
-    constexpr inline const exception_type &&exception() const &&;
-  };
-  template <class Base, class R, class S, class NoValuePolicy> class outcome_exception_observers<Base, R, S, void, NoValuePolicy> : public Base
-  {
-  public:
-    using Base::Base;
-    /// \output_section Narrow state observers
-    /*! Access exception without runtime checks.
-    */
-    constexpr void assume_exception() const noexcept { NoValuePolicy::narrow_exception_check(this); }
-    /// \output_section Wide state observers
-    /*! Access exception with runtime checks.
-    \requires The outcome to have an exception state, else whatever `NoValuePolicy` says ought to happen.
-    */
-    constexpr void exception() const { NoValuePolicy::wide_exception_check(this); }
-  };
-
-  //! The failure observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
-  template <class Base, class R, class S, class P, class NoValuePolicy> class outcome_failure_observers : public Base
-  {
-  public:
-    using exception_type = std::exception_ptr;
-    using Base::Base;
-
-    /// \output_section Synthesising state observers
-    /*! Synthesise exception where possible.
-    \returns A synthesised exception type: if excepted, `exception()`; if errored, `std::make_exception_ptr(std::system_error(error()))`;
-    otherwise a default constructed exception type.
-    */
-    exception_type failure() const noexcept
-    {
-      if((this->_state._status & detail::status_have_exception) != 0)
-      {
-        return this->exception();
-      }
-      if((this->_state._status & detail::status_have_error) != 0)
-      {
-        return std::make_exception_ptr(std::system_error(this->error()));
-      }
-      return exception_type();
-    }
-  };
-}
 
 namespace policy
 {
@@ -207,6 +71,7 @@ namespace detail
   template <class value_type, class status_error_type, class error_type, class payload_exception_type, class payload_type, class exception_type> struct outcome_predicates
   {
     using result = result_predicates<value_type, error_type>;
+
     // Predicate for the implicit constructors to be available
     static constexpr bool implicit_constructors_enabled =                                                                     //
     (std::is_same<bool, std::decay_t<value_type>>::value || !is_same_or_constructible<value_type, status_error_type>)         //
@@ -251,12 +116,9 @@ namespace detail
 
     // Predicate for the converting copy constructor from a compatible outcome to be available.
     template <class T, class U, class V, class W>
-    static constexpr bool enable_compatible_conversion =                                                                  //
-    (std::is_void<T>::value || detail::is_same_or_constructible<value_type, typename outcome<T, U, V, W>::value_type>)    // if our value types are constructible
-    &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename outcome<T, U, V, W>::error_type>)  // if our error types are constructible
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-    &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename outcome<T, U, V, W>::status_type>)  // if our status types are constructible
-#endif
+    static constexpr bool enable_compatible_conversion =                                                                          //
+    (std::is_void<T>::value || detail::is_same_or_constructible<value_type, typename outcome<T, U, V, W>::value_type>)            // if our value types are constructible
+    &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename outcome<T, U, V, W>::error_type>)          // if our error types are constructible
     &&(std::is_void<V>::value || detail::is_same_or_constructible<payload_type, typename outcome<T, U, V, W>::payload_type>)      // if our payload types are constructible
     &&(std::is_void<V>::value || detail::is_same_or_constructible<exception_type, typename outcome<T, U, V, W>::exception_type>)  // if our exception types are constructible
     ;
@@ -294,10 +156,10 @@ namespace detail
   template <class T, class U, class V, typename = std::enable_if_t<trait::is_exception_ptr<V>::value>> constexpr inline V &&extract_exception_payload_from_failure(failure_type<U, V> &&v, enable_exception_from_failure = enable_exception_from_failure()) { return std::move(v.exception); }
   template <class T, class U> constexpr inline T extract_exception_payload_from_failure(const failure_type<U, void> & /*unused*/) { return T{}; }
 
-  template <class Base, class R, class S, class P, class NoValuePolicy> using select_outcome_observers_payload_or_exception = std::conditional_t<trait::is_exception_ptr<P>::value, impl::outcome_exception_observers<Base, R, S, P, NoValuePolicy>, impl::outcome_payload_observers<Base, R, S, P, NoValuePolicy>>;
+  template <class Base, class R, class S, class P, class NoValuePolicy> using select_outcome_observers_payload_or_exception = std::conditional_t<trait::is_exception_ptr<P>::value, detail::outcome_exception_observers<Base, R, S, P, NoValuePolicy>, detail::outcome_payload_observers<Base, R, S, P, NoValuePolicy>>;
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl2 = select_outcome_observers_payload_or_exception<detail::result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>;
   template <class R, class S, class P, class NoValuePolicy>
-  using select_outcome_impl = std::conditional_t<std::is_base_of<std::error_code, S>::value && trait::is_exception_ptr<P>::value, impl::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>, select_outcome_impl2<R, S, P, NoValuePolicy>>;
+  using select_outcome_impl = std::conditional_t<std::is_base_of<std::error_code, S>::value && trait::is_exception_ptr<P>::value, detail::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>, select_outcome_impl2<R, S, P, NoValuePolicy>>;
 }
 
 namespace hooks
@@ -396,15 +258,8 @@ public:
   using value_type = R;
   //! The S type configured
   using status_error_type = S;
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-  //! The status type, always `no_status_type` if `trait::status_type_is_negative<S>` is true.
-  using status_type = typename base::status_type;
-  //! The failure type, always `no_error_type` if `trait::status_type_is_negative<S>` is false.
-  using error_type = typename base::error_type;
-#else
   //! The failure type.
   using error_type = S;
-#endif
   //! The P type configured.
   using payload_exception_type = P;
   //! The payload type, always `no_payload_type` if `trait::is_exception_ptr<P>` is true.
@@ -515,104 +370,18 @@ public:
     using namespace hooks;
     hook_outcome_construction(in_place_type<value_type>, this);
   }
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-  /*! Converting constructor to a successful outcome + status.
-\tparam enable_value_status_converting_constructor
-\exclude
-\param 2
-\exclude
-\param t The value from which to initialise the `value_type`.
-\param u The value from which to initialise the `status_type`.
-
-\effects Initialises the outcome with a `value_type` and an additional `status_type`.
-\requires `trait::status_type_is_negative<EC>` must be false; Type `T` is constructible to `value_type`,
-is not constructible to `exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
-Type `U` is constructible to `status_type`, is not constructible to `value_type`, and is not constructible to `exception_type`.
-\throws Any exception the construction of `value_type(T)` and `status_type(U)` might throw.
-*/
-  template <class T, class U, typename enable_value_status_converting_constructor = std::enable_if_t<                                 //
-                              !std::is_same<std::decay_t<T>, outcome>::value                                                          // not my type
-                              && !detail::is_in_place_type_t<std::decay_t<T>>::value                                                  // not in place construction
-                              && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<exception_type, T>::value  //
-                              && detail::is_same_or_constructible<status_type, U> && !std::is_constructible<exception_type, U>::value>>
-  constexpr outcome(T &&t, U &&u, value_status_converting_constructor_tag = value_status_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_type, U>::value)
-      : base{typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u)}
-      , _ptr()
-  {
-    using namespace hooks;
-    hook_outcome_construction(in_place_type<std::pair<value_type, status_type>>, this);
-  }
-  /*! Converting constructor to a successful outcome + status + payload.
-  \tparam enable_value_status_payload_converting_constructor
-  \exclude
-  \param 3
-  \exclude
-  \param t The value from which to initialise the `value_type`.
-  \param u The value from which to initialise the `status_type`.
-  \param v The value from which to initialise the `payload_type`.
-
-  \effects Initialises the outcome with a `value_type`, a `status_type` and a `payload_type`.
-  \requires `trait::status_type_is_negative<EC>` must be false; Type `T` is constructible to `value_type`, and is not `outcome<R, S, P>`
-  and not `in_place_type<>`;
-  Type `U` is constructible to `status_type`;
-  Type `V` is constructible to `payload_exception_type`.
-  \throws Any exception the construction of `value_type(T)`, `status_type(U)` and `payload_exception_type(V)` might throw.
-  */
-  template <class T, class U, class V, typename enable_value_status_payload_converting_constructor = std::enable_if_t<  //
-                                       !std::is_same<std::decay_t<T>, outcome>::value                                   // not my type
-                                       && !detail::is_in_place_type_t<std::decay_t<T>>::value                           // not in place construction
-                                       && detail::is_same_or_constructible<value_type, T>                               //
-                                       && detail::is_same_or_constructible<status_type, U>                              //
-                                       && detail::is_same_or_constructible<payload_exception_type, V>                   //
-                                       >>
-  constexpr outcome(T &&t, U &&u, V &&v,
-                    value_status_payload_converting_constructor_tag = value_status_payload_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_type, U>::value &&std::is_nothrow_constructible<payload_exception_type, V>::value)
-      : base{typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u)}
-      , _ptr(std::forward<V>(v))
-  {
-    using namespace hooks;
-    this->_state._status |= detail::status_have_payload;
-    hook_outcome_construction(in_place_type<std::tuple<value_type, status_type, payload_type>>, this);
-  }
-  /*! Converting constructor to a successful outcome + payload.
-  \tparam enable_value_payload_converting_constructor_tag
-  \exclude
-  \param 2
-  \exclude
-  \param t The value from which to initialise the `value_type`.
-  \param u The value from which to initialise the `payload_type`.
-
-  \effects Initialises the outcome with a `value_type` and a `payload_type`.
-  \requires `trait::is_exception_ptr<P>` must be false; Type `T` is constructible to `value_type`, is not constructible to `status_error_type`,
-  and is not `outcome<R, S, P>` and not `in_place_type<>`;
-  Type `U` is constructible to `payload_type`, and is not constructible to `status_error_type`.
-  \throws Any exception the construction of `value_type(T)` and `payload_type(U)` might throw.
-  */
-  template <class T, class U, typename enable_value_payload_converting_constructor_tag = std::enable_if_t<                               //
-                              !std::is_same<std::decay_t<T>, outcome>::value                                                             // not my type
-                              && !detail::is_in_place_type_t<std::decay_t<T>>::value                                                     // not in place construction
-                              && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<status_error_type, T>::value  //
-                              && detail::is_same_or_constructible<payload_type, U> && !std::is_constructible<status_error_type, U>::value>>
-  constexpr outcome(T &&t, U &&u, value_payload_converting_constructor_tag = value_payload_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<payload_exception_type, U>::value)
-      : base{in_place_type<typename base::value_type>, std::forward<T>(t)}
-      , _ptr(std::forward<U>(u))
-  {
-    using namespace hooks;
-    hook_outcome_construction(in_place_type<std::pair<value_type, payload_type>>, this);
-  }
-#endif
   /*! Converting constructor to an errored outcome.
-\tparam enable_error_converting_constructor
-\exclude
-\param 1
-\exclude
-\param t The value from which to initialise the `error_type`.
+  \tparam enable_error_converting_constructor
+  \exclude
+  \param 1
+  \exclude
+  \param t The value from which to initialise the `error_type`.
 
-\effects Initialises the outcome with a `error_type`.
-\requires `trait::status_type_is_negative<EC>` must be true; Type T is constructible to `error_type`,
-is not constructible to `value_type`, is not constructible to `payload_exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
-\throws Any exception the construction of `error_type(T)` might throw.
-*/
+  \effects Initialises the outcome with a `error_type`.
+  \requires `trait::status_type_is_negative<EC>` must be true; Type T is constructible to `error_type`,
+  is not constructible to `value_type`, is not constructible to `payload_exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
+  \throws Any exception the construction of `error_type(T)` might throw.
+  */
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_error_converting_constructor<T>))
   constexpr outcome(T &&t, error_converting_constructor_tag = error_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)
@@ -1306,244 +1075,10 @@ namespace hooks
       o->_state._status |= detail::status_have_payload;
   }
 }
-
-namespace policy
-{
-#ifdef __cpp_exceptions
-  /*! Policy interpreting S as a type implementing the `std::error_code` contract, E as
-  a type implementing the `std::exception_ptr` contract, and any wide attempt to access the
-  successful state throws the `exception_ptr` if available, then the `error_code` wrapped
-  into a `std::system_error`.
-  \module Error code interpretation policy
-  */
-  template <class R, class S, class P> struct error_code_throw_as_system_error_exception_rethrow
-  {
-    static_assert(std::is_base_of<std::error_code, S>::value, "error_type must be a base of std::error_code to be used with this policy");
-    static_assert(std::is_base_of<std::exception_ptr, P>::value, "exception_type must be a base of std::exception_ptr to be used with this policy");
-    /*! Performs a narrow check of state, used in the assume_value() functions.
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_value) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a narrow check of state, used in the assume_error() functions.
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_error) == 0)
-        __builtin_unreachable();
-#endif
-    }
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-    /*! Performs a narrow check of state, used in the assume_status() functions
-\effects None.
-*/
-    template <class Impl> static constexpr void narrow_status_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_status) == 0)
-        __builtin_unreachable();
-#endif
-    }
-#endif
-    /*! Performs a narrow check of state, used in the assume_payload() functions.
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_payload) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a narrow check of state, used in the assume_exception() functions.
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_exception) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a wide check of state, used in the value() functions.
-    \effects If outcome does not have a value, if it has an exception it rethrows it via `std::rethrow_exception()`,
-    if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
-    */
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
-    {
-      if((self->_state._status & detail::status_have_value) == 0)
-      {
-        if((self->_state._status & detail::status_have_exception) != 0)
-        {
-          auto *_self = static_cast<const outcome<R, S, P, error_code_throw_as_system_error_exception_rethrow> *>(self);
-          std::rethrow_exception(_self->_ptr);
-        }
-        if((self->_state._status & detail::status_have_error) != 0)
-        {
-          OUTCOME_THROW_EXCEPTION(std::system_error(self->_error));
-        }
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
-      }
-    }
-    /*! Performs a wide check of state, used in the error() functions
-    \effects If outcome does not have an error, it throws `bad_outcome_access`.
-    */
-    template <class Impl> static constexpr void wide_error_check(Impl *self)
-    {
-      if((self->_state._status & detail::status_have_error) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
-      }
-    }
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-    /*! Performs a wide check of state, used in the status() functions
-\effects If outcome does not have an status, it throws `bad_outcome_access`.
-*/
-    template <class Impl> static constexpr void wide_status_check(Impl *self)
-    {
-      if((self->_state._status & detail::status_have_status) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no status"));
-      }
-    }
-#endif
-    /*! Performs a wide check of state, used in the payload() functions
-    \effects If outcome does not have a payload, it throws `bad_outcome_access`.
-    */
-    template <class Impl> static constexpr void wide_payload_check(Impl *self)
-    {
-      if((self->_state._status & detail::status_have_payload) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no payload"));
-      }
-    }
-    /*! Performs a wide check of state, used in the exception() functions
-    \effects If outcome does not have an exception, it throws `bad_outcome_access`.
-    */
-    template <class Impl> static constexpr void wide_exception_check(Impl *self)
-    {
-      if((self->_state._status & detail::status_have_exception) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
-      }
-    }
-  };
-#endif
-}
-namespace impl
-{
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &outcome_payload_observers<Base, R, S, P, NoValuePolicy>::assume_payload() & noexcept
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_payload_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &outcome_payload_observers<Base, R, S, P, NoValuePolicy>::assume_payload() const &noexcept
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_payload_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &&outcome_payload_observers<Base, R, S, P, NoValuePolicy>::assume_payload() && noexcept
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_payload_check(this);
-    return std::move(self->_ptr);
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &&outcome_payload_observers<Base, R, S, P, NoValuePolicy>::assume_payload() const &&noexcept
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_payload_check(this);
-    return std::move(self->_ptr);
-  }
-
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload() &
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_payload_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload() const &
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_payload_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &&outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload() &&
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_payload_check(this);
-    return std::move(self->_ptr);
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &&outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload() const &&
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_payload_check(this);
-    return std::move(self->_ptr);
-  }
-
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() & noexcept
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_exception_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() const &noexcept
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_exception_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() && noexcept
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_exception_check(this);
-    return std::move(self->_ptr);
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() const &&noexcept
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_exception_check(this);
-    return std::move(self->_ptr);
-  }
-
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() &
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_exception_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() const &
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_exception_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() &&
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_exception_check(this);
-    return std::move(self->_ptr);
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() const &&
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_exception_check(this);
-    return std::move(self->_ptr);
-  }
-}
 OUTCOME_V2_NAMESPACE_END
+
+#include "policy/error_code_throw_as_system_error_exception_rethrow.hpp"
+
+#include "detail/outcome_payload_observers_impl.hpp"
 
 #endif

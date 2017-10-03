@@ -26,20 +26,45 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define WG21_EXPERIMENTAL_RESULT_HPP
 
 /***************************** BEGIN WG14 C Programming Language standards part *******************************/
-#define CXX_DECLARE_RESULT(R, D)                                                                                                                                                                                                                                                                                               \
-  struct result_##R                                                                                                                                                                                                                                                                                                            \
+//! A C struct representation of `std::error_code`.
+struct cxx_error_code
+{
+  int code;
+  void *category;
+};
+
+/*! Declares a C struct representation of `result<R, S>`.
+\param R The unique postfix for `struct result_##R##_##S`.
+\param RD The declaration for the `R` type.
+\param S The unique postfix for
+\param SD The declaration for the `S` type.
+*/
+#define CXX_DECLARE_RESULT(R, RD, S, SD)                                                                                                                                                                                                                                                                                       \
+  struct result_##R##_##S                                                                                                                                                                                                                                                                                                      \
   {                                                                                                                                                                                                                                                                                                                            \
-    D value;                                                                                                                                                                                                                                                                                                                   \
-    unsigned char flags;                                                                                                                                                                                                                                                                                                       \
-    int error;                                                                                                                                                                                                                                                                                                                 \
-    void *category;                                                                                                                                                                                                                                                                                                            \
+    RD value;                                                                                                                                                                                                                                                                                                                  \
+    unsigned flags;                                                                                                                                                                                                                                                                                                            \
+    SD error;                                                                                                                                                                                                                                                                                                                  \
   }
-#define CXX_RESULT(R) struct result_##R
+/*! Declares a C struct representation of `result<R, std::error_code>`.
+\param R The unique postfix for `struct result_##R##_##S`.
+\param RD The declaration for the `R` type.
+*/
+#define CXX_DECLARE_RESULT_EC(R, RD) CXX_DECLARE_RESULT(R, RD, errorcode, struct cxx_error_code)
+//! A reference to a previously declared struct by `CXX_DECLARE_RESULT(R, RD, S, SD)`
+#define CXX_RESULT(R, S) struct result_##R##_##S
+//! A reference to a previously declared struct by `CXX_DECLARE_RESULT_EC(R, RD)`
+#define CXX_RESULT_EC(R) struct result_##R##_errorcode
+//! True if a result struct has a valid value
 #define CXX_RESULT_HAS_VALUE(r) (((r).flags & 1) == 1)
+//! True if a result struct has a valid error
 #define CXX_RESULT_HAS_ERROR(r) (((r).flags & 1) == 0)
-// Unable to use this in std::optional based result
+//! True if a result struct's `error` or `code` is an `errno` domain code suitable for setting `errno` with.
 //#define CXX_RESULT_ERROR_IS_ERRNO(r) (((r).flags & (1 << 4)) == (1 << 4))
-#define CXX_RESULT_SET_ERRNO(r) (errno = CXX_RESULT_HAS_ERROR(r) ? (CXX_RESULT_ERROR_IS_ERRNO(r) ? (r).error : EAGAIN) : 0)
+//! C11 generic selecting a result struct's `error` or `code` integer member.
+#define CXX_RESULT_ERROR(r) _Generic((r).error, struct cxx_error_code : ((struct cxx_error_code *) &(r).error)->code, default : (r).error)
+//! Convenience macro setting `errno` to a result struct's `errno` compatible error if present, or `EAGAIN` if errored but incompatible.
+//#define CXX_RESULT_SET_ERRNO(r) (errno = CXX_RESULT_HAS_ERROR(r) ? (CXX_RESULT_ERROR_IS_ERRNO(r) ? CXX_RESULT_ERROR(r) : EAGAIN) : 0)
 
 /***************************** END WG14 C Programming Language standards part *******************************/
 

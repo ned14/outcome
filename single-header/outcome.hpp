@@ -94,55 +94,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef OUTCOME_OUTCOME_HPP
 #define OUTCOME_OUTCOME_HPP
-/* A very simple result type
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
-File Created: June 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#ifndef OUTCOME_RESULT_HPP
-#define OUTCOME_RESULT_HPP
-/* Finaliser for a very simple result type
+/* Exception observers for outcome type
 (C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: Oct 2017
 
@@ -188,11 +140,11 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
-#ifndef OUTCOME_RESULT_FINAL_HPP
-#define OUTCOME_RESULT_FINAL_HPP
-/* Type sugar for success and failure
+#ifndef OUTCOME_OUTCOME_EXCEPTION_OBSERVERS_HPP
+#define OUTCOME_OUTCOME_EXCEPTION_OBSERVERS_HPP
+/* Storage for a very simple result type
 (C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
-File Created: July 2017
+File Created: Oct 2017
 
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -236,8 +188,56 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
-#ifndef OUTCOME_SUCCESS_FAILURE_HPP
-#define OUTCOME_SUCCESS_FAILURE_HPP
+#ifndef OUTCOME_RESULT_STORAGE_HPP
+#define OUTCOME_RESULT_STORAGE_HPP
+/* Essentially an internal optional implementation :)
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: June 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_VALUE_STORAGE_HPP
+#define OUTCOME_VALUE_STORAGE_HPP
 /* Configure Outcome with QuickCppLib
 (C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: August 2015
@@ -1431,9 +1431,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 36dc61eb46333b6fcf8a52dd577cef0de3f14539
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-09-28 23:59:50 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 36dc61eb
+#define OUTCOME_PREVIOUS_COMMIT_REF be042a90c7870f67c4e477572e6e2b793299e8d5
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-03 21:00:09 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE be042a90
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1824,415 +1824,6 @@ OUTCOME_V2_NAMESPACE_END
 #endif
 
 #endif
-#include <exception>
-#include <system_error>
-#include <type_traits>
-
-OUTCOME_V2_NAMESPACE_BEGIN
-
-//! Namespace for traits
-namespace trait
-{
-  /*! Trait for whether type `P` is to be considered a payload to an exception.
-  \module Error code interpretation policy
-  */
-
-
-  template <class P> struct is_exception_ptr : std::integral_constant<bool, std::is_constructible<std::exception_ptr, P>::value>
-  {
-  };
-}
-
-// Do we have C++ 17 deduced templates?
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*! Type sugar for implicitly constructing a `result<>` with a successful state.
-*/
-
-template <class T> struct success_type
-{
-  //! The type of the successful state.
-  using value_type = T;
-  //! The value of the successful state.
-  value_type value;
-};
-/*! Type sugar for implicitly constructing a `result<>` with a successful state.
-*/
-
-template <> struct success_type<void>
-{
-  //! The type of the successful state.
-  using value_type = void;
-};
-/*! Returns type sugar for implicitly constructing a `result<T>` with a successful state,
-default constructing `T` if necessary.
-*/
-
-
-inline constexpr success_type<void> success() noexcept
-{
-  return success_type<void>{};
-}
-/*! Returns type sugar for implicitly constructing a `result<T>` with a successful state.
-\effects Copies or moves the successful state supplied into the returned type sugar.
-*/
-
-
-template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v)
-{
-  return success_type<std::decay_t<T>>{std::forward<T>(v)};
-}
-
-/*! Type sugar for implicitly constructing a `result<>` with a failure state.
-*/
-
-template <class EC = std::error_code, class E = void, bool e_is_exception_ptr = trait::is_exception_ptr<E>::value> struct failure_type;
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and payload.
-*/
-
-template <class EC, class P> struct failure_type<EC, P, false>
-{
-  //! The type of the error code
-  using error_type = EC;
-  //! The type of the payload
-  using payload_type = P;
-  //! The type of the exception
-  using exception_type = void;
-  //! The error code
-  error_type error;
-  //! The payload
-  payload_type payload;
-};
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and exception.
-*/
-
-template <class EC, class E> struct failure_type<EC, E, true>
-{
-  //! The type of the error code
-  using error_type = EC;
-  //! The type of the payload
-  using payload_type = void;
-  //! The type of the exception
-  using exception_type = E;
-  //! The error code
-  error_type error;
-  //! The exception
-  exception_type exception;
-};
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code.
-*/
-
-template <class EC> struct failure_type<EC, void, false>
-{
-  //! The type of the error code
-  using error_type = EC;
-  //! The type of the payload
-  using payload_type = void;
-  //! The type of the exception
-  using exception_type = void;
-  //! The error code
-  error_type error;
-};
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of payload.
-*/
-
-template <class P> struct failure_type<void, P, false>
-{
-  //! The type of the error code
-  using error_type = void;
-  //! The type of the payload
-  using payload_type = P;
-  //! The type of the exception
-  using exception_type = void;
-  //! The payload
-  payload_type payload;
-};
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of exception.
-*/
-
-template <class E> struct failure_type<void, E, true>
-{
-  //! The type of the error code
-  using error_type = void;
-  //! The type of the payload
-  using payload_type = void;
-  //! The type of the exception
-  using exception_type = E;
-  //! The exception
-  exception_type exception;
-};
-/*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
-\effects Copies or moves the failure state supplied into the returned type sugar.
-*/
-
-
-template <class EC> inline constexpr failure_type<std::decay_t<EC>> failure(EC &&v)
-{
-  return failure_type<std::decay_t<EC>>{std::forward<EC>(v)};
-}
-/*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
-\effects Copies or moves the failure state supplied into the returned type sugar.
-*/
-
-
-template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, E &&w)
-{
-  return failure_type<std::decay_t<EC>, std::decay_t<E>>{std::forward<EC>(v), std::forward<E>(w)};
-}
-
-
-
-OUTCOME_V2_NAMESPACE_END
-
-#endif
-/* Error observers for a very simple result type
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
-File Created: Oct 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#ifndef OUTCOME_RESULT_ERROR_OBSERVERS_HPP
-#define OUTCOME_RESULT_ERROR_OBSERVERS_HPP
-/* Storage for a very simple result type
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
-File Created: Oct 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#ifndef OUTCOME_RESULT_STORAGE_HPP
-#define OUTCOME_RESULT_STORAGE_HPP
-/* Essentially an internal optional implementation :)
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
-File Created: June 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#ifndef OUTCOME_VALUE_STORAGE_HPP
-#define OUTCOME_VALUE_STORAGE_HPP
-
-
-
 #include <cstdint> // for uint32_t etc
 #include <initializer_list>
 #include <iosfwd> // for serialisation
@@ -2809,6 +2400,745 @@ namespace detail
 OUTCOME_V2_NAMESPACE_END
 
 #endif
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+namespace detail
+{
+  //! The exception observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
+  template <class Base, class R, class S, class P, class NoValuePolicy> class outcome_exception_observers : public Base
+  {
+  public:
+    using exception_type = P;
+    using Base::Base;
+
+    /// \output_section Narrow state observers
+    /*! Access exception without runtime checks.
+    \preconditions The outcome to have an exception state, otherwise it is undefined behaviour.
+    \returns Reference to the held `exception_type` according to overload.
+    \group assume_exception
+    */
+
+
+
+
+    constexpr inline exception_type &assume_exception() & noexcept;
+    /// \group assume_exception
+    constexpr inline const exception_type &assume_exception() const &noexcept;
+    /// \group assume_exception
+    constexpr inline exception_type &&assume_exception() && noexcept;
+    /// \group assume_exception
+    constexpr inline const exception_type &&assume_exception() const &&noexcept;
+
+    /// \output_section Wide state observers
+    /*! Access exception with runtime checks.
+    \returns Reference to the held `exception_type` according to overload.
+    \requires The outcome to have an exception state, else whatever `NoValuePolicy` says ought to happen.
+    \group exception
+    */
+
+
+
+
+    constexpr inline exception_type &exception() &;
+    /// \group exception
+    constexpr inline const exception_type &exception() const &;
+    /// \group exception
+    constexpr inline exception_type &&exception() &&;
+    /// \group exception
+    constexpr inline const exception_type &&exception() const &&;
+  };
+
+  template <class Base, class R, class S, class NoValuePolicy> class outcome_exception_observers<Base, R, S, void, NoValuePolicy> : public Base
+  {
+  public:
+    using Base::Base;
+    /// \output_section Narrow state observers
+    /*! Access exception without runtime checks.
+    */
+
+    constexpr void assume_exception() const noexcept { NoValuePolicy::narrow_exception_check(this); }
+    /// \output_section Wide state observers
+    /*! Access exception with runtime checks.
+    \requires The outcome to have an exception state, else whatever `NoValuePolicy` says ought to happen.
+    */
+
+
+    constexpr void exception() const { NoValuePolicy::wide_exception_check(this); }
+  };
+}
+
+OUTCOME_V2_NAMESPACE_END
+
+#endif
+/* Failure observers for outcome type
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Oct 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_OUTCOME_FAILURE_OBSERVERS_HPP
+#define OUTCOME_OUTCOME_FAILURE_OBSERVERS_HPP
+
+
+
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+namespace detail
+{
+  //! The failure observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
+  template <class Base, class R, class S, class P, class NoValuePolicy> class outcome_failure_observers : public Base
+  {
+  public:
+    using exception_type = std::exception_ptr;
+    using Base::Base;
+
+    /// \output_section Synthesising state observers
+    /*! Synthesise exception where possible.
+    \returns A synthesised exception type: if excepted, `exception()`; if errored, `std::make_exception_ptr(std::system_error(error()))`;
+    otherwise a default constructed exception type.
+    */
+
+
+
+    exception_type failure() const noexcept
+    {
+      if((this->_state._status & detail::status_have_exception) != 0)
+      {
+        return this->exception();
+      }
+      if((this->_state._status & detail::status_have_error) != 0)
+      {
+        return std::make_exception_ptr(std::system_error(this->error()));
+      }
+      return exception_type();
+    }
+  };
+}
+
+OUTCOME_V2_NAMESPACE_END
+
+#endif
+/* Payload observers for outcome type
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Oct 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_OUTCOME_PAYLOAD_OBSERVERS_HPP
+#define OUTCOME_OUTCOME_PAYLOAD_OBSERVERS_HPP
+
+
+
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+namespace detail
+{
+  //! The payload observers implementation of `outcome<R, S, P>`.
+  template <class Base, class R, class S, class P, class NoValuePolicy> class outcome_payload_observers : public Base
+  {
+  public:
+    using payload_type = P;
+    using Base::Base;
+
+    /// \output_section Narrow state observers
+    /*! Access payload without runtime checks.
+    \preconditions The outcome to have an payload state, otherwise it is undefined behaviour.
+    \returns Reference to the held `payload_type` according to overload.
+    \group assume_payload
+    */
+
+
+
+
+    inline constexpr payload_type &assume_payload() & noexcept;
+    /// \group assume_payload
+    inline constexpr const payload_type &assume_payload() const &noexcept;
+    /// \group assume_payload
+    inline constexpr payload_type &&assume_payload() && noexcept;
+    /// \group assume_payload
+    inline constexpr const payload_type &&assume_payload() const &&noexcept;
+
+    /// \output_section Wide state observers
+    /*! Access payload with runtime checks.
+    \returns Reference to the held `payload_type` according to overload.
+    \requires The outcome to have an payload state, else whatever `NoValuePolicy` says ought to happen.
+    \group payload
+    */
+
+
+
+
+    inline constexpr payload_type &payload() &;
+    /// \group payload
+    inline constexpr const payload_type &payload() const &;
+    /// \group payload
+    inline constexpr payload_type &&payload() &&;
+    /// \group payload
+    inline constexpr const payload_type &&payload() const &&;
+  };
+
+  template <class Base, class R, class S, class NoValuePolicy> class outcome_payload_observers<Base, R, S, void, NoValuePolicy> : public Base
+  {
+  public:
+    using Base::Base;
+    /// \output_section Narrow state observers
+    /*! Access payload without runtime checks.
+    */
+
+    constexpr void assume_payload() const noexcept { NoValuePolicy::narrow_payload_check(this); }
+    /// \output_section Wide state observers
+    /*! Access payload with runtime checks.
+    \requires The outcome to have an payload state, else whatever `NoValuePolicy` says ought to happen.
+    */
+
+
+    constexpr void payload() const { NoValuePolicy::wide_payload_check(this); }
+  };
+}
+
+OUTCOME_V2_NAMESPACE_END
+
+#endif
+/* A very simple result type
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: June 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_RESULT_HPP
+#define OUTCOME_RESULT_HPP
+/* Finaliser for a very simple result type
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Oct 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_RESULT_FINAL_HPP
+#define OUTCOME_RESULT_FINAL_HPP
+/* Type sugar for success and failure
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: July 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_SUCCESS_FAILURE_HPP
+#define OUTCOME_SUCCESS_FAILURE_HPP
+
+
+
+#include <exception>
+#include <system_error>
+#include <type_traits>
+
+OUTCOME_V2_NAMESPACE_BEGIN
+
+//! Namespace for traits
+namespace trait
+{
+  /*! Trait for whether type `P` is to be considered a payload to an exception.
+  \module Error code interpretation policy
+  */
+
+
+  template <class P> struct is_exception_ptr : std::integral_constant<bool, std::is_constructible<std::exception_ptr, P>::value>
+  {
+  };
+}
+
+// Do we have C++ 17 deduced templates?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*! Type sugar for implicitly constructing a `result<>` with a successful state.
+*/
+
+template <class T> struct success_type
+{
+  //! The type of the successful state.
+  using value_type = T;
+  //! The value of the successful state.
+  value_type value;
+};
+/*! Type sugar for implicitly constructing a `result<>` with a successful state.
+*/
+
+template <> struct success_type<void>
+{
+  //! The type of the successful state.
+  using value_type = void;
+};
+/*! Returns type sugar for implicitly constructing a `result<T>` with a successful state,
+default constructing `T` if necessary.
+*/
+
+
+inline constexpr success_type<void> success() noexcept
+{
+  return success_type<void>{};
+}
+/*! Returns type sugar for implicitly constructing a `result<T>` with a successful state.
+\effects Copies or moves the successful state supplied into the returned type sugar.
+*/
+
+
+template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v)
+{
+  return success_type<std::decay_t<T>>{std::forward<T>(v)};
+}
+
+/*! Type sugar for implicitly constructing a `result<>` with a failure state.
+*/
+
+template <class EC = std::error_code, class E = void, bool e_is_exception_ptr = trait::is_exception_ptr<E>::value> struct failure_type;
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and payload.
+*/
+
+template <class EC, class P> struct failure_type<EC, P, false>
+{
+  //! The type of the error code
+  using error_type = EC;
+  //! The type of the payload
+  using payload_type = P;
+  //! The type of the exception
+  using exception_type = void;
+  //! The error code
+  error_type error;
+  //! The payload
+  payload_type payload;
+};
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and exception.
+*/
+
+template <class EC, class E> struct failure_type<EC, E, true>
+{
+  //! The type of the error code
+  using error_type = EC;
+  //! The type of the payload
+  using payload_type = void;
+  //! The type of the exception
+  using exception_type = E;
+  //! The error code
+  error_type error;
+  //! The exception
+  exception_type exception;
+};
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code.
+*/
+
+template <class EC> struct failure_type<EC, void, false>
+{
+  //! The type of the error code
+  using error_type = EC;
+  //! The type of the payload
+  using payload_type = void;
+  //! The type of the exception
+  using exception_type = void;
+  //! The error code
+  error_type error;
+};
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of payload.
+*/
+
+template <class P> struct failure_type<void, P, false>
+{
+  //! The type of the error code
+  using error_type = void;
+  //! The type of the payload
+  using payload_type = P;
+  //! The type of the exception
+  using exception_type = void;
+  //! The payload
+  payload_type payload;
+};
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of exception.
+*/
+
+template <class E> struct failure_type<void, E, true>
+{
+  //! The type of the error code
+  using error_type = void;
+  //! The type of the payload
+  using payload_type = void;
+  //! The type of the exception
+  using exception_type = E;
+  //! The exception
+  exception_type exception;
+};
+/*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
+\effects Copies or moves the failure state supplied into the returned type sugar.
+*/
+
+
+template <class EC> inline constexpr failure_type<std::decay_t<EC>> failure(EC &&v)
+{
+  return failure_type<std::decay_t<EC>>{std::forward<EC>(v)};
+}
+/*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
+\effects Copies or moves the failure state supplied into the returned type sugar.
+*/
+
+
+template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, E &&w)
+{
+  return failure_type<std::decay_t<EC>, std::decay_t<E>>{std::forward<EC>(v), std::forward<E>(w)};
+}
+
+
+
+OUTCOME_V2_NAMESPACE_END
+
+#endif
+/* Error observers for a very simple result type
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Oct 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_RESULT_ERROR_OBSERVERS_HPP
+#define OUTCOME_RESULT_ERROR_OBSERVERS_HPP
+
+
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
@@ -3527,6 +3857,49 @@ public:
   S &&error() && { return _error; }
 };
 
+//! Thrown when you try to access state in a `outcome<T, EC, E>` which isn't present.
+class OUTCOME_SYMBOL_VISIBLE bad_outcome_access : public std::logic_error
+{
+public:
+  bad_outcome_access(const char *what)
+      : std::logic_error(what)
+  {
+  }
+};
+
+//! Thrown when you try to access state in a `outcome<T, EC, E>` which isn't present.
+template <class S, class P> class OUTCOME_SYMBOL_VISIBLE bad_outcome_access_with : public bad_outcome_access
+{
+  S _error;
+  P _payload;
+
+public:
+  bad_outcome_access_with(S x, P y)
+      : bad_outcome_access("no value")
+      , _error(std::move(x))
+      , _payload(std::move(y))
+  {
+  }
+  //! Observes the error
+  const S &error() const & { return _error; }
+  //! Observes the error
+  S &error() & { return _error; }
+  //! Observes the error
+  const S &&error() const && { return _error; }
+  //! Observes the error
+  S &&error() && { return _error; }
+
+  //! Observes the payload
+  const P &payload() const & { return _payload; }
+  //! Observes the payload
+  P &payload() & { return _payload; }
+  //! Observes the payload
+  const P &&payload() const && { return _payload; }
+  //! Observes the payload
+  P &&payload() && { return _payload; }
+};
+
+
 OUTCOME_V2_NAMESPACE_END
 
 #endif
@@ -4203,9 +4576,17 @@ namespace detail
   // These are reused by outcome to save load on the compiler
   template <class value_type, class error_type> struct result_predicates
   {
+    // Is this a common error type?
+    static constexpr bool error_is_common_error_type = //
+    std::is_base_of<std::error_code, std::decay_t<error_type>>::value //
+    || std::is_base_of<std::exception_ptr, std::decay_t<error_type>>::value //
+    /* || std::is_error_code_enum<std::decay_t<error_type>>::value           //
+    || std::is_error_condition_enum<std::decay_t<error_type>>::value */;
+
+
     // Predicate for the implicit constructors to be available
     static constexpr bool implicit_constructors_enabled = //
-    (std::is_same<bool, std::decay_t<value_type>>::value || !is_same_or_constructible<value_type, error_type>) //
+    ((error_is_common_error_type && std::is_same<bool, std::decay_t<value_type>>::value) || !is_same_or_constructible<value_type, error_type>) //
     &&!is_same_or_constructible<error_type, value_type>;
 
     // Predicate for the value converting constructor to be available.
@@ -4339,7 +4720,7 @@ namespace hooks
 
 `NoValuePolicy` defaults to a policy selected according to the characteristics of type `S`:
   1. If `.value()` called when there is no `value_type` but there is an `error_type`:
-    - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<EC>` is true,
+    - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<S>` is true,
     then `throw std::system_error(make_error_code(error()))` [`policy::error_enum_throw_as_system_error<S>`]
     if C++ exceptions are enabled, else call `std::terminate()`.
     - If `S` convertible to a `std::error_code`, then `throw std::system_error(error())` [`policy::error_code_throw_as_system_error<S>`]
@@ -4990,16 +5371,6 @@ OUTCOME_V2_NAMESPACE_END
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
-//! Thrown when you try to access state in a `outcome<T, EC, E>` which isn't present.
-class OUTCOME_SYMBOL_VISIBLE bad_outcome_access : public std::logic_error
-{
-public:
-  bad_outcome_access(const char *what)
-      : std::logic_error(what)
-  {
-  }
-};
-
 //! Placeholder type to indicate there is no payload type
 struct no_payload_type
 {
@@ -5011,160 +5382,6 @@ struct no_exception_type
   no_exception_type() = delete;
 };
 
-namespace impl
-{
-  //! The payload observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
-  template <class Base, class R, class S, class P, class NoValuePolicy> class outcome_payload_observers : public Base
-  {
-  public:
-    using payload_type = P;
-    using Base::Base;
-
-    /// \output_section Narrow state observers
-    /*! Access payload without runtime checks.
-    \preconditions The outcome to have an payload state, otherwise it is undefined behaviour.
-    \returns Reference to the held `payload_type` according to overload.
-    \group assume_payload
-    */
-
-
-
-
-    inline constexpr payload_type &assume_payload() & noexcept;
-    /// \group assume_payload
-    inline constexpr const payload_type &assume_payload() const &noexcept;
-    /// \group assume_payload
-    inline constexpr payload_type &&assume_payload() && noexcept;
-    /// \group assume_payload
-    inline constexpr const payload_type &&assume_payload() const &&noexcept;
-
-    /// \output_section Wide state observers
-    /*! Access payload with runtime checks.
-    \returns Reference to the held `payload_type` according to overload.
-    \requires The outcome to have an payload state, else whatever `NoValuePolicy` says ought to happen.
-    \group payload
-    */
-
-
-
-
-    inline constexpr payload_type &payload() &;
-    /// \group payload
-    inline constexpr const payload_type &payload() const &;
-    /// \group payload
-    inline constexpr payload_type &&payload() &&;
-    /// \group payload
-    inline constexpr const payload_type &&payload() const &&;
-  };
-
-  template <class Base, class R, class S, class NoValuePolicy> class outcome_payload_observers<Base, R, S, void, NoValuePolicy> : public Base
-  {
-  public:
-    using Base::Base;
-    /// \output_section Narrow state observers
-    /*! Access payload without runtime checks.
-    */
-
-    constexpr void assume_payload() const noexcept { NoValuePolicy::narrow_payload_check(this); }
-    /// \output_section Wide state observers
-    /*! Access payload with runtime checks.
-    \requires The outcome to have an payload state, else whatever `NoValuePolicy` says ought to happen.
-    */
-
-
-    constexpr void payload() const { NoValuePolicy::wide_payload_check(this); }
-  };
-
-  //! The exception observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
-  template <class Base, class R, class S, class P, class NoValuePolicy> class outcome_exception_observers : public Base
-  {
-  public:
-    using exception_type = P;
-    using Base::Base;
-
-    /// \output_section Narrow state observers
-    /*! Access exception without runtime checks.
-    \preconditions The outcome to have an exception state, otherwise it is undefined behaviour.
-    \returns Reference to the held `exception_type` according to overload.
-    \group assume_exception
-    */
-
-
-
-
-    constexpr inline exception_type &assume_exception() & noexcept;
-    /// \group assume_exception
-    constexpr inline const exception_type &assume_exception() const &noexcept;
-    /// \group assume_exception
-    constexpr inline exception_type &&assume_exception() && noexcept;
-    /// \group assume_exception
-    constexpr inline const exception_type &&assume_exception() const &&noexcept;
-
-    /// \output_section Wide state observers
-    /*! Access exception with runtime checks.
-    \returns Reference to the held `exception_type` according to overload.
-    \requires The outcome to have an exception state, else whatever `NoValuePolicy` says ought to happen.
-    \group exception
-    */
-
-
-
-
-    constexpr inline exception_type &exception() &;
-    /// \group exception
-    constexpr inline const exception_type &exception() const &;
-    /// \group exception
-    constexpr inline exception_type &&exception() &&;
-    /// \group exception
-    constexpr inline const exception_type &&exception() const &&;
-  };
-  template <class Base, class R, class S, class NoValuePolicy> class outcome_exception_observers<Base, R, S, void, NoValuePolicy> : public Base
-  {
-  public:
-    using Base::Base;
-    /// \output_section Narrow state observers
-    /*! Access exception without runtime checks.
-    */
-
-    constexpr void assume_exception() const noexcept { NoValuePolicy::narrow_exception_check(this); }
-    /// \output_section Wide state observers
-    /*! Access exception with runtime checks.
-    \requires The outcome to have an exception state, else whatever `NoValuePolicy` says ought to happen.
-    */
-
-
-    constexpr void exception() const { NoValuePolicy::wide_exception_check(this); }
-  };
-
-  //! The failure observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
-  template <class Base, class R, class S, class P, class NoValuePolicy> class outcome_failure_observers : public Base
-  {
-  public:
-    using exception_type = std::exception_ptr;
-    using Base::Base;
-
-    /// \output_section Synthesising state observers
-    /*! Synthesise exception where possible.
-    \returns A synthesised exception type: if excepted, `exception()`; if errored, `std::make_exception_ptr(std::system_error(error()))`;
-    otherwise a default constructed exception type.
-    */
-
-
-
-    exception_type failure() const noexcept
-    {
-      if((this->_state._status & detail::status_have_exception) != 0)
-      {
-        return this->exception();
-      }
-      if((this->_state._status & detail::status_have_error) != 0)
-      {
-        return std::make_exception_ptr(std::system_error(this->error()));
-      }
-      return exception_type();
-    }
-  };
-}
 
 namespace policy
 {
@@ -5193,6 +5410,7 @@ namespace detail
   template <class value_type, class status_error_type, class error_type, class payload_exception_type, class payload_type, class exception_type> struct outcome_predicates
   {
     using result = result_predicates<value_type, error_type>;
+
     // Predicate for the implicit constructors to be available
     static constexpr bool implicit_constructors_enabled = //
     (std::is_same<bool, std::decay_t<value_type>>::value || !is_same_or_constructible<value_type, status_error_type>) //
@@ -5240,9 +5458,6 @@ namespace detail
     static constexpr bool enable_compatible_conversion = //
     (std::is_void<T>::value || detail::is_same_or_constructible<value_type, typename outcome<T, U, V, W>::value_type>) // if our value types are constructible
     &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename outcome<T, U, V, W>::error_type>) // if our error types are constructible
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-    &&(std::is_void<U>::value || detail::is_same_or_constructible<status_type, typename outcome<T, U, V, W>::status_type>) // if our status types are constructible
-#endif
     &&(std::is_void<V>::value || detail::is_same_or_constructible<payload_type, typename outcome<T, U, V, W>::payload_type>) // if our payload types are constructible
     &&(std::is_void<V>::value || detail::is_same_or_constructible<exception_type, typename outcome<T, U, V, W>::exception_type>) // if our exception types are constructible
     ;
@@ -5280,10 +5495,10 @@ namespace detail
   template <class T, class U, class V, typename = std::enable_if_t<trait::is_exception_ptr<V>::value>> constexpr inline V &&extract_exception_payload_from_failure(failure_type<U, V> &&v, enable_exception_from_failure = enable_exception_from_failure()) { return std::move(v.exception); }
   template <class T, class U> constexpr inline T extract_exception_payload_from_failure(const failure_type<U, void> & /*unused*/) { return T{}; }
 
-  template <class Base, class R, class S, class P, class NoValuePolicy> using select_outcome_observers_payload_or_exception = std::conditional_t<trait::is_exception_ptr<P>::value, impl::outcome_exception_observers<Base, R, S, P, NoValuePolicy>, impl::outcome_payload_observers<Base, R, S, P, NoValuePolicy>>;
+  template <class Base, class R, class S, class P, class NoValuePolicy> using select_outcome_observers_payload_or_exception = std::conditional_t<trait::is_exception_ptr<P>::value, detail::outcome_exception_observers<Base, R, S, P, NoValuePolicy>, detail::outcome_payload_observers<Base, R, S, P, NoValuePolicy>>;
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl2 = select_outcome_observers_payload_or_exception<detail::result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>;
   template <class R, class S, class P, class NoValuePolicy>
-  using select_outcome_impl = std::conditional_t<std::is_base_of<std::error_code, S>::value && trait::is_exception_ptr<P>::value, impl::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>, select_outcome_impl2<R, S, P, NoValuePolicy>>;
+  using select_outcome_impl = std::conditional_t<std::is_base_of<std::error_code, S>::value && trait::is_exception_ptr<P>::value, detail::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>, select_outcome_impl2<R, S, P, NoValuePolicy>>;
 }
 
 namespace hooks
@@ -5409,15 +5624,8 @@ public:
   using value_type = R;
   //! The S type configured
   using status_error_type = S;
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-  //! The status type, always `no_status_type` if `trait::status_type_is_negative<S>` is true.
-  using status_type = typename base::status_type;
-  //! The failure type, always `no_error_type` if `trait::status_type_is_negative<S>` is false.
-  using error_type = typename base::error_type;
-#else
   //! The failure type.
   using error_type = S;
-#endif
   //! The P type configured.
   using payload_exception_type = P;
   //! The payload type, always `no_payload_type` if `trait::is_exception_ptr<P>` is true.
@@ -5538,145 +5746,18 @@ public:
     using namespace hooks;
     hook_outcome_construction(in_place_type<value_type>, this);
   }
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-  /*! Converting constructor to a successful outcome + status.
-\tparam enable_value_status_converting_constructor
-\exclude
-\param 2
-\exclude
-\param t The value from which to initialise the `value_type`.
-\param u The value from which to initialise the `status_type`.
-
-\effects Initialises the outcome with a `value_type` and an additional `status_type`.
-\requires `trait::status_type_is_negative<EC>` must be false; Type `T` is constructible to `value_type`,
-is not constructible to `exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
-Type `U` is constructible to `status_type`, is not constructible to `value_type`, and is not constructible to `exception_type`.
-\throws Any exception the construction of `value_type(T)` and `status_type(U)` might throw.
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-  template <class T, class U, typename enable_value_status_converting_constructor = std::enable_if_t< //
-                              !std::is_same<std::decay_t<T>, outcome>::value // not my type
-                              && !detail::is_in_place_type_t<std::decay_t<T>>::value // not in place construction
-                              && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<exception_type, T>::value //
-                              && detail::is_same_or_constructible<status_type, U> && !std::is_constructible<exception_type, U>::value>>
-  constexpr outcome(T &&t, U &&u, value_status_converting_constructor_tag = value_status_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_type, U>::value)
-      : base{typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u)}
-      , _ptr()
-  {
-    using namespace hooks;
-    hook_outcome_construction(in_place_type<std::pair<value_type, status_type>>, this);
-  }
-  /*! Converting constructor to a successful outcome + status + payload.
-  \tparam enable_value_status_payload_converting_constructor
-  \exclude
-  \param 3
-  \exclude
-  \param t The value from which to initialise the `value_type`.
-  \param u The value from which to initialise the `status_type`.
-  \param v The value from which to initialise the `payload_type`.
-
-  \effects Initialises the outcome with a `value_type`, a `status_type` and a `payload_type`.
-  \requires `trait::status_type_is_negative<EC>` must be false; Type `T` is constructible to `value_type`, and is not `outcome<R, S, P>`
-  and not `in_place_type<>`;
-  Type `U` is constructible to `status_type`;
-  Type `V` is constructible to `payload_exception_type`.
-  \throws Any exception the construction of `value_type(T)`, `status_type(U)` and `payload_exception_type(V)` might throw.
-  */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  template <class T, class U, class V, typename enable_value_status_payload_converting_constructor = std::enable_if_t< //
-                                       !std::is_same<std::decay_t<T>, outcome>::value // not my type
-                                       && !detail::is_in_place_type_t<std::decay_t<T>>::value // not in place construction
-                                       && detail::is_same_or_constructible<value_type, T> //
-                                       && detail::is_same_or_constructible<status_type, U> //
-                                       && detail::is_same_or_constructible<payload_exception_type, V> //
-                                       >>
-  constexpr outcome(T &&t, U &&u, V &&v,
-                    value_status_payload_converting_constructor_tag = value_status_payload_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_type, U>::value &&std::is_nothrow_constructible<payload_exception_type, V>::value)
-      : base{typename base::value_status_construction_tag(), std::forward<T>(t), std::forward<U>(u)}
-      , _ptr(std::forward<V>(v))
-  {
-    using namespace hooks;
-    this->_state._status |= detail::status_have_payload;
-    hook_outcome_construction(in_place_type<std::tuple<value_type, status_type, payload_type>>, this);
-  }
-  /*! Converting constructor to a successful outcome + payload.
-  \tparam enable_value_payload_converting_constructor_tag
-  \exclude
-  \param 2
-  \exclude
-  \param t The value from which to initialise the `value_type`.
-  \param u The value from which to initialise the `payload_type`.
-
-  \effects Initialises the outcome with a `value_type` and a `payload_type`.
-  \requires `trait::is_exception_ptr<P>` must be false; Type `T` is constructible to `value_type`, is not constructible to `status_error_type`,
-  and is not `outcome<R, S, P>` and not `in_place_type<>`;
-  Type `U` is constructible to `payload_type`, and is not constructible to `status_error_type`.
-  \throws Any exception the construction of `value_type(T)` and `payload_type(U)` might throw.
-  */
-
-
-
-
-
-
-
-
-
-
-
-
-
-  template <class T, class U, typename enable_value_payload_converting_constructor_tag = std::enable_if_t< //
-                              !std::is_same<std::decay_t<T>, outcome>::value // not my type
-                              && !detail::is_in_place_type_t<std::decay_t<T>>::value // not in place construction
-                              && detail::is_same_or_constructible<value_type, T> && !std::is_constructible<status_error_type, T>::value //
-                              && detail::is_same_or_constructible<payload_type, U> && !std::is_constructible<status_error_type, U>::value>>
-  constexpr outcome(T &&t, U &&u, value_payload_converting_constructor_tag = value_payload_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<payload_exception_type, U>::value)
-      : base{in_place_type<typename base::value_type>, std::forward<T>(t)}
-      , _ptr(std::forward<U>(u))
-  {
-    using namespace hooks;
-    hook_outcome_construction(in_place_type<std::pair<value_type, payload_type>>, this);
-  }
-#endif
   /*! Converting constructor to an errored outcome.
-\tparam enable_error_converting_constructor
-\exclude
-\param 1
-\exclude
-\param t The value from which to initialise the `error_type`.
+  \tparam enable_error_converting_constructor
+  \exclude
+  \param 1
+  \exclude
+  \param t The value from which to initialise the `error_type`.
 
-\effects Initialises the outcome with a `error_type`.
-\requires `trait::status_type_is_negative<EC>` must be true; Type T is constructible to `error_type`,
-is not constructible to `value_type`, is not constructible to `payload_exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
-\throws Any exception the construction of `error_type(T)` might throw.
-*/
+  \effects Initialises the outcome with a `error_type`.
+  \requires `trait::status_type_is_negative<EC>` must be true; Type T is constructible to `error_type`,
+  is not constructible to `value_type`, is not constructible to `payload_exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
+  \throws Any exception the construction of `error_type(T)` might throw.
+  */
 
 
 
@@ -6616,7 +6697,61 @@ namespace hooks
       o->_state._status |= detail::status_have_payload;
   }
 }
+OUTCOME_V2_NAMESPACE_END
+/* Policies for result and outcome
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Oct 2017
 
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_POLICY_ERROR_CODE_THROW_AS_SYSTEM_ERROR_EXCEPTION_RETHROW_HPP
+#define OUTCOME_POLICY_ERROR_CODE_THROW_AS_SYSTEM_ERROR_EXCEPTION_RETHROW_HPP
+
+
+
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+//! Namespace for policies
 namespace policy
 {
 #ifdef __cpp_exceptions
@@ -6661,21 +6796,6 @@ namespace policy
         __builtin_unreachable();
 #endif
     }
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-    /*! Performs a narrow check of state, used in the assume_status() functions
-\effects None.
-*/
-
-
-    template <class Impl> static constexpr void narrow_status_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_status) == 0)
-        __builtin_unreachable();
-#endif
-    }
-#endif
     /*! Performs a narrow check of state, used in the assume_payload() functions.
     \effects None.
     */
@@ -6737,20 +6857,6 @@ namespace policy
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
       }
     }
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-    /*! Performs a wide check of state, used in the status() functions
-\effects If outcome does not have an status, it throws `bad_outcome_access`.
-*/
-
-
-    template <class Impl> static constexpr void wide_status_check(Impl *self)
-    {
-      if((self->_state._status & detail::status_have_status) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no status"));
-      }
-    }
-#endif
     /*! Performs a wide check of state, used in the payload() functions
     \effects If outcome does not have a payload, it throws `bad_outcome_access`.
     */
@@ -6778,7 +6884,64 @@ namespace policy
   };
 #endif
 }
-namespace impl
+
+OUTCOME_V2_NAMESPACE_END
+
+#endif
+/* Payload observers for outcome type
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Oct 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_OUTCOME_PAYLOAD_OBSERVERS_IMPL_HPP
+#define OUTCOME_OUTCOME_PAYLOAD_OBSERVERS_IMPL_HPP
+
+
+
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+namespace detail
 {
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &outcome_payload_observers<Base, R, S, P, NoValuePolicy>::assume_payload() & noexcept
   {
@@ -6880,8 +7043,10 @@ namespace impl
     return std::move(self->_ptr);
   }
 }
+
 OUTCOME_V2_NAMESPACE_END
 
+#endif
 #endif
 #include <iostream>
 #include <sstream>
