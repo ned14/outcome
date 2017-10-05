@@ -60,9 +60,6 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / constexpr, "Tests that outcome wo
     // Test void
     constexpr result<void, int> h(in_place_type<void>);
     static_assert(h.has_value(), "");
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-    static_assert(!h.has_status(), "");
-#endif
     constexpr result<int, void> h2(in_place_type<void>);
     static_assert(!h2.has_value(), "");
     static_assert(h2.has_error(), "");

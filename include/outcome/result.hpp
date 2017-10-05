@@ -71,7 +71,9 @@ namespace policy
 #endif
 }
 
-template <class R, class S = std::error_code, class NoValuePolicy = policy::default_result_policy<S>> class result;
+template <class R, class S = std::error_code, class NoValuePolicy = policy::default_result_policy<S>>                                                                   //
+OUTCOME_REQUIRES(detail::type_can_be_used_in_result<R> &&detail::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
+class result;
 
 namespace detail
 {
@@ -196,7 +198,9 @@ namespace hooks
 /*! Used to return from functions either (i) a successful value (ii) a cause of failure. `constexpr` capable.
 \module result<R, S> implementation
 \tparam R The optional type of the successful result (use `void` to disable).
+Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
 \tparam S The optional type of the failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
+Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
 \tparam NoValuePolicy Policy on how to interpret type `S` when a wide observation of a not present value occurs.
 
 `NoValuePolicy` defaults to a policy selected according to the characteristics of type `S`:
@@ -215,8 +219,14 @@ namespace hooks
     - `throw bad_result_access()` if C++ exceptions are enabled, else call `std::terminate()`.
 
 */
-template <class R, class S, class NoValuePolicy> class OUTCOME_NODISCARD result : public detail::result_final<R, S, NoValuePolicy>
+template <class R, class S, class NoValuePolicy>                                                                                                                        //
+OUTCOME_REQUIRES(detail::type_can_be_used_in_result<R> &&detail::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
+class OUTCOME_NODISCARD result : public detail::result_final<R, S, NoValuePolicy>
 {
+  static_assert(detail::type_can_be_used_in_result<R>, "The type R cannot be used in a result");
+  static_assert(detail::type_can_be_used_in_result<S>, "The type S cannot be used in a result");
+  static_assert(std::is_void<S>::value || std::is_default_constructible<S>::value, "The type S must be void or default constructible");
+
   using base = detail::result_final<R, S, NoValuePolicy>;
   template <class T, class U, class V> friend inline std::istream &operator>>(std::istream &s, result<T, U, V> &v);
   template <class T, class U, class V> friend inline std::ostream &operator<<(std::ostream &s, const result<T, U, V> &v);

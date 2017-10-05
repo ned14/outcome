@@ -25,6 +25,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_RESULT_STORAGE_HPP
 #define OUTCOME_RESULT_STORAGE_HPP
 
+#include "../success_failure.hpp"
 #include "value_storage.hpp"
 
 #include <system_error>
@@ -130,25 +131,26 @@ namespace hooks
 }
 namespace detail
 {
-  //! The base implementation type of `result<R, EC, NoValuePolicy>`.
-  template <class R, class EC, class NoValuePolicy>                    //
-  OUTCOME_REQUIRES(                                                    //
+  //! Predicate for permitting type to be used in outcome
+  template <class R>                                                   //
+  static constexpr bool type_can_be_used_in_result =                   //
   (!std::is_reference<R>::value                                        //
    && !detail::is_in_place_type_t<std::decay_t<R>>::value              //
+   && !detail::is_success_type<R>::value                               //
+   && !detail::is_failure_type<R>::value                               //
    && !std::is_array<R>::value                                         //
    && (std::is_void<R>::value || (std::is_object<R>::value             //
                                   && std::is_destructible<R>::value))  //
-   ) &&
-  (!std::is_reference<EC>::value                                         //
-   && !detail::is_in_place_type_t<std::decay_t<EC>>::value               //
-   && !std::is_array<EC>::value                                          //
-   && (std::is_void<EC>::value || (std::is_object<EC>::value             //
-                                   && std::is_destructible<EC>::value))  //
-   )                                                                     //
-  )                                                                      //
+   );
+
+  //! The base implementation type of `result<R, EC, NoValuePolicy>`.
+  template <class R, class EC, class NoValuePolicy>                                                                                                          //
+  OUTCOME_REQUIRES(type_can_be_used_in_result<R> &&type_can_be_used_in_result<EC> && (std::is_void<EC>::value || std::is_default_constructible<EC>::value))  //
   class result_storage
   {
-    static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "error_type must be default constructible");
+    static_assert(type_can_be_used_in_result<R>, "The type R cannot be used in a result");
+    static_assert(type_can_be_used_in_result<EC>, "The type S cannot be used in a result");
+    static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "The type S must be void or default constructible");
 
     friend NoValuePolicy;
     template <class T, class U, class V> friend class result_storage;
