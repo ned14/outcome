@@ -231,10 +231,6 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as i
     (void) c2;
     // Test int, void compiles
     outcome<int, void> d(in_place_type<std::exception_ptr>);
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-    // Test void, status, void compiles
-    constexpr outcome<int, std::errc, void> e(5, std::errc::bad_message);
-#endif
   }
 
   {

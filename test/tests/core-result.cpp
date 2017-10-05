@@ -277,22 +277,6 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
     static_assert(!std::is_trivially_move_assignable<decltype(e)>::value, "");
     static_assert(!std::is_nothrow_move_assignable<decltype(e)>::value, "");
 
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-    // Test value + status info works, and in constexpr
-    using cresult_type = result<int, const char *>;
-    constexpr const char *niall = "niall";
-    constexpr cresult_type f(5, niall);
-    constexpr cresult_type f2(f);
-    static_assert(f, "");
-    static_assert(f.has_value(), "");
-    static_assert(!f.has_error(), "");
-    static_assert(f.has_status(), "");
-    static_assert(f.assume_value() == 5, "");
-    static_assert(f.assume_status() == niall, "");
-    static_assert(f.value() == 5, "");
-    static_assert(f.status() == niall, "");
-#endif
-
     // Test a udt which can only be constructed in place compiles
     result<udt3> g(in_place_type<udt3>, 5, static_cast<const char *>("niall"), nullptr);
     // Does converting inplace construction also work?

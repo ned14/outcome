@@ -27,6 +27,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "config.hpp"
 
+#include <stdexcept>
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 //! Thrown when you try to access state in a `result<R, S>` which isn't present.

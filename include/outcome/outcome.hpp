@@ -63,23 +63,25 @@ namespace policy
 #endif
 }
 
-template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_outcome_policy<R, S, P>> OUTCOME_REQUIRES(std::is_void<P>::value || std::is_default_constructible<P>::value) class outcome;
+template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_outcome_policy<R, S, P>>  //
+OUTCOME_REQUIRES(detail::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))              //
+class outcome;
 
 namespace detail
 {
   // May be reused by outcome subclasses to save load on the compiler
-  template <class value_type, class status_error_type, class error_type, class payload_exception_type, class payload_type, class exception_type> struct outcome_predicates
+  template <class value_type, class error_type, class payload_exception_type, class payload_type, class exception_type> struct outcome_predicates
   {
     using result = result_predicates<value_type, error_type>;
 
     // Predicate for the implicit constructors to be available
     static constexpr bool implicit_constructors_enabled =                                                                     //
-    (std::is_same<bool, std::decay_t<value_type>>::value || !is_same_or_constructible<value_type, status_error_type>)         //
+    (std::is_same<bool, std::decay_t<value_type>>::value || !is_same_or_constructible<value_type, error_type>)                //
     &&(std::is_same<bool, std::decay_t<value_type>>::value || !is_same_or_constructible<value_type, payload_exception_type>)  //
-    &&!is_same_or_constructible<status_error_type, value_type>                                                                //
-    && !is_same_or_constructible<status_error_type, payload_exception_type>                                                   //
+    &&!is_same_or_constructible<error_type, value_type>                                                                       //
+    && !is_same_or_constructible<error_type, payload_exception_type>                                                          //
     && !is_same_or_constructible<payload_exception_type, value_type>                                                          //
-    && !is_same_or_constructible<payload_exception_type, status_error_type>;
+    && !is_same_or_constructible<payload_exception_type, error_type>;
 
     // Predicate for the value converting constructor to be available.
     template <class T>
@@ -112,7 +114,7 @@ namespace detail
     static constexpr bool enable_exception_converting_constructor =  //
     implicit_constructors_enabled                                    //
     && !is_in_place_type_t<std::decay_t<T>>::value                   // not in place construction
-    && !std::is_constructible<value_type, T>::value && !std::is_constructible<status_error_type, T>::value && detail::is_same_or_constructible<exception_type, T>;
+    && !std::is_constructible<value_type, T>::value && !std::is_constructible<error_type, T>::value && detail::is_same_or_constructible<exception_type, T>;
 
     // Predicate for the converting copy constructor from a compatible outcome to be available.
     template <class T, class U, class V, class W>
@@ -196,19 +198,30 @@ namespace hooks
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_payload_exception(outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept;
 }
 
-/*! Used to return from functions (i) a value and (a positive status and/or a payload) or
-(ii) no value and (a negative status and/or a payload). `constexpr` capable.
+/*! Used to return from functions one of (i) a successful value (ii) a cause of failure, with optional additional information. `constexpr` capable.
 \module outcome<R, S, P> implementation
 \tparam R The optional type of the successful result (use `void` to disable).
-\tparam S The optional type of the status result (use `void` to disable). Must be either `void` or DefaultConstructible.
-\tparam P The optional type of the payload/exception result (use `void` to disable). Must be either `void` or DefaultConstructible.
+Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
+\tparam S The optional type of the failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
+Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
+\tparam P The optional type of the payload/exception result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
+Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
 \tparam NoValuePolicy Policy on how to interpret types `S` and `P` when a wide observation of a not present value occurs.
+
+This is an extension of `result<T, E>` and it comes in two variants:
+  1. `outcome<T, E, P>`: simply as if a `result<T, E + P>` i.e. if a failure result, there may be an additional arbitrary payload of type `P`.
+  In this form, `.payload()` returns the payload and there is no `.exception()`.
+  2. `outcome<T, EC, EP>`: Failure cause can be `EC` (`.error()`), or `EP` (`.exception()`) or `EC + EP` i.e. both together.
+  In this form, there is no `.payload()`.
+
+Which variant is chosen depends on `trait::is_exception_ptr<P>`. If it is true, you get the second form, if it is false you get the first form.
 */
-template <class R, class S, class P, class NoValuePolicy>                            //
-OUTCOME_REQUIRES(std::is_void<P>::value || std::is_default_constructible<P>::value)  //
+template <class R, class S, class P, class NoValuePolicy>                                                                       //
+OUTCOME_REQUIRES(detail::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))  //
 class OUTCOME_NODISCARD outcome : public detail::select_outcome_impl<R, S, P, NoValuePolicy>
 {
-  static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "payload_type/exception_type must be default constructible");
+  static_assert(detail::type_can_be_used_in_result<P>, "The payload_type/exception_type cannot be used");
+  static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "payload_type/exception_type must be void or default constructible");
   using base = detail::select_outcome_impl<R, S, P, NoValuePolicy>;
   friend NoValuePolicy;
   friend detail::select_outcome_impl2<R, S, P, NoValuePolicy>;
@@ -256,8 +269,6 @@ public:
   /// \output_section Member types
   //! The success type.
   using value_type = R;
-  //! The S type configured
-  using status_error_type = S;
   //! The failure type.
   using error_type = S;
   //! The P type configured.
@@ -274,7 +285,7 @@ protected:
   //! Requirement predicates for outcome.
   struct predicate
   {
-    using base = detail::outcome_predicates<value_type, status_error_type, error_type, payload_exception_type, payload_type, exception_type>;
+    using base = detail::outcome_predicates<value_type, error_type, payload_exception_type, payload_type, exception_type>;
 
     //! Predicate for the value converting constructor to be available.
     template <class T>
@@ -358,7 +369,7 @@ public:
   \param t The value from which to initialise the `value_type`.
 
   \effects Initialises the outcome with a `value_type`.
-  \requires Type T is constructible to `value_type`, is not constructible to `status_error_type`, is not constructible to `exception_type` and is not `outcome<R, S, P>` and not `in_place_type<>`.
+  \requires Type T is constructible to `value_type`, is not constructible to `error_type`, is not constructible to `exception_type` and is not `outcome<R, S, P>` and not `in_place_type<>`.
   \throws Any exception the construction of `value_type(T)` might throw.
   */
   OUTCOME_TEMPLATE(class T)
@@ -378,7 +389,7 @@ public:
   \param t The value from which to initialise the `error_type`.
 
   \effects Initialises the outcome with a `error_type`.
-  \requires `trait::status_type_is_negative<EC>` must be true; Type T is constructible to `error_type`,
+  \requires Type T is constructible to `error_type`,
   is not constructible to `value_type`, is not constructible to `payload_exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
   \throws Any exception the construction of `error_type(T)` might throw.
   */
@@ -400,7 +411,7 @@ public:
   \param u The value from which to initialise the `payload_exception_type`.
 
   \effects Initialises the outcome with a `error_type` and a `payload_exception_type`.
-  \requires `trait::status_type_is_negative<EC>` must be true; Type T is constructible to `error_type`,
+  \requires Type T is constructible to `error_type`,
   is not constructible to `value_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
   Type `U` is constructible to `payload_exception_type`, is not constructible to `value_type`.
   \throws Any exception the construction of `error_type(T)` and `payload_exception_type(U)` might throw.
@@ -423,7 +434,7 @@ public:
   \param t The error condition from which to initialise the `error_type`.
 
   \effects Initialises the outcome with a `error_type` constructed via `make_error_code(t)`.
-  \requires `trait::status_type_is_negative<EC>` must be true; `std::is_error_condition_enum<ErrorCondEnum>` must be true,
+  \requires `std::is_error_condition_enum<ErrorCondEnum>` must be true,
   `ErrorCondEnum` is not constructible to `value_type`, `error_type` nor `payload_exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
   Finally, the expression `error_type(make_error_code(ErrorCondEnum()))` must be valid.
   \throws Any exception the construction of `error_type(make_error_code(t))` might throw.
@@ -446,7 +457,7 @@ public:
 
   \effects Initialises the outcome with a `exception_type`.
   \requires `trait::is_exception_ptr<P>` must be true; Type T is constructible to `exception_type`,
-  is not constructible to `value_type`, is not constructible to `status_error_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
+  is not constructible to `value_type`, is not constructible to `error_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
   \throws Any exception the construction of `exception_type(T)` might throw.
   */
   OUTCOME_TEMPLATE(class T)
@@ -466,12 +477,12 @@ public:
   \param o The compatible outcome.
 
   \effects Initialises the outcome with a copy of the compatible outcome.
-  \requires Both outcome's `value_type`, `error_type`, `status_type`, `payload_type` and `exception_type` need to be constructible, or the source `void`.
-  \throws Any exception the construction of `value_type(T)`, `status_error_type(U)` or `payload_exception_type(V)` might throw.
+  \requires Both outcome's `value_type`, `error_type`, `payload_type` and `exception_type` need to be constructible, or the source `void`.
+  \throws Any exception the construction of `value_type(T)`, `error_type(U)` or `payload_exception_type(V)` might throw.
   */
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V, W>))
-  constexpr explicit outcome(const outcome<T, U, V, W> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type, V>::value)
+  constexpr explicit outcome(const outcome<T, U, V, W> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type, V>::value)
       : base{typename base::compatible_conversion_tag(), o}
       , _ptr(o._ptr)
   {
@@ -484,12 +495,12 @@ public:
   \param o The compatible outcome.
 
   \effects Initialises the outcome with a move of the compatible outcome.
-  \requires Both outcome's `value_type`, `error_type`, `status_type`, `payload_type` and `exception_type` need to be constructible, or the source `void`.
-  \throws Any exception the construction of `value_type(T)`, `status_error_type(U)` or `payload_exception_type(V)` might throw.
+  \requires Both outcome's `value_type`, `error_type`, `payload_type` and `exception_type` need to be constructible, or the source `void`.
+  \throws Any exception the construction of `value_type(T)`, `error_type(U)` or `payload_exception_type(V)` might throw.
   */
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V, W>))
-  constexpr explicit outcome(outcome<T, U, V, W> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type, V>::value)
+  constexpr explicit outcome(outcome<T, U, V, W> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type, V>::value)
       : base{typename base::compatible_conversion_tag(), std::move(o)}
       , _ptr(std::move(o._ptr))
   {
@@ -502,12 +513,12 @@ public:
   \param o The compatible result.
 
   \effects Initialises the outcome with a copy of the compatible result.
-  \requires Both outcome's `value_type`, `error_type` and `status_type` need to be constructible, or the source `void`.
-  \throws Any exception the construction of `value_type(T)`, `status_error_type(U)` or `payload_exception_type()` might throw.
+  \requires Both outcome's `value_type` and `error_type` need to be constructible, or the source `void`.
+  \throws Any exception the construction of `value_type(T)`, `error_type(U)` or `payload_exception_type()` might throw.
   */
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, error_type>::template enable_compatible_conversion<T, U, V>))
-  constexpr explicit outcome(const result<T, U, V> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type>::value)
+  constexpr explicit outcome(const result<T, U, V> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type>::value)
       : base{typename base::compatible_conversion_tag(), o}
       , _ptr()
   {
@@ -520,12 +531,12 @@ public:
   \param o The compatible result.
 
   \effects Initialises the outcome with a move of the compatible result.
-  \requires Both outcome's `value_type`, `error_type` and `status_type` need to be constructible, or the source `void`.
-  \throws Any exception the construction of `value_type(T)`, `status_error_type(U)` or `payload_exception_type()` might throw.
+  \requires Both outcome's `value_type` and `error_type` need to be constructible, or the source `void`.
+  \throws Any exception the construction of `value_type(T)`, `error_type(U)` or `payload_exception_type()` might throw.
   */
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, error_type>::template enable_compatible_conversion<T, U, V>))
-  constexpr explicit outcome(result<T, U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<status_error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type>::value)
+  constexpr explicit outcome(result<T, U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value &&std::is_nothrow_constructible<payload_exception_type>::value)
       : base{typename base::compatible_conversion_tag(), std::move(o)}
       , _ptr()
   {
@@ -581,7 +592,7 @@ public:
   \param args Arguments with which to in place construct.
 
   \effects Initialises the outcome with a `error_type`.
-  \requires `trait::status_type_is_negative<EC>` must be true; `error_type` is void or `Args...` are constructible to `error_type`.
+  \requires `error_type` is void or `Args...` are constructible to `error_type`.
   \throws Any exception the construction of `error_type(Args...)` might throw.
   */
   OUTCOME_TEMPLATE(class... Args)
@@ -601,7 +612,7 @@ public:
   \param args Arguments with which to in place construct.
 
   \effects Initialises the outcome with a `error_type`.
-  \requires `trait::status_type_is_negative<EC>` must be true; The initializer list + `Args...` are constructible to `error_type`.
+  \requires The initializer list + `Args...` are constructible to `error_type`.
   \throws Any exception the construction of `error_type(il, Args...)` might throw.
   */
   OUTCOME_TEMPLATE(class U, class... Args)
@@ -941,8 +952,8 @@ public:
   /*! Swaps this result with another result
   \effects Any `R` and/or `S` is swapped along with the metadata tracking them.
   */
-  void swap(outcome &o) noexcept(detail::is_nothrow_swappable<value_type>::value           //
-                                 &&detail::is_nothrow_swappable<status_error_type>::value  //
+  void swap(outcome &o) noexcept(detail::is_nothrow_swappable<value_type>::value    //
+                                 &&detail::is_nothrow_swappable<error_type>::value  //
                                  &&detail::is_nothrow_swappable<payload_exception_type>::value)
   {
     using std::swap;

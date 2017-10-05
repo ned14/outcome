@@ -28,7 +28,6 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include "config.hpp"
 
 #include <exception>
-#include <system_error>
 #include <type_traits>
 
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -45,7 +44,8 @@ namespace trait
 }
 
 // Do we have C++ 17 deduced templates?
-#if 0  // def __cpp_deduction_guides
+// GCC 7.2 and clang 6.0 both have problems in their implementations, so leave this disabled for now. But it should work one day.
+#if 0  // defined(__cpp_deduction_guides)  //&& (defined(__clang__) || !defined(__GNUC__) || __GNUC__ > 7 || __GNUC_MINOR__ > 1)
 
 /*! Type sugar for implicitly constructing a `result<>` with a successful state.
 */
@@ -75,8 +75,7 @@ template <class T> success(T /*unused*/)->success<T>;
 success()->success<void>;
 template <class T> using success_type = success<T>;
 
-template <class EC, class E, bool e_is_exception_ptr = trait::is_exception_ptr<E>::value> struct failure;
-template <class EC, class E> using failure_type = failure<EC, E>;
+template <class EC, class E = void, bool e_is_exception_ptr = trait::is_exception_ptr<E>::value> struct failure;
 /*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and payload.
 */
 template <class EC, class P> struct failure<EC, P, false>
@@ -91,6 +90,12 @@ template <class EC, class P> struct failure<EC, P, false>
   error_type error;
   //! The payload
   payload_type payload;
+  template <class U, class V>
+  constexpr failure(U &&a, V &&b)
+      : error(std::forward<U>(a))
+      , payload(std::forward<V>(b))
+  {
+  }
 };
 /*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and exception.
 */
@@ -106,6 +111,12 @@ template <class EC, class E> struct failure<EC, E, true>
   error_type error;
   //! The exception
   exception_type exception;
+  template <class U, class V>
+  constexpr failure(U &&a, V &&b)
+      : error(std::forward<U>(a))
+      , exception(std::forward<V>(b))
+  {
+  }
 };
 /*! Type sugar for implicitly constructing a `result<>` with a failure state of error code.
 */
@@ -119,6 +130,14 @@ template <class EC> struct failure<EC, void, false>
   using exception_type = void;
   //! The error code
   error_type error;
+  constexpr failure(EC &&v)
+      : error(std::move(v))
+  {
+  }
+  constexpr failure(const EC &v)
+      : error(v)
+  {
+  }
 };
 /*! Type sugar for implicitly constructing a `result<>` with a failure state of payload.
 */
@@ -132,6 +151,14 @@ template <class P> struct failure<void, P, false>
   using exception_type = void;
   //! The payload
   payload_type payload;
+  constexpr failure(P &&v)
+      : payload(std::move(v))
+  {
+  }
+  constexpr failure(const P &v)
+      : payload(v)
+  {
+  }
 };
 /*! Type sugar for implicitly constructing a `result<>` with a failure state of exception.
 */
@@ -145,7 +172,19 @@ template <class E> struct failure<void, E, true>
   using exception_type = E;
   //! The exception
   exception_type exception;
+  constexpr failure(E &&v)
+      : exception(std::move(v))
+  {
+  }
+  constexpr failure(const E &v)
+      : exception(v)
+  {
+  }
 };
+template <class EC, class E> failure(EC /*unused*/, E /*unused*/)->failure<EC, E>;
+template <class EC> failure(EC /*unused*/)->failure<EC>;
+failure()->failure<std::error_code>;
+template <class EC = std::error_code, class E = void, bool e_is_exception_ptr = trait::is_exception_ptr<E>::value> using failure_type = failure<EC, E, e_is_exception_ptr>;
 #else
 
 /*! Type sugar for implicitly constructing a `result<>` with a successful state.
@@ -267,6 +306,22 @@ template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std
 }
 
 #endif
+
+namespace detail
+{
+  template <class T> struct is_success_type : std::false_type
+  {
+  };
+  template <class T> struct is_success_type<success_type<T>> : std::true_type
+  {
+  };
+  template <class T> struct is_failure_type : std::false_type
+  {
+  };
+  template <class EC, class E, bool e_is_exception_ptr> struct is_failure_type<failure_type<EC, E, e_is_exception_ptr>> : std::true_type
+  {
+  };
+}
 
 OUTCOME_V2_NAMESPACE_END
 
