@@ -218,7 +218,12 @@ Which variant is chosen depends on `trait::is_exception_ptr<P>`. If it is true, 
 */
 template <class R, class S, class P, class NoValuePolicy>                                                                       //
 OUTCOME_REQUIRES(detail::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))  //
-class OUTCOME_NODISCARD outcome : public detail::select_outcome_impl<R, S, P, NoValuePolicy>
+class OUTCOME_NODISCARD outcome
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+: public detail::outcome_failure_observers<detail::outcome_exception_observers<detail::result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>>
+#else
+: public detail::select_outcome_impl<R, S, P, NoValuePolicy>
+#endif
 {
   static_assert(detail::type_can_be_used_in_result<P>, "The payload_type/exception_type cannot be used");
   static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "payload_type/exception_type must be void or default constructible");

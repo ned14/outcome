@@ -28,6 +28,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include "config.hpp"
 
 #include <exception>
+#include <system_error>
 #include <type_traits>
 
 OUTCOME_V2_NAMESPACE_BEGIN

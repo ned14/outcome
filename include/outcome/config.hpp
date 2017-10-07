@@ -44,6 +44,24 @@ Distributed under the Boost Software License, Version 1.0.
 #error Outcome needs variable template support in the compiler
 #endif
 
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+#define OUTCOME_FORCEINLINE
+#define OUTCOME_NODISCARD [[nodiscard]]
+#define OUTCOME_TEMPLATE(...) template <__VA_ARGS__
+#define OUTCOME_TREQUIRES(...) , __VA_ARGS__ >
+#define OUTCOME_TEXPR(...) typename = decltype(__VA_ARGS__)
+#define OUTCOME_TPRED(...) typename = std::enable_if_t<__VA_ARGS__>
+#define OUTCOME_REQUIRES(...) requires __VA_ARGS__
+/*! \mainpage
+\htmlonly
+<script type="text/javascript">
+window.location.href = "https://ned14.github.io/outcome/"
+</script>
+If you are not redirected automatically, follow this link to <a href='https://ned14.github.io/outcome/'>https://ned14.github.io/outcome/</a>.
+\endhtmlonly
+*/
+#endif
+
 #ifndef OUTCOME_SYMBOL_VISIBLE
 #define OUTCOME_SYMBOL_VISIBLE QUICKCPPLIB_SYMBOL_VISIBLE
 #endif
@@ -79,7 +97,6 @@ of bracketed tokens later fused by the preprocessor into namespace and C++ modul
 //! The Outcome namespace
 namespace outcome_v2_xxx
 {
-}
 }
 /*! The namespace of this Outcome v2.
 */

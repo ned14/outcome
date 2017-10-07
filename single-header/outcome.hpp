@@ -1260,6 +1260,16 @@ Distributed under the Boost Software License, Version 1.0.
 #error Outcome needs variable template support in the compiler
 #endif
 
+
+
+
+
+
+
+
+
+
+
 #ifndef OUTCOME_SYMBOL_VISIBLE
 #define OUTCOME_SYMBOL_VISIBLE QUICKCPPLIB_SYMBOL_VISIBLE
 #endif
@@ -1431,9 +1441,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 0141101e3c74858908234a17c3ffbf4c0f31ee04
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-03 23:19:52 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 0141101e
+#define OUTCOME_PREVIOUS_COMMIT_REF 6db1f3501a5ba7269e237d271f96f8a82615eea4
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-05 01:40:15 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 6db1f350
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1823,17 +1833,9 @@ OUTCOME_V2_NAMESPACE_END
 #define BOOST_OUTCOME_AUTO_TEST_CASE(a, b) BOOST_AUTO_TEST_CASE(a, b)
 #endif
 
-namespace std
-{
-  class error_code;
-  class error_condition;
-  enum class errc;
-  template <class T> struct is_error_code_enum;
-  template <class T> struct is_error_condition_enum;
-}
-
 #endif
 #include <exception>
+#include <system_error>
 #include <type_traits>
 
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -1852,7 +1854,7 @@ namespace trait
 }
 
 // Do we have C++ 17 deduced templates?
-// GCC 7.2 and clang 6.0 both have broken implementations, so leave this disabled for now. But it should work one day.
+// GCC 7.2 and clang 6.0 both have problems in their implementations, so leave this disabled for now. But it should work one day.
 
 
 

@@ -1,0 +1,28 @@
+var result_8hpp =
+[
+    [ "no_value_type", "structoutcome__v2__xxx_1_1no__value__type.html", "structoutcome__v2__xxx_1_1no__value__type" ],
+    [ "no_error_type", "structoutcome__v2__xxx_1_1no__error__type.html", "structoutcome__v2__xxx_1_1no__error__type" ],
+    [ "result", "classoutcome__v2__xxx_1_1result.html", "classoutcome__v2__xxx_1_1result" ],
+    [ "result_predicates", "structoutcome__v2__xxx_1_1detail_1_1result__predicates.html", "structoutcome__v2__xxx_1_1detail_1_1result__predicates" ],
+    [ "is_result", "structoutcome__v2__xxx_1_1detail_1_1is__result.html", null ],
+    [ "is_result< result< R, S, T > >", "structoutcome__v2__xxx_1_1detail_1_1is__result_3_01result_3_01_r_00_01_s_00_01_t_01_4_01_4.html", null ],
+    [ "result", "classoutcome__v2__xxx_1_1result.html", "classoutcome__v2__xxx_1_1result" ],
+    [ "predicate", "structoutcome__v2__xxx_1_1result_1_1predicate.html", "structoutcome__v2__xxx_1_1result_1_1predicate" ],
+    [ "checked", "result_8hpp.html#a3a36e2cff60a5076721438f134ed774b", null ],
+    [ "default_result_policy", "result_8hpp.html#adddb8228ea08538fa63be354fcc2cd3f", null ],
+    [ "is_result", "result_8hpp.html#ab039de28dd8bf196cb07b5194c0ec6a5", null ],
+    [ "unchecked", "result_8hpp.html#a4b57e25db840733be29e04b04c9e843c", null ],
+    [ "extract_error_from_failure", "result_8hpp.html#acc75eca2f35dc6ace500a706b0d9e6ed", null ],
+    [ "extract_error_from_failure", "result_8hpp.html#abcd138e81a77464237680fba1ca2699f", null ],
+    [ "extract_error_from_failure", "result_8hpp.html#a2b3cd2c680a175d863ec26d76fcf233d", null ],
+    [ "extract_value_from_success", "result_8hpp.html#ab7316cbfe6aa9879c5b5f621e9836f56", null ],
+    [ "extract_value_from_success", "result_8hpp.html#a1a94410b3a50d4b03238733b27ffc36c", null ],
+    [ "extract_value_from_success", "result_8hpp.html#a2734b7ab70e45e7f01f40bb555ac1ce7", null ],
+    [ "hook_result_construction", "result_8hpp.html#a9ea286efc7bd79c98bb24de99962e5b0", null ],
+    [ "hook_result_copy_construction", "result_8hpp.html#a65aea7ecae6f947cad431f6a599fe06f", null ],
+    [ "hook_result_in_place_construction", "result_8hpp.html#ae2cd33cfd3fb8fd50181941e6944356f", null ],
+    [ "hook_result_move_construction", "result_8hpp.html#ae0571da4b7167e79369ff6662e0ae141", null ],
+    [ "set_spare_storage", "result_8hpp.html#aad13a824934d249373d305a9421040cf", null ],
+    [ "spare_storage", "result_8hpp.html#aed2306ff27d3ccf715c7e49f933dadea", null ],
+    [ "swap", "result_8hpp.html#a65aa8aa807659fc5dd675fc9009fce1e", null ]
+];
