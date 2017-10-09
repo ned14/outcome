@@ -3,12 +3,12 @@ title = "Tutorial"
 weight = 10
 +++
 
-1. [`unchecked<T, EC>`](unchecked)
+1. [`result<T, EC>`](result)
 
 
 ## TODO: more material will be provided in time...
 
-First we will need to dive into `unchecked<>`, `checked<>` and `result<>`.
+First we will need to dive into `result<>`.
 
 Then customizing `result` and using outcome...
 
