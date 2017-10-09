@@ -53,12 +53,13 @@ public:
   {
   }
   //! Observes the error
+  //! \group result_error
   const S &error() const & { return _error; }
-  //! Observes the error
+  //! \group result_error
   S &error() & { return _error; }
-  //! Observes the error
+  //! \group result_error
   const S &&error() const && { return _error; }
-  //! Observes the error
+  //! \group result_error
   S &&error() && { return _error; }
 };
 
@@ -86,21 +87,23 @@ public:
   {
   }
   //! Observes the error
+  //! \group outcome_error
   const S &error() const & { return _error; }
-  //! Observes the error
+  //! \group outcome_error
   S &error() & { return _error; }
-  //! Observes the error
+  //! \group outcome_error
   const S &&error() const && { return _error; }
-  //! Observes the error
+  //! \group outcome_error
   S &&error() && { return _error; }
 
   //! Observes the payload
+  //! \group outcome_payload
   const P &payload() const & { return _payload; }
-  //! Observes the payload
+  //! \group outcome_payload
   P &payload() & { return _payload; }
-  //! Observes the payload
+  //! \group outcome_payload
   const P &&payload() const && { return _payload; }
-  //! Observes the payload
+  //! \group outcome_payload
   P &&payload() && { return _payload; }
 };
 

@@ -159,6 +159,7 @@ template <class T> using is_result = detail::is_result<std::decay_t<T>>;
 //! True if a result
 template <class T> static constexpr bool is_result_v = detail::is_result<std::decay_t<T>>::value;
 
+//! Namespace for ADL discovered hooks into events in `result` and `outcome`.
 namespace hooks
 {
   /*! The default instantiation hook implementation called when a `result` is first created
@@ -651,7 +652,7 @@ template <class R, class S, class P> inline void swap(result<R, S, P> &a, result
   a.swap(b);
 }
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(STANDARDESE_IS_IN_THE_HOUSE)
 // Check is trivial in all ways except default constructibility
 // static_assert(std::is_trivial<result<int>>::value, "result<int> is not trivial!");
 // static_assert(std::is_trivially_default_constructible<result<int>>::value, "result<int> is not trivially default constructible!");

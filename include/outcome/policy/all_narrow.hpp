@@ -29,7 +29,6 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Namespace for policies
 namespace policy
 {
   /*! Policy which treats wide checks as narrow checks.
