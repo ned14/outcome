@@ -1,6 +1,6 @@
 +++
 title = "TRY operations"
-weight = 20
+weight = 30
 +++
 
 In the implementation of function `print_half` we have seen the usage of the macro `OUTCOME_TRY`:
@@ -51,8 +51,8 @@ Macro `OUTCOME_TRY` does two things:
 1. It extracts a `T` from `result<T>` (or `outcome<T>`).
 2. It declares a dependency between statements: If the "tried" statement fails, the next statement is not executed.
 
-When you are calling functions that return `unchecked<void>` the first of the two things does not make sense. You then have to use macro `OUTCOME_TRYV` instead. Let's use our function `print_half`:
+When you are calling functions that return `result<void>` the first of the two things does not make sense. You then have to use macro `OUTCOME_TRYV` instead. Let's use our function `print_half`:
 
 {{% snippet "using_result.cpp" "tryv" %}}
 
-The first statement will succeed. The second statement will "fail", i.e. it will return an errored unchecked. This will cause an immediate return and the subsequent statements will be skipped.
+The first statement will succeed. The second statement will "fail", i.e. it will return an *errored* result. This will cause an immediate return and the subsequent statements will be skipped.
