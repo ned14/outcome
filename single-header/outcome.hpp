@@ -1270,6 +1270,14 @@ Distributed under the Boost Software License, Version 1.0.
 
 
 
+
+
+
+
+
+
+
+
 #ifndef OUTCOME_SYMBOL_VISIBLE
 #define OUTCOME_SYMBOL_VISIBLE QUICKCPPLIB_SYMBOL_VISIBLE
 #endif
@@ -1441,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 6db1f3501a5ba7269e237d271f96f8a82615eea4
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-05 01:40:15 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 6db1f350
+#define OUTCOME_PREVIOUS_COMMIT_REF 34b86bd6d89819a09e9694772cc5ecf58e5c6ddb
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-06 23:45:54 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 34b86bd6
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -3466,7 +3474,13 @@ namespace detail
   template <class R, class EC, class NoValuePolicy> using select_result_impl = result_error_observers<result_value_observers<result_storage<R, EC, NoValuePolicy>, R, NoValuePolicy>, EC, NoValuePolicy>;
 
   //! The assembled implementation type of `result<R, EC, NoValuePolicy>`.
-  template <class R, class S, class NoValuePolicy> class result_final : public select_result_impl<R, S, NoValuePolicy>
+  template <class R, class S, class NoValuePolicy>
+  class result_final
+
+
+
+  : public select_result_impl<R, S, NoValuePolicy>
+
   {
     using base = select_result_impl<R, S, NoValuePolicy>;
 
@@ -5675,7 +5689,12 @@ Which variant is chosen depends on `trait::is_exception_ptr<P>`. If it is true, 
 
 template <class R, class S, class P, class NoValuePolicy> //
 OUTCOME_REQUIRES(detail::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value)) //
-class OUTCOME_NODISCARD outcome : public detail::select_outcome_impl<R, S, P, NoValuePolicy>
+class OUTCOME_NODISCARD outcome
+
+
+
+: public detail::select_outcome_impl<R, S, P, NoValuePolicy>
+
 {
   static_assert(detail::type_can_be_used_in_result<P>, "The payload_type/exception_type cannot be used");
   static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "payload_type/exception_type must be void or default constructible");

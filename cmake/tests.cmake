@@ -18,6 +18,7 @@ set(outcome_TESTS
   "test/tests/issue0059.cpp"
   "test/tests/issue0061.cpp"
   "test/tests/issue0064.cpp"
+  "test/tests/issue0065.cpp"
   "test/tests/noexcept-propagation.cpp"
   "test/tests/propagate.cpp"
   "test/tests/serialisation.cpp"
