@@ -37,6 +37,7 @@ On Windows, simply download the raw file from above and place it wherever it sui
  to serve as "the docs" until Standardese can be persuaded to produce better
  output.
  - [x] Make an "expected" policy and `expected<T, E>` from it.
+ - [ ] Code snippets in docs should provide link to github original.
  - [ ] Conan package support
  
 Maybe?
