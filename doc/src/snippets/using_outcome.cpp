@@ -69,7 +69,7 @@ namespace Layer2NX
     outcome::result<int> gr = Layer2NX::g();
     if (!gr) {
       delete resource;
-      return gr.as_failure();
+      return gr.as_failure();                // #2
     }
     
     ans += resource->use(gr.value());
