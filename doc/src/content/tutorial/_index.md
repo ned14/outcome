@@ -4,6 +4,7 @@ weight = 10
 +++
 
 1. [`result<T, EC>`](result)
+2. [`outcome<T, EC, EP>`](outcome)
 
 
 ## TODO: more material will be provided in time...

@@ -1,4 +1,5 @@
 #include "../include/outcome/outcome.hpp"
+#include "outcome.hpp"
 #include <iostream>
 
 namespace outcome = OUTCOME_V2_NAMESPACE;
@@ -43,29 +44,68 @@ namespace Layer2NX
 }    
 //! [fun_2f]
 
+struct Resource
+{
+  double use(int i) { return i * 0.01; } 
+};
+
 //! [fun_2fun]    
 namespace Layer2NX
 {  
-  auto fun() noexcept -> outcome::outcome<int> 
+  auto fun() noexcept -> outcome::outcome<double> 
   {
-    int * i = new int{0};
-    OUTCOME_TRY (fr, Layer2NX::f());
-    *i += fr;
-    OUTCOME_TRY (gr, Layer2NX::g());
-    *i += gr;
-    int ans = *i;
-    delete i;
+    Resource* resource = new (std::nothrow) Resource;
+    if (!resource)
+        return std::errc::not_enough_memory;
+      
+    outcome::outcome<int> fr = Layer2NX::f();
+    if (!fr) {
+      delete resource;
+      return fr.as_failure();                // #1
+    }
+    
+    double ans = resource->use(fr.value());
+    
+    outcome::result<int> gr = Layer2NX::g();
+    if (!gr) {
+      delete resource;
+      return gr.as_failure();
+    }
+    
+    ans += resource->use(gr.value());
+    
+    delete resource;
     return ans;
   }
 }
 //! [fun_2fun]
+ 
+//! [fun_2fun2]    
+namespace Layer2NX
+{  
+  auto fun2() noexcept -> outcome::outcome<double> 
+  {
+    std::unique_ptr<Resource> resource {new (std::nothrow) Resource};
+    if (!resource)
+      return std::errc::not_enough_memory;
+    
+    OUTCOME_TRY (fr, Layer2NX::f());
+    double ans = resource->use(fr);
+    
+    OUTCOME_TRY (gr, Layer2NX::g());
+    ans += resource->use(gr);
+    
+    return ans;
+  }
+}
+//! [fun_2fun2]
 
 //! [fun_3run]
 namespace Layer3
 {
-  auto run() -> int // may throw
+  auto run() -> double // may throw
   {
-    if (outcome::outcome<int> o = Layer2NX::fun())
+    if (outcome::outcome<double> o = Layer2NX::fun())
       return o.value();
     else if (o.has_exception())
       std::rethrow_exception(o.exception());
