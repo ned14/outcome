@@ -35,7 +35,6 @@ namespace policy
   /*! Policy interpreting EC as a type implementing the `std::error_code` contract
   and any wide attempt to access the successful state throws the `error_code` wrapped into
   a `std::system_error`
-  \module Error code interpretation policy
   */
   template <class EC> struct error_code_throw_as_system_error
   {

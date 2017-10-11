@@ -36,7 +36,6 @@ namespace policy
   a type implementing the `std::exception_ptr` contract, and any wide attempt to access the
   successful state throws the `exception_ptr` if available, then the `error_code` wrapped
   into a `std::system_error`.
-  \module Error code interpretation policy
   */
   template <class R, class S, class P> struct error_code_throw_as_system_error_exception_rethrow
   {

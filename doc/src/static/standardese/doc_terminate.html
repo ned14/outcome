@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>terminate.hpp</title>
+</head>
+<body>
+<article id="standardese-terminate.hpp" class="standardese-file-documentation">
+<h1 class="standardese-file-documentation-heading">Header file <code>terminate.hpp</code></h1>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">..&#x2F;config.hpp</span><span class="pre">&quot;</span>
+
+<span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
+<span class="pun">{</span>
+    <span class="kwd">namespace</span> <span class="typ dec var fun">policy</span>
+    <span class="pun">{</span>
+        <span class="kwd">struct</span> <a href="doc_terminate.html#standardese-outcome_v2_xxx::policy::terminate"><span class="typ dec var fun">terminate</span></a><span class="pun">;</span>
+    <span class="pun">}</span>
+<span class="pun">}</span>
+</code></pre>
+<section id="standardese-outcome_v2_xxx" class="standardese-entity-documentation">
+<section id="standardese-outcome_v2_xxx::policy" class="standardese-entity-documentation">
+<section id="standardese-outcome_v2_xxx::policy::terminate" class="standardese-entity-documentation">
+<h3 class="standardese-entity-documentation-heading">Struct <code>terminate</code></h3>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">struct</span> <span class="typ dec var fun">terminate</span>
+<span class="pun">{</span>
+    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_terminate.html#standardese-outcome_v2_xxx::policy::terminate::narrow_value_check%3CImpl%3E(Impl*)"><span class="typ dec var fun">narrow_value_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+
+    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_terminate.html#standardese-outcome_v2_xxx::policy::terminate::narrow_error_check%3CImpl%3E(Impl*)"><span class="typ dec var fun">narrow_error_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+
+    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_terminate.html#standardese-outcome_v2_xxx::policy::terminate::narrow_payload_check%3CImpl%3E(Impl*)"><span class="typ dec var fun">narrow_payload_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+
+    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_terminate.html#standardese-outcome_v2_xxx::policy::terminate::narrow_exception_check%3CImpl%3E(Impl*)"><span class="typ dec var fun">narrow_exception_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+
+    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_terminate.html#standardese-outcome_v2_xxx::policy::terminate::wide_value_check%3CImpl%3E(Impl*)"><span class="typ dec var fun">wide_value_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
+
+    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_terminate.html#standardese-outcome_v2_xxx::policy::terminate::wide_error_check%3CImpl%3E(Impl*)"><span class="typ dec var fun">wide_error_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+
+    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_terminate.html#standardese-outcome_v2_xxx::policy::terminate::wide_payload_check%3CImpl%3E(Impl*)"><span class="typ dec var fun">wide_payload_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
+
+    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_terminate.html#standardese-outcome_v2_xxx::policy::terminate::wide_exception_check%3CImpl%3E(Impl*)"><span class="typ dec var fun">wide_exception_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
+<span class="pun">};</span>
+</code></pre>
+<p id="standardese-outcome_v2_xxx::policy::terminate-brief" class="standardese-brief-section">Policy implementing any wide attempt to access the successful state as calling <code>std::terminate</code></p>
+<section id="standardese-outcome_v2_xxx::policy::terminate::narrow_value_check&lt;Impl&gt;(Impl*)" class="standardese-entity-documentation">
+<h3 class="standardese-entity-documentation-heading">Function <code>narrow_value_check</code></h3>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">narrow_value_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+</code></pre>
+<p id="standardese-outcome_v2_xxx::policy::terminate::narrow_value_check&lt;Impl&gt;(Impl*)-brief" class="standardese-brief-section">Performs a narrow check of state, used in the assume_value() functions.</p>
+<dl id="standardese-outcome_v2_xxx::policy::terminate::narrow_value_check&lt;Impl&gt;(Impl*)-inline-sections" class="standardese-inline-sections">
+<dt>Effects:</dt>
+<dd>None.</dd>
+</dl>
+</section>
+<hr class="standardese-entity-documentation-break" />
+<section id="standardese-outcome_v2_xxx::policy::terminate::narrow_error_check&lt;Impl&gt;(Impl*)" class="standardese-entity-documentation">
+<h3 class="standardese-entity-documentation-heading">Function <code>narrow_error_check</code></h3>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">narrow_error_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+</code></pre>
+<p id="standardese-outcome_v2_xxx::policy::terminate::narrow_error_check&lt;Impl&gt;(Impl*)-brief" class="standardese-brief-section">Performs a narrow check of state, used in the assume_error() functions</p>
+<dl id="standardese-outcome_v2_xxx::policy::terminate::narrow_error_check&lt;Impl&gt;(Impl*)-inline-sections" class="standardese-inline-sections">
+<dt>Effects:</dt>
+<dd>None.</dd>
+</dl>
+</section>
+<hr class="standardese-entity-documentation-break" />
+<section id="standardese-outcome_v2_xxx::policy::terminate::narrow_payload_check&lt;Impl&gt;(Impl*)" class="standardese-entity-documentation">
+<h3 class="standardese-entity-documentation-heading">Function <code>narrow_payload_check</code></h3>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">narrow_payload_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+</code></pre>
+<p id="standardese-outcome_v2_xxx::policy::terminate::narrow_payload_check&lt;Impl&gt;(Impl*)-brief" class="standardese-brief-section">Performs a narrow check of state, used in the assume_payload() functions</p>
+<dl id="standardese-outcome_v2_xxx::policy::terminate::narrow_payload_check&lt;Impl&gt;(Impl*)-inline-sections" class="standardese-inline-sections">
+<dt>Effects:</dt>
+<dd>None.</dd>
+</dl>
+</section>
+<hr class="standardese-entity-documentation-break" />
+<section id="standardese-outcome_v2_xxx::policy::terminate::narrow_exception_check&lt;Impl&gt;(Impl*)" class="standardese-entity-documentation">
+<h3 class="standardese-entity-documentation-heading">Function <code>narrow_exception_check</code></h3>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">narrow_exception_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+</code></pre>
+<p id="standardese-outcome_v2_xxx::policy::terminate::narrow_exception_check&lt;Impl&gt;(Impl*)-brief" class="standardese-brief-section">Performs a narrow check of state, used in the assume_exception() functions</p>
+<dl id="standardese-outcome_v2_xxx::policy::terminate::narrow_exception_check&lt;Impl&gt;(Impl*)-inline-sections" class="standardese-inline-sections">
+<dt>Effects:</dt>
+<dd>None.</dd>
+</dl>
+</section>
+<hr class="standardese-entity-documentation-break" />
+<section id="standardese-outcome_v2_xxx::policy::terminate::wide_value_check&lt;Impl&gt;(Impl*)" class="standardese-entity-documentation">
+<h3 class="standardese-entity-documentation-heading">Function <code>wide_value_check</code></h3>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">wide_value_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
+</code></pre>
+<p id="standardese-outcome_v2_xxx::policy::terminate::wide_value_check&lt;Impl&gt;(Impl*)-brief" class="standardese-brief-section">Performs a wide check of state, used in the value() functions.</p>
+<dl id="standardese-outcome_v2_xxx::policy::terminate::wide_value_check&lt;Impl&gt;(Impl*)-inline-sections" class="standardese-inline-sections">
+<dt>Effects:</dt>
+<dd>If result does not have a value, calls <code>std::terminate()</code>.</dd>
+</dl>
+</section>
+<hr class="standardese-entity-documentation-break" />
+<section id="standardese-outcome_v2_xxx::policy::terminate::wide_error_check&lt;Impl&gt;(Impl*)" class="standardese-entity-documentation">
+<h3 class="standardese-entity-documentation-heading">Function <code>wide_error_check</code></h3>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">wide_error_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+</code></pre>
+<p id="standardese-outcome_v2_xxx::policy::terminate::wide_error_check&lt;Impl&gt;(Impl*)-brief" class="standardese-brief-section">Performs a wide check of state, used in the error() functions</p>
+<dl id="standardese-outcome_v2_xxx::policy::terminate::wide_error_check&lt;Impl&gt;(Impl*)-inline-sections" class="standardese-inline-sections">
+<dt>Effects:</dt>
+<dd>If result does not have an error, calls <code>std::terminate()</code>.</dd>
+</dl>
+</section>
+<hr class="standardese-entity-documentation-break" />
+<section id="standardese-outcome_v2_xxx::policy::terminate::wide_payload_check&lt;Impl&gt;(Impl*)" class="standardese-entity-documentation">
+<h3 class="standardese-entity-documentation-heading">Function <code>wide_payload_check</code></h3>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">wide_payload_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
+</code></pre>
+<p id="standardese-outcome_v2_xxx::policy::terminate::wide_payload_check&lt;Impl&gt;(Impl*)-brief" class="standardese-brief-section">Performs a wide check of state, used in the payload() functions</p>
+<dl id="standardese-outcome_v2_xxx::policy::terminate::wide_payload_check&lt;Impl&gt;(Impl*)-inline-sections" class="standardese-inline-sections">
+<dt>Effects:</dt>
+<dd>If outcome does not have an exception, calls <code>std::terminate()</code>.</dd>
+</dl>
+</section>
+<hr class="standardese-entity-documentation-break" />
+<section id="standardese-outcome_v2_xxx::policy::terminate::wide_exception_check&lt;Impl&gt;(Impl*)" class="standardese-entity-documentation">
+<h3 class="standardese-entity-documentation-heading">Function <code>wide_exception_check</code></h3>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
+<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">wide_exception_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
+</code></pre>
+<p id="standardese-outcome_v2_xxx::policy::terminate::wide_exception_check&lt;Impl&gt;(Impl*)-brief" class="standardese-brief-section">Performs a wide check of state, used in the exception() functions</p>
+<dl id="standardese-outcome_v2_xxx::policy::terminate::wide_exception_check&lt;Impl&gt;(Impl*)-inline-sections" class="standardese-inline-sections">
+<dt>Effects:</dt>
+<dd>If outcome does not have an exception, calls <code>std::terminate()</code>.</dd>
+</dl>
+</section>
+<hr class="standardese-entity-documentation-break" />
+</section>
+<hr class="standardese-entity-documentation-break" />
+</section>
+</section>
+</article>
+</body>
+</html>
