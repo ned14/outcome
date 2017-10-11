@@ -63,8 +63,9 @@ Expected permits `T` and `E` to be the same.
 8. `checked<T, E>` uses `success<T>` and `failure<E>` type sugars for disambiguation.
 Expected uses `unexpected<E>` only.
 9. `checked<T, E>` requires `E` to be default constructible.
+10. `checked<T, E>` defaults `E` to `std::error_code`. Expected does not default `E`.
 
 In fact, the two are sufficiently close in design that a highly conforming `expected<T, E>`
-can be implemented by wrapping up `checked<T, E>` with the missing functionality:
+can be implemented by wrapping up `checked<T, E>` with the differing functionality:
 
 {{% snippet "expected_implementation.cpp" "expected_implementation" %}}

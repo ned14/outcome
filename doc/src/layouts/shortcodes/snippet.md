@@ -1,1 +1,1 @@
-{{ $snippet := split (readFile (printf "snippets/%s" (.Get 0))) (printf "//! [%s]" (.Get 1)) }}{{ highlight (index $snippet 1) "c++" "" }}
+<div class="code-snippet">{{ $snippet := split (readFile (printf "snippets/%s" (.Get 0))) (printf "//! [%s]" (.Get 1)) }}{{ $lineno := split (index $snippet 0) "\n" | len }}{{ highlight (index $snippet 1) "c++" "" }}<a href="{{ $.Site.Params.snippetsURL }}{{ .Get 0 }}#L{{ add 1 $lineno }}" class="code-snippet-url" target="_blank">View this code on Github</a></div>

@@ -10,6 +10,7 @@ PygmentsCodeFences = true
   home = [ "HTML", "RSS", "JSON"]
   
 [params]
+  snippetsURL = "https://github.com/ned14/outcome/tree/master/doc/src/snippets/"
   editURL = "https://github.com/ned14/outcome/edit/develop/doc/src/content/"
   
 [[menu.shortcuts]]
