@@ -114,7 +114,7 @@ outcome::result<void> print_half(const std::string& text);
 //! [half_impl]
 outcome::result<void> print_half(const std::string& text)
 {
-  if (outcome::result<int> r = convert(text))  // #1
+  if (outcome::result<int> r = convert(text))     // #1
   {
     std::cout << (r.value() / 2) << std::endl;    // #2
   }
