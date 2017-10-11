@@ -10,10 +10,16 @@ PygmentsCodeFences = true
   home = [ "HTML", "RSS", "JSON"]
   
 [params]
+  snippetsURL = "https://github.com/ned14/outcome/tree/master/doc/src/snippets/"
   editURL = "https://github.com/ned14/outcome/edit/develop/doc/src/content/"
   
 [[menu.shortcuts]]
-  name = "API reference"
+  name = "API reference (standardese)"
+  url = "/standardese/standardese_entities.html"
+  weight = 4
+  
+[[menu.shortcuts]]
+  name = "API reference (doxygen)"
   url = "/doxygen/namespaceoutcome__v2__xxx.html"
   weight = 5
   

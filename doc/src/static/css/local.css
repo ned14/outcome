@@ -46,6 +46,16 @@ code + span.copy-to-clipboard {
   display: none;
 }
 
+div.code-snippet {
+  position: relative;
+}
+div.code-snippet a.code-snippet-url {
+  font-size: small;
+  position: absolute;
+  right: 3em;
+  top: 0.7em;
+}
+
 
 /* Background */ .chroma { background-color: #ffffff }
 /* Error */ .chroma .ss4 {  }

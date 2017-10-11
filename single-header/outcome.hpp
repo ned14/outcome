@@ -1852,9 +1852,7 @@ OUTCOME_V2_NAMESPACE_BEGIN
 namespace trait
 {
   /*! Trait for whether type `P` is to be considered a payload to an exception.
-  \module Error code interpretation policy
   */
-
 
   template <class P> struct is_exception_ptr : std::integral_constant<bool, std::is_constructible<std::exception_ptr, P>::value>
   {
@@ -3752,13 +3750,10 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Namespace for policies
 namespace policy
 {
   /*! Policy which treats wide checks as narrow checks.
-  \module Error code interpretation policy
   */
-
 
   struct all_narrow
   {
@@ -3931,12 +3926,13 @@ public:
   {
   }
   //! Observes the error
+  //! \group result_error
   const S &error() const & { return _error; }
-  //! Observes the error
+  //! \group result_error
   S &error() & { return _error; }
-  //! Observes the error
+  //! \group result_error
   const S &&error() const && { return _error; }
-  //! Observes the error
+  //! \group result_error
   S &&error() && { return _error; }
 };
 
@@ -3964,21 +3960,23 @@ public:
   {
   }
   //! Observes the error
+  //! \group outcome_error
   const S &error() const & { return _error; }
-  //! Observes the error
+  //! \group outcome_error
   S &error() & { return _error; }
-  //! Observes the error
+  //! \group outcome_error
   const S &&error() const && { return _error; }
-  //! Observes the error
+  //! \group outcome_error
   S &&error() && { return _error; }
 
   //! Observes the payload
+  //! \group outcome_payload
   const P &payload() const & { return _payload; }
-  //! Observes the payload
+  //! \group outcome_payload
   P &payload() & { return _payload; }
-  //! Observes the payload
+  //! \group outcome_payload
   const P &&payload() const && { return _payload; }
-  //! Observes the payload
+  //! \group outcome_payload
   P &&payload() && { return _payload; }
 };
 
@@ -3988,16 +3986,13 @@ OUTCOME_V2_NAMESPACE_END
 #endif
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Namespace for policies
 namespace policy
 {
 #ifdef __cpp_exceptions
   /*! Policy interpreting EC as a type implementing the `std::error_code` contract
   and any wide attempt to access the successful state throws the `error_code` wrapped into
   a `std::system_error`
-  \module Error code interpretation policy
   */
-
 
 
 
@@ -4118,16 +4113,13 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Namespace for policies
 namespace policy
 {
 #ifdef __cpp_exceptions
   /*! Policy interpreting EC as an enum convertible into the `std::error_code` contract
   and any wide attempt to access the successful state throws the `error_code` wrapped into
   a `std::system_error`
-  \module Error code interpretation policy
   */
-
 
 
 
@@ -4247,15 +4239,12 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Namespace for policies
 namespace policy
 {
 #ifdef __cpp_exceptions
   /*! Policy interpreting EC as a type implementing the `std::exception_ptr` contract
   and any wide attempt to access the successful state calls `std::rethrow_exception()`.
-  \module Error code interpretation policy
   */
-
 
 
   template <class EC> struct exception_ptr_rethrow
@@ -4375,13 +4364,10 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Namespace for policies
 namespace policy
 {
   /*! Policy implementing any wide attempt to access the successful state as calling `std::terminate`
-  \module Error code interpretation policy
   */
-
 
   struct terminate
   {
@@ -4544,14 +4530,11 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Namespace for policies
 namespace policy
 {
 #ifdef __cpp_exceptions
   /*! Policy which throws `bad_result_access_with<EC>` or `bad_result_access` during wide checks.
-  \module Error code interpretation policy
   */
-
 
   template <class EC> struct throw_bad_result_access
   {
@@ -4630,9 +4613,7 @@ namespace policy
 {
 #ifdef __cpp_exceptions
   /*! Default `result<R, S>` policy selector.
-  \module Error code interpretation policy
   */
-
 
   template <class EC>
   using default_result_policy = std::conditional_t< //
@@ -4741,6 +4722,7 @@ template <class T> using is_result = detail::is_result<std::decay_t<T>>;
 //! True if a result
 template <class T> static constexpr bool is_result_v = detail::is_result<std::decay_t<T>>::value;
 
+//! Namespace for ADL discovered hooks into events in `result` and `outcome`.
 namespace hooks
 {
   /*! The default instantiation hook implementation called when a `result` is first created
@@ -4794,11 +4776,11 @@ namespace hooks
 
   //! Retrieves the 16 bits of spare storage in result/outcome.
   template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::result_final<R, S, NoValuePolicy> *r) noexcept { return (r->_state._status >> detail::status_2byte_shift) & 0xffff; }
+  //! Sets the 16 bits of spare storage in result/outcome.
   template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept { r->_state._status |= (v << detail::status_2byte_shift); }
 }
 
 /*! Used to return from functions either (i) a successful value (ii) a cause of failure. `constexpr` capable.
-\module result<R, S> implementation
 \tparam R The optional type of the successful result (use `void` to disable).
 Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
 \tparam S The optional type of the failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
@@ -4821,7 +4803,6 @@ Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array
     - `throw bad_result_access()` if C++ exceptions are enabled, else call `std::terminate()`.
 
 */
-
 
 
 
@@ -5119,8 +5100,8 @@ public:
 
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<Args...>))
-  constexpr explicit result(in_place_type_t<value_type_if_enabled>, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
-      : base{in_place_type<value_type_if_enabled>, std::forward<Args>(args)...}
+  constexpr explicit result(in_place_type_t<value_type_if_enabled> _, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+      : base{_, std::forward<Args>(args)...}
   {
     using namespace hooks;
     hook_result_in_place_construction(in_place_type<value_type>, this);
@@ -5148,8 +5129,8 @@ public:
 
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<std::initializer_list<U>, Args...>))
-  constexpr explicit result(in_place_type_t<value_type_if_enabled>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
-      : base{in_place_type<value_type_if_enabled>, il, std::forward<Args>(args)...}
+  constexpr explicit result(in_place_type_t<value_type_if_enabled> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
+      : base{_, il, std::forward<Args>(args)...}
   {
     using namespace hooks;
     hook_result_in_place_construction(in_place_type<value_type>, this);
@@ -5175,8 +5156,8 @@ public:
 
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<Args...>))
-  constexpr explicit result(in_place_type_t<error_type_if_enabled>, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
-      : base{in_place_type<error_type_if_enabled>, std::forward<Args>(args)...}
+  constexpr explicit result(in_place_type_t<error_type_if_enabled> _, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
+      : base{_, std::forward<Args>(args)...}
   {
     using namespace hooks;
     hook_result_in_place_construction(in_place_type<error_type>, this);
@@ -5204,8 +5185,8 @@ public:
 
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<std::initializer_list<U>, Args...>))
-  constexpr explicit result(in_place_type_t<error_type_if_enabled>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
-      : base{in_place_type<error_type_if_enabled>, il, std::forward<Args>(args)...}
+  constexpr explicit result(in_place_type_t<error_type_if_enabled> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
+      : base{_, il, std::forward<Args>(args)...}
   {
     using namespace hooks;
     hook_result_in_place_construction(in_place_type<error_type>, this);
@@ -5421,7 +5402,7 @@ template <class R, class S, class P> inline void swap(result<R, S, P> &a, result
   a.swap(b);
 }
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !0
 // Check is trivial in all ways except default constructibility
 // static_assert(std::is_trivial<result<int>>::value, "result<int> is not trivial!");
 // static_assert(std::is_trivially_default_constructible<result<int>>::value, "result<int> is not trivially default constructible!");
@@ -5483,9 +5464,7 @@ namespace policy
 #ifdef __cpp_exceptions
   template <class R, class S, class P> struct error_code_throw_as_system_error_exception_rethrow;
   /*! Default `outcome<R, S, P>` policy selector.
-  \module Error code interpretation policy
   */
-
 
   template <class R, class S, class P>
   using default_outcome_policy = std::conditional_t< //
@@ -5653,7 +5632,6 @@ namespace hooks
 }
 
 /*! Used to return from functions one of (i) a successful value (ii) a cause of failure, with optional additional information. `constexpr` capable.
-\module outcome<R, S, P> implementation
 \tparam R The optional type of the successful result (use `void` to disable).
 Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
 \tparam S The optional type of the failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
@@ -5670,7 +5648,6 @@ This is an extension of `result<T, E>` and it comes in two variants:
 
 Which variant is chosen depends on `trait::is_exception_ptr<P>`. If it is true, you get the second form, if it is false you get the first form.
 */
-
 
 
 
@@ -6872,7 +6849,6 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Namespace for policies
 namespace policy
 {
 #ifdef __cpp_exceptions
@@ -6880,9 +6856,7 @@ namespace policy
   a type implementing the `std::exception_ptr` contract, and any wide attempt to access the
   successful state throws the `exception_ptr` if available, then the `error_code` wrapped
   into a `std::system_error`.
-  \module Error code interpretation policy
   */
-
 
 
 

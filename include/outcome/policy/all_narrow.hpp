@@ -32,7 +32,6 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace policy
 {
   /*! Policy which treats wide checks as narrow checks.
-  \module Error code interpretation policy
   */
   struct all_narrow
   {

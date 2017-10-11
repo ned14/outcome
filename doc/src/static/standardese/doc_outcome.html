@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>outcome.hpp</title>
+</head>
+<body>
+<article id="standardese-outcome.hpp" class="standardese-file-documentation">
+<h1 class="standardese-file-documentation-heading">Header file <code>outcome.hpp</code></h1>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">detail&#x2F;outcome_exception_observers.hpp</span><span class="pre">&quot;</span>
+
+<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">detail&#x2F;outcome_failure_observers.hpp</span><span class="pre">&quot;</span>
+
+<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">detail&#x2F;outcome_payload_observers.hpp</span><span class="pre">&quot;</span>
+
+<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">result.hpp</span><span class="pre">&quot;</span>
+
+<span class="pre">#include</span> <span class="pre">&lt;</span><span class="typ dec var fun">memory</span><span class="pre">&gt;</span>
+
+<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">policy&#x2F;error_code_throw_as_system_error_exception_rethrow.hpp</span><span class="pre">&quot;</span>
+
+<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">detail&#x2F;outcome_payload_observers_impl.hpp</span><span class="pre">&quot;</span>
+
+<span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
+<span class="pun">{</span>
+    <span class="kwd">struct</span> <span class="typ dec var fun">no_payload_type</span><span class="pun">;</span>
+
+    <span class="kwd">struct</span> <span class="typ dec var fun">no_exception_type</span><span class="pun">;</span>
+
+    <span class="kwd">namespace</span> <span class="typ dec var fun">policy</span>
+    <span class="pun">{</span>
+        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">R</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">S</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">P</span><span class="pun">&gt;</span>
+        <span class="kwd">using</span> <span class="typ dec var fun">default_outcome_policy</span> <span class="pun">=</span> <span class="typ dec var fun">std::conditional_t</span><span class="pun">&lt;</span>detail::is_same_or_constructible&lt;std::error_code, S&gt; &amp;&amp; trait::is_exception_ptr&lt;P&gt;::value, error_code_throw_as_system_error_exception_rethrow&lt;R, S, P&gt;, terminate<span class="pun">&gt;</span><span class="pun">;</span>
+    <span class="pun">}</span>
+
+    <span class="kwd">namespace</span> <span class="typ dec var fun">hooks</span>
+    <span class="pun">{</span>
+        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">U</span><span class="pun">&gt;</span>
+        <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">hook_outcome_construction</span><span class="pun">(</span><span class="typ dec var fun">in_place_type_t</span><span class="pun">&lt;</span>T<span class="pun">&gt;</span><span class="pun">,</span> <span class="typ dec var fun">U</span><span class="pun">*</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+
+        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">U</span><span class="pun">&gt;</span>
+        <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">hook_outcome_copy_construction</span><span class="pun">(</span><span class="typ dec var fun">in_place_type_t</span><span class="pun">&lt;</span>T<span class="pun">&gt;</span><span class="pun">,</span> <span class="typ dec var fun">U</span><span class="pun">*</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+
+        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">U</span><span class="pun">&gt;</span>
+        <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">hook_outcome_move_construction</span><span class="pun">(</span><span class="typ dec var fun">in_place_type_t</span><span class="pun">&lt;</span>T<span class="pun">&gt;</span><span class="pun">,</span> <span class="typ dec var fun">U</span><span class="pun">*</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+
+        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">U</span><span class="pun">&gt;</span>
+        <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">hook_outcome_in_place_construction</span><span class="pun">(</span><span class="typ dec var fun">in_place_type_t</span><span class="pun">&lt;</span>T<span class="pun">&gt;</span><span class="pun">,</span> <span class="typ dec var fun">U</span><span class="pun">*</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+
+        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">R</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">S</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">P</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">NoValuePolicy</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">U</span><span class="pun">&gt;</span>
+        <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">override_outcome_payload_exception</span><span class="pun">(</span><span class="typ dec var fun">outcome</span><span class="pun">&lt;</span>R, S, P, NoValuePolicy<span class="pun">&gt;</span><span class="pun">*</span> <span class="typ dec var fun">o</span><span class="pun">,</span> <span class="typ dec var fun">U</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+    <span class="pun">}</span>
+
+    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">R</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">S</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">P</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">NoValuePolicy</span><span class="pun">&gt;</span>
+    <span class="kwd">class</span> <span class="typ dec var fun">outcome</span><span class="pun">;</span>
+
+    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">U</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">V</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">R</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">S</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">P</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">N</span><span class="pun">,</span> <span class="kwd">typename</span> <span class="pun">=</span> decltype(std::declval&lt;outcome&lt;R,S,P,N&gt;&gt;()==std::declval&lt;result&lt;T,U,V&gt;&gt;())<span class="pun">&gt;</span>
+    <span class="kwd">constexpr</span> <span class="kwd">bool</span> <span class="typ dec var fun">operator==</span><span class="pun">(</span><a href="doc_result.html#standardese-outcome_v2_xxx::result%3CR,S,NoValuePolicy%3E"><span class="typ dec var fun">result</span></a><span class="pun">&lt;</span>T, U, V<span class="pun">&gt;</span> <span class="kwd">const</span><span class="pun">&amp;</span> <span class="typ dec var fun">a</span><span class="pun">,</span> <span class="typ dec var fun">outcome</span><span class="pun">&lt;</span>R, S, P, N<span class="pun">&gt;</span> <span class="kwd">const</span><span class="pun">&amp;</span> <span class="typ dec var fun">b</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">(</span><span class="typ dec var fun">noexcept</span><span class="pun">(</span><span class="kwd">std</span><span class="pun">::</span><span class="kwd">declval</span><span class="pun">&lt;</span><span class="kwd">outcome</span><span class="pun">&lt;</span><span class="kwd">R</span><span class="pun">,</span> <span class="kwd">S</span><span class="pun">,</span> <span class="kwd">P</span><span class="pun">,</span> <span class="kwd">N</span><span class="pun">&gt;&gt;</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">==</span> <span class="kwd">std</span><span class="pun">::</span><span class="kwd">declval</span><span class="pun">&lt;</span><span class="kwd">result</span><span class="pun">&lt;</span><span class="kwd">T</span><span class="pun">,</span> <span class="kwd">U</span><span class="pun">,</span> <span class="kwd">V</span><span class="pun">&gt;&gt;</span><span class="pun">(</span><span class="pun">)</span><span class="pun">)</span><span class="pun">)</span><span class="pun">;</span>
+
+    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">U</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">V</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">R</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">S</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">P</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">N</span><span class="pun">,</span> <span class="kwd">typename</span> <span class="pun">=</span> decltype(std::declval&lt;outcome&lt;R,S,P,N&gt;&gt;()!=std::declval&lt;result&lt;T,U,V&gt;&gt;())<span class="pun">&gt;</span>
+    <span class="kwd">constexpr</span> <span class="kwd">bool</span> <span class="typ dec var fun">operator!=</span><span class="pun">(</span><a href="doc_result.html#standardese-outcome_v2_xxx::result%3CR,S,NoValuePolicy%3E"><span class="typ dec var fun">result</span></a><span class="pun">&lt;</span>T, U, V<span class="pun">&gt;</span> <span class="kwd">const</span><span class="pun">&amp;</span> <span class="typ dec var fun">a</span><span class="pun">,</span> <span class="typ dec var fun">outcome</span><span class="pun">&lt;</span>R, S, P, N<span class="pun">&gt;</span> <span class="kwd">const</span><span class="pun">&amp;</span> <span class="typ dec var fun">b</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">(</span><span class="typ dec var fun">noexcept</span><span class="pun">(</span><span class="kwd">std</span><span class="pun">::</span><span class="kwd">declval</span><span class="pun">&lt;</span><span class="kwd">outcome</span><span class="pun">&lt;</span><span class="kwd">R</span><span class="pun">,</span> <span class="kwd">S</span><span class="pun">,</span> <span class="kwd">P</span><span class="pun">,</span> <span class="kwd">N</span><span class="pun">&gt;&gt;</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">!=</span> <span class="kwd">std</span><span class="pun">::</span><span class="kwd">declval</span><span class="pun">&lt;</span><span class="kwd">result</span><span class="pun">&lt;</span><span class="kwd">T</span><span class="pun">,</span> <span class="kwd">U</span><span class="pun">,</span> <span class="kwd">V</span><span class="pun">&gt;&gt;</span><span class="pun">(</span><span class="pun">)</span><span class="pun">)</span><span class="pun">)</span><span class="pun">;</span>
+
+    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">R</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">S</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">P</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">N</span><span class="pun">&gt;</span>
+    <span class="kwd">void</span> <span class="typ dec var fun">swap</span><span class="pun">(</span><span class="typ dec var fun">outcome</span><span class="pun">&lt;</span>R, S, P, N<span class="pun">&gt;</span><span class="pun">&amp;</span> <span class="typ dec var fun">a</span><span class="pun">,</span> <span class="typ dec var fun">outcome</span><span class="pun">&lt;</span>R, S, P, N<span class="pun">&gt;</span><span class="pun">&amp;</span> <span class="typ dec var fun">b</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">(</span><span class="typ dec var fun">noexcept</span><span class="pun">(</span><span class="kwd">a</span><span class="pun">.</span><span class="kwd">swap</span><span class="pun">(</span><span class="kwd">b</span><span class="pun">)</span><span class="pun">)</span><span class="pun">)</span><span class="pun">;</span>
+
+    <span class="kwd">namespace</span> <span class="typ dec var fun">hooks</span>
+    <span class="pun">{</span>
+        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">R</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">S</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">P</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">NoValuePolicy</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">U</span><span class="pun">&gt;</span>
+        <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">override_outcome_payload_exception</span><span class="pun">(</span><span class="typ dec var fun">outcome</span><span class="pun">&lt;</span>R, S, P, NoValuePolicy<span class="pun">&gt;</span><span class="pun">*</span> <span class="typ dec var fun">o</span><span class="pun">,</span> <span class="typ dec var fun">U</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+    <span class="pun">}</span>
+<span class="pun">}</span>
+</code></pre>
+<section id="standardese-outcome_v2_xxx" class="standardese-entity-documentation">
+<section id="standardese-outcome_v2_xxx::policy" class="standardese-entity-documentation">
+</section>
+<section id="standardese-outcome_v2_xxx::hooks" class="standardese-entity-documentation">
+</section>
+<section id="standardese-outcome_v2_xxx::hooks" class="standardese-entity-documentation">
+</section>
+</section>
+</article>
+</body>
+</html>

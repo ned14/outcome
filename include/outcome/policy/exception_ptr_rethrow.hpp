@@ -34,7 +34,6 @@ namespace policy
 #ifdef __cpp_exceptions
   /*! Policy interpreting EC as a type implementing the `std::exception_ptr` contract
   and any wide attempt to access the successful state calls `std::rethrow_exception()`.
-  \module Error code interpretation policy
   */
   template <class EC> struct exception_ptr_rethrow
   {

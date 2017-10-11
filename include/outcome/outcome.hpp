@@ -51,7 +51,6 @@ namespace policy
 #ifdef __cpp_exceptions
   template <class R, class S, class P> struct error_code_throw_as_system_error_exception_rethrow;
   /*! Default `outcome<R, S, P>` policy selector.
-  \module Error code interpretation policy
   */
   template <class R, class S, class P>
   using default_outcome_policy = std::conditional_t<                                                                                                       //
@@ -199,7 +198,6 @@ namespace hooks
 }
 
 /*! Used to return from functions one of (i) a successful value (ii) a cause of failure, with optional additional information. `constexpr` capable.
-\module outcome<R, S, P> implementation
 \tparam R The optional type of the successful result (use `void` to disable).
 Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
 \tparam S The optional type of the failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
