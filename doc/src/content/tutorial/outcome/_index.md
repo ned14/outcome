@@ -20,15 +20,12 @@ Conceptually, `outcome<T, EC, EP>` can be thought of as `variant<T, EC, EP>` or 
 
 Consider a program consisting of three layers:
 
-```
-Layer3
-  ^
-  |
-Layer2NX
-  ^
-  |
-Layer1
-```
+{{<mermaid>}}
+graph BT
+    L3["Layer3"]
+    L2["Layer2NX"] --> L3
+    L1["Layer1"] --> L2
+{{</mermaid>}}
   
 The highest-level layer, `Layer3`, uses exceptions for signalling failures. The middle layer, `Layer2NX`,
 was not designed with exception safety in mind and function need to return information about failures in return value.
