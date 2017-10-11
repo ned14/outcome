@@ -3,17 +3,17 @@ title = "outcome<T, EC, EP>"
 weight = 20
 +++
 
-## `outcome`
+## `outcome<>`
 
 Type `outcome<T, EC, EP>` can store either a `T` or an `EC` or an `EP`.
 The first parameter (`T`) represents a value returned from functions upon success.
 Both `EC` and `EP` represent the reason for function failure when function fails.
-Conceptually, `outcome<T, EC, EP>` can be thought of as `variant<T, EC, EP>` or `variant<T, variant<EC, EP>>`, or `result<variant<EC, EP>>`.
-`EC` defaults to `std::error_code` and `EP` defaults to `std::exception_ptr`. THe distinction is made into two types, `EC` and `EP` for the following reasosns:
+Conceptually, `outcome<T, EC, EP>` can be thought of as `variant<T, EC, EP>` or `variant<T, variant<EC, EP>>`, or `result<T, variant<EC, EP>>`.
+`EC` defaults to `std::error_code` and `EP` defaults to `std::exception_ptr`. The distinction is made into two types, `EC` and `EP` for the following reasosns:
 
 1. The interface: `EC` is inspected in a different way that `EP`.
 2. Performance: handling of `EC` is optimized for POD types.
-3. Interoperability with `result<T, EC>`: like converisons.
+3. Interoperability with `result<T, EC>`.
 
 
 `outcome<T, EC, EP>` is useful for transporting exceptions across layers of the program that was never designed with exception_ptr`safety in mind.
