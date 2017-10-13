@@ -106,7 +106,7 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:ad5802eb45b11a9d9cc66b99e7952e675"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Policy which treats wide checks as narrow checks.  Error code interpretation policy </p>
+<div class="textblock"><p>Policy which treats wide checks as narrow checks. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="aa4647da5508ebc22593fe5bca8a6d1fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa4647da5508ebc22593fe5bca8a6d1fe">&#9670;&nbsp;</a></span>narrow_error_check()</h2>
@@ -134,7 +134,7 @@ template&lt;class Impl &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Performs a narrow check of state, used in the assume_error() functions </p><dl class="section user"><dt>Effects:</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    {</div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      (void) <span class="keyword">self</span>;</div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#if defined(__GNUC__) || defined(__clang__)</span></div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      <span class="keywordflow">if</span>((self-&gt;_state._status &amp; detail::status_have_error) == 0)</div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        __builtin_unreachable();</div><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    {</div><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      (void) <span class="keyword">self</span>;</div><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">#if defined(__GNUC__) || defined(__clang__)</span></div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      <span class="keywordflow">if</span>((self-&gt;_state._status &amp; detail::status_have_error) == 0)</div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        __builtin_unreachable();</div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a41890a083130296354565efc3d15db20"></a>
@@ -163,7 +163,7 @@ template&lt;class Impl &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Performs a narrow check of state, used in the assume_value() functions. </p><dl class="section user"><dt>Effects:</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    {</div><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      (void) <span class="keyword">self</span>;</div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#if defined(__GNUC__) || defined(__clang__)</span></div><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      <span class="keywordflow">if</span>((self-&gt;_state._status &amp; detail::status_have_value) == 0)</div><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        __builtin_unreachable();</div><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    {</div><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      (void) <span class="keyword">self</span>;</div><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#if defined(__GNUC__) || defined(__clang__)</span></div><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <span class="keywordflow">if</span>((self-&gt;_state._status &amp; detail::status_have_value) == 0)</div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        __builtin_unreachable();</div><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ad5802eb45b11a9d9cc66b99e7952e675"></a>
@@ -192,7 +192,7 @@ template&lt;class Impl &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Performs a wide check of state, used in the error() functions </p><dl class="section user"><dt>Effects:</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;{ <a class="code" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html#aa4647da5508ebc22593fe5bca8a6d1fe">narrow_error_check</a>(<span class="keyword">self</span>); }</div><div class="ttc" id="structoutcome__v2__xxx_1_1policy_1_1all__narrow_html_aa4647da5508ebc22593fe5bca8a6d1fe"><div class="ttname"><a href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html#aa4647da5508ebc22593fe5bca8a6d1fe">outcome_v2_xxx::policy::all_narrow::narrow_error_check</a></div><div class="ttdeci">static constexpr void narrow_error_check(Impl *self) noexcept</div><div class="ttdef"><b>Definition:</b> all_narrow.hpp:54</div></div>
+<div class="fragment"><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;{ <a class="code" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html#aa4647da5508ebc22593fe5bca8a6d1fe">narrow_error_check</a>(<span class="keyword">self</span>); }</div><div class="ttc" id="structoutcome__v2__xxx_1_1policy_1_1all__narrow_html_aa4647da5508ebc22593fe5bca8a6d1fe"><div class="ttname"><a href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html#aa4647da5508ebc22593fe5bca8a6d1fe">outcome_v2_xxx::policy::all_narrow::narrow_error_check</a></div><div class="ttdeci">static constexpr void narrow_error_check(Impl *self) noexcept</div><div class="ttdef"><b>Definition:</b> all_narrow.hpp:52</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -222,7 +222,7 @@ template&lt;class Impl &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Performs a wide check of state, used in the value() functions. </p><dl class="section user"><dt>Effects:</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;{ <a class="code" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html#a41890a083130296354565efc3d15db20">narrow_value_check</a>(<span class="keyword">self</span>); }</div><div class="ttc" id="structoutcome__v2__xxx_1_1policy_1_1all__narrow_html_a41890a083130296354565efc3d15db20"><div class="ttname"><a href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html#a41890a083130296354565efc3d15db20">outcome_v2_xxx::policy::all_narrow::narrow_value_check</a></div><div class="ttdeci">static constexpr void narrow_value_check(Impl *self) noexcept</div><div class="ttdef"><b>Definition:</b> all_narrow.hpp:43</div></div>
+<div class="fragment"><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;{ <a class="code" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html#a41890a083130296354565efc3d15db20">narrow_value_check</a>(<span class="keyword">self</span>); }</div><div class="ttc" id="structoutcome__v2__xxx_1_1policy_1_1all__narrow_html_a41890a083130296354565efc3d15db20"><div class="ttname"><a href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html#a41890a083130296354565efc3d15db20">outcome_v2_xxx::policy::all_narrow::narrow_value_check</a></div><div class="ttdeci">static constexpr void narrow_value_check(Impl *self) noexcept</div><div class="ttdef"><b>Definition:</b> all_narrow.hpp:41</div></div>
 </div><!-- fragment -->
 </div>
 </div>

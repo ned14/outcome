@@ -30,7 +30,10 @@ var hierarchy =
     [ "outcome_v2_xxx::detail::enable_payload_from_failure", "structoutcome__v2__xxx_1_1detail_1_1enable__payload__from__failure.html", null ],
     [ "outcome_v2_xxx::policy::error_code_throw_as_system_error< EC >", "structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error.html", null ],
     [ "outcome_v2_xxx::policy::error_code_throw_as_system_error_exception_rethrow< R, S, P >", "structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__exception__rethrow.html", null ],
+    [ "outcome_v2_xxx::policy::error_code_throw_as_system_error_with_payload< R, S, P >", "structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__with__payload.html", null ],
     [ "outcome_v2_xxx::policy::error_enum_throw_as_system_error< EC >", "structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error.html", null ],
+    [ "outcome_v2_xxx::policy::error_enum_throw_as_system_error_exception_rethrow< R, S, P >", "structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__exception__rethrow.html", null ],
+    [ "outcome_v2_xxx::policy::error_enum_throw_as_system_error_with_payload< R, S, P >", "structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__with__payload.html", null ],
     [ "std::exception", null, [
       [ "std::logic_error", null, [
         [ "outcome_v2_xxx::bad_outcome_access", "classoutcome__v2__xxx_1_1bad__outcome__access.html", [
@@ -42,6 +45,7 @@ var hierarchy =
       ] ]
     ] ],
     [ "outcome_v2_xxx::policy::exception_ptr_rethrow< EC >", "structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow.html", null ],
+    [ "outcome_v2_xxx::policy::exception_ptr_rethrow_with_payload< R, S, P >", "structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow__with__payload.html", null ],
     [ "outcome_v2_xxx::failure_type< EC, E, e_is_exception_ptr >", "structoutcome__v2__xxx_1_1failure__type.html", null ],
     [ "outcome_v2_xxx::failure_type< EC, E, true >", "structoutcome__v2__xxx_1_1failure__type_3_01_e_c_00_01_e_00_01true_01_4.html", null ],
     [ "outcome_v2_xxx::failure_type< EC, P, false >", "structoutcome__v2__xxx_1_1failure__type_3_01_e_c_00_01_p_00_01false_01_4.html", null ],
@@ -58,6 +62,7 @@ var hierarchy =
     [ "integral_constant", null, [
       [ "outcome_v2_xxx::detail::_is_nothrow_swappable::is_nothrow_swappable< T, class >", "structoutcome__v2__xxx_1_1detail_1_1__is__nothrow__swappable_1_1is__nothrow__swappable.html", null ],
       [ "outcome_v2_xxx::detail::_is_nothrow_swappable::is_nothrow_swappable< T, decltype(swap(ldeclval< T >(), ldeclval< T >()))>", "structoutcome__v2__xxx_1_1detail_1_1__is__nothrow__swappable_1_1is__nothrow__swappable_3_01_t_00466f078e8572b706c4192fe4dce4cae3.html", null ],
+      [ "outcome_v2_xxx::trait::is_error_code< S >", "structoutcome__v2__xxx_1_1trait_1_1is__error__code.html", null ],
       [ "outcome_v2_xxx::trait::is_exception_ptr< P >", "structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html", null ]
     ] ],
     [ "outcome_v2_xxx::no_error_type", "structoutcome__v2__xxx_1_1no__error__type.html", null ],

@@ -374,7 +374,7 @@ template&lt;class EC &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Returns type sugar for implicitly constructing a <code>result&lt;T&gt;</code> with a failure state. </p><dl class="section user"><dt>Effects:</dt><dd>Copies or moves the failure state supplied into the returned type sugar. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;{</div><div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  <span class="keywordflow">return</span> failure_type&lt;std::decay_t&lt;EC&gt;&gt;{std::forward&lt;EC&gt;(v)};</div><div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;{</div><div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;  <span class="keywordflow">return</span> failure_type&lt;std::decay_t&lt;EC&gt;&gt;{std::forward&lt;EC&gt;(v)};</div><div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a0f665b44fc7c3e7889191fa0a7f8e420"></a>
@@ -413,7 +413,7 @@ template&lt;class EC , class E &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Returns type sugar for implicitly constructing a <code>result&lt;T&gt;</code> with a failure state. </p><dl class="section user"><dt>Effects:</dt><dd>Copies or moves the failure state supplied into the returned type sugar. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;{</div><div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;  <span class="keywordflow">return</span> failure_type&lt;std::decay_t&lt;EC&gt;, std::decay_t&lt;E&gt;&gt;{std::forward&lt;EC&gt;(v), std::forward&lt;E&gt;(w)};</div><div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;{</div><div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  <span class="keywordflow">return</span> failure_type&lt;std::decay_t&lt;EC&gt;, std::decay_t&lt;E&gt;&gt;{std::forward&lt;EC&gt;(v), std::forward&lt;E&gt;(w)};</div><div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a2c076bf0d710212357674191e5285b42"></a>
@@ -472,7 +472,7 @@ template&lt;class T , class U , class V , class R , class S , class P , class N 
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><a name="l01067"></a><span class="lineno"> 1067</span>&#160;{</div><div class="line"><a name="l01068"></a><span class="lineno"> 1068</span>&#160;  <span class="keywordflow">return</span> b != a;</div><div class="line"><a name="l01069"></a><span class="lineno"> 1069</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l01078"></a><span class="lineno"> 1078</span>&#160;{</div><div class="line"><a name="l01079"></a><span class="lineno"> 1079</span>&#160;  <span class="keywordflow">return</span> b != a;</div><div class="line"><a name="l01080"></a><span class="lineno"> 1080</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="afe49a5a98762c0a9d90f2b16fb06f472"></a>
@@ -611,7 +611,7 @@ template&lt;class T , class U , class V , class R , class S , class P , class N 
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><a name="l01049"></a><span class="lineno"> 1049</span>&#160;{</div><div class="line"><a name="l01050"></a><span class="lineno"> 1050</span>&#160;  <span class="keywordflow">return</span> b == a;</div><div class="line"><a name="l01051"></a><span class="lineno"> 1051</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l01060"></a><span class="lineno"> 1060</span>&#160;{</div><div class="line"><a name="l01061"></a><span class="lineno"> 1061</span>&#160;  <span class="keywordflow">return</span> b == a;</div><div class="line"><a name="l01062"></a><span class="lineno"> 1062</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a49d6cc916b79ef6ab6a59e95da1facae"></a>
@@ -892,7 +892,7 @@ template&lt;class T &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Returns type sugar for implicitly constructing a <code>result&lt;T&gt;</code> with a successful state, default constructing <code>T</code> if necessary. </p>
-<div class="fragment"><div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;{</div><div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  <span class="keywordflow">return</span> success_type&lt;void&gt;{};</div><div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;{</div><div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;  <span class="keywordflow">return</span> success_type&lt;void&gt;{};</div><div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a09c4371a661e385878ce8d2a8a46f6f8"></a>
@@ -921,7 +921,7 @@ template&lt;class T &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Returns type sugar for implicitly constructing a <code>result&lt;T&gt;</code> with a successful state. </p><dl class="section user"><dt>Effects:</dt><dd>Copies or moves the successful state supplied into the returned type sugar. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;{</div><div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  <span class="keywordflow">return</span> success_type&lt;std::decay_t&lt;T&gt;&gt;{std::forward&lt;T&gt;(v)};</div><div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;{</div><div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  <span class="keywordflow">return</span> success_type&lt;std::decay_t&lt;T&gt;&gt;{std::forward&lt;T&gt;(v)};</div><div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a65aa8aa807659fc5dd675fc9009fce1e"></a>
@@ -960,7 +960,7 @@ template&lt;class R , class S , class P &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Specialise swap for result. </p><dl class="section user"><dt>Effects:</dt><dd>Calls <code>a.swap(b)</code>. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;{</div><div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;  a.swap(b);</div><div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;{</div><div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;  a.swap(b);</div><div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a53be5f6401c54aed3761947426fe9c46"></a>
@@ -999,7 +999,7 @@ template&lt;class R , class S , class P , class N &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Specialise swap for outcome. </p><dl class="section user"><dt>Effects:</dt><dd>Calls <code>a.swap(b)</code>. </dd></dl>
-<div class="fragment"><div class="line"><a name="l01074"></a><span class="lineno"> 1074</span>&#160;{</div><div class="line"><a name="l01075"></a><span class="lineno"> 1075</span>&#160;  a.swap(b);</div><div class="line"><a name="l01076"></a><span class="lineno"> 1076</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l01085"></a><span class="lineno"> 1085</span>&#160;{</div><div class="line"><a name="l01086"></a><span class="lineno"> 1086</span>&#160;  a.swap(b);</div><div class="line"><a name="l01087"></a><span class="lineno"> 1087</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a6bd69be21d83f875647dd2b824670d47"></a>

@@ -98,6 +98,7 @@ Functions</h2></td></tr>
 <tr class="separator:aed2306ff27d3ccf715c7e49f933dadea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aad13a824934d249373d305a9421040cf"><td class="memTemplParams" colspan="2">template&lt;class R , class S , class NoValuePolicy &gt; </td></tr>
 <tr class="memitem:aad13a824934d249373d305a9421040cf"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#aad13a824934d249373d305a9421040cf">set_spare_storage</a> (<a class="el" href="classoutcome__v2__xxx_1_1detail_1_1result__final.html">detail::result_final</a>&lt; R, S, NoValuePolicy &gt; *r, uint16_t v) noexcept</td></tr>
+<tr class="memdesc:aad13a824934d249373d305a9421040cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the 16 bits of spare storage in result/outcome.  <a href="#aad13a824934d249373d305a9421040cf">More...</a><br /></td></tr>
 <tr class="separator:aad13a824934d249373d305a9421040cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aacaf6da2d2add747f520942f983b761c"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
 <tr class="memitem:aacaf6da2d2add747f520942f983b761c"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#aacaf6da2d2add747f520942f983b761c">hook_outcome_construction</a> (<a class="el" href="structoutcome__v2__xxx_1_1in__place__type__t.html">in_place_type_t</a>&lt; T &gt;, U *) noexcept</td></tr>
@@ -129,6 +130,7 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Namespace containing hooks used for intercepting and manipulating result/outcome. </p>
+<p>Namespace for ADL discovered hooks into events in <code>result</code> and <code>outcome</code>. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="aacaf6da2d2add747f520942f983b761c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aacaf6da2d2add747f520942f983b761c">&#9670;&nbsp;</a></span>hook_outcome_construction()</h2>
@@ -172,7 +174,7 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a3ee75190c2dabe180881fab5081e7c3e"></a>
@@ -217,7 +219,7 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ace9e74219aa9e15ed060c61ce98abb9e"></a>
@@ -262,7 +264,7 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a9266d40886a7b70782e1011da5b9e264"></a>
@@ -307,7 +309,7 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a9ea286efc7bd79c98bb24de99962e5b0"></a>
@@ -352,7 +354,7 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a65aea7ecae6f947cad431f6a599fe06f"></a>
@@ -397,7 +399,7 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ae2cd33cfd3fb8fd50181941e6944356f"></a>
@@ -442,7 +444,7 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ae0571da4b7167e79369ff6662e0ae141"></a>
@@ -487,7 +489,7 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a363acb2ca6f88fd68c75a36223501d9f"></a>
@@ -533,7 +535,7 @@ template&lt;class R , class S , class P , class NoValuePolicy , class U &gt; </d
   </dd>
 </dl>
 <dl class="section user"><dt>Effects:</dt><dd>Sets the payload/exception of the outcome to the given value. </dd></dl>
-<div class="fragment"><div class="line"><a name="l01086"></a><span class="lineno"> 1086</span>&#160;  {</div><div class="line"><a name="l01087"></a><span class="lineno"> 1087</span>&#160;    o-&gt;_ptr = std::forward&lt;U&gt;(v);</div><div class="line"><a name="l01088"></a><span class="lineno"> 1088</span>&#160;    <span class="keywordflow">if</span>(trait::is_exception_ptr&lt;P&gt;::value)</div><div class="line"><a name="l01089"></a><span class="lineno"> 1089</span>&#160;      o-&gt;_state._status |= detail::status_have_exception;</div><div class="line"><a name="l01090"></a><span class="lineno"> 1090</span>&#160;    <span class="keywordflow">else</span></div><div class="line"><a name="l01091"></a><span class="lineno"> 1091</span>&#160;      o-&gt;_state._status |= detail::status_have_payload;</div><div class="line"><a name="l01092"></a><span class="lineno"> 1092</span>&#160;  }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l01097"></a><span class="lineno"> 1097</span>&#160;  {</div><div class="line"><a name="l01098"></a><span class="lineno"> 1098</span>&#160;    o-&gt;_ptr = std::forward&lt;U&gt;(v);</div><div class="line"><a name="l01099"></a><span class="lineno"> 1099</span>&#160;    <span class="keywordflow">if</span>(trait::is_exception_ptr&lt;P&gt;::value)</div><div class="line"><a name="l01100"></a><span class="lineno"> 1100</span>&#160;      o-&gt;_state._status |= detail::status_have_exception;</div><div class="line"><a name="l01101"></a><span class="lineno"> 1101</span>&#160;    <span class="keywordflow">else</span></div><div class="line"><a name="l01102"></a><span class="lineno"> 1102</span>&#160;      o-&gt;_state._status |= detail::status_have_payload;</div><div class="line"><a name="l01103"></a><span class="lineno"> 1103</span>&#160;  }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="aad13a824934d249373d305a9421040cf"></a>
@@ -571,7 +573,9 @@ template&lt;class R , class S , class NoValuePolicy &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;{ r-&gt;_state._status |= (v &lt;&lt; detail::status_2byte_shift); }</div></div><!-- fragment -->
+
+<p>Sets the 16 bits of spare storage in result/outcome. </p>
+<div class="fragment"><div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;{ r-&gt;_state._status |= (v &lt;&lt; detail::status_2byte_shift); }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="aed2306ff27d3ccf715c7e49f933dadea"></a>
@@ -601,7 +605,7 @@ template&lt;class R , class S , class NoValuePolicy &gt; </div>
 </div><div class="memdoc">
 
 <p>Retrieves the 16 bits of spare storage in result/outcome. </p>
-<div class="fragment"><div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;{ <span class="keywordflow">return</span> (r-&gt;_state._status &gt;&gt; detail::status_2byte_shift) &amp; 0xffff; }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;{ <span class="keywordflow">return</span> (r-&gt;_state._status &gt;&gt; detail::status_2byte_shift) &amp; 0xffff; }</div></div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->
