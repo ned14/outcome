@@ -78,7 +78,7 @@ std::error_code make_error_code(ConversionErrc e)
 
 void explicit_construction()
 {
-//! [explicit]	
+//! [explicit]
 outcome::result<int> r {outcome::in_place_type<std::error_code>, ConversionErrc::EmptyString};
 outcome::result<int> s {outcome::in_place_type<int>, 1};
 //! [explicit]
@@ -86,7 +86,7 @@ outcome::result<int> s {outcome::in_place_type<int>, 1};
 
 void factory_construction()
 {
-//! [factory]	
+//! [factory]
 outcome::result<int> r = outcome::failure(ConversionErrc::EmptyString); 
 outcome::result<int> s = outcome::success(1);
 //! [factory]
@@ -104,7 +104,7 @@ struct BigInt
 /*static*/ outcome::result<BigInt> BigInt::fromString(const std::string& s)
 //! [from_string]
 {
-	return BigInt{s};
+    return BigInt{s};
 }
 
 //! [half_decl]

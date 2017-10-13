@@ -49,14 +49,27 @@ struct no_exception_type
 namespace policy
 {
 #ifdef __cpp_exceptions
+  template <class R, class S, class P> struct error_enum_throw_as_system_error_exception_rethrow;
+  template <class R, class S, class P> struct error_enum_throw_as_system_error_with_payload;
   template <class R, class S, class P> struct error_code_throw_as_system_error_exception_rethrow;
+  template <class R, class S, class P> struct error_code_throw_as_system_error_with_payload;
+  template <class R, class S, class P> struct exception_ptr_rethrow_with_payload;
   /*! Default `outcome<R, S, P>` policy selector.
   */
   template <class R, class S, class P>
-  using default_outcome_policy = std::conditional_t<                                                                                                       //
-  detail::is_same_or_constructible<std::error_code, S> && trait::is_exception_ptr<P>::value, error_code_throw_as_system_error_exception_rethrow<R, S, P>,  //
-  terminate                                                                                                                                                //
-  >;
+  using default_outcome_policy =                                                                                                                                                    //
+  std::conditional_t<                                                                                                                                                               //
+  (std::is_error_code_enum<S>::value || std::is_error_condition_enum<S>::value) && trait::is_exception_ptr<P>::value, error_enum_throw_as_system_error_exception_rethrow<R, S, P>,  //
+  std::conditional_t<                                                                                                                                                               //
+  (std::is_error_code_enum<S>::value || std::is_error_condition_enum<S>::value) && !trait::is_exception_ptr<P>::value, error_enum_throw_as_system_error_with_payload<R, S, P>,      //
+  std::conditional_t<                                                                                                                                                               //
+  trait::is_error_code<S>::value && trait::is_exception_ptr<P>::value, error_code_throw_as_system_error_exception_rethrow<R, S, P>,                                                 //
+  std::conditional_t<                                                                                                                                                               //
+  trait::is_error_code<S>::value && !trait::is_exception_ptr<P>::value, error_code_throw_as_system_error_with_payload<R, S, P>,
+  std::conditional_t<  //
+  trait::is_exception_ptr<S>::value, exception_ptr_rethrow_with_payload<R, S, P>,
+  all_narrow  //
+  >>>>>;
 #else
   template <class R, class S, class P> using default_outcome_policy = terminate;
 #endif

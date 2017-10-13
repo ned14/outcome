@@ -9,6 +9,8 @@
 <h1 class="standardese-file-documentation-heading">Header file <code>error_code_throw_as_system_error.hpp</code></h1>
 <pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">..&#x2F;bad_access.hpp</span><span class="pre">&quot;</span>
 
+<span class="pre">#include</span> <span class="pre">&lt;</span><span class="typ dec var fun">system_error</span><span class="pre">&gt;</span>
+
 <span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
 <span class="pun">{</span>
     <span class="kwd">namespace</span> <span class="typ dec var fun">policy</span>
@@ -25,6 +27,8 @@
 <pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">EC</span><span class="pun">&gt;</span>
 <span class="kwd">struct</span> <span class="typ dec var fun">error_code_throw_as_system_error</span>
 <span class="pun">{</span>
+    <span class="kwd">static_assert</span><span class="pun">(</span><span class="kwd">std</span><span class="pun">::</span><span class="kwd">is_base_of</span><span class="pun">&lt;</span><span class="kwd">std</span><span class="pun">::</span><span class="kwd">error_code</span><span class="pun">,</span> <span class="kwd">EC</span><span class="pun">&gt;</span><span class="pun">::</span><span class="kwd">value</span><span class="pun">,</span> <span class="str">&quot;error_type must be a base of a std::error_code to be used with this policy&quot;</span><span class="pun">);</span>
+
     <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
     <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_error_code_throw_as_system_error.html#standardese-outcome_v2_xxx::policy::error_code_throw_as_system_error%3CEC%3E::narrow_value_check%3CImpl%3E(Impl*)"><span class="typ dec var fun">narrow_value_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
 

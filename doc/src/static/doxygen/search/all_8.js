@@ -4,6 +4,7 @@ var searchData=
   ['in_5fplace_5ftype',['in_place_type',['../namespaceoutcome__v2__xxx.html#a7710af708879305880f6d6e31109fd88',1,'outcome_v2_xxx']]],
   ['in_5fplace_5ftype_5ft',['in_place_type_t',['../structoutcome__v2__xxx_1_1in__place__type__t.html',1,'outcome_v2_xxx::in_place_type_t&lt; T &gt;'],['../structoutcome__v2__xxx_1_1in__place__type__t.html#a6a93a26148db50b4829ce42532adae48',1,'outcome_v2_xxx::in_place_type_t::in_place_type_t()']]],
   ['iostream_5fsupport_2ehpp',['iostream_support.hpp',['../iostream__support_8hpp.html',1,'']]],
+  ['is_5ferror_5fcode',['is_error_code',['../structoutcome__v2__xxx_1_1trait_1_1is__error__code.html',1,'outcome_v2_xxx::trait']]],
   ['is_5fexception_5fptr',['is_exception_ptr',['../structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html',1,'outcome_v2_xxx::trait']]],
   ['is_5ffailure_5ftype',['is_failure_type',['../structoutcome__v2__xxx_1_1detail_1_1is__failure__type.html',1,'outcome_v2_xxx::detail']]],
   ['is_5ffailure_5ftype_3c_20failure_5ftype_3c_20ec_2c_20e_2c_20e_5fis_5fexception_5fptr_20_3e_20_3e',['is_failure_type&lt; failure_type&lt; EC, E, e_is_exception_ptr &gt; &gt;',['../structoutcome__v2__xxx_1_1detail_1_1is__failure__type_3_01failure__type_3_01_e_c_00_01_e_00_01e__is__exception__ptr_01_4_01_4.html',1,'outcome_v2_xxx::detail']]],

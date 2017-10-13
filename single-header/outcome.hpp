@@ -1851,10 +1851,16 @@ OUTCOME_V2_NAMESPACE_BEGIN
 //! Namespace for traits
 namespace trait
 {
-  /*! Trait for whether type `P` is to be considered a payload to an exception.
+  /*! Trait for whether type `S` is to be considered an error code.
   */
 
-  template <class P> struct is_exception_ptr : std::integral_constant<bool, std::is_constructible<std::exception_ptr, P>::value>
+  template <class S> struct is_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, S>::value>
+  {
+  };
+  /*! Trait for whether type `P` is to be considered an exception ptr.
+  */
+
+  template <class P> struct is_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, P>::value>
   {
   };
 }
@@ -4617,19 +4623,22 @@ namespace policy
 
   template <class EC>
   using default_result_policy = std::conditional_t< //
-  std::is_void<EC>::value, //
-  terminate, //
+  std::is_void<EC>::value, terminate, //
   std::conditional_t< //
-  std::is_error_code_enum<EC>::value || std::is_error_condition_enum<EC>::value, //
-  error_enum_throw_as_system_error<EC>, //
+  std::is_error_code_enum<EC>::value || std::is_error_condition_enum<EC>::value, error_enum_throw_as_system_error<EC>, //
   std::conditional_t< //
-  detail::is_same_or_constructible<std::error_code, EC>, error_code_throw_as_system_error<EC>, //
+  trait::is_error_code<EC>::value, error_code_throw_as_system_error<EC>, //
   std::conditional_t< //
-  detail::is_same_or_constructible<std::exception_ptr, EC>, exception_ptr_rethrow<EC>, //
-  throw_bad_result_access<EC> //
+  trait::is_exception_ptr<EC>::value, exception_ptr_rethrow<EC>, //
+  all_narrow //
   >>>>;
 #else
-  template <class EC> using default_result_policy = terminate;
+  template <class EC>
+  using default_result_policy = std::conditional_t< //
+  std::is_void<EC>::value || std::is_error_code_enum<EC>::value || std::is_error_condition_enum<EC>::value || trait::is_error_code<EC>::value || trait::is_exception_ptr<EC>::value, //
+  terminate, //
+  all_narrow //
+  >;
 #endif
 }
 
@@ -4797,12 +4806,14 @@ Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array
     - If `S` convertible to a `std::exception_ptr`, then `std::rethrow_exception(error())` [`policy::exception_ptr_rethrow<S>`]
     if C++ exceptions are enabled, else call `std::terminate()`.
     - If `S` is `void`, call `std::terminate()` [`policy::terminate<S>`]
-    - If `S` is none of the above, then `throw bad_result_access_with<S>(error())` [`policy::throw_bad_result_access<S>`]
-    if C++ exceptions are enabled, else call `std::terminate`.
+    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
   2. If `.error()` called when there is no `error_type`:
-    - `throw bad_result_access()` if C++ exceptions are enabled, else call `std::terminate()`.
-
+    - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<S>` is true,
+    or if `S` convertible to a `std::error_code`, or if `S` convertible to a `std::exception_ptr`,
+    or if `S` is `void`, `throw bad_result_access()` if C++ exceptions are enabled, else call `std::terminate()`.
+    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
+
 
 
 
@@ -5402,7 +5413,7 @@ template <class R, class S, class P> inline void swap(result<R, S, P> &a, result
   a.swap(b);
 }
 
-#if !defined(NDEBUG) && !0
+#if !defined(NDEBUG)
 // Check is trivial in all ways except default constructibility
 // static_assert(std::is_trivial<result<int>>::value, "result<int> is not trivial!");
 // static_assert(std::is_trivially_default_constructible<result<int>>::value, "result<int> is not trivially default constructible!");
@@ -5462,15 +5473,28 @@ struct no_exception_type
 namespace policy
 {
 #ifdef __cpp_exceptions
+  template <class R, class S, class P> struct error_enum_throw_as_system_error_exception_rethrow;
+  template <class R, class S, class P> struct error_enum_throw_as_system_error_with_payload;
   template <class R, class S, class P> struct error_code_throw_as_system_error_exception_rethrow;
+  template <class R, class S, class P> struct error_code_throw_as_system_error_with_payload;
+  template <class R, class S, class P> struct exception_ptr_rethrow_with_payload;
   /*! Default `outcome<R, S, P>` policy selector.
   */
 
   template <class R, class S, class P>
-  using default_outcome_policy = std::conditional_t< //
-  detail::is_same_or_constructible<std::error_code, S> && trait::is_exception_ptr<P>::value, error_code_throw_as_system_error_exception_rethrow<R, S, P>, //
-  terminate //
-  >;
+  using default_outcome_policy = //
+  std::conditional_t< //
+  (std::is_error_code_enum<S>::value || std::is_error_condition_enum<S>::value) && trait::is_exception_ptr<P>::value, error_enum_throw_as_system_error_exception_rethrow<R, S, P>, //
+  std::conditional_t< //
+  (std::is_error_code_enum<S>::value || std::is_error_condition_enum<S>::value) && !trait::is_exception_ptr<P>::value, error_enum_throw_as_system_error_with_payload<R, S, P>, //
+  std::conditional_t< //
+  trait::is_error_code<S>::value && trait::is_exception_ptr<P>::value, error_code_throw_as_system_error_exception_rethrow<R, S, P>, //
+  std::conditional_t< //
+  trait::is_error_code<S>::value && !trait::is_exception_ptr<P>::value, error_code_throw_as_system_error_with_payload<R, S, P>,
+  std::conditional_t< //
+  trait::is_exception_ptr<S>::value, exception_ptr_rethrow_with_payload<R, S, P>,
+  all_narrow //
+  >>>>>;
 #else
   template <class R, class S, class P> using default_outcome_policy = terminate;
 #endif

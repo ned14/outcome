@@ -9,6 +9,8 @@
 <h1 class="standardese-file-documentation-heading">Header file <code>error_code_throw_as_system_error_exception_rethrow.hpp</code></h1>
 <pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">..&#x2F;bad_access.hpp</span><span class="pre">&quot;</span>
 
+<span class="pre">#include</span> <span class="pre">&lt;</span><span class="typ dec var fun">system_error</span><span class="pre">&gt;</span>
+
 <span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
 <span class="pun">{</span>
     <span class="kwd">namespace</span> <span class="typ dec var fun">policy</span>
@@ -25,6 +27,8 @@
 <pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">R</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">S</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">P</span><span class="pun">&gt;</span>
 <span class="kwd">struct</span> <span class="typ dec var fun">error_code_throw_as_system_error_exception_rethrow</span>
 <span class="pun">{</span>
+    <span class="kwd">static_assert</span><span class="pun">(</span><span class="kwd">std</span><span class="pun">::</span><span class="kwd">is_base_of</span><span class="pun">&lt;</span><span class="kwd">std</span><span class="pun">::</span><span class="kwd">error_code</span><span class="pun">,</span> <span class="kwd">S</span><span class="pun">&gt;</span><span class="pun">::</span><span class="kwd">value</span><span class="pun">,</span> <span class="str">&quot;error_type must be a base of std::error_code to be used with this policy&quot;</span><span class="pun">);</span>
+
     <span class="kwd">static_assert</span><span class="pun">(</span><span class="kwd">std</span><span class="pun">::</span><span class="kwd">is_base_of</span><span class="pun">&lt;</span><span class="kwd">std</span><span class="pun">::</span><span class="kwd">exception_ptr</span><span class="pun">,</span> <span class="kwd">P</span><span class="pun">&gt;</span><span class="pun">::</span><span class="kwd">value</span><span class="pun">,</span> <span class="str">&quot;exception_type must be a base of std::exception_ptr to be used with this policy&quot;</span><span class="pun">);</span>
 
     <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>

@@ -1,5 +1,6 @@
 var success__failure_8hpp =
 [
+    [ "is_error_code", "structoutcome__v2__xxx_1_1trait_1_1is__error__code.html", null ],
     [ "is_exception_ptr", "structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html", null ],
     [ "success_type", "structoutcome__v2__xxx_1_1success__type.html", "structoutcome__v2__xxx_1_1success__type" ],
     [ "success_type< void >", "structoutcome__v2__xxx_1_1success__type_3_01void_01_4.html", "structoutcome__v2__xxx_1_1success__type_3_01void_01_4" ],

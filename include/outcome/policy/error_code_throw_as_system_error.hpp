@@ -27,6 +27,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../bad_access.hpp"
 
+#include <system_error>
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
