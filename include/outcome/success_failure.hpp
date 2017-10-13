@@ -36,9 +36,14 @@ OUTCOME_V2_NAMESPACE_BEGIN
 //! Namespace for traits
 namespace trait
 {
-  /*! Trait for whether type `P` is to be considered a payload to an exception.
+  /*! Trait for whether type `S` is to be considered an error code.
   */
-  template <class P> struct is_exception_ptr : std::integral_constant<bool, std::is_constructible<std::exception_ptr, P>::value>
+  template <class S> struct is_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, S>::value>
+  {
+  };
+  /*! Trait for whether type `P` is to be considered an exception ptr.
+  */
+  template <class P> struct is_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, P>::value>
   {
   };
 }
