@@ -22,7 +22,7 @@ like ones in [Boost.Filesystem](http://www.boost.org/doc/libs/1_64_0/libs/filesy
 where almost each function comes in two overloads, one throwing an exception,
 the other populating an `error_code` output argument. With Outcome, you can have only one function
 returning a composite return type, and it is through using this return value that you decide whether
-to handle failures locally, or to launch stack unwinding.	 
+to handle failures locally, or to launch stack unwinding.
 
 Outcome can also be used to plug components that potentially throw exceptions into parts of the program
 that are not exception-safe while retaining all information from the thrown exception objects.

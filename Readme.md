@@ -63,10 +63,10 @@ so all the monadic stuff is removed.
    an error code with additional exception ptr as per Peter Dimov's
    request. It also very considerably simplifies implementation.
      - You can choose between a payload type `P` or an exception ptr
-     `E`, so  an error code with additional arbitrary non-exception ptr
+     `E`, so an error code with additional arbitrary non-exception ptr
      payload `P` is also possible. This enables the Filesystem TS `error_code`
-	 returning overloads to return the same extra information as the throwing
-	 overloads.
+     returning overloads to return the same extra information as the throwing
+     overloads.
      - C interoperability is now available, and some C macros for
      working with `struct result_TYPE` are available in result.h.
    - Concepts TS is used when available, otherwise a partial
