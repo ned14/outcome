@@ -32,6 +32,8 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace policy
 {
   /*! Policy which treats wide checks as narrow checks.
+
+  Can be used in both `result` and `outcome`.
   */
   struct all_narrow
   {
@@ -57,6 +59,28 @@ namespace policy
         __builtin_unreachable();
 #endif
     }
+    /*! Performs a narrow check of state, used in the assume_payload() functions
+    \effects None.
+    */
+    template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_payload) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a narrow check of state, used in the assume_exception() functions
+    \effects None.
+    */
+    template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_exception) == 0)
+        __builtin_unreachable();
+#endif
+    }
     /*! Performs a wide check of state, used in the value() functions.
     \effects None.
     */
@@ -65,6 +89,14 @@ namespace policy
     \effects None.
     */
     template <class Impl> static constexpr void wide_error_check(Impl *self) { narrow_error_check(self); }
+    /*! Performs a wide check of state, used in the payload() functions
+    \effects If outcome does not have an exception, calls `std::terminate()`.
+    */
+    template <class Impl> static constexpr void wide_payload_check(Impl *self) { narrow_payload_check(self); }
+    /*! Performs a wide check of state, used in the exception() functions
+    \effects If outcome does not have an exception, calls `std::terminate()`.
+    */
+    template <class Impl> static constexpr void wide_exception_check(Impl *self) { narrow_exception_check(self); }
   };
 }
 

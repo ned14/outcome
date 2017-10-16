@@ -33,10 +33,11 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-#ifdef __cpp_exceptions
   /*! Policy interpreting EC as a type implementing the `std::error_code` contract
   and any wide attempt to access the successful state throws the `error_code` wrapped into
   a `std::system_error`
+
+  Can be used in `result` only.
   */
   template <class EC> struct error_code_throw_as_system_error
   {
@@ -88,7 +89,6 @@ namespace policy
       }
     }
   };
-#endif
 }
 
 OUTCOME_V2_NAMESPACE_END

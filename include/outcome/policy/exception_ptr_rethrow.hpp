@@ -31,9 +31,10 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-#ifdef __cpp_exceptions
   /*! Policy interpreting EC as a type implementing the `std::exception_ptr` contract
   and any wide attempt to access the successful state calls `std::rethrow_exception()`.
+
+  Can be used in `result` only.
   */
   template <class EC> struct exception_ptr_rethrow
   {
@@ -85,7 +86,6 @@ namespace policy
       }
     }
   };
-#endif
 }
 
 OUTCOME_V2_NAMESPACE_END

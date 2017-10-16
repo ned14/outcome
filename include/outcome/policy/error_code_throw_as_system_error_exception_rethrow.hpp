@@ -31,15 +31,18 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
+#ifdef STANDARDESE_IS_IN_THE_HOUSE
 template <class R, class S, class P, class N> class outcome;
+#endif
 
 namespace policy
 {
-#ifdef __cpp_exceptions
-  /*! Policy interpreting S as a type implementing the `std::error_code` contract, E as
+  /*! Policy interpreting S as a type implementing the `std::error_code` contract, P as
   a type implementing the `std::exception_ptr` contract, and any wide attempt to access the
   successful state throws the `exception_ptr` if available, then the `error_code` wrapped
   into a `std::system_error`.
+
+  Can be used in `outcome` only.
   */
   template <class R, class S, class P> struct error_code_throw_as_system_error_exception_rethrow
   {
@@ -140,7 +143,6 @@ namespace policy
       }
     }
   };
-#endif
 }
 
 OUTCOME_V2_NAMESPACE_END

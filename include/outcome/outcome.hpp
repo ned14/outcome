@@ -48,11 +48,13 @@ struct no_exception_type
 
 namespace policy
 {
+  template <class T> constexpr inline void throw_as_system_error_with_payload(const T * /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload"); }
+  template <class T> constexpr inline void throw_exception_ptr_with_payload(const T * /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_exception_ptr_with_payload policy, you must define a throw_exception_ptr_with_payload() free function to say how to handle the payload"); }
 #ifdef __cpp_exceptions
-  template <class R, class S, class P> struct error_enum_throw_as_system_error_exception_rethrow;
-  template <class R, class S, class P> struct error_enum_throw_as_system_error_with_payload;
   template <class R, class S, class P> struct error_code_throw_as_system_error_exception_rethrow;
   template <class R, class S, class P> struct error_code_throw_as_system_error_with_payload;
+  template <class R, class S, class P> struct error_enum_throw_as_system_error_exception_rethrow;
+  template <class R, class S, class P> struct error_enum_throw_as_system_error_with_payload;
   template <class R, class S, class P> struct exception_ptr_rethrow_with_payload;
   /*! Default `outcome<R, S, P>` policy selector.
   */
@@ -207,6 +209,7 @@ namespace hooks
   */
   template <class T, class U> constexpr inline void hook_outcome_in_place_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept {}
 
+  //! Used in hook implementations to override the payload/exception to something other than what was constructed.
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_payload_exception(outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept;
 }
 
@@ -1105,6 +1108,10 @@ namespace hooks
 OUTCOME_V2_NAMESPACE_END
 
 #include "policy/error_code_throw_as_system_error_exception_rethrow.hpp"
+#include "policy/error_code_throw_as_system_error_with_payload.hpp"
+#include "policy/error_enum_throw_as_system_error_exception_rethrow.hpp"
+#include "policy/error_enum_throw_as_system_error_with_payload.hpp"
+#include "policy/exception_ptr_rethrow_with_payload.hpp"
 
 #include "detail/outcome_payload_observers_impl.hpp"
 

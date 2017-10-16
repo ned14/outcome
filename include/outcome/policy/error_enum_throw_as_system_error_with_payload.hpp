@@ -22,22 +22,28 @@ Distributed under the Boost Software License, Version 1.0.
 http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef OUTCOME_POLICY_TERMINATE_HPP
-#define OUTCOME_POLICY_TERMINATE_HPP
+#ifndef OUTCOME_POLICY_ERROR_ENUM_THROW_AS_SYSTEM_ERROR_WITH_PAYLOAD_HPP
+#define OUTCOME_POLICY_ERROR_ENUM_THROW_AS_SYSTEM_ERROR_WITH_PAYLOAD_HPP
 
-#include "../config.hpp"
+#include "../bad_access.hpp"
 
 #include <system_error>
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
+#ifdef STANDARDESE_IS_IN_THE_HOUSE
+template <class R, class S, class P, class N> class outcome;
+#endif
+
 namespace policy
 {
-  /*! Policy implementing any wide attempt to access the successful state as calling `std::terminate`
+  /*! Policy interpreting S as an enum convertible into the `std::error_code` contract
+  and any wide attempt to access the successful state calls an
+  ADL discovered free function `throw_as_system_error_with_payload()`.
 
-  Can be used in both `result` and `outcome`.
+  Can be used in `outcome` only.
   */
-  struct terminate
+  template <class R, class S, class P> struct error_enum_throw_as_system_error_with_payload
   {
     /*! Performs a narrow check of state, used in the assume_value() functions.
     \effects None.
@@ -50,7 +56,7 @@ namespace policy
         __builtin_unreachable();
 #endif
     }
-    /*! Performs a narrow check of state, used in the assume_error() functions
+    /*! Performs a narrow check of state, used in the assume_error() functions.
     \effects None.
     */
     template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
@@ -61,7 +67,7 @@ namespace policy
         __builtin_unreachable();
 #endif
     }
-    /*! Performs a narrow check of state, used in the assume_payload() functions
+    /*! Performs a narrow check of state, used in the assume_payload() functions.
     \effects None.
     */
     template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
@@ -72,7 +78,7 @@ namespace policy
         __builtin_unreachable();
 #endif
     }
-    /*! Performs a narrow check of state, used in the assume_exception() functions
+    /*! Performs a narrow check of state, used in the assume_exception() functions.
     \effects None.
     */
     template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
@@ -84,43 +90,53 @@ namespace policy
 #endif
     }
     /*! Performs a wide check of state, used in the value() functions.
-    \effects If result does not have a value, calls `std::terminate()`.
+    \effects If outcome does not have a value,
+    if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
     */
     template <class Impl> static constexpr void wide_value_check(Impl *self)
     {
       if((self->_state._status & detail::status_have_value) == 0)
       {
-        std::terminate();
+        if((self->_state._status & detail::status_have_payload) != 0)
+        {
+          auto *_self = static_cast<const outcome<R, S, P, error_enum_throw_as_system_error_with_payload> *>(self);
+          throw_as_system_error_with_payload(_self);
+        }
+        if((self->_state._status & detail::status_have_error) != 0)
+        {
+          OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(self->_error)));
+        }
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
       }
     }
     /*! Performs a wide check of state, used in the error() functions
-    \effects If result does not have an error, calls `std::terminate()`.
+    \effects If outcome does not have an error, it throws `bad_outcome_access`.
     */
-    template <class Impl> static constexpr void wide_error_check(Impl *self) noexcept
+    template <class Impl> static constexpr void wide_error_check(Impl *self)
     {
       if((self->_state._status & detail::status_have_error) == 0)
       {
-        std::terminate();
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
       }
     }
     /*! Performs a wide check of state, used in the payload() functions
-    \effects If outcome does not have an exception, calls `std::terminate()`.
+    \effects If outcome does not have a payload, it throws `bad_outcome_access`.
     */
     template <class Impl> static constexpr void wide_payload_check(Impl *self)
     {
       if((self->_state._status & detail::status_have_payload) == 0)
       {
-        std::terminate();
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no payload"));
       }
     }
     /*! Performs a wide check of state, used in the exception() functions
-    \effects If outcome does not have an exception, calls `std::terminate()`.
+    \effects If outcome does not have an exception, it throws `bad_outcome_access`.
     */
     template <class Impl> static constexpr void wide_exception_check(Impl *self)
     {
       if((self->_state._status & detail::status_have_exception) == 0)
       {
-        std::terminate();
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
       }
     }
   };

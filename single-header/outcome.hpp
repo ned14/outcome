@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 34b86bd6d89819a09e9694772cc5ecf58e5c6ddb
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-06 23:45:54 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 34b86bd6
+#define OUTCOME_PREVIOUS_COMMIT_REF 4e4b43125ff2f43b49123442fad8d57f56558a8b
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-13 22:55:33 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4e4b4312
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -3759,7 +3759,11 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace policy
 {
   /*! Policy which treats wide checks as narrow checks.
+
+  Can be used in both `result` and `outcome`.
   */
+
+
 
   struct all_narrow
   {
@@ -3789,6 +3793,32 @@ namespace policy
         __builtin_unreachable();
 #endif
     }
+    /*! Performs a narrow check of state, used in the assume_payload() functions
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_payload) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a narrow check of state, used in the assume_exception() functions
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_exception) == 0)
+        __builtin_unreachable();
+#endif
+    }
     /*! Performs a wide check of state, used in the value() functions.
     \effects None.
     */
@@ -3801,6 +3831,18 @@ namespace policy
 
 
     template <class Impl> static constexpr void wide_error_check(Impl *self) { narrow_error_check(self); }
+    /*! Performs a wide check of state, used in the payload() functions
+    \effects If outcome does not have an exception, calls `std::terminate()`.
+    */
+
+
+    template <class Impl> static constexpr void wide_payload_check(Impl *self) { narrow_payload_check(self); }
+    /*! Performs a wide check of state, used in the exception() functions
+    \effects If outcome does not have an exception, calls `std::terminate()`.
+    */
+
+
+    template <class Impl> static constexpr void wide_exception_check(Impl *self) { narrow_exception_check(self); }
   };
 }
 
@@ -3990,15 +4032,20 @@ public:
 OUTCOME_V2_NAMESPACE_END
 
 #endif
+#include <system_error>
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-#ifdef __cpp_exceptions
   /*! Policy interpreting EC as a type implementing the `std::error_code` contract
   and any wide attempt to access the successful state throws the `error_code` wrapped into
   a `std::system_error`
+
+  Can be used in `result` only.
   */
+
+
 
 
 
@@ -4060,7 +4107,6 @@ namespace policy
       }
     }
   };
-#endif
 }
 
 OUTCOME_V2_NAMESPACE_END
@@ -4117,15 +4163,20 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
+#include <system_error>
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-#ifdef __cpp_exceptions
   /*! Policy interpreting EC as an enum convertible into the `std::error_code` contract
   and any wide attempt to access the successful state throws the `error_code` wrapped into
   a `std::system_error`
+
+  Can be used in `result` only.
   */
+
+
 
 
 
@@ -4186,7 +4237,6 @@ namespace policy
       }
     }
   };
-#endif
 }
 
 OUTCOME_V2_NAMESPACE_END
@@ -4247,10 +4297,13 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-#ifdef __cpp_exceptions
   /*! Policy interpreting EC as a type implementing the `std::exception_ptr` contract
   and any wide attempt to access the successful state calls `std::rethrow_exception()`.
+
+  Can be used in `result` only.
   */
+
+
 
 
   template <class EC> struct exception_ptr_rethrow
@@ -4311,7 +4364,6 @@ namespace policy
       }
     }
   };
-#endif
 }
 
 OUTCOME_V2_NAMESPACE_END
@@ -4368,12 +4420,18 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
+#include <system_error>
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
   /*! Policy implementing any wide attempt to access the successful state as calling `std::terminate`
+
+  Can be used in both `result` and `outcome`.
   */
+
+
 
   struct terminate
   {
@@ -4538,9 +4596,12 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-#ifdef __cpp_exceptions
   /*! Policy which throws `bad_result_access_with<EC>` or `bad_result_access` during wide checks.
+
+  Can be used in `result` only.
   */
+
+
 
   template <class EC> struct throw_bad_result_access
   {
@@ -4595,7 +4656,6 @@ namespace policy
       }
     }
   };
-#endif
 }
 
 OUTCOME_V2_NAMESPACE_END
@@ -5472,11 +5532,13 @@ struct no_exception_type
 
 namespace policy
 {
+  template <class T> constexpr inline void throw_as_system_error_with_payload(const T * /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload"); }
+  template <class T> constexpr inline void throw_exception_ptr_with_payload(const T * /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_exception_ptr_with_payload policy, you must define a throw_exception_ptr_with_payload() free function to say how to handle the payload"); }
 #ifdef __cpp_exceptions
-  template <class R, class S, class P> struct error_enum_throw_as_system_error_exception_rethrow;
-  template <class R, class S, class P> struct error_enum_throw_as_system_error_with_payload;
   template <class R, class S, class P> struct error_code_throw_as_system_error_exception_rethrow;
   template <class R, class S, class P> struct error_code_throw_as_system_error_with_payload;
+  template <class R, class S, class P> struct error_enum_throw_as_system_error_exception_rethrow;
+  template <class R, class S, class P> struct error_enum_throw_as_system_error_with_payload;
   template <class R, class S, class P> struct exception_ptr_rethrow_with_payload;
   /*! Default `outcome<R, S, P>` policy selector.
   */
@@ -5652,6 +5714,7 @@ namespace hooks
 
   template <class T, class U> constexpr inline void hook_outcome_in_place_construction(in_place_type_t<T> /*unused*/, U * /*unused*/) noexcept {}
 
+  //! Used in hook implementations to override the payload/exception to something other than what was constructed.
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_payload_exception(outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept;
 }
 
@@ -6871,16 +6934,25 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
+#include <system_error>
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+
+
+
 
 namespace policy
 {
-#ifdef __cpp_exceptions
-  /*! Policy interpreting S as a type implementing the `std::error_code` contract, E as
+  /*! Policy interpreting S as a type implementing the `std::error_code` contract, P as
   a type implementing the `std::exception_ptr` contract, and any wide attempt to access the
   successful state throws the `exception_ptr` if available, then the `error_code` wrapped
   into a `std::system_error`.
+
+  Can be used in `outcome` only.
   */
+
+
 
 
 
@@ -7001,7 +7073,772 @@ namespace policy
       }
     }
   };
+}
+
+OUTCOME_V2_NAMESPACE_END
+
 #endif
+/* Policies for result and outcome
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Oct 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_POLICY_ERROR_CODE_THROW_AS_SYSTEM_ERROR_WITH_PAYLOAD_HPP
+#define OUTCOME_POLICY_ERROR_CODE_THROW_AS_SYSTEM_ERROR_WITH_PAYLOAD_HPP
+
+
+
+#include <system_error>
+
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+
+
+
+
+namespace policy
+{
+  /*! Policy interpreting S as a type implementing the `std::error_code` contract, P
+  as a payload type, and any wide attempt to access the successful state calls an
+  ADL discovered free function `throw_as_system_error_with_payload()`.
+
+  Can be used in `outcome` only.
+  */
+
+
+
+
+
+  template <class R, class S, class P> struct error_code_throw_as_system_error_with_payload
+  {
+    static_assert(std::is_base_of<std::error_code, S>::value, "error_type must be a base of std::error_code to be used with this policy");
+    /*! Performs a narrow check of state, used in the assume_value() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_value) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a narrow check of state, used in the assume_error() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_error) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a narrow check of state, used in the assume_payload() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_payload) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a narrow check of state, used in the assume_exception() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_exception) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a wide check of state, used in the value() functions.
+    \effects If outcome does not have a value,
+    if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
+    */
+
+
+
+    template <class Impl> static constexpr void wide_value_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_value) == 0)
+      {
+        if((self->_state._status & detail::status_have_payload) != 0)
+        {
+          auto *_self = static_cast<const outcome<R, S, P, error_code_throw_as_system_error_with_payload> *>(self);
+          throw_as_system_error_with_payload(_self);
+        }
+        if((self->_state._status & detail::status_have_error) != 0)
+        {
+          OUTCOME_THROW_EXCEPTION(std::system_error(self->_error));
+        }
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
+      }
+    }
+    /*! Performs a wide check of state, used in the error() functions
+    \effects If outcome does not have an error, it throws `bad_outcome_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_error_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_error) == 0)
+      {
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
+      }
+    }
+    /*! Performs a wide check of state, used in the payload() functions
+    \effects If outcome does not have a payload, it throws `bad_outcome_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_payload_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_payload) == 0)
+      {
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no payload"));
+      }
+    }
+    /*! Performs a wide check of state, used in the exception() functions
+    \effects If outcome does not have an exception, it throws `bad_outcome_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_exception_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_exception) == 0)
+      {
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
+      }
+    }
+  };
+}
+
+OUTCOME_V2_NAMESPACE_END
+
+#endif
+/* Policies for result and outcome
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Oct 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_POLICY_ERROR_ENUM_THROW_AS_SYSTEM_ERROR_EXCEPTION_RETHROW_HPP
+#define OUTCOME_POLICY_ERROR_ENUM_THROW_AS_SYSTEM_ERROR_EXCEPTION_RETHROW_HPP
+
+
+
+#include <system_error>
+
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+
+
+
+
+namespace policy
+{
+  /*! Policy interpreting S as an enum convertible into the `std::error_code` contract, P as
+  a type implementing the `std::exception_ptr` contract, and any wide attempt to access the
+  successful state throws the `exception_ptr` if available, then the `error_code` wrapped
+  into a `std::system_error`.
+
+  Can be used in `outcome` only.
+  */
+
+
+
+
+
+
+  template <class R, class S, class P> struct error_enum_throw_as_system_error_exception_rethrow
+  {
+    static_assert(std::is_base_of<std::error_code, S>::value, "error_type must be a base of std::error_code to be used with this policy");
+    static_assert(std::is_base_of<std::exception_ptr, P>::value, "exception_type must be a base of std::exception_ptr to be used with this policy");
+    /*! Performs a narrow check of state, used in the assume_value() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_value) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a narrow check of state, used in the assume_error() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_error) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a narrow check of state, used in the assume_payload() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_payload) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a narrow check of state, used in the assume_exception() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_exception) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a wide check of state, used in the value() functions.
+    \effects If outcome does not have a value, if it has an exception it rethrows it via `std::rethrow_exception()`,
+    if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
+    */
+
+
+
+    template <class Impl> static constexpr void wide_value_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_value) == 0)
+      {
+        if((self->_state._status & detail::status_have_exception) != 0)
+        {
+          auto *_self = static_cast<const outcome<R, S, P, error_enum_throw_as_system_error_exception_rethrow> *>(self);
+          std::rethrow_exception(_self->_ptr);
+        }
+        if((self->_state._status & detail::status_have_error) != 0)
+        {
+          OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(self->_error)));
+        }
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
+      }
+    }
+    /*! Performs a wide check of state, used in the error() functions
+    \effects If outcome does not have an error, it throws `bad_outcome_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_error_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_error) == 0)
+      {
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
+      }
+    }
+    /*! Performs a wide check of state, used in the payload() functions
+    \effects If outcome does not have a payload, it throws `bad_outcome_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_payload_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_payload) == 0)
+      {
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no payload"));
+      }
+    }
+    /*! Performs a wide check of state, used in the exception() functions
+    \effects If outcome does not have an exception, it throws `bad_outcome_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_exception_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_exception) == 0)
+      {
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
+      }
+    }
+  };
+}
+
+OUTCOME_V2_NAMESPACE_END
+
+#endif
+/* Policies for result and outcome
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Oct 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_POLICY_ERROR_ENUM_THROW_AS_SYSTEM_ERROR_WITH_PAYLOAD_HPP
+#define OUTCOME_POLICY_ERROR_ENUM_THROW_AS_SYSTEM_ERROR_WITH_PAYLOAD_HPP
+
+
+
+#include <system_error>
+
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+
+
+
+
+namespace policy
+{
+  /*! Policy interpreting S as an enum convertible into the `std::error_code` contract
+  and any wide attempt to access the successful state calls an
+  ADL discovered free function `throw_as_system_error_with_payload()`.
+
+  Can be used in `outcome` only.
+  */
+
+
+
+
+
+  template <class R, class S, class P> struct error_enum_throw_as_system_error_with_payload
+  {
+    /*! Performs a narrow check of state, used in the assume_value() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_value) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a narrow check of state, used in the assume_error() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_error) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a narrow check of state, used in the assume_payload() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_payload) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a narrow check of state, used in the assume_exception() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_exception) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a wide check of state, used in the value() functions.
+    \effects If outcome does not have a value,
+    if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
+    */
+
+
+
+    template <class Impl> static constexpr void wide_value_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_value) == 0)
+      {
+        if((self->_state._status & detail::status_have_payload) != 0)
+        {
+          auto *_self = static_cast<const outcome<R, S, P, error_enum_throw_as_system_error_with_payload> *>(self);
+          throw_as_system_error_with_payload(_self);
+        }
+        if((self->_state._status & detail::status_have_error) != 0)
+        {
+          OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(self->_error)));
+        }
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
+      }
+    }
+    /*! Performs a wide check of state, used in the error() functions
+    \effects If outcome does not have an error, it throws `bad_outcome_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_error_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_error) == 0)
+      {
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
+      }
+    }
+    /*! Performs a wide check of state, used in the payload() functions
+    \effects If outcome does not have a payload, it throws `bad_outcome_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_payload_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_payload) == 0)
+      {
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no payload"));
+      }
+    }
+    /*! Performs a wide check of state, used in the exception() functions
+    \effects If outcome does not have an exception, it throws `bad_outcome_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_exception_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_exception) == 0)
+      {
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
+      }
+    }
+  };
+}
+
+OUTCOME_V2_NAMESPACE_END
+
+#endif
+/* Policies for result and outcome
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Oct 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_POLICY_EXCEPTION_PTR_RETHROW_WITH_PAYLOAD_HPP
+#define OUTCOME_POLICY_EXCEPTION_PTR_RETHROW_WITH_PAYLOAD_HPP
+
+
+
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+
+
+
+
+namespace policy
+{
+  /*! Policy interpreting S as a type implementing the `std::exception_ptr` contract
+  and any wide attempt to access the successful state calls an
+  ADL discovered free function `throw_exception_ptr_with_payload()`.
+
+  Can be used in `outcome` only.
+  */
+
+
+
+
+
+  template <class R, class S, class P> struct exception_ptr_rethrow_with_payload
+  {
+    static_assert(std::is_base_of<std::exception_ptr, S>::value, "error_type must be a base of a std::exception_ptr to be used with this policy");
+    /*! Performs a narrow check of state, used in the assume_value() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_value) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a narrow check of state, used in the assume_error() functions
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_error) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a narrow check of state, used in the assume_payload() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_payload) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a narrow check of state, used in the assume_exception() functions.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
+    {
+      (void) self;
+#if defined(__GNUC__) || defined(__clang__)
+      if((self->_state._status & detail::status_have_exception) == 0)
+        __builtin_unreachable();
+#endif
+    }
+    /*! Performs a wide check of state, used in the value() functions
+    if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_value_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_value) == 0)
+      {
+        if((self->_state._status & detail::status_have_payload) != 0)
+        {
+          auto *_self = static_cast<const outcome<R, S, P, exception_ptr_rethrow_with_payload> *>(self);
+          throw_exception_ptr_with_payload(_self);
+        }
+        if((self->_state._status & detail::status_have_error) != 0)
+        {
+          std::rethrow_exception(self->_error);
+        }
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
+      }
+    }
+    /*! Performs a wide check of state, used in the error() functions
+    \effects If outcome does not have an error, it throws `bad_outcome_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_error_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_error) == 0)
+      {
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
+      }
+    }
+    /*! Performs a wide check of state, used in the payload() functions
+    \effects If outcome does not have a payload, it throws `bad_outcome_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_payload_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_payload) == 0)
+      {
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no payload"));
+      }
+    }
+    /*! Performs a wide check of state, used in the exception() functions
+    \effects If outcome does not have an exception, it throws `bad_outcome_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_exception_check(Impl *self)
+    {
+      if((self->_state._status & detail::status_have_exception) == 0)
+      {
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
+      }
+    }
+  };
 }
 
 OUTCOME_V2_NAMESPACE_END

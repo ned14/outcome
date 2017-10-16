@@ -31,8 +31,9 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-#ifdef __cpp_exceptions
   /*! Policy which throws `bad_result_access_with<EC>` or `bad_result_access` during wide checks.
+
+  Can be used in `result` only.
   */
   template <class EC> struct throw_bad_result_access
   {
@@ -79,7 +80,6 @@ namespace policy
       }
     }
   };
-#endif
 }
 
 OUTCOME_V2_NAMESPACE_END
