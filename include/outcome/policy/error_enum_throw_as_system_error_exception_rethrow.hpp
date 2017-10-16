@@ -26,6 +26,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define OUTCOME_POLICY_ERROR_ENUM_THROW_AS_SYSTEM_ERROR_EXCEPTION_RETHROW_HPP
 
 #include "../bad_access.hpp"
+#include "detail/common.hpp"
 
 #include <system_error>
 
@@ -44,68 +45,24 @@ namespace policy
 
   Can be used in `outcome` only.
   */
-  template <class R, class S, class P> struct error_enum_throw_as_system_error_exception_rethrow
+  template <class R, class S, class P> struct error_enum_throw_as_system_error_exception_rethrow : detail::base
   {
     static_assert(std::is_base_of<std::error_code, S>::value, "error_type must be a base of std::error_code to be used with this policy");
     static_assert(std::is_base_of<std::exception_ptr, P>::value, "exception_type must be a base of std::exception_ptr to be used with this policy");
-    /*! Performs a narrow check of state, used in the assume_value() functions.
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_value) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a narrow check of state, used in the assume_error() functions.
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_error) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a narrow check of state, used in the assume_payload() functions.
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_payload) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a narrow check of state, used in the assume_exception() functions.
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_exception) == 0)
-        __builtin_unreachable();
-#endif
-    }
     /*! Performs a wide check of state, used in the value() functions.
     \effects If outcome does not have a value, if it has an exception it rethrows it via `std::rethrow_exception()`,
     if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
     */
     template <class Impl> static constexpr void wide_value_check(Impl *self)
     {
-      if((self->_state._status & detail::status_have_value) == 0)
+      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
-        if((self->_state._status & detail::status_have_exception) != 0)
+        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0)
         {
           auto *_self = static_cast<const outcome<R, S, P, error_enum_throw_as_system_error_exception_rethrow> *>(self);
           std::rethrow_exception(_self->_ptr);
         }
-        if((self->_state._status & detail::status_have_error) != 0)
+        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
           OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(self->_error)));
         }
@@ -117,7 +74,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_error_check(Impl *self)
     {
-      if((self->_state._status & detail::status_have_error) == 0)
+      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
       }
@@ -127,7 +84,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_payload_check(Impl *self)
     {
-      if((self->_state._status & detail::status_have_payload) == 0)
+      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
       {
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no payload"));
       }
@@ -137,7 +94,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_exception_check(Impl *self)
     {
-      if((self->_state._status & detail::status_have_exception) == 0)
+      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
       {
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
       }

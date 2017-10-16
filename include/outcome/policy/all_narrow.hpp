@@ -25,7 +25,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_POLICY_ALL_NARROW_HPP
 #define OUTCOME_POLICY_ALL_NARROW_HPP
 
-#include "../config.hpp"
+#include "detail/common.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -35,68 +35,24 @@ namespace policy
 
   Can be used in both `result` and `outcome`.
   */
-  struct all_narrow
+  struct all_narrow : detail::base
   {
-    /*! Performs a narrow check of state, used in the assume_value() functions.
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_value) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a narrow check of state, used in the assume_error() functions
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_error) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a narrow check of state, used in the assume_payload() functions
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_payload) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a narrow check of state, used in the assume_exception() functions
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_exception) == 0)
-        __builtin_unreachable();
-#endif
-    }
     /*! Performs a wide check of state, used in the value() functions.
     \effects None.
     */
-    template <class Impl> static constexpr void wide_value_check(Impl *self) { narrow_value_check(self); }
+    template <class Impl> static constexpr void wide_value_check(Impl *self) { detail::base::narrow_value_check(self); }
     /*! Performs a wide check of state, used in the error() functions
     \effects None.
     */
-    template <class Impl> static constexpr void wide_error_check(Impl *self) { narrow_error_check(self); }
+    template <class Impl> static constexpr void wide_error_check(Impl *self) { detail::base::narrow_error_check(self); }
     /*! Performs a wide check of state, used in the payload() functions
     \effects If outcome does not have an exception, calls `std::terminate()`.
     */
-    template <class Impl> static constexpr void wide_payload_check(Impl *self) { narrow_payload_check(self); }
+    template <class Impl> static constexpr void wide_payload_check(Impl *self) { detail::base::narrow_payload_check(self); }
     /*! Performs a wide check of state, used in the exception() functions
     \effects If outcome does not have an exception, calls `std::terminate()`.
     */
-    template <class Impl> static constexpr void wide_exception_check(Impl *self) { narrow_exception_check(self); }
+    template <class Impl> static constexpr void wide_exception_check(Impl *self) { detail::base::narrow_exception_check(self); }
   };
 }
 

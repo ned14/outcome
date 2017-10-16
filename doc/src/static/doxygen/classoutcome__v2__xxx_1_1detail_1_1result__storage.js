@@ -18,6 +18,7 @@ var classoutcome__v2__xxx_1_1detail_1_1result__storage =
     [ "operator=", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a782171d55a99edd9e984c0128c909bf3", null ],
     [ "hooks::set_spare_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a150212593ee711b6de757a7614cbb1a6", null ],
     [ "hooks::spare_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a5e03dd967258eff3ad7b2028cf80449c", null ],
+    [ "policy::detail::base", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#acd563c16b139a6402e4a37a05f0bfb88", null ],
     [ "result_final", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#afa14db91855a3ec4e9c1d43d5c10857b", null ],
     [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a53b465b5cafef4b2d53cea62c58ac886", null ],
     [ "_error", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a39ce141b3915d80ee142574c5c22c65e", null ],

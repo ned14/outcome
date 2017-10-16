@@ -260,21 +260,9 @@
 <dt><a href="doc_outcome.html#standardese-outcome_v2_xxx"><code>operator!=</code></a></dt>
 </dl>
 </li>
-<li id="standardese-outcome_v2_xxx::operator&lt;&lt;&lt;R,S,P&gt;(std::ostream&amp;,result&lt;R,S,P&gt;const&amp;)" class="standardese-entity-index-item">
-<dl>
-<dt><a href="doc_iostream_support.html#standardese-outcome_v2_xxx::operator%3C%3C%3CR,S,P%3E(std::ostream&amp;,result%3CR,S,P%3Econst&amp;)"><code>operator&lt;&lt;</code></a></dt>
-<dd>&mdash; Serialise a result</dd>
-</dl>
-</li>
 <li id="standardese-outcome_v2_xxx::operator==&lt;T,U,V,R,S,P,N,&gt;(result&lt;T,U,V&gt;const&amp;,outcome&lt;R,S,P,N&gt;const&amp;)" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_outcome.html#standardese-outcome_v2_xxx"><code>operator==</code></a></dt>
-</dl>
-</li>
-<li id="standardese-outcome_v2_xxx::operator&gt;&gt;&lt;R,S,P&gt;(std::istream&amp;,result&lt;R,S,P&gt;&amp;)" class="standardese-entity-index-item">
-<dl>
-<dt><a href="doc_iostream_support.html#standardese-outcome_v2_xxx::operator%3E%3E%3CR,S,P%3E(std::istream&amp;,result%3CR,S,P%3E&amp;)"><code>operator&gt;&gt;</code></a></dt>
-<dd>&mdash; Deserialise a result</dd>
 </dl>
 </li>
 <li id="standardese-outcome_v2_xxx::outcome&lt;R,S,P,NoValuePolicy&gt;" class="standardese-entity-index-item">
@@ -297,9 +285,9 @@
 <dt><a href="doc_outcome.html#standardese-outcome_v2_xxx::policy"><code>default_outcome_policy</code></a></dt>
 </dl>
 </li>
-<li id="standardese-outcome_v2_xxx::policy::default_result_policy&lt;EC&gt;" class="standardese-entity-index-item">
+<li id="standardese-outcome_v2_xxx::policy::default_result_policy&lt;T,EC&gt;" class="standardese-entity-index-item">
 <dl>
-<dt><a href="doc_result.html#standardese-outcome_v2_xxx::policy::default_result_policy%3CEC%3E"><code>default_result_policy</code></a></dt>
+<dt><a href="doc_result.html#standardese-outcome_v2_xxx::policy::default_result_policy%3CT,EC%3E"><code>default_result_policy</code></a></dt>
 <dd>&mdash; Default <code>result&lt;R, S&gt;</code> policy selector.</dd>
 </dl>
 </li>
@@ -312,7 +300,7 @@
 <li id="standardese-outcome_v2_xxx::policy::error_code_throw_as_system_error_exception_rethrow&lt;R,S,P&gt;" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_error_code_throw_as_system_error_exception_rethrow.html#standardese-outcome_v2_xxx::policy::error_code_throw_as_system_error_exception_rethrow%3CR,S,P%3E"><code>error_code_throw_as_system_error_exception_rethrow</code></a></dt>
-<dd>&mdash; Policy interpreting S as a type implementing the <code>std::error_code</code> contract, E as</dd>
+<dd>&mdash; Policy interpreting S as a type implementing the <code>std::error_code</code> contract, P as</dd>
 </dl>
 </li>
 <li id="standardese-outcome_v2_xxx::policy::error_enum_throw_as_system_error&lt;EC&gt;" class="standardese-entity-index-item">
@@ -321,10 +309,10 @@
 <dd>&mdash; Policy interpreting EC as an enum convertible into the <code>std::error_code</code> contract</dd>
 </dl>
 </li>
-<li id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;EC&gt;" class="standardese-entity-index-item">
+<li id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;R,S,P&gt;" class="standardese-entity-index-item">
 <dl>
-<dt><a href="doc_exception_ptr_rethrow.html#standardese-outcome_v2_xxx::policy::exception_ptr_rethrow%3CEC%3E"><code>exception_ptr_rethrow</code></a></dt>
-<dd>&mdash; Policy interpreting EC as a type implementing the <code>std::exception_ptr</code> contract</dd>
+<dt><a href="doc_exception_ptr_rethrow.html#standardese-outcome_v2_xxx::policy::exception_ptr_rethrow%3CR,S,P%3E"><code>exception_ptr_rethrow</code></a></dt>
+<dd>&mdash; Policy interpreting S or P as a type implementing the <code>std::exception_ptr</code> contract</dd>
 </dl>
 </li>
 <li id="standardese-outcome_v2_xxx::policy::terminate" class="standardese-entity-index-item">
@@ -333,19 +321,23 @@
 <dd>&mdash; Policy implementing any wide attempt to access the successful state as calling <code>std::terminate</code></dd>
 </dl>
 </li>
+<li id="standardese-outcome_v2_xxx::policy::throw_as_system_error_with_payload&lt;T&gt;(Tconst*)" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_outcome.html#standardese-outcome_v2_xxx::policy"><code>throw_as_system_error_with_payload</code></a></dt>
+</dl>
+</li>
 <li id="standardese-outcome_v2_xxx::policy::throw_bad_result_access&lt;EC&gt;" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_throw_bad_result_access.html#standardese-outcome_v2_xxx::policy::throw_bad_result_access%3CEC%3E"><code>throw_bad_result_access</code></a></dt>
 <dd>&mdash; Policy which throws <code>bad_result_access_with&lt;EC&gt;</code> or <code>bad_result_access</code> during wide checks.</dd>
 </dl>
 </li>
-</ul>
-</li>
-<li id="standardese-outcome_v2_xxx::print&lt;R,S,P&gt;(detail::result_final&lt;R,S,P&gt;const&amp;)" class="standardese-entity-index-item">
+<li id="standardese-outcome_v2_xxx::policy::throw_exception_ptr_with_payload&lt;T&gt;(Tconst*)" class="standardese-entity-index-item">
 <dl>
-<dt><a href="doc_iostream_support.html#standardese-outcome_v2_xxx::print%3CR,S,P%3E(detail::result_final%3CR,S,P%3Econst&amp;)"><code>print</code></a></dt>
-<dd>&mdash; Debug print a result</dd>
+<dt><a href="doc_outcome.html#standardese-outcome_v2_xxx::policy"><code>throw_exception_ptr_with_payload</code></a></dt>
 </dl>
+</li>
+</ul>
 </li>
 <li id="standardese-outcome_v2_xxx::result&lt;R,S,NoValuePolicy&gt;" class="standardese-entity-index-item">
 <dl>

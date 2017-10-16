@@ -48,9 +48,10 @@ struct no_exception_type
 
 namespace policy
 {
+  //! Override to define what the policies which throw a system error with payload ought to do for some particular `outcome`.
   template <class T> constexpr inline void throw_as_system_error_with_payload(const T * /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload"); }
+  //! Override to define what the policies which throw an exception ptr with payload ought to do for some particular `outcome`.
   template <class T> constexpr inline void throw_exception_ptr_with_payload(const T * /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_exception_ptr_with_payload policy, you must define a throw_exception_ptr_with_payload() free function to say how to handle the payload"); }
-#ifdef __cpp_exceptions
   template <class R, class S, class P> struct error_code_throw_as_system_error_exception_rethrow;
   template <class R, class S, class P> struct error_code_throw_as_system_error_with_payload;
   template <class R, class S, class P> struct error_enum_throw_as_system_error_exception_rethrow;
@@ -70,11 +71,12 @@ namespace policy
   trait::is_error_code<S>::value && !trait::is_exception_ptr<P>::value, error_code_throw_as_system_error_with_payload<R, S, P>,
   std::conditional_t<  //
   trait::is_exception_ptr<S>::value, exception_ptr_rethrow_with_payload<R, S, P>,
+  std::conditional_t<  //
+  trait::is_exception_ptr<P>::value, exception_ptr_rethrow<R, S, P>,
+  std::conditional_t<  //
+  std::is_void<S>::value, terminate,
   all_narrow  //
-  >>>>>;
-#else
-  template <class R, class S, class P> using default_outcome_policy = terminate;
-#endif
+  >>>>>>>;
 }
 
 template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_outcome_policy<R, S, P>>  //
@@ -229,6 +231,28 @@ This is an extension of `result<T, E>` and it comes in two variants:
   In this form, there is no `.payload()`.
 
 Which variant is chosen depends on `trait::is_exception_ptr<P>`. If it is true, you get the second form, if it is false you get the first form.
+
+Similarly to `result`, `NoValuePolicy` defaults to a policy selected according to the characteristics of types `S` and `P`:
+  1. If `.value()` called when there is no `value_type`:
+    - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<S>` is true:
+      - If `trait::is_exception_ptr<P>` is true, if an exception is set, then `std::rethrow_exception(exception())`, else `throw std::system_error(make_error_code(error()))` [`policy::error_enum_throw_as_system_error_exception_rethrow<R, S, P>`]
+      - If `trait::is_exception_ptr<P>` is false, if a payload is set, then `throw_as_system_error_with_payload()`, else `throw std::system_error(make_error_code(error()))` [`policy::error_enum_throw_as_system_error_with_payload<R, S, P>`]
+    - If `trait::is_error_code<S>`, then:
+      - If `trait::is_exception_ptr<P>` is true, if an exception is set, then `std::rethrow_exception(exception())`, else `throw std::system_error(error())` [`policy::error_code_throw_as_system_error_exception_rethrow<R, S, P>`]
+      - If `trait::is_exception_ptr<P>` is false, if an exception is set, then `throw_as_system_error_with_payload()`, else `throw std::system_error(error())` [`policy::error_code_throw_as_system_error_with_payload<R, S, P>`]
+    - If `trait::is_exception_ptr<S>`, then `throw_exception_ptr_with_payload()` [`policy::exception_ptr_rethrow_with_payload<R, S, P>`]
+    - If `trait::is_exception_ptr<P>`, then `std::rethrow_exception(exception())` [`policy::exception_ptr_rethrow<R, S, P>`]
+    - If `S` is `void`, call `std::terminate()` [`policy::terminate`]
+    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
+  2. If `.error()` called when there is no `error_type`:
+    - For any of the policies above apart from `policy::all_narrow`, `throw bad_outcome_access()`
+    - For `policy::all_narrow`, it is undefined behaviour [`policy::all_narrow`]
+  3. If `.exception()` called when there is no `exception_type`:
+    - For any of the policies above apart from `policy::all_narrow`, `throw bad_outcome_access()`
+    - For `policy::all_narrow`, it is undefined behaviour [`policy::all_narrow`]
+  4. If `.payload()` called when there is no `payload_type`:
+    - For any of the policies above apart from `policy::all_narrow`, `throw bad_outcome_access()`
+    - For `policy::all_narrow`, it is undefined behaviour [`policy::all_narrow`]
 */
 template <class R, class S, class P, class NoValuePolicy>                                                                       //
 OUTCOME_REQUIRES(detail::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))  //
@@ -1103,6 +1127,63 @@ namespace hooks
       o->_state._status |= detail::status_have_exception;
     else
       o->_state._status |= detail::status_have_payload;
+  }
+}
+
+// Implemented here, not in policy/exception_ptr_rethrow.hpp, due to chicken-before-egg problem
+namespace policy
+{
+  namespace detail
+  {
+    template <class R, class S, class P> struct exception_exception_ptr_rethrow : detail::base
+    {
+      static_assert(std::is_base_of<std::exception_ptr, P>::value, "exception_type must be a base of a std::exception_ptr to be used with this policy");
+      /*! Performs a wide check of state, used in the value() functions
+      \effects If result does not have a value, if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_result_access`.
+      */
+      template <class Impl> static constexpr void wide_value_check(Impl *self)
+      {
+        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+        {
+          if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0)
+          {
+            auto *_self = static_cast<const outcome<R, S, P, exception_exception_ptr_rethrow> *>(self);
+            std::rethrow_exception(self->_ptr);
+          }
+          OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
+        }
+      }
+      /*! Performs a wide check of state, used in the value() functions
+      \effects If result does not have a value, if it has an error it throws that error, else it throws `bad_result_access`.
+      */
+      template <class Impl> static constexpr void wide_error_check(Impl *self)
+      {
+        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+        {
+          OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
+        }
+      }
+      /*! Performs a wide check of state, used in the payload() functions
+      \effects If outcome does not have a payload, it throws `bad_outcome_access`.
+      */
+      template <class Impl> static constexpr void wide_payload_check(Impl *self)
+      {
+        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
+        {
+          OUTCOME_THROW_EXCEPTION(bad_outcome_access("no payload"));
+        }
+      }
+      /*! Performs a wide check of state, used in the exception() functions
+      \effects If outcome does not have an exception, it throws `bad_outcome_access`.
+      */
+      template <class Impl> static constexpr void wide_exception_check(Impl *self)
+      {
+        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+        {
+          OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
+        }
+      }
+    };
   }
 }
 OUTCOME_V2_NAMESPACE_END

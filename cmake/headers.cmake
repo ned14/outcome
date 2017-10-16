@@ -18,6 +18,7 @@ set(outcome_HEADERS
   "include/outcome/iostream_support.hpp"
   "include/outcome/outcome.hpp"
   "include/outcome/policy/all_narrow.hpp"
+  "include/outcome/policy/detail/common.hpp"
   "include/outcome/policy/error_code_throw_as_system_error.hpp"
   "include/outcome/policy/error_code_throw_as_system_error_exception_rethrow.hpp"
   "include/outcome/policy/error_code_throw_as_system_error_with_payload.hpp"

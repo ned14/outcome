@@ -126,8 +126,17 @@ namespace detail
 //! Namespace containing hooks used for intercepting and manipulating result/outcome
 namespace hooks
 {
+  //! Get the sixteen bits of spare storage in a `result` or `outcome`.
   template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::result_final<R, S, NoValuePolicy> *r) noexcept;
+  //! Sets the sixteen bits of spare storage in a `result` or `outcome`.
   template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
+}
+namespace policy
+{
+  namespace detail
+  {
+    struct base;
+  }
 }
 namespace detail
 {
@@ -153,6 +162,7 @@ namespace detail
     static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "The type S must be void or default constructible");
 
     friend NoValuePolicy;
+    friend struct policy::detail::base;
     template <class T, class U, class V> friend class result_storage;
     template <class T, class U, class V> friend class result_final;
     template <class T, class U, class V> friend constexpr inline uint16_t hooks::spare_storage(const detail::result_final<T, U, V> *r) noexcept;

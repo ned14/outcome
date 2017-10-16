@@ -9,87 +9,27 @@
 <h1 class="standardese-file-documentation-heading">Header file <code>exception_ptr_rethrow.hpp</code></h1>
 <pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">..&#x2F;bad_access.hpp</span><span class="pre">&quot;</span>
 
+<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">detail&#x2F;common.hpp</span><span class="pre">&quot;</span>
+
 <span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
 <span class="pun">{</span>
     <span class="kwd">namespace</span> <span class="typ dec var fun">policy</span>
     <span class="pun">{</span>
-        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">EC</span><span class="pun">&gt;</span>
-        <span class="kwd">struct</span> <a href="doc_exception_ptr_rethrow.html#standardese-outcome_v2_xxx::policy::exception_ptr_rethrow%3CEC%3E"><span class="typ dec var fun">exception_ptr_rethrow</span></a><span class="pun">;</span>
+        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">R</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">S</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">P</span><span class="pun">&gt;</span>
+        <span class="kwd">using</span> <a href="doc_exception_ptr_rethrow.html#standardese-outcome_v2_xxx::policy::exception_ptr_rethrow%3CR,S,P%3E"><span class="typ dec var fun">exception_ptr_rethrow</span></a> <span class="pun">=</span> <span class="typ dec var fun">std::conditional_t</span><span class="pun">&lt;</span>std::is_void&lt;P&gt;::value, detail::error_exception_ptr_rethrow&lt;S&gt;, detail::exception_exception_ptr_rethrow&lt;R, S, P&gt;<span class="pun">&gt;</span><span class="pun">;</span>
     <span class="pun">}</span>
 <span class="pun">}</span>
 </code></pre>
 <section id="standardese-outcome_v2_xxx" class="standardese-entity-documentation">
 <section id="standardese-outcome_v2_xxx::policy" class="standardese-entity-documentation">
-<section id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;EC&gt;" class="standardese-entity-documentation">
-<h3 class="standardese-entity-documentation-heading">Struct <code>exception_ptr_rethrow</code></h3>
-<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">EC</span><span class="pun">&gt;</span>
-<span class="kwd">struct</span> <span class="typ dec var fun">exception_ptr_rethrow</span>
-<span class="pun">{</span>
-    <span class="kwd">static_assert</span><span class="pun">(</span><span class="kwd">std</span><span class="pun">::</span><span class="kwd">is_base_of</span><span class="pun">&lt;</span><span class="kwd">std</span><span class="pun">::</span><span class="kwd">exception_ptr</span><span class="pun">,</span> <span class="kwd">EC</span><span class="pun">&gt;</span><span class="pun">::</span><span class="kwd">value</span><span class="pun">,</span> <span class="str">&quot;error_type must be a base of a std::exception_ptr to be used with this policy&quot;</span><span class="pun">);</span>
-
-    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
-    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_exception_ptr_rethrow.html#standardese-outcome_v2_xxx::policy::exception_ptr_rethrow%3CEC%3E::narrow_value_check%3CImpl%3E(Impl*)"><span class="typ dec var fun">narrow_value_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
-
-    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
-    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_exception_ptr_rethrow.html#standardese-outcome_v2_xxx::policy::exception_ptr_rethrow%3CEC%3E::narrow_error_check%3CImpl%3E(Impl*)"><span class="typ dec var fun">narrow_error_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
-
-    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
-    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_exception_ptr_rethrow.html#standardese-outcome_v2_xxx::policy::exception_ptr_rethrow%3CEC%3E::wide_value_check%3CImpl%3E(Impl*)"><span class="typ dec var fun">wide_value_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
-
-    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
-    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_exception_ptr_rethrow.html#standardese-outcome_v2_xxx::policy::exception_ptr_rethrow%3CEC%3E::wide_error_check%3CImpl%3E(Impl*)"><span class="typ dec var fun">wide_error_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
-<span class="pun">};</span>
+<section id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;R,S,P&gt;" class="standardese-entity-documentation">
+<h3 class="standardese-entity-documentation-heading">Alias template <code>exception_ptr_rethrow</code></h3>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">R</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">S</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">P</span><span class="pun">&gt;</span>
+<span class="kwd">using</span> <span class="typ dec var fun">exception_ptr_rethrow</span> <span class="pun">=</span> <span class="typ dec var fun">std::conditional_t</span><span class="pun">&lt;</span>std::is_void&lt;P&gt;::value, detail::error_exception_ptr_rethrow&lt;S&gt;, detail::exception_exception_ptr_rethrow&lt;R, S, P&gt;<span class="pun">&gt;</span><span class="pun">;</span>
 </code></pre>
-<p id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;EC&gt;-brief" class="standardese-brief-section">Policy interpreting EC as a type implementing the <code>std::exception_ptr</code> contract</p>
+<p id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;R,S,P&gt;-brief" class="standardese-brief-section">Policy interpreting S or P as a type implementing the <code>std::exception_ptr</code> contract</p>
 <p>and any wide attempt to access the successful state calls <code>std::rethrow_exception()</code>.</p>
-<section id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;EC&gt;::narrow_value_check&lt;Impl&gt;(Impl*)" class="standardese-entity-documentation">
-<h3 class="standardese-entity-documentation-heading">Function <code>narrow_value_check</code></h3>
-<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
-<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">narrow_value_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
-</code></pre>
-<p id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;EC&gt;::narrow_value_check&lt;Impl&gt;(Impl*)-brief" class="standardese-brief-section">Performs a narrow check of state, used in the assume_value() functions.</p>
-<dl id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;EC&gt;::narrow_value_check&lt;Impl&gt;(Impl*)-inline-sections" class="standardese-inline-sections">
-<dt>Effects:</dt>
-<dd>None.</dd>
-</dl>
-</section>
-<hr class="standardese-entity-documentation-break" />
-<section id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;EC&gt;::narrow_error_check&lt;Impl&gt;(Impl*)" class="standardese-entity-documentation">
-<h3 class="standardese-entity-documentation-heading">Function <code>narrow_error_check</code></h3>
-<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
-<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">narrow_error_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
-</code></pre>
-<p id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;EC&gt;::narrow_error_check&lt;Impl&gt;(Impl*)-brief" class="standardese-brief-section">Performs a narrow check of state, used in the assume_error() functions</p>
-<dl id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;EC&gt;::narrow_error_check&lt;Impl&gt;(Impl*)-inline-sections" class="standardese-inline-sections">
-<dt>Effects:</dt>
-<dd>None.</dd>
-</dl>
-</section>
-<hr class="standardese-entity-documentation-break" />
-<section id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;EC&gt;::wide_value_check&lt;Impl&gt;(Impl*)" class="standardese-entity-documentation">
-<h3 class="standardese-entity-documentation-heading">Function <code>wide_value_check</code></h3>
-<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
-<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">wide_value_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
-</code></pre>
-<p id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;EC&gt;::wide_value_check&lt;Impl&gt;(Impl*)-brief" class="standardese-brief-section">Performs a wide check of state, used in the value() functions</p>
-<dl id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;EC&gt;::wide_value_check&lt;Impl&gt;(Impl*)-inline-sections" class="standardese-inline-sections">
-<dt>Effects:</dt>
-<dd>If result does not have a value, if it has an error it rethrows that error via <code>std::rethrow_exception()</code>, else it throws <code>bad_result_access</code>.</dd>
-</dl>
-</section>
-<hr class="standardese-entity-documentation-break" />
-<section id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;EC&gt;::wide_error_check&lt;Impl&gt;(Impl*)" class="standardese-entity-documentation">
-<h3 class="standardese-entity-documentation-heading">Function <code>wide_error_check</code></h3>
-<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
-<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">wide_error_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
-</code></pre>
-<p id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;EC&gt;::wide_error_check&lt;Impl&gt;(Impl*)-brief" class="standardese-brief-section">Performs a wide check of state, used in the value() functions</p>
-<dl id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;EC&gt;::wide_error_check&lt;Impl&gt;(Impl*)-inline-sections" class="standardese-inline-sections">
-<dt>Effects:</dt>
-<dd>If result does not have a value, if it has an error it throws that error, else it throws <code>bad_result_access</code>.</dd>
-</dl>
-</section>
-<hr class="standardese-entity-documentation-break" />
+<p>Can be used in both <code>result</code> and <code>outcome</code>.</p>
 </section>
 <hr class="standardese-entity-documentation-break" />
 </section>

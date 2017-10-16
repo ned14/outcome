@@ -19,6 +19,14 @@
 
 <span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">policy&#x2F;error_code_throw_as_system_error_exception_rethrow.hpp</span><span class="pre">&quot;</span>
 
+<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">policy&#x2F;error_code_throw_as_system_error_with_payload.hpp</span><span class="pre">&quot;</span>
+
+<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">policy&#x2F;error_enum_throw_as_system_error_exception_rethrow.hpp</span><span class="pre">&quot;</span>
+
+<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">policy&#x2F;error_enum_throw_as_system_error_with_payload.hpp</span><span class="pre">&quot;</span>
+
+<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">policy&#x2F;exception_ptr_rethrow_with_payload.hpp</span><span class="pre">&quot;</span>
+
 <span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">detail&#x2F;outcome_payload_observers_impl.hpp</span><span class="pre">&quot;</span>
 
 <span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
@@ -29,8 +37,14 @@
 
     <span class="kwd">namespace</span> <span class="typ dec var fun">policy</span>
     <span class="pun">{</span>
+        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">&gt;</span>
+        <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">throw_as_system_error_with_payload</span><span class="pun">(</span><span class="typ dec var fun">T</span> <span class="kwd">const</span><span class="pun">*</span><span class="pun">)</span><span class="pun">;</span>
+
+        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">&gt;</span>
+        <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">throw_exception_ptr_with_payload</span><span class="pun">(</span><span class="typ dec var fun">T</span> <span class="kwd">const</span><span class="pun">*</span><span class="pun">)</span><span class="pun">;</span>
+
         <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">R</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">S</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">P</span><span class="pun">&gt;</span>
-        <span class="kwd">using</span> <span class="typ dec var fun">default_outcome_policy</span> <span class="pun">=</span> <span class="typ dec var fun">std::conditional_t</span><span class="pun">&lt;</span>(std::is_error_code_enum&lt;S&gt;::value || std::is_error_condition_enum&lt;S&gt;::value) &amp;&amp; trait::is_exception_ptr&lt;P&gt;::value, error_enum_throw_as_system_error_exception_rethrow&lt;R, S, P&gt;, std::conditional_t&lt;(std::is_error_code_enum&lt;S&gt;::value || std::is_error_condition_enum&lt;S&gt;::value) &amp;&amp; !trait::is_exception_ptr&lt;P&gt;::value, error_enum_throw_as_system_error_with_payload&lt;R, S, P&gt;, std::conditional_t&lt;trait::is_error_code&lt;S&gt;::value &amp;&amp; trait::is_exception_ptr&lt;P&gt;::value, error_code_throw_as_system_error_exception_rethrow&lt;R, S, P&gt;, std::conditional_t&lt;trait::is_error_code&lt;S&gt;::value &amp;&amp; !trait::is_exception_ptr&lt;P&gt;::value, error_code_throw_as_system_error_with_payload&lt;R, S, P&gt;, std::conditional_t&lt;trait::is_exception_ptr&lt;S&gt;::value, exception_ptr_rethrow_with_payload&lt;R, S, P&gt;, all_narrow&gt; &gt; &gt; &gt;<span class="pun">&gt;</span><span class="pun">;</span>
+        <span class="kwd">using</span> <span class="typ dec var fun">default_outcome_policy</span> <span class="pun">=</span> <span class="typ dec var fun">std::conditional_t</span><span class="pun">&lt;</span>(std::is_error_code_enum&lt;S&gt;::value || std::is_error_condition_enum&lt;S&gt;::value) &amp;&amp; trait::is_exception_ptr&lt;P&gt;::value, error_enum_throw_as_system_error_exception_rethrow&lt;R, S, P&gt;, std::conditional_t&lt;(std::is_error_code_enum&lt;S&gt;::value || std::is_error_condition_enum&lt;S&gt;::value) &amp;&amp; !trait::is_exception_ptr&lt;P&gt;::value, error_enum_throw_as_system_error_with_payload&lt;R, S, P&gt;, std::conditional_t&lt;trait::is_error_code&lt;S&gt;::value &amp;&amp; trait::is_exception_ptr&lt;P&gt;::value, error_code_throw_as_system_error_exception_rethrow&lt;R, S, P&gt;, std::conditional_t&lt;trait::is_error_code&lt;S&gt;::value &amp;&amp; !trait::is_exception_ptr&lt;P&gt;::value, error_code_throw_as_system_error_with_payload&lt;R, S, P&gt;, std::conditional_t&lt;trait::is_exception_ptr&lt;S&gt;::value, exception_ptr_rethrow_with_payload&lt;R, S, P&gt;, std::conditional_t&lt;trait::is_exception_ptr&lt;P&gt;::value, exception_ptr_rethrow&lt;R, S, P&gt;, std::conditional_t&lt;std::is_void&lt;S&gt;::value, terminate, all_narrow&gt; &gt; &gt; &gt; &gt; &gt;<span class="pun">&gt;</span><span class="pun">;</span>
     <span class="pun">}</span>
 
     <span class="kwd">namespace</span> <span class="typ dec var fun">hooks</span>
@@ -68,6 +82,10 @@
         <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">R</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">S</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">P</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">NoValuePolicy</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">U</span><span class="pun">&gt;</span>
         <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">override_outcome_payload_exception</span><span class="pun">(</span><span class="typ dec var fun">outcome</span><span class="pun">&lt;</span>R, S, P, NoValuePolicy<span class="pun">&gt;</span><span class="pun">*</span> <span class="typ dec var fun">o</span><span class="pun">,</span> <span class="typ dec var fun">U</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
     <span class="pun">}</span>
+
+    <span class="kwd">namespace</span> <span class="typ dec var fun">policy</span>
+    <span class="pun">{</span>
+    <span class="pun">}</span>
 <span class="pun">}</span>
 </code></pre>
 <section id="standardese-outcome_v2_xxx" class="standardese-entity-documentation">
@@ -76,6 +94,8 @@
 <section id="standardese-outcome_v2_xxx::hooks" class="standardese-entity-documentation">
 </section>
 <section id="standardese-outcome_v2_xxx::hooks" class="standardese-entity-documentation">
+</section>
+<section id="standardese-outcome_v2_xxx::policy" class="standardese-entity-documentation">
 </section>
 </section>
 </article>
