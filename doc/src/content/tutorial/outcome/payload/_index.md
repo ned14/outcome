@@ -30,14 +30,14 @@ expensive (at least a few thousand CPU cycles), so constructing one just in case
 be thrown is therefore an unacceptable overhead.
 
 One might think that the differing observer names for the same thing i.e. `.exception()`
-or `.payload()` would generate surprise during use. However that is exactly why the
-distinction was made, if the user specialises `trait::is_exception_ptr<T>` for some `T`
-then it is safer to reflect that in `outcome<>`'s public API because the semantics are
-now quite different.
+or `.payload()` would generate unpleasant surprise during use. However that is exactly why the
+distinction was made, if the user specialises `trait::is_exception_ptr<T>` for some `T`,
+then it is safer to reflect that difference in `outcome<>`'s public API because the semantics are
+now quite different. 
 
 Therefore, instead of thinking of `outcome<T, EC, P>` as a `result<T, EC> + P`, think
 instead that in the case of `outcome<T, EC, EP>`, we already know how to synthesise an exception
 throw which is by rethrowing `EP`. For `outcome<T, EC, P>`, because we do not know `P`,
 there is not a built in default action. But we can of course tell Outcome what to do
-on a per-type and per-namespace basis.
+on a per-type and per-namespace basis. How to do this is what this section of the tutorial explains.
 
