@@ -1,5 +1,6 @@
 +++
 title = "result<T, EC>"
+description = "Gentle introduction to writing code with simple success-or-failure return types."
 weight = 10
 +++
 

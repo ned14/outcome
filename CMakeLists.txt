@@ -138,10 +138,12 @@ int main() {
       file(GLOB_RECURSE example_srcs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
            "${CMAKE_CURRENT_SOURCE_DIR}/doc/src/snippets/*.cpp"
            )
+      set(example_bins)
       foreach(example_src ${example_srcs})
         if(example_src MATCHES ".+/(.+)[.](c|cpp|cxx)$")
           set(example_bin "${PROJECT_NAME}-snippets_${CMAKE_MATCH_1}")
           add_executable(${example_bin} EXCLUDE_FROM_ALL "${example_src}")
+          list(APPEND example_bins ${example_bin})
           set_target_properties(${example_bin} PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
             POSITION_INDEPENDENT_CODE ON
@@ -150,8 +152,15 @@ int main() {
           if(ENABLE_CXX_CONCEPTS)
             target_compile_options(${example_bin} PUBLIC -fconcepts)
           endif()
+          if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+            target_link_libraries(${example_bin} stdc++fs)
+          elseif(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
+            target_link_libraries(${example_bin} c++experimental)
+          endif()
         endif()
       endforeach()
+      add_custom_target(${PROJECT_NAME}-snippets COMMENT "Building all documentation snippets ...")
+      add_dependencies(${PROJECT_NAME}-snippets ${example_bins})
     endif()
   endforeach()
 endif()

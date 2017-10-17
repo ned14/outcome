@@ -65,7 +65,9 @@ namespace policy
 }
 
 template <class R, class S = std::error_code, class NoValuePolicy = policy::default_result_policy<R, S>>                                                                //
+#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                 // GCC's constraints implementation is buggy
 OUTCOME_REQUIRES(detail::type_can_be_used_in_result<R> &&detail::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
+#endif
 class result;
 
 namespace detail
@@ -212,7 +214,9 @@ Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
 template <class R, class S, class NoValuePolicy>                                                                                                                        //
+#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                 // GCC's constraints implementation is buggy
 OUTCOME_REQUIRES(detail::type_can_be_used_in_result<R> &&detail::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
+#endif
 class OUTCOME_NODISCARD result : public detail::result_final<R, S, NoValuePolicy>
 {
   static_assert(detail::type_can_be_used_in_result<R>, "The type R cannot be used in a result");

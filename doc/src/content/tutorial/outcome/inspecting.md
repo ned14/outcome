@@ -1,5 +1,6 @@
 +++
 title = "Inspecting outcome<T, EC, EP>"
+description = ""
 weight = 30
 +++
 

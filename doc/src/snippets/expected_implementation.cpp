@@ -39,7 +39,7 @@ public:
 
   // Expected takes in_place not in_place_type
   template <class... Args>
-  constexpr explicit expected(in_place_t /*unused*/, Args &&... args)
+  constexpr explicit expected(std::in_place_t /*unused*/, Args &&... args)
       : base{OUTCOME_V2_NAMESPACE::in_place_type<T>, std::forward<Args>(args)...}
   {
   }
@@ -92,3 +92,8 @@ template <class E, class... Args> unexpected<E> make_unexpected(Args &&... args)
 }
 template <class E> using bad_expected_access = OUTCOME_V2_NAMESPACE::bad_result_access_with<E>;
 //! [expected_implementation]
+
+int main()
+{
+  return 0;
+}

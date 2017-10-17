@@ -1,6 +1,7 @@
 +++
-title = "Outcome with payload"
-weight = 40
+title = "outcome<T, EC, P>"
+description = "Success-or-failure return types where extra information accompanies failure."
+weight = 30
 +++
 
 `outcome<T, EC, EP>` actually comes in two editions:
