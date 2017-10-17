@@ -28,6 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 BOOST_OUTCOME_AUTO_TEST_CASE(issues / 64 / outcome, "OUTCOME_TRY on excepted outcome is propagating a null error rather than just an exception")
 {
+#ifdef __cpp_exceptions
   using namespace OUTCOME_V2_NAMESPACE;
   auto f = []() -> outcome<int> {
     auto h = []() -> outcome<int> { return std::make_exception_ptr(std::runtime_error("hello")); };
@@ -38,4 +39,5 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 64 / outcome, "OUTCOME_TRY on excepted out
   BOOST_CHECK(!f.has_value());
   BOOST_CHECK(!f.has_error());
   BOOST_CHECK(f.has_exception());
+#endif
 }

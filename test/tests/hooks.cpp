@@ -111,6 +111,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / hooks, "Tests that you can hook o
   outcome<int> e(OUTCOME_V2_NAMESPACE::result<int>(5));
   BOOST_CHECK(!e.has_payload());
 
+#ifdef __cpp_exceptions
   // Does custom error + payload throw work as expected?
   outcome<int> f(make_error_code(std::errc::invalid_argument), "niall");
   try
@@ -122,4 +123,5 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / hooks, "Tests that you can hook o
   {
     BOOST_CHECK(true);
   }
+#endif
 }

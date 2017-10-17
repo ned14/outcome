@@ -88,6 +88,32 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   # For all possible configurations of this library, add each test
   list_filter(outcome_TESTS EXCLUDE REGEX "constexprs")
   include(QuickCppLibMakeStandardTests)
+  
+  # Duplicate all tests into C++ exceptions disabled forms
+  set(noexcept_tests)
+  foreach(testsource ${outcome_TESTS})
+    if(testsource MATCHES ".+/(.+)[.](c|cpp|cxx)$")
+      set(testname ${CMAKE_MATCH_1})
+      if(NOT testname MATCHES "expected-pass")
+        set(target_name "outcome_hl--${testname}-noexcept")
+        add_executable(${target_name} "${testsource}")
+        list(APPEND noexcept_tests ${target_name})
+        set_target_properties(${target_name} PROPERTIES
+          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+          POSITION_INDEPENDENT_CODE ON
+          CXX_EXCEPTIONS OFF
+          CXX_RTTI OFF
+        )
+        add_test(NAME ${target_name} CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
+          COMMAND $<TARGET_FILE:${target_name}> --reporter junit --out $<TARGET_FILE:${target_name}>.junit.xml
+        )
+      endif()
+    endif()
+  endforeach()
+  add_custom_target(${PROJECT_NAME}-noexcept COMMENT "Building all tests with C++ exceptions disabled ...")
+  add_dependencies(${PROJECT_NAME}-noexcept ${noexcept_tests})
+  
+  # Turn on C++ 17 and Concepts where possible for the test suite
   foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
     if(feature STREQUAL cxx_std_17)
       foreach(test_target ${outcome_TEST_TARGETS} ${outcome_EXAMPLE_TARGETS})

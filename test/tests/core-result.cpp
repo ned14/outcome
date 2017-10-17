@@ -217,6 +217,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
       b.assume_value();
       a.assume_error();
     }
+#ifdef __cpp_exceptions
     try
     {
       b.value();
@@ -226,6 +227,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
     catch(const std::system_error & /*unused*/)
     {
     }
+#endif
     static_assert(!std::is_default_constructible<decltype(a)>::value, "");
     static_assert(!std::is_nothrow_default_constructible<decltype(a)>::value, "");
     static_assert(std::is_copy_constructible<decltype(a)>::value, "");

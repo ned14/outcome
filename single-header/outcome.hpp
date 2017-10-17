@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF b27c9248bde7c828e0e4600e7b72aa86ae6f09d0
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-16 23:58:53 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE b27c9248
+#define OUTCOME_PREVIOUS_COMMIT_REF 887e8051dc991e8dd3d5b77e8005a55687dc1462
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-17 21:41:20 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 887e8051
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -4624,7 +4624,9 @@ namespace policy
 }
 
 template <class R, class S = std::error_code, class NoValuePolicy = policy::default_result_policy<R, S>> //
+#if !defined(__GNUC__) || __GNUC__ >= 8 // GCC's constraints implementation is buggy
 OUTCOME_REQUIRES(detail::type_can_be_used_in_result<R> &&detail::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value)) //
+#endif
 class result;
 
 namespace detail
@@ -4812,7 +4814,9 @@ Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array
 
 
 template <class R, class S, class NoValuePolicy> //
+#if !defined(__GNUC__) || __GNUC__ >= 8 // GCC's constraints implementation is buggy
 OUTCOME_REQUIRES(detail::type_can_be_used_in_result<R> &&detail::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value)) //
+#endif
 class OUTCOME_NODISCARD result : public detail::result_final<R, S, NoValuePolicy>
 {
   static_assert(detail::type_can_be_used_in_result<R>, "The type R cannot be used in a result");
@@ -8188,6 +8192,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
+#ifdef __cpp_exceptions
 /*! Utility function which tries to match the exception in the pointer provided
 to an equivalent error code. Ought to work for all standard STL types.
 \param ep The pointer to an exception to convert. If matched, on exit this is
@@ -8276,6 +8281,7 @@ inline std::error_code error_from_exception(std::exception_ptr &&ep = std::curre
   }
   return not_matched;
 }
+#endif
 
 OUTCOME_V2_NAMESPACE_END
 
