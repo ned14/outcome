@@ -131,6 +131,29 @@ int main() {
       )
     endif()
   endif()
+  
+  # Add in the documentation snippets
+  foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
+    if(feature STREQUAL cxx_std_17)
+      file(GLOB_RECURSE example_srcs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+           "${CMAKE_CURRENT_SOURCE_DIR}/doc/src/snippets/*.cpp"
+           )
+      foreach(example_src ${example_srcs})
+        if(example_src MATCHES ".+/(.+)[.](c|cpp|cxx)$")
+          set(example_bin "${PROJECT_NAME}-snippets_${CMAKE_MATCH_1}")
+          add_executable(${example_bin} EXCLUDE_FROM_ALL "${example_src}")
+          set_target_properties(${example_bin} PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+            POSITION_INDEPENDENT_CODE ON
+          )
+          target_compile_features(${example_bin} PUBLIC cxx_std_17)
+          if(ENABLE_CXX_CONCEPTS)
+            target_compile_options(${example_bin} PUBLIC -fconcepts)
+          endif()
+        endif()
+      endforeach()
+    endif()
+  endforeach()
 endif()
 
 # Cache this library's auto scanned sources for later reuse
