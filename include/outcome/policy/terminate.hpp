@@ -25,7 +25,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_POLICY_TERMINATE_HPP
 #define OUTCOME_POLICY_TERMINATE_HPP
 
-#include "../config.hpp"
+#include "detail/common.hpp"
 
 #include <system_error>
 
@@ -34,59 +34,17 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace policy
 {
   /*! Policy implementing any wide attempt to access the successful state as calling `std::terminate`
+
+  Can be used in both `result` and `outcome`.
   */
-  struct terminate
+  struct terminate : detail::base
   {
-    /*! Performs a narrow check of state, used in the assume_value() functions.
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_value) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a narrow check of state, used in the assume_error() functions
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_error) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a narrow check of state, used in the assume_payload() functions
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_payload) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a narrow check of state, used in the assume_exception() functions
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_exception) == 0)
-        __builtin_unreachable();
-#endif
-    }
     /*! Performs a wide check of state, used in the value() functions.
     \effects If result does not have a value, calls `std::terminate()`.
     */
     template <class Impl> static constexpr void wide_value_check(Impl *self)
     {
-      if((self->_state._status & detail::status_have_value) == 0)
+      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
         std::terminate();
       }
@@ -96,7 +54,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_error_check(Impl *self) noexcept
     {
-      if((self->_state._status & detail::status_have_error) == 0)
+      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
         std::terminate();
       }
@@ -106,7 +64,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_payload_check(Impl *self)
     {
-      if((self->_state._status & detail::status_have_payload) == 0)
+      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
       {
         std::terminate();
       }
@@ -116,7 +74,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_exception_check(Impl *self)
     {
-      if((self->_state._status & detail::status_have_exception) == 0)
+      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
       {
         std::terminate();
       }

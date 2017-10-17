@@ -27,6 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 BOOST_OUTCOME_AUTO_TEST_CASE(issues / 65 / outcome, "OUTCOME_TRY does not preserve the exception_ptr")
 {
+#ifdef __cpp_exceptions
   using namespace OUTCOME_V2_NAMESPACE;
   auto g = []() -> outcome<int> {
     auto f = []() -> outcome<int> {
@@ -54,4 +55,5 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 65 / outcome, "OUTCOME_TRY does not preser
   {
     BOOST_CHECK(!strcmp(e.what(), "XXX"));
   }
+#endif
 }

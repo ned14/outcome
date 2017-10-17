@@ -26,66 +26,55 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define OUTCOME_POLICY_EXCEPTION_PTR_RETHROW_HPP
 
 #include "../bad_access.hpp"
+#include "detail/common.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-#ifdef __cpp_exceptions
-  /*! Policy interpreting EC as a type implementing the `std::exception_ptr` contract
-  and any wide attempt to access the successful state calls `std::rethrow_exception()`.
-  */
-  template <class EC> struct exception_ptr_rethrow
+  namespace detail
   {
-    static_assert(std::is_base_of<std::exception_ptr, EC>::value, "error_type must be a base of a std::exception_ptr to be used with this policy");
-    /*! Performs a narrow check of state, used in the assume_value() functions.
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
+    template <class EC> struct error_exception_ptr_rethrow : detail::base
     {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_value) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a narrow check of state, used in the assume_error() functions
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_error) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a wide check of state, used in the value() functions
-    \effects If result does not have a value, if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_result_access`.
-    */
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
-    {
-      if((self->_state._status & detail::status_have_value) == 0)
+      static_assert(std::is_base_of<std::exception_ptr, EC>::value, "error_type must be a base of a std::exception_ptr to be used with this policy");
+      /*! Performs a wide check of state, used in the value() functions
+      \effects If result does not have a value, if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_result_access`.
+      */
+      template <class Impl> static constexpr void wide_value_check(Impl *self)
       {
-        if((self->_state._status & detail::status_have_error) != 0)
+        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
         {
-          std::rethrow_exception(self->_error);
+          if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
+          {
+            std::rethrow_exception(self->_error);
+          }
+          OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
         }
-        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
-    }
-    /*! Performs a wide check of state, used in the value() functions
-    \effects If result does not have a value, if it has an error it throws that error, else it throws `bad_result_access`.
-    */
-    template <class Impl> static constexpr void wide_error_check(Impl *self)
-    {
-      if((self->_state._status & detail::status_have_error) == 0)
+      /*! Performs a wide check of state, used in the value() functions
+      \effects If result does not have a value, if it has an error it throws that error, else it throws `bad_result_access`.
+      */
+      template <class Impl> static constexpr void wide_error_check(Impl *self)
       {
-        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
+        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+        {
+          OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
+        }
       }
-    }
-  };
-#endif
+    };
+    // Implemented in outcome.hpp to work around chicken-before-egg problem
+    template <class R, class S, class P> struct exception_exception_ptr_rethrow;
+  }
+
+  /*! Policy interpreting S or P as a type implementing the `std::exception_ptr` contract
+  and any wide attempt to access the successful state calls `std::rethrow_exception()`.
+
+  Can be used in both `result` and `outcome`.
+  */
+  template <class R, class S, class P>
+  using exception_ptr_rethrow = std::conditional_t<std::is_void<P>::value,                  //
+                                                   detail::error_exception_ptr_rethrow<S>,  //
+                                                   detail::exception_exception_ptr_rethrow<R, S, P>>;
 }
 
 OUTCOME_V2_NAMESPACE_END

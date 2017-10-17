@@ -49,10 +49,9 @@ struct no_error_type
 //! Namespace for policies
 namespace policy
 {
-#ifdef __cpp_exceptions
   /*! Default `result<R, S>` policy selector.
   */
-  template <class EC>
+  template <class T, class EC>
   using default_result_policy = std::conditional_t<                                                                     //
   std::is_void<EC>::value, terminate,                                                                                   //
   std::conditional_t<                                                                                                   //
@@ -60,21 +59,15 @@ namespace policy
   std::conditional_t<                                                                                                   //
   trait::is_error_code<EC>::value, error_code_throw_as_system_error<EC>,                                                //
   std::conditional_t<                                                                                                   //
-  trait::is_exception_ptr<EC>::value, exception_ptr_rethrow<EC>,                                                        //
+  trait::is_exception_ptr<EC>::value, exception_ptr_rethrow<T, EC, void>,                                               //
   all_narrow                                                                                                            //
   >>>>;
-#else
-  template <class EC>
-  using default_result_policy = std::conditional_t<                                                                                                                                   //
-  std::is_void<EC>::value || std::is_error_code_enum<EC>::value || std::is_error_condition_enum<EC>::value || trait::is_error_code<EC>::value || trait::is_exception_ptr<EC>::value,  //
-  terminate,                                                                                                                                                                          //
-  all_narrow                                                                                                                                                                          //
-  >;
-#endif
 }
 
-template <class R, class S = std::error_code, class NoValuePolicy = policy::default_result_policy<S>>                                                                   //
+template <class R, class S = std::error_code, class NoValuePolicy = policy::default_result_policy<R, S>>                                                                //
+#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                 // GCC's constraints implementation is buggy
 OUTCOME_REQUIRES(detail::type_can_be_used_in_result<R> &&detail::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
+#endif
 class result;
 
 namespace detail
@@ -210,21 +203,20 @@ Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array
   1. If `.value()` called when there is no `value_type` but there is an `error_type`:
     - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<S>` is true,
     then `throw std::system_error(make_error_code(error()))` [`policy::error_enum_throw_as_system_error<S>`]
-    if C++ exceptions are enabled, else call `std::terminate()`.
-    - If `S` convertible to a `std::error_code`, then `throw std::system_error(error())` [`policy::error_code_throw_as_system_error<S>`]
-    if C++ exceptions are enabled, else call `std::terminate()`.
-    - If `S` convertible to a `std::exception_ptr`, then `std::rethrow_exception(error())` [`policy::exception_ptr_rethrow<S>`]
-    if C++ exceptions are enabled, else call `std::terminate()`.
-    - If `S` is `void`, call `std::terminate()` [`policy::terminate<S>`]
+    - If `trait::is_error_code<S>`, then `throw std::system_error(error())` [`policy::error_code_throw_as_system_error<S>`]
+    - If `trait::is_exception_ptr<S>`, then `std::rethrow_exception(error())` [`policy::exception_ptr_rethrow<R, S, void>`]
+    - If `S` is `void`, call `std::terminate()` [`policy::terminate`]
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
   2. If `.error()` called when there is no `error_type`:
     - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<S>` is true,
-    or if `S` convertible to a `std::error_code`, or if `S` convertible to a `std::exception_ptr`,
-    or if `S` is `void`, `throw bad_result_access()` if C++ exceptions are enabled, else call `std::terminate()`.
+    or if `trait::is_error_code<S>`, or if `trait::is_exception_ptr<S>`,
+    or if `S` is `void`, do `throw bad_result_access()`
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
 template <class R, class S, class NoValuePolicy>                                                                                                                        //
+#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                 // GCC's constraints implementation is buggy
 OUTCOME_REQUIRES(detail::type_can_be_used_in_result<R> &&detail::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
+#endif
 class OUTCOME_NODISCARD result : public detail::result_final<R, S, NoValuePolicy>
 {
   static_assert(detail::type_can_be_used_in_result<R>, "The type R cannot be used in a result");

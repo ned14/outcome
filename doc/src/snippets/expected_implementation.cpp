@@ -1,3 +1,5 @@
+#include "../../../include/outcome/outcome.hpp"
+
 //! [expected_implementation]
 /* Here is a fairly conforming implementation of P0323R3 `expected<T, E>` using `checked<T, E>`.
 It passes the reference test suite for P0323R3 at
@@ -37,7 +39,7 @@ public:
 
   // Expected takes in_place not in_place_type
   template <class... Args>
-  constexpr explicit expected(in_place_t /*unused*/, Args &&... args)
+  constexpr explicit expected(std::in_place_t /*unused*/, Args &&... args)
       : base{OUTCOME_V2_NAMESPACE::in_place_type<T>, std::forward<Args>(args)...}
   {
   }
@@ -80,7 +82,18 @@ public:
   constexpr void operator->() const { base::assume_value(); }
 };
 template <class E> using unexpected = OUTCOME_V2_NAMESPACE::failure_type<E>;
-template <class E> unexpected<E> make_unexpected(E &&arg) { return OUTCOME_V2_NAMESPACE::failure<E>(std::forward<E>(arg)); }
-template <class E, class... Args> unexpected<E> make_unexpected(Args &&... args) { return OUTCOME_V2_NAMESPACE::failure<E>(std::forward<Args>(args)...); }
+template <class E> unexpected<E> make_unexpected(E &&arg)
+{
+  return OUTCOME_V2_NAMESPACE::failure<E>(std::forward<E>(arg));
+}
+template <class E, class... Args> unexpected<E> make_unexpected(Args &&... args)
+{
+  return OUTCOME_V2_NAMESPACE::failure<E>(std::forward<Args>(args)...);
+}
 template <class E> using bad_expected_access = OUTCOME_V2_NAMESPACE::bad_result_access_with<E>;
 //! [expected_implementation]
+
+int main()
+{
+  return 0;
+}

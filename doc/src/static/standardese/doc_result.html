@@ -29,8 +29,8 @@
 
     <span class="kwd">namespace</span> <a href="standardese_entities.html#standardese-outcome_v2_xxx::policy"><span class="typ dec var fun">policy</span></a>
     <span class="pun">{</span>
-        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">EC</span><span class="pun">&gt;</span>
-        <span class="kwd">using</span> <a href="doc_result.html#standardese-outcome_v2_xxx::policy::default_result_policy%3CEC%3E"><span class="typ dec var fun">default_result_policy</span></a> <span class="pun">=</span> <span class="typ dec var fun">std::conditional_t</span><span class="pun">&lt;</span>std::is_void&lt;EC&gt;::value, terminate, std::conditional_t&lt;std::is_error_code_enum&lt;EC&gt;::value || std::is_error_condition_enum&lt;EC&gt;::value, error_enum_throw_as_system_error&lt;EC&gt;, std::conditional_t&lt;trait::is_error_code&lt;EC&gt;::value, error_code_throw_as_system_error&lt;EC&gt;, std::conditional_t&lt;trait::is_exception_ptr&lt;EC&gt;::value, exception_ptr_rethrow&lt;EC&gt;, all_narrow&gt; &gt; &gt;<span class="pun">&gt;</span><span class="pun">;</span>
+        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">EC</span><span class="pun">&gt;</span>
+        <span class="kwd">using</span> <a href="doc_result.html#standardese-outcome_v2_xxx::policy::default_result_policy%3CT,EC%3E"><span class="typ dec var fun">default_result_policy</span></a> <span class="pun">=</span> <span class="typ dec var fun">std::conditional_t</span><span class="pun">&lt;</span>std::is_void&lt;EC&gt;::value, terminate, std::conditional_t&lt;std::is_error_code_enum&lt;EC&gt;::value || std::is_error_condition_enum&lt;EC&gt;::value, error_enum_throw_as_system_error&lt;EC&gt;, std::conditional_t&lt;trait::is_error_code&lt;EC&gt;::value, error_code_throw_as_system_error&lt;EC&gt;, std::conditional_t&lt;trait::is_exception_ptr&lt;EC&gt;::value, exception_ptr_rethrow&lt;T, EC, void&gt;, all_narrow&gt; &gt; &gt;<span class="pun">&gt;</span><span class="pun">;</span>
     <span class="pun">}</span>
 
     <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">&gt;</span>
@@ -94,12 +94,12 @@
 </section>
 <hr class="standardese-entity-documentation-break" />
 <section id="standardese-outcome_v2_xxx::policy" class="standardese-entity-documentation">
-<section id="standardese-outcome_v2_xxx::policy::default_result_policy&lt;EC&gt;" class="standardese-entity-documentation">
+<section id="standardese-outcome_v2_xxx::policy::default_result_policy&lt;T,EC&gt;" class="standardese-entity-documentation">
 <h3 class="standardese-entity-documentation-heading">Alias template <code>default_result_policy</code></h3>
-<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">EC</span><span class="pun">&gt;</span>
-<span class="kwd">using</span> <span class="typ dec var fun">default_result_policy</span> <span class="pun">=</span> <span class="typ dec var fun">std::conditional_t</span><span class="pun">&lt;</span>std::is_void&lt;EC&gt;::value, terminate, std::conditional_t&lt;std::is_error_code_enum&lt;EC&gt;::value || std::is_error_condition_enum&lt;EC&gt;::value, error_enum_throw_as_system_error&lt;EC&gt;, std::conditional_t&lt;trait::is_error_code&lt;EC&gt;::value, error_code_throw_as_system_error&lt;EC&gt;, std::conditional_t&lt;trait::is_exception_ptr&lt;EC&gt;::value, exception_ptr_rethrow&lt;EC&gt;, all_narrow&gt; &gt; &gt;<span class="pun">&gt;</span><span class="pun">;</span>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">EC</span><span class="pun">&gt;</span>
+<span class="kwd">using</span> <span class="typ dec var fun">default_result_policy</span> <span class="pun">=</span> <span class="typ dec var fun">std::conditional_t</span><span class="pun">&lt;</span>std::is_void&lt;EC&gt;::value, terminate, std::conditional_t&lt;std::is_error_code_enum&lt;EC&gt;::value || std::is_error_condition_enum&lt;EC&gt;::value, error_enum_throw_as_system_error&lt;EC&gt;, std::conditional_t&lt;trait::is_error_code&lt;EC&gt;::value, error_code_throw_as_system_error&lt;EC&gt;, std::conditional_t&lt;trait::is_exception_ptr&lt;EC&gt;::value, exception_ptr_rethrow&lt;T, EC, void&gt;, all_narrow&gt; &gt; &gt;<span class="pun">&gt;</span><span class="pun">;</span>
 </code></pre>
-<p id="standardese-outcome_v2_xxx::policy::default_result_policy&lt;EC&gt;-brief" class="standardese-brief-section">Default <code>result&lt;R, S&gt;</code> policy selector.</p>
+<p id="standardese-outcome_v2_xxx::policy::default_result_policy&lt;T,EC&gt;-brief" class="standardese-brief-section">Default <code>result&lt;R, S&gt;</code> policy selector.</p>
 </section>
 <hr class="standardese-entity-documentation-break" />
 </section>
@@ -307,19 +307,16 @@
 <ul>
 <li>
 <p>If <code>std::is_error_code_enum_v&lt;S&gt;</code> or <code>std::is_error_condition_enum_v&lt;S&gt;</code> is true,
-then <code>throw std::system_error(make_error_code(error()))</code> [<code>policy::error_enum_throw_as_system_error&lt;S&gt;</code>]
-if C++ exceptions are enabled, else call <code>std::terminate()</code>.</p>
+then <code>throw std::system_error(make_error_code(error()))</code> [<code>policy::error_enum_throw_as_system_error&lt;S&gt;</code>]</p>
 </li>
 <li>
-<p>If <code>S</code> convertible to a <code>std::error_code</code>, then <code>throw std::system_error(error())</code> [<code>policy::error_code_throw_as_system_error&lt;S&gt;</code>]
-if C++ exceptions are enabled, else call <code>std::terminate()</code>.</p>
+<p>If <code>trait::is_error_code&lt;S&gt;</code>, then <code>throw std::system_error(error())</code> [<code>policy::error_code_throw_as_system_error&lt;S&gt;</code>]</p>
 </li>
 <li>
-<p>If <code>S</code> convertible to a <code>std::exception_ptr</code>, then <code>std::rethrow_exception(error())</code> [<code>policy::exception_ptr_rethrow&lt;S&gt;</code>]
-if C++ exceptions are enabled, else call <code>std::terminate()</code>.</p>
+<p>If <code>trait::is_exception_ptr&lt;S&gt;</code>, then <code>std::rethrow_exception(error())</code> [<code>policy::exception_ptr_rethrow&lt;R, S, void&gt;</code>]</p>
 </li>
 <li>
-<p>If <code>S</code> is <code>void</code>, call <code>std::terminate()</code> [<code>policy::terminate&lt;S&gt;</code>]</p>
+<p>If <code>S</code> is <code>void</code>, call <code>std::terminate()</code> [<code>policy::terminate</code>]</p>
 </li>
 <li>
 <p>If <code>S</code> is none of the above, then it is undefined behaviour [<code>policy::all_narrow</code>]</p>
@@ -333,8 +330,8 @@ if C++ exceptions are enabled, else call <code>std::terminate()</code>.</p>
 <ul>
 <li>
 <p>If <code>std::is_error_code_enum_v&lt;S&gt;</code> or <code>std::is_error_condition_enum_v&lt;S&gt;</code> is true,
-or if <code>S</code> convertible to a <code>std::error_code</code>, or if <code>S</code> convertible to a <code>std::exception_ptr</code>,
-or if <code>S</code> is <code>void</code>, <code>throw bad_result_access()</code> if C++ exceptions are enabled, else call <code>std::terminate()</code>.</p>
+or if <code>trait::is_error_code&lt;S&gt;</code>, or if <code>trait::is_exception_ptr&lt;S&gt;</code>,
+or if <code>S</code> is <code>void</code>, do <code>throw bad_result_access()</code></p>
 </li>
 <li>
 <p>If <code>S</code> is none of the above, then it is undefined behaviour [<code>policy::all_narrow</code>]</p>

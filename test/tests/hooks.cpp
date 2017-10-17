@@ -87,6 +87,12 @@ namespace hook_test
     std::cout << "hook_outcome_move_construction fires" << std::endl;
     OUTCOME_V2_NAMESPACE::hooks::override_outcome_payload_exception(res, extended_error_info);
   }
+
+  // Make a custom exception type and specialise a function to throw it on wide value access
+  struct custom_exception
+  {
+  };
+  template <class R> constexpr inline void throw_as_system_error_with_payload(const outcome<R> * /*unused*/) { throw custom_exception(); }
 }  // namespace hook_test
 
 BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / hooks, "Tests that you can hook outcome's conversion from a result")
@@ -104,4 +110,18 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / hooks, "Tests that you can hook o
   BOOST_CHECK(!d.has_payload());
   outcome<int> e(OUTCOME_V2_NAMESPACE::result<int>(5));
   BOOST_CHECK(!e.has_payload());
+
+#ifdef __cpp_exceptions
+  // Does custom error + payload throw work as expected?
+  outcome<int> f(make_error_code(std::errc::invalid_argument), "niall");
+  try
+  {
+    f.value();
+    BOOST_CHECK(false);
+  }
+  catch(const custom_exception &)
+  {
+    BOOST_CHECK(true);
+  }
+#endif
 }

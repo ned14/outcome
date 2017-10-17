@@ -38,7 +38,9 @@ On Windows, simply download the raw file from above and place it wherever it sui
  output.
  - [x] Make an "expected" policy and `expected<T, E>` from it.
  - [x] Code snippets in docs should provide link to github original.
- - [ ] Restore testing of C++ exceptions disabled.
+ - [x] Restore testing of C++ exceptions disabled.
+ - [x] Code snippets in doc/src/snippets should be compiled.
+ - [ ] `trait::is_error_code<>` et al should recognise Boost's types
  - [ ] Conan package support
  
 Maybe?

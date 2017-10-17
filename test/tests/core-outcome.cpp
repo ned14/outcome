@@ -205,6 +205,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as i
     std::cout << sizeof(a) << std::endl;  // 40 bytes
     b.assume_value();
     a.assume_error();
+#ifdef __cpp_exceptions
     try
     {
       b.value();
@@ -214,6 +215,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as i
     catch(const std::system_error & /*unused*/)
     {
     }
+#endif
     static_assert(!std::is_default_constructible<decltype(a)>::value, "");
     static_assert(!std::is_nothrow_default_constructible<decltype(a)>::value, "");
     static_assert(std::is_copy_constructible<decltype(a)>::value, "");

@@ -1,5 +1,6 @@
 +++
 title = "Custom error codes"
+description = "Illustrates how you can hook into the std::error_code system from the Standard Library in order to work with your own set of error codes."
 weight = 90
 +++
 

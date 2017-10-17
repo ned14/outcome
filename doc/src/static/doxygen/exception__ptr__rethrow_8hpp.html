@@ -82,16 +82,20 @@ $(document).ready(function(){initNavTree('exception__ptr__rethrow_8hpp.html','')
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#namespaces">Namespaces</a>  </div>
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle">
 <div class="title">exception_ptr_rethrow.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="bad__access_8hpp.html">../bad_access.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="common_8hpp.html">detail/common.hpp</a>&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow.html">outcome_v2_xxx::policy::exception_ptr_rethrow&lt; EC &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1detail_1_1error__exception__ptr__rethrow.html">outcome_v2_xxx::policy::detail::error_exception_ptr_rethrow&lt; EC &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1detail_1_1exception__exception__ptr__rethrow.html">outcome_v2_xxx::policy::detail::exception_exception_ptr_rethrow&lt; R, S, P &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
@@ -102,6 +106,14 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespaceoutcome__v2__xxx_1_1policy"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html">outcome_v2_xxx::policy</a></td></tr>
 <tr class="memdesc:namespaceoutcome__v2__xxx_1_1policy"><td class="mdescLeft">&#160;</td><td class="mdescRight">Namespace for policies. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:namespaceoutcome__v2__xxx_1_1policy_1_1detail"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy_1_1detail.html">outcome_v2_xxx::policy::detail</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a0040bc4da2ef2b097406e068c999b82c"><td class="memTemplParams" colspan="2">template&lt;class R , class S , class P &gt; </td></tr>
+<tr class="memitem:a0040bc4da2ef2b097406e068c999b82c"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a0040bc4da2ef2b097406e068c999b82c">outcome_v2_xxx::policy::exception_ptr_rethrow</a> = std::conditional_t&lt; std::is_void&lt; P &gt;::value, detail::error_exception_ptr_rethrow&lt; S &gt;, detail::exception_exception_ptr_rethrow&lt; R, S, P &gt; &gt;</td></tr>
+<tr class="separator:a0040bc4da2ef2b097406e068c999b82c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 </div><!-- doc-content -->

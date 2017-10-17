@@ -26,44 +26,24 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define OUTCOME_POLICY_THROW_BAD_RESULT_ACCESS_HPP
 
 #include "../bad_access.hpp"
+#include "detail/common.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-#ifdef __cpp_exceptions
   /*! Policy which throws `bad_result_access_with<EC>` or `bad_result_access` during wide checks.
+
+  Can be used in `result` only.
   */
-  template <class EC> struct throw_bad_result_access
+  template <class EC> struct throw_bad_result_access : detail::base
   {
-    /*! Performs a narrow check of state, used in the assume_value() functions.
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_value) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a narrow check of state, used in the assume_error() functions
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_error) == 0)
-        __builtin_unreachable();
-#endif
-    }
     /*! Performs a wide check of state, used in the value() functions.
     \effects If result does not have a value, it throws `bad_result_access_with<EC>`.
     */
     template <class Impl> static constexpr void wide_value_check(Impl *self)
     {
-      if((self->_state._status & detail::status_have_value) == 0)
+      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
         OUTCOME_THROW_EXCEPTION(bad_result_access_with<EC>(self->_error));
       }
@@ -73,13 +53,12 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_error_check(Impl *self)
     {
-      if((self->_state._status & detail::status_have_error) == 0)
+      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
         OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
     }
   };
-#endif
 }
 
 OUTCOME_V2_NAMESPACE_END

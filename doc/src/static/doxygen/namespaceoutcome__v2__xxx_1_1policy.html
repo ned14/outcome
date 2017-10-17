@@ -81,8 +81,10 @@ $(document).ready(function(){initNavTree('namespaceoutcome__v2__xxx_1_1policy.ht
 
 <div class="header">
   <div class="summary">
+<a href="#namespaces">Namespaces</a> &#124;
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#typedef-members">Typedefs</a>  </div>
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">outcome_v2_xxx::policy Namespace Reference</div>  </div>
 </div><!--header-->
@@ -91,6 +93,11 @@ $(document).ready(function(){initNavTree('namespaceoutcome__v2__xxx_1_1policy.ht
 <p>Namespace for policies.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespaceoutcome__v2__xxx_1_1policy_1_1detail"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy_1_1detail.html">detail</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html">all_narrow</a></td></tr>
@@ -107,8 +114,6 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__with__payload.html">error_enum_throw_as_system_error_with_payload</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow.html">exception_ptr_rethrow</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow__with__payload.html">exception_ptr_rethrow_with_payload</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1terminate.html">terminate</a></td></tr>
@@ -118,18 +123,32 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a339bd342d448ffa1a4fd913331aed78f"><td class="memTemplParams" colspan="2">template&lt;class R , class S , class P &gt; </td></tr>
-<tr class="memitem:a339bd342d448ffa1a4fd913331aed78f"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a339bd342d448ffa1a4fd913331aed78f">default_outcome_policy</a> = std::conditional_t&lt;(std::is_error_code_enum&lt; S &gt;::value||std::is_error_condition_enum&lt; S &gt;::value) &amp;&amp;<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; P &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__exception__rethrow.html">error_enum_throw_as_system_error_exception_rethrow</a>&lt; R, S, P &gt;, std::conditional_t&lt;(std::is_error_code_enum&lt; S &gt;::value||std::is_error_condition_enum&lt; S &gt;::value) &amp;&amp;!<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; P &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__with__payload.html">error_enum_throw_as_system_error_with_payload</a>&lt; R, S, P &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt; S &gt;::value &amp;&amp;<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; P &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__exception__rethrow.html">error_code_throw_as_system_error_exception_rethrow</a>&lt; R, S, P &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt; S &gt;::value &amp;&amp;!<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; P &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__with__payload.html">error_code_throw_as_system_error_with_payload</a>&lt; R, S, P &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; S &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow__with__payload.html">exception_ptr_rethrow_with_payload</a>&lt; R, S, P &gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html">all_narrow</a> &gt; &gt;&gt; &gt;&gt;</td></tr>
-<tr class="separator:a339bd342d448ffa1a4fd913331aed78f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae545173dcb9b11bf9efddaea590e059d"><td class="memTemplParams" colspan="2">template&lt;class EC &gt; </td></tr>
-<tr class="memitem:ae545173dcb9b11bf9efddaea590e059d"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#ae545173dcb9b11bf9efddaea590e059d">default_result_policy</a> = std::conditional_t&lt; std::is_void&lt; EC &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1terminate.html">terminate</a>, std::conditional_t&lt; std::is_error_code_enum&lt; EC &gt;::value||std::is_error_condition_enum&lt; EC &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error.html">error_enum_throw_as_system_error</a>&lt; EC &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt; EC &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error.html">error_code_throw_as_system_error</a>&lt; EC &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; EC &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow.html">exception_ptr_rethrow</a>&lt; EC &gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html">all_narrow</a> &gt; &gt;&gt; &gt;</td></tr>
-<tr class="separator:ae545173dcb9b11bf9efddaea590e059d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b4418d856d2d6b02321b68256c9f7a3"><td class="memTemplParams" colspan="2">template&lt;class R , class S , class P &gt; </td></tr>
+<tr class="memitem:a5b4418d856d2d6b02321b68256c9f7a3"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a5b4418d856d2d6b02321b68256c9f7a3">default_outcome_policy</a> = std::conditional_t&lt;(std::is_error_code_enum&lt; S &gt;::value||std::is_error_condition_enum&lt; S &gt;::value) &amp;&amp;<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; P &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__exception__rethrow.html">error_enum_throw_as_system_error_exception_rethrow</a>&lt; R, S, P &gt;, std::conditional_t&lt;(std::is_error_code_enum&lt; S &gt;::value||std::is_error_condition_enum&lt; S &gt;::value) &amp;&amp;!<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; P &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__with__payload.html">error_enum_throw_as_system_error_with_payload</a>&lt; R, S, P &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt; S &gt;::value &amp;&amp;<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; P &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__exception__rethrow.html">error_code_throw_as_system_error_exception_rethrow</a>&lt; R, S, P &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt; S &gt;::value &amp;&amp;!<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; P &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__with__payload.html">error_code_throw_as_system_error_with_payload</a>&lt; R, S, P &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; S &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow__with__payload.html">exception_ptr_rethrow_with_payload</a>&lt; R, S, P &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; P &gt;::value, <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a0040bc4da2ef2b097406e068c999b82c">exception_ptr_rethrow</a>&lt; R, S, P &gt;, std::conditional_t&lt; std::is_void&lt; S &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1terminate.html">terminate</a>, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html">all_narrow</a> &gt; &gt;&gt; &gt;&gt; &gt;&gt;</td></tr>
+<tr class="separator:a5b4418d856d2d6b02321b68256c9f7a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0040bc4da2ef2b097406e068c999b82c"><td class="memTemplParams" colspan="2">template&lt;class R , class S , class P &gt; </td></tr>
+<tr class="memitem:a0040bc4da2ef2b097406e068c999b82c"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a0040bc4da2ef2b097406e068c999b82c">exception_ptr_rethrow</a> = std::conditional_t&lt; std::is_void&lt; P &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1detail_1_1error__exception__ptr__rethrow.html">detail::error_exception_ptr_rethrow</a>&lt; S &gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1detail_1_1exception__exception__ptr__rethrow.html">detail::exception_exception_ptr_rethrow</a>&lt; R, S, P &gt; &gt;</td></tr>
+<tr class="separator:a0040bc4da2ef2b097406e068c999b82c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5330cdcaff26b3168d065f8d9cf47aaa"><td class="memTemplParams" colspan="2">template&lt;class T , class EC &gt; </td></tr>
+<tr class="memitem:a5330cdcaff26b3168d065f8d9cf47aaa"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a5330cdcaff26b3168d065f8d9cf47aaa">default_result_policy</a> = std::conditional_t&lt; std::is_void&lt; EC &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1terminate.html">terminate</a>, std::conditional_t&lt; std::is_error_code_enum&lt; EC &gt;::value||std::is_error_condition_enum&lt; EC &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error.html">error_enum_throw_as_system_error</a>&lt; EC &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt; EC &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error.html">error_code_throw_as_system_error</a>&lt; EC &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; EC &gt;::value, <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a0040bc4da2ef2b097406e068c999b82c">exception_ptr_rethrow</a>&lt; T, EC, void &gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html">all_narrow</a> &gt; &gt;&gt; &gt;</td></tr>
+<tr class="separator:a5330cdcaff26b3168d065f8d9cf47aaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a704fdba5ff20cfca9d38f6aeabd65766"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a704fdba5ff20cfca9d38f6aeabd65766"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a704fdba5ff20cfca9d38f6aeabd65766">throw_as_system_error_with_payload</a> (const T *)</td></tr>
+<tr class="memdesc:a704fdba5ff20cfca9d38f6aeabd65766"><td class="mdescLeft">&#160;</td><td class="mdescRight">Override to define what the policies which throw a system error with payload ought to do for some particular <code>outcome</code>.  <a href="#a704fdba5ff20cfca9d38f6aeabd65766">More...</a><br /></td></tr>
+<tr class="separator:a704fdba5ff20cfca9d38f6aeabd65766"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa033743874981569346361fe9ea9e5b8"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:aa033743874981569346361fe9ea9e5b8"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#aa033743874981569346361fe9ea9e5b8">throw_exception_ptr_with_payload</a> (const T *)</td></tr>
+<tr class="memdesc:aa033743874981569346361fe9ea9e5b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Override to define what the policies which throw an exception ptr with payload ought to do for some particular <code>outcome</code>.  <a href="#aa033743874981569346361fe9ea9e5b8">More...</a><br /></td></tr>
+<tr class="separator:aa033743874981569346361fe9ea9e5b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Namespace for policies. </p>
 </div><h2 class="groupheader">Typedef Documentation</h2>
-<a id="a339bd342d448ffa1a4fd913331aed78f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a339bd342d448ffa1a4fd913331aed78f">&#9670;&nbsp;</a></span>default_outcome_policy</h2>
+<a id="a5b4418d856d2d6b02321b68256c9f7a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b4418d856d2d6b02321b68256c9f7a3">&#9670;&nbsp;</a></span>default_outcome_policy</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -137,7 +156,7 @@ Typedefs</h2></td></tr>
 template&lt;class R , class S , class P &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a339bd342d448ffa1a4fd913331aed78f">outcome_v2_xxx::policy::default_outcome_policy</a> = typedef std::conditional_t&lt; (std::is_error_code_enum&lt;S&gt;::value || std::is_error_condition_enum&lt;S&gt;::value) &amp;&amp; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;P&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__exception__rethrow.html">error_enum_throw_as_system_error_exception_rethrow</a>&lt;R, S, P&gt;, std::conditional_t&lt; (std::is_error_code_enum&lt;S&gt;::value || std::is_error_condition_enum&lt;S&gt;::value) &amp;&amp; !<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;P&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__with__payload.html">error_enum_throw_as_system_error_with_payload</a>&lt;R, S, P&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt;S&gt;::value &amp;&amp; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;P&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__exception__rethrow.html">error_code_throw_as_system_error_exception_rethrow</a>&lt;R, S, P&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt;S&gt;::value &amp;&amp; !<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;P&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__with__payload.html">error_code_throw_as_system_error_with_payload</a>&lt;R, S, P&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;S&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow__with__payload.html">exception_ptr_rethrow_with_payload</a>&lt;R, S, P&gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html">all_narrow</a> &gt; &gt;&gt; &gt;&gt;</td>
+          <td class="memname">using <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a5b4418d856d2d6b02321b68256c9f7a3">outcome_v2_xxx::policy::default_outcome_policy</a> = typedef std::conditional_t&lt; (std::is_error_code_enum&lt;S&gt;::value || std::is_error_condition_enum&lt;S&gt;::value) &amp;&amp; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;P&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__exception__rethrow.html">error_enum_throw_as_system_error_exception_rethrow</a>&lt;R, S, P&gt;, std::conditional_t&lt; (std::is_error_code_enum&lt;S&gt;::value || std::is_error_condition_enum&lt;S&gt;::value) &amp;&amp; !<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;P&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__with__payload.html">error_enum_throw_as_system_error_with_payload</a>&lt;R, S, P&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt;S&gt;::value &amp;&amp; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;P&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__exception__rethrow.html">error_code_throw_as_system_error_exception_rethrow</a>&lt;R, S, P&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt;S&gt;::value &amp;&amp; !<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;P&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__with__payload.html">error_code_throw_as_system_error_with_payload</a>&lt;R, S, P&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;S&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow__with__payload.html">exception_ptr_rethrow_with_payload</a>&lt;R, S, P&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;P&gt;::value, <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a0040bc4da2ef2b097406e068c999b82c">exception_ptr_rethrow</a>&lt;R, S, P&gt;, std::conditional_t&lt; std::is_void&lt;S&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1terminate.html">terminate</a>, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html">all_narrow</a> &gt; &gt;&gt; &gt;&gt; &gt;&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -145,21 +164,100 @@ template&lt;class R , class S , class P &gt; </div>
 
 </div>
 </div>
-<a id="ae545173dcb9b11bf9efddaea590e059d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae545173dcb9b11bf9efddaea590e059d">&#9670;&nbsp;</a></span>default_result_policy</h2>
+<a id="a5330cdcaff26b3168d065f8d9cf47aaa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5330cdcaff26b3168d065f8d9cf47aaa">&#9670;&nbsp;</a></span>default_result_policy</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class EC &gt; </div>
+template&lt;class T , class EC &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#ae545173dcb9b11bf9efddaea590e059d">outcome_v2_xxx::policy::default_result_policy</a> = typedef std::conditional_t&lt; std::is_void&lt;EC&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1terminate.html">terminate</a>, std::conditional_t&lt; std::is_error_code_enum&lt;EC&gt;::value || std::is_error_condition_enum&lt;EC&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error.html">error_enum_throw_as_system_error</a>&lt;EC&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt;EC&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error.html">error_code_throw_as_system_error</a>&lt;EC&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;EC&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow.html">exception_ptr_rethrow</a>&lt;EC&gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html">all_narrow</a> &gt; &gt;&gt; &gt;</td>
+          <td class="memname">using <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a5330cdcaff26b3168d065f8d9cf47aaa">outcome_v2_xxx::policy::default_result_policy</a> = typedef std::conditional_t&lt; std::is_void&lt;EC&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1terminate.html">terminate</a>, std::conditional_t&lt; std::is_error_code_enum&lt;EC&gt;::value || std::is_error_condition_enum&lt;EC&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error.html">error_enum_throw_as_system_error</a>&lt;EC&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt;EC&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error.html">error_code_throw_as_system_error</a>&lt;EC&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;EC&gt;::value, <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a0040bc4da2ef2b097406e068c999b82c">exception_ptr_rethrow</a>&lt;T, EC, void&gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html">all_narrow</a> &gt; &gt;&gt; &gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p>Default <code>result&lt;R, S&gt;</code> policy selector. </p>
 
+</div>
+</div>
+<a id="a0040bc4da2ef2b097406e068c999b82c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0040bc4da2ef2b097406e068c999b82c">&#9670;&nbsp;</a></span>exception_ptr_rethrow</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class R , class S , class P &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a0040bc4da2ef2b097406e068c999b82c">outcome_v2_xxx::policy::exception_ptr_rethrow</a> = typedef std::conditional_t&lt;std::is_void&lt;P&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1detail_1_1error__exception__ptr__rethrow.html">detail::error_exception_ptr_rethrow</a>&lt;S&gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1detail_1_1exception__exception__ptr__rethrow.html">detail::exception_exception_ptr_rethrow</a>&lt;R, S, P&gt; &gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Policy interpreting S or P as a type implementing the <code>std::exception_ptr</code> contract and any wide attempt to access the successful state calls <code>std::rethrow_exception()</code>.</p>
+<p>Can be used in both <code>result</code> and <code>outcome</code>. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a704fdba5ff20cfca9d38f6aeabd65766"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a704fdba5ff20cfca9d38f6aeabd65766">&#9670;&nbsp;</a></span>throw_as_system_error_with_payload()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr void outcome_v2_xxx::policy::throw_as_system_error_with_payload </td>
+          <td>(</td>
+          <td class="paramtype">const T *&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Override to define what the policies which throw a system error with payload ought to do for some particular <code>outcome</code>. </p>
+<div class="fragment"><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;{ static_assert(!std::is_same&lt;T, T&gt;::value, <span class="stringliteral">&quot;To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload&quot;</span>); }</div></div><!-- fragment -->
+</div>
+</div>
+<a id="aa033743874981569346361fe9ea9e5b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa033743874981569346361fe9ea9e5b8">&#9670;&nbsp;</a></span>throw_exception_ptr_with_payload()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr void outcome_v2_xxx::policy::throw_exception_ptr_with_payload </td>
+          <td>(</td>
+          <td class="paramtype">const T *&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Override to define what the policies which throw an exception ptr with payload ought to do for some particular <code>outcome</code>. </p>
+<div class="fragment"><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;{ static_assert(!std::is_same&lt;T, T&gt;::value, <span class="stringliteral">&quot;To use the *_throw_exception_ptr_with_payload policy, you must define a throw_exception_ptr_with_payload() free function to say how to handle the payload&quot;</span>); }</div></div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

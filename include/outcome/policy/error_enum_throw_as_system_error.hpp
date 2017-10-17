@@ -26,6 +26,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define OUTCOME_POLICY_ERROR_ENUM_THROW_AS_SYSTEM_ERROR_HPP
 
 #include "../bad_access.hpp"
+#include "detail/common.hpp"
 
 #include <system_error>
 
@@ -33,43 +34,22 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-#ifdef __cpp_exceptions
   /*! Policy interpreting EC as an enum convertible into the `std::error_code` contract
   and any wide attempt to access the successful state throws the `error_code` wrapped into
   a `std::system_error`
+
+  Can be used in `result` only.
   */
-  template <class EC> struct error_enum_throw_as_system_error
+  template <class EC> struct error_enum_throw_as_system_error : detail::base
   {
-    /*! Performs a narrow check of state, used in the assume_value() functions.
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_value) == 0)
-        __builtin_unreachable();
-#endif
-    }
-    /*! Performs a narrow check of state, used in the assume_error() functions.
-    \effects None.
-    */
-    template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
-    {
-      (void) self;
-#if defined(__GNUC__) || defined(__clang__)
-      if((self->_state._status & detail::status_have_error) == 0)
-        __builtin_unreachable();
-#endif
-    }
     /*! Performs a wide check of state, used in the value() functions.
     \effects If result does not have a value, if it has an error it throws a `std::system_error(error())`, else it throws `bad_result_access`.
     */
     template <class Impl> static constexpr void wide_value_check(Impl *self)
     {
-      if((self->_state._status & detail::status_have_value) == 0)
+      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
-        if((self->_state._status & detail::status_have_error) != 0)
+        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
           OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(self->_error)));
         }
@@ -81,13 +61,12 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_error_check(Impl *self)
     {
-      if((self->_state._status & detail::status_have_error) == 0)
+      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
         OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
     }
   };
-#endif
 }
 
 OUTCOME_V2_NAMESPACE_END

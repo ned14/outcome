@@ -32,6 +32,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
+#ifdef __cpp_exceptions
 /*! Utility function which tries to match the exception in the pointer provided
 to an equivalent error code. Ought to work for all standard STL types.
 \param ep The pointer to an exception to convert. If matched, on exit this is
@@ -109,6 +110,7 @@ inline std::error_code error_from_exception(std::exception_ptr &&ep = std::curre
   }
   return not_matched;
 }
+#endif
 
 OUTCOME_V2_NAMESPACE_END
 

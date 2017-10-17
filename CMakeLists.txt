@@ -88,6 +88,32 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   # For all possible configurations of this library, add each test
   list_filter(outcome_TESTS EXCLUDE REGEX "constexprs")
   include(QuickCppLibMakeStandardTests)
+  
+  # Duplicate all tests into C++ exceptions disabled forms
+  set(noexcept_tests)
+  foreach(testsource ${outcome_TESTS})
+    if(testsource MATCHES ".+/(.+)[.](c|cpp|cxx)$")
+      set(testname ${CMAKE_MATCH_1})
+      if(NOT testname MATCHES "expected-pass")
+        set(target_name "outcome_hl--${testname}-noexcept")
+        add_executable(${target_name} "${testsource}")
+        list(APPEND noexcept_tests ${target_name})
+        set_target_properties(${target_name} PROPERTIES
+          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+          POSITION_INDEPENDENT_CODE ON
+          CXX_EXCEPTIONS OFF
+          CXX_RTTI OFF
+        )
+        add_test(NAME ${target_name} CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
+          COMMAND $<TARGET_FILE:${target_name}> --reporter junit --out $<TARGET_FILE:${target_name}>.junit.xml
+        )
+      endif()
+    endif()
+  endforeach()
+  add_custom_target(${PROJECT_NAME}-noexcept COMMENT "Building all tests with C++ exceptions disabled ...")
+  add_dependencies(${PROJECT_NAME}-noexcept ${noexcept_tests})
+  
+  # Turn on C++ 17 and Concepts where possible for the test suite
   foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
     if(feature STREQUAL cxx_std_17)
       foreach(test_target ${outcome_TEST_TARGETS} ${outcome_EXAMPLE_TARGETS})
@@ -131,6 +157,38 @@ int main() {
       )
     endif()
   endif()
+  
+  # Add in the documentation snippets
+  foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
+    if(feature STREQUAL cxx_std_17)
+      file(GLOB_RECURSE example_srcs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+           "${CMAKE_CURRENT_SOURCE_DIR}/doc/src/snippets/*.cpp"
+           )
+      set(example_bins)
+      foreach(example_src ${example_srcs})
+        if(example_src MATCHES ".+/(.+)[.](c|cpp|cxx)$")
+          set(example_bin "${PROJECT_NAME}-snippets_${CMAKE_MATCH_1}")
+          add_executable(${example_bin} EXCLUDE_FROM_ALL "${example_src}")
+          list(APPEND example_bins ${example_bin})
+          set_target_properties(${example_bin} PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+            POSITION_INDEPENDENT_CODE ON
+          )
+          target_compile_features(${example_bin} PUBLIC cxx_std_17)
+          if(ENABLE_CXX_CONCEPTS)
+            target_compile_options(${example_bin} PUBLIC -fconcepts)
+          endif()
+          if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+            target_link_libraries(${example_bin} stdc++fs)
+          elseif(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
+            target_link_libraries(${example_bin} c++experimental)
+          endif()
+        endif()
+      endforeach()
+      add_custom_target(${PROJECT_NAME}-snippets COMMENT "Building all documentation snippets ...")
+      add_dependencies(${PROJECT_NAME}-snippets ${example_bins})
+    endif()
+  endforeach()
 endif()
 
 # Cache this library's auto scanned sources for later reuse
