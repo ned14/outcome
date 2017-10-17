@@ -112,7 +112,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / hooks, "Tests that you can hook o
   BOOST_CHECK(!e.has_payload());
 
   // Does custom error + payload throw work as expected?
-  outcome<int> f(std::errc::invalid_argument);
+  outcome<int> f(make_error_code(std::errc::invalid_argument), "niall");
   try
   {
     f.value();

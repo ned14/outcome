@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 817043f4380c6502132e2421dd4a61d35271c924
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-16 22:51:14 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 817043f4
+#define OUTCOME_PREVIOUS_COMMIT_REF b27c9248bde7c828e0e4600e7b72aa86ae6f09d0
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-16 23:58:53 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE b27c9248
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -4607,7 +4607,6 @@ struct no_error_type
 //! Namespace for policies
 namespace policy
 {
-#ifdef __cpp_exceptions
   /*! Default `result<R, S>` policy selector.
   */
 
@@ -4622,14 +4621,6 @@ namespace policy
   trait::is_exception_ptr<EC>::value, exception_ptr_rethrow<T, EC, void>, //
   all_narrow //
   >>>>;
-#else
-  template <class T, class EC>
-  using default_result_policy = std::conditional_t< //
-  std::is_void<EC>::value || std::is_error_code_enum<EC>::value || std::is_error_condition_enum<EC>::value || trait::is_error_code<EC>::value || trait::is_exception_ptr<EC>::value, //
-  terminate, //
-  all_narrow //
-  >;
-#endif
 }
 
 template <class R, class S = std::error_code, class NoValuePolicy = policy::default_result_policy<R, S>> //
@@ -4790,22 +4781,16 @@ Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array
   1. If `.value()` called when there is no `value_type` but there is an `error_type`:
     - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<S>` is true,
     then `throw std::system_error(make_error_code(error()))` [`policy::error_enum_throw_as_system_error<S>`]
-    if C++ exceptions are enabled, else call `std::terminate()`.
-    - If `S` convertible to a `std::error_code`, then `throw std::system_error(error())` [`policy::error_code_throw_as_system_error<S>`]
-    if C++ exceptions are enabled, else call `std::terminate()`.
-    - If `S` convertible to a `std::exception_ptr`, then `std::rethrow_exception(error())` [`policy::exception_ptr_rethrow<S>`]
-    if C++ exceptions are enabled, else call `std::terminate()`.
-    - If `S` is `void`, call `std::terminate()` [`policy::terminate<S>`]
+    - If `trait::is_error_code<S>`, then `throw std::system_error(error())` [`policy::error_code_throw_as_system_error<S>`]
+    - If `trait::is_exception_ptr<S>`, then `std::rethrow_exception(error())` [`policy::exception_ptr_rethrow<R, S, void>`]
+    - If `S` is `void`, call `std::terminate()` [`policy::terminate`]
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
   2. If `.error()` called when there is no `error_type`:
     - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<S>` is true,
-    or if `S` convertible to a `std::error_code`, or if `S` convertible to a `std::exception_ptr`,
-    or if `S` is `void`, `throw bad_result_access()` if C++ exceptions are enabled, else call `std::terminate()`.
+    or if `trait::is_error_code<S>`, or if `trait::is_exception_ptr<S>`,
+    or if `S` is `void`, do `throw bad_result_access()`
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
-
-
-
 
 
 
@@ -5466,7 +5451,6 @@ namespace policy
   template <class T> constexpr inline void throw_as_system_error_with_payload(const T * /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload"); }
   //! Override to define what the policies which throw an exception ptr with payload ought to do for some particular `outcome`.
   template <class T> constexpr inline void throw_exception_ptr_with_payload(const T * /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_exception_ptr_with_payload policy, you must define a throw_exception_ptr_with_payload() free function to say how to handle the payload"); }
-#ifdef __cpp_exceptions
   template <class R, class S, class P> struct error_code_throw_as_system_error_exception_rethrow;
   template <class R, class S, class P> struct error_code_throw_as_system_error_with_payload;
   template <class R, class S, class P> struct error_enum_throw_as_system_error_exception_rethrow;
@@ -5490,12 +5474,9 @@ namespace policy
   std::conditional_t< //
   trait::is_exception_ptr<P>::value, exception_ptr_rethrow<R, S, P>,
   std::conditional_t< //
-  std::is_void<S>::value && !trait::is_exception_ptr<P>::value, terminate,
+  std::is_void<S>::value, terminate,
   all_narrow //
   >>>>>>>;
-#else
-  template <class R, class S, class P> using default_outcome_policy = terminate;
-#endif
 }
 
 template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_outcome_policy<R, S, P>> //
@@ -5670,7 +5651,51 @@ This is an extension of `result<T, E>` and it comes in two variants:
   In this form, there is no `.payload()`.
 
 Which variant is chosen depends on `trait::is_exception_ptr<P>`. If it is true, you get the second form, if it is false you get the first form.
+
+Similarly to `result`, `NoValuePolicy` defaults to a policy selected according to the characteristics of types `S` and `P`:
+  1. If `.value()` called when there is no `value_type`:
+    - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<S>` is true:
+      - If `trait::is_exception_ptr<P>` is true, if an exception is set, then `std::rethrow_exception(exception())`, else `throw std::system_error(make_error_code(error()))` [`policy::error_enum_throw_as_system_error_exception_rethrow<R, S, P>`]
+      - If `trait::is_exception_ptr<P>` is false, if a payload is set, then `throw_as_system_error_with_payload()`, else `throw std::system_error(make_error_code(error()))` [`policy::error_enum_throw_as_system_error_with_payload<R, S, P>`]
+    - If `trait::is_error_code<S>`, then:
+      - If `trait::is_exception_ptr<P>` is true, if an exception is set, then `std::rethrow_exception(exception())`, else `throw std::system_error(error())` [`policy::error_code_throw_as_system_error_exception_rethrow<R, S, P>`]
+      - If `trait::is_exception_ptr<P>` is false, if an exception is set, then `throw_as_system_error_with_payload()`, else `throw std::system_error(error())` [`policy::error_code_throw_as_system_error_with_payload<R, S, P>`]
+    - If `trait::is_exception_ptr<S>`, then `throw_exception_ptr_with_payload()` [`policy::exception_ptr_rethrow_with_payload<R, S, P>`]
+    - If `trait::is_exception_ptr<P>`, then `std::rethrow_exception(exception())` [`policy::exception_ptr_rethrow<R, S, P>`]
+    - If `S` is `void`, call `std::terminate()` [`policy::terminate`]
+    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
+  2. If `.error()` called when there is no `error_type`:
+    - For any of the policies above apart from `policy::all_narrow`, `throw bad_outcome_access()`
+    - For `policy::all_narrow`, it is undefined behaviour [`policy::all_narrow`]
+  3. If `.exception()` called when there is no `exception_type`:
+    - For any of the policies above apart from `policy::all_narrow`, `throw bad_outcome_access()`
+    - For `policy::all_narrow`, it is undefined behaviour [`policy::all_narrow`]
+  4. If `.payload()` called when there is no `payload_type`:
+    - For any of the policies above apart from `policy::all_narrow`, `throw bad_outcome_access()`
+    - For `policy::all_narrow`, it is undefined behaviour [`policy::all_narrow`]
 */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
