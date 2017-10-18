@@ -104,10 +104,11 @@ namespace detail
         , _status(o._status)
     {
     }
-    value_storage_trivial(const value_storage_trivial &) = default;
-    value_storage_trivial(value_storage_trivial &&) = default;
-    value_storage_trivial &operator=(const value_storage_trivial &) = default;
-    value_storage_trivial &operator=(value_storage_trivial &&) = default;
+    value_storage_trivial(const value_storage_trivial &) = default;             // NOLINT
+    value_storage_trivial(value_storage_trivial &&) = default;                  // NOLINT
+    value_storage_trivial &operator=(const value_storage_trivial &) = default;  // NOLINT
+    value_storage_trivial &operator=(value_storage_trivial &&) = default;       // NOLINT
+    ~value_storage_trivial() = default;
     constexpr explicit value_storage_trivial(status_bitfield_type status)
         : _empty()
         , _status(status)
@@ -129,14 +130,14 @@ namespace detail
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<U> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_trivial(((o._status & status_have_value) != 0) ? value_storage_trivial(in_place_type<value_type>, o._value) : value_storage_trivial())
+        : value_storage_trivial(((o._status & status_have_value) != 0) ? value_storage_trivial(in_place_type<value_type>, o._value) : value_storage_trivial())  // NOLINT
     {
       _status = o._status;
     }
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_trivial(value_storage_trivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_trivial(((o._status & status_have_value) != 0) ? value_storage_trivial(in_place_type<value_type>, std::move(o._value)) : value_storage_trivial())
+        : value_storage_trivial(((o._status & status_have_value) != 0) ? value_storage_trivial(in_place_type<value_type>, std::move(o._value)) : value_storage_trivial())  // NOLINT
     {
       _status = o._status;
     }
@@ -155,17 +156,17 @@ namespace detail
       empty_type _empty;
       value_type _value;
     };
-    status_bitfield_type _status;
-    value_storage_nontrivial() noexcept : _empty{}, _status(0) {}
-    value_storage_nontrivial &operator=(const value_storage_nontrivial &) = default;  // if reaches here, copy assignment is trivial
-    value_storage_nontrivial &operator=(value_storage_nontrivial &&) = default;       // if reaches here, move assignment is trivial
-    value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(std::is_nothrow_move_constructible<value_type>::value)
-        : _status(o._status)
+    status_bitfield_type _status{0};
+    value_storage_nontrivial() noexcept : _empty{} {}
+    value_storage_nontrivial &operator=(const value_storage_nontrivial &) = default;                                        // if reaches here, copy assignment is trivial
+    value_storage_nontrivial &operator=(value_storage_nontrivial &&) = default;                                             // NOLINT if reaches here, move assignment is trivial
+    value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(std::is_nothrow_move_constructible<value_type>::value)  // NOLINT
+    : _status(o._status)
     {
       if(this->_status & status_have_value)
       {
         this->_status &= ~status_have_value;
-        new(&_value) value_type(std::move(o._value));
+        new(&_value) value_type(std::move(o._value));  // NOLINT
         _status = o._status;
       }
     }
@@ -175,7 +176,7 @@ namespace detail
       if(this->_status & status_have_value)
       {
         this->_status &= ~status_have_value;
-        new(&_value) value_type(o._value);
+        new(&_value) value_type(o._value);  // NOLINT
         _status = o._status;
       }
     }
@@ -186,7 +187,7 @@ namespace detail
       if(this->_status & status_have_value)
       {
         this->_status &= ~status_have_value;
-        new(&_value) value_type;
+        new(&_value) value_type;  // NOLINT
         _status = o._status;
       }
     }
@@ -240,7 +241,7 @@ namespace detail
     {
       if(this->_status & status_have_value)
       {
-        this->_value.~value_type();
+        this->_value.~value_type();  // NOLINT
         this->_status &= ~status_have_value;
       }
     }
@@ -254,7 +255,7 @@ namespace detail
       }
       if((_status & status_have_value) != 0 && (o._status & status_have_value) != 0)
       {
-        swap(_value, o._value);
+        swap(_value, o._value);  // NOLINT
         swap(_status, o._status);
         return;
       }
@@ -262,48 +263,48 @@ namespace detail
       if((_status & status_have_value) != 0)
       {
         // Move construct me into other
-        new(&o._value) value_type(std::move(_value));
-        this->_value.~value_type();
+        new(&o._value) value_type(std::move(_value));  // NOLINT
+        this->_value.~value_type();                    // NOLINT
         swap(_status, o._status);
       }
       else
       {
         // Move construct other into me
-        new(&_value) value_type(std::move(o._value));
-        o._value.~value_type();
+        new(&_value) value_type(std::move(o._value));  // NOLINT
+        o._value.~value_type();                        // NOLINT
         swap(_status, o._status);
       }
     }
   };
-  template <class Base> struct value_storage_delete_copy_constructor : Base
+  template <class Base> struct value_storage_delete_copy_constructor : Base  // NOLINT
   {
     using Base::Base;
     using value_type = typename Base::value_type;
     value_storage_delete_copy_constructor() = default;
     value_storage_delete_copy_constructor(const value_storage_delete_copy_constructor &) = delete;
-    value_storage_delete_copy_constructor(value_storage_delete_copy_constructor &&) = default;
+    value_storage_delete_copy_constructor(value_storage_delete_copy_constructor &&) = default;  // NOLINT
   };
-  template <class Base> struct value_storage_delete_copy_assignment : Base
+  template <class Base> struct value_storage_delete_copy_assignment : Base  // NOLINT
   {
     using Base::Base;
     using value_type = typename Base::value_type;
     value_storage_delete_copy_assignment() = default;
     value_storage_delete_copy_assignment(const value_storage_delete_copy_assignment &) = default;
-    value_storage_delete_copy_assignment(value_storage_delete_copy_assignment &&) = default;
+    value_storage_delete_copy_assignment(value_storage_delete_copy_assignment &&) = default;  // NOLINT
     value_storage_delete_copy_assignment &operator=(const value_storage_delete_copy_assignment &o) = delete;
-    value_storage_delete_copy_assignment &operator=(value_storage_delete_copy_assignment &&o) = default;
+    value_storage_delete_copy_assignment &operator=(value_storage_delete_copy_assignment &&o) = default;  // NOLINT
   };
-  template <class Base> struct value_storage_delete_move_assignment : Base
+  template <class Base> struct value_storage_delete_move_assignment : Base  // NOLINT
   {
     using Base::Base;
     using value_type = typename Base::value_type;
     value_storage_delete_move_assignment() = default;
     value_storage_delete_move_assignment(const value_storage_delete_move_assignment &) = default;
-    value_storage_delete_move_assignment(value_storage_delete_move_assignment &&) = default;
+    value_storage_delete_move_assignment(value_storage_delete_move_assignment &&) = default;  // NOLINT
     value_storage_delete_move_assignment &operator=(const value_storage_delete_move_assignment &o) = default;
     value_storage_delete_move_assignment &operator=(value_storage_delete_move_assignment &&o) = delete;
   };
-  template <class Base> struct value_storage_delete_move_constructor : Base
+  template <class Base> struct value_storage_delete_move_constructor : Base  // NOLINT
   {
     using Base::Base;
     using value_type = typename Base::value_type;
@@ -311,53 +312,53 @@ namespace detail
     value_storage_delete_move_constructor(const value_storage_delete_move_constructor &) = default;
     value_storage_delete_move_constructor(value_storage_delete_move_constructor &&) = delete;
   };
-  template <class Base> struct value_storage_nontrivial_move_assignment : Base
+  template <class Base> struct value_storage_nontrivial_move_assignment : Base  // NOLINT
   {
     using Base::Base;
     using value_type = typename Base::value_type;
     value_storage_nontrivial_move_assignment() = default;
     value_storage_nontrivial_move_assignment(const value_storage_nontrivial_move_assignment &) = default;
-    value_storage_nontrivial_move_assignment(value_storage_nontrivial_move_assignment &&) = default;
+    value_storage_nontrivial_move_assignment(value_storage_nontrivial_move_assignment &&) = default;  // NOLINT
     value_storage_nontrivial_move_assignment &operator=(const value_storage_nontrivial_move_assignment &o) = default;
-    value_storage_nontrivial_move_assignment &operator=(value_storage_nontrivial_move_assignment &&o) noexcept(std::is_nothrow_move_assignable<value_type>::value)
+    value_storage_nontrivial_move_assignment &operator=(value_storage_nontrivial_move_assignment &&o) noexcept(std::is_nothrow_move_assignable<value_type>::value)  // NOLINT
     {
       if((this->_status & status_have_value) != 0 && (o._status & status_have_value) != 0)
       {
-        this->_value = std::move(o._value);
+        this->_value = std::move(o._value);  // NOLINT
       }
       else if((this->_status & status_have_value) != 0 && (o._status & status_have_value) == 0)
       {
-        this->_value.~value_type();
+        this->_value.~value_type();  // NOLINT
       }
       else if((this->_status & status_have_value) == 0 && (o._status & status_have_value) != 0)
       {
-        new(&this->_value) value_type(std::move(o._value));
+        new(&this->_value) value_type(std::move(o._value));  // NOLINT
       }
       this->_status = o._status;
       return *this;
     }
   };
-  template <class Base> struct value_storage_nontrivial_copy_assignment : Base
+  template <class Base> struct value_storage_nontrivial_copy_assignment : Base  // NOLINT
   {
     using Base::Base;
     using value_type = typename Base::value_type;
     value_storage_nontrivial_copy_assignment() = default;
     value_storage_nontrivial_copy_assignment(const value_storage_nontrivial_copy_assignment &) = default;
-    value_storage_nontrivial_copy_assignment(value_storage_nontrivial_copy_assignment &&) = default;
-    value_storage_nontrivial_copy_assignment &operator=(value_storage_nontrivial_copy_assignment &&o) = default;
+    value_storage_nontrivial_copy_assignment(value_storage_nontrivial_copy_assignment &&) = default;              // NOLINT
+    value_storage_nontrivial_copy_assignment &operator=(value_storage_nontrivial_copy_assignment &&o) = default;  // NOLINT
     value_storage_nontrivial_copy_assignment &operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(std::is_nothrow_copy_assignable<value_type>::value)
     {
       if((this->_status & status_have_value) != 0 && (o._status & status_have_value) != 0)
       {
-        this->_value = o._value;
+        this->_value = o._value;  // NOLINT
       }
       else if((this->_status & status_have_value) != 0 && (o._status & status_have_value) == 0)
       {
-        this->_value.~value_type();
+        this->_value.~value_type();  // NOLINT
       }
       else if((this->_status & status_have_value) == 0 && (o._status & status_have_value) != 0)
       {
-        new(&this->_value) value_type(o._value);
+        new(&this->_value) value_type(o._value);  // NOLINT
       }
       this->_status = o._status;
       return *this;
@@ -389,7 +390,7 @@ namespace detail
   // Also check is standard layout
   static_assert(std::is_standard_layout<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not a standard layout type!");
 #endif
-} // namespace detail
+}  // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 

@@ -122,7 +122,7 @@ namespace detail
   template <class State> constexpr inline void _set_error_is_errno(State &state, const std::errc & /*unused*/) { state._status |= status_error_is_errno; }
 
   template <class R, class S, class NoValuePolicy> class result_final;
-} // namespace detail
+}  // namespace detail
 //! Namespace containing hooks used for intercepting and manipulating result/outcome
 namespace hooks
 {
@@ -130,14 +130,14 @@ namespace hooks
   template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::result_final<R, S, NoValuePolicy> *r) noexcept;
   //! Sets the sixteen bits of spare storage in a `result` or `outcome`.
   template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
-} // namespace hooks
+}  // namespace hooks
 namespace policy
 {
   namespace detail
   {
     struct base;
-  } // namespace detail
-} // namespace policy
+  }  // namespace detail
+}  // namespace policy
 namespace detail
 {
   //! Predicate for permitting type to be used in outcome
@@ -165,8 +165,8 @@ namespace detail
     friend struct policy::detail::base;
     template <class T, class U, class V> friend class result_storage;
     template <class T, class U, class V> friend class result_final;
-    template <class T, class U, class V> friend constexpr inline uint16_t hooks::spare_storage(const detail::result_final<T, U, V> *r) noexcept;
-    template <class T, class U, class V> friend constexpr inline void hooks::set_spare_storage(detail::result_final<T, U, V> *r, uint16_t v) noexcept;
+    template <class T, class U, class V> friend constexpr inline uint16_t hooks::spare_storage(const detail::result_final<T, U, V> *r) noexcept;        // NOLINT
+    template <class T, class U, class V> friend constexpr inline void hooks::set_spare_storage(detail::result_final<T, U, V> *r, uint16_t v) noexcept;  // NOLINT
 
     struct disable_in_place_value_type
     {
@@ -183,10 +183,11 @@ namespace detail
     detail::devoid<_error_type> _error;
 
     result_storage() = default;
-    result_storage(const result_storage &) = default;
-    result_storage(result_storage &&) = default;
-    result_storage &operator=(const result_storage &) = default;
-    result_storage &operator=(result_storage &&) = default;
+    result_storage(const result_storage &) = default;             // NOLINT
+    result_storage(result_storage &&) = default;                  // NOLINT
+    result_storage &operator=(const result_storage &) = default;  // NOLINT
+    result_storage &operator=(result_storage &&) = default;       // NOLINT
+    ~result_storage() = default;
 
     template <class... Args>
     constexpr explicit result_storage(in_place_type_t<_value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
@@ -242,7 +243,7 @@ namespace detail
     {
     }
   };
-} // namespace detail
+}  // namespace detail
 OUTCOME_V2_NAMESPACE_END
 
 #endif
