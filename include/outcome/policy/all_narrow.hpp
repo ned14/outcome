@@ -54,7 +54,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_exception_check(Impl *self) { detail::base::narrow_exception_check(self); }
   };
-}
+}  // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 

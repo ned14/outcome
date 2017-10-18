@@ -113,7 +113,7 @@ namespace detail
     */
     constexpr void value() const { NoValuePolicy::wide_value_check(this); }
   };
-}
+} // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 

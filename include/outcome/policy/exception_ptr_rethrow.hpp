@@ -64,7 +64,7 @@ namespace policy
     };
     // Implemented in outcome.hpp to work around chicken-before-egg problem
     template <class R, class S, class P> struct exception_exception_ptr_rethrow;
-  }
+  }  // namespace detail
 
   /*! Policy interpreting S or P as a type implementing the `std::exception_ptr` contract
   and any wide attempt to access the successful state calls `std::rethrow_exception()`.
@@ -75,7 +75,7 @@ namespace policy
   using exception_ptr_rethrow = std::conditional_t<std::is_void<P>::value,                  //
                                                    detail::error_exception_ptr_rethrow<S>,  //
                                                    detail::exception_exception_ptr_rethrow<R, S, P>>;
-}
+}  // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 

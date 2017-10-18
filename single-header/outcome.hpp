@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 887e8051dc991e8dd3d5b77e8005a55687dc1462
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-17 21:41:20 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 887e8051
+#define OUTCOME_PREVIOUS_COMMIT_REF 1c2d524c5b4202c629d15c909b7635892ab73bba
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-18 00:21:03 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 1c2d524c
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1863,7 +1863,7 @@ namespace trait
   template <class P> struct is_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, P>::value>
   {
   };
-}
+} // namespace trait
 
 // Do we have C++ 17 deduced templates?
 // GCC 7.2 and clang 6.0 both have problems in their implementations, so leave this disabled for now. But it should work one day.
@@ -2159,7 +2159,7 @@ namespace detail
   template <class EC, class E, bool e_is_exception_ptr> struct is_failure_type<failure_type<EC, E, e_is_exception_ptr>> : std::true_type
   {
   };
-}
+} // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -2678,7 +2678,7 @@ namespace detail
   template <class State> constexpr inline void _set_error_is_errno(State &state, const std::errc & /*unused*/) { state._status |= status_error_is_errno; }
 
   template <class R, class S, class NoValuePolicy> class result_final;
-}
+} // namespace detail
 //! Namespace containing hooks used for intercepting and manipulating result/outcome
 namespace hooks
 {
@@ -2686,14 +2686,14 @@ namespace hooks
   template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::result_final<R, S, NoValuePolicy> *r) noexcept;
   //! Sets the sixteen bits of spare storage in a `result` or `outcome`.
   template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
-}
+} // namespace hooks
 namespace policy
 {
   namespace detail
   {
     struct base;
-  }
-}
+  } // namespace detail
+} // namespace policy
 namespace detail
 {
   //! Predicate for permitting type to be used in outcome
@@ -2745,7 +2745,7 @@ namespace detail
     result_storage &operator=(result_storage &&) = default;
 
     template <class... Args>
-    constexpr result_storage(in_place_type_t<_value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
+    constexpr explicit result_storage(in_place_type_t<_value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
         : _state{_, std::forward<Args>(args)...}
         , _error()
     {
@@ -2757,14 +2757,14 @@ namespace detail
     {
     }
     template <class... Args>
-    constexpr result_storage(in_place_type_t<_error_type>, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
+    constexpr explicit result_storage(in_place_type_t<_error_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
         : _state{detail::status_have_error}
         , _error{std::forward<Args>(args)...}
     {
       detail::_set_error_is_errno(_state, _error);
     }
     template <class U, class... Args>
-    constexpr result_storage(in_place_type_t<_error_type>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
+    constexpr result_storage(in_place_type_t<_error_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
         : _state{detail::status_have_error}
         , _error{il, std::forward<Args>(args)...}
     {
@@ -2774,31 +2774,31 @@ namespace detail
     {
     };
     template <class T, class U, class V>
-    constexpr result_storage(compatible_conversion_tag, const result_storage<T, U, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
+    constexpr result_storage(compatible_conversion_tag /*unused*/, const result_storage<T, U, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
         : _state(o._state)
         , _error(o._error)
     {
     }
     template <class T, class V>
-    constexpr result_storage(compatible_conversion_tag, const result_storage<T, void, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
+    constexpr result_storage(compatible_conversion_tag /*unused*/, const result_storage<T, void, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
         : _state(o._state)
         , _error(_error_type{})
     {
     }
     template <class T, class U, class V>
-    constexpr result_storage(compatible_conversion_tag, result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
+    constexpr result_storage(compatible_conversion_tag /*unused*/, result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
         : _state(std::move(o._state))
         , _error(std::move(o._error))
     {
     }
     template <class T, class V>
-    constexpr result_storage(compatible_conversion_tag, result_storage<T, void, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
+    constexpr result_storage(compatible_conversion_tag /*unused*/, result_storage<T, void, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
         : _state(std::move(o._state))
         , _error(_error_type{})
     {
     }
   };
-}
+} // namespace detail
 OUTCOME_V2_NAMESPACE_END
 
 #endif
@@ -2867,7 +2867,7 @@ namespace detail
 
     constexpr void exception() const { NoValuePolicy::wide_exception_check(this); }
   };
-}
+} // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -2955,7 +2955,7 @@ namespace detail
       return exception_type();
     }
   };
-}
+} // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -3076,7 +3076,7 @@ namespace detail
 
     constexpr void payload() const { NoValuePolicy::wide_payload_check(this); }
   };
-}
+} // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -3324,7 +3324,7 @@ namespace detail
 
     constexpr void error() const { NoValuePolicy::wide_error_check(this); }
   };
-}
+} // namespace detail
 OUTCOME_V2_NAMESPACE_END
 
 #endif
@@ -3476,7 +3476,7 @@ namespace detail
 
     constexpr void value() const { NoValuePolicy::wide_value_check(this); }
   };
-}
+} // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -3601,11 +3601,7 @@ namespace detail
     constexpr bool operator==(const success_type<void> &o) const noexcept
     {
       (void) o;
-      if(this->_state._status & detail::status_have_value)
-      {
-        return true;
-      }
-      return false;
+      return static_cast<bool>(this->_state._status & detail::status_have_value);
     }
     /*! True if equal to the failure type sugar.
     \param o The failure type sugar to compare to.
@@ -3643,8 +3639,9 @@ namespace detail
       }
       if(this->_state._status & detail::status_have_value)
       {
-        if(detail::safe_compare_notequal(this->_state._value, o._state._value))
+        if(detail::safe_compare_notequal(this->_state._value, o._state._value)) {
           return true;
+}
       }
       return detail::safe_compare_notequal(this->_error, o._error);
     }
@@ -3681,11 +3678,7 @@ namespace detail
     constexpr bool operator!=(const success_type<void> &o) const noexcept
     {
       (void) o;
-      if(this->_state._status & detail::status_have_value)
-      {
-        return false;
-      }
-      return true;
+      return !static_cast<bool>(this->_state._status & detail::status_have_value);
     }
     /*! True if not equal to the failure type sugar.
     \param o The failure type sugar to compare to.
@@ -3708,7 +3701,7 @@ namespace detail
   template <class T, class U, class V, class W> constexpr inline bool operator!=(const success_type<W> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
   //! Calls b != a
   template <class T, class U, class V, class W> constexpr inline bool operator!=(const failure_type<W, void> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
-}
+} // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -3830,7 +3823,9 @@ namespace policy
         (void) self;
 #if defined(__GNUC__) || defined(__clang__)
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+        {
           __builtin_unreachable();
+        }
 #endif
       }
       /*! Performs a narrow check of state, used in the assume_error() functions
@@ -3843,7 +3838,9 @@ namespace policy
         (void) self;
 #if defined(__GNUC__) || defined(__clang__)
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+        {
           __builtin_unreachable();
+        }
 #endif
       }
       /*! Performs a narrow check of state, used in the assume_payload() functions
@@ -3856,7 +3853,9 @@ namespace policy
         (void) self;
 #if defined(__GNUC__) || defined(__clang__)
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
+        {
           __builtin_unreachable();
+        }
 #endif
       }
       /*! Performs a narrow check of state, used in the assume_exception() functions
@@ -3869,12 +3868,14 @@ namespace policy
         (void) self;
 #if defined(__GNUC__) || defined(__clang__)
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+        {
           __builtin_unreachable();
+        }
 #endif
       }
     };
-  }
-}
+  } // namespace detail
+} // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -3917,7 +3918,7 @@ namespace policy
 
     template <class Impl> static constexpr void wide_exception_check(Impl *self) { detail::base::narrow_exception_check(self); }
   };
-}
+} // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -4029,7 +4030,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 class OUTCOME_SYMBOL_VISIBLE bad_result_access : public std::logic_error
 {
 public:
-  bad_result_access(const char *what)
+  explicit bad_result_access(const char *what)
       : std::logic_error(what)
   {
   }
@@ -4041,7 +4042,7 @@ template <class S> class OUTCOME_SYMBOL_VISIBLE bad_result_access_with : public 
   S _error;
 
 public:
-  bad_result_access_with(S v)
+  explicit bad_result_access_with(S v)
       : bad_result_access("no value")
       , _error(std::move(v))
   {
@@ -4061,7 +4062,7 @@ public:
 class OUTCOME_SYMBOL_VISIBLE bad_outcome_access : public std::logic_error
 {
 public:
-  bad_outcome_access(const char *what)
+  explicit bad_outcome_access(const char *what)
       : std::logic_error(what)
   {
   }
@@ -4154,7 +4155,7 @@ namespace policy
       }
     }
   };
-}
+} // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -4259,7 +4260,7 @@ namespace policy
       }
     }
   };
-}
+} // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -4356,7 +4357,7 @@ namespace policy
     };
     // Implemented in outcome.hpp to work around chicken-before-egg problem
     template <class R, class S, class P> struct exception_exception_ptr_rethrow;
-  }
+  } // namespace detail
 
   /*! Policy interpreting S or P as a type implementing the `std::exception_ptr` contract
   and any wide attempt to access the successful state calls `std::rethrow_exception()`.
@@ -4371,7 +4372,7 @@ namespace policy
   using exception_ptr_rethrow = std::conditional_t<std::is_void<P>::value, //
                                                    detail::error_exception_ptr_rethrow<S>, //
                                                    detail::exception_exception_ptr_rethrow<R, S, P>>;
-}
+} // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -4491,7 +4492,7 @@ namespace policy
       }
     }
   };
-}
+} // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -4586,7 +4587,7 @@ namespace policy
       }
     }
   };
-}
+} // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -7052,7 +7053,7 @@ namespace policy
       }
     }
   };
-}
+} // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -7193,7 +7194,7 @@ namespace policy
       }
     }
   };
-}
+} // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -7337,7 +7338,7 @@ namespace policy
       }
     }
   };
-}
+} // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -7477,7 +7478,7 @@ namespace policy
       }
     }
   };
-}
+} // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -7614,7 +7615,7 @@ namespace policy
       }
     }
   };
-}
+} // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -7773,7 +7774,7 @@ namespace detail
     NoValuePolicy::wide_exception_check(this);
     return std::move(self->_ptr);
   }
-}
+} // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -7878,7 +7879,7 @@ namespace detail
       }
     }
   };
-}
+} // namespace detail
 
 //! Deserialise a result
 template <class R, class S, class P> inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
@@ -8084,11 +8085,11 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRY_GLUE(x, y) OUTCOME_TRY_GLUE2(x, y)
 #define OUTCOME_TRY_UNIQUE_NAME OUTCOME_TRY_GLUE(__t, __COUNTER__)
 
-#define OUTCOME_TRYV2(unique, m) auto &&unique = (m); if(!unique.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(unique)>(unique))
+#define OUTCOME_TRYV2(unique, m) auto &&(unique) = (m); if(!(unique).has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(unique)>(unique))
 
 
 
-#define OUTCOME_TRY2(unique, v, m) OUTCOME_TRYV2(unique, m); auto &&v = std::forward<decltype(unique)>(unique).value()
+#define OUTCOME_TRY2(unique, v, m) OUTCOME_TRYV2(unique, m); auto &&(v) = std::forward<decltype(unique)>(unique).value()
 
 
 

@@ -46,7 +46,7 @@ namespace trait
   template <class P> struct is_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, P>::value>
   {
   };
-}
+} // namespace trait
 
 // Do we have C++ 17 deduced templates?
 // GCC 7.2 and clang 6.0 both have problems in their implementations, so leave this disabled for now. But it should work one day.
@@ -326,7 +326,7 @@ namespace detail
   template <class EC, class E, bool e_is_exception_ptr> struct is_failure_type<failure_type<EC, E, e_is_exception_ptr>> : std::true_type
   {
   };
-}
+} // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 

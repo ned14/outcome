@@ -43,7 +43,9 @@ namespace policy
         (void) self;
 #if defined(__GNUC__) || defined(__clang__)
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+        {
           __builtin_unreachable();
+        }
 #endif
       }
       /*! Performs a narrow check of state, used in the assume_error() functions
@@ -54,7 +56,9 @@ namespace policy
         (void) self;
 #if defined(__GNUC__) || defined(__clang__)
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+        {
           __builtin_unreachable();
+        }
 #endif
       }
       /*! Performs a narrow check of state, used in the assume_payload() functions
@@ -65,7 +69,9 @@ namespace policy
         (void) self;
 #if defined(__GNUC__) || defined(__clang__)
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
+        {
           __builtin_unreachable();
+        }
 #endif
       }
       /*! Performs a narrow check of state, used in the assume_exception() functions
@@ -76,12 +82,14 @@ namespace policy
         (void) self;
 #if defined(__GNUC__) || defined(__clang__)
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+        {
           __builtin_unreachable();
+        }
 #endif
       }
     };
-  }
-}
+  }  // namespace detail
+}  // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 

@@ -68,7 +68,7 @@ namespace policy
       }
     }
   };
-}
+}  // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 

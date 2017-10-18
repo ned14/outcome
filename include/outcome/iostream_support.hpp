@@ -126,7 +126,7 @@ namespace detail
       }
     }
   };
-}
+}  // namespace detail
 
 //! Deserialise a result
 template <class R, class S, class P> inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
