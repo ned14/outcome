@@ -35,53 +35,58 @@ namespace policy
   {
     struct base
     {
+    private:
+      static void _ub()
+      {
+#if defined(__GNUC__) || defined(__clang__)
+        __builtin_unreachable();
+#endif
+      }
+
+    public:
       /*! Performs a narrow check of state, used in the assume_value() functions.
       \effects None.
       */
       template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
       {
-        (void) self;
-#if defined(__GNUC__) || defined(__clang__)
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
-          __builtin_unreachable();
-#endif
+        {
+          _ub();
+        }
       }
       /*! Performs a narrow check of state, used in the assume_error() functions
       \effects None.
       */
       template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
       {
-        (void) self;
-#if defined(__GNUC__) || defined(__clang__)
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
-          __builtin_unreachable();
-#endif
+        {
+          _ub();
+        }
       }
       /*! Performs a narrow check of state, used in the assume_payload() functions
       \effects None.
       */
       template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
       {
-        (void) self;
-#if defined(__GNUC__) || defined(__clang__)
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
-          __builtin_unreachable();
-#endif
+        {
+          _ub();
+        }
       }
       /*! Performs a narrow check of state, used in the assume_exception() functions
       \effects None.
       */
       template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
       {
-        (void) self;
-#if defined(__GNUC__) || defined(__clang__)
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
-          __builtin_unreachable();
-#endif
+        {
+          _ub();
+        }
       }
     };
-  }
-}
+  }  // namespace detail
+}  // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 

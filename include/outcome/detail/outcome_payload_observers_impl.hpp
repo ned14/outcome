@@ -130,7 +130,7 @@ namespace detail
     NoValuePolicy::wide_exception_check(this);
     return std::move(self->_ptr);
   }
-}
+}  // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 

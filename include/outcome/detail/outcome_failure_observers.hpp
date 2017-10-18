@@ -56,7 +56,7 @@ namespace detail
       return exception_type();
     }
   };
-}
+} // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
