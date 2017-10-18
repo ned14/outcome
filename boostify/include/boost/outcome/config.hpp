@@ -129,7 +129,7 @@ exported Boost.Outcome v2 namespace.
 #define BOOST_OUTCOME_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                \
   namespace boost                                                                                                                                                                                                                                                                                                              \
   {                                                                                                                                                                                                                                                                                                                            \
-    export namespace outcome_v2                                                                                                                                                                                                                                                                                                \
+    namespace outcome_v2                                                                                                                                                                                                                                                                                                \
     {
 /*! \brief Expands into the appropriate namespace markup to exit the Boost.Outcome v2 namespace.
 \ingroup config

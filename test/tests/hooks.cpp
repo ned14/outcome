@@ -88,11 +88,13 @@ namespace hook_test
     OUTCOME_V2_NAMESPACE::hooks::override_outcome_payload_exception(res, extended_error_info);
   }
 
+#ifdef __cpp_exceptions
   // Make a custom exception type and specialise a function to throw it on wide value access
   struct custom_exception
   {
   };
   template <class R> constexpr inline void throw_as_system_error_with_payload(const outcome<R> * /*unused*/) { throw custom_exception(); }
+#endif
 }  // namespace hook_test
 
 BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / hooks, "Tests that you can hook outcome's conversion from a result")
