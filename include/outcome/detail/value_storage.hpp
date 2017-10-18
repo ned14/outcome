@@ -92,8 +92,8 @@ namespace detail
       empty_type _empty;
       devoid<T> _value;
     };
-    status_bitfield_type _status;
-    constexpr value_storage_trivial() noexcept : _empty{}, _status(0) {}
+    status_bitfield_type _status{0};
+    constexpr value_storage_trivial() noexcept : _empty{} {}
     // Special from-void catchall constructor, always constructs default T irrespective of whether void is valued or not (can do no better if T cannot be copied)
     struct disable_void_catchall
     {
@@ -114,13 +114,13 @@ namespace detail
     {
     }
     template <class... Args>
-    constexpr value_storage_trivial(in_place_type_t<value_type>, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+    constexpr explicit value_storage_trivial(in_place_type_t<value_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
         : _value(std::forward<Args>(args)...)
         , _status(status_have_value)
     {
     }
     template <class U, class... Args>
-    constexpr value_storage_trivial(in_place_type_t<value_type>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
+    constexpr value_storage_trivial(in_place_type_t<value_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
         : _value(il, std::forward<Args>(args)...)
         , _status(status_have_value)
     {
@@ -196,13 +196,13 @@ namespace detail
     {
     }
     template <class... Args>
-    value_storage_nontrivial(in_place_type_t<value_type>, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+    explicit value_storage_nontrivial(in_place_type_t<value_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
         : _value(std::forward<Args>(args)...)
         , _status(status_have_value)
     {
     }
     template <class U, class... Args>
-    value_storage_nontrivial(in_place_type_t<value_type>, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
+    value_storage_nontrivial(in_place_type_t<value_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
         : _value(il, std::forward<Args>(args)...)
         , _status(status_have_value)
     {
@@ -389,7 +389,7 @@ namespace detail
   // Also check is standard layout
   static_assert(std::is_standard_layout<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not a standard layout type!");
 #endif
-}
+} // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
