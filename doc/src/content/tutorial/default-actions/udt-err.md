@@ -1,11 +1,8 @@
 +++
-title = "Policies"
-description = "Specifying how to deal with incorrect usage e.g. retrieving a value when no value is present."
-weight = 60
+title = "User defined error types"
+description = ""
+weight = 5
 +++
-
-Something the tutorial has not mentioned yet is what happens if your `EC` type is not
-an error code nor an error code enum.
 
 So, let us imagine a some user
 defined type (UDT) and some arbitrary error type:

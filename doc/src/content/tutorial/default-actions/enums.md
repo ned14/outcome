@@ -10,8 +10,14 @@ ned@lyta:~/outcome/build_posix$ bin/outcome-snippets_udts
 ned@lyta:~/outcome/build_posix$
 ```
 
-Apparently no exception was thrown? Correct. What actually happened was *undefined behaviour*. Let us
-turn on the undefined behaviour sanitiser and see what happens instead:
+Apparently no exception was thrown? Correct.
+
+It is very likely, given the contents of the tutorial to date, that you will find this surprising. This is because the *default
+action* for a user-defined error type is **undefined behaviour**.
+
+Let's
+demonstrate this by running the code under the undefined behaviour sanitiser
+and see what happens instead:
 
 ```
 ned@lyta:~/outcome/build_posix$ export UBSAN_OPTIONS=print_stacktrace=1
