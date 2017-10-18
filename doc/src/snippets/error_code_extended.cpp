@@ -23,8 +23,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../../../include/outcome.hpp"
 
+#include <array>
 #include <iostream>
-#include <vector>
 
 #ifdef _WIN32
 #include "quickcpplib/include/execinfo_win64.h"
@@ -36,27 +36,35 @@ http://www.boost.org/LICENSE_1_0.txt)
 #pragma warning(disable : 4702)  // unreachable code
 #endif
 
-//! [error_code_extended]
-/* Outcome's hook mechanism works vis ADL, so we will need a custom namespace
-*/
 namespace error_code_extended
 {
   using OUTCOME_V2_NAMESPACE::in_place_type;
+  template <class T> using in_place_type_t = OUTCOME_V2_NAMESPACE::in_place_type_t<T>;
+}
+
+//! [error_code_extended1]
+/* Outcome's hook mechanism works vis ADL, so we will need a custom namespace
+to ensure the hooks apply only to the types declared in this namespace only
+*/
+namespace error_code_extended
+{
   // The extra error information we will keep
   struct extended_error_info
   {
-    std::string detail;
-    std::vector<void *> backtrace;
+    std::array<void *, 16> backtrace;  // The backtrace
+    size_t items;                      // Items in backtrace array which are valid
   };
   struct mythreadlocaldata_t
   {
-    // Keep 16 slots of extended error info
+    // Keep 16 slots of extended error info as a ringbuffer
     extended_error_info slots[16];
+    // The current oldest slot
     uint16_t current{0};
-    extended_error_info &next()
-    {
-      return slots[(current++) % 16];  // NOLINT
-    }
+
+    // Return the oldest slot
+    extended_error_info &next() { return slots[(current++) % 16]; }
+
+    // Retrieve a previously stored slot, detecting if it is stale
     extended_error_info *get(uint16_t idx)
     {
       // If the idx is stale, return not found
@@ -64,21 +72,22 @@ namespace error_code_extended
       {
         return nullptr;
       }
-      return slots + (idx % 16);  // NOLINT
+      return slots + (idx % 16);
     }
   };
+
+  // Meyer singleton returning a thread local data structure for this thread
   inline mythreadlocaldata_t &mythreadlocaldata()
   {
-    // Use thread local storage to keep my out of band data. Note C++ 11 thread_local still isn't
-    // working on OS X on Travis, else we'd use that, this leaks memory.
-    static OUTCOME_THREAD_LOCAL mythreadlocaldata_t *v;
-    if(v == nullptr)
-    {
-      v = new mythreadlocaldata_t;
-    }
-    return *v;
+    static thread_local mythreadlocaldata_t v;
+    return v;
   }
+}
+//! [error_code_extended1]
 
+//! [error_code_extended2]
+namespace error_code_extended
+{
   // Use the error_code type as the ADL bridge for the hooks by creating a type here
   // It can be any type that your localised result uses, including the value type but
   // by localising the error code type here you prevent nasty surprises later when the
@@ -88,16 +97,45 @@ namespace error_code_extended
     // literally passthrough
     using std::error_code::error_code;
     error_code() = default;
-    error_code(std::error_code ec)  // NOLINT
-    : std::error_code(ec)
+    error_code(std::error_code ec)
+        : std::error_code(ec)
     {
     }
   };
 
   // Localise result and outcome to using the local error_code so this namespace gets looked up for the hooks
   template <class R> using result = OUTCOME_V2_NAMESPACE::result<R, error_code>;
-  template <class R> using outcome = OUTCOME_V2_NAMESPACE::outcome<R, error_code>;
+  template <class R> using outcome = OUTCOME_V2_NAMESPACE::outcome<R, error_code /*, std::exception_ptr */>;
+}
+//! [error_code_extended2]
 
+//! [error_code_extended3]
+namespace error_code_extended
+{
+  // Specialise the result construction hook for our localised result
+  // We hook any non-copy, non-move, non-inplace construction, capturing a stack backtrace
+  // if the result is errored.
+  template <class T, class R> inline void hook_result_construction(in_place_type_t<T>, result<R> *res) noexcept
+  {
+    if(res->has_error())
+    {
+      // Grab the next extended info slot in the TLS
+      extended_error_info &eei = mythreadlocaldata().next();
+
+      // Write the index just grabbed into the spare uint16_t
+      OUTCOME_V2_NAMESPACE::hooks::set_spare_storage(res, mythreadlocaldata().current - 1);
+
+      // Capture a backtrace into my claimed extended info slot in the TLS
+      eei.items = ::backtrace(eei.backtrace.data(), eei.backtrace.size());
+    }
+  }
+}
+//! [error_code_extended3]
+
+//! [error_code_extended4]
+namespace error_code_extended
+{
+  // Synthesise a custom exception_ptr from the TLS slot and write it into the outcome
   template <class R> inline void poke_exception(outcome<R> *o)
   {
     if(o->has_error())
@@ -106,51 +144,48 @@ namespace error_code_extended
       if(eei != nullptr)
       {
         // Make a custom string for the exception
-        std::string str(std::move(eei->detail));
+        std::string str(o->error().message());
         str.append(" [");
-        char **symbols = ::backtrace_symbols(eei->backtrace.data(), eei->backtrace.size());
-        for(size_t n = 0; n < eei->backtrace.size(); n++)
+        char **symbols = ::backtrace_symbols(eei->backtrace.data(), eei->items);
+        if(symbols != nullptr)
         {
-          if(n > 0)
+          for(size_t n = 0; n < eei->items; n++)
           {
-            str.append("; ");
+            if(n > 0)
+            {
+              str.append("; ");
+            }
+            str.append(symbols[n]);
           }
-          str.append(symbols[n]);  // NOLINT
+          ::free(symbols);  // not exception safe, could leak symbols if appending str fails
         }
         str.append("]");
+
+        // Override the payload/exception member in the outcome with our synthesised exception ptr
         OUTCOME_V2_NAMESPACE::hooks::override_outcome_payload_exception(o, std::make_exception_ptr(std::runtime_error(str)));
       }
     }
   }
+}
+//! [error_code_extended4]
 
-  // Specialise the result construction hook for our localised result
-  // We hook any non-copy, non-move, non-inplace construction, capturing a stack backtrace
-  // if the result is errored.
-  template <class T, class R> inline void hook_result_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<T>, result<R> *res) noexcept
-  {
-    if(res->has_error())
-    {
-      // Grab the next extended info slot in the TLS
-      extended_error_info &eei = mythreadlocaldata().next();
-      // Write the index just grabbed into the spare uint16_t
-      OUTCOME_V2_NAMESPACE::hooks::set_spare_storage(res, mythreadlocaldata().current - 1);
-      eei.detail = "this is a custom message";
-      eei.backtrace.resize(64);
-      eei.backtrace.resize(::backtrace(eei.backtrace.data(), eei.backtrace.size()));
-    }
-  }
-  // Specialise the outcome copy and move conversion hook for our localised result
-  template <class T, class R> inline void hook_outcome_copy_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<const result<T> &>, outcome<R> *res) noexcept
+//! [error_code_extended5]
+namespace error_code_extended
+{
+  // Specialise the outcome copy and move conversion hook for when our localised result
+  // is used as the source for copy construction our localised outcome
+  template <class T, class R> inline void hook_outcome_copy_construction(in_place_type_t<const result<T> &>, outcome<R> *res) noexcept
   {
     // when copy constructing from a result<T>, poke in an exception
     poke_exception(res);
   }
-  template <class T, class R> inline void hook_outcome_move_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<result<T> &&>, outcome<R> *res) noexcept
+  template <class T, class R> inline void hook_outcome_move_construction(in_place_type_t<result<T> &&>, outcome<R> *res) noexcept
   {
     // when move constructing from a result<T>, poke in an exception
     poke_exception(res);
   }
-}  // namespace error_code_extended
+}
+//! [error_code_extended5]
 
 extern error_code_extended::result<int> func2()
 {
@@ -165,6 +200,7 @@ extern error_code_extended::outcome<int> func1()
   // At here the custom message and backtrace is assembled into a custom exception_ptr
   return outcome<int>(func2());
 }
+//! [error_code_extended]
 
 int main()
 {
@@ -193,4 +229,3 @@ int main()
   }
   return 1;
 }
-//! [error_code_extended]
