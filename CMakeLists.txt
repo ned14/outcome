@@ -98,6 +98,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
         set(target_name "outcome_hl--${testname}-noexcept")
         add_executable(${target_name} "${testsource}")
         list(APPEND noexcept_tests ${target_name})
+        target_link_libraries(${target_name} PRIVATE outcome::hl)
         set_target_properties(${target_name} PROPERTIES
           RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
           POSITION_INDEPENDENT_CODE ON
