@@ -24,4 +24,4 @@ If you need run time unchecked observers, `.assume_value()` and `.assume_error()
 always unchecked at run time.
 
 Finally, if you would like to implement your own default actions, you will find the
-tutorial section on [Policies](policies) useful.
+tutorial section on [Policies](../../policies) useful.
