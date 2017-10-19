@@ -1,4 +1,4 @@
-/* Example of Outcome used with UDTs
+/* Example of Outcome used with void
 (C) 2017 Niall Douglas <http://www.nedproductions.biz/> (149 commits)
 
 
@@ -28,7 +28,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 int main()
 {
   using namespace OUTCOME_V2_NAMESPACE;
-  //! [udts]
+  //! [void_terminate]
   struct udt
   {
     int a{0};
@@ -39,28 +39,7 @@ int main()
     udt() = default;
     int operator*() const { return a; }
   };
-
-  struct err
-  {
-    int a{0};
-    explicit err(int _a)
-        : a(_a)
-    {
-    }
-    err() = default;
-  };
-//! [udts]
-#if 0
-//! [implicit]
-  result<udt, err> res(5);  // fails to compile, cannot convert 'int' to result
-//! [implicit]
-  //! [explicit]
-  // When it is not unambiguous which to construct, we must say which we want same as with std::variant<>
-  result<udt, err> res(in_place_type<err>, 5);
-  //! [explicit]
-#endif
-  //! [access]
-  result<udt, err> res(in_place_type<err>, 5);
+  result<udt, void> res(in_place_type<void>);
 
   // What happens here? What exception type is thrown?
   try
@@ -71,6 +50,6 @@ int main()
   {
     std::cerr << "Exception thrown was " << e.what() << std::endl;
   }
-  //! [access]
+  //! [void_terminate]
   return 0;
 }
