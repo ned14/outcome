@@ -4,8 +4,7 @@ description = ""
 weight = 5
 +++
 
-So, let us imagine a some user
-defined type (UDT) and some arbitrary error type:
+Let us imagine a some user defined value type (`udt`) and some user defined error type (`err`):
 
 {{% snippet "udts.cpp" "udts" %}}
 

@@ -1,22 +1,25 @@
 +++
-title = "result<udt, err>.value()"
+title = "-- What happens?"
 description = ""
 weight = 10
 +++
 
+Let us run the code from the previous page:
+
 ```
 ned@lyta:~/outcome/build_posix$ bin/outcome-snippets_udts
-32767
+Segmentation fault (core dumped)
 ned@lyta:~/outcome/build_posix$
 ```
 
-Apparently no exception was thrown? Correct.
+Apparently no exception was thrown? Correct. Nor was a value printed, though this will 
+*randomly* vary depending on your compiler, libraries, the wind blowing on the day ...
 
-It is very likely, given the contents of the tutorial to date, that you will find this surprising. This is because the *default
+You will probably find this surprising. This is because the *default
 action* for a user-defined error type is **undefined behaviour**.
 
 Let's
-demonstrate this by running the code under the undefined behaviour sanitiser
+demonstrate this by recompiling the code to use the undefined behaviour sanitiser
 and see what happens instead:
 
 ```
@@ -32,3 +35,4 @@ ned@lyta:~/outcome/build_posix$ bin/outcome-snippets_udts
     #6 0x4030c3 in _start (/home/ned/outcome/build_posix/bin/outcome-snippets_udts+0x4030c3)
 ```
 
+The undefined behaviour is correctly trapped at runtime by the undefined behaviour sanitiser.
