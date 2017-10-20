@@ -1,4 +1,5 @@
 body {
+  font-size: 105% !important;
   text-align: justify;
 }
 h2 {
@@ -8,6 +9,9 @@ code, pre {
   background: none;
   border: none;
   text-align: left;
+}
+a code {
+  color: inherit;
 }
 /* Fix Firefox */
 /*#body a.highlight {
