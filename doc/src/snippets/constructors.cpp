@@ -22,6 +22,9 @@ http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifdef _WIN32
+#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_NONSTDC_NO_WARNINGS
+#include <fcntl.h>
 #include <io.h>
 #else
 #define file_handle linux_file_handle
@@ -90,7 +93,7 @@ inline outcome::result<file_handle> file_handle::file(filesystem::path path) noe
   file_handle ret;
 
   // Perform phase 2 of object construction
-  ret._fd = ::open(path.c_str(), O_RDONLY);
+  ret._fd = ::open(path.u8string().c_str(), O_RDONLY);
   if(-1 == ret._fd)
   {
     // Note that if we bail out here, ~file_handle() will correctly not call ::close()
