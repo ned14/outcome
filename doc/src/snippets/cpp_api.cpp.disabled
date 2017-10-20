@@ -1,0 +1,58 @@
+/* Example of Outcome used with C APIs
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (149 commits)
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+#include "../../../include/outcome.hpp"
+
+#include <cstring>  // for memcpy
+
+namespace outcome = OUTCOME_V2_NAMESPACE;
+
+//! [function]
+// Fill the supplied buffer with the integer v converted to a string, returning
+// length of string minus null terminator
+extern "C" outcome::result<size_t> to_string(char *buffer, size_t bufferlen, int v) noexcept
+{
+  try
+  {
+    // Could throw an exception!
+    std::string temp(std::to_string(v));
+
+    // Will this string exceed the supplied buffer?
+    if(temp.size() + 1 > bufferlen)
+      return std::errc::no_buffer_space;
+
+    // Copy the string into the supplied buffer, and return length of string
+    memcpy(buffer, temp.data(), temp.size() + 1);
+    return temp.size();
+  }
+  catch(...)
+  {
+    // This utility function rethrows the C++ exception, matching it
+    // against every standard library exception and generating an
+    // error code exactly matching it if possible. So, if the
+    // string creation threw std::bad_alloc, that would be converted
+    // into make_error_code(std::errc::not_enough_memory).
+    return outcome::error_from_exception();
+  }
+}
+//! [function]

@@ -42,7 +42,6 @@ namespace policy
   */
   template <class EC> struct error_code_throw_as_system_error : detail::base
   {
-    static_assert(std::is_base_of<std::error_code, EC>::value, "error_type must be a base of a std::error_code to be used with this policy");
     /*! Performs a wide check of state, used in the value() functions.
     \effects If result does not have a value, if it has an error it throws a `std::system_error(error())`, else it throws `bad_result_access`.
     */

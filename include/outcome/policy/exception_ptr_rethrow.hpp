@@ -36,7 +36,6 @@ namespace policy
   {
     template <class EC> struct error_exception_ptr_rethrow : detail::base
     {
-      static_assert(std::is_base_of<std::exception_ptr, EC>::value, "error_type must be a base of a std::exception_ptr to be used with this policy");
       /*! Performs a wide check of state, used in the value() functions
       \effects If result does not have a value, if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_result_access`.
       */

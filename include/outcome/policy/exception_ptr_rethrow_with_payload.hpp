@@ -44,7 +44,6 @@ namespace policy
   */
   template <class R, class S, class P> struct exception_ptr_rethrow_with_payload : detail::base
   {
-    static_assert(std::is_base_of<std::exception_ptr, S>::value, "error_type must be a base of a std::exception_ptr to be used with this policy");
     /*! Performs a wide check of state, used in the value() functions
     if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
     */
