@@ -203,8 +203,8 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as i
     outcome<int> a(5);
     outcome<int> b(std::make_error_code(std::errc::invalid_argument));
     std::cout << sizeof(a) << std::endl;  // 40 bytes
-    b.assume_value();
-    a.assume_error();
+    a.assume_value();
+    b.assume_error();
 #ifdef __cpp_exceptions
     try
     {
