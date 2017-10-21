@@ -1,5 +1,6 @@
 #include "../../../include/outcome/outcome.hpp"
 
+#if(_HAS_CXX17 || __cplusplus >= 201700)
 //! [expected_implementation]
 /* Here is a fairly conforming implementation of P0323R3 `expected<T, E>` using `checked<T, E>`.
 It passes the reference test suite for P0323R3 at
@@ -92,6 +93,7 @@ template <class E, class... Args> unexpected<E> make_unexpected(Args &&... args)
 }
 template <class E> using bad_expected_access = OUTCOME_V2_NAMESPACE::bad_result_access_with<E>;
 //! [expected_implementation]
+#endif
 
 int main()
 {

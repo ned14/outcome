@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 993efbdecd30d33bfeded2c6f6a7c535fe122e20
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-18 17:39:26 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 993efbde
+#define OUTCOME_PREVIOUS_COMMIT_REF 0a13d5ae8ef83ac7c4d00004c07759db1a5d4ca2
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-20 17:57:46 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 0a13d5ae
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -4125,7 +4125,6 @@ namespace policy
 
   template <class EC> struct error_code_throw_as_system_error : detail::base
   {
-    static_assert(std::is_base_of<std::error_code, EC>::value, "error_type must be a base of a std::error_code to be used with this policy");
     /*! Performs a wide check of state, used in the value() functions.
     \effects If result does not have a value, if it has an error it throws a `std::system_error(error())`, else it throws `bad_result_access`.
     */
@@ -4325,7 +4324,6 @@ namespace policy
   {
     template <class EC> struct error_exception_ptr_rethrow : detail::base
     {
-      static_assert(std::is_base_of<std::exception_ptr, EC>::value, "error_type must be a base of a std::exception_ptr to be used with this policy");
       /*! Performs a wide check of state, used in the value() functions
       \effects If result does not have a value, if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_result_access`.
       */
@@ -7004,8 +7002,6 @@ namespace policy
 
   template <class R, class S, class P> struct error_code_throw_as_system_error_exception_rethrow : detail::base
   {
-    static_assert(std::is_base_of<std::error_code, S>::value, "error_type must be a base of std::error_code to be used with this policy");
-    static_assert(std::is_base_of<std::exception_ptr, P>::value, "exception_type must be a base of std::exception_ptr to be used with this policy");
     /*! Performs a wide check of state, used in the value() functions.
     \effects If outcome does not have a value, if it has an exception it rethrows it via `std::rethrow_exception()`,
     if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
@@ -7146,7 +7142,6 @@ namespace policy
 
   template <class R, class S, class P> struct error_code_throw_as_system_error_with_payload : detail::base
   {
-    static_assert(std::is_base_of<std::error_code, S>::value, "error_type must be a base of std::error_code to be used with this policy");
     /*! Performs a wide check of state, used in the value() functions.
     \effects If outcome does not have a value,
     if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
@@ -7289,8 +7284,6 @@ namespace policy
 
   template <class R, class S, class P> struct error_enum_throw_as_system_error_exception_rethrow : detail::base
   {
-    static_assert(std::is_base_of<std::error_code, S>::value, "error_type must be a base of std::error_code to be used with this policy");
-    static_assert(std::is_base_of<std::exception_ptr, P>::value, "exception_type must be a base of std::exception_ptr to be used with this policy");
     /*! Performs a wide check of state, used in the value() functions.
     \effects If outcome does not have a value, if it has an exception it rethrows it via `std::rethrow_exception()`,
     if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
@@ -7569,7 +7562,6 @@ namespace policy
 
   template <class R, class S, class P> struct exception_ptr_rethrow_with_payload : detail::base
   {
-    static_assert(std::is_base_of<std::exception_ptr, S>::value, "error_type must be a base of a std::exception_ptr to be used with this policy");
     /*! Performs a wide check of state, used in the value() functions
     if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
     */

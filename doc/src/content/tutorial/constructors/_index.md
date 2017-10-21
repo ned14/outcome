@@ -13,5 +13,5 @@ that one cannot avoid throwing C++ exceptions to abort a construction.
 As with most things in C++, one can achieve zero exception throw object
 construction using a lot of
 extra typing of boilerplate, and a little bit of simple C++ metaprogramming. This section
-shows you how for to implement these for those who are absolutely adverse to ever throwing an exception,
+shows you how to implement these for those who are absolutely adverse to ever throwing an exception,
 or cannot because C++ exceptions have been globally disabled.
