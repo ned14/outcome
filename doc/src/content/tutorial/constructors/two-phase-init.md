@@ -27,7 +27,7 @@ the successfully constructed object, or the cause of any failure to
 construct the object.
 
 Finally, as a phase 3,
-some simple metaprogramming will implement a `construct<T>(Args...)`
+some simple metaprogramming will implement a `construct<T>{}(Args...)`
 free function which will construct any object `T` by calling its
 static initialisation function with `Args...` and returning the
 `result` returned. This isn't as nice as calling `T(Args...)` directly,

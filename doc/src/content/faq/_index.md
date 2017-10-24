@@ -57,8 +57,8 @@ Expected permits `T` and `E` to be the same.
 `bad_expected_access<E>`.
 7. `checked<T, E>` models `std::variant<...>`. Expected models `std::optional<T>`. Thus:
    - `checked<T, E>` does not provide `operator*()` nor `operator->`
-   - `checked<T, E>` `.error()` is wide (i.e. throws on incorrect use) like `.value()`.
-   Expected's `.error()` is narrow (UB on incorrect use). (`checked<T, E>` provides
+   - `checked<T, E>` `.error()` is wide (i.e. throws on no-value) like `.value()`.
+   Expected's `.error()` is narrow (UB on no-error). (`checked<T, E>` provides
    `.assume_value()` and `.assume_error()` for narrow (UB causing) observers)
 8. `checked<T, E>` uses `success<T>` and `failure<E>` type sugars for disambiguation.
 Expected uses `unexpected<E>` only.
