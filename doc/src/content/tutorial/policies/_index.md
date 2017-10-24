@@ -5,7 +5,7 @@ weight = 60
 +++
 
 Earlier in the section on [Default actions](../default-actions), we covered all the different
-actions which Outcome can take upon incorrect observation, and we noted that this facility
+actions which Outcome can take upon no-value observation, and we noted that this facility
 is fully programmable.
 
 `result<T, EC>` is actually `result<T, EC, NoValuePolicy>`. So is `outcome<T, EC, EP|P>` in

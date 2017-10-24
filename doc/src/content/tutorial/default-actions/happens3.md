@@ -12,12 +12,12 @@ Exception thrown was failure1
 ned@lyta:~/outcome/build_posix$
 ```
 
-Ah so now we are throwing a C++ exception on incorrect observation! This
+Ah so now we are throwing a C++ exception on no-value observation! This
 is because we registered our error code enum with the C++ standard library
 and in so doing, we also told the standard library how our error code
 interacts with `std::error_code` and thus `std::system_error`.
 
-Outcome's default action when incorrectly observing a `result` or `outcome`
+Outcome's default action when no-value observing a `result` or `outcome`
 with a `EC` type where `std::is_error_code_enum<EC>` is true, or
 `std::is_error_condition_enum<EC>` is true, is to throw a 
 `std::system_error(make_error_code(.error()))`. So because `.error()`

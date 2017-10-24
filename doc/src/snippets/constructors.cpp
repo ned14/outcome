@@ -55,6 +55,20 @@ class file_handle
   constexpr file_handle() {}
 
 public:
+  using path_type = filesystem::path;
+
+  //! The behaviour of the handle: does it read, read and write, or atomic append?
+  enum class mode : unsigned char  // bit 0 set means writable
+  {
+    unchanged = 0,
+    none = 2,        //!< No ability to read or write anything, but can synchronise (SYNCHRONIZE or 0)
+    attr_read = 4,   //!< Ability to read attributes (FILE_READ_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)
+    attr_write = 5,  //!< Ability to read and write attributes (FILE_READ_ATTRIBUTES|FILE_WRITE_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)
+    read = 6,        //!< Ability to read (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|SYNCHRONISE or O_RDONLY)
+    write = 7,       //!< Ability to read and write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_DATA|FILE_WRITE_ATTRIBUTES|FILE_WRITE_EA|FILE_APPEND_DATA|SYNCHRONISE or O_RDWR)
+    append = 9       //!< All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND_DATA|SYNCHRONISE or O_APPEND)
+  };
+
   // Moves but not copies permitted
   file_handle(const file_handle &) = delete;
   file_handle(file_handle &&o) noexcept : _fd(o._fd) { o._fd = -1; }
@@ -81,19 +95,36 @@ public:
   }
 
   // Phase 2 static member constructor function, which cannot throw
-  static inline outcome::result<file_handle> file(filesystem::path path) noexcept;
+  static inline outcome::result<file_handle> file(path_type path, mode mode = mode::read) noexcept;
 };
 //! [file_handle]
 
 //! [file]
 // Phase 2 static member constructor function, which cannot throw
-inline outcome::result<file_handle> file_handle::file(filesystem::path path) noexcept
+inline outcome::result<file_handle> file_handle::file(file_handle::path_type path, file_handle::mode mode) noexcept
 {
   // Perform phase 1 of object construction
   file_handle ret;
 
   // Perform phase 2 of object construction
-  ret._fd = ::open(path.u8string().c_str(), O_RDONLY);
+  int flags = 0;
+  switch(mode)
+  {
+  case mode::attr_read:
+  case mode::read:
+    flags = O_RDONLY;
+    break;
+  case mode::attr_write:
+  case mode::write:
+    flags = O_RDWR;
+    break;
+  case mode::append:
+    flags = O_APPEND;
+    break;
+  default:
+    return std::errc::invalid_argument;
+  }
+  ret._fd = ::open(path.u8string().c_str(), flags);
   if(-1 == ret._fd)
   {
     // Note that if we bail out here, ~file_handle() will correctly not call ::close()
@@ -111,8 +142,42 @@ inline outcome::result<file_handle> file_handle::file(filesystem::path path) noe
 }
 //! [file]
 
+//! [construct-declaration]
+template <class T> struct construct
+{
+  outcome::result<T> operator()() const noexcept
+  {  //
+    static_assert(!std::is_same<T, T>::value, "construct<T>() was not specialised for the type T supplied");
+  }
+};
+//! [construct-declaration]
+
+//! [construct-specialisation]
+template <> struct construct<file_handle>
+{
+  file_handle::path_type _path;
+  file_handle::mode _mode{file_handle::mode::read};
+  // Any other args, default initialised if necessary, follow here ...
+
+  outcome::result<file_handle> operator()() const noexcept { return file_handle::file(std::move(_path)); }
+};
+//! [construct-specialisation]
+
 int main()
 {
-  outcome::result<file_handle> fh = file_handle::file("hello");
+  //! [static-use]
+  outcome::result<file_handle> fh1 = file_handle::file("hello" /*, file_handle::mode::read */);
+  if(!fh1)
+  {
+    std::cerr << "Opening file 'hello' failed with " << fh1.error().message() << std::endl;
+  }
+  //! [static-use]
+  //! [construct-use]
+  outcome::result<file_handle> fh2 = construct<file_handle>{"hello" /*, file_handle::mode::read */}();
+  if(!fh2)
+  {
+    std::cerr << "Opening file 'hello' failed with " << fh2.error().message() << std::endl;
+  }
+  //! [construct-use]
   return 0;
 }
