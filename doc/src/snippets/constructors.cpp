@@ -55,6 +55,8 @@ class file_handle
   constexpr file_handle() {}
 
 public:
+  using path_type = filesystem::path;
+
   // Moves but not copies permitted
   file_handle(const file_handle &) = delete;
   file_handle(file_handle &&o) noexcept : _fd(o._fd) { o._fd = -1; }
@@ -81,13 +83,13 @@ public:
   }
 
   // Phase 2 static member constructor function, which cannot throw
-  static inline outcome::result<file_handle> file(filesystem::path path) noexcept;
+  static inline outcome::result<file_handle> file(path_type path) noexcept;
 };
 //! [file_handle]
 
 //! [file]
 // Phase 2 static member constructor function, which cannot throw
-inline outcome::result<file_handle> file_handle::file(filesystem::path path) noexcept
+inline outcome::result<file_handle> file_handle::file(file_handle::path_type path) noexcept
 {
   // Perform phase 1 of object construction
   file_handle ret;
@@ -111,8 +113,40 @@ inline outcome::result<file_handle> file_handle::file(filesystem::path path) noe
 }
 //! [file]
 
+//! [construct-declaration]
+template <class T> struct construct
+{
+  outcome::result<T> operator()() const noexcept
+  {  //
+    static_assert(!std::is_same<T, T>::value, "construct<T>() was not specialised for the type T supplied");
+  }
+};
+//! [construct-declaration]
+
+//! [construct-specialisation]
+template <> struct construct<file_handle>
+{
+  file_handle::path_type _path;
+  // Any other args, default initialised if necessary, follow here ...
+  outcome::result<file_handle> operator()() const noexcept { return file_handle::file(std::move(_path)); }
+};
+//! [construct-specialisation]
+
 int main()
 {
-  outcome::result<file_handle> fh = file_handle::file("hello");
+  //! [static-use]
+  outcome::result<file_handle> fh1 = file_handle::file("hello");
+  if(!fh1)
+  {
+    std::cerr << "Opening file 'hello' failed with " << fh1.error().message() << std::endl;
+  }
+  //! [static-use]
+  //! [construct-use]
+  outcome::result<file_handle> fh2 = construct<file_handle>{"hello"}();
+  if(!fh2)
+  {
+    std::cerr << "Opening file 'hello' failed with " << fh2.error().message() << std::endl;
+  }
+  //! [construct-use]
   return 0;
 }
