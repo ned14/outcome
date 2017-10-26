@@ -34,13 +34,47 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  /*! Policy interpreting EC as a type for which `trait::has_error_code<EC>` is true
-  and any wide attempt to access the successful state throws the `error_code` wrapped into
-  a `std::system_error`
+  //! Override to define what the policies which throw a system error with payload ought to do for some particular `result`.
+  template <class T> constexpr inline void throw_as_system_error_with_payload(const T * /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload"); }
+  namespace detail
+  {
+    template <bool has_error_payload, class T, class EC> struct throw_result_as_system_error
+    {
+      template <class Impl> throw_result_as_system_error(const Impl *self)
+      {
+        auto *_self = static_cast<const result<T, EC> *>(self);
+        OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(_self->error())));
+      }
+      template <class Impl> throw_result_as_system_error(Impl *self)
+      {
+        auto *_self = static_cast<result<T, EC> *>(self);
+        OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(_self->error())));
+      }
+    };
+    template <class T, class EC> struct throw_result_as_system_error<true, T, EC>
+    {
+      template <class Impl> throw_result_as_system_error(Impl *self)
+      {
+        auto *_self = static_cast<result<T, EC> *>(self);
+        throw_as_system_error_with_payload(_self);
+      }
+      template <class Impl> throw_result_as_system_error(const Impl *self)
+      {
+        auto *_self = static_cast<const result<T, EC> *>(self);
+        throw_as_system_error_with_payload(_self);
+      }
+    };
+  }
 
-  Can be used in `result` only.
+  /*! Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
+  Any wide attempt to access the successful state where there is none causes:
+
+  1. If `trait::has_error_payload_v<EC>` is true, it calls an
+  ADL discovered free function `throw_as_system_error_with_payload(&result|&outcome)`.
+  2. If `trait::has_error_payload_v<EC>` is false, it calls `OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(.error())))`
   */
-  template <class EC> struct error_code_throw_as_system_error : detail::base
+  template <class T, class EC, class E> struct error_code_throw_as_system_error;
+  template <class T, class EC> struct error_code_throw_as_system_error<T, EC, void> : detail::base
   {
     /*! Performs a wide check of state, used in the value() functions.
     \effects If result does not have a value, if it has an error it throws a `std::system_error(error())`, else it throws `bad_result_access`.
@@ -51,7 +85,7 @@ namespace policy
       {
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          OUTCOME_THROW_EXCEPTION(std::system_error(detail::error_code(self->_error)));
+          detail::throw_result_as_system_error<trait::has_error_payload_v<EC>, T, EC>{self};
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }

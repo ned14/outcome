@@ -60,15 +60,11 @@ namespace policy
   /*! Default `outcome<R, S, P>` policy selector.
   */
   template <class R, class S, class P>
-  using default_outcome_policy =                                                                                                                                                    //
-  std::conditional_t<                                                                                                                                                               //
-  (std::is_error_code_enum<S>::value || std::is_error_condition_enum<S>::value) && trait::is_exception_ptr<P>::value, error_enum_throw_as_system_error_exception_rethrow<R, S, P>,  //
-  std::conditional_t<                                                                                                                                                               //
-  (std::is_error_code_enum<S>::value || std::is_error_condition_enum<S>::value) && !trait::is_exception_ptr<P>::value, error_enum_throw_as_system_error_with_payload<R, S, P>,      //
-  std::conditional_t<                                                                                                                                                               //
-  trait::is_error_code<S>::value && trait::is_exception_ptr<P>::value, error_code_throw_as_system_error_exception_rethrow<R, S, P>,                                                 //
-  std::conditional_t<                                                                                                                                                               //
-  trait::is_error_code<S>::value && !trait::is_exception_ptr<P>::value, error_code_throw_as_system_error_with_payload<R, S, P>,
+  using default_outcome_policy =                                                                                                                              //
+  std::conditional_t<                                                                                                                                         //
+  trait::has_error_code_v<S> && trait::has_error_payload_v<S> && trait::has_exception_ptr_v<P>, error_code_throw_as_system_error_exception_rethrow<R, S, P>,  //
+  std::conditional_t<                                                                                                                                         //
+  trait::has_error_code_v<S> && trait::has_exception_ptr_v<P>, error_code_throw_as_system_error_exception_rethrow<R, S, P>,
   std::conditional_t<  //
   trait::is_exception_ptr<S>::value, exception_ptr_rethrow_with_payload<R, S, P>,
   std::conditional_t<  //
@@ -76,7 +72,7 @@ namespace policy
   std::conditional_t<  //
   std::is_void<S>::value, terminate,
   all_narrow  //
-  >>>>>>>;
+  >>>>>;
 }  // namespace policy
 
 template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_outcome_policy<R, S, P>>  //

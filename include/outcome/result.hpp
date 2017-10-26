@@ -51,13 +51,14 @@ namespace policy
   /*! Default `result<R, S>` policy selector.
   */
   template <class T, class EC>
-  using default_result_policy = std::conditional_t<                    //
-  std::is_void<EC>::value, terminate,                                  //
-  std::conditional_t<                                                  //
-  trait::has_error_code_v<EC>, error_code_throw_as_system_error<EC>,   //
-  std::conditional_t<                                                  //
-  trait::has_exception_ptr_v<EC>, exception_ptr_rethrow<T, EC, void>,  //
-  all_narrow                                                           //
+  using default_result_policy = std::conditional_t<  //
+  std::is_void<EC>::value,
+  terminate,                                                                   //
+  std::conditional_t<                                                          //
+  trait::has_error_code_v<EC>, error_code_throw_as_system_error<T, EC, void>,  //
+  std::conditional_t<                                                          //
+  trait::has_exception_ptr_v<EC>, exception_ptr_rethrow<T, EC, void>,          //
+  all_narrow                                                                   //
   >>>;
 }  // namespace policy
 

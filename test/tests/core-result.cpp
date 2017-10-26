@@ -32,6 +32,35 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <iostream>
 
+// Custom error type with payload
+struct payload
+{
+  std::error_code ec;
+  const char *str{nullptr};
+  payload() = default;
+  payload(std::errc _ec, const char *_str)
+      : ec(make_error_code(_ec))
+      , str(_str)
+  {
+  }
+};
+struct payload_exception : std::runtime_error
+{
+  payload_exception(const char *what)
+      : std::runtime_error(what)
+  {
+  }
+};
+inline const std::error_code &make_error_code(const payload &p)
+{
+  return p.ec;
+}
+// Should we not just detect throw_as_system_error_with_payload() and leave this out entirely?
+inline const char *make_error_payload(const payload &p)
+{
+  return p.str;
+}
+
 BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
 {
 #ifdef TESTING_WG21_EXPERIMENTAL_RESULT
@@ -320,4 +349,27 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
 #endif
     BOOST_CHECK(b.c.error.code == EINVAL);  // NOLINT
   }
+
+#ifndef TESTING_WG21_EXPERIMENTAL_RESULT
+  // Test payload facility
+  {
+    const char *niall = "niall";
+    result<int, payload> b{std::errc::invalid_argument, niall};
+#ifdef __cpp_exceptions
+    try
+    {
+      b.value();
+      BOOST_CHECK(false);
+    }
+    catch(const payload_exception &e)
+    {
+      BOOST_CHECK(e.what() == niall);
+    }
+    catch(...)
+    {
+      BOOST_CHECK(false);
+    }
+#endif
+  }
+#endif
 }

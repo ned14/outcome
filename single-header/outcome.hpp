@@ -1867,6 +1867,11 @@ namespace detail
 namespace trait
 {
   constexpr inline void make_error_code(...);
+  // Also enable for any pair or tuple whose first item satisfies make_error_code()
+  template <class T, //
+            class R = decltype(make_error_code(std::get<0>(std::declval<T>()))) //
+            >
+  constexpr inline R make_error_code(T &&);
   /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
   Also returns true if `std::error_code` is convertible from T.
   */
@@ -1883,6 +1888,14 @@ namespace trait
   template <class T> constexpr bool has_error_code_v = has_error_code<T>::value;
 
   constexpr inline void make_error_payload(...);
+  // Also enable for any pair or tuple whose first item satisfies make_error_code()
+  // and whose second item satisfies make_error_payload() and where tuple size is 2.
+  template <class T, //
+            class R = decltype(make_error_code(std::get<0>(std::declval<T>()))), //
+            class S = decltype(make_error_payload(std::get<1>(std::declval<T>()))) //
+            typename = std::enable_if_t<std::tuple_size<T>::value == 2> //
+            >
+  constexpr inline S make_error_payload(T &&);
   /*! Trait for whether a free function `make_error_payload(T)` not returning `void` exists or not.
   */
 
@@ -1917,19 +1930,39 @@ namespace trait
 //! Namespace for policies
 namespace policy
 {
-  namespace detail
-  {
-    OUTCOME_TEMPLATE(class T)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::error_code>::value))
-    constexpr inline auto make_error_code(T &&v) { return std::forward<T>(v); }
-    OUTCOME_TEMPLATE(class T)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::exception_ptr>::value))
-    constexpr inline auto make_exception_ptr(T &&v) { return std::forward<T>(v); }
+  /*! Pass through `make_error_code` function for anything implicitly convertible to `std::error_code`.
+  \requires `T` is implicitly convertible to `std::error_code`.
+  */
 
-    template <class T> constexpr inline auto error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
-    template <class T> constexpr inline auto error_payload(T &&v) { return make_error_payload(std::forward<T>(v)); }
-    template <class T> constexpr inline auto exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
-  }
+
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::error_code>::value))
+  constexpr inline decltype(auto) make_error_code(T &&v) { return std::forward<T>(v); }
+  /*! Pass through `make_error_code` function for any pair or 2-tuple returning the first item.
+  */
+
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(make_error_code(std::get<0>(std::declval<T>()))), OUTCOME_TPRED(std::tuple_size<T>::value == 2))
+  constexpr inline decltype(auto) make_error_code(T &&v) { return make_error_code(std::get<0>(std::forward<T>(v))); }
+
+  /*! Pass through `make_error_payload` function for any pair or 2-tuple returning the second item.
+  */
+
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(make_error_code(std::get<0>(std::declval<T>()))), OUTCOME_TEXPR(make_error_payload(std::get<1>(std::declval<T>()))), OUTCOME_TPRED(std::tuple_size<T>::value == 2))
+  constexpr inline decltype(auto) make_error_payload(T &&v) { return make_error_payload(std::get<1>(std::forward<T>(v))); }
+
+  /*! Pass through `make_exception_ptr` function for `std::exception_ptr`.
+  */
+
+  inline std::exception_ptr make_exception_ptr(std::exception_ptr v) { return std::move(v); }
+
+  //! Used by policies to extract a `std::error_code` from some input `T` via ADL discovery of some `make_error_code(T)` function.
+  template <class T> constexpr inline decltype(auto) error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
+  //! Used by policies to extract a payload from some input `T` via ADL discovery of some `make_error_payload(T)` function.
+  template <class T> constexpr inline decltype(auto) error_payload(T &&v) { return make_error_payload(std::forward<T>(v)); }
+  //! Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
+  template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
 }
 
 // Do we have C++ 17 deduced templates?
@@ -4127,18 +4160,53 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  /*! Policy interpreting EC as a type for which `trait::has_error_code<EC>` is true
-  and any wide attempt to access the successful state throws the `error_code` wrapped into
-  a `std::system_error`
+  //! Override to define what the policies which throw a system error with payload ought to do for some particular `result`.
+  template <class T> constexpr inline void throw_as_system_error_with_payload(const T * /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload"); }
+  namespace detail
+  {
+    template <bool has_error_payload, class T, class EC> struct throw_result_as_system_error
+    {
+      template <class Impl> throw_result_as_system_error(const Impl *self)
+      {
+        auto *_self = static_cast<const result<T, EC> *>(self);
+        OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(_self->error())));
+      }
+      template <class Impl> throw_result_as_system_error(Impl *self)
+      {
+        auto *_self = static_cast<result<T, EC> *>(self);
+        OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(_self->error())));
+      }
+    };
+    template <class T, class EC> struct throw_result_as_system_error<true, T, EC>
+    {
+      template <class Impl> throw_result_as_system_error(Impl *self)
+      {
+        auto *_self = static_cast<result<T, EC> *>(self);
+        throw_as_system_error_with_payload(_self);
+      }
+      template <class Impl> throw_result_as_system_error(const Impl *self)
+      {
+        auto *_self = static_cast<const result<T, EC> *>(self);
+        throw_as_system_error_with_payload(_self);
+      }
+    };
+  }
 
-  Can be used in `result` only.
+  /*! Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
+  Any wide attempt to access the successful state where there is none causes:
+
+  1. If `trait::has_error_payload_v<EC>` is true, it calls an
+  ADL discovered free function `throw_as_system_error_with_payload(&result|&outcome)`.
+  2. If `trait::has_error_payload_v<EC>` is false, it calls `OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(.error())))`
   */
 
 
 
 
 
-  template <class EC> struct error_code_throw_as_system_error : detail::base
+
+  template <class T, class EC, class E> struct error_code_throw_as_system_error;
+  template <class T, class EC> struct error_code_throw_as_system_error<T, EC, void> : detail::base
   {
     /*! Performs a wide check of state, used in the value() functions.
     \effects If result does not have a value, if it has an error it throws a `std::system_error(error())`, else it throws `bad_result_access`.
@@ -4151,7 +4219,7 @@ namespace policy
       {
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          OUTCOME_THROW_EXCEPTION(std::system_error(detail::error_code(self->_error)));
+          detail::throw_result_as_system_error<trait::has_error_payload_v<EC>, T, EC>{self};
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
@@ -4230,56 +4298,45 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  namespace detail
-  {
-    template <class EC> struct error_exception_ptr_rethrow : detail::base
-    {
-      /*! Performs a wide check of state, used in the value() functions
-      \effects If result does not have a value, if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_result_access`.
-      */
-
-
-      template <class Impl> static constexpr void wide_value_check(Impl *self)
-      {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
-        {
-          if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
-          {
-            std::rethrow_exception(self->_error);
-          }
-          OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
-        }
-      }
-      /*! Performs a wide check of state, used in the value() functions
-      \effects If result does not have a value, if it has an error it throws that error, else it throws `bad_result_access`.
-      */
-
-
-      template <class Impl> static constexpr void wide_error_check(Impl *self)
-      {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
-        {
-          OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
-        }
-      }
-    };
-    // Implemented in outcome.hpp to work around chicken-before-egg problem
-    template <class R, class S, class P> struct exception_exception_ptr_rethrow;
-  } // namespace detail
-
-  /*! Policy interpreting S or P as a type implementing the `std::exception_ptr` contract
-  and any wide attempt to access the successful state calls `std::rethrow_exception()`.
-
-  Can be used in both `result` and `outcome`.
+  /*! Policy interpreting `EC` or `E` as a type for which `trait::has_exception_ptr_v<EC|E>` is true.
+  Any wide attempt to access the successful state where there is none causes:
+  `std::rethrow_exception(policy::exception_ptr(.error()|.exception()))` appropriately.
   */
 
 
 
+  template <class T, class EC, class E> struct exception_ptr_rethrow;
+  template <class T, class EC> struct exception_ptr_rethrow<T, EC, void> : detail::base
+  {
+    /*! Performs a wide check of state, used in the value() functions
+    \effects If result does not have a value, if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_result_access`.
+    */
 
-  template <class R, class S, class P>
-  using exception_ptr_rethrow = std::conditional_t<std::is_void<P>::value, //
-                                                   detail::error_exception_ptr_rethrow<S>, //
-                                                   detail::exception_exception_ptr_rethrow<R, S, P>>;
+
+    template <class Impl> static constexpr void wide_value_check(Impl *self)
+    {
+      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      {
+        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
+        {
+          std::rethrow_exception(policy::exception_ptr(self->_error));
+        }
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
+      }
+    }
+    /*! Performs a wide check of state, used in the value() functions
+    \effects If result does not have a value, if it has an error it throws that error, else it throws `bad_result_access`.
+    */
+
+
+    template <class Impl> static constexpr void wide_error_check(Impl *self)
+    {
+      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      {
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
+      }
+    }
+  };
 } // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
@@ -4521,9 +4578,10 @@ namespace policy
 
   template <class T, class EC>
   using default_result_policy = std::conditional_t< //
-  std::is_void<EC>::value, terminate, //
+  std::is_void<EC>::value,
+  terminate, //
   std::conditional_t< //
-  trait::has_error_code_v<EC>, error_code_throw_as_system_error<EC>, //
+  trait::has_error_code_v<EC>, error_code_throw_as_system_error<T, EC, void>, //
   std::conditional_t< //
   trait::has_exception_ptr_v<EC>, exception_ptr_rethrow<T, EC, void>, //
   all_narrow //
@@ -5366,13 +5424,9 @@ namespace policy
   template <class R, class S, class P>
   using default_outcome_policy = //
   std::conditional_t< //
-  (std::is_error_code_enum<S>::value || std::is_error_condition_enum<S>::value) && trait::is_exception_ptr<P>::value, error_enum_throw_as_system_error_exception_rethrow<R, S, P>, //
+  trait::has_error_code_v<S> && trait::has_error_payload_v<S> && trait::has_exception_ptr_v<P>, error_code_throw_as_system_error_exception_rethrow<R, S, P>, //
   std::conditional_t< //
-  (std::is_error_code_enum<S>::value || std::is_error_condition_enum<S>::value) && !trait::is_exception_ptr<P>::value, error_enum_throw_as_system_error_with_payload<R, S, P>, //
-  std::conditional_t< //
-  trait::is_error_code<S>::value && trait::is_exception_ptr<P>::value, error_code_throw_as_system_error_exception_rethrow<R, S, P>, //
-  std::conditional_t< //
-  trait::is_error_code<S>::value && !trait::is_exception_ptr<P>::value, error_code_throw_as_system_error_with_payload<R, S, P>,
+  trait::has_error_code_v<S> && trait::has_exception_ptr_v<P>, error_code_throw_as_system_error_exception_rethrow<R, S, P>,
   std::conditional_t< //
   trait::is_exception_ptr<S>::value, exception_ptr_rethrow_with_payload<R, S, P>,
   std::conditional_t< //
@@ -5380,7 +5434,7 @@ namespace policy
   std::conditional_t< //
   std::is_void<S>::value, terminate,
   all_narrow //
-  >>>>>>>;
+  >>>>>;
 } // namespace policy
 
 template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_outcome_policy<R, S, P>> //
@@ -6825,706 +6879,12 @@ namespace policy
   } // namespace detail
 } // namespace policy
 OUTCOME_V2_NAMESPACE_END
-/* Policies for result and outcome
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
-File Created: Oct 2017
 
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#ifndef OUTCOME_POLICY_ERROR_CODE_THROW_AS_SYSTEM_ERROR_EXCEPTION_RETHROW_HPP
-#define OUTCOME_POLICY_ERROR_CODE_THROW_AS_SYSTEM_ERROR_EXCEPTION_RETHROW_HPP
-
-
-
-
-#include <system_error>
-
-OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
-
-
-
-
-namespace policy
-{
-  /*! Policy interpreting S as a type implementing the `std::error_code` contract, P as
-  a type implementing the `std::exception_ptr` contract, and any wide attempt to access the
-  successful state throws the `exception_ptr` if available, then the `error_code` wrapped
-  into a `std::system_error`.
-
-  Can be used in `outcome` only.
-  */
-
-
-
-
-
-
-  template <class R, class S, class P> struct error_code_throw_as_system_error_exception_rethrow : detail::base
-  {
-    /*! Performs a wide check of state, used in the value() functions.
-    \effects If outcome does not have a value, if it has an exception it rethrows it via `std::rethrow_exception()`,
-    if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
-    */
-
-
-
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
-      {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0)
-        {
-          auto *_self = static_cast<const outcome<R, S, P, error_code_throw_as_system_error_exception_rethrow> *>(self);
-          std::rethrow_exception(_self->_ptr);
-        }
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
-        {
-          OUTCOME_THROW_EXCEPTION(std::system_error(self->_error));
-        }
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
-      }
-    }
-    /*! Performs a wide check of state, used in the error() functions
-    \effects If outcome does not have an error, it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_error_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
-      }
-    }
-    /*! Performs a wide check of state, used in the payload() functions
-    \effects If outcome does not have a payload, it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_payload_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no payload"));
-      }
-    }
-    /*! Performs a wide check of state, used in the exception() functions
-    \effects If outcome does not have an exception, it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_exception_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
-      }
-    }
-  };
-} // namespace policy
-
-OUTCOME_V2_NAMESPACE_END
-
-#endif
-/* Policies for result and outcome
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
-File Created: Oct 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#ifndef OUTCOME_POLICY_ERROR_CODE_THROW_AS_SYSTEM_ERROR_WITH_PAYLOAD_HPP
-#define OUTCOME_POLICY_ERROR_CODE_THROW_AS_SYSTEM_ERROR_WITH_PAYLOAD_HPP
-
-
-
-
-#include <system_error>
-
-OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
-
-
-
-
-namespace policy
-{
-  /*! Policy interpreting S as a type implementing the `std::error_code` contract, P
-  as a payload type, and any wide attempt to access the successful state calls an
-  ADL discovered free function `throw_as_system_error_with_payload()`.
-
-  Can be used in `outcome` only.
-  */
-
-
-
-
-
-  template <class R, class S, class P> struct error_code_throw_as_system_error_with_payload : detail::base
-  {
-    /*! Performs a wide check of state, used in the value() functions.
-    \effects If outcome does not have a value,
-    if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
-    */
-
-
-
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
-      {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) != 0)
-        {
-          auto *_self = static_cast<const outcome<R, S, P, error_code_throw_as_system_error_with_payload> *>(self);
-          throw_as_system_error_with_payload(_self);
-        }
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
-        {
-          OUTCOME_THROW_EXCEPTION(std::system_error(self->_error));
-        }
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
-      }
-    }
-    /*! Performs a wide check of state, used in the error() functions
-    \effects If outcome does not have an error, it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_error_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
-      }
-    }
-    /*! Performs a wide check of state, used in the payload() functions
-    \effects If outcome does not have a payload, it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_payload_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no payload"));
-      }
-    }
-    /*! Performs a wide check of state, used in the exception() functions
-    \effects If outcome does not have an exception, it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_exception_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
-      }
-    }
-  };
-} // namespace policy
-
-OUTCOME_V2_NAMESPACE_END
-
-#endif
-/* Policies for result and outcome
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
-File Created: Oct 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#ifndef OUTCOME_POLICY_ERROR_ENUM_THROW_AS_SYSTEM_ERROR_EXCEPTION_RETHROW_HPP
-#define OUTCOME_POLICY_ERROR_ENUM_THROW_AS_SYSTEM_ERROR_EXCEPTION_RETHROW_HPP
-
-
-
-
-#include <system_error>
-
-OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
-
-
-
-
-namespace policy
-{
-  /*! Policy interpreting S as an enum convertible into the `std::error_code` contract, P as
-  a type implementing the `std::exception_ptr` contract, and any wide attempt to access the
-  successful state throws the `exception_ptr` if available, then the `error_code` wrapped
-  into a `std::system_error`.
-
-  Can be used in `outcome` only.
-  */
-
-
-
-
-
-
-  template <class R, class S, class P> struct error_enum_throw_as_system_error_exception_rethrow : detail::base
-  {
-    /*! Performs a wide check of state, used in the value() functions.
-    \effects If outcome does not have a value, if it has an exception it rethrows it via `std::rethrow_exception()`,
-    if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
-    */
-
-
-
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
-      {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0)
-        {
-          auto *_self = static_cast<const outcome<R, S, P, error_enum_throw_as_system_error_exception_rethrow> *>(self);
-          std::rethrow_exception(_self->_ptr);
-        }
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
-        {
-          OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(self->_error)));
-        }
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
-      }
-    }
-    /*! Performs a wide check of state, used in the error() functions
-    \effects If outcome does not have an error, it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_error_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
-      }
-    }
-    /*! Performs a wide check of state, used in the payload() functions
-    \effects If outcome does not have a payload, it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_payload_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no payload"));
-      }
-    }
-    /*! Performs a wide check of state, used in the exception() functions
-    \effects If outcome does not have an exception, it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_exception_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
-      }
-    }
-  };
-} // namespace policy
-
-OUTCOME_V2_NAMESPACE_END
-
-#endif
-/* Policies for result and outcome
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
-File Created: Oct 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#ifndef OUTCOME_POLICY_ERROR_ENUM_THROW_AS_SYSTEM_ERROR_WITH_PAYLOAD_HPP
-#define OUTCOME_POLICY_ERROR_ENUM_THROW_AS_SYSTEM_ERROR_WITH_PAYLOAD_HPP
-
-
-
-
-#include <system_error>
-
-OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
-
-
-
-
-namespace policy
-{
-  /*! Policy interpreting S as an enum convertible into the `std::error_code` contract
-  and any wide attempt to access the successful state calls an
-  ADL discovered free function `throw_as_system_error_with_payload()`.
-
-  Can be used in `outcome` only.
-  */
-
-
-
-
-
-  template <class R, class S, class P> struct error_enum_throw_as_system_error_with_payload : detail::base
-  {
-    /*! Performs a wide check of state, used in the value() functions.
-    \effects If outcome does not have a value,
-    if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
-    */
-
-
-
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
-      {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) != 0)
-        {
-          auto *_self = static_cast<const outcome<R, S, P, error_enum_throw_as_system_error_with_payload> *>(self);
-          throw_as_system_error_with_payload(_self);
-        }
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
-        {
-          OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(self->_error)));
-        }
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
-      }
-    }
-    /*! Performs a wide check of state, used in the error() functions
-    \effects If outcome does not have an error, it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_error_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
-      }
-    }
-    /*! Performs a wide check of state, used in the payload() functions
-    \effects If outcome does not have a payload, it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_payload_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no payload"));
-      }
-    }
-    /*! Performs a wide check of state, used in the exception() functions
-    \effects If outcome does not have an exception, it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_exception_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
-      }
-    }
-  };
-} // namespace policy
-
-OUTCOME_V2_NAMESPACE_END
-
-#endif
-/* Policies for result and outcome
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
-File Created: Oct 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#ifndef OUTCOME_POLICY_EXCEPTION_PTR_RETHROW_WITH_PAYLOAD_HPP
-#define OUTCOME_POLICY_EXCEPTION_PTR_RETHROW_WITH_PAYLOAD_HPP
-
-
-
-
-OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
-
-
-
-
-namespace policy
-{
-  /*! Policy interpreting S as a type implementing the `std::exception_ptr` contract
-  and any wide attempt to access the successful state calls an
-  ADL discovered free function `throw_exception_ptr_with_payload()`.
-
-  Can be used in `outcome` only.
-  */
-
-
-
-
-
-  template <class R, class S, class P> struct exception_ptr_rethrow_with_payload : detail::base
-  {
-    /*! Performs a wide check of state, used in the value() functions
-    if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
-      {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) != 0)
-        {
-          auto *_self = static_cast<const outcome<R, S, P, exception_ptr_rethrow_with_payload> *>(self);
-          throw_exception_ptr_with_payload(_self);
-        }
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
-        {
-          std::rethrow_exception(self->_error);
-        }
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
-      }
-    }
-    /*! Performs a wide check of state, used in the error() functions
-    \effects If outcome does not have an error, it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_error_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
-      }
-    }
-    /*! Performs a wide check of state, used in the payload() functions
-    \effects If outcome does not have a payload, it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_payload_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no payload"));
-      }
-    }
-    /*! Performs a wide check of state, used in the exception() functions
-    \effects If outcome does not have an exception, it throws `bad_outcome_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_exception_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
-      }
-    }
-  };
-} // namespace policy
-
-OUTCOME_V2_NAMESPACE_END
-
-#endif
+#include "policy/error_code_throw_as_system_error_exception_rethrow.hpp"
+#include "policy/error_code_throw_as_system_error_with_payload.hpp"
+#include "policy/error_enum_throw_as_system_error_exception_rethrow.hpp"
+#include "policy/error_enum_throw_as_system_error_with_payload.hpp"
+#include "policy/exception_ptr_rethrow_with_payload.hpp"
 /* Payload observers for outcome type
 (C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: Oct 2017

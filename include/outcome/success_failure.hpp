@@ -52,6 +52,11 @@ namespace detail
 namespace trait
 {
   constexpr inline void make_error_code(...);
+  // Also enable for any pair or tuple whose first item satisfies make_error_code()
+  template <class T,                                                             //
+            class R = decltype(make_error_code(std::get<0>(std::declval<T>())))  //
+            >
+  constexpr inline R make_error_code(T &&);
   /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
   Also returns true if `std::error_code` is convertible from T.
   */
@@ -64,6 +69,14 @@ namespace trait
   template <class T> constexpr bool has_error_code_v = has_error_code<T>::value;
 
   constexpr inline void make_error_payload(...);
+  // Also enable for any pair or tuple whose first item satisfies make_error_code()
+  // and whose second item satisfies make_error_payload() and where tuple size is 2.
+  template <class T,                                                                //
+            class R = decltype(make_error_code(std::get<0>(std::declval<T>()))),    //
+            class S = decltype(make_error_payload(std::get<1>(std::declval<T>())))  //
+            typename = std::enable_if_t<std::tuple_size<T>::value == 2>             //
+            >
+  constexpr inline S make_error_payload(T &&);
   /*! Trait for whether a free function `make_error_payload(T)` not returning `void` exists or not.
   */
   template <class T, typename V = decltype(make_error_payload(std::declval<detail::devoid<T>>()))> struct has_error_payload : std::integral_constant<bool, !std::is_void<V>::value>
@@ -91,19 +104,34 @@ namespace trait
 //! Namespace for policies
 namespace policy
 {
-  namespace detail
-  {
-    OUTCOME_TEMPLATE(class T)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::error_code>::value))
-    constexpr inline auto make_error_code(T &&v) { return std::forward<T>(v); }
-    OUTCOME_TEMPLATE(class T)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::exception_ptr>::value))
-    constexpr inline auto make_exception_ptr(T &&v) { return std::forward<T>(v); }
+  /*! Pass through `make_error_code` function for anything implicitly convertible to `std::error_code`.
+  \requires `T` is implicitly convertible to `std::error_code`.
+  */
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::error_code>::value))
+  constexpr inline decltype(auto) make_error_code(T &&v) { return std::forward<T>(v); }
+  /*! Pass through `make_error_code` function for any pair or 2-tuple returning the first item.
+  */
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(make_error_code(std::get<0>(std::declval<T>()))), OUTCOME_TPRED(std::tuple_size<T>::value == 2))
+  constexpr inline decltype(auto) make_error_code(T &&v) { return make_error_code(std::get<0>(std::forward<T>(v))); }
 
-    template <class T> constexpr inline auto error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
-    template <class T> constexpr inline auto error_payload(T &&v) { return make_error_payload(std::forward<T>(v)); }
-    template <class T> constexpr inline auto exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
-  }
+  /*! Pass through `make_error_payload` function for any pair or 2-tuple returning the second item.
+  */
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(make_error_code(std::get<0>(std::declval<T>()))), OUTCOME_TEXPR(make_error_payload(std::get<1>(std::declval<T>()))), OUTCOME_TPRED(std::tuple_size<T>::value == 2))
+  constexpr inline decltype(auto) make_error_payload(T &&v) { return make_error_payload(std::get<1>(std::forward<T>(v))); }
+
+  /*! Pass through `make_exception_ptr` function for `std::exception_ptr`.
+  */
+  inline std::exception_ptr make_exception_ptr(std::exception_ptr v) { return std::move(v); }
+
+  //! Used by policies to extract a `std::error_code` from some input `T` via ADL discovery of some `make_error_code(T)` function.
+  template <class T> constexpr inline decltype(auto) error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
+  //! Used by policies to extract a payload from some input `T` via ADL discovery of some `make_error_payload(T)` function.
+  template <class T> constexpr inline decltype(auto) error_payload(T &&v) { return make_error_payload(std::forward<T>(v)); }
+  //! Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
+  template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
 }
 
 // Do we have C++ 17 deduced templates?
