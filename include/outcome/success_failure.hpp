@@ -33,20 +33,78 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
+namespace detail
+{
+  // Replace void with constructible void_type
+  struct empty_type
+  {
+  };
+  struct void_type
+  {
+    // We always compare true to another instance of me
+    constexpr bool operator==(void_type /*unused*/) const noexcept { return true; }
+    constexpr bool operator!=(void_type /*unused*/) const noexcept { return false; }
+  };
+  template <class T> using devoid = std::conditional_t<std::is_void<T>::value, void_type, T>;
+}
+
 //! Namespace for traits
 namespace trait
 {
-  /*! Trait for whether type `S` is to be considered an error code.
+  constexpr inline void make_error_code(...);
+  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
+  Also returns true if `std::error_code` is convertible from T.
   */
-  template <class S> struct is_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, S>::value>
+  template <class T, typename V = decltype(make_error_code(std::declval<detail::devoid<T>>()))> struct has_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, std::decay_t<V>>::value || std::is_convertible<T, std::error_code>::value>
   {
   };
-  /*! Trait for whether type `P` is to be considered an exception ptr.
+  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
+  Also returns true if `std::error_code` is convertible from T.
   */
-  template <class P> struct is_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, P>::value>
+  template <class T> constexpr bool has_error_code_v = has_error_code<T>::value;
+
+  constexpr inline void make_error_payload(...);
+  /*! Trait for whether a free function `make_error_payload(T)` not returning `void` exists or not.
+  */
+  template <class T, typename V = decltype(make_error_payload(std::declval<detail::devoid<T>>()))> struct has_error_payload : std::integral_constant<bool, !std::is_void<V>::value>
   {
   };
-} // namespace trait
+  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
+  Also returns true if `std::error_code` is convertible from T.
+  */
+  template <class T> constexpr bool has_error_payload_v = has_error_payload<T>::value;
+
+  constexpr inline void make_exception_ptr(...);
+  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
+  Also returns true if `std::exception_ptr` is convertible from T.
+  */
+  template <class T, typename V = decltype(make_exception_ptr(std::declval<detail::devoid<T>>()))> struct has_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, std::decay_t<V>>::value || std::is_convertible<T, std::exception_ptr>::value>
+  {
+  };
+  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
+  Also returns true if `std::exception_ptr` is convertible from T.
+  */
+  template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<T>::value;
+
+}  // namespace trait
+
+//! Namespace for policies
+namespace policy
+{
+  namespace detail
+  {
+    OUTCOME_TEMPLATE(class T)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::error_code>::value))
+    constexpr inline auto make_error_code(T &&v) { return std::forward<T>(v); }
+    OUTCOME_TEMPLATE(class T)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::exception_ptr>::value))
+    constexpr inline auto make_exception_ptr(T &&v) { return std::forward<T>(v); }
+
+    template <class T> constexpr inline auto error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
+    template <class T> constexpr inline auto error_payload(T &&v) { return make_error_payload(std::forward<T>(v)); }
+    template <class T> constexpr inline auto exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
+  }
+}
 
 // Do we have C++ 17 deduced templates?
 // GCC 7.2 and clang 6.0 both have problems in their implementations, so leave this disabled for now. But it should work one day.
@@ -223,32 +281,12 @@ template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v)
   return success_type<std::decay_t<T>>{std::forward<T>(v)};
 }
 
-/*! Type sugar for implicitly constructing a `result<>` with a failure state.
-*/
-template <class EC = std::error_code, class E = void, bool e_is_exception_ptr = trait::is_exception_ptr<E>::value> struct failure_type;
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and payload.
-*/
-template <class EC, class P> struct failure_type<EC, P, false>
-{
-  //! The type of the error code
-  using error_type = EC;
-  //! The type of the payload
-  using payload_type = P;
-  //! The type of the exception
-  using exception_type = void;
-  //! The error code
-  error_type error;
-  //! The payload
-  payload_type payload;
-};
 /*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and exception.
 */
-template <class EC, class E> struct failure_type<EC, E, true>
+template <class EC = std::error_code, class E = void> struct failure_type
 {
   //! The type of the error code
   using error_type = EC;
-  //! The type of the payload
-  using payload_type = void;
   //! The type of the exception
   using exception_type = E;
   //! The error code
@@ -258,38 +296,21 @@ template <class EC, class E> struct failure_type<EC, E, true>
 };
 /*! Type sugar for implicitly constructing a `result<>` with a failure state of error code.
 */
-template <class EC> struct failure_type<EC, void, false>
+template <class EC> struct failure_type<EC, void>
 {
   //! The type of the error code
   using error_type = EC;
-  //! The type of the payload
-  using payload_type = void;
   //! The type of the exception
   using exception_type = void;
   //! The error code
   error_type error;
 };
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of payload.
-*/
-template <class P> struct failure_type<void, P, false>
-{
-  //! The type of the error code
-  using error_type = void;
-  //! The type of the payload
-  using payload_type = P;
-  //! The type of the exception
-  using exception_type = void;
-  //! The payload
-  payload_type payload;
-};
 /*! Type sugar for implicitly constructing a `result<>` with a failure state of exception.
 */
-template <class E> struct failure_type<void, E, true>
+template <class E> struct failure_type<void, E>
 {
   //! The type of the error code
   using error_type = void;
-  //! The type of the payload
-  using payload_type = void;
   //! The type of the exception
   using exception_type = E;
   //! The exception
@@ -323,10 +344,10 @@ namespace detail
   template <class T> struct is_failure_type : std::false_type
   {
   };
-  template <class EC, class E, bool e_is_exception_ptr> struct is_failure_type<failure_type<EC, E, e_is_exception_ptr>> : std::true_type
+  template <class EC, class E> struct is_failure_type<failure_type<EC, E>> : std::true_type
   {
   };
-} // namespace detail
+}  // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 

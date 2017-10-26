@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 0a13d5ae8ef83ac7c4d00004c07759db1a5d4ca2
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-20 17:57:46 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 0a13d5ae
+#define OUTCOME_PREVIOUS_COMMIT_REF b98479774237944d5562fcaef55826f5283a898a
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-26 00:00:41 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE b9847977
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1848,22 +1848,89 @@ OUTCOME_V2_NAMESPACE_END
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
+namespace detail
+{
+  // Replace void with constructible void_type
+  struct empty_type
+  {
+  };
+  struct void_type
+  {
+    // We always compare true to another instance of me
+    constexpr bool operator==(void_type /*unused*/) const noexcept { return true; }
+    constexpr bool operator!=(void_type /*unused*/) const noexcept { return false; }
+  };
+  template <class T> using devoid = std::conditional_t<std::is_void<T>::value, void_type, T>;
+}
+
 //! Namespace for traits
 namespace trait
 {
-  /*! Trait for whether type `S` is to be considered an error code.
+  constexpr inline void make_error_code(...);
+  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
+  Also returns true if `std::error_code` is convertible from T.
   */
 
-  template <class S> struct is_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, S>::value>
+
+  template <class T, typename V = decltype(make_error_code(std::declval<detail::devoid<T>>()))> struct has_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, std::decay_t<V>>::value || std::is_convertible<T, std::error_code>::value>
   {
   };
-  /*! Trait for whether type `P` is to be considered an exception ptr.
+  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
+  Also returns true if `std::error_code` is convertible from T.
   */
 
-  template <class P> struct is_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, P>::value>
+
+  template <class T> constexpr bool has_error_code_v = has_error_code<T>::value;
+
+  constexpr inline void make_error_payload(...);
+  /*! Trait for whether a free function `make_error_payload(T)` not returning `void` exists or not.
+  */
+
+  template <class T, typename V = decltype(make_error_payload(std::declval<detail::devoid<T>>()))> struct has_error_payload : std::integral_constant<bool, !std::is_void<V>::value>
   {
   };
+  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
+  Also returns true if `std::error_code` is convertible from T.
+  */
+
+
+  template <class T> constexpr bool has_error_payload_v = has_error_payload<T>::value;
+
+  constexpr inline void make_exception_ptr(...);
+  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
+  Also returns true if `std::exception_ptr` is convertible from T.
+  */
+
+
+  template <class T, typename V = decltype(make_exception_ptr(std::declval<detail::devoid<T>>()))> struct has_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, std::decay_t<V>>::value || std::is_convertible<T, std::exception_ptr>::value>
+  {
+  };
+  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
+  Also returns true if `std::exception_ptr` is convertible from T.
+  */
+
+
+  template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<T>::value;
+
 } // namespace trait
+
+//! Namespace for policies
+namespace policy
+{
+  namespace detail
+  {
+    OUTCOME_TEMPLATE(class T)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::error_code>::value))
+    constexpr inline auto make_error_code(T &&v) { return std::forward<T>(v); }
+    OUTCOME_TEMPLATE(class T)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::exception_ptr>::value))
+    constexpr inline auto make_exception_ptr(T &&v) { return std::forward<T>(v); }
+
+    template <class T> constexpr inline auto error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
+    template <class T> constexpr inline auto error_payload(T &&v) { return make_error_payload(std::forward<T>(v)); }
+    template <class T> constexpr inline auto exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
+  }
+}
 
 // Do we have C++ 17 deduced templates?
 // GCC 7.2 and clang 6.0 both have problems in their implementations, so leave this disabled for now. But it should work one day.
@@ -2046,35 +2113,13 @@ template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v)
   return success_type<std::decay_t<T>>{std::forward<T>(v)};
 }
 
-/*! Type sugar for implicitly constructing a `result<>` with a failure state.
-*/
-
-template <class EC = std::error_code, class E = void, bool e_is_exception_ptr = trait::is_exception_ptr<E>::value> struct failure_type;
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and payload.
-*/
-
-template <class EC, class P> struct failure_type<EC, P, false>
-{
-  //! The type of the error code
-  using error_type = EC;
-  //! The type of the payload
-  using payload_type = P;
-  //! The type of the exception
-  using exception_type = void;
-  //! The error code
-  error_type error;
-  //! The payload
-  payload_type payload;
-};
 /*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and exception.
 */
 
-template <class EC, class E> struct failure_type<EC, E, true>
+template <class EC = std::error_code, class E = void> struct failure_type
 {
   //! The type of the error code
   using error_type = EC;
-  //! The type of the payload
-  using payload_type = void;
   //! The type of the exception
   using exception_type = E;
   //! The error code
@@ -2085,40 +2130,22 @@ template <class EC, class E> struct failure_type<EC, E, true>
 /*! Type sugar for implicitly constructing a `result<>` with a failure state of error code.
 */
 
-template <class EC> struct failure_type<EC, void, false>
+template <class EC> struct failure_type<EC, void>
 {
   //! The type of the error code
   using error_type = EC;
-  //! The type of the payload
-  using payload_type = void;
   //! The type of the exception
   using exception_type = void;
   //! The error code
   error_type error;
 };
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of payload.
-*/
-
-template <class P> struct failure_type<void, P, false>
-{
-  //! The type of the error code
-  using error_type = void;
-  //! The type of the payload
-  using payload_type = P;
-  //! The type of the exception
-  using exception_type = void;
-  //! The payload
-  payload_type payload;
-};
 /*! Type sugar for implicitly constructing a `result<>` with a failure state of exception.
 */
 
-template <class E> struct failure_type<void, E, true>
+template <class E> struct failure_type<void, E>
 {
   //! The type of the error code
   using error_type = void;
-  //! The type of the payload
-  using payload_type = void;
   //! The type of the exception
   using exception_type = E;
   //! The exception
@@ -2156,7 +2183,7 @@ namespace detail
   template <class T> struct is_failure_type : std::false_type
   {
   };
-  template <class EC, class E, bool e_is_exception_ptr> struct is_failure_type<failure_type<EC, E, e_is_exception_ptr>> : std::true_type
+  template <class EC, class E> struct is_failure_type<failure_type<EC, E>> : std::true_type
   {
   };
 } // namespace detail
@@ -2245,18 +2272,6 @@ namespace detail
   template <class U> struct is_in_place_type_t<in_place_type_t<U>> : std::true_type
   {
   };
-
-  // Replace void with constructible void_type
-  struct empty_type
-  {
-  };
-  struct void_type
-  {
-    // We always compare true to another instance of me
-    constexpr bool operator==(void_type /*unused*/) const noexcept { return true; }
-    constexpr bool operator!=(void_type /*unused*/) const noexcept { return false; }
-  };
-  template <class T> using devoid = std::conditional_t<std::is_void<T>::value, void_type, T>;
 
   using status_bitfield_type = uint32_t;
   static constexpr status_bitfield_type status_have_value = (1 << 0);
@@ -4112,7 +4127,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  /*! Policy interpreting EC as a type implementing the `std::error_code` contract
+  /*! Policy interpreting EC as a type for which `trait::has_error_code<EC>` is true
   and any wide attempt to access the successful state throws the `error_code` wrapped into
   a `std::system_error`
 
@@ -4136,112 +4151,7 @@ namespace policy
       {
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          OUTCOME_THROW_EXCEPTION(std::system_error(self->_error));
-        }
-        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
-      }
-    }
-    /*! Performs a wide check of state, used in the error() functions
-    \effects If result does not have an error, it throws `bad_result_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_error_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
-      {
-        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
-      }
-    }
-  };
-} // namespace policy
-
-OUTCOME_V2_NAMESPACE_END
-
-#endif
-/* Policies for result and outcome
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
-File Created: Oct 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#ifndef OUTCOME_POLICY_ERROR_ENUM_THROW_AS_SYSTEM_ERROR_HPP
-#define OUTCOME_POLICY_ERROR_ENUM_THROW_AS_SYSTEM_ERROR_HPP
-
-
-
-
-#include <system_error>
-
-OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
-namespace policy
-{
-  /*! Policy interpreting EC as an enum convertible into the `std::error_code` contract
-  and any wide attempt to access the successful state throws the `error_code` wrapped into
-  a `std::system_error`
-
-  Can be used in `result` only.
-  */
-
-
-
-
-
-  template <class EC> struct error_enum_throw_as_system_error : detail::base
-  {
-    /*! Performs a wide check of state, used in the value() functions.
-    \effects If result does not have a value, if it has an error it throws a `std::system_error(error())`, else it throws `bad_result_access`.
-    */
-
-
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
-      {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
-        {
-          OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(self->_error)));
+          OUTCOME_THROW_EXCEPTION(std::system_error(detail::error_code(self->_error)));
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
@@ -4613,13 +4523,11 @@ namespace policy
   using default_result_policy = std::conditional_t< //
   std::is_void<EC>::value, terminate, //
   std::conditional_t< //
-  std::is_error_code_enum<EC>::value || std::is_error_condition_enum<EC>::value, error_enum_throw_as_system_error<EC>, //
+  trait::has_error_code_v<EC>, error_code_throw_as_system_error<EC>, //
   std::conditional_t< //
-  trait::is_error_code<EC>::value, error_code_throw_as_system_error<EC>, //
-  std::conditional_t< //
-  trait::is_exception_ptr<EC>::value, exception_ptr_rethrow<T, EC, void>, //
+  trait::has_exception_ptr_v<EC>, exception_ptr_rethrow<T, EC, void>, //
   all_narrow //
-  >>>>;
+  >>>;
 } // namespace policy
 
 template <class R, class S = std::error_code, class NoValuePolicy = policy::default_result_policy<R, S>> //
@@ -4635,11 +4543,7 @@ namespace detail
   {
     // Is this a common error type?
     static constexpr bool error_is_common_error_type = //
-    std::is_base_of<std::error_code, std::decay_t<error_type>>::value //
-    || std::is_base_of<std::exception_ptr, std::decay_t<error_type>>::value //
-    /* || std::is_error_code_enum<std::decay_t<error_type>>::value           //
-    || std::is_error_condition_enum<std::decay_t<error_type>>::value */;
-
+    trait::has_error_code_v<error_type> || trait::has_exception_ptr_v<error_type>;
 
     // Predicate for the implicit constructors to be available
     static constexpr bool implicit_constructors_enabled = //
@@ -4780,20 +4684,16 @@ Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array
 
 `NoValuePolicy` defaults to a policy selected according to the characteristics of type `S`:
   1. If `.value()` called when there is no `value_type` but there is an `error_type`:
-    - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<S>` is true,
-    then `throw std::system_error(make_error_code(error()))` [`policy::error_enum_throw_as_system_error<S>`]
-    - If `trait::is_error_code<S>`, then `throw std::system_error(error())` [`policy::error_code_throw_as_system_error<S>`]
-    - If `trait::is_exception_ptr<S>`, then `std::rethrow_exception(error())` [`policy::exception_ptr_rethrow<R, S, void>`]
+    - If `trait::has_error_code_v<S>` is true,
+    then `throw std::system_error(error()|make_error_code(error()))` [`policy::error_code_throw_as_system_error<S>`]
+    - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))` [`policy::exception_ptr_rethrow<R, S, void>`]
     - If `S` is `void`, call `std::terminate()` [`policy::terminate`]
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
   2. If `.error()` called when there is no `error_type`:
-    - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<S>` is true,
-    or if `trait::is_error_code<S>`, or if `trait::is_exception_ptr<S>`,
+    - If `trait::has_error_code_v<S>`, or if `trait::has_exception_ptr_v<S>`,
     or if `S` is `void`, do `throw bad_result_access()`
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
-
-
 
 
 

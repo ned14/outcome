@@ -34,7 +34,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  /*! Policy interpreting EC as a type implementing the `std::error_code` contract
+  /*! Policy interpreting EC as a type for which `trait::has_error_code<EC>` is true
   and any wide attempt to access the successful state throws the `error_code` wrapped into
   a `std::system_error`
 
@@ -51,7 +51,7 @@ namespace policy
       {
         if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          OUTCOME_THROW_EXCEPTION(std::system_error(self->_error));
+          OUTCOME_THROW_EXCEPTION(std::system_error(detail::error_code(self->_error)));
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
