@@ -34,43 +34,29 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  //! Override to define what the policies which throw a system error with payload ought to do for some particular `result`.
-  template <class T> constexpr inline void throw_as_system_error_with_payload(const T * /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload"); }
   namespace detail
   {
-    template <bool has_error_payload, class T, class EC> struct throw_result_as_system_error
+    template <bool has_error_payload> struct throw_result_as_system_error
     {
-      template <class Impl> throw_result_as_system_error(const Impl *self)
+      template <class Error> explicit throw_result_as_system_error(Error &&error)  // NOLINT
       {
-        auto *_self = static_cast<const result<T, EC> *>(self);
-        OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(_self->error())));
-      }
-      template <class Impl> throw_result_as_system_error(Impl *self)
-      {
-        auto *_self = static_cast<result<T, EC> *>(self);
-        OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(_self->error())));
+        OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(std::forward<Error>(error))));
       }
     };
-    template <class T, class EC> struct throw_result_as_system_error<true, T, EC>
+    template <> struct throw_result_as_system_error<true>
     {
-      template <class Impl> throw_result_as_system_error(Impl *self)
+      template <class Error> explicit throw_result_as_system_error(Error &&error)  // NOLINT
       {
-        auto *_self = static_cast<result<T, EC> *>(self);
-        throw_as_system_error_with_payload(_self);
-      }
-      template <class Impl> throw_result_as_system_error(const Impl *self)
-      {
-        auto *_self = static_cast<const result<T, EC> *>(self);
-        throw_as_system_error_with_payload(_self);
+        throw_as_system_error_with_payload(std::forward<Error>(error));
       }
     };
-  }
+  }  // namespace detail
 
   /*! Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
   Any wide attempt to access the successful state where there is none causes:
 
   1. If `trait::has_error_payload_v<EC>` is true, it calls an
-  ADL discovered free function `throw_as_system_error_with_payload(&result|&outcome)`.
+  ADL discovered free function `throw_as_system_error_with_payload(.error())`.
   2. If `trait::has_error_payload_v<EC>` is false, it calls `OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(.error())))`
   */
   template <class T, class EC, class E> struct error_code_throw_as_system_error;
@@ -79,13 +65,13 @@ namespace policy
     /*! Performs a wide check of state, used in the value() functions.
     \effects If result does not have a value, if it has an error it throws a `std::system_error(error())`, else it throws `bad_result_access`.
     */
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
+    template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
+        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          detail::throw_result_as_system_error<trait::has_error_payload_v<EC>, T, EC>{self};
+          detail::throw_result_as_system_error<trait::has_error_payload_v<EC>>{std::forward<Impl>(self)._error};
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
@@ -93,9 +79,9 @@ namespace policy
     /*! Performs a wide check of state, used in the error() functions
     \effects If result does not have an error, it throws `bad_result_access`.
     */
-    template <class Impl> static constexpr void wide_error_check(Impl *self)
+    template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
         OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }

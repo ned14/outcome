@@ -42,13 +42,13 @@ namespace policy
     /*! Performs a wide check of state, used in the value() functions
     \effects If result does not have a value, if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_result_access`.
     */
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
+    template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
+        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          std::rethrow_exception(policy::exception_ptr(self->_error));
+          std::rethrow_exception(policy::exception_ptr(std::forward<Impl>(self)._error));
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
@@ -56,9 +56,9 @@ namespace policy
     /*! Performs a wide check of state, used in the value() functions
     \effects If result does not have a value, if it has an error it throws that error, else it throws `bad_result_access`.
     */
-    template <class Impl> static constexpr void wide_error_check(Impl *self)
+    template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
         OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }

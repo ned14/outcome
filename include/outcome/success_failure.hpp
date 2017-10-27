@@ -46,21 +46,82 @@ namespace detail
     constexpr bool operator!=(void_type /*unused*/) const noexcept { return false; }
   };
   template <class T> using devoid = std::conditional_t<std::is_void<T>::value, void_type, T>;
-}
+}  // namespace detail
+
+//! Namespace for policies
+namespace policy
+{
+  //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
+  template <class T> constexpr inline void throw_as_system_error_with_payload(const T & /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload"); }
+
+  namespace detail
+  {
+    struct error_code_passthrough
+    {
+    };
+    /* Pass through `make_error_code` function for anything implicitly convertible to `std::error_code`.
+    \requires `T` is implicitly convertible to `std::error_code`.
+    */
+    OUTCOME_TEMPLATE(class T)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::error_code>::value))
+    constexpr inline decltype(auto) make_error_code(T &&v, error_code_passthrough /*unused*/ = {}) { return std::forward<T>(v); }
+
+    template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
+    struct tuple_passthrough
+    {
+    };
+    /* Pass through `make_error_code` function for any pair or tuple returning the first item.
+    \requires That `make_error_code(std::get<0>(std::declval<T>()))` is a valid expression.
+    */
+    OUTCOME_TEMPLATE(class T)
+    OUTCOME_TREQUIRES(OUTCOME_TEXPR(make_error_code(get<0>(std::declval<T>()))))
+    constexpr inline decltype(auto) make_error_code(T &&v, tuple_passthrough /* unused */ = {}) { return make_error_code(get<0>(std::forward<T>(v))); }
+
+    /* Pass through `make_exception_ptr` function for `std::exception_ptr`.
+    */
+    inline std::exception_ptr make_exception_ptr(std::exception_ptr v) { return v; }
+
+    template <class T> constexpr inline decltype(auto) error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
+    template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
+  }  // namespace detail
+  //! Used by policies to extract a `std::error_code` from some input `T` via ADL discovery of some `make_error_code(T)` function.
+  template <class T> constexpr inline decltype(auto) error_code(T &&v) { return detail::error_code(std::forward<T>(v)); }
+  //! Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
+  template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return detail::exception_ptr(std::forward<T>(v)); }
+}  // namespace policy
 
 //! Namespace for traits
 namespace trait
 {
-  constexpr inline void make_error_code(...);
-  // Also enable for any pair or tuple whose first item satisfies make_error_code()
-  template <class T,                                                             //
-            class R = decltype(make_error_code(std::get<0>(std::declval<T>())))  //
-            >
-  constexpr inline R make_error_code(T &&);
+  namespace detail
+  {
+    template <class T> using devoid = OUTCOME_V2_NAMESPACE::detail::devoid<T>;
+    template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
+    constexpr inline void make_error_code(...);
+    // Also enable for any pair or tuple whose first item satisfies make_error_code()
+    template <class T,                                                        //
+              class R = decltype(make_error_code(get<0>(std::declval<T>())))  //
+              >
+    constexpr inline R make_error_code(T &&);
+    template <class T, typename V = decltype(make_error_code(std::declval<devoid<T>>()))> struct has_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, std::decay_t<V>>::value || std::is_convertible<T, std::error_code>::value>
+    {
+    };
+    struct no_error_payload
+    {
+    };
+    template <class T> constexpr inline no_error_payload throw_as_system_error_with_payload(const T & /*unused*/);
+    template <class T, typename V = decltype(throw_as_system_error_with_payload(std::declval<detail::devoid<T>>()))> struct has_error_payload : std::integral_constant<bool, !std::is_same<V, no_error_payload>::value>
+    {
+    };
+    constexpr inline void make_exception_ptr(...);
+    template <class T, typename V = decltype(make_exception_ptr(std::declval<devoid<T>>()))> struct has_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, std::decay_t<V>>::value || std::is_convertible<T, std::exception_ptr>::value>
+    {
+    };
+  }  // namespace detail
   /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
   Also returns true if `std::error_code` is convertible from T.
   */
-  template <class T, typename V = decltype(make_error_code(std::declval<detail::devoid<T>>()))> struct has_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, std::decay_t<V>>::value || std::is_convertible<T, std::error_code>::value>
+  template <class T> struct has_error_code : detail::has_error_code<T>
   {
   };
   /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
@@ -68,30 +129,19 @@ namespace trait
   */
   template <class T> constexpr bool has_error_code_v = has_error_code<T>::value;
 
-  constexpr inline void make_error_payload(...);
-  // Also enable for any pair or tuple whose first item satisfies make_error_code()
-  // and whose second item satisfies make_error_payload() and where tuple size is 2.
-  template <class T,                                                                //
-            class R = decltype(make_error_code(std::get<0>(std::declval<T>()))),    //
-            class S = decltype(make_error_payload(std::get<1>(std::declval<T>())))  //
-            typename = std::enable_if_t<std::tuple_size<T>::value == 2>             //
-            >
-  constexpr inline S make_error_payload(T &&);
-  /*! Trait for whether a free function `make_error_payload(T)` not returning `void` exists or not.
+  /*! Trait for whether a free function `throw_as_system_error_with_payload(T)` exists or not.
   */
-  template <class T, typename V = decltype(make_error_payload(std::declval<detail::devoid<T>>()))> struct has_error_payload : std::integral_constant<bool, !std::is_void<V>::value>
+  template <class T> struct has_error_payload : detail::has_error_payload<T>
   {
   };
-  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
-  Also returns true if `std::error_code` is convertible from T.
+  /*! Trait for whether a free function `throw_as_system_error_with_payload(T)` exists or not.
   */
   template <class T> constexpr bool has_error_payload_v = has_error_payload<T>::value;
 
-  constexpr inline void make_exception_ptr(...);
   /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
   Also returns true if `std::exception_ptr` is convertible from T.
   */
-  template <class T, typename V = decltype(make_exception_ptr(std::declval<detail::devoid<T>>()))> struct has_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, std::decay_t<V>>::value || std::is_convertible<T, std::exception_ptr>::value>
+  template <class T> struct has_exception_ptr : detail::has_exception_ptr<T>
   {
   };
   /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
@@ -100,39 +150,6 @@ namespace trait
   template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<T>::value;
 
 }  // namespace trait
-
-//! Namespace for policies
-namespace policy
-{
-  /*! Pass through `make_error_code` function for anything implicitly convertible to `std::error_code`.
-  \requires `T` is implicitly convertible to `std::error_code`.
-  */
-  OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::error_code>::value))
-  constexpr inline decltype(auto) make_error_code(T &&v) { return std::forward<T>(v); }
-  /*! Pass through `make_error_code` function for any pair or 2-tuple returning the first item.
-  */
-  OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(make_error_code(std::get<0>(std::declval<T>()))), OUTCOME_TPRED(std::tuple_size<T>::value == 2))
-  constexpr inline decltype(auto) make_error_code(T &&v) { return make_error_code(std::get<0>(std::forward<T>(v))); }
-
-  /*! Pass through `make_error_payload` function for any pair or 2-tuple returning the second item.
-  */
-  OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(make_error_code(std::get<0>(std::declval<T>()))), OUTCOME_TEXPR(make_error_payload(std::get<1>(std::declval<T>()))), OUTCOME_TPRED(std::tuple_size<T>::value == 2))
-  constexpr inline decltype(auto) make_error_payload(T &&v) { return make_error_payload(std::get<1>(std::forward<T>(v))); }
-
-  /*! Pass through `make_exception_ptr` function for `std::exception_ptr`.
-  */
-  inline std::exception_ptr make_exception_ptr(std::exception_ptr v) { return std::move(v); }
-
-  //! Used by policies to extract a `std::error_code` from some input `T` via ADL discovery of some `make_error_code(T)` function.
-  template <class T> constexpr inline decltype(auto) error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
-  //! Used by policies to extract a payload from some input `T` via ADL discovery of some `make_error_payload(T)` function.
-  template <class T> constexpr inline decltype(auto) error_payload(T &&v) { return make_error_payload(std::forward<T>(v)); }
-  //! Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
-  template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
-}
 
 // Do we have C++ 17 deduced templates?
 // GCC 7.2 and clang 6.0 both have problems in their implementations, so leave this disabled for now. But it should work one day.

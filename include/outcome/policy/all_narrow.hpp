@@ -40,19 +40,19 @@ namespace policy
     /*! Performs a wide check of state, used in the value() functions.
     \effects None.
     */
-    template <class Impl> static constexpr void wide_value_check(Impl *self) { detail::base::narrow_value_check(self); }
+    template <class Impl> static constexpr void wide_value_check(Impl &&self) { detail::base::narrow_value_check(std::forward<Impl>(self)); }
     /*! Performs a wide check of state, used in the error() functions
     \effects None.
     */
-    template <class Impl> static constexpr void wide_error_check(Impl *self) { detail::base::narrow_error_check(self); }
+    template <class Impl> static constexpr void wide_error_check(Impl &&self) { detail::base::narrow_error_check(std::forward<Impl>(self)); }
     /*! Performs a wide check of state, used in the payload() functions
     \effects If outcome does not have an exception, calls `std::terminate()`.
     */
-    template <class Impl> static constexpr void wide_payload_check(Impl *self) { detail::base::narrow_payload_check(self); }
+    template <class Impl> static constexpr void wide_payload_check(Impl &&self) { detail::base::narrow_payload_check(std::forward<Impl>(self)); }
     /*! Performs a wide check of state, used in the exception() functions
     \effects If outcome does not have an exception, calls `std::terminate()`.
     */
-    template <class Impl> static constexpr void wide_exception_check(Impl *self) { detail::base::narrow_exception_check(self); }
+    template <class Impl> static constexpr void wide_exception_check(Impl &&self) { detail::base::narrow_exception_check(std::forward<Impl>(self)); }
   };
 }  // namespace policy
 

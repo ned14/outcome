@@ -26,9 +26,10 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define OUTCOME_RESULT_HPP
 
 #include "detail/result_final.hpp"
+
 #include "policy/all_narrow.hpp"
-#include "policy/error_code_throw_as_system_error.hpp"
-#include "policy/exception_ptr_rethrow.hpp"
+#include "policy/result_error_code_throw_as_system_error.hpp"
+#include "policy/result_exception_ptr_rethrow.hpp"
 #include "policy/terminate.hpp"
 #include "policy/throw_bad_result_access.hpp"
 

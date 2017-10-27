@@ -36,7 +36,13 @@ namespace policy
     struct base
     {
     private:
-      static void _ub()
+      static
+#ifdef _MSC_VER
+      __declspec(noreturn)
+#elif defined(__GNUC__) || defined(__clang__)
+        __attribute__((noreturn))
+#endif
+      void _ub()
       {
 #if defined(__GNUC__) || defined(__clang__)
         __builtin_unreachable();
@@ -47,9 +53,9 @@ namespace policy
       /*! Performs a narrow check of state, used in the assume_value() functions.
       \effects None.
       */
-      template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
+      template <class Impl> static constexpr void narrow_value_check(Impl &&self) noexcept
       {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
         {
           _ub();
         }
@@ -57,9 +63,9 @@ namespace policy
       /*! Performs a narrow check of state, used in the assume_error() functions
       \effects None.
       */
-      template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
+      template <class Impl> static constexpr void narrow_error_check(Impl &&self) noexcept
       {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
         {
           _ub();
         }
@@ -67,9 +73,9 @@ namespace policy
       /*! Performs a narrow check of state, used in the assume_payload() functions
       \effects None.
       */
-      template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
+      template <class Impl> static constexpr void narrow_payload_check(Impl &&self) noexcept
       {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
+        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
         {
           _ub();
         }
@@ -77,9 +83,9 @@ namespace policy
       /*! Performs a narrow check of state, used in the assume_exception() functions
       \effects None.
       */
-      template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
+      template <class Impl> static constexpr void narrow_exception_check(Impl &&self) noexcept
       {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
         {
           _ub();
         }

@@ -32,6 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <iostream>
 
+#ifdef __cpp_exceptions
 // Custom error type with payload
 struct payload
 {
@@ -46,7 +47,7 @@ struct payload
 };
 struct payload_exception : std::runtime_error
 {
-  payload_exception(const char *what)
+  explicit payload_exception(const char *what)
       : std::runtime_error(what)
   {
   }
@@ -55,11 +56,11 @@ inline const std::error_code &make_error_code(const payload &p)
 {
   return p.ec;
 }
-// Should we not just detect throw_as_system_error_with_payload() and leave this out entirely?
-inline const char *make_error_payload(const payload &p)
+inline void throw_as_system_error_with_payload(const payload &p)
 {
-  return p.str;
+  throw payload_exception(p.str);
 }
+#endif
 
 BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as intended")
 {
@@ -363,7 +364,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
     }
     catch(const payload_exception &e)
     {
-      BOOST_CHECK(e.what() == niall);
+      BOOST_CHECK(!strcmp(e.what(), niall));
     }
     catch(...)
     {

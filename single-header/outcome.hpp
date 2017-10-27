@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF b98479774237944d5562fcaef55826f5283a898a
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-26 00:00:41 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE b9847977
+#define OUTCOME_PREVIOUS_COMMIT_REF c461d6910432bae1c4aeb558169643859be850d7
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-26 22:15:40 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c461d691
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1861,23 +1861,89 @@ namespace detail
     constexpr bool operator!=(void_type /*unused*/) const noexcept { return false; }
   };
   template <class T> using devoid = std::conditional_t<std::is_void<T>::value, void_type, T>;
-}
+} // namespace detail
+
+//! Namespace for policies
+namespace policy
+{
+  //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
+  template <class T> constexpr inline void throw_as_system_error_with_payload(const T & /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload"); }
+
+  namespace detail
+  {
+    struct error_code_passthrough
+    {
+    };
+    /* Pass through `make_error_code` function for anything implicitly convertible to `std::error_code`.
+    \requires `T` is implicitly convertible to `std::error_code`.
+    */
+
+
+    OUTCOME_TEMPLATE(class T)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::error_code>::value))
+    constexpr inline decltype(auto) make_error_code(T &&v, error_code_passthrough /*unused*/ = {}) { return std::forward<T>(v); }
+
+    template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
+    struct tuple_passthrough
+    {
+    };
+    /* Pass through `make_error_code` function for any pair or tuple returning the first item.
+    \requires That `make_error_code(std::get<0>(std::declval<T>()))` is a valid expression.
+    */
+
+
+    OUTCOME_TEMPLATE(class T)
+    OUTCOME_TREQUIRES(OUTCOME_TEXPR(make_error_code(get<0>(std::declval<T>()))))
+    constexpr inline decltype(auto) make_error_code(T &&v, tuple_passthrough /* unused */ = {}) { return make_error_code(get<0>(std::forward<T>(v))); }
+
+    /* Pass through `make_exception_ptr` function for `std::exception_ptr`.
+    */
+
+    inline std::exception_ptr make_exception_ptr(std::exception_ptr v) { return v; }
+
+    template <class T> constexpr inline decltype(auto) error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
+    template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
+  } // namespace detail
+  //! Used by policies to extract a `std::error_code` from some input `T` via ADL discovery of some `make_error_code(T)` function.
+  template <class T> constexpr inline decltype(auto) error_code(T &&v) { return detail::error_code(std::forward<T>(v)); }
+  //! Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
+  template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return detail::exception_ptr(std::forward<T>(v)); }
+} // namespace policy
 
 //! Namespace for traits
 namespace trait
 {
-  constexpr inline void make_error_code(...);
-  // Also enable for any pair or tuple whose first item satisfies make_error_code()
-  template <class T, //
-            class R = decltype(make_error_code(std::get<0>(std::declval<T>()))) //
-            >
-  constexpr inline R make_error_code(T &&);
+  namespace detail
+  {
+    template <class T> using devoid = OUTCOME_V2_NAMESPACE::detail::devoid<T>;
+    template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
+    constexpr inline void make_error_code(...);
+    // Also enable for any pair or tuple whose first item satisfies make_error_code()
+    template <class T, //
+              class R = decltype(make_error_code(get<0>(std::declval<T>()))) //
+              >
+    constexpr inline R make_error_code(T &&);
+    template <class T, typename V = decltype(make_error_code(std::declval<devoid<T>>()))> struct has_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, std::decay_t<V>>::value || std::is_convertible<T, std::error_code>::value>
+    {
+    };
+    struct no_error_payload
+    {
+    };
+    template <class T> constexpr inline no_error_payload throw_as_system_error_with_payload(const T & /*unused*/);
+    template <class T, typename V = decltype(throw_as_system_error_with_payload(std::declval<detail::devoid<T>>()))> struct has_error_payload : std::integral_constant<bool, !std::is_same<V, no_error_payload>::value>
+    {
+    };
+    constexpr inline void make_exception_ptr(...);
+    template <class T, typename V = decltype(make_exception_ptr(std::declval<devoid<T>>()))> struct has_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, std::decay_t<V>>::value || std::is_convertible<T, std::exception_ptr>::value>
+    {
+    };
+  } // namespace detail
   /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
   Also returns true if `std::error_code` is convertible from T.
   */
 
 
-  template <class T, typename V = decltype(make_error_code(std::declval<detail::devoid<T>>()))> struct has_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, std::decay_t<V>>::value || std::is_convertible<T, std::error_code>::value>
+  template <class T> struct has_error_code : detail::has_error_code<T>
   {
   };
   /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
@@ -1887,35 +1953,23 @@ namespace trait
 
   template <class T> constexpr bool has_error_code_v = has_error_code<T>::value;
 
-  constexpr inline void make_error_payload(...);
-  // Also enable for any pair or tuple whose first item satisfies make_error_code()
-  // and whose second item satisfies make_error_payload() and where tuple size is 2.
-  template <class T, //
-            class R = decltype(make_error_code(std::get<0>(std::declval<T>()))), //
-            class S = decltype(make_error_payload(std::get<1>(std::declval<T>()))) //
-            typename = std::enable_if_t<std::tuple_size<T>::value == 2> //
-            >
-  constexpr inline S make_error_payload(T &&);
-  /*! Trait for whether a free function `make_error_payload(T)` not returning `void` exists or not.
+  /*! Trait for whether a free function `throw_as_system_error_with_payload(T)` exists or not.
   */
 
-  template <class T, typename V = decltype(make_error_payload(std::declval<detail::devoid<T>>()))> struct has_error_payload : std::integral_constant<bool, !std::is_void<V>::value>
+  template <class T> struct has_error_payload : detail::has_error_payload<T>
   {
   };
-  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
-  Also returns true if `std::error_code` is convertible from T.
+  /*! Trait for whether a free function `throw_as_system_error_with_payload(T)` exists or not.
   */
-
 
   template <class T> constexpr bool has_error_payload_v = has_error_payload<T>::value;
 
-  constexpr inline void make_exception_ptr(...);
   /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
   Also returns true if `std::exception_ptr` is convertible from T.
   */
 
 
-  template <class T, typename V = decltype(make_exception_ptr(std::declval<detail::devoid<T>>()))> struct has_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, std::decay_t<V>>::value || std::is_convertible<T, std::exception_ptr>::value>
+  template <class T> struct has_exception_ptr : detail::has_exception_ptr<T>
   {
   };
   /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
@@ -1926,44 +1980,6 @@ namespace trait
   template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<T>::value;
 
 } // namespace trait
-
-//! Namespace for policies
-namespace policy
-{
-  /*! Pass through `make_error_code` function for anything implicitly convertible to `std::error_code`.
-  \requires `T` is implicitly convertible to `std::error_code`.
-  */
-
-
-  OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::error_code>::value))
-  constexpr inline decltype(auto) make_error_code(T &&v) { return std::forward<T>(v); }
-  /*! Pass through `make_error_code` function for any pair or 2-tuple returning the first item.
-  */
-
-  OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(make_error_code(std::get<0>(std::declval<T>()))), OUTCOME_TPRED(std::tuple_size<T>::value == 2))
-  constexpr inline decltype(auto) make_error_code(T &&v) { return make_error_code(std::get<0>(std::forward<T>(v))); }
-
-  /*! Pass through `make_error_payload` function for any pair or 2-tuple returning the second item.
-  */
-
-  OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(make_error_code(std::get<0>(std::declval<T>()))), OUTCOME_TEXPR(make_error_payload(std::get<1>(std::declval<T>()))), OUTCOME_TPRED(std::tuple_size<T>::value == 2))
-  constexpr inline decltype(auto) make_error_payload(T &&v) { return make_error_payload(std::get<1>(std::forward<T>(v))); }
-
-  /*! Pass through `make_exception_ptr` function for `std::exception_ptr`.
-  */
-
-  inline std::exception_ptr make_exception_ptr(std::exception_ptr v) { return std::move(v); }
-
-  //! Used by policies to extract a `std::error_code` from some input `T` via ADL discovery of some `make_error_code(T)` function.
-  template <class T> constexpr inline decltype(auto) error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
-  //! Used by policies to extract a payload from some input `T` via ADL discovery of some `make_error_payload(T)` function.
-  template <class T> constexpr inline decltype(auto) error_payload(T &&v) { return make_error_payload(std::forward<T>(v)); }
-  //! Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
-  template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
-}
 
 // Do we have C++ 17 deduced templates?
 // GCC 7.2 and clang 6.0 both have problems in their implementations, so leave this disabled for now. But it should work one day.
@@ -3010,127 +3026,7 @@ namespace detail
 OUTCOME_V2_NAMESPACE_END
 
 #endif
-/* Payload observers for outcome type
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
-File Created: Oct 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#ifndef OUTCOME_OUTCOME_PAYLOAD_OBSERVERS_HPP
-#define OUTCOME_OUTCOME_PAYLOAD_OBSERVERS_HPP
-
-
-
-OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
-namespace detail
-{
-  //! The payload observers implementation of `outcome<R, S, P>`.
-  template <class Base, class R, class S, class P, class NoValuePolicy> class outcome_payload_observers : public Base
-  {
-  public:
-    using payload_type = P;
-    using Base::Base;
-
-    /// \output_section Narrow state observers
-    /*! Access payload without runtime checks.
-    \preconditions The outcome to have an payload state, otherwise it is undefined behaviour.
-    \returns Reference to the held `payload_type` according to overload.
-    \group assume_payload
-    */
-
-
-
-
-    inline constexpr payload_type &assume_payload() & noexcept;
-    /// \group assume_payload
-    inline constexpr const payload_type &assume_payload() const &noexcept;
-    /// \group assume_payload
-    inline constexpr payload_type &&assume_payload() && noexcept;
-    /// \group assume_payload
-    inline constexpr const payload_type &&assume_payload() const &&noexcept;
-
-    /// \output_section Wide state observers
-    /*! Access payload with runtime checks.
-    \returns Reference to the held `payload_type` according to overload.
-    \requires The outcome to have an payload state, else whatever `NoValuePolicy` says ought to happen.
-    \group payload
-    */
-
-
-
-
-    inline constexpr payload_type &payload() &;
-    /// \group payload
-    inline constexpr const payload_type &payload() const &;
-    /// \group payload
-    inline constexpr payload_type &&payload() &&;
-    /// \group payload
-    inline constexpr const payload_type &&payload() const &&;
-  };
-
-  template <class Base, class R, class S, class NoValuePolicy> class outcome_payload_observers<Base, R, S, void, NoValuePolicy> : public Base
-  {
-  public:
-    using Base::Base;
-    /// \output_section Narrow state observers
-    /*! Access payload without runtime checks.
-    */
-
-    constexpr void assume_payload() const noexcept { NoValuePolicy::narrow_payload_check(this); }
-    /// \output_section Wide state observers
-    /*! Access payload with runtime checks.
-    \requires The outcome to have an payload state, else whatever `NoValuePolicy` says ought to happen.
-    */
-
-
-    constexpr void payload() const { NoValuePolicy::wide_payload_check(this); }
-  };
-} // namespace detail
-
-OUTCOME_V2_NAMESPACE_END
-
-#endif
+#include "detail/outcome_payload_observers.hpp"
 /* A very simple result type
 (C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: June 2017
@@ -3301,25 +3197,25 @@ namespace detail
 
     constexpr error_type &assume_error() & noexcept
     {
-      NoValuePolicy::narrow_error_check(this);
+      NoValuePolicy::narrow_error_check(static_cast<result_error_observers &>(*this));
       return this->_error;
     }
     /// \group assume_error
     constexpr const error_type &assume_error() const &noexcept
     {
-      NoValuePolicy::narrow_error_check(this);
+      NoValuePolicy::narrow_error_check(static_cast<const result_error_observers &>(*this));
       return this->_error;
     }
     /// \group assume_error
     constexpr error_type &&assume_error() && noexcept
     {
-      NoValuePolicy::narrow_error_check(this);
+      NoValuePolicy::narrow_error_check(static_cast<result_error_observers &&>(*this));
       return std::move(this->_error);
     }
     /// \group assume_error
     constexpr const error_type &&assume_error() const &&noexcept
     {
-      NoValuePolicy::narrow_error_check(this);
+      NoValuePolicy::narrow_error_check(static_cast<const result_error_observers &&>(*this));
       return std::move(this->_error);
     }
 
@@ -3335,25 +3231,25 @@ namespace detail
 
     constexpr error_type &error() &
     {
-      NoValuePolicy::wide_error_check(this);
+      NoValuePolicy::wide_error_check(static_cast<result_error_observers &>(*this));
       return this->_error;
     }
     /// \group error
     constexpr const error_type &error() const &
     {
-      NoValuePolicy::wide_error_check(this);
+      NoValuePolicy::wide_error_check(static_cast<const result_error_observers &>(*this));
       return this->_error;
     }
     /// \group error
     constexpr error_type &&error() &&
     {
-      NoValuePolicy::wide_error_check(this);
+      NoValuePolicy::wide_error_check(static_cast<result_error_observers &&>(*this));
       return std::move(this->_error);
     }
     /// \group error
     constexpr const error_type &&error() const &&
     {
-      NoValuePolicy::wide_error_check(this);
+      NoValuePolicy::wide_error_check(static_cast<const result_error_observers &&>(*this));
       return std::move(this->_error);
     }
   };
@@ -3365,14 +3261,14 @@ namespace detail
     /*! Access error without runtime checks.
     */
 
-    constexpr void assume_error() const noexcept { NoValuePolicy::narrow_error_check(this); }
+    constexpr void assume_error() const noexcept { NoValuePolicy::narrow_error_check(*this); }
     /// \output_section Wide state observers
     /*! Access error with runtime checks.
     \requires The result to have a failed state, else whatever `NoValuePolicy` says ought to happen.
     */
 
 
-    constexpr void error() const { NoValuePolicy::wide_error_check(this); }
+    constexpr void error() const { NoValuePolicy::wide_error_check(*this); }
   };
 } // namespace detail
 OUTCOME_V2_NAMESPACE_END
@@ -3452,25 +3348,25 @@ namespace detail
 
     constexpr value_type &assume_value() & noexcept
     {
-      NoValuePolicy::narrow_value_check(this);
+      NoValuePolicy::narrow_value_check(static_cast<result_value_observers &>(*this));
       return this->_state._value; // NOLINT
     }
     /// \group assume_value
     constexpr const value_type &assume_value() const &noexcept
     {
-      NoValuePolicy::narrow_value_check(this);
+      NoValuePolicy::narrow_value_check(static_cast<const result_value_observers &>(*this));
       return this->_state._value; // NOLINT
     }
     /// \group assume_value
     constexpr value_type &&assume_value() && noexcept
     {
-      NoValuePolicy::narrow_value_check(this);
+      NoValuePolicy::narrow_value_check(static_cast<result_value_observers &&>(*this));
       return std::move(this->_state._value); // NOLINT
     }
     /// \group assume_value
     constexpr const value_type &&assume_value() const &&noexcept
     {
-      NoValuePolicy::narrow_value_check(this);
+      NoValuePolicy::narrow_value_check(static_cast<const result_value_observers &&>(*this));
       return std::move(this->_state._value); // NOLINT
     }
 
@@ -3486,25 +3382,25 @@ namespace detail
 
     constexpr value_type &value() &
     {
-      NoValuePolicy::wide_value_check(this);
+      NoValuePolicy::wide_value_check(static_cast<result_value_observers &>(*this));
       return this->_state._value; // NOLINT
     }
     /// \group value
     constexpr const value_type &value() const &
     {
-      NoValuePolicy::wide_value_check(this);
+      NoValuePolicy::wide_value_check(static_cast<const result_value_observers &>(*this));
       return this->_state._value; // NOLINT
     }
     /// \group value
     constexpr value_type &&value() &&
     {
-      NoValuePolicy::wide_value_check(this);
+      NoValuePolicy::wide_value_check(static_cast<result_value_observers &&>(*this));
       return std::move(this->_state._value); // NOLINT
     }
     /// \group value
     constexpr const value_type &&value() const &&
     {
-      NoValuePolicy::wide_value_check(this);
+      NoValuePolicy::wide_value_check(static_cast<const result_value_observers &&>(*this));
       return std::move(this->_state._value); // NOLINT
     }
   };
@@ -3517,14 +3413,14 @@ namespace detail
     /*! Access value without runtime checks.
     */
 
-    constexpr void assume_value() const noexcept { NoValuePolicy::narrow_value_check(this); }
+    constexpr void assume_value() const noexcept { NoValuePolicy::narrow_value_check(*this); }
     /// \output_section Wide state observers
     /*! Access value with runtime checks.
     \requires The result to have a successful state, else whatever `NoValuePolicy` says ought to happen.
     */
 
 
-    constexpr void value() const { NoValuePolicy::wide_value_check(this); }
+    constexpr void value() const { NoValuePolicy::wide_value_check(*this); }
   };
 } // namespace detail
 
@@ -3865,7 +3761,13 @@ namespace policy
     struct base
     {
     private:
-      static void _ub()
+      static
+#ifdef _MSC_VER
+      __declspec(noreturn)
+#elif defined(__GNUC__) || defined(__clang__)
+        __attribute__((noreturn))
+#endif
+      void _ub()
       {
 #if defined(__GNUC__) || defined(__clang__)
         __builtin_unreachable();
@@ -3878,9 +3780,9 @@ namespace policy
       */
 
 
-      template <class Impl> static constexpr void narrow_value_check(Impl *self) noexcept
+      template <class Impl> static constexpr void narrow_value_check(Impl &&self) noexcept
       {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
         {
           _ub();
         }
@@ -3890,9 +3792,9 @@ namespace policy
       */
 
 
-      template <class Impl> static constexpr void narrow_error_check(Impl *self) noexcept
+      template <class Impl> static constexpr void narrow_error_check(Impl &&self) noexcept
       {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
         {
           _ub();
         }
@@ -3902,9 +3804,9 @@ namespace policy
       */
 
 
-      template <class Impl> static constexpr void narrow_payload_check(Impl *self) noexcept
+      template <class Impl> static constexpr void narrow_payload_check(Impl &&self) noexcept
       {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
+        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
         {
           _ub();
         }
@@ -3914,9 +3816,9 @@ namespace policy
       */
 
 
-      template <class Impl> static constexpr void narrow_exception_check(Impl *self) noexcept
+      template <class Impl> static constexpr void narrow_exception_check(Impl &&self) noexcept
       {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
         {
           _ub();
         }
@@ -3946,25 +3848,25 @@ namespace policy
     */
 
 
-    template <class Impl> static constexpr void wide_value_check(Impl *self) { detail::base::narrow_value_check(self); }
+    template <class Impl> static constexpr void wide_value_check(Impl &&self) { detail::base::narrow_value_check(std::forward<Impl>(self)); }
     /*! Performs a wide check of state, used in the error() functions
     \effects None.
     */
 
 
-    template <class Impl> static constexpr void wide_error_check(Impl *self) { detail::base::narrow_error_check(self); }
+    template <class Impl> static constexpr void wide_error_check(Impl &&self) { detail::base::narrow_error_check(std::forward<Impl>(self)); }
     /*! Performs a wide check of state, used in the payload() functions
     \effects If outcome does not have an exception, calls `std::terminate()`.
     */
 
 
-    template <class Impl> static constexpr void wide_payload_check(Impl *self) { detail::base::narrow_payload_check(self); }
+    template <class Impl> static constexpr void wide_payload_check(Impl &&self) { detail::base::narrow_payload_check(std::forward<Impl>(self)); }
     /*! Performs a wide check of state, used in the exception() functions
     \effects If outcome does not have an exception, calls `std::terminate()`.
     */
 
 
-    template <class Impl> static constexpr void wide_exception_check(Impl *self) { detail::base::narrow_exception_check(self); }
+    template <class Impl> static constexpr void wide_exception_check(Impl &&self) { detail::base::narrow_exception_check(std::forward<Impl>(self)); }
   };
 } // namespace policy
 
@@ -4160,43 +4062,29 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  //! Override to define what the policies which throw a system error with payload ought to do for some particular `result`.
-  template <class T> constexpr inline void throw_as_system_error_with_payload(const T * /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload"); }
   namespace detail
   {
-    template <bool has_error_payload, class T, class EC> struct throw_result_as_system_error
+    template <bool has_error_payload> struct throw_result_as_system_error
     {
-      template <class Impl> throw_result_as_system_error(const Impl *self)
+      template <class Error> explicit throw_result_as_system_error(Error &&error) // NOLINT
       {
-        auto *_self = static_cast<const result<T, EC> *>(self);
-        OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(_self->error())));
-      }
-      template <class Impl> throw_result_as_system_error(Impl *self)
-      {
-        auto *_self = static_cast<result<T, EC> *>(self);
-        OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(_self->error())));
+        OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(std::forward<Error>(error))));
       }
     };
-    template <class T, class EC> struct throw_result_as_system_error<true, T, EC>
+    template <> struct throw_result_as_system_error<true>
     {
-      template <class Impl> throw_result_as_system_error(Impl *self)
+      template <class Error> explicit throw_result_as_system_error(Error &&error) // NOLINT
       {
-        auto *_self = static_cast<result<T, EC> *>(self);
-        throw_as_system_error_with_payload(_self);
-      }
-      template <class Impl> throw_result_as_system_error(const Impl *self)
-      {
-        auto *_self = static_cast<const result<T, EC> *>(self);
-        throw_as_system_error_with_payload(_self);
+        throw_as_system_error_with_payload(std::forward<Error>(error));
       }
     };
-  }
+  } // namespace detail
 
   /*! Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
   Any wide attempt to access the successful state where there is none causes:
 
   1. If `trait::has_error_payload_v<EC>` is true, it calls an
-  ADL discovered free function `throw_as_system_error_with_payload(&result|&outcome)`.
+  ADL discovered free function `throw_as_system_error_with_payload(.error())`.
   2. If `trait::has_error_payload_v<EC>` is false, it calls `OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(.error())))`
   */
 
@@ -4213,13 +4101,13 @@ namespace policy
     */
 
 
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
+    template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
+        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          detail::throw_result_as_system_error<trait::has_error_payload_v<EC>, T, EC>{self};
+          detail::throw_result_as_system_error<trait::has_error_payload_v<EC>>{std::forward<Impl>(self)._error};
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
@@ -4229,9 +4117,9 @@ namespace policy
     */
 
 
-    template <class Impl> static constexpr void wide_error_check(Impl *self)
+    template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
         OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
@@ -4313,13 +4201,13 @@ namespace policy
     */
 
 
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
+    template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
-        if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
+        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          std::rethrow_exception(policy::exception_ptr(self->_error));
+          std::rethrow_exception(policy::exception_ptr(std::forward<Impl>(self)._error));
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
@@ -4329,9 +4217,9 @@ namespace policy
     */
 
 
-    template <class Impl> static constexpr void wide_error_check(Impl *self)
+    template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
         OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
@@ -4413,9 +4301,9 @@ namespace policy
     */
 
 
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
+    template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
         std::terminate();
       }
@@ -4425,9 +4313,9 @@ namespace policy
     */
 
 
-    template <class Impl> static constexpr void wide_error_check(Impl *self) noexcept
+    template <class Impl> static constexpr void wide_error_check(Impl &&self) noexcept
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
         std::terminate();
       }
@@ -4437,9 +4325,9 @@ namespace policy
     */
 
 
-    template <class Impl> static constexpr void wide_payload_check(Impl *self)
+    template <class Impl> static constexpr void wide_payload_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
       {
         std::terminate();
       }
@@ -4449,9 +4337,9 @@ namespace policy
     */
 
 
-    template <class Impl> static constexpr void wide_exception_check(Impl *self)
+    template <class Impl> static constexpr void wide_exception_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
       {
         std::terminate();
       }
@@ -4532,11 +4420,11 @@ namespace policy
     */
 
 
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
+    template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
-        OUTCOME_THROW_EXCEPTION(bad_result_access_with<EC>(self->_error));
+        OUTCOME_THROW_EXCEPTION(bad_result_access_with<EC>(std::forward<Impl>(self)._error));
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -4544,9 +4432,9 @@ namespace policy
     */
 
 
-    template <class Impl> static constexpr void wide_error_check(Impl *self)
+    template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
         OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
@@ -6885,165 +6773,9 @@ OUTCOME_V2_NAMESPACE_END
 #include "policy/error_enum_throw_as_system_error_exception_rethrow.hpp"
 #include "policy/error_enum_throw_as_system_error_with_payload.hpp"
 #include "policy/exception_ptr_rethrow_with_payload.hpp"
-/* Payload observers for outcome type
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
-File Created: Oct 2017
 
+#include "detail/outcome_payload_observers_impl.hpp"
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#ifndef OUTCOME_OUTCOME_PAYLOAD_OBSERVERS_IMPL_HPP
-#define OUTCOME_OUTCOME_PAYLOAD_OBSERVERS_IMPL_HPP
-
-
-
-OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
-namespace detail
-{
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &outcome_payload_observers<Base, R, S, P, NoValuePolicy>::assume_payload() & noexcept
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_payload_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &outcome_payload_observers<Base, R, S, P, NoValuePolicy>::assume_payload() const &noexcept
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_payload_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &&outcome_payload_observers<Base, R, S, P, NoValuePolicy>::assume_payload() && noexcept
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_payload_check(this);
-    return std::move(self->_ptr);
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &&outcome_payload_observers<Base, R, S, P, NoValuePolicy>::assume_payload() const &&noexcept
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_payload_check(this);
-    return std::move(self->_ptr);
-  }
-
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload() &
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_payload_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload() const &
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_payload_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &&outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload() &&
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_payload_check(this);
-    return std::move(self->_ptr);
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload_type &&outcome_payload_observers<Base, R, S, P, NoValuePolicy>::payload() const &&
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_payload_check(this);
-    return std::move(self->_ptr);
-  }
-
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() & noexcept
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_exception_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() const &noexcept
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_exception_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() && noexcept
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_exception_check(this);
-    return std::move(self->_ptr);
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() const &&noexcept
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::narrow_exception_check(this);
-    return std::move(self->_ptr);
-  }
-
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() &
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_exception_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() const &
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_exception_check(this);
-    return self->_ptr;
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() &&
-  {
-    auto *self = static_cast<outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_exception_check(this);
-    return std::move(self->_ptr);
-  }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() const &&
-  {
-    auto *self = static_cast<const outcome<R, S, P, NoValuePolicy> *>(this);
-    NoValuePolicy::wide_exception_check(this);
-    return std::move(self->_ptr);
-  }
-} // namespace detail
-
-OUTCOME_V2_NAMESPACE_END
-
-#endif
 #endif
 #include <iostream>
 #include <sstream>
