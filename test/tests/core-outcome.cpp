@@ -34,7 +34,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as i
 {
   using namespace OUTCOME_V2_NAMESPACE;
 
-  static_assert(trait::is_exception_ptr<std::exception_ptr>::value, "Trait for detecting exception_ptr is broken");
+  static_assert(trait::has_exception_ptr<std::exception_ptr>::value, "Trait for detecting exception_ptr is broken");
 
   static_assert(std::is_constructible<outcome<long>, int>::value, "Sanity check that monad can be constructed from a value_type");
   static_assert(!std::is_constructible<outcome<outcome<long>>, int>::value, "Sanity check that outer monad can be constructed from an inner monad's value_type");
@@ -190,13 +190,6 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as i
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(m.has_exception());
   }
-  {  // outcome<void, int, int> should work
-    outcome<void, int, int> m(5, 6);
-    BOOST_CHECK(!m);
-    BOOST_CHECK(!m.has_value());
-    BOOST_CHECK(m.has_error());
-    BOOST_CHECK(m.has_payload());
-  }
 
 
   {
@@ -235,17 +228,6 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as i
     outcome<int, void> d(in_place_type<std::exception_ptr>);
   }
 
-  {
-    // constexpr const char *niall = "niall";
-    // error code + matching exception
-    outcome<int> a(std::make_error_code(std::errc::not_enough_memory), std::make_exception_ptr(std::bad_alloc()));
-    a.error();
-    a.exception();
-    // value + payload
-    // outcome<int, std::error_code, const char *> b(5, niall);
-    // b.error();
-    // b.payload();
-  }
   {
     // Can only be constructed via multiple args
     struct udt3

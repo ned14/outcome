@@ -49,21 +49,21 @@ struct no_error_type
 //! Namespace for policies
 namespace policy
 {
-  /*! Default `result<R, S>` policy selector.
+  /*! Default policy selector.
   */
-  template <class T, class EC>
-  using default_result_policy = std::conditional_t<  //
-  std::is_void<EC>::value,
-  terminate,                                                                   //
-  std::conditional_t<                                                          //
-  trait::has_error_code_v<EC>, error_code_throw_as_system_error<T, EC, void>,  //
-  std::conditional_t<                                                          //
-  trait::has_exception_ptr_v<EC>, exception_ptr_rethrow<T, EC, void>,          //
-  all_narrow                                                                   //
+  template <class T, class EC, class E>
+  using default_policy = std::conditional_t<  //
+  std::is_void<EC>::value && std::is_void<E>::value,
+  terminate,                                                                                         //
+  std::conditional_t<                                                                                //
+  trait::has_error_code_v<EC>, error_code_throw_as_system_error<T, EC, E>,                           //
+  std::conditional_t<                                                                                //
+  trait::has_exception_ptr_v<EC> || trait::has_exception_ptr_v<E>, exception_ptr_rethrow<T, EC, E>,  //
+  all_narrow                                                                                         //
   >>>;
 }  // namespace policy
 
-template <class R, class S = std::error_code, class NoValuePolicy = policy::default_result_policy<R, S>>                                                                //
+template <class R, class S = std::error_code, class NoValuePolicy = policy::default_policy<R, S, void>>                                                                 //
 #if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                 // GCC's constraints implementation is buggy
 OUTCOME_REQUIRES(detail::type_can_be_used_in_result<R> &&detail::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
 #endif
@@ -228,9 +228,6 @@ class OUTCOME_NODISCARD result : public detail::result_final<R, S, NoValuePolicy
   {
   };
   struct error_condition_converting_constructor_tag
-  {
-  };
-  struct value_status_converting_constructor_tag
   {
   };
 
