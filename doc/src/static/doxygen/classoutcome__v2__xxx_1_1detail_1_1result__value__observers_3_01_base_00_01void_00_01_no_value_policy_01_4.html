@@ -135,7 +135,7 @@ template&lt;class Base , class NoValuePolicy &gt; </div>
 
 <p>Narrow state observers </p>
 <p>Access value without runtime checks. </p>
-<div class="fragment"><div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;{ NoValuePolicy::narrow_value_check(<span class="keyword">this</span>); }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;{ NoValuePolicy::narrow_value_check(*<span class="keyword">this</span>); }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a5c918cc620b99d8a050a118cb7ecf37c"></a>
@@ -165,7 +165,7 @@ template&lt;class Base , class NoValuePolicy &gt; </div>
 
 <p>Wide state observers </p>
 <p>Access value with runtime checks. </p><dl class="section user"><dt>Requires:</dt><dd>The result to have a successful state, else whatever <code>NoValuePolicy</code> says ought to happen. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;{ NoValuePolicy::wide_value_check(<span class="keyword">this</span>); }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;{ NoValuePolicy::wide_value_check(*<span class="keyword">this</span>); }</div></div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>

@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['rebind',['rebind',['../classoutcome__v2__xxx_1_1outcome.html#a09834293a2eaaba4ecce6783edcef5c6',1,'outcome_v2_xxx::outcome::rebind()'],['../classoutcome__v2__xxx_1_1result.html#a1d371fbbcf1fc7b807a54c1e72a2d02f',1,'outcome_v2_xxx::result::rebind()']]],
-  ['result',['result',['../structoutcome__v2__xxx_1_1detail_1_1outcome__predicates.html#ae8af0961bcea4d2b69f85d2e73e9faff',1,'outcome_v2_xxx::detail::outcome_predicates']]]
+  ['select_5foutcome_5fimpl',['select_outcome_impl',['../namespaceoutcome__v2__xxx_1_1detail.html#aaa420f840032e0108ce04636f90b3519',1,'outcome_v2_xxx::detail']]],
+  ['select_5foutcome_5fimpl2',['select_outcome_impl2',['../namespaceoutcome__v2__xxx_1_1detail.html#aeb2073276ee376fc5ac4ac37d7c4f3ce',1,'outcome_v2_xxx::detail']]],
+  ['select_5fresult_5fimpl',['select_result_impl',['../namespaceoutcome__v2__xxx_1_1detail.html#a80d582ee6958238c92b5d246a7e8c87e',1,'outcome_v2_xxx::detail']]],
+  ['status_5fbitfield_5ftype',['status_bitfield_type',['../namespaceoutcome__v2__xxx_1_1detail.html#ac29d920102ef903d21a70739819dd60d',1,'outcome_v2_xxx::detail']]]
 ];

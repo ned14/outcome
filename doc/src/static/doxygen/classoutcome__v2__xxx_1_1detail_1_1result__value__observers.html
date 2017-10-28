@@ -184,7 +184,7 @@ template&lt;class Base, class R, class NoValuePolicy&gt; </div>
 
 <p>Narrow state observers </p>
 <p>Access value without runtime checks.  The result to have a successful state, otherwise it is undefined behaviour. </p><dl class="section return"><dt>Returns</dt><dd>Reference to the held <code>value_type</code> according to overload.  assume_value </dd></dl>
-<div class="fragment"><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    {</div><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      NoValuePolicy::narrow_value_check(<span class="keyword">this</span>);</div><div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      <span class="keywordflow">return</span> this-&gt;_state._value;</div><div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    {</div><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      NoValuePolicy::narrow_value_check(static_cast&lt;result_value_observers &amp;&gt;(*<span class="keyword">this</span>));</div><div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      <span class="keywordflow">return</span> this-&gt;_state._value;  <span class="comment">// NOLINT</span></div><div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a6948de51a127ba69f3924338227eb344"></a>
@@ -213,7 +213,7 @@ template&lt;class Base, class R, class NoValuePolicy&gt; </div>
 </div><div class="memdoc">
 
 <p>assume_value </p>
-<div class="fragment"><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    {</div><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      NoValuePolicy::narrow_value_check(<span class="keyword">this</span>);</div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      <span class="keywordflow">return</span> this-&gt;_state._value;</div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    {</div><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      NoValuePolicy::narrow_value_check(static_cast&lt;const result_value_observers &amp;&gt;(*<span class="keyword">this</span>));</div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      <span class="keywordflow">return</span> this-&gt;_state._value;  <span class="comment">// NOLINT</span></div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a34497c3aca7e4f87c73fe105f419c3c3"></a>
@@ -242,7 +242,7 @@ template&lt;class Base, class R, class NoValuePolicy&gt; </div>
 </div><div class="memdoc">
 
 <p>assume_value </p>
-<div class="fragment"><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    {</div><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      NoValuePolicy::narrow_value_check(<span class="keyword">this</span>);</div><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      <span class="keywordflow">return</span> std::move(this-&gt;_state._value);</div><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    {</div><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      NoValuePolicy::narrow_value_check(static_cast&lt;result_value_observers &amp;&amp;&gt;(*<span class="keyword">this</span>));</div><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      <span class="keywordflow">return</span> std::move(this-&gt;_state._value);  <span class="comment">// NOLINT</span></div><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ae7254876da537ee58e989411ed29b334"></a>
@@ -271,7 +271,7 @@ template&lt;class Base, class R, class NoValuePolicy&gt; </div>
 </div><div class="memdoc">
 
 <p>assume_value </p>
-<div class="fragment"><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    {</div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      NoValuePolicy::narrow_value_check(<span class="keyword">this</span>);</div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      <span class="keywordflow">return</span> std::move(this-&gt;_state._value);</div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    {</div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      NoValuePolicy::narrow_value_check(static_cast&lt;const result_value_observers &amp;&amp;&gt;(*<span class="keyword">this</span>));</div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      <span class="keywordflow">return</span> std::move(this-&gt;_state._value);  <span class="comment">// NOLINT</span></div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ab808fa9f907c73b62ae7184cb1247577"></a>
@@ -302,7 +302,7 @@ template&lt;class Base, class R, class NoValuePolicy&gt; </div>
 <p>Wide state observers </p>
 <p>Access value with runtime checks. </p><dl class="section return"><dt>Returns</dt><dd>Reference to the held <code>value_type</code> according to overload. </dd></dl>
 <dl class="section user"><dt>Requires:</dt><dd>The result to have a successful state, else whatever <code>NoValuePolicy</code> says ought to happen.  value </dd></dl>
-<div class="fragment"><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    {</div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      NoValuePolicy::wide_value_check(<span class="keyword">this</span>);</div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      <span class="keywordflow">return</span> this-&gt;_state._value;</div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    {</div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      NoValuePolicy::wide_value_check(static_cast&lt;result_value_observers &amp;&gt;(*<span class="keyword">this</span>));</div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      <span class="keywordflow">return</span> this-&gt;_state._value;  <span class="comment">// NOLINT</span></div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a8dba4bfda2932f748b0025605d40ed92"></a>
@@ -331,7 +331,7 @@ template&lt;class Base, class R, class NoValuePolicy&gt; </div>
 </div><div class="memdoc">
 
 <p>value </p>
-<div class="fragment"><div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    {</div><div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;      NoValuePolicy::wide_value_check(<span class="keyword">this</span>);</div><div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      <span class="keywordflow">return</span> this-&gt;_state._value;</div><div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    {</div><div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;      NoValuePolicy::wide_value_check(static_cast&lt;const result_value_observers &amp;&gt;(*<span class="keyword">this</span>));</div><div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      <span class="keywordflow">return</span> this-&gt;_state._value;  <span class="comment">// NOLINT</span></div><div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ad3e843acfdcc48fde735344bf3b01ef7"></a>
@@ -360,7 +360,7 @@ template&lt;class Base, class R, class NoValuePolicy&gt; </div>
 </div><div class="memdoc">
 
 <p>value </p>
-<div class="fragment"><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    {</div><div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;      NoValuePolicy::wide_value_check(<span class="keyword">this</span>);</div><div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      <span class="keywordflow">return</span> std::move(this-&gt;_state._value);</div><div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    {</div><div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;      NoValuePolicy::wide_value_check(static_cast&lt;result_value_observers &amp;&amp;&gt;(*<span class="keyword">this</span>));</div><div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      <span class="keywordflow">return</span> std::move(this-&gt;_state._value);  <span class="comment">// NOLINT</span></div><div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ab863ed613a93a6521ca8653496a2bc14"></a>
@@ -389,7 +389,7 @@ template&lt;class Base, class R, class NoValuePolicy&gt; </div>
 </div><div class="memdoc">
 
 <p>value </p>
-<div class="fragment"><div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    {</div><div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      NoValuePolicy::wide_value_check(<span class="keyword">this</span>);</div><div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      <span class="keywordflow">return</span> std::move(this-&gt;_state._value);</div><div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    {</div><div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      NoValuePolicy::wide_value_check(static_cast&lt;const result_value_observers &amp;&amp;&gt;(*<span class="keyword">this</span>));</div><div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      <span class="keywordflow">return</span> std::move(this-&gt;_state._value);  <span class="comment">// NOLINT</span></div><div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    }</div></div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>

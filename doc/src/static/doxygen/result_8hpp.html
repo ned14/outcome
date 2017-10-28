@@ -91,9 +91,8 @@ $(document).ready(function(){initNavTree('result_8hpp.html','');});
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="result__final_8hpp.html">detail/result_final.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="all__narrow_8hpp.html">policy/all_narrow.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="error__code__throw__as__system__error_8hpp.html">policy/error_code_throw_as_system_error.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="error__enum__throw__as__system__error_8hpp.html">policy/error_enum_throw_as_system_error.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="exception__ptr__rethrow_8hpp.html">policy/exception_ptr_rethrow.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="result__error__code__throw__as__system__error_8hpp.html">policy/result_error_code_throw_as_system_error.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="result__exception__ptr__rethrow_8hpp.html">policy/result_exception_ptr_rethrow.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="terminate_8hpp.html">policy/terminate.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="throw__bad__result__access_8hpp.html">policy/throw_bad_result_access.hpp</a>&quot;</code><br />
 </div><table class="memberdecls">
@@ -135,9 +134,9 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a5330cdcaff26b3168d065f8d9cf47aaa"><td class="memTemplParams" colspan="2">template&lt;class T , class EC &gt; </td></tr>
-<tr class="memitem:a5330cdcaff26b3168d065f8d9cf47aaa"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a5330cdcaff26b3168d065f8d9cf47aaa">outcome_v2_xxx::policy::default_result_policy</a> = std::conditional_t&lt; std::is_void&lt; EC &gt;::value, terminate, std::conditional_t&lt; std::is_error_code_enum&lt; EC &gt;::value||std::is_error_condition_enum&lt; EC &gt;::value, error_enum_throw_as_system_error&lt; EC &gt;, std::conditional_t&lt; trait::is_error_code&lt; EC &gt;::value, error_code_throw_as_system_error&lt; EC &gt;, std::conditional_t&lt; trait::is_exception_ptr&lt; EC &gt;::value, exception_ptr_rethrow&lt; T, EC, void &gt;, all_narrow &gt; &gt;&gt; &gt;</td></tr>
-<tr class="separator:a5330cdcaff26b3168d065f8d9cf47aaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22b45dbad0d3fea32d277c69f60afe1f"><td class="memTemplParams" colspan="2">template&lt;class T , class EC , class E &gt; </td></tr>
+<tr class="memitem:a22b45dbad0d3fea32d277c69f60afe1f"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a22b45dbad0d3fea32d277c69f60afe1f">outcome_v2_xxx::policy::default_policy</a> = std::conditional_t&lt; std::is_void&lt; EC &gt;::value &amp;&amp;std::is_void&lt; E &gt;::value, terminate, std::conditional_t&lt; trait::has_error_code_v&lt; EC &gt;, error_code_throw_as_system_error&lt; T, EC, E &gt;, std::conditional_t&lt; trait::has_exception_ptr_v&lt; EC &gt;||trait::has_exception_ptr_v&lt; E &gt;, exception_ptr_rethrow&lt; T, EC, E &gt;, all_narrow &gt; &gt;&gt;</td></tr>
+<tr class="separator:a22b45dbad0d3fea32d277c69f60afe1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab039de28dd8bf196cb07b5194c0ec6a5"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:ab039de28dd8bf196cb07b5194c0ec6a5"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx.html#ab039de28dd8bf196cb07b5194c0ec6a5">outcome_v2_xxx::is_result</a> = detail::is_result&lt; std::decay_t&lt; T &gt; &gt;</td></tr>
 <tr class="memdesc:ab039de28dd8bf196cb07b5194c0ec6a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a result.  <a href="namespaceoutcome__v2__xxx.html#ab039de28dd8bf196cb07b5194c0ec6a5">More...</a><br /></td></tr>

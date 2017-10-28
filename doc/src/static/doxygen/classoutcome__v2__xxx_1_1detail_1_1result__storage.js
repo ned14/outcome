@@ -6,6 +6,7 @@ var classoutcome__v2__xxx_1_1detail_1_1result__storage =
     [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#aa404696b32f5b54162dc62ede8892c62", null ],
     [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a5aea085914a8c922857cfe95030653f2", null ],
     [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#aff48474983982d0de4b9a4ca7077d4ce", null ],
+    [ "~result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a028ef7f5f6e5da0de56ee215bf06ba6d", null ],
     [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#acdbfcb4d148052d38339f240bf29e51f", null ],
     [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a5b60f5caa2fd636c6eccb34eb3991d5d", null ],
     [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a8da940739c7e12f2bcc055b2b9317449", null ],

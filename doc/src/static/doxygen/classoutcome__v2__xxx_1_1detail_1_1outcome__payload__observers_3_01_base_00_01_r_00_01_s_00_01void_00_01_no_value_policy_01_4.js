@@ -1,5 +1,0 @@
-var classoutcome__v2__xxx_1_1detail_1_1outcome__payload__observers_3_01_base_00_01_r_00_01_s_00_01void_00_01_no_value_policy_01_4 =
-[
-    [ "assume_payload", "classoutcome__v2__xxx_1_1detail_1_1outcome__payload__observers_3_01_base_00_01_r_00_01_s_00_01void_00_01_no_value_policy_01_4.html#ad6ccc8cff9027ef9bd93ca424d945249", null ],
-    [ "payload", "classoutcome__v2__xxx_1_1detail_1_1outcome__payload__observers_3_01_base_00_01_r_00_01_s_00_01void_00_01_no_value_policy_01_4.html#a5777b525d45fe0ba046eb6d4c0f58629", null ]
-];

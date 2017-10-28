@@ -32,6 +32,8 @@ On Windows, simply download the raw file from above and place it wherever it sui
 
 ## Usage from the Conan package manager
 
+*(thanks to Théo Delrieu for contributing this support)*
+
 At the command line, add the bintray repo for Outcome to conan:
 
 ```

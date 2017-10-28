@@ -112,10 +112,10 @@ Functions</h2></td></tr>
 <tr class="memitem:ace9e74219aa9e15ed060c61ce98abb9e"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
 <tr class="memitem:ace9e74219aa9e15ed060c61ce98abb9e"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#ace9e74219aa9e15ed060c61ce98abb9e">hook_outcome_in_place_construction</a> (<a class="el" href="structoutcome__v2__xxx_1_1in__place__type__t.html">in_place_type_t</a>&lt; T &gt;, U *) noexcept</td></tr>
 <tr class="separator:ace9e74219aa9e15ed060c61ce98abb9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a363acb2ca6f88fd68c75a36223501d9f"><td class="memTemplParams" colspan="2">template&lt;class R , class S , class P , class NoValuePolicy , class U &gt; </td></tr>
-<tr class="memitem:a363acb2ca6f88fd68c75a36223501d9f"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#a363acb2ca6f88fd68c75a36223501d9f">override_outcome_payload_exception</a> (<a class="el" href="classoutcome__v2__xxx_1_1outcome.html">outcome</a>&lt; R, S, P, NoValuePolicy &gt; *o, U &amp;&amp;v) noexcept</td></tr>
-<tr class="memdesc:a363acb2ca6f88fd68c75a36223501d9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used in hook implementations to override the payload/exception to something other than what was constructed.  <a href="#a363acb2ca6f88fd68c75a36223501d9f">More...</a><br /></td></tr>
-<tr class="separator:a363acb2ca6f88fd68c75a36223501d9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f5bbd810cf7e8ea3c3709afb61c1c40"><td class="memTemplParams" colspan="2">template&lt;class R , class S , class P , class NoValuePolicy , class U &gt; </td></tr>
+<tr class="memitem:a6f5bbd810cf7e8ea3c3709afb61c1c40"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#a6f5bbd810cf7e8ea3c3709afb61c1c40">override_outcome_exception</a> (<a class="el" href="classoutcome__v2__xxx_1_1outcome.html">outcome</a>&lt; R, S, P, NoValuePolicy &gt; *o, U &amp;&amp;v) noexcept</td></tr>
+<tr class="memdesc:a6f5bbd810cf7e8ea3c3709afb61c1c40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used in hook implementations to override the payload/exception to something other than what was constructed.  <a href="#a6f5bbd810cf7e8ea3c3709afb61c1c40">More...</a><br /></td></tr>
+<tr class="separator:a6f5bbd810cf7e8ea3c3709afb61c1c40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ea286efc7bd79c98bb24de99962e5b0"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
 <tr class="memitem:a9ea286efc7bd79c98bb24de99962e5b0"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#a9ea286efc7bd79c98bb24de99962e5b0">hook_result_construction</a> (<a class="el" href="structoutcome__v2__xxx_1_1in__place__type__t.html">in_place_type_t</a>&lt; T &gt;, U *) noexcept</td></tr>
 <tr class="separator:a9ea286efc7bd79c98bb24de99962e5b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -170,12 +170,12 @@ template&lt;class T , class U &gt; </div>
 </div><div class="memdoc">
 <p>The default instantiation hook implementation called when a <code>outcome</code> is first created by conversion from one of its possible types. Does nothing. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>One of <code>value_type</code>, <code>error_type</code>, <code>std::pair&lt;error_type, payload_type&gt;</code> or <code>exception_type</code>.</td></tr>
+    <tr><td class="paramname">T</td><td>One of <code>value_type</code>, <code>error_type</code>, or <code>exception_type</code>.</td></tr>
   </table>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a3ee75190c2dabe180881fab5081e7c3e"></a>
@@ -220,7 +220,7 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ace9e74219aa9e15ed060c61ce98abb9e"></a>
@@ -260,12 +260,12 @@ template&lt;class T , class U &gt; </div>
 </div><div class="memdoc">
 <p>The default instantiation hook implementation called when a <code>outcome</code> is created by in place construction. Does nothing. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>One of <code>value_type</code>, <code>error_type</code>, <code>std::pair&lt;error_type, payload_type&gt;</code> or <code>exception_type</code>.</td></tr>
+    <tr><td class="paramname">T</td><td>One of <code>value_type</code>, <code>error_type</code>, or <code>exception_type</code>.</td></tr>
   </table>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a9266d40886a7b70782e1011da5b9e264"></a>
@@ -310,7 +310,7 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a9ea286efc7bd79c98bb24de99962e5b0"></a>
@@ -355,7 +355,7 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a65aea7ecae6f947cad431f6a599fe06f"></a>
@@ -400,7 +400,7 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ae2cd33cfd3fb8fd50181941e6944356f"></a>
@@ -445,7 +445,7 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ae0571da4b7167e79369ff6662e0ae141"></a>
@@ -490,11 +490,11 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should! </p>
-<div class="fragment"><div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;{}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;{}</div></div><!-- fragment -->
 </div>
 </div>
-<a id="a363acb2ca6f88fd68c75a36223501d9f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a363acb2ca6f88fd68c75a36223501d9f">&#9670;&nbsp;</a></span>override_outcome_payload_exception()</h2>
+<a id="a6f5bbd810cf7e8ea3c3709afb61c1c40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f5bbd810cf7e8ea3c3709afb61c1c40">&#9670;&nbsp;</a></span>override_outcome_exception()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -505,7 +505,7 @@ template&lt;class R , class S , class P , class NoValuePolicy , class U &gt; </d
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr void outcome_v2_xxx::hooks::override_outcome_payload_exception </td>
+          <td class="memname">constexpr void outcome_v2_xxx::hooks::override_outcome_exception </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classoutcome__v2__xxx_1_1outcome.html">outcome</a>&lt; R, S, P, NoValuePolicy &gt; *&#160;</td>
           <td class="paramname"><em>o</em>, </td>
@@ -530,15 +530,15 @@ template&lt;class R , class S , class P , class NoValuePolicy , class U &gt; </d
 </div><div class="memdoc">
 
 <p>Used in hook implementations to override the payload/exception to something other than what was constructed. </p>
-<p>Used to set/override a payload/exception during a construction hook implementation. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Used to set/override an exception during a construction hook implementation. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">o</td><td>The outcome you wish to change. </td></tr>
-    <tr><td class="paramname">v</td><td>Payload/Exception to be set. </td></tr>
+    <tr><td class="paramname">v</td><td>PException to be set. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Effects:</dt><dd>Sets the payload/exception of the outcome to the given value. </dd></dl>
-<div class="fragment"><div class="line"><a name="l01124"></a><span class="lineno"> 1124</span>&#160;  {</div><div class="line"><a name="l01125"></a><span class="lineno"> 1125</span>&#160;    o-&gt;_ptr = std::forward&lt;U&gt;(v);</div><div class="line"><a name="l01126"></a><span class="lineno"> 1126</span>&#160;    <span class="keywordflow">if</span>(trait::is_exception_ptr&lt;P&gt;::value)</div><div class="line"><a name="l01127"></a><span class="lineno"> 1127</span>&#160;      o-&gt;_state._status |= detail::status_have_exception;</div><div class="line"><a name="l01128"></a><span class="lineno"> 1128</span>&#160;    <span class="keywordflow">else</span></div><div class="line"><a name="l01129"></a><span class="lineno"> 1129</span>&#160;      o-&gt;_state._status |= detail::status_have_payload;</div><div class="line"><a name="l01130"></a><span class="lineno"> 1130</span>&#160;  }</div></div><!-- fragment -->
+<dl class="section user"><dt>Effects:</dt><dd>Sets the exception of the outcome to the given value. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00966"></a><span class="lineno">  966</span>&#160;  {</div><div class="line"><a name="l00967"></a><span class="lineno">  967</span>&#160;    o-&gt;_ptr = std::forward&lt;U&gt;(v);</div><div class="line"><a name="l00968"></a><span class="lineno">  968</span>&#160;    o-&gt;_state._status |= detail::status_have_exception;</div><div class="line"><a name="l00969"></a><span class="lineno">  969</span>&#160;  }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="aad13a824934d249373d305a9421040cf"></a>
@@ -579,7 +579,7 @@ template&lt;class R , class S , class NoValuePolicy &gt; </div>
 
 <p>Sets the sixteen bits of spare storage in a <code>result</code> or <code>outcome</code>. </p>
 <p>Sets the 16 bits of spare storage in result/outcome. </p>
-<div class="fragment"><div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;{ r-&gt;_state._status |= (v &lt;&lt; detail::status_2byte_shift); }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;{ r-&gt;_state._status |= (v &lt;&lt; detail::status_2byte_shift); }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="aed2306ff27d3ccf715c7e49f933dadea"></a>
@@ -610,7 +610,7 @@ template&lt;class R , class S , class NoValuePolicy &gt; </div>
 
 <p>Get the sixteen bits of spare storage in a <code>result</code> or <code>outcome</code>. </p>
 <p>Retrieves the 16 bits of spare storage in result/outcome. </p>
-<div class="fragment"><div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;{ <span class="keywordflow">return</span> (r-&gt;_state._status &gt;&gt; detail::status_2byte_shift) &amp; 0xffff; }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;{ <span class="keywordflow">return</span> (r-&gt;_state._status &gt;&gt; detail::status_2byte_shift) &amp; 0xffff; }</div></div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

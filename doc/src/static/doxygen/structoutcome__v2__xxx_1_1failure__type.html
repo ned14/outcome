@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Outcome: outcome_v2_xxx::failure_type&lt; EC, E, e_is_exception_ptr &gt; Struct Template Reference</title>
+<title>Outcome: outcome_v2_xxx::failure_type&lt; EC, E &gt; Struct Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -80,18 +80,115 @@ $(document).ready(function(){initNavTree('structoutcome__v2__xxx_1_1failure__typ
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="structoutcome__v2__xxx_1_1failure__type-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">outcome_v2_xxx::failure_type&lt; EC, E, e_is_exception_ptr &gt; Struct Template Reference</div>  </div>
+<div class="title">outcome_v2_xxx::failure_type&lt; EC, E &gt; Struct Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
 <p><code>#include &quot;success_failure.hpp&quot;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:ac229218da6633ef992e43bd71f28189d"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1failure__type.html#ac229218da6633ef992e43bd71f28189d">error_type</a> = EC</td></tr>
+<tr class="memdesc:ac229218da6633ef992e43bd71f28189d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of the error code.  <a href="#ac229218da6633ef992e43bd71f28189d">More...</a><br /></td></tr>
+<tr class="separator:ac229218da6633ef992e43bd71f28189d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae545c77df66a89d91c9b75a8d483a523"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1failure__type.html#ae545c77df66a89d91c9b75a8d483a523">exception_type</a> = E</td></tr>
+<tr class="memdesc:ae545c77df66a89d91c9b75a8d483a523"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of the exception.  <a href="#ae545c77df66a89d91c9b75a8d483a523">More...</a><br /></td></tr>
+<tr class="separator:ae545c77df66a89d91c9b75a8d483a523"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:aa3f3b3cb77613abe2547d24cf25f4318"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structoutcome__v2__xxx_1_1failure__type.html#ac229218da6633ef992e43bd71f28189d">error_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1failure__type.html#aa3f3b3cb77613abe2547d24cf25f4318">error</a></td></tr>
+<tr class="memdesc:aa3f3b3cb77613abe2547d24cf25f4318"><td class="mdescLeft">&#160;</td><td class="mdescRight">The error code.  <a href="#aa3f3b3cb77613abe2547d24cf25f4318">More...</a><br /></td></tr>
+<tr class="separator:aa3f3b3cb77613abe2547d24cf25f4318"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae49fd0ed089e08028a31a47ebfc8bad4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structoutcome__v2__xxx_1_1failure__type.html#ae545c77df66a89d91c9b75a8d483a523">exception_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1failure__type.html#ae49fd0ed089e08028a31a47ebfc8bad4">exception</a></td></tr>
+<tr class="memdesc:ae49fd0ed089e08028a31a47ebfc8bad4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The exception.  <a href="#ae49fd0ed089e08028a31a47ebfc8bad4">More...</a><br /></td></tr>
+<tr class="separator:ae49fd0ed089e08028a31a47ebfc8bad4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;class EC = std::error_code, class E = void, bool e_is_exception_ptr = trait::is_exception_ptr&lt;E&gt;::value&gt;<br />
-struct outcome_v2_xxx::failure_type&lt; EC, E, e_is_exception_ptr &gt;</h3>
+<div class="textblock"><h3>template&lt;class EC = std::error_code, class E = void&gt;<br />
+struct outcome_v2_xxx::failure_type&lt; EC, E &gt;</h3>
 
-<p>Type sugar for implicitly constructing a <code>result&lt;&gt;</code> with a failure state. </p>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
+<p>Type sugar for implicitly constructing a <code>result&lt;&gt;</code> with a failure state of error code and exception. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="ac229218da6633ef992e43bd71f28189d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac229218da6633ef992e43bd71f28189d">&#9670;&nbsp;</a></span>error_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class EC  = std::error_code, class E  = void&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="structoutcome__v2__xxx_1_1failure__type.html">outcome_v2_xxx::failure_type</a>&lt; EC, E &gt;::<a class="el" href="structoutcome__v2__xxx_1_1failure__type.html#ac229218da6633ef992e43bd71f28189d">error_type</a> =  EC</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The type of the error code. </p>
+
+</div>
+</div>
+<a id="ae545c77df66a89d91c9b75a8d483a523"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae545c77df66a89d91c9b75a8d483a523">&#9670;&nbsp;</a></span>exception_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class EC  = std::error_code, class E  = void&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="structoutcome__v2__xxx_1_1failure__type.html">outcome_v2_xxx::failure_type</a>&lt; EC, E &gt;::<a class="el" href="structoutcome__v2__xxx_1_1failure__type.html#ae545c77df66a89d91c9b75a8d483a523">exception_type</a> =  E</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The type of the exception. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="aa3f3b3cb77613abe2547d24cf25f4318"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3f3b3cb77613abe2547d24cf25f4318">&#9670;&nbsp;</a></span>error</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class EC  = std::error_code, class E  = void&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structoutcome__v2__xxx_1_1failure__type.html#ac229218da6633ef992e43bd71f28189d">error_type</a> <a class="el" href="structoutcome__v2__xxx_1_1failure__type.html">outcome_v2_xxx::failure_type</a>&lt; EC, E &gt;::error</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The error code. </p>
+
+</div>
+</div>
+<a id="ae49fd0ed089e08028a31a47ebfc8bad4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae49fd0ed089e08028a31a47ebfc8bad4">&#9670;&nbsp;</a></span>exception</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class EC  = std::error_code, class E  = void&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structoutcome__v2__xxx_1_1failure__type.html#ae545c77df66a89d91c9b75a8d483a523">exception_type</a> <a class="el" href="structoutcome__v2__xxx_1_1failure__type.html">outcome_v2_xxx::failure_type</a>&lt; EC, E &gt;::exception</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The exception. </p>
+
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/outcome/<a class="el" href="success__failure_8hpp.html">success_failure.hpp</a></li>
 </ul>
 </div><!-- contents -->
