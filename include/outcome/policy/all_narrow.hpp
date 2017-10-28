@@ -27,6 +27,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "detail/common.hpp"
 
+#include <utility>
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy

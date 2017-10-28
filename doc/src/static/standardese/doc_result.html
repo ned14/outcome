@@ -11,11 +11,9 @@
 
 <span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">policy&#x2F;all_narrow.hpp</span><span class="pre">&quot;</span>
 
-<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">policy&#x2F;error_code_throw_as_system_error.hpp</span><span class="pre">&quot;</span>
+<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">policy&#x2F;result_error_code_throw_as_system_error.hpp</span><span class="pre">&quot;</span>
 
-<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">policy&#x2F;error_enum_throw_as_system_error.hpp</span><span class="pre">&quot;</span>
-
-<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">policy&#x2F;exception_ptr_rethrow.hpp</span><span class="pre">&quot;</span>
+<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">policy&#x2F;result_exception_ptr_rethrow.hpp</span><span class="pre">&quot;</span>
 
 <span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">policy&#x2F;terminate.hpp</span><span class="pre">&quot;</span>
 
@@ -29,8 +27,8 @@
 
     <span class="kwd">namespace</span> <a href="standardese_entities.html#standardese-outcome_v2_xxx::policy"><span class="typ dec var fun">policy</span></a>
     <span class="pun">{</span>
-        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">EC</span><span class="pun">&gt;</span>
-        <span class="kwd">using</span> <a href="doc_result.html#standardese-outcome_v2_xxx::policy::default_result_policy%3CT,EC%3E"><span class="typ dec var fun">default_result_policy</span></a> <span class="pun">=</span> <span class="typ dec var fun">std::conditional_t</span><span class="pun">&lt;</span>std::is_void&lt;EC&gt;::value, terminate, std::conditional_t&lt;std::is_error_code_enum&lt;EC&gt;::value || std::is_error_condition_enum&lt;EC&gt;::value, error_enum_throw_as_system_error&lt;EC&gt;, std::conditional_t&lt;trait::is_error_code&lt;EC&gt;::value, error_code_throw_as_system_error&lt;EC&gt;, std::conditional_t&lt;trait::is_exception_ptr&lt;EC&gt;::value, exception_ptr_rethrow&lt;T, EC, void&gt;, all_narrow&gt; &gt; &gt;<span class="pun">&gt;</span><span class="pun">;</span>
+        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">EC</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">E</span><span class="pun">&gt;</span>
+        <span class="kwd">using</span> <a href="doc_result.html#standardese-outcome_v2_xxx::policy::default_policy%3CT,EC,E%3E"><span class="typ dec var fun">default_policy</span></a> <span class="pun">=</span> <span class="typ dec var fun">std::conditional_t</span><span class="pun">&lt;</span>std::is_void&lt;EC&gt;::value &amp;&amp; std::is_void&lt;E&gt;::value, terminate, std::conditional_t&lt;trait::has_error_code_v&lt;EC&gt;, error_code_throw_as_system_error&lt;T, EC, E&gt;, std::conditional_t&lt;trait::has_exception_ptr_v&lt;EC&gt; || trait::has_exception_ptr_v&lt;E&gt;, exception_ptr_rethrow&lt;T, EC, E&gt;, all_narrow&gt; &gt;<span class="pun">&gt;</span><span class="pun">;</span>
     <span class="pun">}</span>
 
     <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">&gt;</span>
@@ -94,12 +92,12 @@
 </section>
 <hr class="standardese-entity-documentation-break" />
 <section id="standardese-outcome_v2_xxx::policy" class="standardese-entity-documentation">
-<section id="standardese-outcome_v2_xxx::policy::default_result_policy&lt;T,EC&gt;" class="standardese-entity-documentation">
-<h3 class="standardese-entity-documentation-heading">Alias template <code>default_result_policy</code></h3>
-<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">EC</span><span class="pun">&gt;</span>
-<span class="kwd">using</span> <span class="typ dec var fun">default_result_policy</span> <span class="pun">=</span> <span class="typ dec var fun">std::conditional_t</span><span class="pun">&lt;</span>std::is_void&lt;EC&gt;::value, terminate, std::conditional_t&lt;std::is_error_code_enum&lt;EC&gt;::value || std::is_error_condition_enum&lt;EC&gt;::value, error_enum_throw_as_system_error&lt;EC&gt;, std::conditional_t&lt;trait::is_error_code&lt;EC&gt;::value, error_code_throw_as_system_error&lt;EC&gt;, std::conditional_t&lt;trait::is_exception_ptr&lt;EC&gt;::value, exception_ptr_rethrow&lt;T, EC, void&gt;, all_narrow&gt; &gt; &gt;<span class="pun">&gt;</span><span class="pun">;</span>
+<section id="standardese-outcome_v2_xxx::policy::default_policy&lt;T,EC,E&gt;" class="standardese-entity-documentation">
+<h3 class="standardese-entity-documentation-heading">Alias template <code>default_policy</code></h3>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">EC</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">E</span><span class="pun">&gt;</span>
+<span class="kwd">using</span> <span class="typ dec var fun">default_policy</span> <span class="pun">=</span> <span class="typ dec var fun">std::conditional_t</span><span class="pun">&lt;</span>std::is_void&lt;EC&gt;::value &amp;&amp; std::is_void&lt;E&gt;::value, terminate, std::conditional_t&lt;trait::has_error_code_v&lt;EC&gt;, error_code_throw_as_system_error&lt;T, EC, E&gt;, std::conditional_t&lt;trait::has_exception_ptr_v&lt;EC&gt; || trait::has_exception_ptr_v&lt;E&gt;, exception_ptr_rethrow&lt;T, EC, E&gt;, all_narrow&gt; &gt;<span class="pun">&gt;</span><span class="pun">;</span>
 </code></pre>
-<p id="standardese-outcome_v2_xxx::policy::default_result_policy&lt;T,EC&gt;-brief" class="standardese-brief-section">Default <code>result&lt;R, S&gt;</code> policy selector.</p>
+<p id="standardese-outcome_v2_xxx::policy::default_policy&lt;T,EC,E&gt;-brief" class="standardese-brief-section">Default policy selector.</p>
 </section>
 <hr class="standardese-entity-documentation-break" />
 </section>
@@ -246,6 +244,8 @@
 
     result&lt;R, S, NoValuePolicy&gt;<span class="pun">&amp;</span> <a href="doc_result.html#standardese-outcome_v2_xxx::result%3CR,S,NoValuePolicy%3E::operator=(constresult%3CR,S,NoValuePolicy%3E&amp;)"><span class="typ dec var fun">operator=</span></a><span class="pun">(</span>const result&lt;R, S, NoValuePolicy&gt;<span class="pun">&amp;</span><span class="pun">)</span> <span class="pun">=</span> <span class="kwd">default</span><span class="pun">;</span>
 
+    <span class="typ dec var fun">~result</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">=</span> <span class="kwd">default</span><span class="pun">;</span>
+
     <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">&gt;</span>
     <span class="kwd">constexpr</span> <a href="doc_result.html#standardese-outcome_v2_xxx::result%3CR,S,NoValuePolicy%3E::result%3CT,%3E(T&amp;&amp;,outcome_v2_xxx::result::value_converting_constructor_tag)"><span class="typ dec var fun">result</span></a><span class="pun">(</span><span class="typ dec var fun">T</span><span class="pun">&amp;&amp;</span> <a href="doc_result.html#standardese-outcome_v2_xxx::result%3CR,S,NoValuePolicy%3E::result%3CT,%3E(T&amp;&amp;,outcome_v2_xxx::result::value_converting_constructor_tag).t"><span class="typ dec var fun">t</span></a><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">(</span><span class="kwd">std</span><span class="pun">::</span><span class="kwd">is_nothrow_constructible</span><span class="pun">&lt;</span><span class="kwd">value_type</span><span class="pun">,</span> <span class="kwd">T</span><span class="pun">&gt;</span><span class="pun">::</span><span class="kwd">value</span><span class="pun">)</span><span class="pun">;</span>
 
@@ -306,14 +306,11 @@
 </ol>
 <ul>
 <li>
-<p>If <code>std::is_error_code_enum_v&lt;S&gt;</code> or <code>std::is_error_condition_enum_v&lt;S&gt;</code> is true,
-then <code>throw std::system_error(make_error_code(error()))</code> [<code>policy::error_enum_throw_as_system_error&lt;S&gt;</code>]</p>
+<p>If <code>trait::has_error_code_v&lt;S&gt;</code> is true,
+then <code>throw std::system_error(error()|make_error_code(error()))</code> [<code>policy::error_code_throw_as_system_error&lt;S&gt;</code>]</p>
 </li>
 <li>
-<p>If <code>trait::is_error_code&lt;S&gt;</code>, then <code>throw std::system_error(error())</code> [<code>policy::error_code_throw_as_system_error&lt;S&gt;</code>]</p>
-</li>
-<li>
-<p>If <code>trait::is_exception_ptr&lt;S&gt;</code>, then <code>std::rethrow_exception(error())</code> [<code>policy::exception_ptr_rethrow&lt;R, S, void&gt;</code>]</p>
+<p>If <code>trait::has_exception_ptr_v&lt;S&gt;</code>, then <code>std::rethrow_exception(error()|make_exception_ptr(error()))</code> [<code>policy::exception_ptr_rethrow&lt;R, S, void&gt;</code>]</p>
 </li>
 <li>
 <p>If <code>S</code> is <code>void</code>, call <code>std::terminate()</code> [<code>policy::terminate</code>]</p>
@@ -329,8 +326,7 @@ then <code>throw std::system_error(make_error_code(error()))</code> [<code>polic
 </ol>
 <ul>
 <li>
-<p>If <code>std::is_error_code_enum_v&lt;S&gt;</code> or <code>std::is_error_condition_enum_v&lt;S&gt;</code> is true,
-or if <code>trait::is_error_code&lt;S&gt;</code>, or if <code>trait::is_exception_ptr&lt;S&gt;</code>,
+<p>If <code>trait::has_error_code_v&lt;S&gt;</code>, or if <code>trait::has_exception_ptr_v&lt;S&gt;</code>,
 or if <code>S</code> is <code>void</code>, do <code>throw bad_result_access()</code></p>
 </li>
 <li>
