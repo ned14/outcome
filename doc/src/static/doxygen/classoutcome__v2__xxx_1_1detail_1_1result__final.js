@@ -19,7 +19,6 @@ var classoutcome__v2__xxx_1_1detail_1_1result__final =
     [ "has_error", "classoutcome__v2__xxx_1_1detail_1_1result__final.html#a32f8e81ba5699787bdcc1b79bc0fa850", null ],
     [ "has_exception", "classoutcome__v2__xxx_1_1detail_1_1result__final.html#aa898818ec6f3753d496f8b08c3382d82", null ],
     [ "has_failure", "classoutcome__v2__xxx_1_1detail_1_1result__final.html#aee0a97eb0584ffa53b1e4f8034e3b649", null ],
-    [ "has_payload", "classoutcome__v2__xxx_1_1detail_1_1result__final.html#a88e695d4b21772d4957dac19a9569534", null ],
     [ "has_value", "classoutcome__v2__xxx_1_1detail_1_1result__final.html#ace8cddbdc57a39a61db4696506923f4d", null ],
     [ "operator bool", "classoutcome__v2__xxx_1_1detail_1_1result__final.html#ac4825d16531954b9a5606fa0dcba34b6", null ],
     [ "operator!=", "classoutcome__v2__xxx_1_1detail_1_1result__final.html#ae506e7644b1b339d073add23e1780d35", null ],

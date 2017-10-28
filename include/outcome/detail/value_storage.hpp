@@ -58,26 +58,11 @@ namespace detail
   {
   };
 
-  // Replace void with constructible void_type
-  struct empty_type
-  {
-  };
-  struct void_type
-  {
-    // We always compare true to another instance of me
-    constexpr bool operator==(void_type /*unused*/) const noexcept { return true; }
-    constexpr bool operator!=(void_type /*unused*/) const noexcept { return false; }
-  };
-  template <class T> using devoid = std::conditional_t<std::is_void<T>::value, void_type, T>;
-
   using status_bitfield_type = uint32_t;
   static constexpr status_bitfield_type status_have_value = (1 << 0);
   static constexpr status_bitfield_type status_have_error = (1 << 1);
-  static constexpr status_bitfield_type status_have_status = (1 << 2);
-  // bit 3 unused
+  static constexpr status_bitfield_type status_have_exception = (1 << 2);
   static constexpr status_bitfield_type status_error_is_errno = (1 << 4);  // can errno be set from this error?
-  static constexpr status_bitfield_type status_have_payload = (1 << 5);
-  static constexpr status_bitfield_type status_have_exception = (1 << 6);
   // bit 7 unused
   // bits 8-15 unused
   // bits 16-31 used for user supplied 16 bit value

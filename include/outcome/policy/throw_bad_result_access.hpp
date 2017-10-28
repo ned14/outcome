@@ -41,19 +41,19 @@ namespace policy
     /*! Performs a wide check of state, used in the value() functions.
     \effects If result does not have a value, it throws `bad_result_access_with<EC>`.
     */
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
+    template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
-        OUTCOME_THROW_EXCEPTION(bad_result_access_with<EC>(self->_error));
+        OUTCOME_THROW_EXCEPTION(bad_result_access_with<EC>(std::forward<Impl>(self)._error));
       }
     }
     /*! Performs a wide check of state, used in the error() functions
     \effects If result does not have an error, it throws `bad_result_access`.
     */
-    template <class Impl> static constexpr void wide_error_check(Impl *self)
+    template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
         OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }

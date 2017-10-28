@@ -30,6 +30,26 @@ fetch https://github.com/ned14/outcome/raw/develop/single-header/outcome.hpp
 On Windows, simply download the raw file from above and place it wherever it suits you.
 
 
+## Usage from the Conan package manager
+
+*(thanks to Théo Delrieu for contributing this support)*
+
+At the command line, add the bintray repo for Outcome to conan:
+
+```
+conan remote add outcome https://api.bintray.com/conan/ned14/Outcome
+```
+
+Now simply add this to your Conan build:
+
+```
+[requires]
+Outcome/master@ned14/stable
+```
+
+Outcome will be made available by Conan at `<outcome.hpp>`.
+
+
 ## Usage as a git submodule
 
 Given that v2 is still under development, it is currently best used as a git

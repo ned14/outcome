@@ -290,7 +290,7 @@ template&lt;class value_type , class error_type &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=                       </div><div class="line">    std::is_base_of&lt;std::error_code, std::decay_t&lt;error_type&gt;&gt;::value        </div><div class="line">    || std::is_base_of&lt;std::exception_ptr, std::decay_t&lt;error_type&gt;&gt;::value</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">=  </div><div class="line">    trait::has_error_code_v&lt;error_type&gt; || trait::has_exception_ptr_v&lt;error_type&gt;</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a6cd192be7bfbce151d9affada8bd42e9"></a>

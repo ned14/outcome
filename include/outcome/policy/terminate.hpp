@@ -42,9 +42,9 @@ namespace policy
     /*! Performs a wide check of state, used in the value() functions.
     \effects If result does not have a value, calls `std::terminate()`.
     */
-    template <class Impl> static constexpr void wide_value_check(Impl *self)
+    template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
         std::terminate();
       }
@@ -52,19 +52,9 @@ namespace policy
     /*! Performs a wide check of state, used in the error() functions
     \effects If result does not have an error, calls `std::terminate()`.
     */
-    template <class Impl> static constexpr void wide_error_check(Impl *self) noexcept
+    template <class Impl> static constexpr void wide_error_check(Impl &&self) noexcept
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
-      {
-        std::terminate();
-      }
-    }
-    /*! Performs a wide check of state, used in the payload() functions
-    \effects If outcome does not have an exception, calls `std::terminate()`.
-    */
-    template <class Impl> static constexpr void wide_payload_check(Impl *self)
-    {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
         std::terminate();
       }
@@ -72,15 +62,15 @@ namespace policy
     /*! Performs a wide check of state, used in the exception() functions
     \effects If outcome does not have an exception, calls `std::terminate()`.
     */
-    template <class Impl> static constexpr void wide_exception_check(Impl *self)
+    template <class Impl> static constexpr void wide_exception_check(Impl &&self)
     {
-      if((self->_state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
       {
         std::terminate();
       }
     }
   };
-} // namespace policy
+}  // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
 

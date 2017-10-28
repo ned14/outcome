@@ -3,10 +3,8 @@ version: 2.00.{build}-{branch}
  
 # branches to build
 branches:
-  # blacklist
-  except:
-    - master
-    - gh-pages
+  only:
+    - develop
 skip_tags: true
  
 image: Visual Studio 2017

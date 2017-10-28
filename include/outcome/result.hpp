@@ -26,10 +26,10 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define OUTCOME_RESULT_HPP
 
 #include "detail/result_final.hpp"
+
 #include "policy/all_narrow.hpp"
-#include "policy/error_code_throw_as_system_error.hpp"
-#include "policy/error_enum_throw_as_system_error.hpp"
-#include "policy/exception_ptr_rethrow.hpp"
+#include "policy/result_error_code_throw_as_system_error.hpp"
+#include "policy/result_exception_ptr_rethrow.hpp"
 #include "policy/terminate.hpp"
 #include "policy/throw_bad_result_access.hpp"
 
@@ -49,22 +49,21 @@ struct no_error_type
 //! Namespace for policies
 namespace policy
 {
-  /*! Default `result<R, S>` policy selector.
+  /*! Default policy selector.
   */
-  template <class T, class EC>
-  using default_result_policy = std::conditional_t<                                                                     //
-  std::is_void<EC>::value, terminate,                                                                                   //
-  std::conditional_t<                                                                                                   //
-  std::is_error_code_enum<EC>::value || std::is_error_condition_enum<EC>::value, error_enum_throw_as_system_error<EC>,  //
-  std::conditional_t<                                                                                                   //
-  trait::is_error_code<EC>::value, error_code_throw_as_system_error<EC>,                                                //
-  std::conditional_t<                                                                                                   //
-  trait::is_exception_ptr<EC>::value, exception_ptr_rethrow<T, EC, void>,                                               //
-  all_narrow                                                                                                            //
-  >>>>;
+  template <class T, class EC, class E>
+  using default_policy = std::conditional_t<  //
+  std::is_void<EC>::value && std::is_void<E>::value,
+  terminate,                                                                                         //
+  std::conditional_t<                                                                                //
+  trait::has_error_code_v<EC>, error_code_throw_as_system_error<T, EC, E>,                           //
+  std::conditional_t<                                                                                //
+  trait::has_exception_ptr_v<EC> || trait::has_exception_ptr_v<E>, exception_ptr_rethrow<T, EC, E>,  //
+  all_narrow                                                                                         //
+  >>>;
 }  // namespace policy
 
-template <class R, class S = std::error_code, class NoValuePolicy = policy::default_result_policy<R, S>>                                                                //
+template <class R, class S = std::error_code, class NoValuePolicy = policy::default_policy<R, S, void>>                                                                 //
 #if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                 // GCC's constraints implementation is buggy
 OUTCOME_REQUIRES(detail::type_can_be_used_in_result<R> &&detail::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
 #endif
@@ -76,11 +75,8 @@ namespace detail
   template <class value_type, class error_type> struct result_predicates
   {
     // Is this a common error type?
-    static constexpr bool error_is_common_error_type =                       //
-    std::is_base_of<std::error_code, std::decay_t<error_type>>::value        //
-    || std::is_base_of<std::exception_ptr, std::decay_t<error_type>>::value  //
-    /* || std::is_error_code_enum<std::decay_t<error_type>>::value           //
-    || std::is_error_condition_enum<std::decay_t<error_type>>::value */;
+    static constexpr bool error_is_common_error_type =  //
+    trait::has_error_code_v<error_type> || trait::has_exception_ptr_v<error_type>;
 
     // Predicate for the implicit constructors to be available
     static constexpr bool implicit_constructors_enabled =                                                                                       //
@@ -201,15 +197,13 @@ Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array
 
 `NoValuePolicy` defaults to a policy selected according to the characteristics of type `S`:
   1. If `.value()` called when there is no `value_type` but there is an `error_type`:
-    - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<S>` is true,
-    then `throw std::system_error(make_error_code(error()))` [`policy::error_enum_throw_as_system_error<S>`]
-    - If `trait::is_error_code<S>`, then `throw std::system_error(error())` [`policy::error_code_throw_as_system_error<S>`]
-    - If `trait::is_exception_ptr<S>`, then `std::rethrow_exception(error())` [`policy::exception_ptr_rethrow<R, S, void>`]
+    - If `trait::has_error_code_v<S>` is true,
+    then `throw std::system_error(error()|make_error_code(error()))` [`policy::error_code_throw_as_system_error<S>`]
+    - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))` [`policy::exception_ptr_rethrow<R, S, void>`]
     - If `S` is `void`, call `std::terminate()` [`policy::terminate`]
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
   2. If `.error()` called when there is no `error_type`:
-    - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<S>` is true,
-    or if `trait::is_error_code<S>`, or if `trait::is_exception_ptr<S>`,
+    - If `trait::has_error_code_v<S>`, or if `trait::has_exception_ptr_v<S>`,
     or if `S` is `void`, do `throw bad_result_access()`
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
@@ -234,9 +228,6 @@ class OUTCOME_NODISCARD result : public detail::result_final<R, S, NoValuePolicy
   {
   };
   struct error_condition_converting_constructor_tag
-  {
-  };
-  struct value_status_converting_constructor_tag
   {
   };
 

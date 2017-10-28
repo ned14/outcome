@@ -9,7 +9,7 @@ var result_8hpp =
     [ "result", "classoutcome__v2__xxx_1_1result.html", "classoutcome__v2__xxx_1_1result" ],
     [ "predicate", "structoutcome__v2__xxx_1_1result_1_1predicate.html", "structoutcome__v2__xxx_1_1result_1_1predicate" ],
     [ "checked", "result_8hpp.html#a3a36e2cff60a5076721438f134ed774b", null ],
-    [ "default_result_policy", "result_8hpp.html#a5330cdcaff26b3168d065f8d9cf47aaa", null ],
+    [ "default_policy", "result_8hpp.html#a22b45dbad0d3fea32d277c69f60afe1f", null ],
     [ "is_result", "result_8hpp.html#ab039de28dd8bf196cb07b5194c0ec6a5", null ],
     [ "unchecked", "result_8hpp.html#a4b57e25db840733be29e04b04c9e843c", null ],
     [ "extract_error_from_failure", "result_8hpp.html#acc75eca2f35dc6ace500a706b0d9e6ed", null ],

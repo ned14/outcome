@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ldeclval',['ldeclval',['../namespaceoutcome__v2__xxx_1_1detail_1_1__is__nothrow__swappable.html#a15653ee4a026fcaf8134b9b95b069d7f',1,'outcome_v2_xxx::detail::_is_nothrow_swappable']]]
+  ['in_5fplace_5ftype_5ft',['in_place_type_t',['../structoutcome__v2__xxx_1_1in__place__type__t.html#a6a93a26148db50b4829ce42532adae48',1,'outcome_v2_xxx::in_place_type_t']]]
 ];

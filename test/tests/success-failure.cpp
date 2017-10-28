@@ -53,6 +53,6 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / success - failure, "Tests that the success 
     static_assert(std::is_same<decltype(b.error), int>::value, "");
     static_assert(std::is_same<decltype(b.exception), std::exception_ptr>::value, "");
     static_assert(std::is_same<decltype(c.error), int>::value, "");
-    static_assert(std::is_same<decltype(c.payload), int>::value, "");
+    static_assert(std::is_same<decltype(c.exception), int>::value, "");
   }
 }

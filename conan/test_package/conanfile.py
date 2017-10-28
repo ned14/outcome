@@ -5,13 +5,13 @@ class OutcomeTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
     
-    def requirements(self):
-        if self.settings.compiler == "clang" and float(str(self.settings.compiler.version)) < 4.0:
-            raise Exception("clang >= 4.0 is required, %s is being used" % self.settings.compiler.version)
-        if self.settings.compiler == "gcc" and float(str(self.settings.compiler.version)) < 5.0:
-            raise Exception("GCC >= 5.0 is required, %s is being used" % self.settings.compiler.version)
-        if self.settings.compiler == "Visual Studio" and float(str(self.settings.compiler.version)) < 15:
-            raise Exception("Visual Studio >= 15 is required, %s is being used" % self.settings.compiler.version)
+#    def requirements(self):
+#        if self.settings.compiler == "clang" and float(str(self.settings.compiler.version)) < 4.0:
+#            raise Exception("clang >= 4.0 is required, %s is being used" % self.settings.compiler.version)
+#        if self.settings.compiler == "gcc" and float(str(self.settings.compiler.version)) < 5.0:
+#            raise Exception("GCC >= 5.0 is required, %s is being used" % self.settings.compiler.version)
+#        if self.settings.compiler == "Visual Studio" and float(str(self.settings.compiler.version)) < 15:
+#            raise Exception("Visual Studio >= 15 is required, %s is being used" % self.settings.compiler.version)
 
     def build(self):
         cmake = CMake(self)

@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['implicit_5fconstructors_5fenabled',['implicit_constructors_enabled',['../structoutcome__v2__xxx_1_1detail_1_1outcome__predicates.html#a402d661e72e01ac991104162323f81cc',1,'outcome_v2_xxx::detail::outcome_predicates::implicit_constructors_enabled()'],['../structoutcome__v2__xxx_1_1detail_1_1result__predicates.html#a6cd192be7bfbce151d9affada8bd42e9',1,'outcome_v2_xxx::detail::result_predicates::implicit_constructors_enabled()']]],
-  ['in_5fplace_5ftype',['in_place_type',['../namespaceoutcome__v2__xxx.html#a7710af708879305880f6d6e31109fd88',1,'outcome_v2_xxx']]]
+  ['has_5ferror_5fcode_5fv',['has_error_code_v',['../namespaceoutcome__v2__xxx_1_1trait.html#a0113514912d0d186701cc86724e7d0c9',1,'outcome_v2_xxx::trait']]],
+  ['has_5ferror_5fpayload_5fv',['has_error_payload_v',['../namespaceoutcome__v2__xxx_1_1trait.html#aa7ae64d85d7f1d2d9fc3c06867fb0185',1,'outcome_v2_xxx::trait']]],
+  ['has_5fexception_5fptr_5fv',['has_exception_ptr_v',['../namespaceoutcome__v2__xxx_1_1trait.html#a258869ebdc76bcef2cd5926cccbd3d47',1,'outcome_v2_xxx::trait']]]
 ];

@@ -31,7 +31,7 @@
 <span class="pun">:</span> <span class="kwd">public</span> <span class="typ dec var fun">std::logic_error</span>
 <span class="pun">{</span>
 <span class="kwd">public</span><span class="pun">:</span>
-    <span class="typ dec var fun">bad_result_access</span><span class="pun">(</span><span class="kwd">char</span> <span class="kwd">const</span><span class="pun">*</span> <span class="typ dec var fun">what</span><span class="pun">)</span><span class="pun">;</span>
+    <span class="kwd">explicit</span> <span class="typ dec var fun">bad_result_access</span><span class="pun">(</span><span class="kwd">char</span> <span class="kwd">const</span><span class="pun">*</span> <span class="typ dec var fun">what</span><span class="pun">)</span><span class="pun">;</span>
 <span class="pun">};</span>
 </code></pre>
 <p id="standardese-outcome_v2_xxx::bad_result_access-brief" class="standardese-brief-section">Thrown when you try to access state in a <code>result&lt;R, S&gt;</code> which isn’t present.</p>
@@ -44,7 +44,7 @@
 <span class="pun">:</span> <span class="kwd">public</span> <span class="typ dec var fun">bad_result_access</span>
 <span class="pun">{</span>
 <span class="kwd">public</span><span class="pun">:</span>
-    <span class="typ dec var fun">bad_result_access_with</span><span class="pun">(</span><span class="typ dec var fun">S</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>
+    <span class="kwd">explicit</span> <span class="typ dec var fun">bad_result_access_with</span><span class="pun">(</span><span class="typ dec var fun">S</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>
 
     &#x2F;&#x2F;=== result_error ===&#x2F;&#x2F;
     <span class="typ dec var fun">S</span> <span class="kwd">const</span><span class="pun">&amp;</span> <a href="doc_bad_access.html#standardese-outcome_v2_xxx::bad_result_access_with%3CS%3E::error()const&amp;"><span class="typ dec var fun">error</span></a><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;</span><span class="pun">;</span>
@@ -75,7 +75,7 @@
 <span class="pun">:</span> <span class="kwd">public</span> <span class="typ dec var fun">std::logic_error</span>
 <span class="pun">{</span>
 <span class="kwd">public</span><span class="pun">:</span>
-    <span class="typ dec var fun">bad_outcome_access</span><span class="pun">(</span><span class="kwd">char</span> <span class="kwd">const</span><span class="pun">*</span> <span class="typ dec var fun">what</span><span class="pun">)</span><span class="pun">;</span>
+    <span class="kwd">explicit</span> <span class="typ dec var fun">bad_outcome_access</span><span class="pun">(</span><span class="kwd">char</span> <span class="kwd">const</span><span class="pun">*</span> <span class="typ dec var fun">what</span><span class="pun">)</span><span class="pun">;</span>
 <span class="pun">};</span>
 </code></pre>
 <p id="standardese-outcome_v2_xxx::bad_outcome_access-brief" class="standardese-brief-section">Thrown when you try to access state in a <code>outcome&lt;T, EC, E&gt;</code> which isn’t present.</p>

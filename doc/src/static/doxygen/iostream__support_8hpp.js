@@ -1,7 +1,5 @@
 var iostream__support_8hpp =
 [
-    [ "print_payload_exception", "structoutcome__v2__xxx_1_1detail_1_1print__payload__exception.html", "structoutcome__v2__xxx_1_1detail_1_1print__payload__exception" ],
-    [ "print_payload_exception< true >", "structoutcome__v2__xxx_1_1detail_1_1print__payload__exception_3_01true_01_4.html", "structoutcome__v2__xxx_1_1detail_1_1print__payload__exception_3_01true_01_4" ],
     [ "operator<<", "iostream__support_8hpp.html#a2877258902edd1f32c165d7fe3eb724c", null ],
     [ "operator<<", "iostream__support_8hpp.html#a0f638ca4f99395b18babfcd96bd5b2d8", null ],
     [ "operator<<", "iostream__support_8hpp.html#a0595117bebec90c87d3ae39da0468902", null ],

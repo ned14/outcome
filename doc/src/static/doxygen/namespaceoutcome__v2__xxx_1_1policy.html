@@ -104,17 +104,11 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error.html">error_code_throw_as_system_error</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__exception__rethrow.html">error_code_throw_as_system_error_exception_rethrow</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error_3_01_t_00_01_e_c_00_01void_01_4.html">error_code_throw_as_system_error&lt; T, EC, void &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__with__payload.html">error_code_throw_as_system_error_with_payload</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow.html">exception_ptr_rethrow</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error.html">error_enum_throw_as_system_error</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__exception__rethrow.html">error_enum_throw_as_system_error_exception_rethrow</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__with__payload.html">error_enum_throw_as_system_error_with_payload</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow__with__payload.html">exception_ptr_rethrow_with_payload</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow_3_01_t_00_01_e_c_00_01void_01_4.html">exception_ptr_rethrow&lt; T, EC, void &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1terminate.html">terminate</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -123,85 +117,110 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a5b4418d856d2d6b02321b68256c9f7a3"><td class="memTemplParams" colspan="2">template&lt;class R , class S , class P &gt; </td></tr>
-<tr class="memitem:a5b4418d856d2d6b02321b68256c9f7a3"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a5b4418d856d2d6b02321b68256c9f7a3">default_outcome_policy</a> = std::conditional_t&lt;(std::is_error_code_enum&lt; S &gt;::value||std::is_error_condition_enum&lt; S &gt;::value) &amp;&amp;<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; P &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__exception__rethrow.html">error_enum_throw_as_system_error_exception_rethrow</a>&lt; R, S, P &gt;, std::conditional_t&lt;(std::is_error_code_enum&lt; S &gt;::value||std::is_error_condition_enum&lt; S &gt;::value) &amp;&amp;!<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; P &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__with__payload.html">error_enum_throw_as_system_error_with_payload</a>&lt; R, S, P &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt; S &gt;::value &amp;&amp;<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; P &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__exception__rethrow.html">error_code_throw_as_system_error_exception_rethrow</a>&lt; R, S, P &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt; S &gt;::value &amp;&amp;!<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; P &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__with__payload.html">error_code_throw_as_system_error_with_payload</a>&lt; R, S, P &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; S &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow__with__payload.html">exception_ptr_rethrow_with_payload</a>&lt; R, S, P &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; P &gt;::value, <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a0040bc4da2ef2b097406e068c999b82c">exception_ptr_rethrow</a>&lt; R, S, P &gt;, std::conditional_t&lt; std::is_void&lt; S &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1terminate.html">terminate</a>, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html">all_narrow</a> &gt; &gt;&gt; &gt;&gt; &gt;&gt;</td></tr>
-<tr class="separator:a5b4418d856d2d6b02321b68256c9f7a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0040bc4da2ef2b097406e068c999b82c"><td class="memTemplParams" colspan="2">template&lt;class R , class S , class P &gt; </td></tr>
-<tr class="memitem:a0040bc4da2ef2b097406e068c999b82c"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a0040bc4da2ef2b097406e068c999b82c">exception_ptr_rethrow</a> = std::conditional_t&lt; std::is_void&lt; P &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1detail_1_1error__exception__ptr__rethrow.html">detail::error_exception_ptr_rethrow</a>&lt; S &gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1detail_1_1exception__exception__ptr__rethrow.html">detail::exception_exception_ptr_rethrow</a>&lt; R, S, P &gt; &gt;</td></tr>
-<tr class="separator:a0040bc4da2ef2b097406e068c999b82c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5330cdcaff26b3168d065f8d9cf47aaa"><td class="memTemplParams" colspan="2">template&lt;class T , class EC &gt; </td></tr>
-<tr class="memitem:a5330cdcaff26b3168d065f8d9cf47aaa"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a5330cdcaff26b3168d065f8d9cf47aaa">default_result_policy</a> = std::conditional_t&lt; std::is_void&lt; EC &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1terminate.html">terminate</a>, std::conditional_t&lt; std::is_error_code_enum&lt; EC &gt;::value||std::is_error_condition_enum&lt; EC &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error.html">error_enum_throw_as_system_error</a>&lt; EC &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt; EC &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error.html">error_code_throw_as_system_error</a>&lt; EC &gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt; EC &gt;::value, <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a0040bc4da2ef2b097406e068c999b82c">exception_ptr_rethrow</a>&lt; T, EC, void &gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html">all_narrow</a> &gt; &gt;&gt; &gt;</td></tr>
-<tr class="separator:a5330cdcaff26b3168d065f8d9cf47aaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22b45dbad0d3fea32d277c69f60afe1f"><td class="memTemplParams" colspan="2">template&lt;class T , class EC , class E &gt; </td></tr>
+<tr class="memitem:a22b45dbad0d3fea32d277c69f60afe1f"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a22b45dbad0d3fea32d277c69f60afe1f">default_policy</a> = std::conditional_t&lt; std::is_void&lt; EC &gt;::value &amp;&amp;std::is_void&lt; E &gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1terminate.html">terminate</a>, std::conditional_t&lt; <a class="el" href="namespaceoutcome__v2__xxx_1_1trait.html#a0113514912d0d186701cc86724e7d0c9">trait::has_error_code_v</a>&lt; EC &gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error.html">error_code_throw_as_system_error</a>&lt; T, EC, E &gt;, std::conditional_t&lt; <a class="el" href="namespaceoutcome__v2__xxx_1_1trait.html#a258869ebdc76bcef2cd5926cccbd3d47">trait::has_exception_ptr_v</a>&lt; EC &gt;||<a class="el" href="namespaceoutcome__v2__xxx_1_1trait.html#a258869ebdc76bcef2cd5926cccbd3d47">trait::has_exception_ptr_v</a>&lt; E &gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow.html">exception_ptr_rethrow</a>&lt; T, EC, E &gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html">all_narrow</a> &gt; &gt;&gt;</td></tr>
+<tr class="separator:a22b45dbad0d3fea32d277c69f60afe1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a704fdba5ff20cfca9d38f6aeabd65766"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a704fdba5ff20cfca9d38f6aeabd65766"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a704fdba5ff20cfca9d38f6aeabd65766">throw_as_system_error_with_payload</a> (const T *)</td></tr>
-<tr class="memdesc:a704fdba5ff20cfca9d38f6aeabd65766"><td class="mdescLeft">&#160;</td><td class="mdescRight">Override to define what the policies which throw a system error with payload ought to do for some particular <code>outcome</code>.  <a href="#a704fdba5ff20cfca9d38f6aeabd65766">More...</a><br /></td></tr>
-<tr class="separator:a704fdba5ff20cfca9d38f6aeabd65766"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa033743874981569346361fe9ea9e5b8"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:aa033743874981569346361fe9ea9e5b8"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#aa033743874981569346361fe9ea9e5b8">throw_exception_ptr_with_payload</a> (const T *)</td></tr>
-<tr class="memdesc:aa033743874981569346361fe9ea9e5b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Override to define what the policies which throw an exception ptr with payload ought to do for some particular <code>outcome</code>.  <a href="#aa033743874981569346361fe9ea9e5b8">More...</a><br /></td></tr>
-<tr class="separator:aa033743874981569346361fe9ea9e5b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdc64e103ce5270f3d56ee2e7cf4dc3f"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:abdc64e103ce5270f3d56ee2e7cf4dc3f"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#abdc64e103ce5270f3d56ee2e7cf4dc3f">throw_as_system_error_with_payload</a> (const T &amp;)</td></tr>
+<tr class="memdesc:abdc64e103ce5270f3d56ee2e7cf4dc3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Override to define what the policies which throw a system error with payload ought to do for some particular <code>result.error()</code>.  <a href="#abdc64e103ce5270f3d56ee2e7cf4dc3f">More...</a><br /></td></tr>
+<tr class="separator:abdc64e103ce5270f3d56ee2e7cf4dc3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a764975e0cb1ecdcbfa544b97716efc1b"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a764975e0cb1ecdcbfa544b97716efc1b"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto) constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a764975e0cb1ecdcbfa544b97716efc1b">error_code</a> (T &amp;&amp;v)</td></tr>
+<tr class="memdesc:a764975e0cb1ecdcbfa544b97716efc1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used by policies to extract a <code>std::error_code</code> from some input <code>T</code> via ADL discovery of some <code>make_error_code(T)</code> function.  <a href="#a764975e0cb1ecdcbfa544b97716efc1b">More...</a><br /></td></tr>
+<tr class="separator:a764975e0cb1ecdcbfa544b97716efc1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63d9745748fb1319c48e44ce761473fd"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a63d9745748fb1319c48e44ce761473fd"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto) constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a63d9745748fb1319c48e44ce761473fd">exception_ptr</a> (T &amp;&amp;v)</td></tr>
+<tr class="memdesc:a63d9745748fb1319c48e44ce761473fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used by policies to extract a <code>std::exception_ptr</code> from some input <code>T</code> via ADL discovery of some <code>make_exception_ptr(T)</code> function.  <a href="#a63d9745748fb1319c48e44ce761473fd">More...</a><br /></td></tr>
+<tr class="separator:a63d9745748fb1319c48e44ce761473fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Namespace for policies. </p>
 </div><h2 class="groupheader">Typedef Documentation</h2>
-<a id="a5b4418d856d2d6b02321b68256c9f7a3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5b4418d856d2d6b02321b68256c9f7a3">&#9670;&nbsp;</a></span>default_outcome_policy</h2>
+<a id="a22b45dbad0d3fea32d277c69f60afe1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22b45dbad0d3fea32d277c69f60afe1f">&#9670;&nbsp;</a></span>default_policy</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class R , class S , class P &gt; </div>
+template&lt;class T , class EC , class E &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a5b4418d856d2d6b02321b68256c9f7a3">outcome_v2_xxx::policy::default_outcome_policy</a> = typedef std::conditional_t&lt; (std::is_error_code_enum&lt;S&gt;::value || std::is_error_condition_enum&lt;S&gt;::value) &amp;&amp; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;P&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__exception__rethrow.html">error_enum_throw_as_system_error_exception_rethrow</a>&lt;R, S, P&gt;, std::conditional_t&lt; (std::is_error_code_enum&lt;S&gt;::value || std::is_error_condition_enum&lt;S&gt;::value) &amp;&amp; !<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;P&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error__with__payload.html">error_enum_throw_as_system_error_with_payload</a>&lt;R, S, P&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt;S&gt;::value &amp;&amp; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;P&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__exception__rethrow.html">error_code_throw_as_system_error_exception_rethrow</a>&lt;R, S, P&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt;S&gt;::value &amp;&amp; !<a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;P&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error__with__payload.html">error_code_throw_as_system_error_with_payload</a>&lt;R, S, P&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;S&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow__with__payload.html">exception_ptr_rethrow_with_payload</a>&lt;R, S, P&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;P&gt;::value, <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a0040bc4da2ef2b097406e068c999b82c">exception_ptr_rethrow</a>&lt;R, S, P&gt;, std::conditional_t&lt; std::is_void&lt;S&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1terminate.html">terminate</a>, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html">all_narrow</a> &gt; &gt;&gt; &gt;&gt; &gt;&gt;</td>
+          <td class="memname">using <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a22b45dbad0d3fea32d277c69f60afe1f">outcome_v2_xxx::policy::default_policy</a> = typedef std::conditional_t&lt; std::is_void&lt;EC&gt;::value &amp;&amp; std::is_void&lt;E&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1terminate.html">terminate</a>, std::conditional_t&lt; <a class="el" href="namespaceoutcome__v2__xxx_1_1trait.html#a0113514912d0d186701cc86724e7d0c9">trait::has_error_code_v</a>&lt;EC&gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error.html">error_code_throw_as_system_error</a>&lt;T, EC, E&gt;, std::conditional_t&lt; <a class="el" href="namespaceoutcome__v2__xxx_1_1trait.html#a258869ebdc76bcef2cd5926cccbd3d47">trait::has_exception_ptr_v</a>&lt;EC&gt; || <a class="el" href="namespaceoutcome__v2__xxx_1_1trait.html#a258869ebdc76bcef2cd5926cccbd3d47">trait::has_exception_ptr_v</a>&lt;E&gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1exception__ptr__rethrow.html">exception_ptr_rethrow</a>&lt;T, EC, E&gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html">all_narrow</a> &gt; &gt;&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Default <code>outcome&lt;R, S, P&gt;</code> policy selector. </p>
-
-</div>
-</div>
-<a id="a5330cdcaff26b3168d065f8d9cf47aaa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5330cdcaff26b3168d065f8d9cf47aaa">&#9670;&nbsp;</a></span>default_result_policy</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class T , class EC &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">using <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a5330cdcaff26b3168d065f8d9cf47aaa">outcome_v2_xxx::policy::default_result_policy</a> = typedef std::conditional_t&lt; std::is_void&lt;EC&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1terminate.html">terminate</a>, std::conditional_t&lt; std::is_error_code_enum&lt;EC&gt;::value || std::is_error_condition_enum&lt;EC&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__enum__throw__as__system__error.html">error_enum_throw_as_system_error</a>&lt;EC&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__error__code.html">trait::is_error_code</a>&lt;EC&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1error__code__throw__as__system__error.html">error_code_throw_as_system_error</a>&lt;EC&gt;, std::conditional_t&lt; <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1is__exception__ptr.html">trait::is_exception_ptr</a>&lt;EC&gt;::value, <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a0040bc4da2ef2b097406e068c999b82c">exception_ptr_rethrow</a>&lt;T, EC, void&gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1all__narrow.html">all_narrow</a> &gt; &gt;&gt; &gt;</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Default <code>result&lt;R, S&gt;</code> policy selector. </p>
-
-</div>
-</div>
-<a id="a0040bc4da2ef2b097406e068c999b82c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0040bc4da2ef2b097406e068c999b82c">&#9670;&nbsp;</a></span>exception_ptr_rethrow</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class R , class S , class P &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">using <a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a0040bc4da2ef2b097406e068c999b82c">outcome_v2_xxx::policy::exception_ptr_rethrow</a> = typedef std::conditional_t&lt;std::is_void&lt;P&gt;::value, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1detail_1_1error__exception__ptr__rethrow.html">detail::error_exception_ptr_rethrow</a>&lt;S&gt;, <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1detail_1_1exception__exception__ptr__rethrow.html">detail::exception_exception_ptr_rethrow</a>&lt;R, S, P&gt; &gt;</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Policy interpreting S or P as a type implementing the <code>std::exception_ptr</code> contract and any wide attempt to access the successful state calls <code>std::rethrow_exception()</code>.</p>
-<p>Can be used in both <code>result</code> and <code>outcome</code>. </p>
+<p>Default policy selector. </p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a704fdba5ff20cfca9d38f6aeabd65766"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a704fdba5ff20cfca9d38f6aeabd65766">&#9670;&nbsp;</a></span>throw_as_system_error_with_payload()</h2>
+<a id="a764975e0cb1ecdcbfa544b97716efc1b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a764975e0cb1ecdcbfa544b97716efc1b">&#9670;&nbsp;</a></span>error_code()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">decltype(auto) constexpr outcome_v2_xxx::policy::error_code </td>
+          <td>(</td>
+          <td class="paramtype">T &amp;&amp;&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Used by policies to extract a <code>std::error_code</code> from some input <code>T</code> via ADL discovery of some <code>make_error_code(T)</code> function. </p>
+<div class="fragment"><div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="namespaceoutcome__v2__xxx_1_1policy.html#a764975e0cb1ecdcbfa544b97716efc1b">detail::error_code</a>(std::forward&lt;T&gt;(v)); }</div><div class="ttc" id="namespaceoutcome__v2__xxx_1_1policy_html_a764975e0cb1ecdcbfa544b97716efc1b"><div class="ttname"><a href="namespaceoutcome__v2__xxx_1_1policy.html#a764975e0cb1ecdcbfa544b97716efc1b">outcome_v2_xxx::policy::error_code</a></div><div class="ttdeci">decltype(auto) constexpr error_code(T &amp;&amp;v)</div><div class="ttdoc">Used by policies to extract a std::error_code from some input T via ADL discovery of some make_error_...</div><div class="ttdef"><b>Definition:</b> success_failure.hpp:112</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a63d9745748fb1319c48e44ce761473fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63d9745748fb1319c48e44ce761473fd">&#9670;&nbsp;</a></span>exception_ptr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">decltype(auto) constexpr outcome_v2_xxx::policy::exception_ptr </td>
+          <td>(</td>
+          <td class="paramtype">T &amp;&amp;&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Used by policies to extract a <code>std::exception_ptr</code> from some input <code>T</code> via ADL discovery of some <code>make_exception_ptr(T)</code> function. </p>
+<div class="fragment"><div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="namespaceoutcome__v2__xxx_1_1policy.html#a63d9745748fb1319c48e44ce761473fd">detail::exception_ptr</a>(std::forward&lt;T&gt;(v)); }</div><div class="ttc" id="namespaceoutcome__v2__xxx_1_1policy_html_a63d9745748fb1319c48e44ce761473fd"><div class="ttname"><a href="namespaceoutcome__v2__xxx_1_1policy.html#a63d9745748fb1319c48e44ce761473fd">outcome_v2_xxx::policy::exception_ptr</a></div><div class="ttdeci">decltype(auto) constexpr exception_ptr(T &amp;&amp;v)</div><div class="ttdoc">Used by policies to extract a std::exception_ptr from some input T via ADL discovery of some make_exc...</div><div class="ttdef"><b>Definition:</b> success_failure.hpp:114</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="abdc64e103ce5270f3d56ee2e7cf4dc3f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abdc64e103ce5270f3d56ee2e7cf4dc3f">&#9670;&nbsp;</a></span>throw_as_system_error_with_payload()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -214,7 +233,7 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="memname">constexpr void outcome_v2_xxx::policy::throw_as_system_error_with_payload </td>
           <td>(</td>
-          <td class="paramtype">const T *&#160;</td>
+          <td class="paramtype">const T &amp;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -226,38 +245,8 @@ template&lt;class T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Override to define what the policies which throw a system error with payload ought to do for some particular <code>outcome</code>. </p>
-<div class="fragment"><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;{ static_assert(!std::is_same&lt;T, T&gt;::value, <span class="stringliteral">&quot;To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload&quot;</span>); }</div></div><!-- fragment -->
-</div>
-</div>
-<a id="aa033743874981569346361fe9ea9e5b8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa033743874981569346361fe9ea9e5b8">&#9670;&nbsp;</a></span>throw_exception_ptr_with_payload()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class T &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr void outcome_v2_xxx::policy::throw_exception_ptr_with_payload </td>
-          <td>(</td>
-          <td class="paramtype">const T *&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Override to define what the policies which throw an exception ptr with payload ought to do for some particular <code>outcome</code>. </p>
-<div class="fragment"><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;{ static_assert(!std::is_same&lt;T, T&gt;::value, <span class="stringliteral">&quot;To use the *_throw_exception_ptr_with_payload policy, you must define a throw_exception_ptr_with_payload() free function to say how to handle the payload&quot;</span>); }</div></div><!-- fragment -->
+<p>Override to define what the policies which throw a system error with payload ought to do for some particular <code>result.error()</code>. </p>
+<div class="fragment"><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;{ static_assert(!std::is_same&lt;T, T&gt;::value, <span class="stringliteral">&quot;To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload&quot;</span>); }</div></div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

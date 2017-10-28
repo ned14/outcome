@@ -29,33 +29,33 @@
 <span class="pun">:</span> <span class="typ dec var fun">detail::base</span>
 <span class="pun">{</span>
     <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
-    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_throw_bad_result_access.html#standardese-outcome_v2_xxx::policy::throw_bad_result_access%3CEC%3E::wide_value_check%3CImpl%3E(Impl*)"><span class="typ dec var fun">wide_value_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
+    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_throw_bad_result_access.html#standardese-outcome_v2_xxx::policy::throw_bad_result_access%3CEC%3E::wide_value_check%3CImpl%3E(Impl&amp;&amp;)"><span class="typ dec var fun">wide_value_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
 
     <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
-    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_throw_bad_result_access.html#standardese-outcome_v2_xxx::policy::throw_bad_result_access%3CEC%3E::wide_error_check%3CImpl%3E(Impl*)"><span class="typ dec var fun">wide_error_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
+    <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="doc_throw_bad_result_access.html#standardese-outcome_v2_xxx::policy::throw_bad_result_access%3CEC%3E::wide_error_check%3CImpl%3E(Impl&amp;&amp;)"><span class="typ dec var fun">wide_error_check</span></a><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
 <span class="pun">};</span>
 </code></pre>
 <p id="standardese-outcome_v2_xxx::policy::throw_bad_result_access&lt;EC&gt;-brief" class="standardese-brief-section">Policy which throws <code>bad_result_access_with&lt;EC&gt;</code> or <code>bad_result_access</code> during wide checks.</p>
 <p>Can be used in <code>result</code> only.</p>
-<section id="standardese-outcome_v2_xxx::policy::throw_bad_result_access&lt;EC&gt;::wide_value_check&lt;Impl&gt;(Impl*)" class="standardese-entity-documentation">
+<section id="standardese-outcome_v2_xxx::policy::throw_bad_result_access&lt;EC&gt;::wide_value_check&lt;Impl&gt;(Impl&amp;&amp;)" class="standardese-entity-documentation">
 <h3 class="standardese-entity-documentation-heading">Function <code>wide_value_check</code></h3>
 <pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
-<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">wide_value_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
+<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">wide_value_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
 </code></pre>
-<p id="standardese-outcome_v2_xxx::policy::throw_bad_result_access&lt;EC&gt;::wide_value_check&lt;Impl&gt;(Impl*)-brief" class="standardese-brief-section">Performs a wide check of state, used in the value() functions.</p>
-<dl id="standardese-outcome_v2_xxx::policy::throw_bad_result_access&lt;EC&gt;::wide_value_check&lt;Impl&gt;(Impl*)-inline-sections" class="standardese-inline-sections">
+<p id="standardese-outcome_v2_xxx::policy::throw_bad_result_access&lt;EC&gt;::wide_value_check&lt;Impl&gt;(Impl&amp;&amp;)-brief" class="standardese-brief-section">Performs a wide check of state, used in the value() functions.</p>
+<dl id="standardese-outcome_v2_xxx::policy::throw_bad_result_access&lt;EC&gt;::wide_value_check&lt;Impl&gt;(Impl&amp;&amp;)-inline-sections" class="standardese-inline-sections">
 <dt>Effects:</dt>
 <dd>If result does not have a value, it throws <code>bad_result_access_with&lt;EC&gt;</code>.</dd>
 </dl>
 </section>
 <hr class="standardese-entity-documentation-break" />
-<section id="standardese-outcome_v2_xxx::policy::throw_bad_result_access&lt;EC&gt;::wide_error_check&lt;Impl&gt;(Impl*)" class="standardese-entity-documentation">
+<section id="standardese-outcome_v2_xxx::policy::throw_bad_result_access&lt;EC&gt;::wide_error_check&lt;Impl&gt;(Impl&amp;&amp;)" class="standardese-entity-documentation">
 <h3 class="standardese-entity-documentation-heading">Function <code>wide_error_check</code></h3>
 <pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">Impl</span><span class="pun">&gt;</span>
-<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">wide_error_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">*</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
+<span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">wide_error_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
 </code></pre>
-<p id="standardese-outcome_v2_xxx::policy::throw_bad_result_access&lt;EC&gt;::wide_error_check&lt;Impl&gt;(Impl*)-brief" class="standardese-brief-section">Performs a wide check of state, used in the error() functions</p>
-<dl id="standardese-outcome_v2_xxx::policy::throw_bad_result_access&lt;EC&gt;::wide_error_check&lt;Impl&gt;(Impl*)-inline-sections" class="standardese-inline-sections">
+<p id="standardese-outcome_v2_xxx::policy::throw_bad_result_access&lt;EC&gt;::wide_error_check&lt;Impl&gt;(Impl&amp;&amp;)-brief" class="standardese-brief-section">Performs a wide check of state, used in the error() functions</p>
+<dl id="standardese-outcome_v2_xxx::policy::throw_bad_result_access&lt;EC&gt;::wide_error_check&lt;Impl&gt;(Impl&amp;&amp;)-inline-sections" class="standardese-inline-sections">
 <dt>Effects:</dt>
 <dd>If result does not have an error, it throws <code>bad_result_access</code>.</dd>
 </dl>

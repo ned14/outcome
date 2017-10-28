@@ -7,6 +7,7 @@ var structoutcome__v2__xxx_1_1detail_1_1value__storage__trivial =
     [ "value_storage_trivial", "structoutcome__v2__xxx_1_1detail_1_1value__storage__trivial.html#ad1a9f5ee30e948c67fbd8741b7db32d9", null ],
     [ "value_storage_trivial", "structoutcome__v2__xxx_1_1detail_1_1value__storage__trivial.html#a54d3292af5817ed6af510218dd337824", null ],
     [ "value_storage_trivial", "structoutcome__v2__xxx_1_1detail_1_1value__storage__trivial.html#a52aa924cb369d7be754607da6a6c9db9", null ],
+    [ "~value_storage_trivial", "structoutcome__v2__xxx_1_1detail_1_1value__storage__trivial.html#a716faeae3d0668fadc4682ec933f338b", null ],
     [ "value_storage_trivial", "structoutcome__v2__xxx_1_1detail_1_1value__storage__trivial.html#aefbd161ce079a111ab516b6720f8c77a", null ],
     [ "value_storage_trivial", "structoutcome__v2__xxx_1_1detail_1_1value__storage__trivial.html#adb0749ec9ae9f1b10dbfbd1bbf713700", null ],
     [ "value_storage_trivial", "structoutcome__v2__xxx_1_1detail_1_1value__storage__trivial.html#a553b4492007dedb82f4c54d3543ad5be", null ],
