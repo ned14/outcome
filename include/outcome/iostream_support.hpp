@@ -89,43 +89,6 @@ namespace detail
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_constructible<std::error_code, T>::value))
   inline std::string safe_message(T && /*unused*/) { return {}; }
   inline std::string safe_message(const std::error_code &ec) { return " (" + ec.message() + ")"; }
-  template <bool is_exception> struct print_payload_exception
-  {
-    template <class R, class S, class P, class N> print_payload_exception(std::ostream &s, const outcome<R, S, P, N> &v)
-    {
-      if(v.has_payload())
-      {
-        s << v.payload();
-      }
-    }
-  };
-  template <> struct print_payload_exception<true>
-  {
-    template <class R, class S, class P, class N> print_payload_exception(std::ostream &s, const outcome<R, S, P, N> &v)
-    {
-      if(v.has_exception())
-      {
-#ifdef __cpp_exceptions
-        try
-        {
-          std::rethrow_exception(v.exception());
-        }
-        catch(const std::system_error &e)
-        {
-          s << "std::system_error code " << e.code() << ": " << e.what();
-        }
-        catch(const std::exception &e)
-        {
-          s << "std::exception: " << e.what();
-        }
-        catch(...)
-#endif
-        {
-          s << "unknown exception";
-        }
-      }
-    }
-  };
 }  // namespace detail
 
 //! Deserialise a result
@@ -208,13 +171,13 @@ template <class P> inline std::string print(const detail::result_final<void, voi
 //! Deserialise an outcome
 template <class R, class S, class P, class N> inline std::istream &operator>>(std::istream &s, outcome<R, S, P, N> &v)
 {
-  static_assert(!trait::is_exception_ptr<P>::value, "Cannot call operator>> on an outcome with an exception_ptr in it");
+  static_assert(!trait::has_exception_ptr_v<P>, "Cannot call operator>> on an outcome with an exception_ptr in it");
   s >> v._state;
   if(v.has_error())
   {
     s >> v._error;
   }
-  if(v.has_payload())
+  if(v.has_exception())
   {
     s >> v._ptr;
   }
@@ -223,13 +186,13 @@ template <class R, class S, class P, class N> inline std::istream &operator>>(st
 //! Serialise an outcome
 template <class R, class S, class P, class N> inline std::ostream &operator<<(std::ostream &s, const outcome<R, S, P, N> &v)
 {
-  static_assert(!trait::is_exception_ptr<P>::value, "Cannot call operator<< on an outcome with an exception_ptr in it");
+  static_assert(!trait::has_exception_ptr_v<P>, "Cannot call operator<< on an outcome with an exception_ptr in it");
   s << v._state;
   if(v.has_error())
   {
     s << v._error;
   }
-  if(v.has_payload())
+  if(v.has_exception())
   {
     s << v._ptr;
   }
@@ -239,7 +202,7 @@ template <class R, class S, class P, class N> inline std::ostream &operator<<(st
 template <class R, class S, class P, class N> inline std::string print(const outcome<R, S, P, N> &v)
 {
   std::stringstream s;
-  int total = static_cast<int>(v.has_value()) + static_cast<int>(v.has_error()) + static_cast<int>(v.has_payload()) + static_cast<int>(v.has_exception());
+  int total = static_cast<int>(v.has_value()) + static_cast<int>(v.has_error()) + static_cast<int>(v.has_exception());
   if(total > 1)
   {
     s << "{ ";
@@ -249,7 +212,27 @@ template <class R, class S, class P, class N> inline std::string print(const out
   {
     s << ", ";
   }
-  detail::print_payload_exception<trait::is_exception_ptr<P>::value>(s, v);
+  if(v.has_exception())
+  {
+#ifdef __cpp_exceptions
+    try
+    {
+      std::rethrow_exception(v.exception());
+    }
+    catch(const std::system_error &e)
+    {
+      s << "std::system_error code " << e.code() << ": " << e.what();
+    }
+    catch(const std::exception &e)
+    {
+      s << "std::exception: " << e.what();
+    }
+    catch(...)
+#endif
+    {
+      s << "unknown exception";
+    }
+  }
   if(total > 1)
   {
     s << " }";

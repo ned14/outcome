@@ -352,11 +352,11 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
   }
 
 #ifndef TESTING_WG21_EXPERIMENTAL_RESULT
+#ifdef __cpp_exceptions
   // Test payload facility
   {
     const char *niall = "niall";
     result<int, payload> b{std::errc::invalid_argument, niall};
-#ifdef __cpp_exceptions
     try
     {
       b.value();
@@ -370,7 +370,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
     {
       BOOST_CHECK(false);
     }
-#endif
   }
+#endif
 #endif
 }

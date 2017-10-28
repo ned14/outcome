@@ -79,51 +79,29 @@ namespace hook_test
   {
     // when copy constructing from a result<T>, place extended_error_coding::extended_error_info into the payload
     std::cout << "hook_outcome_copy_construction fires" << std::endl;
-    OUTCOME_V2_NAMESPACE::hooks::override_outcome_payload_exception(res, extended_error_info);
+    OUTCOME_V2_NAMESPACE::hooks::override_outcome_exception(res, extended_error_info);
   }
   template <class T, class R> constexpr inline void hook_outcome_move_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<result<T> &&>, outcome<R> *res) noexcept
   {
     // when move constructing from a result<T>, place extended_error_coding::extended_error_info into the payload
     std::cout << "hook_outcome_move_construction fires" << std::endl;
-    OUTCOME_V2_NAMESPACE::hooks::override_outcome_payload_exception(res, extended_error_info);
+    OUTCOME_V2_NAMESPACE::hooks::override_outcome_exception(res, extended_error_info);
   }
-
-#ifdef __cpp_exceptions
-  // Make a custom exception type and specialise a function to throw it on wide value access
-  struct custom_exception
-  {
-  };
-  template <class R> constexpr inline void throw_as_system_error_with_payload(const outcome<R> * /*unused*/) { throw custom_exception(); }
-#endif
 }  // namespace hook_test
 
 BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / hooks, "Tests that you can hook outcome's conversion from a result")
 {
   using namespace hook_test;
   outcome<int> a(result<int>(5));
-  BOOST_REQUIRE(a.has_payload());
-  BOOST_CHECK(a.payload() == "5");
+  BOOST_REQUIRE(a.has_exception());
+  BOOST_CHECK(a.exception() == "5");
   outcome<std::string> b(result<std::string>("niall"));
-  BOOST_CHECK(b.payload() == "niall");
+  BOOST_CHECK(b.exception() == "niall");
 
   // Make sure hook does not fire for any other kind of outcome copy or move, only when converting from our custom result only
   outcome<int> c(5);
   outcome<long> d(c);  // can't be the same type as source, else copy elision takes place and no ADL hook calling
-  BOOST_CHECK(!d.has_payload());
+  BOOST_CHECK(!d.has_exception());
   outcome<int> e(OUTCOME_V2_NAMESPACE::result<int>(5));
-  BOOST_CHECK(!e.has_payload());
-
-#ifdef __cpp_exceptions
-  // Does custom error + payload throw work as expected?
-  outcome<int> f(make_error_code(std::errc::invalid_argument), "niall");
-  try
-  {
-    f.value();
-    BOOST_CHECK(false);
-  }
-  catch(const custom_exception &)
-  {
-    BOOST_CHECK(true);
-  }
-#endif
+  BOOST_CHECK(!e.has_exception());
 }
