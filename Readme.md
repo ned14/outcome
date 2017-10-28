@@ -40,8 +40,8 @@ On Windows, simply download the raw file from above and place it wherever it sui
  - [x] Code snippets in docs should provide link to github original.
  - [x] Restore testing of C++ exceptions disabled.
  - [x] Code snippets in doc/src/snippets should be compiled.
- - [ ] `trait::is_error_code<>` et al should recognise Boost's types
- - [ ] Conan package support
+ - [ ] `trait::has_error_code<>`, `trait::has_exception_ptr<>` et al should recognise Boost's types
+ - [x] Conan package support
  
 Maybe?
  - [ ] Make `result`'s explicit converting constructors accept any type providing a
