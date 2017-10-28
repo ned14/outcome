@@ -971,4 +971,9 @@ namespace hooks
 
 OUTCOME_V2_NAMESPACE_END
 
+#include "detail/outcome_exception_observers_impl.hpp"
+
+#include "policy/outcome_error_code_throw_as_system_error.hpp"
+#include "policy/outcome_exception_ptr_rethrow.hpp"
+
 #endif

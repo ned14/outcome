@@ -59,16 +59,6 @@ namespace policy
         std::terminate();
       }
     }
-    /*! Performs a wide check of state, used in the payload() functions
-    \effects If outcome does not have an exception, calls `std::terminate()`.
-    */
-    template <class Impl> static constexpr void wide_payload_check(Impl &&self)
-    {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
-      {
-        std::terminate();
-      }
-    }
     /*! Performs a wide check of state, used in the exception() functions
     \effects If outcome does not have an exception, calls `std::terminate()`.
     */

@@ -46,6 +46,30 @@ namespace detail
     constexpr bool operator!=(void_type /*unused*/) const noexcept { return false; }
   };
   template <class T> using devoid = std::conditional_t<std::is_void<T>::value, void_type, T>;
+
+  template <class Output, class Input> using rebind_type5 = Output;
+  template <class Output, class Input>
+  using rebind_type4 = std::conditional_t<                                   //
+  std::is_volatile<Input>::value,                                            //
+  std::add_volatile_t<rebind_type5<Output, std::remove_volatile_t<Input>>>,  //
+  rebind_type5<Output, Input>>;
+  template <class Output, class Input>
+  using rebind_type3 = std::conditional_t<                             //
+  std::is_const<Input>::value,                                         //
+  std::add_const_t<rebind_type4<Output, std::remove_const_t<Input>>>,  //
+  rebind_type4<Output, Input>>;
+  template <class Output, class Input>
+  using rebind_type2 = std::conditional_t<                                            //
+  std::is_lvalue_reference<Input>::value,                                             //
+  std::add_lvalue_reference_t<rebind_type3<Output, std::remove_reference_t<Input>>>,  //
+  rebind_type3<Output, Input>>;
+  template <class Output, class Input>
+  using rebind_type = std::conditional_t<                                             //
+  std::is_rvalue_reference<Input>::value,                                             //
+  std::add_rvalue_reference_t<rebind_type2<Output, std::remove_reference_t<Input>>>,  //
+  rebind_type2<Output, Input>>;
+
+  // static_assert(std::is_same_v<rebind_type<int, volatile const double &&>, volatile const int &&>, "");
 }  // namespace detail
 
 //! Namespace for policies

@@ -70,16 +70,6 @@ namespace policy
           _ub();
         }
       }
-      /*! Performs a narrow check of state, used in the assume_payload() functions
-      \effects None.
-      */
-      template <class Impl> static constexpr void narrow_payload_check(Impl &&self) noexcept
-      {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_payload) == 0)
-        {
-          _ub();
-        }
-      }
       /*! Performs a narrow check of state, used in the assume_exception() functions
       \effects None.
       */

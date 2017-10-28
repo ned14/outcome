@@ -22,11 +22,10 @@ Distributed under the Boost Software License, Version 1.0.
 http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef OUTCOME_POLICY_RESULT_EXCEPTION_PTR_RETHROW_HPP
-#define OUTCOME_POLICY_RESULT_EXCEPTION_PTR_RETHROW_HPP
+#ifndef OUTCOME_POLICY_OUTCOME_EXCEPTION_PTR_RETHROW_HPP
+#define OUTCOME_POLICY_OUTCOME_EXCEPTION_PTR_RETHROW_HPP
 
-#include "../bad_access.hpp"
-#include "detail/common.hpp"
+#include "result_exception_ptr_rethrow.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -36,8 +35,7 @@ namespace policy
   Any wide attempt to access the successful state where there is none causes:
   `std::rethrow_exception(policy::exception_ptr(.error()|.exception()))` appropriately.
   */
-  template <class T, class EC, class E> struct exception_ptr_rethrow;
-  template <class T, class EC> struct exception_ptr_rethrow<T, EC, void> : detail::base
+  template <class T, class EC, class E> struct exception_ptr_rethrow : detail::base
   {
     /*! Performs a wide check of state, used in the value() functions
     \effects If result does not have a value, if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_result_access`.
@@ -46,11 +44,17 @@ namespace policy
     {
       if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
+        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0)
+        {
+          using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<outcome<T, EC, E, exception_ptr_rethrow>, decltype(self)>;
+          Outcome _self = static_cast<Outcome>(self);  // NOLINT
+          detail::rethrow_exception<trait::has_exception_ptr_v<E>>{policy::exception_ptr(std::forward<Outcome>(_self)._ptr)};
+        }
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          std::rethrow_exception(policy::exception_ptr(std::forward<Impl>(self)._error));
+          detail::rethrow_exception<trait::has_exception_ptr_v<EC>>{policy::exception_ptr(std::forward<Impl>(self)._error)};
         }
-        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
       }
     }
     /*! Performs a wide check of state, used in the value() functions
@@ -60,7 +64,17 @@ namespace policy
     {
       if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
-        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
+      }
+    }
+    /*! Performs a wide check of state, used in the exception() functions
+    \effects If result does not have an exception, it throws `bad_outcome_access`.
+    */
+    template <class Impl> static constexpr void wide_exception_check(Impl &&self)
+    {
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+      {
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
       }
     }
   };
