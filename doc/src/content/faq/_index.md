@@ -3,6 +3,89 @@ title = "Frequently asked questions"
 weight = 30
 +++
 
+{{% toc %}}
+
+## Is Outcome safe to use in extern APIs?
+
+Outcome is specifically designed for use in the public interfaces of multi-million
+line codebases. Its layout is hard coded to:
+
+```c
+struct
+{
+  T value;
+  unsigned int flags;
+  EC error;
+};
+```
+
+This is, of course, C-compatible and Outcome provides [a macro-based C interface](../tutorial/c-api)
+for C code needing to call `extern "C"` C++ functions returning a `result<T, EC>`.
+
+
+## Does Outcome have a stable ABI?
+
+Until Outcome passes a second Boost peer review and enters Boost, no. Once into Boost,
+Outcome's ABI will be formally fixed as the v2 ABI one year after its first Boost release.
+Thereafter the [ABI compliance checker](https://lvc.github.io/abi-compliance-checker/)
+will be run per-commit to ensure Outcome's ABI remains stable.
+
+
+## Is Outcome suitable for fixed latency/predictable execution coding such as for high frequency trading or audio?
+
+Great care has been taken to ensure that Outcome never unexpectedly executes anything
+with unbounded execution times such as `malloc()`, `dynamic_cast<>()` or `throw`.
+Outcome works perfectly with C++ exceptions and RTTI globally disabled.
+
+Outcome's entire design premise is that its users are happy to exchange a small, predictable constant overhead
+during successful code paths, in exchange for completely predictable failure code paths.
+In contrast, table-based exception handling gives zero run time overhead for the
+successful code path, and completely unpredictable (and very expensive) overhead
+for failure code paths.
+
+For code where predictability of execution no matter the code path is paramount,
+writing all your code to use Outcome is not a bad place to start. Obviously enough,
+do choose a non-throwing policy when configuring `outcome` or `result` such as
+`policy::all_narrow` to guarantee that exceptions can never be thrown by Outcome
+(or use the convenience typedef for `result`, `unchecked` which uses `policy::all_narrow`).
+
+
+## What kind of performance benefits will using Outcome in my code bring?
+
+It is very hard to say anything definitive about performance impacts in codebases one
+has never seen. Each codebase is unique. However to come up with some form of measure,
+we timed returning an error via each of the main mechanisms, doing so over ten stack
+frames. A stack frame is defined to be something called by the compiler whilst
+unwinding the stack between the point of returning the error and the thing which handles
+the error, so for example ten stack allocated objects might be destructed, or ten levels
+of stack depth might be unwound. This is not a particularly realistic test, but it
+should at least give one an idea of the performance impact of returning Outcome's
+`result` or `outcome` over say returning a plain integer, or throwing an exception.
+
+{{% figure src="results_log.png" title="Log graph comparing GCC 7.2, clang 5.0, Visual Studio 2017.5 and XCode 8.2" %}}
+
+As you can see, throwing and catching an exception is
+expensive on table-based exception handling implementations such as these, anywhere
+between 16,000 and 36,000 CPU cycles. Simple integer returns are always going to be
+the fastest as they do the least work, and that costs 90 to 100 CPU cycles.
+
+Note that returning a `result<int, std::error_code>` with an int (result-error-value)
+is no additional runtime overhead over returning a naked int on most compilers.
+
+Returning a `result<int, std::error_code>` with an error code (result-error-error)
+is no additional runtime overhead over returning a naked int on most compilers.
+
+You might wonder what happens if type `E` has a non-trivial destructor, thus making the
+`result<T, E>` have a non-trivial destructor? We tested `E = std::exception_ptr` and
+found no performance difference to `E = std::error_code` for returning a value. Returning an error
+was obviously much slower at anywhere between 300 and 1,500 CPU cycles due to returning
+an exception pointer being at least two atomic operations per stack frame, but that is
+still two orders of magnitude better than throwing and catching an exception.
+
+We conclude that if failure is anything but extremely rare in your C++ codebase,
+using Outcome instead of throwing and catching exceptions ought to be quicker overall.
+
+
 ## Why is implicit default construction disabled?
 
 This was one of the more interesting points of discussion during the peer review of

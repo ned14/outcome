@@ -4,7 +4,10 @@ description = ""
 weight = 10
 +++
 
-To see how payload-transporting outcome might be useful, consider the
+Something which has long annoyed the purists in the C++ leadership is the problem of dual
+overloads in `error_code` capable standard library APIs.
+
+Consider the
 [`copy_file()`](http://en.cppreference.com/w/cpp/filesystem/copy_file)
 API from the Filesystem TS:
 

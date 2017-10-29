@@ -37,15 +37,19 @@ namespace filesystem
 //! [filesystem_api_fixed]
 namespace filesystem2
 {
-  // Paths related to a failure. Also causes ADL discovery to check this namespace.
+  // Error code + paths related to a failure. Also causes ADL discovery to check this namespace.
   struct failure_info
   {
+    std::error_code ec;
     path path1, path2;
   };
 
+  // Tell Outcome that failure_info is to be treated as a std::error_code
+  inline const std::error_code &make_error_code(const failure_info &fi) { return fi.ec; }
+
   // Localise an outcome implementation specific to this namespace. Normally would just
   // be `result`, but for clarity we'll use `fs_result`.
-  template <class T> using fs_result = outcome::outcome<T, std::error_code, failure_info>;
+  template <class T> using fs_result = outcome::result<T, failure_info>;
 
   /*! Copies the file at path `from` to path `to`.
   \returns Successful if file was successfully copied, otherwise the error code reported
@@ -58,18 +62,25 @@ namespace filesystem2
 
 namespace filesystem2
 {
-  fs_result<void> copy_file(const path &from, const path &to) noexcept { return {make_error_code(std::errc::no_such_file_or_directory), failure_info{from, to}}; }
+  fs_result<void> copy_file(const path &from, const path &to) noexcept { return failure_info{make_error_code(std::errc::no_such_file_or_directory), from, to}; }
 }
 
 //! [filesystem_api_custom_throw]
 namespace filesystem2
 {
-  // For outcome's with error_code + payload configuration, this free function is discovered by ADL
-  // and called to implement throwing the error code with payload.
-  template <class T> inline void throw_as_system_error_with_payload(const fs_result<T> *src)
+  // If we would like Outcome to do something other than the default action (see next
+  // section), we can declare this ADL discovered free function to customise what
+  // to do instead.
+  //
+  // Note that rvalue semantics are propagated internally by Outcome, so if the user
+  // called .value() on a rvalued result, failure_info will be moved rather than
+  // copied from the result. That means we can overload once with value semantics,
+  // and not need to overload for lvalue and rvalue situations unless we really feel
+  // we need to for some reason.
+  inline void throw_as_system_error_with_payload(failure_info fi)
   {
     // Throw the exact same filesystem_error exception which the throwing copy_file() edition does.
-    throw filesystem_error(src->error().message(), src->payload().path1, src->payload().path2, src->error());
+    throw filesystem_error(fi.ec.message(), std::move(fi.path1), std::move(fi.path2), fi.ec);
   }
 }
 //! [filesystem_api_custom_throw]
@@ -77,13 +88,16 @@ namespace filesystem2
 int main()
 {
   //! [filesystem_api_custom_throw_demo]
+  // Non-throwing use case
   auto o = filesystem2::copy_file("dontexist", "alsodontexist");
   if(!o)
   {
-    std::cerr << "Copy file failed with error " << o.error().message()                          //
-              << " (path1 = " << o.payload().path1 << ", path2 = " << o.payload().path2 << ")"  //
+    std::cerr << "Copy file failed with error " << o.error().ec.message()                   //
+              << " (path1 = " << o.error().path1 << ", path2 = " << o.error().path2 << ")"  //
               << std::endl;
   }
+
+  // Throwing use case
   try
   {
     // Try to observe the successful value, thus triggering default actions which invokes
