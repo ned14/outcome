@@ -1,6 +1,6 @@
 +++
 title = "outcome<T, EC, EP>"
-description = "Success-or-failure return types where failure can take two forms, expected failure and unexpected failure."
+description = "Success-or-failure return types where failure can take two forms, expected/handled failure and unexpected/abort failure."
 weight = 20
 +++
 

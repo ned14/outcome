@@ -59,7 +59,7 @@ class ResultErrorValue(ErrorHandlingSystem):
     def preamble(self, idx):
         return '#include "../include/outcome/result.hpp"\n'
     def function_cont(self, name):
-        return 'extern outcome::result<int> %s(int par)' % name
+        return 'extern OUTCOME_V2_NAMESPACE::result<int> %s(int par)' % name
     def function_final(self):
         return r'''{ return par; }'''
 
@@ -69,13 +69,13 @@ class ResultErrorError(ResultErrorValue):
 
 class ResultExceptionValue(ResultErrorValue):
     def function_cont(self, name):
-        return 'extern outcome::result<int, std::exception_ptr> %s(int par)' % name
+        return 'extern OUTCOME_V2_NAMESPACE::result<int, std::exception_ptr> %s(int par)' % name
     def function_final(self):
         return r'''{ return par; }'''
         
 class ResultExceptionError(ResultExceptionValue):
     def function_cont(self, name):
-        return 'extern outcome::result<int, std::exception_ptr> %s(int par)' % name
+        return 'extern OUTCOME_V2_NAMESPACE::result<int, std::exception_ptr> %s(int par)' % name
     def function_final(self):
         return r'''{ return std::make_exception_ptr(std::exception()); }'''
         
@@ -90,9 +90,9 @@ matrix = [
 
 if sys.platform == 'win32':
     compilers = [
-        ('msvc19-noexcept', r'cl /O2 /MD /Z7 /volatile:iso /Fe%s'),
-        ('msvc19', r'cl /nologo /O2 /MD /Z7 /EHsc /volatile:iso /Fe%s'),
-        ('msvc19-ltcg', r'cl /nologo /O2 /GL /MD /Z7 /volatile:iso /EHsc /Fe%s'),
+        ('msvc1912-noexcept', r'cl /nologo /std:c++latest /O2 /Gy /MD /Fe%s /I..\\..'),
+        ('msvc1912', r'cl /nologo /std:c++latest /O2 /Gy /MD /EHsc /Fe%s /I..\\..'),
+        ('msvc1912-ltcg', r'cl /nologo /std:c++latest /O2 /Gy /GL /MD /EHsc /Fe%s /I..\\..'),
     ]
 elif sys.platform == 'darwin':
     compilers = [
@@ -100,10 +100,10 @@ elif sys.platform == 'darwin':
     ]
 else:
     compilers = [
-        ('gcc62-noexcept', r'g++-6 -std=c++14 -fno-exceptions -O3 -g -o %s'),
-        ('gcc62', r'g++-6 -std=c++14 -O3 -g -o %s'),
-        ('gcc62-lto', r'g++-6 -std=c++14 -O3 -g -flto -o %s'),
-        ('clang40', r'clang++-4.0 -std=c++14 -O3 -g -o %s'),
+        ('gcc72-noexcept', r'g++-7 -std=c++17 -fno-exceptions -O3 -g -o %s -I../..'),
+        ('gcc72', r'g++-7 -std=c++17 -O3 -g -o %s -I../..'),
+        ('gcc72-lto', r'g++-7 -std=c++17 -O3 -g -flto -o %s -I../..'),
+        ('clang50', r'clang++-5.0 -std=c++17 -O3 -g -o %s -I../..'),
 #        ('clang40-lto', r'clang++-4.0 -std=c++14 -O3 -g -flto -o %s'),  not working yet
     ]
 
@@ -131,6 +131,9 @@ with open('results-'+sys.platform+'.csv', 'wt') as resultsh:
                 args.append("runner.cpp")
                 for n in xrange(0, SOURCES):
                     args.append("source%04d.cpp" % n)
+                if sys.platform == 'win32':
+                    args.append("/link")
+                    args.append("/OPT:REF,ICF")
                 #print(' '.join(args))
                 try:
                     print("Compiling", exename, "...")

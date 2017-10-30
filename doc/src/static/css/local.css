@@ -60,6 +60,34 @@ div.code-snippet a.code-snippet-url {
   top: 0.7em;
 }
 
+nav#TableOfContents {
+  width: 30em;
+  float: right;
+  text-align: left;
+  font-size: inherit !important;
+}
+nav#TableOfContents > ul {
+  list-style: none;
+}
+nav#TableOfContents > ul > li > ul {
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px #000000;
+  background-color: white;
+  padding-right: 1em;
+  list-style-type: lower-roman;
+}
+nav#TableOfContents > ul > li > ul > li {
+  line-height: normal;
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+nav#TableOfContents > ul > li > ul > li > a.highlight {
+  display: inline;
+}
+nav#TableOfContents > ul > li > ul > li > a.highlight code {
+  vertical-align: inherit;
+}
+
 
 /* Background */ .chroma { background-color: #ffffff }
 /* Error */ .chroma .ss4 {  }
