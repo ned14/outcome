@@ -68,7 +68,8 @@ namespace policy
         }
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          detail::throw_result_as_system_error<trait::has_error_payload_v<EC>>{std::forward<Impl>(self)._error};
+          // ADL discovered
+          throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
         }
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
       }

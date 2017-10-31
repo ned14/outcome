@@ -25,15 +25,15 @@ objects. We define the difference as being "having programmable actions in
 response to no-value observation other than throwing a hard coded logic error type exception[^1]".
 This philosophical difference implies that throwing a C++ exception is
 solely used to *abort the current operation with a useful-to-the-programmer default action*,
-**not** as a control flow alternative to ordinary returns from function, **not** for reporting logic errors.
+**not** as a control flow alternative to ordinary returns from function, **not** for reporting "recoverable" logic errors.
 
 You can, of course,
-choose different default actions for your particular Outcome type, implement your own
+choose different default actions for your particular Outcome instance, implement your own
 default actions, and indeed configure a `result` and `outcome` which throw a
 logic error type exception exactly the same way as Expected or Optional does.
 How to do this is described later in this tutorial.
 
-Instead this section describes the default actions implemented by Outcome, which
+This section describes the default actions implemented by Outcome, which
 we believe will cover the large majority of users with no further configuration
 needed.
 

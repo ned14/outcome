@@ -79,6 +79,8 @@ namespace filesystem2
   // we need to for some reason.
   inline void throw_as_system_error_with_payload(failure_info fi)
   {
+    // If the error code is not filesystem related e.g. ENOMEM, throw that as a standard STL exception.
+    outcome::try_throw_exception_from_error(fi.ec);
     // Throw the exact same filesystem_error exception which the throwing copy_file() edition does.
     throw filesystem_error(fi.ec.message(), std::move(fi.path1), std::move(fi.path2), fi.ec);
   }
@@ -109,6 +111,11 @@ int main()
   {
     std::cerr << "Copy file failed with exception " << e.what()                 //
               << " (path1 = " << e.path1() << ", path2 = " << e.path2() << ")"  //
+              << std::endl;
+  }
+  catch(const std::exception &e)
+  {
+    std::cerr << "Copy file failed with exception " << e.what()  //
               << std::endl;
   }
   //! [filesystem_api_custom_throw_demo]

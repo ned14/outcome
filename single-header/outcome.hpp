@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF c461d6910432bae1c4aeb558169643859be850d7
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-26 22:15:40 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c461d691
+#define OUTCOME_PREVIOUS_COMMIT_REF 786bd124105f9c7b123d399a785f1bd9344dbe1d
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-10-29 01:39:42 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 786bd124
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1890,9 +1890,6 @@ namespace detail
 //! Namespace for policies
 namespace policy
 {
-  //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
-  template <class T> constexpr inline void throw_as_system_error_with_payload(const T & /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload"); }
-
   namespace detail
   {
     struct error_code_passthrough
@@ -1932,6 +1929,14 @@ namespace policy
   template <class T> constexpr inline decltype(auto) error_code(T &&v) { return detail::error_code(std::forward<T>(v)); }
   //! Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
   template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return detail::exception_ptr(std::forward<T>(v)); }
+
+  //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
+  template <class Error> constexpr inline void throw_as_system_error_with_payload(const Error &error)
+  {
+    static_assert(std::is_convertible<Error, std::error_code>::value || std::is_error_code_enum<std::decay_t<Error>>::value || std::is_error_condition_enum<std::decay_t<Error>>::value,
+                  "To use the error_code_throw_as_system_error policy with a custom Error type, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload");
+    OUTCOME_THROW_EXCEPTION(std::system_error(error_code(error)));
+  }
 } // namespace policy
 
 //! Namespace for traits
@@ -1948,13 +1953,6 @@ namespace trait
               >
     constexpr inline R make_error_code(T &&);
     template <class T, typename V = decltype(make_error_code(std::declval<devoid<T>>()))> struct has_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, std::decay_t<V>>::value || std::is_convertible<T, std::error_code>::value>
-    {
-    };
-    struct no_error_payload
-    {
-    };
-    template <class T> constexpr inline no_error_payload throw_as_system_error_with_payload(const T & /*unused*/);
-    template <class T, typename V = decltype(throw_as_system_error_with_payload(std::declval<detail::devoid<T>>()))> struct has_error_payload : std::integral_constant<bool, !std::is_same<V, no_error_payload>::value>
     {
     };
     constexpr inline void make_exception_ptr(...);
@@ -1976,17 +1974,6 @@ namespace trait
 
 
   template <class T> constexpr bool has_error_code_v = has_error_code<T>::value;
-
-  /*! Trait for whether a free function `throw_as_system_error_with_payload(T)` exists or not.
-  */
-
-  template <class T> struct has_error_payload : detail::has_error_payload<T>
-  {
-  };
-  /*! Trait for whether a free function `throw_as_system_error_with_payload(T)` exists or not.
-  */
-
-  template <class T> constexpr bool has_error_payload_v = has_error_payload<T>::value;
 
   /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
   Also returns true if `std::exception_ptr` is convertible from T.
@@ -3832,6 +3819,8 @@ namespace policy
 OUTCOME_V2_NAMESPACE_END
 
 #endif
+#include <utility>
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
@@ -4058,24 +4047,6 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  namespace detail
-  {
-    template <bool has_error_payload> struct throw_result_as_system_error
-    {
-      template <class Error> explicit throw_result_as_system_error(Error &&error) // NOLINT
-      {
-        OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(std::forward<Error>(error))));
-      }
-    };
-    template <> struct throw_result_as_system_error<true>
-    {
-      template <class Error> explicit throw_result_as_system_error(Error &&error) // NOLINT
-      {
-        throw_as_system_error_with_payload(std::forward<Error>(error));
-      }
-    };
-  } // namespace detail
-
   template <class T, class EC, class E> struct error_code_throw_as_system_error;
   /*! Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
   Any wide attempt to access the successful state where there is none causes:
@@ -4103,7 +4074,8 @@ namespace policy
       {
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          detail::throw_result_as_system_error<trait::has_error_payload_v<EC>>{std::forward<Impl>(self)._error};
+          // ADL discovered
+          throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
@@ -6700,7 +6672,8 @@ namespace policy
         }
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          detail::throw_result_as_system_error<trait::has_error_payload_v<EC>>{std::forward<Impl>(self)._error};
+          // ADL discovered
+          throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
         }
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
       }
@@ -7336,6 +7309,50 @@ inline std::error_code error_from_exception(std::exception_ptr &&ep = std::curre
   {
   }
   return not_matched;
+}
+
+/*! Utility function which tries to throw the equivalent STL exception type for
+some given error code, not including `system_error`.
+\param ec The error code to try to convert into a STL exception throw.
+
+\effects If the input error code has a category of `generic_category()` (all platforms)
+or `system_category()` (POSIX only), throw the STL exception type matching
+the `errno` domained code if one is available. For example, `ENOMEM` would cause
+`std::bad_alloc()` to be thrown.
+*/
+
+
+
+
+
+
+
+
+inline void try_throw_exception_from_error(std::error_code ec)
+{
+  if(!ec || (ec.category() != std::generic_category()
+#ifndef _WIN32
+             && ec.category() != std::system_category()
+#endif
+             ))
+  {
+    return;
+  }
+  switch(ec.value())
+  {
+  case EINVAL:
+    throw std::invalid_argument("invalid argument");
+  case EDOM:
+    throw std::domain_error("domain error");
+  case E2BIG:
+    throw std::length_error("length error");
+  case ERANGE:
+    throw std::out_of_range("out of range");
+  case EOVERFLOW:
+    throw std::overflow_error("overflow error");
+  case ENOMEM:
+    throw std::bad_alloc();
+  }
 }
 #endif
 

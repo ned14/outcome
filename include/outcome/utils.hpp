@@ -110,6 +110,42 @@ inline std::error_code error_from_exception(std::exception_ptr &&ep = std::curre
   }
   return not_matched;
 }
+
+/*! Utility function which tries to throw the equivalent STL exception type for
+some given error code, not including `system_error`.
+\param ec The error code to try to convert into a STL exception throw.
+
+\effects If the input error code has a category of `generic_category()` (all platforms)
+or `system_category()` (POSIX only), throw the STL exception type matching
+the `errno` domained code if one is available. For example, `ENOMEM` would cause
+`std::bad_alloc()` to be thrown.
+*/
+inline void try_throw_exception_from_error(std::error_code ec)
+{
+  if(!ec || (ec.category() != std::generic_category()
+#ifndef _WIN32
+             && ec.category() != std::system_category()
+#endif
+             ))
+  {
+    return;
+  }
+  switch(ec.value())
+  {
+  case EINVAL:
+    throw std::invalid_argument("invalid argument");
+  case EDOM:
+    throw std::domain_error("domain error");
+  case E2BIG:
+    throw std::length_error("length error");
+  case ERANGE:
+    throw std::out_of_range("out of range");
+  case EOVERFLOW:
+    throw std::overflow_error("overflow error");
+  case ENOMEM:
+    throw std::bad_alloc();
+  }
+}
 #endif
 
 OUTCOME_V2_NAMESPACE_END
