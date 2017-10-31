@@ -37,4 +37,4 @@ ned@lyta:~/outcome/build_posix$ bin/outcome-snippets_udts
 
 The undefined behaviour is correctly trapped at runtime by the undefined behaviour sanitiser.
 
-[^1]: Note that this is *hard* undefined behaviour. The compiler (if GCC, clang, or MSVC) is explicitly told that observation of a value which is not present can never happen. The optimiser will thus generate code assuming it can never happen. This is what causes the segmentation fault above, no assembler is generated for the no-value observation case which causes corruption of the CPU registers, thus making visible early the undefined behaviour.
+[^1]: Note that this is *hard* undefined behaviour. The compiler (if GCC, clang, or MSVC) is explicitly told that observation of a value which is not present can **never** happen. The optimiser will thus generate code assuming it can never happen. This is what causes the segmentation fault above, no assembler is generated for the no-value observation case which causes corruption of the CPU registers, thus making visible early the undefined behaviour.

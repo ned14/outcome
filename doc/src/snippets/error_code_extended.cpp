@@ -162,7 +162,7 @@ namespace error_code_extended
         str.append("]");
 
         // Override the payload/exception member in the outcome with our synthesised exception ptr
-        OUTCOME_V2_NAMESPACE::hooks::override_outcome_payload_exception(o, std::make_exception_ptr(std::runtime_error(str)));
+        OUTCOME_V2_NAMESPACE::hooks::override_outcome_exception(o, std::make_exception_ptr(std::runtime_error(str)));
       }
     }
   }

@@ -4,7 +4,7 @@ description = ""
 weight = 20
 +++
 
-In the previous section `outcome<T, EC, P>`, we used the `failure_info` type to create
+In a previous section, we used the `failure_info` type to create
 the ADL bridge into the namespace where the ADL discovered `throw_as_system_error_with_payload()`
 function was to be found.
 

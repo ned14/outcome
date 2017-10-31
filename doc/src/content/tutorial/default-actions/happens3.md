@@ -18,12 +18,21 @@ and in so doing, we also told the standard library how our error code
 interacts with `std::error_code` and thus `std::system_error`.
 
 Outcome's default action when no-value observing a `result` or `outcome`
-with a `EC` type where `std::is_error_code_enum<EC>` is true, or
-`std::is_error_condition_enum<EC>` is true, is to throw a 
-`std::system_error(make_error_code(.error()))`. So because `.error()`
+with a `EC` type where some ADL discovered free function `make_error_code(EC)`
+returning a `std::error_code` exists[^1], is to throw a 
+`std::system_error(make_error_code(.error()))`. This is how the `failure_info`
+custom `EC` type was annotated to be treated as a `std::error_code` in the
+[previous section of the tutorial](../../payload/copy_file2), this is the exact
+same mechanism[^2].
+
+So above, because `.error()`
 is set to `err::failure1`, the free function we defined `make_error_code(err)`
 converts that into a `std::error_code`, and from that the `std::system_error`
-is constructed and thrown.
+is constructed and thrown during a no-value value observation.
 
 On catching a `std::exception`, we print the `what()` which this particular
 standard library implementation (libstdc++) has chosen to set to `error_code::message()`.
+
+[^1]: `trait::has_error_code<EC>` determines this.
+
+[^2]: One only needs to additionally define the `throw_as_system_error_with_payload()` free function if type `EC` does not have `std::is_error_code_enum<EC>` nor `std::is_error_condition_enum<EC>` defined as true.
