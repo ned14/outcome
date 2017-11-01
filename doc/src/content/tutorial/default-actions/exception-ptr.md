@@ -4,12 +4,12 @@ description = ""
 weight = 40
 +++
 
-Another default action exists for `result<T, EC>` where `trait::is_exception_ptr<EC>` is
-true, and for `outcome<T, EC, EP>` where `trait::is_exception_ptr<EP>` is true.
+Another default action exists for `result<T, EC>` where `trait::has_exception_ptr<EC>` is
+true, and for `outcome<T, EC, EP>` where `trait::has_exception_ptr<EP>` is true.
 
 This default action simply rethrows
-the exception pointer via `std::rethrow_exception(.error())` for `result` and
-`std::rethrow_exception(.exception())` for `outcome`.
+the exception pointer via `std::rethrow_exception(make_exception_ptr(.error()))` for `result` and
+`std::rethrow_exception(make_exception_ptr(.exception()))` for `outcome`.
 
 {{% snippet "exception_ptr.cpp" "exception_ptr" %}}
 

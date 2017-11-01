@@ -58,6 +58,16 @@ namespace policy
         OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
     }
+    /*! Performs a wide check of state, used in the exception() functions
+    \effects If result does not have an exception, it throws `bad_outcome_access`.
+    */
+    template <class Impl> static constexpr void wide_exception_check(Impl &&self)
+    {
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+      {
+        OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
+      }
+    }
   };
 }  // namespace policy
 

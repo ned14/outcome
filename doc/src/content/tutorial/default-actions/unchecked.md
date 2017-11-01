@@ -17,8 +17,8 @@ type, we also provide another simplified template alias to `result<T, E>` called
 Similar to `.value()` in the WG21 Expected proposal or Optional, no-value observation throws
 these logic error type exceptions:
 
-- Incorrect `.value()` observation throws `bad_result_access_with<E>`.
-- Incorrect `.error()` observation throws `bad_result_access`.
+- No-value `.value()` observation throws `bad_result_access_with<E>`.
+- No-error `.error()` observation throws `bad_result_access`.
 
 If you need run time unchecked observers, `.assume_value()` and `.assume_error()` are
 always unchecked at run time.

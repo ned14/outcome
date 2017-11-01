@@ -75,9 +75,6 @@ namespace detail
 //! Namespace for policies
 namespace policy
 {
-  //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
-  template <class T> constexpr inline void throw_as_system_error_with_payload(const T & /*unused*/) { static_assert(!std::is_same<T, T>::value, "To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload"); }
-
   namespace detail
   {
     struct error_code_passthrough
@@ -112,6 +109,14 @@ namespace policy
   template <class T> constexpr inline decltype(auto) error_code(T &&v) { return detail::error_code(std::forward<T>(v)); }
   //! Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
   template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return detail::exception_ptr(std::forward<T>(v)); }
+
+  //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
+  template <class Error> constexpr inline void throw_as_system_error_with_payload(const Error &error)
+  {
+    static_assert(std::is_convertible<Error, std::error_code>::value || std::is_error_code_enum<std::decay_t<Error>>::value || std::is_error_condition_enum<std::decay_t<Error>>::value,
+                  "To use the error_code_throw_as_system_error policy with a custom Error type, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload");
+    OUTCOME_THROW_EXCEPTION(std::system_error(error_code(error)));
+  }
 }  // namespace policy
 
 //! Namespace for traits
@@ -130,13 +135,6 @@ namespace trait
     template <class T, typename V = decltype(make_error_code(std::declval<devoid<T>>()))> struct has_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, std::decay_t<V>>::value || std::is_convertible<T, std::error_code>::value>
     {
     };
-    struct no_error_payload
-    {
-    };
-    template <class T> constexpr inline no_error_payload throw_as_system_error_with_payload(const T & /*unused*/);
-    template <class T, typename V = decltype(throw_as_system_error_with_payload(std::declval<detail::devoid<T>>()))> struct has_error_payload : std::integral_constant<bool, !std::is_same<V, no_error_payload>::value>
-    {
-    };
     constexpr inline void make_exception_ptr(...);
     template <class T, typename V = decltype(make_exception_ptr(std::declval<devoid<T>>()))> struct has_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, std::decay_t<V>>::value || std::is_convertible<T, std::exception_ptr>::value>
     {
@@ -152,15 +150,6 @@ namespace trait
   Also returns true if `std::error_code` is convertible from T.
   */
   template <class T> constexpr bool has_error_code_v = has_error_code<T>::value;
-
-  /*! Trait for whether a free function `throw_as_system_error_with_payload(T)` exists or not.
-  */
-  template <class T> struct has_error_payload : detail::has_error_payload<T>
-  {
-  };
-  /*! Trait for whether a free function `throw_as_system_error_with_payload(T)` exists or not.
-  */
-  template <class T> constexpr bool has_error_payload_v = has_error_payload<T>::value;
 
   /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
   Also returns true if `std::exception_ptr` is convertible from T.

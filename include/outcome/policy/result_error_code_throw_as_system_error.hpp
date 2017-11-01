@@ -34,24 +34,6 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  namespace detail
-  {
-    template <bool has_error_payload> struct throw_result_as_system_error
-    {
-      template <class Error> explicit throw_result_as_system_error(Error &&error)  // NOLINT
-      {
-        OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(std::forward<Error>(error))));
-      }
-    };
-    template <> struct throw_result_as_system_error<true>
-    {
-      template <class Error> explicit throw_result_as_system_error(Error &&error)  // NOLINT
-      {
-        throw_as_system_error_with_payload(std::forward<Error>(error));
-      }
-    };
-  }  // namespace detail
-
   template <class T, class EC, class E> struct error_code_throw_as_system_error;
   /*! Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
   Any wide attempt to access the successful state where there is none causes:
@@ -71,7 +53,8 @@ namespace policy
       {
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          detail::throw_result_as_system_error<trait::has_error_payload_v<EC>>{std::forward<Impl>(self)._error};
+          // ADL discovered
+          throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }

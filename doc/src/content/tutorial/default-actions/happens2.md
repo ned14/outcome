@@ -15,7 +15,7 @@ ned@lyta:~/outcome/build_posix$
 Also undefined behaviour. This is because Outcome doesn't know what to do
 with a strongly typed `enum` any more than some user defined `struct`.
 
-Let's register our error code enum with the C++ standard library. This causes
+Let us register our error code enum with the C++ standard library. This causes
 Outcome to treat it quite differently.
 
 {{% snippet "error_code_enums2.cpp" "declaration" %}}

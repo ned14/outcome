@@ -29,7 +29,7 @@ construct(std::in_place_type<file_handle>, "hello");
 Tagged overloading is fine for smaller projects, but for larger code bases:
 
 1. It takes longer to type `construct(std::in_place_type<file_handle>, "hello")`,
-and is possibly less intutive to write,
+and is possibly less intuitive to write,
 than it does `construct<file_handle>{"hello"}()`.
 2. Compiler error messages are enormously clearer if you encode the permitted
 overloads for construction into the `construct<file_handle>` type rather than
