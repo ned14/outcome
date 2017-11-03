@@ -11,17 +11,17 @@ The final option which this section covers is to use the ADL discovered event ho
 which tell you when a namespace-localised `outcome` or `result` has been:
 
 - Constructed
-  - `hook_result_construction(in_place_type_t<T|E>, result<T, E> *)`
-  - `hook_outcome_construction(in_place_type_t<T|EC|EP>, outcome<T, EC, EP> *)`
+  - `hook_result_construction(result<T, E> *this, U &&src)`
+  - `hook_outcome_construction(outcome<T, EC, EP> *this, U &&src)`
 - In-place constructed
-  - `hook_result_in_place_construction(in_place_type_t<T|E>, result<T, E> *)`
-  - `hook_outcome_in_place_construction(in_place_type_t<T|EC|EP>, outcome<T, EC, EP> *)`
+  - `hook_result_in_place_construction(result<T, E> *this, U &&src)`
+  - `hook_outcome_in_place_construction(outcome<T, EC, EP> *this, U &&src)`
 - Copied
-  - `hook_result_copy_construction(in_place_type_t<T|E>, result<T, E> *)`
-  - `hook_outcome_copy_construction(in_place_type_t<T|EC|EP>, outcome<T, EC, EP> *)`
+  - `hook_result_copy_construction(result<T, E> *this, U &&src)`
+  - `hook_outcome_copy_construction(outcome<T, EC, EP> *this, U &&src)`
 - Moved
-  - `hook_result_move_construction(in_place_type_t<T|E>, result<T, E> *)`
-  - `hook_outcome_move_construction(in_place_type_t<T|EC|EP>, outcome<T, EC, EP> *)`
+  - `hook_result_move_construction(result<T, E> *this, in_place_type_t<T|E>, Args&&... srcs)`
+  - `hook_outcome_move_construction(outcome<T, EC, EP> *this, in_place_type_t<T|EC|EP>, Args&&... srcs)`
 
 One criticism often levelled against these success-or-failure objects is that they do
 not provide as rich a set of facilities as C++ exception throws. This section shows

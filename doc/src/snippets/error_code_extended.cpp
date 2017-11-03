@@ -115,7 +115,7 @@ namespace error_code_extended
   // Specialise the result construction hook for our localised result
   // We hook any non-copy, non-move, non-inplace construction, capturing a stack backtrace
   // if the result is errored.
-  template <class T, class R> inline void hook_result_construction(in_place_type_t<T>, result<R> *res) noexcept
+  template <class T, class U> inline void hook_result_construction(result<T> *res, U && /*unused*/) noexcept
   {
     if(res->has_error())
     {
@@ -174,12 +174,12 @@ namespace error_code_extended
 {
   // Specialise the outcome copy and move conversion hook for when our localised result
   // is used as the source for copy construction our localised outcome
-  template <class T, class R> inline void hook_outcome_copy_construction(in_place_type_t<const result<T> &>, outcome<R> *res) noexcept
+  template <class T, class U> inline void hook_outcome_copy_construction(outcome<T> *res, const result<U> & /*unused*/) noexcept
   {
     // when copy constructing from a result<T>, poke in an exception
     poke_exception(res);
   }
-  template <class T, class R> inline void hook_outcome_move_construction(in_place_type_t<result<T> &&>, outcome<R> *res) noexcept
+  template <class T, class U> inline void hook_outcome_move_construction(outcome<T> *res, result<U> && /*unused*/) noexcept
   {
     // when move constructing from a result<T>, poke in an exception
     poke_exception(res);
