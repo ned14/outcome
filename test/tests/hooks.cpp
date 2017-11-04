@@ -47,12 +47,12 @@ namespace hook_test
   // Localise result to using the local error_code so this namespace gets looked up for the hooks
   template <class R> using result = OUTCOME_V2_NAMESPACE::result<R, error_code>;
   // Specialise the result construction hook for our localised result
-  template <class T> constexpr inline void hook_result_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<T>, result<int> *res) noexcept
+  template <class U> constexpr inline void hook_result_construction(result<int> *res, U && /*unused*/) noexcept
   {
     // Write the value in the result into the static storage
     snprintf(extended_error_info, sizeof(extended_error_info), "%d", res->assume_value());
   }
-  template <class T> constexpr inline void hook_result_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<T>, result<std::string> *res) noexcept
+  template <class U> constexpr inline void hook_result_construction(result<std::string> *res, U && /*unused*/) noexcept
   {
     // Write the value in the result into the static storage
     snprintf(extended_error_info, sizeof(extended_error_info), "%s", res->assume_value().c_str());
@@ -75,13 +75,13 @@ namespace hook_test
   template <class R> using outcome = OUTCOME_V2_NAMESPACE::outcome<R, error_code, std::string>;
 
   // Specialise the outcome copy and move conversion hook for our localised result
-  template <class T, class R> constexpr inline void hook_outcome_copy_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<const result<T> &>, outcome<R> *res) noexcept
+  template <class T, class U> constexpr inline void hook_outcome_copy_construction(outcome<T> *res, const result<U> & /*unused*/) noexcept
   {
     // when copy constructing from a result<T>, place extended_error_coding::extended_error_info into the payload
     std::cout << "hook_outcome_copy_construction fires" << std::endl;
     OUTCOME_V2_NAMESPACE::hooks::override_outcome_exception(res, extended_error_info);
   }
-  template <class T, class R> constexpr inline void hook_outcome_move_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<result<T> &&>, outcome<R> *res) noexcept
+  template <class T, class U> constexpr inline void hook_outcome_move_construction(outcome<T> *res, result<U> && /*unused*/) noexcept
   {
     // when move constructing from a result<T>, place extended_error_coding::extended_error_info into the payload
     std::cout << "hook_outcome_move_construction fires" << std::endl;
