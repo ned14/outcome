@@ -145,7 +145,7 @@ exported Outcome v2 namespace.
 
 #ifdef _WIN32
 #include "quickcpplib/include/execinfo_win64.h"
-#else
+#elif !defined(__ANDROID__)
 #include <execinfo.h>
 #endif
 #include <stdio.h>
@@ -155,9 +155,12 @@ namespace detail
 {
   QUICKCPPLIB_NORETURN inline void do_fatal_exit(const char *expr)
   {
+#if !defined(__ANDROID__)
     void *bt[16];
     size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0]));
+#endif
     fprintf(stderr, "FATAL: Outcome throws exception %s with exceptions disabled\n", expr);
+#if !defined(__ANDROID__)
     char **bts = backtrace_symbols(bt, btlen);
     if(bts)
     {
@@ -165,6 +168,7 @@ namespace detail
         fprintf(stderr, "  %s\n", bts[n]);
       free(bts);
     }
+#endif
     abort();
   }
 }
