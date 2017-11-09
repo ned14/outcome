@@ -67,6 +67,7 @@ namespace httplib
 {
   result<std::string> get(std::string url)
   {
+    (void) url;
 #if 1
     return "hello world";
 #else
@@ -105,7 +106,7 @@ namespace filelib
   inline void throw_as_system_error_with_payload(failure_info fi)
   {
     // If the error code is not filesystem related e.g. ENOMEM, throw that as a standard STL exception.
-    OUTCOME_V2_NAMESPACE::try_throw_exception_from_error(fi.ec);
+    OUTCOME_V2_NAMESPACE::try_throw_std_exception_from_error(fi.ec);
     // Throw the exact same filesystem_error exception which the throwing copy_file() edition does.
     throw filesystem_error(fi.ec.message(), std::move(fi.path1), std::move(fi.path2), fi.ec);
   }
@@ -120,7 +121,11 @@ namespace filelib
 
 namespace filelib
 {
-  result<size_t> write_file(string_view chunk) noexcept { return failure_info{make_error_code(std::errc::no_space_on_device), "somepath"}; }
+  result<size_t> write_file(string_view chunk) noexcept
+  {
+    (void) chunk;
+    return failure_info{make_error_code(std::errc::no_space_on_device), "somepath"};
+  }
 }
 
 //! [tidylib]
@@ -160,18 +165,9 @@ namespace app
         : std::error_code(ec)
     {
     }
-
-    // Allow construction from httplib::status_code, but do nothing
-    // This enables copy/move construction from httplib::result into app::outcome
-    explicit error_code(const httplib::failure & /*unused*/) {}
-    // Allow construction from filelib::failure_info, copying only the error code
-    explicit error_code(const filelib::failure_info &fi)
-        : error_code(fi.ec)
-    {
-    }
   };
   // Localise an outcome implementation for this namespace
-  template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_code>;
+  template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_code /*, std::exception_ptr */>;
   using OUTCOME_V2_NAMESPACE::success;
 }
 //! [app]
@@ -184,7 +180,14 @@ namespace app
   {
     // passthrough
     using std::runtime_error::runtime_error;
-    httplib_error() = default;
+    httplib_error(httplib::failure _failure, std::string msg)
+        : std::runtime_error(std::move(msg))
+        , failure(std::move(_failure))
+    {
+    }
+
+    // the original failure
+    httplib::failure failure;
   };
 
   namespace detail
@@ -221,7 +224,7 @@ namespace app
         str.append(" [url was ");
         str.append(src.error().url);
         str.append("]");
-        OUTCOME_V2_NAMESPACE::hooks::override_outcome_exception(o, std::make_exception_ptr(httplib_error(std::move(str))));
+        OUTCOME_V2_NAMESPACE::hooks::override_outcome_exception(o, std::make_exception_ptr(httplib_error(std::move(src.error()), std::move(str))));
       }
     }
   }
@@ -243,7 +246,7 @@ namespace app
       {
         auto &fi = src.error();
         // Synthesise a filesystem_error, exactly as if someone had called src.value()
-        OUTCOME_V2_NAMESPACE::try_throw_exception_from_error(fi.ec);
+        OUTCOME_V2_NAMESPACE::try_throw_std_exception_from_error(fi.ec);
         OUTCOME_V2_NAMESPACE::hooks::override_outcome_exception(o, std::make_exception_ptr(filelib::filesystem_error(fi.ec.message(), std::move(fi.path1), std::move(fi.path2), fi.ec)));
       }
     }
@@ -283,7 +286,7 @@ namespace app
     if(errcode != 0)
     {
       // If the error code matches a standard STL exception, throw as that.
-      OUTCOME_V2_NAMESPACE::try_throw_exception_from_error(std::error_code(errcode, std::generic_category()));
+      OUTCOME_V2_NAMESPACE::try_throw_std_exception_from_error(std::error_code(errcode, std::generic_category()));
       // Otherwise wrap the error code into a tidylib_error exception throw
       return std::make_exception_ptr(tidylib_error(errcode));
     }

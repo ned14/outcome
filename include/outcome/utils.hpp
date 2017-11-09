@@ -120,7 +120,7 @@ or `system_category()` (POSIX only), throw the STL exception type matching
 the `errno` domained code if one is available. For example, `ENOMEM` would cause
 `std::bad_alloc()` to be thrown.
 */
-inline void try_throw_exception_from_error(std::error_code ec)
+inline void try_throw_std_exception_from_error(std::error_code ec)
 {
   if(!ec || (ec.category() != std::generic_category()
 #ifndef _WIN32
