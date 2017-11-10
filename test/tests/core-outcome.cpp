@@ -48,8 +48,8 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as i
   static_assert(!std::is_constructible<outcome<std::string>, outcome<int>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
 
   static_assert(std::is_constructible<outcome<int>, outcome<void>>::value, "Sanity check that all monads can be constructed from a void monad");
-  static_assert(std::is_constructible<outcome<outcome<int>>, outcome<void>>::value, "Sanity check that outer monad can be constructed from a compatible monad");
-  static_assert(std::is_constructible<outcome<outcome<outcome<int>>>, outcome<void>>::value, "Sanity check that outer monad can be constructed from a compatible monad up to two nestings deep");
+  static_assert(!std::is_constructible<outcome<outcome<int>>, outcome<void>>::value, "Sanity check that outer monad can be constructed from a compatible monad");
+  static_assert(!std::is_constructible<outcome<outcome<outcome<int>>>, outcome<void>>::value, "Sanity check that outer monad can be constructed from a compatible monad up to two nestings deep");
   static_assert(!std::is_constructible<outcome<void>, outcome<int>>::value, "Sanity check that incompatible monads cannot be constructed from one another");
 
   static_assert(std::is_void<result<void>::value_type>::value, "Sanity check that result<void> has a void value_type");

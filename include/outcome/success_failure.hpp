@@ -113,6 +113,7 @@ namespace policy
   //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
   template <class Error> constexpr inline void throw_as_system_error_with_payload(const Error &error)
   {
+    (void) error;
     static_assert(std::is_convertible<Error, std::error_code>::value || std::is_error_code_enum<std::decay_t<Error>>::value || std::is_error_condition_enum<std::decay_t<Error>>::value,
                   "To use the error_code_throw_as_system_error policy with a custom Error type, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload");
     OUTCOME_THROW_EXCEPTION(std::system_error(error_code(error)));
@@ -315,7 +316,19 @@ template <class T> struct success_type
   //! The type of the successful state.
   using value_type = T;
   //! The value of the successful state.
-  value_type value;
+  value_type _value;
+
+  /*! Access value.
+  \returns Reference to the held `value_type` according to overload.
+  \group value
+  */
+  constexpr value_type &value() & { return _value; }
+  /// \group value
+  constexpr const value_type &value() const & { return _value; }
+  /// \group value
+  constexpr value_type &&value() && { return std::move(_value); }
+  /// \group value
+  constexpr const value_type &&value() const && { return std::move(_value); }
 };
 /*! Type sugar for implicitly constructing a `result<>` with a successful state.
 */
@@ -348,9 +361,33 @@ template <class EC = std::error_code, class E = void> struct failure_type
   //! The type of the exception
   using exception_type = E;
   //! The error code
-  error_type error;
+  error_type _error;
   //! The exception
-  exception_type exception;
+  exception_type _exception;
+
+  /*! Access error.
+  \returns Reference to the held `error_type` according to overload.
+  \group error
+  */
+  constexpr error_type &error() & { return _error; }
+  /// \group error
+  constexpr const error_type &error() const & { return _error; }
+  /// \group error
+  constexpr error_type &&error() && { return std::move(_error); }
+  /// \group error
+  constexpr const error_type &&error() const && { return std::move(_error); }
+
+  /*! Access exception.
+  \returns Reference to the held `exception_type` according to overload.
+  \group exception
+  */
+  constexpr exception_type &exception() & { return _exception; }
+  /// \group exception
+  constexpr const exception_type &exception() const & { return _exception; }
+  /// \group exception
+  constexpr exception_type &&exception() && { return std::move(_exception); }
+  /// \group exception
+  constexpr const exception_type &&exception() const && { return std::move(_exception); }
 };
 /*! Type sugar for implicitly constructing a `result<>` with a failure state of error code.
 */
@@ -361,7 +398,19 @@ template <class EC> struct failure_type<EC, void>
   //! The type of the exception
   using exception_type = void;
   //! The error code
-  error_type error;
+  error_type _error;
+
+  /*! Access error.
+  \returns Reference to the held `error_type` according to overload.
+  \group error2
+  */
+  constexpr error_type &error() & { return _error; }
+  /// \group error2
+  constexpr const error_type &error() const & { return _error; }
+  /// \group error2
+  constexpr error_type &&error() && { return std::move(_error); }
+  /// \group error2
+  constexpr const error_type &&error() const && { return std::move(_error); }
 };
 /*! Type sugar for implicitly constructing a `result<>` with a failure state of exception.
 */
@@ -372,7 +421,19 @@ template <class E> struct failure_type<void, E>
   //! The type of the exception
   using exception_type = E;
   //! The exception
-  exception_type exception;
+  exception_type _exception;
+
+  /*! Access exception.
+  \returns Reference to the held `exception_type` according to overload.
+  \group exception2
+  */
+  constexpr exception_type &exception() & { return _exception; }
+  /// \group exception2
+  constexpr const exception_type &exception() const & { return _exception; }
+  /// \group exception2
+  constexpr exception_type &&exception() && { return std::move(_exception); }
+  /// \group exception2
+  constexpr const exception_type &&exception() const && { return std::move(_exception); }
 };
 /*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
 \effects Copies or moves the failure state supplied into the returned type sugar.

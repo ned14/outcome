@@ -218,28 +218,22 @@ namespace detail
     struct compatible_conversion_tag
     {
     };
-    template <class T, class U, class V>
-    constexpr result_storage(compatible_conversion_tag /*unused*/, const result_storage<T, U, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
-        : _state(o._state)
-        , _error(o._error)
+    template <class U, class V>
+    constexpr result_storage(compatible_conversion_tag /*unused*/, U &&a, V &&b)
+        : _state(in_place_type<_value_type>, std::forward<U>(a))
+        , _error(std::forward<V>(b))
     {
     }
-    template <class T, class V>
-    constexpr result_storage(compatible_conversion_tag /*unused*/, const result_storage<T, void, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
-        : _state(o._state)
-        , _error(_error_type{})
+    template <class V>
+    constexpr result_storage(compatible_conversion_tag /*unused*/, detail::void_type /*unused*/, V &&b)
+        : _state(in_place_type<_value_type>)
+        , _error(std::forward<V>(b))
     {
     }
-    template <class T, class U, class V>
-    constexpr result_storage(compatible_conversion_tag /*unused*/, result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
-        : _state(std::move(o._state))
-        , _error(std::move(o._error))
-    {
-    }
-    template <class T, class V>
-    constexpr result_storage(compatible_conversion_tag /*unused*/, result_storage<T, void, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
-        : _state(std::move(o._state))
-        , _error(_error_type{})
+    template <class U, class V>
+    constexpr result_storage(compatible_conversion_tag /*unused*/, U &&a, detail::void_type /*unused*/)
+        : _state(in_place_type<_value_type>, std::forward<U>(a))
+        , _error()
     {
     }
   };
