@@ -236,7 +236,30 @@ namespace detail
         , _error()
     {
     }
-  };
+    template <class T, class U, class V>
+    constexpr result_storage(compatible_conversion_tag /*unused*/, const result_storage<T, U, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
+        : _state(o._state)
+        , _error(o._error)
+    {
+    }
+    template <class T, class V>
+    constexpr result_storage(compatible_conversion_tag /*unused*/, const result_storage<T, void, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
+        : _state(o._state)
+        , _error(_error_type{})
+    {
+    }
+    template <class T, class U, class V>
+    constexpr result_storage(compatible_conversion_tag /*unused*/, result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
+        : _state(std::move(o._state))
+        , _error(std::move(o._error))
+    {
+    }
+    template <class T, class V>
+    constexpr result_storage(compatible_conversion_tag /*unused*/, result_storage<T, void, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
+        : _state(std::move(o._state))
+        , _error(_error_type{})
+    {
+    }  };
 }  // namespace detail
 OUTCOME_V2_NAMESPACE_END
 
