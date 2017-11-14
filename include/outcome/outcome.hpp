@@ -120,11 +120,6 @@ namespace detail
   template <class T, class U, class V> constexpr inline V &&extract_exception_from_failure(failure_type<U, V> &&v) { return std::move(v._exception); }
   template <class T, class U> constexpr inline T extract_exception_from_failure(const failure_type<U, void> & /*unused*/) { return T{}; }
 
-  OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(convert::exception_type(std::declval<U>())))
-  constexpr inline typename T::exception_type convert_exception_type(U &&v) { return convert::exception_type(std::forward<U>(v)); }
-  template <class T, class U> constexpr inline typename T::exception_type convert_exception_type(const U & /*unused*/) { return typename T::exception_type{}; }
-
 }  // namespace detail
 
 namespace hooks
@@ -243,9 +238,6 @@ class OUTCOME_NODISCARD outcome
   {
   };
   struct exception_converting_constructor_tag
-  {
-  };
-  struct explicit_valueorerror_converting_constructor_tag
   {
   };
 
@@ -429,32 +421,6 @@ public:
     using namespace hooks;
     this->_state._status |= detail::status_have_exception;
     hook_outcome_construction(this, std::forward<T>(t));
-  }
-
-  /*! Explicit converting constructor from a compatible type.
-  \tparam 1
-  \exclude
-  \tparam 2
-  \exclude
-  \tparam 3
-  \exclude
-  \param o The compatible `ValueOrError` concept type. `ValueOrError` concept matches any type with a `value_type`,
-  an `error_type`, a `.value()` and an `.error()`.
-
-  \effects Initialises the outcome with the contents the compatible input. If `convert::exception_type<outcome>(std::forward<T>(o))`
-  is defined, the exception will be initialised from that, otherwise it is left uninitialised.
-  \requires That `convert::value_type<outcome>(std::forward<T>(o))` and `convert::error_type<outcome>(std::forward<T>(o))`
-  be defined; that `T` is not this outcome type.
-  */
-  OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<outcome, T>::value && !detail::is_success_type<T>::value && !detail::is_failure_type<T>::value),  //
-                    OUTCOME_TEXPR(convert::value_type<outcome>(std::declval<T>())), OUTCOME_TEXPR(convert::error_type<outcome>(std::declval<T>())))
-  constexpr explicit outcome(T &&o, explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())
-      : base{typename base::compatible_conversion_tag(), convert::value_type<outcome>(std::forward<T>(o)), convert::error_type<outcome>(std::forward<T>(o))}
-      , _ptr{detail::convert_exception_type<outcome>(std::forward<T>(o))}
-  {
-    using namespace hooks;
-    hook_outcome_converting_construction(this, std::forward<T>(o));
   }
 
   /*! Explicit converting copy constructor from a compatible outcome type.

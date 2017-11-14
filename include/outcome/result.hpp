@@ -244,6 +244,9 @@ class OUTCOME_NODISCARD result : public detail::result_final<R, S, NoValuePolicy
   struct error_condition_converting_constructor_tag
   {
   };
+  struct explicit_valueornone_converting_constructor_tag
+  {
+  };
   struct explicit_valueorerror_converting_constructor_tag
   {
   };
@@ -391,30 +394,43 @@ public:
     hook_result_construction(this, std::forward<ErrorCondEnum>(t));
   }
 
-  /*! Explicit converting constructor from a compatible type.
+#if 0
+  /*! Explicit converting constructor from a compatible `ValueOrNone` type.
   \tparam 1
   \exclude
-  \tparam 2
-  \exclude
-  \tparam 3
-  \exclude
-  \param o The compatible `ValueOrError` concept type. `ValueOrError` concept matches any type with a `value_type`,
-  an `error_type`, a `.value()` and an `.error()`.
+  \param o The compatible `ValueOrNone` concept type. `ValueOrNone` concept matches any type with a `value_type`,
+  a `.value()` and a `.has_value()`.
 
   \effects Initialises the result with the contents the compatible input.
-  \requires That `convert::value_type<result>(std::forward<T>(o))` and `convert::error_type<result>(std::forward<T>(o))`
-  be defined; that `T` is not this result type; that `T` is neither a success nor failure type sugar.
+  \requires That `convert::value_or_none<result>(std::forward<T>(o))` be defined and `convert::value_or_error<result>(std::forward<T>(o))`
+  not be defined; that `T` is not any result type.
   */
   OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<result, T>::value && !detail::is_success_type<T>::value && !detail::is_failure_type<T>::value),  //
-                    OUTCOME_TEXPR(convert::value_type<result>(std::declval<T>())), OUTCOME_TEXPR(convert::error_type<result>(std::declval<T>())))
-  constexpr explicit result(T &&o, explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())
-      : base{typename base::compatible_conversion_tag(), convert::value_type<result>(std::forward<T>(o)), convert::error_type<result>(std::forward<T>(o))}
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!is_result_v<T>), OUTCOME_TEXPR(convert::value_or_none<result>(std::declval<T>())))
+  constexpr explicit result(T &&o, explicit_valueornone_converting_constructor_tag /*unused*/ = explicit_valueornone_converting_constructor_tag())
+      : base{typename base::compatible_conversion_tag(), convert::value_or_none<result>(std::forward<T>(o))}
   {
     using namespace hooks;
     hook_result_converting_construction(this, std::forward<T>(o));
   }
+#endif
+  /*! Explicit converting constructor from a compatible `ValueOrError` type.
+  \tparam 1
+  \exclude
+  \param o The compatible `ValueOrError` concept type. `ValueOrError` concept matches any type with a `value_type`,
+  an `error_type`, a `.value()`, an `.error()` and a `.has_value()`.
 
+  \effects Initialises the result with the contents the compatible input.
+  \requires That `convert::value_or_error<result>(std::forward<T>(o))` be defined; that `T` is not any result type.
+  */
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!is_result_v<T>), OUTCOME_TEXPR(convert::value_or_error<result>(std::declval<T>())))
+  constexpr explicit result(T &&o, explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())
+      : base{typename base::compatible_conversion_tag(), convert::value_or_error<result>(std::forward<T>(o))}
+  {
+    using namespace hooks;
+    hook_result_converting_construction(this, std::forward<T>(o));
+  }
   /*! Explicit converting copy constructor from a compatible result type.
   \tparam 3
   \exclude

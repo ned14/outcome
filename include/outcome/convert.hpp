@@ -32,56 +32,79 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 //! Namespace for injected convertibility
 namespace convert
 {
-  /*! Converts a value type.
-  \requires That `U::value_type` exists and `std::is_constructible<typename T::value_type, typename U::value_type>::value` is true;
-  That `std::declval<U>().value()` exists.
+#ifdef __cpp_concepts
+  /* The `ValueOrNone` concept.
+  \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
-  OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_constructible<typename T::value_type, typename std::decay_t<U>::value_type>::value),  //
-                    OUTCOME_TEXPR(std::declval<U>().value()))
-  constexpr inline typename T::value_type value_type(U &&v) { return typename T::value_type(std::forward<U>(v).value()); }
+  template <class U> concept ValueOrNone = requires(U a)
+  {
+    {
+      a.has_value()
+    }
+    ->bool;
+    {a.value()};
+  };
+  /* The `ValueOrError` concept.
+  \requires That `U::value_type` and `U::error_type` exist;
+  that `std::declval<U>().has_value()` returns a `bool`, `std::declval<U>().value()` and  `std::declval<U>().error()` exists.
+  */
+  template <class U> concept ValueOrError = requires(U a)
+  {
+    {
+      a.has_value()
+    }
+    ->bool;
+    {a.value()};
+    {a.error()};
+  };
+#else
+  namespace detail
+  {
+    struct no_converter
+    {
+    };
+    inline no_converter value_or_none(...);
+    inline no_converter value_or_error(...);
+    template <class U> static constexpr bool ValueOrNone = std::is_same<no_converter, decltype(value_or_none(std::declval<U>()))>::value;
+    template <class U> static constexpr bool ValueOrError = std::is_same<no_converter, decltype(value_or_error(std::declval<U>()))>::value;
+  }
+  template <class U> static constexpr bool ValueOrNone = detail::ValueOrNone<U>;
+  template <class U> static constexpr bool ValueOrError = detail::ValueOrError<U>;
+#endif
 
-  /*! Converts a value type.
-  \requires That `U::value_type` exists and `std::is_void<typename U::value_type>::value` and
-  `std::is_default_constructible<typename T::value_type>::value` is true.
-  */
-  OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_default_constructible<typename T::value_type>::value &&std::is_void<typename std::decay_t<U>::value_type>::value))
-  constexpr inline detail::void_type value_type(U && /* unused */) { return detail::void_type{}; }
+  namespace detail
+  {
+    template <class T, class X> struct make_type
+    {
+      template <class U> static constexpr T value(U &&v) { return T{in_place_type<typename T::value_type>, std::forward<U>(v).value()}; }
+      template <class U> static constexpr T error(U &&v) { return T{in_place_type<typename T::error_type>, std::forward<U>(v).error()}; }
+      static constexpr T error() { return T{in_place_type<typename T::error_type>}; }
+    };
+    template <class T> struct make_type<T, void>
+    {
+      template <class U> static constexpr T value(U && /*unused*/) { return T{in_place_type<typename T::value_type>}; }
+      template <class U> static constexpr T error(U && /*unused*/) { return T{in_place_type<typename T::error_type>}; }
+      static constexpr T error() { return T{in_place_type<typename T::error_type>}; }
+    };
+  }
 
-  /*! Converts an error type.
-  \requires That `U::error_type` exists and `std::is_constructible<typename T::error_type, typename U::error_type>::value` is true;
-  That `std::declval<U>().error()` exists.
+  /*! Converts a something matching the `ValueOrNone` concept.
+  \requires `ValueOrNone<U>` and `U`'s `value_type` be constructible into `T`'s `value_type`.
   */
   OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_constructible<typename T::error_type, typename std::decay_t<U>::error_type>::value),  //
-                    OUTCOME_TEXPR(std::declval<U>().error()))
-  constexpr inline typename T::error_type error_type(U &&v) { return typename T::error_type(std::forward<U>(v).error()); }
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(ValueOrNone<U> && (std::is_void<typename std::decay_t<U>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::value_type, typename std::decay_t<U>::value_type>) ))
+  constexpr inline T value_or_none(U &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(std::forward<U>(v)) : detail::make_type<T, void>::error(); }
 
-  /*! Converts an error type.
-  \requires That `U::error_type` exists and `std::is_void<typename U::error_type>::value` and
-  `std::is_default_constructible<typename T::error_type>::value` is true.
+  /*! Converts a something matching the `ValueOrError` concept.
+  \requires `ValueOrNone<U>`, `U`'s `value_type` be constructible into `T`'s `value_type`
+  and `U`'s `error_type` be constructible into `T`'s `error_type`.
   */
   OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_default_constructible<typename T::error_type>::value &&std::is_void<typename std::decay_t<U>::error_type>::value))
-  constexpr inline detail::void_type error_type(U && /* unused */) { return detail::void_type{}; }
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(ValueOrError<U>                                                                                                                                                                         //
+                                  && (std::is_void<typename std::decay_t<U>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::value_type, typename std::decay_t<U>::value_type>)  //
+                                  &&(std::is_void<typename std::decay_t<U>::error_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::error_type, typename std::decay_t<U>::error_type>) ))
+  constexpr inline T value_or_error(U &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(std::forward<U>(v)) : detail::make_type<T, typename std::decay_t<U>::error_type>::error(std::forward<U>(v)); }
 
-  /*! Converts an exception type.
-  \requires That `U::exception_type` exists and `std::is_constructible<typename T::exception_type, typename U::exception_type>::value` is true;
-  That `std::declval<U>().exception()` exists.
-  */
-  OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_constructible<typename T::exception_type, typename std::decay_t<U>::exception_type>::value),  //
-                    OUTCOME_TEXPR(std::declval<U>().exception()))
-  constexpr inline typename T::exception_type exception_type(U &&v) { return typename T::exception_type(std::forward<U>(v).exception()); }
-
-  /*! Converts an exception type.
-  \requires That `U::exception_type` exists and `std::is_void<typename U::exception_type>::value` and
-  `std::is_default_constructible<typename T::exception_type>::value` is true.
-  */
-  OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_default_constructible<typename T::exception_type>::value &&std::is_void<typename std::decay_t<U>::exception_type>::value))
-  constexpr inline detail::void_type exception_type(U && /* unused */) { return detail::void_type{}; }
 }  // namespace convert
 
 OUTCOME_V2_NAMESPACE_END
