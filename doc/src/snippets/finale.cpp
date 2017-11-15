@@ -166,13 +166,14 @@ namespace app
     {
     }
   };
-  // Localise an outcome implementation for this namespace
+  // Localise a result and outcome implementation for this namespace
+  template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, std::exception_ptr>;
   template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_code /*, std::exception_ptr */>;
   using OUTCOME_V2_NAMESPACE::success;
 }
 //! [app]
 
-//! [app_map_httplib]
+//! [app_map_httplib1]
 namespace app
 {
   // Specialise an exception type for httplib errors
@@ -190,50 +191,64 @@ namespace app
     httplib::failure failure;
   };
 
-  namespace detail
+  // Type erase httplib::result<U> into a httplib_error exception ptr
+  template <class U> inline std::exception_ptr make_httplib_exception(const httplib::result<U> &src)
   {
-    template <class T, class U> inline void poke_exception(outcome<T> *o, const httplib::result<U> &src)
+    std::string str("httplib failed with error ");
+    switch(src.error().status)
     {
-      if(src.has_error())
-      {
-        std::string str("httplib failed with error ");
-        switch(src.error().status)
-        {
-        case httplib::status_code::success:
-          str.append("success");
-          break;
-        case httplib::status_code::bad_request:
-          str.append("bad request");
-          break;
-        case httplib::status_code::access_denied:
-          str.append("access denied");
-          break;
-        case httplib::status_code::logon_failed:
-          str.append("logon failed");
-          break;
-        case httplib::status_code::forbidden:
-          str.append("forbidden");
-          break;
-        case httplib::status_code::not_found:
-          str.append("not found");
-          break;
-        case httplib::status_code::internal_error:
-          str.append("internal error");
-          break;
-        }
-        str.append(" [url was ");
-        str.append(src.error().url);
-        str.append("]");
-        OUTCOME_V2_NAMESPACE::hooks::override_outcome_exception(o, std::make_exception_ptr(httplib_error(std::move(src.error()), std::move(str))));
-      }
+    case httplib::status_code::success:
+      str.append("success");
+      break;
+    case httplib::status_code::bad_request:
+      str.append("bad request");
+      break;
+    case httplib::status_code::access_denied:
+      str.append("access denied");
+      break;
+    case httplib::status_code::logon_failed:
+      str.append("logon failed");
+      break;
+    case httplib::status_code::forbidden:
+      str.append("forbidden");
+      break;
+    case httplib::status_code::not_found:
+      str.append("not found");
+      break;
+    case httplib::status_code::internal_error:
+      str.append("internal error");
+      break;
     }
+    str.append(" [url was ");
+    str.append(src.error().url);
+    str.append("]");
+    return std::make_exception_ptr(httplib_error(std::move(src.error()), std::move(str)));
   }
-
-  // When a httplib result gets constructed into an app outcome, synthesise this exception ptr
-  template <class T, class U> constexpr inline void hook_outcome_copy_construction(outcome<T> *out, const httplib::result<U> &src) { detail::poke_exception(out, src); }
-  template <class T, class U> constexpr inline void hook_outcome_move_construction(outcome<T> *out, httplib::result<U> &&src) { detail::poke_exception(out, src); }
 }
-//! [app_map_httplib]
+//! [app_map_httplib1]
+
+//! [app_map_httplib2]
+// Inject custom ValueOrError conversion
+OUTCOME_V2_NAMESPACE_BEGIN
+namespace convert
+{
+  // Provide custom ValueOrError conversion from httplib::result<U> into any result<T, std::exception_ptr>
+  template <class T, bool is_result, class U,                                                              //
+            typename = std::enable_if_t<std::is_constructible<typename T::value_type, U>::value>,          //
+            typename = std::enable_if_t<std::is_same<std::exception_ptr, typename T::error_type>::value>>  //
+  constexpr inline T
+  value_or_error(httplib::result<U> &&src)
+  {
+    return src.has_value() ? T{std::move(src.value())} : T{app::make_httplib_exception(src)};
+  }
+}
+OUTCOME_V2_NAMESPACE_END
+//! [app_map_httplib2]
+
+namespace app
+{
+  static auto test_value_or_error = OUTCOME_V2_NAMESPACE::convert::value_or_error<OUTCOME_V2_NAMESPACE::result<int, std::exception_ptr>, false>(httplib::result<int>{5});
+}
 
 //! [app_map_filelib]
 namespace app
@@ -301,17 +316,18 @@ namespace app
 //! [app_go]
 namespace app
 {
-  outcome<void> go()
+  result<void> go()
   {
     // Note that explicit construction is required when converting between differing types
     // of outcome and result. This makes it explicit what you intend to do.
+    result<std::string> a(httplib::get("http://www.nedproductions.biz/"));
 
     // Try to GET this URL. If an unsuccessful HTTP status is returned, serialise a string
     // containing a description of the HTTP status code and the URL which failed, storing
     // that into a httplib_error exception type which is stored as an exception ptr. The
     // TRY operation below will return that exception ptr to be rethrown in the caller.
     // Otherwise the fetched data is returned in a std::string data.
-    OUTCOME_TRY(data, outcome<std::string>(httplib::get("http://www.nedproductions.biz/")));
+    OUTCOME_TRY(data, result<std::string>(httplib::get("http://www.nedproductions.biz/")));
     string_view data_view(data);
 
     // HTML tidy the fetched data. If the C library fails due to an error corresponding to
@@ -325,7 +341,7 @@ namespace app
 
     // Write the tidied data to some file. If the write fails, synthesise a filesystem_error
     // exception ptr exactly as if one called filelib::write_file(data_view).value().
-    OUTCOME_TRY(written, outcome<size_t>(filelib::write_file(data_view)));
+    OUTCOME_TRY(written, result<size_t>(filelib::write_file(data_view)));
     return success();
   }
 }

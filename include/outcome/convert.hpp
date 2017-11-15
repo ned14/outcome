@@ -89,18 +89,18 @@ namespace convert
   }
 
   /*! Converts a something matching the `ValueOrNone` concept.
-  \requires `ValueOrNone<U>` and `U`'s `value_type` be constructible into `T`'s `value_type`.
+  \requires `is_result` to be false, `ValueOrNone<U>` to be true and `U`'s `value_type` be constructible into `T`'s `value_type`.
   */
-  OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(ValueOrNone<U> && (std::is_void<typename std::decay_t<U>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::value_type, typename std::decay_t<U>::value_type>) ))
+  OUTCOME_TEMPLATE(class T, bool is_result, class U)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!is_result && ValueOrNone<U> && (std::is_void<typename std::decay_t<U>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::value_type, typename std::decay_t<U>::value_type>) ))
   constexpr inline T value_or_none(U &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(std::forward<U>(v)) : detail::make_type<T, void>::error(); }
 
   /*! Converts a something matching the `ValueOrError` concept.
-  \requires `ValueOrNone<U>`, `U`'s `value_type` be constructible into `T`'s `value_type`
+  \requires `is_result` to be false, `ValueOrNone<U>` to be true, `U`'s `value_type` be constructible into `T`'s `value_type`
   and `U`'s `error_type` be constructible into `T`'s `error_type`.
   */
-  OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(ValueOrError<U>                                                                                                                                                                         //
+  OUTCOME_TEMPLATE(class T, bool is_result, class U)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!is_result && ValueOrError<U>                                                                                                                                                           //
                                   && (std::is_void<typename std::decay_t<U>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::value_type, typename std::decay_t<U>::value_type>)  //
                                   &&(std::is_void<typename std::decay_t<U>::error_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::error_type, typename std::decay_t<U>::error_type>) ))
   constexpr inline T value_or_error(U &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(std::forward<U>(v)) : detail::make_type<T, typename std::decay_t<U>::error_type>::error(std::forward<U>(v)); }

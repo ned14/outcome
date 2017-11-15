@@ -152,3 +152,28 @@ In fact, the two are sufficiently close in design that a highly conforming `expe
 can be implemented by wrapping up `checked<T, E>` with the differing functionality:
 
 {{% snippet "expected_implementation.cpp" "expected_implementation" %}}
+
+
+## Why doesn't Outcome duplicate `std::expected<T, E>`'s design?
+
+There are a number of reasons:
+
+1. Outcome is not aimed at the same audience as Expected. We target developers
+and users who would be happy to use Boost. Expected targets the standard library user.
+2. Outcome believes that the monadic use case isn't as important as Expected does.
+Specifically, we think that 99% of use of Expected in the real world will be to
+return failure from functions, and not as some sort of enhanced or "rich" Optional.
+Outcome therefore models a subset of Variant, whereas Expected models an extended Optional.
+3. Outcome believes that if you are thinking about using something like Outcome,
+then for you writing failure code will be in the same proportion as writing success code,
+and thus in Outcome writing for failure is exactly the same as writing for success.
+Expected assumes that success will be more common than failure, and makes you type
+more when writing for failure.
+4. Outcome goes to considerable effort to help the end user type fewer characters
+during use. This results in tighter, less verbose, more succinct code. The cost of this is a steeper
+learning curve and more complex mental model than when programming with Expected.
+5. Outcome has facilities to make easier interoperation between multiple third
+party libraries each using incommensurate Outcome configurations. Expected does
+not do any of this, but subsequent WG21 papers do propose various interoperation
+mechanisms, [one of which](https://wg21.link/P0786) Outcome implements so code using Expected will seamlessly
+interoperate with code using Outcome.

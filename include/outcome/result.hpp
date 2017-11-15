@@ -394,26 +394,6 @@ public:
     hook_result_construction(this, std::forward<ErrorCondEnum>(t));
   }
 
-#if 0
-  /*! Explicit converting constructor from a compatible `ValueOrNone` type.
-  \tparam 1
-  \exclude
-  \param o The compatible `ValueOrNone` concept type. `ValueOrNone` concept matches any type with a `value_type`,
-  a `.value()` and a `.has_value()`.
-
-  \effects Initialises the result with the contents the compatible input.
-  \requires That `convert::value_or_none<result>(std::forward<T>(o))` be defined and `convert::value_or_error<result>(std::forward<T>(o))`
-  not be defined; that `T` is not any result type.
-  */
-  OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(!is_result_v<T>), OUTCOME_TEXPR(convert::value_or_none<result>(std::declval<T>())))
-  constexpr explicit result(T &&o, explicit_valueornone_converting_constructor_tag /*unused*/ = explicit_valueornone_converting_constructor_tag())
-      : base{typename base::compatible_conversion_tag(), convert::value_or_none<result>(std::forward<T>(o))}
-  {
-    using namespace hooks;
-    hook_result_converting_construction(this, std::forward<T>(o));
-  }
-#endif
   /*! Explicit converting constructor from a compatible `ValueOrError` type.
   \tparam 1
   \exclude
@@ -421,10 +401,10 @@ public:
   an `error_type`, a `.value()`, an `.error()` and a `.has_value()`.
 
   \effects Initialises the result with the contents the compatible input.
-  \requires That `convert::value_or_error<result>(std::forward<T>(o))` be defined; that `T` is not any result type.
+  \requires That `convert::value_or_error<result, is_result_v<T>>(std::forward<T>(o))` be available.
   */
   OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(!is_result_v<T>), OUTCOME_TEXPR(convert::value_or_error<result>(std::declval<T>())))
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(convert::value_or_error<result, is_result_v<T>>(std::declval<T>())))
   constexpr explicit result(T &&o, explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())
       : base{typename base::compatible_conversion_tag(), convert::value_or_error<result>(std::forward<T>(o))}
   {
