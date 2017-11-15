@@ -178,14 +178,6 @@ namespace hooks
   WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
   */
   template <class T, class U> constexpr inline void hook_result_move_construction(T * /*unused*/, U && /*unused*/) noexcept {}
-  /*! The default instantiation hook implementation called when a `result` is created by conversion
-  from a type matching the `ValueOrError` concept. Does nothing.
-  \param 1 Some `result<...>` being constructed.
-  \param 2 The source data.
-
-  WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
-  */
-  template <class T, class U> constexpr inline void hook_result_converting_construction(T * /*unused*/, U && /*unused*/) noexcept {}
   /*! The default instantiation hook implementation called when a `result` is created by in place
   construction. Does nothing.
   \param 1 Some `result<...>` being constructed.
@@ -397,19 +389,20 @@ public:
   /*! Explicit converting constructor from a compatible `ValueOrError` type.
   \tparam 1
   \exclude
-  \param o The compatible `ValueOrError` concept type. `ValueOrError` concept matches any type with a `value_type`,
-  an `error_type`, a `.value()`, an `.error()` and a `.has_value()`.
+  \param o The input for which a `convert::value_or_error<result, std::decay_t<T>>{}(std::forward<T>(o))` is available.
 
-  \effects Initialises the result with the contents the compatible input.
-  \requires That `convert::value_or_error<result, is_result_v<T>>(std::forward<T>(o))` be available.
+  \effects Initialises the result with the contents of the compatible input.
+  \requires That `convert::value_or_error<result, std::decay_t<T>>{}(std::forward<T>(o))` be available. The
+  default implementation will consume `T`'s matching the `ValueOrError` concept type.
+  `ValueOrError` concept matches any type with a `value_type`,
+  an `error_type`, a `.value()`, an `.error()` and a `.has_value()`.
   */
   OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(convert::value_or_error<result, is_result_v<T>>(std::declval<T>())))
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<result, std::decay_t<T>>::enable_result_inputs || !is_result_v<T>),  //
+                    OUTCOME_TEXPR(convert::value_or_error<result, std::decay_t<T>>{}(std::declval<T>())))
   constexpr explicit result(T &&o, explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())  // NOLINT
-  : base{typename base::compatible_conversion_tag(), convert::value_or_error<result, is_result_v<T>>(std::forward<T>(o))}
+  : result{convert::value_or_error<result, std::decay_t<T>>{}(std::forward<T>(o))}
   {
-    using namespace hooks;
-    hook_result_converting_construction(this, std::forward<T>(o));
   }
   /*! Explicit converting copy constructor from a compatible result type.
   \tparam 3

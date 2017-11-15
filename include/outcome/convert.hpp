@@ -60,13 +60,20 @@ namespace convert
 #else
   namespace detail
   {
-    struct no_converter
+    struct no_match
     {
     };
-    inline no_converter value_or_none(...);
-    inline no_converter value_or_error(...);
-    template <class U> static constexpr bool ValueOrNone = std::is_same<no_converter, decltype(value_or_none(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
-    template <class U> static constexpr bool ValueOrError = std::is_same<no_converter, decltype(value_or_error(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
+    inline no_match match_value_or_none(...);
+    inline no_match match_value_or_error(...);
+    OUTCOME_TEMPLATE(class U)
+    OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<U>().has_value()), OUTCOME_TEXPR(std::declval<U>().value()))
+    inline U match_value_or_none(U &&);
+    OUTCOME_TEMPLATE(class U)
+    OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<U>().has_value()), OUTCOME_TEXPR(std::declval<U>().value()), OUTCOME_TEXPR(std::declval<U>().error()))
+    inline U match_value_or_error(U &&);
+
+    template <class U> static constexpr bool ValueOrNone = !std::is_same<no_match, decltype(match_value_or_none(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
+    template <class U> static constexpr bool ValueOrError = !std::is_same<no_match, decltype(match_value_or_error(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
   }  // namespace detail
   template <class U> static constexpr bool ValueOrNone = detail::ValueOrNone<U>;
   template <class U> static constexpr bool ValueOrError = detail::ValueOrError<U>;
@@ -88,23 +95,28 @@ namespace convert
     };
   }  // namespace detail
 
-  /*! Converts a something matching the `ValueOrNone` concept.
-  \requires `is_result` to be false, `ValueOrNone<U>` to be true and `U`'s `value_type` be constructible into `T`'s `value_type`.
+  /*! Default converter for types matching the `ValueOrError` concept.
+  You can partially or fully specialise this converter for your own user defined types by
+  injecting specialisations into the `convert` namespace.
   */
-  OUTCOME_TEMPLATE(class T, bool is_result, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(!is_result && ValueOrNone<U> && (std::is_void<typename std::decay_t<U>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::value_type, typename std::decay_t<U>::value_type>) ))
-  constexpr inline T value_or_none(U &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(std::forward<U>(v)) : detail::make_type<T, void>::error(); }
-
-  /*! Converts a something matching the `ValueOrError` concept.
-  \requires `is_result` to be false, `ValueOrNone<U>` to be true, `U`'s `value_type` be constructible into `T`'s `value_type`
-  and `U`'s `error_type` be constructible into `T`'s `error_type`.
-  */
-  OUTCOME_TEMPLATE(class T, bool is_result, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(!is_result && ValueOrError<U>                                                                                                                                                           //
-                                  && (std::is_void<typename std::decay_t<U>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::value_type, typename std::decay_t<U>::value_type>)  //
-                                  &&(std::is_void<typename std::decay_t<U>::error_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::error_type, typename std::decay_t<U>::error_type>) ))
-  constexpr inline T value_or_error(U &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(std::forward<U>(v)) : detail::make_type<T, typename std::decay_t<U>::error_type>::error(std::forward<U>(v)); }
-
+  template <class T, class U> struct value_or_error
+  {
+    //! False to indicate that this converter wants `result`/`outcome` to reject all other `result`
+    static constexpr bool enable_result_inputs = false;
+    //! False to indicate that this converter wants `outcome` to reject all other `outcome`
+    static constexpr bool enable_outcome_inputs = false;
+    /*! Default converter for types matching the `ValueOrError` concept.
+    \requires `std::decay_t<X>` to be the same type as `U`;
+    `ValueOrError<U>` to be true, `U`'s `value_type` be constructible into `T`'s `value_type`
+    and `U`'s `error_type` be constructible into `T`'s `error_type`.
+    */
+    OUTCOME_TEMPLATE(class X)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_same<U, std::decay_t<X>>::value                                                                                                                                                 //
+                                    &&ValueOrError<U>                                                                                                                                                                       //
+                                    && (std::is_void<typename std::decay_t<X>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::value_type, typename std::decay_t<X>::value_type>)  //
+                                    &&(std::is_void<typename std::decay_t<X>::error_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::error_type, typename std::decay_t<X>::error_type>) ))
+    constexpr T operator()(X &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(std::forward<X>(v)) : detail::make_type<T, typename U::error_type>::error(std::forward<X>(v)); }
+  };
 }  // namespace convert
 
 OUTCOME_V2_NAMESPACE_END
