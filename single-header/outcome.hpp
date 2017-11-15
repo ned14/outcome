@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF dbeaed206886d529a784c3dd29843cd8cb169e5f
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-11-11 11:35:17 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE dbeaed20
+#define OUTCOME_PREVIOUS_COMMIT_REF 7c8eaaa0c826e9fbf1d7d067c4fd9864c672614a
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-11-15 00:17:57 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 7c8eaaa0
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -3256,9 +3256,9 @@ namespace convert
     };
     inline no_converter value_or_none(...);
     inline no_converter value_or_error(...);
-    template <class U> static constexpr bool ValueOrNone = std::is_same<no_converter, decltype(value_or_none(std::declval<U>()))>::value;
-    template <class U> static constexpr bool ValueOrError = std::is_same<no_converter, decltype(value_or_error(std::declval<U>()))>::value;
-  }
+    template <class U> static constexpr bool ValueOrNone = std::is_same<no_converter, decltype(value_or_none(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
+    template <class U> static constexpr bool ValueOrError = std::is_same<no_converter, decltype(value_or_error(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
+  } // namespace detail
   template <class U> static constexpr bool ValueOrNone = detail::ValueOrNone<U>;
   template <class U> static constexpr bool ValueOrError = detail::ValueOrError<U>;
 #endif
@@ -3277,26 +3277,26 @@ namespace convert
       template <class U> static constexpr T error(U && /*unused*/) { return T{in_place_type<typename T::error_type>}; }
       static constexpr T error() { return T{in_place_type<typename T::error_type>}; }
     };
-  }
+  } // namespace detail
 
   /*! Converts a something matching the `ValueOrNone` concept.
-  \requires `ValueOrNone<U>` and `U`'s `value_type` be constructible into `T`'s `value_type`.
+  \requires `is_result` to be false, `ValueOrNone<U>` to be true and `U`'s `value_type` be constructible into `T`'s `value_type`.
   */
 
 
-  OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(ValueOrNone<U> && (std::is_void<typename std::decay_t<U>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::value_type, typename std::decay_t<U>::value_type>) ))
+  OUTCOME_TEMPLATE(class T, bool is_result, class U)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!is_result && ValueOrNone<U> && (std::is_void<typename std::decay_t<U>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::value_type, typename std::decay_t<U>::value_type>) ))
   constexpr inline T value_or_none(U &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(std::forward<U>(v)) : detail::make_type<T, void>::error(); }
 
   /*! Converts a something matching the `ValueOrError` concept.
-  \requires `ValueOrNone<U>`, `U`'s `value_type` be constructible into `T`'s `value_type`
+  \requires `is_result` to be false, `ValueOrNone<U>` to be true, `U`'s `value_type` be constructible into `T`'s `value_type`
   and `U`'s `error_type` be constructible into `T`'s `error_type`.
   */
 
 
 
-  OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(ValueOrError<U> //
+  OUTCOME_TEMPLATE(class T, bool is_result, class U)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!is_result && ValueOrError<U> //
                                   && (std::is_void<typename std::decay_t<U>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::value_type, typename std::decay_t<U>::value_type>) //
                                   &&(std::is_void<typename std::decay_t<U>::error_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::error_type, typename std::decay_t<U>::error_type>) ))
   constexpr inline T value_or_error(U &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(std::forward<U>(v)) : detail::make_type<T, typename std::decay_t<U>::error_type>::error(std::forward<U>(v)); }
@@ -5083,26 +5083,6 @@ public:
     hook_result_construction(this, std::forward<ErrorCondEnum>(t));
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   /*! Explicit converting constructor from a compatible `ValueOrError` type.
   \tparam 1
   \exclude
@@ -5110,7 +5090,7 @@ public:
   an `error_type`, a `.value()`, an `.error()` and a `.has_value()`.
 
   \effects Initialises the result with the contents the compatible input.
-  \requires That `convert::value_or_error<result>(std::forward<T>(o))` be defined; that `T` is not any result type.
+  \requires That `convert::value_or_error<result, is_result_v<T>>(std::forward<T>(o))` be available.
   */
 
 
@@ -5121,9 +5101,9 @@ public:
 
 
   OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(!is_result_v<T>), OUTCOME_TEXPR(convert::value_or_error<result>(std::declval<T>())))
-  constexpr explicit result(T &&o, explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())
-      : base{typename base::compatible_conversion_tag(), convert::value_or_error<result>(std::forward<T>(o))}
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(convert::value_or_error<result, is_result_v<T>>(std::declval<T>())))
+  constexpr explicit result(T &&o, explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag()) // NOLINT
+  : base{typename base::compatible_conversion_tag(), convert::value_or_error<result, is_result_v<T>>(std::forward<T>(o))}
   {
     using namespace hooks;
     hook_result_converting_construction(this, std::forward<T>(o));

@@ -405,8 +405,8 @@ public:
   */
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(convert::value_or_error<result, is_result_v<T>>(std::declval<T>())))
-  constexpr explicit result(T &&o, explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())
-      : base{typename base::compatible_conversion_tag(), convert::value_or_error<result>(std::forward<T>(o))}
+  constexpr explicit result(T &&o, explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())  // NOLINT
+  : base{typename base::compatible_conversion_tag(), convert::value_or_error<result, is_result_v<T>>(std::forward<T>(o))}
   {
     using namespace hooks;
     hook_result_converting_construction(this, std::forward<T>(o));

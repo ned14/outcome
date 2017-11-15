@@ -25,7 +25,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_CONVERT_HPP
 #define OUTCOME_CONVERT_HPP
 
-#include "success_failure.hpp"
+#include "detail/result_storage.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -65,9 +65,9 @@ namespace convert
     };
     inline no_converter value_or_none(...);
     inline no_converter value_or_error(...);
-    template <class U> static constexpr bool ValueOrNone = std::is_same<no_converter, decltype(value_or_none(std::declval<U>()))>::value;
-    template <class U> static constexpr bool ValueOrError = std::is_same<no_converter, decltype(value_or_error(std::declval<U>()))>::value;
-  }
+    template <class U> static constexpr bool ValueOrNone = std::is_same<no_converter, decltype(value_or_none(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
+    template <class U> static constexpr bool ValueOrError = std::is_same<no_converter, decltype(value_or_error(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
+  }  // namespace detail
   template <class U> static constexpr bool ValueOrNone = detail::ValueOrNone<U>;
   template <class U> static constexpr bool ValueOrError = detail::ValueOrError<U>;
 #endif
@@ -86,7 +86,7 @@ namespace convert
       template <class U> static constexpr T error(U && /*unused*/) { return T{in_place_type<typename T::error_type>}; }
       static constexpr T error() { return T{in_place_type<typename T::error_type>}; }
     };
-  }
+  }  // namespace detail
 
   /*! Converts a something matching the `ValueOrNone` concept.
   \requires `is_result` to be false, `ValueOrNone<U>` to be true and `U`'s `value_type` be constructible into `T`'s `value_type`.

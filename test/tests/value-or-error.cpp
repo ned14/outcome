@@ -38,8 +38,8 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / valueorerror, "Tests that outcome
     } a;
     static_assert(convert::ValueOrNone<value_or_error>, "");
     static_assert(convert::ValueOrError<value_or_error>, "");
-    BOOST_CHECK(convert::value_or_none<result<long>>(a).value() == 78);
-    BOOST_CHECK(convert::value_or_error<result<long>>(a).value() == 78);
+    BOOST_CHECK((convert::value_or_none<result<long>, false>(a).value() == 78));
+    BOOST_CHECK((convert::value_or_error<result<long>, false>(a).value() == 78));
 
     result<long> b(a);
     BOOST_CHECK(b.has_value());
