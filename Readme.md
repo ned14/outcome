@@ -36,7 +36,12 @@ On Windows, simply download the raw file from above and place it wherever it sui
  - [x] Manually copy & paste together a basic synopsis of result and outcome
  to serve as "the docs" until Standardese can be persuaded to produce better
  output.
- - [ ] Conan package support
+ - [x] Make an "expected" policy and `expected<T, E>` from it.
+ - [x] Code snippets in docs should provide link to github original.
+ - [x] Restore testing of C++ exceptions disabled.
+ - [x] Code snippets in doc/src/snippets should be compiled.
+ - [ ] `trait::has_error_code<>`, `trait::has_exception_ptr<>` et al should recognise Boost's types
+ - [x] Conan package support
  
 Maybe?
  - [ ] Make `result`'s explicit converting constructors accept any type providing a
@@ -45,24 +50,25 @@ Maybe?
 # Changes since v1:
 
 As per the Boost peer review feedback, v2 Outcome has been pared down to
-no more than the barest of bare essentials. The plan is to occupy the lowest
-level in a generalised [C++ Monadic interface (P0650R0)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0650r0.pdf)
-as an adjunct to the [primary C++ monad object Expected (P0323R2)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0323r2.pdf).
-You can find a reference implemenetation for the proposed standardised Result
-at https://github.com/ned14/outcome/tree/develop/include/outcome/experimental/.
+no more than the barest of bare essentials. The plan is to participate
+in a generalised [C++ Monadic interface (P0650R0)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0650r0.pdf)
+so all the monadic stuff is removed.
 
 - Major changes:
-   - You can now customise types directly, so `result<T, EC =
+   - You can now customise types directly, same as Expected, so `result<T, EC =
    std::error_code>` and `outcome<T, EC = std::error_code, P|E =
    std::exception_ptr>`.
    - Default construction no longer permitted.
-   - Empty state no longer possible.
-   - Variant storage gone, it's now a standard layout type. This enables returning
+   - Empty state no longer possible. Write `optional<result<T, E>>` if
+   you want that.
+   - Variant storage gone, it's now a struct-based type. This enables returning
    an error code with additional exception ptr as per Peter Dimov's
    request. It also very considerably simplifies implementation.
      - You can choose between a payload type `P` or an exception ptr
-     `E`, so  an error code with additional arbitrary non-exception ptr
-     payload `P` is also possible.
+     `E`, so an error code with additional arbitrary non-exception ptr
+     payload `P` is also possible. This enables the Filesystem TS `error_code`
+     returning overloads to return the same extra information as the throwing
+     overloads.
      - C interoperability is now available, and some C macros for
      working with `struct result_TYPE` are available in result.h.
    - Concepts TS is used when available, otherwise a partial
@@ -70,28 +76,28 @@ at https://github.com/ned14/outcome/tree/develop/include/outcome/experimental/.
    - Types `EC`, `P` and `E` must be default constructible. `T` need not
    be so.
    - Constructors now follow those of `std::variant`, so it will
-   implicitly convert from any input convertible to any of its types so
+   implicitly convert from any input constructible to any of its types so
    long as it is not ambiguous. As with `std::variant`, in place
    construction is achieved via `in_place_type<T>` tagging. Explicit
    conversion construction also works, we replicate `std::variant`'s
    value semantics very closely despite not having variant storage.
    - New type sugar types `success<T>`, `failure<EC, E>` for being
    explicit about which kind of `result` or `outcome` we are constructing.
-   - `.has_value()`, `.has_error()` and `.has_exception()` now only
+   - `.has_value()`, `.has_error()`, `.has_exception()` and `.has_payload()` now only
    return true if that specific member is present. A new
    `.has_failure()` is true if errored or excepted.
-   - `.value()` throws exception or `std::system_error(EC)` if no value
+   - `.value()` throws exception or `std::system_error(EC)` or UB if no value
    or returns a reference to the value.
-   - `.error()` throws `bad_result_access|bad_outcome_access` if no
+   - `.error()` throws `bad_result_access|bad_outcome_access` or UB if no
    error or returns a reference to the error.
-   - `.payload()` throws `bad_result_access|bad_outcome_access` if no
+   - `.payload()` throws `bad_result_access|bad_outcome_access` or UB if no
    payload or returns a reference to the payload.
-   - `.exception()` throws `bad_result_access|bad_outcome_access` if no
+   - `.exception()` throws `bad_result_access|bad_outcome_access` or UB if no
    exception or returns a reference to the exception.
    - `.failure()` returns the exception if present, else a synthesised
    `exception_ptr` from the error, else a null `exception_ptr`.
    - `.assume_value()`, `.assume_error()`, `.assume_payload()` and
-   `.assume_exception()` all provide runtime unchecked access to the
+   `.assume_exception()` all provide runtime unchecked UB access to the
    underlying storage.
    - The doxygen docs which were widely criticised have been replaced
    with an experimental Standardese + Hugo based solution instead.
@@ -102,9 +108,9 @@ at https://github.com/ned14/outcome/tree/develop/include/outcome/experimental/.
    interface make them no longer necessary.
    - All preprocessor assembly of code fragments. You now have an
    equally complex rabbit warren of policy and trait driven composited
-   fragments of template into implementation. Standardese (the
-   documentation tool) really struggles with this. Doxygen simply blows
-   up.
+   fragments of template into implementation. I did warn reviewers during
+   the v1 review that a pure C++ v2 would be no better in this regard than
+   the preprocessor assembled v1.
    - All macro based customisation points. We now use an ADL function
    based customisation point design, 100% C++.
    - `error_code_extended` is gone for now. It is believed that via the
@@ -115,10 +121,8 @@ at https://github.com/ned14/outcome/tree/develop/include/outcome/experimental/.
    inequality comparison.
    - Any ability to change state after construction.
    - LEWG `expected<T, E>` is gone. The new templatised `result<T, E>`
-   is a much slimmer edition of Expected providing the same core
-   functionality but in a much smaller package and with
-   `std::variant<>`'s look and feel instead of new type sugar like
-   `make_unexpected`.
+   is a close substitute to Expected. See the FAQ entry on how to adapt
+   a `result<T, E>` into an `expected<T, E>` with a simple shim class.
 
  - Stuff retained:
    - `OUTCOME_TRY`, `OUTCOME_TRYV`, `OUTCOME_TRYX` all work as before.
@@ -137,15 +141,10 @@ at https://github.com/ned14/outcome/tree/develop/include/outcome/experimental/.
 
  - Stuff lost:
    - Outcome v2 needs a much newer compiler than before: clang 4 or
-   better, GCC 6 or better, ideally with Concepts enabled. Sorry, no
-   MSVC support, I've submitted repros of the ICEs for VS2017.3. I've
-   been careful to keep MSVC's frontend happy, the ICEs are all in the
-   backend, so it'll likely start working soon.
-   - Compile time load may now be higher than with v1. Almost every
-   function is compile time enabled depending on input types (we do use
-   template variables to cache previously calculated results) with
-   calculated noexcept. It'll get a lot better as compilers make better
-   use of the boolean logic supplied by Concepts.
+   better, GCC 6 or better, VS2017 or better. Ideally with Concepts
+   enabled.
+   - Compile time load may now be higher than with v1. In my own
+   code, there is an approx 15% compile time regression in v2 over v1.
 
 ## Commits and tags in this git repository can be verified using:
 <pre>

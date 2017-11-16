@@ -6,7 +6,8 @@ compiler:
 sudo: false
 os:
  - linux
-# - osx
+ - osx
+osx_image: xcode9
 branches:
   only:
     - develop
@@ -27,55 +28,38 @@ addons:
     - clang-4.0
     - cmake
     - cmake-data
-    - python-pygments
 
 env:
 # - __="Code bloat tests"
  - __="Documentation" NAME=TravisDocumentation
  - __="cmake tests" NAME=TravisLinuxWorker
-# - __="cmake tests osx" NAME=TravisOSXWorker
+ - __="cmake tests osx" NAME=TravisOSXWorker
  
 matrix:
   exclude:
-#  - os: osx
-#    compiler: g++-6
+  - os: osx
+    compiler: g++-6
   - os: linux
     compiler: clang-4.0
     env: __="Documentation" NAME=TravisDocumentation
-#  - os: linux
-#    env: __="cmake tests osx" NAME=TravisOSXWorker
-#  - os: osx
-#    env: __="Code bloat tests"
-#  - os: osx
-#    env: __="Documentation" NAME=TravisDocumentation
-#  - os: osx
-#    env: __="cmake tests" NAME=TravisLinuxWorker
+  - os: linux
+    env: __="cmake tests osx" NAME=TravisOSXWorker
+  - os: osx
+    env: __="Code bloat tests"
+  - os: osx
+    env: __="Documentation" NAME=TravisDocumentation
+  - os: osx
+    env: __="cmake tests" NAME=TravisLinuxWorker
  
 cache:
   apt: true
   directories:
     - hugo_bin
-#    - llvm-3.9.1
     
 before_install:
-# -
-#    LLVM_VERSION=3.9.1;
-#    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-#      if [ -z "$(ls -A llvm-$LLVM_VERSION)" ]; then
-#        wget -O llvm-$LLVM_VERSION.tar.xz http://llvm.org/releases/$LLVM_VERSION/clang+llvm-$LLVM_VERSION-x86_64-linux-gnu-debian8.tar.xz;
-#        mkdir llvm-$LLVM_VERSION;
-#        xzcat llvm-$LLVM_VERSION.tar.xz | tar -xvf - --strip 1 -C llvm-$LLVM_VERSION;
-#        cd llvm-$LLVM_VERSION/bin;
-#        ln -s clang-3.9 clang++-3.9;
-#        cd ../..;
-#      fi;
-#      llvm-$LLVM_VERSION/bin/llvm-config --version;
-#      export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
-#      export PATH="$PWD/llvm-$LLVM_VERSION/bin:$PATH";
-#    fi
  - if [ "$__" = "Documentation" ]; then
      if [ ! -f "hugo_bin/hugo" ]; then
-       wget -O hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.24.1/hugo_0.24.1_Linux-64bit.tar.gz;
+       wget -O hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.29/hugo_0.29_Linux-64bit.tar.gz;
        mkdir hugo_bin;
        tar xf hugo.tar.gz -C hugo_bin;
      fi;
@@ -101,7 +85,7 @@ script:
    fi
  -
    if [ "$__" = "cmake tests osx" ]; then
-     ctest -S .ci.cmake -V -E "noexcept|error_code_extended";
+     ctest -S .ci.cmake -V;
    fi
  -
    if [ "$__" = "Documentation" ]; then
@@ -111,7 +95,7 @@ script:
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
-     ctest -S .docs.cmake -V;
+     CXX=g++-6 ctest -S .docs.cmake -V;
      cd doc/html;
      git add . || true;
      git commit -a -m "Travis CI updates documentation" || true;
@@ -120,6 +104,16 @@ script:
    fi
  
 after_success:
+ -
+   if [ "$__" = "cmake tests" ]; then
+     git clone https://github.com/ned14/boost-outcome;
+     python include/outcome/quickcpplib/scripts/boostify.py boost-outcome;
+     cd boost-outcome;
+     git add . || true;
+     git commit -a -m "Travis CI updates Boost.Outcome from Outcome" || true;
+     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost-outcome master;  
+     cd ..;     
+   fi
  - bash -x ./update_coveralls.sh `pwd`
 
 after_failure:

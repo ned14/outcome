@@ -1,0 +1,27 @@
+var classoutcome__v2__xxx_1_1detail_1_1result__storage =
+[
+    [ "compatible_conversion_tag", "structoutcome__v2__xxx_1_1detail_1_1result__storage_1_1compatible__conversion__tag.html", null ],
+    [ "_error_type", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a3121becc6811b63841e998f5c9ec1c1b", null ],
+    [ "_value_type", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#ac1ed8f7e7d59c6d5876a14370de16d19", null ],
+    [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#aa404696b32f5b54162dc62ede8892c62", null ],
+    [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a5aea085914a8c922857cfe95030653f2", null ],
+    [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#aff48474983982d0de4b9a4ca7077d4ce", null ],
+    [ "~result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a028ef7f5f6e5da0de56ee215bf06ba6d", null ],
+    [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#acdbfcb4d148052d38339f240bf29e51f", null ],
+    [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a5b60f5caa2fd636c6eccb34eb3991d5d", null ],
+    [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a8da940739c7e12f2bcc055b2b9317449", null ],
+    [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#ab31e5355a7c3f1e394fbf6d3378c99b9", null ],
+    [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#aeee183c9f21ead9ba07d2ce702ecccdc", null ],
+    [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#ab6217e089809ab0131819d7aad6efa25", null ],
+    [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a243faa2db9634529453df3f4ee7dd01b", null ],
+    [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a6594a8d8773c2f29372428e1c7800947", null ],
+    [ "operator=", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a8551d7462c4dd53944d7352fa6783d69", null ],
+    [ "operator=", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a782171d55a99edd9e984c0128c909bf3", null ],
+    [ "hooks::set_spare_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a150212593ee711b6de757a7614cbb1a6", null ],
+    [ "hooks::spare_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a5e03dd967258eff3ad7b2028cf80449c", null ],
+    [ "policy::detail::base", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#acd563c16b139a6402e4a37a05f0bfb88", null ],
+    [ "result_final", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#afa14db91855a3ec4e9c1d43d5c10857b", null ],
+    [ "result_storage", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a53b465b5cafef4b2d53cea62c58ac886", null ],
+    [ "_error", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a39ce141b3915d80ee142574c5c22c65e", null ],
+    [ "_state", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a2a9ac93c1f4ac5470ed2e99cec61d816", null ]
+];

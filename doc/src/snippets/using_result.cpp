@@ -1,4 +1,4 @@
-#include "../include/outcome/outcome.hpp"
+#include "../../../include/outcome.hpp"
 #include <algorithm>
 #include <ctype.h>
 #include <string>
@@ -48,55 +48,63 @@ outcome::result<int> convert(const std::string& str) noexcept
 
 namespace
 {
-    struct ConversionErrorCategory : std::error_category
+  struct ConversionErrorCategory : std::error_category
+  {
+    const char* name() const noexcept override { return "bad-convet"; }
+    std::string message(int ev) const override;
+  };
+  
+  std::string ConversionErrorCategory::message(int ev) const
+  {
+    switch (static_cast<ConversionErrc>(ev))
     {
-      const char* name() const noexcept override { return "bad-convet"; }
-      std::string message(int ev) const override;
-    };
-    
-    std::string ConversionErrorCategory::message(int ev) const
-    {
-        switch (static_cast<ConversionErrc>(ev))
-        {
-            case ConversionErrc::EmptyString:
-                return "empty string provided";
-            case ConversionErrc::IllegalChar:
-                return "non-digit char provided";
-            case ConversionErrc::TooLong:
-                return "converted int would be too large";
-        }
-        return "(UNCHARTED)";
+    case ConversionErrc::EmptyString:
+      return "empty string provided";
+    case ConversionErrc::IllegalChar:
+      return "non-digit char provided";
+    case ConversionErrc::TooLong:
+      return "converted int would be too large";
     }
-    
-    const ConversionErrorCategory globalConversionErrorCategory {};
+      return "(UNCHARTED)";
+  }
+  
+  const ConversionErrorCategory globalConversionErrorCategory {};
 }
 
 std::error_code make_error_code(ConversionErrc e)
 {
-    return std::error_code{static_cast<int>(e), globalConversionErrorCategory};
+  return std::error_code{static_cast<int>(e), globalConversionErrorCategory};
 }
 
 void explicit_construction()
 {
-//! [explicit]	
+//! [explicit]
 outcome::result<int> r {outcome::in_place_type<std::error_code>, ConversionErrc::EmptyString};
 outcome::result<int> s {outcome::in_place_type<int>, 1};
 //! [explicit]
 }
 
+void factory_construction()
+{
+//! [factory]
+outcome::result<int> r = outcome::failure(ConversionErrc::EmptyString); 
+outcome::result<int> s = outcome::success(1);
+//! [factory]
+}
+
 struct BigInt
 {
-    static outcome::result<BigInt> fromString(const std::string& s);
-    explicit BigInt(const std::string&) {}
-    BigInt half() const { return BigInt{""}; }
-    friend std::ostream& operator<<(std::ostream& o, const BigInt&) { return o << "big int half"; }
+  static outcome::result<BigInt> fromString(const std::string& s);
+  explicit BigInt(const std::string&) {}
+  BigInt half() const { return BigInt{""}; }
+  friend std::ostream& operator<<(std::ostream& o, const BigInt&) { return o << "big int half"; }
 };
 
 //! [from_string]
 /*static*/ outcome::result<BigInt> BigInt::fromString(const std::string& s)
 //! [from_string]
 {
-	return BigInt{s};
+    return BigInt{s};
 }
 
 //! [half_decl]
@@ -106,23 +114,23 @@ outcome::result<void> print_half(const std::string& text);
 //! [half_impl]
 outcome::result<void> print_half(const std::string& text)
 {
-    if (outcome::result<int> r = convert(text))         // #1
+  if (outcome::result<int> r = convert(text))     // #1
+  {
+    std::cout << (r.value() / 2) << std::endl;    // #2
+  }
+  else
+  {
+    if (r.error() == ConversionErrc::TooLong)     // #3 
     {
-        std::cout << (r.value() / 2) << std::endl;      // #2
+      OUTCOME_TRY (i, BigInt::fromString(text));  // #4
+      std::cout << i.half() << std::endl;
     }
     else
     {
-        if (r.error() == ConversionErrc::TooLong)       // #3 
-        {
-            OUTCOME_TRY (i, BigInt::fromString(text));  // #4
-            std::cout << i.half() << std::endl;
-        }
-        else
-        {
-            return r.as_failure();                      // #5
-        }
+      return r.as_failure();                      // #5
     }
-    return outcome::success();                          // #6
+  }
+  return outcome::success();                      // #6
 }
 //! [half_impl]
 
@@ -140,11 +148,11 @@ int main()
 {
   if (outcome::result<void> r = print_half("1299999999999999999999999999"))
   {
-      std::cout << "ok" << std::endl;
+    std::cout << "ok" << std::endl;
   }
   else
   {
-      std::cout << r.error() << std::endl; 
+    std::cout << r.error() << std::endl; 
   }
   
   (void)test();

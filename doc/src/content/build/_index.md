@@ -5,8 +5,8 @@ weight = 3
 
 Outcome v2 is feature complete, meeting the feedback from the Boost peer review in May 2017.
 It is an all new code base, written entirely from scratch during the month of June 2017.
-It is currently undergoing at least three months of maturation before being
-returned for a second review. As a result, consider this library to **beta**
+It has completed three months of maturation, and will shortly be sent back to Boost
+for a second peer review. As a result, consider this library to **beta**
 quality and subject change if a second review demands it.
 
 That said, the essentials here are the same as they were in v1. Indeed most code
@@ -28,6 +28,26 @@ fetch https://github.com/ned14/outcome/raw/develop/single-header/outcome.hpp
 ```
 
 On Windows, simply download the raw file from above and place it wherever it suits you.
+
+
+## Usage from the Conan package manager
+
+*(thanks to Théo Delrieu for contributing this support)*
+
+At the command line, add the bintray repo for Outcome to conan:
+
+```
+conan remote add outcome https://api.bintray.com/conan/ned14/Outcome
+```
+
+Now simply add this to your Conan build:
+
+```
+[requires]
+Outcome/master@ned14/stable
+```
+
+Outcome will be made available by Conan at `<outcome.hpp>`.
 
 
 ## Usage as a git submodule
@@ -56,6 +76,20 @@ cd outcome
 git pull
 git submodule update
 ```
+
+## Usage as a stable source tarball
+
+If you would prefer a single source tarball of the stable branch containing
+all the documentation, tests and sources, this can always be retrieved from:
+
+https://dedi4.nedprod.com/static/files/outcome-v2.0-source-latest.tar.xz
+
+This tarball is automatically generated when Outcome fully compiles and passes
+all unit tests on all platforms tested by the CIs. This currently includes:
+
+- Linux: GCC 6.3, clang 4.0
+- MacOS: XCode 9
+- Windows: VS2017
 
 <hr>
 

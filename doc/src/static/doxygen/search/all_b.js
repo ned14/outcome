@@ -1,0 +1,5 @@
+var searchData=
+[
+  ['make_5ferror_5fcode',['make_error_code',['../namespaceoutcome__v2__xxx_1_1policy_1_1detail.html#a973b4e87d44427b6fa7a961b1d7ebcdf',1,'outcome_v2_xxx::policy::detail::make_error_code(T &amp;&amp;v, error_code_passthrough={})'],['../namespaceoutcome__v2__xxx_1_1policy_1_1detail.html#af78d3f7045bc639dc2c327c78689c23a',1,'outcome_v2_xxx::policy::detail::make_error_code(T &amp;&amp;v, tuple_passthrough={})'],['../namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#aedca1dab7cd74a83b707c1cb76fc1cb7',1,'outcome_v2_xxx::trait::detail::make_error_code(...)'],['../namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a34fa8a78143b351473ba82ccb2c5981d',1,'outcome_v2_xxx::trait::detail::make_error_code(T &amp;&amp;)']]],
+  ['make_5fexception_5fptr',['make_exception_ptr',['../namespaceoutcome__v2__xxx_1_1policy_1_1detail.html#a061acb44dfeeac89b129ba179bdb947c',1,'outcome_v2_xxx::policy::detail::make_exception_ptr()'],['../namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a40751c005604eaa905bad2ce5293d515',1,'outcome_v2_xxx::trait::detail::make_exception_ptr()']]]
+];

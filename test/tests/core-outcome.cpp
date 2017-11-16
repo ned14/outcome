@@ -24,11 +24,17 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
-BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended")
+#include <iostream>
+
+#ifdef _MSC_VER
+#pragma warning(disable : 4702)  // unreachable code
+#endif
+
+BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended")
 {
   using namespace OUTCOME_V2_NAMESPACE;
 
-  static_assert(trait::is_exception_ptr<std::exception_ptr>::value, "Trait for detecting exception_ptr is broken");
+  static_assert(trait::has_exception_ptr<std::exception_ptr>::value, "Trait for detecting exception_ptr is broken");
 
   static_assert(std::is_constructible<outcome<long>, int>::value, "Sanity check that monad can be constructed from a value_type");
   static_assert(!std::is_constructible<outcome<outcome<long>>, int>::value, "Sanity check that outer monad can be constructed from an inner monad's value_type");
@@ -61,10 +67,10 @@ BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended"
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.value(), const std::system_error &);
+    BOOST_CHECK_THROW(m.value(), std::system_error);
     BOOST_CHECK_NO_THROW(m.error());
-    BOOST_CHECK_THROW(m.exception(), const bad_outcome_access &);
-    BOOST_CHECK_THROW(std::rethrow_exception(m.failure()), const std::system_error &);
+    BOOST_CHECK_THROW(m.exception(), bad_outcome_access);
+    BOOST_CHECK_THROW(std::rethrow_exception(m.failure()), std::system_error);
   }
   {  // errored void
     outcome<void> m(std::errc::bad_address);
@@ -72,10 +78,10 @@ BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended"
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(([&m]() -> void { return m.value(); }()), const std::system_error &);
+    BOOST_CHECK_THROW(([&m]() -> void { return m.value(); }()), std::system_error);
     BOOST_CHECK_NO_THROW(m.error());
-    BOOST_CHECK_THROW(m.exception(), const bad_outcome_access &);
-    BOOST_CHECK_THROW(std::rethrow_exception(m.failure()), const std::system_error &);
+    BOOST_CHECK_THROW(m.exception(), bad_outcome_access);
+    BOOST_CHECK_THROW(std::rethrow_exception(m.failure()), std::system_error);
   }
   {  // valued int
     outcome<int> m(5);
@@ -86,8 +92,8 @@ BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended"
     BOOST_CHECK(m.value() == 5);
     m.value() = 6;
     BOOST_CHECK(m.value() == 6);
-    BOOST_CHECK_THROW(m.error(), const bad_outcome_access &);
-    BOOST_CHECK_THROW(m.exception(), const bad_outcome_access &);
+    BOOST_CHECK_THROW(m.error(), bad_outcome_access);
+    BOOST_CHECK_THROW(m.exception(), bad_outcome_access);
     BOOST_CHECK(!m.failure());
   }
   {  // moves do not clear state
@@ -110,8 +116,8 @@ BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended"
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(!m.has_exception());
     BOOST_CHECK_NO_THROW(m.value());  // works, but type returned is unusable
-    BOOST_CHECK_THROW(m.error(), const bad_outcome_access &);
-    BOOST_CHECK_THROW(m.exception(), const bad_outcome_access &);
+    BOOST_CHECK_THROW(m.error(), bad_outcome_access);
+    BOOST_CHECK_THROW(m.exception(), bad_outcome_access);
     BOOST_CHECK(!m.failure());
   }
   {  // errored
@@ -121,9 +127,9 @@ BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended"
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
     BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.value(), const std::system_error &);
+    BOOST_CHECK_THROW(m.value(), std::system_error);
     BOOST_CHECK(m.error() == ec);
-    BOOST_CHECK_THROW(m.exception(), const bad_outcome_access &);
+    BOOST_CHECK_THROW(m.exception(), bad_outcome_access);
 #ifdef __cpp_exceptions
     BOOST_CHECK(m.failure());
     try
@@ -145,8 +151,8 @@ BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended"
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(m.has_exception());
-    BOOST_CHECK_THROW(m.value(), const std::system_error &);
-    BOOST_CHECK_THROW(m.error(), const bad_outcome_access &);
+    BOOST_CHECK_THROW(m.value(), std::system_error);
+    BOOST_CHECK_THROW(m.error(), bad_outcome_access);
     BOOST_CHECK(m.exception() == e);
 #ifdef __cpp_exceptions
     BOOST_CHECK(m.failure());
@@ -171,8 +177,8 @@ BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended"
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(m.has_exception());
-    BOOST_CHECK_THROW(m.value(), const Foo &);
-    BOOST_CHECK_THROW(m.error(), const bad_outcome_access &);
+    BOOST_CHECK_THROW(m.value(), Foo);
+    BOOST_CHECK_THROW(m.error(), bad_outcome_access);
     BOOST_CHECK(m.exception() == e);
   }
   {  // outcome<void, void> should work
@@ -184,30 +190,25 @@ BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended"
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(m.has_exception());
   }
-  {  // outcome<void, int, int> should work
-    outcome<void, int, int> m(5, 6);
-    BOOST_CHECK(!m);
-    BOOST_CHECK(!m.has_value());
-    BOOST_CHECK(m.has_error());
-    BOOST_CHECK(m.has_payload());
-  }
 
 
   {
     outcome<int> a(5);
     outcome<int> b(std::make_error_code(std::errc::invalid_argument));
     std::cout << sizeof(a) << std::endl;  // 40 bytes
-    b.assume_value();
-    a.assume_error();
+    a.assume_value();
+    b.assume_error();
+#ifdef __cpp_exceptions
     try
     {
       b.value();
       std::cerr << "fail" << std::endl;
       std::terminate();
     }
-    catch(const std::system_error &e)
+    catch(const std::system_error & /*unused*/)
     {
     }
+#endif
     static_assert(!std::is_default_constructible<decltype(a)>::value, "");
     static_assert(!std::is_nothrow_default_constructible<decltype(a)>::value, "");
     static_assert(std::is_copy_constructible<decltype(a)>::value, "");
@@ -225,23 +226,8 @@ BOOST_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as intended"
     (void) c2;
     // Test int, void compiles
     outcome<int, void> d(in_place_type<std::exception_ptr>);
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-    // Test void, status, void compiles
-    constexpr outcome<int, std::errc, void> e(5, std::errc::bad_message);
-#endif
   }
 
-  {
-    // constexpr const char *niall = "niall";
-    // error code + matching exception
-    outcome<int> a(std::make_error_code(std::errc::not_enough_memory), std::make_exception_ptr(std::bad_alloc()));
-    a.error();
-    a.exception();
-    // value + payload
-    // outcome<int, std::error_code, const char *> b(5, niall);
-    // b.error();
-    // b.payload();
-  }
   {
     // Can only be constructed via multiple args
     struct udt3

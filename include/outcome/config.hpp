@@ -37,11 +37,29 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef __cpp_variadic_templates
 #error Outcome needs variadic template support in the compiler
 #endif
-#ifndef __cpp_constexpr
-#error Outcome needs constexpr (C++ 11) support in the compiler
+#if __cpp_constexpr < 201304 && _MSC_FULL_VER < 191100000
+#error Outcome needs constexpr (C++ 14) support in the compiler
 #endif
 #ifndef __cpp_variable_templates
 #error Outcome needs variable template support in the compiler
+#endif
+
+#ifdef DOXYGEN_IS_IN_THE_HOUSE
+#define OUTCOME_FORCEINLINE
+#define OUTCOME_NODISCARD [[nodiscard]]
+#define OUTCOME_TEMPLATE(...) template <__VA_ARGS__
+#define OUTCOME_TREQUIRES(...) , __VA_ARGS__ >
+#define OUTCOME_TEXPR(...) typename = decltype(__VA_ARGS__)
+#define OUTCOME_TPRED(...) typename = std::enable_if_t<__VA_ARGS__>
+#define OUTCOME_REQUIRES(...) requires __VA_ARGS__
+/*! \mainpage
+\htmlonly
+<script type="text/javascript">
+window.location.href = "https://ned14.github.io/outcome/"
+</script>
+If you are not redirected automatically, follow this link to <a href='https://ned14.github.io/outcome/'>https://ned14.github.io/outcome/</a>.
+\endhtmlonly
+*/
 #endif
 
 #ifndef OUTCOME_SYMBOL_VISIBLE
@@ -68,19 +86,6 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_REQUIRES
 #define OUTCOME_REQUIRES(...) QUICKCPPLIB_REQUIRES(__VA_ARGS__)
 #endif
-#ifndef OUTCOME_MSVC_WORKAROUNDS
-// Older MSVC's constexpr isn't up to Outcome v2 and it ICEs, so don't use constexpr in those situations
-#if defined(_MSC_VER) && !defined(__clang__) && _MSC_FULL_VER <= 191025019 /* VS2017 Update 2*/
-#define OUTCOME_MSVC_WORKAROUNDS 1
-#endif
-#endif
-#ifndef OUTCOME_MSVC_CONSTEXPR
-#if OUTCOME_MSVC_WORKAROUNDS
-#define OUTCOME_MSVC_CONSTEXPR
-#else
-#define OUTCOME_MSVC_CONSTEXPR constexpr
-#endif
-#endif
 
 #include "quickcpplib/include/import.h"
 
@@ -93,8 +98,7 @@ of bracketed tokens later fused by the preprocessor into namespace and C++ modul
 namespace outcome_v2_xxx
 {
 }
-}
-/*! The namespace of this Boost.Outcome v2.
+/*! The namespace of this Outcome v2.
 */
 #define OUTCOME_V2_NAMESPACE outcome_v2_xxx
 /*! Expands into the appropriate namespace markup to enter the Outcome v2 namespace.
@@ -134,10 +138,14 @@ exported Outcome v2 namespace.
 #endif
 #endif
 
-#ifndef OUTCOME_DO_FATAL_EXIT
+#ifndef OUTCOME_THROW_EXCEPTION
+#ifdef __cpp_exceptions
+#define OUTCOME_THROW_EXCEPTION(expr) throw expr
+#else
+
 #ifdef _WIN32
 #include "quickcpplib/include/execinfo_win64.h"
-#else
+#elif !defined(__ANDROID__)
 #include <execinfo.h>
 #endif
 #include <stdio.h>
@@ -147,9 +155,12 @@ namespace detail
 {
   QUICKCPPLIB_NORETURN inline void do_fatal_exit(const char *expr)
   {
+#if !defined(__ANDROID__)
     void *bt[16];
     size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0]));
+#endif
     fprintf(stderr, "FATAL: Outcome throws exception %s with exceptions disabled\n", expr);
+#if !defined(__ANDROID__)
     char **bts = backtrace_symbols(bt, btlen);
     if(bts)
     {
@@ -157,12 +168,18 @@ namespace detail
         fprintf(stderr, "  %s\n", bts[n]);
       free(bts);
     }
+#endif
     abort();
   }
 }
 OUTCOME_V2_NAMESPACE_END
-#define OUTCOME_DO_FATAL_EXIT(expr) OUTCOME_V2_NAMESPACE::detail::do_fatal_exit(#expr)
+#define OUTCOME_THROW_EXCEPTION(expr) OUTCOME_V2_NAMESPACE::detail::do_fatal_exit(#expr)
+
+#endif
 #endif
 
+#ifndef BOOST_OUTCOME_AUTO_TEST_CASE
+#define BOOST_OUTCOME_AUTO_TEST_CASE(a, b) BOOST_AUTO_TEST_CASE(a, b)
+#endif
 
 #endif

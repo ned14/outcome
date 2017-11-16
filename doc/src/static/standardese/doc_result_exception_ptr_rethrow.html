@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>result_exception_ptr_rethrow.hpp</title>
+</head>
+<body>
+<article id="standardese-result_exception_ptr_rethrow.hpp" class="standardese-file-documentation">
+<h1 class="standardese-file-documentation-heading">Header file <code>result_exception_ptr_rethrow.hpp</code></h1>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">..&#x2F;bad_access.hpp</span><span class="pre">&quot;</span>
+
+<span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">detail&#x2F;common.hpp</span><span class="pre">&quot;</span>
+
+<span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
+<span class="pun">{</span>
+    <span class="kwd">namespace</span> <span class="typ dec var fun">policy</span>
+    <span class="pun">{</span>
+        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">EC</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">E</span><span class="pun">&gt;</span>
+        <span class="kwd">struct</span> <a href="doc_outcome_exception_ptr_rethrow.html#standardese-outcome_v2_xxx::policy::exception_ptr_rethrow%3CT,EC,E%3E"><span class="typ dec var fun">exception_ptr_rethrow</span></a><span class="pun">;</span>
+
+        <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">EC</span><span class="pun">&gt;</span>
+        <span class="kwd">struct</span> <a href="doc_outcome_exception_ptr_rethrow.html#standardese-outcome_v2_xxx::policy::exception_ptr_rethrow%3CT,EC,E%3E"><span class="typ dec var fun">exception_ptr_rethrow</span></a><span class="pun">&lt;</span><span class="kwd">T</span><span class="pun">,</span> <span class="kwd">EC</span><span class="pun">,</span> <span class="typ dec var fun">void</span><span class="pun">&gt;</span><span class="pun">;</span>
+    <span class="pun">}</span>
+<span class="pun">}</span>
+</code></pre>
+<section id="standardese-outcome_v2_xxx" class="standardese-entity-documentation">
+<section id="standardese-outcome_v2_xxx::policy" class="standardese-entity-documentation">
+<section id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;T,EC,E&gt;" class="standardese-entity-documentation">
+<h3 class="standardese-entity-documentation-heading">Struct <code>exception_ptr_rethrow</code></h3>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">EC</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">E</span><span class="pun">&gt;</span>
+<span class="kwd">struct</span> <span class="typ dec var fun">exception_ptr_rethrow</span><span class="pun">;</span>
+</code></pre>
+<p id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;T,EC,E&gt;-brief" class="standardese-brief-section">Policy interpreting <code>EC</code> or <code>E</code> as a type for which <code>trait::has_exception_ptr_v&lt;EC|E&gt;</code> is true.</p>
+<p>Any wide attempt to access the successful state where there is none causes:
+<code>std::rethrow_exception(policy::exception_ptr(.error()|.exception()))</code> appropriately.</p>
+</section>
+<hr class="standardese-entity-documentation-break" />
+</section>
+</section>
+</article>
+</body>
+</html>

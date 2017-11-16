@@ -1,10 +1,10 @@
-#include "../include/outcome/outcome.hpp"
+#include "../../../include/outcome.hpp"
 
 namespace outcome = OUTCOME_V2_NAMESPACE;
 
 struct string_view
 {
-	string_view(const char*) {}
+    string_view(const char*) {}
 };
 
 struct Handle {};
@@ -31,7 +31,7 @@ auto read_data(Handle&)     noexcept -> outcome::result<Buffer> { return Buffer{
 auto parse(const Buffer&)   noexcept -> outcome::result<int>    { return int{}; }
 
 int main() {
-//! [inspect]	
+//! [inspect]
 if (auto rslt = read_int_from_file("config.cfg"))
   use_int(rslt.value());
 else

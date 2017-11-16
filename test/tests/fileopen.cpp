@@ -36,7 +36,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <fcntl.h>
 #endif
 
-BOOST_AUTO_TEST_CASE(works / outcome / fileopen, "Tests that the outcome semantically represents opening a file")
+BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / fileopen, "Tests that the outcome semantically represents opening a file")
 {
   using namespace OUTCOME_V2_NAMESPACE;
 

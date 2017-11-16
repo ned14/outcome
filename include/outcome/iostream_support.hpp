@@ -39,7 +39,7 @@ namespace detail
     s << v._status << " ";
     if((v._status & status_have_value) != 0)
     {
-      s << v._value;
+      s << v._value;  // NOLINT
     }
     return s;
   }
@@ -53,7 +53,7 @@ namespace detail
     s << v._status << " ";
     if((v._status & status_have_value) != 0)
     {
-      s << v._value;
+      s << v._value;  // NOLINT
     }
     return s;
   }
@@ -63,8 +63,8 @@ namespace detail
     s >> v._status;
     if((v._status & status_have_value) != 0)
     {
-      new(&v._value) decltype(v._value)();
-      s >> v._value;
+      new(&v._value) decltype(v._value)();  // NOLINT
+      s >> v._value;                        // NOLINT
     }
     return s;
   }
@@ -80,8 +80,8 @@ namespace detail
     s >> v._status;
     if((v._status & status_have_value) != 0)
     {
-      new(&v._value) decltype(v._value)();
-      s >> v._value;
+      new(&v._value) decltype(v._value)();  // NOLINT
+      s >> v._value;                        // NOLINT
     }
     return s;
   }
@@ -89,44 +89,7 @@ namespace detail
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_constructible<std::error_code, T>::value))
   inline std::string safe_message(T && /*unused*/) { return {}; }
   inline std::string safe_message(const std::error_code &ec) { return " (" + ec.message() + ")"; }
-  template <bool is_exception> struct print_payload_exception
-  {
-    template <class R, class S, class P, class N> print_payload_exception(std::ostream &s, const outcome<R, S, P, N> &v)
-    {
-      if(v.has_payload())
-      {
-        s << v.payload();
-      }
-    }
-  };
-  template <> struct print_payload_exception<true>
-  {
-    template <class R, class S, class P, class N> print_payload_exception(std::ostream &s, const outcome<R, S, P, N> &v)
-    {
-      if(v.has_exception())
-      {
-#ifdef __cpp_exceptions
-        try
-        {
-          std::rethrow_exception(v.exception());
-        }
-        catch(const std::system_error &e)
-        {
-          s << "std::system_error code " << e.code() << ": " << e.what();
-        }
-        catch(const std::exception &e)
-        {
-          s << "std::exception: " << e.what();
-        }
-        catch(...)
-#endif
-        {
-          s << "unknown exception";
-        }
-      }
-    }
-  };
-}
+}  // namespace detail
 
 //! Deserialise a result
 template <class R, class S, class P> inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
@@ -149,7 +112,7 @@ template <class R, class S, class P> inline std::ostream &operator<<(std::ostrea
   return s;
 }
 //! Debug print a result
-template <class R, class S, class P> inline std::string print(const impl::result_final<R, S, P> &v)
+template <class R, class S, class P> inline std::string print(const detail::result_final<R, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -163,7 +126,7 @@ template <class R, class S, class P> inline std::string print(const impl::result
   return s.str();
 }
 //! Debug print a result
-template <class S, class P> inline std::string print(const impl::result_final<void, S, P> &v)
+template <class S, class P> inline std::string print(const detail::result_final<void, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -177,7 +140,7 @@ template <class S, class P> inline std::string print(const impl::result_final<vo
   return s.str();
 }
 //! Debug print a result
-template <class R, class P> inline std::string print(const impl::result_final<R, void, P> &v)
+template <class R, class P> inline std::string print(const detail::result_final<R, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -191,7 +154,7 @@ template <class R, class P> inline std::string print(const impl::result_final<R,
   return s.str();
 }
 //! Debug print a result
-template <class P> inline std::string print(const impl::result_final<void, void, P> &v)
+template <class P> inline std::string print(const detail::result_final<void, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -208,13 +171,13 @@ template <class P> inline std::string print(const impl::result_final<void, void,
 //! Deserialise an outcome
 template <class R, class S, class P, class N> inline std::istream &operator>>(std::istream &s, outcome<R, S, P, N> &v)
 {
-  static_assert(!trait::is_exception_ptr<P>::value, "Cannot call operator>> on an outcome with an exception_ptr in it");
+  static_assert(!trait::has_exception_ptr_v<P>, "Cannot call operator>> on an outcome with an exception_ptr in it");
   s >> v._state;
   if(v.has_error())
   {
     s >> v._error;
   }
-  if(v.has_payload())
+  if(v.has_exception())
   {
     s >> v._ptr;
   }
@@ -223,13 +186,13 @@ template <class R, class S, class P, class N> inline std::istream &operator>>(st
 //! Serialise an outcome
 template <class R, class S, class P, class N> inline std::ostream &operator<<(std::ostream &s, const outcome<R, S, P, N> &v)
 {
-  static_assert(!trait::is_exception_ptr<P>::value, "Cannot call operator<< on an outcome with an exception_ptr in it");
+  static_assert(!trait::has_exception_ptr_v<P>, "Cannot call operator<< on an outcome with an exception_ptr in it");
   s << v._state;
   if(v.has_error())
   {
     s << v._error;
   }
-  if(v.has_payload())
+  if(v.has_exception())
   {
     s << v._ptr;
   }
@@ -239,17 +202,37 @@ template <class R, class S, class P, class N> inline std::ostream &operator<<(st
 template <class R, class S, class P, class N> inline std::string print(const outcome<R, S, P, N> &v)
 {
   std::stringstream s;
-  int total = static_cast<int>(v.has_value()) + static_cast<int>(v.has_error()) + static_cast<int>(v.has_payload()) + static_cast<int>(v.has_exception());
+  int total = static_cast<int>(v.has_value()) + static_cast<int>(v.has_error()) + static_cast<int>(v.has_exception());
   if(total > 1)
   {
     s << "{ ";
   }
-  s << print(static_cast<const impl::result_final<R, S, N> &>(v));
+  s << print(static_cast<const detail::result_final<R, S, N> &>(v));
   if(total > 1)
   {
     s << ", ";
   }
-  detail::print_payload_exception<trait::is_exception_ptr<P>::value>(s, v);
+  if(v.has_exception())
+  {
+#ifdef __cpp_exceptions
+    try
+    {
+      std::rethrow_exception(v.exception());
+    }
+    catch(const std::system_error &e)
+    {
+      s << "std::system_error code " << e.code() << ": " << e.what();
+    }
+    catch(const std::exception &e)
+    {
+      s << "std::exception: " << e.what();
+    }
+    catch(...)
+#endif
+    {
+      s << "unknown exception";
+    }
+  }
   if(total > 1)
   {
     s << " }";

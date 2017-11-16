@@ -26,6 +26,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
+#include <iostream>
+
 namespace hook_test
 {
   using OUTCOME_V2_NAMESPACE::in_place_type;
@@ -45,19 +47,19 @@ namespace hook_test
   // Localise result to using the local error_code so this namespace gets looked up for the hooks
   template <class R> using result = OUTCOME_V2_NAMESPACE::result<R, error_code>;
   // Specialise the result construction hook for our localised result
-  template <class T> constexpr inline void hook_result_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<T>, result<int> *res) noexcept
+  template <class U> constexpr inline void hook_result_construction(result<int> *res, U && /*unused*/) noexcept
   {
     // Write the value in the result into the static storage
-    snprintf(extended_error_info, sizeof(extended_error_info), "%d", res->assume_value());
+    snprintf(extended_error_info, sizeof(extended_error_info), "%d", res->assume_value());  // NOLINT
   }
-  template <class T> constexpr inline void hook_result_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<T>, result<std::string> *res) noexcept
+  template <class U> constexpr inline void hook_result_construction(result<std::string> *res, U && /*unused*/) noexcept
   {
     // Write the value in the result into the static storage
-    snprintf(extended_error_info, sizeof(extended_error_info), "%s", res->assume_value().c_str());
+    snprintf(extended_error_info, sizeof(extended_error_info), "%s", res->assume_value().c_str());  // NOLINT
   }
 }  // namespace hook_test
 
-BOOST_AUTO_TEST_CASE(works / result / hooks, "Tests that you can hook result's construction")
+BOOST_OUTCOME_AUTO_TEST_CASE(works / result / hooks, "Tests that you can hook result's construction")
 {
   using namespace hook_test;
   result<int> a(5);
@@ -73,33 +75,33 @@ namespace hook_test
   template <class R> using outcome = OUTCOME_V2_NAMESPACE::outcome<R, error_code, std::string>;
 
   // Specialise the outcome copy and move conversion hook for our localised result
-  template <class T, class R> constexpr inline void hook_outcome_copy_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<const result<T> &>, outcome<R> *res) noexcept
+  template <class T, class U> constexpr inline void hook_outcome_copy_construction(outcome<T> *res, const result<U> & /*unused*/) noexcept
   {
     // when copy constructing from a result<T>, place extended_error_coding::extended_error_info into the payload
     std::cout << "hook_outcome_copy_construction fires" << std::endl;
-    OUTCOME_V2_NAMESPACE::hooks::override_outcome_payload_exception(res, extended_error_info);
+    OUTCOME_V2_NAMESPACE::hooks::override_outcome_exception(res, extended_error_info);
   }
-  template <class T, class R> constexpr inline void hook_outcome_move_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<result<T> &&>, outcome<R> *res) noexcept
+  template <class T, class U> constexpr inline void hook_outcome_move_construction(outcome<T> *res, result<U> && /*unused*/) noexcept
   {
     // when move constructing from a result<T>, place extended_error_coding::extended_error_info into the payload
     std::cout << "hook_outcome_move_construction fires" << std::endl;
-    OUTCOME_V2_NAMESPACE::hooks::override_outcome_payload_exception(res, extended_error_info);
+    OUTCOME_V2_NAMESPACE::hooks::override_outcome_exception(res, extended_error_info);
   }
 }  // namespace hook_test
 
-BOOST_AUTO_TEST_CASE(works / outcome / hooks, "Tests that you can hook outcome's conversion from a result")
+BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / hooks, "Tests that you can hook outcome's conversion from a result")
 {
   using namespace hook_test;
   outcome<int> a(result<int>(5));
-  BOOST_REQUIRE(a.has_payload());
-  BOOST_CHECK(a.payload() == "5");
+  BOOST_REQUIRE(a.has_exception());
+  BOOST_CHECK(a.exception() == "5");
   outcome<std::string> b(result<std::string>("niall"));
-  BOOST_CHECK(b.payload() == "niall");
+  BOOST_CHECK(b.exception() == "niall");
 
   // Make sure hook does not fire for any other kind of outcome copy or move, only when converting from our custom result only
   outcome<int> c(5);
   outcome<long> d(c);  // can't be the same type as source, else copy elision takes place and no ADL hook calling
-  BOOST_CHECK(!d.has_payload());
+  BOOST_CHECK(!d.has_exception());
   outcome<int> e(OUTCOME_V2_NAMESPACE::result<int>(5));
-  BOOST_CHECK(!e.has_payload());
+  BOOST_CHECK(!e.has_exception());
 }

@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
-BOOST_AUTO_TEST_CASE(works / outcome / constexpr, "Tests that outcome works as intended in a constexpr evaluation context")
+BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / constexpr, "Tests that outcome works as intended in a constexpr evaluation context")
 {
   using namespace OUTCOME_V2_NAMESPACE;
 
@@ -60,9 +60,6 @@ BOOST_AUTO_TEST_CASE(works / outcome / constexpr, "Tests that outcome works as i
     // Test void
     constexpr result<void, int> h(in_place_type<void>);
     static_assert(h.has_value(), "");
-#if OUTCOME_ENABLE_POSITIVE_STATUS
-    static_assert(!h.has_status(), "");
-#endif
     constexpr result<int, void> h2(in_place_type<void>);
     static_assert(!h2.has_value(), "");
     static_assert(h2.has_error(), "");
@@ -78,11 +75,11 @@ BOOST_AUTO_TEST_CASE(works / outcome / constexpr, "Tests that outcome works as i
     constexpr outcome<long, int, const char *> g2(g);
     static_assert(g.has_value(), "");
     static_assert(!g.has_error(), "");
-    static_assert(!g.has_payload(), "");
+    static_assert(!g.has_exception(), "");
     static_assert(g.value() == 5, "");
     static_assert(g2.has_value(), "");
     static_assert(!g2.has_error(), "");
-    static_assert(!g2.has_payload(), "");
+    static_assert(!g2.has_exception(), "");
     static_assert(g2.value() == 5, "");
     constexpr outcome<void, int, char *> g3(in_place_type<void>);
     constexpr outcome<long, int, const char *> g4(g3);

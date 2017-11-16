@@ -22,7 +22,7 @@ like ones in [Boost.Filesystem](http://www.boost.org/doc/libs/1_64_0/libs/filesy
 where almost each function comes in two overloads, one throwing an exception,
 the other populating an `error_code` output argument. With Outcome, you can have only one function
 returning a composite return type, and it is through using this return value that you decide whether
-to handle failures locally, or to launch stack unwinding.	 
+to handle failures locally, or to launch stack unwinding.
 
 Outcome can also be used to plug components that potentially throw exceptions into parts of the program
 that are not exception-safe while retaining all information from the thrown exception objects.
@@ -49,11 +49,10 @@ will look like this:
 
 {{% snippet "intro_example.cpp" "implementation" %}}
 
-Each occurence of `OUTCOME_TRY` is a control statement. If the returned `result<T>` contains an error information, the function is immediatelly returned with `result<U>` containing the same error information; otherwise object of type `T` is move-constructed on the stack.
+Each occurance of `OUTCOME_TRY` is a control statement. If the returned `result<T>` contains an error information, the function is immediately returned with `result<U>` containing the same error information; otherwise object of type `T` is move-constructed on the stack.
 
 {{% notice note %}}
 This is the v2 Outcome designed in response to feedback from a [Boost peer review held in
 May 2017](https://lists.boost.org/boost-announce/2017/06/0510.php). This library
-is expected to pass a second Boost peer review, and be submitted to WG21 for standardisation
-into the standard C++ library.
+is expected to pass a second Boost peer review expected for the end of 2017.
 {{% /notice %}}
