@@ -40,12 +40,12 @@ On Windows, simply download the raw file from above and place it wherever it sui
  - [x] Code snippets in docs should provide link to github original.
  - [x] Restore testing of C++ exceptions disabled.
  - [x] Code snippets in doc/src/snippets should be compiled.
- - [ ] `trait::has_error_code<>`, `trait::has_exception_ptr<>` et al should recognise Boost's types
  - [x] Conan package support
- 
-Maybe?
- - [ ] Make `result`'s explicit converting constructors accept any type providing a
+ - [x] Make `result`'s explicit converting constructors accept any type providing a
  `.has_value()`, `.value()` and `.error()` (i.e. Expected)
+ - [ ] Regen docs and submit bugs to Standardese
+ - [ ] Translate docs into Boost edition
+ - [ ] Get AFIO et al working with latest Outcome
 
 # Changes since v1:
 
@@ -56,24 +56,21 @@ so all the monadic stuff is removed.
 
 - Major changes:
    - You can now customise types directly, same as Expected, so `result<T, EC =
-   std::error_code>` and `outcome<T, EC = std::error_code, P|E =
+   std::error_code>` and `outcome<T, EC = std::error_code, E =
    std::exception_ptr>`.
-   - Default construction no longer permitted.
-   - Empty state no longer possible. Write `optional<result<T, E>>` if
-   you want that.
-   - Variant storage gone, it's now a struct-based type. This enables returning
-   an error code with additional exception ptr as per Peter Dimov's
-   request. It also very considerably simplifies implementation.
-     - You can choose between a payload type `P` or an exception ptr
-     `E`, so an error code with additional arbitrary non-exception ptr
-     payload `P` is also possible. This enables the Filesystem TS `error_code`
-     returning overloads to return the same extra information as the throwing
-     overloads.
-     - C interoperability is now available, and some C macros for
-     working with `struct result_TYPE` are available in result.h.
+   - Default construction no longer permitted, as per review feedback.
+   - Empty state no longer possible, as per review feedback. Write
+   `optional<result<T, E>>` if you want that.
+   - As per review feedback, Variant storage gone, it's now a struct-based
+   type for simplicity.
+   - `EC` and `E` types are interpreted via `trait::has_error_code_v<EC>`
+   and `trait::has_exception_ptr_v<E>`. This allows custom payloads to
+   be easily attached to `error_code` and `exception_ptr`.
+   - C interoperability is now available, and some C macros for
+   working with `struct result_TYPE` are available in result.h.
    - Concepts TS is used when available, otherwise a partial
    SFINAE-based emulation is used.
-   - Types `EC`, `P` and `E` must be default constructible. `T` need not
+   - Types `EC` and `E` must be default constructible. `T` need not
    be so.
    - Constructors now follow those of `std::variant`, so it will
    implicitly convert from any input constructible to any of its types so
@@ -83,15 +80,17 @@ so all the monadic stuff is removed.
    value semantics very closely despite not having variant storage.
    - New type sugar types `success<T>`, `failure<EC, E>` for being
    explicit about which kind of `result` or `outcome` we are constructing.
-   - `.has_value()`, `.has_error()`, `.has_exception()` and `.has_payload()` now only
+   - We implement construction from `ValueOrError` Concept matching
+   types which include `std::expected<T, E>`, as per the `ValueOrError`
+   paper https://wg21.link/P0786.
+   - `.has_value()`, `.has_error()` and `.has_exception()` now only
    return true if that specific member is present. A new
    `.has_failure()` is true if errored or excepted.
-   - `.value()` throws exception or `std::system_error(EC)` or UB if no value
-   or returns a reference to the value.
+   - `.value()` throws `bad_result_access|bad_outcome_access`
+   or `std::system_error(EC)` or `std::rethrow_exception(EC)` or UB
+   if no value or returns a reference to the value.
    - `.error()` throws `bad_result_access|bad_outcome_access` or UB if no
    error or returns a reference to the error.
-   - `.payload()` throws `bad_result_access|bad_outcome_access` or UB if no
-   payload or returns a reference to the payload.
    - `.exception()` throws `bad_result_access|bad_outcome_access` or UB if no
    exception or returns a reference to the exception.
    - `.failure()` returns the exception if present, else a synthesised
@@ -112,15 +111,15 @@ so all the monadic stuff is removed.
    the v1 review that a pure C++ v2 would be no better in this regard than
    the preprocessor assembled v1.
    - All macro based customisation points. We now use an ADL function
-   based customisation point design, 100% C++.
+   based, or injection of type specialisation, customisation points. 100% C++.
    - `error_code_extended` is gone for now. It is believed that via the
-   ADL customisation points you can easily implement your own. There is
+   customisation points you can easily implement your own. There is
    a worked example at
-   https://github.com/ned14/outcome/blob/develop/example/error_code_extended.cpp.
+   https://ned14.github.io/outcome/tutorial/hooks/keeping_state
    - Any operators apart from boolean test, strict equality and
    inequality comparison.
    - Any ability to change state after construction.
-   - LEWG `expected<T, E>` is gone. The new templatised `result<T, E>`
+   - LEWG `expected<T, E>` is gone. The new `checked<T, E>`
    is a close substitute to Expected. See the FAQ entry on how to adapt
    a `result<T, E>` into an `expected<T, E>` with a simple shim class.
 
