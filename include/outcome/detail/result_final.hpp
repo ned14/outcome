@@ -103,7 +103,7 @@ namespace detail
     {
       if(this->_state._status & detail::status_have_value)
       {
-        return detail::safe_compare_equal(this->_state._value, o.value);  // NOLINT
+        return detail::safe_compare_equal(this->_state._value, o._value);  // NOLINT
       }
       return false;
     }
@@ -124,7 +124,7 @@ namespace detail
     \effects If a valid expression to do so, calls the `operator==` operation on the failure item returning true if equal. Otherwise returns false.
     \throws Any exception the `operator==` operation might throw.
     */
-    template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->_error, o.error); }
+    template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->_error, o._error); }
     /*! True if not equal to the other result.
     \param o The other result to compare to.
 
@@ -160,7 +160,7 @@ namespace detail
     {
       if(this->_state._status & detail::status_have_value)
       {
-        return detail::safe_compare_notequal(this->_state._value, o.value);  // NOLINT
+        return detail::safe_compare_notequal(this->_state._value, o._value);  // NOLINT
       }
       return true;
     }

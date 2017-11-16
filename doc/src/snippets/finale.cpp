@@ -342,7 +342,7 @@ namespace app
 //! [app_go]
 namespace app
 {
-  outcome<void> go()
+  outcome<void> go()  // NOT noexcept, this can throw STL exceptions e.g. bad_alloc
   {
     // Note that explicit construction is required when converting between differing types
     // of outcome and result. This makes it explicit what you intend to do as conversion

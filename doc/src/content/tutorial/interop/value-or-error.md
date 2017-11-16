@@ -1,7 +1,6 @@
 +++
 title = "ValueOrError Concept"
-description = "Interoperating with std::expected<T, E> and other ValueOrError concept matching types."
-weight = 80
+weight = 7
 +++
 
 Something not really mentioned until now is how Outcome interoperates with the proposed
@@ -33,5 +32,5 @@ useless for constexpr code. Thus separate explicit converting constructors exist
 from any Outcome type (though note that `result` construction from `outcome` does use the
 `ValueOrError` mechanism).
 
-No example of how to implement your own `convert::value_or_error<DEST, SRC>` is given here as many
-examples of implementation follow in the final tutorial section, next.
+Examples of how to implement your own `convert::value_or_error<DEST, SRC>` converter
+is demonstrated in the worked example, next.

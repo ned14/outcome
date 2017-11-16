@@ -36,7 +36,7 @@ namespace convert
   /* The `ValueOrNone` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
-  template <class U> concept ValueOrNone = requires(U a)
+  template <class U> concept bool ValueOrNone = requires(U a)
   {
     {
       a.has_value()
@@ -48,7 +48,7 @@ namespace convert
   \requires That `U::value_type` and `U::error_type` exist;
   that `std::declval<U>().has_value()` returns a `bool`, `std::declval<U>().value()` and  `std::declval<U>().error()` exists.
   */
-  template <class U> concept ValueOrError = requires(U a)
+  template <class U> concept bool ValueOrError = requires(U a)
   {
     {
       a.has_value()

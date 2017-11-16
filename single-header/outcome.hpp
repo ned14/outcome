@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF ab1683ef160756a6113910a51d8fa0b27fbfacd2
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-11-15 12:00:46 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE ab1683ef
+#define OUTCOME_PREVIOUS_COMMIT_REF 84b38777e635f86a41560ea848cdd89b85b6d42f
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-11-15 20:45:04 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 84b38777
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -3224,7 +3224,7 @@ namespace convert
   */
 
 
-  template <class U> concept ValueOrNone = requires(U a)
+  template <class U> concept bool ValueOrNone = requires(U a)
   {
     {
       a.has_value()
@@ -3239,7 +3239,7 @@ namespace convert
 
 
 
-  template <class U> concept ValueOrError = requires(U a)
+  template <class U> concept bool ValueOrError = requires(U a)
   {
     {
       a.has_value()
@@ -3768,7 +3768,7 @@ namespace detail
     {
       if(this->_state._status & detail::status_have_value)
       {
-        return detail::safe_compare_equal(this->_state._value, o.value); // NOLINT
+        return detail::safe_compare_equal(this->_state._value, o._value); // NOLINT
       }
       return false;
     }
@@ -3799,7 +3799,7 @@ namespace detail
 
 
 
-    template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->_error, o.error); }
+    template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->_error, o._error); }
     /*! True if not equal to the other result.
     \param o The other result to compare to.
 
@@ -3846,7 +3846,7 @@ namespace detail
     {
       if(this->_state._status & detail::status_have_value)
       {
-        return detail::safe_compare_notequal(this->_state._value, o.value); // NOLINT
+        return detail::safe_compare_notequal(this->_state._value, o._value); // NOLINT
       }
       return true;
     }
