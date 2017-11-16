@@ -116,10 +116,22 @@ namespace detail
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl2 = detail::outcome_exception_observers<detail::result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>;
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl = std::conditional_t<trait::has_error_code_v<S> && trait::has_exception_ptr_v<P>, detail::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>, select_outcome_impl2<R, S, P, NoValuePolicy>>;
 
-  template <class T, class U, class V> constexpr inline const V &extract_exception_from_failure(const failure_type<U, V> &v) { return v.exception; }
-  template <class T, class U, class V> constexpr inline V &&extract_exception_from_failure(failure_type<U, V> &&v) { return std::move(v.exception); }
+  template <class T, class U, class V> constexpr inline const V &extract_exception_from_failure(const failure_type<U, V> &v) { return v._exception; }
+  template <class T, class U, class V> constexpr inline V &&extract_exception_from_failure(failure_type<U, V> &&v) { return std::move(v._exception); }
   template <class T, class U> constexpr inline T extract_exception_from_failure(const failure_type<U, void> & /*unused*/) { return T{}; }
+
+  template <class T> struct is_outcome : std::false_type
+  {
+  };
+  template <class R, class S, class T, class N> struct is_outcome<outcome<R, S, T, N>> : std::true_type
+  {
+  };
 }  // namespace detail
+
+//! True if an outcome
+template <class T> using is_outcome = detail::is_outcome<std::decay_t<T>>;
+//! True if an outcome
+template <class T> static constexpr bool is_outcome_v = detail::is_outcome<std::decay_t<T>>::value;
 
 namespace hooks
 {
@@ -229,6 +241,9 @@ class OUTCOME_NODISCARD outcome
   {
   };
   struct exception_converting_constructor_tag
+  {
+  };
+  struct explicit_valueorerror_converting_constructor_tag
   {
   };
 
@@ -414,6 +429,25 @@ public:
     hook_outcome_construction(this, std::forward<T>(t));
   }
 
+  /*! Explicit converting constructor from a compatible `ValueOrError` type.
+  \tparam 1
+  \exclude
+  \param o The input for which a `convert::value_or_error<outcome, std::decay_t<T>>{}(std::forward<T>(o))` is available.
+
+  \effects Initialises the outcome with the contents of the compatible input.
+  \requires That `convert::value_or_error<outcome, std::decay_t<T>>{}(std::forward<T>(o))` be available. The
+  default implementation will consume `T`'s matching the `ValueOrError` concept type.
+  `ValueOrError` concept matches any type with a `value_type`,
+  an `error_type`, a `.value()`, an `.error()` and a `.has_value()`.
+  */
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<outcome, std::decay_t<T>>::enable_result_inputs || !is_result_v<T>),    //
+                    OUTCOME_TPRED(convert::value_or_error<outcome, std::decay_t<T>>::enable_outcome_inputs || !is_outcome_v<T>),  //
+                    OUTCOME_TEXPR(convert::value_or_error<outcome, std::decay_t<T>>{}(std::declval<T>())))
+  constexpr explicit outcome(T &&o, explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())  // NOLINT
+  : outcome{convert::value_or_error<outcome, std::decay_t<T>>{}(std::forward<T>(o))}
+  {
+  }
   /*! Explicit converting copy constructor from a compatible outcome type.
   \tparam 4
   \exclude

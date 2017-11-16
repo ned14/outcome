@@ -50,12 +50,12 @@ namespace hook_test
   template <class U> constexpr inline void hook_result_construction(result<int> *res, U && /*unused*/) noexcept
   {
     // Write the value in the result into the static storage
-    snprintf(extended_error_info, sizeof(extended_error_info), "%d", res->assume_value());
+    snprintf(extended_error_info, sizeof(extended_error_info), "%d", res->assume_value());  // NOLINT
   }
   template <class U> constexpr inline void hook_result_construction(result<std::string> *res, U && /*unused*/) noexcept
   {
     // Write the value in the result into the static storage
-    snprintf(extended_error_info, sizeof(extended_error_info), "%s", res->assume_value().c_str());
+    snprintf(extended_error_info, sizeof(extended_error_info), "%s", res->assume_value().c_str());  // NOLINT
   }
 }  // namespace hook_test
 

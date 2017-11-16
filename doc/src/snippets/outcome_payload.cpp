@@ -80,7 +80,7 @@ namespace filesystem2
   inline void throw_as_system_error_with_payload(failure_info fi)
   {
     // If the error code is not filesystem related e.g. ENOMEM, throw that as a standard STL exception.
-    outcome::try_throw_exception_from_error(fi.ec);
+    outcome::try_throw_std_exception_from_error(fi.ec);
     // Throw the exact same filesystem_error exception which the throwing copy_file() edition does.
     throw filesystem_error(fi.ec.message(), std::move(fi.path1), std::move(fi.path2), fi.ec);
   }

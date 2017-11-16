@@ -53,7 +53,7 @@ struct blank_policy
 };
 //! [blank]
 
-using MyOutcomeType = int;
+using MyOutcomeType = outcome<int>;
 
 //! [cast]
 template <class T, class EC, class E> struct outcome_policy

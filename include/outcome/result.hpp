@@ -25,6 +25,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_RESULT_HPP
 #define OUTCOME_RESULT_HPP
 
+#include "convert.hpp"
 #include "detail/result_final.hpp"
 
 #include "policy/all_narrow.hpp"
@@ -129,12 +130,12 @@ namespace detail
                                                                    && !std::is_same<choose_inplace_value_error_constructor<Args...>, disable_inplace_value_error_constructor>::value;
   };
 
-  template <class T, class U> constexpr inline const U &extract_value_from_success(const success_type<U> &v) { return v.value; }
-  template <class T, class U> constexpr inline U &&extract_value_from_success(success_type<U> &&v) { return std::move(v.value); }
+  template <class T, class U> constexpr inline const U &extract_value_from_success(const success_type<U> &v) { return v._value; }
+  template <class T, class U> constexpr inline U &&extract_value_from_success(success_type<U> &&v) { return std::move(v._value); }
   template <class T> constexpr inline T extract_value_from_success(const success_type<void> & /*unused*/) { return T{}; }
 
-  template <class T, class U, class V> constexpr inline const U &extract_error_from_failure(const failure_type<U, V> &v) { return v.error; }
-  template <class T, class U, class V> constexpr inline U &&extract_error_from_failure(failure_type<U, V> &&v) { return std::move(v.error); }
+  template <class T, class U, class V> constexpr inline const U &extract_error_from_failure(const failure_type<U, V> &v) { return v._error; }
+  template <class T, class U, class V> constexpr inline U &&extract_error_from_failure(failure_type<U, V> &&v) { return std::move(v._error); }
   template <class T, class V> constexpr inline T extract_error_from_failure(const failure_type<void, V> & /*unused*/) { return T{}; }
 
   template <class T> struct is_result : std::false_type
@@ -233,6 +234,12 @@ class OUTCOME_NODISCARD result : public detail::result_final<R, S, NoValuePolicy
   {
   };
   struct error_condition_converting_constructor_tag
+  {
+  };
+  struct explicit_valueornone_converting_constructor_tag
+  {
+  };
+  struct explicit_valueorerror_converting_constructor_tag
   {
   };
 
@@ -379,6 +386,24 @@ public:
     hook_result_construction(this, std::forward<ErrorCondEnum>(t));
   }
 
+  /*! Explicit converting constructor from a compatible `ValueOrError` type.
+  \tparam 1
+  \exclude
+  \param o The input for which a `convert::value_or_error<result, std::decay_t<T>>{}(std::forward<T>(o))` is available.
+
+  \effects Initialises the result with the contents of the compatible input.
+  \requires That `convert::value_or_error<result, std::decay_t<T>>{}(std::forward<T>(o))` be available. The
+  default implementation will consume `T`'s matching the `ValueOrError` concept type.
+  `ValueOrError` concept matches any type with a `value_type`,
+  an `error_type`, a `.value()`, an `.error()` and a `.has_value()`.
+  */
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<result, std::decay_t<T>>::enable_result_inputs || !is_result_v<T>),  //
+                    OUTCOME_TEXPR(convert::value_or_error<result, std::decay_t<T>>{}(std::declval<T>())))
+  constexpr explicit result(T &&o, explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())  // NOLINT
+  : result{convert::value_or_error<result, std::decay_t<T>>{}(std::forward<T>(o))}
+  {
+  }
   /*! Explicit converting copy constructor from a compatible result type.
   \tparam 3
   \exclude

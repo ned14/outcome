@@ -5,6 +5,7 @@ set(outcome_HEADERS
   "include/outcome.hpp"
   "include/outcome/bad_access.hpp"
   "include/outcome/config.hpp"
+  "include/outcome/convert.hpp"
   "include/outcome/detail/outcome_exception_observers.hpp"
   "include/outcome/detail/outcome_exception_observers_impl.hpp"
   "include/outcome/detail/outcome_failure_observers.hpp"
