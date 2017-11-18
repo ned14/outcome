@@ -113,8 +113,8 @@ namespace convert
     OUTCOME_TEMPLATE(class X)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_same<U, std::decay_t<X>>::value                                                                                                                                                 //
                                     &&ValueOrError<U>                                                                                                                                                                       //
-                                    && (std::is_void<typename std::decay_t<X>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::value_type, typename std::decay_t<X>::value_type>)  //
-                                    &&(std::is_void<typename std::decay_t<X>::error_type>::value || OUTCOME_V2_NAMESPACE::detail::is_same_or_constructible<typename T::error_type, typename std::decay_t<X>::error_type>) ))
+                                    && (std::is_void<typename std::decay_t<X>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::value_type, typename std::decay_t<X>::value_type>)  //
+                                    &&(std::is_void<typename std::decay_t<X>::error_type>::value || OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::error_type, typename std::decay_t<X>::error_type>) ))
     constexpr T operator()(X &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(std::forward<X>(v)) : detail::make_type<T, typename U::error_type>::error(std::forward<X>(v)); }
   };
 }  // namespace convert

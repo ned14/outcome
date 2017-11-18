@@ -53,10 +53,10 @@ namespace detail
     // Predicate for the implicit constructors to be available
     static constexpr bool implicit_constructors_enabled =     //
     result::implicit_constructors_enabled                     //
-    && !is_same_or_constructible<value_type, exception_type>  //
-    && !is_same_or_constructible<error_type, exception_type>  //
-    && !is_same_or_constructible<exception_type, value_type>  //
-    && !is_same_or_constructible<exception_type, error_type>;
+    && !is_explicitly_constructible<value_type, exception_type>  //
+    && !is_explicitly_constructible<error_type, exception_type>  //
+    && !is_explicitly_constructible<exception_type, value_type>  //
+    && !is_explicitly_constructible<exception_type, error_type>;
 
     // Predicate for the value converting constructor to be available.
     template <class T>
@@ -82,14 +82,14 @@ namespace detail
     static constexpr bool enable_exception_converting_constructor =  //
     implicit_constructors_enabled                                    //
     && !is_in_place_type_t<std::decay_t<T>>::value                   // not in place construction
-    && !std::is_constructible<value_type, T>::value && !std::is_constructible<error_type, T>::value && detail::is_same_or_constructible<exception_type, T>;
+    && !std::is_constructible<value_type, T>::value && !std::is_constructible<error_type, T>::value && detail::is_explicitly_constructible<exception_type, T>;
 
     // Predicate for the converting copy constructor from a compatible outcome to be available.
     template <class T, class U, class V, class W>
     static constexpr bool enable_compatible_conversion =                                                                          //
-    (std::is_void<T>::value || detail::is_same_or_constructible<value_type, typename outcome<T, U, V, W>::value_type>)            // if our value types are constructible
-    &&(std::is_void<U>::value || detail::is_same_or_constructible<error_type, typename outcome<T, U, V, W>::error_type>)          // if our error types are constructible
-    &&(std::is_void<V>::value || detail::is_same_or_constructible<exception_type, typename outcome<T, U, V, W>::exception_type>)  // if our exception types are constructible
+    (std::is_void<T>::value || detail::is_explicitly_constructible<value_type, typename outcome<T, U, V, W>::value_type>)            // if our value types are constructible
+    &&(std::is_void<U>::value || detail::is_explicitly_constructible<error_type, typename outcome<T, U, V, W>::error_type>)          // if our error types are constructible
+    &&(std::is_void<V>::value || detail::is_explicitly_constructible<exception_type, typename outcome<T, U, V, W>::exception_type>)  // if our exception types are constructible
     ;
 
     // Predicate for the implicit converting inplace constructor from a compatible input to be available.

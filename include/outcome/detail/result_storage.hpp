@@ -37,23 +37,23 @@ namespace detail
   /* True if type is the same or constructible. Works around a bug where clang + libstdc++
   pukes on std::is_constructible<filesystem::path, void> (this bug is fixed upstream).
   */
-  template <class T, class U, class... Args> struct _is_same_or_constructible
+  template <class T, class U> struct _is_explicitly_constructible
   {
-    static constexpr bool value = std::is_constructible<T, U, Args...>::value;
+    static constexpr bool value = std::is_constructible<T, U>::value;
   };
-  template <class T> struct _is_same_or_constructible<T, T>
+  template <class T> struct _is_explicitly_constructible<T, T>
   {
     static constexpr bool value = true;
   };
-  template <class T> struct _is_same_or_constructible<T, void>
+  template <class T> struct _is_explicitly_constructible<T, void>
   {
     static constexpr bool value = false;
   };
-  template <> struct _is_same_or_constructible<void, void>
+  template <> struct _is_explicitly_constructible<void, void>
   {
     static constexpr bool value = false;
   };
-  template <class T, class U, class... Args> static constexpr bool is_same_or_constructible = _is_same_or_constructible<T, U>::value;
+  template <class T, class U> static constexpr bool is_explicitly_constructible = _is_explicitly_constructible<T, U>::value;
 // True if type is nothrow swappable
 #if !defined(STANDARDESE_IS_IN_THE_HOUSE) && (_HAS_CXX17 || __cplusplus >= 201700)
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
