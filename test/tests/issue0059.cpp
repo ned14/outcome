@@ -27,6 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 BOOST_OUTCOME_AUTO_TEST_CASE(issues / 59, "result<NonMovable> supported?")
 {
+#if defined(_MSC_VER) || __cplusplus >= 201700
   using namespace OUTCOME_V2_NAMESPACE;
   struct udt
   {
@@ -48,4 +49,5 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 59, "result<NonMovable> supported?")
     return success();
   };
   (void) f();
+#endif
 }

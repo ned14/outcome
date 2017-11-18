@@ -3237,7 +3237,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 //! Namespace for injected convertibility
 namespace convert
 {
-#ifdef __cpp_concepts
+#if 0 || defined(__cpp_concepts)
   /* The `ValueOrNone` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
@@ -5011,7 +5011,7 @@ public:
   \param t The value from which to initialise the `value_type`.
 
   \effects Initialises the result with a `value_type`.
-  \requires Type T is constructible to `value_type`, is not constructible to `error_type`, and is not `result<R, S>` and not `in_place_type<>`.
+  \requires Type T is implicitly constructible to `value_type`, is not implicitly constructible to `error_type`, and is not `result<R, S>` and not `in_place_type<>`.
   \throws Any exception the construction of `value_type(T)` might throw.
   */
 
@@ -5040,8 +5040,8 @@ public:
   \param t The value from which to initialise the `error_type`.
 
   \effects Initialises the result with a `error_type`.
-  \requires Type T is constructible to `error_type`,
-  is not constructible to `value_type`, and is not `result<R, S>` and not `in_place_type<>`.
+  \requires Type T is implicitly constructible to `error_type`,
+  is not implicitly constructible to `value_type`, and is not `result<R, S>` and not `in_place_type<>`.
   \throws Any exception the construction of `error_type(T)` might throw.
   */
 
@@ -5074,7 +5074,7 @@ public:
 
   \effects Initialises the result with a `error_type` constructed via `make_error_code(t)`.
   \requires `std::is_error_condition_enum<ErrorCondEnum>` must be true,
-  `ErrorCondEnum` is not constructible to `value_type` nor `error_type`, and is not `result<R, S>` and not `in_place_type<>`;
+  `ErrorCondEnum` is not implicitly constructible to `value_type` nor `error_type`, and is not `result<R, S>` and not `in_place_type<>`;
   Finally, the expression `error_type(make_error_code(ErrorCondEnum()))` must be valid.
   \throws Any exception the construction of `error_type(make_error_code(t))` might throw.
   */
@@ -5931,7 +5931,7 @@ public:
   \param t The value from which to initialise the `value_type`.
 
   \effects Initialises the outcome with a `value_type`.
-  \requires Type T is constructible to `value_type`, is not constructible to `error_type`, is not constructible to `exception_type` and is not `outcome<R, S, P>` and not `in_place_type<>`.
+  \requires Type T is implicitly constructible to `value_type`, is not implicitly constructible to `error_type`, is not implicitly constructible to `exception_type` and is not `outcome<R, S, P>` and not `in_place_type<>`.
   \throws Any exception the construction of `value_type(T)` might throw.
   */
 
@@ -5961,8 +5961,8 @@ public:
   \param t The value from which to initialise the `error_type`.
 
   \effects Initialises the outcome with a `error_type`.
-  \requires Type T is constructible to `error_type`,
-  is not constructible to `value_type`, is not constructible to `exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
+  \requires Type T is implicitly constructible to `error_type`,
+  is not implicitly constructible to `value_type`, is not implicitly constructible to `exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
   \throws Any exception the construction of `error_type(T)` might throw.
   */
 
@@ -5994,7 +5994,7 @@ public:
 
   \effects Initialises the outcome with a `error_type` constructed via `make_error_code(t)`.
   \requires `std::is_error_condition_enum<ErrorCondEnum>` must be true,
-  `ErrorCondEnum` is not constructible to `value_type`, `error_type` nor `exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
+  `ErrorCondEnum` is not implicitly constructible to `value_type`, `error_type` nor `exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
   Finally, the expression `error_type(make_error_code(ErrorCondEnum()))` must be valid.
   \throws Any exception the construction of `error_type(make_error_code(t))` might throw.
   */
@@ -6027,8 +6027,8 @@ public:
   \param t The value from which to initialise the `exception_type`.
 
   \effects Initialises the outcome with a `exception_type`.
-  \requires `trait::is_exception_ptr<P>` must be true; Type T is constructible to `exception_type`,
-  is not constructible to `value_type`, is not constructible to `error_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
+  \requires `trait::is_exception_ptr<P>` must be true; Type T is implicitly constructible to `exception_type`,
+  is not implicitly constructible to `value_type`, is not implicitly constructible to `error_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
   \throws Any exception the construction of `exception_type(T)` might throw.
   */
 
