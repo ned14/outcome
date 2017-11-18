@@ -124,12 +124,6 @@
 <dd>&mdash; Thrown when you try to access state in a <code>outcome&lt;T, EC, E&gt;</code> which isn’t present.</dd>
 </dl>
 </li>
-<li id="standardese-outcome_v2_xxx::bad_outcome_access_with&lt;S,P&gt;" class="standardese-entity-index-item">
-<dl>
-<dt><a href="doc_bad_access.html#standardese-outcome_v2_xxx::bad_outcome_access_with%3CS,P%3E"><code>bad_outcome_access_with</code></a></dt>
-<dd>&mdash; Thrown when you try to access state in a <code>outcome&lt;T, EC, E&gt;</code> which isn’t present.</dd>
-</dl>
-</li>
 <li id="standardese-outcome_v2_xxx::bad_result_access" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_bad_access.html#standardese-outcome_v2_xxx::bad_result_access"><code>bad_result_access</code></a></dt>
@@ -148,57 +142,91 @@
 <dd>&mdash; A “checked” edition of <code>result&lt;T, E&gt;</code> which does no special handling of specific <code>E</code> types at all.</dd>
 </dl>
 </li>
+<li id="standardese-outcome_v2_xxx::convert" class="standardese-namespace-documentation">
+<h3 class="standardese-namespace-documentation-heading">Namespace <code>convert</code></h3>
+<p class="standardese-brief-section">Namespace for injected convertibility</p>
+<ul class="standardese-namespace-members">
+<li id="standardese-outcome_v2_xxx::convert::ValueOrError" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_convert.html#standardese-outcome_v2_xxx::convert"><code>ValueOrError</code></a></dt>
+</dl>
+</li>
+<li id="standardese-outcome_v2_xxx::convert::ValueOrNone" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_convert.html#standardese-outcome_v2_xxx::convert"><code>ValueOrNone</code></a></dt>
+</dl>
+</li>
+<li id="standardese-outcome_v2_xxx::convert::value_or_error&lt;T,U&gt;" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_convert.html#standardese-outcome_v2_xxx::convert::value_or_error%3CT,U%3E"><code>value_or_error</code></a></dt>
+<dd>&mdash; Default converter for types matching the <code>ValueOrError</code> concept.</dd>
+</dl>
+</li>
+</ul>
+</li>
 <li id="standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code)" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_utils.html#standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code)"><code>error_from_exception</code></a></dt>
 <dd>&mdash; Utility function which tries to match the exception in the pointer provided</dd>
 </dl>
 </li>
+<li id="standardese-outcome_v2_xxx::failure&lt;EC&gt;(EC&amp;&amp;)" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_success_failure.html#standardese-outcome_v2_xxx::failure%3CEC%3E(EC&amp;&amp;)"><code>failure</code></a></dt>
+<dd>&mdash; Returns type sugar for implicitly constructing a <code>result&lt;T&gt;</code> with a failure state.</dd>
+</dl>
+</li>
+<li id="standardese-outcome_v2_xxx::failure_type&lt;EC,E&gt;" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_success_failure.html#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E"><code>failure_type</code></a></dt>
+<dd>&mdash; Type sugar for implicitly constructing a <code>result&lt;&gt;</code> with a failure state of error code and exception.</dd>
+</dl>
+</li>
 <li id="standardese-outcome_v2_xxx::hooks" class="standardese-namespace-documentation">
 <h3 class="standardese-namespace-documentation-heading">Namespace <code>hooks</code></h3>
 <p class="standardese-brief-section">Namespace for ADL discovered hooks into events in <code>result</code> and <code>outcome</code>.</p>
 <ul class="standardese-namespace-members">
-<li id="standardese-outcome_v2_xxx::hooks::hook_outcome_construction&lt;T,U&gt;(in_place_type_t&lt;T&gt;,U*)" class="standardese-entity-index-item">
+<li id="standardese-outcome_v2_xxx::hooks::hook_outcome_construction&lt;T,U&gt;(T*,U&amp;&amp;)" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_outcome.html#standardese-outcome_v2_xxx::hooks"><code>hook_outcome_construction</code></a></dt>
 </dl>
 </li>
-<li id="standardese-outcome_v2_xxx::hooks::hook_outcome_copy_construction&lt;T,U&gt;(in_place_type_t&lt;T&gt;,U*)" class="standardese-entity-index-item">
+<li id="standardese-outcome_v2_xxx::hooks::hook_outcome_copy_construction&lt;T,U&gt;(T*,U&amp;&amp;)" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_outcome.html#standardese-outcome_v2_xxx::hooks"><code>hook_outcome_copy_construction</code></a></dt>
 </dl>
 </li>
-<li id="standardese-outcome_v2_xxx::hooks::hook_outcome_in_place_construction&lt;T,U&gt;(in_place_type_t&lt;T&gt;,U*)" class="standardese-entity-index-item">
+<li id="standardese-outcome_v2_xxx::hooks::hook_outcome_in_place_construction&lt;T,U,Args&gt;(T*,in_place_type_t&lt;U&gt;,Args&amp;&amp;...)" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_outcome.html#standardese-outcome_v2_xxx::hooks"><code>hook_outcome_in_place_construction</code></a></dt>
 </dl>
 </li>
-<li id="standardese-outcome_v2_xxx::hooks::hook_outcome_move_construction&lt;T,U&gt;(in_place_type_t&lt;T&gt;,U*)" class="standardese-entity-index-item">
+<li id="standardese-outcome_v2_xxx::hooks::hook_outcome_move_construction&lt;T,U&gt;(T*,U&amp;&amp;)" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_outcome.html#standardese-outcome_v2_xxx::hooks"><code>hook_outcome_move_construction</code></a></dt>
 </dl>
 </li>
-<li id="standardese-outcome_v2_xxx::hooks::hook_result_construction&lt;T,U&gt;(in_place_type_t&lt;T&gt;,U*)" class="standardese-entity-index-item">
+<li id="standardese-outcome_v2_xxx::hooks::hook_result_construction&lt;T,U&gt;(T*,U&amp;&amp;)" class="standardese-entity-index-item">
 <dl>
-<dt><a href="doc_result.html#standardese-outcome_v2_xxx::hooks::hook_result_construction%3CT,U%3E(in_place_type_t%3CT%3E,U*)"><code>hook_result_construction</code></a></dt>
+<dt><a href="doc_result.html#standardese-outcome_v2_xxx::hooks::hook_result_construction%3CT,U%3E(T*,U&amp;&amp;)"><code>hook_result_construction</code></a></dt>
 <dd>&mdash; The default instantiation hook implementation called when a <code>result</code> is first created</dd>
 </dl>
 </li>
-<li id="standardese-outcome_v2_xxx::hooks::hook_result_copy_construction&lt;T,U&gt;(in_place_type_t&lt;T&gt;,U*)" class="standardese-entity-index-item">
+<li id="standardese-outcome_v2_xxx::hooks::hook_result_copy_construction&lt;T,U&gt;(T*,U&amp;&amp;)" class="standardese-entity-index-item">
 <dl>
-<dt><a href="doc_result.html#standardese-outcome_v2_xxx::hooks::hook_result_copy_construction%3CT,U%3E(in_place_type_t%3CT%3E,U*)"><code>hook_result_copy_construction</code></a></dt>
+<dt><a href="doc_result.html#standardese-outcome_v2_xxx::hooks::hook_result_copy_construction%3CT,U%3E(T*,U&amp;&amp;)"><code>hook_result_copy_construction</code></a></dt>
 <dd>&mdash; The default instantiation hook implementation called when a <code>result</code> is created by copying</dd>
 </dl>
 </li>
-<li id="standardese-outcome_v2_xxx::hooks::hook_result_in_place_construction&lt;T,U&gt;(in_place_type_t&lt;T&gt;,U*)" class="standardese-entity-index-item">
+<li id="standardese-outcome_v2_xxx::hooks::hook_result_in_place_construction&lt;T,U,Args&gt;(T*,in_place_type_t&lt;U&gt;,Args&amp;&amp;...)" class="standardese-entity-index-item">
 <dl>
-<dt><a href="doc_result.html#standardese-outcome_v2_xxx::hooks::hook_result_in_place_construction%3CT,U%3E(in_place_type_t%3CT%3E,U*)"><code>hook_result_in_place_construction</code></a></dt>
+<dt><a href="doc_result.html#standardese-outcome_v2_xxx::hooks::hook_result_in_place_construction%3CT,U,Args%3E(T*,in_place_type_t%3CU%3E,Args&amp;&amp;...)"><code>hook_result_in_place_construction</code></a></dt>
 <dd>&mdash; The default instantiation hook implementation called when a <code>result</code> is created by in place</dd>
 </dl>
 </li>
-<li id="standardese-outcome_v2_xxx::hooks::hook_result_move_construction&lt;T,U&gt;(in_place_type_t&lt;T&gt;,U*)" class="standardese-entity-index-item">
+<li id="standardese-outcome_v2_xxx::hooks::hook_result_move_construction&lt;T,U&gt;(T*,U&amp;&amp;)" class="standardese-entity-index-item">
 <dl>
-<dt><a href="doc_result.html#standardese-outcome_v2_xxx::hooks::hook_result_move_construction%3CT,U%3E(in_place_type_t%3CT%3E,U*)"><code>hook_result_move_construction</code></a></dt>
+<dt><a href="doc_result.html#standardese-outcome_v2_xxx::hooks::hook_result_move_construction%3CT,U%3E(T*,U&amp;&amp;)"><code>hook_result_move_construction</code></a></dt>
 <dd>&mdash; The default instantiation hook implementation called when a <code>result</code> is created by moving</dd>
 </dl>
 </li>
@@ -220,6 +248,16 @@
 </dl>
 </li>
 </ul>
+</li>
+<li id="standardese-outcome_v2_xxx::is_outcome&lt;T&gt;" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_outcome.html#standardese-outcome_v2_xxx"><code>is_outcome</code></a></dt>
+</dl>
+</li>
+<li id="standardese-outcome_v2_xxx::is_outcome_v" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_outcome.html#standardese-outcome_v2_xxx"><code>is_outcome_v</code></a></dt>
+</dl>
 </li>
 <li id="standardese-outcome_v2_xxx::is_result&lt;T&gt;" class="standardese-entity-index-item">
 <dl>
@@ -293,10 +331,22 @@
 <dd>&mdash; Default policy selector.</dd>
 </dl>
 </li>
+<li id="standardese-outcome_v2_xxx::policy::error_code&lt;T&gt;(T&amp;&amp;)" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_success_failure.html#standardese-outcome_v2_xxx::policy::error_code%3CT%3E(T&amp;&amp;)"><code>error_code</code></a></dt>
+<dd>&mdash; Used by policies to extract a <code>std::error_code</code> from some input <code>T</code> via ADL discovery of some <code>make_error_code(T)</code> function.</dd>
+</dl>
+</li>
 <li id="standardese-outcome_v2_xxx::policy::error_code_throw_as_system_error&lt;T,EC,E&gt;" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_outcome_error_code_throw_as_system_error.html#standardese-outcome_v2_xxx::policy::error_code_throw_as_system_error%3CT,EC,E%3E"><code>error_code_throw_as_system_error</code></a></dt>
 <dd>&mdash; Policy interpreting <code>EC</code> as a type for which <code>trait::has_error_code_v&lt;EC&gt;</code> is true.</dd>
+</dl>
+</li>
+<li id="standardese-outcome_v2_xxx::policy::exception_ptr&lt;T&gt;(T&amp;&amp;)" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_success_failure.html#standardese-outcome_v2_xxx::policy::exception_ptr%3CT%3E(T&amp;&amp;)"><code>exception_ptr</code></a></dt>
+<dd>&mdash; Used by policies to extract a <code>std::exception_ptr</code> from some input <code>T</code> via ADL discovery of some <code>make_exception_ptr(T)</code> function.</dd>
 </dl>
 </li>
 <li id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;T,EC,E&gt;" class="standardese-entity-index-item">
@@ -309,6 +359,12 @@
 <dl>
 <dt><a href="doc_terminate.html#standardese-outcome_v2_xxx::policy::terminate"><code>terminate</code></a></dt>
 <dd>&mdash; Policy implementing any wide attempt to access the successful state as calling <code>std::terminate</code></dd>
+</dl>
+</li>
+<li id="standardese-outcome_v2_xxx::policy::throw_as_system_error_with_payload&lt;Error&gt;(Errorconst&amp;)" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_success_failure.html#standardese-outcome_v2_xxx::policy::throw_as_system_error_with_payload%3CError%3E(Errorconst&amp;)"><code>throw_as_system_error_with_payload</code></a></dt>
+<dd>&mdash; Override to define what the policies which throw a system error with payload ought to do for some particular <code>result.error()</code>.</dd>
 </dl>
 </li>
 <li id="standardese-outcome_v2_xxx::policy::throw_bad_result_access&lt;EC&gt;" class="standardese-entity-index-item">
@@ -331,15 +387,64 @@
 <dd>&mdash; Used to return from functions either (i) a successful value (ii) a cause of failure. <code>constexpr</code> capable.</dd>
 </dl>
 </li>
-<li id="standardese-outcome_v2_xxx::swap&lt;R,S,P,N&gt;(outcome&lt;R,S,P,N&gt;&amp;,outcome&lt;R,S,P,N&gt;&amp;)" class="standardese-entity-index-item">
+<li id="standardese-outcome_v2_xxx::success()" class="standardese-entity-index-item">
 <dl>
-<dt><a href="doc_outcome.html#standardese-outcome_v2_xxx"><code>swap</code></a></dt>
+<dt><a href="doc_success_failure.html#standardese-outcome_v2_xxx::success%3CT%3E(T&amp;&amp;)"><code>success</code></a></dt>
+<dd>&mdash; Returns type sugar for implicitly constructing a <code>result&lt;T&gt;</code> with a successful state,</dd>
 </dl>
+</li>
+<li id="standardese-outcome_v2_xxx::success_type&lt;T&gt;" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_success_failure.html#standardese-outcome_v2_xxx::success_type%3CT%3E"><code>success_type</code></a></dt>
+<dd>&mdash; Type sugar for implicitly constructing a <code>result&lt;&gt;</code> with a successful state.</dd>
+</dl>
+</li>
+<li id="standardese-outcome_v2_xxx::swap&lt;R,S,P&gt;(result&lt;R,S,P&gt;&amp;,result&lt;R,S,P&gt;&amp;)" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_result.html#standardese-outcome_v2_xxx::swap%3CR,S,P%3E(result%3CR,S,P%3E&amp;,result%3CR,S,P%3E&amp;)"><code>swap</code></a></dt>
+<dd>&mdash; Specialise swap for result.</dd>
+</dl>
+</li>
+<li id="standardese-outcome_v2_xxx::trait" class="standardese-namespace-documentation">
+<h3 class="standardese-namespace-documentation-heading">Namespace <code>trait</code></h3>
+<p class="standardese-brief-section">Namespace for traits</p>
+<ul class="standardese-namespace-members">
+<li id="standardese-outcome_v2_xxx::trait::has_error_code&lt;T&gt;" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_success_failure.html#standardese-outcome_v2_xxx::trait::has_error_code%3CT%3E"><code>has_error_code</code></a></dt>
+<dd>&mdash; Trait for whether a free function <code>make_error_code(T)</code> returning a <code>std::error_code</code> exists or not.</dd>
+</dl>
+</li>
+<li id="standardese-outcome_v2_xxx::trait::has_error_code_v" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_success_failure.html#standardese-outcome_v2_xxx::trait::has_error_code_v"><code>has_error_code_v</code></a></dt>
+<dd>&mdash; Trait for whether a free function <code>make_error_code(T)</code> returning a <code>std::error_code</code> exists or not.</dd>
+</dl>
+</li>
+<li id="standardese-outcome_v2_xxx::trait::has_exception_ptr&lt;T&gt;" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_success_failure.html#standardese-outcome_v2_xxx::trait::has_exception_ptr%3CT%3E"><code>has_exception_ptr</code></a></dt>
+<dd>&mdash; Trait for whether a free function <code>make_exception_ptr(T)</code> returning a <code>std::exception_ptr</code> exists or not.</dd>
+</dl>
+</li>
+<li id="standardese-outcome_v2_xxx::trait::has_exception_ptr_v" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_success_failure.html#standardese-outcome_v2_xxx::trait::has_exception_ptr_v"><code>has_exception_ptr_v</code></a></dt>
+<dd>&mdash; Trait for whether a free function <code>make_exception_ptr(T)</code> returning a <code>std::exception_ptr</code> exists or not.</dd>
+</dl>
+</li>
+</ul>
 </li>
 <li id="standardese-outcome_v2_xxx::try_operation_return_as&lt;T&gt;(T&amp;&amp;)" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_try.html#standardese-outcome_v2_xxx::try_operation_return_as%3CT%3E(T&amp;&amp;)"><code>try_operation_return_as</code></a></dt>
 <dd>&mdash; Customisation point for changing what the <code>OUTCOME_TRY</code> macros</dd>
+</dl>
+</li>
+<li id="standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code)" class="standardese-entity-index-item">
+<dl>
+<dt><a href="doc_utils.html#standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code)"><code>try_throw_std_exception_from_error</code></a></dt>
+<dd>&mdash; Utility function which tries to throw the equivalent STL exception type for</dd>
 </dl>
 </li>
 <li id="standardese-outcome_v2_xxx::unchecked&lt;R,S&gt;" class="standardese-entity-index-item">

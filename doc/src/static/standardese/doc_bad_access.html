@@ -19,9 +19,6 @@
     <span class="kwd">class</span> <a href="doc_bad_access.html#standardese-outcome_v2_xxx::bad_result_access_with%3CS%3E"><span class="typ dec var fun">bad_result_access_with</span></a><span class="pun">;</span>
 
     <span class="kwd">class</span> <a href="doc_bad_access.html#standardese-outcome_v2_xxx::bad_outcome_access"><span class="typ dec var fun">bad_outcome_access</span></a><span class="pun">;</span>
-
-    <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">S</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">P</span><span class="pun">&gt;</span>
-    <span class="kwd">class</span> <a href="doc_bad_access.html#standardese-outcome_v2_xxx::bad_outcome_access_with%3CS,P%3E"><span class="typ dec var fun">bad_outcome_access_with</span></a><span class="pun">;</span>
 <span class="pun">}</span>
 </code></pre>
 <section id="standardese-outcome_v2_xxx" class="standardese-entity-documentation">
@@ -79,57 +76,6 @@
 <span class="pun">};</span>
 </code></pre>
 <p id="standardese-outcome_v2_xxx::bad_outcome_access-brief" class="standardese-brief-section">Thrown when you try to access state in a <code>outcome&lt;T, EC, E&gt;</code> which isn’t present.</p>
-</section>
-<hr class="standardese-entity-documentation-break" />
-<section id="standardese-outcome_v2_xxx::bad_outcome_access_with&lt;S,P&gt;" class="standardese-entity-documentation">
-<h3 class="standardese-entity-documentation-heading">Class <code>bad_outcome_access_with</code></h3>
-<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">S</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">P</span><span class="pun">&gt;</span>
-<span class="kwd">class</span> <span class="typ dec var fun">bad_outcome_access_with</span>
-<span class="pun">:</span> <span class="kwd">public</span> <span class="typ dec var fun">bad_outcome_access</span>
-<span class="pun">{</span>
-<span class="kwd">public</span><span class="pun">:</span>
-    <span class="typ dec var fun">bad_outcome_access_with</span><span class="pun">(</span><span class="typ dec var fun">S</span> <span class="typ dec var fun">x</span><span class="pun">,</span> <span class="typ dec var fun">P</span> <span class="typ dec var fun">y</span><span class="pun">)</span><span class="pun">;</span>
-
-    &#x2F;&#x2F;=== outcome_error ===&#x2F;&#x2F;
-    <span class="typ dec var fun">S</span> <span class="kwd">const</span><span class="pun">&amp;</span> <a href="doc_bad_access.html#standardese-outcome_v2_xxx::bad_outcome_access_with%3CS,P%3E::error()const&amp;"><span class="typ dec var fun">error</span></a><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;</span><span class="pun">;</span>
-    <span class="typ dec var fun">S</span><span class="pun">&amp;</span> <a href="doc_bad_access.html#standardese-outcome_v2_xxx::bad_outcome_access_with%3CS,P%3E::error()const&amp;"><span class="typ dec var fun">error</span></a><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;</span><span class="pun">;</span>
-    <span class="typ dec var fun">S</span> <span class="kwd">const</span><span class="pun">&amp;&amp;</span> <a href="doc_bad_access.html#standardese-outcome_v2_xxx::bad_outcome_access_with%3CS,P%3E::error()const&amp;"><span class="typ dec var fun">error</span></a><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
-    <span class="typ dec var fun">S</span><span class="pun">&amp;&amp;</span> <a href="doc_bad_access.html#standardese-outcome_v2_xxx::bad_outcome_access_with%3CS,P%3E::error()const&amp;"><span class="typ dec var fun">error</span></a><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
-
-    &#x2F;&#x2F;=== outcome_payload ===&#x2F;&#x2F;
-    <span class="typ dec var fun">P</span> <span class="kwd">const</span><span class="pun">&amp;</span> <a href="doc_bad_access.html#standardese-outcome_v2_xxx::bad_outcome_access_with%3CS,P%3E::payload()const&amp;"><span class="typ dec var fun">payload</span></a><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;</span><span class="pun">;</span>
-    <span class="typ dec var fun">P</span><span class="pun">&amp;</span> <a href="doc_bad_access.html#standardese-outcome_v2_xxx::bad_outcome_access_with%3CS,P%3E::payload()const&amp;"><span class="typ dec var fun">payload</span></a><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;</span><span class="pun">;</span>
-    <span class="typ dec var fun">P</span> <span class="kwd">const</span><span class="pun">&amp;&amp;</span> <a href="doc_bad_access.html#standardese-outcome_v2_xxx::bad_outcome_access_with%3CS,P%3E::payload()const&amp;"><span class="typ dec var fun">payload</span></a><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
-    <span class="typ dec var fun">P</span><span class="pun">&amp;&amp;</span> <a href="doc_bad_access.html#standardese-outcome_v2_xxx::bad_outcome_access_with%3CS,P%3E::payload()const&amp;"><span class="typ dec var fun">payload</span></a><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
-<span class="pun">};</span>
-</code></pre>
-<p id="standardese-outcome_v2_xxx::bad_outcome_access_with&lt;S,P&gt;-brief" class="standardese-brief-section">Thrown when you try to access state in a <code>outcome&lt;T, EC, E&gt;</code> which isn’t present.</p>
-<section id="standardese-outcome_v2_xxx::bad_outcome_access_with&lt;S,P&gt;::error()const&amp;" class="standardese-entity-documentation">
-<h3 class="standardese-entity-documentation-heading">Function <code>error</code></h3>
-<pre><code class="standardese-language-cpp standardese-entity-synopsis">(1) <span class="typ dec var fun">S</span> <span class="kwd">const</span><span class="pun">&amp;</span> <span class="typ dec var fun">error</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;</span><span class="pun">;</span>
-
-(2) <span class="typ dec var fun">S</span><span class="pun">&amp;</span> <span class="typ dec var fun">error</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;</span><span class="pun">;</span>
-
-(3) <span class="typ dec var fun">S</span> <span class="kwd">const</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">error</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
-
-(4) <span class="typ dec var fun">S</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">error</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
-</code></pre>
-<p id="standardese-outcome_v2_xxx::bad_outcome_access_with&lt;S,P&gt;::error()const&amp;-brief" class="standardese-brief-section">Observes the error</p>
-</section>
-<hr class="standardese-entity-documentation-break" />
-<section id="standardese-outcome_v2_xxx::bad_outcome_access_with&lt;S,P&gt;::payload()const&amp;" class="standardese-entity-documentation">
-<h3 class="standardese-entity-documentation-heading">Function <code>payload</code></h3>
-<pre><code class="standardese-language-cpp standardese-entity-synopsis">(1) <span class="typ dec var fun">P</span> <span class="kwd">const</span><span class="pun">&amp;</span> <span class="typ dec var fun">payload</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;</span><span class="pun">;</span>
-
-(2) <span class="typ dec var fun">P</span><span class="pun">&amp;</span> <span class="typ dec var fun">payload</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;</span><span class="pun">;</span>
-
-(3) <span class="typ dec var fun">P</span> <span class="kwd">const</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">payload</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
-
-(4) <span class="typ dec var fun">P</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">payload</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
-</code></pre>
-<p id="standardese-outcome_v2_xxx::bad_outcome_access_with&lt;S,P&gt;::payload()const&amp;-brief" class="standardese-brief-section">Observes the payload</p>
-</section>
-<hr class="standardese-entity-documentation-break" />
 </section>
 <hr class="standardese-entity-documentation-break" />
 </section>

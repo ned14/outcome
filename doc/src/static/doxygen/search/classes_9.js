@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['no_5ferror_5fpayload',['no_error_payload',['../structoutcome__v2__xxx_1_1trait_1_1detail_1_1no__error__payload.html',1,'outcome_v2_xxx::trait::detail']]],
-  ['no_5ferror_5ftype',['no_error_type',['../structoutcome__v2__xxx_1_1no__error__type.html',1,'outcome_v2_xxx']]],
-  ['no_5fexception_5ftype',['no_exception_type',['../structoutcome__v2__xxx_1_1no__exception__type.html',1,'outcome_v2_xxx']]],
-  ['no_5fvalue_5ftype',['no_value_type',['../structoutcome__v2__xxx_1_1no__value__type.html',1,'outcome_v2_xxx']]]
+  ['make_5ftype',['make_type',['../structoutcome__v2__xxx_1_1convert_1_1detail_1_1make__type.html',1,'outcome_v2_xxx::convert::detail']]],
+  ['make_5ftype_3c_20t_2c_20void_20_3e',['make_type&lt; T, void &gt;',['../structoutcome__v2__xxx_1_1convert_1_1detail_1_1make__type_3_01_t_00_01void_01_4.html',1,'outcome_v2_xxx::convert::detail']]]
 ];

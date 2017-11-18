@@ -18,6 +18,8 @@
 <span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
 <span class="pun">{</span>
     <span class="typ dec var fun">std::error_code</span> <a href="doc_utils.html#standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code)"><span class="typ dec var fun">error_from_exception</span></a><span class="pun">(</span><span class="typ dec var fun">std::exception_ptr</span><span class="pun">&amp;&amp;</span> <a href="doc_utils.html#standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code).ep"><span class="typ dec var fun">ep</span></a> <span class="pun">=</span> <span class="kwd">std</span><span class="pun">::</span><span class="kwd">current_exception</span><span class="pun">(</span><span class="pun">,</span> <span class="typ dec var fun">std::error_code</span> <a href="doc_utils.html#standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code).not_matched"><span class="typ dec var fun">not_matched</span></a> <span class="pun">=</span> <span class="kwd">std</span><span class="pun">::</span><span class="kwd">make_error_code</span><span class="pun">(</span><span class="kwd">std</span><span class="pun">::</span><span class="kwd">errc</span><span class="pun">::</span><span class="kwd">resource_unavailable_try_again</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
+
+    <span class="kwd">void</span> <a href="doc_utils.html#standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code)"><span class="typ dec var fun">try_throw_std_exception_from_error</span></a><span class="pun">(</span><span class="typ dec var fun">std::error_code</span> <a href="doc_utils.html#standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code).ec"><span class="typ dec var fun">ec</span></a><span class="pun">)</span><span class="pun">;</span>
 <span class="pun">}</span>
 </code></pre>
 <section id="standardese-outcome_v2_xxx" class="standardese-entity-documentation">
@@ -48,6 +50,30 @@ and the pointer is left unmodified.</dd>
 <p>Note that a null pointer in returns a null error code.</p>
 </section>
 <hr class="standardese-entity-documentation-break" />
+</section>
+<hr class="standardese-entity-documentation-break" />
+<section id="standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code)" class="standardese-entity-documentation">
+<h3 class="standardese-entity-documentation-heading">Function <code>try_throw_std_exception_from_error</code></h3>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">void</span> <span class="typ dec var fun">try_throw_std_exception_from_error</span><span class="pun">(</span><span class="typ dec var fun">std::error_code</span> <a href="doc_utils.html#standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code).ec"><span class="typ dec var fun">ec</span></a><span class="pun">)</span><span class="pun">;</span>
+</code></pre>
+<p id="standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code)-brief" class="standardese-brief-section">Utility function which tries to throw the equivalent STL exception type for</p>
+<dl id="standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code)-inline-sections" class="standardese-inline-sections">
+<dt>Effects:</dt>
+<dd>If the input error code has a category of <code>generic_category()</code> (all platforms)
+or <code>system_category()</code> (POSIX only), throw the STL exception type matching
+the <code>errno</code> domained code if one is available. For example, <code>ENOMEM</code> would cause
+<code>std::bad_alloc()</code> to be thrown.</dd>
+</dl>
+<p>some given error code, not including <code>system_error</code>.</p>
+<h4 class="standardese-list-section-heading">Parameters</h4>
+<ul id="standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code)-params" class="standardese-list-section">
+<li id="standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code).ec">
+<dl id="standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code).ec" class="standardese-term-description-item">
+<dt><code>ec</code></dt>
+<dd>&mdash; The error code to try to convert into a STL exception throw.</dd>
+</dl>
+</li>
+</ul>
 </section>
 <hr class="standardese-entity-documentation-break" />
 </section>

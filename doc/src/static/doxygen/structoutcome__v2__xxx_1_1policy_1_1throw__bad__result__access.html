@@ -107,6 +107,9 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a6b784f2992e1b59d033351b8d473c411"><td class="memTemplParams" colspan="2">template&lt;class Impl &gt; </td></tr>
 <tr class="memitem:a6b784f2992e1b59d033351b8d473c411"><td class="memTemplItemLeft" align="right" valign="top">static constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1throw__bad__result__access.html#a6b784f2992e1b59d033351b8d473c411">wide_error_check</a> (Impl &amp;&amp;self)</td></tr>
 <tr class="separator:a6b784f2992e1b59d033351b8d473c411"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5063f5080989997f737a51b3d5e3cd5d"><td class="memTemplParams" colspan="2">template&lt;class Impl &gt; </td></tr>
+<tr class="memitem:a5063f5080989997f737a51b3d5e3cd5d"><td class="memTemplItemLeft" align="right" valign="top">static constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1throw__bad__result__access.html#a5063f5080989997f737a51b3d5e3cd5d">wide_exception_check</a> (Impl &amp;&amp;self)</td></tr>
+<tr class="separator:a5063f5080989997f737a51b3d5e3cd5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9570ef83d522d0fc3f1c8b23f41e486"><td class="memTemplParams" colspan="2">template&lt;class Impl &gt; </td></tr>
 <tr class="memitem:ad9570ef83d522d0fc3f1c8b23f41e486"><td class="memTemplItemLeft" align="right" valign="top">static constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1detail_1_1base.html#ad9570ef83d522d0fc3f1c8b23f41e486">narrow_value_check</a> (Impl &amp;&amp;self) noexcept</td></tr>
 <tr class="separator:ad9570ef83d522d0fc3f1c8b23f41e486"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -150,7 +153,7 @@ template&lt;class Impl &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Performs a narrow check of state, used in the assume_error() functions </p><dl class="section user"><dt>Effects:</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      {</div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keywordflow">if</span>((<span class="keyword">self</span>._state._status &amp; OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)</div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        {</div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;          _ub();</div><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        }</div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      {</div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keywordflow">if</span>((<span class="keyword">self</span>._state._status &amp; OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)</div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        {</div><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;          _ub(<span class="keyword">self</span>);</div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        }</div><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;      }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ac0d90f882b5260ad739ae1b9d7b3ed82"></a>
@@ -179,7 +182,7 @@ template&lt;class Impl &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Performs a narrow check of state, used in the assume_exception() functions </p><dl class="section user"><dt>Effects:</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      {</div><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        <span class="keywordflow">if</span>((<span class="keyword">self</span>._state._status &amp; OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)</div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        {</div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;          _ub();</div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        }</div><div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      {</div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="keywordflow">if</span>((<span class="keyword">self</span>._state._status &amp; OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)</div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        {</div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;          _ub(<span class="keyword">self</span>);</div><div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        }</div><div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ad9570ef83d522d0fc3f1c8b23f41e486"></a>
@@ -208,7 +211,7 @@ template&lt;class Impl &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Performs a narrow check of state, used in the assume_value() functions. </p><dl class="section user"><dt>Effects:</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      {</div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordflow">if</span>((<span class="keyword">self</span>._state._status &amp; OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)</div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        {</div><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;          _ub();</div><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        }</div><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      {</div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="keywordflow">if</span>((<span class="keyword">self</span>._state._status &amp; OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)</div><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        {</div><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;          _ub(<span class="keyword">self</span>);</div><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        }</div><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a6b784f2992e1b59d033351b8d473c411"></a>
@@ -240,6 +243,38 @@ template&lt;class Impl &gt; </div>
 </div><div class="memdoc">
 <p>Performs a wide check of state, used in the error() functions </p><dl class="section user"><dt>Effects:</dt><dd>If result does not have an error, it throws <code>bad_result_access</code>. </dd></dl>
 <div class="fragment"><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    {</div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      <span class="keywordflow">if</span>((<span class="keyword">self</span>._state._status &amp; OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)</div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      {</div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <a class="code" href="config_8hpp.html#af09e26ac558a8ce5302a4174f1105441">OUTCOME_THROW_EXCEPTION</a>(bad_result_access(<span class="stringliteral">&quot;no error&quot;</span>));</div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      }</div><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    }</div><div class="ttc" id="config_8hpp_html_af09e26ac558a8ce5302a4174f1105441"><div class="ttname"><a href="config_8hpp.html#af09e26ac558a8ce5302a4174f1105441">OUTCOME_THROW_EXCEPTION</a></div><div class="ttdeci">#define OUTCOME_THROW_EXCEPTION(expr)</div><div class="ttdef"><b>Definition:</b> config.hpp:143</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a5063f5080989997f737a51b3d5e3cd5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5063f5080989997f737a51b3d5e3cd5d">&#9670;&nbsp;</a></span>wide_exception_check()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class EC &gt; </div>
+<div class="memtemplate">
+template&lt;class Impl &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static constexpr void <a class="el" href="structoutcome__v2__xxx_1_1policy_1_1throw__bad__result__access.html">outcome_v2_xxx::policy::throw_bad_result_access</a>&lt; EC &gt;::wide_exception_check </td>
+          <td>(</td>
+          <td class="paramtype">Impl &amp;&amp;&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Performs a wide check of state, used in the exception() functions </p><dl class="section user"><dt>Effects:</dt><dd>If result does not have an exception, it throws <code>bad_outcome_access</code>. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    {</div><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      <span class="keywordflow">if</span>((<span class="keyword">self</span>._state._status &amp; OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)</div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      {</div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <a class="code" href="config_8hpp.html#af09e26ac558a8ce5302a4174f1105441">OUTCOME_THROW_EXCEPTION</a>(bad_outcome_access(<span class="stringliteral">&quot;no exception&quot;</span>));</div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;      }</div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    }</div><div class="ttc" id="config_8hpp_html_af09e26ac558a8ce5302a4174f1105441"><div class="ttname"><a href="config_8hpp.html#af09e26ac558a8ce5302a4174f1105441">OUTCOME_THROW_EXCEPTION</a></div><div class="ttdeci">#define OUTCOME_THROW_EXCEPTION(expr)</div><div class="ttdef"><b>Definition:</b> config.hpp:143</div></div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -1,5 +1,6 @@
 var namespaceoutcome__v2__xxx =
 [
+    [ "convert", "namespaceoutcome__v2__xxx_1_1convert.html", "namespaceoutcome__v2__xxx_1_1convert" ],
     [ "detail", "namespaceoutcome__v2__xxx_1_1detail.html", "namespaceoutcome__v2__xxx_1_1detail" ],
     [ "policy", "namespaceoutcome__v2__xxx_1_1policy.html", "namespaceoutcome__v2__xxx_1_1policy" ],
     [ "trait", "namespaceoutcome__v2__xxx_1_1trait.html", "namespaceoutcome__v2__xxx_1_1trait" ],

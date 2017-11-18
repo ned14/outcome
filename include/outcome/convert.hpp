@@ -32,7 +32,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 //! Namespace for injected convertibility
 namespace convert
 {
-#if defined(STANDARDESE_IS_IN_THE_HOUSE) || defined(__cpp_concepts)
+#if defined(__cpp_concepts)
   /* The `ValueOrNone` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
@@ -75,7 +75,14 @@ namespace convert
     template <class U> static constexpr bool ValueOrNone = !std::is_same<no_match, decltype(match_value_or_none(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
     template <class U> static constexpr bool ValueOrError = !std::is_same<no_match, decltype(match_value_or_error(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
   }  // namespace detail
+  /* The `ValueOrNone` concept.
+  \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
+  */
   template <class U> static constexpr bool ValueOrNone = detail::ValueOrNone<U>;
+  /* The `ValueOrError` concept.
+  \requires That `U::value_type` and `U::error_type` exist;
+  that `std::declval<U>().has_value()` returns a `bool`, `std::declval<U>().value()` and  `std::declval<U>().error()` exists.
+  */
   template <class U> static constexpr bool ValueOrError = detail::ValueOrError<U>;
 #endif
 

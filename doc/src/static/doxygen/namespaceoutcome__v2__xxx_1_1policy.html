@@ -123,10 +123,6 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:abdc64e103ce5270f3d56ee2e7cf4dc3f"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:abdc64e103ce5270f3d56ee2e7cf4dc3f"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#abdc64e103ce5270f3d56ee2e7cf4dc3f">throw_as_system_error_with_payload</a> (const T &amp;)</td></tr>
-<tr class="memdesc:abdc64e103ce5270f3d56ee2e7cf4dc3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Override to define what the policies which throw a system error with payload ought to do for some particular <code>result.error()</code>.  <a href="#abdc64e103ce5270f3d56ee2e7cf4dc3f">More...</a><br /></td></tr>
-<tr class="separator:abdc64e103ce5270f3d56ee2e7cf4dc3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a764975e0cb1ecdcbfa544b97716efc1b"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a764975e0cb1ecdcbfa544b97716efc1b"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto) constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a764975e0cb1ecdcbfa544b97716efc1b">error_code</a> (T &amp;&amp;v)</td></tr>
 <tr class="memdesc:a764975e0cb1ecdcbfa544b97716efc1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used by policies to extract a <code>std::error_code</code> from some input <code>T</code> via ADL discovery of some <code>make_error_code(T)</code> function.  <a href="#a764975e0cb1ecdcbfa544b97716efc1b">More...</a><br /></td></tr>
@@ -135,6 +131,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a63d9745748fb1319c48e44ce761473fd"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto) constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a63d9745748fb1319c48e44ce761473fd">exception_ptr</a> (T &amp;&amp;v)</td></tr>
 <tr class="memdesc:a63d9745748fb1319c48e44ce761473fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used by policies to extract a <code>std::exception_ptr</code> from some input <code>T</code> via ADL discovery of some <code>make_exception_ptr(T)</code> function.  <a href="#a63d9745748fb1319c48e44ce761473fd">More...</a><br /></td></tr>
 <tr class="separator:a63d9745748fb1319c48e44ce761473fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69b1c2383978fc6eed3337c045af25dc"><td class="memTemplParams" colspan="2">template&lt;class Error &gt; </td></tr>
+<tr class="memitem:a69b1c2383978fc6eed3337c045af25dc"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1policy.html#a69b1c2383978fc6eed3337c045af25dc">throw_as_system_error_with_payload</a> (const Error &amp;error)</td></tr>
+<tr class="memdesc:a69b1c2383978fc6eed3337c045af25dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Override to define what the policies which throw a system error with payload ought to do for some particular <code>result.error()</code>.  <a href="#a69b1c2383978fc6eed3337c045af25dc">More...</a><br /></td></tr>
+<tr class="separator:a69b1c2383978fc6eed3337c045af25dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Namespace for policies. </p>
@@ -184,7 +184,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Used by policies to extract a <code>std::error_code</code> from some input <code>T</code> via ADL discovery of some <code>make_error_code(T)</code> function. </p>
-<div class="fragment"><div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="namespaceoutcome__v2__xxx_1_1policy.html#a764975e0cb1ecdcbfa544b97716efc1b">detail::error_code</a>(std::forward&lt;T&gt;(v)); }</div><div class="ttc" id="namespaceoutcome__v2__xxx_1_1policy_html_a764975e0cb1ecdcbfa544b97716efc1b"><div class="ttname"><a href="namespaceoutcome__v2__xxx_1_1policy.html#a764975e0cb1ecdcbfa544b97716efc1b">outcome_v2_xxx::policy::error_code</a></div><div class="ttdeci">decltype(auto) constexpr error_code(T &amp;&amp;v)</div><div class="ttdoc">Used by policies to extract a std::error_code from some input T via ADL discovery of some make_error_...</div><div class="ttdef"><b>Definition:</b> success_failure.hpp:112</div></div>
+<div class="fragment"><div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="namespaceoutcome__v2__xxx_1_1policy.html#a764975e0cb1ecdcbfa544b97716efc1b">detail::error_code</a>(std::forward&lt;T&gt;(v)); }</div><div class="ttc" id="namespaceoutcome__v2__xxx_1_1policy_html_a764975e0cb1ecdcbfa544b97716efc1b"><div class="ttname"><a href="namespaceoutcome__v2__xxx_1_1policy.html#a764975e0cb1ecdcbfa544b97716efc1b">outcome_v2_xxx::policy::error_code</a></div><div class="ttdeci">decltype(auto) constexpr error_code(T &amp;&amp;v)</div><div class="ttdoc">Used by policies to extract a std::error_code from some input T via ADL discovery of some make_error_...</div><div class="ttdef"><b>Definition:</b> success_failure.hpp:109</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -215,17 +215,17 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Used by policies to extract a <code>std::exception_ptr</code> from some input <code>T</code> via ADL discovery of some <code>make_exception_ptr(T)</code> function. </p>
-<div class="fragment"><div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="namespaceoutcome__v2__xxx_1_1policy.html#a63d9745748fb1319c48e44ce761473fd">detail::exception_ptr</a>(std::forward&lt;T&gt;(v)); }</div><div class="ttc" id="namespaceoutcome__v2__xxx_1_1policy_html_a63d9745748fb1319c48e44ce761473fd"><div class="ttname"><a href="namespaceoutcome__v2__xxx_1_1policy.html#a63d9745748fb1319c48e44ce761473fd">outcome_v2_xxx::policy::exception_ptr</a></div><div class="ttdeci">decltype(auto) constexpr exception_ptr(T &amp;&amp;v)</div><div class="ttdoc">Used by policies to extract a std::exception_ptr from some input T via ADL discovery of some make_exc...</div><div class="ttdef"><b>Definition:</b> success_failure.hpp:114</div></div>
+<div class="fragment"><div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="namespaceoutcome__v2__xxx_1_1policy.html#a63d9745748fb1319c48e44ce761473fd">detail::exception_ptr</a>(std::forward&lt;T&gt;(v)); }</div><div class="ttc" id="namespaceoutcome__v2__xxx_1_1policy_html_a63d9745748fb1319c48e44ce761473fd"><div class="ttname"><a href="namespaceoutcome__v2__xxx_1_1policy.html#a63d9745748fb1319c48e44ce761473fd">outcome_v2_xxx::policy::exception_ptr</a></div><div class="ttdeci">decltype(auto) constexpr exception_ptr(T &amp;&amp;v)</div><div class="ttdoc">Used by policies to extract a std::exception_ptr from some input T via ADL discovery of some make_exc...</div><div class="ttdef"><b>Definition:</b> success_failure.hpp:111</div></div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="abdc64e103ce5270f3d56ee2e7cf4dc3f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abdc64e103ce5270f3d56ee2e7cf4dc3f">&#9670;&nbsp;</a></span>throw_as_system_error_with_payload()</h2>
+<a id="a69b1c2383978fc6eed3337c045af25dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69b1c2383978fc6eed3337c045af25dc">&#9670;&nbsp;</a></span>throw_as_system_error_with_payload()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class T &gt; </div>
+template&lt;class Error &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -233,8 +233,8 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="memname">constexpr void outcome_v2_xxx::policy::throw_as_system_error_with_payload </td>
           <td>(</td>
-          <td class="paramtype">const T &amp;&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const Error &amp;&#160;</td>
+          <td class="paramname"><em>error</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -246,7 +246,9 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Override to define what the policies which throw a system error with payload ought to do for some particular <code>result.error()</code>. </p>
-<div class="fragment"><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;{ static_assert(!std::is_same&lt;T, T&gt;::value, <span class="stringliteral">&quot;To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload&quot;</span>); }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  {</div><div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    (void) error;</div><div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    static_assert(std::is_convertible&lt;Error, std::error_code&gt;::value || std::is_error_code_enum&lt;std::decay_t&lt;Error&gt;&gt;::value || std::is_error_condition_enum&lt;std::decay_t&lt;Error&gt;&gt;::value,</div><div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;                  <span class="stringliteral">&quot;To use the error_code_throw_as_system_error policy with a custom Error type, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload&quot;</span>);</div><div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <a class="code" href="config_8hpp.html#af09e26ac558a8ce5302a4174f1105441">OUTCOME_THROW_EXCEPTION</a>(std::system_error(<a class="code" href="namespaceoutcome__v2__xxx_1_1policy.html#a764975e0cb1ecdcbfa544b97716efc1b">error_code</a>(error)));</div><div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  }</div><div class="ttc" id="config_8hpp_html_af09e26ac558a8ce5302a4174f1105441"><div class="ttname"><a href="config_8hpp.html#af09e26ac558a8ce5302a4174f1105441">OUTCOME_THROW_EXCEPTION</a></div><div class="ttdeci">#define OUTCOME_THROW_EXCEPTION(expr)</div><div class="ttdef"><b>Definition:</b> config.hpp:143</div></div>
+<div class="ttc" id="namespaceoutcome__v2__xxx_1_1policy_html_a764975e0cb1ecdcbfa544b97716efc1b"><div class="ttname"><a href="namespaceoutcome__v2__xxx_1_1policy.html#a764975e0cb1ecdcbfa544b97716efc1b">outcome_v2_xxx::policy::error_code</a></div><div class="ttdeci">decltype(auto) constexpr error_code(T &amp;&amp;v)</div><div class="ttdoc">Used by policies to extract a std::error_code from some input T via ADL discovery of some make_error_...</div><div class="ttdef"><b>Definition:</b> success_failure.hpp:109</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

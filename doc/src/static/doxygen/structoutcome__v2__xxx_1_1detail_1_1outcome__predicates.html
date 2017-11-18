@@ -181,7 +181,7 @@ template&lt;class T , class U , class V , class W &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=                                                                          </div><div class="line">    (std::is_void&lt;T&gt;::value || detail::is_same_or_constructible&lt;value_type, typename outcome&lt;T, U, V, W&gt;::value_type&gt;)            </div><div class="line">    &amp;&amp;(std::is_void&lt;U&gt;::value || detail::is_same_or_constructible&lt;error_type, <span class="keyword">typename</span> <a class="code" href="classoutcome__v2__xxx_1_1outcome.html#ad6e4bba4bf7d01cab2772f3b1e85de83">outcome&lt;T, U, V, W&gt;::error_type</a>&gt;)          </div><div class="line">    &amp;&amp;(std::is_void&lt;V&gt;::value || detail::is_same_or_constructible&lt;exception_type, typename outcome&lt;T, U, V, W&gt;::exception_type&gt;)</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">=                                                                             </div><div class="line">    (std::is_void&lt;T&gt;::value || detail::is_explicitly_constructible&lt;value_type, typename outcome&lt;T, U, V, W&gt;::value_type&gt;)            </div><div class="line">    &amp;&amp;(std::is_void&lt;U&gt;::value || detail::is_explicitly_constructible&lt;error_type, <span class="keyword">typename</span> <a class="code" href="classoutcome__v2__xxx_1_1outcome.html#ad6e4bba4bf7d01cab2772f3b1e85de83">outcome&lt;T, U, V, W&gt;::error_type</a>&gt;)          </div><div class="line">    &amp;&amp;(std::is_void&lt;V&gt;::value || detail::is_explicitly_constructible&lt;exception_type, typename outcome&lt;T, U, V, W&gt;::exception_type&gt;)</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ae08f930d0a86e6dd22dc8d723678386f"></a>
@@ -207,7 +207,7 @@ template&lt;class ErrorCondEnum &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= result::template enable_error_condition_converting_constructor&lt;ErrorCondEnum&gt;  </div><div class="line">                                                                          &amp;&amp; !std::is_constructible&lt;exception_type, ErrorCondEnum&gt;::value</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">= result::template enable_error_condition_converting_constructor&lt;ErrorCondEnum&gt;  </div><div class="line">                                                                          &amp;&amp; !detail::is_implicitly_constructible&lt;exception_type, ErrorCondEnum&gt;</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a1cc73bafd57f60537a922bf719ee2932"></a>
@@ -233,7 +233,7 @@ template&lt;class T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=  </div><div class="line">    <a class="code" href="structoutcome__v2__xxx_1_1detail_1_1outcome__predicates.html#a565a2a948828e24229081d253e5ba991">implicit_constructors_enabled</a>                                </div><div class="line">    &amp;&amp;result::template enable_error_converting_constructor&lt;T&gt;    </div><div class="line">    &amp;&amp; !std::is_constructible&lt;exception_type, T&gt;::value</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">=  </div><div class="line">    <a class="code" href="structoutcome__v2__xxx_1_1detail_1_1outcome__predicates.html#a565a2a948828e24229081d253e5ba991">implicit_constructors_enabled</a>                                </div><div class="line">    &amp;&amp;result::template enable_error_converting_constructor&lt;T&gt;    </div><div class="line">    &amp;&amp; !detail::is_implicitly_constructible&lt;exception_type, T&gt;</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a5a2b6e3f63ee66574e60620981277a18"></a>
@@ -259,7 +259,7 @@ template&lt;class T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=  </div><div class="line">    <a class="code" href="structoutcome__v2__xxx_1_1detail_1_1outcome__predicates.html#a565a2a948828e24229081d253e5ba991">implicit_constructors_enabled</a>                                    </div><div class="line">    &amp;&amp; !is_in_place_type_t&lt;std::decay_t&lt;T&gt;&gt;::value                   </div><div class="line">    &amp;&amp; !std::is_constructible&lt;value_type, T&gt;::value &amp;&amp; !std::is_constructible&lt;error_type, T&gt;::value &amp;&amp; detail::is_same_or_constructible&lt;exception_type, T&gt;</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">=  </div><div class="line">    <a class="code" href="structoutcome__v2__xxx_1_1detail_1_1outcome__predicates.html#a565a2a948828e24229081d253e5ba991">implicit_constructors_enabled</a>                                    </div><div class="line">    &amp;&amp; !is_in_place_type_t&lt;std::decay_t&lt;T&gt;&gt;::value                   </div><div class="line">    &amp;&amp; !detail::is_implicitly_constructible&lt;value_type, T&gt; &amp;&amp; !detail::is_implicitly_constructible&lt;error_type, T&gt; &amp;&amp; detail::is_implicitly_constructible&lt;exception_type, T&gt;</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a37e992354067d858945492c860d0ec68"></a>
@@ -311,7 +311,7 @@ template&lt;class T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=  </div><div class="line">    <a class="code" href="structoutcome__v2__xxx_1_1detail_1_1outcome__predicates.html#a565a2a948828e24229081d253e5ba991">implicit_constructors_enabled</a>                                </div><div class="line">    &amp;&amp;result::template enable_value_converting_constructor&lt;T&gt;    </div><div class="line">    &amp;&amp; !std::is_constructible&lt;exception_type, T&gt;::value</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">=  </div><div class="line">    <a class="code" href="structoutcome__v2__xxx_1_1detail_1_1outcome__predicates.html#a565a2a948828e24229081d253e5ba991">implicit_constructors_enabled</a>                                </div><div class="line">    &amp;&amp;result::template enable_value_converting_constructor&lt;T&gt;    </div><div class="line">    &amp;&amp; !detail::is_implicitly_constructible&lt;exception_type, T&gt;</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a565a2a948828e24229081d253e5ba991"></a>
@@ -335,7 +335,7 @@ template&lt;class value_type , class error_type , class exception_type &gt; </di
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=     </div><div class="line">    <a class="code" href="structoutcome__v2__xxx_1_1detail_1_1result__predicates.html#a6cd192be7bfbce151d9affada8bd42e9">result::implicit_constructors_enabled</a>                     </div><div class="line">    &amp;&amp; !is_same_or_constructible&lt;value_type, exception_type&gt;  </div><div class="line">    &amp;&amp; !is_same_or_constructible&lt;error_type, exception_type&gt;  </div><div class="line">    &amp;&amp; !is_same_or_constructible&lt;exception_type, value_type&gt;  </div><div class="line">    &amp;&amp; !is_same_or_constructible&lt;exception_type, error_type&gt;</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">=                </div><div class="line">    <a class="code" href="structoutcome__v2__xxx_1_1detail_1_1result__predicates.html#a6cd192be7bfbce151d9affada8bd42e9">result::implicit_constructors_enabled</a>                                </div><div class="line">    &amp;&amp; !detail::is_implicitly_constructible&lt;value_type, exception_type&gt;  </div><div class="line">    &amp;&amp; !detail::is_implicitly_constructible&lt;error_type, exception_type&gt;  </div><div class="line">    &amp;&amp; !detail::is_implicitly_constructible&lt;exception_type, value_type&gt;  </div><div class="line">    &amp;&amp; !detail::is_implicitly_constructible&lt;exception_type, error_type&gt;</div></div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
