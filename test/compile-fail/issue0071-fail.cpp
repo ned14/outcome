@@ -1,5 +1,5 @@
 /* clang-format off
-(error: no matching function for call to .+::result|error: no matching constructor for initialization of 'result<udt, std::error_code>'|cannot convert argument 1 from 'int')
+(error: no matching function for call to .+::result|error: no matching constructor for initialization of 'result<udt>'|cannot convert argument 1 from 'int')
 clang-format on
 */
 
