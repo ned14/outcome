@@ -17,7 +17,7 @@ Conceptually, `outcome<T, EC, EP>` can be thought of as `variant<T, EC, EP>` or 
 3. Interoperability with `result<T, EC>`.
 
 
-`outcome<T, EC, EP>` is useful for transporting exceptions across layers of the program that was never designed with exception_ptr`safety in mind.
+`outcome<T, EC, EP>` is useful for transporting exceptions across layers of the program that were never designed with exception safety in mind.
 
 Consider a program consisting of three layers:
 
@@ -29,9 +29,9 @@ graph BT
 {{</mermaid>}}
   
 The highest-level layer, `Layer3`, uses exceptions for signalling failures. The middle layer, `Layer2NX`,
-was not designed with exception safety in mind and function need to return information about failures in return value.
+was not designed with exception safety in mind and functions need to return information about failures in return value.
 But down in the implementation details, in `Layer1`, another library is used that again throws exceptions. The goal is
-to be able to transfer an exception thrown in `Layer1` through `Layer2`, which is not exception-safe, and be able to rethrow it in `Layer3`.
+to be able to transfer an exception thrown in `Layer1` through `Layer2NX`, which is not exception-safe, and be able to rethrow it in `Layer3`.
 
 In `Layer1` we have a throwing function:
 
