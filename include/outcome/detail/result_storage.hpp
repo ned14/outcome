@@ -54,6 +54,25 @@ namespace detail
     static constexpr bool value = false;
   };
   template <class T, class U> static constexpr bool is_explicitly_constructible = _is_explicitly_constructible<T, U>::value;
+
+  template <class T, class U> struct _is_implicitly_constructible
+  {
+    static constexpr bool value = std::is_convertible<U, T>::value;
+  };
+  template <class T> struct _is_implicitly_constructible<T, T>
+  {
+    static constexpr bool value = true;
+  };
+  template <class T> struct _is_implicitly_constructible<T, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <> struct _is_implicitly_constructible<void, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <class T, class U> static constexpr bool is_implicitly_constructible = _is_implicitly_constructible<T, U>::value;
+
 // True if type is nothrow swappable
 #if !defined(STANDARDESE_IS_IN_THE_HOUSE) && (_HAS_CXX17 || __cplusplus >= 201700)
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;

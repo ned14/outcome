@@ -32,7 +32,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 59, "result<NonMovable> supported?")
   {
     const char *_v{nullptr};
     udt() = delete;
-    constexpr explicit udt(const char *v) noexcept : _v(v) {}
+    constexpr udt(const char *v) noexcept : _v(v) {}  // NOLINT
     udt(udt &&o) = delete;
     udt(const udt &) = delete;
     udt &operator=(udt &&o) = delete;

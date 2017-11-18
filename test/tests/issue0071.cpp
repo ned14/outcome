@@ -30,8 +30,9 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 71 / outcome, "Implicit construction is ov
   struct udt
   {
     int v;
-    explicit udt(int a) : v(a) {};
+    explicit udt(int a)
+        : v(a){};
   };
-  result<udt> m = { 5 };
+  result<udt> m = udt{5};
   BOOST_CHECK(m.value().v == 5);
 }
