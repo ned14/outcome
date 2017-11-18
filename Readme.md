@@ -46,6 +46,7 @@ On Windows, simply download the raw file from above and place it wherever it sui
  - [ ] Regen docs and submit bugs to Standardese
  - [ ] Translate docs into Boost edition
  - [ ] Get AFIO et al working with latest Outcome
+ - [ ] Check all files in Boost edition have licence boilerplate (issue #38)
 
 # Changes since v1:
 
