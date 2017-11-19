@@ -89,7 +89,8 @@ $(document).ready(function(){initNavTree('result_8hpp.html','');});
 <div class="title">result.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="result__final_8hpp.html">detail/result_final.hpp</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="convert_8hpp.html">convert.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="result__final_8hpp.html">detail/result_final.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="all__narrow_8hpp.html">policy/all_narrow.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="result__error__code__throw__as__system__error_8hpp.html">policy/result_error_code_throw_as_system_error.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="result__exception__ptr__rethrow_8hpp.html">policy/result_exception_ptr_rethrow.hpp</a>&quot;</code><br />
@@ -168,18 +169,18 @@ Functions</h2></td></tr>
 <tr class="memitem:a2b3cd2c680a175d863ec26d76fcf233d"><td class="memTemplParams" colspan="2">template&lt;class T , class V &gt; </td></tr>
 <tr class="memitem:a2b3cd2c680a175d863ec26d76fcf233d"><td class="memTemplItemLeft" align="right" valign="top">constexpr T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1detail.html#a2b3cd2c680a175d863ec26d76fcf233d">outcome_v2_xxx::detail::extract_error_from_failure</a> (const failure_type&lt; void, V &gt; &amp;)</td></tr>
 <tr class="separator:a2b3cd2c680a175d863ec26d76fcf233d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9ea286efc7bd79c98bb24de99962e5b0"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
-<tr class="memitem:a9ea286efc7bd79c98bb24de99962e5b0"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#a9ea286efc7bd79c98bb24de99962e5b0">outcome_v2_xxx::hooks::hook_result_construction</a> (in_place_type_t&lt; T &gt;, U *) noexcept</td></tr>
-<tr class="separator:a9ea286efc7bd79c98bb24de99962e5b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65aea7ecae6f947cad431f6a599fe06f"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
-<tr class="memitem:a65aea7ecae6f947cad431f6a599fe06f"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#a65aea7ecae6f947cad431f6a599fe06f">outcome_v2_xxx::hooks::hook_result_copy_construction</a> (in_place_type_t&lt; T &gt;, U *) noexcept</td></tr>
-<tr class="separator:a65aea7ecae6f947cad431f6a599fe06f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0571da4b7167e79369ff6662e0ae141"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
-<tr class="memitem:ae0571da4b7167e79369ff6662e0ae141"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#ae0571da4b7167e79369ff6662e0ae141">outcome_v2_xxx::hooks::hook_result_move_construction</a> (in_place_type_t&lt; T &gt;, U *) noexcept</td></tr>
-<tr class="separator:ae0571da4b7167e79369ff6662e0ae141"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae2cd33cfd3fb8fd50181941e6944356f"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
-<tr class="memitem:ae2cd33cfd3fb8fd50181941e6944356f"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#ae2cd33cfd3fb8fd50181941e6944356f">outcome_v2_xxx::hooks::hook_result_in_place_construction</a> (in_place_type_t&lt; T &gt;, U *) noexcept</td></tr>
-<tr class="separator:ae2cd33cfd3fb8fd50181941e6944356f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace2ccfa7b1da8a804018a1f2907e6e80"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
+<tr class="memitem:ace2ccfa7b1da8a804018a1f2907e6e80"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#ace2ccfa7b1da8a804018a1f2907e6e80">outcome_v2_xxx::hooks::hook_result_construction</a> (T *, U &amp;&amp;) noexcept</td></tr>
+<tr class="separator:ace2ccfa7b1da8a804018a1f2907e6e80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e08a0b2812c6a3af211b55b380abe2c"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
+<tr class="memitem:a6e08a0b2812c6a3af211b55b380abe2c"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#a6e08a0b2812c6a3af211b55b380abe2c">outcome_v2_xxx::hooks::hook_result_copy_construction</a> (T *, U &amp;&amp;) noexcept</td></tr>
+<tr class="separator:a6e08a0b2812c6a3af211b55b380abe2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7e3a8108f7b7f7bbc382a5203172373"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
+<tr class="memitem:af7e3a8108f7b7f7bbc382a5203172373"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#af7e3a8108f7b7f7bbc382a5203172373">outcome_v2_xxx::hooks::hook_result_move_construction</a> (T *, U &amp;&amp;) noexcept</td></tr>
+<tr class="separator:af7e3a8108f7b7f7bbc382a5203172373"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25865af55b1b535133d491ab920f41ca"><td class="memTemplParams" colspan="2">template&lt;class T , class U , class... Args&gt; </td></tr>
+<tr class="memitem:a25865af55b1b535133d491ab920f41ca"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#a25865af55b1b535133d491ab920f41ca">outcome_v2_xxx::hooks::hook_result_in_place_construction</a> (T *, in_place_type_t&lt; U &gt;, Args &amp;&amp;...) noexcept</td></tr>
+<tr class="separator:a25865af55b1b535133d491ab920f41ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed2306ff27d3ccf715c7e49f933dadea"><td class="memTemplParams" colspan="2">template&lt;class R , class S , class NoValuePolicy &gt; </td></tr>
 <tr class="memitem:aed2306ff27d3ccf715c7e49f933dadea"><td class="memTemplItemLeft" align="right" valign="top">constexpr uint16_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#aed2306ff27d3ccf715c7e49f933dadea">outcome_v2_xxx::hooks::spare_storage</a> (const detail::result_final&lt; R, S, NoValuePolicy &gt; *r) noexcept</td></tr>
 <tr class="memdesc:aed2306ff27d3ccf715c7e49f933dadea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the sixteen bits of spare storage in a <code>result</code> or <code>outcome</code>.  <a href="namespaceoutcome__v2__xxx_1_1hooks.html#aed2306ff27d3ccf715c7e49f933dadea">More...</a><br /></td></tr>

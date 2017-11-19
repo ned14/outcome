@@ -101,8 +101,6 @@ Namespaces</h2></td></tr>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1trait_1_1has__error__code.html">has_error_code</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1trait_1_1has__error__payload.html">has_error_payload</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1trait_1_1has__exception__ptr.html">has_exception_ptr</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -111,9 +109,6 @@ Variables</h2></td></tr>
 <tr class="memitem:a0113514912d0d186701cc86724e7d0c9"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a0113514912d0d186701cc86724e7d0c9"><td class="memTemplItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1trait.html#a0113514912d0d186701cc86724e7d0c9">has_error_code_v</a> = <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1has__error__code.html">has_error_code</a>&lt;T&gt;::value</td></tr>
 <tr class="separator:a0113514912d0d186701cc86724e7d0c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa7ae64d85d7f1d2d9fc3c06867fb0185"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:aa7ae64d85d7f1d2d9fc3c06867fb0185"><td class="memTemplItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1trait.html#aa7ae64d85d7f1d2d9fc3c06867fb0185">has_error_payload_v</a> = <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1has__error__payload.html">has_error_payload</a>&lt;T&gt;::value</td></tr>
-<tr class="separator:aa7ae64d85d7f1d2d9fc3c06867fb0185"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a258869ebdc76bcef2cd5926cccbd3d47"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a258869ebdc76bcef2cd5926cccbd3d47"><td class="memTemplItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1trait.html#a258869ebdc76bcef2cd5926cccbd3d47">has_exception_ptr_v</a> = <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1has__exception__ptr.html">has_exception_ptr</a>&lt;T&gt;::value</td></tr>
 <tr class="separator:a258869ebdc76bcef2cd5926cccbd3d47"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -135,23 +130,6 @@ template&lt;class T &gt; </div>
       </table>
 </div><div class="memdoc">
 <p>Trait for whether a free function <code>make_error_code(T)</code> returning a <code>std::error_code</code> exists or not. Also returns true if <code>std::error_code</code> is convertible from T. </p>
-
-</div>
-</div>
-<a id="aa7ae64d85d7f1d2d9fc3c06867fb0185"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa7ae64d85d7f1d2d9fc3c06867fb0185">&#9670;&nbsp;</a></span>has_error_payload_v</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class T &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr bool outcome_v2_xxx::trait::has_error_payload_v = <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1has__error__payload.html">has_error_payload</a>&lt;T&gt;::value</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Trait for whether a free function <code>throw_as_system_error_with_payload(T)</code> exists or not. </p>
 
 </div>
 </div>

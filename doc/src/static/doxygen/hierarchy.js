@@ -1,9 +1,13 @@
 var hierarchy =
 [
-    [ "outcome_v2_xxx::detail::_is_same_or_constructible< T, U, Args >", "structoutcome__v2__xxx_1_1detail_1_1__is__same__or__constructible.html", null ],
-    [ "outcome_v2_xxx::detail::_is_same_or_constructible< T, T >", "structoutcome__v2__xxx_1_1detail_1_1__is__same__or__constructible_3_01_t_00_01_t_01_4.html", null ],
-    [ "outcome_v2_xxx::detail::_is_same_or_constructible< T, void >", "structoutcome__v2__xxx_1_1detail_1_1__is__same__or__constructible_3_01_t_00_01void_01_4.html", null ],
-    [ "outcome_v2_xxx::detail::_is_same_or_constructible< void, void >", "structoutcome__v2__xxx_1_1detail_1_1__is__same__or__constructible_3_01void_00_01void_01_4.html", null ],
+    [ "outcome_v2_xxx::detail::_is_explicitly_constructible< T, U >", "structoutcome__v2__xxx_1_1detail_1_1__is__explicitly__constructible.html", null ],
+    [ "outcome_v2_xxx::detail::_is_explicitly_constructible< T, T >", "structoutcome__v2__xxx_1_1detail_1_1__is__explicitly__constructible_3_01_t_00_01_t_01_4.html", null ],
+    [ "outcome_v2_xxx::detail::_is_explicitly_constructible< T, void >", "structoutcome__v2__xxx_1_1detail_1_1__is__explicitly__constructible_3_01_t_00_01void_01_4.html", null ],
+    [ "outcome_v2_xxx::detail::_is_explicitly_constructible< void, void >", "structoutcome__v2__xxx_1_1detail_1_1__is__explicitly__constructible_3_01void_00_01void_01_4.html", null ],
+    [ "outcome_v2_xxx::detail::_is_implicitly_constructible< T, U >", "structoutcome__v2__xxx_1_1detail_1_1__is__implicitly__constructible.html", null ],
+    [ "outcome_v2_xxx::detail::_is_implicitly_constructible< T, T >", "structoutcome__v2__xxx_1_1detail_1_1__is__implicitly__constructible_3_01_t_00_01_t_01_4.html", null ],
+    [ "outcome_v2_xxx::detail::_is_implicitly_constructible< T, void >", "structoutcome__v2__xxx_1_1detail_1_1__is__implicitly__constructible_3_01_t_00_01void_01_4.html", null ],
+    [ "outcome_v2_xxx::detail::_is_implicitly_constructible< void, void >", "structoutcome__v2__xxx_1_1detail_1_1__is__implicitly__constructible_3_01void_00_01void_01_4.html", null ],
     [ "Base", null, [
       [ "outcome_v2_xxx::detail::outcome_exception_observers< Base, R, S, P, NoValuePolicy >", "classoutcome__v2__xxx_1_1detail_1_1outcome__exception__observers.html", null ],
       [ "outcome_v2_xxx::detail::outcome_exception_observers< Base, R, S, void, NoValuePolicy >", "classoutcome__v2__xxx_1_1detail_1_1outcome__exception__observers_3_01_base_00_01_r_00_01_s_00_01void_00_01_no_value_policy_01_4.html", null ],
@@ -49,6 +53,7 @@ var hierarchy =
     [ "false_type", null, [
       [ "outcome_v2_xxx::detail::is_failure_type< T >", "structoutcome__v2__xxx_1_1detail_1_1is__failure__type.html", null ],
       [ "outcome_v2_xxx::detail::is_in_place_type_t< T >", "structoutcome__v2__xxx_1_1detail_1_1is__in__place__type__t.html", null ],
+      [ "outcome_v2_xxx::detail::is_outcome< T >", "structoutcome__v2__xxx_1_1detail_1_1is__outcome.html", null ],
       [ "outcome_v2_xxx::detail::is_result< T >", "structoutcome__v2__xxx_1_1detail_1_1is__result.html", null ],
       [ "outcome_v2_xxx::detail::is_success_type< T >", "structoutcome__v2__xxx_1_1detail_1_1is__success__type.html", null ]
     ] ],
@@ -57,25 +62,22 @@ var hierarchy =
       [ "outcome_v2_xxx::trait::detail::has_error_code< T >", "structoutcome__v2__xxx_1_1trait_1_1detail_1_1has__error__code.html", [
         [ "outcome_v2_xxx::trait::has_error_code< T >", "structoutcome__v2__xxx_1_1trait_1_1has__error__code.html", null ]
       ] ],
-      [ "outcome_v2_xxx::trait::detail::has_error_payload< T >", "structoutcome__v2__xxx_1_1trait_1_1detail_1_1has__error__payload.html", [
-        [ "outcome_v2_xxx::trait::has_error_payload< T >", "structoutcome__v2__xxx_1_1trait_1_1has__error__payload.html", null ]
-      ] ],
       [ "outcome_v2_xxx::trait::detail::has_exception_ptr< T >", "structoutcome__v2__xxx_1_1trait_1_1detail_1_1has__exception__ptr.html", [
         [ "outcome_v2_xxx::trait::has_exception_ptr< T >", "structoutcome__v2__xxx_1_1trait_1_1has__exception__ptr.html", null ]
       ] ],
       [ "outcome_v2_xxx::detail::_is_nothrow_swappable::is_nothrow_swappable< T, class >", "structoutcome__v2__xxx_1_1detail_1_1__is__nothrow__swappable_1_1is__nothrow__swappable.html", null ],
       [ "outcome_v2_xxx::detail::_is_nothrow_swappable::is_nothrow_swappable< T, decltype(swap(ldeclval< T >(), ldeclval< T >()))>", "structoutcome__v2__xxx_1_1detail_1_1__is__nothrow__swappable_1_1is__nothrow__swappable_3_01_t_00466f078e8572b706c4192fe4dce4cae3.html", null ],
       [ "outcome_v2_xxx::trait::detail::has_error_code< T, V >", "structoutcome__v2__xxx_1_1trait_1_1detail_1_1has__error__code.html", null ],
-      [ "outcome_v2_xxx::trait::detail::has_error_payload< T, V >", "structoutcome__v2__xxx_1_1trait_1_1detail_1_1has__error__payload.html", null ],
       [ "outcome_v2_xxx::trait::detail::has_exception_ptr< T, V >", "structoutcome__v2__xxx_1_1trait_1_1detail_1_1has__exception__ptr.html", null ]
     ] ],
-    [ "outcome_v2_xxx::trait::detail::no_error_payload", "structoutcome__v2__xxx_1_1trait_1_1detail_1_1no__error__payload.html", null ],
+    [ "outcome_v2_xxx::convert::detail::make_type< T, X >", "structoutcome__v2__xxx_1_1convert_1_1detail_1_1make__type.html", null ],
+    [ "outcome_v2_xxx::convert::detail::make_type< T, void >", "structoutcome__v2__xxx_1_1convert_1_1detail_1_1make__type_3_01_t_00_01void_01_4.html", null ],
     [ "outcome_v2_xxx::no_error_type", "structoutcome__v2__xxx_1_1no__error__type.html", null ],
     [ "outcome_v2_xxx::no_exception_type", "structoutcome__v2__xxx_1_1no__exception__type.html", null ],
     [ "outcome_v2_xxx::no_value_type", "structoutcome__v2__xxx_1_1no__value__type.html", null ],
     [ "outcome_v2_xxx::detail::outcome_predicates< value_type, error_type, exception_type >", "structoutcome__v2__xxx_1_1detail_1_1outcome__predicates.html", null ],
-    [ "outcome_v2_xxx::outcome< R, S, P, NoValuePolicy >::predicate", "structoutcome__v2__xxx_1_1outcome_1_1predicate.html", null ],
     [ "outcome_v2_xxx::result< R, S, NoValuePolicy >::predicate", "structoutcome__v2__xxx_1_1result_1_1predicate.html", null ],
+    [ "outcome_v2_xxx::outcome< R, S, P, NoValuePolicy >::predicate", "structoutcome__v2__xxx_1_1outcome_1_1predicate.html", null ],
     [ "outcome_v2_xxx::detail::result_predicates< value_type, error_type >", "structoutcome__v2__xxx_1_1detail_1_1result__predicates.html", null ],
     [ "outcome_v2_xxx::detail::result_storage< R, EC, NoValuePolicy >", "classoutcome__v2__xxx_1_1detail_1_1result__storage.html", [
       [ "outcome_v2_xxx::detail::result_value_observers< result_storage< R, EC, NoValuePolicy >, R, NoValuePolicy >", "classoutcome__v2__xxx_1_1detail_1_1result__value__observers.html", [
@@ -95,15 +97,15 @@ var hierarchy =
     [ "outcome_v2_xxx::policy::detail::rethrow_exception< true >", "structoutcome__v2__xxx_1_1policy_1_1detail_1_1rethrow__exception_3_01true_01_4.html", null ],
     [ "outcome_v2_xxx::success_type< T >", "structoutcome__v2__xxx_1_1success__type.html", null ],
     [ "outcome_v2_xxx::success_type< void >", "structoutcome__v2__xxx_1_1success__type_3_01void_01_4.html", null ],
-    [ "outcome_v2_xxx::policy::detail::throw_result_as_system_error< has_error_payload >", "structoutcome__v2__xxx_1_1policy_1_1detail_1_1throw__result__as__system__error.html", null ],
-    [ "outcome_v2_xxx::policy::detail::throw_result_as_system_error< true >", "structoutcome__v2__xxx_1_1policy_1_1detail_1_1throw__result__as__system__error_3_01true_01_4.html", null ],
     [ "true_type", null, [
       [ "outcome_v2_xxx::detail::is_failure_type< failure_type< EC, E > >", "structoutcome__v2__xxx_1_1detail_1_1is__failure__type_3_01failure__type_3_01_e_c_00_01_e_01_4_01_4.html", null ],
       [ "outcome_v2_xxx::detail::is_in_place_type_t< in_place_type_t< U > >", "structoutcome__v2__xxx_1_1detail_1_1is__in__place__type__t_3_01in__place__type__t_3_01_u_01_4_01_4.html", null ],
+      [ "outcome_v2_xxx::detail::is_outcome< outcome< R, S, T, N > >", "structoutcome__v2__xxx_1_1detail_1_1is__outcome_3_01outcome_3_01_r_00_01_s_00_01_t_00_01_n_01_4_01_4.html", null ],
       [ "outcome_v2_xxx::detail::is_result< result< R, S, T > >", "structoutcome__v2__xxx_1_1detail_1_1is__result_3_01result_3_01_r_00_01_s_00_01_t_01_4_01_4.html", null ],
       [ "outcome_v2_xxx::detail::is_success_type< success_type< T > >", "structoutcome__v2__xxx_1_1detail_1_1is__success__type_3_01success__type_3_01_t_01_4_01_4.html", null ]
     ] ],
     [ "outcome_v2_xxx::policy::detail::tuple_passthrough", "structoutcome__v2__xxx_1_1policy_1_1detail_1_1tuple__passthrough.html", null ],
+    [ "outcome_v2_xxx::convert::value_or_error< T, U >", "structoutcome__v2__xxx_1_1convert_1_1value__or__error.html", null ],
     [ "outcome_v2_xxx::detail::value_storage_nontrivial< T >", "structoutcome__v2__xxx_1_1detail_1_1value__storage__nontrivial.html", null ],
     [ "outcome_v2_xxx::detail::value_storage_trivial< T >", "structoutcome__v2__xxx_1_1detail_1_1value__storage__trivial.html", null ],
     [ "outcome_v2_xxx::detail::void_type", "structoutcome__v2__xxx_1_1detail_1_1void__type.html", null ]

@@ -1,9 +1,13 @@
 var result__storage_8hpp =
 [
-    [ "_is_same_or_constructible", "structoutcome__v2__xxx_1_1detail_1_1__is__same__or__constructible.html", null ],
-    [ "_is_same_or_constructible< T, T >", "structoutcome__v2__xxx_1_1detail_1_1__is__same__or__constructible_3_01_t_00_01_t_01_4.html", null ],
-    [ "_is_same_or_constructible< T, void >", "structoutcome__v2__xxx_1_1detail_1_1__is__same__or__constructible_3_01_t_00_01void_01_4.html", null ],
-    [ "_is_same_or_constructible< void, void >", "structoutcome__v2__xxx_1_1detail_1_1__is__same__or__constructible_3_01void_00_01void_01_4.html", null ],
+    [ "_is_explicitly_constructible", "structoutcome__v2__xxx_1_1detail_1_1__is__explicitly__constructible.html", null ],
+    [ "_is_explicitly_constructible< T, T >", "structoutcome__v2__xxx_1_1detail_1_1__is__explicitly__constructible_3_01_t_00_01_t_01_4.html", null ],
+    [ "_is_explicitly_constructible< T, void >", "structoutcome__v2__xxx_1_1detail_1_1__is__explicitly__constructible_3_01_t_00_01void_01_4.html", null ],
+    [ "_is_explicitly_constructible< void, void >", "structoutcome__v2__xxx_1_1detail_1_1__is__explicitly__constructible_3_01void_00_01void_01_4.html", null ],
+    [ "_is_implicitly_constructible", "structoutcome__v2__xxx_1_1detail_1_1__is__implicitly__constructible.html", null ],
+    [ "_is_implicitly_constructible< T, T >", "structoutcome__v2__xxx_1_1detail_1_1__is__implicitly__constructible_3_01_t_00_01_t_01_4.html", null ],
+    [ "_is_implicitly_constructible< T, void >", "structoutcome__v2__xxx_1_1detail_1_1__is__implicitly__constructible_3_01_t_00_01void_01_4.html", null ],
+    [ "_is_implicitly_constructible< void, void >", "structoutcome__v2__xxx_1_1detail_1_1__is__implicitly__constructible_3_01void_00_01void_01_4.html", null ],
     [ "is_nothrow_swappable", "structoutcome__v2__xxx_1_1detail_1_1__is__nothrow__swappable_1_1is__nothrow__swappable.html", null ],
     [ "is_nothrow_swappable< T, decltype(swap(ldeclval< T >(), ldeclval< T >()))>", "structoutcome__v2__xxx_1_1detail_1_1__is__nothrow__swappable_1_1is__nothrow__swappable_3_01_t_00466f078e8572b706c4192fe4dce4cae3.html", null ],
     [ "result_final", "classoutcome__v2__xxx_1_1detail_1_1result__final.html", "classoutcome__v2__xxx_1_1detail_1_1result__final" ],

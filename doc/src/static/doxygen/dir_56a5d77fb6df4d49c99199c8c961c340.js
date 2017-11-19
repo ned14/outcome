@@ -9,6 +9,7 @@ var dir_56a5d77fb6df4d49c99199c8c961c340 =
       [ "bad_outcome_access_with", "classoutcome__v2__xxx_1_1bad__outcome__access__with.html", "classoutcome__v2__xxx_1_1bad__outcome__access__with" ]
     ] ],
     [ "config.hpp", "config_8hpp.html", "config_8hpp" ],
+    [ "convert.hpp", "convert_8hpp.html", "convert_8hpp" ],
     [ "iostream_support.hpp", "iostream__support_8hpp.html", "iostream__support_8hpp" ],
     [ "outcome.hpp", "outcome_8hpp.html", "outcome_8hpp" ],
     [ "result.h", "result_8h.html", "result_8h" ],

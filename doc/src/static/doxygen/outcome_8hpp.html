@@ -106,6 +106,10 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1detail_1_1outcome__predicates.html">outcome_v2_xxx::detail::outcome_predicates&lt; value_type, error_type, exception_type &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1detail_1_1is__outcome.html">outcome_v2_xxx::detail::is_outcome&lt; T &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1detail_1_1is__outcome_3_01outcome_3_01_r_00_01_s_00_01_t_00_01_n_01_4_01_4.html">outcome_v2_xxx::detail::is_outcome&lt; outcome&lt; R, S, T, N &gt; &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classoutcome__v2__xxx_1_1outcome.html">outcome_v2_xxx::outcome&lt; R, S, P, NoValuePolicy &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1outcome_1_1predicate.html">outcome_v2_xxx::outcome&lt; R, S, P, NoValuePolicy &gt;::predicate</a></td></tr>
@@ -131,6 +135,10 @@ Typedefs</h2></td></tr>
 <tr class="memitem:aaa420f840032e0108ce04636f90b3519"><td class="memTemplParams" colspan="2">template&lt;class R , class S , class P , class NoValuePolicy &gt; </td></tr>
 <tr class="memitem:aaa420f840032e0108ce04636f90b3519"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1detail.html#aaa420f840032e0108ce04636f90b3519">outcome_v2_xxx::detail::select_outcome_impl</a> = std::conditional_t&lt; trait::has_error_code_v&lt; S &gt; &amp;&amp;trait::has_exception_ptr_v&lt; P &gt;, detail::outcome_failure_observers&lt; select_outcome_impl2&lt; R, S, P, NoValuePolicy &gt;, R, S, P, NoValuePolicy &gt;, select_outcome_impl2&lt; R, S, P, NoValuePolicy &gt; &gt;</td></tr>
 <tr class="separator:aaa420f840032e0108ce04636f90b3519"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a000ad7887eeee0af0ef44c9dc7fef388"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a000ad7887eeee0af0ef44c9dc7fef388"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx.html#a000ad7887eeee0af0ef44c9dc7fef388">outcome_v2_xxx::is_outcome</a> = detail::is_outcome&lt; std::decay_t&lt; T &gt; &gt;</td></tr>
+<tr class="memdesc:a000ad7887eeee0af0ef44c9dc7fef388"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if an outcome.  <a href="namespaceoutcome__v2__xxx.html#a000ad7887eeee0af0ef44c9dc7fef388">More...</a><br /></td></tr>
+<tr class="separator:a000ad7887eeee0af0ef44c9dc7fef388"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -143,18 +151,18 @@ Functions</h2></td></tr>
 <tr class="memitem:ac24837cda91a1a6ebf21d4b0fd56136c"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
 <tr class="memitem:ac24837cda91a1a6ebf21d4b0fd56136c"><td class="memTemplItemLeft" align="right" valign="top">constexpr T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1detail.html#ac24837cda91a1a6ebf21d4b0fd56136c">outcome_v2_xxx::detail::extract_exception_from_failure</a> (const failure_type&lt; U, void &gt; &amp;)</td></tr>
 <tr class="separator:ac24837cda91a1a6ebf21d4b0fd56136c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aacaf6da2d2add747f520942f983b761c"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
-<tr class="memitem:aacaf6da2d2add747f520942f983b761c"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#aacaf6da2d2add747f520942f983b761c">outcome_v2_xxx::hooks::hook_outcome_construction</a> (in_place_type_t&lt; T &gt;, U *) noexcept</td></tr>
-<tr class="separator:aacaf6da2d2add747f520942f983b761c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ee75190c2dabe180881fab5081e7c3e"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
-<tr class="memitem:a3ee75190c2dabe180881fab5081e7c3e"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#a3ee75190c2dabe180881fab5081e7c3e">outcome_v2_xxx::hooks::hook_outcome_copy_construction</a> (in_place_type_t&lt; T &gt;, U *) noexcept</td></tr>
-<tr class="separator:a3ee75190c2dabe180881fab5081e7c3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9266d40886a7b70782e1011da5b9e264"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
-<tr class="memitem:a9266d40886a7b70782e1011da5b9e264"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#a9266d40886a7b70782e1011da5b9e264">outcome_v2_xxx::hooks::hook_outcome_move_construction</a> (in_place_type_t&lt; T &gt;, U *) noexcept</td></tr>
-<tr class="separator:a9266d40886a7b70782e1011da5b9e264"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace9e74219aa9e15ed060c61ce98abb9e"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
-<tr class="memitem:ace9e74219aa9e15ed060c61ce98abb9e"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#ace9e74219aa9e15ed060c61ce98abb9e">outcome_v2_xxx::hooks::hook_outcome_in_place_construction</a> (in_place_type_t&lt; T &gt;, U *) noexcept</td></tr>
-<tr class="separator:ace9e74219aa9e15ed060c61ce98abb9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7fd8d00509344710227815028da6efb"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
+<tr class="memitem:aa7fd8d00509344710227815028da6efb"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#aa7fd8d00509344710227815028da6efb">outcome_v2_xxx::hooks::hook_outcome_construction</a> (T *, U &amp;&amp;) noexcept</td></tr>
+<tr class="separator:aa7fd8d00509344710227815028da6efb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63a0f8665e97537f289c90a391ff85be"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
+<tr class="memitem:a63a0f8665e97537f289c90a391ff85be"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#a63a0f8665e97537f289c90a391ff85be">outcome_v2_xxx::hooks::hook_outcome_copy_construction</a> (T *, U &amp;&amp;) noexcept</td></tr>
+<tr class="separator:a63a0f8665e97537f289c90a391ff85be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad09175acdd51c4bca8d1c8e20fb906b7"><td class="memTemplParams" colspan="2">template&lt;class T , class U &gt; </td></tr>
+<tr class="memitem:ad09175acdd51c4bca8d1c8e20fb906b7"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#ad09175acdd51c4bca8d1c8e20fb906b7">outcome_v2_xxx::hooks::hook_outcome_move_construction</a> (T *, U &amp;&amp;) noexcept</td></tr>
+<tr class="separator:ad09175acdd51c4bca8d1c8e20fb906b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68d80e12dec51ea8b820d0569babbe46"><td class="memTemplParams" colspan="2">template&lt;class T , class U , class... Args&gt; </td></tr>
+<tr class="memitem:a68d80e12dec51ea8b820d0569babbe46"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#a68d80e12dec51ea8b820d0569babbe46">outcome_v2_xxx::hooks::hook_outcome_in_place_construction</a> (T *, in_place_type_t&lt; U &gt;, Args &amp;&amp;...) noexcept</td></tr>
+<tr class="separator:a68d80e12dec51ea8b820d0569babbe46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f5bbd810cf7e8ea3c3709afb61c1c40"><td class="memTemplParams" colspan="2">template&lt;class R , class S , class P , class NoValuePolicy , class U &gt; </td></tr>
 <tr class="memitem:a6f5bbd810cf7e8ea3c3709afb61c1c40"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1hooks.html#a6f5bbd810cf7e8ea3c3709afb61c1c40">outcome_v2_xxx::hooks::override_outcome_exception</a> (outcome&lt; R, S, P, NoValuePolicy &gt; *o, U &amp;&amp;v) noexcept</td></tr>
 <tr class="memdesc:a6f5bbd810cf7e8ea3c3709afb61c1c40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used in hook implementations to override the payload/exception to something other than what was constructed.  <a href="namespaceoutcome__v2__xxx_1_1hooks.html#a6f5bbd810cf7e8ea3c3709afb61c1c40">More...</a><br /></td></tr>

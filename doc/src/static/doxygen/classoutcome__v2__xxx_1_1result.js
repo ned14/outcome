@@ -15,6 +15,7 @@ var classoutcome__v2__xxx_1_1result =
     [ "result", "classoutcome__v2__xxx_1_1result.html#a02d50b81ff0272e99ff6d16f945b71cb", null ],
     [ "result", "classoutcome__v2__xxx_1_1result.html#a89552fbbd6b0d5b5d3dc90e32e670599", null ],
     [ "result", "classoutcome__v2__xxx_1_1result.html#a14597ae7d9c68783e908e9c66b0c0e84", null ],
+    [ "result", "classoutcome__v2__xxx_1_1result.html#ad8646a28e3fbcb16adc81d0c5dc36475", null ],
     [ "result", "classoutcome__v2__xxx_1_1result.html#abe0627444d9769d7711ad89c56ffb51c", null ],
     [ "result", "classoutcome__v2__xxx_1_1result.html#a4d110696e1df365dacc7a0c90681cff2", null ],
     [ "result", "classoutcome__v2__xxx_1_1result.html#a2a91fe6fb27ceaa0acdbc2b64faa5bbe", null ],

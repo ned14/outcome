@@ -98,10 +98,6 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1detail_1_1rethrow__exception_3_01true_01_4.html">rethrow_exception&lt; true &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1detail_1_1throw__result__as__system__error.html">throw_result_as_system_error</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1detail_1_1throw__result__as__system__error_3_01true_01_4.html">throw_result_as_system_error&lt; true &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1policy_1_1detail_1_1tuple__passthrough.html">tuple_passthrough</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -151,7 +147,7 @@ template&lt;class T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a34fa8a78143b351473ba82ccb2c5981d">make_error_code</a>(std::forward&lt;T&gt;(v)); }</div><div class="ttc" id="namespaceoutcome__v2__xxx_1_1trait_1_1detail_html_a34fa8a78143b351473ba82ccb2c5981d"><div class="ttname"><a href="namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a34fa8a78143b351473ba82ccb2c5981d">outcome_v2_xxx::trait::detail::make_error_code</a></div><div class="ttdeci">constexpr R make_error_code(T &amp;&amp;)</div></div>
+<div class="fragment"><div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a34fa8a78143b351473ba82ccb2c5981d">make_error_code</a>(std::forward&lt;T&gt;(v)); }</div><div class="ttc" id="namespaceoutcome__v2__xxx_1_1trait_1_1detail_html_a34fa8a78143b351473ba82ccb2c5981d"><div class="ttname"><a href="namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a34fa8a78143b351473ba82ccb2c5981d">outcome_v2_xxx::trait::detail::make_error_code</a></div><div class="ttdeci">constexpr R make_error_code(T &amp;&amp;)</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -180,7 +176,7 @@ template&lt;class T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a40751c005604eaa905bad2ce5293d515">make_exception_ptr</a>(std::forward&lt;T&gt;(v)); }</div><div class="ttc" id="namespaceoutcome__v2__xxx_1_1trait_1_1detail_html_a40751c005604eaa905bad2ce5293d515"><div class="ttname"><a href="namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a40751c005604eaa905bad2ce5293d515">outcome_v2_xxx::trait::detail::make_exception_ptr</a></div><div class="ttdeci">constexpr void make_exception_ptr(...)</div></div>
+<div class="fragment"><div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a40751c005604eaa905bad2ce5293d515">make_exception_ptr</a>(std::forward&lt;T&gt;(v)); }</div><div class="ttc" id="namespaceoutcome__v2__xxx_1_1trait_1_1detail_html_a40751c005604eaa905bad2ce5293d515"><div class="ttname"><a href="namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a40751c005604eaa905bad2ce5293d515">outcome_v2_xxx::trait::detail::make_exception_ptr</a></div><div class="ttdeci">constexpr void make_exception_ptr(...)</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -247,7 +243,7 @@ template&lt;class T , typename  = std::enable_if_t&lt; std::is_convertible&lt;T,
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;{}) { <span class="keywordflow">return</span> std::forward&lt;T&gt;(v); }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;{}) { <span class="keywordflow">return</span> std::forward&lt;T&gt;(v); }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="af78d3f7045bc639dc2c327c78689c23a"></a>
@@ -285,7 +281,7 @@ template&lt;class T , typename  = decltype( make_error_code(get&lt;0&gt;(std::de
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;{}) { <span class="keywordflow">return</span> <a class="code" href="namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a34fa8a78143b351473ba82ccb2c5981d">make_error_code</a>(get&lt;0&gt;(std::forward&lt;T&gt;(v))); }</div><div class="ttc" id="namespaceoutcome__v2__xxx_1_1trait_1_1detail_html_a34fa8a78143b351473ba82ccb2c5981d"><div class="ttname"><a href="namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a34fa8a78143b351473ba82ccb2c5981d">outcome_v2_xxx::trait::detail::make_error_code</a></div><div class="ttdeci">constexpr R make_error_code(T &amp;&amp;)</div></div>
+<div class="fragment"><div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;{}) { <span class="keywordflow">return</span> <a class="code" href="namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a34fa8a78143b351473ba82ccb2c5981d">make_error_code</a>(get&lt;0&gt;(std::forward&lt;T&gt;(v))); }</div><div class="ttc" id="namespaceoutcome__v2__xxx_1_1trait_1_1detail_html_a34fa8a78143b351473ba82ccb2c5981d"><div class="ttname"><a href="namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a34fa8a78143b351473ba82ccb2c5981d">outcome_v2_xxx::trait::detail::make_error_code</a></div><div class="ttdeci">constexpr R make_error_code(T &amp;&amp;)</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -312,7 +308,7 @@ template&lt;class T , typename  = decltype( make_error_code(get&lt;0&gt;(std::de
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;{ <span class="keywordflow">return</span> v; }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;{ <span class="keywordflow">return</span> v; }</div></div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

@@ -89,6 +89,12 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 </li>
 <li>_error
 : <a class="el" href="classoutcome__v2__xxx_1_1detail_1_1result__storage.html#a39ce141b3915d80ee142574c5c22c65e">outcome_v2_xxx::detail::result_storage&lt; R, EC, NoValuePolicy &gt;</a>
+, <a class="el" href="structoutcome__v2__xxx_1_1failure__type.html#a0040e2d57c5cece5242dabf0bae6e790">outcome_v2_xxx::failure_type&lt; EC, E &gt;</a>
+, <a class="el" href="structoutcome__v2__xxx_1_1failure__type_3_01_e_c_00_01void_01_4.html#ad150e2c474749d1535fd9b61bbdf2a67">outcome_v2_xxx::failure_type&lt; EC, void &gt;</a>
+</li>
+<li>_exception
+: <a class="el" href="structoutcome__v2__xxx_1_1failure__type.html#a40f6dd1aa2a43944efe7b29fb273bcc3">outcome_v2_xxx::failure_type&lt; EC, E &gt;</a>
+, <a class="el" href="structoutcome__v2__xxx_1_1failure__type_3_01void_00_01_e_01_4.html#a070a8ef742652585d4706a6084715fce">outcome_v2_xxx::failure_type&lt; void, E &gt;</a>
 </li>
 <li>_ptr
 : <a class="el" href="classoutcome__v2__xxx_1_1outcome.html#a72932dc310bd36cfba517989746e350b">outcome_v2_xxx::outcome&lt; R, S, P, NoValuePolicy &gt;</a>
@@ -103,6 +109,7 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 <li>_value
 : <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1value__storage__nontrivial.html#a47f93c5d7c8b36e256577eb9bb82d74c">outcome_v2_xxx::detail::value_storage_nontrivial&lt; T &gt;</a>
 , <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1value__storage__trivial.html#aa2effcaa67795db386cb75f59d521dfd">outcome_v2_xxx::detail::value_storage_trivial&lt; T &gt;</a>
+, <a class="el" href="structoutcome__v2__xxx_1_1success__type.html#ada0fea5bbed43fc336ac9c9084c1ac78">outcome_v2_xxx::success_type&lt; T &gt;</a>
 </li>
 </ul>
 
@@ -163,22 +170,20 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 : <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1outcome__predicates.html#a37e992354067d858945492c860d0ec68">outcome_v2_xxx::detail::outcome_predicates&lt; value_type, error_type, exception_type &gt;</a>
 , <a class="el" href="structoutcome__v2__xxx_1_1outcome_1_1predicate.html#a3b5eea53b7f6d15a8cd2111b5b465ea2">outcome_v2_xxx::outcome&lt; R, S, P, NoValuePolicy &gt;::predicate</a>
 </li>
+<li>enable_outcome_inputs
+: <a class="el" href="structoutcome__v2__xxx_1_1convert_1_1value__or__error.html#a433679fe991372506f940920635bb91a">outcome_v2_xxx::convert::value_or_error&lt; T, U &gt;</a>
+</li>
+<li>enable_result_inputs
+: <a class="el" href="structoutcome__v2__xxx_1_1convert_1_1value__or__error.html#a7045baf8223ca71f4df77c4956d595ad">outcome_v2_xxx::convert::value_or_error&lt; T, U &gt;</a>
+</li>
 <li>enable_value_converting_constructor
 : <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1outcome__predicates.html#a17a7df31972e7331f558269c72ca6b25">outcome_v2_xxx::detail::outcome_predicates&lt; value_type, error_type, exception_type &gt;</a>
 , <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1result__predicates.html#a35372e97165cae14e9a4365b2d999b4a">outcome_v2_xxx::detail::result_predicates&lt; value_type, error_type &gt;</a>
 , <a class="el" href="structoutcome__v2__xxx_1_1outcome_1_1predicate.html#a925729703accaf3ed3c237b6f2bbc8a6">outcome_v2_xxx::outcome&lt; R, S, P, NoValuePolicy &gt;::predicate</a>
 , <a class="el" href="structoutcome__v2__xxx_1_1result_1_1predicate.html#ace9cbf4211f7ee4876ac1e594d94acb1">outcome_v2_xxx::result&lt; R, S, NoValuePolicy &gt;::predicate</a>
 </li>
-<li>error
-: <a class="el" href="structoutcome__v2__xxx_1_1failure__type.html#aa3f3b3cb77613abe2547d24cf25f4318">outcome_v2_xxx::failure_type&lt; EC, E &gt;</a>
-, <a class="el" href="structoutcome__v2__xxx_1_1failure__type_3_01_e_c_00_01void_01_4.html#a68a35b58c3c28020dfe03ee4a88609ee">outcome_v2_xxx::failure_type&lt; EC, void &gt;</a>
-</li>
 <li>error_is_common_error_type
 : <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1result__predicates.html#a34b33f353b27a46a4a1ab0ad016fcc68">outcome_v2_xxx::detail::result_predicates&lt; value_type, error_type &gt;</a>
-</li>
-<li>exception
-: <a class="el" href="structoutcome__v2__xxx_1_1failure__type.html#ae49fd0ed089e08028a31a47ebfc8bad4">outcome_v2_xxx::failure_type&lt; EC, E &gt;</a>
-, <a class="el" href="structoutcome__v2__xxx_1_1failure__type_3_01void_00_01_e_01_4.html#ad62031a378b46234533e2a9a98d4ffe7">outcome_v2_xxx::failure_type&lt; void, E &gt;</a>
 </li>
 </ul>
 
@@ -193,11 +198,14 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 
 <h3><a id="index_v"></a>- v -</h3><ul>
 <li>value
-: <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1__is__same__or__constructible.html#ad9d5a4e2ffcae416ba38ecb1603e27aa">outcome_v2_xxx::detail::_is_same_or_constructible&lt; T, U, Args &gt;</a>
-, <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1__is__same__or__constructible_3_01_t_00_01_t_01_4.html#ade83b1d6fcbe428332b756cf351c5c59">outcome_v2_xxx::detail::_is_same_or_constructible&lt; T, T &gt;</a>
-, <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1__is__same__or__constructible_3_01_t_00_01void_01_4.html#aac97ce73b16ed1835e8196cf5ed2148c">outcome_v2_xxx::detail::_is_same_or_constructible&lt; T, void &gt;</a>
-, <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1__is__same__or__constructible_3_01void_00_01void_01_4.html#a3006ab02198b9ef87116e4e0f52c54f5">outcome_v2_xxx::detail::_is_same_or_constructible&lt; void, void &gt;</a>
-, <a class="el" href="structoutcome__v2__xxx_1_1success__type.html#affa05e96b5f6125caa21942da7a2adb7">outcome_v2_xxx::success_type&lt; T &gt;</a>
+: <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1__is__explicitly__constructible.html#aa74792e5ce3f931f4bb6a7f0ada07881">outcome_v2_xxx::detail::_is_explicitly_constructible&lt; T, U &gt;</a>
+, <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1__is__explicitly__constructible_3_01_t_00_01_t_01_4.html#ab6682091bfd4386c1100b019033535ad">outcome_v2_xxx::detail::_is_explicitly_constructible&lt; T, T &gt;</a>
+, <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1__is__explicitly__constructible_3_01_t_00_01void_01_4.html#ac7565337c2ee8b3693b71b27c3b68278">outcome_v2_xxx::detail::_is_explicitly_constructible&lt; T, void &gt;</a>
+, <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1__is__explicitly__constructible_3_01void_00_01void_01_4.html#ac43ebc039ea264450fa0a63761f1c152">outcome_v2_xxx::detail::_is_explicitly_constructible&lt; void, void &gt;</a>
+, <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1__is__implicitly__constructible.html#a421705217aa1c69d3777dbf7ac60f0c2">outcome_v2_xxx::detail::_is_implicitly_constructible&lt; T, U &gt;</a>
+, <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1__is__implicitly__constructible_3_01_t_00_01_t_01_4.html#af04b9d51ace480ea279f309d74d93d29">outcome_v2_xxx::detail::_is_implicitly_constructible&lt; T, T &gt;</a>
+, <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1__is__implicitly__constructible_3_01_t_00_01void_01_4.html#a8f8814eb3f2c747b19dc29fadb42ed1f">outcome_v2_xxx::detail::_is_implicitly_constructible&lt; T, void &gt;</a>
+, <a class="el" href="structoutcome__v2__xxx_1_1detail_1_1__is__implicitly__constructible_3_01void_00_01void_01_4.html#adaeb8333d126a8ac3353ef2a0fae8069">outcome_v2_xxx::detail::_is_implicitly_constructible&lt; void, void &gt;</a>
 </li>
 </ul>
 </div><!-- contents -->

@@ -5,11 +5,8 @@ var success__failure_8hpp =
     [ "error_code_passthrough", "structoutcome__v2__xxx_1_1policy_1_1detail_1_1error__code__passthrough.html", null ],
     [ "tuple_passthrough", "structoutcome__v2__xxx_1_1policy_1_1detail_1_1tuple__passthrough.html", null ],
     [ "has_error_code", "structoutcome__v2__xxx_1_1trait_1_1detail_1_1has__error__code.html", null ],
-    [ "no_error_payload", "structoutcome__v2__xxx_1_1trait_1_1detail_1_1no__error__payload.html", null ],
-    [ "has_error_payload", "structoutcome__v2__xxx_1_1trait_1_1detail_1_1has__error__payload.html", null ],
     [ "has_exception_ptr", "structoutcome__v2__xxx_1_1trait_1_1detail_1_1has__exception__ptr.html", null ],
     [ "has_error_code", "structoutcome__v2__xxx_1_1trait_1_1has__error__code.html", null ],
-    [ "has_error_payload", "structoutcome__v2__xxx_1_1trait_1_1has__error__payload.html", null ],
     [ "has_exception_ptr", "structoutcome__v2__xxx_1_1trait_1_1has__exception__ptr.html", null ],
     [ "success_type", "structoutcome__v2__xxx_1_1success__type.html", "structoutcome__v2__xxx_1_1success__type" ],
     [ "success_type< void >", "structoutcome__v2__xxx_1_1success__type_3_01void_01_4.html", "structoutcome__v2__xxx_1_1success__type_3_01void_01_4" ],
@@ -43,9 +40,7 @@ var success__failure_8hpp =
     [ "make_exception_ptr", "success__failure_8hpp.html#a40751c005604eaa905bad2ce5293d515", null ],
     [ "success", "success__failure_8hpp.html#a9cc561a6b59545140f366b009d981965", null ],
     [ "success", "success__failure_8hpp.html#a09c4371a661e385878ce8d2a8a46f6f8", null ],
-    [ "throw_as_system_error_with_payload", "success__failure_8hpp.html#abdc64e103ce5270f3d56ee2e7cf4dc3f", null ],
-    [ "throw_as_system_error_with_payload", "success__failure_8hpp.html#a60e9d8ec1bb7c3d99f7200de9afdb9de", null ],
+    [ "throw_as_system_error_with_payload", "success__failure_8hpp.html#a69b1c2383978fc6eed3337c045af25dc", null ],
     [ "has_error_code_v", "success__failure_8hpp.html#a0113514912d0d186701cc86724e7d0c9", null ],
-    [ "has_error_payload_v", "success__failure_8hpp.html#aa7ae64d85d7f1d2d9fc3c06867fb0185", null ],
     [ "has_exception_ptr_v", "success__failure_8hpp.html#a258869ebdc76bcef2cd5926cccbd3d47", null ]
 ];

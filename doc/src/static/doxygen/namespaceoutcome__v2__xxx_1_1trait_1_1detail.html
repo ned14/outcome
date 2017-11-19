@@ -93,11 +93,7 @@ $(document).ready(function(){initNavTree('namespaceoutcome__v2__xxx_1_1trait_1_1
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1trait_1_1detail_1_1has__error__code.html">has_error_code</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1trait_1_1detail_1_1has__error__payload.html">has_error_payload</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1trait_1_1detail_1_1has__exception__ptr.html">has_exception_ptr</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structoutcome__v2__xxx_1_1trait_1_1detail_1_1no__error__payload.html">no_error_payload</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
@@ -116,10 +112,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a34fa8a78143b351473ba82ccb2c5981d"><td class="memTemplParams" colspan="2">template&lt;class T , class R  = decltype(make_error_code(get&lt;0&gt;(std::declval&lt;T&gt;())))&gt; </td></tr>
 <tr class="memitem:a34fa8a78143b351473ba82ccb2c5981d"><td class="memTemplItemLeft" align="right" valign="top">constexpr R&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a34fa8a78143b351473ba82ccb2c5981d">make_error_code</a> (T &amp;&amp;)</td></tr>
 <tr class="separator:a34fa8a78143b351473ba82ccb2c5981d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60e9d8ec1bb7c3d99f7200de9afdb9de"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a60e9d8ec1bb7c3d99f7200de9afdb9de"><td class="memTemplItemLeft" align="right" valign="top">constexpr <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1detail_1_1no__error__payload.html">no_error_payload</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a60e9d8ec1bb7c3d99f7200de9afdb9de">throw_as_system_error_with_payload</a> (const T &amp;)</td></tr>
-<tr class="memdesc:a60e9d8ec1bb7c3d99f7200de9afdb9de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Override to define what the policies which throw a system error with payload ought to do for some particular <code>result.error()</code>.  <a href="#a60e9d8ec1bb7c3d99f7200de9afdb9de">More...</a><br /></td></tr>
-<tr class="separator:a60e9d8ec1bb7c3d99f7200de9afdb9de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40751c005604eaa905bad2ce5293d515"><td class="memItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceoutcome__v2__xxx_1_1trait_1_1detail.html#a40751c005604eaa905bad2ce5293d515">make_exception_ptr</a> (...)</td></tr>
 <tr class="separator:a40751c005604eaa905bad2ce5293d515"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -247,36 +239,6 @@ template&lt;class T , class R  = decltype(make_error_code(get&lt;0&gt;(std::decl
 </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a id="a60e9d8ec1bb7c3d99f7200de9afdb9de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a60e9d8ec1bb7c3d99f7200de9afdb9de">&#9670;&nbsp;</a></span>throw_as_system_error_with_payload()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class T &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr <a class="el" href="structoutcome__v2__xxx_1_1trait_1_1detail_1_1no__error__payload.html">no_error_payload</a> outcome_v2_xxx::trait::detail::throw_as_system_error_with_payload </td>
-          <td>(</td>
-          <td class="paramtype">const T &amp;&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Override to define what the policies which throw a system error with payload ought to do for some particular <code>result.error()</code>. </p>
-<div class="fragment"><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;{ static_assert(!std::is_same&lt;T, T&gt;::value, <span class="stringliteral">&quot;To use the *_throw_as_system_error_with_payload policy, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload&quot;</span>); }</div></div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

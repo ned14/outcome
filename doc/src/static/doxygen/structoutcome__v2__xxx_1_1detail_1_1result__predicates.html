@@ -162,7 +162,7 @@ template&lt;class T , class U , class V &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=                                                      </div><div class="line">    (std::is_void&lt;T&gt;::value || is_same_or_constructible&lt;value_type, typename result&lt;T, U, V&gt;::value_type&gt;)    </div><div class="line">    &amp;&amp;(std::is_void&lt;U&gt;::value || is_same_or_constructible&lt;error_type, <span class="keyword">typename</span> <a class="code" href="classoutcome__v2__xxx_1_1result.html#a68e47bfebb15a90b0e82cf39cdd95cda">result&lt;T, U, V&gt;::error_type</a>&gt;)</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">=                                                                 </div><div class="line">    (std::is_void&lt;T&gt;::value || detail::is_explicitly_constructible&lt;value_type, typename result&lt;T, U, V&gt;::value_type&gt;)    </div><div class="line">    &amp;&amp;(std::is_void&lt;U&gt;::value || detail::is_explicitly_constructible&lt;error_type, <span class="keyword">typename</span> <a class="code" href="classoutcome__v2__xxx_1_1result.html#a68e47bfebb15a90b0e82cf39cdd95cda">result&lt;T, U, V&gt;::error_type</a>&gt;)</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a2c90642380c24c2b59e9b76112b3fd61"></a>
@@ -188,7 +188,7 @@ template&lt;class ErrorCondEnum &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=                                                     </div><div class="line">    !is_in_place_type_t&lt;std::decay_t&lt;ErrorCondEnum&gt;&gt;::value                                                                   </div><div class="line">    &amp;&amp; std::is_error_condition_enum&lt;ErrorCondEnum&gt;::value                                                                     </div><div class="line">    &amp;&amp; !std::is_constructible&lt;value_type, ErrorCondEnum&gt;::value &amp;&amp; !std::is_constructible&lt;error_type, ErrorCondEnum&gt;::value</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">=                                                                   </div><div class="line">    !is_in_place_type_t&lt;std::decay_t&lt;ErrorCondEnum&gt;&gt;::value                                                                                 </div><div class="line">    &amp;&amp; std::is_error_condition_enum&lt;ErrorCondEnum&gt;::value                                                                                   </div><div class="line">    &amp;&amp; !detail::is_implicitly_constructible&lt;value_type, ErrorCondEnum&gt; &amp;&amp; !detail::is_implicitly_constructible&lt;error_type, ErrorCondEnum&gt;</div></div><!-- fragment -->
 </div>
 </div>
 <a id="af996e67fd5e2fe22d261a0aa9913dcc6"></a>
@@ -214,7 +214,7 @@ template&lt;class T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=  </div><div class="line">    <a class="code" href="structoutcome__v2__xxx_1_1detail_1_1result__predicates.html#a6cd192be7bfbce151d9affada8bd42e9">implicit_constructors_enabled</a>                                </div><div class="line">    &amp;&amp; !is_in_place_type_t&lt;std::decay_t&lt;T&gt;&gt;::value               </div><div class="line">    &amp;&amp; !std::is_constructible&lt;value_type, T&gt;::value &amp;&amp; is_same_or_constructible&lt;error_type, T&gt;</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">=  </div><div class="line">    <a class="code" href="structoutcome__v2__xxx_1_1detail_1_1result__predicates.html#a6cd192be7bfbce151d9affada8bd42e9">implicit_constructors_enabled</a>                                </div><div class="line">    &amp;&amp; !is_in_place_type_t&lt;std::decay_t&lt;T&gt;&gt;::value               </div><div class="line">    &amp;&amp; !detail::is_implicitly_constructible&lt;value_type, T&gt; &amp;&amp; detail::is_implicitly_constructible&lt;error_type, T&gt;</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a951736506229d9680d1f244f9077d77e"></a>
@@ -266,7 +266,7 @@ template&lt;class T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=  </div><div class="line">    <a class="code" href="structoutcome__v2__xxx_1_1detail_1_1result__predicates.html#a6cd192be7bfbce151d9affada8bd42e9">implicit_constructors_enabled</a>                                </div><div class="line">    &amp;&amp; !is_in_place_type_t&lt;std::decay_t&lt;T&gt;&gt;::value               </div><div class="line">    &amp;&amp; is_same_or_constructible&lt;value_type, T&gt; &amp;&amp; !std::is_constructible&lt;error_type, T&gt;::value</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">=  </div><div class="line">    <a class="code" href="structoutcome__v2__xxx_1_1detail_1_1result__predicates.html#a6cd192be7bfbce151d9affada8bd42e9">implicit_constructors_enabled</a>                                </div><div class="line">    &amp;&amp; !is_in_place_type_t&lt;std::decay_t&lt;T&gt;&gt;::value               </div><div class="line">    &amp;&amp; detail::is_implicitly_constructible&lt;value_type, T&gt; &amp;&amp; !detail::is_implicitly_constructible&lt;error_type, T&gt;</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a34b33f353b27a46a4a1ab0ad016fcc68"></a>
@@ -314,7 +314,7 @@ template&lt;class value_type , class error_type &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=                                                                                       </div><div class="line">    ((<a class="code" href="structoutcome__v2__xxx_1_1detail_1_1result__predicates.html#a34b33f353b27a46a4a1ab0ad016fcc68">error_is_common_error_type</a> &amp;&amp; std::is_same&lt;bool, std::decay_t&lt;value_type&gt;&gt;::value) || !is_same_or_constructible&lt;value_type, error_type&gt;)  </div><div class="line">    &amp;&amp;!is_same_or_constructible&lt;error_type, value_type&gt;</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">=                                                                                                  </div><div class="line">    ((<a class="code" href="structoutcome__v2__xxx_1_1detail_1_1result__predicates.html#a34b33f353b27a46a4a1ab0ad016fcc68">error_is_common_error_type</a> &amp;&amp; std::is_same&lt;bool, std::decay_t&lt;value_type&gt;&gt;::value) || !detail::is_implicitly_constructible&lt;value_type, error_type&gt;)  </div><div class="line">    &amp;&amp;!detail::is_implicitly_constructible&lt;error_type, value_type&gt;</div></div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
