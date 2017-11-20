@@ -38,7 +38,8 @@ namespace policy
   template <class T, class EC, class E> struct exception_ptr_rethrow : detail::base
   {
     /*! Performs a wide check of state, used in the value() functions
-    \effects If result does not have a value, if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_result_access`.
+    \effects If outcome does not have a value, if it has an exception it rethrows that exception via `std::rethrow_exception()`,
+    if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_outcome_access`.
     */
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
@@ -57,8 +58,8 @@ namespace policy
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
       }
     }
-    /*! Performs a wide check of state, used in the value() functions
-    \effects If result does not have a value, if it has an error it throws that error, else it throws `bad_result_access`.
+    /*! Performs a wide check of state, used in the error() functions
+    \effects If outcome does not have an error, it throws `bad_outcome_access`.
     */
     template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {

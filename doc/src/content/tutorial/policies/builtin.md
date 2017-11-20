@@ -34,10 +34,11 @@ if there is no exception.
 The narrow checks are the same as for the `all_narrow` policy.
 
 `exception_ptr_rethrow<T, EC, EP>`
-: Policy interpreting either `EC` or `EP` as meeting the `std::exception_ptr` contract. If
+: Policy interpreting either or both `EC` and `EP` as meeting the `std::exception_ptr` contract. If
 there is no value, `.value()`
 will `std::rethrow_exception(error)` or `std::rethrow_exception(make_exception_ptr(error))`
-if `EP` is `void`, else `std::rethrow_exception(exception)` or `std::rethrow_exception(make_exception_ptr(exception))`.
+if `EP` is `void`, else `std::rethrow_exception(exception)` or `std::rethrow_exception(make_exception_ptr(exception))`
+or `std::rethrow_exception(error)` or `std::rethrow_exception(make_exception_ptr(error))` as appropriate.
 `.error()` will `OUTCOME_THROW_EXCEPTION(bad_result_access("no error"))`
 or `OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"))`
 if there is no error.
