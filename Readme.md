@@ -45,7 +45,7 @@ On Windows, simply download the raw file from above and place it wherever it sui
  `.has_value()`, `.value()` and `.error()` (i.e. Expected)
  - [x] Regen docs and submit bugs to Standardese
  - [ ] Translate docs into Boost edition
- - [ ] Get AFIO et al working with latest Outcome
+ - [x] Get AFIO et al working with latest Outcome
  - [ ] Check all files in Boost edition have licence boilerplate (issue #38)
 
 # Changes since v1:
