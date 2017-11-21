@@ -43,9 +43,9 @@ On Windows, simply download the raw file from above and place it wherever it sui
  - [x] Conan package support
  - [x] Make `result`'s explicit converting constructors accept any type providing a
  `.has_value()`, `.value()` and `.error()` (i.e. Expected)
- - [ ] Regen docs and submit bugs to Standardese
- - [ ] Translate docs into Boost edition
- - [ ] Get AFIO et al working with latest Outcome
+ - [x] Regen docs and submit bugs to Standardese
+ - [x] Translate docs into Boost edition
+ - [x] Get AFIO et al working with latest Outcome
  - [ ] Check all files in Boost edition have licence boilerplate (issue #38)
 
 # Changes since v1:

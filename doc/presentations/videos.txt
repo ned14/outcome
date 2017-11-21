@@ -1,4 +1,9 @@
-20170429 ACCU Mongrel Monads, Dirty, dirty, dirty
+20170429, ACCU, Mongrel Monads, Dirty, dirty, dirty
 Covers the history of error handling in C++, and how the LEWG Expected works.
 Slides: https://docs.google.com/presentation/d/1X_3VOxb8PMGXHBzjmzl5oVnwYVIyBpZHcY0Idv_9tSc/edit?usp=sharing
 Video: https://youtu.be/XVofgKH-uu4
+
+20171110, Meeting C++, Introduction to proposed std::expected<T, E>
+Literature review of the several WG21 papers relating to std::expected<T, E>
+Slides: https://docs.google.com/presentation/d/1XTsnsGIV4HTh_07bjpCk_XG2NWDs6Tlrw8f5rrUHodc/edit?usp=sharing
+Video: Awaiting

@@ -1,10 +1,11 @@
 # Files to copy over
 include_files = [
     (r'include/(.*)', r'include/boost/\1'),
-    r'example/.*',
+    r'doc/src/.*',
     r'test/.*',
     r'\.clang-.*',
     r'\.gitattributes',
+    r'\index.html',
 ]
 exclude_files = [
     r'.*quickcpplib.*',
