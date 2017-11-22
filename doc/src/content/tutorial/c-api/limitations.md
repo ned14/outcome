@@ -10,7 +10,7 @@ marshalling at the ABI boundary:
 
 1. A C++ function may not throw exceptions if it is safe to call from C, and
 so should always be marked `noexcept`.
-2. A C++ function should annotated with `extern "C"` to prevent its symbol
+2. A C++ function should be annotated with `extern "C"` to prevent its symbol
 being mangled, and thus give it the C rather than C++ ABI.
 3. You cannot use overloading in your `extern "C"` functions.
 4. You may only use types in your C++ function for which these traits are both true:
