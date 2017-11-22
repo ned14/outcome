@@ -76,7 +76,7 @@ namespace error_code_extended
     }
   };
 
-  // Meyer singleton returning a thread local data structure for this thread
+  // Meyers' singleton returning a thread local data structure for this thread
   inline mythreadlocaldata_t &mythreadlocaldata()
   {
     static thread_local mythreadlocaldata_t v;
