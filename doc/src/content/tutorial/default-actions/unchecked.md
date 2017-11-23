@@ -4,8 +4,8 @@ description = ""
 weight = 60
 +++
 
-We have now covered all of the default actions in Outcome whereby `result<T, EC>` and `outcome<T, EC, EP|P>` implement
-various default actions upon no-value observation according to traits defined upon the `EC` and `EP|P` chosen.
+We have now covered all of the default actions in Outcome whereby `result<T, EC>` and `outcome<T, EC, EP>` implement
+various default actions upon no-value observation according to traits defined upon the `EC` and `EP` chosen.
 
 If you don't want all this clever automatic detection of traits, and just want a plain,
 always-undefined-behaviour-on-no-value-observation success-or-failure type, we provide
