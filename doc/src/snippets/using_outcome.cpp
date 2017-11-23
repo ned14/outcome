@@ -29,8 +29,7 @@ auto old::h() noexcept -> outcome::outcome<int>
   OUTCOME_TRY(i, g());               // #1
     
   try {
-    int j = f();
-    return i + j;
+    return i + f();
   }
   catch (...) {
     return std::current_exception(); // #2
