@@ -114,13 +114,14 @@ inline std::error_code error_from_exception(std::exception_ptr &&ep = std::curre
 /*! Utility function which tries to throw the equivalent STL exception type for
 some given error code, not including `system_error`.
 \param ec The error code to try to convert into a STL exception throw.
+\param msg Optional custom message for the STL exception type.
 
 \effects If the input error code has a category of `generic_category()` (all platforms)
 or `system_category()` (POSIX only), throw the STL exception type matching
 the `errno` domained code if one is available. For example, `ENOMEM` would cause
 `std::bad_alloc()` to be thrown.
 */
-inline void try_throw_std_exception_from_error(std::error_code ec)
+inline void try_throw_std_exception_from_error(std::error_code ec, const std::string &msg = std::string{})
 {
   if(!ec || (ec.category() != std::generic_category()
 #ifndef _WIN32
@@ -133,15 +134,15 @@ inline void try_throw_std_exception_from_error(std::error_code ec)
   switch(ec.value())
   {
   case EINVAL:
-    throw std::invalid_argument("invalid argument");
+    throw msg.empty() ? std::invalid_argument("invalid argument") : std::invalid_argument(msg);
   case EDOM:
-    throw std::domain_error("domain error");
+    throw msg.empty() ? std::domain_error("domain error") : std::domain_error(msg);
   case E2BIG:
-    throw std::length_error("length error");
+    throw msg.empty() ? std::length_error("length error") : std::length_error(msg);
   case ERANGE:
-    throw std::out_of_range("out of range");
+    throw msg.empty() ? std::out_of_range("out of range") : std::out_of_range(msg);
   case EOVERFLOW:
-    throw std::overflow_error("overflow error");
+    throw msg.empty() ? std::overflow_error("overflow error") : std::overflow_error(msg);
   case ENOMEM:
     throw std::bad_alloc();
   }
