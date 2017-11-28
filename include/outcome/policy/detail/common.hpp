@@ -27,6 +27,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../../config.hpp"
 
+#include <cassert>
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
@@ -45,6 +47,7 @@ namespace policy
 #endif
       void _ub(Impl && /*unused*/)
       {
+        assert(false);
 #if defined(__GNUC__) || defined(__clang__)
         __builtin_unreachable();
 #endif

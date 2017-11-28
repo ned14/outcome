@@ -45,22 +45,22 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRY_GLUE(x, y) OUTCOME_TRY_GLUE2(x, y)
 #define OUTCOME_TRY_UNIQUE_NAME OUTCOME_TRY_GLUE(__t, __COUNTER__)
 
-#define OUTCOME_TRYV2(unique, m)                                                                                                                                                                                                                                                                                               \
-  auto &&(unique) = (m);                                                                                                                                                                                                                                                                                                         \
-  if(!(unique).has_value())                                                                                                                                                                                                                                                                                                      \
+#define OUTCOME_TRYV2(unique, ...)                                                                                                                                                                                                                                                                                             \
+  auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                            \
+  if(!(unique).has_value())                                                                                                                                                                                                                                                                                                    \
   return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(unique)>(unique))
-#define OUTCOME_TRY2(unique, v, m)                                                                                                                                                                                                                                                                                             \
-  OUTCOME_TRYV2(unique, m);                                                                                                                                                                                                                                                                                                    \
-  auto &&(v) = std::forward<decltype(unique)>(unique).value()
+#define OUTCOME_TRY2(unique, v, ...)                                                                                                                                                                                                                                                                                           \
+  OUTCOME_TRYV2(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                                          \
+  auto && (v) = std::forward<decltype(unique)>(unique).value()
 
-/*! If the outcome returned by expression *m* is not valued, propagate any
+/*! If the outcome returned by expression ... is not valued, propagate any
 failure by immediately returning that failure state immediately
 */
-#define OUTCOME_TRYV(m) OUTCOME_TRYV2(OUTCOME_TRY_UNIQUE_NAME, m)
+#define OUTCOME_TRYV(...) OUTCOME_TRYV2(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
 
 #if defined(__GNUC__) || defined(__clang__)
 
-/*! If the outcome returned by expression *m* is not valued, propagate any
+/*! If the outcome returned by expression ... is not valued, propagate any
 failure by immediately returning that failure state immediately, else become the
 unwrapped value as an expression. This makes `OUTCOME_TRYX(expr)` an expression
 which can be used exactly like the `try` operator in other languages.
@@ -69,9 +69,9 @@ which can be used exactly like the `try` operator in other languages.
 portable. The macro is not made available on unsupported compilers,
 so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 */
-#define OUTCOME_TRYX(m)                                                                                                                                                                                                                                                                                                        \
+#define OUTCOME_TRYX(...)                                                                                                                                                                                                                                                                                                      \
   ({                                                                                                                                                                                                                                                                                                                           \
-    auto &&res = (m);                                                                                                                                                                                                                                                                                                          \
+    auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                \
     if(!res.has_value())                                                                                                                                                                                                                                                                                                       \
       return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(res)>(res));                                                                                                                                                                                                                                  \
     std::forward<decltype(res)>(res).value();                                                                                                                                                                                                                                                                                  \
@@ -79,9 +79,9 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 })
 #endif
 
-/*! If the outcome returned by expression *m* is not valued, propagate any
+/*! If the outcome returned by expression ... is not valued, propagate any
 failure by immediately returning that failure immediately, else set *v* to the unwrapped value.
 */
-#define OUTCOME_TRY(v, m) OUTCOME_TRY2(OUTCOME_TRY_UNIQUE_NAME, v, m)
+#define OUTCOME_TRY(v, ...) OUTCOME_TRY2(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
 
 #endif

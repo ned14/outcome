@@ -33,12 +33,17 @@ namespace policy
 {
   namespace detail
   {
-    template <bool has_error_payload> struct rethrow_exception;
+    template <bool has_error_payload> struct rethrow_exception
+    {
+      template <class Exception> explicit rethrow_exception(Exception && /*unused*/)  // NOLINT
+      {
+      }
+    };
     template <> struct rethrow_exception<true>
     {
       template <class Exception> explicit rethrow_exception(Exception &&excpt)  // NOLINT
       {
-        std::rethrow_exception(std::forward<Exception>(excpt));
+        std::rethrow_exception(policy::exception_ptr(std::forward<Exception>(excpt)));
       }
     };
   }  // namespace detail
@@ -64,7 +69,7 @@ namespace policy
         {
           using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<outcome<T, EC, E, error_code_throw_as_system_error>, decltype(self)>;
           Outcome _self = static_cast<Outcome>(self);  // NOLINT
-          detail::rethrow_exception<trait::has_exception_ptr_v<E>>{policy::exception_ptr(std::forward<Outcome>(_self)._ptr)};
+          detail::rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
         }
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
