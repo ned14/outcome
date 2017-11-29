@@ -34,7 +34,7 @@ But down in the implementation details, in `Layer1`, another library is used tha
 to be able to transfer an exception thrown in `Layer1` through `Layer2_old`, which is not exception-safe,
 and be able to rethrow it in `Layer3`.
 
-In `Layer1` we have two functions from two libraries: one reports failures by throwin exceptions, the other by returnin `result<>`:
+In `Layer1` we have two functions from two libraries: one reports failures by throwin exceptions, the other by returning `result<>`:
 
 {{% snippet "using_outcome.cpp" "decl_f_g" %}}  
 

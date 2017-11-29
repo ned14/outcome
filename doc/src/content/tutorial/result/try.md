@@ -49,6 +49,7 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 {{% /notice %}}
 
 Macro `OUTCOME_TRY` does two things:
+
 1. It extracts a `T` from `result<T>` (or `outcome<T>`).
 2. It declares a dependency between statements: If the "tried" statement fails, the next statement is not executed.
 
