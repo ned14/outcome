@@ -21,15 +21,15 @@
 
 <span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY_UNIQUE_NAME</span>
 
-<span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRYV2</span><span class="pre">(</span><span class="pre">unique,m</span><span class="pre">)</span>
+<span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRYV2</span><span class="pre">(</span><span class="pre">unique,...</span><span class="pre">)</span>
 
-<span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY2</span><span class="pre">(</span><span class="pre">unique,v,m</span><span class="pre">)</span>
+<span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY2</span><span class="pre">(</span><span class="pre">unique,v,...</span><span class="pre">)</span>
 
-<span class="pre">#define</span> <a href="doc_try.html#standardese-OUTCOME_TRYV"><span class="typ dec var fun">OUTCOME_TRYV</span></a><span class="pre">(</span><span class="pre">m</span><span class="pre">)</span>
+<span class="pre">#define</span> <a href="doc_try.html#standardese-OUTCOME_TRYV"><span class="typ dec var fun">OUTCOME_TRYV</span></a><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
 
-<span class="pre">#define</span> <a href="doc_try.html#standardese-OUTCOME_TRYX"><span class="typ dec var fun">OUTCOME_TRYX</span></a><span class="pre">(</span><span class="pre">m</span><span class="pre">)</span>
+<span class="pre">#define</span> <a href="doc_try.html#standardese-OUTCOME_TRYX"><span class="typ dec var fun">OUTCOME_TRYX</span></a><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
 
-<span class="pre">#define</span> <a href="doc_try.html#standardese-OUTCOME_TRY"><span class="typ dec var fun">OUTCOME_TRY</span></a><span class="pre">(</span><span class="pre">v,m</span><span class="pre">)</span>
+<span class="pre">#define</span> <a href="doc_try.html#standardese-OUTCOME_TRY"><span class="typ dec var fun">OUTCOME_TRY</span></a><span class="pre">(</span><span class="pre">v,...</span><span class="pre">)</span>
 </code></pre>
 <section id="standardese-outcome_v2_xxx" class="standardese-entity-documentation">
 <section id="standardese-outcome_v2_xxx::try_operation_return_as&lt;T&gt;(T&amp;&amp;)" class="standardese-entity-documentation">
@@ -37,44 +37,44 @@
 <pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">&gt;</span>
 <span class="kwd">auto</span> <span class="typ dec var fun">try_operation_return_as</span><span class="pun">(</span><span class="typ dec var fun">T</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>
 </code></pre>
-<p id="standardese-outcome_v2_xxx::try_operation_return_as&lt;T&gt;(T&amp;&amp;)-brief" class="standardese-brief-section">Customisation point for changing what the <code>OUTCOME_TRY</code> macros</p>
+<p id="standardese-outcome_v2_xxx::try_operation_return_as&lt;T&gt;(T&amp;&amp;)-brief" class="standardese-brief-section">Customisation point for changing what the <code>OUTCOME_TRY</code> macros
+do. This function defaults to returning <code>std::forward&lt;T&gt;(v).as_failure()</code>.</p>
 <dl id="standardese-outcome_v2_xxx::try_operation_return_as&lt;T&gt;(T&amp;&amp;)-inline-sections" class="standardese-inline-sections">
 <dt>Effects:</dt>
 <dd>Extracts any state apart from value into a <code>failure_type</code>.</dd>
 <dt>Requires:</dt>
 <dd>The input value to have a <code>.as_failure()</code> member function.</dd>
 </dl>
-<p>do. This function defaults to returning <code>std::forward&lt;T&gt;(v).as_failure()</code>.</p>
 </section>
 <hr class="standardese-entity-documentation-break" />
 </section>
 <section id="standardese-OUTCOME_TRYV" class="standardese-entity-documentation">
 <h2 class="standardese-entity-documentation-heading">Macro <code>OUTCOME_TRYV</code></h2>
-<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRYV</span><span class="pre">(</span><span class="pre">m</span><span class="pre">)</span>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRYV</span><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
 </code></pre>
-<p id="standardese-OUTCOME_TRYV-brief" class="standardese-brief-section">If the outcome returned by expression <em>m</em> is not valued, propagate any</p>
-<p>failure by immediately returning that failure state immediately</p>
+<p id="standardese-OUTCOME_TRYV-brief" class="standardese-brief-section">If the outcome returned by expression … is not valued, propagate any
+failure by immediately returning that failure state immediately</p>
 </section>
 <hr class="standardese-entity-documentation-break" />
 <section id="standardese-OUTCOME_TRYX" class="standardese-entity-documentation">
 <h2 class="standardese-entity-documentation-heading">Macro <code>OUTCOME_TRYX</code></h2>
-<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRYX</span><span class="pre">(</span><span class="pre">m</span><span class="pre">)</span>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRYX</span><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
 </code></pre>
-<p id="standardese-OUTCOME_TRYX-brief" class="standardese-brief-section">If the outcome returned by expression <em>m</em> is not valued, propagate any</p>
-<p>failure by immediately returning that failure state immediately, else become the
+<p id="standardese-OUTCOME_TRYX-brief" class="standardese-brief-section">If the outcome returned by expression … is not valued, propagate any
+failure by immediately returning that failure state immediately, else become the
 unwrapped value as an expression. This makes <code>OUTCOME_TRYX(expr)</code> an expression
 which can be used exactly like the <code>try</code> operator in other languages.</p>
-<p>\note This macro makes use of a proprietary extension in GCC and clang and is not
+<p><em>Note:</em>* This macro makes use of a proprietary extension in GCC and clang and is not
 portable. The macro is not made available on unsupported compilers,
 so you can test for its presence using <code>#ifdef OUTCOME_TRYX</code>.</p>
 </section>
 <hr class="standardese-entity-documentation-break" />
 <section id="standardese-OUTCOME_TRY" class="standardese-entity-documentation">
 <h2 class="standardese-entity-documentation-heading">Macro <code>OUTCOME_TRY</code></h2>
-<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY</span><span class="pre">(</span><span class="pre">v,m</span><span class="pre">)</span>
+<pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY</span><span class="pre">(</span><span class="pre">v,...</span><span class="pre">)</span>
 </code></pre>
-<p id="standardese-OUTCOME_TRY-brief" class="standardese-brief-section">If the outcome returned by expression <em>m</em> is not valued, propagate any</p>
-<p>failure by immediately returning that failure immediately, else set <em>v</em> to the unwrapped value.</p>
+<p id="standardese-OUTCOME_TRY-brief" class="standardese-brief-section">If the outcome returned by expression … is not valued, propagate any
+failure by immediately returning that failure immediately, else set <em>v</em> to the unwrapped value.</p>
 </section>
 <hr class="standardese-entity-documentation-break" />
 </article>
