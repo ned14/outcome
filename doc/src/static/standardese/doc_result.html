@@ -128,8 +128,8 @@
 <pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">U</span><span class="pun">&gt;</span>
 <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">hook_result_construction</span><span class="pun">(</span><span class="typ dec var fun">T</span><span class="pun">*</span><span class="pun">,</span> <span class="typ dec var fun">U</span><span class="pun">&amp;&amp;</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
 </code></pre>
-<p id="standardese-outcome_v2_xxx::hooks::hook_result_construction&lt;T,U&gt;(T*,U&amp;&amp;)-brief" class="standardese-brief-section">The default instantiation hook implementation called when a <code>result</code> is first created</p>
-<p>by conversion from one of its possible types. Does nothing.</p>
+<p id="standardese-outcome_v2_xxx::hooks::hook_result_construction&lt;T,U&gt;(T*,U&amp;&amp;)-brief" class="standardese-brief-section">The default instantiation hook implementation called when a <code>result</code> is first created
+by conversion from one of its possible types. Does nothing.</p>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!</p>
 <h4 class="standardese-list-section-heading">Parameters</h4>
 <ul id="standardese-outcome_v2_xxx::hooks::hook_result_construction&lt;T,U&gt;(T*,U&amp;&amp;)-params" class="standardese-list-section">
@@ -147,8 +147,8 @@
 <pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">U</span><span class="pun">&gt;</span>
 <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">hook_result_copy_construction</span><span class="pun">(</span><span class="typ dec var fun">T</span><span class="pun">*</span><span class="pun">,</span> <span class="typ dec var fun">U</span><span class="pun">&amp;&amp;</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
 </code></pre>
-<p id="standardese-outcome_v2_xxx::hooks::hook_result_copy_construction&lt;T,U&gt;(T*,U&amp;&amp;)-brief" class="standardese-brief-section">The default instantiation hook implementation called when a <code>result</code> is created by copying</p>
-<p>from another <code>result</code>. Does nothing.</p>
+<p id="standardese-outcome_v2_xxx::hooks::hook_result_copy_construction&lt;T,U&gt;(T*,U&amp;&amp;)-brief" class="standardese-brief-section">The default instantiation hook implementation called when a <code>result</code> is created by copying
+from another <code>result</code>. Does nothing.</p>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!</p>
 <h4 class="standardese-list-section-heading">Parameters</h4>
 <ul id="standardese-outcome_v2_xxx::hooks::hook_result_copy_construction&lt;T,U&gt;(T*,U&amp;&amp;)-params" class="standardese-list-section">
@@ -166,8 +166,8 @@
 <pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">U</span><span class="pun">&gt;</span>
 <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">hook_result_move_construction</span><span class="pun">(</span><span class="typ dec var fun">T</span><span class="pun">*</span><span class="pun">,</span> <span class="typ dec var fun">U</span><span class="pun">&amp;&amp;</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
 </code></pre>
-<p id="standardese-outcome_v2_xxx::hooks::hook_result_move_construction&lt;T,U&gt;(T*,U&amp;&amp;)-brief" class="standardese-brief-section">The default instantiation hook implementation called when a <code>result</code> is created by moving</p>
-<p>from another <code>result</code>. Does nothing.</p>
+<p id="standardese-outcome_v2_xxx::hooks::hook_result_move_construction&lt;T,U&gt;(T*,U&amp;&amp;)-brief" class="standardese-brief-section">The default instantiation hook implementation called when a <code>result</code> is created by moving
+from another <code>result</code>. Does nothing.</p>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!</p>
 <h4 class="standardese-list-section-heading">Parameters</h4>
 <ul id="standardese-outcome_v2_xxx::hooks::hook_result_move_construction&lt;T,U&gt;(T*,U&amp;&amp;)-params" class="standardese-list-section">
@@ -185,8 +185,8 @@
 <pre><code class="standardese-language-cpp standardese-entity-synopsis"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">U</span><span class="pun">,</span> <span class="kwd">class</span> <span class="pun">...</span> <span class="typ dec var fun">Args</span><span class="pun">&gt;</span>
 <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">hook_result_in_place_construction</span><span class="pun">(</span><span class="typ dec var fun">T</span><span class="pun">*</span><span class="pun">,</span> <span class="typ dec var fun">in_place_type_t</span><span class="pun">&lt;</span>U<span class="pun">&gt;</span><span class="pun">,</span> Args &amp;&amp;...<span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
 </code></pre>
-<p id="standardese-outcome_v2_xxx::hooks::hook_result_in_place_construction&lt;T,U,Args&gt;(T*,in_place_type_t&lt;U&gt;,Args&amp;&amp;...)-brief" class="standardese-brief-section">The default instantiation hook implementation called when a <code>result</code> is created by in place</p>
-<p>construction. Does nothing.</p>
+<p id="standardese-outcome_v2_xxx::hooks::hook_result_in_place_construction&lt;T,U,Args&gt;(T*,in_place_type_t&lt;U&gt;,Args&amp;&amp;...)-brief" class="standardese-brief-section">The default instantiation hook implementation called when a <code>result</code> is created by in place
+construction. Does nothing.</p>
 <p>WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!</p>
 <h4 class="standardese-list-section-heading">Parameters</h4>
 <ul id="standardese-outcome_v2_xxx::hooks::hook_result_in_place_construction&lt;T,U,Args&gt;(T*,in_place_type_t&lt;U&gt;,Args&amp;&amp;...)-params" class="standardese-list-section">

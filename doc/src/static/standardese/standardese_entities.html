@@ -69,7 +69,8 @@
 <li id="standardese-OUTCOME_TRY" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_try.html#standardese-OUTCOME_TRY"><code>OUTCOME_TRY</code></a></dt>
-<dd>&mdash; If the outcome returned by expression <em>m</em> is not valued, propagate any</dd>
+<dd>&mdash; If the outcome returned by expression … is not valued, propagate any
+failure by immediately returning that failure immediately, else set <em>v</em> to the unwrapped value.</dd>
 </dl>
 </li>
 <li id="standardese-OUTCOME_TRY2" class="standardese-entity-index-item">
@@ -80,7 +81,8 @@
 <li id="standardese-OUTCOME_TRYV" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_try.html#standardese-OUTCOME_TRYV"><code>OUTCOME_TRYV</code></a></dt>
-<dd>&mdash; If the outcome returned by expression <em>m</em> is not valued, propagate any</dd>
+<dd>&mdash; If the outcome returned by expression … is not valued, propagate any
+failure by immediately returning that failure state immediately</dd>
 </dl>
 </li>
 <li id="standardese-OUTCOME_TRYV2" class="standardese-entity-index-item">
@@ -91,7 +93,10 @@
 <li id="standardese-OUTCOME_TRYX" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_try.html#standardese-OUTCOME_TRYX"><code>OUTCOME_TRYX</code></a></dt>
-<dd>&mdash; If the outcome returned by expression <em>m</em> is not valued, propagate any</dd>
+<dd>&mdash; If the outcome returned by expression … is not valued, propagate any
+failure by immediately returning that failure state immediately, else become the
+unwrapped value as an expression. This makes <code>OUTCOME_TRYX(expr)</code> an expression
+which can be used exactly like the <code>try</code> operator in other languages.</dd>
 </dl>
 </li>
 <li id="standardese-OUTCOME_TRY_GLUE" class="standardese-entity-index-item">
@@ -167,7 +172,8 @@
 <li id="standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code)" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_utils.html#standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code)"><code>error_from_exception</code></a></dt>
-<dd>&mdash; Utility function which tries to match the exception in the pointer provided</dd>
+<dd>&mdash; Utility function which tries to match the exception in the pointer provided
+to an equivalent error code. Ought to work for all standard STL types.</dd>
 </dl>
 </li>
 <li id="standardese-outcome_v2_xxx::failure&lt;EC&gt;(EC&amp;&amp;)" class="standardese-entity-index-item">
@@ -209,25 +215,29 @@
 <li id="standardese-outcome_v2_xxx::hooks::hook_result_construction&lt;T,U&gt;(T*,U&amp;&amp;)" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_result.html#standardese-outcome_v2_xxx::hooks::hook_result_construction%3CT,U%3E(T*,U&amp;&amp;)"><code>hook_result_construction</code></a></dt>
-<dd>&mdash; The default instantiation hook implementation called when a <code>result</code> is first created</dd>
+<dd>&mdash; The default instantiation hook implementation called when a <code>result</code> is first created
+by conversion from one of its possible types. Does nothing.</dd>
 </dl>
 </li>
 <li id="standardese-outcome_v2_xxx::hooks::hook_result_copy_construction&lt;T,U&gt;(T*,U&amp;&amp;)" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_result.html#standardese-outcome_v2_xxx::hooks::hook_result_copy_construction%3CT,U%3E(T*,U&amp;&amp;)"><code>hook_result_copy_construction</code></a></dt>
-<dd>&mdash; The default instantiation hook implementation called when a <code>result</code> is created by copying</dd>
+<dd>&mdash; The default instantiation hook implementation called when a <code>result</code> is created by copying
+from another <code>result</code>. Does nothing.</dd>
 </dl>
 </li>
 <li id="standardese-outcome_v2_xxx::hooks::hook_result_in_place_construction&lt;T,U,Args&gt;(T*,in_place_type_t&lt;U&gt;,Args&amp;&amp;...)" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_result.html#standardese-outcome_v2_xxx::hooks::hook_result_in_place_construction%3CT,U,Args%3E(T*,in_place_type_t%3CU%3E,Args&amp;&amp;...)"><code>hook_result_in_place_construction</code></a></dt>
-<dd>&mdash; The default instantiation hook implementation called when a <code>result</code> is created by in place</dd>
+<dd>&mdash; The default instantiation hook implementation called when a <code>result</code> is created by in place
+construction. Does nothing.</dd>
 </dl>
 </li>
 <li id="standardese-outcome_v2_xxx::hooks::hook_result_move_construction&lt;T,U&gt;(T*,U&amp;&amp;)" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_result.html#standardese-outcome_v2_xxx::hooks::hook_result_move_construction%3CT,U%3E(T*,U&amp;&amp;)"><code>hook_result_move_construction</code></a></dt>
-<dd>&mdash; The default instantiation hook implementation called when a <code>result</code> is created by moving</dd>
+<dd>&mdash; The default instantiation hook implementation called when a <code>result</code> is created by moving
+from another <code>result</code>. Does nothing.</dd>
 </dl>
 </li>
 <li id="standardese-outcome_v2_xxx::hooks::override_outcome_exception&lt;R,S,P,NoValuePolicy,U&gt;(outcome&lt;R,S,P,NoValuePolicy&gt;*,U&amp;&amp;)" class="standardese-entity-index-item">
@@ -390,7 +400,8 @@
 <li id="standardese-outcome_v2_xxx::success()" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_success_failure.html#standardese-outcome_v2_xxx::success%3CT%3E(T&amp;&amp;)"><code>success</code></a></dt>
-<dd>&mdash; Returns type sugar for implicitly constructing a <code>result&lt;T&gt;</code> with a successful state,</dd>
+<dd>&mdash; Returns type sugar for implicitly constructing a <code>result&lt;T&gt;</code> with a successful state,
+default constructing <code>T</code> if necessary.</dd>
 </dl>
 </li>
 <li id="standardese-outcome_v2_xxx::success_type&lt;T&gt;" class="standardese-entity-index-item">
@@ -438,13 +449,15 @@
 <li id="standardese-outcome_v2_xxx::try_operation_return_as&lt;T&gt;(T&amp;&amp;)" class="standardese-entity-index-item">
 <dl>
 <dt><a href="doc_try.html#standardese-outcome_v2_xxx::try_operation_return_as%3CT%3E(T&amp;&amp;)"><code>try_operation_return_as</code></a></dt>
-<dd>&mdash; Customisation point for changing what the <code>OUTCOME_TRY</code> macros</dd>
+<dd>&mdash; Customisation point for changing what the <code>OUTCOME_TRY</code> macros
+do. This function defaults to returning <code>std::forward&lt;T&gt;(v).as_failure()</code>.</dd>
 </dl>
 </li>
-<li id="standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code)" class="standardese-entity-index-item">
+<li id="standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code,std::stringconst&amp;)" class="standardese-entity-index-item">
 <dl>
-<dt><a href="doc_utils.html#standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code)"><code>try_throw_std_exception_from_error</code></a></dt>
-<dd>&mdash; Utility function which tries to throw the equivalent STL exception type for</dd>
+<dt><a href="doc_utils.html#standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code,std::stringconst&amp;)"><code>try_throw_std_exception_from_error</code></a></dt>
+<dd>&mdash; Utility function which tries to throw the equivalent STL exception type for
+some given error code, not including <code>system_error</code>.</dd>
 </dl>
 </li>
 <li id="standardese-outcome_v2_xxx::unchecked&lt;R,S&gt;" class="standardese-entity-index-item">
