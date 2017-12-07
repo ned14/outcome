@@ -935,9 +935,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF c7a2d31274ff5a8d7a1cac6cd6144e9130115e8d
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-09-24 18:33:07 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE c7a2d312
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF c63d3daf4bae85183c081d378d76a1cff1ca0f79
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-11-20 13:31:55 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE c63d3daf
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
 
@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 4ee19b706c01784d8759a5bc64aba397633ddca3
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-11-18 13:17:41 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4ee19b70
+#define OUTCOME_PREVIOUS_COMMIT_REF c91a233cea8de779d8ecde4ae0e2bdce9b4e495a
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-12-06 22:25:30 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c91a233c
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -3237,7 +3237,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 //! Namespace for injected convertibility
 namespace convert
 {
-#if 0 || defined(__cpp_concepts)
+#if defined(__cpp_concepts)
   /* The `ValueOrNone` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
@@ -3285,7 +3285,19 @@ namespace convert
     template <class U> static constexpr bool ValueOrNone = !std::is_same<no_match, decltype(match_value_or_none(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
     template <class U> static constexpr bool ValueOrError = !std::is_same<no_match, decltype(match_value_or_error(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
   } // namespace detail
+  /* The `ValueOrNone` concept.
+  \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
+  */
+
+
   template <class U> static constexpr bool ValueOrNone = detail::ValueOrNone<U>;
+  /* The `ValueOrError` concept.
+  \requires That `U::value_type` and `U::error_type` exist;
+  that `std::declval<U>().has_value()` returns a `bool`, `std::declval<U>().value()` and  `std::declval<U>().error()` exists.
+  */
+
+
+
   template <class U> static constexpr bool ValueOrError = detail::ValueOrError<U>;
 #endif
 
@@ -4010,6 +4022,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
+#include <cassert>
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
@@ -4028,6 +4042,7 @@ namespace policy
 #endif
       void _ub(Impl && /*unused*/)
       {
+        assert(false);
 #if defined(__GNUC__) || defined(__clang__)
         __builtin_unreachable();
 #endif
@@ -4260,41 +4275,6 @@ public:
   {
   }
 };
-
-//! Thrown when you try to access state in a `outcome<T, EC, E>` which isn't present.
-template <class S, class P> class OUTCOME_SYMBOL_VISIBLE bad_outcome_access_with : public bad_outcome_access
-{
-  S _error;
-  P _payload;
-
-public:
-  bad_outcome_access_with(S x, P y)
-      : bad_outcome_access("no value")
-      , _error(std::move(x))
-      , _payload(std::move(y))
-  {
-  }
-  //! Observes the error
-  //! \group outcome_error
-  const S &error() const & { return _error; }
-  //! \group outcome_error
-  S &error() & { return _error; }
-  //! \group outcome_error
-  const S &&error() const && { return _error; }
-  //! \group outcome_error
-  S &&error() && { return _error; }
-
-  //! Observes the payload
-  //! \group outcome_payload
-  const P &payload() const & { return _payload; }
-  //! \group outcome_payload
-  P &payload() & { return _payload; }
-  //! \group outcome_payload
-  const P &&payload() const && { return _payload; }
-  //! \group outcome_payload
-  P &&payload() && { return _payload; }
-};
-
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -4671,6 +4651,11 @@ namespace policy
 OUTCOME_V2_NAMESPACE_END
 
 #endif
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdocumentation" // Standardese markup confuses clang
+#endif
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 //! Placeholder type to indicate there is no value type
@@ -5545,10 +5530,19 @@ template <class R, class S = std::error_code> using checked = result<R, S, polic
 
 OUTCOME_V2_NAMESPACE_END
 
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
 #endif
 #include <memory>
 
-OUTCOME_V2_NAMESPACE_BEGIN
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdocumentation" // Standardese markup confuses clang
+#endif
+
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 //! Placeholder type to indicate there is no exception type
 struct no_exception_type
@@ -6830,6 +6824,10 @@ namespace hooks
 } // namespace hooks
 
 OUTCOME_V2_NAMESPACE_END
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 /* Exception observers for outcome type
 (C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: Oct 2017
@@ -6996,12 +6994,17 @@ namespace policy
 {
   namespace detail
   {
-    template <bool has_error_payload> struct rethrow_exception;
+    template <bool has_error_payload> struct rethrow_exception
+    {
+      template <class Exception> explicit rethrow_exception(Exception && /*unused*/) // NOLINT
+      {
+      }
+    };
     template <> struct rethrow_exception<true>
     {
       template <class Exception> explicit rethrow_exception(Exception &&excpt) // NOLINT
       {
-        std::rethrow_exception(std::forward<Exception>(excpt));
+        std::rethrow_exception(policy::exception_ptr(std::forward<Exception>(excpt)));
       }
     };
   } // namespace detail
@@ -7036,7 +7039,7 @@ namespace policy
         {
           using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<outcome<T, EC, E, error_code_throw_as_system_error>, decltype(self)>;
           Outcome _self = static_cast<Outcome>(self); // NOLINT
-          detail::rethrow_exception<trait::has_exception_ptr_v<E>>{policy::exception_ptr(std::forward<Outcome>(_self)._ptr)};
+          detail::rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
         }
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
@@ -7141,8 +7144,10 @@ namespace policy
   template <class T, class EC, class E> struct exception_ptr_rethrow : detail::base
   {
     /*! Performs a wide check of state, used in the value() functions
-    \effects If result does not have a value, if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_result_access`.
+    \effects If outcome does not have a value, if it has an exception it rethrows that exception via `std::rethrow_exception()`,
+    if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_outcome_access`.
     */
+
 
 
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
@@ -7153,17 +7158,17 @@ namespace policy
         {
           using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<outcome<T, EC, E, exception_ptr_rethrow>, decltype(self)>;
           Outcome _self = static_cast<Outcome>(self); // NOLINT
-          detail::rethrow_exception<trait::has_exception_ptr_v<E>>{policy::exception_ptr(std::forward<Outcome>(_self)._ptr)};
+          detail::rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
         }
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          detail::rethrow_exception<trait::has_exception_ptr_v<EC>>{policy::exception_ptr(std::forward<Impl>(self)._error)};
+          detail::rethrow_exception<trait::has_exception_ptr_v<EC>>{std::forward<Impl>(self)._error};
         }
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
       }
     }
-    /*! Performs a wide check of state, used in the value() functions
-    \effects If result does not have a value, if it has an error it throws that error, else it throws `bad_result_access`.
+    /*! Performs a wide check of state, used in the error() functions
+    \effects If outcome does not have an error, it throws `bad_outcome_access`.
     */
 
 
@@ -7481,29 +7486,29 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRY_GLUE(x, y) OUTCOME_TRY_GLUE2(x, y)
 #define OUTCOME_TRY_UNIQUE_NAME OUTCOME_TRY_GLUE(__t, __COUNTER__)
 
-#define OUTCOME_TRYV2(unique, m) auto &&(unique) = (m); if(!(unique).has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(unique)>(unique))
+#define OUTCOME_TRYV2(unique, ...) auto && (unique) = (__VA_ARGS__); if(!(unique).has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(unique)>(unique))
 
 
 
-#define OUTCOME_TRY2(unique, v, m) OUTCOME_TRYV2(unique, m); auto &&(v) = std::forward<decltype(unique)>(unique).value()
+#define OUTCOME_TRY2(unique, v, ...) OUTCOME_TRYV2(unique, __VA_ARGS__); auto && (v) = std::forward<decltype(unique)>(unique).value()
 
 
 
-/*! If the outcome returned by expression *m* is not valued, propagate any
+/*! If the outcome returned by expression ... is not valued, propagate any
 failure by immediately returning that failure state immediately
 */
 
 
-#define OUTCOME_TRYV(m) OUTCOME_TRYV2(OUTCOME_TRY_UNIQUE_NAME, m)
+#define OUTCOME_TRYV(...) OUTCOME_TRYV2(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
 
 #if defined(__GNUC__) || defined(__clang__)
 
-/*! If the outcome returned by expression *m* is not valued, propagate any
+/*! If the outcome returned by expression ... is not valued, propagate any
 failure by immediately returning that failure state immediately, else become the
 unwrapped value as an expression. This makes `OUTCOME_TRYX(expr)` an expression
 which can be used exactly like the `try` operator in other languages.
 
-\note This macro makes use of a proprietary extension in GCC and clang and is not
+**Note:** This macro makes use of a proprietary extension in GCC and clang and is not
 portable. The macro is not made available on unsupported compilers,
 so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 */
@@ -7515,7 +7520,7 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 
 
 
-#define OUTCOME_TRYX(m) ({ auto &&res = (m); if(!res.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(res)>(res)); std::forward<decltype(res)>(res).value(); })
+#define OUTCOME_TRYX(...) ({ auto &&res = (__VA_ARGS__); if(!res.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(res)>(res)); std::forward<decltype(res)>(res).value(); })
 
 
 
@@ -7525,12 +7530,12 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 
 #endif
 
-/*! If the outcome returned by expression *m* is not valued, propagate any
+/*! If the outcome returned by expression ... is not valued, propagate any
 failure by immediately returning that failure immediately, else set *v* to the unwrapped value.
 */
 
 
-#define OUTCOME_TRY(v, m) OUTCOME_TRY2(OUTCOME_TRY_UNIQUE_NAME, v, m)
+#define OUTCOME_TRY(v, ...) OUTCOME_TRY2(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
 
 #endif
 /* Tries to convert an exception ptr into its equivalent error code
@@ -7682,6 +7687,7 @@ inline std::error_code error_from_exception(std::exception_ptr &&ep = std::curre
 /*! Utility function which tries to throw the equivalent STL exception type for
 some given error code, not including `system_error`.
 \param ec The error code to try to convert into a STL exception throw.
+\param msg Optional custom message for the STL exception type.
 
 \effects If the input error code has a category of `generic_category()` (all platforms)
 or `system_category()` (POSIX only), throw the STL exception type matching
@@ -7696,7 +7702,8 @@ the `errno` domained code if one is available. For example, `ENOMEM` would cause
 
 
 
-inline void try_throw_std_exception_from_error(std::error_code ec)
+
+inline void try_throw_std_exception_from_error(std::error_code ec, const std::string &msg = std::string{})
 {
   if(!ec || (ec.category() != std::generic_category()
 #ifndef _WIN32
@@ -7709,15 +7716,15 @@ inline void try_throw_std_exception_from_error(std::error_code ec)
   switch(ec.value())
   {
   case EINVAL:
-    throw std::invalid_argument("invalid argument");
+    throw msg.empty() ? std::invalid_argument("invalid argument") : std::invalid_argument(msg);
   case EDOM:
-    throw std::domain_error("domain error");
+    throw msg.empty() ? std::domain_error("domain error") : std::domain_error(msg);
   case E2BIG:
-    throw std::length_error("length error");
+    throw msg.empty() ? std::length_error("length error") : std::length_error(msg);
   case ERANGE:
-    throw std::out_of_range("out of range");
+    throw msg.empty() ? std::out_of_range("out of range") : std::out_of_range(msg);
   case EOVERFLOW:
-    throw std::overflow_error("overflow error");
+    throw msg.empty() ? std::overflow_error("overflow error") : std::overflow_error(msg);
   case ENOMEM:
     throw std::bad_alloc();
   }
