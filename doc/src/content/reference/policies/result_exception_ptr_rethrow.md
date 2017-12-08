@@ -1,12 +1,10 @@
 +++
 title = "exception_ptr rethrow (Result)"
-slug = "doc_result_exception_ptr_rethrow.md"
-weight = 35
+weight = 50
 +++
-
 # Header file `result_exception_ptr_rethrow.hpp`
 
-<a id="standardese-result_exception_ptr_rethrow.hpp"/>
+<a id="standardese-result_exception_ptr_rethrow.hpp"></a>
 
 <pre><code class="standardese-language-cpp"><span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">..&#x2F;bad_access.hpp</span><span class="pre">&quot;</span>
 
@@ -25,13 +23,13 @@ weight = 35
 <span class="pun">}</span>
 </code></pre>
 
-<a id="standardese-outcome_v2_xxx"/>
+<a id="standardese-outcome_v2_xxx"></a>
 
-<a id="standardese-outcome_v2_xxx::policy"/>
+<a id="standardese-outcome_v2_xxx::policy"></a>
 
-### Struct `exception_ptr_rethrow`
+### Struct `outcome_v2_xxx::policy::exception_ptr_rethrow`
 
-<a id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow<T,EC,E>"/>
+<a id="standardese-outcome_v2_xxx::policy::exception_ptr_rethrow&lt;T,EC,E&gt;"></a>
 
 <pre><code class="standardese-language-cpp"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">EC</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">E</span><span class="pun">&gt;</span>
 <span class="kwd">struct</span> <span class="typ dec var fun">exception_ptr_rethrow</span><span class="pun">;</span>

@@ -1,12 +1,10 @@
 +++
 title = "outcome<R, S, P>"
-slug = "doc_outcome.md"
 weight = 10
 +++
-
 # Header file `outcome.hpp`
 
-<a id="standardese-outcome.hpp"/>
+<a id="standardese-outcome.hpp"></a>
 
 <pre><code class="standardese-language-cpp"><span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">detail&#x2F;outcome_exception_observers.hpp</span><span class="pre">&quot;</span>
 
@@ -69,8 +67,8 @@ weight = 10
 <span class="pun">}</span>
 </code></pre>
 
-<a id="standardese-outcome_v2_xxx"/>
+<a id="standardese-outcome_v2_xxx"></a>
 
-<a id="standardese-outcome_v2_xxx::hooks"/>
+<a id="standardese-outcome_v2_xxx::hooks"></a>
 
-<a id="standardese-outcome_v2_xxx::hooks"/>
+<a id="standardese-outcome_v2_xxx::hooks"></a>
