@@ -1,19 +1,17 @@
 +++
 title = "Try operations"
-slug = "doc_try.md"
 weight = 30
 +++
-
 # Header file `try.hpp`
 
-<a id="standardese-try.hpp"/>
+<a id="standardese-try.hpp"></a>
 
 <pre><code class="standardese-language-cpp"><span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">success_failure.hpp</span><span class="pre">&quot;</span>
 
 <span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
 <span class="pun">{</span>
     <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">&gt;</span>
-    <span class="kwd">auto</span> <a href="doc_try.md#standardese-outcome_v2_xxx::try_operation_return_as%3CT%3E(T&amp;&amp;)"><span class="typ dec var fun">try_operation_return_as</span></a><span class="pun">(</span><span class="typ dec var fun">T</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>
+    <span class="kwd">auto</span> <a href="#standardese-outcome_v2_xxx::try_operation_return_as%3CT%3E(T&amp;&amp;)"><span class="typ dec var fun">try_operation_return_as</span></a><span class="pun">(</span><span class="typ dec var fun">T</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>
 <span class="pun">}</span>
 
 <span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY_GLUE2</span><span class="pre">(</span><span class="pre">x,y</span><span class="pre">)</span>
@@ -26,18 +24,18 @@ weight = 30
 
 <span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY2</span><span class="pre">(</span><span class="pre">unique,v,...</span><span class="pre">)</span>
 
-<span class="pre">#define</span> <a href="doc_try.md#standardese-OUTCOME_TRYV"><span class="typ dec var fun">OUTCOME_TRYV</span></a><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
+<span class="pre">#define</span> <a href="#standardese-OUTCOME_TRYV"><span class="typ dec var fun">OUTCOME_TRYV</span></a><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
 
-<span class="pre">#define</span> <a href="doc_try.md#standardese-OUTCOME_TRYX"><span class="typ dec var fun">OUTCOME_TRYX</span></a><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
+<span class="pre">#define</span> <a href="#standardese-OUTCOME_TRYX"><span class="typ dec var fun">OUTCOME_TRYX</span></a><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
 
-<span class="pre">#define</span> <a href="doc_try.md#standardese-OUTCOME_TRY"><span class="typ dec var fun">OUTCOME_TRY</span></a><span class="pre">(</span><span class="pre">v,...</span><span class="pre">)</span>
+<span class="pre">#define</span> <a href="#standardese-OUTCOME_TRY"><span class="typ dec var fun">OUTCOME_TRY</span></a><span class="pre">(</span><span class="pre">v,...</span><span class="pre">)</span>
 </code></pre>
 
-<a id="standardese-outcome_v2_xxx"/>
+<a id="standardese-outcome_v2_xxx"></a>
 
-### Function `try_operation_return_as`
+### Function `outcome_v2_xxx::try_operation_return_as`
 
-<a id="standardese-outcome_v2_xxx::try_operation_return_as<T>(T&&)"/>
+<a id="standardese-outcome_v2_xxx::try_operation_return_as&lt;T&gt;(T&amp;&amp;)"></a>
 
 <pre><code class="standardese-language-cpp"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">&gt;</span>
 <span class="kwd">auto</span> <span class="typ dec var fun">try_operation_return_as</span><span class="pun">(</span><span class="typ dec var fun">T</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>
@@ -53,7 +51,7 @@ Customisation point for changing what the `OUTCOME_TRY` macros do. This function
 
 ## Macro `OUTCOME_TRYV`
 
-<a id="standardese-OUTCOME_TRYV"/>
+<a id="standardese-OUTCOME_TRYV"></a>
 
 <pre><code class="standardese-language-cpp"><span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRYV</span><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
 </code></pre>
@@ -64,7 +62,7 @@ If the outcome returned by expression … is not valued, propagate any failure b
 
 ## Macro `OUTCOME_TRYX`
 
-<a id="standardese-OUTCOME_TRYX"/>
+<a id="standardese-OUTCOME_TRYX"></a>
 
 <pre><code class="standardese-language-cpp"><span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRYX</span><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
 </code></pre>
@@ -77,7 +75,7 @@ If the outcome returned by expression … is not valued, propagate any failure b
 
 ## Macro `OUTCOME_TRY`
 
-<a id="standardese-OUTCOME_TRY"/>
+<a id="standardese-OUTCOME_TRY"></a>
 
 <pre><code class="standardese-language-cpp"><span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY</span><span class="pre">(</span><span class="pre">v,...</span><span class="pre">)</span>
 </code></pre>

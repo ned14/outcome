@@ -25,6 +25,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_RESULT_H
 #define OUTCOME_RESULT_H
 
+/// \output_name result_c
+
 //! A C struct representation of `std::error_code`.
 struct cxx_error_code
 {
