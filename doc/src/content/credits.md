@@ -4,14 +4,33 @@ description = "Giving thanks to those who made Outcome happen"
 +++
 
 ## github contributors
+
 {{%ghcontributors "https://api.github.com/repos/ned14/outcome/contributors?per_page=100" %}}
 
 ## This pretty, modern C++ documentation
+
 * [Hugo](https://gohugo.io) - static website generator of this documentation.
 * [hugo-theme-docdock](https://github.com/vjeantet/hugo-theme-docdock) - the Hugo theme used by this documentation.
 * [Standardese](https://github.com/foonathan/standardese) - the API reference generator
 
-# Special thanks
+# Special thanks for Outcome v2
+
+For a second time, Charley Bay stepped up as review manager. Given how much work it was
+for the v1 review, I can only say **thank you**.
+
+Andrzej Krzemienski went far beyond the call of duty in the development of Outcome v2.
+He wrote the front page, and the start of the tutorial. He thus set the tone, pacing,
+style and form of the tutorial which I merely continued for the rest of the tutorial.
+He also volunteered considerable amounts of his time as as primary peer reviewer for
+the v2 design and implementation, asking many very valuable "stupid questions" at least
+one of which caused a major rethink and refactor. If Outcome v2 passes its second peer
+review, it's because of Andrzej. Thank you.
+
+Jonathan Müller invested countless hours in his doxygen replacement tool Standardese
+which Outcome uses to generate the reference API docs, and a not insignificant number
+of those went on fixing issues for Outcome. Thank you.
+
+# Special thanks for Outcome v1
 
 To Paul Bristow who <a href="https://lists.boost.org/Archives/boost/2015/05/222687.php">
 proposed the name "Outcome"</a> for the library after a very extended

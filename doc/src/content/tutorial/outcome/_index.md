@@ -13,7 +13,7 @@ Conceptually, `outcome<T, EC, EP>` can be thought of as `variant<T, EC, EP>` or 
 `EC` defaults to `std::error_code` and `EP` defaults to `std::exception_ptr`. The distinction is made into two types, `EC` and `EP` for the following reasosns:
 
 1. The interface: `EC` is inspected in a different way that `EP`.
-2. Performance: handling of `EC` is optimized for POD types.
+2. Performance: handling of `EC` is optimized for trivial types.
 3. Interoperability with `result<T, EC>`.
 
 
@@ -34,7 +34,7 @@ But down in the implementation details, in `Layer1`, another library is used tha
 to be able to transfer an exception thrown in `Layer1` through `Layer2_old`, which is not exception-safe,
 and be able to rethrow it in `Layer3`.
 
-In `Layer1` we have two functions from two libraries: one reports failures by throwin exceptions, the other by returning `result<>`:
+In `Layer1` we have two functions from two libraries: one reports failures by throwing exceptions, the other by returning `result<>`:
 
 {{% snippet "using_outcome.cpp" "decl_f_g" %}}  
 
