@@ -27,6 +27,10 @@ items = {
     'doc_throw_bad_result_access.md' : ("Throw bad_result_access", 70, 'policies'),
 }
 
+replacements = {
+    'detail::result_final' : 'result_or_outcome',
+}
+
 def title(item):
     return items[item][0]
 
@@ -68,6 +72,7 @@ args = [standardese_path, '-D', '_cpp_exceptions=1', '-D', 'STANDARDESE_IS_IN_TH
   '--input.blacklist_namespace', 'detail',
   '--input.require_comment=0',
   '--output.format=commonmark_html',
+  '--output.entity_index_order=namespace_external',
   '-I../../../../include/outcome', '-I../../../../..',
   '../../../../include/outcome/bad_access.hpp',
   '../../../../include/outcome/convert.hpp',
@@ -98,6 +103,8 @@ weight = ''' + weight(item) + r'''
 ''')
                 contents = ih.read()
                 contents = contents.replace(item, '')
+                for replacement in replacements:
+                    contents = contents.replace(replacement, replacements[replacement])
                 oh.write(contents)
         docs[item] = doc
         os.remove(item)
@@ -112,6 +119,8 @@ weight = 20
         contents = ih.read()
         for doc in docs:
             contents = contents.replace(doc, docs[doc][:-3])
+            for replacement in replacements:
+                contents = contents.replace(replacement, replacements[replacement])
         oh.write(contents)
 with open('policies/_index.md', 'wt') as oh:
     oh.write(r'''+++
