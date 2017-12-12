@@ -23,12 +23,37 @@ This is, of course, C-compatible and Outcome provides [a macro-based C interface
 for C code needing to call `extern "C"` C++ functions returning a `result<T, EC>`.
 
 
-## Does Outcome have a stable ABI?
+## Does Outcome have a stable ABI and API?
 
 Until Outcome passes a second Boost peer review and enters Boost, no. Once into Boost,
-Outcome's ABI will be formally fixed as the v2 ABI one year after its first Boost release.
+Outcome's ABI and API will be formally fixed as the v2 interface one year after its first Boost release.
 Thereafter the [ABI compliance checker](https://lvc.github.io/abi-compliance-checker/)
-will be run per-commit to ensure Outcome's ABI remains stable.
+will be run per-commit to ensure Outcome's ABI and API remains stable.
+
+Note that the stable ABI and API guarantee will only apply to standalone Outcome, not to Boost.Outcome.
+Boost.Outcome has dependencies on other parts of Boost which are not stable across releases.
+
+
+## How badly will including Outcome in my public interface affect compile times?
+
+Outcome is dependent on `<system_error>`, which unfortunately includes `<string>` and thus
+drags in quite a lot of other stuff. If your public interface already includes `<string>`,
+then the impact of including Outcome will be very low. If you do not include `<string>`,
+unfortunately impact may be relatively quite high, depending on the total impact of your
+public interface files.
+
+Measures are being taken to remedy this situation however. The first is that C++ Modules
+will eliminate much of the impact of being dependent on `<string>`, and Outcome will make
+use of C++ Modules where enabled as soon as a compiler does not ICE on Outcome (i.e. Modules
+support is implemented specifically for the Microsoft compiler, but said compiler still
+internal compiler errors when attempting to create an Outcome Module. Microsoft are aware
+of the cause and hope to fix it within the next year or two).
+
+Longer term, SG14 the WG21 study group for low latency/high performance C++ are working on
+a `<system_error2>` which remedies some of the problems in `<system_error>`. The dependency
+on `<string>` has been removed, and thus any `<system_error2>` would be considerably lower
+impact. An Outcome v3 is likely to support any proposed `<system_error2>`, and
+that is likely many years away yet as ISO standardisation takes time.
 
 
 ## Is Outcome suitable for fixed latency/predictable execution coding such as for high frequency trading or audio?
@@ -160,18 +185,22 @@ There are a number of reasons:
 
 1. Outcome is not aimed at the same audience as Expected. We target developers
 and users who would be happy to use Boost. Expected targets the standard library user.
+
 2. Outcome believes that the monadic use case isn't as important as Expected does.
 Specifically, we think that 99% of use of Expected in the real world will be to
 return failure from functions, and not as some sort of enhanced or "rich" Optional.
 Outcome therefore models a subset of Variant, whereas Expected models an extended Optional.
+
 3. Outcome believes that if you are thinking about using something like Outcome,
 then for you writing failure code will be in the same proportion as writing success code,
 and thus in Outcome writing for failure is exactly the same as writing for success.
 Expected assumes that success will be more common than failure, and makes you type
 more when writing for failure.
+
 4. Outcome goes to considerable effort to help the end user type fewer characters
 during use. This results in tighter, less verbose, more succinct code. The cost of this is a steeper
 learning curve and more complex mental model than when programming with Expected.
+
 5. Outcome has facilities to make easier interoperation between multiple third
 party libraries each using incommensurate Outcome configurations. Expected does
 not do any of this, but subsequent WG21 papers do propose various interoperation

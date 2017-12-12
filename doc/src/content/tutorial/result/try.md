@@ -10,7 +10,7 @@ In the implementation of function `print_half` we have seen the usage of the mac
 OUTCOME_TRY (i, BigInt::fromString(text));
 ```
 
-This control statement is raughly equivalent to:
+This control statement is roughly equivalent to:
 
 ```c++
 auto&& __result = BigInt::fromString(text);

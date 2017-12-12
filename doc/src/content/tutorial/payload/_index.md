@@ -9,8 +9,13 @@ in fact to merely satisfy `trait::has_error_code_v<EC>` for `EC` to be treated a
 `std::error_code`.
 
 In turn, `trait::has_error_code_v<EC>` is true if there exists some ADL discovered free
-function called `make_error_code(EC)` returning a `std::error_code`, or if `EC` is implicitly
-convertible into a `std::error_code`.
+function:
+
+1. `make_error_code(EC)` returning a `std::error_code`.
+2. `make_error_code(std::get<0>(EC))` returning a `std::error_code` (i.e. EC might be
+`std::pair<std::error_code, U>` or `std::tuple<std::error_code, ...>`).
+
+... or if `EC` is implicitly convertible into a `std::error_code`.
 
 Thus, we can in fact use any custom `EC` type we like, including one carrying additional
 information, or *payload*. This payload can carry anything you like, and you can tell

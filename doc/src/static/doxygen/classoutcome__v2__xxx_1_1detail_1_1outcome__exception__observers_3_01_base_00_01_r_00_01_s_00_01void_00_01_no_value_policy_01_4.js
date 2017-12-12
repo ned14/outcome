@@ -1,5 +1,0 @@
-var classoutcome__v2__xxx_1_1detail_1_1outcome__exception__observers_3_01_base_00_01_r_00_01_s_00_01void_00_01_no_value_policy_01_4 =
-[
-    [ "assume_exception", "classoutcome__v2__xxx_1_1detail_1_1outcome__exception__observers_3_01_base_00_01_r_00_01_s_00_01void_00_01_no_value_policy_01_4.html#a4713691edb247d6a73689ff705dea7d3", null ],
-    [ "exception", "classoutcome__v2__xxx_1_1detail_1_1outcome__exception__observers_3_01_base_00_01_r_00_01_s_00_01void_00_01_no_value_policy_01_4.html#aa33c3973e56ef0d0a00ade5cca714385", null ]
-];

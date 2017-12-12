@@ -14,9 +14,9 @@ a code {
   color: inherit;
 }
 /* Fix Firefox */
-/*#body a.highlight {
+#body a.highlight {
   vertical-align: middle;
-}*/
+}
 
 pre .copy-to-clipboard {
   background-color: transparent;
