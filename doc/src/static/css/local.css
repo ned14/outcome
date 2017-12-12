@@ -20,6 +20,21 @@ a code {
 a.api-reference {
   font-family: monospace;
 }
+div.footnotes {
+  font-size: 85%;
+}
+#tags {
+  float: none;
+  display: flex;
+  /*justify-content: space-around;*/
+  justify-content: center;
+  flex-wrap: wrap;
+}
+#tags a {
+  margin-left: 0.25em;
+  margin-right: 0.25em;
+  margin-bottom: 0.25em;
+}
 
 pre .copy-to-clipboard {
   background-color: transparent;

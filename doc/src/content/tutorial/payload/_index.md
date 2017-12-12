@@ -2,11 +2,13 @@
 title = "Custom payloads"
 description = "Success-or-failure return types where extra information in addition to the error code accompanies failure."
 weight = 30
+tags = [ "payload", "has_error_code", "make_error_code" ]
 +++
 
 So far, type `EC` in `result<T, EC>` has always been a `std::error_code`. But it need
-in fact to merely satisfy `trait::has_error_code_v<EC>` for `EC` to be treated as a
-`std::error_code`.
+in fact to merely satisfy
+{{< api "success_failure/#standardese-outcome_v2_xxx::trait::has_error_code%3CT%3E" "trait::has_error_code_v<EC>">}}
+for `EC` to be treated as a `std::error_code`.
 
 In turn, `trait::has_error_code_v<EC>` is true if there exists some ADL discovered free
 function:
