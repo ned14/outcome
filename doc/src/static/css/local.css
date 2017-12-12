@@ -17,6 +17,9 @@ a code {
 #body a.highlight {
   vertical-align: middle;
 }
+a.api-reference {
+  font-family: monospace;
+}
 
 pre .copy-to-clipboard {
   background-color: transparent;

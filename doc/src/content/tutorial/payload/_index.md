@@ -12,8 +12,8 @@ In turn, `trait::has_error_code_v<EC>` is true if there exists some ADL discover
 function:
 
 1. `make_error_code(EC)` returning a `std::error_code`.
-2. `make_error_code(std::get<0>(EC))` returning a `std::error_code` (i.e. EC might be
-`std::pair<std::error_code, U>` or `std::tuple<std::error_code, ...>`).
+2. `make_error_code(get<0>(EC))` returning a `std::error_code` (i.e. EC might be
+`pair<std::error_code, U>` or `tuple<std::error_code, ...>`).
 
 ... or if `EC` is implicitly convertible into a `std::error_code`.
 

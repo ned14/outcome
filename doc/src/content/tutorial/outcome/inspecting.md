@@ -2,6 +2,7 @@
 title = "Inspecting outcome<T, EC, EP>"
 description = ""
 weight = 30
+tags = ["outcome", "value", "error", "exception"]
 +++
 
 Continuing with the previous example, in `Layer3` we have function `z` which again reports failures via exceptions.

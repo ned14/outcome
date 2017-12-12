@@ -2,15 +2,16 @@
 title = "outcome<T, EC, EP>"
 description = "Success-or-failure return types where failure can take two forms, expected/handled failure and unexpected/abort failure."
 weight = 20
+tags = ["outcome"]
 +++
 
 ## `outcome<>`
 
-Type `outcome<T, EC, EP>` can store either a `T` or an `EC` or an `EP`.
+Type {{< api "outcome" "outcome<T, EC, EP>" >}} can store either a `T` or an `EC` or an `EP`.
 The first parameter (`T`) represents a value returned from functions upon success.
 Both `EC` and `EP` represent the reason for function failure when function fails.
 Conceptually, `outcome<T, EC, EP>` can be thought of as `variant<T, EC, EP>` or `variant<T, variant<EC, EP>>`, or `result<T, variant<EC, EP>>`.
-`EC` defaults to `std::error_code` and `EP` defaults to `std::exception_ptr`. The distinction is made into two types, `EC` and `EP` for the following reasosns:
+`EC` defaults to `std::error_code` and `EP` defaults to `std::exception_ptr`. The distinction is made into two types, `EC` and `EP` for the following reasons:
 
 1. The interface: `EC` is inspected in a different way that `EP`.
 2. Performance: handling of `EC` is optimized for trivial types.

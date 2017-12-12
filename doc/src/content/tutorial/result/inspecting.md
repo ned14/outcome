@@ -2,6 +2,7 @@
 title = "Inspecting result<T, EC>"
 description = ""
 weight = 20
+tags = ["nodiscard", "value", "error", "try"]
 +++
 
 Suppose we will be writing function `print_half` that takes an integral number (however big) represented as an `std::string` and outputs a number which is twice smaller:
