@@ -7,8 +7,9 @@ weight = 80
 This is the final section of the tutorial, and it is unavoidably quite lengthy.
 
 One thing which Outcome solves -- which alternatives do not -- is how to
-non-intrusively tie together multiple third party libraries, each using
-Outcome with custom incommensurate `E` types, or indeed arbitrary return
+**non-intrusively** tie together multiple third party libraries, each using
+Outcome -- or some other `T|E` implementatation like `std::expected<T, E>`
+-- with custom incommensurate `E` types, or indeed arbitrary return
 types which are "split" `T|E` return types. Solving
 this well is the *coup de grâce* of Outcome against alternative approaches
 to this problem domain,
@@ -20,7 +21,7 @@ developer when `T|E` return type based code proliferates at scale,
 where dozens of libraries may be using completely incompatible `T|E` return types.
 
 Secondly we shall introduce the `ValueOrError` concept support in Outcome
-which implements a subset of the proposed [`ValueOrError`
+which implements a subset of the proposed [WG21 `ValueOrError`
 concept framework](https://wg21.link/P0786).
 
 Finally, we shall then step through a worked example which mocks up a realistic

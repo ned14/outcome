@@ -2,6 +2,7 @@
 title = "Result returning constructors"
 description = "How to metaprogram construction of objects which use result<T, EC> to return failure instead of throwing a C++ exception."
 weight = 47
+tags = ["constructors"]
 +++
 
 An oft asked question during conference talks on Expected/Outcome is how to
