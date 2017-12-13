@@ -2,6 +2,7 @@
 title = "void"
 description = ""
 weight = 50
+tags = ["terminate"]
 +++
 
 What about `result<udt, void>`? This is absolutely legal, it means that no error state is

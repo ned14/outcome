@@ -2,9 +2,10 @@
 title = "TRY operations"
 description = ""
 weight = 30
+tags = ["try"]
 +++
 
-In the implementation of function `print_half` we have seen the usage of the macro `OUTCOME_TRY`:
+In the implementation of function `print_half` we have seen the usage of the macro {{< api try OUTCOME_TRY >}}:
 
 ```c++
 OUTCOME_TRY (i, BigInt::fromString(text));

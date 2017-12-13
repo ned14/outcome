@@ -2,6 +2,7 @@
 title = "Auto-throwing filesystem_error"
 description = ""
 weight = 30
+tags = ["default-actions", "value"]
 +++
 
 Something not mentioned at all until now (and properly described in the next

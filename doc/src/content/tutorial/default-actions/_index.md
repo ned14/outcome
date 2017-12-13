@@ -2,6 +2,7 @@
 title = "Default actions"
 description = "The default rules for handling different categories of failure type"
 weight = 45
+tags = ["default-actions"]
 +++
 
 In the last section, we observed with `.value()` the value of the `outcome` returned by `copy_file()`
