@@ -87,7 +87,7 @@ script:
    if [ "$__" = "cmake tests osx" ]; then
      ctest -S .ci.cmake -V;
    fi
- -
+ - >
    if [ "$__" = "Documentation" ]; then
      git config --global push.default simple;
      git config --global user.name "Jenkins nedprod CI";
