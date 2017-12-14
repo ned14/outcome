@@ -2,6 +2,7 @@
 title = "Keeping state"
 description = ""
 weight = 10
+tags = ["backtrace"]
 +++
 
 The first thing we are going to need is somewhere to store the stack backtrace.

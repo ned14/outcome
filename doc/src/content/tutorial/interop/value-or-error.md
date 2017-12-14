@@ -1,6 +1,7 @@
 +++
 title = "ValueOrError Concept"
 weight = 7
+tags = [ "value-or-error" ]
 +++
 
 Something not really mentioned until now is how Outcome interoperates with the proposed

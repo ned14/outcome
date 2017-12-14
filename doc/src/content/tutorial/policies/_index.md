@@ -2,6 +2,7 @@
 title = "Policies"
 description = "Defining your own NoValuePolicy policies, plus an overview of the precanned policies which come in the Outcome source code."
 weight = 60
+tags = [ "policies" ]
 +++
 
 Earlier in the section on [Default actions](../default-actions), we covered all the different
@@ -28,8 +29,8 @@ namespace policy {
   >>>;
 }
   ```  
-- For `unchecked<T, EC>`, `NoValuePolicy` is hard coded to `policy::all_narrow`.
-- For `checked<T, EC>`, `NoValuePolicy` is hard coded to `policy::throw_bad_result_access<EC>`.
+- For `unchecked<T, EC>`, `NoValuePolicy` is hard coded to {{< api "policies/all_narrow" "policy::all_narrow" >}}.
+- For `checked<T, EC>`, `NoValuePolicy` is hard coded to {{< api "policies/throw_bad_result_access" "policy::throw_bad_result_access<EC>" >}}.
   
 These exactly match the Default Actions described earlier.
 
