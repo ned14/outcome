@@ -1268,20 +1268,11 @@ Specialise swap for outcome.
 
 Used to set/override an exception during a construction hook implementation.
 
+*Effects:* Sets the exception of the outcome to the given value.
+
 #### Parameters
 
   - `o` &mdash; The outcome you wish to change.
-
-### Parameter `v`
-
-<a id="standardese-outcome_v2_xxx::hooks::override_outcome_exception&lt;R,S,P,NoValuePolicy,U&gt;(outcome&lt;R,S,P,NoValuePolicy&gt;*,U&amp;&amp;).v"></a>
-
-<pre><code class="standardese-language-cpp"><span class="typ dec var fun">U</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">v</span></code></pre>
-
-PException to be set.
-
-*Effects:* Sets the exception of the outcome to the given value.
-
------
+  - `v` &mdash; Exception to be set.
 
 -----

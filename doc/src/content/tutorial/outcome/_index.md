@@ -7,7 +7,7 @@ tags = ["outcome"]
 
 ## `outcome<>`
 
-Type {{< api "outcome" "outcome<T, EC, EP>" >}} can store either a `T` or an `EC` or an `EP`.
+Type {{< api "outcome/#standardese-outcome_v2_xxx::outcome%3CR,S,P,NoValuePolicy%3E" "outcome<T, EC, EP>" >}} can store either a `T` or an `EC` or an `EP`.
 The first parameter (`T`) represents a value returned from functions upon success.
 Both `EC` and `EP` represent the reason for function failure when function fails.
 Conceptually, `outcome<T, EC, EP>` can be thought of as `variant<T, EC, EP>` or `variant<T, variant<EC, EP>>`, or `result<T, variant<EC, EP>>`.
