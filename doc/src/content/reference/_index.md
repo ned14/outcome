@@ -4,23 +4,23 @@ weight = 20
 +++
 # Project index
 
-  - [`CXX_DECLARE_RESULT`](result#standardese-CXX_DECLARE_RESULT) &mdash; Declares a C struct representation of `result<R, S>`.
+  - [`CXX_DECLARE_RESULT`](result_c#standardese-CXX_DECLARE_RESULT) &mdash; Declares a C struct representation of `result<R, S>`.
 
-  - [`CXX_DECLARE_RESULT_EC`](result#standardese-CXX_DECLARE_RESULT_EC) &mdash; Declares a C struct representation of `result<R, std::error_code>`.
+  - [`CXX_DECLARE_RESULT_EC`](result_c#standardese-CXX_DECLARE_RESULT_EC) &mdash; Declares a C struct representation of `result<R, std::error_code>`.
 
-  - [`CXX_RESULT`](result#standardese-CXX_RESULT) &mdash; A reference to a previously declared struct by `CXX_DECLARE_RESULT(R, RD, S, SD)`
+  - [`CXX_RESULT`](result_c#standardese-CXX_RESULT) &mdash; A reference to a previously declared struct by `CXX_DECLARE_RESULT(R, RD, S, SD)`
 
-  - [`CXX_RESULT_EC`](result#standardese-CXX_RESULT_EC) &mdash; A reference to a previously declared struct by `CXX_DECLARE_RESULT_EC(R, RD)`
+  - [`CXX_RESULT_EC`](result_c#standardese-CXX_RESULT_EC) &mdash; A reference to a previously declared struct by `CXX_DECLARE_RESULT_EC(R, RD)`
 
-  - [`CXX_RESULT_ERROR`](result#standardese-CXX_RESULT_ERROR) &mdash; C11 generic selecting a result struct’s `error` or `code` integer member.
+  - [`CXX_RESULT_ERROR`](result_c#standardese-CXX_RESULT_ERROR) &mdash; C11 generic selecting a result struct’s `error` or `code` integer member.
 
-  - [`CXX_RESULT_ERROR_IS_ERRNO`](result#standardese-CXX_RESULT_ERROR_IS_ERRNO) &mdash; True if a result struct’s `error` or `code` is an `errno` domain code suitable for setting `errno` with.
+  - [`CXX_RESULT_ERROR_IS_ERRNO`](result_c#standardese-CXX_RESULT_ERROR_IS_ERRNO) &mdash; True if a result struct’s `error` or `code` is an `errno` domain code suitable for setting `errno` with.
 
-  - [`CXX_RESULT_HAS_ERROR`](result#standardese-CXX_RESULT_HAS_ERROR) &mdash; True if a result struct has a valid error
+  - [`CXX_RESULT_HAS_ERROR`](result_c#standardese-CXX_RESULT_HAS_ERROR) &mdash; True if a result struct has a valid error
 
-  - [`CXX_RESULT_HAS_VALUE`](result#standardese-CXX_RESULT_HAS_VALUE) &mdash; True if a result struct has a valid value
+  - [`CXX_RESULT_HAS_VALUE`](result_c#standardese-CXX_RESULT_HAS_VALUE) &mdash; True if a result struct has a valid value
 
-  - [`CXX_RESULT_SET_ERRNO`](result#standardese-CXX_RESULT_SET_ERRNO) &mdash; Convenience macro setting `errno` to a result struct’s `errno` compatible error if present, or `EAGAIN` if errored but incompatible.
+  - [`CXX_RESULT_SET_ERRNO`](result_c#standardese-CXX_RESULT_SET_ERRNO) &mdash; Convenience macro setting `errno` to a result struct’s `errno` compatible error if present, or `EAGAIN` if errored but incompatible.
 
   - [`OUTCOME_ERROR_FROM_EXCEPTION_HPP`](utils#standardese-utils.hpp)
 
@@ -40,7 +40,7 @@ weight = 20
 
   - [`OUTCOME_TRY_UNIQUE_NAME`](try#standardese-try.hpp)
 
-  - [`cxx_error_code`](result#standardese-cxx_error_code) &mdash; A C struct representation of `std::error_code`.
+  - [`cxx_error_code`](result_c#standardese-cxx_error_code) &mdash; A C struct representation of `std::error_code`.
 
   - ## Namespace `outcome_v2_xxx::convert`
     
