@@ -16,7 +16,7 @@ items = {
     'doc_convert.md' : ("Interoperation", 60, ''),
     'doc_bad_access.md' : ("Exceptions", 70, ''),
     'doc_iostream_support.md' : ("iostream support", 80, ''),
-    'doc_result_h.md' : ("C API", 90, ''),
+    'doc_result_c.md' : ("C API", 90, ''),
 
     'doc_all_narrow.md' : ("All narrow (hard UB)", 10, 'policies'),
     'doc_outcome_error_code_throw_as_system_error.md' : ("error_code throw as system_error (Outcome)", 20, 'policies'),

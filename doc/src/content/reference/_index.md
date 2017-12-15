@@ -4,23 +4,23 @@ weight = 20
 +++
 # Project index
 
-  - [`CXX_DECLARE_RESULT`](result#standardese-CXX_DECLARE_RESULT) &mdash; Declares a C struct representation of `result<R, S>`.
+  - [`CXX_DECLARE_RESULT`](result_c#standardese-CXX_DECLARE_RESULT) &mdash; Declares a C struct representation of `result<R, S>`.
 
-  - [`CXX_DECLARE_RESULT_EC`](result#standardese-CXX_DECLARE_RESULT_EC) &mdash; Declares a C struct representation of `result<R, std::error_code>`.
+  - [`CXX_DECLARE_RESULT_EC`](result_c#standardese-CXX_DECLARE_RESULT_EC) &mdash; Declares a C struct representation of `result<R, std::error_code>`.
 
-  - [`CXX_RESULT`](result#standardese-CXX_RESULT) &mdash; A reference to a previously declared struct by `CXX_DECLARE_RESULT(R, RD, S, SD)`
+  - [`CXX_RESULT`](result_c#standardese-CXX_RESULT) &mdash; A reference to a previously declared struct by `CXX_DECLARE_RESULT(R, RD, S, SD)`
 
-  - [`CXX_RESULT_EC`](result#standardese-CXX_RESULT_EC) &mdash; A reference to a previously declared struct by `CXX_DECLARE_RESULT_EC(R, RD)`
+  - [`CXX_RESULT_EC`](result_c#standardese-CXX_RESULT_EC) &mdash; A reference to a previously declared struct by `CXX_DECLARE_RESULT_EC(R, RD)`
 
-  - [`CXX_RESULT_ERROR`](result#standardese-CXX_RESULT_ERROR) &mdash; C11 generic selecting a result struct’s `error` or `code` integer member.
+  - [`CXX_RESULT_ERROR`](result_c#standardese-CXX_RESULT_ERROR) &mdash; C11 generic selecting a result struct’s `error` or `code` integer member.
 
-  - [`CXX_RESULT_ERROR_IS_ERRNO`](result#standardese-CXX_RESULT_ERROR_IS_ERRNO) &mdash; True if a result struct’s `error` or `code` is an `errno` domain code suitable for setting `errno` with.
+  - [`CXX_RESULT_ERROR_IS_ERRNO`](result_c#standardese-CXX_RESULT_ERROR_IS_ERRNO) &mdash; True if a result struct’s `error` or `code` is an `errno` domain code suitable for setting `errno` with.
 
-  - [`CXX_RESULT_HAS_ERROR`](result#standardese-CXX_RESULT_HAS_ERROR) &mdash; True if a result struct has a valid error
+  - [`CXX_RESULT_HAS_ERROR`](result_c#standardese-CXX_RESULT_HAS_ERROR) &mdash; True if a result struct has a valid error
 
-  - [`CXX_RESULT_HAS_VALUE`](result#standardese-CXX_RESULT_HAS_VALUE) &mdash; True if a result struct has a valid value
+  - [`CXX_RESULT_HAS_VALUE`](result_c#standardese-CXX_RESULT_HAS_VALUE) &mdash; True if a result struct has a valid value
 
-  - [`CXX_RESULT_SET_ERRNO`](result#standardese-CXX_RESULT_SET_ERRNO) &mdash; Convenience macro setting `errno` to a result struct’s `errno` compatible error if present, or `EAGAIN` if errored but incompatible.
+  - [`CXX_RESULT_SET_ERRNO`](result_c#standardese-CXX_RESULT_SET_ERRNO) &mdash; Convenience macro setting `errno` to a result struct’s `errno` compatible error if present, or `EAGAIN` if errored but incompatible.
 
   - [`OUTCOME_ERROR_FROM_EXCEPTION_HPP`](utils#standardese-utils.hpp)
 
@@ -40,7 +40,7 @@ weight = 20
 
   - [`OUTCOME_TRY_UNIQUE_NAME`](try#standardese-try.hpp)
 
-  - [`cxx_error_code`](result#standardese-cxx_error_code) &mdash; A C struct representation of `std::error_code`.
+  - [`cxx_error_code`](result_c#standardese-cxx_error_code) &mdash; A C struct representation of `std::error_code`.
 
   - ## Namespace `outcome_v2_xxx::convert`
     
@@ -60,13 +60,13 @@ weight = 20
     
     Namespace for ADL discovered hooks into events in `result` and `outcome`.
     
-      - [`hook_outcome_construction`](outcome#standardese-outcome_v2_xxx::hooks)
+      - [`hook_outcome_construction`](outcome#standardese-outcome_v2_xxx::hooks::hook_outcome_construction\<T,U\>\(T*,U&&\)) &mdash; The default instantiation hook implementation called when a `outcome` is first created by conversion from one of its possible types. Does nothing.
     
-      - [`hook_outcome_copy_construction`](outcome#standardese-outcome_v2_xxx::hooks)
+      - [`hook_outcome_copy_construction`](outcome#standardese-outcome_v2_xxx::hooks::hook_outcome_copy_construction\<T,U\>\(T*,U&&\)) &mdash; The default instantiation hook implementation called when a `outcome` is created by copying from another `outcome` or `result`. Does nothing.
     
-      - [`hook_outcome_in_place_construction`](outcome#standardese-outcome_v2_xxx::hooks)
+      - [`hook_outcome_in_place_construction`](outcome#standardese-outcome_v2_xxx::hooks::hook_outcome_in_place_construction\<T,U,Args\>\(T*,in_place_type_t\<U\>,Args&&...\)) &mdash; The default instantiation hook implementation called when a `outcome` is created by in place construction. Does nothing.
     
-      - [`hook_outcome_move_construction`](outcome#standardese-outcome_v2_xxx::hooks)
+      - [`hook_outcome_move_construction`](outcome#standardese-outcome_v2_xxx::hooks::hook_outcome_move_construction\<T,U\>\(T*,U&&\)) &mdash; The default instantiation hook implementation called when a `outcome` is created by moving from another `outcome` or `result`. Does nothing.
     
       - [`hook_result_construction`](result#standardese-outcome_v2_xxx::hooks::hook_result_construction\<T,U\>\(T*,U&&\)) &mdash; The default instantiation hook implementation called when a `result` is first created by conversion from one of its possible types. Does nothing.
     
@@ -76,7 +76,7 @@ weight = 20
     
       - [`hook_result_move_construction`](result#standardese-outcome_v2_xxx::hooks::hook_result_move_construction\<T,U\>\(T*,U&&\)) &mdash; The default instantiation hook implementation called when a `result` is created by moving from another `result`. Does nothing.
     
-      - [`override_outcome_exception`](outcome#standardese-outcome_v2_xxx::hooks)
+      - [`override_outcome_exception`](outcome#standardese-outcome_v2_xxx::hooks::override_outcome_exception\<R,S,P,NoValuePolicy,U\>\(outcome\<R,S,P,NoValuePolicy\>*,U&&\)) &mdash; Used in hook implementations to override the payload/exception to something other than what was constructed.
     
       - [`set_spare_storage`](result#standardese-outcome_v2_xxx::hooks::set_spare_storage\<R,S,NoValuePolicy\>\(result_or_outcome\<R,S,NoValuePolicy\>*,uint16_t\)) &mdash; Sets the 16 bits of spare storage in result/outcome.
     
@@ -138,9 +138,9 @@ weight = 20
     
       - [`failure_type`](success_failure#standardese-outcome_v2_xxx::failure_type\<EC,E\>) &mdash; Type sugar for implicitly constructing a `result<>` with a failure state of error code and exception.
     
-      - [`is_outcome`](outcome#standardese-outcome_v2_xxx)
+      - [`is_outcome`](outcome#standardese-outcome_v2_xxx::is_outcome\<T\>) &mdash; True if an outcome
     
-      - [`is_outcome_v`](outcome#standardese-outcome_v2_xxx)
+      - [`is_outcome_v`](outcome#standardese-outcome_v2_xxx::is_outcome_v) &mdash; True if an outcome
     
       - [`is_result`](result#standardese-outcome_v2_xxx::is_result\<T\>) &mdash; True if a result
     
@@ -148,19 +148,19 @@ weight = 20
     
       - [`no_error_type`](result#standardese-outcome_v2_xxx::no_error_type) &mdash; Placeholder type to indicate there is no error type
     
-      - [`no_exception_type`](outcome#standardese-outcome_v2_xxx)
+      - [`no_exception_type`](outcome#standardese-outcome_v2_xxx::no_exception_type) &mdash; Placeholder type to indicate there is no exception type
     
       - [`no_value_type`](result#standardese-outcome_v2_xxx::no_value_type) &mdash; Placeholder type to indicate there is no value type
     
-      - [`operator!=`](outcome#standardese-outcome_v2_xxx)
+      - [`operator!=`](outcome#standardese-outcome_v2_xxx::operator!=\<T,U,V,R,S,P,N,\>\(result\<T,U,V\>const&,outcome\<R,S,P,N\>const&\)) &mdash; True if the result is not equal to the outcome
     
       - [`operator<<`](iostream_support#standardese-outcome_v2_xxx::operator\<\<\<R,S,P\>\(std::ostream&,result\<R,S,P\>const&\)) &mdash; Serialise a result
     
-      - [`operator==`](outcome#standardese-outcome_v2_xxx)
+      - [`operator==`](outcome#standardese-outcome_v2_xxx::operator==\<T,U,V,R,S,P,N,\>\(result\<T,U,V\>const&,outcome\<R,S,P,N\>const&\)) &mdash; True if the result is equal to the outcome
     
       - [`operator>>`](iostream_support#standardese-outcome_v2_xxx::operator\>\>\<R,S,P\>\(std::istream&,result\<R,S,P\>&\)) &mdash; Deserialise a result
     
-      - [`outcome`](outcome#standardese-outcome_v2_xxx)
+      - [`outcome`](outcome#standardese-outcome_v2_xxx::outcome\<R,S,P,NoValuePolicy\>) &mdash; Used to return from functions one of (i) a successful value (ii) a cause of failure, with optional additional information. `constexpr` capable.
     
       - [`print`](iostream_support#standardese-outcome_v2_xxx::print\<R,S,P\>\(result_or_outcome\<R,S,P\>const&\)) &mdash; Debug print a result
     

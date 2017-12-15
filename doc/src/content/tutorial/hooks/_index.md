@@ -14,16 +14,16 @@ which tell you when a namespace-localised `outcome` or `result` has been:
 
 - Constructed
   - {{< api "result/#standardese-outcome_v2_xxx::hooks::hook_result_construction%3CT,U%3E(T*,U&&)" "hook_result_construction(result<T, E> *this, U &&src)" >}}
-  - `hook_outcome_construction(outcome<T, EC, EP> *this, U &&src)`
+  - {{< api "outcome/#standardese-outcome_v2_xxx::hooks::hook_outcome_construction%3CT,U%3E(T*,U&&)" "hook_outcome_construction(outcome<T, EC, EP> *this, U &&src)" >}}
 - In-place constructed
   - {{< api "result/#standardese-outcome_v2_xxx::hooks::hook_result_in_place_construction%3CT,U,Args%3E(T*,in_place_type_t%3CU%3E,Args&&...)" "hook_result_in_place_construction(result<T, E> *this, in_place_type_t<T|E>, Args&&... srcs)" >}}
-  - `hook_outcome_in_place_construction(outcome<T, EC, EP> *this, in_place_type_t<T|EC|EP>, Args&&... srcs)`
+  - {{< api "outcome/#standardese-outcome_v2_xxx::hooks::hook_outcome_in_place_construction%3CT,U,Args%3E(T*,in_place_type_t%3CU%3E,Args&&...)" "hook_outcome_in_place_construction(outcome<T, EC, EP> *this, in_place_type_t<T|EC|EP>, Args&&... srcs)" >}}
 - Copied
   - {{< api "result/#standardese-outcome_v2_xxx::hooks::hook_result_copy_construction%3CT,U%3E(T*,U&&)" "hook_result_copy_construction(result<T, E> *this, U &&src)" >}}
-  - `hook_outcome_copy_construction(outcome<T, EC, EP> *this, U &&src)`
+  - {{< api "outcome/#standardese-outcome_v2_xxx::hooks::hook_outcome_copy_construction%3CT,U%3E(T*,U&&)" "hook_outcome_copy_construction(outcome<T, EC, EP> *this, U &&src)" >}}
 - Moved
   - {{< api "result/#standardese-outcome_v2_xxx::hooks::hook_result_move_construction%3CT,U%3E(T*,U&&)" "hook_result_move_construction(result<T, E> *this, U &&src)" >}}
-  - `hook_outcome_move_construction(outcome<T, EC, EP> *this, U &&src)`
+  - {{< api "outcome/#standardese-outcome_v2_xxx::hooks::hook_outcome_move_construction%3CT,U%3E(T*,U&&)" "hook_outcome_move_construction(outcome<T, EC, EP> *this, U &&src)" >}}
 
 One criticism often levelled against these success-or-failure objects is that they do
 not provide as rich a set of facilities as C++ exception throws. This section shows

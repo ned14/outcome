@@ -1003,7 +1003,8 @@ namespace hooks
 {
   /*! Used to set/override an exception during a construction hook implementation.
   \param o The outcome you wish to change.
-  \param v PException to be set.
+  \param v Exception to be set.
+  
   \effects Sets the exception of the outcome to the given value.
   */
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_exception(outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept
