@@ -115,7 +115,6 @@ Override to define what the policies which throw a system error with payload oug
 
 <pre><code class="standardese-language-cpp"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">&gt;</span>
 <span class="kwd">struct</span> <span class="typ dec var fun">has_error_code</span>
-<span class="pun">:</span> <span class="typ dec var fun">detail::has_error_code&lt;T&gt;</span>
 <span class="pun">{</span>
 <span class="pun">};</span>
 </code></pre>
@@ -145,7 +144,6 @@ Also returns true if `std::error_code` is convertible from T.
 
 <pre><code class="standardese-language-cpp"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">&gt;</span>
 <span class="kwd">struct</span> <span class="typ dec var fun">has_exception_ptr</span>
-<span class="pun">:</span> <span class="typ dec var fun">detail::has_exception_ptr&lt;T&gt;</span>
 <span class="pun">{</span>
 <span class="pun">};</span>
 </code></pre>

@@ -199,7 +199,6 @@ Used in hook implementations to override the payload/exception to something othe
 
 <pre><code class="standardese-language-cpp"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <a href="#standardese-outcome_v2_xxx::outcome%3CR,S,P,NoValuePolicy%3E.R"><span class="typ dec var fun">R</span></a><span class="pun">,</span> <span class="kwd">class</span> <a href="#standardese-outcome_v2_xxx::outcome%3CR,S,P,NoValuePolicy%3E.S"><span class="typ dec var fun">S</span></a><span class="pun">,</span> <span class="kwd">class</span> <a href="#standardese-outcome_v2_xxx::outcome%3CR,S,P,NoValuePolicy%3E.P"><span class="typ dec var fun">P</span></a><span class="pun">,</span> <span class="kwd">class</span> <a href="#standardese-outcome_v2_xxx::outcome%3CR,S,P,NoValuePolicy%3E.NoValuePolicy"><span class="typ dec var fun">NoValuePolicy</span></a><span class="pun">&gt;</span>
 <span class="kwd">class</span> <span class="typ dec var fun">outcome</span>
-<span class="pun">:</span> <span class="kwd">public</span> <span class="typ dec var fun">detail::select_outcome_impl&lt;R,S,P,NoValuePolicy&gt;</span>
 <span class="pun">{</span>
 <span class="kwd">public</span><span class="pun">:</span>
     &#x2F;&#x2F;=== Member types ===&#x2F;&#x2F;
