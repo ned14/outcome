@@ -30,6 +30,8 @@ items = {
 replacements = {
     'detail::result_final' : 'result_or_outcome',
 }
+for item in items:
+    replacements[item] = os.path.join(items[item][2], item[4:-3])
 
 def title(item):
     return items[item][0]
@@ -69,7 +71,8 @@ shutil.rmtree("doc/src/content/reference")
 os.makedirs("doc/src/content/reference/policies")
 os.chdir("doc/src/content/reference")
 args = [standardese_path, '-D', '_cpp_exceptions=1', '-D', 'STANDARDESE_IS_IN_THE_HOUSE=1',
-  '--input.blacklist_namespace', 'detail',
+  '--input.blacklist_namespace=detail',
+#  '--input.exclude_namespace=detail',
   '--input.require_comment=0',
   '--output.format=commonmark_html',
   '--output.entity_index_order=namespace_external',
@@ -104,7 +107,10 @@ weight = ''' + weight(item) + r'''
                 contents = ih.read()
                 contents = contents.replace(item, '')
                 for replacement in replacements:
-                    contents = contents.replace(replacement, replacements[replacement])
+                    s = section(item)
+                    r = replacements[replacement]
+                    if s: r = r[len(s)+1:]
+                    contents = contents.replace(replacement, r)
                 oh.write(contents)
         docs[item] = doc
         os.remove(item)
@@ -117,10 +123,9 @@ weight = 20
 +++
 ''')
         contents = ih.read()
-        for doc in docs:
-            contents = contents.replace(doc, docs[doc][:-3])
-            for replacement in replacements:
-                contents = contents.replace(replacement, replacements[replacement])
+        for replacement in replacements:
+            r = replacements[replacement]
+            contents = contents.replace(replacement, r)
         oh.write(contents)
 with open('policies/_index.md', 'wt') as oh:
     oh.write(r'''+++
