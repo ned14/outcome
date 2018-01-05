@@ -62,8 +62,14 @@ namespace detail
   };
 }
 
+// Define the linkage for this function to be used by external code.
+// This would be the usual __declspec(dllexport) or __declspec(dllimport)
+// if we were in a Windows DLL etc. But for this example use a global
+// instance but with inline linkage so multiple definitions do not collide.
+#define THIS_MODULE_API_DECL extern inline
+
 // Declare a global function returning a static instance of the custom category
-extern const detail::ConversionErrc_category &ConversionErrc_category()
+THIS_MODULE_API_DECL const detail::ConversionErrc_category &ConversionErrc_category()
 {
   static detail::ConversionErrc_category c;
   return c;
