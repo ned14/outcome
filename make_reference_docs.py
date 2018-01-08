@@ -77,6 +77,7 @@ args = [standardese_path, '-D', '_cpp_exceptions=1', '-D', 'STANDARDESE_IS_IN_TH
   '--input.require_comment=0',
   '--output.format=commonmark_html',
   '--output.entity_index_order=namespace_external',
+  '--output.show_complex_noexcept=0',
   '-I../../../../include/outcome', '-I../../../../..',
   '../../../../include/outcome/bad_access.hpp',
   '../../../../include/outcome/convert.hpp',
