@@ -22,23 +22,11 @@ weight = 20
 
   - [`CXX_RESULT_SET_ERRNO`](result_c#standardese-CXX_RESULT_SET_ERRNO) &mdash; Convenience macro setting `errno` to a result struct’s `errno` compatible error if present, or `EAGAIN` if errored but incompatible.
 
-  - [`OUTCOME_ERROR_FROM_EXCEPTION_HPP`](utils#standardese-utils.hpp)
-
   - [`OUTCOME_TRY`](try#standardese-OUTCOME_TRY) &mdash; If the outcome returned by expression … is not valued, propagate any failure by immediately returning that failure immediately, else set *v* to the unwrapped value.
-
-  - [`OUTCOME_TRY2`](try#standardese-try.hpp)
 
   - [`OUTCOME_TRYV`](try#standardese-OUTCOME_TRYV) &mdash; If the outcome returned by expression … is not valued, propagate any failure by immediately returning that failure state immediately
 
-  - [`OUTCOME_TRYV2`](try#standardese-try.hpp)
-
   - [`OUTCOME_TRYX`](try#standardese-OUTCOME_TRYX) &mdash; If the outcome returned by expression … is not valued, propagate any failure by immediately returning that failure state immediately, else become the unwrapped value as an expression. This makes `OUTCOME_TRYX(expr)` an expression which can be used exactly like the `try` operator in other languages.
-
-  - [`OUTCOME_TRY_GLUE`](try#standardese-try.hpp)
-
-  - [`OUTCOME_TRY_GLUE2`](try#standardese-try.hpp)
-
-  - [`OUTCOME_TRY_UNIQUE_NAME`](try#standardese-try.hpp)
 
   - [`cxx_error_code`](result_c#standardese-cxx_error_code) &mdash; A C struct representation of `std::error_code`.
 

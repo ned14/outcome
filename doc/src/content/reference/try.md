@@ -14,16 +14,6 @@ weight = 30
     <span class="kwd">auto</span> <a href="#standardese-outcome_v2_xxx::try_operation_return_as%3CT%3E(T&amp;&amp;)"><span class="typ dec var fun">try_operation_return_as</span></a><span class="pun">(</span><span class="typ dec var fun">T</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>
 <span class="pun">}</span>
 
-<span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY_GLUE2</span><span class="pre">(</span><span class="pre">x,y</span><span class="pre">)</span>
-
-<span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY_GLUE</span><span class="pre">(</span><span class="pre">x,y</span><span class="pre">)</span>
-
-<span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY_UNIQUE_NAME</span>
-
-<span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRYV2</span><span class="pre">(</span><span class="pre">unique,...</span><span class="pre">)</span>
-
-<span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY2</span><span class="pre">(</span><span class="pre">unique,v,...</span><span class="pre">)</span>
-
 <span class="pre">#define</span> <a href="#standardese-OUTCOME_TRYV"><span class="typ dec var fun">OUTCOME_TRYV</span></a><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
 
 <span class="pre">#define</span> <a href="#standardese-OUTCOME_TRYX"><span class="typ dec var fun">OUTCOME_TRYX</span></a><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
