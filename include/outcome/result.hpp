@@ -394,6 +394,10 @@ public:
   /*! Explicit converting constructor from a compatible `ValueOrError` type.
   \tparam 1
   \exclude
+  \tparam 2
+  \exclude
+  \param 1
+  \exclude
   \param o The input for which a `convert::value_or_error<result, std::decay_t<T>>{}(std::forward<T>(o))` is available.
 
   \effects Initialises the result with the contents of the compatible input.
