@@ -13,7 +13,7 @@ list is given in reverse chronological order.
 
 *Literature review of the several WG21 papers relating to std::expected<T, E>.*
 
-Awaiting video
+{{< youtube JfMBLx7qE0I >}}
 
 {{< slides "d/e/2PACX-1vSnTCn_hX3_uKNco8LtJTgAg2LrRO0zOJ3JiQiWMFFG8pNVwvUZr2ooYjXO9V94kdlqLxSB7DLTLPf5" >}}
 
