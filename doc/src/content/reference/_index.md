@@ -82,7 +82,7 @@ weight = 20
     
       - [`error_code`](success_failure#standardese-outcome_v2_xxx::policy::error_code\<T\>\(T&&\)) &mdash; Used by policies to extract a `std::error_code` from some input `T` via ADL discovery of some `make_error_code(T)` function.
     
-      - [`error_code_throw_as_system_error`](policies/result_error_code_throw_as_system_error#standardese-outcome_v2_xxx::policy::error_code_throw_as_system_error\<T,EC\>) &mdash; Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
+      - [`error_code_throw_as_system_error`](policies/outcome_error_code_throw_as_system_error#standardese-outcome_v2_xxx::policy::error_code_throw_as_system_error\<T,EC,E\>) &mdash; Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
     
       - [`exception_ptr`](success_failure#standardese-outcome_v2_xxx::policy::exception_ptr\<T\>\(T&&\)) &mdash; Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
     

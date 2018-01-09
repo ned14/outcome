@@ -352,43 +352,10 @@ Similarly to `result`, `NoValuePolicy` defaults to a policy selected according t
 
 #### Template parameters
 
+  - `R` &mdash; The optional type of the successful result (use `void` to disable). Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
+  - `S` &mdash; The optional type of the first failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`. Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
+  - `P` &mdash; The optional type of the second failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`. Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
   - `NoValuePolicy` &mdash; Policy on how to interpret types `S` and `P` when a wide observation of a not present value occurs.
-
-### Template parameter `R`
-
-<a id="standardese-outcome_v2_xxx::outcome&lt;R,S,P,NoValuePolicy&gt;.R"></a>
-
-<pre><code class="standardese-language-cpp"><span class="kwd">class</span> <span class="typ dec var fun">R</span></code></pre>
-
-The optional type of the successful result (use `void` to disable).
-
-Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-
------
-
-### Template parameter `S`
-
-<a id="standardese-outcome_v2_xxx::outcome&lt;R,S,P,NoValuePolicy&gt;.S"></a>
-
-<pre><code class="standardese-language-cpp"><span class="kwd">class</span> <span class="typ dec var fun">S</span></code></pre>
-
-The optional type of the first failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
-
-Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-
------
-
-### Template parameter `P`
-
-<a id="standardese-outcome_v2_xxx::outcome&lt;R,S,P,NoValuePolicy&gt;.P"></a>
-
-<pre><code class="standardese-language-cpp"><span class="kwd">class</span> <span class="typ dec var fun">P</span></code></pre>
-
-The optional type of the second failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
-
-Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-
------
 
 ### Type alias `value_type`
 

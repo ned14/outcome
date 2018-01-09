@@ -333,31 +333,9 @@ Any `R` (`value_type`) state can be observed using the member functions `.value(
 
 #### Template parameters
 
+  - `R` &mdash; The optional type of the successful result (use `void` to disable). Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
+  - `S` &mdash; The optional type of the failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`. Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
   - `NoValuePolicy` &mdash; Policy on how to interpret type `S` when a wide observation of a not present value occurs.
-
-### Template parameter `R`
-
-<a id="standardese-outcome_v2_xxx::result&lt;R,S,NoValuePolicy&gt;.R"></a>
-
-<pre><code class="standardese-language-cpp"><span class="kwd">class</span> <span class="typ dec var fun">R</span></code></pre>
-
-The optional type of the successful result (use `void` to disable).
-
-Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-
------
-
-### Template parameter `S`
-
-<a id="standardese-outcome_v2_xxx::result&lt;R,S,NoValuePolicy&gt;.S"></a>
-
-<pre><code class="standardese-language-cpp"><span class="kwd">class</span> <span class="typ dec var fun">S</span></code></pre>
-
-The optional type of the failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
-
-Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-
------
 
 ### Type alias `value_type`
 
