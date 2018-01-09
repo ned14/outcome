@@ -195,10 +195,14 @@ Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array
 Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
 \tparam NoValuePolicy Policy on how to interpret type `S` when a wide observation of a not present value occurs.
 
+Any `R` (`value_type`) state can be observed using the member functions `.value()` and `.assume_value()`. Any `S` (`error_type`) state can be
+observed using the member functions `.error()` and `.assume_error()`.
+
 `NoValuePolicy` defaults to a policy selected according to the characteristics of type `S`:
+
   1. If `.value()` called when there is no `value_type` but there is an `error_type`:
     - If `trait::has_error_code_v<S>` is true,
-    then `throw std::system_error(error()|make_error_code(error()))` [`policy::error_code_throw_as_system_error<S>`]
+    then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}} \endverbatim]
     - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))` [`policy::exception_ptr_rethrow<R, S, void>`]
     - If `S` is `void`, call `std::terminate()` [`policy::terminate`]
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
@@ -250,7 +254,7 @@ public:
   using error_type_if_enabled = typename base::_error_type;
 
   //! Used to rebind this result to a different result type.
-  template <class T, class U = S> using rebind = result<T, U>;
+  template <class T, class U = S, class V = policy::default_policy<T, U, void>> using rebind = result<T, U, V>;
 
 protected:
   //! Requirement predicates for result.

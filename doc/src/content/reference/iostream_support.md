@@ -53,7 +53,7 @@ weight = 80
 <span class="typ dec var fun">std::istream</span><span class="pun">&amp;</span> <span class="typ dec var fun">operator&gt;&gt;</span><span class="pun">(</span><span class="typ dec var fun">std::istream</span><span class="pun">&amp;</span> <span class="typ dec var fun">s</span><span class="pun">,</span> <a href="result#standardese-outcome_v2_xxx::result%3CR,S,NoValuePolicy%3E"><span class="typ dec var fun">result</span></a><span class="pun">&lt;</span>R, S, P<span class="pun">&gt;</span><span class="pun">&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>
 </code></pre>
 
-Deserialise a result. Format is `(unsigned) status; " "; value if value present; error if error present"`. Spare storage is preserved.
+Deserialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
 
 -----
 
@@ -65,7 +65,7 @@ Deserialise a result. Format is `(unsigned) status; " "; value if value present;
 <span class="typ dec var fun">std::ostream</span><span class="pun">&amp;</span> <span class="typ dec var fun">operator&lt;&lt;</span><span class="pun">(</span><span class="typ dec var fun">std::ostream</span><span class="pun">&amp;</span> <span class="typ dec var fun">s</span><span class="pun">,</span> <a href="result#standardese-outcome_v2_xxx::result%3CR,S,NoValuePolicy%3E"><span class="typ dec var fun">result</span></a><span class="pun">&lt;</span>R, S, P<span class="pun">&gt;</span> <span class="kwd">const</span><span class="pun">&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>
 </code></pre>
 
-Serialise a result. Format is `(unsigned) status; " "; value if value present; error if error present"`. Spare storage is preserved.
+Serialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
 
 If you are printing to a human readable destination, use `print()` instead.
 
@@ -127,7 +127,7 @@ Debug print a result into a form suitable for human reading. Format is `(+void)|
 <span class="typ dec var fun">std::istream</span><span class="pun">&amp;</span> <span class="typ dec var fun">operator&gt;&gt;</span><span class="pun">(</span><span class="typ dec var fun">std::istream</span><span class="pun">&amp;</span> <span class="typ dec var fun">s</span><span class="pun">,</span> <a href="outcome#standardese-outcome_v2_xxx::outcome%3CR,S,P,NoValuePolicy%3E"><span class="typ dec var fun">outcome</span></a><span class="pun">&lt;</span>R, S, P, N<span class="pun">&gt;</span><span class="pun">&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>
 </code></pre>
 
-Deserialise an outcome. Format is `(unsigned) status; " "; value if value present; error if error present; exception if exception present"` Spare storage is preserved.
+Deserialise an outcome. Format is `status_unsigned [value][error][exception]`. Spare storage is preserved.
 
 *Requires:* That `trait::has_exception_ptr_v<P>` is false.
 
@@ -141,7 +141,7 @@ Deserialise an outcome. Format is `(unsigned) status; " "; value if value presen
 <span class="typ dec var fun">std::ostream</span><span class="pun">&amp;</span> <span class="typ dec var fun">operator&lt;&lt;</span><span class="pun">(</span><span class="typ dec var fun">std::ostream</span><span class="pun">&amp;</span> <span class="typ dec var fun">s</span><span class="pun">,</span> <a href="outcome#standardese-outcome_v2_xxx::outcome%3CR,S,P,NoValuePolicy%3E"><span class="typ dec var fun">outcome</span></a><span class="pun">&lt;</span>R, S, P, N<span class="pun">&gt;</span> <span class="kwd">const</span><span class="pun">&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>
 </code></pre>
 
-Serialise an outcome. Format is `(unsigned) status; " "; value if value present; error if error present; exception if exception present"` Spare storage is preserved.
+Serialise an outcome. Format is `status_unsigned [value][error][exception]`. Spare storage is preserved.
 
 *Requires:* That `trait::has_exception_ptr_v<P>` is false.
 
