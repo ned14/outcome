@@ -38,12 +38,6 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Placeholder type to indicate there is no exception type
-struct no_exception_type
-{
-  no_exception_type() = delete;
-};
-
 template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_policy<R, S, P>>  //
 OUTCOME_REQUIRES(detail::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))      //
 class outcome;

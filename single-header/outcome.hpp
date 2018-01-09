@@ -4658,17 +4658,6 @@ OUTCOME_V2_NAMESPACE_END
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Placeholder type to indicate there is no value type
-struct no_value_type
-{
-  no_value_type() = delete;
-};
-//! Placeholder type to indicate there is no error type
-struct no_error_type
-{
-  no_error_type() = delete;
-};
-
 //! Namespace for policies
 namespace policy
 {
@@ -5551,12 +5540,6 @@ OUTCOME_V2_NAMESPACE_END
 #endif
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
-//! Placeholder type to indicate there is no exception type
-struct no_exception_type
-{
-  no_exception_type() = delete;
-};
 
 template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_policy<R, S, P>> //
 OUTCOME_REQUIRES(detail::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value)) //
@@ -7288,7 +7271,7 @@ namespace detail
   inline std::string safe_message(const std::error_code &ec) { return " (" + ec.message() + ")"; }
 } // namespace detail
 
-//! Deserialise a result. Format is `(unsigned) status; " "; value if value present; error if error present"`
+//! Deserialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
 template <class R, class S, class P> inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
 {
   s >> v._state;
@@ -7298,7 +7281,7 @@ template <class R, class S, class P> inline std::istream &operator>>(std::istrea
   }
   return s;
 }
-/*! Serialise a result. Format is `(unsigned) status; " "; value if value present; error if error present"`.
+/*! Serialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
 If you are printing to a human readable destination, use `print()` instead.
 */
 
@@ -7381,7 +7364,7 @@ template <class P> inline std::string print(const detail::result_final<void, voi
   return s.str();
 }
 
-/*! Deserialise an outcome. Format is `(unsigned) status; " "; value if value present; error if error present; exception if exception present"`
+/*! Deserialise an outcome. Format is `status_unsigned [value][error][exception]`. Spare storage is preserved.
 \requires That `trait::has_exception_ptr_v<P>` is false.
 */
 
@@ -7400,7 +7383,7 @@ template <class R, class S, class P, class N> inline std::istream &operator>>(st
   }
   return s;
 }
-/*! Serialise an outcome. Format is `(unsigned) status; " "; value if value present; error if error present; exception if exception present"`
+/*! Serialise an outcome. Format is `status_unsigned [value][error][exception]`. Spare storage is preserved.
 If you are printing to a human readable destination, use `print()` instead.
 \requires That `trait::has_exception_ptr_v<P>` is false.
 */

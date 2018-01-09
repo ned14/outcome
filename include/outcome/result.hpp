@@ -41,17 +41,6 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Placeholder type to indicate there is no value type
-struct no_value_type
-{
-  no_value_type() = delete;
-};
-//! Placeholder type to indicate there is no error type
-struct no_error_type
-{
-  no_error_type() = delete;
-};
-
 //! Namespace for policies
 namespace policy
 {
