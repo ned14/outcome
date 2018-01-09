@@ -935,9 +935,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF c63d3daf4bae85183c081d378d76a1cff1ca0f79
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-11-20 13:31:55 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE c63d3daf
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF efc6c12dca3b8f2210d741a985a53b162383dfdf
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-12-06 20:49:53 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE efc6c12d
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
 
@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF c91a233cea8de779d8ecde4ae0e2bdce9b4e495a
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2017-12-06 22:25:30 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c91a233c
+#define OUTCOME_PREVIOUS_COMMIT_REF 3d0a4ad58ae00d27540cdb509fd91e8d30998744
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-08 18:57:04 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 3d0a4ad5
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -5090,6 +5090,10 @@ public:
   /*! Explicit converting constructor from a compatible `ValueOrError` type.
   \tparam 1
   \exclude
+  \tparam 2
+  \exclude
+  \param 1
+  \exclude
   \param o The input for which a `convert::value_or_error<result, std::decay_t<T>>{}(std::forward<T>(o))` is available.
 
   \effects Initialises the result with the contents of the compatible input.
@@ -5098,6 +5102,10 @@ public:
   `ValueOrError` concept matches any type with a `value_type`,
   an `error_type`, a `.value()`, an `.error()` and a `.has_value()`.
   */
+
+
+
+
 
 
 
@@ -5918,7 +5926,7 @@ protected:
 public:
   /// \output_section Converting constructors
   /*! Converting constructor to a successful outcome.
-  \tparam enable_value_converting_constructor
+  \tparam 1
   \exclude
   \param 1
   \exclude
@@ -5948,7 +5956,7 @@ public:
     hook_outcome_construction(this, std::forward<T>(t));
   }
   /*! Converting constructor to an errored outcome.
-  \tparam enable_error_converting_constructor
+  \tparam 1
   \exclude
   \param 1
   \exclude
@@ -5980,7 +5988,9 @@ public:
     hook_outcome_construction(this, std::forward<T>(t));
   }
   /*! Special error condition converting constructor to an errored outcome.
-  \tparam enable_error_condition_converting_constructor
+  \tparam 1
+  \exclude
+  \tparam 2
   \exclude
   \param 1
   \exclude
@@ -6004,6 +6014,8 @@ public:
 
 
 
+
+
   OUTCOME_TEMPLATE(class ErrorCondEnum)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))), //
                     OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor<ErrorCondEnum>))
@@ -6014,7 +6026,7 @@ public:
     hook_outcome_construction(this, std::forward<ErrorCondEnum>(t));
   }
   /*! Converting constructor to an excepted outcome.
-  \tparam enable_exception_converting_constructor
+  \tparam 1
   \exclude
   \param 1
   \exclude
@@ -6050,6 +6062,12 @@ public:
   /*! Explicit converting constructor from a compatible `ValueOrError` type.
   \tparam 1
   \exclude
+  \tparam 2
+  \exclude
+  \tparam 3
+  \exclude
+  \param 1
+  \exclude
   \param o The input for which a `convert::value_or_error<outcome, std::decay_t<T>>{}(std::forward<T>(o))` is available.
 
   \effects Initialises the outcome with the contents of the compatible input.
@@ -6058,6 +6076,12 @@ public:
   `ValueOrError` concept matches any type with a `value_type`,
   an `error_type`, a `.value()`, an `.error()` and a `.has_value()`.
   */
+
+
+
+
+
+
 
 
 
@@ -6809,9 +6833,11 @@ namespace hooks
 {
   /*! Used to set/override an exception during a construction hook implementation.
   \param o The outcome you wish to change.
-  \param v PException to be set.
+  \param v Exception to be set.
+
   \effects Sets the exception of the outcome to the given value.
   */
+
 
 
 
@@ -7262,7 +7288,7 @@ namespace detail
   inline std::string safe_message(const std::error_code &ec) { return " (" + ec.message() + ")"; }
 } // namespace detail
 
-//! Deserialise a result
+//! Deserialise a result. Format is `(unsigned) status; " "; value if value present; error if error present"`
 template <class R, class S, class P> inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
 {
   s >> v._state;
@@ -7272,7 +7298,11 @@ template <class R, class S, class P> inline std::istream &operator>>(std::istrea
   }
   return s;
 }
-//! Serialise a result
+/*! Serialise a result. Format is `(unsigned) status; " "; value if value present; error if error present"`.
+If you are printing to a human readable destination, use `print()` instead.
+*/
+
+
 template <class R, class S, class P> inline std::ostream &operator<<(std::ostream &s, const result<R, S, P> &v)
 {
   s << v._state;
@@ -7282,7 +7312,11 @@ template <class R, class S, class P> inline std::ostream &operator<<(std::ostrea
   }
   return s;
 }
-//! Debug print a result
+/*! Debug print a result into a form suitable for human reading. Format is `value|error`. If the
+error type is `error_code`, appends `" (ec.message())"` afterwards.
+*/
+
+
 template <class R, class S, class P> inline std::string print(const detail::result_final<R, S, P> &v)
 {
   std::stringstream s;
@@ -7296,7 +7330,11 @@ template <class R, class S, class P> inline std::string print(const detail::resu
   }
   return s.str();
 }
-//! Debug print a result
+/*! Debug print a result into a form suitable for human reading. Format is `(+void)|error`. If the
+error type is `error_code`, appends `" (ec.message())"` afterwards.
+*/
+
+
 template <class S, class P> inline std::string print(const detail::result_final<void, S, P> &v)
 {
   std::stringstream s;
@@ -7310,7 +7348,9 @@ template <class S, class P> inline std::string print(const detail::result_final<
   }
   return s.str();
 }
-//! Debug print a result
+/*! Debug print a result into a form suitable for human reading. Format is `value|(-void)`.
+*/
+
 template <class R, class P> inline std::string print(const detail::result_final<R, void, P> &v)
 {
   std::stringstream s;
@@ -7324,7 +7364,9 @@ template <class R, class P> inline std::string print(const detail::result_final<
   }
   return s.str();
 }
-//! Debug print a result
+/*! Debug print a result into a form suitable for human reading. Format is `(+void)|(-void)`.
+*/
+
 template <class P> inline std::string print(const detail::result_final<void, void, P> &v)
 {
   std::stringstream s;
@@ -7339,7 +7381,11 @@ template <class P> inline std::string print(const detail::result_final<void, voi
   return s.str();
 }
 
-//! Deserialise an outcome
+/*! Deserialise an outcome. Format is `(unsigned) status; " "; value if value present; error if error present; exception if exception present"`
+\requires That `trait::has_exception_ptr_v<P>` is false.
+*/
+
+
 template <class R, class S, class P, class N> inline std::istream &operator>>(std::istream &s, outcome<R, S, P, N> &v)
 {
   static_assert(!trait::has_exception_ptr_v<P>, "Cannot call operator>> on an outcome with an exception_ptr in it");
@@ -7354,7 +7400,13 @@ template <class R, class S, class P, class N> inline std::istream &operator>>(st
   }
   return s;
 }
-//! Serialise an outcome
+/*! Serialise an outcome. Format is `(unsigned) status; " "; value if value present; error if error present; exception if exception present"`
+If you are printing to a human readable destination, use `print()` instead.
+\requires That `trait::has_exception_ptr_v<P>` is false.
+*/
+
+
+
 template <class R, class S, class P, class N> inline std::ostream &operator<<(std::ostream &s, const outcome<R, S, P, N> &v)
 {
   static_assert(!trait::has_exception_ptr_v<P>, "Cannot call operator<< on an outcome with an exception_ptr in it");
@@ -7369,7 +7421,29 @@ template <class R, class S, class P, class N> inline std::ostream &operator<<(st
   }
   return s;
 }
-//! Debug print an outcome
+/*! Debug print an outcome into a form suitable for human reading. Format is one of:
+
+1. `value|error|exception`
+2. `{ error, exception }`
+
+If the error type is `error_code`, appends `" (ec.message())"` after the error.
+Exception type is printed as one of:
+
+1. `std::system_error code code(): what()`
+2. `std::exception: what()`
+3. `unknown exception`
+*/
+
+
+
+
+
+
+
+
+
+
+
 template <class R, class S, class P, class N> inline std::string print(const outcome<R, S, P, N> &v)
 {
   std::stringstream s;
@@ -7482,14 +7556,19 @@ template <class T> OUTCOME_REQUIRES(requires(T &&v){{v.as_failure()}}) decltype(
 
 OUTCOME_V2_NAMESPACE_END
 
+//! \exclude
 #define OUTCOME_TRY_GLUE2(x, y) x##y
+//! \exclude
 #define OUTCOME_TRY_GLUE(x, y) OUTCOME_TRY_GLUE2(x, y)
+//! \exclude
 #define OUTCOME_TRY_UNIQUE_NAME OUTCOME_TRY_GLUE(__t, __COUNTER__)
 
+//! \exclude
 #define OUTCOME_TRYV2(unique, ...) auto && (unique) = (__VA_ARGS__); if(!(unique).has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(unique)>(unique))
 
 
 
+//! \exclude
 #define OUTCOME_TRY2(unique, v, ...) OUTCOME_TRYV2(unique, __VA_ARGS__); auto && (v) = std::forward<decltype(unique)>(unique).value()
 
 
@@ -7584,8 +7663,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
-#ifndef OUTCOME_ERROR_FROM_EXCEPTION_HPP
-#define OUTCOME_ERROR_FROM_EXCEPTION_HPP
+#ifndef OUTCOME_UTILS_HPP
+#define OUTCOME_UTILS_HPP
 
 
 

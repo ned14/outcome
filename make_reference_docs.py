@@ -72,10 +72,12 @@ os.makedirs("doc/src/content/reference/policies")
 os.chdir("doc/src/content/reference")
 args = [standardese_path, '-D', '_cpp_exceptions=1', '-D', 'STANDARDESE_IS_IN_THE_HOUSE=1',
   '--input.blacklist_namespace=detail',
+  '--input.blacklist_dir=detail',
 #  '--input.exclude_namespace=detail',
   '--input.require_comment=0',
   '--output.format=commonmark_html',
   '--output.entity_index_order=namespace_external',
+  '--output.show_complex_noexcept=0',
   '-I../../../../include/outcome', '-I../../../../..',
   '../../../../include/outcome/bad_access.hpp',
   '../../../../include/outcome/convert.hpp',

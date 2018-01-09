@@ -22,23 +22,11 @@ weight = 20
 
   - [`CXX_RESULT_SET_ERRNO`](result_c#standardese-CXX_RESULT_SET_ERRNO) &mdash; Convenience macro setting `errno` to a result struct’s `errno` compatible error if present, or `EAGAIN` if errored but incompatible.
 
-  - [`OUTCOME_ERROR_FROM_EXCEPTION_HPP`](utils#standardese-utils.hpp)
-
   - [`OUTCOME_TRY`](try#standardese-OUTCOME_TRY) &mdash; If the outcome returned by expression … is not valued, propagate any failure by immediately returning that failure immediately, else set *v* to the unwrapped value.
-
-  - [`OUTCOME_TRY2`](try#standardese-try.hpp)
 
   - [`OUTCOME_TRYV`](try#standardese-OUTCOME_TRYV) &mdash; If the outcome returned by expression … is not valued, propagate any failure by immediately returning that failure state immediately
 
-  - [`OUTCOME_TRYV2`](try#standardese-try.hpp)
-
   - [`OUTCOME_TRYX`](try#standardese-OUTCOME_TRYX) &mdash; If the outcome returned by expression … is not valued, propagate any failure by immediately returning that failure state immediately, else become the unwrapped value as an expression. This makes `OUTCOME_TRYX(expr)` an expression which can be used exactly like the `try` operator in other languages.
-
-  - [`OUTCOME_TRY_GLUE`](try#standardese-try.hpp)
-
-  - [`OUTCOME_TRY_GLUE2`](try#standardese-try.hpp)
-
-  - [`OUTCOME_TRY_UNIQUE_NAME`](try#standardese-try.hpp)
 
   - [`cxx_error_code`](result_c#standardese-cxx_error_code) &mdash; A C struct representation of `std::error_code`.
 
@@ -154,15 +142,15 @@ weight = 20
     
       - [`operator!=`](outcome#standardese-outcome_v2_xxx::operator!=\<T,U,V,R,S,P,N,\>\(result\<T,U,V\>const&,outcome\<R,S,P,N\>const&\)) &mdash; True if the result is not equal to the outcome
     
-      - [`operator<<`](iostream_support#standardese-outcome_v2_xxx::operator\<\<\<R,S,P\>\(std::ostream&,result\<R,S,P\>const&\)) &mdash; Serialise a result
+      - [`operator<<`](iostream_support#standardese-outcome_v2_xxx::operator\<\<\<R,S,P\>\(std::ostream&,result\<R,S,P\>const&\)) &mdash; Serialise a result. Format is `(unsigned) status; " "; value if value present; error if error present"`. Spare storage is preserved.
     
       - [`operator==`](outcome#standardese-outcome_v2_xxx::operator==\<T,U,V,R,S,P,N,\>\(result\<T,U,V\>const&,outcome\<R,S,P,N\>const&\)) &mdash; True if the result is equal to the outcome
     
-      - [`operator>>`](iostream_support#standardese-outcome_v2_xxx::operator\>\>\<R,S,P\>\(std::istream&,result\<R,S,P\>&\)) &mdash; Deserialise a result
+      - [`operator>>`](iostream_support#standardese-outcome_v2_xxx::operator\>\>\<R,S,P\>\(std::istream&,result\<R,S,P\>&\)) &mdash; Deserialise a result. Format is `(unsigned) status; " "; value if value present; error if error present"`. Spare storage is preserved.
     
       - [`outcome`](outcome#standardese-outcome_v2_xxx::outcome\<R,S,P,NoValuePolicy\>) &mdash; Used to return from functions one of (i) a successful value (ii) a cause of failure, with optional additional information. `constexpr` capable.
     
-      - [`print`](iostream_support#standardese-outcome_v2_xxx::print\<R,S,P\>\(result_or_outcome\<R,S,P\>const&\)) &mdash; Debug print a result
+      - [`print`](iostream_support#standardese-outcome_v2_xxx::print\<R,S,P\>\(result_or_outcome\<R,S,P\>const&\)) &mdash; Debug print a result into a form suitable for human reading. Format is `value|error`. If the error type is `error_code`, appends `" (ec.message())"` afterwards.
     
       - [`result`](result#standardese-outcome_v2_xxx::result\<R,S,NoValuePolicy\>) &mdash; Used to return from functions either (i) a successful value (ii) a cause of failure. `constexpr` capable.
     

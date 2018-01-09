@@ -14,16 +14,6 @@ weight = 30
     <span class="kwd">auto</span> <a href="#standardese-outcome_v2_xxx::try_operation_return_as%3CT%3E(T&amp;&amp;)"><span class="typ dec var fun">try_operation_return_as</span></a><span class="pun">(</span><span class="typ dec var fun">T</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>
 <span class="pun">}</span>
 
-<span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY_GLUE2</span><span class="pre">(</span><span class="pre">x,y</span><span class="pre">)</span>
-
-<span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY_GLUE</span><span class="pre">(</span><span class="pre">x,y</span><span class="pre">)</span>
-
-<span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY_UNIQUE_NAME</span>
-
-<span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRYV2</span><span class="pre">(</span><span class="pre">unique,...</span><span class="pre">)</span>
-
-<span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY2</span><span class="pre">(</span><span class="pre">unique,v,...</span><span class="pre">)</span>
-
 <span class="pre">#define</span> <a href="#standardese-OUTCOME_TRYV"><span class="typ dec var fun">OUTCOME_TRYV</span></a><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
 
 <span class="pre">#define</span> <a href="#standardese-OUTCOME_TRYX"><span class="typ dec var fun">OUTCOME_TRYX</span></a><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
@@ -53,7 +43,7 @@ Customisation point for changing what the `OUTCOME_TRY` macros do. This function
 
 <a id="standardese-OUTCOME_TRYV"></a>
 
-<pre><code class="standardese-language-cpp"><span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRYV</span><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
+<pre><code class="standardese-language-cpp"><span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRYV</span><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span> <span class="pre">OUTCOME_TRYV2(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)</span>
 </code></pre>
 
 If the outcome returned by expression … is not valued, propagate any failure by immediately returning that failure state immediately
@@ -64,7 +54,7 @@ If the outcome returned by expression … is not valued, propagate any failure b
 
 <a id="standardese-OUTCOME_TRYX"></a>
 
-<pre><code class="standardese-language-cpp"><span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRYX</span><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span>
+<pre><code class="standardese-language-cpp"><span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRYX</span><span class="pre">(</span><span class="pre">...</span><span class="pre">)</span> <span class="pre">({ auto &amp;&amp;res = (__VA_ARGS__); if(!res.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward&lt;decltype(res)&gt;(res)); std::forward&lt;decltype(res)&gt;(res).value(); })</span>
 </code></pre>
 
 If the outcome returned by expression … is not valued, propagate any failure by immediately returning that failure state immediately, else become the unwrapped value as an expression. This makes `OUTCOME_TRYX(expr)` an expression which can be used exactly like the `try` operator in other languages.
@@ -77,7 +67,7 @@ If the outcome returned by expression … is not valued, propagate any failure b
 
 <a id="standardese-OUTCOME_TRY"></a>
 
-<pre><code class="standardese-language-cpp"><span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY</span><span class="pre">(</span><span class="pre">v,...</span><span class="pre">)</span>
+<pre><code class="standardese-language-cpp"><span class="pre">#define</span> <span class="typ dec var fun">OUTCOME_TRY</span><span class="pre">(</span><span class="pre">v,...</span><span class="pre">)</span> <span class="pre">OUTCOME_TRY2(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)</span>
 </code></pre>
 
 If the outcome returned by expression … is not valued, propagate any failure by immediately returning that failure immediately, else set *v* to the unwrapped value.
