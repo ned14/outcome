@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF c06d86b5866079b40e2509fa863ee0a723c2b405
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-10 18:46:00 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c06d86b5
+#define OUTCOME_PREVIOUS_COMMIT_REF 286f98daf58bc4aed246435e3bc88c51926508ad
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-10 18:51:28 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 286f98da
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -3749,7 +3749,7 @@ namespace detail
 
 
 
-    template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->_error, o._error); }
+    template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->error(), o.error()); }
     /*! True if not equal to the other result.
     \param o The other result to compare to.
 
@@ -7188,9 +7188,14 @@ namespace detail
   inline std::string safe_message(const std::error_code &ec) { return " (" + ec.message() + ")"; }
 } // namespace detail
 
-//! Deserialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
+/*! Deserialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
+\requires That `trait::has_error_code_v<S>` is false.
+*/
+
+
 template <class R, class S, class P> inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
 {
+  static_assert(!trait::has_error_code_v<S>, "Cannot call operator>> on a result with an error_code in it");
   s >> v._state;
   if(v.has_error())
   {
@@ -7200,11 +7205,14 @@ template <class R, class S, class P> inline std::istream &operator>>(std::istrea
 }
 /*! Serialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
 If you are printing to a human readable destination, use `print()` instead.
+\requires That `trait::has_error_code_v<S>` is false.
 */
+
 
 
 template <class R, class S, class P> inline std::ostream &operator<<(std::ostream &s, const result<R, S, P> &v)
 {
+  static_assert(!trait::has_error_code_v<S>, "Cannot call operator<< on a result with an error_code in it");
   s << v._state;
   if(v.has_error())
   {
