@@ -6,13 +6,7 @@ weight = 80
 
 <a id="standardese-iostream_support.hpp"></a>
 
-<pre><code class="standardese-language-cpp"><span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">outcome.hpp</span><span class="pre">&quot;</span>
-
-<span class="pre">#include</span> <span class="pre">&lt;</span><span class="typ dec var fun">iostream</span><span class="pre">&gt;</span>
-
-<span class="pre">#include</span> <span class="pre">&lt;</span><span class="typ dec var fun">sstream</span><span class="pre">&gt;</span>
-
-<span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
+<pre><code class="standardese-language-cpp"><span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
 <span class="pun">{</span>
     <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">R</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">S</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">P</span><span class="pun">&gt;</span>
     <span class="typ dec var fun">std::istream</span><span class="pun">&amp;</span> <a href="#standardese-outcome_v2_xxx::operator%3E%3E%3CR,S,P%3E(std::istream&amp;,result%3CR,S,P%3E&amp;)"><span class="typ dec var fun">operator&gt;&gt;</span></a><span class="pun">(</span><span class="typ dec var fun">std::istream</span><span class="pun">&amp;</span> <span class="typ dec var fun">s</span><span class="pun">,</span> <a href="result#standardese-outcome_v2_xxx::result%3CR,S,NoValuePolicy%3E"><span class="typ dec var fun">result</span></a><span class="pun">&lt;</span>R, S, P<span class="pun">&gt;</span><span class="pun">&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>

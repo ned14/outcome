@@ -6,9 +6,7 @@ weight = 30
 
 <a id="standardese-try.hpp"></a>
 
-<pre><code class="standardese-language-cpp"><span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">success_failure.hpp</span><span class="pre">&quot;</span>
-
-<span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
+<pre><code class="standardese-language-cpp"><span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
 <span class="pun">{</span>
     <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">&gt;</span>
     <span class="kwd">auto</span> <a href="#standardese-outcome_v2_xxx::try_operation_return_as%3CT%3E(T&amp;&amp;)"><span class="typ dec var fun">try_operation_return_as</span></a><span class="pun">(</span><span class="typ dec var fun">T</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>

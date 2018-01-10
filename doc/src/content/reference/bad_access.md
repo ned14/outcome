@@ -6,11 +6,7 @@ weight = 70
 
 <a id="standardese-bad_access.hpp"></a>
 
-<pre><code class="standardese-language-cpp"><span class="pre">#include</span> <span class="pre">&quot;</span><span class="typ dec var fun">config.hpp</span><span class="pre">&quot;</span>
-
-<span class="pre">#include</span> <span class="pre">&lt;</span><span class="typ dec var fun">stdexcept</span><span class="pre">&gt;</span>
-
-<span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
+<pre><code class="standardese-language-cpp"><span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
 <span class="pun">{</span>
     <span class="kwd">class</span> <a href="#standardese-outcome_v2_xxx::bad_result_access"><span class="typ dec var fun">bad_result_access</span></a><span class="pun">;</span>
 
