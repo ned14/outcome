@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF ff1eb6355ffcf9b66f6110cbaf1f25ad3ff75a48
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-09 23:01:22 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE ff1eb635
+#define OUTCOME_PREVIOUS_COMMIT_REF d8c72ccb0ee258583f16e3b59595c554fa9a225d
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-10 09:24:46 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE d8c72ccb
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1997,150 +1997,6 @@ namespace trait
 
 } // namespace trait
 
-// Do we have C++ 17 deduced templates?
-// GCC 7.2 and clang 6.0 both have problems in their implementations, so leave this disabled for now. But it should work one day.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*! Type sugar for implicitly constructing a `result<>` with a successful state.
 */
 
@@ -2148,8 +2004,24 @@ template <class T> struct success_type
 {
   //! The type of the successful state.
   using value_type = T;
+
+private:
   //! The value of the successful state.
   value_type _value;
+
+public:
+  //! Default constructor
+  constexpr success_type() = default;
+  //! Copy constructor
+  constexpr success_type(const success_type &) = default;
+  //! Move constructor
+  constexpr success_type(success_type &&) = default;
+  //! Initialising constructor
+  template <class U>
+  constexpr explicit success_type(U &&v)
+      : _value(std::forward<U>(v))
+  {
+  }
 
   /*! Access value.
   \returns Reference to the held `value_type` according to overload.
@@ -2202,10 +2074,27 @@ template <class EC = std::error_code, class E = void> struct failure_type
   using error_type = EC;
   //! The type of the exception
   using exception_type = E;
+
+private:
   //! The error code
   error_type _error;
   //! The exception
   exception_type _exception;
+
+public:
+  //! Default constructor
+  constexpr failure_type() = default;
+  //! Copy constructor
+  constexpr failure_type(const failure_type &) = default;
+  //! Move constructor
+  constexpr failure_type(failure_type &&) = default;
+  //! Initialising constructor
+  template <class U, class V>
+  constexpr explicit failure_type(U &&u, V &&v)
+      : _error(std::forward<U>(u))
+      , _exception(std::forward<V>(v))
+  {
+  }
 
   /*! Access error.
   \returns Reference to the held `error_type` according to overload.
@@ -2246,8 +2135,24 @@ template <class EC> struct failure_type<EC, void>
   using error_type = EC;
   //! The type of the exception
   using exception_type = void;
+
+private:
   //! The error code
   error_type _error;
+
+public:
+  //! Default constructor
+  constexpr failure_type() = default;
+  //! Copy constructor
+  constexpr failure_type(const failure_type &) = default;
+  //! Move constructor
+  constexpr failure_type(failure_type &&) = default;
+  //! Initialising constructor
+  template <class U>
+  constexpr explicit failure_type(U &&u)
+      : _error(std::forward<U>(u))
+  {
+  }
 
   /*! Access error.
   \returns Reference to the held `error_type` according to overload.
@@ -2273,8 +2178,24 @@ template <class E> struct failure_type<void, E>
   using error_type = void;
   //! The type of the exception
   using exception_type = E;
+
+private:
   //! The exception
   exception_type _exception;
+
+public:
+  //! Default constructor
+  constexpr failure_type() = default;
+  //! Copy constructor
+  constexpr failure_type(const failure_type &) = default;
+  //! Move constructor
+  constexpr failure_type(failure_type &&) = default;
+  //! Initialising constructor
+  template <class V>
+  constexpr explicit failure_type(V &&v)
+      : _exception(std::forward<V>(v))
+  {
+  }
 
   /*! Access exception.
   \returns Reference to the held `exception_type` according to overload.
@@ -2309,8 +2230,6 @@ template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std
 {
   return failure_type<std::decay_t<EC>, std::decay_t<E>>{std::forward<EC>(v), std::forward<E>(w)};
 }
-
-
 
 namespace detail
 {
@@ -3908,7 +3827,7 @@ namespace detail
 
 
 
-    template <class T> constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_notequal(this->_error, o._error); }
+    template <class T> constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_notequal(this->error(), o.error()); }
   };
   //! Calls b == a
   template <class T, class U, class V, class W> constexpr inline bool operator==(const success_type<W> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
@@ -4742,12 +4661,12 @@ namespace detail
                                                                    && !std::is_same<choose_inplace_value_error_constructor<Args...>, disable_inplace_value_error_constructor>::value;
   };
 
-  template <class T, class U> constexpr inline const U &extract_value_from_success(const success_type<U> &v) { return v._value; }
-  template <class T, class U> constexpr inline U &&extract_value_from_success(success_type<U> &&v) { return std::move(v._value); }
+  template <class T, class U> constexpr inline const U &extract_value_from_success(const success_type<U> &v) { return v.value(); }
+  template <class T, class U> constexpr inline U &&extract_value_from_success(success_type<U> &&v) { return std::move(v).value(); }
   template <class T> constexpr inline T extract_value_from_success(const success_type<void> & /*unused*/) { return T{}; }
 
-  template <class T, class U, class V> constexpr inline const U &extract_error_from_failure(const failure_type<U, V> &v) { return v._error; }
-  template <class T, class U, class V> constexpr inline U &&extract_error_from_failure(failure_type<U, V> &&v) { return std::move(v._error); }
+  template <class T, class U, class V> constexpr inline const U &extract_error_from_failure(const failure_type<U, V> &v) { return v.error(); }
+  template <class T, class U, class V> constexpr inline U &&extract_error_from_failure(failure_type<U, V> &&v) { return std::move(v).error(); }
   template <class T, class V> constexpr inline T extract_error_from_failure(const failure_type<void, V> & /*unused*/) { return T{}; }
 
   template <class T> struct is_result : std::false_type
@@ -5624,8 +5543,8 @@ namespace detail
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl2 = detail::outcome_exception_observers<detail::result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>;
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl = std::conditional_t<trait::has_error_code_v<S> && trait::has_exception_ptr_v<P>, detail::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>, select_outcome_impl2<R, S, P, NoValuePolicy>>;
 
-  template <class T, class U, class V> constexpr inline const V &extract_exception_from_failure(const failure_type<U, V> &v) { return v._exception; }
-  template <class T, class U, class V> constexpr inline V &&extract_exception_from_failure(failure_type<U, V> &&v) { return std::move(v._exception); }
+  template <class T, class U, class V> constexpr inline const V &extract_exception_from_failure(const failure_type<U, V> &v) { return v.exception(); }
+  template <class T, class U, class V> constexpr inline V &&extract_exception_from_failure(failure_type<U, V> &&v) { return std::move(v).exception(); }
   template <class T, class U> constexpr inline T extract_exception_from_failure(const failure_type<U, void> & /*unused*/) { return T{}; }
 
   template <class T> struct is_outcome : std::false_type

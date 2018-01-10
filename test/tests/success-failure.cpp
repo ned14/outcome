@@ -37,9 +37,9 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / success - failure, "Tests that the success 
     static_assert(std::is_same<decltype(a), success_type<int>>::value, "");
     static_assert(std::is_same<decltype(b), success_type<void>>::value, "");
     static_assert(std::is_same<decltype(c), success_type<const char *>>::value, "");
-    static_assert(std::is_same<decltype(a._value), int>::value, "");
+    static_assert(std::is_same<decltype(a)::value_type, int>::value, "");
     // static_assert(std::is_same<decltype(b.value), int>::value, "");
-    static_assert(std::is_same<decltype(c._value), const char *>::value, "");
+    static_assert(std::is_same<decltype(c)::value_type, const char *>::value, "");
   }
   {
     auto e = std::make_exception_ptr(5);
@@ -49,10 +49,10 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / success - failure, "Tests that the success 
     static_assert(std::is_same<decltype(a), failure_type<int, void>>::value, "");
     static_assert(std::is_same<decltype(b), failure_type<int, std::exception_ptr>>::value, "");
     static_assert(std::is_same<decltype(c), failure_type<int, int>>::value, "");
-    static_assert(std::is_same<decltype(a._error), int>::value, "");
-    static_assert(std::is_same<decltype(b._error), int>::value, "");
-    static_assert(std::is_same<decltype(b._exception), std::exception_ptr>::value, "");
-    static_assert(std::is_same<decltype(c._error), int>::value, "");
-    static_assert(std::is_same<decltype(c._exception), int>::value, "");
+    static_assert(std::is_same<decltype(a)::error_type, int>::value, "");
+    static_assert(std::is_same<decltype(b)::error_type, int>::value, "");
+    static_assert(std::is_same<decltype(b)::exception_type, std::exception_ptr>::value, "");
+    static_assert(std::is_same<decltype(c)::error_type, int>::value, "");
+    static_assert(std::is_same<decltype(c)::exception_type, int>::value, "");
   }
 }

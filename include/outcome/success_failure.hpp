@@ -165,158 +165,30 @@ namespace trait
 
 }  // namespace trait
 
-// Do we have C++ 17 deduced templates?
-// GCC 7.2 and clang 6.0 both have problems in their implementations, so leave this disabled for now. But it should work one day.
-#if 0  // defined(__cpp_deduction_guides)  //&& (defined(__clang__) || !defined(__GNUC__) || __GNUC__ > 7 || __GNUC_MINOR__ > 1)
-
-/*! Type sugar for implicitly constructing a `result<>` with a successful state.
-*/
-template <class T> struct success
-{
-  //! The type of the successful state.
-  using value_type = T;
-  //! The value of the successful state.
-  value_type value;
-  constexpr success(T &&v)
-      : value(std::move(v))
-  {
-  }
-  constexpr success(const T &v)
-      : value(v)
-  {
-  }
-};
-/*! Type sugar for implicitly constructing a `result<>` with a successful state.
-*/
-template <> struct success<void>
-{
-  //! The type of the successful state.
-  using value_type = void;
-};
-template <class T> success(T /*unused*/)->success<T>;
-success()->success<void>;
-template <class T> using success_type = success<T>;
-
-template <class EC, class E = void, bool e_is_exception_ptr = trait::is_exception_ptr<E>::value> struct failure;
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and payload.
-*/
-template <class EC, class P> struct failure<EC, P, false>
-{
-  //! The type of the error code
-  using error_type = EC;
-  //! The type of the payload
-  using payload_type = P;
-  //! The type of the exception
-  using exception_type = void;
-  //! The error code
-  error_type error;
-  //! The payload
-  payload_type payload;
-  template <class U, class V>
-  constexpr failure(U &&a, V &&b)
-      : error(std::forward<U>(a))
-      , payload(std::forward<V>(b))
-  {
-  }
-};
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and exception.
-*/
-template <class EC, class E> struct failure<EC, E, true>
-{
-  //! The type of the error code
-  using error_type = EC;
-  //! The type of the payload
-  using payload_type = void;
-  //! The type of the exception
-  using exception_type = E;
-  //! The error code
-  error_type error;
-  //! The exception
-  exception_type exception;
-  template <class U, class V>
-  constexpr failure(U &&a, V &&b)
-      : error(std::forward<U>(a))
-      , exception(std::forward<V>(b))
-  {
-  }
-};
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code.
-*/
-template <class EC> struct failure<EC, void, false>
-{
-  //! The type of the error code
-  using error_type = EC;
-  //! The type of the payload
-  using payload_type = void;
-  //! The type of the exception
-  using exception_type = void;
-  //! The error code
-  error_type error;
-  constexpr failure(EC &&v)
-      : error(std::move(v))
-  {
-  }
-  constexpr failure(const EC &v)
-      : error(v)
-  {
-  }
-};
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of payload.
-*/
-template <class P> struct failure<void, P, false>
-{
-  //! The type of the error code
-  using error_type = void;
-  //! The type of the payload
-  using payload_type = P;
-  //! The type of the exception
-  using exception_type = void;
-  //! The payload
-  payload_type payload;
-  constexpr failure(P &&v)
-      : payload(std::move(v))
-  {
-  }
-  constexpr failure(const P &v)
-      : payload(v)
-  {
-  }
-};
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of exception.
-*/
-template <class E> struct failure<void, E, true>
-{
-  //! The type of the error code
-  using error_type = void;
-  //! The type of the payload
-  using payload_type = void;
-  //! The type of the exception
-  using exception_type = E;
-  //! The exception
-  exception_type exception;
-  constexpr failure(E &&v)
-      : exception(std::move(v))
-  {
-  }
-  constexpr failure(const E &v)
-      : exception(v)
-  {
-  }
-};
-template <class EC, class E> failure(EC /*unused*/, E /*unused*/)->failure<EC, E>;
-template <class EC> failure(EC /*unused*/)->failure<EC>;
-failure()->failure<std::error_code>;
-template <class EC = std::error_code, class E = void, bool e_is_exception_ptr = trait::is_exception_ptr<E>::value> using failure_type = failure<EC, E, e_is_exception_ptr>;
-#else
-
 /*! Type sugar for implicitly constructing a `result<>` with a successful state.
 */
 template <class T> struct success_type
 {
   //! The type of the successful state.
   using value_type = T;
+
+private:
   //! The value of the successful state.
   value_type _value;
+
+public:
+  //! Default constructor
+  constexpr success_type() = default;
+  //! Copy constructor
+  constexpr success_type(const success_type &) = default;
+  //! Move constructor
+  constexpr success_type(success_type &&) = default;
+  //! Initialising constructor
+  template <class U>
+  constexpr explicit success_type(U &&v)
+      : _value(std::forward<U>(v))
+  {
+  }
 
   /*! Access value.
   \returns Reference to the held `value_type` according to overload.
@@ -360,10 +232,27 @@ template <class EC = std::error_code, class E = void> struct failure_type
   using error_type = EC;
   //! The type of the exception
   using exception_type = E;
+
+private:
   //! The error code
   error_type _error;
   //! The exception
   exception_type _exception;
+
+public:
+  //! Default constructor
+  constexpr failure_type() = default;
+  //! Copy constructor
+  constexpr failure_type(const failure_type &) = default;
+  //! Move constructor
+  constexpr failure_type(failure_type &&) = default;
+  //! Initialising constructor
+  template <class U, class V>
+  constexpr explicit failure_type(U &&u, V &&v)
+      : _error(std::forward<U>(u))
+      , _exception(std::forward<V>(v))
+  {
+  }
 
   /*! Access error.
   \returns Reference to the held `error_type` according to overload.
@@ -397,8 +286,24 @@ template <class EC> struct failure_type<EC, void>
   using error_type = EC;
   //! The type of the exception
   using exception_type = void;
+
+private:
   //! The error code
   error_type _error;
+
+public:
+  //! Default constructor
+  constexpr failure_type() = default;
+  //! Copy constructor
+  constexpr failure_type(const failure_type &) = default;
+  //! Move constructor
+  constexpr failure_type(failure_type &&) = default;
+  //! Initialising constructor
+  template <class U>
+  constexpr explicit failure_type(U &&u)
+      : _error(std::forward<U>(u))
+  {
+  }
 
   /*! Access error.
   \returns Reference to the held `error_type` according to overload.
@@ -420,8 +325,24 @@ template <class E> struct failure_type<void, E>
   using error_type = void;
   //! The type of the exception
   using exception_type = E;
+
+private:
   //! The exception
   exception_type _exception;
+
+public:
+  //! Default constructor
+  constexpr failure_type() = default;
+  //! Copy constructor
+  constexpr failure_type(const failure_type &) = default;
+  //! Move constructor
+  constexpr failure_type(failure_type &&) = default;
+  //! Initialising constructor
+  template <class V>
+  constexpr explicit failure_type(V &&v)
+      : _exception(std::forward<V>(v))
+  {
+  }
 
   /*! Access exception.
   \returns Reference to the held `exception_type` according to overload.
@@ -449,8 +370,6 @@ template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std
 {
   return failure_type<std::decay_t<EC>, std::decay_t<E>>{std::forward<EC>(v), std::forward<E>(w)};
 }
-
-#endif
 
 namespace detail
 {
