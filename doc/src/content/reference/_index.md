@@ -66,9 +66,9 @@ weight = 20
     
       - [`override_outcome_exception`](outcome#standardese-outcome_v2_xxx::hooks::override_outcome_exception\<R,S,P,NoValuePolicy,U\>\(outcome\<R,S,P,NoValuePolicy\>*,U&&\)) &mdash; Used in hook implementations to override the payload/exception to something other than what was constructed.
     
-      - [`set_spare_storage`](result#standardese-outcome_v2_xxx::hooks::set_spare_storage\<R,S,NoValuePolicy\>\(result_or_outcome\<R,S,NoValuePolicy\>*,uint16_t\)) &mdash; Sets the 16 bits of spare storage in result/outcome.
+      - [`set_spare_storage`](result#standardese-outcome_v2_xxx::hooks::set_spare_storage\<R,S,NoValuePolicy\>\(detail::result_final\<R,S,NoValuePolicy\>*,uint16_t\)) &mdash; Sets the 16 bits of spare storage in result/outcome.
     
-      - [`spare_storage`](result#standardese-outcome_v2_xxx::hooks::spare_storage\<R,S,NoValuePolicy\>\(result_or_outcome\<R,S,NoValuePolicy\>const*\)) &mdash; Retrieves the 16 bits of spare storage in result/outcome.
+      - [`spare_storage`](result#standardese-outcome_v2_xxx::hooks::spare_storage\<R,S,NoValuePolicy\>\(detail::result_final\<R,S,NoValuePolicy\>const*\)) &mdash; Retrieves the 16 bits of spare storage in result/outcome.
 
   - ## Namespace `outcome_v2_xxx::policy`
     
@@ -144,7 +144,7 @@ weight = 20
     
       - [`outcome`](outcome#standardese-outcome_v2_xxx::outcome\<R,S,P,NoValuePolicy\>) &mdash; Used to return from functions one of (i) a successful value (ii) a cause of failure (ii) a different cause of failure. `constexpr` capable.
     
-      - [`print`](iostream_support#standardese-outcome_v2_xxx::print\<R,S,P\>\(result_or_outcome\<R,S,P\>const&\)) &mdash; Debug print a result into a form suitable for human reading. Format is `value|error`. If the error type is `error_code`, appends `" (ec.message())"` afterwards.
+      - [`print`](iostream_support#standardese-outcome_v2_xxx::print\<R,S,P\>\(detail::result_final\<R,S,P\>const&\)) &mdash; Debug print a result into a form suitable for human reading. Format is `value|error`. If the error type is `error_code`, appends `" (ec.message())"` afterwards.
     
       - [`result`](result#standardese-outcome_v2_xxx::result\<R,S,NoValuePolicy\>) &mdash; Used to return from functions either (i) a successful value (ii) a cause of failure. `constexpr` capable.
     

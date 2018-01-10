@@ -34,11 +34,11 @@ namespace detail
 {
   template <class R, class EC, class NoValuePolicy> using select_result_impl = result_error_observers<result_value_observers<result_storage<R, EC, NoValuePolicy>, R, NoValuePolicy>, EC, NoValuePolicy>;
 
-  //! The assembled implementation type of `result<R, EC, NoValuePolicy>`.
+  //! The assembled implementation type of `result<R, S, NoValuePolicy>`.
   template <class R, class S, class NoValuePolicy>
   class result_final
-#ifdef DOXYGEN_IS_IN_THE_HOUSE
-  : public result_error_observers<result_value_observers<result_storage<R, EC, NoValuePolicy>, R, NoValuePolicy>, EC, NoValuePolicy>
+#if defined(DOXYGEN_IS_IN_THE_HOUSE)
+  : public result_error_observers<result_value_observers<result_storage<R, S, NoValuePolicy>, R, NoValuePolicy>, S, NoValuePolicy>
 #else
   : public select_result_impl<R, S, NoValuePolicy>
 #endif

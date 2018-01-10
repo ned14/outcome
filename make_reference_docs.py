@@ -28,7 +28,7 @@ items = {
 }
 
 replacements = {
-    'detail::result_final' : 'result_or_outcome',
+#    'detail::result_final' : 'result_or_outcome',
 }
 for item in items:
     replacements[item] = os.path.join(items[item][2], item[4:-3])

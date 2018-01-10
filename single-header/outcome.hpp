@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 3d0a4ad58ae00d27540cdb509fd91e8d30998744
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-08 18:57:04 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 3d0a4ad5
+#define OUTCOME_PREVIOUS_COMMIT_REF ff1eb6355ffcf9b66f6110cbaf1f25ad3ff75a48
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-09 23:01:22 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE ff1eb635
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -2932,7 +2932,7 @@ namespace detail
     template <class... Args>
     constexpr explicit result_storage(in_place_type_t<_error_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
         : _state{detail::status_have_error}
-        , _error{std::forward<Args>(args)...}
+        , _error(std::forward<Args>(args)...)
     {
       detail::_set_error_is_errno(_state, _error);
     }
@@ -3709,7 +3709,7 @@ namespace detail
 {
   template <class R, class EC, class NoValuePolicy> using select_result_impl = result_error_observers<result_value_observers<result_storage<R, EC, NoValuePolicy>, R, NoValuePolicy>, EC, NoValuePolicy>;
 
-  //! The assembled implementation type of `result<R, EC, NoValuePolicy>`.
+  //! The assembled implementation type of `result<R, S, NoValuePolicy>`.
   template <class R, class S, class NoValuePolicy>
   class result_final
 
@@ -4832,16 +4832,19 @@ namespace hooks
 } // namespace hooks
 
 /*! Used to return from functions either (i) a successful value (ii) a cause of failure. `constexpr` capable.
-\tparam R The optional type of the successful result (use `void` to disable).
-Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-\tparam S The optional type of the failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
-Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
+
+\tparam R The optional type of the successful result (use `void` to disable). Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
+\tparam S The optional type of the failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`. Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
 \tparam NoValuePolicy Policy on how to interpret type `S` when a wide observation of a not present value occurs.
 
+Any `R` (`value_type`) state can be observed using the member functions `.value()` and `.assume_value()`. Any `S` (`error_type`) state can be
+observed using the member functions `.error()` and `.assume_error()`.
+
 `NoValuePolicy` defaults to a policy selected according to the characteristics of type `S`:
+
   1. If `.value()` called when there is no `value_type` but there is an `error_type`:
     - If `trait::has_error_code_v<S>` is true,
-    then `throw std::system_error(error()|make_error_code(error()))` [`policy::error_code_throw_as_system_error<S>`]
+    then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}} \endverbatim]
     - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))` [`policy::exception_ptr_rethrow<R, S, void>`]
     - If `S` is `void`, call `std::terminate()` [`policy::terminate`]
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
@@ -4850,6 +4853,9 @@ Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array
     or if `S` is `void`, do `throw bad_result_access()`
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
+
+
+
 
 
 
@@ -4911,7 +4917,7 @@ public:
   using error_type_if_enabled = typename base::_error_type;
 
   //! Used to rebind this result to a different result type.
-  template <class T, class U = S> using rebind = result<T, U>;
+  template <class T, class U = S, class V = policy::default_policy<T, U, void>> using rebind = result<T, U, V>;
 
 protected:
   //! Requirement predicates for result.
@@ -5700,49 +5706,41 @@ namespace hooks
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_exception(outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept;
 } // namespace hooks
 
-/*! Used to return from functions one of (i) a successful value (ii) a cause of failure, with optional additional information. `constexpr` capable.
-\tparam R The optional type of the successful result (use `void` to disable).
-Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-\tparam S The optional type of the failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
-Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-\tparam P The optional type of the payload/exception result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
-Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
+/*! Used to return from functions one of (i) a successful value (ii) a cause of failure (ii) a different cause of failure. `constexpr` capable.
+
+\tparam R The optional type of the successful result (use `void` to disable). Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
+\tparam S The optional type of the first failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`. Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
+\tparam P The optional type of the second failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`. Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
 \tparam NoValuePolicy Policy on how to interpret types `S` and `P` when a wide observation of a not present value occurs.
 
-This is an extension of `result<T, E>` and it comes in two variants:
-  1. `outcome<T, E, P>`: simply as if a `result<T, E + P>` i.e. if a failure result, there may be an additional arbitrary payload of type `P`.
-  In this form, `.payload()` returns the payload and there is no `.exception()`.
-  2. `outcome<T, EC, EP>`: Failure cause can be `EC` (`.error()`), or `EP` (`.exception()`) or `EC + EP` i.e. both together.
-  In this form, there is no `.payload()`.
+This is an extension of `result<R, S>` and it allows an alternative failure to be stored of type `P`, which can be observed
+with the member functions `.exception()` and `.assume_exception()`. The `P` state takes precedence during no-value observation
+over any `S` state, and it is possible to store `S + P` simultaneously such that `outcome` could have any one the states:
 
-Which variant is chosen depends on `trait::is_exception_ptr<P>`. If it is true, you get the second form, if it is false you get the first form.
+1. `R` (`value_type`)
+2. `S` (`error_type`)
+3. `P` (`exception_type`)
+4. `S + P` (`error_type + exception_type`)
 
 Similarly to `result`, `NoValuePolicy` defaults to a policy selected according to the characteristics of types `S` and `P`:
-  1. If `.value()` called when there is no `value_type`:
-    - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<S>` is true:
-      - If `trait::is_exception_ptr<P>` is true, if an exception is set, then `std::rethrow_exception(exception())`, else `throw std::system_error(make_error_code(error()))` [`policy::error_enum_throw_as_system_error_exception_rethrow<R, S, P>`]
-      - If `trait::is_exception_ptr<P>` is false, if a payload is set, then `throw_as_system_error_with_payload()`, else `throw std::system_error(make_error_code(error()))` [`policy::error_enum_throw_as_system_error_with_payload<R, S, P>`]
-    - If `trait::is_error_code<S>`, then:
-      - If `trait::is_exception_ptr<P>` is true, if an exception is set, then `std::rethrow_exception(exception())`, else `throw std::system_error(error())` [`policy::error_code_throw_as_system_error_exception_rethrow<R, S, P>`]
-      - If `trait::is_exception_ptr<P>` is false, if an exception is set, then `throw_as_system_error_with_payload()`, else `throw std::system_error(error())` [`policy::error_code_throw_as_system_error_with_payload<R, S, P>`]
-    - If `trait::is_exception_ptr<S>`, then `throw_exception_ptr_with_payload()` [`policy::exception_ptr_rethrow_with_payload<R, S, P>`]
-    - If `trait::is_exception_ptr<P>`, then `std::rethrow_exception(exception())` [`policy::exception_ptr_rethrow<R, S, P>`]
+
+  1. If `.value()` called when there is no `value_type` but there is an `exception_type`:
+    - If `trait::has_exception_ptr_v<P>`, then `std::rethrow_exception(exception()|make_exception_ptr(exception()))` [`policy::exception_ptr_rethrow<R, S, P>`]
+  2. If `.value()` called when there is no `value_type` but there is an `error_type`:
+    - If `trait::has_error_code_v<S>` is true,
+    then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}} \endverbatim]
+    - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))` [`policy::exception_ptr_rethrow<R, S, void>`]
     - If `S` is `void`, call `std::terminate()` [`policy::terminate`]
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
-  2. If `.error()` called when there is no `error_type`:
-    - For any of the policies above apart from `policy::all_narrow`, `throw bad_outcome_access()`
-    - For `policy::all_narrow`, it is undefined behaviour [`policy::all_narrow`]
   3. If `.exception()` called when there is no `exception_type`:
-    - For any of the policies above apart from `policy::all_narrow`, `throw bad_outcome_access()`
-    - For `policy::all_narrow`, it is undefined behaviour [`policy::all_narrow`]
-  4. If `.payload()` called when there is no `payload_type`:
-    - For any of the policies above apart from `policy::all_narrow`, `throw bad_outcome_access()`
-    - For `policy::all_narrow`, it is undefined behaviour [`policy::all_narrow`]
+    - If `trait::has_exception_ptr_v<P>`,
+    or if `P` is `void`, do `throw bad_outcome_access()`
+    - If `P` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
+  4. If `.error()` called when there is no `error_type`:
+    - If `trait::has_error_code_v<S>`, or if `trait::has_exception_ptr_v<S>`,
+    or if `S` is `void`, do `throw bad_outcome_access()`
+    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
-
-
-
-
 
 
 
@@ -5832,7 +5830,7 @@ public:
   using exception_type = P;
 
   //! Used to rebind this outcome to a different outcome type
-  template <class T, class U = S, class V = P> using rebind = outcome<T, U, P>;
+  template <class T, class U = S, class V = P, class W = policy::default_policy<T, U, V>> using rebind = outcome<T, U, V, W>;
 
 protected:
   //! Requirement predicates for outcome.
