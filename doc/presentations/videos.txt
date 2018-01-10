@@ -6,4 +6,4 @@ Video: https://youtu.be/XVofgKH-uu4
 20171110, Meeting C++, Introduction to proposed std::expected<T, E>
 Literature review of the several WG21 papers relating to std::expected<T, E>
 Slides: https://docs.google.com/presentation/d/1XTsnsGIV4HTh_07bjpCk_XG2NWDs6Tlrw8f5rrUHodc/edit?usp=sharing
-Video: Awaiting
+Video: https://www.youtube.com/watch?v=JfMBLx7qE0I

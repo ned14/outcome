@@ -91,7 +91,7 @@ namespace detail
   inline std::string safe_message(const std::error_code &ec) { return " (" + ec.message() + ")"; }
 }  // namespace detail
 
-//! Deserialise a result. Format is `(unsigned) status; " "; value if value present; error if error present"`. Spare storage is preserved.
+//! Deserialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
 template <class R, class S, class P> inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
 {
   s >> v._state;
@@ -101,7 +101,7 @@ template <class R, class S, class P> inline std::istream &operator>>(std::istrea
   }
   return s;
 }
-/*! Serialise a result. Format is `(unsigned) status; " "; value if value present; error if error present"`. Spare storage is preserved.
+/*! Serialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
 If you are printing to a human readable destination, use `print()` instead.
 */
 template <class R, class S, class P> inline std::ostream &operator<<(std::ostream &s, const result<R, S, P> &v)
@@ -176,7 +176,7 @@ template <class P> inline std::string print(const detail::result_final<void, voi
   return s.str();
 }
 
-/*! Deserialise an outcome. Format is `(unsigned) status; " "; value if value present; error if error present; exception if exception present"` Spare storage is preserved.
+/*! Deserialise an outcome. Format is `status_unsigned [value][error][exception]`. Spare storage is preserved.
 \requires That `trait::has_exception_ptr_v<P>` is false.
 */
 template <class R, class S, class P, class N> inline std::istream &operator>>(std::istream &s, outcome<R, S, P, N> &v)
@@ -193,7 +193,7 @@ template <class R, class S, class P, class N> inline std::istream &operator>>(st
   }
   return s;
 }
-/*! Serialise an outcome. Format is `(unsigned) status; " "; value if value present; error if error present; exception if exception present"` Spare storage is preserved.
+/*! Serialise an outcome. Format is `status_unsigned [value][error][exception]`. Spare storage is preserved.
 If you are printing to a human readable destination, use `print()` instead.
 \requires That `trait::has_exception_ptr_v<P>` is false.
 */
