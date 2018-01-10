@@ -46,7 +46,7 @@ weight = 20
     
     <a id="standardese-outcome_v2_xxx::hooks"></a>
     
-    Namespace for ADL discovered hooks into events in `result` and `outcome`.
+    Namespace containing hooks used for intercepting and manipulating result/outcome
     
       - [`hook_outcome_construction`](outcome#standardese-outcome_v2_xxx::hooks::hook_outcome_construction\<T,U\>\(T*,U&&\)) &mdash; The default instantiation hook implementation called when a `outcome` is first created by conversion from one of its possible types. Does nothing.
     
@@ -66,9 +66,9 @@ weight = 20
     
       - [`override_outcome_exception`](outcome#standardese-outcome_v2_xxx::hooks::override_outcome_exception\<R,S,P,NoValuePolicy,U\>\(outcome\<R,S,P,NoValuePolicy\>*,U&&\)) &mdash; Used in hook implementations to override the payload/exception to something other than what was constructed.
     
-      - [`set_spare_storage`](result#standardese-outcome_v2_xxx::hooks::set_spare_storage\<R,S,NoValuePolicy\>\(detail::result_final\<R,S,NoValuePolicy\>*,uint16_t\)) &mdash; Sets the 16 bits of spare storage in result/outcome.
+      - [`set_spare_storage`](result#standardese-outcome_v2_xxx::hooks::set_spare_storage\<R,S,NoValuePolicy\>\(detail::result_final\<R,S,NoValuePolicy\>*,uint16_t\)) &mdash; Sets the sixteen bits of spare storage in a `result` or `outcome`.
     
-      - [`spare_storage`](result#standardese-outcome_v2_xxx::hooks::spare_storage\<R,S,NoValuePolicy\>\(detail::result_final\<R,S,NoValuePolicy\>const*\)) &mdash; Retrieves the 16 bits of spare storage in result/outcome.
+      - [`spare_storage`](result#standardese-outcome_v2_xxx::hooks::spare_storage\<R,S,NoValuePolicy\>\(detail::result_final\<R,S,NoValuePolicy\>const*\)) &mdash; Get the sixteen bits of spare storage in a `result` or `outcome`.
 
   - ## Namespace `outcome_v2_xxx::policy`
     
@@ -125,6 +125,10 @@ weight = 20
       - [`failure`](success_failure#standardese-outcome_v2_xxx::failure\<EC\>\(EC&&\)) &mdash; Returns type sugar for implicitly constructing a `result<T>` with a failure state.
     
       - [`failure_type`](success_failure#standardese-outcome_v2_xxx::failure_type\<EC,E\>) &mdash; Type sugar for implicitly constructing a `result<>` with a failure state of error code and exception.
+    
+      - [`in_place_type`](doc_value_storage.md#standardese-outcome_v2_xxx::in_place_type) &mdash; Aliases `std::in_place_type<T>` if on C++ 17 or later, else defined locally.
+    
+      - [`in_place_type_t`](doc_value_storage.md#standardese-outcome_v2_xxx::in_place_type_t\<T\>) &mdash; Aliases `std::in_place_type_t<T>` if on C++ 17 or later, else defined locally.
     
       - [`is_outcome`](outcome#standardese-outcome_v2_xxx::is_outcome\<T\>) &mdash; True if an outcome
     

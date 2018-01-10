@@ -97,6 +97,7 @@ namespace detail
 template <class R, class S, class P> inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
 {
   static_assert(!trait::has_error_code_v<S>, "Cannot call operator>> on a result with an error_code in it");
+  static_assert(!trait::has_exception_ptr_v<S>, "Cannot call operator>> on a result with an exception_ptr in it");
   s >> v._state;
   if(v.has_error())
   {
@@ -111,6 +112,7 @@ If you are printing to a human readable destination, use `print()` instead.
 template <class R, class S, class P> inline std::ostream &operator<<(std::ostream &s, const result<R, S, P> &v)
 {
   static_assert(!trait::has_error_code_v<S>, "Cannot call operator<< on a result with an error_code in it");
+  static_assert(!trait::has_exception_ptr_v<S>, "Cannot call operator<< on a result with an exception_ptr in it");
   s << v._state;
   if(v.has_error())
   {
