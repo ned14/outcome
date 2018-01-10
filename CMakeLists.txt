@@ -133,39 +133,6 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
       endforeach()
     endif()
   endforeach()
-
-  # If we are on a compiler capable of it, add in a test of the WG21 proposed result implementation
-  if(ENABLE_CXX_CONCEPTS AND CMAKE_VERSION VERSION_GREATER 3.7.99)
-    include(CheckCXXSourceCompiles)
-    set(CMAKE_REQUIRED_FLAGS "-std=c++17")
-    check_cxx_source_compiles("
-template <class T> struct success
-{
-  using value_type = T;
-  value_type value;
-};
-template <class T> success(T /*unused*/)->success<T>;
-success()->success<void>;
-int main() {
-  auto v = success{5};
-  return 0;
-}
-" CXX_HAS_TEMPLATE_DEDUCTION_GUIDES)
-    if(CXX_HAS_TEMPLATE_DEDUCTION_GUIDES)
-      add_executable(wg21-reference-result "test/tests/core-result.cpp")
-      target_compile_features(wg21-reference-result PRIVATE cxx_std_17)
-      target_compile_definitions(wg21-reference-result PRIVATE TESTING_WG21_EXPERIMENTAL_RESULT)
-      target_compile_options(wg21-reference-result PRIVATE -fconcepts)
-      set_target_properties(wg21-reference-result PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-      )
-      add_test(NAME wg21-reference-result
-        COMMAND $<TARGET_FILE:wg21-reference-result>
-      )
-    endif()
-  endif()
   
   # Add in the documentation snippets
   foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
