@@ -17,6 +17,16 @@ items = {
     'doc_bad_access.md' : ("Exceptions", 70, ''),
     'doc_iostream_support.md' : ("iostream support", 80, ''),
     'doc_result_c.md' : ("C API", 90, ''),
+    
+    'doc_common.md' : None,
+    'doc_outcome_exception_observers.md' : None,
+    'doc_outcome_exception_observers_impl.md' : None,
+    'doc_outcome_failure_observers.md' : None,
+    'doc_result_error_observers.md' : None,
+    'doc_result_final.md' : None,
+    'doc_result_storage.md' : None,
+    'doc_result_value_observers.md' : None,
+    'doc_value_storage.md' : None,
 
     'doc_all_narrow.md' : ("All narrow (hard UB)", 10, 'policies'),
     'doc_outcome_error_code_throw_as_system_error.md' : ("error_code throw as system_error (Outcome)", 20, 'policies'),
@@ -28,10 +38,11 @@ items = {
 }
 
 replacements = {
-    'detail::result_final' : 'result_or_outcome',
+#    'detail::result_final' : 'result_or_outcome',
 }
 for item in items:
-    replacements[item] = os.path.join(items[item][2], item[4:-3])
+    if items[item] is not None:
+        replacements[item] = os.path.join(items[item][2], item[4:-3])
 
 def title(item):
     return items[item][0]
@@ -87,8 +98,9 @@ args = [standardese_path, '-D', '_cpp_exceptions=1', '-D', 'STANDARDESE_IS_IN_TH
   '../../../../include/outcome/result.hpp',
   '../../../../include/outcome/success_failure.hpp',
   '../../../../include/outcome/try.hpp',
-  '../../../../include/outcome/utils.hpp'
+  '../../../../include/outcome/utils.hpp',
 ]
+args += ['../../../../include/outcome/detail/' + x for x in os.listdir('../../../../include/outcome/detail')]
 args += ['../../../../include/outcome/policy/' + x for x in os.listdir('../../../../include/outcome/policy')]
 print(args)
 subprocess.check_call(args)
@@ -97,7 +109,7 @@ subprocess.check_call(args)
 docs = {}
 for item in os.listdir('.'):
     if item.startswith('doc_'):
-        if item == 'doc_common.md': continue
+        if items[item] is None: continue
         doc = os.path.join(section(item), item[4:])
         with open(doc, 'wt') as oh:
             with open(item, 'rt') as ih:

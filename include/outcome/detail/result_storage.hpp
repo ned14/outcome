@@ -223,7 +223,7 @@ namespace detail
     template <class... Args>
     constexpr explicit result_storage(in_place_type_t<_error_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
         : _state{detail::status_have_error}
-        , _error{std::forward<Args>(args)...}
+        , _error(std::forward<Args>(args)...)
     {
       detail::_set_error_is_errno(_state, _error);
     }

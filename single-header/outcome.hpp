@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 3d0a4ad58ae00d27540cdb509fd91e8d30998744
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-08 18:57:04 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 3d0a4ad5
+#define OUTCOME_PREVIOUS_COMMIT_REF 286f98daf58bc4aed246435e3bc88c51926508ad
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-10 18:51:28 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 286f98da
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1997,150 +1997,6 @@ namespace trait
 
 } // namespace trait
 
-// Do we have C++ 17 deduced templates?
-// GCC 7.2 and clang 6.0 both have problems in their implementations, so leave this disabled for now. But it should work one day.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*! Type sugar for implicitly constructing a `result<>` with a successful state.
 */
 
@@ -2148,8 +2004,24 @@ template <class T> struct success_type
 {
   //! The type of the successful state.
   using value_type = T;
+
+private:
   //! The value of the successful state.
   value_type _value;
+
+public:
+  //! Default constructor
+  constexpr success_type() = default;
+  //! Copy constructor
+  constexpr success_type(const success_type &) = default;
+  //! Move constructor
+  constexpr success_type(success_type &&) = default;
+  //! Initialising constructor
+  template <class U>
+  constexpr explicit success_type(U &&v)
+      : _value(std::forward<U>(v))
+  {
+  }
 
   /*! Access value.
   \returns Reference to the held `value_type` according to overload.
@@ -2202,10 +2074,27 @@ template <class EC = std::error_code, class E = void> struct failure_type
   using error_type = EC;
   //! The type of the exception
   using exception_type = E;
+
+private:
   //! The error code
   error_type _error;
   //! The exception
   exception_type _exception;
+
+public:
+  //! Default constructor
+  constexpr failure_type() = default;
+  //! Copy constructor
+  constexpr failure_type(const failure_type &) = default;
+  //! Move constructor
+  constexpr failure_type(failure_type &&) = default;
+  //! Initialising constructor
+  template <class U, class V>
+  constexpr explicit failure_type(U &&u, V &&v)
+      : _error(std::forward<U>(u))
+      , _exception(std::forward<V>(v))
+  {
+  }
 
   /*! Access error.
   \returns Reference to the held `error_type` according to overload.
@@ -2246,8 +2135,24 @@ template <class EC> struct failure_type<EC, void>
   using error_type = EC;
   //! The type of the exception
   using exception_type = void;
+
+private:
   //! The error code
   error_type _error;
+
+public:
+  //! Default constructor
+  constexpr failure_type() = default;
+  //! Copy constructor
+  constexpr failure_type(const failure_type &) = default;
+  //! Move constructor
+  constexpr failure_type(failure_type &&) = default;
+  //! Initialising constructor
+  template <class U>
+  constexpr explicit failure_type(U &&u)
+      : _error(std::forward<U>(u))
+  {
+  }
 
   /*! Access error.
   \returns Reference to the held `error_type` according to overload.
@@ -2273,8 +2178,24 @@ template <class E> struct failure_type<void, E>
   using error_type = void;
   //! The type of the exception
   using exception_type = E;
+
+private:
   //! The exception
   exception_type _exception;
+
+public:
+  //! Default constructor
+  constexpr failure_type() = default;
+  //! Copy constructor
+  constexpr failure_type(const failure_type &) = default;
+  //! Move constructor
+  constexpr failure_type(failure_type &&) = default;
+  //! Initialising constructor
+  template <class V>
+  constexpr explicit failure_type(V &&v)
+      : _exception(std::forward<V>(v))
+  {
+  }
 
   /*! Access exception.
   \returns Reference to the held `exception_type` according to overload.
@@ -2309,8 +2230,6 @@ template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std
 {
   return failure_type<std::decay_t<EC>, std::decay_t<E>>{std::forward<EC>(v), std::forward<E>(w)};
 }
-
-
 
 namespace detail
 {
@@ -2932,7 +2851,7 @@ namespace detail
     template <class... Args>
     constexpr explicit result_storage(in_place_type_t<_error_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
         : _state{detail::status_have_error}
-        , _error{std::forward<Args>(args)...}
+        , _error(std::forward<Args>(args)...)
     {
       detail::_set_error_is_errno(_state, _error);
     }
@@ -3709,7 +3628,7 @@ namespace detail
 {
   template <class R, class EC, class NoValuePolicy> using select_result_impl = result_error_observers<result_value_observers<result_storage<R, EC, NoValuePolicy>, R, NoValuePolicy>, EC, NoValuePolicy>;
 
-  //! The assembled implementation type of `result<R, EC, NoValuePolicy>`.
+  //! The assembled implementation type of `result<R, S, NoValuePolicy>`.
   template <class R, class S, class NoValuePolicy>
   class result_final
 
@@ -3830,7 +3749,7 @@ namespace detail
 
 
 
-    template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->_error, o._error); }
+    template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->error(), o.error()); }
     /*! True if not equal to the other result.
     \param o The other result to compare to.
 
@@ -3908,7 +3827,7 @@ namespace detail
 
 
 
-    template <class T> constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_notequal(this->_error, o._error); }
+    template <class T> constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_notequal(this->error(), o.error()); }
   };
   //! Calls b == a
   template <class T, class U, class V, class W> constexpr inline bool operator==(const success_type<W> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
@@ -4742,12 +4661,12 @@ namespace detail
                                                                    && !std::is_same<choose_inplace_value_error_constructor<Args...>, disable_inplace_value_error_constructor>::value;
   };
 
-  template <class T, class U> constexpr inline const U &extract_value_from_success(const success_type<U> &v) { return v._value; }
-  template <class T, class U> constexpr inline U &&extract_value_from_success(success_type<U> &&v) { return std::move(v._value); }
+  template <class T, class U> constexpr inline const U &extract_value_from_success(const success_type<U> &v) { return v.value(); }
+  template <class T, class U> constexpr inline U &&extract_value_from_success(success_type<U> &&v) { return std::move(v).value(); }
   template <class T> constexpr inline T extract_value_from_success(const success_type<void> & /*unused*/) { return T{}; }
 
-  template <class T, class U, class V> constexpr inline const U &extract_error_from_failure(const failure_type<U, V> &v) { return v._error; }
-  template <class T, class U, class V> constexpr inline U &&extract_error_from_failure(failure_type<U, V> &&v) { return std::move(v._error); }
+  template <class T, class U, class V> constexpr inline const U &extract_error_from_failure(const failure_type<U, V> &v) { return v.error(); }
+  template <class T, class U, class V> constexpr inline U &&extract_error_from_failure(failure_type<U, V> &&v) { return std::move(v).error(); }
   template <class T, class V> constexpr inline T extract_error_from_failure(const failure_type<void, V> & /*unused*/) { return T{}; }
 
   template <class T> struct is_result : std::false_type
@@ -4832,16 +4751,19 @@ namespace hooks
 } // namespace hooks
 
 /*! Used to return from functions either (i) a successful value (ii) a cause of failure. `constexpr` capable.
-\tparam R The optional type of the successful result (use `void` to disable).
-Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-\tparam S The optional type of the failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
-Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
+
+\tparam R The optional type of the successful result (use `void` to disable). Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
+\tparam S The optional type of the failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`. Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
 \tparam NoValuePolicy Policy on how to interpret type `S` when a wide observation of a not present value occurs.
 
+Any `R` (`value_type`) state can be observed using the member functions `.value()` and `.assume_value()`. Any `S` (`error_type`) state can be
+observed using the member functions `.error()` and `.assume_error()`.
+
 `NoValuePolicy` defaults to a policy selected according to the characteristics of type `S`:
+
   1. If `.value()` called when there is no `value_type` but there is an `error_type`:
     - If `trait::has_error_code_v<S>` is true,
-    then `throw std::system_error(error()|make_error_code(error()))` [`policy::error_code_throw_as_system_error<S>`]
+    then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}} \endverbatim]
     - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))` [`policy::exception_ptr_rethrow<R, S, void>`]
     - If `S` is `void`, call `std::terminate()` [`policy::terminate`]
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
@@ -4850,6 +4772,9 @@ Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array
     or if `S` is `void`, do `throw bad_result_access()`
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
+
+
+
 
 
 
@@ -4911,7 +4836,7 @@ public:
   using error_type_if_enabled = typename base::_error_type;
 
   //! Used to rebind this result to a different result type.
-  template <class T, class U = S> using rebind = result<T, U>;
+  template <class T, class U = S, class V = policy::default_policy<T, U, void>> using rebind = result<T, U, V>;
 
 protected:
   //! Requirement predicates for result.
@@ -5618,8 +5543,8 @@ namespace detail
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl2 = detail::outcome_exception_observers<detail::result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>;
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl = std::conditional_t<trait::has_error_code_v<S> && trait::has_exception_ptr_v<P>, detail::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>, select_outcome_impl2<R, S, P, NoValuePolicy>>;
 
-  template <class T, class U, class V> constexpr inline const V &extract_exception_from_failure(const failure_type<U, V> &v) { return v._exception; }
-  template <class T, class U, class V> constexpr inline V &&extract_exception_from_failure(failure_type<U, V> &&v) { return std::move(v._exception); }
+  template <class T, class U, class V> constexpr inline const V &extract_exception_from_failure(const failure_type<U, V> &v) { return v.exception(); }
+  template <class T, class U, class V> constexpr inline V &&extract_exception_from_failure(failure_type<U, V> &&v) { return std::move(v).exception(); }
   template <class T, class U> constexpr inline T extract_exception_from_failure(const failure_type<U, void> & /*unused*/) { return T{}; }
 
   template <class T> struct is_outcome : std::false_type
@@ -5700,49 +5625,41 @@ namespace hooks
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_exception(outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept;
 } // namespace hooks
 
-/*! Used to return from functions one of (i) a successful value (ii) a cause of failure, with optional additional information. `constexpr` capable.
-\tparam R The optional type of the successful result (use `void` to disable).
-Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-\tparam S The optional type of the failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
-Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-\tparam P The optional type of the payload/exception result (use `void` to disable). Must be either `void` or `DefaultConstructible`.
-Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
+/*! Used to return from functions one of (i) a successful value (ii) a cause of failure (ii) a different cause of failure. `constexpr` capable.
+
+\tparam R The optional type of the successful result (use `void` to disable). Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
+\tparam S The optional type of the first failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`. Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
+\tparam P The optional type of the second failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`. Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
 \tparam NoValuePolicy Policy on how to interpret types `S` and `P` when a wide observation of a not present value occurs.
 
-This is an extension of `result<T, E>` and it comes in two variants:
-  1. `outcome<T, E, P>`: simply as if a `result<T, E + P>` i.e. if a failure result, there may be an additional arbitrary payload of type `P`.
-  In this form, `.payload()` returns the payload and there is no `.exception()`.
-  2. `outcome<T, EC, EP>`: Failure cause can be `EC` (`.error()`), or `EP` (`.exception()`) or `EC + EP` i.e. both together.
-  In this form, there is no `.payload()`.
+This is an extension of `result<R, S>` and it allows an alternative failure to be stored of type `P`, which can be observed
+with the member functions `.exception()` and `.assume_exception()`. The `P` state takes precedence during no-value observation
+over any `S` state, and it is possible to store `S + P` simultaneously such that `outcome` could have any one the states:
 
-Which variant is chosen depends on `trait::is_exception_ptr<P>`. If it is true, you get the second form, if it is false you get the first form.
+1. `R` (`value_type`)
+2. `S` (`error_type`)
+3. `P` (`exception_type`)
+4. `S + P` (`error_type + exception_type`)
 
 Similarly to `result`, `NoValuePolicy` defaults to a policy selected according to the characteristics of types `S` and `P`:
-  1. If `.value()` called when there is no `value_type`:
-    - If `std::is_error_code_enum_v<S>` or `std::is_error_condition_enum_v<S>` is true:
-      - If `trait::is_exception_ptr<P>` is true, if an exception is set, then `std::rethrow_exception(exception())`, else `throw std::system_error(make_error_code(error()))` [`policy::error_enum_throw_as_system_error_exception_rethrow<R, S, P>`]
-      - If `trait::is_exception_ptr<P>` is false, if a payload is set, then `throw_as_system_error_with_payload()`, else `throw std::system_error(make_error_code(error()))` [`policy::error_enum_throw_as_system_error_with_payload<R, S, P>`]
-    - If `trait::is_error_code<S>`, then:
-      - If `trait::is_exception_ptr<P>` is true, if an exception is set, then `std::rethrow_exception(exception())`, else `throw std::system_error(error())` [`policy::error_code_throw_as_system_error_exception_rethrow<R, S, P>`]
-      - If `trait::is_exception_ptr<P>` is false, if an exception is set, then `throw_as_system_error_with_payload()`, else `throw std::system_error(error())` [`policy::error_code_throw_as_system_error_with_payload<R, S, P>`]
-    - If `trait::is_exception_ptr<S>`, then `throw_exception_ptr_with_payload()` [`policy::exception_ptr_rethrow_with_payload<R, S, P>`]
-    - If `trait::is_exception_ptr<P>`, then `std::rethrow_exception(exception())` [`policy::exception_ptr_rethrow<R, S, P>`]
+
+  1. If `.value()` called when there is no `value_type` but there is an `exception_type`:
+    - If `trait::has_exception_ptr_v<P>`, then `std::rethrow_exception(exception()|make_exception_ptr(exception()))` [`policy::exception_ptr_rethrow<R, S, P>`]
+  2. If `.value()` called when there is no `value_type` but there is an `error_type`:
+    - If `trait::has_error_code_v<S>` is true,
+    then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}} \endverbatim]
+    - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))` [`policy::exception_ptr_rethrow<R, S, void>`]
     - If `S` is `void`, call `std::terminate()` [`policy::terminate`]
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
-  2. If `.error()` called when there is no `error_type`:
-    - For any of the policies above apart from `policy::all_narrow`, `throw bad_outcome_access()`
-    - For `policy::all_narrow`, it is undefined behaviour [`policy::all_narrow`]
   3. If `.exception()` called when there is no `exception_type`:
-    - For any of the policies above apart from `policy::all_narrow`, `throw bad_outcome_access()`
-    - For `policy::all_narrow`, it is undefined behaviour [`policy::all_narrow`]
-  4. If `.payload()` called when there is no `payload_type`:
-    - For any of the policies above apart from `policy::all_narrow`, `throw bad_outcome_access()`
-    - For `policy::all_narrow`, it is undefined behaviour [`policy::all_narrow`]
+    - If `trait::has_exception_ptr_v<P>`,
+    or if `P` is `void`, do `throw bad_outcome_access()`
+    - If `P` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
+  4. If `.error()` called when there is no `error_type`:
+    - If `trait::has_error_code_v<S>`, or if `trait::has_exception_ptr_v<S>`,
+    or if `S` is `void`, do `throw bad_outcome_access()`
+    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
-
-
-
-
 
 
 
@@ -5832,7 +5749,7 @@ public:
   using exception_type = P;
 
   //! Used to rebind this outcome to a different outcome type
-  template <class T, class U = S, class V = P> using rebind = outcome<T, U, P>;
+  template <class T, class U = S, class V = P, class W = policy::default_policy<T, U, V>> using rebind = outcome<T, U, V, W>;
 
 protected:
   //! Requirement predicates for outcome.
@@ -7271,9 +7188,14 @@ namespace detail
   inline std::string safe_message(const std::error_code &ec) { return " (" + ec.message() + ")"; }
 } // namespace detail
 
-//! Deserialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
+/*! Deserialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
+\requires That `trait::has_error_code_v<S>` is false.
+*/
+
+
 template <class R, class S, class P> inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
 {
+  static_assert(!trait::has_error_code_v<S>, "Cannot call operator>> on a result with an error_code in it");
   s >> v._state;
   if(v.has_error())
   {
@@ -7283,11 +7205,14 @@ template <class R, class S, class P> inline std::istream &operator>>(std::istrea
 }
 /*! Serialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
 If you are printing to a human readable destination, use `print()` instead.
+\requires That `trait::has_error_code_v<S>` is false.
 */
+
 
 
 template <class R, class S, class P> inline std::ostream &operator<<(std::ostream &s, const result<R, S, P> &v)
 {
+  static_assert(!trait::has_error_code_v<S>, "Cannot call operator<< on a result with an error_code in it");
   s << v._state;
   if(v.has_error())
   {

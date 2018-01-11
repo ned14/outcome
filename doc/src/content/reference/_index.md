@@ -46,7 +46,7 @@ weight = 20
     
     <a id="standardese-outcome_v2_xxx::hooks"></a>
     
-    Namespace for ADL discovered hooks into events in `result` and `outcome`.
+    Namespace containing hooks used for intercepting and manipulating result/outcome
     
       - [`hook_outcome_construction`](outcome#standardese-outcome_v2_xxx::hooks::hook_outcome_construction\<T,U\>\(T*,U&&\)) &mdash; The default instantiation hook implementation called when a `outcome` is first created by conversion from one of its possible types. Does nothing.
     
@@ -66,9 +66,9 @@ weight = 20
     
       - [`override_outcome_exception`](outcome#standardese-outcome_v2_xxx::hooks::override_outcome_exception\<R,S,P,NoValuePolicy,U\>\(outcome\<R,S,P,NoValuePolicy\>*,U&&\)) &mdash; Used in hook implementations to override the payload/exception to something other than what was constructed.
     
-      - [`set_spare_storage`](result#standardese-outcome_v2_xxx::hooks::set_spare_storage\<R,S,NoValuePolicy\>\(result_or_outcome\<R,S,NoValuePolicy\>*,uint16_t\)) &mdash; Sets the 16 bits of spare storage in result/outcome.
+      - [`set_spare_storage`](result#standardese-outcome_v2_xxx::hooks::set_spare_storage\<R,S,NoValuePolicy\>\(detail::result_final\<R,S,NoValuePolicy\>*,uint16_t\)) &mdash; Sets the sixteen bits of spare storage in a `result` or `outcome`.
     
-      - [`spare_storage`](result#standardese-outcome_v2_xxx::hooks::spare_storage\<R,S,NoValuePolicy\>\(result_or_outcome\<R,S,NoValuePolicy\>const*\)) &mdash; Retrieves the 16 bits of spare storage in result/outcome.
+      - [`spare_storage`](result#standardese-outcome_v2_xxx::hooks::spare_storage\<R,S,NoValuePolicy\>\(detail::result_final\<R,S,NoValuePolicy\>const*\)) &mdash; Get the sixteen bits of spare storage in a `result` or `outcome`.
 
   - ## Namespace `outcome_v2_xxx::policy`
     
@@ -126,6 +126,10 @@ weight = 20
     
       - [`failure_type`](success_failure#standardese-outcome_v2_xxx::failure_type\<EC,E\>) &mdash; Type sugar for implicitly constructing a `result<>` with a failure state of error code and exception.
     
+      - [`in_place_type`](doc_value_storage.md#standardese-outcome_v2_xxx::in_place_type) &mdash; Aliases `std::in_place_type<T>` if on C++ 17 or later, else defined locally.
+    
+      - [`in_place_type_t`](doc_value_storage.md#standardese-outcome_v2_xxx::in_place_type_t\<T\>) &mdash; Aliases `std::in_place_type_t<T>` if on C++ 17 or later, else defined locally.
+    
       - [`is_outcome`](outcome#standardese-outcome_v2_xxx::is_outcome\<T\>) &mdash; True if an outcome
     
       - [`is_outcome_v`](outcome#standardese-outcome_v2_xxx::is_outcome_v) &mdash; True if an outcome
@@ -144,7 +148,7 @@ weight = 20
     
       - [`outcome`](outcome#standardese-outcome_v2_xxx::outcome\<R,S,P,NoValuePolicy\>) &mdash; Used to return from functions one of (i) a successful value (ii) a cause of failure (ii) a different cause of failure. `constexpr` capable.
     
-      - [`print`](iostream_support#standardese-outcome_v2_xxx::print\<R,S,P\>\(result_or_outcome\<R,S,P\>const&\)) &mdash; Debug print a result into a form suitable for human reading. Format is `value|error`. If the error type is `error_code`, appends `" (ec.message())"` afterwards.
+      - [`print`](iostream_support#standardese-outcome_v2_xxx::print\<R,S,P\>\(detail::result_final\<R,S,P\>const&\)) &mdash; Debug print a result into a form suitable for human reading. Format is `value|error`. If the error type is `error_code`, appends `" (ec.message())"` afterwards.
     
       - [`result`](result#standardese-outcome_v2_xxx::result\<R,S,NoValuePolicy\>) &mdash; Used to return from functions either (i) a successful value (ii) a cause of failure. `constexpr` capable.
     

@@ -91,9 +91,13 @@ namespace detail
   inline std::string safe_message(const std::error_code &ec) { return " (" + ec.message() + ")"; }
 }  // namespace detail
 
-//! Deserialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
+/*! Deserialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
+\requires That `trait::has_error_code_v<S>` is false.
+*/
 template <class R, class S, class P> inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
 {
+  static_assert(!trait::has_error_code_v<S>, "Cannot call operator>> on a result with an error_code in it");
+  static_assert(!trait::has_exception_ptr_v<S>, "Cannot call operator>> on a result with an exception_ptr in it");
   s >> v._state;
   if(v.has_error())
   {
@@ -103,9 +107,12 @@ template <class R, class S, class P> inline std::istream &operator>>(std::istrea
 }
 /*! Serialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
 If you are printing to a human readable destination, use `print()` instead.
+\requires That `trait::has_error_code_v<S>` is false.
 */
 template <class R, class S, class P> inline std::ostream &operator<<(std::ostream &s, const result<R, S, P> &v)
 {
+  static_assert(!trait::has_error_code_v<S>, "Cannot call operator<< on a result with an error_code in it");
+  static_assert(!trait::has_exception_ptr_v<S>, "Cannot call operator<< on a result with an exception_ptr in it");
   s << v._state;
   if(v.has_error())
   {
