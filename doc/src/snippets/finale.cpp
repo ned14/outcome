@@ -27,6 +27,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #else
 #include "../../../include/outcome/quickcpplib/include/string_view.hpp"
 #endif
+#include <cstring>  // for memcpy
 #include <experimental/filesystem>
 
 //! [httplib]
