@@ -4,7 +4,7 @@
 namespace outcome = OUTCOME_V2_NAMESPACE;
 
 //! [decl_f_g]
-auto f() -> int;  // may throw
+auto f() -> int;  // throws on failure
 auto g() noexcept -> outcome::result<int>;
 //! [decl_f_g]
 
@@ -38,7 +38,7 @@ auto old::h() noexcept -> outcome::outcome<int>
 //! [def_h]
 
 //! [def_z]
-auto z() -> int // may throw
+auto z() -> int // throws on failure
 {
   if (outcome::outcome<int> o = old::h())
     return o.value();
