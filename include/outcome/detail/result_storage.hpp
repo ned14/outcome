@@ -201,6 +201,12 @@ namespace detail
     detail::value_storage_select_impl<_value_type> _state;
     detail::devoid<_error_type> _error;
 
+  public:
+    // Used by iostream support to access state
+    detail::value_storage_select_impl<_value_type> &__state() { return _state; }
+    const detail::value_storage_select_impl<_value_type> &__state() const { return _state; }
+
+  protected:
     result_storage() = default;
     result_storage(const result_storage &) = default;             // NOLINT
     result_storage(result_storage &&) = default;                  // NOLINT

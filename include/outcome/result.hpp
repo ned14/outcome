@@ -221,8 +221,6 @@ class OUTCOME_NODISCARD result : public detail::result_final<R, S, NoValuePolicy
   static_assert(std::is_void<S>::value || std::is_default_constructible<S>::value, "The type S must be void or default constructible");
 
   using base = detail::result_final<R, S, NoValuePolicy>;
-  template <class T, class U, class V> friend inline std::istream &operator>>(std::istream &s, result<T, U, V> &v);        // NOLINT
-  template <class T, class U, class V> friend inline std::ostream &operator<<(std::ostream &s, const result<T, U, V> &v);  // NOLINT
 
   struct value_converting_constructor_tag
   {
