@@ -806,14 +806,14 @@ public:
     }
     if(this->_state._status & detail::status_have_error)
     {
-      if(!detail::safe_compare_equal(this->_error, o.error))
+      if(!detail::safe_compare_equal(this->_error, o.error()))
       {
         return false;
       }
     }
     if((this->_state._status & detail::status_have_exception))
     {
-      return detail::safe_compare_equal(this->_ptr, o.exception);
+      return detail::safe_compare_equal(this->_ptr, o.exception());
     }
     return true;
   }
@@ -861,14 +861,14 @@ public:
     }
     if(this->_state._status & detail::status_have_error)
     {
-      if(detail::safe_compare_notequal(this->_error, o.error))
+      if(detail::safe_compare_notequal(this->_error, o.error()))
       {
         return true;
       }
     }
     if((this->_state._status & detail::status_have_exception))
     {
-      return detail::safe_compare_notequal(this->_ptr, o.exception);
+      return detail::safe_compare_notequal(this->_ptr, o.exception());
     }
     return false;
   }

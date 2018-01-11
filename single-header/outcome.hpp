@@ -3755,7 +3755,7 @@ namespace detail
 
 
 
-    template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->error(), o.error()); }
+    template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->_error, o.error()); }
     /*! True if not equal to the other result.
     \param o The other result to compare to.
 
@@ -3833,7 +3833,7 @@ namespace detail
 
 
 
-    template <class T> constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_notequal(this->error(), o.error()); }
+    template <class T> constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_notequal(this->_error, o.error()); }
   };
   //! Calls b == a
   template <class T, class U, class V, class W> constexpr inline bool operator==(const success_type<W> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
@@ -7197,8 +7197,10 @@ namespace detail
 \exclude
 \tparam 4
 \exclude
+
 \requires That `R` and `S` implement `operator>>`.
 */
+
 
 
 
@@ -7222,8 +7224,10 @@ If you are printing to a human readable destination, use `print()` instead.
 \exclude
 \tparam 4
 \exclude
+
 \requires That `R` and `S` implement `operator<<`.
 */
+
 
 
 
@@ -7318,8 +7322,10 @@ template <class P> inline std::string print(const detail::result_final<void, voi
 \exclude
 \tparam 6
 \exclude
+
 \requires That `R`, `S` and `P` implement `operator>>`.
 */
+
 
 
 
@@ -7351,8 +7357,10 @@ If you are printing to a human readable destination, use `print()` instead.
 \exclude
 \tparam 6
 \exclude
+
 \requires That `R`, `S` and `P` implement `operator<<`.
 */
+
 
 
 
