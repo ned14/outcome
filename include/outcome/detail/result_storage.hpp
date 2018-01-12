@@ -198,7 +198,11 @@ namespace detail
     using _value_type = std::conditional_t<std::is_same<R, EC>::value, disable_in_place_value_type, R>;
     using _error_type = std::conditional_t<std::is_same<R, EC>::value, disable_in_place_error_type, EC>;
 
+#ifdef STANDARDESE_IS_IN_THE_HOUSE
+    detail::value_storage_trivial<_value_type> _state;
+#else
     detail::value_storage_select_impl<_value_type> _state;
+#endif
     detail::devoid<_error_type> _error;
 
   public:

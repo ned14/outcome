@@ -82,7 +82,7 @@ weight = 20
     
       - [`error_code`](success_failure#standardese-outcome_v2_xxx::policy::error_code\<T\>\(T&&\)) &mdash; Used by policies to extract a `std::error_code` from some input `T` via ADL discovery of some `make_error_code(T)` function.
     
-      - [`error_code_throw_as_system_error`](policies/result_error_code_throw_as_system_error#standardese-outcome_v2_xxx::policy::error_code_throw_as_system_error\<T,EC\>) &mdash; Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
+      - [`error_code_throw_as_system_error`](policies/outcome_error_code_throw_as_system_error#standardese-outcome_v2_xxx::policy::error_code_throw_as_system_error\<T,EC,E\>) &mdash; Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
     
       - [`exception_ptr`](success_failure#standardese-outcome_v2_xxx::policy::exception_ptr\<T\>\(T&&\)) &mdash; Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
     
@@ -156,7 +156,7 @@ weight = 20
     
       - [`success_type`](success_failure#standardese-outcome_v2_xxx::success_type\<T\>) &mdash; Type sugar for implicitly constructing a `result<>` with a successful state.
     
-      - [`swap`](result#standardese-outcome_v2_xxx::swap\<R,S,P\>\(result\<R,S,P\>&,result\<R,S,P\>&\)) &mdash; Specialise swap for result.
+      - [`swap`](outcome#standardese-outcome_v2_xxx::swap\<R,S,P,N\>\(outcome\<R,S,P,N\>&,outcome\<R,S,P,N\>&\)) &mdash; Specialise swap for outcome.
     
       - [`try_operation_return_as`](try#standardese-outcome_v2_xxx::try_operation_return_as\<T\>\(T&&\)) &mdash; Customisation point for changing what the `OUTCOME_TRY` macros do. This function defaults to returning `std::forward<T>(v).as_failure()`.
     

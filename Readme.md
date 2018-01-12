@@ -48,6 +48,7 @@ On Windows, simply download the raw file from above and place it wherever it sui
  - [x] Get AFIO et al working with latest Outcome
  - [x] Hyperlink all the tutorial mentions of things to the reference docs.
  - [ ] Freshen list of tests in Boost edition
+ - [ ] Test with AFIO before code freeze
  - [ ] Check all files in Boost edition have licence boilerplate (issue #38)
 
 # Changes since v1:
