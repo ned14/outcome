@@ -2829,6 +2829,12 @@ namespace detail
     detail::value_storage_select_impl<_value_type> _state;
     detail::devoid<_error_type> _error;
 
+  public:
+    // Used by iostream support to access state
+    detail::value_storage_select_impl<_value_type> &__state() { return _state; }
+    const detail::value_storage_select_impl<_value_type> &__state() const { return _state; }
+
+  protected:
     result_storage() = default;
     result_storage(const result_storage &) = default; // NOLINT
     result_storage(result_storage &&) = default; // NOLINT
@@ -3749,7 +3755,7 @@ namespace detail
 
 
 
-    template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->error(), o.error()); }
+    template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->_error, o.error()); }
     /*! True if not equal to the other result.
     \param o The other result to compare to.
 
@@ -3827,7 +3833,7 @@ namespace detail
 
 
 
-    template <class T> constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_notequal(this->error(), o.error()); }
+    template <class T> constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_notequal(this->_error, o.error()); }
   };
   //! Calls b == a
   template <class T, class U, class V, class W> constexpr inline bool operator==(const success_type<W> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
@@ -4804,8 +4810,6 @@ class OUTCOME_NODISCARD result : public detail::result_final<R, S, NoValuePolicy
   static_assert(std::is_void<S>::value || std::is_default_constructible<S>::value, "The type S must be void or default constructible");
 
   using base = detail::result_final<R, S, NoValuePolicy>;
-  template <class T, class U, class V> friend inline std::istream &operator>>(std::istream &s, result<T, U, V> &v); // NOLINT
-  template <class T, class U, class V> friend inline std::ostream &operator<<(std::ostream &s, const result<T, U, V> &v); // NOLINT
 
   struct value_converting_constructor_tag
   {
@@ -5709,8 +5713,6 @@ class OUTCOME_NODISCARD outcome
   friend NoValuePolicy;
   friend detail::select_outcome_impl2<R, S, P, NoValuePolicy>;
   template <class T, class U, class V, class W> friend class outcome;
-  template <class T, class U, class V, class W> friend inline std::istream &operator>>(std::istream &s, outcome<T, U, V, W> &v); // NOLINT
-  template <class T, class U, class V, class W> friend inline std::ostream &operator<<(std::ostream &s, const outcome<T, U, V, W> &v); // NOLINT
   template <class T, class U, class V, class W, class X> friend constexpr inline void hooks::override_outcome_exception(outcome<T, U, V, W> *o, X &&v) noexcept; // NOLINT
 
   struct value_converting_constructor_tag
@@ -7131,6 +7133,8 @@ OUTCOME_V2_NAMESPACE_BEGIN
 
 namespace detail
 {
+  template <class T> typename std::add_lvalue_reference<T>::type lvalueref() noexcept;
+
   template <class T> inline std::ostream &operator<<(std::ostream &s, const value_storage_trivial<T> &v)
   {
     s << v._status << " ";
@@ -7189,34 +7193,56 @@ namespace detail
 } // namespace detail
 
 /*! Deserialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
-\requires That `trait::has_error_code_v<S>` is false.
+\tparam 3
+\exclude
+\tparam 4
+\exclude
+
+\requires That `R` and `S` implement `operator>>`.
 */
 
 
-template <class R, class S, class P> inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
+
+
+
+
+
+OUTCOME_TEMPLATE(class R, class S, class P)
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<std::istream>() >> detail::lvalueref<R>()), OUTCOME_TEXPR(std::declval<std::istream>() >> detail::lvalueref<S>()))
+inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
 {
-  static_assert(!trait::has_error_code_v<S>, "Cannot call operator>> on a result with an error_code in it");
-  s >> v._state;
+  s >> v.__state();
   if(v.has_error())
   {
-    s >> v._error;
+    s >> v.assume_error();
   }
   return s;
 }
 /*! Serialise a result. Format is `status_unsigned [value][error]`. Spare storage is preserved.
 If you are printing to a human readable destination, use `print()` instead.
-\requires That `trait::has_error_code_v<S>` is false.
+\tparam 3
+\exclude
+\tparam 4
+\exclude
+
+\requires That `R` and `S` implement `operator<<`.
 */
 
 
 
-template <class R, class S, class P> inline std::ostream &operator<<(std::ostream &s, const result<R, S, P> &v)
+
+
+
+
+
+OUTCOME_TEMPLATE(class R, class S, class P)
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<std::ostream>() << detail::lvalueref<R>()), OUTCOME_TEXPR(std::declval<std::ostream>() << detail::lvalueref<S>()))
+inline std::ostream &operator<<(std::ostream &s, const result<R, S, P> &v)
 {
-  static_assert(!trait::has_error_code_v<S>, "Cannot call operator<< on a result with an error_code in it");
-  s << v._state;
+  s << v.__state();
   if(v.has_error())
   {
-    s << v._error;
+    s << v.assume_error();
   }
   return s;
 }
@@ -7290,42 +7316,72 @@ template <class P> inline std::string print(const detail::result_final<void, voi
 }
 
 /*! Deserialise an outcome. Format is `status_unsigned [value][error][exception]`. Spare storage is preserved.
-\requires That `trait::has_exception_ptr_v<P>` is false.
+\tparam 4
+\exclude
+\tparam 5
+\exclude
+\tparam 6
+\exclude
+
+\requires That `R`, `S` and `P` implement `operator>>`.
 */
 
 
-template <class R, class S, class P, class N> inline std::istream &operator>>(std::istream &s, outcome<R, S, P, N> &v)
+
+
+
+
+
+
+
+OUTCOME_TEMPLATE(class R, class S, class P, class N)
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<std::istream>() >> detail::lvalueref<R>()), OUTCOME_TEXPR(std::declval<std::istream>() >> detail::lvalueref<S>()), OUTCOME_TEXPR(std::declval<std::istream>() >> detail::lvalueref<P>()))
+inline std::istream &operator>>(std::istream &s, outcome<R, S, P, N> &v)
 {
-  static_assert(!trait::has_exception_ptr_v<P>, "Cannot call operator>> on an outcome with an exception_ptr in it");
-  s >> v._state;
+  s >> v.__state();
   if(v.has_error())
   {
-    s >> v._error;
+    s >> v.assume_error();
   }
   if(v.has_exception())
   {
-    s >> v._ptr;
+    s >> v.assume_exception();
   }
   return s;
 }
 /*! Serialise an outcome. Format is `status_unsigned [value][error][exception]`. Spare storage is preserved.
 If you are printing to a human readable destination, use `print()` instead.
-\requires That `trait::has_exception_ptr_v<P>` is false.
+\tparam 4
+\exclude
+\tparam 5
+\exclude
+\tparam 6
+\exclude
+
+\requires That `R`, `S` and `P` implement `operator<<`.
 */
 
 
 
-template <class R, class S, class P, class N> inline std::ostream &operator<<(std::ostream &s, const outcome<R, S, P, N> &v)
+
+
+
+
+
+
+
+OUTCOME_TEMPLATE(class R, class S, class P, class N)
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<std::ostream>() << detail::lvalueref<R>()), OUTCOME_TEXPR(std::declval<std::ostream>() << detail::lvalueref<S>()), OUTCOME_TEXPR(std::declval<std::ostream>() << detail::lvalueref<P>()))
+inline std::ostream &operator<<(std::ostream &s, const outcome<R, S, P, N> &v)
 {
-  static_assert(!trait::has_exception_ptr_v<P>, "Cannot call operator<< on an outcome with an exception_ptr in it");
-  s << v._state;
+  s << v.__state();
   if(v.has_error())
   {
-    s << v._error;
+    s << v.assume_error();
   }
   if(v.has_exception())
   {
-    s << v._ptr;
+    s << v.assume_exception();
   }
   return s;
 }

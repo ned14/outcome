@@ -124,7 +124,7 @@ namespace detail
     \effects If a valid expression to do so, calls the `operator==` operation on the failure item returning true if equal. Otherwise returns false.
     \throws Any exception the `operator==` operation might throw.
     */
-    template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->error(), o.error()); }
+    template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->_error, o.error()); }
     /*! True if not equal to the other result.
     \param o The other result to compare to.
 
@@ -181,7 +181,7 @@ namespace detail
     \effects If a valid expression to do so, calls the `operator!=` operation on the failure item returning true if not equal. Otherwise returns false.
     \throws Any exception the `operator!=` operation might throw.
     */
-    template <class T> constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_notequal(this->error(), o.error()); }
+    template <class T> constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_notequal(this->_error, o.error()); }
   };
   //! Calls b == a
   template <class T, class U, class V, class W> constexpr inline bool operator==(const success_type<W> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }

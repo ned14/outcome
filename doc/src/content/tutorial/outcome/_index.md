@@ -7,15 +7,10 @@ tags = ["outcome"]
 
 ## `outcome<>`
 
-Type {{< api "outcome/#standardese-outcome_v2_xxx::outcome%3CR,S,P,NoValuePolicy%3E" "outcome<T, EC, EP>" >}} can store either a `T` or an `EC` or an `EP`.
-The first parameter (`T`) represents a value returned from functions upon success.
-Both `EC` and `EP` represent the reason for function failure when function fails.
-Conceptually, `outcome<T, EC, EP>` can be thought of as `variant<T, EC, EP>` or `variant<T, variant<EC, EP>>`, or `result<T, variant<EC, EP>>`.
-`EC` defaults to `std::error_code` and `EP` defaults to `std::exception_ptr`. The distinction is made into two types, `EC` and `EP` for the following reasons:
+Type {{< api "outcome/#standardese-outcome_v2_xxx::outcome%3CR,S,P,NoValuePolicy%3E" "outcome<T, EC, EP>" >}} represets either a successfully computed value of type `T` or a reason for failure. Failure can be represented by `EC` or `EP` or both. Although usually it will either be an `EC` or an `EP`. `EC` defaults to `std::error_code` and `EP` defaults to `std::exception_ptr`. The distinction is made into two types, `EC` and `EP`:
 
-1. The interface: `EC` is inspected in a different way that `EP`.
-2. Performance: handling of `EC` is optimized for trivial types.
-3. Interoperability with `result<T, EC>`.
+- `EC` represents a failue from lower-layer function which was retured through {{< api "result/#standardese-outcome_v2_xxx::result%3CR,S,NoValuePolicy%3E" "result<T, EC>" >}}.
+- `EP` represents pointer to an exception thrown in a lower-layer function to signal a failure; but at the current level we do not want to proceed with stck unwinding.
 
 
 `outcome<T, EC, EP>` is useful for transporting exceptions across layers of the program that were never designed with exception safety in mind.

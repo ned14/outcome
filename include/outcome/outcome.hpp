@@ -222,8 +222,6 @@ class OUTCOME_NODISCARD outcome
   friend NoValuePolicy;
   friend detail::select_outcome_impl2<R, S, P, NoValuePolicy>;
   template <class T, class U, class V, class W> friend class outcome;
-  template <class T, class U, class V, class W> friend inline std::istream &operator>>(std::istream &s, outcome<T, U, V, W> &v);                                  // NOLINT
-  template <class T, class U, class V, class W> friend inline std::ostream &operator<<(std::ostream &s, const outcome<T, U, V, W> &v);                            // NOLINT
   template <class T, class U, class V, class W, class X> friend constexpr inline void hooks::override_outcome_exception(outcome<T, U, V, W> *o, X &&v) noexcept;  // NOLINT
 
   struct value_converting_constructor_tag
@@ -808,14 +806,14 @@ public:
     }
     if(this->_state._status & detail::status_have_error)
     {
-      if(!detail::safe_compare_equal(this->_error, o.error))
+      if(!detail::safe_compare_equal(this->_error, o.error()))
       {
         return false;
       }
     }
     if((this->_state._status & detail::status_have_exception))
     {
-      return detail::safe_compare_equal(this->_ptr, o.exception);
+      return detail::safe_compare_equal(this->_ptr, o.exception());
     }
     return true;
   }
@@ -863,14 +861,14 @@ public:
     }
     if(this->_state._status & detail::status_have_error)
     {
-      if(detail::safe_compare_notequal(this->_error, o.error))
+      if(detail::safe_compare_notequal(this->_error, o.error()))
       {
         return true;
       }
     }
     if((this->_state._status & detail::status_have_exception))
     {
-      return detail::safe_compare_notequal(this->_ptr, o.exception);
+      return detail::safe_compare_notequal(this->_ptr, o.exception());
     }
     return false;
   }
