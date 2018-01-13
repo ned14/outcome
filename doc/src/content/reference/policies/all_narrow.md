@@ -48,7 +48,7 @@ Can be used in both `result` and `outcome`.
 <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">wide_value_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
 </code></pre>
 
-Performs a wide check of state, used in the value() functions.
+Performs a wide check of state, used in the value() functions. Calls `narrow_value_check()` and does nothing else.
 
 *Effects:* None.
 
@@ -62,7 +62,7 @@ Performs a wide check of state, used in the value() functions.
 <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">wide_error_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
 </code></pre>
 
-Performs a wide check of state, used in the error() functions
+Performs a wide check of state, used in the error() functions. Calls `narrow_error_check()` and does nothing else.
 
 *Effects:* None.
 
@@ -76,9 +76,9 @@ Performs a wide check of state, used in the error() functions
 <span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">void</span> <span class="typ dec var fun">wide_exception_check</span><span class="pun">(</span><span class="typ dec var fun">Impl</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">self</span><span class="pun">)</span><span class="pun">;</span>
 </code></pre>
 
-Performs a wide check of state, used in the exception() functions
+Performs a wide check of state, used in the exception() functions. Calls `narrow_exception_check()` and does nothing else.
 
-*Effects:* If outcome does not have an exception, calls `std::terminate()`.
+*Effects:* None.
 
 -----
 
