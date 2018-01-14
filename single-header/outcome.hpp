@@ -935,9 +935,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF efc6c12dca3b8f2210d741a985a53b162383dfdf
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-12-06 20:49:53 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE efc6c12d
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 7f3df03d2e927815fffbf74b6dd69cd660f32b0a
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-12-14 08:04:25 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 7f3df03d
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
 
@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 286f98daf58bc4aed246435e3bc88c51926508ad
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-10 18:51:28 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 286f98da
+#define OUTCOME_PREVIOUS_COMMIT_REF 823f9338705d64488d890c90a96e26cca85d869f
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-12 09:19:55 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 823f9338
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -2826,7 +2826,11 @@ namespace detail
     using _value_type = std::conditional_t<std::is_same<R, EC>::value, disable_in_place_value_type, R>;
     using _error_type = std::conditional_t<std::is_same<R, EC>::value, disable_in_place_error_type, EC>;
 
+
+
+
     detail::value_storage_select_impl<_value_type> _state;
+
     detail::devoid<_error_type> _error;
 
   public:
@@ -4032,20 +4036,20 @@ namespace policy
 
   struct all_narrow : detail::base
   {
-    /*! Performs a wide check of state, used in the value() functions.
+    /*! Performs a wide check of state, used in the value() functions. Calls `narrow_value_check()` and does nothing else.
     \effects None.
     */
 
 
     template <class Impl> static constexpr void wide_value_check(Impl &&self) { detail::base::narrow_value_check(std::forward<Impl>(self)); }
-    /*! Performs a wide check of state, used in the error() functions
+    /*! Performs a wide check of state, used in the error() functions. Calls `narrow_error_check()` and does nothing else.
     \effects None.
     */
 
 
     template <class Impl> static constexpr void wide_error_check(Impl &&self) { detail::base::narrow_error_check(std::forward<Impl>(self)); }
-    /*! Performs a wide check of state, used in the exception() functions
-    \effects If outcome does not have an exception, calls `std::terminate()`.
+    /*! Performs a wide check of state, used in the exception() functions. Calls `narrow_exception_check()` and does nothing else.
+    \effects None.
     */
 
 
@@ -6505,14 +6509,14 @@ public:
     }
     if(this->_state._status & detail::status_have_error)
     {
-      if(!detail::safe_compare_equal(this->_error, o.error))
+      if(!detail::safe_compare_equal(this->_error, o.error()))
       {
         return false;
       }
     }
     if((this->_state._status & detail::status_have_exception))
     {
-      return detail::safe_compare_equal(this->_ptr, o.exception);
+      return detail::safe_compare_equal(this->_ptr, o.exception());
     }
     return true;
   }
@@ -6571,14 +6575,14 @@ public:
     }
     if(this->_state._status & detail::status_have_error)
     {
-      if(detail::safe_compare_notequal(this->_error, o.error))
+      if(detail::safe_compare_notequal(this->_error, o.error()))
       {
         return true;
       }
     }
     if((this->_state._status & detail::status_have_exception))
     {
-      return detail::safe_compare_notequal(this->_ptr, o.exception);
+      return detail::safe_compare_notequal(this->_ptr, o.exception());
     }
     return false;
   }
@@ -7208,7 +7212,7 @@ namespace detail
 
 
 OUTCOME_TEMPLATE(class R, class S, class P)
-OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<std::istream>() >> detail::lvalueref<R>()), OUTCOME_TEXPR(std::declval<std::istream>() >> detail::lvalueref<S>()))
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lvalueref<R>()), OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lvalueref<S>()))
 inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
 {
   s >> v.__state();
@@ -7236,7 +7240,7 @@ If you are printing to a human readable destination, use `print()` instead.
 
 
 OUTCOME_TEMPLATE(class R, class S, class P)
-OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<std::ostream>() << detail::lvalueref<R>()), OUTCOME_TEXPR(std::declval<std::ostream>() << detail::lvalueref<S>()))
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lvalueref<R>()), OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lvalueref<S>()))
 inline std::ostream &operator<<(std::ostream &s, const result<R, S, P> &v)
 {
   s << v.__state();
@@ -7335,7 +7339,7 @@ template <class P> inline std::string print(const detail::result_final<void, voi
 
 
 OUTCOME_TEMPLATE(class R, class S, class P, class N)
-OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<std::istream>() >> detail::lvalueref<R>()), OUTCOME_TEXPR(std::declval<std::istream>() >> detail::lvalueref<S>()), OUTCOME_TEXPR(std::declval<std::istream>() >> detail::lvalueref<P>()))
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lvalueref<R>()), OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lvalueref<S>()), OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lvalueref<P>()))
 inline std::istream &operator>>(std::istream &s, outcome<R, S, P, N> &v)
 {
   s >> v.__state();
@@ -7371,7 +7375,7 @@ If you are printing to a human readable destination, use `print()` instead.
 
 
 OUTCOME_TEMPLATE(class R, class S, class P, class N)
-OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<std::ostream>() << detail::lvalueref<R>()), OUTCOME_TEXPR(std::declval<std::ostream>() << detail::lvalueref<S>()), OUTCOME_TEXPR(std::declval<std::ostream>() << detail::lvalueref<P>()))
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lvalueref<R>()), OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lvalueref<S>()), OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lvalueref<P>()))
 inline std::ostream &operator<<(std::ostream &s, const outcome<R, S, P, N> &v)
 {
   s << v.__state();
