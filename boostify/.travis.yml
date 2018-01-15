@@ -32,11 +32,11 @@ cache:
     
 before_install:
  - if [ ! -f "boost/bootstrap.sh" ]; then
-     wget -O boost.tar.bz2 https://dl.bintray.com/boostorg/release/1.65.1/source/boost_1_65_1.tar.bz2;
+     wget -O boost.tar.bz2 https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.tar.bz2;
      tar xf boost.tar.bz2 -C boost;
-     mv boost/boost_1_65_1 .;
+     mv boost/boost_1_66_0 .;
      rm -rf boost;
-     mv boost_1_65_1 boost;
+     mv boost_1_66_0 boost;
      ls -l;
      ls -l boost;
      cd boost;

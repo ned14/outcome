@@ -12,7 +12,8 @@ exclude_files = [
     r'.*\.natvis',
     r'.*\.vs',
     r'test/single-header-test.cpp',
-    r'test/constexprs/.*'
+    r'test/constexprs/.*',
+    r'doc/src/themes/.*'
 ]
 overlay_files = [
     (r'boostify', r''),
