@@ -277,7 +277,7 @@ Similarly to `result`, `NoValuePolicy` defaults to a policy selected according t
 
 <!-- end list -->
 
-  - If `trait::has_exception_ptr_v<P>`, then `std::rethrow_exception(exception()|make_exception_ptr(exception()))` \[`policy::exception_ptr_rethrow<R, S, P>`\]
+  - If {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-exception-ptr-v" "trait::has_exception_ptr_v<P>" >}} is true, then `std::rethrow_exception(exception()|make_exception_ptr(exception()))` \[{{<api "policies/outcome_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, P>">}}\]
 
 <!-- end list -->
 
@@ -285,13 +285,13 @@ Similarly to `result`, `NoValuePolicy` defaults to a policy selected according t
 
 <!-- end list -->
 
-  - If `trait::has_error_code_v<S>` is true, then `throw std::system_error(error()|make_error_code(error()))` \[{{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}}verbatim\]
+  - If {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-error-code-v" "trait::has_error_code_v<S>" >}} is true, then `throw std::system_error(error()|make_error_code(error()))` \[{{<api "policies/outcome_error_code_throw_as_system_error/" "policy::error_code_throw_as_system_error<S>">}}\]
 
-  - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))` \[`policy::exception_ptr_rethrow<R, S, void>`\]
+  - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))` \[{{<api "policies/result_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, void>">}}\]
 
-  - If `S` is `void`, call `std::terminate()` \[`policy::terminate`\]
+  - If `S` is `void`, call `std::terminate()` \[{{<api "policies/terminate/" "policy::terminate">}}\]
 
-  - If `S` is none of the above, then it is undefined behaviour \[`policy::all_narrow`\]
+  - If `S` is none of the above, then it is undefined behaviour \[{{<api "policies/all_narrow/" "policy::all_narrow">}}\]
 
 <!-- end list -->
 

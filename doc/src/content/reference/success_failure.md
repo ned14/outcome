@@ -319,13 +319,15 @@ Returns type sugar for implicitly constructing a `result<T>` with a successful s
     <span class="kwd">constexpr</span> <span class="typ dec var fun">error_type</span><span class="pun">&amp;&amp;</span> <a href="doc_result_error_observers.md#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::error()&amp;"><span class="typ dec var fun">error</span></a><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
     <span class="kwd">constexpr</span> <span class="typ dec var fun">error_type</span><span class="pun">&amp;&amp;</span> <a href="doc_result_error_observers.md#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::error()&amp;"><span class="typ dec var fun">error</span></a><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
 
-    <span class="kwd">constexpr</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception_type"><span class="typ dec var fun">exception_type</span></a><span class="pun">&amp;</span> <span class="typ dec var fun">exception</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;</span><span class="pun">;</span>
-
-    <span class="kwd">constexpr</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception_type"><span class="typ dec var fun">exception_type</span></a><span class="pun">&amp;</span> <span class="typ dec var fun">exception</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;</span><span class="pun">;</span>
-
-    <span class="kwd">constexpr</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception_type"><span class="typ dec var fun">exception_type</span></a><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">exception</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
-
-    <span class="kwd">constexpr</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception_type"><span class="typ dec var fun">exception_type</span></a><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">exception</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
+    &#x2F;&#x2F;=== exception ===&#x2F;&#x2F;
+    <span class="kwd">constexpr</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception_type"><span class="typ dec var fun">exception_type</span></a><span class="pun">&amp;</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception()&amp;"><span class="typ dec var fun">exception</span></a><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;</span><span class="pun">;</span>
+    <span class="kwd">constexpr</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception_type"><span class="typ dec var fun">exception_type</span></a><span class="pun">&amp;</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception()&amp;"><span class="typ dec var fun">exception</span></a><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;</span><span class="pun">;</span>
+    <span class="kwd">constexpr</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception_type"><span class="typ dec var fun">exception_type</span></a><span class="pun">&amp;&amp;</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception()&amp;"><span class="typ dec var fun">exception</span></a><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
+    <span class="kwd">constexpr</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception_type"><span class="typ dec var fun">exception_type</span></a><span class="pun">&amp;&amp;</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception()&amp;"><span class="typ dec var fun">exception</span></a><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
+    <span class="kwd">constexpr</span> <span class="typ dec var fun">&#x27;hidden&#x27;</span><span class="pun">&amp;</span> <a href="doc_outcome_exception_observers.md#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception()&amp;"><span class="typ dec var fun">exception</span></a><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;</span><span class="pun">;</span>
+    <span class="kwd">constexpr</span> <span class="typ dec var fun">&#x27;hidden&#x27;</span><span class="pun">&amp;</span> <a href="doc_outcome_exception_observers.md#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception()&amp;"><span class="typ dec var fun">exception</span></a><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;</span><span class="pun">;</span>
+    <span class="kwd">constexpr</span> <span class="typ dec var fun">&#x27;hidden&#x27;</span><span class="pun">&amp;&amp;</span> <a href="doc_outcome_exception_observers.md#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception()&amp;"><span class="typ dec var fun">exception</span></a><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
+    <span class="kwd">constexpr</span> <span class="typ dec var fun">&#x27;hidden&#x27;</span><span class="pun">&amp;&amp;</span> <a href="doc_outcome_exception_observers.md#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception()&amp;"><span class="typ dec var fun">exception</span></a><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
 <span class="pun">};</span>
 </code></pre>
 
@@ -408,6 +410,31 @@ Initialising constructor
 Access error.
 
 *Returns:* Reference to the held `error_type` according to overload.
+
+-----
+
+### Function `exception`
+
+<a id="standardese-outcome_v2_xxx::failure_type&lt;EC,E&gt;::exception()&amp;"></a><pre><code class="standardese-language-cpp">(1) <span class="kwd">constexpr</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception_type"><span class="typ dec var fun">exception_type</span></a><span class="pun">&amp;</span> <span class="typ dec var fun">exception</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;</span><span class="pun">;</span>
+
+(2) <span class="kwd">constexpr</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception_type"><span class="typ dec var fun">exception_type</span></a><span class="pun">&amp;</span> <span class="typ dec var fun">exception</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;</span><span class="pun">;</span>
+
+(3) <span class="kwd">constexpr</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception_type"><span class="typ dec var fun">exception_type</span></a><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">exception</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
+
+(4) <span class="kwd">constexpr</span> <a href="#standardese-outcome_v2_xxx::failure_type%3CEC,E%3E::exception_type"><span class="typ dec var fun">exception_type</span></a><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">exception</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
+
+(5) <span class="kwd">constexpr</span> <span class="typ dec var fun">&#x27;hidden&#x27;</span><span class="pun">&amp;</span> <span class="typ dec var fun">exception</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;</span><span class="pun">;</span>
+
+(6) <span class="kwd">constexpr</span> <span class="typ dec var fun">&#x27;hidden&#x27;</span><span class="pun">&amp;</span> <span class="typ dec var fun">exception</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;</span><span class="pun">;</span>
+
+(7) <span class="kwd">constexpr</span> <span class="typ dec var fun">&#x27;hidden&#x27;</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">exception</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
+
+(8) <span class="kwd">constexpr</span> <span class="typ dec var fun">&#x27;hidden&#x27;</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">exception</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">const</span> <span class="pun">&amp;&amp;</span><span class="pun">;</span>
+</code></pre>
+
+Access exception.
+
+*Returns:* Reference to the held `exception_type` according to overload.
 
 -----
 
