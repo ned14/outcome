@@ -33,7 +33,7 @@ weight = 20
   - ## Namespace `outcome_v2_xxx::convert`
     
     <a id="standardese-outcome_v2_xxx::convert"></a>
-    
+
     Namespace for injected convertibility
     
       - [`ValueOrError`](convert#standardese-outcome_v2_xxx::convert)
@@ -45,7 +45,7 @@ weight = 20
   - ## Namespace `outcome_v2_xxx::hooks`
     
     <a id="standardese-outcome_v2_xxx::hooks"></a>
-    
+
     Namespace containing hooks used for intercepting and manipulating result/outcome
     
       - [`hook_outcome_construction`](outcome#standardese-outcome_v2_xxx::hooks::hook_outcome_construction\<T,U\>\(T*,U&&\)) &mdash; The default instantiation hook implementation called when a `outcome` is first created by conversion from one of its possible types. Does nothing.
@@ -73,7 +73,7 @@ weight = 20
   - ## Namespace `outcome_v2_xxx::policy`
     
     <a id="standardese-outcome_v2_xxx::policy"></a>
-    
+
     Namespace for policies
     
       - [`all_narrow`](policies/all_narrow#standardese-outcome_v2_xxx::policy::all_narrow) &mdash; Policy which treats wide checks as narrow checks.
@@ -97,7 +97,7 @@ weight = 20
   - ## Namespace `outcome_v2_xxx::trait`
     
     <a id="standardese-outcome_v2_xxx::trait"></a>
-    
+
     Namespace for traits
     
       - [`has_error_code`](success_failure#standardese-outcome_v2_xxx::trait::has_error_code\<T\>) &mdash; Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
@@ -111,7 +111,7 @@ weight = 20
   - ## Namespace `outcome_v2_xxx`
     
     <a id="standardese-outcome_v2_xxx"></a>
-    
+
       - [`bad_outcome_access`](bad_access#standardese-outcome_v2_xxx::bad_outcome_access) &mdash; Thrown when you try to access state in a `outcome<T, EC, E>` which isn’t present.
     
       - [`bad_result_access`](bad_access#standardese-outcome_v2_xxx::bad_result_access) &mdash; Thrown when you try to access state in a `result<R, S>` which isn’t present.
