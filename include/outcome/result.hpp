@@ -201,7 +201,7 @@ observed using the member functions `.error()` and `.assume_error()`.
 
   1. If `.value()` called when there is no `value_type` but there is an `error_type`:
     - If `trait::has_error_code_v<S>` is true,
-    then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}} \endverbatim]
+    then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}} \end]
     - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))` [`policy::exception_ptr_rethrow<R, S, void>`]
     - If `S` is `void`, call `std::terminate()` [`policy::terminate`]
     - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]

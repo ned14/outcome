@@ -109,24 +109,24 @@ subprocess.check_call(args)
 docs = {}
 for item in os.listdir('.'):
     if item.startswith('doc_'):
-        if items[item] is None: continue
-        doc = os.path.join(section(item), item[4:])
-        with open(doc, 'wt') as oh:
-            with open(item, 'rt') as ih:
-                oh.write(r'''+++
+        if items[item] is not None:
+            doc = os.path.join(section(item), item[4:])
+            with open(doc, 'wt') as oh:
+                with open(item, 'rt') as ih:
+                    oh.write(r'''+++
 title = "''' + title(item) + r'''"
 weight = ''' + weight(item) + r'''
 +++
 ''')
-                contents = ih.read()
-                contents = contents.replace(item, '')
-                for replacement in replacements:
-                    s = section(item)
-                    r = replacements[replacement]
-                    if s: r = r[len(s)+1:]
-                    contents = contents.replace(replacement, r)
-                oh.write(contents)
-        docs[item] = doc
+                    contents = ih.read()
+                    contents = contents.replace(item, '')
+                    for replacement in replacements:
+                        s = section(item)
+                        r = replacements[replacement]
+                        if s: r = r[len(s)+1:]
+                        contents = contents.replace(replacement, r)
+                    oh.write(contents)
+            docs[item] = doc
         os.remove(item)
 # Write an index
 with open('_index.md', 'wt') as oh:

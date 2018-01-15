@@ -316,7 +316,7 @@ Any `R` (`value_type`) state can be observed using the member functions `.value(
 
 <!-- end list -->
 
-  - If `trait::has_error_code_v<S>` is true, then `throw std::system_error(error()|make_error_code(error()))` \[{{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}}verbatim\]
+  - If `trait::has_error_code_v<S>` is true, then `throw std::system_error(error()|make_error_code(error()))` \[{{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}}\]
 
   - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))` \[`policy::exception_ptr_rethrow<R, S, void>`\]
 

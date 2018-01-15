@@ -156,7 +156,7 @@ weight = 20
     
       - [`success_type`](success_failure#standardese-outcome_v2_xxx::success_type\<T\>) &mdash; Type sugar for implicitly constructing a `result<>` with a successful state.
     
-      - [`swap`](outcome#standardese-outcome_v2_xxx::swap\<R,S,P,N\>\(outcome\<R,S,P,N\>&,outcome\<R,S,P,N\>&\)) &mdash; Specialise swap for outcome.
+      - [`swap`](result#standardese-outcome_v2_xxx::swap\<R,S,P\>\(result\<R,S,P\>&,result\<R,S,P\>&\)) &mdash; Specialise swap for result.
     
       - [`try_operation_return_as`](try#standardese-outcome_v2_xxx::try_operation_return_as\<T\>\(T&&\)) &mdash; Customisation point for changing what the `OUTCOME_TRY` macros do. This function defaults to returning `std::forward<T>(v).as_failure()`.
     
