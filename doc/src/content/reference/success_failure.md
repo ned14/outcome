@@ -6,7 +6,7 @@ weight = 40
 
 <a id="standardese-success_failure.hpp"></a><pre><code class="standardese-language-cpp"><span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
 <span class="pun">{</span>
-    <span class="kwd">namespace</span> <a href="standardese_entities.md#standardese-outcome_v2_xxx::policy"><span class="typ dec var fun">policy</span></a>
+    <span class="kwd">namespace</span> <span class="typ dec var fun">policy</span>
     <span class="pun">{</span>
         <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">&gt;</span>
         <span class="kwd">constexpr</span> <span class="kwd">auto</span> <a href="#standardese-outcome_v2_xxx::policy::error_code%3CT%3E(T&amp;&amp;)"><span class="typ dec var fun">error_code</span></a><span class="pun">(</span><span class="typ dec var fun">T</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>
@@ -18,7 +18,7 @@ weight = 40
         <span class="kwd">constexpr</span> <span class="kwd">void</span> <a href="#standardese-outcome_v2_xxx::policy::throw_as_system_error_with_payload%3CError%3E(Errorconst&amp;)"><span class="typ dec var fun">throw_as_system_error_with_payload</span></a><span class="pun">(</span><span class="typ dec var fun">Error</span> <span class="kwd">const</span><span class="pun">&amp;</span> <span class="typ dec var fun">error</span><span class="pun">)</span><span class="pun">;</span>
     <span class="pun">}</span>
 
-    <span class="kwd">namespace</span> <a href="standardese_entities.md#standardese-outcome_v2_xxx::trait"><span class="typ dec var fun">trait</span></a>
+    <span class="kwd">namespace</span> <span class="typ dec var fun">trait</span>
     <span class="pun">{</span>
         <span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">&gt;</span>
         <span class="kwd">struct</span> <a href="#standardese-outcome_v2_xxx::trait::has_error_code%3CT%3E"><span class="typ dec var fun">has_error_code</span></a><span class="pun">;</span>

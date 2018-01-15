@@ -6,7 +6,7 @@ weight = 60
 
 <a id="standardese-convert.hpp"></a><pre><code class="standardese-language-cpp"><span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
 <span class="pun">{</span>
-    <span class="kwd">namespace</span> <a href="standardese_entities.md#standardese-outcome_v2_xxx::convert"><span class="typ dec var fun">convert</span></a>
+    <span class="kwd">namespace</span> <span class="typ dec var fun">convert</span>
     <span class="pun">{</span>
         <span class="typ dec var fun">template</span> <span class="pun">&lt;</span><span class="typ dec var fun">class</span> <span class="kwd">U</span><span class="pun">&gt;</span><span class="typ dec var fun">static</span> <span class="typ dec var fun">constexpr</span> <span class="typ dec var fun">bool</span> <span class="kwd">ValueOrNone</span> <span class="pun">=</span> <span class="kwd">detail</span><span class="pun">::</span><span class="kwd">ValueOrNone</span><span class="pun">&lt;</span><span class="kwd">U</span><span class="pun">&gt;</span><span class="pun">;</span>
 
