@@ -277,7 +277,7 @@ Similarly to `result`, `NoValuePolicy` defaults to a policy selected according t
 
 <!-- end list -->
 
-  - If \\verbatim {{\<api “success\_failure/\#unexposed-entity-outcome-v2-xxx-trait-has-exception-ptr-v” “trait::has\_exception\_ptr\_v\<P\>” \>}} \\end is true, then `std::rethrow_exception(exception()|make_exception_ptr(exception()))` \[{{<api "policies/outcome_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, P>">}}\]
+  - If {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-exception-ptr-v" "trait::has_exception_ptr_v<P>" >}} is true, then `std::rethrow_exception(exception()|make_exception_ptr(exception()))` \[{{<api "policies/outcome_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, P>">}}\]
 
 <!-- end list -->
 
@@ -285,7 +285,7 @@ Similarly to `result`, `NoValuePolicy` defaults to a policy selected according t
 
 <!-- end list -->
 
-  - If \\verbatim {{\<api “success\_failure/\#unexposed-entity-outcome-v2-xxx-trait-has-error-code-v” “trait::has\_error\_code\_v\<S\>” \>}} \\end is true, then `throw std::system_error(error()|make_error_code(error()))` \[{{<api "policies/outcome_error_code_throw_as_system_error/" "policy::error_code_throw_as_system_error<S>">}}\]
+  - If {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-error-code-v" "trait::has_error_code_v<S>" >}} is true, then `throw std::system_error(error()|make_error_code(error()))` \[{{<api "policies/outcome_error_code_throw_as_system_error/" "policy::error_code_throw_as_system_error<S>">}}\]
 
   - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))` \[{{<api "policies/result_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, void>">}}\]
 
@@ -1019,7 +1019,7 @@ Returns this outcome as a `failure_type` with any errored and/or excepted state 
 
 True if the result is equal to the outcome
 
-*Effects:* Calls `b == a`.
+*Remarks:* Implemented as `b == a`.
 
 *Requires:* That the expression `b == a` is a valid expression.
 
@@ -1040,7 +1040,7 @@ True if the result is equal to the outcome
 
 True if the result is not equal to the outcome
 
-*Effects:* Calls `b != a`.
+*Remarks:* Implemented as `b != a`.
 
 *Requires:* That the expression `b != a` is a valid expression.
 

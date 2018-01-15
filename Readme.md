@@ -50,6 +50,8 @@ On Windows, simply download the raw file from above and place it wherever it sui
  - [ ] Freshen list of tests in Boost edition
  - [ ] Test with AFIO before code freeze
  - [ ] Check all files in Boost edition have licence boilerplate (issue #38)
+ - [ ] Disable develop to master branch merging
+ - [ ] Disable documentation updates by Travis
 
 # Changes since v1:
 
