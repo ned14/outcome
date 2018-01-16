@@ -4,7 +4,8 @@ weight = 50
 +++
 # Header file `utils.hpp`
 
-<a id="standardese-utils.hpp"></a>
+<a id="standardese-utils.hpp" style="display: none"></a>
+
 <pre><code class="standardese-language-cpp"><span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
 <span class="pun">{</span>
     <span class="typ dec var fun">std::error_code</span> <a href="#standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code)"><span class="typ dec var fun">error_from_exception</span></a><span class="pun">(</span><span class="typ dec var fun">std::exception_ptr</span><span class="pun">&amp;&amp;</span> <a href="#standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code).ep"><span class="typ dec var fun">ep</span></a> <span class="pun">=</span> <span class="kwd">std</span><span class="pun">::</span><span class="kwd">current_exception</span><span class="pun">(</span><span class="pun">,</span> <span class="typ dec var fun">std::error_code</span> <a href="#standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code).not_matched"><span class="typ dec var fun">not_matched</span></a> <span class="pun">=</span> <span class="kwd">std</span><span class="pun">::</span><span class="kwd">make_error_code</span><span class="pun">(</span><span class="kwd">std</span><span class="pun">::</span><span class="kwd">errc</span><span class="pun">::</span><span class="kwd">resource_unavailable_try_again</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
@@ -13,11 +14,12 @@ weight = 50
 <span class="pun">}</span>
 </code></pre>
 
-<a id="standardese-outcome_v2_xxx"></a>
+<a id="standardese-outcome_v2_xxx" style="display: none"></a>
 
 ### Function `outcome_v2_xxx::error_from_exception`
 
-<a id="standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code)"></a>
+<a id="standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code)" style="display: none"></a>
+
 <pre><code class="standardese-language-cpp"><span class="typ dec var fun">std::error_code</span> <span class="typ dec var fun">error_from_exception</span><span class="pun">(</span><span class="typ dec var fun">std::exception_ptr</span><span class="pun">&amp;&amp;</span> <a href="#standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code).ep"><span class="typ dec var fun">ep</span></a> <span class="pun">=</span> <span class="kwd">std</span><span class="pun">::</span><span class="kwd">current_exception</span><span class="pun">(</span><span class="pun">,</span> <span class="typ dec var fun">std::error_code</span> <a href="#standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code).not_matched"><span class="typ dec var fun">not_matched</span></a> <span class="pun">=</span> <span class="kwd">std</span><span class="pun">::</span><span class="kwd">make_error_code</span><span class="pun">(</span><span class="kwd">std</span><span class="pun">::</span><span class="kwd">errc</span><span class="pun">::</span><span class="kwd">resource_unavailable_try_again</span><span class="pun">)</span> <span class="kwd">noexcept</span><span class="pun">;</span>
 </code></pre>
 
@@ -31,7 +33,8 @@ Utility function which tries to match the exception in the pointer provided to a
 
 ### Parameter `not_matched`
 
-<a id="standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code).not_matched"></a>
+<a id="standardese-outcome_v2_xxx::error_from_exception(std::exception_ptr&amp;&amp;,std::error_code).not_matched" style="display: none"></a>
+
 <pre><code class="standardese-language-cpp"><span class="typ dec var fun">std::error_code</span> <span class="typ dec var fun">not_matched</span> <span class="pun">=</span> <span class="kwd">std</span><span class="pun">::</span><span class="kwd">make_error_code</span><span class="pun">(</span><span class="kwd">std</span><span class="pun">::</span><span class="kwd">errc</span><span class="pun">::</span><span class="kwd">resource_unavailable_try_again</span></code></pre>
 
 The error code to return if we could not match the exception.
@@ -44,7 +47,8 @@ Note that a null pointer in returns a null error code.
 
 ### Function `outcome_v2_xxx::try_throw_std_exception_from_error`
 
-<a id="standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code,std::stringconst&amp;)"></a>
+<a id="standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code,std::stringconst&amp;)" style="display: none"></a>
+
 <pre><code class="standardese-language-cpp"><span class="kwd">void</span> <span class="typ dec var fun">try_throw_std_exception_from_error</span><span class="pun">(</span><span class="typ dec var fun">std::error_code</span> <a href="#standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code,std::stringconst&amp;).ec"><span class="typ dec var fun">ec</span></a><span class="pun">,</span> <span class="typ dec var fun">std::string</span> <span class="kwd">const</span><span class="pun">&amp;</span> <a href="#standardese-outcome_v2_xxx::try_throw_std_exception_from_error(std::error_code,std::stringconst&amp;).msg"><span class="typ dec var fun">msg</span></a> <span class="pun">=</span> <span class="kwd">std</span><span class="pun">::</span><span class="kwd">string</span><span class="pun">{</span><span class="pun">)</span><span class="pun">;</span>
 </code></pre>
 
