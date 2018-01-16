@@ -5,7 +5,7 @@
 # Created: Dec 2017
 
 from __future__ import print_function
-import os, subprocess, shutil
+import os, subprocess, shutil, re
 
 items = {
     'doc_outcome.md' : ("outcome<R, S, P>", 10, ''),
@@ -52,6 +52,23 @@ def weight(item):
 
 def section(item):
     return items[item][2]
+    
+aref_re = re.compile(r'''<a href="(.*?)">(.*?)</a>''')
+def strip_arefs(content):
+    idx = 0
+    while True:
+        match = aref_re.search(content, idx)
+        if not match:
+            break
+        link = match.group(1)
+        if link[0] != '#':
+            if '#' in link:
+                link = link[:link.find('#')]
+            if link not in items:
+                print("Removing due to not existing", match.group(0))
+                content = content[:match.start(0)] + content[match.start(2):match.end(2)] + content[match.end(0):]
+        idx = match.start(0) + 1
+    return content
 
 def which(program):
     def is_exe(fpath):
@@ -109,24 +126,25 @@ subprocess.check_call(args)
 docs = {}
 for item in os.listdir('.'):
     if item.startswith('doc_'):
-        if items[item] is None: continue
-        doc = os.path.join(section(item), item[4:])
-        with open(doc, 'wt') as oh:
-            with open(item, 'rt') as ih:
-                oh.write(r'''+++
+        if items[item] is not None:
+            doc = os.path.join(section(item), item[4:])
+            with open(doc, 'wt') as oh:
+                with open(item, 'rt') as ih:
+                    oh.write(r'''+++
 title = "''' + title(item) + r'''"
 weight = ''' + weight(item) + r'''
 +++
 ''')
-                contents = ih.read()
-                contents = contents.replace(item, '')
-                for replacement in replacements:
-                    s = section(item)
-                    r = replacements[replacement]
-                    if s: r = r[len(s)+1:]
-                    contents = contents.replace(replacement, r)
-                oh.write(contents)
-        docs[item] = doc
+                    contents = ih.read()
+                    contents = contents.replace(item, '')
+                    contents = strip_arefs(contents)
+                    for replacement in replacements:
+                        s = section(item)
+                        r = replacements[replacement]
+                        if s: r = r[len(s)+1:]
+                        contents = contents.replace(replacement, r)
+                    oh.write(contents)
+            docs[item] = doc
         os.remove(item)
 # Write an index
 with open('_index.md', 'wt') as oh:
@@ -137,6 +155,7 @@ weight = 20
 +++
 ''')
         contents = ih.read()
+        contents = strip_arefs(contents)
         for replacement in replacements:
             r = replacements[replacement]
             contents = contents.replace(replacement, r)

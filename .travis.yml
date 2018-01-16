@@ -59,7 +59,7 @@ cache:
 before_install:
  - if [ "$__" = "Documentation" ]; then
      if [ ! -f "hugo_bin/hugo" ]; then
-       wget -O hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.29/hugo_0.29_Linux-64bit.tar.gz;
+       wget -O hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.32.4/hugo_0.32.4_Linux-64bit.tar.gz;
        mkdir hugo_bin;
        tar xf hugo.tar.gz -C hugo_bin;
      fi;

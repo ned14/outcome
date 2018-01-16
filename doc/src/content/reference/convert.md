@@ -5,10 +5,9 @@ weight = 60
 # Header file `convert.hpp`
 
 <a id="standardese-convert.hpp"></a>
-
 <pre><code class="standardese-language-cpp"><span class="kwd">namespace</span> <span class="typ dec var fun">outcome_v2_xxx</span>
 <span class="pun">{</span>
-    <span class="kwd">namespace</span> <a href="standardese_entities.md#standardese-outcome_v2_xxx::convert"><span class="typ dec var fun">convert</span></a>
+    <span class="kwd">namespace</span> <span class="typ dec var fun">convert</span>
     <span class="pun">{</span>
         <span class="typ dec var fun">template</span> <span class="pun">&lt;</span><span class="typ dec var fun">class</span> <span class="kwd">U</span><span class="pun">&gt;</span><span class="typ dec var fun">static</span> <span class="typ dec var fun">constexpr</span> <span class="typ dec var fun">bool</span> <span class="kwd">ValueOrNone</span> <span class="pun">=</span> <span class="kwd">detail</span><span class="pun">::</span><span class="kwd">ValueOrNone</span><span class="pun">&lt;</span><span class="kwd">U</span><span class="pun">&gt;</span><span class="pun">;</span>
 
@@ -27,7 +26,6 @@ weight = 60
 ### Struct `outcome_v2_xxx::convert::value_or_error`
 
 <a id="standardese-outcome_v2_xxx::convert::value_or_error&lt;T,U&gt;"></a>
-
 <pre><code class="standardese-language-cpp"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">T</span><span class="pun">,</span> <span class="kwd">class</span> <span class="typ dec var fun">U</span><span class="pun">&gt;</span>
 <span class="kwd">struct</span> <span class="typ dec var fun">value_or_error</span>
 <span class="pun">{</span>
@@ -47,7 +45,6 @@ You can partially or fully specialise this converter for your own user defined t
 ### Variable `enable_result_inputs`
 
 <a id="standardese-outcome_v2_xxx::convert::value_or_error&lt;T,U&gt;::enable_result_inputs"></a>
-
 <pre><code class="standardese-language-cpp"><span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">bool</span> <span class="kwd">const</span> <span class="typ dec var fun">enable_result_inputs</span><span class="pun">;</span>
 </code></pre>
 
@@ -58,7 +55,6 @@ False to indicate that this converter wants `result`/`outcome` to reject all oth
 ### Variable `enable_outcome_inputs`
 
 <a id="standardese-outcome_v2_xxx::convert::value_or_error&lt;T,U&gt;::enable_outcome_inputs"></a>
-
 <pre><code class="standardese-language-cpp"><span class="kwd">static</span> <span class="kwd">constexpr</span> <span class="kwd">bool</span> <span class="kwd">const</span> <span class="typ dec var fun">enable_outcome_inputs</span><span class="pun">;</span>
 </code></pre>
 
@@ -69,7 +65,6 @@ False to indicate that this converter wants `outcome` to reject all other `outco
 ### Function `operator()`
 
 <a id="standardese-outcome_v2_xxx::convert::value_or_error&lt;T,U&gt;::operator()&lt;X,&gt;(X&amp;&amp;)"></a>
-
 <pre><code class="standardese-language-cpp"><span class="kwd">template</span> <span class="pun">&lt;</span><span class="kwd">class</span> <span class="typ dec var fun">X</span><span class="pun">,</span> <span class="kwd">typename</span> <span class="pun">=</span> std::enable_if_t&lt;std::is_same&lt;U,std::decay_t&lt;X&gt;&gt;::value&amp;&amp;ValueOrError&lt;U&gt;&amp;&amp;(std::is_void&lt;typename std::decay_t&lt;X&gt;::value_type&gt;::value||outcome_v2_xxx::detail::is_explicitly_constructible&lt;typename T::value_type,typename std::decay_t&lt;X&gt;::value_type&gt;)&amp;&amp;(std::is_void&lt;typename std::decay_t&lt;X&gt;::error_type&gt;::value||outcome_v2_xxx::detail::is_explicitly_constructible&lt;typename T::error_type,typename std::decay_t&lt;X&gt;::error_type&gt;)&gt;<span class="pun">&gt;</span>
 <span class="kwd">constexpr</span> <span class="typ dec var fun">T</span> <span class="typ dec var fun">operator()</span><span class="pun">(</span><span class="typ dec var fun">X</span><span class="pun">&amp;&amp;</span> <span class="typ dec var fun">v</span><span class="pun">)</span><span class="pun">;</span>
 </code></pre>

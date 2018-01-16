@@ -41,12 +41,16 @@ project
     [ run tests/issue0059.cpp ]
     [ run tests/issue0061.cpp ]
     [ run tests/issue0064.cpp ]
+    [ run tests/issue0065.cpp ]
+    [ run tests/issue0071.cpp ]
+    [ run tests/issue0095.cpp ]
     [ run tests/noexcept-propagation.cpp ]
     [ run tests/propagate.cpp ]
     [ run tests/serialisation.cpp ]
     [ run tests/success-failure.cpp ]
     [ run tests/swap.cpp ]
     [ run tests/udts.cpp ]
+    [ run tests/value-or-error.cpp ]
 
     [ run expected-pass.cpp ]
 

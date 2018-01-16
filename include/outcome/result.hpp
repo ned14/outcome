@@ -199,16 +199,17 @@ observed using the member functions `.error()` and `.assume_error()`.
 
 `NoValuePolicy` defaults to a policy selected according to the characteristics of type `S`:
 
-  1. If `.value()` called when there is no `value_type` but there is an `error_type`:
-    - If `trait::has_error_code_v<S>` is true,
-    then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}} \endverbatim]
-    - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))` [`policy::exception_ptr_rethrow<R, S, void>`]
-    - If `S` is `void`, call `std::terminate()` [`policy::terminate`]
-    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
-  2. If `.error()` called when there is no `error_type`:
-    - If `trait::has_error_code_v<S>`, or if `trait::has_exception_ptr_v<S>`,
-    or if `S` is `void`, do `throw bad_result_access()`
-    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
+1. If `.value()` called when there is no `value_type` but there is an `error_type`:
+  - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-error-code-v" "trait::has_error_code_v<S>">}} \end is true,
+  then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}} \end]
+  - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-exception-ptr-v" "trait::has_exception_ptr_v<S>">}} \end, then `std::rethrow_exception(error()|make_exception_ptr(error()))`
+  [\verbatim {{<api "policies/result_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, void>">}} \end]
+  - If `S` is `void`, call `std::terminate()` [\verbatim {{<api "policies/terminate/" "policy::terminate">}} \end]
+  - If `S` is none of the above, then it is undefined behaviour [\verbatim {{<api "policies/all_narrow/" "policy::all_narrow">}} \end]
+2. If `.error()` called when there is no `error_type`:
+  - If `trait::has_error_code_v<S>`, or if `trait::has_exception_ptr_v<S>`,
+  or if `S` is `void`, do `throw bad_result_access()`
+  - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
 template <class R, class S, class NoValuePolicy>                                                                                                                        //
 #if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                 // GCC's constraints implementation is buggy
