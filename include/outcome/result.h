@@ -62,7 +62,7 @@ struct cxx_error_code
 //! True if a result struct has a valid value
 #define CXX_RESULT_HAS_VALUE(r) (((r).flags & 1) == 1)
 //! True if a result struct has a valid error
-#define CXX_RESULT_HAS_ERROR(r) (((r).flags & 1) == 0)
+#define CXX_RESULT_HAS_ERROR(r) (((r).flags & 2) == 2)
 //! True if a result struct's `error` or `code` is an `errno` domain code suitable for setting `errno` with.
 #define CXX_RESULT_ERROR_IS_ERRNO(r) (((r).flags & (1 << 4)) == (1 << 4))
 //! C11 generic selecting a result struct's `error` or `code` integer member.

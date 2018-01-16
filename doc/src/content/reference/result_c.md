@@ -4,7 +4,7 @@ weight = 90
 +++
 # Header file `result_c`
 
-<a id="standardese-result.h" style="display: none"></a>
+<a id="standardese-result-h" style="display: none"></a>
 
 <pre><code class="standardese-language-cpp"><span class="kwd">struct</span> <a href="#standardese-cxx_error_code"><span class="typ dec var fun">cxx_error_code</span></a><span class="pun">;</span>
 
@@ -102,7 +102,7 @@ True if a result struct has a valid value
 
 <a id="standardese-CXX_RESULT_HAS_ERROR" style="display: none"></a>
 
-<pre><code class="standardese-language-cpp"><span class="pre">#define</span> <span class="typ dec var fun">CXX_RESULT_HAS_ERROR</span><span class="pre">(</span><span class="pre">r</span><span class="pre">)</span> <span class="pre">(((r).flags &amp; 1) == 0)</span>
+<pre><code class="standardese-language-cpp"><span class="pre">#define</span> <span class="typ dec var fun">CXX_RESULT_HAS_ERROR</span><span class="pre">(</span><span class="pre">r</span><span class="pre">)</span> <span class="pre">(((r).flags &amp; 2) == 2)</span>
 </code></pre>
 
 True if a result struct has a valid error
