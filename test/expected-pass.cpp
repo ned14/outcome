@@ -213,7 +213,7 @@ struct Oracle
       , val(o.val)
   {
   }
-  Oracle(Oracle &&o) noexcept : s(sMoveConstructed), val(o.val) { o.s = sMovedFrom; }
+  Oracle(Oracle &&o) noexcept : s(sMoveConstructed), val(std::move(o.val)) { o.s = sMovedFrom; }  // NOLINT
 
   Oracle &operator=(const OracleVal &v)
   {
@@ -224,7 +224,7 @@ struct Oracle
   Oracle &operator=(OracleVal &&v) noexcept
   {
     s = sValueMoveConstructed;
-    val = v;
+    val = std::move(v);  // NOLINT
     v.s = sMovedFrom;
     return *this;
   }
@@ -237,7 +237,7 @@ struct Oracle
   Oracle &operator=(Oracle &&o) noexcept
   {
     s = sMoveConstructed;
-    val = o.val;
+    val = std::move(o.val);  // NOLINT
     o.s = sMovedFrom;
     return *this;
   }
@@ -440,7 +440,7 @@ void expected_from_cnv_value()
   BOOST_TEST_EQ(e.value().s, sValueCopyConstructed);
   BOOST_TEST_EQ(v.s, sValueConstructed);
 
-  expected_sc<Oracle> e2(v);
+  expected_sc<Oracle> e2(std::move(v));  // NOLINT
   // BOOST_REQUIRE_NO_THROW(e2.value());
   BOOST_TEST(!!e2);
   BOOST_TEST(e2.has_value());
@@ -501,7 +501,7 @@ void expected_from_in_place_value()
   BOOST_TEST_EQ(e.value().s, sValueCopyConstructed);
   BOOST_TEST_EQ(v.s, sValueConstructed);
 
-  expected_sc<Oracle> e2{stde::in_place, v};
+  expected_sc<Oracle> e2{stde::in_place, std::move(v)};  // NOLINT
   // BOOST_REQUIRE_NO_THROW(e2.value());
   BOOST_TEST(!!e2);
   BOOST_TEST(e2.has_value());
