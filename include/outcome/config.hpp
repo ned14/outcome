@@ -148,8 +148,8 @@ exported Outcome v2 namespace.
 #elif !defined(__ANDROID__)
 #include <execinfo.h>
 #endif
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 OUTCOME_V2_NAMESPACE_BEGIN
 namespace detail
 {
@@ -162,16 +162,16 @@ namespace detail
     fprintf(stderr, "FATAL: Outcome throws exception %s with exceptions disabled\n", expr);
 #if !defined(__ANDROID__)
     char **bts = backtrace_symbols(bt, btlen);
-    if(bts)
+    if(bts != nullptr)
     {
-      for(size_t n = 0; n < btlen; n++)
-        fprintf(stderr, "  %s\n", bts[n]);
-      free(bts);
+      for(size_t n = 0; n < btlen; n++) {
+        fprintf(stderr, "  %s\n", bts[n]); }
+      free(bts);  // NOLINT
     }
 #endif
     abort();
   }
-}
+}  // namespace detail
 OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_THROW_EXCEPTION(expr) OUTCOME_V2_NAMESPACE::detail::do_fatal_exit(#expr)
 

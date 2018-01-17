@@ -18,6 +18,8 @@
 
 #if !defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 7
 
+#include <utility>
+
 #include "../include/outcome/iostream_support.hpp"
 #include "../include/outcome/result.hpp"
 
@@ -81,7 +83,7 @@ namespace stde
       }
     };
     template <class T, class E> using select_expected_base = std::conditional_t<std::is_default_constructible<T>::value, enable_default_constructor<T, E>, expected_result<T, E>>;
-  }
+  }  // namespace detail
   template <class T, class E> class expected : public detail::select_expected_base<T, E>
   {
     static_assert(!std::is_same<T, E>::value, "T and E cannot be the same in this expected implementation");
@@ -102,8 +104,8 @@ namespace stde
     // Expected always accepts a T even if ambiguous
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_constructible<T, U>::value))
-    constexpr expected(U &&v)
-        : base{OUTCOME_V2_NAMESPACE::in_place_type<T>, std::forward<U>(v)}
+    constexpr expected(U &&v)  // NOLINT
+    : base{OUTCOME_V2_NAMESPACE::in_place_type<T>, std::forward<U>(v)}
     {
     }
 
@@ -144,25 +146,25 @@ namespace stde
 
   // Not actually part of the Expected proposal, but needed to pass the test
   template <typename T> using exception_or = expected<T, std::exception_ptr>;
-}
+}  // namespace stde
 
 template <class T> using expected_sc = stde::expected<T, std::error_code>;
 
 struct NoDefaultConstructible
 {
   NoDefaultConstructible() = delete;
-  NoDefaultConstructible(int) {}
+  NoDefaultConstructible(int /*unused*/) {}  // NOLINT
 };
 
 struct NoCopyConstructible
 {
-  NoCopyConstructible() {}
+  NoCopyConstructible() = default;
   NoCopyConstructible(NoCopyConstructible const &) = delete;
   NoCopyConstructible(NoCopyConstructible &&) noexcept = default;
 };
 struct NoMoveConstructible
 {
-  NoMoveConstructible() {}
+  NoMoveConstructible() = default;
   NoMoveConstructible(NoMoveConstructible const &) noexcept = default;
   NoMoveConstructible(NoMoveConstructible &&) = delete;
   NoMoveConstructible &operator=(NoMoveConstructible const &) noexcept = default;
@@ -186,36 +188,32 @@ enum State
 
 struct OracleVal
 {
-  State s;
+  State s{sValueConstructed};
   int i;
-  constexpr OracleVal(int i_ = 0)
-      : s(sValueConstructed)
-      , i(i_)
+  constexpr OracleVal(int i_ = 0)  // NOLINT
+  : i(i_)
   {
   }
 };
 
 struct Oracle
 {
-  State s;
+  State s{sDefaultConstructed};
   OracleVal val;
 
-  Oracle()
-      : s(sDefaultConstructed)
+  Oracle() {}
+  Oracle(const OracleVal &v)  // NOLINT
+  : s(sValueCopyConstructed),
+    val(v)
   {
   }
-  Oracle(const OracleVal &v)
-      : s(sValueCopyConstructed)
-      , val(v)
-  {
-  }
-  Oracle(OracleVal &&v) noexcept : s(sValueMoveConstructed), val(std::move(v)) { v.s = sMovedFrom; }
+  Oracle(OracleVal &&v) noexcept : s(sValueMoveConstructed), val(v) { v.s = sMovedFrom; }  // NOLINT
   Oracle(const Oracle &o)
       : s(sCopyConstructed)
       , val(o.val)
   {
   }
-  Oracle(Oracle &&o) noexcept : s(sMoveConstructed), val(std::move(o.val)) { o.s = sMovedFrom; }
+  Oracle(Oracle &&o) noexcept : s(sMoveConstructed), val(o.val) { o.s = sMovedFrom; }
 
   Oracle &operator=(const OracleVal &v)
   {
@@ -226,7 +224,7 @@ struct Oracle
   Oracle &operator=(OracleVal &&v) noexcept
   {
     s = sValueMoveConstructed;
-    val = std::move(v);
+    val = v;
     v.s = sMovedFrom;
     return *this;
   }
@@ -239,7 +237,7 @@ struct Oracle
   Oracle &operator=(Oracle &&o) noexcept
   {
     s = sMoveConstructed;
-    val = std::move(o.val);
+    val = o.val;
     o.s = sMovedFrom;
     return *this;
   }
@@ -248,9 +246,9 @@ struct Oracle
 struct Guard
 {
   std::string val;
-  Guard() {}
-  explicit Guard(std::string s, int = 0)
-      : val(s)
+  Guard() = default;
+  explicit Guard(std::string s, int /*unused*/ = 0)
+      : val(std::move(s))
   {
   }
   Guard(const Guard &) = delete;
@@ -272,7 +270,7 @@ struct Date
 {
   int i;
   Date() = delete;
-  Date(int i_) noexcept : i{i_} {}
+  Date(int i_) noexcept : i{i_} {}  // NOLINT
   Date(Date &&d) noexcept : i(d.i) { d.i = 0; }
   Date(const Date &) = delete;
   Date &operator=(const Date &) = delete;
@@ -288,8 +286,8 @@ struct TExcept
 {
   int i;
   TExcept() = delete;
-  TExcept(int i_)
-      : i{i_}
+  TExcept(int i_)  // NOLINT
+  : i{i_}
   {
   }
   TExcept(TExcept &&d)
@@ -311,9 +309,9 @@ template <class T> struct MoveAware
 {
   T val;
   bool moved;
-  MoveAware(T val_)
-      : val(val_)
-      , moved(false)
+  MoveAware(T val_)  // NOLINT
+  : val(val_),
+    moved(false)
   {
   }
   MoveAware(MoveAware const &) = delete;
@@ -335,7 +333,7 @@ template <class T> struct MoveAware
 
 struct OverloadedAddressOf
 {
-  OverloadedAddressOf() {}
+  OverloadedAddressOf() = default;
   OverloadedAddressOf *operator&() const { return nullptr; }
 };
 
@@ -442,7 +440,7 @@ void expected_from_cnv_value()
   BOOST_TEST_EQ(e.value().s, sValueCopyConstructed);
   BOOST_TEST_EQ(v.s, sValueConstructed);
 
-  expected_sc<Oracle> e2(std::move(v));
+  expected_sc<Oracle> e2(v);
   // BOOST_REQUIRE_NO_THROW(e2.value());
   BOOST_TEST(!!e2);
   BOOST_TEST(e2.has_value());
@@ -453,7 +451,7 @@ void expected_from_cnv_value()
 
 struct NDCE  // no default constructor
 {            // (no default date exists)
-  explicit NDCE(int) {}
+  explicit NDCE(int /*unused*/) {}
 };
 
 void except_constructor_NDCE()
@@ -461,9 +459,9 @@ void except_constructor_NDCE()
   expected_sc<NDCE> e{NDCE{1}};
   BOOST_TEST(e.has_value());
 }
-struct NDC  // no default constructor
-{           // (no default date exists)
-  NDC(int) {}
+struct NDC                // no default constructor
+{                         // (no default date exists)
+  NDC(int /*unused*/) {}  // NOLINT
 };
 
 void except_constructor_NDC()
@@ -503,7 +501,7 @@ void expected_from_in_place_value()
   BOOST_TEST_EQ(e.value().s, sValueCopyConstructed);
   BOOST_TEST_EQ(v.s, sValueConstructed);
 
-  expected_sc<Oracle> e2{stde::in_place, std::move(v)};
+  expected_sc<Oracle> e2{stde::in_place, v};
   // BOOST_REQUIRE_NO_THROW(e2.value());
   BOOST_TEST(!!e2);
   BOOST_TEST(e2.has_value());

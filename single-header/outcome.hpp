@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 823f9338705d64488d890c90a96e26cca85d869f
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-12 09:19:55 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 823f9338
+#define OUTCOME_PREVIOUS_COMMIT_REF ed56d2bd79ebc7c8ddd1fd203c2f0930c71472bf
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-16 21:48:37 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE ed56d2bd
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1811,8 +1811,8 @@ _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(l
 #elif !defined(__ANDROID__)
 #include <execinfo.h>
 #endif
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 OUTCOME_V2_NAMESPACE_BEGIN
 namespace detail
 {
@@ -1825,16 +1825,16 @@ namespace detail
     fprintf(stderr, "FATAL: Outcome throws exception %s with exceptions disabled\n", expr);
 #if !defined(__ANDROID__)
     char **bts = backtrace_symbols(bt, btlen);
-    if(bts)
+    if(bts != nullptr)
     {
-      for(size_t n = 0; n < btlen; n++)
-        fprintf(stderr, "  %s\n", bts[n]);
-      free(bts);
+      for(size_t n = 0; n < btlen; n++) {
+        fprintf(stderr, "  %s\n", bts[n]); }
+      free(bts); // NOLINT
     }
 #endif
     abort();
   }
-}
+} // namespace detail
 OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_THROW_EXCEPTION(expr) OUTCOME_V2_NAMESPACE::detail::do_fatal_exit(#expr)
 
@@ -2715,7 +2715,7 @@ namespace detail
     template <class T> struct is_nothrow_swappable<T, decltype(swap(ldeclval<T>(), ldeclval<T>()))> : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
     {
     };
-  }
+  } // namespace _is_nothrow_swappable
   template <class T> using is_nothrow_swappable = _is_nothrow_swappable::is_nothrow_swappable<T>;
 #endif
   OUTCOME_TEMPLATE(class T, class U)
@@ -3839,13 +3839,69 @@ namespace detail
 
     template <class T> constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_notequal(this->_error, o.error()); }
   };
-  //! Calls b == a
+  /*! True if the result is equal to the success type sugar.
+  \param a The success type sugar to compare.
+  \param b The result to compare.
+
+  \effects If a valid expression to do so, calls the `operator==` operation on the successful item returning true if equal. Otherwise returns false.
+  \remarks Implemented as `b == a`.
+  \throws Any exception the `operator==` operation might throw.
+  */
+
+
+
+
+
+
+
   template <class T, class U, class V, class W> constexpr inline bool operator==(const success_type<W> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
-  //! Calls b == a
+  /*! True if the result is equal to the failure type sugar.
+  \param a The failure type sugar to compare.
+  \param b The result to compare.
+
+  \effects If a valid expression to do so, calls the `operator==` operation on the failure item returning true if equal. Otherwise returns false.
+  \remarks Implemented as `b == a`.
+  \throws Any exception the `operator==` operation might throw.
+  */
+
+
+
+
+
+
+
   template <class T, class U, class V, class W> constexpr inline bool operator==(const failure_type<W, void> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
-  //! Calls b != a
+  /*! True if the result is not equal to the success type sugar.
+  \param a The success type sugar to compare.
+  \param b The result to compare.
+
+  \effects If a valid expression to do so, calls the `operator!=` operation on the successful item returning true if not equal. Otherwise returns false.
+  \remarks Implemented as `b != a`.
+  \throws Any exception the `operator!=` operation might throw.
+  */
+
+
+
+
+
+
+
   template <class T, class U, class V, class W> constexpr inline bool operator!=(const success_type<W> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
-  //! Calls b != a
+  /*! True if the result is not equal to the failure type sugar.
+  \param a The failure type sugar to compare.
+  \param b The result to compare.
+
+  \effects If a valid expression to do so, calls the `operator!=` operation on the failure item returning true if not equal. Otherwise returns false.
+  \remarks Implemented as `b != a`.
+  \throws Any exception the `operator!=` operation might throw.
+  */
+
+
+
+
+
+
+
   template <class T, class U, class V, class W> constexpr inline bool operator!=(const failure_type<W, void> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
 } // namespace detail
 
@@ -4173,7 +4229,7 @@ public:
   }
 };
 
-//! Thrown when you try to access a vlue in a `result<R, S>` which isn't present.
+//! Thrown when you try to access a value in a `result<R, S>` which isn't present.
 template <class S> class OUTCOME_SYMBOL_VISIBLE bad_result_access_with : public bad_result_access
 {
   S _error;
@@ -4771,17 +4827,19 @@ observed using the member functions `.error()` and `.assume_error()`.
 
 `NoValuePolicy` defaults to a policy selected according to the characteristics of type `S`:
 
-  1. If `.value()` called when there is no `value_type` but there is an `error_type`:
-    - If `trait::has_error_code_v<S>` is true,
-    then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}} \endverbatim]
-    - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))` [`policy::exception_ptr_rethrow<R, S, void>`]
-    - If `S` is `void`, call `std::terminate()` [`policy::terminate`]
-    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
-  2. If `.error()` called when there is no `error_type`:
-    - If `trait::has_error_code_v<S>`, or if `trait::has_exception_ptr_v<S>`,
-    or if `S` is `void`, do `throw bad_result_access()`
-    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
+1. If `.value()` called when there is no `value_type` but there is an `error_type`:
+  - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-error-code-v" "trait::has_error_code_v<S>">}} \end is true,
+  then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}} \end]
+  - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-exception-ptr-v" "trait::has_exception_ptr_v<S>">}} \end, then `std::rethrow_exception(error()|make_exception_ptr(error()))`
+  [\verbatim {{<api "policies/result_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, void>">}} \end]
+  - If `S` is `void`, call `std::terminate()` [\verbatim {{<api "policies/terminate/" "policy::terminate">}} \end]
+  - If `S` is none of the above, then it is undefined behaviour [\verbatim {{<api "policies/all_narrow/" "policy::all_narrow">}} \end]
+2. If `.error()` called when there is no `error_type`:
+  - If `trait::has_error_code_v<S>`, or if `trait::has_exception_ptr_v<S>`,
+  or if `S` is `void`, do `throw bad_result_access()`
+  - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
+
 
 
 
@@ -5444,7 +5502,7 @@ contract (i.e. undefined behaviour).
 
 template <class R, class S = std::error_code> using unchecked = result<R, S, policy::all_narrow>;
 
-/*! A "checked" edition of `result<T, E>` which does no special handling of specific `E` types at all.
+/*! A "checked" edition of `result<T, E>` which resembles fairly closely a `std::expected<T, E>`.
 Attempting to access `T` when there is an `E` results in `bad_result_access<E>` being thrown. Nothing else.
 
 Note that this approximates the proposed `expected<T, E>` up for standardisation, see the FAQ for more
@@ -5651,23 +5709,31 @@ over any `S` state, and it is possible to store `S + P` simultaneously such that
 
 Similarly to `result`, `NoValuePolicy` defaults to a policy selected according to the characteristics of types `S` and `P`:
 
-  1. If `.value()` called when there is no `value_type` but there is an `exception_type`:
-    - If `trait::has_exception_ptr_v<P>`, then `std::rethrow_exception(exception()|make_exception_ptr(exception()))` [`policy::exception_ptr_rethrow<R, S, P>`]
-  2. If `.value()` called when there is no `value_type` but there is an `error_type`:
-    - If `trait::has_error_code_v<S>` is true,
-    then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}} \endverbatim]
-    - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))` [`policy::exception_ptr_rethrow<R, S, void>`]
-    - If `S` is `void`, call `std::terminate()` [`policy::terminate`]
-    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
-  3. If `.exception()` called when there is no `exception_type`:
-    - If `trait::has_exception_ptr_v<P>`,
-    or if `P` is `void`, do `throw bad_outcome_access()`
-    - If `P` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
-  4. If `.error()` called when there is no `error_type`:
-    - If `trait::has_error_code_v<S>`, or if `trait::has_exception_ptr_v<S>`,
-    or if `S` is `void`, do `throw bad_outcome_access()`
-    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
+1. If `.value()` called when there is no `value_type` but there is an `exception_type`:
+  - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-exception-ptr-v" "trait::has_exception_ptr_v<P>" >}} \end is true,
+  then `std::rethrow_exception(exception()|make_exception_ptr(exception()))`
+  [\verbatim {{<api "policies/outcome_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, P>">}} \end]
+2. If `.value()` called when there is no `value_type` but there is an `error_type`:
+  - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-error-code-v" "trait::has_error_code_v<S>" >}} \end is true,
+  then `throw std::system_error(error()|make_error_code(error()))`
+  [\verbatim {{<api "policies/outcome_error_code_throw_as_system_error/" "policy::error_code_throw_as_system_error<S>">}} \end]
+  - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))`
+  [\verbatim {{<api "policies/result_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, void>">}} \end]
+  - If `S` is `void`, call `std::terminate()` [\verbatim {{<api "policies/terminate/" "policy::terminate">}} \end]
+  - If `S` is none of the above, then it is undefined behaviour [\verbatim {{<api "policies/all_narrow/" "policy::all_narrow">}} \end]
+3. If `.exception()` called when there is no `exception_type`:
+  - If `trait::has_exception_ptr_v<P>`,
+  or if `P` is `void`, do `throw bad_outcome_access()`
+  - If `P` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
+4. If `.error()` called when there is no `error_type`:
+  - If `trait::has_error_code_v<S>`, or if `trait::has_exception_ptr_v<S>`,
+  or if `S` is `void`, do `throw bad_outcome_access()`
+  - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
+
+
+
+
 
 
 
@@ -6677,7 +6743,7 @@ public:
 \param a The result to compare.
 \param b The outcome to compare.
 
-\effects Calls `b == a`.
+\remarks Implemented as `b == a`.
 \requires That the expression `b == a` is a valid expression.
 \throws Any exception that `b == a` might throw.
 */
@@ -6704,7 +6770,7 @@ noexcept(std::declval<outcome<R, S, P, N>>() == std::declval<result<T, U, V>>())
 \param a The result to compare.
 \param b The outcome to compare.
 
-\effects Calls `b != a`.
+\remarks Implemented as `b != a`.
 \requires That the expression `b != a` is a valid expression.
 \throws Any exception that `b != a` might throw.
 */

@@ -50,6 +50,7 @@ On Windows, simply download the raw file from above and place it wherever it sui
  - [x] Freshen list of tests in Boost edition
  - [x] Test with AFIO before code freeze
  - [x] Check all files in Boost edition have licence boilerplate (issue #38)
+ - [ ] Do clang-tidy pass until it's completely clean. Sigh.
  - [ ] Disable develop to master branch merging
  - [ ] Disable documentation updates by Travis
 
