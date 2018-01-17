@@ -178,13 +178,23 @@ private:
 
 public:
   //! Default constructor
-  constexpr success_type() = default;
+  success_type() = default;
   //! Copy constructor
-  constexpr success_type(const success_type &) = default;
+  success_type(const success_type &) = default;
   //! Move constructor
-  constexpr success_type(success_type &&) = default;
-  //! Initialising constructor
-  template <class U>
+  success_type(success_type &&) = default;  // NOLINT
+  //! Copy assignment
+  success_type &operator=(const success_type &) = default;
+  //! Move assignment
+  success_type &operator=(success_type &&) = default;  // NOLINT
+  //! Destructor
+  ~success_type() = default;
+  /*! Initialising constructor
+
+  \requires That `U` is not `success_type`.
+  */
+  OUTCOME_TEMPLATE(class U)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<success_type, std::decay_t<U>>::value))
   constexpr explicit success_type(U &&v)
       : _value(std::forward<U>(v))
   {
@@ -241,11 +251,17 @@ private:
 
 public:
   //! Default constructor
-  constexpr failure_type() = default;
+  failure_type() = default;
   //! Copy constructor
-  constexpr failure_type(const failure_type &) = default;
+  failure_type(const failure_type &) = default;
   //! Move constructor
-  constexpr failure_type(failure_type &&) = default;
+  failure_type(failure_type &&) = default;  // NOLINT
+  //! Copy assignment
+  failure_type &operator=(const failure_type &) = default;
+  //! Move assignment
+  failure_type &operator=(failure_type &&) = default;  // NOLINT
+  //! Destructor
+  ~failure_type() = default;
   //! Initialising constructor
   template <class U, class V>
   constexpr explicit failure_type(U &&u, V &&v)
@@ -293,13 +309,23 @@ private:
 
 public:
   //! Default constructor
-  constexpr failure_type() = default;
+  failure_type() = default;
   //! Copy constructor
-  constexpr failure_type(const failure_type &) = default;
+  failure_type(const failure_type &) = default;
   //! Move constructor
-  constexpr failure_type(failure_type &&) = default;
-  //! Initialising constructor
-  template <class U>
+  failure_type(failure_type &&) = default;  // NOLINT
+  //! Copy assignment
+  failure_type &operator=(const failure_type &) = default;
+  //! Move assignment
+  failure_type &operator=(failure_type &&) = default;  // NOLINT
+  //! Destructor
+  ~failure_type() = default;
+  /*! Initialising constructor
+
+ \requires That `U` is not `failure_type`.
+ */
+  OUTCOME_TEMPLATE(class U)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<U>>::value))
   constexpr explicit failure_type(U &&u)
       : _error(std::forward<U>(u))
   {
@@ -332,13 +358,23 @@ private:
 
 public:
   //! Default constructor
-  constexpr failure_type() = default;
+  failure_type() = default;
   //! Copy constructor
-  constexpr failure_type(const failure_type &) = default;
+  failure_type(const failure_type &) = default;
   //! Move constructor
-  constexpr failure_type(failure_type &&) = default;
-  //! Initialising constructor
-  template <class V>
+  failure_type(failure_type &&) = default;  // NOLINT
+  //! Copy assignment
+  failure_type &operator=(const failure_type &) = default;
+  //! Move assignment
+  failure_type &operator=(failure_type &&) = default;  // NOLINT
+  //! Destructor
+  ~failure_type() = default;
+  /*! Initialising constructor
+
+  \requires That `V` is not `failure_type`.
+  */
+  OUTCOME_TEMPLATE(class V)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<V>>::value))
   constexpr explicit failure_type(V &&v)
       : _exception(std::forward<V>(v))
   {

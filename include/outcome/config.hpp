@@ -157,15 +157,17 @@ namespace detail
   {
 #if !defined(__ANDROID__)
     void *bt[16];
-    size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0]));
+    size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0]));                                // NOLINT
 #endif
-    fprintf(stderr, "FATAL: Outcome throws exception %s with exceptions disabled\n", expr);
+    fprintf(stderr, "FATAL: Outcome throws exception %s with exceptions disabled\n", expr);  // NOLINT
 #if !defined(__ANDROID__)
-    char **bts = backtrace_symbols(bt, btlen);
+    char **bts = backtrace_symbols(bt, btlen);                                               // NOLINT
     if(bts != nullptr)
     {
-      for(size_t n = 0; n < btlen; n++) {
-        fprintf(stderr, "  %s\n", bts[n]); }
+      for(size_t n = 0; n < btlen; n++)
+      {
+        fprintf(stderr, "  %s\n", bts[n]);  // NOLINT
+      }
       free(bts);  // NOLINT
     }
 #endif
