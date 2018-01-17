@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF ca592532a1272b9c7d99a3c5ae830942d9d4f7a8
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-17 14:28:25 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE ca592532
+#define OUTCOME_PREVIOUS_COMMIT_REF f169631604d4696c02242d482ad9ae1b5a918ef2
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-17 15:13:11 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f1696316
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -2012,6 +2012,7 @@ private:
   value_type _value;
 
 public:
+  /// \output_section Default, copy/move constructors and assignment
   //! Default constructor
   success_type() = default;
   //! Copy constructor
@@ -2038,19 +2039,20 @@ public:
   {
   }
 
+  /// \output_section Observers
   /*! Access value.
   \returns Reference to the held `value_type` according to overload.
-  \group value
+  \group success_type_value
   */
 
 
 
   constexpr value_type &value() & { return _value; }
-  /// \group value
+  /// \group success_type_value
   constexpr const value_type &value() const & { return _value; }
-  /// \group value
+  /// \group success_type_value
   constexpr value_type &&value() && { return std::move(_value); }
-  /// \group value
+  /// \group success_type_value
   constexpr const value_type &&value() const && { return std::move(_value); }
 };
 /*! Type sugar for implicitly constructing a `result<>` with a successful state.
@@ -2097,6 +2099,7 @@ private:
   exception_type _exception;
 
 public:
+  /// \output_section Default, copy/move constructors and assignment
   //! Default constructor
   failure_type() = default;
   //! Copy constructor
@@ -2117,34 +2120,35 @@ public:
   {
   }
 
+  /// \output_section Observers
   /*! Access error.
   \returns Reference to the held `error_type` according to overload.
-  \group error
+  \group failure_type_error
   */
 
 
 
   constexpr error_type &error() & { return _error; }
-  /// \group error
+  /// \group failure_type_error
   constexpr const error_type &error() const & { return _error; }
-  /// \group error
+  /// \group failure_type_error
   constexpr error_type &&error() && { return std::move(_error); }
-  /// \group error
+  /// \group failure_type_error
   constexpr const error_type &&error() const && { return std::move(_error); }
 
   /*! Access exception.
   \returns Reference to the held `exception_type` according to overload.
-  \group exception
+  \group failure_type_exception
   */
 
 
 
   constexpr exception_type &exception() & { return _exception; }
-  /// \group exception
+  /// \group failure_type_exception
   constexpr const exception_type &exception() const & { return _exception; }
-  /// \group exception
+  /// \group failure_type_exception
   constexpr exception_type &&exception() && { return std::move(_exception); }
-  /// \group exception
+  /// \group failure_type_exception
   constexpr const exception_type &&exception() const && { return std::move(_exception); }
 };
 /*! Type sugar for implicitly constructing a `result<>` with a failure state of error code.
@@ -2162,6 +2166,7 @@ private:
   error_type _error;
 
 public:
+  /// \output_section Default, copy/move constructors and assignment
   //! Default constructor
   failure_type() = default;
   //! Copy constructor
@@ -2176,8 +2181,8 @@ public:
   ~failure_type() = default;
   /*! Initialising constructor
 
- \requires That `U` is not `failure_type`.
- */
+  \requires That `U` is not `failure_type`.
+  */
 
 
 
@@ -2188,19 +2193,20 @@ public:
   {
   }
 
+  /// \output_section Observers
   /*! Access error.
   \returns Reference to the held `error_type` according to overload.
-  \group error2
+  \group failure_type_error2
   */
 
 
 
   constexpr error_type &error() & { return _error; }
-  /// \group error2
+  /// \group failure_type_error2
   constexpr const error_type &error() const & { return _error; }
-  /// \group error2
+  /// \group failure_type_error2
   constexpr error_type &&error() && { return std::move(_error); }
-  /// \group error2
+  /// \group failure_type_error2
   constexpr const error_type &&error() const && { return std::move(_error); }
 };
 /*! Type sugar for implicitly constructing a `result<>` with a failure state of exception.
@@ -2218,6 +2224,7 @@ private:
   exception_type _exception;
 
 public:
+  /// \output_section Default, copy/move constructors and assignment
   //! Default constructor
   failure_type() = default;
   //! Copy constructor
@@ -2244,19 +2251,20 @@ public:
   {
   }
 
+  /// \output_section Observers
   /*! Access exception.
   \returns Reference to the held `exception_type` according to overload.
-  \group exception2
+  \group failure_type_exception2
   */
 
 
 
   constexpr exception_type &exception() & { return _exception; }
-  /// \group exception2
+  /// \group failure_type_exception2
   constexpr const exception_type &exception() const & { return _exception; }
-  /// \group exception2
+  /// \group failure_type_exception2
   constexpr exception_type &&exception() && { return std::move(_exception); }
-  /// \group exception2
+  /// \group failure_type_exception2
   constexpr const exception_type &&exception() const && { return std::move(_exception); }
 };
 /*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
@@ -3085,9 +3093,11 @@ namespace detail
 
     /// \output_section Synthesising state observers
     /*! Synthesise exception where possible.
+    \requires `trait::has_error_code_v<S>` and `trait::has_exception_ptr_v<P>` to be true, else it does not appear.
     \returns A synthesised exception type: if excepted, `exception()`; if errored, `std::make_exception_ptr(std::system_error(error()))`;
     otherwise a default constructed exception type.
     */
+
 
 
 
@@ -4875,16 +4885,16 @@ observed using the member functions `.error()` and `.assume_error()`.
 `NoValuePolicy` defaults to a policy selected according to the characteristics of type `S`:
 
 1. If `.value()` called when there is no `value_type` but there is an `error_type`:
-  - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-error-code-v" "trait::has_error_code_v<S>">}} \end is true,
-  then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}} \end]
-  - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-exception-ptr-v" "trait::has_exception_ptr_v<S>">}} \end, then `std::rethrow_exception(error()|make_exception_ptr(error()))`
-  [\verbatim {{<api "policies/result_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, void>">}} \end]
-  - If `S` is `void`, call `std::terminate()` [\verbatim {{<api "policies/terminate/" "policy::terminate">}} \end]
-  - If `S` is none of the above, then it is undefined behaviour [\verbatim {{<api "policies/all_narrow/" "policy::all_narrow">}} \end]
+   - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-error-code-v" "trait::has_error_code_v<S>">}} \end is true,
+then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<api "policies/result_error_code_throw_as_system_error" "policy::error_code_throw_as_system_error<S>">}} \end]
+   - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-exception-ptr-v" "trait::has_exception_ptr_v<S>">}} \end is true, then `std::rethrow_exception(error()|make_exception_ptr(error()))`
+[\verbatim {{<api "policies/result_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, void>">}} \end]
+   - If `S` is `void`, call `std::terminate()` [\verbatim {{<api "policies/terminate/" "policy::terminate">}} \end]
+   - If `S` is none of the above, then it is undefined behaviour [\verbatim {{<api "policies/all_narrow/" "policy::all_narrow">}} \end]
 2. If `.error()` called when there is no `error_type`:
-  - If `trait::has_error_code_v<S>`, or if `trait::has_exception_ptr_v<S>`,
-  or if `S` is `void`, do `throw bad_result_access()`
-  - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
+   - If `trait::has_error_code_v<S>`, or if `trait::has_exception_ptr_v<S>`,
+or if `S` is `void`, do `throw bad_result_access()`
+   - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
 
 
@@ -5757,25 +5767,25 @@ over any `S` state, and it is possible to store `S + P` simultaneously such that
 Similarly to `result`, `NoValuePolicy` defaults to a policy selected according to the characteristics of types `S` and `P`:
 
 1. If `.value()` called when there is no `value_type` but there is an `exception_type`:
-  - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-exception-ptr-v" "trait::has_exception_ptr_v<P>" >}} \end is true,
-  then `std::rethrow_exception(exception()|make_exception_ptr(exception()))`
-  [\verbatim {{<api "policies/outcome_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, P>">}} \end]
+   - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-exception-ptr-v" "trait::has_exception_ptr_v<P>" >}} \end is true,
+then `std::rethrow_exception(exception()|make_exception_ptr(exception()))`
+[\verbatim {{<api "policies/outcome_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, P>">}} \end]
 2. If `.value()` called when there is no `value_type` but there is an `error_type`:
-  - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-error-code-v" "trait::has_error_code_v<S>" >}} \end is true,
-  then `throw std::system_error(error()|make_error_code(error()))`
-  [\verbatim {{<api "policies/outcome_error_code_throw_as_system_error/" "policy::error_code_throw_as_system_error<S>">}} \end]
-  - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))`
-  [\verbatim {{<api "policies/result_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, void>">}} \end]
-  - If `S` is `void`, call `std::terminate()` [\verbatim {{<api "policies/terminate/" "policy::terminate">}} \end]
-  - If `S` is none of the above, then it is undefined behaviour [\verbatim {{<api "policies/all_narrow/" "policy::all_narrow">}} \end]
+   - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-error-code-v" "trait::has_error_code_v<S>" >}} \end is true,
+then `throw std::system_error(error()|make_error_code(error()))`
+[\verbatim {{<api "policies/outcome_error_code_throw_as_system_error/" "policy::error_code_throw_as_system_error<S>">}} \end]
+   - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))`
+[\verbatim {{<api "policies/result_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, void>">}} \end]
+   - If `S` is `void`, call `std::terminate()` [\verbatim {{<api "policies/terminate/" "policy::terminate">}} \end]
+   - If `S` is none of the above, then it is undefined behaviour [\verbatim {{<api "policies/all_narrow/" "policy::all_narrow">}} \end]
 3. If `.exception()` called when there is no `exception_type`:
-  - If `trait::has_exception_ptr_v<P>`,
-  or if `P` is `void`, do `throw bad_outcome_access()`
-  - If `P` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
+   - If `trait::has_exception_ptr_v<P>`,
+or if `P` is `void`, do `throw bad_outcome_access()`
+   - If `P` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 4. If `.error()` called when there is no `error_type`:
-  - If `trait::has_error_code_v<S>`, or if `trait::has_exception_ptr_v<S>`,
-  or if `S` is `void`, do `throw bad_outcome_access()`
-  - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
+   - If `trait::has_error_code_v<S>`, or if `trait::has_exception_ptr_v<S>`,
+or if `S` is `void`, do `throw bad_outcome_access()`
+   - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
 
 
@@ -5818,6 +5828,8 @@ Similarly to `result`, `NoValuePolicy` defaults to a policy selected according t
 template <class R, class S, class P, class NoValuePolicy> //
 OUTCOME_REQUIRES(detail::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value)) //
 class OUTCOME_NODISCARD outcome
+
+
 
 
 
@@ -7668,7 +7680,7 @@ failure by immediately returning that failure state immediately, else become the
 unwrapped value as an expression. This makes `OUTCOME_TRYX(expr)` an expression
 which can be used exactly like the `try` operator in other languages.
 
-**Note:** This macro makes use of a proprietary extension in GCC and clang and is not
+\remarks This macro makes use of a proprietary extension in GCC and clang and is not
 portable. The macro is not made available on unsupported compilers,
 so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 */

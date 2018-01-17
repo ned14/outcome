@@ -1,11 +1,13 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+#
 # Munges the output from Standardese to generate the reference API
 # docs in the Outcome website
 # (C) 2017 Niall Douglas http://www.nedprod.com/
 # Created: Dec 2017
 
 from __future__ import print_function
-import os, subprocess, shutil, re
+import os, subprocess, shutil, re, sys
 
 items = {
     'doc_outcome.md' : ("outcome<R, S, P>", 10, ''),
@@ -69,6 +71,33 @@ def strip_arefs(content):
                 content = content[:match.start(0)] + content[match.start(2):match.end(2)] + content[match.end(0):]
         idx = match.start(0) + 1
     return content
+    
+indented_span_re = re.compile(r'''( +)<span''')
+def strip_indent_before_spans(content):
+    while True:
+        match = re.search(indented_span_re, content)
+        if not match:
+            return content
+        spaces = match.group(1)
+        hardspaces = '&nbsp;'
+        for x in range(0, len(spaces) - 1):
+            hardspaces += '&nbsp;'
+        content = content[:match.start(1)] + hardspaces + content[match.end(1):]
+        
+def repair_verbatims(content):
+    if r'''\\verbatim''' not in content:
+        return content
+    while True:
+        idx1 = content.find(r'''\\verbatim''')
+        if idx1 == -1:
+            return content
+        idx2 = content.find(r'''\\end''', idx1)
+        so = content[idx1+10:idx2].lstrip().rstrip()
+        s = so.replace('\\', '')
+        s = s.replace(r'“', '"')
+        s = s.replace(r'”', '"')
+        content = content[:idx1] + s + content[idx2+4:]
+        print('Fixing up Standardese failure to expand \\verbatim:\n   ', so, '\n   ', s)
 
 def which(program):
     def is_exe(fpath):
@@ -137,6 +166,8 @@ weight = ''' + weight(item) + r'''
 ''')
                     contents = ih.read()
                     contents = contents.replace(item, '')
+                    contents = strip_indent_before_spans(contents)
+                    contents = repair_verbatims(contents)
                     contents = strip_arefs(contents)
                     for replacement in replacements:
                         s = section(item)
