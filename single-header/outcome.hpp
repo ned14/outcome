@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF ed56d2bd79ebc7c8ddd1fd203c2f0930c71472bf
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-16 21:48:37 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE ed56d2bd
+#define OUTCOME_PREVIOUS_COMMIT_REF 0374bf55bfa4a22da9f5becf965e62805078d0f6
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-17 09:10:38 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 0374bf55
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1820,15 +1820,17 @@ namespace detail
   {
 #if !defined(__ANDROID__)
     void *bt[16];
-    size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0]));
+    size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0])); // NOLINT
 #endif
-    fprintf(stderr, "FATAL: Outcome throws exception %s with exceptions disabled\n", expr);
+    fprintf(stderr, "FATAL: Outcome throws exception %s with exceptions disabled\n", expr); // NOLINT
 #if !defined(__ANDROID__)
-    char **bts = backtrace_symbols(bt, btlen);
+    char **bts = backtrace_symbols(bt, btlen); // NOLINT
     if(bts != nullptr)
     {
-      for(size_t n = 0; n < btlen; n++) {
-        fprintf(stderr, "  %s\n", bts[n]); }
+      for(size_t n = 0; n < btlen; n++)
+      {
+        fprintf(stderr, "  %s\n", bts[n]); // NOLINT
+      }
       free(bts); // NOLINT
     }
 #endif
@@ -2011,13 +2013,26 @@ private:
 
 public:
   //! Default constructor
-  constexpr success_type() = default;
+  success_type() = default;
   //! Copy constructor
-  constexpr success_type(const success_type &) = default;
+  success_type(const success_type &) = default;
   //! Move constructor
-  constexpr success_type(success_type &&) = default;
-  //! Initialising constructor
-  template <class U>
+  success_type(success_type &&) = default; // NOLINT
+  //! Copy assignment
+  success_type &operator=(const success_type &) = default;
+  //! Move assignment
+  success_type &operator=(success_type &&) = default; // NOLINT
+  //! Destructor
+  ~success_type() = default;
+  /*! Initialising constructor
+
+  \requires That `U` is not `success_type`.
+  */
+
+
+
+  OUTCOME_TEMPLATE(class U)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<success_type, std::decay_t<U>>::value))
   constexpr explicit success_type(U &&v)
       : _value(std::forward<U>(v))
   {
@@ -2083,11 +2098,17 @@ private:
 
 public:
   //! Default constructor
-  constexpr failure_type() = default;
+  failure_type() = default;
   //! Copy constructor
-  constexpr failure_type(const failure_type &) = default;
+  failure_type(const failure_type &) = default;
   //! Move constructor
-  constexpr failure_type(failure_type &&) = default;
+  failure_type(failure_type &&) = default; // NOLINT
+  //! Copy assignment
+  failure_type &operator=(const failure_type &) = default;
+  //! Move assignment
+  failure_type &operator=(failure_type &&) = default; // NOLINT
+  //! Destructor
+  ~failure_type() = default;
   //! Initialising constructor
   template <class U, class V>
   constexpr explicit failure_type(U &&u, V &&v)
@@ -2142,13 +2163,26 @@ private:
 
 public:
   //! Default constructor
-  constexpr failure_type() = default;
+  failure_type() = default;
   //! Copy constructor
-  constexpr failure_type(const failure_type &) = default;
+  failure_type(const failure_type &) = default;
   //! Move constructor
-  constexpr failure_type(failure_type &&) = default;
-  //! Initialising constructor
-  template <class U>
+  failure_type(failure_type &&) = default; // NOLINT
+  //! Copy assignment
+  failure_type &operator=(const failure_type &) = default;
+  //! Move assignment
+  failure_type &operator=(failure_type &&) = default; // NOLINT
+  //! Destructor
+  ~failure_type() = default;
+  /*! Initialising constructor
+
+ \requires That `U` is not `failure_type`.
+ */
+
+
+
+  OUTCOME_TEMPLATE(class U)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<U>>::value))
   constexpr explicit failure_type(U &&u)
       : _error(std::forward<U>(u))
   {
@@ -2185,13 +2219,26 @@ private:
 
 public:
   //! Default constructor
-  constexpr failure_type() = default;
+  failure_type() = default;
   //! Copy constructor
-  constexpr failure_type(const failure_type &) = default;
+  failure_type(const failure_type &) = default;
   //! Move constructor
-  constexpr failure_type(failure_type &&) = default;
-  //! Initialising constructor
-  template <class V>
+  failure_type(failure_type &&) = default; // NOLINT
+  //! Copy assignment
+  failure_type &operator=(const failure_type &) = default;
+  //! Move assignment
+  failure_type &operator=(failure_type &&) = default; // NOLINT
+  //! Destructor
+  ~failure_type() = default;
+  /*! Initialising constructor
+
+  \requires That `V` is not `failure_type`.
+  */
+
+
+
+  OUTCOME_TEMPLATE(class V)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<V>>::value))
   constexpr explicit failure_type(V &&v)
       : _exception(std::forward<V>(v))
   {
@@ -2333,10 +2380,10 @@ namespace detail
   };
 
   using status_bitfield_type = uint32_t;
-  static constexpr status_bitfield_type status_have_value = (1 << 0);
-  static constexpr status_bitfield_type status_have_error = (1 << 1);
-  static constexpr status_bitfield_type status_have_exception = (1 << 2);
-  static constexpr status_bitfield_type status_error_is_errno = (1 << 4); // can errno be set from this error?
+  static constexpr status_bitfield_type status_have_value = (1U << 0U);
+  static constexpr status_bitfield_type status_have_error = (1U << 1U);
+  static constexpr status_bitfield_type status_have_exception = (1U << 2U);
+  static constexpr status_bitfield_type status_error_is_errno = (1U << 4U); // can errno be set from this error?
   // bit 7 unused
   // bits 8-15 unused
   // bits 16-31 used for user supplied 16 bit value
@@ -2457,7 +2504,7 @@ namespace detail
     }
     template <class... Args>
     explicit value_storage_nontrivial(in_place_type_t<value_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
-        : _value(std::forward<Args>(args)...)
+        : _value(std::forward<Args>(args)...) // NOLINT
         , _status(status_have_value)
     {
     }
