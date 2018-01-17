@@ -23,7 +23,7 @@ if it does we want to communicate the failure reason.
 
 {{% snippet "using_result.cpp" "convert_decl" %}}
 
-Class template {{< api "result/#standardese-outcome_v2_xxx::result%3CR,S,NoValuePolicy%3E" "result<T, EC>" >}} has two template parameters. The first (`T`) represents the type of the object
+Class template {{< api "result/#standardese-outcome_v2_xxx__result-R-S-NoValuePolicy-" "result<T, EC>" >}} has two template parameters. The first (`T`) represents the type of the object
 returned from the function upon success; the second (`EC`) is the type of object containing information about the reason
 for failure when the function fails. A `result<T, EC>` object either stores a `T` or an `EC` at any given moment,
 and is therefore conceptually similar to `variant<T, EC>`. `EC` is defaulted to `std::error_code`.

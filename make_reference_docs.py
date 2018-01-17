@@ -56,7 +56,8 @@ def section(item):
     return items[item][2]
     
 aref_re = re.compile(r'''<a href="(.*?)">(.*?)</a>''')
-def strip_arefs(content):
+aref2_re = re.compile(r'''\[(.*)]\((.*)\)''')
+def strip_arefs(content, item):
     idx = 0
     while True:
         match = aref_re.search(content, idx)
@@ -66,9 +67,27 @@ def strip_arefs(content):
         if link[0] != '#':
             if '#' in link:
                 link = link[:link.find('#')]
-            if link not in items:
+            if link not in items or items[link] is None:
                 print("Removing due to not existing", match.group(0))
                 content = content[:match.start(0)] + content[match.start(2):match.end(2)] + content[match.end(0):]
+            else:
+                if items[item][2] != '' and items[link][2] == '':
+                    content = content[:match.start(1)] + '../../' + content[match.start(1):]
+                else:
+                    content = content[:match.start(1)] + '../' + content[match.start(1):]
+        idx = match.start(0) + 1
+    idx = 0
+    while True:
+        match = aref2_re.search(content, idx)
+        if not match:
+            break
+        link = match.group(2)
+        if link[0] != '#':
+            if '#' in link:
+                link = link[:link.find('#')]
+            if link not in items or items[link] is None:
+                print("Removing due to not existing", match.group(0))
+                content = content[:match.start(0)] + content[match.start(1):match.end(1)] + content[match.end(0):]
         idx = match.start(0) + 1
     return content
     
@@ -168,7 +187,7 @@ weight = ''' + weight(item) + r'''
                     contents = contents.replace(item, '')
                     contents = strip_indent_before_spans(contents)
                     contents = repair_verbatims(contents)
-                    contents = strip_arefs(contents)
+                    contents = strip_arefs(contents, item)
                     for replacement in replacements:
                         s = section(item)
                         r = replacements[replacement]
@@ -186,7 +205,7 @@ weight = 20
 +++
 ''')
         contents = ih.read()
-        contents = strip_arefs(contents)
+        contents = strip_arefs(contents, item)
         for replacement in replacements:
             r = replacements[replacement]
             contents = contents.replace(replacement, r)
