@@ -59,10 +59,10 @@ namespace detail
   };
 
   using status_bitfield_type = uint32_t;
-  static constexpr status_bitfield_type status_have_value = (1 << 0);
-  static constexpr status_bitfield_type status_have_error = (1 << 1);
-  static constexpr status_bitfield_type status_have_exception = (1 << 2);
-  static constexpr status_bitfield_type status_error_is_errno = (1 << 4);  // can errno be set from this error?
+  static constexpr status_bitfield_type status_have_value = (1U << 0U);
+  static constexpr status_bitfield_type status_have_error = (1U << 1U);
+  static constexpr status_bitfield_type status_have_exception = (1U << 2U);
+  static constexpr status_bitfield_type status_error_is_errno = (1U << 4U);  // can errno be set from this error?
   // bit 7 unused
   // bits 8-15 unused
   // bits 16-31 used for user supplied 16 bit value
@@ -183,7 +183,7 @@ namespace detail
     }
     template <class... Args>
     explicit value_storage_nontrivial(in_place_type_t<value_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
-        : _value(std::forward<Args>(args)...)
+        : _value(std::forward<Args>(args)...)  // NOLINT
         , _status(status_have_value)
     {
     }

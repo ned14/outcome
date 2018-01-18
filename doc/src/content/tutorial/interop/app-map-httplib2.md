@@ -3,7 +3,7 @@ title = "Mapping the HTTP library into the Application 2/2"
 weight = 35
 +++
 
-If you remember the tutorial section on the [`ValueOrError` Concept](../../value-or-error),
+If you remember the tutorial section on the [`ValueOrError` Concept](../value-or-error),
 this is an example of how to implement a custom `ValueOrError` Concept converter
 in Outcome:
 

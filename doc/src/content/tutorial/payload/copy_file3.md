@@ -6,7 +6,7 @@ tags = ["default-actions", "value"]
 +++
 
 Something not mentioned at all until now (and properly described in the next
-section, [Default actions](../default-actions/)) is that Outcome can be
+section, [Default actions](../../default-actions/)) is that Outcome can be
 programmed take various actions when the user tries to observe `.value()`
 when there is no value, and so on for the other possible state observations.
 

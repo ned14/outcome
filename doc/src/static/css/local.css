@@ -2,6 +2,9 @@ body {
   font-size: 105% !important;
   text-align: justify;
 }
+h2, h3, h4, h5, h6 {
+  text-align: left;
+}
 h2 {
   text-transform: none;
 }

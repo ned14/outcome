@@ -10,7 +10,7 @@ int main()
   using namespace OUTCOME_V2_NAMESPACE;
   struct udt
   {
-    explicit udt(int) {}
+    explicit udt(int /*unused*/) {}
   };
   // Must not be possible to implicitly initialise a result<udt>
   result<udt> m(5);

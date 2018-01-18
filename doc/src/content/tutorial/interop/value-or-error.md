@@ -7,9 +7,9 @@ tags = [ "value-or-error" ]
 Something not really mentioned until now is how Outcome interoperates with the proposed
 [`std::expected<T, E>`](https://wg21.link/P0323), whose design lands in between `outcome::unchecked<T, E>`
 and `outcome::checked<T, E>`, both of which are simplified aliases for `outcome::result<T, E>` [hard
-coding the `NoValuePolicy` to a fixed policy](../policies).
+coding the `NoValuePolicy` to a fixed policy](../../policies).
 
-Expected and Outcome are [isomorphic to one another in design intent](../../faq/#why-doesn-t-outcome-duplicate-std-expected-t-e-s-design), but interoperation
+Expected and Outcome are [isomorphic to one another in design intent](../../../faq/#why-doesn-t-outcome-duplicate-std-expected-t-e-s-design), but interoperation
 for code using Expected and Outcome ought to be seamless thanks to the proposed [`ValueOrError`
 concept framework](https://wg21.link/P0786), a subset of which Outcome implements.
 
