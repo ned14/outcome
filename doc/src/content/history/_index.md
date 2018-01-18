@@ -13,7 +13,8 @@ gantt
   title History of the Outcome library
   Outcome v1: done, des1, 2014-06,2017-05
   Boost peer review of v1: done, des2, after des1, 30d
-  Outcome v2: active, des3, after des2, 365d
+  Outcome v2 development: done, des3, after des2, 2018-01
+  Boost peer review of v2: active, des4, after des3, 30d
   section Events
   Separated from AFIO v1: crit, done, 2014-06,2d
   Boost.Expected added: crit, done, 2014-10,2d
@@ -115,8 +116,10 @@ had felt the basic proposed design fine.
 A period of maturation then followed by porting a large existing codebase using Outcome v1
 to v2, and writing a significant amount of new code using v2 to test it for unanticipated
 surprises and bugs. Quite a few corner cases were found and fixed. At the end of September
-2017, Outcome v2 was deemed to be "mature" and a script generated "Boost edition" made
-available. All that remained before it was ready for a second Boost peer review was the
-documentation. This took two months to write, and at the start of December 2017 Outcome
-reentered the Boost peer review queue.
+2017, Outcome v2 was deemed to be "mature", and a script generated "Boost edition" made
+available.
+
+All that remained before it was ready for a second Boost peer review was the
+documentation. This took four months to write (same time as to write the library itself!),
+and in January 2018 Outcome began its second, and hopefully final, Boost peer review.
 
