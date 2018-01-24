@@ -7,7 +7,8 @@ weight = 30
 These are the precanned policies built into Outcome:
 
 {{< api "policies/all_narrow" "all_narrow" >}}
-: Wide checks call their narrow check cousins only. Narrow checks
+: Wide checks call their narrow check cousins only. If there is an observation
+of a value/error/exception which is not present, the narrow checks
 call a function called `_ub()` which:
 
  1. Is marked with any compiler-specific markup to say it will never return,
