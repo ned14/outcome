@@ -17,7 +17,7 @@ The implementation will do the following: if the integral number can be represnt
 
 #1. You test if `result<>` object represents a successful operation with contextual conversion to `bool`.
 
-#2. Function `.value()` extracts the successfully returned `BigInt`.
+#2. Function `.value()` extracts the successfully returned `int`.
 
 #3. Function `.error()` allows you to inspect the error sub-object, representing information about the reason for failure.
 
@@ -25,7 +25,7 @@ The implementation will do the following: if the integral number can be represnt
 
 {{% snippet "using_result.cpp" "from_string" %}}
 
-   Our control statement means: if `fromString` returned failure, this same error information should be returned from `print_half`, even though the type of `result<>` is different. If `fromString` returned success, we create  variable `i` of type `int` with the value returned from `fromString`. If control goes to subsequent line, it means `fromString` succeeded and variable of type `int` is in scope.
+   Our control statement means: if `fromString` returned failure, this same error information should be returned from `print_half`, even though the type of `result<>` is different. If `fromString` returned success, we create  variable `i` of type `BigInt` with the value returned from `fromString`. If control goes to subsequent line, it means `fromString` succeeded and variable of type `BigInt` is in scope.
 
 #5. In the return statement we extract the error information and use it to initialize the return value from `print_half`. We could have written `return r.error();` instead,
     and it would have the same effect, but it would not work if we were using `outcome<>` instead of `result<>` -- this will be covered later.
