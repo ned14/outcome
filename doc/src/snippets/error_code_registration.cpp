@@ -13,7 +13,7 @@ enum class ConversionErrc
 
 namespace std
 {
-  // Tell the C++ 11 STL metaprogramming that enum MathError::valid_errors
+  // Tell the C++ 11 STL metaprogramming that enum ConversionErrc
   // is registered with the standard error code system
   template <> struct is_error_code_enum<ConversionErrc> : std::true_type
   {
