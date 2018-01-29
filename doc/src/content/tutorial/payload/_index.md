@@ -30,7 +30,7 @@ containing the cause of failure with accompanying context from the payload.
 set the exception ptr in the constructed `outcome` to a custom exception
 containing the cause of the failure with accompanying context from the payload.
 3. Transmit a stack backtrace specifying the exact point at which failure occurred,
-symbolising that into human readable text at the moment of conversion into human
+symbolising that backtrace into human readable text at the moment of conversion into human
 readable text.
 4. Upon a namespace-localised `result` from library A being copy/moved into a
 namespace-localised `result` from C bindings library B, set the C `errno` if

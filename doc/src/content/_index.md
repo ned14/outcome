@@ -49,7 +49,7 @@ will look like this:
 
 {{% snippet "intro_example.cpp" "implementation" %}}
 
-Each occurance of `OUTCOME_TRY` is a control statement. If the returned `result<T>` contains an error information, the function is immediately returned with `result<U>` containing the same error information; otherwise object of type `T` is move-constructed on the stack.
+Each occurance of `OUTCOME_TRY` is a control statement. If the returned `result<T>` contains error information, the function is immediately returned with `result<U>` containing the same error information; otherwise object of type `T` is move-constructed on the stack.
 
 {{% notice note %}}
 This is the v2 Outcome designed in response to feedback from a [Boost peer review held in
