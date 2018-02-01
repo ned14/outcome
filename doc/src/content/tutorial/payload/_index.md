@@ -6,7 +6,7 @@ tags = [ "payload", "has_error_code", "make_error_code" ]
 +++
 
 So far in this tutorial, type `EC` in `result<T, EC>` has always been a
-`std::error_code` (though it can be of any type you wish instead). `EC` need
+`std::error_code` (though it can be of any type you wish instead). `EC` needs
 in fact to merely satisfy
 {{< api "success_failure/#standardese-outcome_v2_xxx__trait__has_error_code-T-" "trait::has_error_code_v<EC>">}}
 for `EC` to be treated as if an `std::error_code`.

@@ -11,7 +11,7 @@ Suppose we will be writing a function `print_half` that takes an integer number 
 
 The type `result<void>` means that there is no value to be retuned upon success, but that the operation might still fail, and we may be interested in inspecting the cause of the failure. The class template `result<>` is declared with the attribute `[[nodiscard]]`, which means the compiler will warn you if you forget to inspect the returned object (in C++ 17 or later).
 
-The implementation will do the following: if the integral number can be represnted by an `int`, we will convert to `int` and use its arithmetical operations. If the number is too large, we will fall back to using a custom `BigInt` implementation that needs to allocate memory. In the implementation we will use the function `convert` defined in the previous section.
+The implementation will do the following: if the integral number can be represented by an `int`, we will convert to `int` and use its arithmetical operations. If the number is too large, we will fall back to using a custom `BigInt` implementation that needs to allocate memory. In the implementation we will use the function `convert` defined in the previous section.
 
 {{% snippet "using_result.cpp" "half_impl" %}}
 
