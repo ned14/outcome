@@ -10,7 +10,7 @@ Outcome is a header only C++ 14 library known to work on these compiler-platform
 - Visual Studio 2017 [Windows]
 - XCode 9 [MacOS]
 
-It is worth turning on C++ 17 if you can, there are many usability and performance improvements.
+It is worth turning on C++ 17 if you can, as there are many usability and performance improvements.
 If your compiler implements the Concepts TS, it is worth turning support on. Support is automatically
 detected and used.
 

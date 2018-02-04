@@ -55,7 +55,7 @@ On Windows, simply download the raw file from above and place it wherever it sui
  - [x] Disable documentation updates by Travis
  - [x] Fix all the broken links in the tutorial to the reference APIs
  - [x] Generate final gh-pages site using Linux, as Hugo on Windows makes borked output
- - [ ] Disable boost-outcome auto-generation
+ - [x] Disable boost-outcome auto-generation
 
 # Changes since v1:
 

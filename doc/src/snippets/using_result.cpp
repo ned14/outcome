@@ -116,14 +116,14 @@ outcome::result<void> print_half(const std::string& text)
 {
   if (outcome::result<int> r = convert(text))     // #1
   {
-    std::cout << (r.value() / 2) << std::endl;    // #2
+    std::cout << (r.value() / 2) << '\n';    // #2
   }
   else
   {
     if (r.error() == ConversionErrc::TooLong)     // #3 
     {
       OUTCOME_TRY (i, BigInt::fromString(text));  // #4
-      std::cout << i.half() << std::endl;
+      std::cout << i.half() << '\n';
     }
     else
     {
@@ -148,11 +148,11 @@ int main()
 {
   if (outcome::result<void> r = print_half("1299999999999999999999999999"))
   {
-    std::cout << "ok" << std::endl;
+    std::cout << "ok" << '\n';
   }
   else
   {
-    std::cout << r.error() << std::endl; 
+    std::cout << r.error() << '\n'; 
   }
   
   (void)test();

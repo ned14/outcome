@@ -5,10 +5,11 @@ weight = 30
 tags = [ "payload", "has_error_code", "make_error_code" ]
 +++
 
-So far, type `EC` in `result<T, EC>` has always been a `std::error_code`. But it need
+So far in this tutorial, type `EC` in `result<T, EC>` has always been a
+`std::error_code` (though it can be of any type you wish instead). `EC` needs
 in fact to merely satisfy
 {{< api "success_failure/#standardese-outcome_v2_xxx__trait__has_error_code-T-" "trait::has_error_code_v<EC>">}}
-for `EC` to be treated as a `std::error_code`.
+for `EC` to be treated as if an `std::error_code`.
 
 In turn, `trait::has_error_code_v<EC>` is true if there exists some ADL discovered free
 function:
@@ -29,7 +30,7 @@ containing the cause of failure with accompanying context from the payload.
 set the exception ptr in the constructed `outcome` to a custom exception
 containing the cause of the failure with accompanying context from the payload.
 3. Transmit a stack backtrace specifying the exact point at which failure occurred,
-symbolising that into human readable text at the moment of conversion into human
+symbolising that backtrace into human readable text at the moment of conversion into human
 readable text.
 4. Upon a namespace-localised `result` from library A being copy/moved into a
 namespace-localised `result` from C bindings library B, set the C `errno` if

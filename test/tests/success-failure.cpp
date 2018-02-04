@@ -24,6 +24,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/success_failure.hpp"
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
+#include <iostream>
+
 BOOST_OUTCOME_AUTO_TEST_CASE(works / success - failure, "Tests that the success and failure type sugars work as intended")
 {
   using namespace OUTCOME_V2_NAMESPACE;
