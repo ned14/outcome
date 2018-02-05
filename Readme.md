@@ -6,6 +6,20 @@ CTest dashboard: http://my.cdash.org/index.php?project=Boost.Outcome
 
 Documentation: https://ned14.github.io/outcome/
 
+
+## Purpose of this library
+
+Outcome is a C++14 library for reporting and handling function failures. It can be used as a substitute for, or a complement to, the exception handling mechanism.
+
+One use case is for contexts where using C++ exception handling is unsuitable for different reasons:
+
+ * The high relative cost of throwing and catching a C++ exception.
+ * Making some or all control paths explicitly detailed to aid code correctness auditing, as opposed to having hidden control paths caused by exceptions potentially thrown from any place.
+ * Company policy to compile with exceptions disabled.
+ * Maintaining a code base that was never designed with exception-safety in mind.
+ * Parts of the programs/frameworks that themselves implement exception handling and cannot afford to use exceptions, like propagating failure reports across threads, tasks, fibers…
+
+
 ## Usage as a single header file
 
 Outcome v2 comes in single header file form. This is regenerated per commit. To fetch
