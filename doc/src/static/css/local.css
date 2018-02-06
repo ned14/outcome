@@ -11,6 +11,7 @@ h2 {
 code, pre {
   background: none;
   border: none;
+  line-height: 1.5;
   text-align: left;
 }
 a code {
