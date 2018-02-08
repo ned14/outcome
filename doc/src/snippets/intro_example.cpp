@@ -1,52 +1,56 @@
 #include "../../../include/outcome.hpp"
-
+#include <string>
+using std::string;
 namespace outcome = OUTCOME_V2_NAMESPACE;
 
 struct string_view
 {
-    string_view(const char*) {}
+  string_view(const char*) {}
+  operator string() { return {}; }
 };
 
-struct Handle {};
-struct Buffer {};
+struct LibError : std::runtime_error
+{
+  explicit LibError(std::error_code, string_view s) : std::runtime_error(s) {}
+};
 
-void use_int(int) {}
-
-template <typename EC>
-  void report_error(EC) {}
+void use_string(string) {}
 
 //! [signature]
-auto read_int_from_file(string_view path) noexcept
-  -> outcome::result<int>;
+auto read_data_from_file(string_view path) noexcept
+  -> outcome::result<string>;
 //! [signature]
-
-//! [aux_signatures]
-auto open_file(string_view path) noexcept -> outcome::result<Handle>;
-auto read_data(Handle& h)        noexcept -> outcome::result<Buffer>;     
-auto parse(const Buffer& b)      noexcept -> outcome::result<int>;
-//! [aux_signatures]
-
-auto open_file(string_view) noexcept -> outcome::result<Handle> { return Handle{}; }
-auto read_data(Handle&)     noexcept -> outcome::result<Buffer> { return Buffer{}; }    
-auto parse(const Buffer&)   noexcept -> outcome::result<int>    { return int{}; }
 
 int main() {
 //! [inspect]
-if (auto rslt = read_int_from_file("config.cfg"))
-  use_int(rslt.value());
+if (auto rslt = read_data_from_file("config.cfg"))
+  use_string(rslt.value());                   // returns string
 else
-  report_error(rslt.error()); // returns std::error_code
+  throw LibError{rslt.error(), "config.cfg"}; // returns error_code
 //! [inspect]
 }
 
-
 //! [implementation]
-auto read_int_from_file(string_view path) noexcept
+auto process(const string& content) noexcept
+  -> outcome::result<int>;
+
+auto get_int_from_file(string_view path) noexcept
   -> outcome::result<int>
 {
-  OUTCOME_TRY(handle, open_file(path));    // decltype(handle) == Handle
-  OUTCOME_TRY(buffer, read_data(handle));  // decltype(buffer) == Buffer
-  OUTCOME_TRY(val, parse(buffer));         // decltype(val) == int
-  return val;
+  OUTCOME_TRY(str, read_data_from_file(path));
+  // if control gets here read_data_from_file() has succeeded
+  return process(str);  // decltype(str) == string
 }
 //! [implementation]
+
+auto process(const string&) noexcept
+  -> outcome::result<int>
+{
+  return outcome::success(1);
+}
+
+auto read_data_from_file(string_view) noexcept
+  -> outcome::result<string>
+{
+  return outcome::success("1");
+}
