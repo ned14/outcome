@@ -89,7 +89,6 @@ script:
    fi
  - >
    if [ "$__" = "Documentation" ]; then
-     exit 0;
      git config --global push.default simple;
      git config --global user.name "Jenkins nedprod CI";
      git config --global user.email "foo@nowhere";
@@ -108,7 +107,6 @@ script:
 after_success:
  -
    if [ "$__" = "cmake tests" ]; then
-     exit 0;
      git clone https://github.com/ned14/boost-outcome;
      python include/outcome/quickcpplib/scripts/boostify.py boost-outcome;
      cd boost-outcome;
