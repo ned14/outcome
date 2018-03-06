@@ -27,6 +27,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "convert.hpp"
 #include "detail/result_final.hpp"
+#include "trait_system_error.hpp"
 
 #include "policy/all_narrow.hpp"
 #include "policy/result_error_code_throw_as_system_error.hpp"

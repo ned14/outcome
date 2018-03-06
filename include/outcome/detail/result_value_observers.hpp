@@ -59,13 +59,13 @@ namespace detail
     constexpr value_type &&assume_value() && noexcept
     {
       NoValuePolicy::narrow_value_check(static_cast<result_value_observers &&>(*this));
-      return std::move(this->_state._value);  // NOLINT
+      return static_cast<value_type &&>(this->_state._value);  // NOLINT
     }
     /// \group assume_value
     constexpr const value_type &&assume_value() const &&noexcept
     {
       NoValuePolicy::narrow_value_check(static_cast<const result_value_observers &&>(*this));
-      return std::move(this->_state._value);  // NOLINT
+      return static_cast<const value_type &&>(this->_state._value);  // NOLINT
     }
 
     /// \output_section Wide state observers
@@ -89,13 +89,13 @@ namespace detail
     constexpr value_type &&value() &&
     {
       NoValuePolicy::wide_value_check(static_cast<result_value_observers &&>(*this));
-      return std::move(this->_state._value);  // NOLINT
+      return static_cast<value_type &&>(this->_state._value);  // NOLINT
     }
     /// \group value
     constexpr const value_type &&value() const &&
     {
       NoValuePolicy::wide_value_check(static_cast<const result_value_observers &&>(*this));
-      return std::move(this->_state._value);  // NOLINT
+      return static_cast<const value_type &&>(this->_state._value);  // NOLINT
     }
   };
   template <class Base, class NoValuePolicy> class result_value_observers<Base, void, NoValuePolicy> : public Base

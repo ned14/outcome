@@ -59,13 +59,13 @@ namespace detail
     constexpr error_type &&assume_error() && noexcept
     {
       NoValuePolicy::narrow_error_check(static_cast<result_error_observers &&>(*this));
-      return std::move(this->_error);
+      return static_cast<error_type &&>(this->_error);
     }
     /// \group assume_error
     constexpr const error_type &&assume_error() const &&noexcept
     {
       NoValuePolicy::narrow_error_check(static_cast<const result_error_observers &&>(*this));
-      return std::move(this->_error);
+      return static_cast<const error_type &&>(this->_error);
     }
 
     /// \output_section Wide state observers
@@ -89,13 +89,13 @@ namespace detail
     constexpr error_type &&error() &&
     {
       NoValuePolicy::wide_error_check(static_cast<result_error_observers &&>(*this));
-      return std::move(this->_error);
+      return static_cast<error_type &&>(this->_error);
     }
     /// \group error
     constexpr const error_type &&error() const &&
     {
       NoValuePolicy::wide_error_check(static_cast<const result_error_observers &&>(*this));
-      return std::move(this->_error);
+      return static_cast<const error_type &&>(this->_error);
     }
   };
   template <class Base, class NoValuePolicy> class result_error_observers<Base, void, NoValuePolicy> : public Base
