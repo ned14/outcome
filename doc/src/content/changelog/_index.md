@@ -3,7 +3,8 @@ title = "Changelog"
 weight = 80
 +++
 
-# v2.1 in progress [project](https://github.com/ned14/outcome/projects/1)
+---
+## v2.1 in progress [[project]](https://github.com/ned14/outcome/projects/1)
 
 - [#110](https://github.com/ned14/outcome/issues/110)
     - Separated `result` from its hard coded dependency on the `<system_error>` header.
@@ -11,4 +12,8 @@ weight = 80
     - Renamed `result.hpp` into `basic_result.hpp`.
     - Moved `<system_error>` dependent code into a new `system_error_support.hpp` header file.
 
-# v2.0 18th Jan 2018 (Boost peer review edition) [release](https://github.com/ned14/outcome/releases/tag/v2.0-boost-peer-review)
+---
+## v2.0 18th Jan 2018 [[release]](https://github.com/ned14/outcome/releases/tag/v2.0-boost-peer-review)
+
+- Boost peer review edition. This is what was reviewed.
+- Changelog from v1 can be found in the release notes above.
