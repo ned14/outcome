@@ -1470,6 +1470,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 
+#include <cstdint> // for uint32_t etc
+#include <initializer_list>
+#include <iosfwd> // for future serialisation
 #include <type_traits>
 
 #if __cplusplus >= 201700 || _HAS_CXX17
@@ -2375,115 +2378,11 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
-#include <exception>
-#include <system_error>
-
 OUTCOME_V2_NAMESPACE_BEGIN
-
-//! Namespace for policies
-namespace policy
-{
-  namespace detail
-  {
-    struct error_code_passthrough
-    {
-    };
-    /* Pass through `make_error_code` function for anything implicitly convertible to `std::error_code`.
-    \requires `T` is implicitly convertible to `std::error_code`.
-    */
-
-
-    OUTCOME_TEMPLATE(class T)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::error_code>::value))
-    constexpr inline decltype(auto) make_error_code(T &&v, error_code_passthrough /*unused*/ = {}) { return std::forward<T>(v); }
-
-    template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
-    struct tuple_passthrough
-    {
-    };
-    /* Pass through `make_error_code` function for any pair or tuple returning the first item.
-    \requires That `make_error_code(std::get<0>(std::declval<T>()))` is a valid expression.
-    */
-
-
-    OUTCOME_TEMPLATE(class T)
-    OUTCOME_TREQUIRES(OUTCOME_TEXPR(make_error_code(get<0>(std::declval<T>()))))
-    constexpr inline decltype(auto) make_error_code(T &&v, tuple_passthrough /* unused */ = {}) { return make_error_code(get<0>(std::forward<T>(v))); }
-
-    /* Pass through `make_exception_ptr` function for `std::exception_ptr`.
-    */
-
-    inline std::exception_ptr make_exception_ptr(std::exception_ptr v) { return v; }
-
-    template <class T> constexpr inline decltype(auto) error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
-    template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
-  } // namespace detail
-  //! Used by policies to extract a `std::error_code` from some input `T` via ADL discovery of some `make_error_code(T)` function.
-  template <class T> constexpr inline decltype(auto) error_code(T &&v) { return detail::error_code(std::forward<T>(v)); }
-  //! Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
-  template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return detail::exception_ptr(std::forward<T>(v)); }
-
-  //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
-  template <class Error> constexpr inline void throw_as_system_error_with_payload(const Error &error)
-  {
-    (void) error;
-    static_assert(std::is_convertible<Error, std::error_code>::value || std::is_error_code_enum<std::decay_t<Error>>::value || std::is_error_condition_enum<std::decay_t<Error>>::value,
-                  "To use the error_code_throw_as_system_error policy with a custom Error type, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload");
-    OUTCOME_THROW_EXCEPTION(std::system_error(error_code(error)));
-  }
-} // namespace policy
 
 //! Namespace for traits
 namespace trait
 {
-  namespace detail
-  {
-    template <class T> using devoid = OUTCOME_V2_NAMESPACE::detail::devoid<T>;
-    template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
-    constexpr inline void make_error_code(...);
-    // Also enable for any pair or tuple whose first item satisfies make_error_code()
-    template <class T, //
-              class R = decltype(make_error_code(get<0>(std::declval<T>()))) //
-              >
-    constexpr inline R make_error_code(T &&);
-    template <class T, typename V = decltype(make_error_code(std::declval<devoid<T>>()))> struct has_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, std::decay_t<V>>::value || std::is_convertible<T, std::error_code>::value>
-    {
-    };
-    constexpr inline void make_exception_ptr(...);
-    template <class T, typename V = decltype(make_exception_ptr(std::declval<devoid<T>>()))> struct has_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, std::decay_t<V>>::value || std::is_convertible<T, std::exception_ptr>::value>
-    {
-    };
-  } // namespace detail
-  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
-  Also returns true if `std::error_code` is convertible from T.
-  */
-
-
-  template <class T> struct has_error_code : detail::has_error_code<T>
-  {
-  };
-  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
-  Also returns true if `std::error_code` is convertible from T.
-  */
-
-
-  template <class T> constexpr bool has_error_code_v = has_error_code<T>::value;
-
-  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
-  Also returns true if `std::exception_ptr` is convertible from T.
-  */
-
-
-  template <class T> struct has_exception_ptr : detail::has_exception_ptr<T>
-  {
-  };
-  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
-  Also returns true if `std::exception_ptr` is convertible from T.
-  */
-
-
-  template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<T>::value;
-
   /*! Requirements predicate for permitting type to be used in result/outcome.
 
   - Is not a reference.
@@ -2513,7 +2412,6 @@ namespace trait
    );
 
 } // namespace trait
-
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -2569,10 +2467,6 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
-#include <cstdint> // for uint32_t etc
-#include <initializer_list>
-#include <iosfwd> // for serialisation
-
 OUTCOME_V2_NAMESPACE_BEGIN
 
 namespace detail
@@ -2620,13 +2514,13 @@ namespace detail
     }
     template <class... Args>
     constexpr explicit value_storage_trivial(in_place_type_t<value_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
-        : _value(std::forward<Args>(args)...)
+        : _value(static_cast<Args &&>(args)...)
         , _status(status_have_value)
     {
     }
     template <class U, class... Args>
     constexpr value_storage_trivial(in_place_type_t<value_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
-        : _value(il, std::forward<Args>(args)...)
+        : _value(il, static_cast<Args &&>(args)...)
         , _status(status_have_value)
     {
     }
@@ -2641,7 +2535,7 @@ namespace detail
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_trivial(value_storage_trivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_trivial(((o._status & status_have_value) != 0) ? value_storage_trivial(in_place_type<value_type>, std::move(o._value)) : value_storage_trivial()) // NOLINT
+        : value_storage_trivial(((o._status & status_have_value) != 0) ? value_storage_trivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : value_storage_trivial()) // NOLINT
     {
       _status = o._status;
     }
@@ -2670,7 +2564,7 @@ namespace detail
       if(this->_status & status_have_value)
       {
         this->_status &= ~status_have_value;
-        new(&_value) value_type(std::move(o._value)); // NOLINT
+        new(&_value) value_type(static_cast<value_type &&>(o._value)); // NOLINT
         _status = o._status;
       }
     }
@@ -2702,13 +2596,13 @@ namespace detail
     }
     template <class... Args>
     explicit value_storage_nontrivial(in_place_type_t<value_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
-        : _value(std::forward<Args>(args)...) // NOLINT
+        : _value(static_cast<Args &&>(args)...) // NOLINT
         , _status(status_have_value)
     {
     }
     template <class U, class... Args>
     value_storage_nontrivial(in_place_type_t<value_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
-        : _value(il, std::forward<Args>(args)...)
+        : _value(il, static_cast<Args &&>(args)...)
         , _status(status_have_value)
     {
     }
@@ -2730,14 +2624,14 @@ namespace detail
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_nontrivial(value_storage_nontrivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, std::move(o._value)) : value_storage_nontrivial())
+        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : value_storage_nontrivial())
     {
       _status = o._status;
     }
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_nontrivial(value_storage_trivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, std::move(o._value)) : value_storage_nontrivial())
+        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : value_storage_nontrivial())
     {
       _status = o._status;
     }
@@ -2767,14 +2661,14 @@ namespace detail
       if((_status & status_have_value) != 0)
       {
         // Move construct me into other
-        new(&o._value) value_type(std::move(_value)); // NOLINT
+        new(&o._value) value_type(static_cast<value_type &&>(_value)); // NOLINT
         this->_value.~value_type(); // NOLINT
         swap(_status, o._status);
       }
       else
       {
         // Move construct other into me
-        new(&_value) value_type(std::move(o._value)); // NOLINT
+        new(&_value) value_type(static_cast<value_type &&>(o._value)); // NOLINT
         o._value.~value_type(); // NOLINT
         swap(_status, o._status);
       }
@@ -2828,7 +2722,7 @@ namespace detail
     {
       if((this->_status & status_have_value) != 0 && (o._status & status_have_value) != 0)
       {
-        this->_value = std::move(o._value); // NOLINT
+        this->_value = static_cast<value_type &&>(o._value); // NOLINT
       }
       else if((this->_status & status_have_value) != 0 && (o._status & status_have_value) == 0)
       {
@@ -2836,7 +2730,7 @@ namespace detail
       }
       else if((this->_status & status_have_value) == 0 && (o._status & status_have_value) != 0)
       {
-        new(&this->_value) value_type(std::move(o._value)); // NOLINT
+        new(&this->_value) value_type(static_cast<value_type &&>(o._value)); // NOLINT
       }
       this->_status = o._status;
       return *this;
@@ -2899,39 +2793,14 @@ namespace detail
 OUTCOME_V2_NAMESPACE_END
 
 #endif
-#include <system_error>
-
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
   template <class State, class E> constexpr inline void _set_error_is_errno(State & /*unused*/, const E & /*unused*/) {}
-  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::error_code &error)
-  {
-    if(error.category() == std::generic_category()
-#ifndef _WIN32
-       || error.category() == std::system_category()
-#endif
-       )
-    {
-      state._status |= status_error_is_errno;
-    }
-  }
-  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::error_condition &error)
-  {
-    if(error.category() == std::generic_category()
-#ifndef _WIN32
-       || error.category() == std::system_category()
-#endif
-       )
-    {
-      state._status |= status_error_is_errno;
-    }
-  }
-  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::errc & /*unused*/) { state._status |= status_error_is_errno; }
-
   template <class R, class S, class NoValuePolicy> class result_final;
-} // namespace detail
+}
+
 //! Namespace containing hooks used for intercepting and manipulating result/outcome
 namespace hooks
 {
@@ -2940,6 +2809,7 @@ namespace hooks
   //! Sets the sixteen bits of spare storage in a `result` or `outcome`.
   template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
 } // namespace hooks
+
 namespace policy
 {
   namespace detail
@@ -2947,6 +2817,7 @@ namespace policy
     struct base;
   } // namespace detail
 } // namespace policy
+
 namespace detail
 {
   //! The base implementation type of `result<R, EC, NoValuePolicy>`.
@@ -2998,27 +2869,27 @@ namespace detail
 
     template <class... Args>
     constexpr explicit result_storage(in_place_type_t<_value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
-        : _state{_, std::forward<Args>(args)...}
+        : _state{_, static_cast<Args &&>(args)...}
         , _error()
     {
     }
     template <class U, class... Args>
     constexpr result_storage(in_place_type_t<_value_type> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, std::initializer_list<U>, Args...>::value)
-        : _state{_, il, std::forward<Args>(args)...}
+        : _state{_, il, static_cast<Args &&>(args)...}
         , _error()
     {
     }
     template <class... Args>
     constexpr explicit result_storage(in_place_type_t<_error_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
         : _state{detail::status_have_error}
-        , _error(std::forward<Args>(args)...)
+        , _error(static_cast<Args &&>(args)...)
     {
       detail::_set_error_is_errno(_state, _error);
     }
     template <class U, class... Args>
     constexpr result_storage(in_place_type_t<_error_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
         : _state{detail::status_have_error}
-        , _error{il, std::forward<Args>(args)...}
+        , _error{il, static_cast<Args &&>(args)...}
     {
       detail::_set_error_is_errno(_state, _error);
     }
@@ -3039,13 +2910,13 @@ namespace detail
     }
     template <class T, class U, class V>
     constexpr result_storage(compatible_conversion_tag /*unused*/, result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
-        : _state(std::move(o._state))
-        , _error(std::move(o._error))
+        : _state(static_cast<decltype(o._state) &&>(o._state))
+        , _error(static_cast<U &&>(o._error))
     {
     }
     template <class T, class V>
     constexpr result_storage(compatible_conversion_tag /*unused*/, result_storage<T, void, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
-        : _state(std::move(o._state))
+        : _state(static_cast<decltype(o._state) &&>(o._state))
         , _error(_error_type{})
     {
     }
@@ -3174,6 +3045,9 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define OUTCOME_OUTCOME_FAILURE_OBSERVERS_HPP
 
 
+
+#include <exception>
+#include <system_error>
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -3386,8 +3260,8 @@ namespace convert
   {
     template <class T, class X> struct make_type
     {
-      template <class U> static constexpr T value(U &&v) { return T{in_place_type<typename T::value_type>, std::forward<U>(v).value()}; }
-      template <class U> static constexpr T error(U &&v) { return T{in_place_type<typename T::error_type>, std::forward<U>(v).error()}; }
+      template <class U> static constexpr T value(U &&v) { return T{in_place_type<typename T::value_type>, static_cast<U &&>(v).value()}; }
+      template <class U> static constexpr T error(U &&v) { return T{in_place_type<typename T::error_type>, static_cast<U &&>(v).error()}; }
       static constexpr T error() { return T{in_place_type<typename T::error_type>}; }
     };
     template <class T> struct make_type<T, void>
@@ -3425,7 +3299,7 @@ namespace convert
                                     &&ValueOrError<U> //
                                     && (std::is_void<typename std::decay_t<X>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::value_type, typename std::decay_t<X>::value_type>) //
                                     &&(std::is_void<typename std::decay_t<X>::error_type>::value || OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::error_type, typename std::decay_t<X>::error_type>) ))
-    constexpr T operator()(X &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(std::forward<X>(v)) : detail::make_type<T, typename U::error_type>::error(std::forward<X>(v)); }
+    constexpr T operator()(X &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(static_cast<X &&>(v)) : detail::make_type<T, typename U::error_type>::error(static_cast<X &&>(v)); }
   };
 } // namespace convert
 
@@ -3480,6 +3354,201 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef OUTCOME_RESULT_FINAL_HPP
 #define OUTCOME_RESULT_FINAL_HPP
+/* Traits for Outcome
+(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: March 2018
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_TRAIT_SYSTEM_ERROR_HPP
+#define OUTCOME_TRAIT_SYSTEM_ERROR_HPP
+
+
+
+#include <exception>
+#include <system_error>
+
+OUTCOME_V2_NAMESPACE_BEGIN
+
+namespace detail
+{
+  // Customise _set_error_is_errno
+  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::error_code &error)
+  {
+    if(error.category() == std::generic_category()
+#ifndef _WIN32
+       || error.category() == std::system_category()
+#endif
+       )
+    {
+      state._status |= status_error_is_errno;
+    }
+  }
+  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::error_condition &error)
+  {
+    if(error.category() == std::generic_category()
+#ifndef _WIN32
+       || error.category() == std::system_category()
+#endif
+       )
+    {
+      state._status |= status_error_is_errno;
+    }
+  }
+  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::errc & /*unused*/) { state._status |= status_error_is_errno; }
+
+} // namespace detail
+
+//! Namespace for policies
+namespace policy
+{
+  namespace detail
+  {
+    struct error_code_passthrough
+    {
+    };
+    /* Pass through `make_error_code` function for anything implicitly convertible to `std::error_code`.
+    \requires `T` is implicitly convertible to `std::error_code`.
+    */
+
+
+    OUTCOME_TEMPLATE(class T)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::error_code>::value))
+    constexpr inline decltype(auto) make_error_code(T &&v, error_code_passthrough /*unused*/ = {}) { return std::forward<T>(v); }
+
+    template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
+    struct tuple_passthrough
+    {
+    };
+    /* Pass through `make_error_code` function for any pair or tuple returning the first item.
+    \requires That `make_error_code(std::get<0>(std::declval<T>()))` is a valid expression.
+    */
+
+
+    OUTCOME_TEMPLATE(class T)
+    OUTCOME_TREQUIRES(OUTCOME_TEXPR(make_error_code(get<0>(std::declval<T>()))))
+    constexpr inline decltype(auto) make_error_code(T &&v, tuple_passthrough /* unused */ = {}) { return make_error_code(get<0>(std::forward<T>(v))); }
+
+    /* Pass through `make_exception_ptr` function for `std::exception_ptr`.
+    */
+
+    inline std::exception_ptr make_exception_ptr(std::exception_ptr v) { return v; }
+
+    template <class T> constexpr inline decltype(auto) error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
+    template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
+  } // namespace detail
+  //! Used by policies to extract a `std::error_code` from some input `T` via ADL discovery of some `make_error_code(T)` function.
+  template <class T> constexpr inline decltype(auto) error_code(T &&v) { return detail::error_code(std::forward<T>(v)); }
+  //! Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
+  template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return detail::exception_ptr(std::forward<T>(v)); }
+
+  //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
+  template <class Error> constexpr inline void throw_as_system_error_with_payload(const Error &error)
+  {
+    (void) error;
+    static_assert(std::is_convertible<Error, std::error_code>::value || std::is_error_code_enum<std::decay_t<Error>>::value || std::is_error_condition_enum<std::decay_t<Error>>::value,
+                  "To use the error_code_throw_as_system_error policy with a custom Error type, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload");
+    OUTCOME_THROW_EXCEPTION(std::system_error(error_code(error)));
+  }
+} // namespace policy
+
+//! Namespace for traits
+namespace trait
+{
+  namespace detail
+  {
+    template <class T> using devoid = OUTCOME_V2_NAMESPACE::detail::devoid<T>;
+    template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
+    constexpr inline void make_error_code(...);
+    // Also enable for any pair or tuple whose first item satisfies make_error_code()
+    template <class T, //
+              class R = decltype(make_error_code(get<0>(std::declval<T>()))) //
+              >
+    constexpr inline R make_error_code(T &&);
+    template <class T, typename V = decltype(make_error_code(std::declval<devoid<T>>()))> struct has_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, std::decay_t<V>>::value || std::is_convertible<T, std::error_code>::value>
+    {
+    };
+    constexpr inline void make_exception_ptr(...);
+    template <class T, typename V = decltype(make_exception_ptr(std::declval<devoid<T>>()))> struct has_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, std::decay_t<V>>::value || std::is_convertible<T, std::exception_ptr>::value>
+    {
+    };
+  } // namespace detail
+  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
+  Also returns true if `std::error_code` is convertible from T.
+  */
+
+
+  template <class T> struct has_error_code : detail::has_error_code<T>
+  {
+  };
+  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
+  Also returns true if `std::error_code` is convertible from T.
+  */
+
+
+  template <class T> constexpr bool has_error_code_v = has_error_code<T>::value;
+
+  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
+  Also returns true if `std::exception_ptr` is convertible from T.
+  */
+
+
+  template <class T> struct has_exception_ptr : detail::has_exception_ptr<T>
+  {
+  };
+  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
+  Also returns true if `std::exception_ptr` is convertible from T.
+  */
+
+
+  template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<T>::value;
+
+} // namespace trait
+
+
+OUTCOME_V2_NAMESPACE_END
+
+#endif
 /* Error observers for a very simple result type
 (C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: Oct 2017

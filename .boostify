@@ -1,5 +1,6 @@
 # Files to copy over
 include_files = [
+    (r'include/status-code/include/(.*)', r'include/boost/experimental/status-code/\1'),
     (r'include/(.*)', r'include/boost/\1'),
     r'doc/src/.*',
     r'test/.*',
@@ -9,6 +10,7 @@ include_files = [
 ]
 exclude_files = [
     r'.*quickcpplib.*',
+    r'.*status-code.*',
     r'.*\.natvis',
     r'.*\.vs',
     r'test/single-header-test.cpp',

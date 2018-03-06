@@ -25,6 +25,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_RESULT_FINAL_HPP
 #define OUTCOME_RESULT_FINAL_HPP
 
+#include "../trait_system_error.hpp"
 #include "result_error_observers.hpp"
 #include "result_value_observers.hpp"
 

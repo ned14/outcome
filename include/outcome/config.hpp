@@ -138,6 +138,9 @@ exported Outcome v2 namespace.
 #endif
 #endif
 
+#include <cstdint>  // for uint32_t etc
+#include <initializer_list>
+#include <iosfwd>  // for future serialisation
 #include <type_traits>
 
 #if __cplusplus >= 201700 || _HAS_CXX17

@@ -27,10 +27,6 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../config.hpp"
 
-#include <cstdint>  // for uint32_t etc
-#include <initializer_list>
-#include <iosfwd>  // for serialisation
-
 OUTCOME_V2_NAMESPACE_BEGIN
 
 namespace detail
@@ -78,13 +74,13 @@ namespace detail
     }
     template <class... Args>
     constexpr explicit value_storage_trivial(in_place_type_t<value_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
-        : _value(std::forward<Args>(args)...)
+        : _value(static_cast<Args &&>(args)...)
         , _status(status_have_value)
     {
     }
     template <class U, class... Args>
     constexpr value_storage_trivial(in_place_type_t<value_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
-        : _value(il, std::forward<Args>(args)...)
+        : _value(il, static_cast<Args &&>(args)...)
         , _status(status_have_value)
     {
     }
@@ -99,7 +95,7 @@ namespace detail
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_trivial(value_storage_trivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_trivial(((o._status & status_have_value) != 0) ? value_storage_trivial(in_place_type<value_type>, std::move(o._value)) : value_storage_trivial())  // NOLINT
+        : value_storage_trivial(((o._status & status_have_value) != 0) ? value_storage_trivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : value_storage_trivial())  // NOLINT
     {
       _status = o._status;
     }
@@ -128,7 +124,7 @@ namespace detail
       if(this->_status & status_have_value)
       {
         this->_status &= ~status_have_value;
-        new(&_value) value_type(std::move(o._value));  // NOLINT
+        new(&_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
         _status = o._status;
       }
     }
@@ -160,13 +156,13 @@ namespace detail
     }
     template <class... Args>
     explicit value_storage_nontrivial(in_place_type_t<value_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
-        : _value(std::forward<Args>(args)...)  // NOLINT
+        : _value(static_cast<Args &&>(args)...)  // NOLINT
         , _status(status_have_value)
     {
     }
     template <class U, class... Args>
     value_storage_nontrivial(in_place_type_t<value_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
-        : _value(il, std::forward<Args>(args)...)
+        : _value(il, static_cast<Args &&>(args)...)
         , _status(status_have_value)
     {
     }
@@ -188,14 +184,14 @@ namespace detail
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_nontrivial(value_storage_nontrivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, std::move(o._value)) : value_storage_nontrivial())
+        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : value_storage_nontrivial())
     {
       _status = o._status;
     }
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_nontrivial(value_storage_trivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, std::move(o._value)) : value_storage_nontrivial())
+        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : value_storage_nontrivial())
     {
       _status = o._status;
     }
@@ -225,15 +221,15 @@ namespace detail
       if((_status & status_have_value) != 0)
       {
         // Move construct me into other
-        new(&o._value) value_type(std::move(_value));  // NOLINT
-        this->_value.~value_type();                    // NOLINT
+        new(&o._value) value_type(static_cast<value_type &&>(_value));  // NOLINT
+        this->_value.~value_type();                                     // NOLINT
         swap(_status, o._status);
       }
       else
       {
         // Move construct other into me
-        new(&_value) value_type(std::move(o._value));  // NOLINT
-        o._value.~value_type();                        // NOLINT
+        new(&_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        o._value.~value_type();                                         // NOLINT
         swap(_status, o._status);
       }
     }
@@ -286,7 +282,7 @@ namespace detail
     {
       if((this->_status & status_have_value) != 0 && (o._status & status_have_value) != 0)
       {
-        this->_value = std::move(o._value);  // NOLINT
+        this->_value = static_cast<value_type &&>(o._value);  // NOLINT
       }
       else if((this->_status & status_have_value) != 0 && (o._status & status_have_value) == 0)
       {
@@ -294,7 +290,7 @@ namespace detail
       }
       else if((this->_status & status_have_value) == 0 && (o._status & status_have_value) != 0)
       {
-        new(&this->_value) value_type(std::move(o._value));  // NOLINT
+        new(&this->_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
       }
       this->_status = o._status;
       return *this;

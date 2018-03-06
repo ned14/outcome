@@ -29,39 +29,14 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include "../trait.hpp"
 #include "value_storage.hpp"
 
-#include <system_error>
-
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
   template <class State, class E> constexpr inline void _set_error_is_errno(State & /*unused*/, const E & /*unused*/) {}
-  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::error_code &error)
-  {
-    if(error.category() == std::generic_category()
-#ifndef _WIN32
-       || error.category() == std::system_category()
-#endif
-       )
-    {
-      state._status |= status_error_is_errno;
-    }
-  }
-  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::error_condition &error)
-  {
-    if(error.category() == std::generic_category()
-#ifndef _WIN32
-       || error.category() == std::system_category()
-#endif
-       )
-    {
-      state._status |= status_error_is_errno;
-    }
-  }
-  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::errc & /*unused*/) { state._status |= status_error_is_errno; }
-
   template <class R, class S, class NoValuePolicy> class result_final;
-}  // namespace detail
+}
+
 //! Namespace containing hooks used for intercepting and manipulating result/outcome
 namespace hooks
 {
@@ -70,6 +45,7 @@ namespace hooks
   //! Sets the sixteen bits of spare storage in a `result` or `outcome`.
   template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
 }  // namespace hooks
+
 namespace policy
 {
   namespace detail
@@ -77,6 +53,7 @@ namespace policy
     struct base;
   }  // namespace detail
 }  // namespace policy
+
 namespace detail
 {
   //! The base implementation type of `result<R, EC, NoValuePolicy>`.
@@ -128,27 +105,27 @@ namespace detail
 
     template <class... Args>
     constexpr explicit result_storage(in_place_type_t<_value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
-        : _state{_, std::forward<Args>(args)...}
+        : _state{_, static_cast<Args &&>(args)...}
         , _error()
     {
     }
     template <class U, class... Args>
     constexpr result_storage(in_place_type_t<_value_type> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, std::initializer_list<U>, Args...>::value)
-        : _state{_, il, std::forward<Args>(args)...}
+        : _state{_, il, static_cast<Args &&>(args)...}
         , _error()
     {
     }
     template <class... Args>
     constexpr explicit result_storage(in_place_type_t<_error_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
         : _state{detail::status_have_error}
-        , _error(std::forward<Args>(args)...)
+        , _error(static_cast<Args &&>(args)...)
     {
       detail::_set_error_is_errno(_state, _error);
     }
     template <class U, class... Args>
     constexpr result_storage(in_place_type_t<_error_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
         : _state{detail::status_have_error}
-        , _error{il, std::forward<Args>(args)...}
+        , _error{il, static_cast<Args &&>(args)...}
     {
       detail::_set_error_is_errno(_state, _error);
     }
@@ -169,13 +146,13 @@ namespace detail
     }
     template <class T, class U, class V>
     constexpr result_storage(compatible_conversion_tag /*unused*/, result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
-        : _state(std::move(o._state))
-        , _error(std::move(o._error))
+        : _state(static_cast<decltype(o._state) &&>(o._state))
+        , _error(static_cast<U &&>(o._error))
     {
     }
     template <class T, class V>
     constexpr result_storage(compatible_conversion_tag /*unused*/, result_storage<T, void, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
-        : _state(std::move(o._state))
+        : _state(static_cast<decltype(o._state) &&>(o._state))
         , _error(_error_type{})
     {
     }
