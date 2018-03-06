@@ -14,3 +14,9 @@
 	branch = master
 	fetchRecurseSubmodules = true
 	ignore = untracked
+[submodule "include/outcome/status-code"]
+	path = include/outcome/status-code
+	url = https://github.com/ned14/status-code.git
+	branch = master
+	fetchRecurseSubmodules = true
+	ignore = untracked

@@ -32,12 +32,12 @@ include(QuickCppLibMakeHeaderOnlyLibrary)
 # Make preprocessed edition of this library target
 if(NOT PROJECT_IS_DEPENDENCY)
   if(NOT PYTHONINTERP_FOUND)
-    indented_message(WARNING "NOT rebuilding precompiled edition of library due to python not being installed")
+    indented_message(WARNING "NOT rebuilding preprocessed edition of library due to python not being installed")
   else()
     # See if the ply package is installed so pcpp can run
     execute_process(COMMAND python -c "import ply" RESULT_VARIABLE python_has_ply)
     if(NOT python_has_ply EQUAL 0)
-      indented_message(WARNING "NOT rebuilding precompiled edition of library due to installed python not having the ply package installed. "
+      indented_message(WARNING "NOT rebuilding preprocessed edition of library due to installed python not having the ply package installed. "
         "Do 'pip install ply' to fix. NOTE that doxygen docs will NOT build without the precompiled edition.")
     else()
       add_partial_preprocess(outcome_hl-pp
