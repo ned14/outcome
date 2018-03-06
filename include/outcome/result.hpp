@@ -58,9 +58,9 @@ namespace policy
   >>>;
 }  // namespace policy
 
-template <class R, class S = std::error_code, class NoValuePolicy = policy::default_policy<R, S, void>>                                                                 //
-#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                 // GCC's constraints implementation is buggy
-OUTCOME_REQUIRES(detail::type_can_be_used_in_result<R> &&detail::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
+template <class R, class S = std::error_code, class NoValuePolicy = policy::default_policy<R, S, void>>                                                               //
+#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                               // GCC's constraints implementation is buggy
+OUTCOME_REQUIRES(trait::type_can_be_used_in_result<R> &&trait::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
 #endif
 class result;
 
@@ -211,14 +211,14 @@ then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<a
 or if `S` is `void`, do `throw bad_result_access()`
    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
-template <class R, class S, class NoValuePolicy>                                                                                                                        //
-#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                 // GCC's constraints implementation is buggy
-OUTCOME_REQUIRES(detail::type_can_be_used_in_result<R> &&detail::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
+template <class R, class S, class NoValuePolicy>                                                                                                                      //
+#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                               // GCC's constraints implementation is buggy
+OUTCOME_REQUIRES(trait::type_can_be_used_in_result<R> &&trait::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
 #endif
 class OUTCOME_NODISCARD result : public detail::result_final<R, S, NoValuePolicy>
 {
-  static_assert(detail::type_can_be_used_in_result<R>, "The type R cannot be used in a result");
-  static_assert(detail::type_can_be_used_in_result<S>, "The type S cannot be used in a result");
+  static_assert(trait::type_can_be_used_in_result<R>, "The type R cannot be used in a result");
+  static_assert(trait::type_can_be_used_in_result<S>, "The type S cannot be used in a result");
   static_assert(std::is_void<S>::value || std::is_default_constructible<S>::value, "The type S must be void or default constructible");
 
   using base = detail::result_final<R, S, NoValuePolicy>;

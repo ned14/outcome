@@ -39,7 +39,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_policy<R, S, P>>  //
-OUTCOME_REQUIRES(detail::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))      //
+OUTCOME_REQUIRES(trait::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))       //
 class outcome;
 
 namespace detail
@@ -211,8 +211,8 @@ or if `P` is `void`, do `throw bad_outcome_access()`
 or if `S` is `void`, do `throw bad_outcome_access()`
    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
-template <class R, class S, class P, class NoValuePolicy>                                                                       //
-OUTCOME_REQUIRES(detail::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))  //
+template <class R, class S, class P, class NoValuePolicy>                                                                      //
+OUTCOME_REQUIRES(trait::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))  //
 class OUTCOME_NODISCARD outcome
 #if defined(DOXYGEN_IS_IN_THE_HOUSE) || defined(STANDARDESE_IS_IN_THE_HOUSE)
 : public detail::outcome_failure_observers<detail::select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>,
@@ -222,7 +222,7 @@ class OUTCOME_NODISCARD outcome
 : public detail::select_outcome_impl<R, S, P, NoValuePolicy>
 #endif
 {
-  static_assert(detail::type_can_be_used_in_result<P>, "The exception_type cannot be used");
+  static_assert(trait::type_can_be_used_in_result<P>, "The exception_type cannot be used");
   static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "exception_type must be void or default constructible");
   using base = detail::select_outcome_impl<R, S, P, NoValuePolicy>;
   friend NoValuePolicy;

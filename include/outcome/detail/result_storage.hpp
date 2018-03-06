@@ -26,6 +26,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define OUTCOME_RESULT_STORAGE_HPP
 
 #include "../success_failure.hpp"
+#include "../trait.hpp"
 #include "value_storage.hpp"
 
 #include <system_error>
@@ -34,87 +35,6 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  /* True if type is the same or constructible. Works around a bug where clang + libstdc++
-  pukes on std::is_constructible<filesystem::path, void> (this bug is fixed upstream).
-  */
-  template <class T, class U> struct _is_explicitly_constructible
-  {
-    static constexpr bool value = std::is_constructible<T, U>::value;
-  };
-  template <class T> struct _is_explicitly_constructible<T, T>
-  {
-    static constexpr bool value = true;
-  };
-  template <class T> struct _is_explicitly_constructible<T, void>
-  {
-    static constexpr bool value = false;
-  };
-  template <> struct _is_explicitly_constructible<void, void>
-  {
-    static constexpr bool value = false;
-  };
-  template <class T, class U> static constexpr bool is_explicitly_constructible = _is_explicitly_constructible<T, U>::value;
-
-  template <class T, class U> struct _is_implicitly_constructible
-  {
-    static constexpr bool value = std::is_convertible<U, T>::value;
-  };
-  template <class T> struct _is_implicitly_constructible<T, T>
-  {
-    static constexpr bool value = true;
-  };
-  template <class T> struct _is_implicitly_constructible<T, void>
-  {
-    static constexpr bool value = false;
-  };
-  template <> struct _is_implicitly_constructible<void, void>
-  {
-    static constexpr bool value = false;
-  };
-  template <class T, class U> static constexpr bool is_implicitly_constructible = _is_implicitly_constructible<T, U>::value;
-
-// True if type is nothrow swappable
-#if !defined(STANDARDESE_IS_IN_THE_HOUSE) && (_HAS_CXX17 || __cplusplus >= 201700)
-  template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
-#else
-  namespace _is_nothrow_swappable
-  {
-    using namespace std;
-    template <class T> constexpr inline T &ldeclval();
-    template <class T, class = void> struct is_nothrow_swappable : std::integral_constant<bool, false>
-    {
-    };
-    template <class T> struct is_nothrow_swappable<T, decltype(swap(ldeclval<T>(), ldeclval<T>()))> : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
-    {
-    };
-  }  // namespace _is_nothrow_swappable
-  template <class T> using is_nothrow_swappable = _is_nothrow_swappable::is_nothrow_swappable<T>;
-#endif
-  OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>() == std::declval<U>()))
-  inline bool safe_compare_equal(const T &a, const U &b) noexcept(noexcept(std::declval<T>() == std::declval<U>()))
-  {
-    // std::cout << "Taken " << typeid(T).name() << " == " << typeid(U).name() << " = " << (a == b) << std::endl;
-    return a == b;
-  }
-  template <class T, class U> inline bool safe_compare_equal(T && /*unused*/, U && /*unused*/) noexcept
-  {
-    // std::cout << "Fallback " << typeid(T).name() << " == " << typeid(U).name() << " = false" << std::endl;
-    return false;
-  }
-  OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>() != std::declval<U>()))
-  inline bool safe_compare_notequal(const T &a, const U &b) noexcept(noexcept(std::declval<T>() != std::declval<U>()))
-  {
-    // std::cout << "Taken " << typeid(T).name() << " != " << typeid(U).name() << " = " << (a != b) << std::endl;
-    return a != b;
-  }
-  template <class T, class U> inline bool safe_compare_notequal(T && /*unused*/, U && /*unused*/) noexcept
-  {
-    // std::cout << "Fallback " << typeid(T).name() << " != " << typeid(U).name() << " = true" << std::endl;
-    return true;
-  }
-
   template <class State, class E> constexpr inline void _set_error_is_errno(State & /*unused*/, const E & /*unused*/) {}
   template <class State> constexpr inline void _set_error_is_errno(State &state, const std::error_code &error)
   {
@@ -159,25 +79,13 @@ namespace policy
 }  // namespace policy
 namespace detail
 {
-  //! Predicate for permitting type to be used in outcome
-  template <class R>                                                   //
-  static constexpr bool type_can_be_used_in_result =                   //
-  (!std::is_reference<R>::value                                        //
-   && !detail::is_in_place_type_t<std::decay_t<R>>::value              //
-   && !detail::is_success_type<R>::value                               //
-   && !detail::is_failure_type<R>::value                               //
-   && !std::is_array<R>::value                                         //
-   && (std::is_void<R>::value || (std::is_object<R>::value             //
-                                  && std::is_destructible<R>::value))  //
-   );
-
   //! The base implementation type of `result<R, EC, NoValuePolicy>`.
-  template <class R, class EC, class NoValuePolicy>                                                                                                          //
-  OUTCOME_REQUIRES(type_can_be_used_in_result<R> &&type_can_be_used_in_result<EC> && (std::is_void<EC>::value || std::is_default_constructible<EC>::value))  //
+  template <class R, class EC, class NoValuePolicy>                                                                                                                        //
+  OUTCOME_REQUIRES(trait::type_can_be_used_in_result<R> &&trait::type_can_be_used_in_result<EC> && (std::is_void<EC>::value || std::is_default_constructible<EC>::value))  //
   class result_storage
   {
-    static_assert(type_can_be_used_in_result<R>, "The type R cannot be used in a result");
-    static_assert(type_can_be_used_in_result<EC>, "The type S cannot be used in a result");
+    static_assert(trait::type_can_be_used_in_result<R>, "The type R cannot be used in a result");
+    static_assert(trait::type_can_be_used_in_result<EC>, "The type S cannot be used in a result");
     static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "The type S must be void or default constructible");
 
     friend NoValuePolicy;

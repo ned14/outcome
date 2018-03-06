@@ -30,34 +30,11 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include <cstdint>  // for uint32_t etc
 #include <initializer_list>
 #include <iosfwd>  // for serialisation
-#include <type_traits>
-#include <utility>  // for in_place_type_t
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
-#if __cplusplus >= 201700 || _HAS_CXX17
-template <class T> using in_place_type_t = std::in_place_type_t<T>;
-using std::in_place_type;
-#else
-//! Aliases `std::in_place_type_t<T>` if on C++ 17 or later, else defined locally.
-template <class T> struct in_place_type_t
-{
-  explicit in_place_type_t() = default;
-};
-//! Aliases `std::in_place_type<T>` if on C++ 17 or later, else defined locally.
-template <class T> constexpr in_place_type_t<T> in_place_type{};
-#endif
-
 namespace detail
 {
-  // Test if type is an in_place_type_t
-  template <class T> struct is_in_place_type_t : std::false_type
-  {
-  };
-  template <class U> struct is_in_place_type_t<in_place_type_t<U>> : std::true_type
-  {
-  };
-
   using status_bitfield_type = uint32_t;
   static constexpr status_bitfield_type status_have_value = (1U << 0U);
   static constexpr status_bitfield_type status_have_error = (1U << 1U);

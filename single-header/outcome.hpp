@@ -935,9 +935,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF efc6c12dca3b8f2210d741a985a53b162383dfdf
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2017-12-06 20:49:53 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE efc6c12d
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 4587483051c58c3b2f5fb2814d7c78c39567b06b
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2018-02-02 16:44:24 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 45874830
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
 
@@ -1449,9 +1449,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 6151a8b2d4fb55d7d3d45c0688afaabd81fef1e5
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-01-29 09:48:47 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 6151a8b2
+#define OUTCOME_PREVIOUS_COMMIT_REF ba86c03db079fd5c87b1f7d0e9c0d43ab55cfe6a
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-03-06 09:15:57 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE ba86c03d
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -1468,6 +1468,164 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_V2_NAMESPACE_EXPORT_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(OUTCOME_V2)
 #define OUTCOME_V2_NAMESPACE_END QUICKCPPLIB_BIND_NAMESPACE_END(OUTCOME_V2)
 #endif
+
+
+#include <type_traits>
+
+#if __cplusplus >= 201700 || _HAS_CXX17
+#include <utility> // for in_place_type_t
+
+OUTCOME_V2_NAMESPACE_BEGIN
+template <class T> using in_place_type_t = std::in_place_type_t<T>;
+using std::in_place_type;
+OUTCOME_V2_NAMESPACE_END
+#else
+OUTCOME_V2_NAMESPACE_BEGIN
+//! Aliases `std::in_place_type_t<T>` if on C++ 17 or later, else defined locally.
+template <class T> struct in_place_type_t
+{
+  explicit in_place_type_t() = default;
+};
+//! Aliases `std::in_place_type<T>` if on C++ 17 or later, else defined locally.
+template <class T> constexpr in_place_type_t<T> in_place_type{};
+OUTCOME_V2_NAMESPACE_END
+#endif
+
+OUTCOME_V2_NAMESPACE_BEGIN
+namespace detail
+{
+  // Test if type is an in_place_type_t
+  template <class T> struct is_in_place_type_t
+  {
+    static constexpr bool value = false;
+  };
+  template <class U> struct is_in_place_type_t<in_place_type_t<U>>
+  {
+    static constexpr bool value = true;
+  };
+
+  // Replace void with constructible void_type
+  struct empty_type
+  {
+  };
+  struct void_type
+  {
+    // We always compare true to another instance of me
+    constexpr bool operator==(void_type /*unused*/) const noexcept { return true; }
+    constexpr bool operator!=(void_type /*unused*/) const noexcept { return false; }
+  };
+  template <class T> using devoid = std::conditional_t<std::is_void<T>::value, void_type, T>;
+
+  template <class Output, class Input> using rebind_type5 = Output;
+  template <class Output, class Input>
+  using rebind_type4 = std::conditional_t< //
+  std::is_volatile<Input>::value, //
+  std::add_volatile_t<rebind_type5<Output, std::remove_volatile_t<Input>>>, //
+  rebind_type5<Output, Input>>;
+  template <class Output, class Input>
+  using rebind_type3 = std::conditional_t< //
+  std::is_const<Input>::value, //
+  std::add_const_t<rebind_type4<Output, std::remove_const_t<Input>>>, //
+  rebind_type4<Output, Input>>;
+  template <class Output, class Input>
+  using rebind_type2 = std::conditional_t< //
+  std::is_lvalue_reference<Input>::value, //
+  std::add_lvalue_reference_t<rebind_type3<Output, std::remove_reference_t<Input>>>, //
+  rebind_type3<Output, Input>>;
+  template <class Output, class Input>
+  using rebind_type = std::conditional_t< //
+  std::is_rvalue_reference<Input>::value, //
+  std::add_rvalue_reference_t<rebind_type2<Output, std::remove_reference_t<Input>>>, //
+  rebind_type2<Output, Input>>;
+
+  // static_assert(std::is_same_v<rebind_type<int, volatile const double &&>, volatile const int &&>, "");
+
+
+  /* True if type is the same or constructible. Works around a bug where clang + libstdc++
+  pukes on std::is_constructible<filesystem::path, void> (this bug is fixed upstream).
+  */
+
+
+  template <class T, class U> struct _is_explicitly_constructible
+  {
+    static constexpr bool value = std::is_constructible<T, U>::value;
+  };
+  template <class T> struct _is_explicitly_constructible<T, T>
+  {
+    static constexpr bool value = true;
+  };
+  template <class T> struct _is_explicitly_constructible<T, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <> struct _is_explicitly_constructible<void, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <class T, class U> static constexpr bool is_explicitly_constructible = _is_explicitly_constructible<T, U>::value;
+
+  template <class T, class U> struct _is_implicitly_constructible
+  {
+    static constexpr bool value = std::is_convertible<U, T>::value;
+  };
+  template <class T> struct _is_implicitly_constructible<T, T>
+  {
+    static constexpr bool value = true;
+  };
+  template <class T> struct _is_implicitly_constructible<T, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <> struct _is_implicitly_constructible<void, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <class T, class U> static constexpr bool is_implicitly_constructible = _is_implicitly_constructible<T, U>::value;
+
+// True if type is nothrow swappable
+#if !0 && (_HAS_CXX17 || __cplusplus >= 201700)
+  template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
+#else
+  namespace _is_nothrow_swappable
+  {
+    using namespace std;
+    template <class T> constexpr inline T &ldeclval();
+    template <class T, class = void> struct is_nothrow_swappable : std::integral_constant<bool, false>
+    {
+    };
+    template <class T> struct is_nothrow_swappable<T, decltype(swap(ldeclval<T>(), ldeclval<T>()))> : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
+    {
+    };
+  } // namespace _is_nothrow_swappable
+  template <class T> using is_nothrow_swappable = _is_nothrow_swappable::is_nothrow_swappable<T>;
+#endif
+  OUTCOME_TEMPLATE(class T, class U)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>() == std::declval<U>()))
+  inline bool safe_compare_equal(const T &a, const U &b) noexcept(noexcept(std::declval<T>() == std::declval<U>()))
+  {
+    // std::cout << "Taken " << typeid(T).name() << " == " << typeid(U).name() << " = " << (a == b) << std::endl;
+    return a == b;
+  }
+  template <class T, class U> inline bool safe_compare_equal(T && /*unused*/, U && /*unused*/) noexcept
+  {
+    // std::cout << "Fallback " << typeid(T).name() << " == " << typeid(U).name() << " = false" << std::endl;
+    return false;
+  }
+  OUTCOME_TEMPLATE(class T, class U)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>() != std::declval<U>()))
+  inline bool safe_compare_notequal(const T &a, const U &b) noexcept(noexcept(std::declval<T>() != std::declval<U>()))
+  {
+    // std::cout << "Taken " << typeid(T).name() << " != " << typeid(U).name() << " = " << (a != b) << std::endl;
+    return a != b;
+  }
+  template <class T, class U> inline bool safe_compare_notequal(T && /*unused*/, U && /*unused*/) noexcept
+  {
+    // std::cout << "Fallback " << typeid(T).name() << " != " << typeid(U).name() << " = true" << std::endl;
+    return true;
+  }
+
+} // namespace detail
+OUTCOME_V2_NAMESPACE_END
 
 
 #ifndef OUTCOME_THROW_EXCEPTION
@@ -1848,50 +2006,379 @@ OUTCOME_V2_NAMESPACE_END
 #endif
 
 #endif
-#include <exception>
-#include <system_error>
-#include <type_traits>
-
 OUTCOME_V2_NAMESPACE_BEGIN
+
+/*! Type sugar for implicitly constructing a `result<>` with a successful state.
+*/
+
+template <class T> struct success_type
+{
+  //! The type of the successful state.
+  using value_type = T;
+
+private:
+  //! The value of the successful state.
+  value_type _value;
+
+public:
+  /// \output_section Default, copy/move constructors and assignment
+  //! Default constructor
+  success_type() = default;
+  //! Copy constructor
+  success_type(const success_type &) = default;
+  //! Move constructor
+  success_type(success_type &&) = default; // NOLINT
+  //! Copy assignment
+  success_type &operator=(const success_type &) = default;
+  //! Move assignment
+  success_type &operator=(success_type &&) = default; // NOLINT
+  //! Destructor
+  ~success_type() = default;
+  /*! Initialising constructor
+
+  \requires That `U` is not `success_type`.
+  */
+
+
+
+  OUTCOME_TEMPLATE(class U)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<success_type, std::decay_t<U>>::value))
+  constexpr explicit success_type(U &&v)
+      : _value(static_cast<U &&>(v))
+  {
+  }
+
+  /// \output_section Observers
+  /*! Access value.
+  \returns Reference to the held `value_type` according to overload.
+  \group success_type_value
+  */
+
+
+
+  constexpr value_type &value() & { return _value; }
+  /// \group success_type_value
+  constexpr const value_type &value() const & { return _value; }
+  /// \group success_type_value
+  constexpr value_type &&value() && { return static_cast<value_type &&>(_value); }
+  /// \group success_type_value
+  constexpr const value_type &&value() const && { return static_cast<value_type &&>(_value); }
+};
+/*! Type sugar for implicitly constructing a `result<>` with a successful state.
+*/
+
+template <> struct success_type<void>
+{
+  //! The type of the successful state.
+  using value_type = void;
+};
+/*! Returns type sugar for implicitly constructing a `result<T>` with a successful state,
+default constructing `T` if necessary.
+*/
+
+
+inline constexpr success_type<void> success() noexcept
+{
+  return success_type<void>{};
+}
+/*! Returns type sugar for implicitly constructing a `result<T>` with a successful state.
+\effects Copies or moves the successful state supplied into the returned type sugar.
+*/
+
+
+template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v)
+{
+  return success_type<std::decay_t<T>>{static_cast<T &&>(v)};
+}
+
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and exception.
+*/
+
+template <class EC, class E = void> struct failure_type
+{
+  //! The type of the error code
+  using error_type = EC;
+  //! The type of the exception
+  using exception_type = E;
+
+private:
+  //! The error code
+  error_type _error;
+  //! The exception
+  exception_type _exception;
+
+public:
+  /// \output_section Default, copy/move constructors and assignment
+  //! Default constructor
+  failure_type() = default;
+  //! Copy constructor
+  failure_type(const failure_type &) = default;
+  //! Move constructor
+  failure_type(failure_type &&) = default; // NOLINT
+  //! Copy assignment
+  failure_type &operator=(const failure_type &) = default;
+  //! Move assignment
+  failure_type &operator=(failure_type &&) = default; // NOLINT
+  //! Destructor
+  ~failure_type() = default;
+  //! Initialising constructor
+  template <class U, class V>
+  constexpr explicit failure_type(U &&u, V &&v)
+      : _error(static_cast<U &&>(u))
+      , _exception(static_cast<V &&>(v))
+  {
+  }
+
+  /// \output_section Observers
+  /*! Access error.
+  \returns Reference to the held `error_type` according to overload.
+  \group failure_type_error
+  */
+
+
+
+  constexpr error_type &error() & { return _error; }
+  /// \group failure_type_error
+  constexpr const error_type &error() const & { return _error; }
+  /// \group failure_type_error
+  constexpr error_type &&error() && { return static_cast<error_type &&>(_error); }
+  /// \group failure_type_error
+  constexpr const error_type &&error() const && { return static_cast<error_type &&>(_error); }
+
+  /*! Access exception.
+  \returns Reference to the held `exception_type` according to overload.
+  \group failure_type_exception
+  */
+
+
+
+  constexpr exception_type &exception() & { return _exception; }
+  /// \group failure_type_exception
+  constexpr const exception_type &exception() const & { return _exception; }
+  /// \group failure_type_exception
+  constexpr exception_type &&exception() && { return static_cast<exception_type &&>(_exception); }
+  /// \group failure_type_exception
+  constexpr const exception_type &&exception() const && { return static_cast<exception_type &&>(_exception); }
+};
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code.
+*/
+
+template <class EC> struct failure_type<EC, void>
+{
+  //! The type of the error code
+  using error_type = EC;
+  //! The type of the exception
+  using exception_type = void;
+
+private:
+  //! The error code
+  error_type _error;
+
+public:
+  /// \output_section Default, copy/move constructors and assignment
+  //! Default constructor
+  failure_type() = default;
+  //! Copy constructor
+  failure_type(const failure_type &) = default;
+  //! Move constructor
+  failure_type(failure_type &&) = default; // NOLINT
+  //! Copy assignment
+  failure_type &operator=(const failure_type &) = default;
+  //! Move assignment
+  failure_type &operator=(failure_type &&) = default; // NOLINT
+  //! Destructor
+  ~failure_type() = default;
+  /*! Initialising constructor
+
+  \requires That `U` is not `failure_type`.
+  */
+
+
+
+  OUTCOME_TEMPLATE(class U)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<U>>::value))
+  constexpr explicit failure_type(U &&u)
+      : _error(static_cast<U &&>(u))
+  {
+  }
+
+  /// \output_section Observers
+  /*! Access error.
+  \returns Reference to the held `error_type` according to overload.
+  \group failure_type_error2
+  */
+
+
+
+  constexpr error_type &error() & { return _error; }
+  /// \group failure_type_error2
+  constexpr const error_type &error() const & { return _error; }
+  /// \group failure_type_error2
+  constexpr error_type &&error() && { return static_cast<error_type &&>(_error); }
+  /// \group failure_type_error2
+  constexpr const error_type &&error() const && { return static_cast<error_type &&>(_error); }
+};
+/*! Type sugar for implicitly constructing a `result<>` with a failure state of exception.
+*/
+
+template <class E> struct failure_type<void, E>
+{
+  //! The type of the error code
+  using error_type = void;
+  //! The type of the exception
+  using exception_type = E;
+
+private:
+  //! The exception
+  exception_type _exception;
+
+public:
+  /// \output_section Default, copy/move constructors and assignment
+  //! Default constructor
+  failure_type() = default;
+  //! Copy constructor
+  failure_type(const failure_type &) = default;
+  //! Move constructor
+  failure_type(failure_type &&) = default; // NOLINT
+  //! Copy assignment
+  failure_type &operator=(const failure_type &) = default;
+  //! Move assignment
+  failure_type &operator=(failure_type &&) = default; // NOLINT
+  //! Destructor
+  ~failure_type() = default;
+  /*! Initialising constructor
+
+  \requires That `V` is not `failure_type`.
+  */
+
+
+
+  OUTCOME_TEMPLATE(class V)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<V>>::value))
+  constexpr explicit failure_type(V &&v)
+      : _exception(static_cast<V &&>(v))
+  {
+  }
+
+  /// \output_section Observers
+  /*! Access exception.
+  \returns Reference to the held `exception_type` according to overload.
+  \group failure_type_exception2
+  */
+
+
+
+  constexpr exception_type &exception() & { return _exception; }
+  /// \group failure_type_exception2
+  constexpr const exception_type &exception() const & { return _exception; }
+  /// \group failure_type_exception2
+  constexpr exception_type &&exception() && { return static_cast<exception_type &&>(_exception); }
+  /// \group failure_type_exception2
+  constexpr const exception_type &&exception() const && { return static_cast<exception_type &&>(_exception); }
+};
+/*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
+\effects Copies or moves the failure state supplied into the returned type sugar.
+*/
+
+
+template <class EC> inline constexpr failure_type<std::decay_t<EC>> failure(EC &&v)
+{
+  return failure_type<std::decay_t<EC>>{static_cast<EC &&>(v)};
+}
+/*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
+\effects Copies or moves the failure state supplied into the returned type sugar.
+*/
+
+
+template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, E &&w)
+{
+  return failure_type<std::decay_t<EC>, std::decay_t<E>>{static_cast<EC &&>(v), static_cast<E &&>(w)};
+}
 
 namespace detail
 {
-  // Replace void with constructible void_type
-  struct empty_type
+  template <class T> struct is_success_type
   {
+    static constexpr bool value = false;
   };
-  struct void_type
+  template <class T> struct is_success_type<success_type<T>>
   {
-    // We always compare true to another instance of me
-    constexpr bool operator==(void_type /*unused*/) const noexcept { return true; }
-    constexpr bool operator!=(void_type /*unused*/) const noexcept { return false; }
+    static constexpr bool value = true;
   };
-  template <class T> using devoid = std::conditional_t<std::is_void<T>::value, void_type, T>;
-
-  template <class Output, class Input> using rebind_type5 = Output;
-  template <class Output, class Input>
-  using rebind_type4 = std::conditional_t< //
-  std::is_volatile<Input>::value, //
-  std::add_volatile_t<rebind_type5<Output, std::remove_volatile_t<Input>>>, //
-  rebind_type5<Output, Input>>;
-  template <class Output, class Input>
-  using rebind_type3 = std::conditional_t< //
-  std::is_const<Input>::value, //
-  std::add_const_t<rebind_type4<Output, std::remove_const_t<Input>>>, //
-  rebind_type4<Output, Input>>;
-  template <class Output, class Input>
-  using rebind_type2 = std::conditional_t< //
-  std::is_lvalue_reference<Input>::value, //
-  std::add_lvalue_reference_t<rebind_type3<Output, std::remove_reference_t<Input>>>, //
-  rebind_type3<Output, Input>>;
-  template <class Output, class Input>
-  using rebind_type = std::conditional_t< //
-  std::is_rvalue_reference<Input>::value, //
-  std::add_rvalue_reference_t<rebind_type2<Output, std::remove_reference_t<Input>>>, //
-  rebind_type2<Output, Input>>;
-
-  // static_assert(std::is_same_v<rebind_type<int, volatile const double &&>, volatile const int &&>, "");
+  template <class T> struct is_failure_type
+  {
+    static constexpr bool value = false;
+  };
+  template <class EC, class E> struct is_failure_type<failure_type<EC, E>>
+  {
+    static constexpr bool value = true;
+  };
 } // namespace detail
+
+//! True if the type is a success type
+template <class T> static constexpr bool is_success_type = detail::is_success_type<std::decay_t<T>>::value;
+
+//! True if the type is a failure type
+template <class T> static constexpr bool is_failure_type = detail::is_failure_type<std::decay_t<T>>::value;
+
+OUTCOME_V2_NAMESPACE_END
+
+#endif
+/* Traits for Outcome
+(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: March 2018
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_TRAIT_HPP
+#define OUTCOME_TRAIT_HPP
+
+
+
+#include <exception>
+#include <system_error>
+
+OUTCOME_V2_NAMESPACE_BEGIN
 
 //! Namespace for policies
 namespace policy
@@ -1997,310 +2484,36 @@ namespace trait
 
   template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<T>::value;
 
+  /*! Requirements predicate for permitting type to be used in result/outcome.
+
+  - Is not a reference.
+  - Is not an `in_place_type_t<>`.
+  - Is not a `success_type<>`.
+  - Is not a `failure_type<>`.
+  - Is not an array.
+  - Is `void`, or else is an Object and is Destructible.
+  */
+
+
+
+
+
+
+
+
+  template <class R> //
+  static constexpr bool type_can_be_used_in_result = //
+  (!std::is_reference<R>::value //
+   && !OUTCOME_V2_NAMESPACE::detail::is_in_place_type_t<std::decay_t<R>>::value //
+   && !is_success_type<R> //
+   && !is_failure_type<R> //
+   && !std::is_array<R>::value //
+   && (std::is_void<R>::value || (std::is_object<R>::value //
+                                  && std::is_destructible<R>::value)) //
+   );
+
 } // namespace trait
 
-/*! Type sugar for implicitly constructing a `result<>` with a successful state.
-*/
-
-template <class T> struct success_type
-{
-  //! The type of the successful state.
-  using value_type = T;
-
-private:
-  //! The value of the successful state.
-  value_type _value;
-
-public:
-  /// \output_section Default, copy/move constructors and assignment
-  //! Default constructor
-  success_type() = default;
-  //! Copy constructor
-  success_type(const success_type &) = default;
-  //! Move constructor
-  success_type(success_type &&) = default; // NOLINT
-  //! Copy assignment
-  success_type &operator=(const success_type &) = default;
-  //! Move assignment
-  success_type &operator=(success_type &&) = default; // NOLINT
-  //! Destructor
-  ~success_type() = default;
-  /*! Initialising constructor
-
-  \requires That `U` is not `success_type`.
-  */
-
-
-
-  OUTCOME_TEMPLATE(class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<success_type, std::decay_t<U>>::value))
-  constexpr explicit success_type(U &&v)
-      : _value(std::forward<U>(v))
-  {
-  }
-
-  /// \output_section Observers
-  /*! Access value.
-  \returns Reference to the held `value_type` according to overload.
-  \group success_type_value
-  */
-
-
-
-  constexpr value_type &value() & { return _value; }
-  /// \group success_type_value
-  constexpr const value_type &value() const & { return _value; }
-  /// \group success_type_value
-  constexpr value_type &&value() && { return std::move(_value); }
-  /// \group success_type_value
-  constexpr const value_type &&value() const && { return std::move(_value); }
-};
-/*! Type sugar for implicitly constructing a `result<>` with a successful state.
-*/
-
-template <> struct success_type<void>
-{
-  //! The type of the successful state.
-  using value_type = void;
-};
-/*! Returns type sugar for implicitly constructing a `result<T>` with a successful state,
-default constructing `T` if necessary.
-*/
-
-
-inline constexpr success_type<void> success() noexcept
-{
-  return success_type<void>{};
-}
-/*! Returns type sugar for implicitly constructing a `result<T>` with a successful state.
-\effects Copies or moves the successful state supplied into the returned type sugar.
-*/
-
-
-template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v)
-{
-  return success_type<std::decay_t<T>>{std::forward<T>(v)};
-}
-
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and exception.
-*/
-
-template <class EC = std::error_code, class E = void> struct failure_type
-{
-  //! The type of the error code
-  using error_type = EC;
-  //! The type of the exception
-  using exception_type = E;
-
-private:
-  //! The error code
-  error_type _error;
-  //! The exception
-  exception_type _exception;
-
-public:
-  /// \output_section Default, copy/move constructors and assignment
-  //! Default constructor
-  failure_type() = default;
-  //! Copy constructor
-  failure_type(const failure_type &) = default;
-  //! Move constructor
-  failure_type(failure_type &&) = default; // NOLINT
-  //! Copy assignment
-  failure_type &operator=(const failure_type &) = default;
-  //! Move assignment
-  failure_type &operator=(failure_type &&) = default; // NOLINT
-  //! Destructor
-  ~failure_type() = default;
-  //! Initialising constructor
-  template <class U, class V>
-  constexpr explicit failure_type(U &&u, V &&v)
-      : _error(std::forward<U>(u))
-      , _exception(std::forward<V>(v))
-  {
-  }
-
-  /// \output_section Observers
-  /*! Access error.
-  \returns Reference to the held `error_type` according to overload.
-  \group failure_type_error
-  */
-
-
-
-  constexpr error_type &error() & { return _error; }
-  /// \group failure_type_error
-  constexpr const error_type &error() const & { return _error; }
-  /// \group failure_type_error
-  constexpr error_type &&error() && { return std::move(_error); }
-  /// \group failure_type_error
-  constexpr const error_type &&error() const && { return std::move(_error); }
-
-  /*! Access exception.
-  \returns Reference to the held `exception_type` according to overload.
-  \group failure_type_exception
-  */
-
-
-
-  constexpr exception_type &exception() & { return _exception; }
-  /// \group failure_type_exception
-  constexpr const exception_type &exception() const & { return _exception; }
-  /// \group failure_type_exception
-  constexpr exception_type &&exception() && { return std::move(_exception); }
-  /// \group failure_type_exception
-  constexpr const exception_type &&exception() const && { return std::move(_exception); }
-};
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code.
-*/
-
-template <class EC> struct failure_type<EC, void>
-{
-  //! The type of the error code
-  using error_type = EC;
-  //! The type of the exception
-  using exception_type = void;
-
-private:
-  //! The error code
-  error_type _error;
-
-public:
-  /// \output_section Default, copy/move constructors and assignment
-  //! Default constructor
-  failure_type() = default;
-  //! Copy constructor
-  failure_type(const failure_type &) = default;
-  //! Move constructor
-  failure_type(failure_type &&) = default; // NOLINT
-  //! Copy assignment
-  failure_type &operator=(const failure_type &) = default;
-  //! Move assignment
-  failure_type &operator=(failure_type &&) = default; // NOLINT
-  //! Destructor
-  ~failure_type() = default;
-  /*! Initialising constructor
-
-  \requires That `U` is not `failure_type`.
-  */
-
-
-
-  OUTCOME_TEMPLATE(class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<U>>::value))
-  constexpr explicit failure_type(U &&u)
-      : _error(std::forward<U>(u))
-  {
-  }
-
-  /// \output_section Observers
-  /*! Access error.
-  \returns Reference to the held `error_type` according to overload.
-  \group failure_type_error2
-  */
-
-
-
-  constexpr error_type &error() & { return _error; }
-  /// \group failure_type_error2
-  constexpr const error_type &error() const & { return _error; }
-  /// \group failure_type_error2
-  constexpr error_type &&error() && { return std::move(_error); }
-  /// \group failure_type_error2
-  constexpr const error_type &&error() const && { return std::move(_error); }
-};
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of exception.
-*/
-
-template <class E> struct failure_type<void, E>
-{
-  //! The type of the error code
-  using error_type = void;
-  //! The type of the exception
-  using exception_type = E;
-
-private:
-  //! The exception
-  exception_type _exception;
-
-public:
-  /// \output_section Default, copy/move constructors and assignment
-  //! Default constructor
-  failure_type() = default;
-  //! Copy constructor
-  failure_type(const failure_type &) = default;
-  //! Move constructor
-  failure_type(failure_type &&) = default; // NOLINT
-  //! Copy assignment
-  failure_type &operator=(const failure_type &) = default;
-  //! Move assignment
-  failure_type &operator=(failure_type &&) = default; // NOLINT
-  //! Destructor
-  ~failure_type() = default;
-  /*! Initialising constructor
-
-  \requires That `V` is not `failure_type`.
-  */
-
-
-
-  OUTCOME_TEMPLATE(class V)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<V>>::value))
-  constexpr explicit failure_type(V &&v)
-      : _exception(std::forward<V>(v))
-  {
-  }
-
-  /// \output_section Observers
-  /*! Access exception.
-  \returns Reference to the held `exception_type` according to overload.
-  \group failure_type_exception2
-  */
-
-
-
-  constexpr exception_type &exception() & { return _exception; }
-  /// \group failure_type_exception2
-  constexpr const exception_type &exception() const & { return _exception; }
-  /// \group failure_type_exception2
-  constexpr exception_type &&exception() && { return std::move(_exception); }
-  /// \group failure_type_exception2
-  constexpr const exception_type &&exception() const && { return std::move(_exception); }
-};
-/*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
-\effects Copies or moves the failure state supplied into the returned type sugar.
-*/
-
-
-template <class EC> inline constexpr failure_type<std::decay_t<EC>> failure(EC &&v)
-{
-  return failure_type<std::decay_t<EC>>{std::forward<EC>(v)};
-}
-/*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
-\effects Copies or moves the failure state supplied into the returned type sugar.
-*/
-
-
-template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, E &&w)
-{
-  return failure_type<std::decay_t<EC>, std::decay_t<E>>{std::forward<EC>(v), std::forward<E>(w)};
-}
-
-namespace detail
-{
-  template <class T> struct is_success_type : std::false_type
-  {
-  };
-  template <class T> struct is_success_type<success_type<T>> : std::true_type
-  {
-  };
-  template <class T> struct is_failure_type : std::false_type
-  {
-  };
-  template <class EC, class E> struct is_failure_type<failure_type<EC, E>> : std::true_type
-  {
-  };
-} // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -2359,34 +2572,11 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include <cstdint> // for uint32_t etc
 #include <initializer_list>
 #include <iosfwd> // for serialisation
-#include <type_traits>
-#include <utility> // for in_place_type_t
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
-#if __cplusplus >= 201700 || _HAS_CXX17
-template <class T> using in_place_type_t = std::in_place_type_t<T>;
-using std::in_place_type;
-#else
-//! Aliases `std::in_place_type_t<T>` if on C++ 17 or later, else defined locally.
-template <class T> struct in_place_type_t
-{
-  explicit in_place_type_t() = default;
-};
-//! Aliases `std::in_place_type<T>` if on C++ 17 or later, else defined locally.
-template <class T> constexpr in_place_type_t<T> in_place_type{};
-#endif
-
 namespace detail
 {
-  // Test if type is an in_place_type_t
-  template <class T> struct is_in_place_type_t : std::false_type
-  {
-  };
-  template <class U> struct is_in_place_type_t<in_place_type_t<U>> : std::true_type
-  {
-  };
-
   using status_bitfield_type = uint32_t;
   static constexpr status_bitfield_type status_have_value = (1U << 0U);
   static constexpr status_bitfield_type status_have_error = (1U << 1U);
@@ -2715,89 +2905,6 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  /* True if type is the same or constructible. Works around a bug where clang + libstdc++
-  pukes on std::is_constructible<filesystem::path, void> (this bug is fixed upstream).
-  */
-
-
-  template <class T, class U> struct _is_explicitly_constructible
-  {
-    static constexpr bool value = std::is_constructible<T, U>::value;
-  };
-  template <class T> struct _is_explicitly_constructible<T, T>
-  {
-    static constexpr bool value = true;
-  };
-  template <class T> struct _is_explicitly_constructible<T, void>
-  {
-    static constexpr bool value = false;
-  };
-  template <> struct _is_explicitly_constructible<void, void>
-  {
-    static constexpr bool value = false;
-  };
-  template <class T, class U> static constexpr bool is_explicitly_constructible = _is_explicitly_constructible<T, U>::value;
-
-  template <class T, class U> struct _is_implicitly_constructible
-  {
-    static constexpr bool value = std::is_convertible<U, T>::value;
-  };
-  template <class T> struct _is_implicitly_constructible<T, T>
-  {
-    static constexpr bool value = true;
-  };
-  template <class T> struct _is_implicitly_constructible<T, void>
-  {
-    static constexpr bool value = false;
-  };
-  template <> struct _is_implicitly_constructible<void, void>
-  {
-    static constexpr bool value = false;
-  };
-  template <class T, class U> static constexpr bool is_implicitly_constructible = _is_implicitly_constructible<T, U>::value;
-
-// True if type is nothrow swappable
-#if !0 && (_HAS_CXX17 || __cplusplus >= 201700)
-  template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
-#else
-  namespace _is_nothrow_swappable
-  {
-    using namespace std;
-    template <class T> constexpr inline T &ldeclval();
-    template <class T, class = void> struct is_nothrow_swappable : std::integral_constant<bool, false>
-    {
-    };
-    template <class T> struct is_nothrow_swappable<T, decltype(swap(ldeclval<T>(), ldeclval<T>()))> : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
-    {
-    };
-  } // namespace _is_nothrow_swappable
-  template <class T> using is_nothrow_swappable = _is_nothrow_swappable::is_nothrow_swappable<T>;
-#endif
-  OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>() == std::declval<U>()))
-  inline bool safe_compare_equal(const T &a, const U &b) noexcept(noexcept(std::declval<T>() == std::declval<U>()))
-  {
-    // std::cout << "Taken " << typeid(T).name() << " == " << typeid(U).name() << " = " << (a == b) << std::endl;
-    return a == b;
-  }
-  template <class T, class U> inline bool safe_compare_equal(T && /*unused*/, U && /*unused*/) noexcept
-  {
-    // std::cout << "Fallback " << typeid(T).name() << " == " << typeid(U).name() << " = false" << std::endl;
-    return false;
-  }
-  OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>() != std::declval<U>()))
-  inline bool safe_compare_notequal(const T &a, const U &b) noexcept(noexcept(std::declval<T>() != std::declval<U>()))
-  {
-    // std::cout << "Taken " << typeid(T).name() << " != " << typeid(U).name() << " = " << (a != b) << std::endl;
-    return a != b;
-  }
-  template <class T, class U> inline bool safe_compare_notequal(T && /*unused*/, U && /*unused*/) noexcept
-  {
-    // std::cout << "Fallback " << typeid(T).name() << " != " << typeid(U).name() << " = true" << std::endl;
-    return true;
-  }
-
   template <class State, class E> constexpr inline void _set_error_is_errno(State & /*unused*/, const E & /*unused*/) {}
   template <class State> constexpr inline void _set_error_is_errno(State &state, const std::error_code &error)
   {
@@ -2842,25 +2949,13 @@ namespace policy
 } // namespace policy
 namespace detail
 {
-  //! Predicate for permitting type to be used in outcome
-  template <class R> //
-  static constexpr bool type_can_be_used_in_result = //
-  (!std::is_reference<R>::value //
-   && !detail::is_in_place_type_t<std::decay_t<R>>::value //
-   && !detail::is_success_type<R>::value //
-   && !detail::is_failure_type<R>::value //
-   && !std::is_array<R>::value //
-   && (std::is_void<R>::value || (std::is_object<R>::value //
-                                  && std::is_destructible<R>::value)) //
-   );
-
   //! The base implementation type of `result<R, EC, NoValuePolicy>`.
   template <class R, class EC, class NoValuePolicy> //
-  OUTCOME_REQUIRES(type_can_be_used_in_result<R> &&type_can_be_used_in_result<EC> && (std::is_void<EC>::value || std::is_default_constructible<EC>::value)) //
+  OUTCOME_REQUIRES(trait::type_can_be_used_in_result<R> &&trait::type_can_be_used_in_result<EC> && (std::is_void<EC>::value || std::is_default_constructible<EC>::value)) //
   class result_storage
   {
-    static_assert(type_can_be_used_in_result<R>, "The type R cannot be used in a result");
-    static_assert(type_can_be_used_in_result<EC>, "The type S cannot be used in a result");
+    static_assert(trait::type_can_be_used_in_result<R>, "The type R cannot be used in a result");
+    static_assert(trait::type_can_be_used_in_result<EC>, "The type S cannot be used in a result");
     static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "The type S must be void or default constructible");
 
     friend NoValuePolicy;
@@ -4720,7 +4815,7 @@ namespace policy
 
 template <class R, class S = std::error_code, class NoValuePolicy = policy::default_policy<R, S, void>> //
 #if !defined(__GNUC__) || __GNUC__ >= 8 // GCC's constraints implementation is buggy
-OUTCOME_REQUIRES(detail::type_can_be_used_in_result<R> &&detail::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value)) //
+OUTCOME_REQUIRES(trait::type_can_be_used_in_result<R> &&trait::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value)) //
 #endif
 class result;
 
@@ -4920,12 +5015,12 @@ or if `S` is `void`, do `throw bad_result_access()`
 
 template <class R, class S, class NoValuePolicy> //
 #if !defined(__GNUC__) || __GNUC__ >= 8 // GCC's constraints implementation is buggy
-OUTCOME_REQUIRES(detail::type_can_be_used_in_result<R> &&detail::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value)) //
+OUTCOME_REQUIRES(trait::type_can_be_used_in_result<R> &&trait::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value)) //
 #endif
 class OUTCOME_NODISCARD result : public detail::result_final<R, S, NoValuePolicy>
 {
-  static_assert(detail::type_can_be_used_in_result<R>, "The type R cannot be used in a result");
-  static_assert(detail::type_can_be_used_in_result<S>, "The type S cannot be used in a result");
+  static_assert(trait::type_can_be_used_in_result<R>, "The type R cannot be used in a result");
+  static_assert(trait::type_can_be_used_in_result<S>, "The type S cannot be used in a result");
   static_assert(std::is_void<S>::value || std::is_default_constructible<S>::value, "The type S must be void or default constructible");
 
   using base = detail::result_final<R, S, NoValuePolicy>;
@@ -5590,7 +5685,7 @@ OUTCOME_V2_NAMESPACE_END
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_policy<R, S, P>> //
-OUTCOME_REQUIRES(detail::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value)) //
+OUTCOME_REQUIRES(trait::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value)) //
 class outcome;
 
 namespace detail
@@ -5826,7 +5921,7 @@ or if `S` is `void`, do `throw bad_outcome_access()`
 
 
 template <class R, class S, class P, class NoValuePolicy> //
-OUTCOME_REQUIRES(detail::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value)) //
+OUTCOME_REQUIRES(trait::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value)) //
 class OUTCOME_NODISCARD outcome
 
 
@@ -5836,7 +5931,7 @@ class OUTCOME_NODISCARD outcome
 : public detail::select_outcome_impl<R, S, P, NoValuePolicy>
 
 {
-  static_assert(detail::type_can_be_used_in_result<P>, "The exception_type cannot be used");
+  static_assert(trait::type_can_be_used_in_result<P>, "The exception_type cannot be used");
   static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "exception_type must be void or default constructible");
   using base = detail::select_outcome_impl<R, S, P, NoValuePolicy>;
   friend NoValuePolicy;
