@@ -112,7 +112,7 @@ namespace detail
     implicit_constructors_enabled && !std::is_same<choose_inplace_value_error_exception_constructor<Args...>, disable_inplace_value_error_exception_constructor>::value;
   };
 
-  template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl2 = detail::outcome_exception_observers<detail::result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>;
+  template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl2 = detail::outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>;
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl = std::conditional_t<trait::has_error_code_v<S> && trait::has_exception_ptr_v<P>, detail::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>, select_outcome_impl2<R, S, P, NoValuePolicy>>;
 
   template <class T, class U, class V> constexpr inline const V &extract_exception_from_failure(const failure_type<U, V> &v) { return v.exception(); }
@@ -211,18 +211,18 @@ or if `P` is `void`, do `throw bad_outcome_access()`
 or if `S` is `void`, do `throw bad_outcome_access()`
    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
-template <class R, class S, class P, class NoValuePolicy>                                                                      //
-OUTCOME_REQUIRES(trait::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))  //
+template <class R, class S, class P, class NoValuePolicy>                                                                            //
+OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))  //
 class OUTCOME_NODISCARD outcome
 #if defined(DOXYGEN_IS_IN_THE_HOUSE) || defined(STANDARDESE_IS_IN_THE_HOUSE)
 : public detail::outcome_failure_observers<detail::select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>,
   public detail::select_outcome_impl2<R, S, P, NoValuePolicy>,
-  public detail::result_final<R, S, NoValuePolicy>
+  public detail::basic_result_final<R, S, NoValuePolicy>
 #else
 : public detail::select_outcome_impl<R, S, P, NoValuePolicy>
 #endif
 {
-  static_assert(trait::type_can_be_used_in_result<P>, "The exception_type cannot be used");
+  static_assert(trait::type_can_be_used_in_basic_result<P>, "The exception_type cannot be used");
   static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "exception_type must be void or default constructible");
   using base = detail::select_outcome_impl<R, S, P, NoValuePolicy>;
   friend NoValuePolicy;

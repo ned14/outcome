@@ -142,7 +142,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef OUTCOME_OUTCOME_EXCEPTION_OBSERVERS_HPP
 #define OUTCOME_OUTCOME_EXCEPTION_OBSERVERS_HPP
-/* Storage for a very simple result type
+/* Storage for a very simple basic_result type
 (C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: Oct 2017
 
@@ -188,8 +188,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
-#ifndef OUTCOME_RESULT_STORAGE_HPP
-#define OUTCOME_RESULT_STORAGE_HPP
+#ifndef OUTCOME_BASIC_RESULT_STORAGE_HPP
+#define OUTCOME_BASIC_RESULT_STORAGE_HPP
 /* Type sugar for success and failure
 (C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: July 2017
@@ -2011,7 +2011,7 @@ OUTCOME_V2_NAMESPACE_END
 #endif
 OUTCOME_V2_NAMESPACE_BEGIN
 
-/*! Type sugar for implicitly constructing a `result<>` with a successful state.
+/*! Type sugar for implicitly constructing a `basic_result<>` with a successful state.
 */
 
 template <class T> struct success_type
@@ -2067,7 +2067,7 @@ public:
   /// \group success_type_value
   constexpr const value_type &&value() const && { return static_cast<value_type &&>(_value); }
 };
-/*! Type sugar for implicitly constructing a `result<>` with a successful state.
+/*! Type sugar for implicitly constructing a `basic_result<>` with a successful state.
 */
 
 template <> struct success_type<void>
@@ -2075,7 +2075,7 @@ template <> struct success_type<void>
   //! The type of the successful state.
   using value_type = void;
 };
-/*! Returns type sugar for implicitly constructing a `result<T>` with a successful state,
+/*! Returns type sugar for implicitly constructing a `basic_result<T>` with a successful state,
 default constructing `T` if necessary.
 */
 
@@ -2084,7 +2084,7 @@ inline constexpr success_type<void> success() noexcept
 {
   return success_type<void>{};
 }
-/*! Returns type sugar for implicitly constructing a `result<T>` with a successful state.
+/*! Returns type sugar for implicitly constructing a `basic_result<T>` with a successful state.
 \effects Copies or moves the successful state supplied into the returned type sugar.
 */
 
@@ -2094,7 +2094,7 @@ template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v)
   return success_type<std::decay_t<T>>{static_cast<T &&>(v)};
 }
 
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and exception.
+/*! Type sugar for implicitly constructing a `basic_result<>` with a failure state of error code and exception.
 */
 
 template <class EC, class E = void> struct failure_type
@@ -2163,7 +2163,7 @@ public:
   /// \group failure_type_exception
   constexpr const exception_type &&exception() const && { return static_cast<exception_type &&>(_exception); }
 };
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code.
+/*! Type sugar for implicitly constructing a `basic_result<>` with a failure state of error code.
 */
 
 template <class EC> struct failure_type<EC, void>
@@ -2221,7 +2221,7 @@ public:
   /// \group failure_type_error2
   constexpr const error_type &&error() const && { return static_cast<error_type &&>(_error); }
 };
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of exception.
+/*! Type sugar for implicitly constructing a `basic_result<>` with a failure state of exception.
 */
 
 template <class E> struct failure_type<void, E>
@@ -2279,7 +2279,7 @@ public:
   /// \group failure_type_exception2
   constexpr const exception_type &&exception() const && { return static_cast<exception_type &&>(_exception); }
 };
-/*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
+/*! Returns type sugar for implicitly constructing a `basic_result<T>` with a failure state.
 \effects Copies or moves the failure state supplied into the returned type sugar.
 */
 
@@ -2288,7 +2288,7 @@ template <class EC> inline constexpr failure_type<std::decay_t<EC>> failure(EC &
 {
   return failure_type<std::decay_t<EC>>{static_cast<EC &&>(v)};
 }
-/*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
+/*! Returns type sugar for implicitly constructing a `basic_result<T>` with a failure state.
 \effects Copies or moves the failure state supplied into the returned type sugar.
 */
 
@@ -2383,7 +2383,7 @@ OUTCOME_V2_NAMESPACE_BEGIN
 //! Namespace for traits
 namespace trait
 {
-  /*! Requirements predicate for permitting type to be used in result/outcome.
+  /*! Requirements predicate for permitting type to be used in `basic_result`/`basic_outcome`.
 
   - Is not a reference.
   - Is not an `in_place_type_t<>`.
@@ -2401,7 +2401,7 @@ namespace trait
 
 
   template <class R> //
-  static constexpr bool type_can_be_used_in_result = //
+  static constexpr bool type_can_be_used_in_basic_result = //
   (!std::is_reference<R>::value //
    && !OUTCOME_V2_NAMESPACE::detail::is_in_place_type_t<std::decay_t<R>>::value //
    && !is_success_type<R> //
@@ -2798,16 +2798,16 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace detail
 {
   template <class State, class E> constexpr inline void _set_error_is_errno(State & /*unused*/, const E & /*unused*/) {}
-  template <class R, class S, class NoValuePolicy> class result_final;
+  template <class R, class S, class NoValuePolicy> class basic_result_final;
 }
 
-//! Namespace containing hooks used for intercepting and manipulating result/outcome
+//! Namespace containing hooks used for intercepting and manipulating `basic_result`/`basic_outcome`
 namespace hooks
 {
-  //! Get the sixteen bits of spare storage in a `result` or `outcome`.
-  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::result_final<R, S, NoValuePolicy> *r) noexcept;
-  //! Sets the sixteen bits of spare storage in a `result` or `outcome`.
-  template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
+  //! Get the sixteen bits of spare storage in a `basic_result` or `basic_outcome`.
+  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept;
+  //! Sets the sixteen bits of spare storage in a `basic_result` or `basic_outcome`.
+  template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
 } // namespace hooks
 
 namespace policy
@@ -2820,21 +2820,21 @@ namespace policy
 
 namespace detail
 {
-  //! The base implementation type of `result<R, EC, NoValuePolicy>`.
+  //! The base implementation type of `basic_result<R, EC, NoValuePolicy>`.
   template <class R, class EC, class NoValuePolicy> //
-  OUTCOME_REQUIRES(trait::type_can_be_used_in_result<R> &&trait::type_can_be_used_in_result<EC> && (std::is_void<EC>::value || std::is_default_constructible<EC>::value)) //
-  class result_storage
+  OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<EC> && (std::is_void<EC>::value || std::is_default_constructible<EC>::value)) //
+  class basic_result_storage
   {
-    static_assert(trait::type_can_be_used_in_result<R>, "The type R cannot be used in a result");
-    static_assert(trait::type_can_be_used_in_result<EC>, "The type S cannot be used in a result");
+    static_assert(trait::type_can_be_used_in_basic_result<R>, "The type R cannot be used in a basic_result");
+    static_assert(trait::type_can_be_used_in_basic_result<EC>, "The type S cannot be used in a basic_result");
     static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "The type S must be void or default constructible");
 
     friend NoValuePolicy;
     friend struct policy::detail::base;
-    template <class T, class U, class V> friend class result_storage;
-    template <class T, class U, class V> friend class result_final;
-    template <class T, class U, class V> friend constexpr inline uint16_t hooks::spare_storage(const detail::result_final<T, U, V> *r) noexcept; // NOLINT
-    template <class T, class U, class V> friend constexpr inline void hooks::set_spare_storage(detail::result_final<T, U, V> *r, uint16_t v) noexcept; // NOLINT
+    template <class T, class U, class V> friend class basic_result_storage;
+    template <class T, class U, class V> friend class basic_result_final;
+    template <class T, class U, class V> friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept; // NOLINT
+    template <class T, class U, class V> friend constexpr inline void hooks::set_spare_storage(detail::basic_result_final<T, U, V> *r, uint16_t v) noexcept; // NOLINT
 
     struct disable_in_place_value_type
     {
@@ -2860,34 +2860,34 @@ namespace detail
     const detail::value_storage_select_impl<_value_type> &__state() const { return _state; }
 
   protected:
-    result_storage() = default;
-    result_storage(const result_storage &) = default; // NOLINT
-    result_storage(result_storage &&) = default; // NOLINT
-    result_storage &operator=(const result_storage &) = default; // NOLINT
-    result_storage &operator=(result_storage &&) = default; // NOLINT
-    ~result_storage() = default;
+    basic_result_storage() = default;
+    basic_result_storage(const basic_result_storage &) = default; // NOLINT
+    basic_result_storage(basic_result_storage &&) = default; // NOLINT
+    basic_result_storage &operator=(const basic_result_storage &) = default; // NOLINT
+    basic_result_storage &operator=(basic_result_storage &&) = default; // NOLINT
+    ~basic_result_storage() = default;
 
     template <class... Args>
-    constexpr explicit result_storage(in_place_type_t<_value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
+    constexpr explicit basic_result_storage(in_place_type_t<_value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
         : _state{_, static_cast<Args &&>(args)...}
         , _error()
     {
     }
     template <class U, class... Args>
-    constexpr result_storage(in_place_type_t<_value_type> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, std::initializer_list<U>, Args...>::value)
+    constexpr basic_result_storage(in_place_type_t<_value_type> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, std::initializer_list<U>, Args...>::value)
         : _state{_, il, static_cast<Args &&>(args)...}
         , _error()
     {
     }
     template <class... Args>
-    constexpr explicit result_storage(in_place_type_t<_error_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
+    constexpr explicit basic_result_storage(in_place_type_t<_error_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
         : _state{detail::status_have_error}
         , _error(static_cast<Args &&>(args)...)
     {
       detail::_set_error_is_errno(_state, _error);
     }
     template <class U, class... Args>
-    constexpr result_storage(in_place_type_t<_error_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
+    constexpr basic_result_storage(in_place_type_t<_error_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
         : _state{detail::status_have_error}
         , _error{il, static_cast<Args &&>(args)...}
     {
@@ -2897,25 +2897,25 @@ namespace detail
     {
     };
     template <class T, class U, class V>
-    constexpr result_storage(compatible_conversion_tag /*unused*/, const result_storage<T, U, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
+    constexpr basic_result_storage(compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
         : _state(o._state)
         , _error(o._error)
     {
     }
     template <class T, class V>
-    constexpr result_storage(compatible_conversion_tag /*unused*/, const result_storage<T, void, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
+    constexpr basic_result_storage(compatible_conversion_tag /*unused*/, const basic_result_storage<T, void, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
         : _state(o._state)
         , _error(_error_type{})
     {
     }
     template <class T, class U, class V>
-    constexpr result_storage(compatible_conversion_tag /*unused*/, result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
+    constexpr basic_result_storage(compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
         : _state(static_cast<decltype(o._state) &&>(o._state))
         , _error(static_cast<U &&>(o._error))
     {
     }
     template <class T, class V>
-    constexpr result_storage(compatible_conversion_tag /*unused*/, result_storage<T, void, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
+    constexpr basic_result_storage(compatible_conversion_tag /*unused*/, basic_result_storage<T, void, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
         : _state(static_cast<decltype(o._state) &&>(o._state))
         , _error(_error_type{})
     {
@@ -3281,9 +3281,9 @@ namespace convert
 
   template <class T, class U> struct value_or_error
   {
-    //! False to indicate that this converter wants `result`/`outcome` to reject all other `result`
+    //! False to indicate that this converter wants `basic_result`/`basic_outcome` to reject all other `basic_result`
     static constexpr bool enable_result_inputs = false;
-    //! False to indicate that this converter wants `outcome` to reject all other `outcome`
+    //! False to indicate that this converter wants `basic_outcome` to reject all other `basic_outcome`
     static constexpr bool enable_outcome_inputs = false;
     /*! Default converter for types matching the `ValueOrError` concept.
     \requires `std::decay_t<X>` to be the same type as `U`;
@@ -3352,9 +3352,9 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
-#ifndef OUTCOME_RESULT_FINAL_HPP
-#define OUTCOME_RESULT_FINAL_HPP
-/* Error observers for a very simple result type
+#ifndef OUTCOME_BASIC_RESULT_FINAL_HPP
+#define OUTCOME_BASIC_RESULT_FINAL_HPP
+/* Error observers for a very simple basic_result type
 (C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: Oct 2017
 
@@ -3400,8 +3400,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
-#ifndef OUTCOME_RESULT_ERROR_OBSERVERS_HPP
-#define OUTCOME_RESULT_ERROR_OBSERVERS_HPP
+#ifndef OUTCOME_BASIC_RESULT_ERROR_OBSERVERS_HPP
+#define OUTCOME_BASIC_RESULT_ERROR_OBSERVERS_HPP
 
 
 
@@ -3409,8 +3409,8 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  //! The error observers implementation of `result<R, EC, NoValuePolicy>`.
-  template <class Base, class EC, class NoValuePolicy> class result_error_observers : public Base
+  //! The error observers implementation of `basic_result<R, EC, NoValuePolicy>`.
+  template <class Base, class EC, class NoValuePolicy> class basic_result_error_observers : public Base
   {
   public:
     using error_type = EC;
@@ -3418,7 +3418,7 @@ namespace detail
 
     /// \output_section Narrow state observers
     /*! Access error without runtime checks.
-    \preconditions The result to have a failed state, otherwise it is undefined behaviour.
+    \preconditions The basic_result to have a failed state, otherwise it is undefined behaviour.
     \returns Reference to the held `error_type` according to overload.
     \group assume_error
     */
@@ -3428,32 +3428,32 @@ namespace detail
 
     constexpr error_type &assume_error() & noexcept
     {
-      NoValuePolicy::narrow_error_check(static_cast<result_error_observers &>(*this));
+      NoValuePolicy::narrow_error_check(static_cast<basic_result_error_observers &>(*this));
       return this->_error;
     }
     /// \group assume_error
     constexpr const error_type &assume_error() const &noexcept
     {
-      NoValuePolicy::narrow_error_check(static_cast<const result_error_observers &>(*this));
+      NoValuePolicy::narrow_error_check(static_cast<const basic_result_error_observers &>(*this));
       return this->_error;
     }
     /// \group assume_error
     constexpr error_type &&assume_error() && noexcept
     {
-      NoValuePolicy::narrow_error_check(static_cast<result_error_observers &&>(*this));
+      NoValuePolicy::narrow_error_check(static_cast<basic_result_error_observers &&>(*this));
       return static_cast<error_type &&>(this->_error);
     }
     /// \group assume_error
     constexpr const error_type &&assume_error() const &&noexcept
     {
-      NoValuePolicy::narrow_error_check(static_cast<const result_error_observers &&>(*this));
+      NoValuePolicy::narrow_error_check(static_cast<const basic_result_error_observers &&>(*this));
       return static_cast<const error_type &&>(this->_error);
     }
 
     /// \output_section Wide state observers
     /*! Access error with runtime checks.
     \returns Reference to the held `error_type` according to overload.
-    \requires The result to have a failed state, else whatever `NoValuePolicy` says ought to happen.
+    \requires The basic_result to have a failed state, else whatever `NoValuePolicy` says ought to happen.
     \group error
     */
 
@@ -3462,29 +3462,29 @@ namespace detail
 
     constexpr error_type &error() &
     {
-      NoValuePolicy::wide_error_check(static_cast<result_error_observers &>(*this));
+      NoValuePolicy::wide_error_check(static_cast<basic_result_error_observers &>(*this));
       return this->_error;
     }
     /// \group error
     constexpr const error_type &error() const &
     {
-      NoValuePolicy::wide_error_check(static_cast<const result_error_observers &>(*this));
+      NoValuePolicy::wide_error_check(static_cast<const basic_result_error_observers &>(*this));
       return this->_error;
     }
     /// \group error
     constexpr error_type &&error() &&
     {
-      NoValuePolicy::wide_error_check(static_cast<result_error_observers &&>(*this));
+      NoValuePolicy::wide_error_check(static_cast<basic_result_error_observers &&>(*this));
       return static_cast<error_type &&>(this->_error);
     }
     /// \group error
     constexpr const error_type &&error() const &&
     {
-      NoValuePolicy::wide_error_check(static_cast<const result_error_observers &&>(*this));
+      NoValuePolicy::wide_error_check(static_cast<const basic_result_error_observers &&>(*this));
       return static_cast<const error_type &&>(this->_error);
     }
   };
-  template <class Base, class NoValuePolicy> class result_error_observers<Base, void, NoValuePolicy> : public Base
+  template <class Base, class NoValuePolicy> class basic_result_error_observers<Base, void, NoValuePolicy> : public Base
   {
   public:
     using Base::Base;
@@ -3495,7 +3495,7 @@ namespace detail
     constexpr void assume_error() const noexcept { NoValuePolicy::narrow_error_check(*this); }
     /// \output_section Wide state observers
     /*! Access error with runtime checks.
-    \requires The result to have a failed state, else whatever `NoValuePolicy` says ought to happen.
+    \requires The basic_result to have a failed state, else whatever `NoValuePolicy` says ought to happen.
     */
 
 
@@ -3505,7 +3505,7 @@ namespace detail
 OUTCOME_V2_NAMESPACE_END
 
 #endif
-/* Value observers for a very simple result type
+/* Value observers for a very simple basic_result type
 (C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: Oct 2017
 
@@ -3560,8 +3560,8 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  //! The value observers implementation of `result<R, EC, NoValuePolicy>`.
-  template <class Base, class R, class NoValuePolicy> class result_value_observers : public Base
+  //! The value observers implementation of `basic_result<R, EC, NoValuePolicy>`.
+  template <class Base, class R, class NoValuePolicy> class basic_result_value_observers : public Base
   {
   public:
     using value_type = R;
@@ -3569,7 +3569,7 @@ namespace detail
 
     /// \output_section Narrow state observers
     /*! Access value without runtime checks.
-    \preconditions The result to have a successful state, otherwise it is undefined behaviour.
+    \preconditions The basic_result to have a successful state, otherwise it is undefined behaviour.
     \returns Reference to the held `value_type` according to overload.
     \group assume_value
     */
@@ -3579,32 +3579,32 @@ namespace detail
 
     constexpr value_type &assume_value() & noexcept
     {
-      NoValuePolicy::narrow_value_check(static_cast<result_value_observers &>(*this));
+      NoValuePolicy::narrow_value_check(static_cast<basic_result_value_observers &>(*this));
       return this->_state._value; // NOLINT
     }
     /// \group assume_value
     constexpr const value_type &assume_value() const &noexcept
     {
-      NoValuePolicy::narrow_value_check(static_cast<const result_value_observers &>(*this));
+      NoValuePolicy::narrow_value_check(static_cast<const basic_result_value_observers &>(*this));
       return this->_state._value; // NOLINT
     }
     /// \group assume_value
     constexpr value_type &&assume_value() && noexcept
     {
-      NoValuePolicy::narrow_value_check(static_cast<result_value_observers &&>(*this));
+      NoValuePolicy::narrow_value_check(static_cast<basic_result_value_observers &&>(*this));
       return static_cast<value_type &&>(this->_state._value); // NOLINT
     }
     /// \group assume_value
     constexpr const value_type &&assume_value() const &&noexcept
     {
-      NoValuePolicy::narrow_value_check(static_cast<const result_value_observers &&>(*this));
+      NoValuePolicy::narrow_value_check(static_cast<const basic_result_value_observers &&>(*this));
       return static_cast<const value_type &&>(this->_state._value); // NOLINT
     }
 
     /// \output_section Wide state observers
     /*! Access value with runtime checks.
     \returns Reference to the held `value_type` according to overload.
-    \requires The result to have a successful state, else whatever `NoValuePolicy` says ought to happen.
+    \requires The basic_result to have a successful state, else whatever `NoValuePolicy` says ought to happen.
     \group value
     */
 
@@ -3613,29 +3613,29 @@ namespace detail
 
     constexpr value_type &value() &
     {
-      NoValuePolicy::wide_value_check(static_cast<result_value_observers &>(*this));
+      NoValuePolicy::wide_value_check(static_cast<basic_result_value_observers &>(*this));
       return this->_state._value; // NOLINT
     }
     /// \group value
     constexpr const value_type &value() const &
     {
-      NoValuePolicy::wide_value_check(static_cast<const result_value_observers &>(*this));
+      NoValuePolicy::wide_value_check(static_cast<const basic_result_value_observers &>(*this));
       return this->_state._value; // NOLINT
     }
     /// \group value
     constexpr value_type &&value() &&
     {
-      NoValuePolicy::wide_value_check(static_cast<result_value_observers &&>(*this));
+      NoValuePolicy::wide_value_check(static_cast<basic_result_value_observers &&>(*this));
       return static_cast<value_type &&>(this->_state._value); // NOLINT
     }
     /// \group value
     constexpr const value_type &&value() const &&
     {
-      NoValuePolicy::wide_value_check(static_cast<const result_value_observers &&>(*this));
+      NoValuePolicy::wide_value_check(static_cast<const basic_result_value_observers &&>(*this));
       return static_cast<const value_type &&>(this->_state._value); // NOLINT
     }
   };
-  template <class Base, class NoValuePolicy> class result_value_observers<Base, void, NoValuePolicy> : public Base
+  template <class Base, class NoValuePolicy> class basic_result_value_observers<Base, void, NoValuePolicy> : public Base
   {
   public:
     using Base::Base;
@@ -3647,7 +3647,7 @@ namespace detail
     constexpr void assume_value() const noexcept { NoValuePolicy::narrow_value_check(*this); }
     /// \output_section Wide state observers
     /*! Access value with runtime checks.
-    \requires The result to have a successful state, else whatever `NoValuePolicy` says ought to happen.
+    \requires The basic_result to have a successful state, else whatever `NoValuePolicy` says ought to happen.
     */
 
 
@@ -3662,18 +3662,18 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  template <class R, class EC, class NoValuePolicy> using select_result_impl = result_error_observers<result_value_observers<result_storage<R, EC, NoValuePolicy>, R, NoValuePolicy>, EC, NoValuePolicy>;
+  template <class R, class EC, class NoValuePolicy> using select_basic_result_impl = basic_result_error_observers<basic_result_value_observers<basic_result_storage<R, EC, NoValuePolicy>, R, NoValuePolicy>, EC, NoValuePolicy>;
 
-  //! The assembled implementation type of `result<R, S, NoValuePolicy>`.
+  //! The assembled implementation type of `basic_result<R, S, NoValuePolicy>`.
   template <class R, class S, class NoValuePolicy>
-  class result_final
+  class basic_result_final
 
 
 
-  : public select_result_impl<R, S, NoValuePolicy>
+  : public select_basic_result_impl<R, S, NoValuePolicy>
 
   {
-    using base = select_result_impl<R, S, NoValuePolicy>;
+    using base = select_basic_result_impl<R, S, NoValuePolicy>;
 
   public:
     using base::base;
@@ -3711,8 +3711,8 @@ namespace detail
     constexpr bool has_failure() const noexcept { return (this->_state._status & detail::status_have_error) != 0 && (this->_state._status & detail::status_have_exception) != 0; }
 
     /// \output_section Comparison operators
-    /*! True if equal to the other result.
-    \param o The other result to compare to.
+    /*! True if equal to the other basic_result.
+    \param o The other basic_result to compare to.
 
     \effects If a valid expression to do so, calls the `operator==` operation on each
     of the two stored items returning true if both are true. Otherwise returns false.
@@ -3725,7 +3725,7 @@ namespace detail
 
 
     template <class T, class U, class V>
-    constexpr bool operator==(const result_final<T, U, V> &o) const noexcept( //
+    constexpr bool operator==(const basic_result_final<T, U, V> &o) const noexcept( //
     noexcept(detail::safe_compare_equal(std::declval<detail::devoid<R>>(), std::declval<detail::devoid<T>>())) //
     && noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<U>>())))
     {
@@ -3786,8 +3786,8 @@ namespace detail
 
 
     template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->_error, o.error()); }
-    /*! True if not equal to the other result.
-    \param o The other result to compare to.
+    /*! True if not equal to the other basic_result.
+    \param o The other basic_result to compare to.
 
     \effects If a valid expression to do so, calls the `operator!=` operation on each
     of the two stored items, returning true if any are not equal. Otherwise returns true.
@@ -3800,7 +3800,7 @@ namespace detail
 
 
     template <class T, class U, class V>
-    constexpr bool operator!=(const result_final<T, U, V> &o) const noexcept( //
+    constexpr bool operator!=(const basic_result_final<T, U, V> &o) const noexcept( //
     noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<R>>(), std::declval<detail::devoid<T>>())) //
     && noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<U>>())))
     {
@@ -3865,9 +3865,9 @@ namespace detail
 
     template <class T> constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_notequal(this->_error, o.error()); }
   };
-  /*! True if the result is equal to the success type sugar.
+  /*! True if the basic_result is equal to the success type sugar.
   \param a The success type sugar to compare.
-  \param b The result to compare.
+  \param b The basic_result to compare.
 
   \effects If a valid expression to do so, calls the `operator==` operation on the successful item returning true if equal. Otherwise returns false.
   \remarks Implemented as `b == a`.
@@ -3880,10 +3880,10 @@ namespace detail
 
 
 
-  template <class T, class U, class V, class W> constexpr inline bool operator==(const success_type<W> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
-  /*! True if the result is equal to the failure type sugar.
+  template <class T, class U, class V, class W> constexpr inline bool operator==(const success_type<W> &a, const basic_result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
+  /*! True if the basic_result is equal to the failure type sugar.
   \param a The failure type sugar to compare.
-  \param b The result to compare.
+  \param b The basic_result to compare.
 
   \effects If a valid expression to do so, calls the `operator==` operation on the failure item returning true if equal. Otherwise returns false.
   \remarks Implemented as `b == a`.
@@ -3896,10 +3896,10 @@ namespace detail
 
 
 
-  template <class T, class U, class V, class W> constexpr inline bool operator==(const failure_type<W, void> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
-  /*! True if the result is not equal to the success type sugar.
+  template <class T, class U, class V, class W> constexpr inline bool operator==(const failure_type<W, void> &a, const basic_result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
+  /*! True if the basic_result is not equal to the success type sugar.
   \param a The success type sugar to compare.
-  \param b The result to compare.
+  \param b The basic_result to compare.
 
   \effects If a valid expression to do so, calls the `operator!=` operation on the successful item returning true if not equal. Otherwise returns false.
   \remarks Implemented as `b != a`.
@@ -3912,10 +3912,10 @@ namespace detail
 
 
 
-  template <class T, class U, class V, class W> constexpr inline bool operator!=(const success_type<W> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
-  /*! True if the result is not equal to the failure type sugar.
+  template <class T, class U, class V, class W> constexpr inline bool operator!=(const success_type<W> &a, const basic_result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
+  /*! True if the basic_result is not equal to the failure type sugar.
   \param a The failure type sugar to compare.
-  \param b The result to compare.
+  \param b The basic_result to compare.
 
   \effects If a valid expression to do so, calls the `operator!=` operation on the failure item returning true if not equal. Otherwise returns false.
   \remarks Implemented as `b != a`.
@@ -3928,12 +3928,13 @@ namespace detail
 
 
 
-  template <class T, class U, class V, class W> constexpr inline bool operator!=(const failure_type<W, void> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
+  template <class T, class U, class V, class W> constexpr inline bool operator!=(const failure_type<W, void> &a, const basic_result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
 } // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
 #endif
+// This stuff onwards needs to be moved out of here
 /* Traits for Outcome
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: March 2018
@@ -5032,9 +5033,9 @@ namespace hooks
   template <class T, class U, class... Args> constexpr inline void hook_result_in_place_construction(T * /*unused*/, in_place_type_t<U> /*unused*/, Args &&... /*unused*/) noexcept {}
 
   //! Retrieves the 16 bits of spare storage in result/outcome.
-  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::result_final<R, S, NoValuePolicy> *r) noexcept { return (r->_state._status >> detail::status_2byte_shift) & 0xffff; }
+  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept { return (r->_state._status >> detail::status_2byte_shift) & 0xffff; }
   //! Sets the 16 bits of spare storage in result/outcome.
-  template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept { r->_state._status |= (v << detail::status_2byte_shift); }
+  template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept { r->_state._status |= (v << detail::status_2byte_shift); }
 } // namespace hooks
 
 /*! Used to return from functions either (i) a successful value (ii) a cause of failure. `constexpr` capable.
@@ -5084,15 +5085,15 @@ or if `S` is `void`, do `throw bad_result_access()`
 
 template <class R, class S, class NoValuePolicy> //
 #if !defined(__GNUC__) || __GNUC__ >= 8 // GCC's constraints implementation is buggy
-OUTCOME_REQUIRES(trait::type_can_be_used_in_result<R> &&trait::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value)) //
+OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value)) //
 #endif
-class OUTCOME_NODISCARD result : public detail::result_final<R, S, NoValuePolicy>
+class OUTCOME_NODISCARD result : public detail::basic_result_final<R, S, NoValuePolicy>
 {
-  static_assert(trait::type_can_be_used_in_result<R>, "The type R cannot be used in a result");
-  static_assert(trait::type_can_be_used_in_result<S>, "The type S cannot be used in a result");
+  static_assert(trait::type_can_be_used_in_basic_result<R>, "The type R cannot be used in a basic_result");
+  static_assert(trait::type_can_be_used_in_basic_result<S>, "The type S cannot be used in a basic_result");
   static_assert(std::is_void<S>::value || std::is_default_constructible<S>::value, "The type S must be void or default constructible");
 
-  using base = detail::result_final<R, S, NoValuePolicy>;
+  using base = detail::basic_result_final<R, S, NoValuePolicy>;
 
   struct value_converting_constructor_tag
   {
@@ -5827,7 +5828,7 @@ namespace detail
     implicit_constructors_enabled && !std::is_same<choose_inplace_value_error_exception_constructor<Args...>, disable_inplace_value_error_exception_constructor>::value;
   };
 
-  template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl2 = detail::outcome_exception_observers<detail::result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>;
+  template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl2 = detail::outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>;
   template <class R, class S, class P, class NoValuePolicy> using select_outcome_impl = std::conditional_t<trait::has_error_code_v<S> && trait::has_exception_ptr_v<P>, detail::outcome_failure_observers<select_outcome_impl2<R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>, select_outcome_impl2<R, S, P, NoValuePolicy>>;
 
   template <class T, class U, class V> constexpr inline const V &extract_exception_from_failure(const failure_type<U, V> &v) { return v.exception(); }
@@ -5990,7 +5991,7 @@ or if `S` is `void`, do `throw bad_outcome_access()`
 
 
 template <class R, class S, class P, class NoValuePolicy> //
-OUTCOME_REQUIRES(trait::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value)) //
+OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value)) //
 class OUTCOME_NODISCARD outcome
 
 
@@ -6000,7 +6001,7 @@ class OUTCOME_NODISCARD outcome
 : public detail::select_outcome_impl<R, S, P, NoValuePolicy>
 
 {
-  static_assert(trait::type_can_be_used_in_result<P>, "The exception_type cannot be used");
+  static_assert(trait::type_can_be_used_in_basic_result<P>, "The exception_type cannot be used");
   static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "exception_type must be void or default constructible");
   using base = detail::select_outcome_impl<R, S, P, NoValuePolicy>;
   friend NoValuePolicy;
@@ -7544,7 +7545,7 @@ error type is `error_code`, appends `" (ec.message())"` afterwards.
 */
 
 
-template <class R, class S, class P> inline std::string print(const detail::result_final<R, S, P> &v)
+template <class R, class S, class P> inline std::string print(const detail::basic_result_final<R, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -7562,7 +7563,7 @@ error type is `error_code`, appends `" (ec.message())"` afterwards.
 */
 
 
-template <class S, class P> inline std::string print(const detail::result_final<void, S, P> &v)
+template <class S, class P> inline std::string print(const detail::basic_result_final<void, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -7578,7 +7579,7 @@ template <class S, class P> inline std::string print(const detail::result_final<
 /*! Debug print a result into a form suitable for human reading. Format is `value|(-void)`.
 */
 
-template <class R, class P> inline std::string print(const detail::result_final<R, void, P> &v)
+template <class R, class P> inline std::string print(const detail::basic_result_final<R, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -7594,7 +7595,7 @@ template <class R, class P> inline std::string print(const detail::result_final<
 /*! Debug print a result into a form suitable for human reading. Format is `(+void)|(-void)`.
 */
 
-template <class P> inline std::string print(const detail::result_final<void, void, P> &v)
+template <class P> inline std::string print(const detail::basic_result_final<void, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -7709,7 +7710,7 @@ template <class R, class S, class P, class N> inline std::string print(const out
   {
     s << "{ ";
   }
-  s << print(static_cast<const detail::result_final<R, S, N> &>(v));
+  s << print(static_cast<const detail::basic_result_final<R, S, N> &>(v));
   if(total > 1)
   {
     s << ", ";

@@ -26,7 +26,9 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define OUTCOME_RESULT_HPP
 
 #include "convert.hpp"
-#include "detail/result_final.hpp"
+#include "detail/basic_result_final.hpp"
+
+// This stuff onwards needs to be moved out of here
 #include "trait_system_error.hpp"
 
 #include "policy/all_narrow.hpp"
@@ -184,9 +186,9 @@ namespace hooks
   template <class T, class U, class... Args> constexpr inline void hook_result_in_place_construction(T * /*unused*/, in_place_type_t<U> /*unused*/, Args &&... /*unused*/) noexcept {}
 
   //! Retrieves the 16 bits of spare storage in result/outcome.
-  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::result_final<R, S, NoValuePolicy> *r) noexcept { return (r->_state._status >> detail::status_2byte_shift) & 0xffff; }
+  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept { return (r->_state._status >> detail::status_2byte_shift) & 0xffff; }
   //! Sets the 16 bits of spare storage in result/outcome.
-  template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept { r->_state._status |= (v << detail::status_2byte_shift); }
+  template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept { r->_state._status |= (v << detail::status_2byte_shift); }
 }  // namespace hooks
 
 /*! Used to return from functions either (i) a successful value (ii) a cause of failure. `constexpr` capable.
@@ -212,17 +214,17 @@ then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<a
 or if `S` is `void`, do `throw bad_result_access()`
    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
-template <class R, class S, class NoValuePolicy>                                                                                                                      //
-#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                               // GCC's constraints implementation is buggy
-OUTCOME_REQUIRES(trait::type_can_be_used_in_result<R> &&trait::type_can_be_used_in_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
+template <class R, class S, class NoValuePolicy>                                                                                                                                  //
+#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                           // GCC's constraints implementation is buggy
+OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
 #endif
-class OUTCOME_NODISCARD result : public detail::result_final<R, S, NoValuePolicy>
+class OUTCOME_NODISCARD result : public detail::basic_result_final<R, S, NoValuePolicy>
 {
-  static_assert(trait::type_can_be_used_in_result<R>, "The type R cannot be used in a result");
-  static_assert(trait::type_can_be_used_in_result<S>, "The type S cannot be used in a result");
+  static_assert(trait::type_can_be_used_in_basic_result<R>, "The type R cannot be used in a basic_result");
+  static_assert(trait::type_can_be_used_in_basic_result<S>, "The type S cannot be used in a basic_result");
   static_assert(std::is_void<S>::value || std::is_default_constructible<S>::value, "The type S must be void or default constructible");
 
-  using base = detail::result_final<R, S, NoValuePolicy>;
+  using base = detail::basic_result_final<R, S, NoValuePolicy>;
 
   struct value_converting_constructor_tag
   {

@@ -25,7 +25,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_CONVERT_HPP
 #define OUTCOME_CONVERT_HPP
 
-#include "detail/result_storage.hpp"
+#include "detail/basic_result_storage.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -108,9 +108,9 @@ namespace convert
   */
   template <class T, class U> struct value_or_error
   {
-    //! False to indicate that this converter wants `result`/`outcome` to reject all other `result`
+    //! False to indicate that this converter wants `basic_result`/`basic_outcome` to reject all other `basic_result`
     static constexpr bool enable_result_inputs = false;
-    //! False to indicate that this converter wants `outcome` to reject all other `outcome`
+    //! False to indicate that this converter wants `basic_outcome` to reject all other `basic_outcome`
     static constexpr bool enable_outcome_inputs = false;
     /*! Default converter for types matching the `ValueOrError` concept.
     \requires `std::decay_t<X>` to be the same type as `U`;

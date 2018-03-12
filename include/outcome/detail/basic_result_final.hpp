@@ -22,28 +22,28 @@ Distributed under the Boost Software License, Version 1.0.
 http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef OUTCOME_RESULT_FINAL_HPP
-#define OUTCOME_RESULT_FINAL_HPP
+#ifndef OUTCOME_BASIC_RESULT_FINAL_HPP
+#define OUTCOME_BASIC_RESULT_FINAL_HPP
 
-#include "result_error_observers.hpp"
-#include "result_value_observers.hpp"
+#include "basic_result_error_observers.hpp"
+#include "basic_result_value_observers.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  template <class R, class EC, class NoValuePolicy> using select_result_impl = result_error_observers<result_value_observers<result_storage<R, EC, NoValuePolicy>, R, NoValuePolicy>, EC, NoValuePolicy>;
+  template <class R, class EC, class NoValuePolicy> using select_basic_result_impl = basic_result_error_observers<basic_result_value_observers<basic_result_storage<R, EC, NoValuePolicy>, R, NoValuePolicy>, EC, NoValuePolicy>;
 
-  //! The assembled implementation type of `result<R, S, NoValuePolicy>`.
+  //! The assembled implementation type of `basic_result<R, S, NoValuePolicy>`.
   template <class R, class S, class NoValuePolicy>
-  class result_final
+  class basic_result_final
 #if defined(DOXYGEN_IS_IN_THE_HOUSE)
-  : public result_error_observers<result_value_observers<result_storage<R, S, NoValuePolicy>, R, NoValuePolicy>, S, NoValuePolicy>
+  : public basic_result_error_observers<basic_result_value_observers<basic_result_storage<R, S, NoValuePolicy>, R, NoValuePolicy>, S, NoValuePolicy>
 #else
-  : public select_result_impl<R, S, NoValuePolicy>
+  : public select_basic_result_impl<R, S, NoValuePolicy>
 #endif
   {
-    using base = select_result_impl<R, S, NoValuePolicy>;
+    using base = select_basic_result_impl<R, S, NoValuePolicy>;
 
   public:
     using base::base;
@@ -71,15 +71,15 @@ namespace detail
     constexpr bool has_failure() const noexcept { return (this->_state._status & detail::status_have_error) != 0 && (this->_state._status & detail::status_have_exception) != 0; }
 
     /// \output_section Comparison operators
-    /*! True if equal to the other result.
-    \param o The other result to compare to.
+    /*! True if equal to the other basic_result.
+    \param o The other basic_result to compare to.
 
     \effects If a valid expression to do so, calls the `operator==` operation on each
     of the two stored items returning true if both are true. Otherwise returns false.
     \throws Any exception the individual `operator==` operations might throw.
     */
     template <class T, class U, class V>
-    constexpr bool operator==(const result_final<T, U, V> &o) const noexcept(                                   //
+    constexpr bool operator==(const basic_result_final<T, U, V> &o) const noexcept(                             //
     noexcept(detail::safe_compare_equal(std::declval<detail::devoid<R>>(), std::declval<detail::devoid<T>>()))  //
     && noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<U>>())))
     {
@@ -125,15 +125,15 @@ namespace detail
     \throws Any exception the `operator==` operation might throw.
     */
     template <class T> constexpr bool operator==(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_equal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_equal(this->_error, o.error()); }
-    /*! True if not equal to the other result.
-    \param o The other result to compare to.
+    /*! True if not equal to the other basic_result.
+    \param o The other basic_result to compare to.
 
     \effects If a valid expression to do so, calls the `operator!=` operation on each
     of the two stored items, returning true if any are not equal. Otherwise returns true.
     \throws Any exception the individual `operator!=` operations might throw.
     */
     template <class T, class U, class V>
-    constexpr bool operator!=(const result_final<T, U, V> &o) const noexcept(                                      //
+    constexpr bool operator!=(const basic_result_final<T, U, V> &o) const noexcept(                                //
     noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<R>>(), std::declval<detail::devoid<T>>()))  //
     && noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<U>>())))
     {
@@ -183,42 +183,42 @@ namespace detail
     */
     template <class T> constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(noexcept(detail::safe_compare_notequal(std::declval<detail::devoid<S>>(), std::declval<detail::devoid<T>>()))) { return detail::safe_compare_notequal(this->_error, o.error()); }
   };
-  /*! True if the result is equal to the success type sugar.
+  /*! True if the basic_result is equal to the success type sugar.
   \param a The success type sugar to compare.
-  \param b The result to compare.
+  \param b The basic_result to compare.
 
   \effects If a valid expression to do so, calls the `operator==` operation on the successful item returning true if equal. Otherwise returns false.
   \remarks Implemented as `b == a`.
   \throws Any exception the `operator==` operation might throw.
   */
-  template <class T, class U, class V, class W> constexpr inline bool operator==(const success_type<W> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
-  /*! True if the result is equal to the failure type sugar.
+  template <class T, class U, class V, class W> constexpr inline bool operator==(const success_type<W> &a, const basic_result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
+  /*! True if the basic_result is equal to the failure type sugar.
   \param a The failure type sugar to compare.
-  \param b The result to compare.
+  \param b The basic_result to compare.
 
   \effects If a valid expression to do so, calls the `operator==` operation on the failure item returning true if equal. Otherwise returns false.
   \remarks Implemented as `b == a`.
   \throws Any exception the `operator==` operation might throw.
   */
-  template <class T, class U, class V, class W> constexpr inline bool operator==(const failure_type<W, void> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
-  /*! True if the result is not equal to the success type sugar.
+  template <class T, class U, class V, class W> constexpr inline bool operator==(const failure_type<W, void> &a, const basic_result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
+  /*! True if the basic_result is not equal to the success type sugar.
   \param a The success type sugar to compare.
-  \param b The result to compare.
+  \param b The basic_result to compare.
 
   \effects If a valid expression to do so, calls the `operator!=` operation on the successful item returning true if not equal. Otherwise returns false.
   \remarks Implemented as `b != a`.
   \throws Any exception the `operator!=` operation might throw.
   */
-  template <class T, class U, class V, class W> constexpr inline bool operator!=(const success_type<W> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
-  /*! True if the result is not equal to the failure type sugar.
+  template <class T, class U, class V, class W> constexpr inline bool operator!=(const success_type<W> &a, const basic_result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
+  /*! True if the basic_result is not equal to the failure type sugar.
   \param a The failure type sugar to compare.
-  \param b The result to compare.
+  \param b The basic_result to compare.
 
   \effects If a valid expression to do so, calls the `operator!=` operation on the failure item returning true if not equal. Otherwise returns false.
   \remarks Implemented as `b != a`.
   \throws Any exception the `operator!=` operation might throw.
   */
-  template <class T, class U, class V, class W> constexpr inline bool operator!=(const failure_type<W, void> &a, const result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
+  template <class T, class U, class V, class W> constexpr inline bool operator!=(const failure_type<W, void> &a, const basic_result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
 }  // namespace detail
 
 OUTCOME_V2_NAMESPACE_END

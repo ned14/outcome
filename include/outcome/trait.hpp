@@ -32,7 +32,7 @@ OUTCOME_V2_NAMESPACE_BEGIN
 //! Namespace for traits
 namespace trait
 {
-  /*! Requirements predicate for permitting type to be used in result/outcome.
+  /*! Requirements predicate for permitting type to be used in `basic_result`/`basic_outcome`.
 
   - Is not a reference.
   - Is not an `in_place_type_t<>`.
@@ -42,7 +42,7 @@ namespace trait
   - Is `void`, or else is an Object and is Destructible.
   */
   template <class R>                                                             //
-  static constexpr bool type_can_be_used_in_result =                             //
+  static constexpr bool type_can_be_used_in_basic_result =                       //
   (!std::is_reference<R>::value                                                  //
    && !OUTCOME_V2_NAMESPACE::detail::is_in_place_type_t<std::decay_t<R>>::value  //
    && !is_success_type<R>                                                        //

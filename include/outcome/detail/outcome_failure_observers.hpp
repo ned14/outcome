@@ -25,7 +25,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_OUTCOME_FAILURE_OBSERVERS_HPP
 #define OUTCOME_OUTCOME_FAILURE_OBSERVERS_HPP
 
-#include "result_storage.hpp"
+#include "basic_result_storage.hpp"
 
 #include <exception>
 #include <system_error>

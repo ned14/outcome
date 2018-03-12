@@ -135,7 +135,7 @@ inline std::ostream &operator<<(std::ostream &s, const result<R, S, P> &v)
 /*! Debug print a result into a form suitable for human reading. Format is `value|error`. If the
 error type is `error_code`, appends `" (ec.message())"` afterwards.
 */
-template <class R, class S, class P> inline std::string print(const detail::result_final<R, S, P> &v)
+template <class R, class S, class P> inline std::string print(const detail::basic_result_final<R, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -151,7 +151,7 @@ template <class R, class S, class P> inline std::string print(const detail::resu
 /*! Debug print a result into a form suitable for human reading. Format is `(+void)|error`. If the
 error type is `error_code`, appends `" (ec.message())"` afterwards.
 */
-template <class S, class P> inline std::string print(const detail::result_final<void, S, P> &v)
+template <class S, class P> inline std::string print(const detail::basic_result_final<void, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -166,7 +166,7 @@ template <class S, class P> inline std::string print(const detail::result_final<
 }
 /*! Debug print a result into a form suitable for human reading. Format is `value|(-void)`.
 */
-template <class R, class P> inline std::string print(const detail::result_final<R, void, P> &v)
+template <class R, class P> inline std::string print(const detail::basic_result_final<R, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -181,7 +181,7 @@ template <class R, class P> inline std::string print(const detail::result_final<
 }
 /*! Debug print a result into a form suitable for human reading. Format is `(+void)|(-void)`.
 */
-template <class P> inline std::string print(const detail::result_final<void, void, P> &v)
+template <class P> inline std::string print(const detail::basic_result_final<void, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -266,7 +266,7 @@ template <class R, class S, class P, class N> inline std::string print(const out
   {
     s << "{ ";
   }
-  s << print(static_cast<const detail::result_final<R, S, N> &>(v));
+  s << print(static_cast<const detail::basic_result_final<R, S, N> &>(v));
   if(total > 1)
   {
     s << ", ";

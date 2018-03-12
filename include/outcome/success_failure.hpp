@@ -29,7 +29,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
-/*! Type sugar for implicitly constructing a `result<>` with a successful state.
+/*! Type sugar for implicitly constructing a `basic_result<>` with a successful state.
 */
 template <class T> struct success_type
 {
@@ -78,21 +78,21 @@ public:
   /// \group success_type_value
   constexpr const value_type &&value() const && { return static_cast<value_type &&>(_value); }
 };
-/*! Type sugar for implicitly constructing a `result<>` with a successful state.
+/*! Type sugar for implicitly constructing a `basic_result<>` with a successful state.
 */
 template <> struct success_type<void>
 {
   //! The type of the successful state.
   using value_type = void;
 };
-/*! Returns type sugar for implicitly constructing a `result<T>` with a successful state,
+/*! Returns type sugar for implicitly constructing a `basic_result<T>` with a successful state,
 default constructing `T` if necessary.
 */
 inline constexpr success_type<void> success() noexcept
 {
   return success_type<void>{};
 }
-/*! Returns type sugar for implicitly constructing a `result<T>` with a successful state.
+/*! Returns type sugar for implicitly constructing a `basic_result<T>` with a successful state.
 \effects Copies or moves the successful state supplied into the returned type sugar.
 */
 template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v)
@@ -100,7 +100,7 @@ template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v)
   return success_type<std::decay_t<T>>{static_cast<T &&>(v)};
 }
 
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code and exception.
+/*! Type sugar for implicitly constructing a `basic_result<>` with a failure state of error code and exception.
 */
 template <class EC, class E = void> struct failure_type
 {
@@ -162,7 +162,7 @@ public:
   /// \group failure_type_exception
   constexpr const exception_type &&exception() const && { return static_cast<exception_type &&>(_exception); }
 };
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of error code.
+/*! Type sugar for implicitly constructing a `basic_result<>` with a failure state of error code.
 */
 template <class EC> struct failure_type<EC, void>
 {
@@ -213,7 +213,7 @@ public:
   /// \group failure_type_error2
   constexpr const error_type &&error() const && { return static_cast<error_type &&>(_error); }
 };
-/*! Type sugar for implicitly constructing a `result<>` with a failure state of exception.
+/*! Type sugar for implicitly constructing a `basic_result<>` with a failure state of exception.
 */
 template <class E> struct failure_type<void, E>
 {
@@ -264,14 +264,14 @@ public:
   /// \group failure_type_exception2
   constexpr const exception_type &&exception() const && { return static_cast<exception_type &&>(_exception); }
 };
-/*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
+/*! Returns type sugar for implicitly constructing a `basic_result<T>` with a failure state.
 \effects Copies or moves the failure state supplied into the returned type sugar.
 */
 template <class EC> inline constexpr failure_type<std::decay_t<EC>> failure(EC &&v)
 {
   return failure_type<std::decay_t<EC>>{static_cast<EC &&>(v)};
 }
-/*! Returns type sugar for implicitly constructing a `result<T>` with a failure state.
+/*! Returns type sugar for implicitly constructing a `basic_result<T>` with a failure state.
 \effects Copies or moves the failure state supplied into the returned type sugar.
 */
 template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, E &&w)
