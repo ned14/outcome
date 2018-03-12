@@ -120,14 +120,14 @@ namespace detail
         : _state{detail::status_have_error}
         , _error(static_cast<Args &&>(args)...)
     {
-      detail::_set_error_is_errno(_state, _error);
+      _set_error_is_errno(_state, _error);
     }
     template <class U, class... Args>
     constexpr basic_result_storage(in_place_type_t<_error_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
         : _state{detail::status_have_error}
         , _error{il, static_cast<Args &&>(args)...}
     {
-      detail::_set_error_is_errno(_state, _error);
+      _set_error_is_errno(_state, _error);
     }
     struct compatible_conversion_tag
     {
