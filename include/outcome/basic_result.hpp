@@ -73,7 +73,7 @@ namespace detail
     template <class ErrorCondEnum>
     static constexpr bool enable_error_condition_converting_constructor =                                                                   //
     !is_in_place_type_t<std::decay_t<ErrorCondEnum>>::value                                                                                 // not in place construction
-    && trait::is_error_type_enum<error_type, ErrorCondEnum>::value                                                                          // is an error condition enum
+    && trait::is_error_type_enum<error_type, std::decay_t<ErrorCondEnum>>::value                                                            // is an error condition enum
     && !detail::is_implicitly_constructible<value_type, ErrorCondEnum> && !detail::is_implicitly_constructible<error_type, ErrorCondEnum>;  // not constructible via any other means
 
     // Predicate for the converting copy constructor from a compatible input to be available.
