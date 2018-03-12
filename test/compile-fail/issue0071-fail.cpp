@@ -3,7 +3,7 @@
 clang-format on
 */
 
-#include "../../include/outcome/result.hpp"
+#include "../../include/outcome/std_result.hpp"
 
 int main()
 {
