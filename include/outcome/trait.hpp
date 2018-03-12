@@ -52,6 +52,26 @@ namespace trait
                                   && std::is_destructible<R>::value))            //
    );
 
+  /*! Trait for whether a type is an error type or not. This is specialised by
+  later code to enable implicit conversion for when the value type is `bool` and the
+  error type is convertible to `bool`, something which ordinarily would disable
+  all implicit constructors.
+  */
+  template <class E> struct is_error_type
+  {
+    static constexpr bool value = false;
+  };
+
+  /*! Trait for whether a type is an error type enum or not. This is specialised by
+  later code to enable implicit conversion from such enum types.
+  \tparam E The error type.
+  \tparam Enum The enum type.
+  */
+  template <class E, class Enum> struct is_error_type_enum
+  {
+    static constexpr bool value = false;
+  };
+
 }  // namespace trait
 
 OUTCOME_V2_NAMESPACE_END

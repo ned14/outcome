@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define BOOST_OUTCOME_AUTO_TEST_CASE(...) BOOST_AUTO_TEST_CASE(__VA_ARGS__)
 #else
 #include "../../include/outcome/result.h"
-#include "../../include/outcome/result.hpp"
+#include "../../include/outcome/std_result.hpp"
 #endif
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
@@ -126,6 +126,17 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
     BOOST_CHECK(m.value() == 5);
     m.value() = 6;
     BOOST_CHECK(m.value() == 6);
+    BOOST_CHECK_THROW(m.error(), bad_result_access);
+  }
+  {  // valued bool
+    result<bool> m(false);
+    BOOST_CHECK(m);
+    BOOST_CHECK(m.has_value());
+    BOOST_CHECK(!m.has_error());
+    // BOOST_CHECK(!m.has_exception());
+    BOOST_CHECK(m.value() == false);
+    m.value() = true;
+    BOOST_CHECK(m.value() == true);
     BOOST_CHECK_THROW(m.error(), bad_result_access);
   }
   {  // moves do not clear state

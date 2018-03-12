@@ -27,13 +27,13 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "detail/common.hpp"
 
-#include <system_error>
+#include <cstdlib>
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  /*! Policy implementing any wide attempt to access the successful state as calling `std::terminate`
+  /*! Policy implementing any wide attempt to access the successful state as calling `std::abort`
 
   Can be used in both `result` and `outcome`.
   */
@@ -46,7 +46,7 @@ namespace policy
     {
       if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
-        std::terminate();
+        std::abort();
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -56,7 +56,7 @@ namespace policy
     {
       if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
-        std::terminate();
+        std::abort();
       }
     }
     /*! Performs a wide check of state, used in the exception() functions
@@ -66,7 +66,7 @@ namespace policy
     {
       if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
       {
-        std::terminate();
+        std::abort();
       }
     }
   };

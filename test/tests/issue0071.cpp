@@ -21,7 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../include/outcome/result.hpp"
+#include "../../include/outcome/std_result.hpp"
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
 BOOST_OUTCOME_AUTO_TEST_CASE(issues / 71 / outcome, "Implicit construction is over eager")

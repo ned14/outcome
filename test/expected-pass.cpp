@@ -21,7 +21,7 @@
 #include <utility>
 
 #include "../include/outcome/iostream_support.hpp"
-#include "../include/outcome/result.hpp"
+#include "../include/outcome/std_result.hpp"
 
 #define QUICKCPPLIB_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
 #include "quickcpplib/include/boost/test/unit_test.hpp"

@@ -152,6 +152,21 @@ namespace trait
   */
   template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<T>::value;
 
+  // std::error_code and std::exception_ptr are error types
+  template <> struct is_error_type<std::error_code>
+  {
+    static constexpr bool value = true;
+  };
+  template <> struct is_error_type<std::exception_ptr>
+  {
+    static constexpr bool value = true;
+  };
+  // For std::error_code, std::is_error_condition_enum<> is the trait we want.
+  template <class Enum> struct is_error_type_enum<std::error_code, Enum>
+  {
+    static constexpr bool value = std::is_error_condition_enum<Enum>::value;
+  };
+
 }  // namespace trait
 
 

@@ -27,7 +27,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "detail/outcome_exception_observers.hpp"
 #include "detail/outcome_failure_observers.hpp"
-#include "result.hpp"
+#include "std_result.hpp"
 
 #include <memory>
 
@@ -38,8 +38,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_policy<R, S, P>>  //
-OUTCOME_REQUIRES(trait::type_can_be_used_in_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))       //
+template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::std_default_policy<R, S, P>>  //
+OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))     //
 class outcome;
 
 namespace detail
@@ -266,7 +266,7 @@ public:
   using exception_type = P;
 
   //! Used to rebind this outcome to a different outcome type
-  template <class T, class U = S, class V = P, class W = policy::default_policy<T, U, V>> using rebind = outcome<T, U, V, W>;
+  template <class T, class U = S, class V = P, class W = policy::std_default_policy<T, U, V>> using rebind = outcome<T, U, V, W>;
 
 protected:
   //! Requirement predicates for outcome.
@@ -448,8 +448,8 @@ public:
   an `error_type`, a `.value()`, an `.error()` and a `.has_value()`.
   */
   OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<outcome, std::decay_t<T>>::enable_result_inputs || !is_result_v<T>),    //
-                    OUTCOME_TPRED(convert::value_or_error<outcome, std::decay_t<T>>::enable_outcome_inputs || !is_outcome_v<T>),  //
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<outcome, std::decay_t<T>>::enable_result_inputs || !is_basic_result_v<T>),  //
+                    OUTCOME_TPRED(convert::value_or_error<outcome, std::decay_t<T>>::enable_outcome_inputs || !is_outcome_v<T>),      //
                     OUTCOME_TEXPR(convert::value_or_error<outcome, std::decay_t<T>>{}(std::declval<T>())))
   constexpr explicit outcome(T &&o, explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())  // NOLINT
   : outcome{convert::value_or_error<outcome, std::decay_t<T>>{}(std::forward<T>(o))}
