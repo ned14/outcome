@@ -1,5 +1,5 @@
 /* clang-format off
-(error: no matching function for call to .+::basic_result<int, int>::basic_result(.+::in_place_type_t<int>&)|error: no matching constructor for initialization of 'result<int, int>'|cannot convert argument 1 from '.+::in_place_type_t<int>')
+(error: no matching function for call to .+::basic_result<int, int, .+>::basic_result(.+::in_place_type_t<int>&)|error: no matching constructor for initialization of 'result<int, int>'|cannot convert argument 1 from '.+::in_place_type_t<int>')
 clang-format on
 */
 
