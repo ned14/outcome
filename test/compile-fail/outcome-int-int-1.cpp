@@ -1,5 +1,5 @@
 /* clang-format off
-(error: no matching function for call to .+::basic_outcome<int, int, int>::basic_outcome|error: no matching constructor for initialization of 'outcome<int, int, int>'|cannot convert argument 1 from 'int')
+(error: no matching function for call to .+::basic_outcome<int, int, int, .+>::basic_outcome|error: no matching constructor for initialization of 'outcome<int, int, int>'|cannot convert argument 1 from 'int')
 clang-format on
 */
 
