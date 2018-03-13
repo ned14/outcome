@@ -47,7 +47,7 @@ namespace policy
       {
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0)
         {
-          using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<outcome<T, EC, E, exception_ptr_rethrow>, decltype(self)>;
+          using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<basic_outcome<T, EC, E, exception_ptr_rethrow>, decltype(self)>;
           Outcome _self = static_cast<Outcome>(self);  // NOLINT
           detail::rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
         }

@@ -10,7 +10,10 @@ weight = 80
     - Separated `result` from its hard coded dependency on the `<system_error>` header.
     - Renamed `result` and `outcome` to `basic_result` and `basic_outcome`.
     - Renamed `result.hpp` into `basic_result.hpp`.
-    - Moved `<system_error>` dependent code into a new `system_error_support.hpp` header file.
+    - Moved `<system_error>` and `<exception>` dependent code into new
+    `std_result.hpp` and `std_outcome.hpp` header files.
+    - Added `boost_result.hpp` and `boost_outcome.hpp` which use Boost.System
+    and Boost.Exception (these are `result.hpp` and `outcome.hpp` in the Boost edition).
 
 ---
 ## v2.0 18th Jan 2018 [[release]](https://github.com/ned14/outcome/releases/tag/v2.0-boost-peer-review)

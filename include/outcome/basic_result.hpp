@@ -119,9 +119,9 @@ namespace detail
   };
 }  // namespace detail
 
-//! True if a result
+//! True if a `basic_result`
 template <class T> using is_basic_result = detail::is_basic_result<std::decay_t<T>>;
-//! True if a result
+//! True if a `basic_result`
 template <class T> static constexpr bool is_basic_result_v = detail::is_basic_result<std::decay_t<T>>::value;
 
 //! Namespace for ADL discovered hooks into events in `result` and `outcome`.

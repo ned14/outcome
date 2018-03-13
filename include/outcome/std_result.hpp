@@ -26,7 +26,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define OUTCOME_STD_RESULT_HPP
 
 #include "basic_result.hpp"
-#include "std_trait.hpp"
+#include "detail/std_trait.hpp"
 
 #include "policy/result_error_code_throw_as_system_error.hpp"
 #include "policy/result_exception_ptr_rethrow.hpp"
@@ -68,13 +68,13 @@ or if `S` is `void`, do `throw bad_result_access()`
 - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
 template <class R, class S = std::error_code, class NoValuePolicy = policy::std_default_policy<R, S, void>>  //
-using result = basic_result<R, S, NoValuePolicy>;
+using std_result = basic_result<R, S, NoValuePolicy>;
 
 /*! An "unchecked" edition of `result<T, E>` which does no special handling of specific `E` types at all.
 Attempting to access `T` when there is an `E` results in nothing happening at all, it is treated with a narrow
 contract (i.e. undefined behaviour).
 */
-template <class R, class S = std::error_code> using unchecked = result<R, S, policy::all_narrow>;
+template <class R, class S = std::error_code> using std_unchecked = std_result<R, S, policy::all_narrow>;
 
 /*! A "checked" edition of `result<T, E>` which resembles fairly closely a `std::expected<T, E>`.
 Attempting to access `T` when there is an `E` results in `bad_result_access<E>` being thrown. Nothing else.
@@ -82,7 +82,7 @@ Attempting to access `T` when there is an `E` results in `bad_result_access<E>` 
 Note that this approximates the proposed `expected<T, E>` up for standardisation, see the FAQ for more
 detail.
 */
-template <class R, class S = std::error_code> using checked = result<R, S, policy::throw_bad_result_access<S>>;
+template <class R, class S = std::error_code> using std_checked = std_result<R, S, policy::throw_bad_result_access<S>>;
 
 OUTCOME_V2_NAMESPACE_END
 

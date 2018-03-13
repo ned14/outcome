@@ -72,6 +72,16 @@ namespace trait
     static constexpr bool value = false;
   };
 
+  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
+  Also returns true if `std::error_code` is convertible from T.
+  */
+  template <class T> struct has_error_code;
+
+  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
+  Also returns true if `std::exception_ptr` is convertible from T.
+  */
+  template <class T> struct has_exception_ptr;
+
 }  // namespace trait
 
 OUTCOME_V2_NAMESPACE_END

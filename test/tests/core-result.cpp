@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define BOOST_OUTCOME_AUTO_TEST_CASE(...) BOOST_AUTO_TEST_CASE(__VA_ARGS__)
 #else
 #include "../../include/outcome/result.h"
-#include "../../include/outcome/std_result.hpp"
+#include "../../include/outcome/result.hpp"
 #endif
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 

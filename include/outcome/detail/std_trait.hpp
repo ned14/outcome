@@ -22,10 +22,10 @@ Distributed under the Boost Software License, Version 1.0.
 http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef OUTCOME_TRAIT_SYSTEM_ERROR_HPP
-#define OUTCOME_TRAIT_SYSTEM_ERROR_HPP
+#ifndef OUTCOME_STD_TRAIT_HPP
+#define OUTCOME_STD_TRAIT_HPP
 
-#include "config.hpp"
+#include "../config.hpp"
 
 #include <exception>
 #include <system_error>

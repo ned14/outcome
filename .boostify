@@ -1,6 +1,7 @@
 # Files to copy over
 include_files = [
-    (r'include/status-code/include/(.*)', r'include/boost/experimental/status-code/\1'),
+    (r'include/status-code/include/(.*)', r'include/boost/outcome/experimental/status-code/\1'),
+    (r'include/outcome/boost_(.*)', r'include/boost/outcome/\1'),
     (r'include/(.*)', r'include/boost/\1'),
     r'doc/src/.*',
     r'test/.*',

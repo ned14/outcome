@@ -1,4 +1,4 @@
-/* A less simple result type
+/* A very simple result type
 (C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: June 2017
 
@@ -22,18 +22,25 @@ Distributed under the Boost Software License, Version 1.0.
 http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef OUTCOME_OUTCOME_HPP
-#define OUTCOME_OUTCOME_HPP
+#ifndef OUTCOME_RESULT_HPP
+#define OUTCOME_RESULT_HPP
 
-#include "result.hpp"
-#include "std_outcome.hpp"
+#include "std_result.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-/*! In standalone Outcome, this aliases `std_outcome<>`. In Boost.Outcome, this aliases `boost_outcome<>`.
+/*! In standalone Outcome, this aliases `std_result<>`. In Boost.Outcome, this aliases `boost_result<>`.
 */
-template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::std_default_policy<R, S, P>>  //
-using outcome = std_outcome<R, S, P, NoValuePolicy>;
+template <class R, class S = std::error_code, class NoValuePolicy = policy::std_default_policy<R, S, void>>  //
+using result = std_result<R, S, NoValuePolicy>;
+
+/*! In standalone Outcome, this aliases `std_unchecked<>`. In Boost.Outcome, this aliases `boost_checked<>`.
+*/
+template <class R, class S = std::error_code> using unchecked = result<R, S, policy::all_narrow>;
+
+/*! In standalone Outcome, this aliases `std_checked<>`. In Boost.Outcome, this aliases `boost_checked<>`.
+*/
+template <class R, class S = std::error_code> using checked = result<R, S, policy::throw_bad_result_access<S>>;
 
 OUTCOME_V2_NAMESPACE_END
 
