@@ -46,7 +46,7 @@ OUTCOME_V2_NAMESPACE_END
 //! \exclude
 #define OUTCOME_TRY_GLUE(x, y) OUTCOME_TRY_GLUE2(x, y)
 //! \exclude
-#define OUTCOME_TRY_UNIQUE_NAME OUTCOME_TRY_GLUE(__t, __COUNTER__)
+#define OUTCOME_TRY_UNIQUE_NAME OUTCOME_TRY_GLUE(_outcome_try_unique_name_temporary, __COUNTER__)
 
 //! \exclude
 #define OUTCOME_TRYV2(unique, ...)                                                                                                                                                                                                                                                                                             \

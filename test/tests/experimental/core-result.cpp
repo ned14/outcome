@@ -25,6 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/experimental/result.hpp"
 #define BOOST_OUTCOME_AUTO_TEST_CASE(...) BOOST_AUTO_TEST_CASE(__VA_ARGS__)
 #else
+#include "../../include/outcome/result.h"
 #include "../../include/outcome/result.hpp"
 #endif
 #include "quickcpplib/include/boost/test/unit_test.hpp"
@@ -334,6 +335,31 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
     static_assert(a.value() == 5, "a is not 5");
     static_assert(b.error() == std::errc::invalid_argument, "b is not errored");
     BOOST_CHECK_THROW(b.value(), std::system_error);
+  }
+
+  // Test C compatibility
+  {
+    CXX_DECLARE_RESULT_EC(int, int);
+    CXX_RESULT_EC(int) c_result = {5, 1, {0, nullptr}};
+    result<int> cxx_result{5};
+    static_assert(sizeof(c_result) == sizeof(cxx_result), "Sizes of C and C++ results do not match!");
+
+    union test_t {
+      result<int> cxx;
+      CXX_RESULT_EC(int) c;
+    };
+    test_t a{5};
+    BOOST_CHECK(a.cxx.has_value());          // NOLINT
+    BOOST_CHECK(CXX_RESULT_HAS_VALUE(a.c));  // NOLINT
+    BOOST_CHECK(a.c.value == 5);             // NOLINT
+
+    test_t b{std::errc::invalid_argument};
+    BOOST_CHECK(b.cxx.has_error());          // NOLINT
+    BOOST_CHECK(CXX_RESULT_HAS_ERROR(b.c));  // NOLINT
+#ifndef TESTING_WG21_EXPERIMENTAL_RESULT
+    BOOST_CHECK(CXX_RESULT_ERROR_IS_ERRNO(b.c));  // NOLINT
+#endif
+    BOOST_CHECK(b.c.error.code == EINVAL);  // NOLINT
   }
 
 #ifndef TESTING_WG21_EXPERIMENTAL_RESULT
