@@ -1472,9 +1472,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF f21cfdd2751a59ef4860cb041361f1dc420a3b30
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-03-13 00:15:05 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f21cfdd2
+#define OUTCOME_PREVIOUS_COMMIT_REF 7df4e24cf12e6cdb3126f46e0f7f9c0b7d239477
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-03-14 09:12:43 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 7df4e24c
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 
 
@@ -8103,12 +8103,30 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRY_UNIQUE_NAME OUTCOME_TRY_GLUE(_outcome_try_unique_name_temporary, __COUNTER__)
 
 //! \exclude
-#define OUTCOME_TRYV2(unique, ...) auto && (unique) = (__VA_ARGS__); if(!(unique).has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(unique)>(unique))
+#define OUTCOME_TRY_RETURN_ARG_COUNT(_1_, _2_, _3_, _4_, _5_, _6_, _7_, _8_, count, ...) count
+//! \exclude
+#define OUTCOME_TRY_EXPAND_ARGS(args) OUTCOME_TRY_RETURN_ARG_COUNT args
+//! \exclude
+#define OUTCOME_TRY_COUNT_ARGS_MAX8(...) OUTCOME_TRY_EXPAND_ARGS((__VA_ARGS__, 8, 7, 6, 5, 4, 3, 2, 1, 0))
+//! \exclude
+#define OUTCOME_TRY_OVERLOAD_MACRO2(name, count) name##count
+//! \exclude
+#define OUTCOME_TRY_OVERLOAD_MACRO1(name, count) OUTCOME_TRY_OVERLOAD_MACRO2(name, count)
+//! \exclude
+#define OUTCOME_TRY_OVERLOAD_MACRO(name, count) OUTCOME_TRY_OVERLOAD_MACRO1(name, count)
+//! \exclude
+#define OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
+//! \exclude
+#define OUTCOME_TRY_CALL_OVERLOAD(name, ...) OUTCOME_TRY_OVERLOAD_GLUE(OUTCOME_TRY_OVERLOAD_MACRO(name, OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
+
+
+//! \exclude
+#define OUTCOME_TRYV2(unique, ...) auto && (unique) = (__VA_ARGS__); if(!(unique).has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 
 
 
 //! \exclude
-#define OUTCOME_TRY2(unique, v, ...) OUTCOME_TRYV2(unique, __VA_ARGS__); auto && (v) = std::forward<decltype(unique)>(unique).value()
+#define OUTCOME_TRY2(unique, v, ...) OUTCOME_TRYV2(unique, __VA_ARGS__); auto && (v) = static_cast<decltype(unique) &&>(unique).value()
 
 
 
@@ -8138,7 +8156,7 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 
 
 
-#define OUTCOME_TRYX(...) ({ auto &&res = (__VA_ARGS__); if(!res.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(std::forward<decltype(res)>(res)); std::forward<decltype(res)>(res).value(); })
+#define OUTCOME_TRYX(...) ({ auto &&res = (__VA_ARGS__); if(!res.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res)); static_cast<decltype(res) &&>(res).value(); })
 
 
 
@@ -8149,11 +8167,80 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 #endif
 
 /*! If the outcome returned by expression ... is not valued, propagate any
-failure by immediately returning that failure immediately, else set *v* to the unwrapped value.
+failure by immediately returning that failure immediately, else set *auto v* to the unwrapped value.
 */
 
 
-#define OUTCOME_TRY(v, ...) OUTCOME_TRY2(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
+#define OUTCOME_TRYA(v, ...) OUTCOME_TRY2(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
+
+//! \exclude
+#define OUTCOME_TRY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME_TRYA(a, b, c, d, e, f, g, h)
+//! \exclude
+#define OUTCOME_TRY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME_TRYA(a, b, c, d, e, f, g)
+//! \exclude
+#define OUTCOME_TRY_INVOKE_TRY6(a, b, c, d, e, f) OUTCOME_TRYA(a, b, c, d, e, f)
+//! \exclude
+#define OUTCOME_TRY_INVOKE_TRY5(a, b, c, d, e) OUTCOME_TRYA(a, b, c, d, e)
+//! \exclude
+#define OUTCOME_TRY_INVOKE_TRY4(a, b, c, d) OUTCOME_TRYA(a, b, c, d)
+//! \exclude
+#define OUTCOME_TRY_INVOKE_TRY3(a, b, c) OUTCOME_TRYA(a, b, c)
+//! \exclude
+#define OUTCOME_TRY_INVOKE_TRY2(a, b) OUTCOME_TRYA(a, b)
+//! \exclude
+#define OUTCOME_TRY_INVOKE_TRY1(a) OUTCOME_TRYV(a)
+/*! This uses C macro overloading to select between `OUTCOME_TRYV(...)` and `OUTCOME_TRYA(v, ...)`
+based on whether there is one or two or more arguments to the macro.
+
+It can surprise people as template parameters are not recognised by the C preprocessor. For example:
+
+```c++
+OUTCOME_TRY(foo<int, long>());
+```
+
+Here the programmer obviously intends this to be an `OUTCOME_TRYV(...)`, but the C macro overload
+mechanism will perceive this as setting the variable `foo<int,` to the result of the function call
+`long>()`. This will fail to compile.
+
+One solution is to simply wrap all function calls with brackets so the C preprocessor breaks
+them correctly e.g.
+
+```c++
+OUTCOME_TRY((foo<int, long>()));
+OUTCOME_TRY(foovalue, (foo<int, long>()));
+```
+
+This solution also avoids ever exceeding eight C macro input parameters, as overloading is
+only implemented up to eight parameters.
+
+The other solution is to call `OUTCOME_TRYV` or `OUTCOME_TRYA` directly as appropriate.
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#define OUTCOME_TRY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRY_INVOKE_TRY, __VA_ARGS__)
 
 #endif
 /* Tries to convert an exception ptr into its equivalent error code
