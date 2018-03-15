@@ -32,6 +32,8 @@ OUTCOME_V2_NAMESPACE_BEGIN
 namespace detail
 {
   using status_bitfield_type = uint32_t;
+
+  // WARNING: These bits are not tracked by abi-dumper, but changing them will break ABI!
   static constexpr status_bitfield_type status_have_value = (1U << 0U);
   static constexpr status_bitfield_type status_have_error = (1U << 1U);
   static constexpr status_bitfield_type status_have_exception = (1U << 2U);

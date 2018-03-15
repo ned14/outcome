@@ -320,7 +320,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \brief Defined between stable releases of Outcome. It means the inline namespace
 //! will be permuted per-commit to ensure ABI uniqueness. \ingroup config
+#ifndef OUTCOME_DISABLE_ABI_PERMUTATION
 #define OUTCOME_UNSTABLE_VERSION
+#endif
 // Pull in detection of __MINGW64_VERSION_MAJOR
 #if defined(__MINGW32__) && !0
 #include <_mingw.h>
@@ -1471,14 +1473,15 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_BIND_DECLARE(decl, desc) static const char *quickcpplib_out[] = {#decl, desc};
 
 #endif
+#if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 7df4e24cf12e6cdb3126f46e0f7f9c0b7d239477
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-03-14 09:12:43 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 7df4e24c
+#define OUTCOME_PREVIOUS_COMMIT_REF 6c2a4dcaa8f2669686a97e4f5b50228ae067f09f
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-03-14 19:04:22 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 6c2a4dca
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
-
-
-
+#else
+#define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
+#endif
 
 #if defined(GENERATING_OUTCOME_MODULE_INTERFACE)
 #define OUTCOME_V2_NAMESPACE QUICKCPPLIB_BIND_NAMESPACE(OUTCOME_V2)
