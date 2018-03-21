@@ -43,17 +43,20 @@ matrix:
     compiler: g++-6
   - os: linux
     compiler: clang-4.0
-    env:
-    - __="ABI stability" NAME=TravisABICheck
-    - __="Documentation" NAME=TravisDocumentation
+    env: __="ABI stability" NAME=TravisABICheck
+  - os: linux
+    compiler: clang-4.0
+    env: __="Documentation" NAME=TravisDocumentation
   - os: linux
     env: __="cmake tests osx" NAME=TravisOSXWorker
   - os: osx
-    env:
-    - __="Code bloat tests"
-    - __="ABI stability" NAME=TravisABICheck
-    - __="Documentation" NAME=TravisDocumentation
-    - __="cmake tests" NAME=TravisLinuxWorker
+    env: __="Code bloat tests"
+  - os: osx
+    env: __="ABI stability" NAME=TravisABICheck
+  - os: osx
+    env: __="Documentation" NAME=TravisDocumentation
+  - os: osx
+    env: __="cmake tests" NAME=TravisLinuxWorker
  
 cache:
   apt: true
