@@ -40,17 +40,16 @@ if(NOT PROJECT_IS_DEPENDENCY)
       indented_message(WARNING "NOT rebuilding preprocessed edition of library due to installed python not having the ply package installed. "
         "Do 'pip install ply' to fix. NOTE that doxygen docs will NOT build without the precompiled edition.")
     else()
-  	  function(make_single_header target name source)
+      function(make_single_header target name)
         add_partial_preprocess(${target}
                               "${name}"
-                              "${source}"
+                              ${ARGN}
                               -I ..
                               --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
                               --passthru-comments --line-directive # --debug
                               -U QUICKCPPLIB_ENABLE_VALGRIND
                               -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
                               -U STANDARDESE_IS_IN_THE_HOUSE
-                              ${ARGN}
                               WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                               )
         if(NOT CMAKE_VERSION VERSION_LESS 3.3)
@@ -62,7 +61,8 @@ if(NOT PROJECT_IS_DEPENDENCY)
                          "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome.hpp")
       make_single_header(outcome_hl-pp-basic
                          "${CMAKE_CURRENT_SOURCE_DIR}/single-header/basic.hpp"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/basic_outcome.hpp")
+                         "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/basic_outcome.hpp"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/try.hpp")
       make_single_header(outcome_hl-pp-abi
                          "${CMAKE_CURRENT_SOURCE_DIR}/single-header/abi.hpp"
                          "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/basic_outcome.hpp"
