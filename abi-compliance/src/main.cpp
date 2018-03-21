@@ -22,8 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#define OUTCOME_DISABLE_ABI_PERMUTATION 1
-#include "../../include/outcome.hpp"
+#include "../../single-header/abi.hpp"
 
 struct NonTrivialType
 {

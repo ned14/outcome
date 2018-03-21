@@ -6,6 +6,14 @@ weight = 80
 ---
 ## v2.1 in progress [[project]](https://github.com/ned14/outcome/projects/1)
 
+- Added reference dump of v2.1 ABI so we can check if ABI breakage detection works in the next set of changes.
+
+- [#124](https://github.com/ned14/outcome/issues/124)
+    - `OUTCOME_TRY` is now overloaded and selects `void` or `auto` edition according to input parameter count.
+
+- [#120](https://github.com/ned14/outcome/issues/120)
+    - Fix generation of double underscored temporary variables in OUTCOME_UNIQUE_NAME, which is UB.
+
 - [#110](https://github.com/ned14/outcome/issues/110)
     - Separated `result` from its hard coded dependency on the `<system_error>` header.
     - Renamed `result` and `outcome` to `basic_result` and `basic_outcome`.

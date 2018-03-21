@@ -1,0 +1,2 @@
+<headers>../single-header/abi.hpp</headers>
+<libs>build/liboutcome-abi-lib.so</libs>
