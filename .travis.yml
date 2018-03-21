@@ -28,9 +28,11 @@ addons:
     - clang-4.0
     - cmake
     - cmake-data
+    - abi-compliance-checker
 
 env:
 # - __="Code bloat tests"
+ - __="ABI stability" NAME=TravisABICheck
  - __="Documentation" NAME=TravisDocumentation
  - __="cmake tests" NAME=TravisLinuxWorker
  - __="cmake tests osx" NAME=TravisOSXWorker
@@ -41,15 +43,17 @@ matrix:
     compiler: g++-6
   - os: linux
     compiler: clang-4.0
-    env: __="Documentation" NAME=TravisDocumentation
+    env:
+    - __="ABI stability" NAME=TravisABICheck
+    - __="Documentation" NAME=TravisDocumentation
   - os: linux
     env: __="cmake tests osx" NAME=TravisOSXWorker
   - os: osx
-    env: __="Code bloat tests"
-  - os: osx
-    env: __="Documentation" NAME=TravisDocumentation
-  - os: osx
-    env: __="cmake tests" NAME=TravisLinuxWorker
+    env:
+    - __="Code bloat tests"
+    - __="ABI stability" NAME=TravisABICheck
+    - __="Documentation" NAME=TravisDocumentation
+    - __="cmake tests" NAME=TravisLinuxWorker
  
 cache:
   apt: true
@@ -76,6 +80,12 @@ script:
      if grep -q "failure message" results.posix.xml; then
        exit 1;
      fi;
+   fi
+ -
+   if [ "$__" = "ABI stability" ]; then
+     if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisABICheck; fi;
+     cd abi-compliance;
+     ./check-api-abi.sh abi_dumps/Outcome/2.1/ABI.dump;
    fi
  -
    if [ "$__" = "cmake tests" ]; then
