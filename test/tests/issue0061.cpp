@@ -31,7 +31,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 61 / result, "result<T1, E1> does not comp
   {
     const char *_v{nullptr};
     udt1() = default;
-    constexpr explicit udt1(const char *v) noexcept : _v(v) {}
+    constexpr udt1(const char *v) noexcept : _v(v) {}  // NOLINT
     udt1(udt1 &&o) = delete;
     udt1(const udt1 &) = delete;
     udt1 &operator=(udt1 &&o) = delete;
@@ -60,23 +60,16 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 61 / result, "result<T1, E1> does not comp
   result2 b(5);
   BOOST_CHECK(b == a);     // udt2 will compare to udt1
   BOOST_CHECK(!(b != a));  // udt2 will compare to udt1
-  BOOST_CHECK(a != _a);
-  BOOST_CHECK(a != b);     // udt1 will NOT compare to udt2, always say they differ
-  BOOST_CHECK(!(a == b));  // udt1 will NOT compare to udt2, always say they differ
 
   result<void> c = success();
   result<void> d = success();
   BOOST_CHECK(c == d);
   BOOST_CHECK(!(c != d));
-  BOOST_CHECK(b != c);
-  BOOST_CHECK(!(b == c));
-  BOOST_CHECK(c != b);
-  BOOST_CHECK(!(c == b));
 
   BOOST_CHECK(a == success());
   BOOST_CHECK(success() == a);
-  BOOST_CHECK(a != failure(5));
-  BOOST_CHECK(failure(5) != a);
+  BOOST_CHECK(b != failure("foo"));
+  BOOST_CHECK(failure("foo") != b);
 }
 
 BOOST_OUTCOME_AUTO_TEST_CASE(issues / 61 / outcome, "outcome<T1, E1, P1> does not compare to incompatible outcome<T2, E2, P2>")
@@ -86,7 +79,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 61 / outcome, "outcome<T1, E1, P1> does no
   {
     const char *_v{nullptr};
     udt1() = default;
-    constexpr explicit udt1(const char *v) noexcept : _v(v) {}
+    constexpr udt1(const char *v) noexcept : _v(v) {}  // NOLINT
     udt1(udt1 &&o) = delete;
     udt1(const udt1 &) = delete;
     udt1 &operator=(udt1 &&o) = delete;
@@ -115,21 +108,14 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 61 / outcome, "outcome<T1, E1, P1> does no
   outcome2 b(5);
   BOOST_CHECK(b == a);     // udt2 will compare to udt1
   BOOST_CHECK(!(b != a));  // udt2 will compare to udt1
-  BOOST_CHECK(a != _a);
-  BOOST_CHECK(a != b);     // udt1 will NOT compare to udt2, always say they differ
-  BOOST_CHECK(!(a == b));  // udt1 will NOT compare to udt2, always say they differ
 
   outcome<void> c = success();
   outcome<void> d = success();
   BOOST_CHECK(c == d);
   BOOST_CHECK(!(c != d));
-  BOOST_CHECK(b != c);
-  BOOST_CHECK(!(b == c));
-  BOOST_CHECK(c != b);
-  BOOST_CHECK(!(c == b));
 
   BOOST_CHECK(a == success());
   BOOST_CHECK(success() == a);
-  BOOST_CHECK(a != failure(5));
-  BOOST_CHECK(failure(5) != a);
+  BOOST_CHECK(b != failure("foo"));
+  BOOST_CHECK(failure("foo") != b);
 }

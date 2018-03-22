@@ -6,13 +6,26 @@ weight = 80
 ---
 ## v2.1 in progress [[project]](https://github.com/ned14/outcome/projects/1)
 
-- Added reference dump of v2.1 ABI so we can check if ABI breakage detection works in the next set of changes.
+- [#107](https://github.com/ned14/outcome/issues/107) and [#116](https://github.com/ned14/outcome/issues/116)
+    - `operator==` and `operator!=` now become disabled if the value, error and
+    exception types do not implement the same operator.
+    - Relatedly, both comparison operators simple didn't work right. Fixed.
+
+- [#109](https://github.com/ned14/outcome/issues/109)
+    - `swap()` now has correct `noexcept` calculation and now correctly orders
+    the swaps to be whichever is the throwing swap first.
+
+- Added reference dump of v2.1 ABI so we can check if ABI breakage detection
+works in the next set of changes, plus Travis job to check ABI and API compatibility
+per commit.
 
 - [#124](https://github.com/ned14/outcome/issues/124)
-    - `OUTCOME_TRY` is now overloaded and selects `void` or `auto` edition according to input parameter count.
+    - `OUTCOME_TRY` is now overloaded and selects `void` or `auto` edition
+    according to input parameter count.
 
 - [#120](https://github.com/ned14/outcome/issues/120)
-    - Fix generation of double underscored temporary variables in OUTCOME_UNIQUE_NAME, which is UB.
+    - Fix generation of double underscored temporary variables in
+    `OUTCOME_UNIQUE_NAME`, which is UB.
 
 - [#110](https://github.com/ned14/outcome/issues/110)
     - Separated `result` from its hard coded dependency on the `<system_error>` header.
@@ -27,4 +40,4 @@ weight = 80
 ## v2.0 18th Jan 2018 [[release]](https://github.com/ned14/outcome/releases/tag/v2.0-boost-peer-review)
 
 - Boost peer review edition. This is what was reviewed.
-- Changelog from v1 can be found in the release notes above.
+- Changelog from v1 can be found in the release notes for this release.
