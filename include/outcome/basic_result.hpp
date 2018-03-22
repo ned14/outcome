@@ -586,33 +586,23 @@ public:
   /// \output_section Swap
   /*! Swaps this basic_result with another basic_result
   \effects Any `R` and/or `S` is swapped along with the metadata tracking them.
+  \throws If the swap of value or error can throw, the throwing swap is done first.
   */
-  void swap(basic_result &o) noexcept(detail::is_nothrow_swappable<value_type>::value  //
-                                      &&detail::is_nothrow_swappable<error_type>::value)
+  void swap(basic_result &o) noexcept(detail::is_nothrow_swappable<value_type>::value &&std::is_nothrow_move_constructible<value_type>::value  //
+                                      &&detail::is_nothrow_swappable<error_type>::value &&std::is_nothrow_move_constructible<error_type>::value)
   {
     using std::swap;
-#ifdef __cpp_exceptions
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4297)  // use of throw in noexcept function
-#endif
-    this->_state.swap(o._state);
-    try
+    // If value swap can throw, do it first
+    if(!noexcept(this->_state.swap(o._state)))
     {
+      this->_state.swap(o._state);
       swap(this->_error, o._error);
     }
-    catch(...)
+    else
     {
-      swap(this->_state, o._state);
-      throw;
+      swap(this->_error, o._error);
+      this->_state.swap(o._state);
     }
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#else
-    swap(this->_state, o._state);
-    swap(this->_error, o._error);
-#endif
   }
 
   /// \output_section Converters

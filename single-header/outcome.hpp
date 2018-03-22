@@ -1482,9 +1482,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 493851b6f2ea4015129ec37ff5f23b6ae8a98d5f
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-03-15 19:14:43 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 493851b6
+#define OUTCOME_PREVIOUS_COMMIT_REF b8d2354f52f83865709078de1208ed630ff9cf03
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-03-22 08:43:08 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE b8d2354f
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -2763,7 +2763,7 @@ namespace detail
     {
       _status = o._status;
     }
-    constexpr void swap(value_storage_trivial &o)
+    constexpr void swap(value_storage_trivial &o) noexcept
     {
       // storage is trivial, so just use assignment
       using std::swap;
@@ -2867,7 +2867,7 @@ namespace detail
         this->_status &= ~status_have_value;
       }
     }
-    constexpr void swap(value_storage_nontrivial &o)
+    constexpr void swap(value_storage_nontrivial &o) noexcept(detail::is_nothrow_swappable<value_type>::value &&std::is_nothrow_move_constructible<value_type>::value)
     {
       using std::swap;
       if((_status & status_have_value) == 0 && (o._status & status_have_value) == 0)
@@ -4948,35 +4948,26 @@ public:
   /// \output_section Swap
   /*! Swaps this basic_result with another basic_result
   \effects Any `R` and/or `S` is swapped along with the metadata tracking them.
+  \throws If the swap of value or error can throw, the throwing swap is done first.
   */
 
 
-  void swap(basic_result &o) noexcept(detail::is_nothrow_swappable<value_type>::value //
-                                      &&detail::is_nothrow_swappable<error_type>::value)
+
+  void swap(basic_result &o) noexcept(detail::is_nothrow_swappable<value_type>::value &&std::is_nothrow_move_constructible<value_type>::value //
+                                      &&detail::is_nothrow_swappable<error_type>::value &&std::is_nothrow_move_constructible<error_type>::value)
   {
     using std::swap;
-#ifdef __cpp_exceptions
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4297) // use of throw in noexcept function
-#endif
-    this->_state.swap(o._state);
-    try
+    // If value swap can throw, do it first
+    if(!noexcept(this->_state.swap(o._state)))
     {
+      this->_state.swap(o._state);
       swap(this->_error, o._error);
     }
-    catch(...)
+    else
     {
-      swap(this->_state, o._state);
-      throw;
+      swap(this->_error, o._error);
+      this->_state.swap(o._state);
     }
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#else
-    swap(this->_state, o._state);
-    swap(this->_error, o._error);
-#endif
   }
 
   /// \output_section Converters
@@ -7095,46 +7086,52 @@ public:
   /// \output_section Swap
   /*! Swaps this result with another result
   \effects Any `R` and/or `S` is swapped along with the metadata tracking them.
+  \throws If the swap of value or error or exception can throw, the throwing swap is done first.
+  If more than one of those can throw, the object is left in an indeterminate state should a throw occur.
   */
 
 
-  void swap(basic_outcome &o) noexcept(detail::is_nothrow_swappable<value_type>::value //
-                                       &&detail::is_nothrow_swappable<error_type>::value //
-                                       &&detail::is_nothrow_swappable<exception_type>::value)
+
+
+  void swap(basic_outcome &o) noexcept(detail::is_nothrow_swappable<value_type>::value &&std::is_nothrow_move_constructible<value_type>::value //
+                                       &&detail::is_nothrow_swappable<error_type>::value &&std::is_nothrow_move_constructible<error_type>::value //
+                                       &&detail::is_nothrow_swappable<exception_type>::value &&std::is_nothrow_move_constructible<exception_type>::value)
   {
     using std::swap;
-#ifdef __cpp_exceptions
+    constexpr bool value_throws = !noexcept(this->_state.swap(o._state));
+    constexpr bool error_throws = !noexcept(swap(this->_ptr, o._ptr));
+    constexpr bool exception_throws = !noexcept(swap(this->_ptr, o._ptr));
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4297) // use of throw in noexcept function
+#pragma warning(disable : 4127) // conditional expression is constant
 #endif
-    this->_state.swap(o._state);
-    try
+    // Do throwing swap first
+    if(value_throws && !error_throws && !exception_throws)
+    {
+      this->_state.swap(o._state);
+      swap(this->_error, o._error);
+      swap(this->_ptr, o._ptr);
+    }
+    else if(!value_throws && !error_throws && exception_throws)
+    {
+      swap(this->_ptr, o._ptr);
+      this->_state.swap(o._state);
+      swap(this->_error, o._error);
+    }
+    else if(!value_throws && error_throws && !exception_throws)
     {
       swap(this->_error, o._error);
-      try
-      {
-        swap(this->_ptr, o._ptr);
-      }
-      catch(...)
-      {
-        swap(this->_state, o._state);
-        swap(this->_error, o._error);
-        throw;
-      }
+      this->_state.swap(o._state);
+      swap(this->_ptr, o._ptr);
     }
-    catch(...)
+    else
     {
-      swap(this->_state, o._state);
-      throw;
+      this->_state.swap(o._state);
+      swap(this->_error, o._error);
+      swap(this->_ptr, o._ptr);
     }
 #ifdef _MSC_VER
 #pragma warning(pop)
-#endif
-#else
-    swap(this->_state, o._state);
-    swap(this->_error, o._error);
-    swap(this->_ptr, o._ptr);
 #endif
   }
 

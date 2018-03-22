@@ -101,7 +101,7 @@ namespace detail
     {
       _status = o._status;
     }
-    constexpr void swap(value_storage_trivial &o)
+    constexpr void swap(value_storage_trivial &o) noexcept
     {
       // storage is trivial, so just use assignment
       using std::swap;
@@ -205,7 +205,7 @@ namespace detail
         this->_status &= ~status_have_value;
       }
     }
-    constexpr void swap(value_storage_nontrivial &o)
+    constexpr void swap(value_storage_nontrivial &o) noexcept(detail::is_nothrow_swappable<value_type>::value &&std::is_nothrow_move_constructible<value_type>::value)
     {
       using std::swap;
       if((_status & status_have_value) == 0 && (o._status & status_have_value) == 0)

@@ -857,44 +857,48 @@ public:
   /// \output_section Swap
   /*! Swaps this result with another result
   \effects Any `R` and/or `S` is swapped along with the metadata tracking them.
+  \throws If the swap of value or error or exception can throw, the throwing swap is done first.
+  If more than one of those can throw, the object is left in an indeterminate state should a throw occur.
   */
-  void swap(basic_outcome &o) noexcept(detail::is_nothrow_swappable<value_type>::value    //
-                                       &&detail::is_nothrow_swappable<error_type>::value  //
-                                       &&detail::is_nothrow_swappable<exception_type>::value)
+  void swap(basic_outcome &o) noexcept(detail::is_nothrow_swappable<value_type>::value &&std::is_nothrow_move_constructible<value_type>::value    //
+                                       &&detail::is_nothrow_swappable<error_type>::value &&std::is_nothrow_move_constructible<error_type>::value  //
+                                       &&detail::is_nothrow_swappable<exception_type>::value &&std::is_nothrow_move_constructible<exception_type>::value)
   {
     using std::swap;
-#ifdef __cpp_exceptions
+    constexpr bool value_throws = !noexcept(this->_state.swap(o._state));
+    constexpr bool error_throws = !noexcept(swap(this->_ptr, o._ptr));
+    constexpr bool exception_throws = !noexcept(swap(this->_ptr, o._ptr));
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4297)  // use of throw in noexcept function
+#pragma warning(disable : 4127)  // conditional expression is constant
 #endif
-    this->_state.swap(o._state);
-    try
+    // Do throwing swap first
+    if(value_throws && !error_throws && !exception_throws)
+    {
+      this->_state.swap(o._state);
+      swap(this->_error, o._error);
+      swap(this->_ptr, o._ptr);
+    }
+    else if(!value_throws && !error_throws && exception_throws)
+    {
+      swap(this->_ptr, o._ptr);
+      this->_state.swap(o._state);
+      swap(this->_error, o._error);
+    }
+    else if(!value_throws && error_throws && !exception_throws)
     {
       swap(this->_error, o._error);
-      try
-      {
-        swap(this->_ptr, o._ptr);
-      }
-      catch(...)
-      {
-        swap(this->_state, o._state);
-        swap(this->_error, o._error);
-        throw;
-      }
+      this->_state.swap(o._state);
+      swap(this->_ptr, o._ptr);
     }
-    catch(...)
+    else
     {
-      swap(this->_state, o._state);
-      throw;
+      this->_state.swap(o._state);
+      swap(this->_error, o._error);
+      swap(this->_ptr, o._ptr);
     }
 #ifdef _MSC_VER
 #pragma warning(pop)
-#endif
-#else
-    swap(this->_state, o._state);
-    swap(this->_error, o._error);
-    swap(this->_ptr, o._ptr);
 #endif
   }
 
