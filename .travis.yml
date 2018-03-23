@@ -73,7 +73,7 @@ before_install:
      ls -l hugo_bin;
      export PATH=$PATH:`pwd`/hugo_bin;
    fi
-
+   
 script:
  -
    if [ "$__" = "Code bloat tests" ]; then
@@ -86,6 +86,7 @@ script:
    fi
  -
    if [ "$__" = "ABI stability" ]; then
+     pip install ply;
      if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisABICheck; fi;
      mkdir build;
      cd build;
