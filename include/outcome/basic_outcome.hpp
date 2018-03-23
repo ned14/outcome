@@ -112,7 +112,7 @@ namespace detail
   };
 
   template <class T, class U, class V> constexpr inline const V &extract_exception_from_failure(const failure_type<U, V> &v) { return v.exception(); }
-  template <class T, class U, class V> constexpr inline V &&extract_exception_from_failure(failure_type<U, V> &&v) { return std::move(v).exception(); }
+  template <class T, class U, class V> constexpr inline V &&extract_exception_from_failure(failure_type<U, V> &&v) { return static_cast<failure_type<U, V> &&>(v).exception(); }
   template <class T, class U> constexpr inline T extract_exception_from_failure(const failure_type<U, void> & /*unused*/) { return T{}; }
 
   template <class T> struct is_basic_outcome
@@ -376,7 +376,7 @@ public:
   OUTCOME_TEMPLATE(class ErrorCondEnum)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))),  //
                     OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor<ErrorCondEnum>))
-  constexpr basic_outcome(ErrorCondEnum &&t, error_condition_converting_constructor_tag /*unused*/ = error_condition_converting_constructor_tag()) noexcept(noexcept(error_type(make_error_code(std::forward<ErrorCondEnum>(t)))))  // NOLINT
+  constexpr basic_outcome(ErrorCondEnum &&t, error_condition_converting_constructor_tag /*unused*/ = error_condition_converting_constructor_tag()) noexcept(noexcept(error_type(make_error_code(static_cast<ErrorCondEnum &&>(t)))))  // NOLINT
   : base{in_place_type<typename base::_error_type>, make_error_code(t)}
   {
     using namespace hooks;
@@ -953,13 +953,13 @@ public:
   {
     if(this->has_error() && this->has_exception())
     {
-      return OUTCOME_V2_NAMESPACE::failure(std::move(this->assume_error()), std::move(_ptr));
+      return OUTCOME_V2_NAMESPACE::failure(static_cast<S &&>(this->assume_error()), static_cast<P &&>(_ptr));
     }
     if(this->has_exception())
     {
-      return OUTCOME_V2_NAMESPACE::failure(error_type(), std::move(_ptr));
+      return OUTCOME_V2_NAMESPACE::failure(error_type(), static_cast<P &&>(_ptr));
     }
-    return OUTCOME_V2_NAMESPACE::failure(std::move(this->assume_error()), exception_type());
+    return OUTCOME_V2_NAMESPACE::failure(static_cast<S &&>(this->assume_error()), exception_type());
   }
 };
 
