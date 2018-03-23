@@ -86,7 +86,7 @@ script:
    fi
  -
    if [ "$__" = "ABI stability" ]; then
-     pip install ply;
+     pip install ply --user `whoami`;
      if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisABICheck; fi;
      mkdir build;
      cd build;
