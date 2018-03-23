@@ -24,15 +24,27 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
-BOOST_OUTCOME_AUTO_TEST_CASE(issues / 116 / outcome, "Bad implementation of outcome::operator==")
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 115 / outcome, "Initialization from `failure_type` drops default-constructed values")
 {
   namespace out = OUTCOME_V2_NAMESPACE;
 
-  out::outcome<int> o1 = 1;
-  BOOST_CHECK(!o1.has_error());
+  out::outcome<int> o1 = std::error_code{};
+  BOOST_CHECK(o1.has_error());
+  BOOST_CHECK(!o1.has_exception());
 
-  out::outcome<int> o2 = out::failure(std::error_code{EINVAL, std::generic_category()});
+  out::outcome<int> o2 = out::failure(std::error_code{});
   BOOST_CHECK(o2.has_error());
+  BOOST_CHECK(!o2.has_exception());
 
-  BOOST_CHECK(o1 != o2);
+  out::outcome<int> o3(std::error_code{}, std::exception_ptr{});
+  BOOST_CHECK(o3.has_error());
+  BOOST_CHECK(o3.has_exception());
+
+  out::outcome<int> o4 = out::failure(std::error_code{}, std::exception_ptr{});
+  BOOST_CHECK(o4.has_error());
+  BOOST_CHECK(o4.has_exception());
+
+  out::outcome<int> o5 = out::failure(std::exception_ptr{});
+  BOOST_CHECK(!o5.has_error());
+  BOOST_CHECK(o5.has_exception());
 }

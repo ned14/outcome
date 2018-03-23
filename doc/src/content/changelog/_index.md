@@ -6,10 +6,17 @@ weight = 80
 ---
 ## v2.1 in progress [[project]](https://github.com/ned14/outcome/projects/1)
 
+- [#115](https://github.com/ned14/outcome/issues/115)
+    - Outcome did not construct correctly from `failure_type`.
+
+- Inexplicably outcome's error + exception constructor had been removed.
+Nobody noticed during the Boost peer review, which is worrying seeing as that
+constructor is needed for one of the main advertised features to Boost!
+
 - [#107](https://github.com/ned14/outcome/issues/107) and [#116](https://github.com/ned14/outcome/issues/116)
     - `operator==` and `operator!=` now become disabled if the value, error and
     exception types do not implement the same operator.
-    - Relatedly, both comparison operators simple didn't work right. Fixed.
+    - Relatedly, both comparison operators simply didn't work right. Fixed.
 
 - [#109](https://github.com/ned14/outcome/issues/109)
     - `swap()` now has correct `noexcept` calculation and now correctly orders

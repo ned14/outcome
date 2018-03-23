@@ -110,10 +110,18 @@ template <class EC, class E = void> struct failure_type
   using exception_type = E;
 
 private:
+  bool _have_error, _have_exception;
   //! The error code
   error_type _error;
   //! The exception
   exception_type _exception;
+
+  struct error_init_tag
+  {
+  };
+  struct exception_init_tag
+  {
+  };
 
 public:
   /// \output_section Default, copy/move constructors and assignment
@@ -132,12 +140,39 @@ public:
   //! Initialising constructor
   template <class U, class V>
   constexpr explicit failure_type(U &&u, V &&v)
-      : _error(static_cast<U &&>(u))
+      : _have_error(true)
+      , _have_exception(true)
+      , _error(static_cast<U &&>(u))
       , _exception(static_cast<V &&>(v))
+  {
+  }
+  /*! Initialising constructor for `error_type` only.
+  */
+  template <class U>
+  constexpr explicit failure_type(in_place_type_t<error_type> /*unused*/, U &&u, error_init_tag /*unused*/ = error_init_tag())
+      : _have_error(true)
+      , _have_exception(false)
+      , _error(static_cast<U &&>(u))
+      , _exception()
+  {
+  }
+  /*! Initialising constructor for `exception_type` only.
+  */
+  template <class U>
+  constexpr explicit failure_type(in_place_type_t<exception_type> /*unused*/, U &&u, exception_init_tag /*unused*/ = exception_init_tag())
+      : _have_error(false)
+      , _have_exception(true)
+      , _error()
+      , _exception(static_cast<U &&>(u))
   {
   }
 
   /// \output_section Observers
+  //! True if has error
+  constexpr bool has_error() const { return _have_error; }
+  //! True if has exception
+  constexpr bool has_exception() const { return _have_exception; }
+
   /*! Access error.
   \returns Reference to the held `error_type` according to overload.
   \group failure_type_error

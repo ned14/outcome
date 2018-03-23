@@ -21,6 +21,7 @@ set(outcome_TESTS
   "test/tests/issue0065.cpp"
   "test/tests/issue0071.cpp"
   "test/tests/issue0095.cpp"
+  "test/tests/issue0115.cpp"
   "test/tests/issue0116.cpp"
   "test/tests/noexcept-propagation.cpp"
   "test/tests/propagate.cpp"
