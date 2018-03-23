@@ -87,7 +87,11 @@ script:
  -
    if [ "$__" = "ABI stability" ]; then
      if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisABICheck; fi;
-     cd abi-compliance;
+     mkdir build;
+     cd build;
+     cmake ..;
+     make outcome_hl-pp-abi;
+     cd ../abi-compliance;
      sh ./check-api-abi.sh abi_dumps/Outcome/2.1/ABI.dump;
    fi
  -
