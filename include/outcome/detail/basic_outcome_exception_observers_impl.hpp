@@ -47,13 +47,13 @@ namespace detail
   {
     basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<basic_outcome<R, S, P, NoValuePolicy> &&>(*this);  // NOLINT
     NoValuePolicy::narrow_exception_check(self);
-    return std::move(self._ptr);
+    return static_cast<P &&>(self._ptr);
   }
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::assume_exception() const &&noexcept
   {
     const basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<const basic_outcome<R, S, P, NoValuePolicy> &&>(*this);  // NOLINT
     NoValuePolicy::narrow_exception_check(self);
-    return std::move(self._ptr);
+    return static_cast<P &&>(self._ptr);
   }
 
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception() &
@@ -72,13 +72,13 @@ namespace detail
   {
     basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<basic_outcome<R, S, P, NoValuePolicy> &&>(*this);  // NOLINT
     NoValuePolicy::wide_exception_check(self);
-    return std::move(self._ptr);
+    return static_cast<P &&>(self._ptr);
   }
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception() const &&
   {
     const basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<const basic_outcome<R, S, P, NoValuePolicy> &&>(*this);  // NOLINT
     NoValuePolicy::wide_exception_check(self);
-    return std::move(self._ptr);
+    return static_cast<P &&>(self._ptr);
   }
 }  // namespace detail
 
