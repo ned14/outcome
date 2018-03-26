@@ -28,7 +28,8 @@ addons:
     - clang-4.0
     - cmake
     - cmake-data
-    - abi-compliance-checker
+#    - abi-compliance-checker
+    - abi-dumper
 
 env:
 # - __="Code bloat tests"
@@ -93,7 +94,8 @@ script:
      cmake ..;
      make outcome_hl-pp-abi;
      cd ../abi-compliance;
-     sh ./check-api-abi.sh abi_dumps/Outcome/2.1/ABI.dump;
+#     sh ./check-api-abi.sh abi_dumps/Outcome/2.1/ABI.dump;
+     sh ./check-abi.sh abi_dumps/Outcome/2.1/binary_only.dump;
    fi
  -
    if [ "$__" = "cmake tests" ]; then

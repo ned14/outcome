@@ -4,23 +4,9 @@ $VAR1 = {
           'Arch' => 'x86_64',
           'Compiler' => 'GNU C++14 6.3.0 20170519 -mtune=generic -march=x86-64 -g -O2 -std=gnu++14 -fPIC -fstack-protector',
           'Headers' => {
-                         'basic_outcome.hpp' => 1,
-                         'basic_outcome_exception_observers.hpp' => 1,
-                         'basic_result.hpp' => 1,
-                         'basic_result_error_observers.hpp' => 1,
-                         'basic_result_final.hpp' => 1,
-                         'basic_result_storage.hpp' => 1,
-                         'basic_result_value_observers.hpp' => 1,
-                         'config.hpp' => 1,
-                         'exception_ptr.h' => 1,
-                         'outcome.hpp' => 1,
-                         'result.hpp' => 1,
-                         'std_outcome.hpp' => 1,
-                         'std_result.hpp' => 1,
+                         'abi.hpp' => 1,
                          'stdint.h' => 1,
-                         'system_error' => 1,
-                         'type_traits' => 1,
-                         'value_storage.hpp' => 1
+                         'type_traits' => 1
                        },
           'Language' => 'C++',
           'LibraryName' => 'liboutcome-abi-lib.so',
@@ -32,625 +18,420 @@ $VAR1 = {
                             'outcome_v2' => 1,
                             'outcome_v2::detail' => 1,
                             'outcome_v2::policy' => 1,
+                            'outcome_v2::policy::detail' => 1,
                             'outcome_v2::trait' => 1,
                             'std' => 1,
-                            'std::_V2' => 1,
                             'std::__exception_ptr' => 1
                           },
-          'Needed' => {
-                        'libc.so.6' => 1,
-                        'libstdc++.so.6' => 1
-                      },
+          'Needed' => {},
           'Sources' => {
                          'main.cpp' => 1
                        },
           'SymbolInfo' => {
-                            '49115' => {
+                            '13690' => {
                                          'Artificial' => 1,
-                                         'Class' => '35349',
+                                         'Class' => '5733',
                                          'Constructor' => 1,
-                                         'Header' => 'value_storage.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '133',
+                                         'Line' => '2624',
                                          'MnglName' => '_ZN10outcome_v26detail24value_storage_nontrivialI14NonTrivialTypeEC2ERKS3_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '47486'
+                                                               'type' => '12916'
                                                              },
                                                       '1' => {
                                                                'name' => 'o',
-                                                               'type' => '47502'
+                                                               'type' => '12932'
                                                              }
                                                     },
                                          'ShortName' => 'value_storage_nontrivial'
                                        },
-                            '49116' => {
+                            '13691' => {
                                          'Artificial' => 1,
-                                         'Class' => '35349',
+                                         'Class' => '5733',
                                          'Constructor' => 1,
-                                         'Header' => 'value_storage.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '133',
+                                         'Line' => '2624',
                                          'MnglName' => '_ZN10outcome_v26detail24value_storage_nontrivialI14NonTrivialTypeEC1ERKS3_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '47486'
+                                                               'type' => '12916'
                                                              },
                                                       '1' => {
                                                                'name' => 'o',
-                                                               'type' => '47502'
+                                                               'type' => '12932'
                                                              }
                                                     },
                                          'ShortName' => 'value_storage_nontrivial'
                                        },
-                            '49146' => {
-                                         'Line' => '76',
-                                         'MnglName' => '_Z22outcome_NonTrivialTypeRN10outcome_v213basic_outcomeI14NonTrivialTypeSt10error_codeNSt15__exception_ptr13exception_ptrENS_6policy32error_code_throw_as_system_errorIS1_S2_S4_EEEE',
+                            '13729' => {
+                                         'Line' => '78',
+                                         'MnglName' => '_Z22outcome_NonTrivialTypeRN10outcome_v213basic_outcomeI14NonTrivialTypeldNS_6policy9terminateEEE',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'v',
-                                                               'type' => '49680'
+                                                               'type' => '14163'
                                                              }
                                                     },
-                                         'Return' => '43919',
+                                         'Return' => '13718',
                                          'ShortName' => 'outcome_NonTrivialType',
                                          'Source' => 'main.cpp'
                                        },
-                            '49735' => {
+                            '14217' => {
                                          'Artificial' => 1,
-                                         'Class' => '43591',
+                                         'Class' => '11303',
                                          'Constructor' => 1,
-                                         'Header' => 'basic_outcome.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '191',
-                                         'MnglName' => '_ZN10outcome_v213basic_outcomeI14NonTrivialTypeSt10error_codeNSt15__exception_ptr13exception_ptrENS_6policy32error_code_throw_as_system_errorIS1_S2_S4_EEEC2ERKS8_',
+                                         'Line' => '5266',
+                                         'MnglName' => '_ZN10outcome_v213basic_outcomeI14NonTrivialTypeldNS_6policy9terminateEEC2ERKS4_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '48282'
+                                                               'type' => '13459'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '49691'
+                                                               'type' => '14174'
                                                              }
                                                     },
                                          'ShortName' => 'basic_outcome'
                                        },
-                            '49736' => {
+                            '14218' => {
                                          'Artificial' => 1,
-                                         'Class' => '43591',
+                                         'Class' => '11303',
                                          'Constructor' => 1,
-                                         'Header' => 'basic_outcome.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '191',
-                                         'MnglName' => '_ZN10outcome_v213basic_outcomeI14NonTrivialTypeSt10error_codeNSt15__exception_ptr13exception_ptrENS_6policy32error_code_throw_as_system_errorIS1_S2_S4_EEEC1ERKS8_',
+                                         'Line' => '5266',
+                                         'MnglName' => '_ZN10outcome_v213basic_outcomeI14NonTrivialTypeldNS_6policy9terminateEEC1ERKS4_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '48282'
+                                                               'type' => '13459'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '49691'
+                                                               'type' => '14174'
                                                              }
                                                     },
                                          'ShortName' => 'basic_outcome'
                                        },
-                            '49821' => {
+                            '14288' => {
                                          'Artificial' => 1,
-                                         'Class' => '42053',
+                                         'Class' => '9585',
                                          'Constructor' => 1,
-                                         'Header' => 'basic_outcome_exception_observers.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '96',
-                                         'MnglName' => '_ZN10outcome_v26detail33basic_outcome_exception_observersINS0_18basic_result_finalI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS3_S4_NSt15__exception_ptr13exception_ptrEEEEES3_S4_S8_S9_S8_EC2ERKSB_',
+                                         'Line' => '4959',
+                                         'MnglName' => '_ZN10outcome_v26detail33basic_outcome_exception_observersINS0_18basic_result_finalI14NonTrivialTypelNS_6policy9terminateEEES3_ldS5_vEC2ERKS7_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '49772'
+                                                               'type' => '13424'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '49777'
+                                                               'type' => '14245'
                                                              }
                                                     },
                                          'ShortName' => 'basic_outcome_exception_observers'
                                        },
-                            '49822' => {
+                            '14289' => {
                                          'Artificial' => 1,
-                                         'Class' => '42053',
+                                         'Class' => '9585',
                                          'Constructor' => 1,
-                                         'Header' => 'basic_outcome_exception_observers.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '96',
-                                         'MnglName' => '_ZN10outcome_v26detail33basic_outcome_exception_observersINS0_18basic_result_finalI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS3_S4_NSt15__exception_ptr13exception_ptrEEEEES3_S4_S8_S9_S8_EC1ERKSB_',
+                                         'Line' => '4959',
+                                         'MnglName' => '_ZN10outcome_v26detail33basic_outcome_exception_observersINS0_18basic_result_finalI14NonTrivialTypelNS_6policy9terminateEEES3_ldS5_vEC1ERKS7_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '49772'
+                                                               'type' => '13424'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '49777'
+                                                               'type' => '14245'
                                                              }
                                                     },
                                          'ShortName' => 'basic_outcome_exception_observers'
                                        },
-                            '49896' => {
-                                         'Artificial' => 1,
-                                         'Class' => '41698',
-                                         'Constructor' => 1,
-                                         'Header' => 'basic_outcome_exception_observers.hpp',
-                                         'InLine' => 1,
-                                         'Line' => '44',
-                                         'MnglName' => '_ZN10outcome_v26detail33basic_outcome_exception_observersINS0_18basic_result_finalI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS3_S4_NSt15__exception_ptr13exception_ptrEEEEES3_S4_S8_S9_vEC2ERKSB_',
-                                         'Param' => {
-                                                      '0' => {
-                                                               'name' => 'this',
-                                                               'type' => '48241'
-                                                             },
-                                                      '1' => {
-                                                               'name' => 'p1',
-                                                               'type' => '49852'
-                                                             }
-                                                    },
-                                         'ShortName' => 'basic_outcome_exception_observers'
-                                       },
-                            '49897' => {
-                                         'Artificial' => 1,
-                                         'Class' => '41698',
-                                         'Constructor' => 1,
-                                         'Header' => 'basic_outcome_exception_observers.hpp',
-                                         'InLine' => 1,
-                                         'Line' => '44',
-                                         'MnglName' => '_ZN10outcome_v26detail33basic_outcome_exception_observersINS0_18basic_result_finalI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS3_S4_NSt15__exception_ptr13exception_ptrEEEEES3_S4_S8_S9_vEC1ERKSB_',
-                                         'Param' => {
-                                                      '0' => {
-                                                               'name' => 'this',
-                                                               'type' => '48241'
-                                                             },
-                                                      '1' => {
-                                                               'name' => 'p1',
-                                                               'type' => '49852'
-                                                             }
-                                                    },
-                                         'ShortName' => 'basic_outcome_exception_observers'
-                                       },
-                            '49982' => {
-                                         'Artificial' => 1,
-                                         'Class' => '41401',
-                                         'Constructor' => 1,
-                                         'Header' => 'basic_result_final.hpp',
-                                         'InLine' => 1,
-                                         'Line' => '39',
-                                         'MnglName' => '_ZN10outcome_v26detail18basic_result_finalI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS2_S3_NSt15__exception_ptr13exception_ptrEEEEC2ERKS9_',
-                                         'Param' => {
-                                                      '0' => {
-                                                               'name' => 'this',
-                                                               'type' => '49933'
-                                                             },
-                                                      '1' => {
-                                                               'name' => 'p1',
-                                                               'type' => '49938'
-                                                             }
-                                                    },
-                                         'ShortName' => 'basic_result_final'
-                                       },
-                            '49983' => {
-                                         'Artificial' => 1,
-                                         'Class' => '41401',
-                                         'Constructor' => 1,
-                                         'Header' => 'basic_result_final.hpp',
-                                         'InLine' => 1,
-                                         'Line' => '39',
-                                         'MnglName' => '_ZN10outcome_v26detail18basic_result_finalI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS2_S3_NSt15__exception_ptr13exception_ptrEEEEC1ERKS9_',
-                                         'Param' => {
-                                                      '0' => {
-                                                               'name' => 'this',
-                                                               'type' => '49933'
-                                                             },
-                                                      '1' => {
-                                                               'name' => 'p1',
-                                                               'type' => '49938'
-                                                             }
-                                                    },
-                                         'ShortName' => 'basic_result_final'
-                                       },
-                            '50057' => {
-                                         'Artificial' => 1,
-                                         'Class' => '41064',
-                                         'Constructor' => 1,
-                                         'Header' => 'basic_result_error_observers.hpp',
-                                         'InLine' => 1,
-                                         'Line' => '35',
-                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_error_observersINS0_28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS4_S5_NSt15__exception_ptr13exception_ptrEEEEES4_SA_EES5_SA_EC2ERKSD_',
-                                         'Param' => {
-                                                      '0' => {
-                                                               'name' => 'this',
-                                                               'type' => '48194'
-                                                             },
-                                                      '1' => {
-                                                               'name' => 'p1',
-                                                               'type' => '50013'
-                                                             }
-                                                    },
-                                         'ShortName' => 'basic_result_error_observers'
-                                       },
-                            '50058' => {
-                                         'Artificial' => 1,
-                                         'Class' => '41064',
-                                         'Constructor' => 1,
-                                         'Header' => 'basic_result_error_observers.hpp',
-                                         'InLine' => 1,
-                                         'Line' => '35',
-                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_error_observersINS0_28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS4_S5_NSt15__exception_ptr13exception_ptrEEEEES4_SA_EES5_SA_EC1ERKSD_',
-                                         'Param' => {
-                                                      '0' => {
-                                                               'name' => 'this',
-                                                               'type' => '48194'
-                                                             },
-                                                      '1' => {
-                                                               'name' => 'p1',
-                                                               'type' => '50013'
-                                                             }
-                                                    },
-                                         'ShortName' => 'basic_result_error_observers'
-                                       },
-                            '50132' => {
-                                         'Artificial' => 1,
-                                         'Class' => '40728',
-                                         'Constructor' => 1,
-                                         'Header' => 'basic_result_value_observers.hpp',
-                                         'InLine' => 1,
-                                         'Line' => '35',
-                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS3_S4_NSt15__exception_ptr13exception_ptrEEEEES3_S9_EC2ERKSB_',
-                                         'Param' => {
-                                                      '0' => {
-                                                               'name' => 'this',
-                                                               'type' => '48153'
-                                                             },
-                                                      '1' => {
-                                                               'name' => 'p1',
-                                                               'type' => '50088'
-                                                             }
-                                                    },
-                                         'ShortName' => 'basic_result_value_observers'
-                                       },
-                            '50133' => {
-                                         'Artificial' => 1,
-                                         'Class' => '40728',
-                                         'Constructor' => 1,
-                                         'Header' => 'basic_result_value_observers.hpp',
-                                         'InLine' => 1,
-                                         'Line' => '35',
-                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS3_S4_NSt15__exception_ptr13exception_ptrEEEEES3_S9_EC1ERKSB_',
-                                         'Param' => {
-                                                      '0' => {
-                                                               'name' => 'this',
-                                                               'type' => '48153'
-                                                             },
-                                                      '1' => {
-                                                               'name' => 'p1',
-                                                               'type' => '50088'
-                                                             }
-                                                    },
-                                         'ShortName' => 'basic_result_value_observers'
-                                       },
-                            '50194' => {
-                                         'Artificial' => 1,
-                                         'Class' => '40411',
-                                         'Constructor' => 1,
-                                         'Header' => 'basic_result_storage.hpp',
-                                         'InLine' => 1,
-                                         'Line' => '100',
-                                         'MnglName' => '_ZN10outcome_v26detail20basic_result_storageI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS2_S3_NSt15__exception_ptr13exception_ptrEEEEC2ERKS9_',
-                                         'Param' => {
-                                                      '0' => {
-                                                               'name' => 'this',
-                                                               'type' => '48107'
-                                                             },
-                                                      '1' => {
-                                                               'name' => 'p1',
-                                                               'type' => '48118'
-                                                             }
-                                                    },
-                                         'Protected' => 1,
-                                         'ShortName' => 'basic_result_storage'
-                                       },
-                            '50195' => {
-                                         'Artificial' => 1,
-                                         'Class' => '40411',
-                                         'Constructor' => 1,
-                                         'Header' => 'basic_result_storage.hpp',
-                                         'InLine' => 1,
-                                         'Line' => '100',
-                                         'MnglName' => '_ZN10outcome_v26detail20basic_result_storageI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS2_S3_NSt15__exception_ptr13exception_ptrEEEEC1ERKS9_',
-                                         'Param' => {
-                                                      '0' => {
-                                                               'name' => 'this',
-                                                               'type' => '48107'
-                                                             },
-                                                      '1' => {
-                                                               'name' => 'p1',
-                                                               'type' => '48118'
-                                                             }
-                                                    },
-                                         'Protected' => 1,
-                                         'ShortName' => 'basic_result_storage'
-                                       },
-                            '50225' => {
-                                         'Line' => '71',
-                                         'MnglName' => '_Z11outcome_intRN10outcome_v213basic_outcomeIiSt10error_codeNSt15__exception_ptr13exception_ptrENS_6policy32error_code_throw_as_system_errorIiS1_S3_EEEE',
+                            '14327' => {
+                                         'Line' => '73',
+                                         'MnglName' => '_Z11outcome_intRN10outcome_v213basic_outcomeIildNS_6policy9terminateEEE',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'v',
-                                                               'type' => '49680'
+                                                               'type' => '14163'
                                                              }
                                                     },
-                                         'Return' => '43919',
+                                         'Return' => '13718',
                                          'ShortName' => 'outcome_int',
                                          'Source' => 'main.cpp'
                                        },
-                            '50433' => {
-                                         'Line' => '66',
-                                         'MnglName' => '_Z21result_NonTrivialTypeRN10outcome_v212basic_resultI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS1_S2_vEEEE',
+                            '14398' => {
+                                         'Line' => '68',
+                                         'MnglName' => '_Z21result_NonTrivialTypeRN10outcome_v212basic_resultI14NonTrivialTypelNS_6policy9terminateEEE',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'v',
-                                                               'type' => '50854'
+                                                               'type' => '14793'
                                                              }
                                                     },
-                                         'Return' => '43963',
+                                         'Return' => '14387',
                                          'ShortName' => 'result_NonTrivialType',
                                          'Source' => 'main.cpp'
                                        },
-                            '50896' => {
+                            '14833' => {
                                          'Artificial' => 1,
-                                         'Class' => '42993',
+                                         'Class' => '10732',
                                          'Constructor' => 1,
-                                         'Header' => 'basic_result.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '278',
-                                         'MnglName' => '_ZN10outcome_v212basic_resultI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS1_S2_vEEEC2ERKS6_',
+                                         'Line' => '4363',
+                                         'MnglName' => '_ZN10outcome_v212basic_resultI14NonTrivialTypelNS_6policy9terminateEEC2ERKS4_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '47894'
+                                                               'type' => '13324'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '47905'
+                                                               'type' => '13335'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result'
                                        },
-                            '50897' => {
+                            '14834' => {
                                          'Artificial' => 1,
-                                         'Class' => '42993',
+                                         'Class' => '10732',
                                          'Constructor' => 1,
-                                         'Header' => 'basic_result.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '278',
-                                         'MnglName' => '_ZN10outcome_v212basic_resultI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS1_S2_vEEEC1ERKS6_',
+                                         'Line' => '4363',
+                                         'MnglName' => '_ZN10outcome_v212basic_resultI14NonTrivialTypelNS_6policy9terminateEEC1ERKS4_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '47894'
+                                                               'type' => '13324'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '47905'
+                                                               'type' => '13335'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result'
                                        },
-                            '50982' => {
+                            '14915' => {
                                          'Artificial' => 1,
-                                         'Class' => '38462',
+                                         'Class' => '8932',
                                          'Constructor' => 1,
-                                         'Header' => 'basic_result_final.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '39',
-                                         'MnglName' => '_ZN10outcome_v26detail18basic_result_finalI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS2_S3_vEEEC2ERKS7_',
+                                         'Line' => '3460',
+                                         'MnglName' => '_ZN10outcome_v26detail18basic_result_finalI14NonTrivialTypelNS_6policy9terminateEEC2ERKS5_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '50933'
+                                                               'type' => '14867'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '50938'
+                                                               'type' => '14872'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result_final'
                                        },
-                            '50983' => {
+                            '14916' => {
                                          'Artificial' => 1,
-                                         'Class' => '38462',
+                                         'Class' => '8932',
                                          'Constructor' => 1,
-                                         'Header' => 'basic_result_final.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '39',
-                                         'MnglName' => '_ZN10outcome_v26detail18basic_result_finalI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS2_S3_vEEEC1ERKS7_',
+                                         'Line' => '3460',
+                                         'MnglName' => '_ZN10outcome_v26detail18basic_result_finalI14NonTrivialTypelNS_6policy9terminateEEC1ERKS5_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '50933'
+                                                               'type' => '14867'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '50938'
+                                                               'type' => '14872'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result_final'
                                        },
-                            '51057' => {
+                            '14986' => {
                                          'Artificial' => 1,
-                                         'Class' => '38125',
+                                         'Class' => '8585',
                                          'Constructor' => 1,
-                                         'Header' => 'basic_result_error_observers.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '35',
-                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_error_observersINS0_28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS4_S5_vEEEES4_S8_EES5_S8_EC2ERKSB_',
+                                         'Line' => '3204',
+                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_error_observersINS0_28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypelNS_6policy9terminateEEES4_S6_EElS6_EC2ERKS9_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '47853'
+                                                               'type' => '13283'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '51013'
+                                                               'type' => '14943'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result_error_observers'
                                        },
-                            '51058' => {
+                            '14987' => {
                                          'Artificial' => 1,
-                                         'Class' => '38125',
+                                         'Class' => '8585',
                                          'Constructor' => 1,
-                                         'Header' => 'basic_result_error_observers.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '35',
-                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_error_observersINS0_28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS4_S5_vEEEES4_S8_EES5_S8_EC1ERKSB_',
+                                         'Line' => '3204',
+                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_error_observersINS0_28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypelNS_6policy9terminateEEES4_S6_EElS6_EC1ERKS9_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '47853'
+                                                               'type' => '13283'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '51013'
+                                                               'type' => '14943'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result_error_observers'
                                        },
-                            '51132' => {
+                            '15057' => {
                                          'Artificial' => 1,
-                                         'Class' => '37789',
+                                         'Class' => '8239',
                                          'Constructor' => 1,
-                                         'Header' => 'basic_result_value_observers.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '35',
-                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS3_S4_vEEEES3_S7_EC2ERKS9_',
+                                         'Line' => '3355',
+                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypelNS_6policy9terminateEEES3_S5_EC2ERKS7_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '47812'
+                                                               'type' => '13242'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '51088'
+                                                               'type' => '15014'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result_value_observers'
                                        },
-                            '51133' => {
+                            '15058' => {
                                          'Artificial' => 1,
-                                         'Class' => '37789',
+                                         'Class' => '8239',
                                          'Constructor' => 1,
-                                         'Header' => 'basic_result_value_observers.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '35',
-                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS3_S4_vEEEES3_S7_EC1ERKS9_',
+                                         'Line' => '3355',
+                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypelNS_6policy9terminateEEES3_S5_EC1ERKS7_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '47812'
+                                                               'type' => '13242'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '51088'
+                                                               'type' => '15014'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result_value_observers'
                                        },
-                            '51194' => {
+                            '15114' => {
                                          'Artificial' => 1,
-                                         'Class' => '37443',
+                                         'Class' => '7882',
                                          'Constructor' => 1,
-                                         'Header' => 'basic_result_storage.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '100',
-                                         'MnglName' => '_ZN10outcome_v26detail20basic_result_storageI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS2_S3_vEEEC2ERKS7_',
+                                         'Line' => '2917',
+                                         'MnglName' => '_ZN10outcome_v26detail20basic_result_storageI14NonTrivialTypelNS_6policy9terminateEEC2ERKS5_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '47760'
+                                                               'type' => '13190'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '47777'
+                                                               'type' => '13207'
                                                              }
                                                     },
                                          'Protected' => 1,
                                          'ShortName' => 'basic_result_storage'
                                        },
-                            '51195' => {
+                            '15115' => {
                                          'Artificial' => 1,
-                                         'Class' => '37443',
+                                         'Class' => '7882',
                                          'Constructor' => 1,
-                                         'Header' => 'basic_result_storage.hpp',
+                                         'Header' => 'abi.hpp',
                                          'InLine' => 1,
-                                         'Line' => '100',
-                                         'MnglName' => '_ZN10outcome_v26detail20basic_result_storageI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS2_S3_vEEEC1ERKS7_',
+                                         'Line' => '2917',
+                                         'MnglName' => '_ZN10outcome_v26detail20basic_result_storageI14NonTrivialTypelNS_6policy9terminateEEC1ERKS5_',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '47760'
+                                                               'type' => '13190'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '47777'
+                                                               'type' => '13207'
                                                              }
                                                     },
                                          'Protected' => 1,
                                          'ShortName' => 'basic_result_storage'
                                        },
-                            '51349' => {
-                                         'Line' => '61',
-                                         'MnglName' => '_Z10result_intRN10outcome_v212basic_resultIiSt10error_codeNS_6policy32error_code_throw_as_system_errorIiS1_vEEEE',
+                            '15267' => {
+                                         'Line' => '63',
+                                         'MnglName' => '_Z10result_intRN10outcome_v212basic_resultIilNS_6policy9terminateEEE',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'v',
-                                                               'type' => '50854'
+                                                               'type' => '14793'
                                                              }
                                                     },
-                                         'Return' => '43963',
+                                         'Return' => '14387',
                                          'ShortName' => 'result_int',
                                          'Source' => 'main.cpp'
                                        },
-                            '51411' => {
-                                         'Line' => '56',
+                            '15327' => {
+                                         'Line' => '58',
                                          'MnglName' => '_Z28value_storage_NonTrivialTypeRN10outcome_v26detail24value_storage_nontrivialI14NonTrivialTypeEE',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'v',
-                                                               'type' => '47491'
+                                                               'type' => '12921'
                                                              }
                                                     },
-                                         'Return' => '35349',
+                                         'Return' => '5733',
                                          'ShortName' => 'value_storage_NonTrivialType',
                                          'Source' => 'main.cpp'
                                        },
-                            '51540' => {
-                                         'Line' => '51',
+                            '15449' => {
+                                         'Line' => '53',
                                          'MnglName' => '_Z17value_storage_intRN10outcome_v26detail21value_storage_trivialIiEE',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'v',
-                                                               'type' => '47469'
+                                                               'type' => '12899'
                                                              }
                                                     },
-                                         'Return' => '34975',
+                                         'Return' => '5343',
                                          'ShortName' => 'value_storage_int',
                                          'Source' => 'main.cpp'
                                        },
-                            '51591' => {
-                                         'Line' => '45',
+                            '15498' => {
+                                         'Line' => '47',
                                          'MnglName' => '_Z11status_bitsv',
-                                         'Return' => '34510',
+                                         'Return' => '4855',
                                          'ShortName' => 'status_bits',
                                          'Source' => 'main.cpp'
                                        }
@@ -658,12 +439,12 @@ $VAR1 = {
           'SymbolVersion' => {},
           'Symbols' => {
                          'liboutcome-abi-lib.so' => {
-                                                      '_Z10result_intRN10outcome_v212basic_resultIiSt10error_codeNS_6policy32error_code_throw_as_system_errorIiS1_vEEEE' => 1,
-                                                      '_Z11outcome_intRN10outcome_v213basic_outcomeIiSt10error_codeNSt15__exception_ptr13exception_ptrENS_6policy32error_code_throw_as_system_errorIiS1_S3_EEEE' => 1,
+                                                      '_Z10result_intRN10outcome_v212basic_resultIilNS_6policy9terminateEEE' => 1,
+                                                      '_Z11outcome_intRN10outcome_v213basic_outcomeIildNS_6policy9terminateEEE' => 1,
                                                       '_Z11status_bitsv' => 1,
                                                       '_Z17value_storage_intRN10outcome_v26detail21value_storage_trivialIiEE' => 1,
-                                                      '_Z21result_NonTrivialTypeRN10outcome_v212basic_resultI14NonTrivialTypeSt10error_codeNS_6policy32error_code_throw_as_system_errorIS1_S2_vEEEE' => 1,
-                                                      '_Z22outcome_NonTrivialTypeRN10outcome_v213basic_outcomeI14NonTrivialTypeSt10error_codeNSt15__exception_ptr13exception_ptrENS_6policy32error_code_throw_as_system_errorIS1_S2_S4_EEEE' => 1,
+                                                      '_Z21result_NonTrivialTypeRN10outcome_v212basic_resultI14NonTrivialTypelNS_6policy9terminateEEE' => 1,
+                                                      '_Z22outcome_NonTrivialTypeRN10outcome_v213basic_outcomeI14NonTrivialTypeldNS_6policy9terminateEEE' => 1,
                                                       '_Z28value_storage_NonTrivialTypeRN10outcome_v26detail24value_storage_nontrivialI14NonTrivialTypeEE' => 1,
                                                       '_fini' => 1,
                                                       '_init' => 1
@@ -675,7 +456,322 @@ $VAR1 = {
                                    'Name' => 'void',
                                    'Type' => 'Intrinsic'
                                  },
-                          '1360' => {
+                          '10270' => {
+                                       'Header' => 'abi.hpp',
+                                       'Line' => '3880',
+                                       'Name' => 'struct outcome_v2::policy::detail::base',
+                                       'NameSpace' => 'outcome_v2::policy::detail',
+                                       'Size' => '1',
+                                       'Type' => 'Struct'
+                                     },
+                          '10280' => {
+                                       'Base' => {
+                                                   '10270' => {
+                                                                'pos' => '0'
+                                                              }
+                                                 },
+                                       'Header' => 'abi.hpp',
+                                       'Line' => '4043',
+                                       'Name' => 'struct outcome_v2::policy::terminate',
+                                       'NameSpace' => 'outcome_v2::policy',
+                                       'Size' => '1',
+                                       'Type' => 'Struct'
+                                     },
+                          '10732' => {
+                                       'Base' => {
+                                                   '8932' => {
+                                                               'pos' => '0'
+                                                             }
+                                                 },
+                                       'Header' => 'abi.hpp',
+                                       'Line' => '4268',
+                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>',
+                                       'NameSpace' => 'outcome_v2',
+                                       'Size' => '24',
+                                       'TParam' => {
+                                                     '0' => {
+                                                              'key' => 'R',
+                                                              'type' => '12632'
+                                                            },
+                                                     '1' => {
+                                                              'key' => 'S',
+                                                              'type' => '110'
+                                                            },
+                                                     '2' => {
+                                                              'key' => 'NoValuePolicy',
+                                                              'type' => '10280'
+                                                            }
+                                                   },
+                                       'Type' => 'Class'
+                                     },
+                          '110' => {
+                                     'Name' => 'long',
+                                     'Size' => '8',
+                                     'Type' => 'Intrinsic'
+                                   },
+                          '11097' => {
+                                       'BaseType' => '10732',
+                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>const',
+                                       'Size' => '24',
+                                       'Type' => 'Const'
+                                     },
+                          '11303' => {
+                                       'Base' => {
+                                                   '9585' => {
+                                                               'pos' => '0'
+                                                             }
+                                                 },
+                                       'Header' => 'abi.hpp',
+                                       'Line' => '5266',
+                                       'Memb' => {
+                                                   '0' => {
+                                                            'access' => 'protected',
+                                                            'name' => '_ptr',
+                                                            'offset' => '24',
+                                                            'type' => '5331'
+                                                          }
+                                                 },
+                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>',
+                                       'NameSpace' => 'outcome_v2',
+                                       'Size' => '32',
+                                       'TParam' => {
+                                                     '0' => {
+                                                              'key' => 'R',
+                                                              'type' => '12632'
+                                                            },
+                                                     '1' => {
+                                                              'key' => 'S',
+                                                              'type' => '110'
+                                                            },
+                                                     '2' => {
+                                                              'key' => 'P',
+                                                              'type' => '3884'
+                                                            },
+                                                     '3' => {
+                                                              'key' => 'NoValuePolicy',
+                                                              'type' => '10280'
+                                                            }
+                                                   },
+                                       'Type' => 'Class'
+                                     },
+                          '11523' => {
+                                       'BaseType' => '11303',
+                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>const',
+                                       'Size' => '32',
+                                       'Type' => 'Const'
+                                     },
+                          '12632' => {
+                                       'Line' => '27',
+                                       'Memb' => {
+                                                   '0' => {
+                                                            'name' => 'foo',
+                                                            'offset' => '0',
+                                                            'type' => '2544'
+                                                          }
+                                                 },
+                                       'Name' => 'struct NonTrivialType',
+                                       'Size' => '8',
+                                       'Source' => 'main.cpp',
+                                       'Type' => 'Struct'
+                                     },
+                          '12899' => {
+                                       'BaseType' => '5343',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_trivial<int>&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '12910' => {
+                                       'BaseType' => '5733',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '12916' => {
+                                       'BaseType' => '12910',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '12921' => {
+                                       'BaseType' => '5733',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '12932' => {
+                                       'BaseType' => '6101',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '13184' => {
+                                       'BaseType' => '7882',
+                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '13190' => {
+                                       'BaseType' => '13184',
+                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '13207' => {
+                                       'BaseType' => '8205',
+                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '13236' => {
+                                       'BaseType' => '8239',
+                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '13242' => {
+                                       'BaseType' => '13236',
+                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '13277' => {
+                                       'BaseType' => '8585',
+                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '13283' => {
+                                       'BaseType' => '13277',
+                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '13318' => {
+                                       'BaseType' => '10732',
+                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '13324' => {
+                                       'BaseType' => '13318',
+                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '13335' => {
+                                       'BaseType' => '11097',
+                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '13418' => {
+                                       'BaseType' => '9585',
+                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate, void>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '13424' => {
+                                       'BaseType' => '13418',
+                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate, void>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '13453' => {
+                                       'BaseType' => '11303',
+                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '13459' => {
+                                       'BaseType' => '13453',
+                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '13718' => {
+                                       'BaseType' => '11303',
+                                       'Line' => '45',
+                                       'Name' => 'outcome',
+                                       'Size' => '32',
+                                       'Source' => 'main.cpp',
+                                       'Type' => 'Typedef'
+                                     },
+                          '14163' => {
+                                       'BaseType' => '13718',
+                                       'Name' => 'outcome&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '14174' => {
+                                       'BaseType' => '11523',
+                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '14245' => {
+                                       'BaseType' => '9945',
+                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate, void>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '14387' => {
+                                       'BaseType' => '10732',
+                                       'Line' => '44',
+                                       'Name' => 'result',
+                                       'Size' => '24',
+                                       'Source' => 'main.cpp',
+                                       'Type' => 'Typedef'
+                                     },
+                          '14793' => {
+                                       'BaseType' => '14387',
+                                       'Name' => 'result&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '14861' => {
+                                       'BaseType' => '8932',
+                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '14867' => {
+                                       'BaseType' => '14861',
+                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '14872' => {
+                                       'BaseType' => '9232',
+                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '14943' => {
+                                       'BaseType' => '8927',
+                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '15014' => {
+                                       'BaseType' => '8580',
+                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '153' => {
+                                     'BaseType' => '164',
+                                     'Header' => 'stdint.h',
+                                     'Line' => '51',
+                                     'Name' => 'uint32_t',
+                                     'Size' => '4',
+                                     'Type' => 'Typedef'
+                                   },
+                          '164' => {
+                                     'Name' => 'unsigned int',
+                                     'Size' => '4',
+                                     'Type' => 'Intrinsic'
+                                   },
+                          '1912' => {
                                       'Header' => 'type_traits',
                                       'Line' => '2179',
                                       'Name' => 'struct std::conditional<true, outcome_v2::detail::void_type, void>',
@@ -686,7 +782,7 @@ $VAR1 = {
                                                              'name' => 'true'
                                                            },
                                                     '1' => {
-                                                             'type' => '34407'
+                                                             'type' => '4749'
                                                            },
                                                     '2' => {
                                                              'name' => 'void'
@@ -694,8 +790,8 @@ $VAR1 = {
                                                   },
                                       'Type' => 'Struct'
                                     },
-                          '1373' => {
-                                      'BaseType' => '34407',
+                          '1925' => {
+                                      'BaseType' => '4749',
                                       'Header' => 'type_traits',
                                       'Line' => '2180',
                                       'Name' => 'std::conditional<true, outcome_v2::detail::void_type, void>::type',
@@ -703,8 +799,8 @@ $VAR1 = {
                                       'Size' => '1',
                                       'Type' => 'Typedef'
                                     },
-                          '1386' => {
-                                      'BaseType' => '1373',
+                          '1938' => {
+                                      'BaseType' => '1925',
                                       'Header' => 'type_traits',
                                       'Line' => '2527',
                                       'Name' => 'std::conditional_t',
@@ -712,1046 +808,375 @@ $VAR1 = {
                                       'Size' => '1',
                                       'Type' => 'Typedef'
                                     },
-                          '164' => {
-                                     'BaseType' => '175',
-                                     'Header' => 'stdint.h',
-                                     'Line' => '51',
-                                     'Name' => 'uint32_t',
-                                     'Size' => '4',
-                                     'Type' => 'Typedef'
-                                   },
-                          '1679' => {
-                                      'Header' => 'exception_ptr.h',
-                                      'Line' => '77',
+                          '2544' => {
+                                      'BaseType' => '1',
+                                      'Name' => 'void*',
+                                      'Size' => '8',
+                                      'Type' => 'Pointer'
+                                    },
+                          '3884' => {
+                                      'Name' => 'double',
+                                      'Size' => '8',
+                                      'Type' => 'Intrinsic'
+                                    },
+                          '4740' => {
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '1313',
+                                      'Name' => 'struct outcome_v2::detail::empty_type',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '1',
+                                      'Type' => 'Struct'
+                                    },
+                          '4749' => {
+                                      'Copied' => 1,
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '1316',
+                                      'Name' => 'struct outcome_v2::detail::void_type',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '1',
+                                      'Type' => 'Struct'
+                                    },
+                          '4855' => {
+                                      'BaseType' => '153',
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2525',
+                                      'Name' => 'outcome_v2::detail::status_bitfield_type',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '4',
+                                      'Type' => 'Typedef'
+                                    },
+                          '5331' => {
+                                      'BaseType' => '1938',
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '1322',
+                                      'Name' => 'outcome_v2::detail::devoid',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '1',
+                                      'Type' => 'Typedef'
+                                    },
+                          '5343' => {
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2539',
                                       'Memb' => {
                                                   '0' => {
-                                                           'access' => 'private',
-                                                           'name' => '_M_exception_object',
+                                                           'name' => 'unnamed0',
                                                            'offset' => '0',
-                                                           'type' => '27164'
+                                                           'type' => '5356'
+                                                         },
+                                                  '1' => {
+                                                           'name' => '_status',
+                                                           'offset' => '4',
+                                                           'type' => '4855'
                                                          }
                                                 },
-                                      'Name' => 'std::__exception_ptr::exception_ptr',
-                                      'NameSpace' => 'std::__exception_ptr',
+                                      'Name' => 'struct outcome_v2::detail::value_storage_trivial<int>',
+                                      'NameSpace' => 'outcome_v2::detail',
                                       'Size' => '8',
+                                      'TParam' => {
+                                                    '0' => {
+                                                             'key' => 'T',
+                                                             'type' => '92'
+                                                           }
+                                                  },
+                                      'Type' => 'Struct'
+                                    },
+                          '5356' => {
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2542',
+                                      'Memb' => {
+                                                  '0' => {
+                                                           'name' => '_empty',
+                                                           'offset' => '0',
+                                                           'type' => '4740'
+                                                         },
+                                                  '1' => {
+                                                           'name' => '_value',
+                                                           'offset' => '0',
+                                                           'type' => '5331'
+                                                         }
+                                                },
+                                      'Name' => 'outcome_v2::detail::value_storage_trivial<int>::anon-union-abi.hpp-2542',
+                                      'NameSpace' => 'outcome_v2::detail::value_storage_trivial<int>',
+                                      'Size' => '4',
+                                      'Type' => 'Union'
+                                    },
+                          '5733' => {
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2603',
+                                      'Memb' => {
+                                                  '0' => {
+                                                           'name' => 'unnamed0',
+                                                           'offset' => '0',
+                                                           'type' => '5746'
+                                                         },
+                                                  '1' => {
+                                                           'name' => '_status',
+                                                           'offset' => '8',
+                                                           'type' => '4855'
+                                                         }
+                                                },
+                                      'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '16',
+                                      'TParam' => {
+                                                    '0' => {
+                                                             'key' => 'T',
+                                                             'type' => '12632'
+                                                           }
+                                                  },
+                                      'Type' => 'Struct'
+                                    },
+                          '5746' => {
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2606',
+                                      'Memb' => {
+                                                  '0' => {
+                                                           'name' => '_empty',
+                                                           'offset' => '0',
+                                                           'type' => '4740'
+                                                         },
+                                                  '1' => {
+                                                           'name' => '_value',
+                                                           'offset' => '0',
+                                                           'type' => '5780'
+                                                         }
+                                                },
+                                      'Name' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType>::anon-union-abi.hpp-2606',
+                                      'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType>',
+                                      'Size' => '8',
+                                      'Type' => 'Union'
+                                    },
+                          '5780' => {
+                                      'BaseType' => '12632',
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2605',
+                                      'Name' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType>::value_type',
+                                      'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType>',
+                                      'Size' => '8',
+                                      'Type' => 'Typedef'
+                                    },
+                          '6101' => {
+                                      'BaseType' => '5733',
+                                      'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>const',
+                                      'Size' => '16',
+                                      'Type' => 'Const'
+                                    },
+                          '6434' => {
+                                      'BaseType' => '6451',
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2829',
+                                      'Name' => 'outcome_v2::detail::value_storage_select_impl',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '1',
+                                      'Type' => 'Typedef'
+                                    },
+                          '6451' => {
+                                      'BaseType' => '1938',
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2828',
+                                      'Name' => 'outcome_v2::detail::value_storage_select_copy_assignment',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '1',
+                                      'Type' => 'Typedef'
+                                    },
+                          '7882' => {
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2879',
+                                      'Memb' => {
+                                                  '0' => {
+                                                           'access' => 'protected',
+                                                           'name' => '_state',
+                                                           'offset' => '0',
+                                                           'type' => '6434'
+                                                         },
+                                                  '1' => {
+                                                           'access' => 'protected',
+                                                           'name' => '_error',
+                                                           'offset' => '16',
+                                                           'type' => '5331'
+                                                         }
+                                                },
+                                      'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '24',
+                                      'TParam' => {
+                                                    '0' => {
+                                                             'key' => 'R',
+                                                             'type' => '12632'
+                                                           },
+                                                    '1' => {
+                                                             'key' => 'EC',
+                                                             'type' => '110'
+                                                           },
+                                                    '2' => {
+                                                             'key' => 'NoValuePolicy',
+                                                             'type' => '10280'
+                                                           }
+                                                  },
                                       'Type' => 'Class'
                                     },
-                          '175' => {
-                                     'Name' => 'unsigned int',
-                                     'Size' => '4',
-                                     'Type' => 'Intrinsic'
-                                   },
-                          '25090' => {
-                                       'Copied' => 1,
-                                       'Name' => 'std::_V2::error_category',
-                                       'NameSpace' => 'std::_V2',
-                                       'Type' => 'Class'
-                                     },
-                          '25095' => {
-                                       'BaseType' => '25090',
-                                       'Name' => 'std::_V2::error_category const',
-                                       'Type' => 'Const'
-                                     },
-                          '25108' => {
-                                       'Header' => 'system_error',
-                                       'Line' => '138',
-                                       'Memb' => {
-                                                   '0' => {
-                                                            'access' => 'private',
-                                                            'name' => '_M_value',
-                                                            'offset' => '0',
-                                                            'type' => '93'
-                                                          },
-                                                   '1' => {
-                                                            'access' => 'private',
-                                                            'name' => '_M_cat',
-                                                            'offset' => '8',
-                                                            'type' => '47023'
-                                                          }
-                                                 },
-                                       'Name' => 'struct std::error_code',
-                                       'NameSpace' => 'std',
-                                       'Size' => '16',
-                                       'Type' => 'Struct'
-                                     },
-                          '27164' => {
-                                       'BaseType' => '1',
-                                       'Name' => 'void*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '34399' => {
-                                       'Header' => 'config.hpp',
-                                       'Line' => '179',
-                                       'Name' => 'struct outcome_v2::detail::empty_type',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '1',
-                                       'Type' => 'Struct'
-                                     },
-                          '34407' => {
-                                       'Copied' => 1,
-                                       'Header' => 'config.hpp',
-                                       'Line' => '182',
-                                       'Name' => 'struct outcome_v2::detail::void_type',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '1',
-                                       'Type' => 'Struct'
-                                     },
-                          '34510' => {
-                                       'BaseType' => '164',
-                                       'Header' => 'value_storage.hpp',
-                                       'Line' => '34',
-                                       'Name' => 'outcome_v2::detail::status_bitfield_type',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '4',
-                                       'Type' => 'Typedef'
-                                     },
-                          '34964' => {
-                                       'BaseType' => '1386',
-                                       'Header' => 'config.hpp',
-                                       'Line' => '188',
-                                       'Name' => 'outcome_v2::detail::devoid',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '1',
-                                       'Type' => 'Typedef'
-                                     },
-                          '34975' => {
-                                       'Header' => 'value_storage.hpp',
-                                       'Line' => '48',
-                                       'Memb' => {
-                                                   '0' => {
-                                                            'name' => 'unnamed0',
-                                                            'offset' => '0',
-                                                            'type' => '34987'
-                                                          },
-                                                   '1' => {
-                                                            'name' => '_status',
-                                                            'offset' => '4',
-                                                            'type' => '34510'
-                                                          }
-                                                 },
-                                       'Name' => 'struct outcome_v2::detail::value_storage_trivial<int>',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '8',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'key' => 'T',
-                                                              'type' => '93'
+                          '8205' => {
+                                      'BaseType' => '7882',
+                                      'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>const',
+                                      'Size' => '24',
+                                      'Type' => 'Const'
+                                    },
+                          '8239' => {
+                                      'Base' => {
+                                                  '7882' => {
+                                                              'pos' => '0'
                                                             }
-                                                   },
-                                       'Type' => 'Struct'
-                                     },
-                          '34987' => {
-                                       'Header' => 'value_storage.hpp',
-                                       'Line' => '51',
-                                       'Memb' => {
-                                                   '0' => {
-                                                            'name' => '_empty',
-                                                            'offset' => '0',
-                                                            'type' => '34399'
-                                                          },
-                                                   '1' => {
-                                                            'name' => '_value',
-                                                            'offset' => '0',
-                                                            'type' => '34964'
-                                                          }
-                                                 },
-                                       'Name' => 'outcome_v2::detail::value_storage_trivial<int>::anon-union-value_storage.hpp-51',
-                                       'NameSpace' => 'outcome_v2::detail::value_storage_trivial<int>',
-                                       'Size' => '4',
-                                       'Type' => 'Union'
-                                     },
-                          '35349' => {
-                                       'Header' => 'value_storage.hpp',
-                                       'Line' => '112',
-                                       'Memb' => {
-                                                   '0' => {
-                                                            'name' => 'unnamed0',
-                                                            'offset' => '0',
-                                                            'type' => '35361'
-                                                          },
-                                                   '1' => {
-                                                            'name' => '_status',
-                                                            'offset' => '8',
-                                                            'type' => '34510'
-                                                          }
-                                                 },
-                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '16',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'key' => 'T',
-                                                              'type' => '47202'
+                                                },
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '3355',
+                                      'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '24',
+                                      'TParam' => {
+                                                    '0' => {
+                                                             'key' => 'Base',
+                                                             'type' => '7882'
+                                                           },
+                                                    '1' => {
+                                                             'key' => 'R',
+                                                             'type' => '12632'
+                                                           },
+                                                    '2' => {
+                                                             'key' => 'NoValuePolicy',
+                                                             'type' => '10280'
+                                                           }
+                                                  },
+                                      'Type' => 'Class'
+                                    },
+                          '8580' => {
+                                      'BaseType' => '8239',
+                                      'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>const',
+                                      'Size' => '24',
+                                      'Type' => 'Const'
+                                    },
+                          '8585' => {
+                                      'Base' => {
+                                                  '8239' => {
+                                                              'pos' => '0'
                                                             }
-                                                   },
-                                       'Type' => 'Struct'
-                                     },
-                          '35361' => {
-                                       'Header' => 'value_storage.hpp',
-                                       'Line' => '115',
-                                       'Memb' => {
-                                                   '0' => {
-                                                            'name' => '_empty',
-                                                            'offset' => '0',
-                                                            'type' => '34399'
-                                                          },
-                                                   '1' => {
-                                                            'name' => '_value',
-                                                            'offset' => '0',
-                                                            'type' => '35392'
-                                                          }
-                                                 },
-                                       'Name' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType>::anon-union-value_storage.hpp-115',
-                                       'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType>',
-                                       'Size' => '8',
-                                       'Type' => 'Union'
-                                     },
-                          '35392' => {
-                                       'BaseType' => '47202',
-                                       'Header' => 'value_storage.hpp',
-                                       'Line' => '114',
-                                       'Name' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType>::value_type',
-                                       'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType>',
-                                       'Size' => '8',
-                                       'Type' => 'Typedef'
-                                     },
-                          '35702' => {
-                                       'BaseType' => '35349',
-                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>const',
-                                       'Size' => '16',
-                                       'Type' => 'Const'
-                                     },
-                          '36024' => {
-                                       'BaseType' => '36041',
-                                       'Header' => 'value_storage.hpp',
-                                       'Line' => '338',
-                                       'Name' => 'outcome_v2::detail::value_storage_select_impl',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '1',
-                                       'Type' => 'Typedef'
-                                     },
-                          '36041' => {
-                                       'BaseType' => '1386',
-                                       'Header' => 'value_storage.hpp',
-                                       'Line' => '337',
-                                       'Name' => 'outcome_v2::detail::value_storage_select_copy_assignment',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '1',
-                                       'Type' => 'Typedef'
-                                     },
-                          '37443' => {
-                                       'Header' => 'basic_result_storage.hpp',
-                                       'Line' => '62',
-                                       'Memb' => {
-                                                   '0' => {
-                                                            'access' => 'protected',
-                                                            'name' => '_state',
-                                                            'offset' => '0',
-                                                            'type' => '36024'
-                                                          },
-                                                   '1' => {
-                                                            'access' => 'protected',
-                                                            'name' => '_error',
-                                                            'offset' => '16',
-                                                            'type' => '34964'
-                                                          }
-                                                 },
-                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '32',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'key' => 'R',
-                                                              'type' => '47202'
-                                                            },
-                                                     '1' => {
-                                                              'key' => 'EC',
-                                                              'type' => '25108'
-                                                            },
-                                                     '2' => {
-                                                              'key' => 'NoValuePolicy',
-                                                              'type' => '42493'
+                                                },
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '3204',
+                                      'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '24',
+                                      'TParam' => {
+                                                    '0' => {
+                                                             'key' => 'Base',
+                                                             'type' => '8239'
+                                                           },
+                                                    '1' => {
+                                                             'key' => 'EC',
+                                                             'type' => '110'
+                                                           },
+                                                    '2' => {
+                                                             'key' => 'NoValuePolicy',
+                                                             'type' => '10280'
+                                                           }
+                                                  },
+                                      'Type' => 'Class'
+                                    },
+                          '8927' => {
+                                      'BaseType' => '8585',
+                                      'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>const',
+                                      'Size' => '24',
+                                      'Type' => 'Const'
+                                    },
+                          '8932' => {
+                                      'Base' => {
+                                                  '8585' => {
+                                                              'pos' => '0'
                                                             }
-                                                   },
-                                       'Type' => 'Class'
-                                     },
-                          '37755' => {
-                                       'BaseType' => '37443',
-                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >const',
-                                       'Size' => '32',
-                                       'Type' => 'Const'
-                                     },
-                          '37789' => {
-                                       'Base' => {
-                                                   '37443' => {
-                                                                'pos' => '0'
-                                                              }
-                                                 },
-                                       'Header' => 'basic_result_value_observers.hpp',
-                                       'Line' => '35',
-                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '32',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'key' => 'Base',
-                                                              'type' => '37443'
-                                                            },
-                                                     '1' => {
-                                                              'key' => 'R',
-                                                              'type' => '47202'
-                                                            },
-                                                     '2' => {
-                                                              'key' => 'NoValuePolicy',
-                                                              'type' => '42493'
-                                                            }
-                                                   },
-                                       'Type' => 'Class'
-                                     },
-                          '38120' => {
-                                       'BaseType' => '37789',
-                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >const',
-                                       'Size' => '32',
-                                       'Type' => 'Const'
-                                     },
-                          '38125' => {
-                                       'Base' => {
-                                                   '37789' => {
-                                                                'pos' => '0'
-                                                              }
-                                                 },
-                                       'Header' => 'basic_result_error_observers.hpp',
-                                       'Line' => '35',
-                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '32',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'key' => 'Base',
-                                                              'type' => '37789'
-                                                            },
-                                                     '1' => {
-                                                              'key' => 'EC',
-                                                              'type' => '25108'
-                                                            },
-                                                     '2' => {
-                                                              'key' => 'NoValuePolicy',
-                                                              'type' => '42493'
-                                                            }
-                                                   },
-                                       'Type' => 'Class'
-                                     },
-                          '38457' => {
-                                       'BaseType' => '38125',
-                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >const',
-                                       'Size' => '32',
-                                       'Type' => 'Const'
-                                     },
-                          '38462' => {
-                                       'Base' => {
-                                                   '38125' => {
-                                                                'pos' => '0'
-                                                              }
-                                                 },
-                                       'Header' => 'basic_result_final.hpp',
-                                       'Line' => '39',
-                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '32',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'key' => 'R',
-                                                              'type' => '47202'
-                                                            },
-                                                     '1' => {
-                                                              'key' => 'S',
-                                                              'type' => '25108'
-                                                            },
-                                                     '2' => {
-                                                              'key' => 'NoValuePolicy',
-                                                              'type' => '42493'
-                                                            }
-                                                   },
-                                       'Type' => 'Class'
-                                     },
-                          '38754' => {
-                                       'BaseType' => '38462',
-                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >const',
-                                       'Size' => '32',
-                                       'Type' => 'Const'
-                                     },
-                          '40411' => {
-                                       'Header' => 'basic_result_storage.hpp',
-                                       'Line' => '62',
-                                       'Memb' => {
-                                                   '0' => {
-                                                            'access' => 'protected',
-                                                            'name' => '_state',
-                                                            'offset' => '0',
-                                                            'type' => '36024'
-                                                          },
-                                                   '1' => {
-                                                            'access' => 'protected',
-                                                            'name' => '_error',
-                                                            'offset' => '16',
-                                                            'type' => '34964'
-                                                          }
-                                                 },
-                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '32',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'key' => 'R',
-                                                              'type' => '47202'
-                                                            },
-                                                     '1' => {
-                                                              'key' => 'EC',
-                                                              'type' => '25108'
-                                                            },
-                                                     '2' => {
-                                                              'key' => 'NoValuePolicy',
-                                                              'type' => '42503'
-                                                            }
-                                                   },
-                                       'Type' => 'Class'
-                                     },
-                          '40723' => {
-                                       'BaseType' => '40411',
-                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >const',
-                                       'Size' => '32',
-                                       'Type' => 'Const'
-                                     },
-                          '40728' => {
-                                       'Base' => {
-                                                   '40411' => {
-                                                                'pos' => '0'
-                                                              }
-                                                 },
-                                       'Header' => 'basic_result_value_observers.hpp',
-                                       'Line' => '35',
-                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '32',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'key' => 'Base',
-                                                              'type' => '40411'
-                                                            },
-                                                     '1' => {
-                                                              'key' => 'R',
-                                                              'type' => '47202'
-                                                            },
-                                                     '2' => {
-                                                              'key' => 'NoValuePolicy',
-                                                              'type' => '42503'
-                                                            }
-                                                   },
-                                       'Type' => 'Class'
-                                     },
-                          '41059' => {
-                                       'BaseType' => '40728',
-                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >const',
-                                       'Size' => '32',
-                                       'Type' => 'Const'
-                                     },
-                          '41064' => {
-                                       'Base' => {
-                                                   '40728' => {
-                                                                'pos' => '0'
-                                                              }
-                                                 },
-                                       'Header' => 'basic_result_error_observers.hpp',
-                                       'Line' => '35',
-                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '32',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'key' => 'Base',
-                                                              'type' => '40728'
-                                                            },
-                                                     '1' => {
-                                                              'key' => 'EC',
-                                                              'type' => '25108'
-                                                            },
-                                                     '2' => {
-                                                              'key' => 'NoValuePolicy',
-                                                              'type' => '42503'
-                                                            }
-                                                   },
-                                       'Type' => 'Class'
-                                     },
-                          '41396' => {
-                                       'BaseType' => '41064',
-                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >const',
-                                       'Size' => '32',
-                                       'Type' => 'Const'
-                                     },
-                          '41401' => {
-                                       'Base' => {
-                                                   '41064' => {
-                                                                'pos' => '0'
-                                                              }
-                                                 },
-                                       'Header' => 'basic_result_final.hpp',
-                                       'Line' => '39',
-                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '32',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'key' => 'R',
-                                                              'type' => '47202'
-                                                            },
-                                                     '1' => {
-                                                              'key' => 'S',
-                                                              'type' => '25108'
-                                                            },
-                                                     '2' => {
-                                                              'key' => 'NoValuePolicy',
-                                                              'type' => '42503'
-                                                            }
-                                                   },
-                                       'Type' => 'Class'
-                                     },
-                          '41693' => {
-                                       'BaseType' => '41401',
-                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >const',
-                                       'Size' => '32',
-                                       'Type' => 'Const'
-                                     },
-                          '41698' => {
-                                       'Base' => {
-                                                   '41401' => {
-                                                                'pos' => '0'
-                                                              }
-                                                 },
-                                       'Header' => 'basic_outcome_exception_observers.hpp',
-                                       'Line' => '44',
-                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr>, void>',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '32',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'key' => 'Base',
-                                                              'type' => '41401'
-                                                            },
-                                                     '1' => {
-                                                              'key' => 'R',
-                                                              'type' => '47202'
-                                                            },
-                                                     '2' => {
-                                                              'key' => 'S',
-                                                              'type' => '25108'
-                                                            },
-                                                     '3' => {
-                                                              'key' => 'P',
-                                                              'type' => '1679'
-                                                            },
-                                                     '4' => {
-                                                              'key' => 'NoValuePolicy',
-                                                              'type' => '42503'
-                                                            },
-                                                     '5' => {
-                                                              'key' => 'FailureImpl',
-                                                              'type' => '1'
-                                                            }
-                                                   },
-                                       'Type' => 'Class'
-                                     },
-                          '42048' => {
-                                       'BaseType' => '41698',
-                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr>, void>const',
-                                       'Size' => '32',
-                                       'Type' => 'Const'
-                                     },
-                          '42053' => {
-                                       'Base' => {
-                                                   '41698' => {
-                                                                'pos' => '0'
-                                                              }
-                                                 },
-                                       'Header' => 'basic_outcome_exception_observers.hpp',
-                                       'Line' => '96',
-                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr>, std::__exception_ptr::exception_ptr>',
-                                       'NameSpace' => 'outcome_v2::detail',
-                                       'Size' => '32',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'key' => 'Base',
-                                                              'type' => '41401'
-                                                            },
-                                                     '1' => {
-                                                              'key' => 'R',
-                                                              'type' => '47202'
-                                                            },
-                                                     '2' => {
-                                                              'key' => 'S',
-                                                              'type' => '25108'
-                                                            },
-                                                     '3' => {
-                                                              'key' => 'P',
-                                                              'type' => '1679'
-                                                            },
-                                                     '4' => {
-                                                              'key' => 'NoValuePolicy',
-                                                              'type' => '42503'
-                                                            },
-                                                     '5' => {
-                                                              'key' => 'FailureImpl',
-                                                              'type' => '1679'
-                                                            }
-                                                   },
-                                       'Type' => 'Class'
-                                     },
-                          '42192' => {
-                                       'BaseType' => '42053',
-                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr>, std::__exception_ptr::exception_ptr>const',
-                                       'Size' => '32',
-                                       'Type' => 'Const'
-                                     },
-                          '42493' => {
-                                       'Name' => 'struct outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void>',
-                                       'NameSpace' => 'outcome_v2::policy',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'type' => '47202'
-                                                            },
-                                                     '1' => {
-                                                              'type' => '25108'
-                                                            },
-                                                     '2' => {
-                                                              'name' => 'void'
-                                                            }
-                                                   },
-                                       'Type' => 'Struct'
-                                     },
-                          '42503' => {
-                                       'Name' => 'struct outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr>',
-                                       'NameSpace' => 'outcome_v2::policy',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'type' => '47202'
-                                                            },
-                                                     '1' => {
-                                                              'type' => '25108'
-                                                            },
-                                                     '2' => {
-                                                              'type' => '1679'
-                                                            }
-                                                   },
-                                       'Type' => 'Struct'
-                                     },
-                          '42993' => {
-                                       'Base' => {
-                                                   '38462' => {
-                                                                'pos' => '0'
-                                                              }
-                                                 },
-                                       'Header' => 'basic_result.hpp',
-                                       'Line' => '183',
-                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >',
-                                       'NameSpace' => 'outcome_v2',
-                                       'Size' => '32',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'key' => 'R',
-                                                              'type' => '47202'
-                                                            },
-                                                     '1' => {
-                                                              'key' => 'S',
-                                                              'type' => '25108'
-                                                            },
-                                                     '2' => {
-                                                              'key' => 'NoValuePolicy',
-                                                              'type' => '42493'
-                                                            }
-                                                   },
-                                       'Type' => 'Class'
-                                     },
-                          '43357' => {
-                                       'BaseType' => '42993',
-                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >const',
-                                       'Size' => '32',
-                                       'Type' => 'Const'
-                                     },
-                          '43591' => {
-                                       'Base' => {
-                                                   '42053' => {
-                                                                'pos' => '0'
-                                                              }
-                                                 },
-                                       'Header' => 'basic_outcome.hpp',
-                                       'Line' => '191',
-                                       'Memb' => {
-                                                   '0' => {
-                                                            'access' => 'protected',
-                                                            'name' => '_ptr',
-                                                            'offset' => '32',
-                                                            'type' => '34964'
-                                                          }
-                                                 },
-                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >',
-                                       'NameSpace' => 'outcome_v2',
-                                       'Size' => '40',
-                                       'TParam' => {
-                                                     '0' => {
-                                                              'key' => 'R',
-                                                              'type' => '47202'
-                                                            },
-                                                     '1' => {
-                                                              'key' => 'S',
-                                                              'type' => '25108'
-                                                            },
-                                                     '2' => {
-                                                              'key' => 'P',
-                                                              'type' => '1679'
-                                                            },
-                                                     '3' => {
-                                                              'key' => 'NoValuePolicy',
-                                                              'type' => '42503'
-                                                            }
-                                                   },
-                                       'Type' => 'Class'
-                                     },
-                          '43810' => {
-                                       'BaseType' => '43591',
-                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >const',
-                                       'Size' => '40',
-                                       'Type' => 'Const'
-                                     },
-                          '43919' => {
-                                       'BaseType' => '43930',
-                                       'Header' => 'outcome.hpp',
-                                       'Line' => '36',
-                                       'Name' => 'outcome_v2::outcome',
-                                       'NameSpace' => 'outcome_v2',
-                                       'Size' => '40',
-                                       'Type' => 'Typedef'
-                                     },
-                          '43930' => {
-                                       'BaseType' => '43591',
-                                       'Header' => 'std_outcome.hpp',
-                                       'Line' => '70',
-                                       'Name' => 'outcome_v2::std_outcome',
-                                       'NameSpace' => 'outcome_v2',
-                                       'Size' => '40',
-                                       'Type' => 'Typedef'
-                                     },
-                          '43963' => {
-                                       'BaseType' => '43974',
-                                       'Header' => 'result.hpp',
-                                       'Line' => '35',
-                                       'Name' => 'outcome_v2::result',
-                                       'NameSpace' => 'outcome_v2',
-                                       'Size' => '32',
-                                       'Type' => 'Typedef'
-                                     },
-                          '43974' => {
-                                       'BaseType' => '42993',
-                                       'Header' => 'std_result.hpp',
-                                       'Line' => '71',
-                                       'Name' => 'outcome_v2::std_result',
-                                       'NameSpace' => 'outcome_v2',
-                                       'Size' => '32',
-                                       'Type' => 'Typedef'
-                                     },
-                          '47023' => {
-                                       'BaseType' => '25095',
-                                       'Name' => 'std::_V2::error_category const*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '47202' => {
-                                       'Line' => '28',
-                                       'Memb' => {
-                                                   '0' => {
-                                                            'name' => 'foo',
-                                                            'offset' => '0',
-                                                            'type' => '27164'
-                                                          }
-                                                 },
-                                       'Name' => 'struct NonTrivialType',
-                                       'Size' => '8',
-                                       'Source' => 'main.cpp',
-                                       'Type' => 'Struct'
-                                     },
-                          '47469' => {
-                                       'BaseType' => '34975',
-                                       'Name' => 'struct outcome_v2::detail::value_storage_trivial<int>&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '47480' => {
-                                       'BaseType' => '35349',
-                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '47486' => {
-                                       'BaseType' => '47480',
-                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '47491' => {
-                                       'BaseType' => '35349',
-                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '47502' => {
-                                       'BaseType' => '35702',
-                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '47754' => {
-                                       'BaseType' => '37443',
-                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '47760' => {
-                                       'BaseType' => '47754',
-                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '47777' => {
-                                       'BaseType' => '37755',
-                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '47806' => {
-                                       'BaseType' => '37789',
-                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '47812' => {
-                                       'BaseType' => '47806',
-                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '47847' => {
-                                       'BaseType' => '38125',
-                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '47853' => {
-                                       'BaseType' => '47847',
-                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '47888' => {
-                                       'BaseType' => '42993',
-                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '47894' => {
-                                       'BaseType' => '47888',
-                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '47905' => {
-                                       'BaseType' => '43357',
-                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '48101' => {
-                                       'BaseType' => '40411',
-                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '48107' => {
-                                       'BaseType' => '48101',
-                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '48118' => {
-                                       'BaseType' => '40723',
-                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '48147' => {
-                                       'BaseType' => '40728',
-                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '48153' => {
-                                       'BaseType' => '48147',
-                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '48188' => {
-                                       'BaseType' => '41064',
-                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '48194' => {
-                                       'BaseType' => '48188',
-                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '48235' => {
-                                       'BaseType' => '41698',
-                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr>, void>*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '48241' => {
-                                       'BaseType' => '48235',
-                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr>, void>*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '48276' => {
-                                       'BaseType' => '43591',
-                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '48282' => {
-                                       'BaseType' => '48276',
-                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '49680' => {
-                                       'BaseType' => '43919',
-                                       'Name' => 'outcome_v2::outcome&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '49691' => {
-                                       'BaseType' => '43810',
-                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '49766' => {
-                                       'BaseType' => '42053',
-                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr>, std::__exception_ptr::exception_ptr>*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '49772' => {
-                                       'BaseType' => '49766',
-                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr>, std::__exception_ptr::exception_ptr>*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '49777' => {
-                                       'BaseType' => '42192',
-                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr>, std::__exception_ptr::exception_ptr>const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '49852' => {
-                                       'BaseType' => '42048',
-                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr>, void>const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '49927' => {
-                                       'BaseType' => '41401',
-                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '49933' => {
-                                       'BaseType' => '49927',
-                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '49938' => {
-                                       'BaseType' => '41693',
-                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '50013' => {
-                                       'BaseType' => '41396',
-                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '50088' => {
-                                       'BaseType' => '41059',
-                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, std::__exception_ptr::exception_ptr> >const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '50854' => {
-                                       'BaseType' => '43963',
-                                       'Name' => 'outcome_v2::result&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '50927' => {
-                                       'BaseType' => '38462',
-                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '50933' => {
-                                       'BaseType' => '50927',
-                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '50938' => {
-                                       'BaseType' => '38754',
-                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '51013' => {
-                                       'BaseType' => '38457',
-                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '51088' => {
-                                       'BaseType' => '38120',
-                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, std::error_code, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >, NonTrivialType, outcome_v2::policy::error_code_throw_as_system_error<NonTrivialType, std::error_code, void> >const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '93' => {
+                                                },
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '3460',
+                                      'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '24',
+                                      'TParam' => {
+                                                    '0' => {
+                                                             'key' => 'R',
+                                                             'type' => '12632'
+                                                           },
+                                                    '1' => {
+                                                             'key' => 'S',
+                                                             'type' => '110'
+                                                           },
+                                                    '2' => {
+                                                             'key' => 'NoValuePolicy',
+                                                             'type' => '10280'
+                                                           }
+                                                  },
+                                      'Type' => 'Class'
+                                    },
+                          '92' => {
                                     'Name' => 'int',
                                     'Size' => '4',
                                     'Type' => 'Intrinsic'
-                                  }
+                                  },
+                          '9232' => {
+                                      'BaseType' => '8932',
+                                      'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>const',
+                                      'Size' => '24',
+                                      'Type' => 'Const'
+                                    },
+                          '9585' => {
+                                      'Base' => {
+                                                  '8932' => {
+                                                              'pos' => '0'
+                                                            }
+                                                },
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '4959',
+                                      'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate, void>',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '24',
+                                      'TParam' => {
+                                                    '0' => {
+                                                             'key' => 'Base',
+                                                             'type' => '8932'
+                                                           },
+                                                    '1' => {
+                                                             'key' => 'R',
+                                                             'type' => '12632'
+                                                           },
+                                                    '2' => {
+                                                             'key' => 'S',
+                                                             'type' => '110'
+                                                           },
+                                                    '3' => {
+                                                             'key' => 'P',
+                                                             'type' => '3884'
+                                                           },
+                                                    '4' => {
+                                                             'key' => 'NoValuePolicy',
+                                                             'type' => '10280'
+                                                           },
+                                                    '5' => {
+                                                             'key' => 'FailureImpl',
+                                                             'type' => '1'
+                                                           }
+                                                  },
+                                      'Type' => 'Class'
+                                    },
+                          '9945' => {
+                                      'BaseType' => '9585',
+                                      'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate, void>const',
+                                      'Size' => '24',
+                                      'Type' => 'Const'
+                                    }
                         },
           'UndefinedSymbols' => {
                                   'liboutcome-abi-lib.so' => {
                                                                '_ITM_deregisterTMCloneTable' => 0,
                                                                '_ITM_registerTMCloneTable' => 0,
                                                                '_Jv_RegisterClasses' => 0,
-                                                               '_ZNSt15__exception_ptr13exception_ptrC1ERKS0_@CXXABI_1.3.3' => 0,
-                                                               '_ZNSt8ios_base4InitC1Ev@GLIBCXX_3.4' => 0,
-                                                               '_ZNSt8ios_base4InitD1Ev@GLIBCXX_3.4' => 0,
-                                                               '__cxa_atexit@GLIBC_2.2.5' => 0,
-                                                               '__cxa_finalize@GLIBC_2.2.5' => 0,
+                                                               '__cxa_finalize' => 0,
                                                                '__gmon_start__' => 0
                                                              }
                                 },
