@@ -34,13 +34,13 @@ namespace policy
 {
   /*! Policy interpreting `EC` or `E` as a type for which `trait::has_exception_ptr_v<EC|E>` is true.
   Any wide attempt to access the successful state where there is none causes:
-  `std::rethrow_exception(policy::exception_ptr(.error()|.exception()))` appropriately.
+  `rethrow_exception(policy::exception_ptr(.error()|.exception()))` appropriately.
   */
   template <class T, class EC, class E> struct exception_ptr_rethrow;
   template <class T, class EC> struct exception_ptr_rethrow<T, EC, void> : detail::base
   {
     /*! Performs a wide check of state, used in the value() functions
-    \effects If result does not have a value, if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_result_access`.
+    \effects If result does not have a value, if it has an error it rethrows that error via `rethrow_exception()`, else it throws `bad_result_access`.
     */
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
@@ -48,7 +48,8 @@ namespace policy
       {
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          std::rethrow_exception(policy::exception_ptr(std::forward<Impl>(self)._error));
+          // ADL
+          rethrow_exception(policy::exception_ptr(std::forward<Impl>(self)._error));
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }

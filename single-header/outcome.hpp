@@ -5218,19 +5218,40 @@ namespace trait
   namespace detail
   {
     template <class T> using devoid = OUTCOME_V2_NAMESPACE::detail::devoid<T>;
-    template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
+
     constexpr inline void make_error_code(...);
     // Also enable for any pair or tuple whose first item satisfies make_error_code()
+    template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
     template <class T, //
               class R = decltype(make_error_code(get<0>(std::declval<T>()))) //
               >
     constexpr inline R make_error_code(T &&);
-    template <class T, typename V = decltype(make_error_code(std::declval<devoid<T>>()))> struct has_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, std::decay_t<V>>::value || std::is_convertible<T, std::error_code>::value>
+
+    template <class T, typename V = decltype(make_error_code(std::declval<devoid<T>>()))> struct has_error_code
     {
+      static constexpr bool value = false;
     };
-    constexpr inline void make_exception_ptr(...);
-    template <class T, typename V = decltype(make_exception_ptr(std::declval<devoid<T>>()))> struct has_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, std::decay_t<V>>::value || std::is_convertible<T, std::exception_ptr>::value>
+    template <> struct has_error_code<std::error_code, void>
     {
+      static constexpr bool value = true;
+    };
+    template <class T> struct has_error_code<T, std::error_code>
+    {
+      static constexpr bool value = true;
+    };
+
+    constexpr inline void make_exception_ptr(...);
+    template <class T, typename V = decltype(make_exception_ptr(std::declval<devoid<T>>()))> struct has_exception_ptr
+    {
+      static constexpr bool value = false;
+    };
+    template <> struct has_exception_ptr<std::exception_ptr, void>
+    {
+      static constexpr bool value = true;
+    };
+    template <class T> struct has_exception_ptr<T, std::exception_ptr>
+    {
+      static constexpr bool value = true;
     };
   } // namespace detail
   /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
@@ -5238,7 +5259,7 @@ namespace trait
   */
 
 
-  template <class T> struct has_error_code : detail::has_error_code<T>
+  template <class T> struct has_error_code : detail::has_error_code<std::decay_t<T>>
   {
   };
   /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
@@ -5246,14 +5267,14 @@ namespace trait
   */
 
 
-  template <class T> constexpr bool has_error_code_v = has_error_code<T>::value;
+  template <class T> constexpr bool has_error_code_v = has_error_code<std::decay_t<T>>::value;
 
   /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
   Also returns true if `std::exception_ptr` is convertible from T.
   */
 
 
-  template <class T> struct has_exception_ptr : detail::has_exception_ptr<T>
+  template <class T> struct has_exception_ptr : detail::has_exception_ptr<std::decay_t<T>>
   {
   };
   /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
@@ -5261,7 +5282,7 @@ namespace trait
   */
 
 
-  template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<T>::value;
+  template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<std::decay_t<T>>::value;
 
   // std::error_code and std::exception_ptr are error types
   template <> struct is_error_type<std::error_code>
@@ -5440,15 +5461,9 @@ namespace policy
 {
   template <class T, class EC, class E> struct error_code_throw_as_system_error;
   /*! Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
-  Any wide attempt to access the successful state where there is none causes:
-
-  1. If `trait::has_error_payload_v<EC>` is true, it calls an
+  Any wide attempt to access the successful state where there is none calls an
   ADL discovered free function `throw_as_system_error_with_payload(.error())`.
-  2. If `trait::has_error_payload_v<EC>` is false, it calls `OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(.error())))`
   */
-
-
-
 
 
 
@@ -5547,7 +5562,7 @@ namespace policy
 {
   /*! Policy interpreting `EC` or `E` as a type for which `trait::has_exception_ptr_v<EC|E>` is true.
   Any wide attempt to access the successful state where there is none causes:
-  `std::rethrow_exception(policy::exception_ptr(.error()|.exception()))` appropriately.
+  `rethrow_exception(policy::exception_ptr(.error()|.exception()))` appropriately.
   */
 
 
@@ -5556,7 +5571,7 @@ namespace policy
   template <class T, class EC> struct exception_ptr_rethrow<T, EC, void> : detail::base
   {
     /*! Performs a wide check of state, used in the value() functions
-    \effects If result does not have a value, if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_result_access`.
+    \effects If result does not have a value, if it has an error it rethrows that error via `rethrow_exception()`, else it throws `bad_result_access`.
     */
 
 
@@ -5566,7 +5581,8 @@ namespace policy
       {
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          std::rethrow_exception(policy::exception_ptr(std::forward<Impl>(self)._error));
+          // ADL
+          rethrow_exception(policy::exception_ptr(std::forward<Impl>(self)._error));
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
@@ -7758,17 +7774,18 @@ namespace policy
 {
   namespace detail
   {
-    template <bool has_error_payload> struct rethrow_exception
+    template <bool has_error_payload> struct _rethrow_exception
     {
-      template <class Exception> explicit rethrow_exception(Exception && /*unused*/) // NOLINT
+      template <class Exception> explicit _rethrow_exception(Exception && /*unused*/) // NOLINT
       {
       }
     };
-    template <> struct rethrow_exception<true>
+    template <> struct _rethrow_exception<true>
     {
-      template <class Exception> explicit rethrow_exception(Exception &&excpt) // NOLINT
+      template <class Exception> explicit _rethrow_exception(Exception &&excpt) // NOLINT
       {
-        std::rethrow_exception(policy::exception_ptr(std::forward<Exception>(excpt)));
+        // ADL
+        rethrow_exception(policy::exception_ptr(std::forward<Exception>(excpt)));
       }
     };
   } // namespace detail
@@ -7803,7 +7820,7 @@ namespace policy
         {
           using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<basic_outcome<T, EC, E, error_code_throw_as_system_error>, decltype(self)>;
           Outcome _self = static_cast<Outcome>(self); // NOLINT
-          detail::rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
+          detail::_rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
         }
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
@@ -7922,11 +7939,11 @@ namespace policy
         {
           using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<basic_outcome<T, EC, E, exception_ptr_rethrow>, decltype(self)>;
           Outcome _self = static_cast<Outcome>(self); // NOLINT
-          detail::rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
+          detail::_rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
         }
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          detail::rethrow_exception<trait::has_exception_ptr_v<EC>>{std::forward<Impl>(self)._error};
+          detail::_rethrow_exception<trait::has_exception_ptr_v<EC>>{std::forward<Impl>(self)._error};
         }
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
       }
@@ -8273,7 +8290,7 @@ template <class R, class S, class P, class N> inline std::string print(const out
 #ifdef __cpp_exceptions
     try
     {
-      std::rethrow_exception(v.exception());
+      rethrow_exception(v.exception());
     }
     catch(const std::system_error &e)
     {

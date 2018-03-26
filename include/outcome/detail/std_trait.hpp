@@ -115,42 +115,63 @@ namespace trait
   namespace detail
   {
     template <class T> using devoid = OUTCOME_V2_NAMESPACE::detail::devoid<T>;
-    template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
+
     constexpr inline void make_error_code(...);
     // Also enable for any pair or tuple whose first item satisfies make_error_code()
+    template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
     template <class T,                                                        //
               class R = decltype(make_error_code(get<0>(std::declval<T>())))  //
               >
     constexpr inline R make_error_code(T &&);
-    template <class T, typename V = decltype(make_error_code(std::declval<devoid<T>>()))> struct has_error_code : std::integral_constant<bool, std::is_base_of<std::error_code, std::decay_t<V>>::value || std::is_convertible<T, std::error_code>::value>
+
+    template <class T, typename V = decltype(make_error_code(std::declval<devoid<T>>()))> struct has_error_code
     {
+      static constexpr bool value = false;
     };
-    constexpr inline void make_exception_ptr(...);
-    template <class T, typename V = decltype(make_exception_ptr(std::declval<devoid<T>>()))> struct has_exception_ptr : std::integral_constant<bool, std::is_base_of<std::exception_ptr, std::decay_t<V>>::value || std::is_convertible<T, std::exception_ptr>::value>
+    template <> struct has_error_code<std::error_code, void>
     {
+      static constexpr bool value = true;
+    };
+    template <class T> struct has_error_code<T, std::error_code>
+    {
+      static constexpr bool value = true;
+    };
+
+    constexpr inline void make_exception_ptr(...);
+    template <class T, typename V = decltype(make_exception_ptr(std::declval<devoid<T>>()))> struct has_exception_ptr
+    {
+      static constexpr bool value = false;
+    };
+    template <> struct has_exception_ptr<std::exception_ptr, void>
+    {
+      static constexpr bool value = true;
+    };
+    template <class T> struct has_exception_ptr<T, std::exception_ptr>
+    {
+      static constexpr bool value = true;
     };
   }  // namespace detail
   /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
   Also returns true if `std::error_code` is convertible from T.
   */
-  template <class T> struct has_error_code : detail::has_error_code<T>
+  template <class T> struct has_error_code : detail::has_error_code<std::decay_t<T>>
   {
   };
   /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
   Also returns true if `std::error_code` is convertible from T.
   */
-  template <class T> constexpr bool has_error_code_v = has_error_code<T>::value;
+  template <class T> constexpr bool has_error_code_v = has_error_code<std::decay_t<T>>::value;
 
   /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
   Also returns true if `std::exception_ptr` is convertible from T.
   */
-  template <class T> struct has_exception_ptr : detail::has_exception_ptr<T>
+  template <class T> struct has_exception_ptr : detail::has_exception_ptr<std::decay_t<T>>
   {
   };
   /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
   Also returns true if `std::exception_ptr` is convertible from T.
   */
-  template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<T>::value;
+  template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<std::decay_t<T>>::value;
 
   // std::error_code and std::exception_ptr are error types
   template <> struct is_error_type<std::error_code>

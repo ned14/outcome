@@ -36,11 +36,8 @@ namespace policy
 {
   template <class T, class EC, class E> struct error_code_throw_as_system_error;
   /*! Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
-  Any wide attempt to access the successful state where there is none causes:
-
-  1. If `trait::has_error_payload_v<EC>` is true, it calls an
+  Any wide attempt to access the successful state where there is none calls an
   ADL discovered free function `throw_as_system_error_with_payload(.error())`.
-  2. If `trait::has_error_payload_v<EC>` is false, it calls `OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(.error())))`
   */
   template <class T, class EC> struct error_code_throw_as_system_error<T, EC, void> : detail::base
   {

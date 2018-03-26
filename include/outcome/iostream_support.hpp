@@ -276,7 +276,7 @@ template <class R, class S, class P, class N> inline std::string print(const out
 #ifdef __cpp_exceptions
     try
     {
-      std::rethrow_exception(v.exception());
+      rethrow_exception(v.exception());
     }
     catch(const std::system_error &e)
     {

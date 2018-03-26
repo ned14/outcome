@@ -49,11 +49,11 @@ namespace policy
         {
           using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<basic_outcome<T, EC, E, exception_ptr_rethrow>, decltype(self)>;
           Outcome _self = static_cast<Outcome>(self);  // NOLINT
-          detail::rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
+          detail::_rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
         }
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
-          detail::rethrow_exception<trait::has_exception_ptr_v<EC>>{std::forward<Impl>(self)._error};
+          detail::_rethrow_exception<trait::has_exception_ptr_v<EC>>{std::forward<Impl>(self)._error};
         }
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
       }
