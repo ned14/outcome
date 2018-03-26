@@ -1267,9 +1267,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF fd0d1cbca05fc1116ddcf695680123e3a3c2e88e
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-03-23 10:00:01 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE fd0d1cbc
+#define OUTCOME_PREVIOUS_COMMIT_REF 38e09b9985f8ace045374dacd720835344c1a15a
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-03-26 21:36:01 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 38e09b99
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1291,6 +1291,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <cstdint> // for uint32_t etc
 #include <initializer_list>
 #include <iosfwd> // for future serialisation
+#include <new> // for placement in moves etc
 #include <type_traits>
 
 #if __cplusplus >= 201700 || _HAS_CXX17

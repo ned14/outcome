@@ -41,6 +41,9 @@ struct NonTrivialType
   ~NonTrivialType() { foo = nullptr; }
 };
 
+template <class T> using result = OUTCOME_V2_NAMESPACE::basic_result<T, long, OUTCOME_V2_NAMESPACE::policy::terminate>;
+template <class T> using outcome = OUTCOME_V2_NAMESPACE::basic_outcome<T, long, double, OUTCOME_V2_NAMESPACE::policy::terminate>;
+
 extern QUICKCPPLIB_SYMBOL_EXPORT OUTCOME_V2_NAMESPACE::detail::status_bitfield_type status_bits()
 {
   using namespace OUTCOME_V2_NAMESPACE::detail;
@@ -57,22 +60,22 @@ extern QUICKCPPLIB_SYMBOL_EXPORT OUTCOME_V2_NAMESPACE::detail::value_storage_non
   return v;
 }
 
-extern QUICKCPPLIB_SYMBOL_EXPORT OUTCOME_V2_NAMESPACE::result<int> result_int(OUTCOME_V2_NAMESPACE::result<int> &v)
+extern QUICKCPPLIB_SYMBOL_EXPORT result<int> result_int(result<int> &v)
 {
   return v;
 }
 
-extern QUICKCPPLIB_SYMBOL_EXPORT OUTCOME_V2_NAMESPACE::result<NonTrivialType> result_NonTrivialType(OUTCOME_V2_NAMESPACE::result<NonTrivialType> &v)
+extern QUICKCPPLIB_SYMBOL_EXPORT result<NonTrivialType> result_NonTrivialType(result<NonTrivialType> &v)
 {
   return v;
 }
 
-extern QUICKCPPLIB_SYMBOL_EXPORT OUTCOME_V2_NAMESPACE::outcome<int> outcome_int(OUTCOME_V2_NAMESPACE::outcome<int> &v)
+extern QUICKCPPLIB_SYMBOL_EXPORT outcome<int> outcome_int(outcome<int> &v)
 {
   return v;
 }
 
-extern QUICKCPPLIB_SYMBOL_EXPORT OUTCOME_V2_NAMESPACE::outcome<NonTrivialType> outcome_NonTrivialType(OUTCOME_V2_NAMESPACE::outcome<NonTrivialType> &v)
+extern QUICKCPPLIB_SYMBOL_EXPORT outcome<NonTrivialType> outcome_NonTrivialType(outcome<NonTrivialType> &v)
 {
   return v;
 }
