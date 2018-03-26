@@ -32,7 +32,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! In standalone Outcome, this aliases `std_outcome<>`. In Boost.Outcome, this aliases `boost_outcome<>`.
 */
-template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::std_default_policy<R, S, P>>  //
+template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_policy<R, S, P>>  //
 using outcome = std_outcome<R, S, P, NoValuePolicy>;
 
 OUTCOME_V2_NAMESPACE_END

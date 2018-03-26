@@ -66,7 +66,7 @@ or if `P` is `void`, do `throw bad_outcome_access()`
 or if `S` is `void`, do `throw bad_outcome_access()`
    - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
-template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::std_default_policy<R, S, P>>  //
+template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_policy<R, S, P>>  //
 using std_outcome = basic_outcome<R, S, P, NoValuePolicy>;
 
 OUTCOME_V2_NAMESPACE_END

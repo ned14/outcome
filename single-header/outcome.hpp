@@ -5196,6 +5196,14 @@ namespace policy
 
     template <class T> constexpr inline decltype(auto) error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
     template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
+
+    template <class T> struct throw_as_system_error_with_payload_missing_specialisation
+    {
+      constexpr throw_as_system_error_with_payload_missing_specialisation(...) {}
+    };
+    struct std_enum_overload_tag
+    {
+    };
   } // namespace detail
   //! Used by policies to extract a `std::error_code` from some input `T` via ADL discovery of some `make_error_code(T)` function.
   template <class T> constexpr inline decltype(auto) error_code(T &&v) { return detail::error_code(std::forward<T>(v)); }
@@ -5203,13 +5211,14 @@ namespace policy
   template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return detail::exception_ptr(std::forward<T>(v)); }
 
   //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
-  template <class Error> constexpr inline void throw_as_system_error_with_payload(const Error &error)
+  template <class Error> constexpr inline void throw_as_system_error_with_payload(detail::throw_as_system_error_with_payload_missing_specialisation<Error> /* unused */)
   {
-    (void) error;
-    static_assert(std::is_convertible<Error, std::error_code>::value || std::is_error_code_enum<std::decay_t<Error>>::value || std::is_error_condition_enum<std::decay_t<Error>>::value,
-                  "To use the error_code_throw_as_system_error policy with a custom Error type, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload");
-    OUTCOME_THROW_EXCEPTION(std::system_error(error_code(error)));
+    static_assert(!std::is_same<Error, Error>::value, "To use the error_code_throw_as_system_error policy with a custom Error type, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload");
   }
+  inline void throw_as_system_error_with_payload(std::error_code error) { OUTCOME_THROW_EXCEPTION(std::system_error(error)); }
+  OUTCOME_TEMPLATE(class Error)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_code_enum<std::decay_t<Error>>::value || std::is_error_condition_enum<std::decay_t<Error>>::value))
+  inline void throw_as_system_error_with_payload(Error &&error, detail::std_enum_overload_tag = detail::std_enum_overload_tag()) { OUTCOME_THROW_EXCEPTION(std::system_error(error_code(error))); }
 } // namespace policy
 
 //! Namespace for traits
@@ -5227,7 +5236,7 @@ namespace trait
               >
     constexpr inline R make_error_code(T &&);
 
-    template <class T, typename V = decltype(make_error_code(std::declval<devoid<T>>()))> struct has_error_code
+    template <class T, typename V = std::decay_t<decltype(make_error_code(std::declval<devoid<T>>()))>> struct has_error_code
     {
       static constexpr bool value = false;
     };
@@ -5241,7 +5250,7 @@ namespace trait
     };
 
     constexpr inline void make_exception_ptr(...);
-    template <class T, typename V = decltype(make_exception_ptr(std::declval<devoid<T>>()))> struct has_exception_ptr
+    template <class T, typename V = std::decay_t<decltype(make_exception_ptr(std::declval<devoid<T>>()))>> struct has_exception_ptr
     {
       static constexpr bool value = false;
     };
@@ -5721,7 +5730,7 @@ namespace policy
   */
 
   template <class T, class EC, class E>
-  using std_default_policy = std::conditional_t< //
+  using default_policy = std::conditional_t< //
   std::is_void<EC>::value && std::is_void<E>::value,
   terminate, //
   std::conditional_t< //
@@ -5763,7 +5772,7 @@ or if `S` is `void`, do `throw bad_result_access()`
 
 
 
-template <class R, class S = std::error_code, class NoValuePolicy = policy::std_default_policy<R, S, void>> //
+template <class R, class S = std::error_code, class NoValuePolicy = policy::default_policy<R, S, void>> //
 using std_result = basic_result<R, S, NoValuePolicy>;
 
 /*! An "unchecked" edition of `result<T, E>` which does no special handling of specific `E` types at all.
@@ -5796,7 +5805,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 /*! In standalone Outcome, this aliases `std_result<>`. In Boost.Outcome, this aliases `boost_result<>`.
 */
 
-template <class R, class S = std::error_code, class NoValuePolicy = policy::std_default_policy<R, S, void>> //
+template <class R, class S = std::error_code, class NoValuePolicy = policy::default_policy<R, S, void>> //
 using result = std_result<R, S, NoValuePolicy>;
 
 /*! In standalone Outcome, this aliases `std_unchecked<>`. In Boost.Outcome, this aliases `boost_checked<>`.
@@ -7713,7 +7722,7 @@ or if `S` is `void`, do `throw bad_outcome_access()`
 
 
 
-template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::std_default_policy<R, S, P>> //
+template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_policy<R, S, P>> //
 using std_outcome = basic_outcome<R, S, P, NoValuePolicy>;
 
 OUTCOME_V2_NAMESPACE_END
@@ -7984,7 +7993,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 /*! In standalone Outcome, this aliases `std_outcome<>`. In Boost.Outcome, this aliases `boost_outcome<>`.
 */
 
-template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::std_default_policy<R, S, P>> //
+template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_policy<R, S, P>> //
 using outcome = std_outcome<R, S, P, NoValuePolicy>;
 
 OUTCOME_V2_NAMESPACE_END

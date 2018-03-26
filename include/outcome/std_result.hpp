@@ -40,7 +40,7 @@ namespace policy
   /*! Default policy selector.
   */
   template <class T, class EC, class E>
-  using std_default_policy = std::conditional_t<  //
+  using default_policy = std::conditional_t<  //
   std::is_void<EC>::value && std::is_void<E>::value,
   terminate,                                                                                         //
   std::conditional_t<                                                                                //
@@ -67,7 +67,7 @@ then `throw std::system_error(error()|make_error_code(error()))` [\verbatim {{<a
 or if `S` is `void`, do `throw bad_result_access()`
 - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
 */
-template <class R, class S = std::error_code, class NoValuePolicy = policy::std_default_policy<R, S, void>>  //
+template <class R, class S = std::error_code, class NoValuePolicy = policy::default_policy<R, S, void>>  //
 using std_result = basic_result<R, S, NoValuePolicy>;
 
 /*! An "unchecked" edition of `result<T, E>` which does no special handling of specific `E` types at all.

@@ -31,7 +31,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! In standalone Outcome, this aliases `std_result<>`. In Boost.Outcome, this aliases `boost_result<>`.
 */
-template <class R, class S = std::error_code, class NoValuePolicy = policy::std_default_policy<R, S, void>>  //
+template <class R, class S = std::error_code, class NoValuePolicy = policy::default_policy<R, S, void>>  //
 using result = std_result<R, S, NoValuePolicy>;
 
 /*! In standalone Outcome, this aliases `std_unchecked<>`. In Boost.Outcome, this aliases `boost_checked<>`.
