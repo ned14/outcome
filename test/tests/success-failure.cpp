@@ -43,6 +43,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / success - failure, "Tests that the success 
     // static_assert(std::is_same<decltype(b.value), int>::value, "");
     static_assert(std::is_same<decltype(c)::value_type, const char *>::value, "");
   }
+#if !defined(__APPLE__) || defined(__cpp_exceptions)
   {
     auto e = std::make_exception_ptr(5);
     auto a = failure(5);
@@ -57,4 +58,5 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / success - failure, "Tests that the success 
     static_assert(std::is_same<decltype(c)::error_type, int>::value, "");
     static_assert(std::is_same<decltype(c)::exception_type, int>::value, "");
   }
+#endif
 }

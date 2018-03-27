@@ -143,6 +143,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as i
     }
 #endif
   }
+#if !defined(__APPLE__) || defined(__cpp_exceptions)
   {  // excepted
     std::error_code ec(5, std::system_category());
     auto e = std::make_exception_ptr(std::system_error(ec));  // NOLINT
@@ -190,6 +191,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as i
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(m.has_exception());
   }
+#endif
 
 
   {

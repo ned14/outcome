@@ -170,6 +170,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
     BOOST_CHECK_THROW(m.value(), std::system_error);
     BOOST_CHECK(m.error() == ec);
   }
+#if !defined(__APPLE__) || defined(__cpp_exceptions)
   {  // errored, custom
     std::error_code ec(5, std::system_category());
     auto e = std::make_exception_ptr(std::system_error(ec));  // NOLINT
@@ -181,6 +182,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
     BOOST_CHECK_THROW(m.value(), std::system_error);
     BOOST_CHECK(m.error() == e);
   }
+#endif
 #ifndef TESTING_WG21_EXPERIMENTAL_RESULT
   {  // custom error type
     struct Foo

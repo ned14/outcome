@@ -104,38 +104,34 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   list_filter(outcome_TESTS EXCLUDE REGEX "constexprs")
   include(QuickCppLibMakeStandardTests)
   
-  # Noexcept tests fail on OS X for some unknown reason. Issue tracked
-  # at https://github.com/ned14/outcome/issues/67
-  if(NOT APPLE)
-    # Duplicate all tests into C++ exceptions disabled forms
-    set(noexcept_tests)
-    foreach(testsource ${outcome_TESTS})
-      if(testsource MATCHES ".+/(.+)[.](c|cpp|cxx)$")
-        set(testname ${CMAKE_MATCH_1})
-        if(NOT testname MATCHES "expected-pass")
-          set(target_name "outcome_hl--${testname}-noexcept")
-          add_executable(${target_name} "${testsource}")
-          list(APPEND noexcept_tests ${target_name})
-          if(MSVC AND NOT CLANG)
-            # Disable warnings "C++ exception handler used" and "noexcept used with no exception handling"
-            target_compile_options(${target_name} PRIVATE /wd4530 /wd4577)
-          endif()
-          target_link_libraries(${target_name} PRIVATE outcome::hl)
-          set_target_properties(${target_name} PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-            POSITION_INDEPENDENT_CODE ON
-            CXX_EXCEPTIONS OFF
-            CXX_RTTI OFF
-          )
-          add_test(NAME ${target_name} CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
-            COMMAND $<TARGET_FILE:${target_name}> --reporter junit --out $<TARGET_FILE:${target_name}>.junit.xml
-          )
+  # Duplicate all tests into C++ exceptions disabled forms
+  set(noexcept_tests)
+  foreach(testsource ${outcome_TESTS})
+    if(testsource MATCHES ".+/(.+)[.](c|cpp|cxx)$")
+      set(testname ${CMAKE_MATCH_1})
+      if(NOT testname MATCHES "expected-pass")
+        set(target_name "outcome_hl--${testname}-noexcept")
+        add_executable(${target_name} "${testsource}")
+        list(APPEND noexcept_tests ${target_name})
+        if(MSVC AND NOT CLANG)
+          # Disable warnings "C++ exception handler used" and "noexcept used with no exception handling"
+          target_compile_options(${target_name} PRIVATE /wd4530 /wd4577)
         endif()
+        target_link_libraries(${target_name} PRIVATE outcome::hl)
+        set_target_properties(${target_name} PROPERTIES
+          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+          POSITION_INDEPENDENT_CODE ON
+          CXX_EXCEPTIONS OFF
+          CXX_RTTI OFF
+        )
+        add_test(NAME ${target_name} CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
+          COMMAND $<TARGET_FILE:${target_name}> --reporter junit --out $<TARGET_FILE:${target_name}>.junit.xml
+        )
       endif()
-    endforeach()
-    add_custom_target(${PROJECT_NAME}-noexcept COMMENT "Building all tests with C++ exceptions disabled ...")
-    add_dependencies(${PROJECT_NAME}-noexcept ${noexcept_tests})
-  endif()
+    endif()
+  endforeach()
+  add_custom_target(${PROJECT_NAME}-noexcept COMMENT "Building all tests with C++ exceptions disabled ...")
+  add_dependencies(${PROJECT_NAME}-noexcept ${noexcept_tests})
   
   # Turn on C++ 17 and Concepts where possible for the test suite
   foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
