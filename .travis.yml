@@ -94,9 +94,9 @@ script:
      cmake ..;
      make outcome_hl-pp-abi;
      cd ../abi-compliance;
-#     sh ./check-api-abi.sh abi_dumps/Outcome/2.1/ABI.dump;
      sh ./check-abi.sh abi_dumps/Outcome/2.1/binary_only.dump;
    fi
+#     sh ./check-api-abi.sh abi_dumps/Outcome/2.1/ABI.dump;
  -
    if [ "$__" = "cmake tests" ]; then
      if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
