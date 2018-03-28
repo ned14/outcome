@@ -33,7 +33,7 @@ addons:
 
 env:
 # - __="Code bloat tests"
- - __="ABI stability" NAME=TravisABICheck
+# - __="ABI stability" NAME=TravisABICheck
  - __="Documentation" NAME=TravisDocumentation
  - __="cmake tests" NAME=TravisLinuxWorker
  - __="cmake tests osx" NAME=TravisOSXWorker
@@ -42,9 +42,9 @@ matrix:
   exclude:
   - os: osx
     compiler: g++-6
-  - os: linux
-    compiler: clang-4.0
-    env: __="ABI stability" NAME=TravisABICheck
+#  - os: linux
+#    compiler: clang-4.0
+#    env: __="ABI stability" NAME=TravisABICheck
   - os: linux
     compiler: clang-4.0
     env: __="Documentation" NAME=TravisDocumentation
@@ -52,8 +52,8 @@ matrix:
     env: __="cmake tests osx" NAME=TravisOSXWorker
   - os: osx
     env: __="Code bloat tests"
-  - os: osx
-    env: __="ABI stability" NAME=TravisABICheck
+#  - os: osx
+#    env: __="ABI stability" NAME=TravisABICheck
   - os: osx
     env: __="Documentation" NAME=TravisDocumentation
   - os: osx

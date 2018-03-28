@@ -267,59 +267,76 @@ protected:
   {
     using base = detail::outcome_predicates<value_type, error_type, exception_type>;
 
+    // Predicate for any constructors to be available at all
+    static constexpr bool constructors_enabled = (!std::is_same<std::decay_t<value_type>, std::decay_t<error_type>>::value          //
+                                                  && !std::is_same<std::decay_t<value_type>, std::decay_t<exception_type>>::value   //
+                                                  && !std::is_same<std::decay_t<error_type>, std::decay_t<exception_type>>::value)  //
+                                                 || (std::is_void<value_type>::value && std::is_void<error_type>::value)            //
+                                                 || (std::is_void<value_type>::value && std::is_void<exception_type>::value)        //
+                                                 || (std::is_void<error_type>::value && std::is_void<exception_type>::value);
+
     //! Predicate for the value converting constructor to be available.
     template <class T>
     static constexpr bool enable_value_converting_constructor =  //
-    !std::is_same<std::decay_t<T>, basic_outcome>::value         // not my type
+    constructors_enabled                                         //
+    && !std::is_same<std::decay_t<T>, basic_outcome>::value      // not my type
     && base::template enable_value_converting_constructor<T>;
 
     //! Predicate for the error converting constructor to be available.
     template <class T>
     static constexpr bool enable_error_converting_constructor =  //
-    !std::is_same<std::decay_t<T>, basic_outcome>::value         // not my type
+    constructors_enabled                                         //
+    && !std::is_same<std::decay_t<T>, basic_outcome>::value      // not my type
     && base::template enable_error_converting_constructor<T>;
 
     //! Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>
     static constexpr bool enable_error_condition_converting_constructor =  //
-    !std::is_same<std::decay_t<ErrorCondEnum>, basic_outcome>::value       // not my type
+    constructors_enabled                                                   //
+    && !std::is_same<std::decay_t<ErrorCondEnum>, basic_outcome>::value    // not my type
     && base::template enable_error_condition_converting_constructor<ErrorCondEnum>;
 
     // Predicate for the exception converting constructor to be available.
     template <class T>
     static constexpr bool enable_exception_converting_constructor =  //
-    !std::is_same<std::decay_t<T>, basic_outcome>::value             // not my type
+    constructors_enabled                                             //
+    && !std::is_same<std::decay_t<T>, basic_outcome>::value          // not my type
     && base::template enable_exception_converting_constructor<T>;
 
     // Predicate for the error + exception converting constructor to be available.
     template <class T, class U>
     static constexpr bool enable_error_exception_converting_constructor =  //
-    !std::is_same<std::decay_t<T>, basic_outcome>::value                   // not my type
+    constructors_enabled                                                   //
+    && !std::is_same<std::decay_t<T>, basic_outcome>::value                // not my type
     && base::template enable_error_exception_converting_constructor<T, U>;
 
     //! Predicate for the converting constructor from a compatible input to be available.
     template <class T, class U, class V, class W>
-    static constexpr bool enable_compatible_conversion =            //
-    !std::is_same<basic_outcome<T, U, V, W>, basic_outcome>::value  // not my type
+    static constexpr bool enable_compatible_conversion =               //
+    constructors_enabled                                               //
+    && !std::is_same<basic_outcome<T, U, V, W>, basic_outcome>::value  // not my type
     && base::template enable_compatible_conversion<T, U, V, W>;
 
     //! Predicate for the inplace construction of value to be available.
     template <class... Args>
     static constexpr bool enable_inplace_value_constructor =  //
-    std::is_void<value_type>::value                           //
-    || std::is_constructible<value_type, Args...>::value;
+    constructors_enabled                                      //
+    && (std::is_void<value_type>::value                       //
+        || std::is_constructible<value_type, Args...>::value);
 
     //! Predicate for the inplace construction of error to be available.
     template <class... Args>
     static constexpr bool enable_inplace_error_constructor =  //
-    std::is_void<error_type>::value                           //
-    || std::is_constructible<error_type, Args...>::value;
+    constructors_enabled                                      //
+    && (std::is_void<error_type>::value                       //
+        || std::is_constructible<error_type, Args...>::value);
 
     //! Predicate for the inplace construction of exception to be available.
     template <class... Args>
     static constexpr bool enable_inplace_exception_constructor =  //
-    std::is_void<exception_type>::value                           //
-    || std::is_constructible<exception_type, Args...>::value;
+    constructors_enabled                                          //
+    && (std::is_void<exception_type>::value                       //
+        || std::is_constructible<exception_type, Args...>::value);
 
     // Predicate for the implicit converting inplace constructor to be available.
     template <class... Args>
@@ -340,6 +357,19 @@ protected:
   detail::devoid<exception_type> _ptr;
 
 public:
+  /// \output_section Disabling constructor
+  /*! Disabling constructor.
+  \tparam 1
+  \exclude
+
+  \requires Any one of `value_type`, `error_type` and `exception_type` to be the same type.
+  \effects Declares a catch-all constructor which is deleted to give a clear error message to the user
+  that identical `value_type`, `error_type` or `exception_type` is not supported, whilst also preserving compile-time introspection.
+  */
+  OUTCOME_TEMPLATE(class... Args)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED((!predicate::constructors_enabled && sizeof...(Args) > 0)))
+  basic_outcome(Args &&... /*unused*/) = delete;  // NOLINT Note that basic_outcome<> with any of the same type is NOT SUPPORTED, see docs!
+
   /// \output_section Converting constructors
   /*! Converting constructor to a successful outcome.
   \tparam 1

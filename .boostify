@@ -1,20 +1,21 @@
 # Files to copy over
 include_files = [
+    (r'include/outcome/experimental/status-code/include/(.*)', r'include/boost/outcome/experimental/status-code/\1'),
     (r'include/(.*)', r'include/boost/\1'),
-    r'doc/src/.*',
-    r'test/.*',
-    r'\.clang-.*',
-    r'\.gitattributes',
-    r'\index.html',
+    r'^doc/src/.*$',
+    r'^test/.*$',
+    r'^\.clang-.*$',
+    r'^\.gitattributes$',
+    r'^\index.html$',
 ]
 exclude_files = [
     r'.*quickcpplib.*',
-    r'.*status-code.*',
-    r'.*\.natvis',
-    r'.*\.vs',
-    r'test/single-header-test.cpp',
-    r'test/constexprs/.*',
-    r'doc/src/themes/.*'
+    r'^include/outcome/experimental/status-code/(?!include)',
+    r'.*\.natvis$',
+    r'.*\.vs.*',
+    r'^test/single-header-test.cpp$',
+    r'^test/constexprs/.*',
+    r'^doc/src/themes/.*'
 ]
 overlay_files = [
     (r'boostify', r''),
@@ -40,6 +41,10 @@ def fix_auto_test_case(x):
 macros = {
     r'^OUTCOME_': r'BOOST_OUTCOME_',
     r'([^_])OUTCOME_': r'\1BOOST_OUTCOME_',
+    r'^SYSTEM_ERROR2_': r'BOOST_SYSTEM_ERROR2_',
+    r'([^_])SYSTEM_ERROR2_': r'\1SYSTEM_ERROR2_',
+    r'DOXYGEN_': r'BOOST_OUTCOME_DOXYGEN_',
+    r'STANDARDESE_': r'BOOST_OUTCOME_STANDARDESE_',
     r'../include/outcome' : r'../include/boost/outcome',
     r'#include "quickcpplib/include/boost/test/unit_test.hpp"' : r'#include <boost/test/unit_test.hpp>\n#include <boost/test/unit_test_monitor.hpp>',
     r'BOOST_OUTCOME_AUTO_TEST_CASE\((.*)' : fix_auto_test_case,
@@ -47,8 +52,19 @@ macros = {
     r'#ifdef __cpp_exceptions' : r'#ifndef BOOST_NO_EXCEPTIONS',
 }
 transforms = {
-    r'.*\.hpp' : macros,
-    r'.*\.ipp' : macros,
-    r'.*\.cpp' : macros,
-    r'.*\.h': macros
+    r'^test/tests/.*\.cpp$': {
+      r'std::errc([^:])': r'boost::system::errc::errc_t\1',
+      r'std::errc::': r'boost::system::errc::',
+      r'std::error_code': r'boost::system::error_code',
+      r'std::make_error_code': r'make_error_code',
+      r'std::generic_category': r'boost::system::generic_category',
+      r'std::system_category': r'boost::system::system_category',
+      r'std::system_error': r'boost::system::system_error',
+      r'std::exception_ptr': r'boost::exception_ptr',
+      r'std::make_exception_ptr': r'boost::copy_exception',
+    },
+    r'^.*\.hpp$' : macros,
+    r'^.*\.ipp$' : macros,
+    r'^.*\.cpp$' : macros,
+    r'^.*\.h$': macros
 }

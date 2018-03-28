@@ -5,6 +5,7 @@ set(outcome_HEADERS
   "include/outcome/bad_access.hpp"
   "include/outcome/basic_outcome.hpp"
   "include/outcome/basic_result.hpp"
+  "include/outcome/boost_outcome.hpp"
   "include/outcome/boost_result.hpp"
   "include/outcome/config.hpp"
   "include/outcome/convert.hpp"

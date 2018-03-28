@@ -66,7 +66,7 @@ namespace policy
 {
   namespace detail
   {
-    struct error_code_passthrough
+    struct std_error_code_passthrough
     {
     };
     /* Pass through `make_error_code` function for anything implicitly convertible to `std::error_code`.
@@ -74,7 +74,7 @@ namespace policy
     */
     OUTCOME_TEMPLATE(class T)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::error_code>::value))
-    constexpr inline decltype(auto) make_error_code(T &&v, error_code_passthrough /*unused*/ = {}) { return std::forward<T>(v); }
+    constexpr inline decltype(auto) make_error_code(T &&v, std_error_code_passthrough /*unused*/ = {}) { return std::forward<T>(v); }
 
     template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
     struct tuple_passthrough

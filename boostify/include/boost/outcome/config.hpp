@@ -129,7 +129,7 @@ exported Boost.Outcome v2 namespace.
 #define BOOST_OUTCOME_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                \
   namespace boost                                                                                                                                                                                                                                                                                                              \
   {                                                                                                                                                                                                                                                                                                                            \
-    namespace outcome_v2                                                                                                                                                                                                                                                                                                \
+    namespace outcome_v2                                                                                                                                                                                                                                                                                                       \
     {
 /*! \brief Expands into the appropriate namespace markup to exit the Boost.Outcome v2 namespace.
 \ingroup config
@@ -137,6 +137,140 @@ exported Boost.Outcome v2 namespace.
 #define BOOST_OUTCOME_V2_NAMESPACE_END                                                                                                                                                                                                                                                                                         \
   }                                                                                                                                                                                                                                                                                                                            \
   }
+
+#include <cstdint>  // for uint32_t etc
+#include <initializer_list>
+#include <iosfwd>  // for future serialisation
+#include <new>     // for placement in moves etc
+#include <type_traits>
+
+#if __cplusplus >= 201700 || _HAS_CXX17
+#include <utility>  // for in_place_type_t
+
+BOOST_OUTCOME_V2_NAMESPACE_BEGIN
+template <class T> using in_place_type_t = std::in_place_type_t<T>;
+using std::in_place_type;
+BOOST_OUTCOME_V2_NAMESPACE_END
+#else
+BOOST_OUTCOME_V2_NAMESPACE_BEGIN
+//! Aliases `std::in_place_type_t<T>` if on C++ 17 or later, else defined locally.
+template <class T> struct in_place_type_t
+{
+  explicit in_place_type_t() = default;
+};
+//! Aliases `std::in_place_type<T>` if on C++ 17 or later, else defined locally.
+template <class T> constexpr in_place_type_t<T> in_place_type{};
+BOOST_OUTCOME_V2_NAMESPACE_END
+#endif
+
+BOOST_OUTCOME_V2_NAMESPACE_BEGIN
+namespace detail
+{
+  // Test if type is an in_place_type_t
+  template <class T> struct is_in_place_type_t
+  {
+    static constexpr bool value = false;
+  };
+  template <class U> struct is_in_place_type_t<in_place_type_t<U>>
+  {
+    static constexpr bool value = true;
+  };
+
+  // Replace void with constructible void_type
+  struct empty_type
+  {
+  };
+  struct void_type
+  {
+    // We always compare true to another instance of me
+    constexpr bool operator==(void_type /*unused*/) const noexcept { return true; }
+    constexpr bool operator!=(void_type /*unused*/) const noexcept { return false; }
+  };
+  template <class T> using devoid = std::conditional_t<std::is_void<T>::value, void_type, T>;
+
+  template <class Output, class Input> using rebind_type5 = Output;
+  template <class Output, class Input>
+  using rebind_type4 = std::conditional_t<                                   //
+  std::is_volatile<Input>::value,                                            //
+  std::add_volatile_t<rebind_type5<Output, std::remove_volatile_t<Input>>>,  //
+  rebind_type5<Output, Input>>;
+  template <class Output, class Input>
+  using rebind_type3 = std::conditional_t<                             //
+  std::is_const<Input>::value,                                         //
+  std::add_const_t<rebind_type4<Output, std::remove_const_t<Input>>>,  //
+  rebind_type4<Output, Input>>;
+  template <class Output, class Input>
+  using rebind_type2 = std::conditional_t<                                            //
+  std::is_lvalue_reference<Input>::value,                                             //
+  std::add_lvalue_reference_t<rebind_type3<Output, std::remove_reference_t<Input>>>,  //
+  rebind_type3<Output, Input>>;
+  template <class Output, class Input>
+  using rebind_type = std::conditional_t<                                             //
+  std::is_rvalue_reference<Input>::value,                                             //
+  std::add_rvalue_reference_t<rebind_type2<Output, std::remove_reference_t<Input>>>,  //
+  rebind_type2<Output, Input>>;
+
+  // static_assert(std::is_same_v<rebind_type<int, volatile const double &&>, volatile const int &&>, "");
+
+
+  /* True if type is the same or constructible. Works around a bug where clang + libstdc++
+  pukes on std::is_constructible<filesystem::path, void> (this bug is fixed upstream).
+  */
+  template <class T, class U> struct _is_explicitly_constructible
+  {
+    static constexpr bool value = std::is_constructible<T, U>::value;
+  };
+  template <class T> struct _is_explicitly_constructible<T, T>
+  {
+    static constexpr bool value = true;
+  };
+  template <class T> struct _is_explicitly_constructible<T, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <> struct _is_explicitly_constructible<void, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <class T, class U> static constexpr bool is_explicitly_constructible = _is_explicitly_constructible<T, U>::value;
+
+  template <class T, class U> struct _is_implicitly_constructible
+  {
+    static constexpr bool value = std::is_convertible<U, T>::value;
+  };
+  template <class T> struct _is_implicitly_constructible<T, T>
+  {
+    static constexpr bool value = true;
+  };
+  template <class T> struct _is_implicitly_constructible<T, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <> struct _is_implicitly_constructible<void, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <class T, class U> static constexpr bool is_implicitly_constructible = _is_implicitly_constructible<T, U>::value;
+
+// True if type is nothrow swappable
+#if !defined(STANDARDESE_IS_IN_THE_HOUSE) && (_HAS_CXX17 || __cplusplus >= 201700)
+  template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
+#else
+  namespace _is_nothrow_swappable
+  {
+    using namespace std;
+    template <class T> constexpr inline T &ldeclval();
+    template <class T, class = void> struct is_nothrow_swappable : std::integral_constant<bool, false>
+    {
+    };
+    template <class T> struct is_nothrow_swappable<T, decltype(swap(ldeclval<T>(), ldeclval<T>()))> : std::integral_constant<bool, noexcept(swap(ldeclval<T>(), ldeclval<T>()))>
+    {
+    };
+  }  // namespace _is_nothrow_swappable
+  template <class T> using is_nothrow_swappable = _is_nothrow_swappable::is_nothrow_swappable<T>;
+#endif
+}  // namespace detail
+BOOST_OUTCOME_V2_NAMESPACE_END
 
 #ifndef BOOST_OUTCOME_THROW_EXCEPTION
 #include <boost/throw_exception.hpp>

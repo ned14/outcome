@@ -1267,9 +1267,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 4305920a1e8dadc8a1a10b39f4c214ef74e15bd1
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-03-27 08:11:09 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4305920a
+#define OUTCOME_PREVIOUS_COMMIT_REF e1a31b35ae218abf7962b5d7afdd9cc98ab652ad
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-03-27 17:37:12 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE e1a31b35
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -4121,8 +4121,11 @@ namespace detail
   {
     // Predicate for the implicit constructors to be available
     static constexpr bool implicit_constructors_enabled = //
-    ((trait::is_error_type<std::decay_t<value_type>>::value && std::is_same<bool, std::decay_t<value_type>>::value) || !detail::is_implicitly_constructible<value_type, error_type>) //
-    &&!detail::is_implicitly_constructible<error_type, value_type>;
+    !(trait::is_error_type<std::decay_t<value_type>>::value && trait::is_error_type<std::decay_t<error_type>>::value) // both value and error types cannot be whitelisted error types
+    && ((!detail::is_implicitly_constructible<value_type, error_type> && !detail::is_implicitly_constructible<error_type, value_type>) // if value and error types cannot be constructed into one another
+        || (trait::is_error_type<std::decay_t<error_type>>::value // if error type is a whitelisted error type
+            && !detail::is_implicitly_constructible<error_type, value_type> // AND which cannot be constructed from the value type
+            && std::is_integral<value_type>::value)); // AND the value type is some integral type
 
     // Predicate for the value converting constructor to be available.
     template <class T>
@@ -4327,46 +4330,56 @@ protected:
   {
     using base = detail::result_predicates<value_type, error_type>;
 
+    // Predicate for any constructors to be available at all
+    static constexpr bool constructors_enabled = !std::is_same<std::decay_t<value_type>, std::decay_t<error_type>>::value;
+
     //! Predicate for the value converting constructor to be available.
     template <class T>
     static constexpr bool enable_value_converting_constructor = //
-    !std::is_same<std::decay_t<T>, basic_result>::value // not my type
+    constructors_enabled //
+    && !std::is_same<std::decay_t<T>, basic_result>::value // not my type
     && base::template enable_value_converting_constructor<T>;
 
     //! Predicate for the error converting constructor to be available.
     template <class T>
     static constexpr bool enable_error_converting_constructor = //
-    !std::is_same<std::decay_t<T>, basic_result>::value // not my type
+    constructors_enabled //
+    && !std::is_same<std::decay_t<T>, basic_result>::value // not my type
     && base::template enable_error_converting_constructor<T>;
 
     //! Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>
     static constexpr bool enable_error_condition_converting_constructor = //
-    !std::is_same<std::decay_t<ErrorCondEnum>, basic_result>::value // not my type
+    constructors_enabled //
+    && !std::is_same<std::decay_t<ErrorCondEnum>, basic_result>::value // not my type
     && base::template enable_error_condition_converting_constructor<ErrorCondEnum>;
 
     //! Predicate for the converting copy constructor from a compatible input to be available.
     template <class T, class U, class V>
     static constexpr bool enable_compatible_conversion = //
-    !std::is_same<basic_result<T, U, V>, basic_result>::value // not my type
+    constructors_enabled //
+    && !std::is_same<basic_result<T, U, V>, basic_result>::value // not my type
     && base::template enable_compatible_conversion<T, U, V>;
 
     //! Predicate for the inplace construction of value to be available.
     template <class... Args>
     static constexpr bool enable_inplace_value_constructor = //
-    std::is_void<value_type>::value //
-    || std::is_constructible<value_type, Args...>::value;
+    constructors_enabled //
+    && (std::is_void<value_type>::value //
+        || std::is_constructible<value_type, Args...>::value);
 
     //! Predicate for the inplace construction of error to be available.
     template <class... Args>
     static constexpr bool enable_inplace_error_constructor = //
-    std::is_void<error_type>::value //
-    || std::is_constructible<error_type, Args...>::value;
+    constructors_enabled //
+    && (std::is_void<error_type>::value //
+        || std::is_constructible<error_type, Args...>::value);
 
     // Predicate for the implicit converting inplace constructor to be available.
     template <class... Args>
     static constexpr bool enable_inplace_value_error_constructor = //
-    base::template enable_inplace_value_error_constructor<Args...>;
+    constructors_enabled //
+    &&base::template enable_inplace_value_error_constructor<Args...>;
     template <class... Args> using choose_inplace_value_error_constructor = typename base::template choose_inplace_value_error_constructor<Args...>;
   };
 
@@ -4383,6 +4396,26 @@ public:
   //! Copy assignment available if `value_type` and `error_type` implement it.
   basic_result &operator=(const basic_result & /*unused*/) = default;
   ~basic_result() = default;
+
+  /// \output_section Disabling constructor
+  /*! Disabling constructor.
+  \tparam 1
+  \exclude
+
+  \requires `value_type` and `error_type` to be the same type.
+  \effects Declares a catch-all constructor which is deleted to give a clear error message to the user
+  that identical `value_type` and `error_type` is not supported, whilst also preserving compile-time introspection.
+  */
+
+
+
+
+
+
+
+  OUTCOME_TEMPLATE(class... Args)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED((!predicate::constructors_enabled && sizeof...(Args) > 0)))
+  basic_result(Args &&... /*unused*/) = delete; // NOLINT Note that basic_result<T, T> is NOT SUPPORTED, see docs!
 
   /// \output_section Converting constructors
   /*! Implicit converting constructor to a successful basic_result.
@@ -5350,59 +5383,76 @@ protected:
   {
     using base = detail::outcome_predicates<value_type, error_type, exception_type>;
 
+    // Predicate for any constructors to be available at all
+    static constexpr bool constructors_enabled = (!std::is_same<std::decay_t<value_type>, std::decay_t<error_type>>::value //
+                                                  && !std::is_same<std::decay_t<value_type>, std::decay_t<exception_type>>::value //
+                                                  && !std::is_same<std::decay_t<error_type>, std::decay_t<exception_type>>::value) //
+                                                 || (std::is_void<value_type>::value && std::is_void<error_type>::value) //
+                                                 || (std::is_void<value_type>::value && std::is_void<exception_type>::value) //
+                                                 || (std::is_void<error_type>::value && std::is_void<exception_type>::value);
+
     //! Predicate for the value converting constructor to be available.
     template <class T>
     static constexpr bool enable_value_converting_constructor = //
-    !std::is_same<std::decay_t<T>, basic_outcome>::value // not my type
+    constructors_enabled //
+    && !std::is_same<std::decay_t<T>, basic_outcome>::value // not my type
     && base::template enable_value_converting_constructor<T>;
 
     //! Predicate for the error converting constructor to be available.
     template <class T>
     static constexpr bool enable_error_converting_constructor = //
-    !std::is_same<std::decay_t<T>, basic_outcome>::value // not my type
+    constructors_enabled //
+    && !std::is_same<std::decay_t<T>, basic_outcome>::value // not my type
     && base::template enable_error_converting_constructor<T>;
 
     //! Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>
     static constexpr bool enable_error_condition_converting_constructor = //
-    !std::is_same<std::decay_t<ErrorCondEnum>, basic_outcome>::value // not my type
+    constructors_enabled //
+    && !std::is_same<std::decay_t<ErrorCondEnum>, basic_outcome>::value // not my type
     && base::template enable_error_condition_converting_constructor<ErrorCondEnum>;
 
     // Predicate for the exception converting constructor to be available.
     template <class T>
     static constexpr bool enable_exception_converting_constructor = //
-    !std::is_same<std::decay_t<T>, basic_outcome>::value // not my type
+    constructors_enabled //
+    && !std::is_same<std::decay_t<T>, basic_outcome>::value // not my type
     && base::template enable_exception_converting_constructor<T>;
 
     // Predicate for the error + exception converting constructor to be available.
     template <class T, class U>
     static constexpr bool enable_error_exception_converting_constructor = //
-    !std::is_same<std::decay_t<T>, basic_outcome>::value // not my type
+    constructors_enabled //
+    && !std::is_same<std::decay_t<T>, basic_outcome>::value // not my type
     && base::template enable_error_exception_converting_constructor<T, U>;
 
     //! Predicate for the converting constructor from a compatible input to be available.
     template <class T, class U, class V, class W>
     static constexpr bool enable_compatible_conversion = //
-    !std::is_same<basic_outcome<T, U, V, W>, basic_outcome>::value // not my type
+    constructors_enabled //
+    && !std::is_same<basic_outcome<T, U, V, W>, basic_outcome>::value // not my type
     && base::template enable_compatible_conversion<T, U, V, W>;
 
     //! Predicate for the inplace construction of value to be available.
     template <class... Args>
     static constexpr bool enable_inplace_value_constructor = //
-    std::is_void<value_type>::value //
-    || std::is_constructible<value_type, Args...>::value;
+    constructors_enabled //
+    && (std::is_void<value_type>::value //
+        || std::is_constructible<value_type, Args...>::value);
 
     //! Predicate for the inplace construction of error to be available.
     template <class... Args>
     static constexpr bool enable_inplace_error_constructor = //
-    std::is_void<error_type>::value //
-    || std::is_constructible<error_type, Args...>::value;
+    constructors_enabled //
+    && (std::is_void<error_type>::value //
+        || std::is_constructible<error_type, Args...>::value);
 
     //! Predicate for the inplace construction of exception to be available.
     template <class... Args>
     static constexpr bool enable_inplace_exception_constructor = //
-    std::is_void<exception_type>::value //
-    || std::is_constructible<exception_type, Args...>::value;
+    constructors_enabled //
+    && (std::is_void<exception_type>::value //
+        || std::is_constructible<exception_type, Args...>::value);
 
     // Predicate for the implicit converting inplace constructor to be available.
     template <class... Args>
@@ -5423,6 +5473,26 @@ protected:
   detail::devoid<exception_type> _ptr;
 
 public:
+  /// \output_section Disabling constructor
+  /*! Disabling constructor.
+  \tparam 1
+  \exclude
+
+  \requires Any one of `value_type`, `error_type` and `exception_type` to be the same type.
+  \effects Declares a catch-all constructor which is deleted to give a clear error message to the user
+  that identical `value_type`, `error_type` or `exception_type` is not supported, whilst also preserving compile-time introspection.
+  */
+
+
+
+
+
+
+
+  OUTCOME_TEMPLATE(class... Args)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED((!predicate::constructors_enabled && sizeof...(Args) > 0)))
+  basic_outcome(Args &&... /*unused*/) = delete; // NOLINT Note that basic_outcome<> with any of the same type is NOT SUPPORTED, see docs!
+
   /// \output_section Converting constructors
   /*! Converting constructor to a successful outcome.
   \tparam 1

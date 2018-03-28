@@ -6,6 +6,17 @@ weight = 80
 ---
 ## v2.1 in progress [[project]](https://github.com/ned14/outcome/projects/1)
 
+- [#135](https://github.com/ned14/outcome/issues/135)
+    - Added much clearer compile failure when user tries `result<T, T>` or `outcome`
+    where two or more types are identical. Thanks to Andrzej Krzemieński
+    for suggesting a technique which combines SFINAE correctness with
+    the remaining ability for `result<T, T>` etc to be a valid type, but
+    not constructible.
+
+- [#67](https://github.com/ned14/outcome/issues/67)
+    - Fixed one of the oldest long open bugs in Outcome, that the noexcept
+unit tests failed on OS X for an unknown reason.
+
 - [#115](https://github.com/ned14/outcome/issues/115)
     - Outcome did not construct correctly from `failure_type`.
 
