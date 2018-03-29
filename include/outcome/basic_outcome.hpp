@@ -214,6 +214,9 @@ class OUTCOME_NODISCARD basic_outcome
   template <class T, class U, class V, class W> friend class basic_outcome;
   template <class T, class U, class V, class W, class X> friend constexpr inline void hooks::override_outcome_exception(basic_outcome<T, U, V, W> *o, X &&v) noexcept;  // NOLINT
 
+  struct implicit_constructors_disabled_tag
+  {
+  };
   struct value_converting_constructor_tag
   {
   };
@@ -274,6 +277,9 @@ protected:
                                                  || (std::is_void<value_type>::value && std::is_void<error_type>::value)            //
                                                  || (std::is_void<value_type>::value && std::is_void<exception_type>::value)        //
                                                  || (std::is_void<error_type>::value && std::is_void<exception_type>::value);
+
+    // Predicate for implicit constructors to be available at all
+    static constexpr bool implicit_constructors_enabled = constructors_enabled && base::implicit_constructors_enabled;
 
     //! Predicate for the value converting constructor to be available.
     template <class T>
@@ -357,18 +363,31 @@ protected:
   detail::devoid<exception_type> _ptr;
 
 public:
-  /// \output_section Disabling constructor
-  /*! Disabling constructor.
-  \tparam 1
+  /// \output_section Disabling constructors
+  /*! Disabling constructor for when all constructors are disabled.
+  \tparam 2
   \exclude
 
   \requires Any one of `value_type`, `error_type` and `exception_type` to be the same type.
   \effects Declares a catch-all constructor which is deleted to give a clear error message to the user
   that identical `value_type`, `error_type` or `exception_type` is not supported, whilst also preserving compile-time introspection.
   */
-  OUTCOME_TEMPLATE(class... Args)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED((!predicate::constructors_enabled && sizeof...(Args) > 0)))
-  basic_outcome(Args &&... /*unused*/) = delete;  // NOLINT Note that basic_outcome<> with any of the same type is NOT SUPPORTED, see docs!
+  OUTCOME_TEMPLATE(class Arg, class... Args)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED((!predicate::constructors_enabled && sizeof...(Args) >= 0)))
+  basic_outcome(Arg && /*unused*/, Args &&... /*unused*/) = delete;  // NOLINT basic_outcome<> with any of the same type is NOT SUPPORTED, see docs!
+
+  /*! Disabling implicit constructor for when implicit constructors are disabled.
+  \tparam 1
+  \exclude
+
+  \requires Any one of `value_type`, `error_type` and `exception_type` to be ambiguous.
+  \effects Declares a value type constructor which is deleted to give a clear error message to the user
+  that `value_type` or `error_type` or `exception_type` are ambiguous, whilst also preserving compile-time introspection.
+  */
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED((predicate::constructors_enabled && !predicate::implicit_constructors_enabled  //
+                                   && (detail::is_implicitly_constructible<value_type, T> || detail::is_implicitly_constructible<error_type, T> || detail::is_implicitly_constructible<exception_type, T>) )))
+  basic_outcome(T && /*unused*/, implicit_constructors_disabled_tag /*unused*/ = implicit_constructors_disabled_tag()) = delete;  // NOLINT Implicit constructors disabled, use explicit in_place_type<T>, success() or failure(). see docs!
 
   /// \output_section Converting constructors
   /*! Converting constructor to a successful outcome.

@@ -191,6 +191,9 @@ class OUTCOME_NODISCARD basic_result : public detail::basic_result_final<R, S, N
 
   using base = detail::basic_result_final<R, S, NoValuePolicy>;
 
+  struct implicit_constructors_disabled_tag
+  {
+  };
   struct value_converting_constructor_tag
   {
   };
@@ -230,6 +233,9 @@ protected:
 
     // Predicate for any constructors to be available at all
     static constexpr bool constructors_enabled = !std::is_same<std::decay_t<value_type>, std::decay_t<error_type>>::value;
+
+    // Predicate for implicit constructors to be available at all
+    static constexpr bool implicit_constructors_enabled = constructors_enabled && base::implicit_constructors_enabled;
 
     //! Predicate for the value converting constructor to be available.
     template <class T>
@@ -295,18 +301,31 @@ public:
   basic_result &operator=(const basic_result & /*unused*/) = default;
   ~basic_result() = default;
 
-  /// \output_section Disabling constructor
-  /*! Disabling constructor.
-  \tparam 1
+  /// \output_section Disabling constructors
+  /*! Disabling constructor for when all constructors are disabled.
+  \tparam 2
   \exclude
 
   \requires `value_type` and `error_type` to be the same type.
   \effects Declares a catch-all constructor which is deleted to give a clear error message to the user
   that identical `value_type` and `error_type` is not supported, whilst also preserving compile-time introspection.
   */
-  OUTCOME_TEMPLATE(class... Args)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED((!predicate::constructors_enabled && sizeof...(Args) > 0)))
-  basic_result(Args &&... /*unused*/) = delete;  // NOLINT Note that basic_result<T, T> is NOT SUPPORTED, see docs!
+  OUTCOME_TEMPLATE(class Arg, class... Args)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(!predicate::constructors_enabled && (sizeof...(Args) >= 0)))
+  basic_result(Arg && /*unused*/, Args &&... /*unused*/) = delete;  // NOLINT basic_result<T, T> is NOT SUPPORTED, see docs!
+
+  /*! Disabling implicit constructor for when implicit constructors are disabled.
+  \tparam 1
+  \exclude
+
+  \requires `value_type` and `error_type` to be ambiguous.
+  \effects Declares a value type constructor which is deleted to give a clear error message to the user
+  that `value_type` and `error_type` are ambiguous, whilst also preserving compile-time introspection.
+  */
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED((predicate::constructors_enabled && !predicate::implicit_constructors_enabled  //
+                                   && (detail::is_implicitly_constructible<value_type, T> || detail::is_implicitly_constructible<error_type, T>) )))
+  basic_result(T && /*unused*/, implicit_constructors_disabled_tag /*unused*/ = implicit_constructors_disabled_tag()) = delete;  // NOLINT Implicit constructors disabled, use explicit in_place_type<T>, success() or failure(). see docs!
 
   /// \output_section Converting constructors
   /*! Implicit converting constructor to a successful basic_result.
