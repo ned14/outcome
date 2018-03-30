@@ -1267,9 +1267,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF fc4ad246bd3a8da0f4a1d61fc0fcf73cdeed7378
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-03-28 20:34:10 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE fc4ad246
+#define OUTCOME_PREVIOUS_COMMIT_REF ab3afd506b1dc4bf05dec060bc7c748d91ee7a62
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-03-29 08:46:16 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE ab3afd50
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -4121,32 +4121,41 @@ namespace detail
   {
     // Predicate for the implicit constructors to be available
     static constexpr bool implicit_constructors_enabled = //
-    !(trait::is_error_type<std::decay_t<value_type>>::value && trait::is_error_type<std::decay_t<error_type>>::value) // both value and error types cannot be whitelisted error types
+    !(trait::is_error_type<std::decay_t<value_type>>::value && trait::is_error_type<std::decay_t<error_type>>::value) // both value and error types are not whitelisted error types
     && ((!detail::is_implicitly_constructible<value_type, error_type> && !detail::is_implicitly_constructible<error_type, value_type>) // if value and error types cannot be constructed into one another
         || (trait::is_error_type<std::decay_t<error_type>>::value // if error type is a whitelisted error type
             && !detail::is_implicitly_constructible<error_type, value_type> // AND which cannot be constructed from the value type
             && std::is_integral<value_type>::value)); // AND the value type is some integral type
 
-    // Predicate for the value converting constructor to be available.
+    // Predicate for the value converting constructor to be available. Weakened to allow result<int, C enum>.
     template <class T>
     static constexpr bool enable_value_converting_constructor = //
     implicit_constructors_enabled //
     && !is_in_place_type_t<std::decay_t<T>>::value // not in place construction
-    && detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T>;
+    &&
+    !trait::is_error_type_enum<error_type,
+                               std::decay_t<T>>::value // not an enum valid for my error type
+    && (std::is_same<value_type, std::decay_t<T>>::value // is directly value type
+        || (detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T>) ); // is unambiguously for value type
 
-    // Predicate for the error converting constructor to be available.
+
+    // Predicate for the error converting constructor to be available. Weakened to allow result<int, C enum>.
     template <class T>
     static constexpr bool enable_error_converting_constructor = //
     implicit_constructors_enabled //
     && !is_in_place_type_t<std::decay_t<T>>::value // not in place construction
-    && !detail::is_implicitly_constructible<value_type, T> && detail::is_implicitly_constructible<error_type, T>;
+    &&
+    !trait::is_error_type_enum<error_type,
+                               std::decay_t<T>>::value // not an enum valid for my error type
+    && (std::is_same<error_type, std::decay_t<T>>::value // is directly error type
+        || (!detail::is_implicitly_constructible<value_type, T> && detail::is_implicitly_constructible<error_type, T>) ); // is unambiguously for error type
 
     // Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>
     static constexpr bool enable_error_condition_converting_constructor = //
     !is_in_place_type_t<std::decay_t<ErrorCondEnum>>::value // not in place construction
     && trait::is_error_type_enum<error_type, std::decay_t<ErrorCondEnum>>::value // is an error condition enum
-    && !detail::is_implicitly_constructible<value_type, ErrorCondEnum> && !detail::is_implicitly_constructible<error_type, ErrorCondEnum>; // not constructible via any other means
+    /*&& !detail::is_implicitly_constructible<value_type, ErrorCondEnum> && !detail::is_implicitly_constructible<error_type, ErrorCondEnum>*/; // not constructible via any other means
 
     // Predicate for the converting copy constructor from a compatible input to be available.
     template <class T, class U, class V>
@@ -4405,7 +4414,7 @@ public:
 
   /// \output_section Disabling constructors
   /*! Disabling constructor for when all constructors are disabled.
-  \tparam 1
+  \tparam 2
   \exclude
 
   \requires `value_type` and `error_type` to be the same type.
@@ -5163,14 +5172,14 @@ namespace detail
     static constexpr bool enable_value_converting_constructor = //
     implicit_constructors_enabled //
     &&result::template enable_value_converting_constructor<T> //
-    && !detail::is_implicitly_constructible<exception_type, T>;
+    && !detail::is_implicitly_constructible<exception_type, T>; // deliberately less tolerant of ambiguity than result's edition
 
     // Predicate for the error converting constructor to be available.
     template <class T>
     static constexpr bool enable_error_converting_constructor = //
     implicit_constructors_enabled //
     &&result::template enable_error_converting_constructor<T> //
-    && !detail::is_implicitly_constructible<exception_type, T>;
+    && !detail::is_implicitly_constructible<exception_type, T>; // deliberately less tolerant of ambiguity than result's edition
 
     // Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>

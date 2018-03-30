@@ -61,14 +61,14 @@ namespace detail
     static constexpr bool enable_value_converting_constructor =  //
     implicit_constructors_enabled                                //
     &&result::template enable_value_converting_constructor<T>    //
-    && !detail::is_implicitly_constructible<exception_type, T>;
+    && !detail::is_implicitly_constructible<exception_type, T>;  // deliberately less tolerant of ambiguity than result's edition
 
     // Predicate for the error converting constructor to be available.
     template <class T>
     static constexpr bool enable_error_converting_constructor =  //
     implicit_constructors_enabled                                //
     &&result::template enable_error_converting_constructor<T>    //
-    && !detail::is_implicitly_constructible<exception_type, T>;
+    && !detail::is_implicitly_constructible<exception_type, T>;  // deliberately less tolerant of ambiguity than result's edition
 
     // Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>

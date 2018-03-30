@@ -62,6 +62,8 @@ transforms = {
       r'std::system_error': r'boost::system::system_error',
       r'std::exception_ptr': r'boost::exception_ptr',
       r'std::make_exception_ptr': r'boost::copy_exception',
+      r'std::current_exception': r'boost::current_exception',
+      r'std::rethrow_exception': r'boost::rethrow_exception',
     },
     r'^.*\.hpp$' : macros,
     r'^.*\.ipp$' : macros,

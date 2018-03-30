@@ -25,11 +25,50 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_BOOST_RESULT_HPP
 #define OUTCOME_BOOST_RESULT_HPP
 
-#include "std_result.hpp"
+#include "config.hpp"
 
 #include "boost/exception_ptr.hpp"
+
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+//! Namespace for policies
+namespace policy
+{
+  namespace detail
+  {
+    /* Pass through `make_exception_ptr` function for `boost::exception_ptr`.
+    The reason this needs to be here, declared before the rest of Outcome,
+    is that there is no boost::make_exception_ptr as Boost still uses the old
+    naming boost::copy_exception. Therefore the ADL discovered make_exception_ptr
+    doesn't work, hence this hacky pre-declaration here.
+
+    I was tempted to just inject a boost::make_exception_ptr, but I can see
+    Boost doing that itself at some point. This hack should keep working after.
+    */
+    inline boost::exception_ptr make_exception_ptr(boost::exception_ptr v) { return v; }
+  }
+}
+OUTCOME_V2_NAMESPACE_END
+
+#include "std_result.hpp"
+
 #include "boost/system/error_code.hpp"
 #include "boost/system/system_error.hpp"
+
+// ADL injection of throw_as_system_error_with_payload
+namespace boost
+{
+  namespace system
+  {
+    inline void throw_as_system_error_with_payload(const error_code &error) { OUTCOME_THROW_EXCEPTION(system_error(error)); }
+    namespace errc
+    {
+      OUTCOME_TEMPLATE(class Error)
+      OUTCOME_TREQUIRES(OUTCOME_TPRED(is_error_code_enum<std::decay_t<Error>>::value || is_error_condition_enum<std::decay_t<Error>>::value))
+      inline void throw_as_system_error_with_payload(Error &&error) { OUTCOME_THROW_EXCEPTION(system_error(make_error_code(error))); }
+    }
+  }
+}
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -76,16 +115,7 @@ namespace policy
     OUTCOME_TEMPLATE(class T)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, boost::system::error_code>::value))
     constexpr inline decltype(auto) make_error_code(T &&v, boost_error_code_passthrough /*unused*/ = {}) { return std::forward<T>(v); }
-
-    struct boost_enum_overload_tag
-    {
-    };
   }  // namespace detail
-
-  inline void throw_as_system_error_with_payload(boost::system::error_code error) { OUTCOME_THROW_EXCEPTION(boost::system::system_error(error)); }
-  OUTCOME_TEMPLATE(class Error)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(boost::system::is_error_code_enum<std::decay_t<Error>>::value || boost::system::is_error_condition_enum<std::decay_t<Error>>::value))
-  inline void throw_as_system_error_with_payload(Error &&error, detail::boost_enum_overload_tag = detail::boost_enum_overload_tag()) { OUTCOME_THROW_EXCEPTION(boost::system::system_error(error_code(error))); }
 }  // namespace policy
 
 //! Namespace for traits
@@ -101,6 +131,14 @@ namespace trait
     {
       static constexpr bool value = true;
     };
+    template <> struct has_exception_ptr<boost::exception_ptr, void>
+    {
+      static constexpr bool value = true;
+    };
+    template <class T> struct has_exception_ptr<T, boost::exception_ptr>
+    {
+      static constexpr bool value = true;
+    };
   }  // namespace detail
 
   // boost::system::error_code is an error type
@@ -110,6 +148,11 @@ namespace trait
   };
   // boost::system::error_code::errc_t is an error type
   template <> struct is_error_type<boost::system::errc::errc_t>
+  {
+    static constexpr bool value = true;
+  };
+  // boost::exception_ptr is an error types
+  template <> struct is_error_type<boost::exception_ptr>
   {
     static constexpr bool value = true;
   };

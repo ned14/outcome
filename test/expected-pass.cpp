@@ -1035,7 +1035,9 @@ BOOST_AUTO_TEST_CASE(expected_pass)
   static_assert(!std::is_default_constructible<expected_sc<NoDefaultConstructible>>::value, "");
 
   static_assert(!std::is_copy_constructible<NoCopyConstructible>::value, "");
+#if !defined(__clang__)  // some versions of clang get this wrong
   static_assert(!std::is_constructible<expected_sc<NoCopyConstructible>, NoCopyConstructible const &>::value, "");
+#endif
   static_assert(!std::is_constructible<stde::exception_or<NoCopyConstructible>, stde::exception_or<NoCopyConstructible> const &>::value, "");
   static_assert(!std::is_copy_constructible<stde::exception_or<NoCopyConstructible>>::value, "");
 

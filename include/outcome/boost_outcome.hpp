@@ -42,40 +42,6 @@ namespace detail
   }
 }
 
-//! Namespace for policies
-namespace policy
-{
-  namespace detail
-  {
-    /* Pass through `make_exception_ptr` function for `boost::exception_ptr`.
-    */
-    inline boost::exception_ptr make_exception_ptr(boost::exception_ptr v) { return v; }
-  }  // namespace detail
-}  // namespace policy
-
-//! Namespace for traits
-namespace trait
-{
-  namespace detail
-  {
-    template <> struct has_exception_ptr<boost::exception_ptr, void>
-    {
-      static constexpr bool value = true;
-    };
-    template <class T> struct has_exception_ptr<T, boost::exception_ptr>
-    {
-      static constexpr bool value = true;
-    };
-  }  // namespace detail
-
-  // boost::exception_ptr are error types
-  template <> struct is_error_type<boost::exception_ptr>
-  {
-    static constexpr bool value = true;
-  };
-
-}  // namespace trait
-
 
 /*! `basic_outcome` defaulted to use `boost::system::error_code`, `boost::exception_ptr` and a `NoValuePolicy` appropriate for `boost` types.
 

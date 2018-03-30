@@ -91,13 +91,10 @@ namespace policy
     */
     inline std::exception_ptr make_exception_ptr(std::exception_ptr v) { return v; }
 
+    // Try ADL, if not use fall backs above
     template <class T> constexpr inline decltype(auto) error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
     template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
 
-    template <class T> struct throw_as_system_error_with_payload_missing_specialisation
-    {
-      constexpr throw_as_system_error_with_payload_missing_specialisation(...) {}
-    };
     struct std_enum_overload_tag
     {
     };
@@ -108,11 +105,8 @@ namespace policy
   template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return detail::exception_ptr(std::forward<T>(v)); }
 
   //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
-  template <class Error> constexpr inline void throw_as_system_error_with_payload(detail::throw_as_system_error_with_payload_missing_specialisation<Error> /* unused */)
-  {
-    static_assert(!std::is_same<Error, Error>::value, "To use the error_code_throw_as_system_error policy with a custom Error type, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload");
-  }
-  inline void throw_as_system_error_with_payload(std::error_code error) { OUTCOME_THROW_EXCEPTION(std::system_error(error)); }
+  // inline void throw_as_system_error_with_payload(...) = delete;  // To use the error_code_throw_as_system_error policy with a custom Error type, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload
+  inline void throw_as_system_error_with_payload(const std::error_code &error) { OUTCOME_THROW_EXCEPTION(std::system_error(error)); }
   OUTCOME_TEMPLATE(class Error)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_code_enum<std::decay_t<Error>>::value || std::is_error_condition_enum<std::decay_t<Error>>::value))
   inline void throw_as_system_error_with_payload(Error &&error, detail::std_enum_overload_tag = detail::std_enum_overload_tag()) { OUTCOME_THROW_EXCEPTION(std::system_error(error_code(error))); }
