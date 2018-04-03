@@ -37,7 +37,7 @@ namespace policy
   template <class T, class EC, class E> struct error_code_throw_as_system_error;
   /*! Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
   Any wide attempt to access the successful state where there is none calls an
-  ADL discovered free function `throw_as_system_error_with_payload(.error())`.
+  ADL discovered free function `outcome_throw_as_system_error_with_payload(.error())`.
   */
   template <class T, class EC> struct error_code_throw_as_system_error<T, EC, void> : detail::base
   {
@@ -51,7 +51,7 @@ namespace policy
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
           // ADL discovered
-          throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
+          outcome_throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }

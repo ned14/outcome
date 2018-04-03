@@ -1482,9 +1482,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF ab3afd506b1dc4bf05dec060bc7c748d91ee7a62
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-03-29 08:46:16 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE ab3afd50
+#define OUTCOME_PREVIOUS_COMMIT_REF f533900572b6b0d0938ad0733b59eaabdf4cf6ce
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-03-30 09:08:17 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f5339005
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -5277,11 +5277,11 @@ namespace policy
   template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return detail::exception_ptr(std::forward<T>(v)); }
 
   //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
-  // inline void throw_as_system_error_with_payload(...) = delete;  // To use the error_code_throw_as_system_error policy with a custom Error type, you must define a throw_as_system_error_with_payload() free function to say how to handle the payload
-  inline void throw_as_system_error_with_payload(const std::error_code &error) { OUTCOME_THROW_EXCEPTION(std::system_error(error)); }
+  // inline void outcome_throw_as_system_error_with_payload(...) = delete;  // To use the error_code_throw_as_system_error policy with a custom Error type, you must define a outcome_throw_as_system_error_with_payload() free function to say how to handle the payload
+  inline void outcome_throw_as_system_error_with_payload(const std::error_code &error) { OUTCOME_THROW_EXCEPTION(std::system_error(error)); }
   OUTCOME_TEMPLATE(class Error)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_code_enum<std::decay_t<Error>>::value || std::is_error_condition_enum<std::decay_t<Error>>::value))
-  inline void throw_as_system_error_with_payload(Error &&error, detail::std_enum_overload_tag = detail::std_enum_overload_tag()) { OUTCOME_THROW_EXCEPTION(std::system_error(error_code(error))); }
+  inline void outcome_throw_as_system_error_with_payload(Error &&error, detail::std_enum_overload_tag = detail::std_enum_overload_tag()) { OUTCOME_THROW_EXCEPTION(std::system_error(error_code(error))); }
 } // namespace policy
 
 //! Namespace for traits
@@ -5534,7 +5534,7 @@ namespace policy
   template <class T, class EC, class E> struct error_code_throw_as_system_error;
   /*! Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
   Any wide attempt to access the successful state where there is none calls an
-  ADL discovered free function `throw_as_system_error_with_payload(.error())`.
+  ADL discovered free function `outcome_throw_as_system_error_with_payload(.error())`.
   */
 
 
@@ -5553,7 +5553,7 @@ namespace policy
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
           // ADL discovered
-          throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
+          outcome_throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
@@ -6035,17 +6035,8 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  // Used by later code to implement .failure() observers for some given set of types
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline void basic_outcome_failure_exception_from_error(...) {}
-  template <class Base, class R, class S, class P, class NoValuePolicy, //
-            typename = std::enable_if_t<trait::has_error_code<S>::value && trait::has_exception_ptr<P>::value>>
-  inline P basic_outcome_failure_exception_from_error(const S & /* unused */);
-
   //! The exception observers implementation of `basic_outcome<R, S, P>`.
-  template <class Base, class R, class S, class P, class NoValuePolicy, class FailureImpl = decltype(basic_outcome_failure_exception_from_error<Base, R, S, P, NoValuePolicy>(std::declval<detail::devoid<S>>()))> class basic_outcome_exception_observers;
-
-  // Exception observers present, failure observers not present
-  template <class Base, class R, class S, class P, class NoValuePolicy> class basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void> : public Base
+  template <class Base, class R, class S, class P, class NoValuePolicy> class basic_outcome_exception_observers : public Base
   {
   public:
     using exception_type = P;
@@ -6088,8 +6079,8 @@ namespace detail
     constexpr inline const exception_type &&exception() const &&;
   };
 
-  // Exception observers not present, failure observers not present
-  template <class Base, class R, class S, class NoValuePolicy> class basic_outcome_exception_observers<Base, R, S, void, NoValuePolicy, void> : public Base
+  // Exception observers not present
+  template <class Base, class R, class S, class NoValuePolicy> class basic_outcome_exception_observers<Base, R, S, void, NoValuePolicy> : public Base
   {
   public:
     using Base::Base;
@@ -6107,14 +6098,80 @@ namespace detail
     constexpr void exception() const { NoValuePolicy::wide_exception_check(this); }
   };
 
-  // Exception observers present, failure observers present
-  template <class Base, class R, class S, class P, class NoValuePolicy, class FailureImpl> class basic_outcome_exception_observers : public basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>
-  {
-    using _base = basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>;
+} // namespace detail
 
+OUTCOME_V2_NAMESPACE_END
+
+#endif
+/* Failure observers for outcome type
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Oct 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_BASIC_OUTCOME_FAILURE_OBSERVERS_HPP
+#define OUTCOME_BASIC_OUTCOME_FAILURE_OBSERVERS_HPP
+
+
+
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+namespace detail
+{
+  namespace adl
+  {
+    struct search_detail_adl
+    {
+    };
+  }
+  template <class S, class P> inline void basic_outcome_failure_exception_from_error(...) = delete; // No specialisation for these error and exception types available!
+
+  //! The failure observers implementation of `basic_outcome<R, S, P>`.
+  template <class Base, class R, class S, class P, class NoValuePolicy> class basic_outcome_failure_observers : public Base
+  {
   public:
     using exception_type = P;
-    using _base::_base;
+    using Base::Base;
 
     /// \output_section Synthesising state observers
     /*! Synthesise exception where possible.
@@ -6134,7 +6191,7 @@ namespace detail
       }
       if((this->_state._status & detail::status_have_error) != 0)
       {
-        return basic_outcome_failure_exception_from_error<Base, R, S, P, NoValuePolicy>(this->error());
+        return basic_outcome_failure_exception_from_error(this->error(), adl::search_detail_adl());
       }
       return exception_type();
     }
@@ -6233,6 +6290,11 @@ namespace detail
     static constexpr bool enable_inplace_value_error_exception_constructor = //
     implicit_constructors_enabled && !std::is_same<choose_inplace_value_error_exception_constructor<Args...>, disable_inplace_value_error_exception_constructor>::value;
   };
+
+  // Select whether to use basic_outcome_failure_observers or not
+  template <class Base, class R, class S, class P, class NoValuePolicy>
+  using select_basic_outcome_failure_observers = //
+  std::conditional_t<trait::has_error_code<S>::value && trait::has_exception_ptr<P>::value, basic_outcome_failure_observers<Base, R, S, P, NoValuePolicy>, Base>;
 
   template <class T, class U, class V> constexpr inline const V &extract_exception_from_failure(const failure_type<U, V> &v) { return v.exception(); }
   template <class T, class U, class V> constexpr inline V &&extract_exception_from_failure(failure_type<U, V> &&v) { return static_cast<failure_type<U, V> &&>(v).exception(); }
@@ -6358,14 +6420,14 @@ class OUTCOME_NODISCARD basic_outcome
 
 
 
-: public detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>
+: public detail::select_basic_outcome_failure_observers<detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>
 
 {
   static_assert(trait::type_can_be_used_in_basic_result<P>, "The exception_type cannot be used");
   static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "exception_type must be void or default constructible");
-  using base = detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>;
+  using base = detail::select_basic_outcome_failure_observers<detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>;
   friend NoValuePolicy;
-  friend detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy, void>;
+  friend detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>;
   template <class T, class U, class V, class W> friend class basic_outcome;
   template <class T, class U, class V, class W, class X> friend constexpr inline void hooks::override_outcome_exception(basic_outcome<T, U, V, W> *o, X &&v) noexcept; // NOLINT
 
@@ -7731,50 +7793,50 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::assume_exception() & noexcept
+  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() & noexcept
   {
     basic_outcome<R, S, P, NoValuePolicy> &self = static_cast<basic_outcome<R, S, P, NoValuePolicy> &>(*this); // NOLINT
     NoValuePolicy::narrow_exception_check(self);
     return self._ptr;
   }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::assume_exception() const &noexcept
+  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() const &noexcept
   {
     const basic_outcome<R, S, P, NoValuePolicy> &self = static_cast<const basic_outcome<R, S, P, NoValuePolicy> &>(*this); // NOLINT
     NoValuePolicy::narrow_exception_check(self);
     return self._ptr;
   }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::assume_exception() && noexcept
+  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() && noexcept
   {
     basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<basic_outcome<R, S, P, NoValuePolicy> &&>(*this); // NOLINT
     NoValuePolicy::narrow_exception_check(self);
     return static_cast<P &&>(self._ptr);
   }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::assume_exception() const &&noexcept
+  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() const &&noexcept
   {
     const basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<const basic_outcome<R, S, P, NoValuePolicy> &&>(*this); // NOLINT
     NoValuePolicy::narrow_exception_check(self);
     return static_cast<P &&>(self._ptr);
   }
 
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception() &
+  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() &
   {
     basic_outcome<R, S, P, NoValuePolicy> &self = static_cast<basic_outcome<R, S, P, NoValuePolicy> &>(*this); // NOLINT
     NoValuePolicy::wide_exception_check(self);
     return self._ptr;
   }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception() const &
+  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() const &
   {
     const basic_outcome<R, S, P, NoValuePolicy> &self = static_cast<const basic_outcome<R, S, P, NoValuePolicy> &>(*this); // NOLINT
     NoValuePolicy::wide_exception_check(self);
     return self._ptr;
   }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception() &&
+  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() &&
   {
     basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<basic_outcome<R, S, P, NoValuePolicy> &&>(*this); // NOLINT
     NoValuePolicy::wide_exception_check(self);
     return static_cast<P &&>(self._ptr);
   }
-  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy, void>::exception() const &&
+  template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() const &&
   {
     const basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<const basic_outcome<R, S, P, NoValuePolicy> &&>(*this); // NOLINT
     NoValuePolicy::wide_exception_check(self);
@@ -7790,12 +7852,9 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  // Enable the .failure() observer for types matching `trait::has_error_code_v<S>` and `trait::has_exception_ptr_v<P>`
-  template <class Base, class R, class S, class P, class NoValuePolicy, //
-            typename /* predicate */>
-  inline P basic_outcome_failure_exception_from_error(const S &ec)
+  namespace adl
   {
-    return std::make_exception_ptr(std::system_error(policy::detail::make_error_code(ec)));
+    inline std::exception_ptr basic_outcome_failure_exception_from_error(const std::error_code &ec, search_detail_adl /*unused*/) { return std::make_exception_ptr(std::system_error(policy::detail::make_error_code(ec))); }
   }
 }
 
@@ -7930,7 +7989,7 @@ namespace policy
   an attempt to rethrow `E` if `trait::has_exception_ptr_v<E>` is true, else:
 
   1. If `trait::has_error_payload_v<EC>` is true, it calls an
-  ADL discovered free function `throw_as_system_error_with_payload(.error())`.
+  ADL discovered free function `outcome_throw_as_system_error_with_payload(.error())`.
   2. If `trait::has_error_payload_v<EC>` is false, it calls `OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(.error())))`
   */
 
@@ -7960,7 +8019,7 @@ namespace policy
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
           // ADL discovered
-          throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
+          outcome_throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
         }
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
       }

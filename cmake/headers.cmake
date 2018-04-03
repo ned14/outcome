@@ -11,6 +11,7 @@ set(outcome_HEADERS
   "include/outcome/convert.hpp"
   "include/outcome/detail/basic_outcome_exception_observers.hpp"
   "include/outcome/detail/basic_outcome_exception_observers_impl.hpp"
+  "include/outcome/detail/basic_outcome_failure_observers.hpp"
   "include/outcome/detail/basic_result_error_observers.hpp"
   "include/outcome/detail/basic_result_final.hpp"
   "include/outcome/detail/basic_result_storage.hpp"

@@ -32,12 +32,9 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  // Enable the .failure() observer for types matching `trait::has_error_code_v<S>` and `trait::has_exception_ptr_v<P>`
-  template <class Base, class R, class S, class P, class NoValuePolicy,  //
-            typename /* predicate */>
-  inline P basic_outcome_failure_exception_from_error(const S &ec)
+  namespace adl
   {
-    return std::make_exception_ptr(std::system_error(policy::detail::make_error_code(ec)));
+    inline std::exception_ptr basic_outcome_failure_exception_from_error(const std::error_code &ec, search_detail_adl /*unused*/) { return std::make_exception_ptr(std::system_error(policy::detail::make_error_code(ec))); }
   }
 }
 

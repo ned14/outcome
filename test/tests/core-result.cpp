@@ -55,7 +55,7 @@ inline const std::error_code &make_error_code(const payload &p)
 {
   return p.ec;
 }
-inline void throw_as_system_error_with_payload(const payload &p)
+inline void outcome_throw_as_system_error_with_payload(const payload &p)
 {
   throw payload_exception(p.str);
 }

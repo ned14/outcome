@@ -104,7 +104,7 @@ namespace filelib
   inline const std::error_code &make_error_code(const failure_info &fi) { return fi.ec; }
 
   // Tell Outcome that no-value observation should throw a custom exception
-  inline void throw_as_system_error_with_payload(failure_info fi)
+  inline void outcome_throw_as_system_error_with_payload(failure_info fi)
   {
     // If the error code is not filesystem related e.g. ENOMEM, throw that as a standard STL exception.
     OUTCOME_V2_NAMESPACE::try_throw_std_exception_from_error(fi.ec);

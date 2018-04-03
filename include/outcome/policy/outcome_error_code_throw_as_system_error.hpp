@@ -54,7 +54,7 @@ namespace policy
   an attempt to rethrow `E` if `trait::has_exception_ptr_v<E>` is true, else:
 
   1. If `trait::has_error_payload_v<EC>` is true, it calls an
-  ADL discovered free function `throw_as_system_error_with_payload(.error())`.
+  ADL discovered free function `outcome_throw_as_system_error_with_payload(.error())`.
   2. If `trait::has_error_payload_v<EC>` is false, it calls `OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(.error())))`
   */
   template <class T, class EC, class E> struct error_code_throw_as_system_error : detail::base
@@ -75,7 +75,7 @@ namespace policy
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
           // ADL discovered
-          throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
+          outcome_throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
         }
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
       }

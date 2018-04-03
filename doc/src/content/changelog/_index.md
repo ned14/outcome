@@ -6,6 +6,9 @@ weight = 80
 ---
 ## v2.1 in progress [[project]](https://github.com/ned14/outcome/projects/1)
 
+- Renamed ADL discovered customisation point `throw_as_system_error_with_payload()`
+to `outcome_throw_as_system_error_with_payload()`.
+
 - [#135](https://github.com/ned14/outcome/issues/135)
     - Added much clearer compile failure when user tries `result<T, T>` or `outcome`
     where two or more types are identical. Thanks to Andrzej Krzemieński

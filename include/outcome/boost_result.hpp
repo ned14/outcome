@@ -55,17 +55,17 @@ OUTCOME_V2_NAMESPACE_END
 #include "boost/system/error_code.hpp"
 #include "boost/system/system_error.hpp"
 
-// ADL injection of throw_as_system_error_with_payload
+// ADL injection of outcome_throw_as_system_error_with_payload
 namespace boost
 {
   namespace system
   {
-    inline void throw_as_system_error_with_payload(const error_code &error) { OUTCOME_THROW_EXCEPTION(system_error(error)); }
+    inline void outcome_throw_as_system_error_with_payload(const error_code &error) { OUTCOME_THROW_EXCEPTION(system_error(error)); }
     namespace errc
     {
       OUTCOME_TEMPLATE(class Error)
       OUTCOME_TREQUIRES(OUTCOME_TPRED(is_error_code_enum<std::decay_t<Error>>::value || is_error_condition_enum<std::decay_t<Error>>::value))
-      inline void throw_as_system_error_with_payload(Error &&error) { OUTCOME_THROW_EXCEPTION(system_error(make_error_code(error))); }
+      inline void outcome_throw_as_system_error_with_payload(Error &&error) { OUTCOME_THROW_EXCEPTION(system_error(make_error_code(error))); }
     }
   }
 }

@@ -77,7 +77,7 @@ namespace filesystem2
   // copied from the result. That means we can overload once with value semantics,
   // and not need to overload for lvalue and rvalue situations unless we really feel
   // we need to for some reason.
-  inline void throw_as_system_error_with_payload(failure_info fi)
+  inline void outcome_throw_as_system_error_with_payload(failure_info fi)
   {
     // If the error code is not filesystem related e.g. ENOMEM, throw that as a standard STL exception.
     outcome::try_throw_std_exception_from_error(fi.ec);
@@ -103,7 +103,7 @@ int main()
   try
   {
     // Try to observe the successful value, thus triggering default actions which invokes
-    // our throw_as_system_error_with_payload() above which then throws filesystem_error
+    // our outcome_throw_as_system_error_with_payload() above which then throws filesystem_error
     // exactly like the Filesystem TS does for its throwing overload.
     filesystem2::copy_file("dontexist", "alsodontexist").value();
   }
