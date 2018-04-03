@@ -105,7 +105,7 @@ OUTCOME_TEMPLATE(class R, class S, class P)
 OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lvalueref<R>()), OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lvalueref<S>()))
 inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
 {
-  s >> v.__state();
+  s >> v._iostreams_state();
   if(v.has_error())
   {
     s >> v.assume_error();
@@ -125,7 +125,7 @@ OUTCOME_TEMPLATE(class R, class S, class P)
 OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lvalueref<R>()), OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lvalueref<S>()))
 inline std::ostream &operator<<(std::ostream &s, const result<R, S, P> &v)
 {
-  s << v.__state();
+  s << v._iostreams_state();
   if(v.has_error())
   {
     s << v.assume_error();
@@ -209,7 +209,7 @@ OUTCOME_TEMPLATE(class R, class S, class P, class N)
 OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lvalueref<R>()), OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lvalueref<S>()), OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lvalueref<P>()))
 inline std::istream &operator>>(std::istream &s, outcome<R, S, P, N> &v)
 {
-  s >> v.__state();
+  s >> v._iostreams_state();
   if(v.has_error())
   {
     s >> v.assume_error();
@@ -235,7 +235,7 @@ OUTCOME_TEMPLATE(class R, class S, class P, class N)
 OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lvalueref<R>()), OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lvalueref<S>()), OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lvalueref<P>()))
 inline std::ostream &operator<<(std::ostream &s, const outcome<R, S, P, N> &v)
 {
-  s << v.__state();
+  s << v._iostreams_state();
   if(v.has_error())
   {
     s << v.assume_error();

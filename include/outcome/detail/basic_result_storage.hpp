@@ -92,8 +92,8 @@ namespace detail
 
   public:
     // Used by iostream support to access state
-    detail::value_storage_select_impl<_value_type> &__state() { return _state; }
-    const detail::value_storage_select_impl<_value_type> &__state() const { return _state; }
+    detail::value_storage_select_impl<_value_type> &_iostreams_state() { return _state; }
+    const detail::value_storage_select_impl<_value_type> &_iostreams_state() const { return _state; }
 
   protected:
     basic_result_storage() = default;

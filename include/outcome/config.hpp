@@ -144,7 +144,7 @@ exported Outcome v2 namespace.
 #include <new>     // for placement in moves etc
 #include <type_traits>
 
-#if __cplusplus >= 201700 || _HAS_CXX17
+#if __cplusplus >= 201700 || (defined(_MSC_VER) && _HAS_CXX17)
 #include <utility>  // for in_place_type_t
 
 OUTCOME_V2_NAMESPACE_BEGIN
