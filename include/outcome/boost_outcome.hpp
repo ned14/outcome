@@ -36,7 +36,7 @@ namespace detail
   namespace adl
   {
     // Implement the .failure() observer.
-    inline boost::exception_ptr basic_outcome_failure_exception_from_error(const boost::system::error_code &ec, search_detail_adl /*unused*/) { return boost::copy_exception(boost::system::system_error(policy::detail::make_error_code(ec))); }
+    inline boost::exception_ptr basic_outcome_failure_exception_from_error(const boost::system::error_code &ec, search_detail_adl /*unused*/) { return boost::copy_exception(boost::system::system_error(ec)); }
   }
 }
 

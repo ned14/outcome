@@ -6,6 +6,12 @@ weight = 80
 ---
 ## v2.1 in progress [[project]](https://github.com/ned14/outcome/projects/1)
 
+- Boost edition is now 100% Boost, so defaults for `result` and `outcome` are
+`boost::system::error_code::errc_t` and `boost::exception_ptr`. Moreover,
+the test suite in the Boost edition now exclusively tests the Boost edition.
+One can, of course, freely use the standalone edition with Boost, and the Boost
+edition with `std` types.
+
 - Renamed ADL discovered customisation point `throw_as_system_error_with_payload()`
 to `outcome_throw_as_system_error_with_payload()`.
 

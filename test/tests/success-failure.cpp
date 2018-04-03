@@ -45,7 +45,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / success - failure, "Tests that the success 
   }
 #if !defined(__APPLE__) || defined(__cpp_exceptions)
   {
-    auto e = std::make_exception_ptr(5);
+    auto e = std::make_exception_ptr(std::exception());
     auto a = failure(5);
     auto b = failure(5, e);
     auto c = failure(5, 5);
