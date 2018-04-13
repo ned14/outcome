@@ -32,6 +32,8 @@ set(outcome_HEADERS
   "include/outcome/experimental/status-code/include/system_error2.hpp"
   "include/outcome/experimental/status-code/include/win32_code.hpp"
   "include/outcome/experimental/status-code/single-header/system_error2.hpp"
+  "include/outcome/experimental/status_outcome.hpp"
+  "include/outcome/experimental/status_result.hpp"
   "include/outcome/iostream_support.hpp"
   "include/outcome/outcome.hpp"
   "include/outcome/policy/all_narrow.hpp"
