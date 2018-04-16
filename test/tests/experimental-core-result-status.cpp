@@ -23,7 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../include/outcome/experimental/status_result.hpp"
 
-template <class T, class S = SYSTEM_ERROR2_NAMESPACE::system_code> using result = OUTCOME_V2_NAMESPACE::experimental::status_result<T, S>;
+template <class T, class S = SYSTEM_ERROR2_NAMESPACE::system_code> using result = OUTCOME_V2_NAMESPACE::experimental::erased_result<T, S>;
 using OUTCOME_V2_NAMESPACE::in_place_type;
 
 #include "quickcpplib/include/boost/test/unit_test.hpp"
@@ -128,7 +128,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / result, "Tests that the resul
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
     // BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.value(), status_error<void>);
+    BOOST_CHECK_THROW(m.value(), generic_error);
     BOOST_CHECK_NO_THROW(m.error());
   }
   {  // errored void
@@ -137,7 +137,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / result, "Tests that the resul
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
     // BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(([&m]() -> void { return m.value(); }()), status_error<void>);
+    BOOST_CHECK_THROW(([&m]() -> void { return m.value(); }()), generic_error);
     BOOST_CHECK_NO_THROW(m.error());
   }
   {  // valued int
@@ -182,13 +182,13 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / result, "Tests that the resul
     BOOST_CHECK_NO_THROW(m.value());  // works, but type returned is unusable
   }
   {  // errored
-    generic_code ec(errc::no_link);
+    error ec(errc::no_link);
     result<int> m(ec);
     BOOST_CHECK(!m);
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
     // BOOST_CHECK(!m.has_exception());
-    BOOST_CHECK_THROW(m.value(), status_error<void>);
+    BOOST_CHECK_THROW(m.value(), generic_error);
     BOOST_CHECK(m.error() == ec);
   }
   if(false)  // NOLINT
@@ -244,7 +244,6 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / result, "Tests that the resul
       ~udt3() = default;
     };
 
-
     result<int> a(5);
     result<int> b(generic_code{errc::invalid_argument});
     std::cout << sizeof(a) << std::endl;  // 32 bytes
@@ -260,7 +259,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / result, "Tests that the resul
       std::cerr << "fail" << std::endl;
       std::terminate();
     }
-    catch(const status_error<void> &e)
+    catch(const generic_error &e)
     {
       BOOST_CHECK(!strcmp(e.what(), b.error().message().c_str()));
     }

@@ -1482,9 +1482,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 5188e87c55b19b58eb94a52b6119ddd398375976
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-04-03 19:40:41 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 5188e87c
+#define OUTCOME_PREVIOUS_COMMIT_REF 1521b808351b623d1a19acb0a2eb455785a0a5dd
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-04-13 09:01:49 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 1521b808
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -5190,12 +5190,11 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
-#ifndef OUTCOME_STD_TRAIT_HPP
-#define OUTCOME_STD_TRAIT_HPP
+#ifndef OUTCOME_TRAIT_STD_ERROR_CODE_HPP
+#define OUTCOME_TRAIT_STD_ERROR_CODE_HPP
 
 
 
-#include <exception>
 #include <system_error>
 
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -5259,23 +5258,16 @@ namespace policy
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(make_error_code(get<0>(std::declval<T>()))))
     constexpr inline decltype(auto) make_error_code(T &&v, tuple_passthrough /* unused */ = {}) { return make_error_code(get<0>(std::forward<T>(v))); }
 
-    /* Pass through `make_exception_ptr` function for `std::exception_ptr`.
-    */
-
-    inline std::exception_ptr make_exception_ptr(std::exception_ptr v) { return v; }
-
     // Try ADL, if not use fall backs above
     template <class T> constexpr inline decltype(auto) error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
-    template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
 
     struct std_enum_overload_tag
     {
     };
   } // namespace detail
+
   //! Used by policies to extract a `std::error_code` from some input `T` via ADL discovery of some `make_error_code(T)` function.
   template <class T> constexpr inline decltype(auto) error_code(T &&v) { return detail::error_code(std::forward<T>(v)); }
-  //! Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
-  template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return detail::exception_ptr(std::forward<T>(v)); }
 
   //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
   // inline void outcome_throw_as_system_error_with_payload(...) = delete;  // To use the error_code_throw_as_system_error policy with a custom Error type, you must define a outcome_throw_as_system_error_with_payload() free function to say how to handle the payload
@@ -5312,6 +5304,136 @@ namespace trait
     {
       static constexpr bool value = true;
     };
+  } // namespace detail
+
+  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
+  Also returns true if `std::error_code` is convertible from T.
+  */
+
+
+  template <class T> struct has_error_code : detail::has_error_code<std::decay_t<T>>
+  {
+  };
+  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
+  Also returns true if `std::error_code` is convertible from T.
+  */
+
+
+  template <class T> constexpr bool has_error_code_v = has_error_code<std::decay_t<T>>::value;
+
+  // std::error_code is an error type
+  template <> struct is_error_type<std::error_code>
+  {
+    static constexpr bool value = true;
+  };
+  // For std::error_code, std::is_error_condition_enum<> is the trait we want.
+  template <class Enum> struct is_error_type_enum<std::error_code, Enum>
+  {
+    static constexpr bool value = std::is_error_condition_enum<Enum>::value;
+  };
+
+} // namespace trait
+
+OUTCOME_V2_NAMESPACE_END
+
+#endif
+/* Traits for Outcome
+(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: March 2018
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_TRAIT_STD_EXCEPTION_HPP
+#define OUTCOME_TRAIT_STD_EXCEPTION_HPP
+
+
+
+#include <exception>
+
+OUTCOME_V2_NAMESPACE_BEGIN
+
+//! Namespace for policies
+namespace policy
+{
+  namespace detail
+  {
+    /* Pass through `make_exception_ptr` function for `std::exception_ptr`.
+    */
+
+    inline std::exception_ptr make_exception_ptr(std::exception_ptr v) { return v; }
+
+    // Try ADL, if not use fall backs above
+    template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
+  } // namespace detail
+
+  //! Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
+  template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return detail::exception_ptr(std::forward<T>(v)); }
+
+  namespace detail
+  {
+    template <bool has_error_payload> struct _rethrow_exception
+    {
+      template <class Exception> explicit _rethrow_exception(Exception && /*unused*/) // NOLINT
+      {
+      }
+    };
+    template <> struct _rethrow_exception<true>
+    {
+      template <class Exception> explicit _rethrow_exception(Exception &&excpt) // NOLINT
+      {
+        // ADL
+        rethrow_exception(policy::exception_ptr(std::forward<Exception>(excpt)));
+      }
+    };
+  } // namespace detail
+} // namespace policy
+
+//! Namespace for traits
+namespace trait
+{
+  namespace detail
+  {
+    template <class T> using devoid = OUTCOME_V2_NAMESPACE::detail::devoid<T>;
 
     constexpr inline void make_exception_ptr(...);
     template <class T, typename V = std::decay_t<decltype(make_exception_ptr(std::declval<devoid<T>>()))>> struct has_exception_ptr
@@ -5327,20 +5449,6 @@ namespace trait
       static constexpr bool value = true;
     };
   } // namespace detail
-  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
-  Also returns true if `std::error_code` is convertible from T.
-  */
-
-
-  template <class T> struct has_error_code : detail::has_error_code<std::decay_t<T>>
-  {
-  };
-  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
-  Also returns true if `std::error_code` is convertible from T.
-  */
-
-
-  template <class T> constexpr bool has_error_code_v = has_error_code<std::decay_t<T>>::value;
 
   /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
   Also returns true if `std::exception_ptr` is convertible from T.
@@ -5357,23 +5465,13 @@ namespace trait
 
   template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<std::decay_t<T>>::value;
 
-  // std::error_code and std::exception_ptr are error types
-  template <> struct is_error_type<std::error_code>
-  {
-    static constexpr bool value = true;
-  };
+  // std::exception_ptr is an error type
   template <> struct is_error_type<std::exception_ptr>
   {
     static constexpr bool value = true;
   };
-  // For std::error_code, std::is_error_condition_enum<> is the trait we want.
-  template <class Enum> struct is_error_type_enum<std::error_code, Enum>
-  {
-    static constexpr bool value = std::is_error_condition_enum<Enum>::value;
-  };
 
 } // namespace trait
-
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -7967,24 +8065,6 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  namespace detail
-  {
-    template <bool has_error_payload> struct _rethrow_exception
-    {
-      template <class Exception> explicit _rethrow_exception(Exception && /*unused*/) // NOLINT
-      {
-      }
-    };
-    template <> struct _rethrow_exception<true>
-    {
-      template <class Exception> explicit _rethrow_exception(Exception &&excpt) // NOLINT
-      {
-        // ADL
-        rethrow_exception(policy::exception_ptr(std::forward<Exception>(excpt)));
-      }
-    };
-  } // namespace detail
-
   /*! Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
   Any wide attempt to access the successful state where there is none causes
   an attempt to rethrow `E` if `trait::has_exception_ptr_v<E>` is true, else:

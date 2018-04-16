@@ -27,66 +27,129 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../basic_outcome.hpp"
 
+#include "../detail/trait_std_error_code.hpp"  // FIXME needed as the failure observers require trait::has_error_code<T>
+#include "../detail/trait_std_exception.hpp"
 #include "status_result.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Namespace for policies
-namespace policy
+namespace detail
 {
-  /*! Default policy selector.
-  */
-  template <class T, class EC, class E>
-  using default_status_policy = std::conditional_t<                                                                                    //
-  std::is_void<EC>::value && std::is_void<E>::value,                                                                                   //
-  terminate,                                                                                                                           //
-  std::conditional_t<SYSTEM_ERROR2_NAMESPACE::is_status_code<EC>::value && (std::is_void<E>::value || trait::has_exception_ptr_v<E>),  //
-                     status_code_throw<T, EC, E>,                                                                                      //
-                     all_narrow                                                                                                        //
-                     >>;
-}  // namespace policy
-
-/*! TODO
-*/
-template <class R, class S = SYSTEM_ERROR2_NAMESPACE::error, class P = std::exception_ptr>  //
-using status_outcome = basic_outcome<R, S, P, policy::default_status_policy<R, S, P>>;
-
-//! Namespace for policies
-namespace policy
-{
-  /*!
-  */
-  template <class T, class DomainType, class E> struct status_code_throw<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E> : detail::base
+  namespace adl
   {
-    /*! Performs a wide check of state, used in the value() functions.
-    \effects See description of class for effects.
-    */
-    template <class Impl> static constexpr void wide_value_check(Impl &&self)
+    template <class DomainType> inline std::exception_ptr basic_outcome_failure_exception_from_error(const SYSTEM_ERROR2_NAMESPACE::status_code<DomainType> &sc, search_detail_adl /*unused*/)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      try
       {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0)
+        sc.throw_exception();
+      }
+      catch(...)
+      {
+        return std::current_exception();
+      }
+      return {};
+    }
+  }
+}
+
+//! Namespace for traits
+namespace trait
+{
+  namespace detail
+  {
+    template <class DomainType> struct has_error_code<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, void>
+    {
+      static constexpr bool value = true;
+    };
+    template <class T, class DomainType> struct has_error_code<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
+    {
+      static constexpr bool value = true;
+    };
+  }  // namespace detail
+#if 0
+  template <class DomainType> struct is_error_type<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
+  {
+    static constexpr bool value = true;
+  };
+  template <> struct is_error_type<SYSTEM_ERROR2_NAMESPACE::errc>
+  {
+    static constexpr bool value = true;
+  };
+  template <class DomainType, class Enum> struct is_error_type_enum<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, Enum>
+  {
+    static constexpr bool value = boost::system::is_error_condition_enum<Enum>::value;
+  };
+#endif
+}  // namespace trait
+
+
+//! Namespace for experimental features
+namespace experimental
+{
+  //! Namespace for policies
+  namespace policy
+  {
+    /*! Default policy selector.
+    */
+    template <class T, class EC, class E>
+    using default_status_outcome_policy = std::conditional_t<                                                                                                  //
+    std::is_void<EC>::value && std::is_void<E>::value,                                                                                                         //
+    OUTCOME_V2_NAMESPACE::policy::terminate,                                                                                                                   //
+    std::conditional_t<SYSTEM_ERROR2_NAMESPACE::is_status_code<EC>::value && (std::is_void<E>::value || OUTCOME_V2_NAMESPACE::trait::has_exception_ptr_v<E>),  //
+                       status_code_throw<T, EC, E>,                                                                                                            //
+                       OUTCOME_V2_NAMESPACE::policy::all_narrow                                                                                                //
+                       >>;
+  }  // namespace policy
+
+  /*! TODO
+  */
+  template <class R, class S = SYSTEM_ERROR2_NAMESPACE::system_code, class P = std::exception_ptr>  //
+  using erased_outcome = basic_outcome<R, S, P, policy::default_status_outcome_policy<R, S, P>>;
+
+  /*! TODO
+  */
+  template <class R, class DomainType, class P = std::exception_ptr>  //
+  using status_outcome = basic_outcome<R, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, P, policy::default_status_outcome_policy<R, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, P>>;
+
+  //! Namespace for policies
+  namespace policy
+  {
+    /*!
+    */
+    template <class T, class DomainType, class E> struct status_code_throw<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E> : OUTCOME_V2_NAMESPACE::policy::detail::base
+    {
+      using _base = OUTCOME_V2_NAMESPACE::policy::detail::base;
+      /*! Performs a wide check of state, used in the value() functions.
+      \effects See description of class for effects.
+      */
+      template <class Impl> static constexpr void wide_value_check(Impl &&self)
+      {
+        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
         {
           using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<basic_outcome<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E, status_code_throw>, decltype(self)>;
           Outcome _self = static_cast<Outcome>(self);  // NOLINT
-          detail::_rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
-        }
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
-        {
-          self.assume_error().throw_exception();
+          if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0)
+          {
+            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::has_exception_ptr_v<E>>(static_cast<Outcome>(_self)._ptr);
+          }
+          if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
+          {
+            static_cast<Outcome>(_self).assume_error().throw_exception();
+          }
         }
       }
-    }
-    /*! Performs a wide check of state, used in the error() functions
-    \effects TODO
-    */
-    template <class Impl> static constexpr void wide_error_check(Impl &&self) { detail::base::narrow_error_check(static_cast<Impl &&>(self)); }
-    /*! Performs a wide check of state, used in the exception() functions
-    \effects TODO
-    */
-    template <class Impl> static constexpr void wide_exception_check(Impl &&self) { detail::base::narrow_exception_check(static_cast<Impl &&>(self)); }
-  };
-}  // namespace policy
+      /*! Performs a wide check of state, used in the error() functions
+      \effects TODO
+      */
+      template <class Impl> static constexpr void wide_error_check(Impl &&self) { _base::narrow_error_check(static_cast<Impl &&>(self)); }
+      /*! Performs a wide check of state, used in the exception() functions
+      \effects TODO
+      */
+      template <class Impl> static constexpr void wide_exception_check(Impl &&self) { _base::narrow_exception_check(static_cast<Impl &&>(self)); }
+    };
+  }  // namespace policy
+
+}  // namespace experimental
 
 OUTCOME_V2_NAMESPACE_END
 

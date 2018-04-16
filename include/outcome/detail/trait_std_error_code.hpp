@@ -22,12 +22,11 @@ Distributed under the Boost Software License, Version 1.0.
 http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef OUTCOME_STD_TRAIT_HPP
-#define OUTCOME_STD_TRAIT_HPP
+#ifndef OUTCOME_TRAIT_STD_ERROR_CODE_HPP
+#define OUTCOME_TRAIT_STD_ERROR_CODE_HPP
 
 #include "../config.hpp"
 
-#include <exception>
 #include <system_error>
 
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -87,22 +86,16 @@ namespace policy
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(make_error_code(get<0>(std::declval<T>()))))
     constexpr inline decltype(auto) make_error_code(T &&v, tuple_passthrough /* unused */ = {}) { return make_error_code(get<0>(std::forward<T>(v))); }
 
-    /* Pass through `make_exception_ptr` function for `std::exception_ptr`.
-    */
-    inline std::exception_ptr make_exception_ptr(std::exception_ptr v) { return v; }
-
     // Try ADL, if not use fall backs above
     template <class T> constexpr inline decltype(auto) error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
-    template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
 
     struct std_enum_overload_tag
     {
     };
   }  // namespace detail
+
   //! Used by policies to extract a `std::error_code` from some input `T` via ADL discovery of some `make_error_code(T)` function.
   template <class T> constexpr inline decltype(auto) error_code(T &&v) { return detail::error_code(std::forward<T>(v)); }
-  //! Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
-  template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return detail::exception_ptr(std::forward<T>(v)); }
 
   //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
   // inline void outcome_throw_as_system_error_with_payload(...) = delete;  // To use the error_code_throw_as_system_error policy with a custom Error type, you must define a outcome_throw_as_system_error_with_payload() free function to say how to handle the payload
@@ -139,21 +132,8 @@ namespace trait
     {
       static constexpr bool value = true;
     };
-
-    constexpr inline void make_exception_ptr(...);
-    template <class T, typename V = std::decay_t<decltype(make_exception_ptr(std::declval<devoid<T>>()))>> struct has_exception_ptr
-    {
-      static constexpr bool value = false;
-    };
-    template <> struct has_exception_ptr<std::exception_ptr, void>
-    {
-      static constexpr bool value = true;
-    };
-    template <class T> struct has_exception_ptr<T, std::exception_ptr>
-    {
-      static constexpr bool value = true;
-    };
   }  // namespace detail
+
   /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
   Also returns true if `std::error_code` is convertible from T.
   */
@@ -165,23 +145,8 @@ namespace trait
   */
   template <class T> constexpr bool has_error_code_v = has_error_code<std::decay_t<T>>::value;
 
-  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
-  Also returns true if `std::exception_ptr` is convertible from T.
-  */
-  template <class T> struct has_exception_ptr : detail::has_exception_ptr<std::decay_t<T>>
-  {
-  };
-  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
-  Also returns true if `std::exception_ptr` is convertible from T.
-  */
-  template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<std::decay_t<T>>::value;
-
-  // std::error_code and std::exception_ptr are error types
+  // std::error_code is an error type
   template <> struct is_error_type<std::error_code>
-  {
-    static constexpr bool value = true;
-  };
-  template <> struct is_error_type<std::exception_ptr>
   {
     static constexpr bool value = true;
   };
@@ -192,7 +157,6 @@ namespace trait
   };
 
 }  // namespace trait
-
 
 OUTCOME_V2_NAMESPACE_END
 

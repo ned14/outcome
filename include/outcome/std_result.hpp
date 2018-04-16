@@ -26,7 +26,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define OUTCOME_STD_RESULT_HPP
 
 #include "basic_result.hpp"
-#include "detail/std_trait.hpp"
+#include "detail/trait_std_error_code.hpp"
+#include "detail/trait_std_exception.hpp"
 
 #include "policy/result_error_code_throw_as_system_error.hpp"
 #include "policy/result_exception_ptr_rethrow.hpp"

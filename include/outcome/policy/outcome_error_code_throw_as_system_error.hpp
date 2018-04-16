@@ -31,24 +31,6 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  namespace detail
-  {
-    template <bool has_error_payload> struct _rethrow_exception
-    {
-      template <class Exception> explicit _rethrow_exception(Exception && /*unused*/)  // NOLINT
-      {
-      }
-    };
-    template <> struct _rethrow_exception<true>
-    {
-      template <class Exception> explicit _rethrow_exception(Exception &&excpt)  // NOLINT
-      {
-        // ADL
-        rethrow_exception(policy::exception_ptr(std::forward<Exception>(excpt)));
-      }
-    };
-  }  // namespace detail
-
   /*! Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
   Any wide attempt to access the successful state where there is none causes
   an attempt to rethrow `E` if `trait::has_exception_ptr_v<E>` is true, else:

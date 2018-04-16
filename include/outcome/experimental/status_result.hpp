@@ -31,6 +31,15 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
+namespace detail
+{
+  // Customise _set_error_is_errno
+  template <class State> constexpr inline void _set_error_is_errno(State &state, const SYSTEM_ERROR2_NAMESPACE::generic_code & /*unused*/) { state._status |= status_error_is_errno; }
+  template <class State> constexpr inline void _set_error_is_errno(State &state, const SYSTEM_ERROR2_NAMESPACE::posix_code & /*unused*/) { state._status |= status_error_is_errno; }
+  template <class State> constexpr inline void _set_error_is_errno(State &state, const SYSTEM_ERROR2_NAMESPACE::errc & /*unused*/) { state._status |= status_error_is_errno; }
+
+}  // namespace detail
+
 //! Namespace for experimental features
 namespace experimental
 {
@@ -80,7 +89,12 @@ namespace experimental
   /*! TODO
   */
   template <class R, class S = SYSTEM_ERROR2_NAMESPACE::system_code>  //
-  using status_result = basic_result<R, S, policy::default_status_result_policy<R, S>>;
+  using erased_result = basic_result<R, S, policy::default_status_result_policy<R, S>>;
+
+  /*! TODO
+  */
+  template <class R, class DomainType>  //
+  using status_result = basic_result<R, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, policy::default_status_result_policy<R, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>>;
 
 }  // namespace experimental
 
