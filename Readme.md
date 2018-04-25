@@ -39,8 +39,9 @@ On Windows, simply download the raw file from above and place it wherever it sui
 
 ## Pre Boost entry todo:
 
- - [ ] Fix up the .natvis file, and permanently solve the permuting SHA issue.
  - [x] Raise ABI compliance checker on CI.
+ - [ ] Fix up the .natvis file, and permanently solve the permuting SHA issue.
+ - [ ] Fix up the C interface to use `status_code`.
 
 ## Commits and tags in this git repository can be verified using:
 <pre>
