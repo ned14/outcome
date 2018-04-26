@@ -64,7 +64,11 @@ namespace experimental
         {
           if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
           {
+#ifdef __cpp_exceptions
             self._error.throw_exception();
+#else
+            OUTCOME_THROW_EXCEPTION(wide_value_check);
+#endif
           }
         }
       }

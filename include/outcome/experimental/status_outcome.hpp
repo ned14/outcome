@@ -39,6 +39,7 @@ namespace detail
   {
     template <class DomainType> inline std::exception_ptr basic_outcome_failure_exception_from_error(const SYSTEM_ERROR2_NAMESPACE::status_code<DomainType> &sc, search_detail_adl /*unused*/)
     {
+#ifdef __cpp_exceptions
       try
       {
         sc.throw_exception();
@@ -47,6 +48,7 @@ namespace detail
       {
         return std::current_exception();
       }
+#endif
       return {};
     }
   }
@@ -134,7 +136,11 @@ namespace experimental
           }
           if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
           {
+#ifdef __cpp_exceptions
             static_cast<Outcome>(_self).assume_error().throw_exception();
+#else
+            OUTCOME_THROW_EXCEPTION(wide_value_check);
+#endif
           }
         }
       }
