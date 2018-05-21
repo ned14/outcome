@@ -1267,9 +1267,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF cc218e85c3f54ad140e8b5fbfcea530c7277ac83
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-04-25 08:55:50 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE cc218e85
+#define OUTCOME_PREVIOUS_COMMIT_REF 238b4df9e90c581ab488f827517bd397bc7e2630
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-04-26 19:16:58 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 238b4df9
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1372,10 +1372,6 @@ namespace detail
   {
     static constexpr bool value = std::is_constructible<T, U>::value;
   };
-  template <class T> struct _is_explicitly_constructible<T, T>
-  {
-    static constexpr bool value = true;
-  };
   template <class T> struct _is_explicitly_constructible<T, void>
   {
     static constexpr bool value = false;
@@ -1389,10 +1385,6 @@ namespace detail
   template <class T, class U> struct _is_implicitly_constructible
   {
     static constexpr bool value = std::is_convertible<U, T>::value;
-  };
-  template <class T> struct _is_implicitly_constructible<T, T>
-  {
-    static constexpr bool value = true;
   };
   template <class T> struct _is_implicitly_constructible<T, void>
   {
@@ -4136,8 +4128,7 @@ namespace detail
     &&
     !trait::is_error_type_enum<error_type,
                                std::decay_t<T>>::value // not an enum valid for my error type
-    && (std::is_same<value_type, std::decay_t<T>>::value // is directly value type
-        || (detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T>) ); // is unambiguously for value type
+    && (detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T>); // is unambiguously for value type
 
 
     // Predicate for the error converting constructor to be available. Weakened to allow result<int, C enum>.
@@ -4148,8 +4139,7 @@ namespace detail
     &&
     !trait::is_error_type_enum<error_type,
                                std::decay_t<T>>::value // not an enum valid for my error type
-    && (std::is_same<error_type, std::decay_t<T>>::value // is directly error type
-        || (!detail::is_implicitly_constructible<value_type, T> && detail::is_implicitly_constructible<error_type, T>) ); // is unambiguously for error type
+    && (!detail::is_implicitly_constructible<value_type, T> && detail::is_implicitly_constructible<error_type, T>); // is unambiguously for error type
 
     // Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>

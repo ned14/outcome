@@ -65,9 +65,8 @@ namespace detail
     && !is_in_place_type_t<std::decay_t<T>>::value               // not in place construction
     &&
     !trait::is_error_type_enum<error_type,
-                               std::decay_t<T>>::value                                                                     // not an enum valid for my error type
-    && (std::is_same<value_type, std::decay_t<T>>::value                                                                   // is directly value type
-        || (detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T>) );  // is unambiguously for value type
+                               std::decay_t<T>>::value                                                               // not an enum valid for my error type
+    && (detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T>);  // is unambiguously for value type
 
 
     // Predicate for the error converting constructor to be available. Weakened to allow result<int, C enum>.
@@ -77,9 +76,8 @@ namespace detail
     && !is_in_place_type_t<std::decay_t<T>>::value               // not in place construction
     &&
     !trait::is_error_type_enum<error_type,
-                               std::decay_t<T>>::value                                                                     // not an enum valid for my error type
-    && (std::is_same<error_type, std::decay_t<T>>::value                                                                   // is directly error type
-        || (!detail::is_implicitly_constructible<value_type, T> && detail::is_implicitly_constructible<error_type, T>) );  // is unambiguously for error type
+                               std::decay_t<T>>::value                                                               // not an enum valid for my error type
+    && (!detail::is_implicitly_constructible<value_type, T> && detail::is_implicitly_constructible<error_type, T>);  // is unambiguously for error type
 
     // Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>

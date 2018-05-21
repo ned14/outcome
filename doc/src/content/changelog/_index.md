@@ -6,6 +6,11 @@ weight = 80
 ---
 ## v2.1 in progress [[project]](https://github.com/ned14/outcome/projects/1)
 
+- [#140](https://github.com/ned14/outcome/issues/140)
+    - Fixed a nasty corner case bug where value type's without a copy constructor
+but with a move constructor would indicate via traits that copy construction
+was available. Thanks to Microsoft's compiler team for reporting this issue.
+
 - Added experimental `status_result` and `status_outcome` based on experimental
 `status_code`.
 
