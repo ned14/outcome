@@ -11,7 +11,7 @@ the case in C++, doing this is straightforward but requires typing boilerplate
 to tell the C++ STL about your custom error type. This is not part of Outcome library, 
 but we still provide this short guide here, because how to do this is not well documented [1].
 
-Suppose you want to report all reasons for failure in conveting an `std::string` to a non-negative `int`.
+Suppose you want to report all reasons for failure in converting a `std::string` to a non-negative `int`.
 The list is:
 
 * `EmptyString` -- the input string is empty,
