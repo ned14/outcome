@@ -220,10 +220,6 @@ namespace detail
   {
     static constexpr bool value = std::is_constructible<T, U>::value;
   };
-  template <class T> struct _is_explicitly_constructible<T, T>
-  {
-    static constexpr bool value = true;
-  };
   template <class T> struct _is_explicitly_constructible<T, void>
   {
     static constexpr bool value = false;
@@ -237,10 +233,6 @@ namespace detail
   template <class T, class U> struct _is_implicitly_constructible
   {
     static constexpr bool value = std::is_convertible<U, T>::value;
-  };
-  template <class T> struct _is_implicitly_constructible<T, T>
-  {
-    static constexpr bool value = true;
   };
   template <class T> struct _is_implicitly_constructible<T, void>
   {

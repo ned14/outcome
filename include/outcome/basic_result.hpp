@@ -60,24 +60,24 @@ namespace detail
 
     // Predicate for the value converting constructor to be available. Weakened to allow result<int, C enum>.
     template <class T>
-    static constexpr bool enable_value_converting_constructor =  //
-    implicit_constructors_enabled                                //
-    && !is_in_place_type_t<std::decay_t<T>>::value               // not in place construction
-    &&
-    !trait::is_error_type_enum<error_type,
-                               std::decay_t<T>>::value                                                               // not an enum valid for my error type
-    && (detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T>);  // is unambiguously for value type
+    static constexpr bool enable_value_converting_constructor =                                                      //
+    implicit_constructors_enabled                                                                                    //
+    && !is_in_place_type_t<std::decay_t<T>>::value                                                                   // not in place construction
+    && !trait::is_error_type_enum<error_type, std::decay_t<T>>::value                                                // not an enum valid for my error type
+    && ((detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T>)  // is unambiguously for value type
+        || (std::is_same<value_type, std::decay_t<T>>::value                                                         // OR is my value type exactly
+            && detail::is_implicitly_constructible<value_type, T>) );                                                // and my value type is constructible from this ref form of T
 
 
     // Predicate for the error converting constructor to be available. Weakened to allow result<int, C enum>.
     template <class T>
-    static constexpr bool enable_error_converting_constructor =  //
-    implicit_constructors_enabled                                //
-    && !is_in_place_type_t<std::decay_t<T>>::value               // not in place construction
-    &&
-    !trait::is_error_type_enum<error_type,
-                               std::decay_t<T>>::value                                                               // not an enum valid for my error type
-    && (!detail::is_implicitly_constructible<value_type, T> && detail::is_implicitly_constructible<error_type, T>);  // is unambiguously for error type
+    static constexpr bool enable_error_converting_constructor =                                                      //
+    implicit_constructors_enabled                                                                                    //
+    && !is_in_place_type_t<std::decay_t<T>>::value                                                                   // not in place construction
+    && !trait::is_error_type_enum<error_type, std::decay_t<T>>::value                                                // not an enum valid for my error type
+    && ((!detail::is_implicitly_constructible<value_type, T> && detail::is_implicitly_constructible<error_type, T>)  // is unambiguously for error type
+        || (std::is_same<error_type, std::decay_t<T>>::value                                                         // OR is my error type exactly
+            && detail::is_implicitly_constructible<error_type, T>) );                                                // and my error type is constructible from this ref form of T
 
     // Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>

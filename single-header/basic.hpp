@@ -746,9 +746,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 2f20b924a9900a6e82928888a513eb6437359961
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2018-04-16 15:47:17 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 2f20b924
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 71e7d496a726771aa92cb3ec5539f917d342d6e7
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2018-05-29 08:29:58 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 71e7d496
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1267,9 +1267,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 7efba82bee97fb6f499e8de4041584b3ba39355a
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-05-21 17:32:54 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 7efba82b
+#define OUTCOME_PREVIOUS_COMMIT_REF 4f12238c22e16052949413704d30a4eae6aecd5d
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-05-29 08:33:17 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4f12238c
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -4120,15 +4120,15 @@ namespace detail
             && !detail::is_implicitly_constructible<error_type, value_type> // AND which cannot be constructed from the value type
             && std::is_integral<value_type>::value)); // AND the value type is some integral type
 
-    // Predicate for the value converting constructor to be available. Weakened to allow result<int, C enum>.
+    // Predicate for the value converting constructor to be available.
     template <class T>
     static constexpr bool enable_value_converting_constructor = //
     implicit_constructors_enabled //
     && !is_in_place_type_t<std::decay_t<T>>::value // not in place construction
-    &&
-    !trait::is_error_type_enum<error_type,
-                               std::decay_t<T>>::value // not an enum valid for my error type
-    && (detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T>); // is unambiguously for value type
+    && !trait::is_error_type_enum<error_type, std::decay_t<T>>::value // not an enum valid for my error type
+    && ((detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T>) // is unambiguously for value type
+        || (std::is_same<value_type, std::decay_t<T>>::value // OR is my value type exactly
+            && detail::is_implicitly_constructible<value_type, T>) ); // and my value type is constructible from this ref form of T
 
 
     // Predicate for the error converting constructor to be available. Weakened to allow result<int, C enum>.
@@ -4136,10 +4136,10 @@ namespace detail
     static constexpr bool enable_error_converting_constructor = //
     implicit_constructors_enabled //
     && !is_in_place_type_t<std::decay_t<T>>::value // not in place construction
-    &&
-    !trait::is_error_type_enum<error_type,
-                               std::decay_t<T>>::value // not an enum valid for my error type
-    && (!detail::is_implicitly_constructible<value_type, T> && detail::is_implicitly_constructible<error_type, T>); // is unambiguously for error type
+    && !trait::is_error_type_enum<error_type, std::decay_t<T>>::value // not an enum valid for my error type
+    && ((!detail::is_implicitly_constructible<value_type, T> && detail::is_implicitly_constructible<error_type, T>) // is unambiguously for error type
+        || (std::is_same<error_type, std::decay_t<T>>::value // OR is my error type exactly
+            && detail::is_implicitly_constructible<error_type, T>) ); // and my error type is constructible from this ref form of T
 
     // Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>
