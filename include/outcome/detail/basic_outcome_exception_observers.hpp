@@ -22,17 +22,17 @@ Distributed under the Boost Software License, Version 1.0.
 http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef OUTCOME_OUTCOME_EXCEPTION_OBSERVERS_HPP
-#define OUTCOME_OUTCOME_EXCEPTION_OBSERVERS_HPP
+#ifndef OUTCOME_BASIC_OUTCOME_EXCEPTION_OBSERVERS_HPP
+#define OUTCOME_BASIC_OUTCOME_EXCEPTION_OBSERVERS_HPP
 
-#include "result_storage.hpp"
+#include "basic_result_storage.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  //! The exception observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
-  template <class Base, class R, class S, class P, class NoValuePolicy> class outcome_exception_observers : public Base
+  //! The exception observers implementation of `basic_outcome<R, S, P>`.
+  template <class Base, class R, class S, class P, class NoValuePolicy> class basic_outcome_exception_observers : public Base
   {
   public:
     using exception_type = P;
@@ -67,7 +67,8 @@ namespace detail
     constexpr inline const exception_type &&exception() const &&;
   };
 
-  template <class Base, class R, class S, class NoValuePolicy> class outcome_exception_observers<Base, R, S, void, NoValuePolicy> : public Base
+  // Exception observers not present
+  template <class Base, class R, class S, class NoValuePolicy> class basic_outcome_exception_observers<Base, R, S, void, NoValuePolicy> : public Base
   {
   public:
     using Base::Base;
@@ -81,6 +82,7 @@ namespace detail
     */
     constexpr void exception() const { NoValuePolicy::wide_exception_check(this); }
   };
+
 }  // namespace detail
 
 OUTCOME_V2_NAMESPACE_END

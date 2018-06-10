@@ -26,7 +26,7 @@ namespace old
 //! [def_h]
 auto old::h() noexcept -> outcome::outcome<int>
 {
-  OUTCOME_TRY(i, g());               // #1
+  OUTCOME_TRY(i, (g()));             // #1
     
   try {
     return i + f();

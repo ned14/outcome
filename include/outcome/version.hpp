@@ -9,4 +9,6 @@
 
 //! \brief Defined between stable releases of Outcome. It means the inline namespace
 //! will be permuted per-commit to ensure ABI uniqueness. \ingroup config
+#ifndef OUTCOME_DISABLE_ABI_PERMUTATION
 #define OUTCOME_UNSTABLE_VERSION
+#endif

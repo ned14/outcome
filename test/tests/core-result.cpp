@@ -25,7 +25,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/experimental/result.hpp"
 #define BOOST_OUTCOME_AUTO_TEST_CASE(...) BOOST_AUTO_TEST_CASE(__VA_ARGS__)
 #else
-#include "../../include/outcome/result.h"
 #include "../../include/outcome/result.hpp"
 #endif
 #include "quickcpplib/include/boost/test/unit_test.hpp"
@@ -56,7 +55,7 @@ inline const std::error_code &make_error_code(const payload &p)
 {
   return p.ec;
 }
-inline void throw_as_system_error_with_payload(const payload &p)
+inline void outcome_throw_as_system_error_with_payload(const payload &p)
 {
   throw payload_exception(p.str);
 }
@@ -128,6 +127,17 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
     BOOST_CHECK(m.value() == 6);
     BOOST_CHECK_THROW(m.error(), bad_result_access);
   }
+  {  // valued bool
+    result<bool> m(false);
+    BOOST_CHECK(m);
+    BOOST_CHECK(m.has_value());
+    BOOST_CHECK(!m.has_error());
+    // BOOST_CHECK(!m.has_exception());
+    BOOST_CHECK(m.value() == false);
+    m.value() = true;
+    BOOST_CHECK(m.value() == true);
+    BOOST_CHECK_THROW(m.error(), bad_result_access);
+  }
   {  // moves do not clear state
     result<std::string> m("niall");
     BOOST_CHECK(m);
@@ -160,6 +170,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
     BOOST_CHECK_THROW(m.value(), std::system_error);
     BOOST_CHECK(m.error() == ec);
   }
+#if !defined(__APPLE__) || defined(__cpp_exceptions)
   {  // errored, custom
     std::error_code ec(5, std::system_category());
     auto e = std::make_exception_ptr(std::system_error(ec));  // NOLINT
@@ -171,6 +182,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
     BOOST_CHECK_THROW(m.value(), std::system_error);
     BOOST_CHECK(m.error() == e);
   }
+#endif
 #ifndef TESTING_WG21_EXPERIMENTAL_RESULT
   {  // custom error type
     struct Foo
@@ -324,31 +336,6 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
     static_assert(a.value() == 5, "a is not 5");
     static_assert(b.error() == std::errc::invalid_argument, "b is not errored");
     BOOST_CHECK_THROW(b.value(), std::system_error);
-  }
-
-  // Test C compatibility
-  {
-    CXX_DECLARE_RESULT_EC(int, int);
-    CXX_RESULT_EC(int) c_result = {5, 1, {0, nullptr}};
-    result<int> cxx_result{5};
-    static_assert(sizeof(c_result) == sizeof(cxx_result), "Sizes of C and C++ results do not match!");
-
-    union test_t {
-      result<int> cxx;
-      CXX_RESULT_EC(int) c;
-    };
-    test_t a{5};
-    BOOST_CHECK(a.cxx.has_value());          // NOLINT
-    BOOST_CHECK(CXX_RESULT_HAS_VALUE(a.c));  // NOLINT
-    BOOST_CHECK(a.c.value == 5);             // NOLINT
-
-    test_t b{std::errc::invalid_argument};
-    BOOST_CHECK(b.cxx.has_error());          // NOLINT
-    BOOST_CHECK(CXX_RESULT_HAS_ERROR(b.c));  // NOLINT
-#ifndef TESTING_WG21_EXPERIMENTAL_RESULT
-    BOOST_CHECK(CXX_RESULT_ERROR_IS_ERRNO(b.c));  // NOLINT
-#endif
-    BOOST_CHECK(b.c.error.code == EINVAL);  // NOLINT
   }
 
 #ifndef TESTING_WG21_EXPERIMENTAL_RESULT

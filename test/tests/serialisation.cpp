@@ -26,6 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / serialisation, "Tests that the outcome serialises and deserialises as intended")
 {
+#if !defined(__APPLE__) || defined(__cpp_exceptions)
   using namespace OUTCOME_V2_NAMESPACE;
   outcome<std::string> a("niall"), b(std::error_code(5, std::generic_category())), c(std::make_exception_ptr(std::ios_base::failure("A test failure message")));
   std::cout << "a contains " << print(a) << " and b contains " << print(b) << " and c contains " << print(c) << std::endl;
@@ -37,4 +38,5 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / serialisation, "Tests that the ou
   outcome<int, std::string, long> e(failure(""));
   ss >> e;
   BOOST_CHECK(d == e);
+#endif
 }

@@ -31,6 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / comparison, "Tests that the outcome can compare to compatible outcomes")
 {
+#if !defined(__APPLE__) || defined(__cpp_exceptions)
   using namespace OUTCOME_V2_NAMESPACE;
   auto p = std::make_exception_ptr(std::runtime_error("hi"));
   // value comparison
@@ -90,4 +91,5 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / comparison, "Tests that the outco
     // BOOST_CHECK(a != f);
   }
   // Should I do outcome<int>(5) == 5? Unsure if it's wise
+#endif
 }

@@ -28,9 +28,12 @@ addons:
     - clang-4.0
     - cmake
     - cmake-data
+#    - abi-compliance-checker
+    - abi-dumper
 
 env:
 # - __="Code bloat tests"
+# - __="ABI stability" NAME=TravisABICheck
  - __="Documentation" NAME=TravisDocumentation
  - __="cmake tests" NAME=TravisLinuxWorker
  - __="cmake tests osx" NAME=TravisOSXWorker
@@ -39,6 +42,9 @@ matrix:
   exclude:
   - os: osx
     compiler: g++-6
+#  - os: linux
+#    compiler: clang-4.0
+#    env: __="ABI stability" NAME=TravisABICheck
   - os: linux
     compiler: clang-4.0
     env: __="Documentation" NAME=TravisDocumentation
@@ -46,6 +52,8 @@ matrix:
     env: __="cmake tests osx" NAME=TravisOSXWorker
   - os: osx
     env: __="Code bloat tests"
+#  - os: osx
+#    env: __="ABI stability" NAME=TravisABICheck
   - os: osx
     env: __="Documentation" NAME=TravisDocumentation
   - os: osx
@@ -66,7 +74,7 @@ before_install:
      ls -l hugo_bin;
      export PATH=$PATH:`pwd`/hugo_bin;
    fi
-
+   
 script:
  -
    if [ "$__" = "Code bloat tests" ]; then
@@ -77,6 +85,18 @@ script:
        exit 1;
      fi;
    fi
+ -
+   if [ "$__" = "ABI stability" ]; then
+     pip install ply --user `whoami`;
+     if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisABICheck; fi;
+     mkdir build;
+     cd build;
+     cmake ..;
+     make outcome_hl-pp-abi;
+     cd ../abi-compliance;
+     sh ./check-abi.sh abi_dumps/Outcome/2.1/binary_only.dump;
+   fi
+#     sh ./check-api-abi.sh abi_dumps/Outcome/2.1/ABI.dump;
  -
    if [ "$__" = "cmake tests" ]; then
      if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
@@ -89,7 +109,6 @@ script:
    fi
  - >
    if [ "$__" = "Documentation" ]; then
-     exit 0;
      git config --global push.default simple;
      git config --global user.name "Jenkins nedprod CI";
      git config --global user.email "foo@nowhere";

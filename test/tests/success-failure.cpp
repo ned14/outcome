@@ -21,8 +21,10 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../include/outcome/success_failure.hpp"
+#include "../../include/outcome/result.hpp"
 #include "quickcpplib/include/boost/test/unit_test.hpp"
+
+#include <iostream>
 
 BOOST_OUTCOME_AUTO_TEST_CASE(works / success - failure, "Tests that the success and failure type sugars work as intended")
 {
@@ -41,8 +43,9 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / success - failure, "Tests that the success 
     // static_assert(std::is_same<decltype(b.value), int>::value, "");
     static_assert(std::is_same<decltype(c)::value_type, const char *>::value, "");
   }
+#if !defined(__APPLE__) || defined(__cpp_exceptions)
   {
-    auto e = std::make_exception_ptr(5);
+    auto e = std::make_exception_ptr(std::exception());
     auto a = failure(5);
     auto b = failure(5, e);
     auto c = failure(5, 5);
@@ -55,4 +58,5 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / success - failure, "Tests that the success 
     static_assert(std::is_same<decltype(c)::error_type, int>::value, "");
     static_assert(std::is_same<decltype(c)::exception_type, int>::value, "");
   }
+#endif
 }

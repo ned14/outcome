@@ -22,26 +22,34 @@ Distributed under the Boost Software License, Version 1.0.
 http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef OUTCOME_OUTCOME_FAILURE_OBSERVERS_HPP
-#define OUTCOME_OUTCOME_FAILURE_OBSERVERS_HPP
+#ifndef OUTCOME_BASIC_OUTCOME_FAILURE_OBSERVERS_HPP
+#define OUTCOME_BASIC_OUTCOME_FAILURE_OBSERVERS_HPP
 
-#include "result_storage.hpp"
+#include "basic_result_storage.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  //! The failure observers implementation of `outcome<R, S, P>`. Only appears separate due to standardese limitations.
-  template <class Base, class R, class S, class P, class NoValuePolicy> class outcome_failure_observers : public Base
+  namespace adl
+  {
+    struct search_detail_adl
+    {
+    };
+  }
+  template <class S, class P> inline void basic_outcome_failure_exception_from_error(...) = delete;  // No specialisation for these error and exception types available!
+
+  //! The failure observers implementation of `basic_outcome<R, S, P>`.
+  template <class Base, class R, class S, class P, class NoValuePolicy> class basic_outcome_failure_observers : public Base
   {
   public:
-    using exception_type = std::exception_ptr;
+    using exception_type = P;
     using Base::Base;
 
     /// \output_section Synthesising state observers
     /*! Synthesise exception where possible.
     \requires `trait::has_error_code_v<S>` and `trait::has_exception_ptr_v<P>` to be true, else it does not appear.
-    \returns A synthesised exception type: if excepted, `exception()`; if errored, `std::make_exception_ptr(std::system_error(error()))`;
+    \returns A synthesised exception type: if excepted, `exception()`; if errored, `xxx::make_exception_ptr(xxx::system_error(error()))`;
     otherwise a default constructed exception type.
     */
     exception_type failure() const noexcept
@@ -52,11 +60,12 @@ namespace detail
       }
       if((this->_state._status & detail::status_have_error) != 0)
       {
-        return std::make_exception_ptr(std::system_error(this->error()));
+        return basic_outcome_failure_exception_from_error(this->error(), adl::search_detail_adl());
       }
       return exception_type();
     }
   };
+
 }  // namespace detail
 
 OUTCOME_V2_NAMESPACE_END

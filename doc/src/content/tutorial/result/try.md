@@ -8,10 +8,21 @@ tags = ["try"]
 In the implementation of function `print_half` we have seen the usage of the macro {{< api try OUTCOME_TRY >}}:
 
 ```c++
-OUTCOME_TRY (i, BigInt::fromString(text));
+OUTCOME_TRY (i, (BigInt::fromString(text)));
 ```
 
-This control statement is roughly equivalent to:
+The `OUTCOME_TRY` macro uses C macro overloading to select between two implementations based on the number of
+input parameters. If there is exactly one input parameter i.e. without the `i, `, the control statement is
+roughly equivalent to:
+
+```c++
+auto&& __result = BigInt::fromString(text);
+if (!__result)
+  return __result.as_failure();
+```
+
+Where `__result` is a compile time generated unique name. If there are between two and eight parameters,
+this control statement is roughly equivalent to:
 
 ```c++
 auto&& __result = BigInt::fromString(text);
@@ -20,7 +31,9 @@ if (!__result)
 auto&& i = __result.value();
 ```
 
-Where `__result` is a unique name.
+So here `i` as the first C macro parameter is set to the value of any successful result. To prevent
+confounding of the C preprocessor, you should always wrap the function invocation in brackets. This is done
+throughout this tutorial.
 
 Additionally, in GCC and Clang which provide an extension to C++ known as
 [statement expressions](https://gcc.gnu.org/onlinedocs/gcc/Statement-Exprs.html "GCC docs on statement expressions")

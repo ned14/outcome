@@ -41,8 +41,8 @@ Now we can implement function `convert` as follows:
 {{% snippet "using_result.cpp" "convert" %}}
 
 `result<T, EC>` is convertible from any `T2` convertible to `T` as well as any `EC2` convertible to `EC`,
-provided that the conversion is not ambiguous. If some type `X` is both convertible to `T` and `EC`, 
-conversion to `result<T, EC>` fails to compile. In this case you need to use one of the tagged constructors:
+provided that there is no constructability possible in either direction between `T` and `EC`. If there is,
+all implicit conversion is disabled, and you will need to use one of the tagged constructors:
 
 {{% snippet "using_result.cpp" "explicit" %}}
 

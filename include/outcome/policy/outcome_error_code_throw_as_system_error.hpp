@@ -31,29 +31,12 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  namespace detail
-  {
-    template <bool has_error_payload> struct rethrow_exception
-    {
-      template <class Exception> explicit rethrow_exception(Exception && /*unused*/)  // NOLINT
-      {
-      }
-    };
-    template <> struct rethrow_exception<true>
-    {
-      template <class Exception> explicit rethrow_exception(Exception &&excpt)  // NOLINT
-      {
-        std::rethrow_exception(policy::exception_ptr(std::forward<Exception>(excpt)));
-      }
-    };
-  }  // namespace detail
-
   /*! Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
   Any wide attempt to access the successful state where there is none causes
   an attempt to rethrow `E` if `trait::has_exception_ptr_v<E>` is true, else:
 
   1. If `trait::has_error_payload_v<EC>` is true, it calls an
-  ADL discovered free function `throw_as_system_error_with_payload(.error())`.
+  ADL discovered free function `outcome_throw_as_system_error_with_payload(.error())`.
   2. If `trait::has_error_payload_v<EC>` is false, it calls `OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(.error())))`
   */
   template <class T, class EC, class E> struct error_code_throw_as_system_error : detail::base
@@ -67,14 +50,14 @@ namespace policy
       {
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0)
         {
-          using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<outcome<T, EC, E, error_code_throw_as_system_error>, decltype(self)>;
+          using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<basic_outcome<T, EC, E, error_code_throw_as_system_error>, decltype(self)>;
           Outcome _self = static_cast<Outcome>(self);  // NOLINT
-          detail::rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
+          detail::_rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
         }
         if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
         {
           // ADL discovered
-          throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
+          outcome_throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
         }
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
       }

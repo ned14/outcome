@@ -104,7 +104,7 @@ namespace filelib
   inline const std::error_code &make_error_code(const failure_info &fi) { return fi.ec; }
 
   // Tell Outcome that no-value observation should throw a custom exception
-  inline void throw_as_system_error_with_payload(failure_info fi)
+  inline void outcome_throw_as_system_error_with_payload(failure_info fi)
   {
     // If the error code is not filesystem related e.g. ENOMEM, throw that as a standard STL exception.
     OUTCOME_V2_NAMESPACE::try_throw_std_exception_from_error(fi.ec);
@@ -354,7 +354,7 @@ namespace app
     // that into a httplib_error exception type which is stored as an exception ptr. The
     // TRY operation below will return that exception ptr to be rethrown in the caller.
     // Otherwise the fetched data is returned in a std::string data.
-    OUTCOME_TRY(data, outcome<std::string>(httplib::get("http://www.nedproductions.biz/")));
+    OUTCOME_TRY(data, (outcome<std::string>(httplib::get("http://www.nedproductions.biz/"))));
     string_view data_view(data);
 
     // HTML tidy the fetched data. If the C library fails due to an error corresponding to
@@ -364,11 +364,11 @@ namespace app
     // TRY operation below will return that exception ptr to be rethrown in the caller.
     // Otherwise the tidied data is returned into holdmem, with the string view updated to
     // point at the tidied data.
-    OUTCOME_TRY(holdmem, tidy_html(data_view));
+    OUTCOME_TRY(holdmem, (tidy_html(data_view)));
 
     // Write the tidied data to some file. If the write fails, synthesise a filesystem_error
     // exception ptr exactly as if one called filelib::write_file(data_view).value().
-    OUTCOME_TRY(written, outcome<size_t>(filelib::write_file(data_view)));
+    OUTCOME_TRY(written, (outcome<size_t>(filelib::write_file(data_view))));
     return success();
   }
 }

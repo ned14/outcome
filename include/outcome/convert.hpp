@@ -25,7 +25,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_CONVERT_HPP
 #define OUTCOME_CONVERT_HPP
 
-#include "detail/result_storage.hpp"
+#include "detail/basic_result_storage.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -90,8 +90,8 @@ namespace convert
   {
     template <class T, class X> struct make_type
     {
-      template <class U> static constexpr T value(U &&v) { return T{in_place_type<typename T::value_type>, std::forward<U>(v).value()}; }
-      template <class U> static constexpr T error(U &&v) { return T{in_place_type<typename T::error_type>, std::forward<U>(v).error()}; }
+      template <class U> static constexpr T value(U &&v) { return T{in_place_type<typename T::value_type>, static_cast<U &&>(v).value()}; }
+      template <class U> static constexpr T error(U &&v) { return T{in_place_type<typename T::error_type>, static_cast<U &&>(v).error()}; }
       static constexpr T error() { return T{in_place_type<typename T::error_type>}; }
     };
     template <class T> struct make_type<T, void>
@@ -108,9 +108,9 @@ namespace convert
   */
   template <class T, class U> struct value_or_error
   {
-    //! False to indicate that this converter wants `result`/`outcome` to reject all other `result`
+    //! False to indicate that this converter wants `basic_result`/`basic_outcome` to reject all other `basic_result`
     static constexpr bool enable_result_inputs = false;
-    //! False to indicate that this converter wants `outcome` to reject all other `outcome`
+    //! False to indicate that this converter wants `basic_outcome` to reject all other `basic_outcome`
     static constexpr bool enable_outcome_inputs = false;
     /*! Default converter for types matching the `ValueOrError` concept.
     \requires `std::decay_t<X>` to be the same type as `U`;
@@ -122,7 +122,7 @@ namespace convert
                                     &&ValueOrError<U>                                                                                                                                                                          //
                                     && (std::is_void<typename std::decay_t<X>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::value_type, typename std::decay_t<X>::value_type>)  //
                                     &&(std::is_void<typename std::decay_t<X>::error_type>::value || OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::error_type, typename std::decay_t<X>::error_type>) ))
-    constexpr T operator()(X &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(std::forward<X>(v)) : detail::make_type<T, typename U::error_type>::error(std::forward<X>(v)); }
+    constexpr T operator()(X &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(static_cast<X &&>(v)) : detail::make_type<T, typename U::error_type>::error(static_cast<X &&>(v)); }
   };
 }  // namespace convert
 

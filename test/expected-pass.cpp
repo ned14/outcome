@@ -21,7 +21,7 @@
 #include <utility>
 
 #include "../include/outcome/iostream_support.hpp"
-#include "../include/outcome/result.hpp"
+#include "../include/outcome/std_result.hpp"
 
 #define QUICKCPPLIB_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
 #include "quickcpplib/include/boost/test/unit_test.hpp"
@@ -1061,9 +1061,7 @@ BOOST_AUTO_TEST_CASE(expected_pass)
 #endif
 
   static_assert(!std::is_move_constructible<NoMoveConstructible>::value, "");
-#ifndef _MSC_VER
-  static_assert(std::is_constructible<expected_sc<NoMoveConstructible>, NoMoveConstructible &&>::value, "");
-#endif
+  static_assert(!std::is_constructible<expected_sc<NoMoveConstructible>, NoMoveConstructible &&>::value, "");
   static_assert(std::is_move_constructible<expected_sc<NoMoveConstructible>>::value, "");
 
   except_default_constructor();

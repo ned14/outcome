@@ -191,7 +191,7 @@ extern error_code_extended::result<int> func2()
 {
   using namespace error_code_extended;
   // At here the stack backtrace is collected and custom message stored in TLS
-  return {std::errc::operation_not_permitted};
+  return make_error_code(std::errc::operation_not_permitted);
 }
 
 extern error_code_extended::outcome<int> func1()

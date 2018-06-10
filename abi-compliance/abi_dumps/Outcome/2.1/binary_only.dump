@@ -1,0 +1,1184 @@
+$VAR1 = {
+          'ABI_DUMPER_VERSION' => '1.1',
+          'ABI_DUMP_VERSION' => '3.5',
+          'Arch' => 'x86_64',
+          'Compiler' => 'GNU C++14 6.3.0 20170519 -mtune=generic -march=x86-64 -g -O2 -std=gnu++14 -fPIC -fstack-protector',
+          'Headers' => {
+                         'abi.hpp' => 1,
+                         'stdint.h' => 1,
+                         'type_traits' => 1
+                       },
+          'Language' => 'C++',
+          'LibraryName' => 'liboutcome-abi-lib.so',
+          'LibraryVersion' => '2.1',
+          'MissedOffsets' => '1',
+          'MissedRegs' => '1',
+          'NameSpaces' => {
+                            '__gnu_cxx' => 1,
+                            'outcome_v2' => 1,
+                            'outcome_v2::detail' => 1,
+                            'outcome_v2::policy' => 1,
+                            'outcome_v2::policy::detail' => 1,
+                            'outcome_v2::trait' => 1,
+                            'std' => 1,
+                            'std::__exception_ptr' => 1
+                          },
+          'Needed' => {},
+          'Sources' => {
+                         'main.cpp' => 1
+                       },
+          'SymbolInfo' => {
+                            '13690' => {
+                                         'Artificial' => 1,
+                                         'Class' => '5733',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '2624',
+                                         'MnglName' => '_ZN10outcome_v26detail24value_storage_nontrivialI14NonTrivialTypeEC2ERKS3_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '12916'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'o',
+                                                               'type' => '12932'
+                                                             }
+                                                    },
+                                         'ShortName' => 'value_storage_nontrivial'
+                                       },
+                            '13691' => {
+                                         'Artificial' => 1,
+                                         'Class' => '5733',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '2624',
+                                         'MnglName' => '_ZN10outcome_v26detail24value_storage_nontrivialI14NonTrivialTypeEC1ERKS3_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '12916'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'o',
+                                                               'type' => '12932'
+                                                             }
+                                                    },
+                                         'ShortName' => 'value_storage_nontrivial'
+                                       },
+                            '13729' => {
+                                         'Line' => '78',
+                                         'MnglName' => '_Z22outcome_NonTrivialTypeRN10outcome_v213basic_outcomeI14NonTrivialTypeldNS_6policy9terminateEEE',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'v',
+                                                               'type' => '14163'
+                                                             }
+                                                    },
+                                         'Return' => '13718',
+                                         'ShortName' => 'outcome_NonTrivialType',
+                                         'Source' => 'main.cpp'
+                                       },
+                            '14217' => {
+                                         'Artificial' => 1,
+                                         'Class' => '11303',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '5266',
+                                         'MnglName' => '_ZN10outcome_v213basic_outcomeI14NonTrivialTypeldNS_6policy9terminateEEC2ERKS4_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '13459'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'p1',
+                                                               'type' => '14174'
+                                                             }
+                                                    },
+                                         'ShortName' => 'basic_outcome'
+                                       },
+                            '14218' => {
+                                         'Artificial' => 1,
+                                         'Class' => '11303',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '5266',
+                                         'MnglName' => '_ZN10outcome_v213basic_outcomeI14NonTrivialTypeldNS_6policy9terminateEEC1ERKS4_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '13459'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'p1',
+                                                               'type' => '14174'
+                                                             }
+                                                    },
+                                         'ShortName' => 'basic_outcome'
+                                       },
+                            '14288' => {
+                                         'Artificial' => 1,
+                                         'Class' => '9585',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '4959',
+                                         'MnglName' => '_ZN10outcome_v26detail33basic_outcome_exception_observersINS0_18basic_result_finalI14NonTrivialTypelNS_6policy9terminateEEES3_ldS5_vEC2ERKS7_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '13424'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'p1',
+                                                               'type' => '14245'
+                                                             }
+                                                    },
+                                         'ShortName' => 'basic_outcome_exception_observers'
+                                       },
+                            '14289' => {
+                                         'Artificial' => 1,
+                                         'Class' => '9585',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '4959',
+                                         'MnglName' => '_ZN10outcome_v26detail33basic_outcome_exception_observersINS0_18basic_result_finalI14NonTrivialTypelNS_6policy9terminateEEES3_ldS5_vEC1ERKS7_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '13424'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'p1',
+                                                               'type' => '14245'
+                                                             }
+                                                    },
+                                         'ShortName' => 'basic_outcome_exception_observers'
+                                       },
+                            '14327' => {
+                                         'Line' => '73',
+                                         'MnglName' => '_Z11outcome_intRN10outcome_v213basic_outcomeIildNS_6policy9terminateEEE',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'v',
+                                                               'type' => '14163'
+                                                             }
+                                                    },
+                                         'Return' => '13718',
+                                         'ShortName' => 'outcome_int',
+                                         'Source' => 'main.cpp'
+                                       },
+                            '14398' => {
+                                         'Line' => '68',
+                                         'MnglName' => '_Z21result_NonTrivialTypeRN10outcome_v212basic_resultI14NonTrivialTypelNS_6policy9terminateEEE',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'v',
+                                                               'type' => '14793'
+                                                             }
+                                                    },
+                                         'Return' => '14387',
+                                         'ShortName' => 'result_NonTrivialType',
+                                         'Source' => 'main.cpp'
+                                       },
+                            '14833' => {
+                                         'Artificial' => 1,
+                                         'Class' => '10732',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '4363',
+                                         'MnglName' => '_ZN10outcome_v212basic_resultI14NonTrivialTypelNS_6policy9terminateEEC2ERKS4_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '13324'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'p1',
+                                                               'type' => '13335'
+                                                             }
+                                                    },
+                                         'ShortName' => 'basic_result'
+                                       },
+                            '14834' => {
+                                         'Artificial' => 1,
+                                         'Class' => '10732',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '4363',
+                                         'MnglName' => '_ZN10outcome_v212basic_resultI14NonTrivialTypelNS_6policy9terminateEEC1ERKS4_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '13324'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'p1',
+                                                               'type' => '13335'
+                                                             }
+                                                    },
+                                         'ShortName' => 'basic_result'
+                                       },
+                            '14915' => {
+                                         'Artificial' => 1,
+                                         'Class' => '8932',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '3460',
+                                         'MnglName' => '_ZN10outcome_v26detail18basic_result_finalI14NonTrivialTypelNS_6policy9terminateEEC2ERKS5_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '14867'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'p1',
+                                                               'type' => '14872'
+                                                             }
+                                                    },
+                                         'ShortName' => 'basic_result_final'
+                                       },
+                            '14916' => {
+                                         'Artificial' => 1,
+                                         'Class' => '8932',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '3460',
+                                         'MnglName' => '_ZN10outcome_v26detail18basic_result_finalI14NonTrivialTypelNS_6policy9terminateEEC1ERKS5_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '14867'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'p1',
+                                                               'type' => '14872'
+                                                             }
+                                                    },
+                                         'ShortName' => 'basic_result_final'
+                                       },
+                            '14986' => {
+                                         'Artificial' => 1,
+                                         'Class' => '8585',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '3204',
+                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_error_observersINS0_28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypelNS_6policy9terminateEEES4_S6_EElS6_EC2ERKS9_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '13283'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'p1',
+                                                               'type' => '14943'
+                                                             }
+                                                    },
+                                         'ShortName' => 'basic_result_error_observers'
+                                       },
+                            '14987' => {
+                                         'Artificial' => 1,
+                                         'Class' => '8585',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '3204',
+                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_error_observersINS0_28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypelNS_6policy9terminateEEES4_S6_EElS6_EC1ERKS9_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '13283'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'p1',
+                                                               'type' => '14943'
+                                                             }
+                                                    },
+                                         'ShortName' => 'basic_result_error_observers'
+                                       },
+                            '15057' => {
+                                         'Artificial' => 1,
+                                         'Class' => '8239',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '3355',
+                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypelNS_6policy9terminateEEES3_S5_EC2ERKS7_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '13242'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'p1',
+                                                               'type' => '15014'
+                                                             }
+                                                    },
+                                         'ShortName' => 'basic_result_value_observers'
+                                       },
+                            '15058' => {
+                                         'Artificial' => 1,
+                                         'Class' => '8239',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '3355',
+                                         'MnglName' => '_ZN10outcome_v26detail28basic_result_value_observersINS0_20basic_result_storageI14NonTrivialTypelNS_6policy9terminateEEES3_S5_EC1ERKS7_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '13242'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'p1',
+                                                               'type' => '15014'
+                                                             }
+                                                    },
+                                         'ShortName' => 'basic_result_value_observers'
+                                       },
+                            '15114' => {
+                                         'Artificial' => 1,
+                                         'Class' => '7882',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '2917',
+                                         'MnglName' => '_ZN10outcome_v26detail20basic_result_storageI14NonTrivialTypelNS_6policy9terminateEEC2ERKS5_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '13190'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'p1',
+                                                               'type' => '13207'
+                                                             }
+                                                    },
+                                         'Protected' => 1,
+                                         'ShortName' => 'basic_result_storage'
+                                       },
+                            '15115' => {
+                                         'Artificial' => 1,
+                                         'Class' => '7882',
+                                         'Constructor' => 1,
+                                         'Header' => 'abi.hpp',
+                                         'InLine' => 1,
+                                         'Line' => '2917',
+                                         'MnglName' => '_ZN10outcome_v26detail20basic_result_storageI14NonTrivialTypelNS_6policy9terminateEEC1ERKS5_',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'this',
+                                                               'type' => '13190'
+                                                             },
+                                                      '1' => {
+                                                               'name' => 'p1',
+                                                               'type' => '13207'
+                                                             }
+                                                    },
+                                         'Protected' => 1,
+                                         'ShortName' => 'basic_result_storage'
+                                       },
+                            '15267' => {
+                                         'Line' => '63',
+                                         'MnglName' => '_Z10result_intRN10outcome_v212basic_resultIilNS_6policy9terminateEEE',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'v',
+                                                               'type' => '14793'
+                                                             }
+                                                    },
+                                         'Return' => '14387',
+                                         'ShortName' => 'result_int',
+                                         'Source' => 'main.cpp'
+                                       },
+                            '15327' => {
+                                         'Line' => '58',
+                                         'MnglName' => '_Z28value_storage_NonTrivialTypeRN10outcome_v26detail24value_storage_nontrivialI14NonTrivialTypeEE',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'v',
+                                                               'type' => '12921'
+                                                             }
+                                                    },
+                                         'Return' => '5733',
+                                         'ShortName' => 'value_storage_NonTrivialType',
+                                         'Source' => 'main.cpp'
+                                       },
+                            '15449' => {
+                                         'Line' => '53',
+                                         'MnglName' => '_Z17value_storage_intRN10outcome_v26detail21value_storage_trivialIiEE',
+                                         'Param' => {
+                                                      '0' => {
+                                                               'name' => 'v',
+                                                               'type' => '12899'
+                                                             }
+                                                    },
+                                         'Return' => '5343',
+                                         'ShortName' => 'value_storage_int',
+                                         'Source' => 'main.cpp'
+                                       },
+                            '15498' => {
+                                         'Line' => '47',
+                                         'MnglName' => '_Z11status_bitsv',
+                                         'Return' => '4855',
+                                         'ShortName' => 'status_bits',
+                                         'Source' => 'main.cpp'
+                                       }
+                          },
+          'SymbolVersion' => {},
+          'Symbols' => {
+                         'liboutcome-abi-lib.so' => {
+                                                      '_Z10result_intRN10outcome_v212basic_resultIilNS_6policy9terminateEEE' => 1,
+                                                      '_Z11outcome_intRN10outcome_v213basic_outcomeIildNS_6policy9terminateEEE' => 1,
+                                                      '_Z11status_bitsv' => 1,
+                                                      '_Z17value_storage_intRN10outcome_v26detail21value_storage_trivialIiEE' => 1,
+                                                      '_Z21result_NonTrivialTypeRN10outcome_v212basic_resultI14NonTrivialTypelNS_6policy9terminateEEE' => 1,
+                                                      '_Z22outcome_NonTrivialTypeRN10outcome_v213basic_outcomeI14NonTrivialTypeldNS_6policy9terminateEEE' => 1,
+                                                      '_Z28value_storage_NonTrivialTypeRN10outcome_v26detail24value_storage_nontrivialI14NonTrivialTypeEE' => 1,
+                                                      '_fini' => 1,
+                                                      '_init' => 1
+                                                    }
+                       },
+          'Target' => 'unix',
+          'TypeInfo' => {
+                          '1' => {
+                                   'Name' => 'void',
+                                   'Type' => 'Intrinsic'
+                                 },
+                          '10270' => {
+                                       'Header' => 'abi.hpp',
+                                       'Line' => '3880',
+                                       'Name' => 'struct outcome_v2::policy::detail::base',
+                                       'NameSpace' => 'outcome_v2::policy::detail',
+                                       'Size' => '1',
+                                       'Type' => 'Struct'
+                                     },
+                          '10280' => {
+                                       'Base' => {
+                                                   '10270' => {
+                                                                'pos' => '0'
+                                                              }
+                                                 },
+                                       'Header' => 'abi.hpp',
+                                       'Line' => '4043',
+                                       'Name' => 'struct outcome_v2::policy::terminate',
+                                       'NameSpace' => 'outcome_v2::policy',
+                                       'Size' => '1',
+                                       'Type' => 'Struct'
+                                     },
+                          '10732' => {
+                                       'Base' => {
+                                                   '8932' => {
+                                                               'pos' => '0'
+                                                             }
+                                                 },
+                                       'Header' => 'abi.hpp',
+                                       'Line' => '4268',
+                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>',
+                                       'NameSpace' => 'outcome_v2',
+                                       'Size' => '24',
+                                       'TParam' => {
+                                                     '0' => {
+                                                              'key' => 'R',
+                                                              'type' => '12632'
+                                                            },
+                                                     '1' => {
+                                                              'key' => 'S',
+                                                              'type' => '110'
+                                                            },
+                                                     '2' => {
+                                                              'key' => 'NoValuePolicy',
+                                                              'type' => '10280'
+                                                            }
+                                                   },
+                                       'Type' => 'Class'
+                                     },
+                          '110' => {
+                                     'Name' => 'long',
+                                     'Size' => '8',
+                                     'Type' => 'Intrinsic'
+                                   },
+                          '11097' => {
+                                       'BaseType' => '10732',
+                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>const',
+                                       'Size' => '24',
+                                       'Type' => 'Const'
+                                     },
+                          '11303' => {
+                                       'Base' => {
+                                                   '9585' => {
+                                                               'pos' => '0'
+                                                             }
+                                                 },
+                                       'Header' => 'abi.hpp',
+                                       'Line' => '5266',
+                                       'Memb' => {
+                                                   '0' => {
+                                                            'access' => 'protected',
+                                                            'name' => '_ptr',
+                                                            'offset' => '24',
+                                                            'type' => '5331'
+                                                          }
+                                                 },
+                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>',
+                                       'NameSpace' => 'outcome_v2',
+                                       'Size' => '32',
+                                       'TParam' => {
+                                                     '0' => {
+                                                              'key' => 'R',
+                                                              'type' => '12632'
+                                                            },
+                                                     '1' => {
+                                                              'key' => 'S',
+                                                              'type' => '110'
+                                                            },
+                                                     '2' => {
+                                                              'key' => 'P',
+                                                              'type' => '3884'
+                                                            },
+                                                     '3' => {
+                                                              'key' => 'NoValuePolicy',
+                                                              'type' => '10280'
+                                                            }
+                                                   },
+                                       'Type' => 'Class'
+                                     },
+                          '11523' => {
+                                       'BaseType' => '11303',
+                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>const',
+                                       'Size' => '32',
+                                       'Type' => 'Const'
+                                     },
+                          '12632' => {
+                                       'Line' => '27',
+                                       'Memb' => {
+                                                   '0' => {
+                                                            'name' => 'foo',
+                                                            'offset' => '0',
+                                                            'type' => '2544'
+                                                          }
+                                                 },
+                                       'Name' => 'struct NonTrivialType',
+                                       'Size' => '8',
+                                       'Source' => 'main.cpp',
+                                       'Type' => 'Struct'
+                                     },
+                          '12899' => {
+                                       'BaseType' => '5343',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_trivial<int>&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '12910' => {
+                                       'BaseType' => '5733',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '12916' => {
+                                       'BaseType' => '12910',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '12921' => {
+                                       'BaseType' => '5733',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '12932' => {
+                                       'BaseType' => '6101',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '13184' => {
+                                       'BaseType' => '7882',
+                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '13190' => {
+                                       'BaseType' => '13184',
+                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '13207' => {
+                                       'BaseType' => '8205',
+                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '13236' => {
+                                       'BaseType' => '8239',
+                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '13242' => {
+                                       'BaseType' => '13236',
+                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '13277' => {
+                                       'BaseType' => '8585',
+                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '13283' => {
+                                       'BaseType' => '13277',
+                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '13318' => {
+                                       'BaseType' => '10732',
+                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '13324' => {
+                                       'BaseType' => '13318',
+                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '13335' => {
+                                       'BaseType' => '11097',
+                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '13418' => {
+                                       'BaseType' => '9585',
+                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate, void>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '13424' => {
+                                       'BaseType' => '13418',
+                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate, void>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '13453' => {
+                                       'BaseType' => '11303',
+                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '13459' => {
+                                       'BaseType' => '13453',
+                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '13718' => {
+                                       'BaseType' => '11303',
+                                       'Line' => '45',
+                                       'Name' => 'outcome',
+                                       'Size' => '32',
+                                       'Source' => 'main.cpp',
+                                       'Type' => 'Typedef'
+                                     },
+                          '14163' => {
+                                       'BaseType' => '13718',
+                                       'Name' => 'outcome&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '14174' => {
+                                       'BaseType' => '11523',
+                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '14245' => {
+                                       'BaseType' => '9945',
+                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate, void>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '14387' => {
+                                       'BaseType' => '10732',
+                                       'Line' => '44',
+                                       'Name' => 'result',
+                                       'Size' => '24',
+                                       'Source' => 'main.cpp',
+                                       'Type' => 'Typedef'
+                                     },
+                          '14793' => {
+                                       'BaseType' => '14387',
+                                       'Name' => 'result&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '14861' => {
+                                       'BaseType' => '8932',
+                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '14867' => {
+                                       'BaseType' => '14861',
+                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '14872' => {
+                                       'BaseType' => '9232',
+                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '14943' => {
+                                       'BaseType' => '8927',
+                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '15014' => {
+                                       'BaseType' => '8580',
+                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '153' => {
+                                     'BaseType' => '164',
+                                     'Header' => 'stdint.h',
+                                     'Line' => '51',
+                                     'Name' => 'uint32_t',
+                                     'Size' => '4',
+                                     'Type' => 'Typedef'
+                                   },
+                          '164' => {
+                                     'Name' => 'unsigned int',
+                                     'Size' => '4',
+                                     'Type' => 'Intrinsic'
+                                   },
+                          '1912' => {
+                                      'Header' => 'type_traits',
+                                      'Line' => '2179',
+                                      'Name' => 'struct std::conditional<true, outcome_v2::detail::void_type, void>',
+                                      'NameSpace' => 'std',
+                                      'Size' => '1',
+                                      'TParam' => {
+                                                    '0' => {
+                                                             'name' => 'true'
+                                                           },
+                                                    '1' => {
+                                                             'type' => '4749'
+                                                           },
+                                                    '2' => {
+                                                             'name' => 'void'
+                                                           }
+                                                  },
+                                      'Type' => 'Struct'
+                                    },
+                          '1925' => {
+                                      'BaseType' => '4749',
+                                      'Header' => 'type_traits',
+                                      'Line' => '2180',
+                                      'Name' => 'std::conditional<true, outcome_v2::detail::void_type, void>::type',
+                                      'NameSpace' => 'std::conditional<true, outcome_v2::detail::void_type, void>',
+                                      'Size' => '1',
+                                      'Type' => 'Typedef'
+                                    },
+                          '1938' => {
+                                      'BaseType' => '1925',
+                                      'Header' => 'type_traits',
+                                      'Line' => '2527',
+                                      'Name' => 'std::conditional_t',
+                                      'NameSpace' => 'std',
+                                      'Size' => '1',
+                                      'Type' => 'Typedef'
+                                    },
+                          '2544' => {
+                                      'BaseType' => '1',
+                                      'Name' => 'void*',
+                                      'Size' => '8',
+                                      'Type' => 'Pointer'
+                                    },
+                          '3884' => {
+                                      'Name' => 'double',
+                                      'Size' => '8',
+                                      'Type' => 'Intrinsic'
+                                    },
+                          '4740' => {
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '1313',
+                                      'Name' => 'struct outcome_v2::detail::empty_type',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '1',
+                                      'Type' => 'Struct'
+                                    },
+                          '4749' => {
+                                      'Copied' => 1,
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '1316',
+                                      'Name' => 'struct outcome_v2::detail::void_type',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '1',
+                                      'Type' => 'Struct'
+                                    },
+                          '4855' => {
+                                      'BaseType' => '153',
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2525',
+                                      'Name' => 'outcome_v2::detail::status_bitfield_type',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '4',
+                                      'Type' => 'Typedef'
+                                    },
+                          '5331' => {
+                                      'BaseType' => '1938',
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '1322',
+                                      'Name' => 'outcome_v2::detail::devoid',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '1',
+                                      'Type' => 'Typedef'
+                                    },
+                          '5343' => {
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2539',
+                                      'Memb' => {
+                                                  '0' => {
+                                                           'name' => 'unnamed0',
+                                                           'offset' => '0',
+                                                           'type' => '5356'
+                                                         },
+                                                  '1' => {
+                                                           'name' => '_status',
+                                                           'offset' => '4',
+                                                           'type' => '4855'
+                                                         }
+                                                },
+                                      'Name' => 'struct outcome_v2::detail::value_storage_trivial<int>',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '8',
+                                      'TParam' => {
+                                                    '0' => {
+                                                             'key' => 'T',
+                                                             'type' => '92'
+                                                           }
+                                                  },
+                                      'Type' => 'Struct'
+                                    },
+                          '5356' => {
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2542',
+                                      'Memb' => {
+                                                  '0' => {
+                                                           'name' => '_empty',
+                                                           'offset' => '0',
+                                                           'type' => '4740'
+                                                         },
+                                                  '1' => {
+                                                           'name' => '_value',
+                                                           'offset' => '0',
+                                                           'type' => '5331'
+                                                         }
+                                                },
+                                      'Name' => 'outcome_v2::detail::value_storage_trivial<int>::anon-union-abi.hpp-2542',
+                                      'NameSpace' => 'outcome_v2::detail::value_storage_trivial<int>',
+                                      'Size' => '4',
+                                      'Type' => 'Union'
+                                    },
+                          '5733' => {
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2603',
+                                      'Memb' => {
+                                                  '0' => {
+                                                           'name' => 'unnamed0',
+                                                           'offset' => '0',
+                                                           'type' => '5746'
+                                                         },
+                                                  '1' => {
+                                                           'name' => '_status',
+                                                           'offset' => '8',
+                                                           'type' => '4855'
+                                                         }
+                                                },
+                                      'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '16',
+                                      'TParam' => {
+                                                    '0' => {
+                                                             'key' => 'T',
+                                                             'type' => '12632'
+                                                           }
+                                                  },
+                                      'Type' => 'Struct'
+                                    },
+                          '5746' => {
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2606',
+                                      'Memb' => {
+                                                  '0' => {
+                                                           'name' => '_empty',
+                                                           'offset' => '0',
+                                                           'type' => '4740'
+                                                         },
+                                                  '1' => {
+                                                           'name' => '_value',
+                                                           'offset' => '0',
+                                                           'type' => '5780'
+                                                         }
+                                                },
+                                      'Name' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType>::anon-union-abi.hpp-2606',
+                                      'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType>',
+                                      'Size' => '8',
+                                      'Type' => 'Union'
+                                    },
+                          '5780' => {
+                                      'BaseType' => '12632',
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2605',
+                                      'Name' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType>::value_type',
+                                      'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType>',
+                                      'Size' => '8',
+                                      'Type' => 'Typedef'
+                                    },
+                          '6101' => {
+                                      'BaseType' => '5733',
+                                      'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType>const',
+                                      'Size' => '16',
+                                      'Type' => 'Const'
+                                    },
+                          '6434' => {
+                                      'BaseType' => '6451',
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2829',
+                                      'Name' => 'outcome_v2::detail::value_storage_select_impl',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '1',
+                                      'Type' => 'Typedef'
+                                    },
+                          '6451' => {
+                                      'BaseType' => '1938',
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2828',
+                                      'Name' => 'outcome_v2::detail::value_storage_select_copy_assignment',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '1',
+                                      'Type' => 'Typedef'
+                                    },
+                          '7882' => {
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '2879',
+                                      'Memb' => {
+                                                  '0' => {
+                                                           'access' => 'protected',
+                                                           'name' => '_state',
+                                                           'offset' => '0',
+                                                           'type' => '6434'
+                                                         },
+                                                  '1' => {
+                                                           'access' => 'protected',
+                                                           'name' => '_error',
+                                                           'offset' => '16',
+                                                           'type' => '5331'
+                                                         }
+                                                },
+                                      'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '24',
+                                      'TParam' => {
+                                                    '0' => {
+                                                             'key' => 'R',
+                                                             'type' => '12632'
+                                                           },
+                                                    '1' => {
+                                                             'key' => 'EC',
+                                                             'type' => '110'
+                                                           },
+                                                    '2' => {
+                                                             'key' => 'NoValuePolicy',
+                                                             'type' => '10280'
+                                                           }
+                                                  },
+                                      'Type' => 'Class'
+                                    },
+                          '8205' => {
+                                      'BaseType' => '7882',
+                                      'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>const',
+                                      'Size' => '24',
+                                      'Type' => 'Const'
+                                    },
+                          '8239' => {
+                                      'Base' => {
+                                                  '7882' => {
+                                                              'pos' => '0'
+                                                            }
+                                                },
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '3355',
+                                      'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '24',
+                                      'TParam' => {
+                                                    '0' => {
+                                                             'key' => 'Base',
+                                                             'type' => '7882'
+                                                           },
+                                                    '1' => {
+                                                             'key' => 'R',
+                                                             'type' => '12632'
+                                                           },
+                                                    '2' => {
+                                                             'key' => 'NoValuePolicy',
+                                                             'type' => '10280'
+                                                           }
+                                                  },
+                                      'Type' => 'Class'
+                                    },
+                          '8580' => {
+                                      'BaseType' => '8239',
+                                      'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>const',
+                                      'Size' => '24',
+                                      'Type' => 'Const'
+                                    },
+                          '8585' => {
+                                      'Base' => {
+                                                  '8239' => {
+                                                              'pos' => '0'
+                                                            }
+                                                },
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '3204',
+                                      'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '24',
+                                      'TParam' => {
+                                                    '0' => {
+                                                             'key' => 'Base',
+                                                             'type' => '8239'
+                                                           },
+                                                    '1' => {
+                                                             'key' => 'EC',
+                                                             'type' => '110'
+                                                           },
+                                                    '2' => {
+                                                             'key' => 'NoValuePolicy',
+                                                             'type' => '10280'
+                                                           }
+                                                  },
+                                      'Type' => 'Class'
+                                    },
+                          '8927' => {
+                                      'BaseType' => '8585',
+                                      'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>const',
+                                      'Size' => '24',
+                                      'Type' => 'Const'
+                                    },
+                          '8932' => {
+                                      'Base' => {
+                                                  '8585' => {
+                                                              'pos' => '0'
+                                                            }
+                                                },
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '3460',
+                                      'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '24',
+                                      'TParam' => {
+                                                    '0' => {
+                                                             'key' => 'R',
+                                                             'type' => '12632'
+                                                           },
+                                                    '1' => {
+                                                             'key' => 'S',
+                                                             'type' => '110'
+                                                           },
+                                                    '2' => {
+                                                             'key' => 'NoValuePolicy',
+                                                             'type' => '10280'
+                                                           }
+                                                  },
+                                      'Type' => 'Class'
+                                    },
+                          '92' => {
+                                    'Name' => 'int',
+                                    'Size' => '4',
+                                    'Type' => 'Intrinsic'
+                                  },
+                          '9232' => {
+                                      'BaseType' => '8932',
+                                      'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>const',
+                                      'Size' => '24',
+                                      'Type' => 'Const'
+                                    },
+                          '9585' => {
+                                      'Base' => {
+                                                  '8932' => {
+                                                              'pos' => '0'
+                                                            }
+                                                },
+                                      'Header' => 'abi.hpp',
+                                      'Line' => '4959',
+                                      'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate, void>',
+                                      'NameSpace' => 'outcome_v2::detail',
+                                      'Size' => '24',
+                                      'TParam' => {
+                                                    '0' => {
+                                                             'key' => 'Base',
+                                                             'type' => '8932'
+                                                           },
+                                                    '1' => {
+                                                             'key' => 'R',
+                                                             'type' => '12632'
+                                                           },
+                                                    '2' => {
+                                                             'key' => 'S',
+                                                             'type' => '110'
+                                                           },
+                                                    '3' => {
+                                                             'key' => 'P',
+                                                             'type' => '3884'
+                                                           },
+                                                    '4' => {
+                                                             'key' => 'NoValuePolicy',
+                                                             'type' => '10280'
+                                                           },
+                                                    '5' => {
+                                                             'key' => 'FailureImpl',
+                                                             'type' => '1'
+                                                           }
+                                                  },
+                                      'Type' => 'Class'
+                                    },
+                          '9945' => {
+                                      'BaseType' => '9585',
+                                      'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate, void>const',
+                                      'Size' => '24',
+                                      'Type' => 'Const'
+                                    }
+                        },
+          'UndefinedSymbols' => {
+                                  'liboutcome-abi-lib.so' => {
+                                                               '_ITM_deregisterTMCloneTable' => 0,
+                                                               '_ITM_registerTMCloneTable' => 0,
+                                                               '_Jv_RegisterClasses' => 0,
+                                                               '__cxa_finalize' => 0,
+                                                               '__gmon_start__' => 0
+                                                             }
+                                },
+          'WordSize' => '8'
+        };

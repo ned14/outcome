@@ -32,7 +32,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 64 / outcome, "OUTCOME_TRY on excepted out
   using namespace OUTCOME_V2_NAMESPACE;
   auto f = []() -> outcome<int> {
     auto h = []() -> outcome<int> { return std::make_exception_ptr(std::runtime_error("hello")); };
-    OUTCOME_TRYV(h());
+    OUTCOME_TRY((h()));
     return 0;
   }();
   std::cout << print(f) << std::endl;
