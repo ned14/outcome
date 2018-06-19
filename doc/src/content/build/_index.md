@@ -82,7 +82,7 @@ git submodule update
 If you would prefer a single source tarball of the stable branch containing
 all the documentation, tests and sources, this can always be retrieved from:
 
-https://dedi4.nedprod.com/static/files/outcome-v2.0-source-latest.tar.xz
+https://dedi5.nedprod.com/static/files/outcome-v2.0-source-latest.tar.xz
 
 This tarball is automatically generated when Outcome fully compiles and passes
 all unit tests on all platforms tested by the CIs. This currently includes:
