@@ -68,16 +68,16 @@ public:
 public:
   constexpr _payload_domain() noexcept : _base(0x7b782c8f935e34ba) {}
 
-  static inline constexpr const _payload_domain *get();
+  static inline constexpr const _payload_domain &get();
 
   virtual _base::string_ref name() const noexcept override final { return string_ref("payload domain"); }  // NOLINT
 protected:
-  virtual bool _failure(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final  // NOLINT
+  virtual bool _do_failure(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final  // NOLINT
   {
     assert(code.domain() == *this);
     return static_cast<const status_code_payload &>(code).value().ec != SYSTEM_ERROR2_NAMESPACE::errc::success;  // NOLINT
   }
-  virtual bool _equivalent(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code1, const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code2) const noexcept override final  // NOLINT
+  virtual bool _do_equivalent(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code1, const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code2) const noexcept override final  // NOLINT
   {
     assert(code1.domain() == *this);
     const auto &c1 = static_cast<const status_code_payload &>(code1);  // NOLINT
@@ -93,14 +93,14 @@ protected:
     assert(code.domain() == *this);
     return static_cast<const status_code_payload &>(code).value().ec;  // NOLINT
   }
-  virtual _base::string_ref _message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final  // NOLINT
+  virtual _base::string_ref _do_message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final  // NOLINT
   {
     assert(code.domain() == *this);
     const auto &c = static_cast<const status_code_payload &>(code);  // NOLINT
     static SYSTEM_ERROR2_CONSTEXPR14 SYSTEM_ERROR2_NAMESPACE::detail::generic_code_messages msgs;
     return string_ref(msgs[static_cast<int>(c.value().ec)]);
   }
-  virtual void _throw_exception(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const override final  // NOLINT
+  virtual void _do_throw_exception(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const override final  // NOLINT
   {
     assert(code.domain() == *this);
     const auto &c = static_cast<const status_code_payload &>(code);  // NOLINT
@@ -108,9 +108,9 @@ protected:
   }
 };
 constexpr _payload_domain payload_domain;
-inline constexpr const _payload_domain *_payload_domain::get()
+inline constexpr const _payload_domain &_payload_domain::get()
 {
-  return &payload_domain;
+  return payload_domain;
 }
 inline status_code_payload make_status_code(payload c) noexcept
 {

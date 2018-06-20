@@ -961,9 +961,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 71e7d496a726771aa92cb3ec5539f917d342d6e7
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2018-05-29 08:29:58 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 71e7d496
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 906a816f80dd69216c2bdf464e78d6ad15f5e61a
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2018-06-17 01:46:17 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 906a816f
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1101,6 +1101,11 @@ extern "C" void _mm_pause();
 #endif
 #endif
 
+#ifndef QUICKCPPLIB_NODISCARD
+#if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
+#define QUICKCPPLIB_NODISCARD [[nodiscard]]
+#endif
+#endif
 #ifndef QUICKCPPLIB_NODISCARD
 #ifdef __has_cpp_attribute
 #if __has_cpp_attribute(nodiscard)
@@ -1482,9 +1487,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 4f12238c22e16052949413704d30a4eae6aecd5d
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-05-29 08:33:17 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4f12238c
+#define OUTCOME_PREVIOUS_COMMIT_REF 95e0a2210dc9fe22f78117be79550197840c4ab5
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-06-15 17:54:13 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 95e0a221
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1694,7 +1699,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <sal.h>
 #include <stddef.h>
 
-#ifdef BINDLIB_EXPORTS
+#ifdef QUICKCPPLIB_EXPORTS
 #define EXECINFO_DECL extern __declspec(dllexport)
 #else
 #if defined(__cplusplus) && (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0
@@ -4287,7 +4292,7 @@ namespace detail
             && !detail::is_implicitly_constructible<error_type, value_type> // AND which cannot be constructed from the value type
             && std::is_integral<value_type>::value)); // AND the value type is some integral type
 
-    // Predicate for the value converting constructor to be available.
+    // Predicate for the value converting constructor to be available. Weakened to allow result<int, C enum>.
     template <class T>
     static constexpr bool enable_value_converting_constructor = //
     implicit_constructors_enabled //
