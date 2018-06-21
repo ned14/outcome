@@ -5,6 +5,82 @@ weight = 30
 
 {{% toc %}}
 
+## Can I use Outcome to write zero overhead deterministic exceptions as is proposed to enter C++ 23?
+
+Technically yes:
+
+```c++
+// Switch this to 0 if you have deterministic exceptions support in your compiler
+#define OUTCOME_DETERMINISTIC_EXCEPTIONS_USE_EMULATION 1
+
+#include "outcome/try.hpp"
+#include "outcome/experimental/status_result.hpp"
+
+/*! Declare an API which throws a deterministic exception. Will compile into
+deterministic exceptions, or an emulation.
+*/
+#if OUTCOME_DETERMINISTIC_EXCEPTIONS_USE_EMULATION
+#define OUTCOME_THROWS_API(rettype, errtype, ...) ::OUTCOME_V2_NAMESPACE::experimental::erased_result<rettype, errtype> __VA_ARGS__ noexcept
+#else
+#define OUTCOME_THROWS_API(rettype, errtype, ...) rettype __VA_ARGS__ throws(errtype)
+#endif
+
+/*! Declare an API which deterministically throws the default std::error.
+Will compile into deterministic exceptions, or an emulation.
+*/
+#if OUTCOME_DETERMINISTIC_EXCEPTIONS_USE_EMULATION
+#define OUTCOME_THROWS_ERROR_API(rettype, ...) ::OUTCOME_V2_NAMESPACE::experimental::erased_result<rettype, ::SYSTEM_ERROR2_NAMESPACE::error> __VA_ARGS__ noexcept
+#else
+#define OUTCOME_THROWS_ERROR_API(rettype, ...) rettype __VA_ARGS__ throws(std::error)
+#endif
+
+/*! Throws a deterministic exception. Will compile into deterministic exceptions,
+or an emulation.
+*/
+#if OUTCOME_DETERMINISTIC_EXCEPTIONS_USE_EMULATION
+#define OUTCOME_THROW(...) return ::OUTCOME_V2_NAMESPACE::failure(__VA_ARGS__)
+#else
+#define OUTCOME_THROW(...) throw(__VA_ARGS__)
+#endif
+
+/*! Call an API. Will compile into deterministic exceptions, or an emulation.
+*/
+#if OUTCOME_DETERMINISTIC_EXCEPTIONS_USE_EMULATION
+#define OUTCOME_CALL_API(...) OUTCOME_TRY(...)
+#else
+#define OUTCOME_CALL_API(...) (__VA_ARGS__)
+#endif
+
+/*! Catch any deterministic exceptions thrown by an expression into a ValueOrError
+concept matching type.
+*/
+#if OUTCOME_DETERMINISTIC_EXCEPTIONS_USE_EMULATION
+#define OUTCOME_CATCH_EXPR(...) (...)
+#else
+#define OUTCOME_CATCH_EXPR(...) catch(__VA_ARGS__)
+#endif
+```
+
+You would then have to write your code in this quite unnatural form:
+
+```c++
+// Throws ::SYSTEM_ERROR2_NAMESPACE::error, the proposed std::error for P0709 Zero
+// overhead deterministic exceptions
+OUTCOME_THROWS_ERROR_API(int, foo(double x))
+{
+  if(x < INT_MIN || x > INT_MAX)
+    OUTCOME_THROW(::SYSTEM_ERROR2_NAMESPACE::errc::result_out_of_range);
+  return static_cast<int>(x);
+}
+...
+int v = OUTCOME_CALL_API(foo(5.0));
+```
+
+As much as it is technically feasible, it is probably not worth inudating your
+C++ code with so many macros, especially as Outcome will continue to work just fine
+in future C++ compilers.
+
+
 ## Is Outcome safe to use in extern APIs?
 
 Outcome is specifically designed for use in the public interfaces of multi-million

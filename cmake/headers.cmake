@@ -30,6 +30,7 @@ set(outcome_HEADERS
   "include/outcome/experimental/status-code/include/status_code_domain.hpp"
   "include/outcome/experimental/status-code/include/status_error.hpp"
   "include/outcome/experimental/status-code/include/system_code.hpp"
+  "include/outcome/experimental/status-code/include/system_code_from_exception.hpp"
   "include/outcome/experimental/status-code/include/system_error2.hpp"
   "include/outcome/experimental/status-code/include/win32_code.hpp"
   "include/outcome/experimental/status-code/single-header/system_error2.hpp"
