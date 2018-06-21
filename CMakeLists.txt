@@ -135,7 +135,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   
   # Turn on C++ 17 and Concepts where possible for the test suite
   foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
-    if(feature STREQUAL cxx_std_17)
+    if(feature STREQUAL "cxx_std_17")
       foreach(test_target ${outcome_TEST_TARGETS} ${outcome_EXAMPLE_TARGETS})
         target_compile_features(${test_target} PUBLIC cxx_std_17)
         if(ENABLE_CXX_CONCEPTS)
