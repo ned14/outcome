@@ -56,7 +56,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 61 / result, "result<T1, E1> does not comp
   using result1 = result<int, udt1>;
   using result2 = result<int, udt2>;
 
-  result1 a(5), _a(6);
+  result1 a(5);
   result2 b(5);
   BOOST_CHECK(b == a);     // udt2 will compare to udt1
   BOOST_CHECK(!(b != a));  // udt2 will compare to udt1

@@ -56,6 +56,8 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / constexpr, "Tests that outcome wo
     constexpr result<long, int> g4(g3);
     constexpr result<int, void> g5(in_place_type<void>);
     constexpr result<long, int> g6(g5);
+    (void) g4;
+    (void) g6;
 
     // Test void
     constexpr result<void, int> h(in_place_type<void>);
@@ -85,5 +87,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / constexpr, "Tests that outcome wo
     constexpr outcome<long, int, const char *> g4(g3);
     constexpr outcome<int, void, char *> g5(in_place_type<void>);
     constexpr outcome<long, int, const char *> g6(g5);
+    (void) g4;
+    (void) g6;
   }
 }

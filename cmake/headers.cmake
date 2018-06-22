@@ -22,6 +22,7 @@ set(outcome_HEADERS
   "include/outcome/experimental/status-code/include/com_code.hpp"
   "include/outcome/experimental/status-code/include/config.hpp"
   "include/outcome/experimental/status-code/include/error.hpp"
+  "include/outcome/experimental/status-code/include/errored_status_code.hpp"
   "include/outcome/experimental/status-code/include/generic_code.hpp"
   "include/outcome/experimental/status-code/include/iostream_support.hpp"
   "include/outcome/experimental/status-code/include/nt_code.hpp"
