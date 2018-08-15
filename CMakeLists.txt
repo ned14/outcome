@@ -116,6 +116,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
         if(MSVC AND NOT CLANG)
           # Disable warnings "C++ exception handler used" and "noexcept used with no exception handling"
           target_compile_options(${target_name} PRIVATE /wd4530 /wd4577)
+#          target_compile_options(${target_name} PRIVATE /permissive-)  # test bug report #142
         endif()
         target_link_libraries(${target_name} PRIVATE outcome::hl)
         set_target_properties(${target_name} PROPERTIES
