@@ -37,7 +37,7 @@ It is possible to inspect the state manualy:
 
 {{% snippet "intro_example.cpp" "inspect" %}}
 
-Or, if this function is called in anoter function that also returns `result<T>` you can use a dedicated control statement:
+Or, if this function is called in another function that also returns `result<T>` you can use a dedicated control statement:
 
 {{% snippet "intro_example.cpp" "implementation" %}}
 
