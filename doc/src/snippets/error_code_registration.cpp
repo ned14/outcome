@@ -6,7 +6,8 @@
 // This is the custom error code enum
 enum class ConversionErrc
 {
-  EmptyString = 1, // 0 is never an error
+  Success     = 0, // 0 should not represent an error
+  EmptyString = 1,
   IllegalChar = 2,
   TooLong     = 3,
 };
@@ -33,6 +34,8 @@ namespace detail
     {
       switch (static_cast<ConversionErrc>(c))
       {
+      case ConversionErrc::Success:
+        return "conversion successful";
       case ConversionErrc::EmptyString:
         return "converting empty string";
       case ConversionErrc::IllegalChar:
