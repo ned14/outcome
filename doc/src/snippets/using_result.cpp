@@ -15,7 +15,8 @@ outcome::result<int> convert(const std::string& str) noexcept;
 //! [enum]
 enum class ConversionErrc
 {
-  EmptyString = 1, // 0 is never an error
+  Success     = 0, // 0 should not represent an error
+  EmptyString = 1, // (for rationale, see tutorial on error codes)
   IllegalChar = 2,
   TooLong     = 3,
 };
@@ -35,13 +36,13 @@ outcome::result<int> convert(const std::string& str) noexcept
 {
   if (str.empty())
     return ConversionErrc::EmptyString;
-    
+
   if (!std::all_of(str.begin(), str.end(), ::isdigit))
     return ConversionErrc::IllegalChar;
-    
+
   if (str.length() > 9)
     return ConversionErrc::TooLong;
-  
+
   return atoi(str.c_str());
 }
 //! [convert]
@@ -53,11 +54,13 @@ namespace
     const char* name() const noexcept override { return "bad-convet"; }
     std::string message(int ev) const override;
   };
-  
+
   std::string ConversionErrorCategory::message(int ev) const
   {
     switch (static_cast<ConversionErrc>(ev))
     {
+    case ConversionErrc::Success:
+      return "conversion successful";
     case ConversionErrc::EmptyString:
       return "empty string provided";
     case ConversionErrc::IllegalChar:
@@ -67,7 +70,7 @@ namespace
     }
       return "(UNCHARTED)";
   }
-  
+
   const ConversionErrorCategory globalConversionErrorCategory {};
 }
 
@@ -87,7 +90,7 @@ outcome::result<int> s {outcome::in_place_type<int>, 1};
 void factory_construction()
 {
 //! [factory]
-outcome::result<int> r = outcome::failure(ConversionErrc::EmptyString); 
+outcome::result<int> r = outcome::failure(ConversionErrc::EmptyString);
 outcome::result<int> s = outcome::success(1);
 //! [factory]
 }
@@ -120,7 +123,7 @@ outcome::result<void> print_half(const std::string& text)
   }
   else
   {
-    if (r.error() == ConversionErrc::TooLong)     // #3 
+    if (r.error() == ConversionErrc::TooLong)     // #3
     {
       OUTCOME_TRY (i, (BigInt::fromString(text)));// #4
       std::cout << i.half() << std::endl;
@@ -152,8 +155,8 @@ int main()
   }
   else
   {
-    std::cout << r.error() << std::endl; 
+    std::cout << r.error() << std::endl;
   }
-  
+
   (void)test();
 }

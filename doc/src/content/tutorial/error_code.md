@@ -8,7 +8,7 @@ weight = 91
 This section illustrates how you can hook into the `std::error_code` system from
 the Standard Library in order to work with your own set of error codes. As is usually
 the case in C++, doing this is straightforward but requires typing boilerplate
-to tell the C++ STL about your custom error type. This is not part of Outcome library, 
+to tell the C++ STL about your custom error type. This is not part of Outcome library,
 but we still provide this short guide here, because how to do this is not well documented [1].
 
 Suppose you want to report all reasons for failure in converting a `std::string` to a non-negative `int`.
@@ -36,6 +36,18 @@ error code enum directly, but look at the advantages:
    exclusively written to understand `std::errc` alone to examine your custom error
    code domain for equivalence to the standard error conditions, AND without being
    recompiled.
+
+{{% notice note %}}
+This documentation recommends that when you define your custom `enum` for representing
+`error_code`s, you should always make sure that value 0 never represents an actual error:
+it should either represent a success or should not be provided at all. If you only
+intend to use your `enum` inside `result<>` or `outcome<>` you can just start your
+enumerations from 1. If you intend to also return `std::error_code` directly from
+functions, you should probably define value 0 as success, so that you are able to
+inform about function's success by returning `MyEnum::Success`. This is because `error_code`'s
+contextual conversion to `bool` (which some people use to check if there was an error or not)
+only checks for the numeric value of the error code (without looking at error domain (category)).
+{{% /notice %}}
 
 [1]: The only documentation I'm aware of is the quite old guide by Chris Kohlhoff, founder of
 ASIO and the Networking TS:

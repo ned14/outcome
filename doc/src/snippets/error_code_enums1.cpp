@@ -41,9 +41,9 @@ int main()
   };
   enum class err
   {
-    success,   // REMEMBER it is best practice to always put "success"
-    failure1,  // with value 0 as your first item in any error code
-    failure2   // enum, even if you never use it.
+    success,   // 0 should not represent an error
+    failure1,  // (for rationale, see tutorial on error codes)
+    failure2
   };
   result<udt, err> res(err::failure1);
 
