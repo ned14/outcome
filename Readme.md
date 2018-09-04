@@ -29,13 +29,19 @@ on Linux:
 wget https://github.com/ned14/outcome/raw/develop/single-header/outcome.hpp
 ```
 
-On BSD and OS X:
+On BSD:
 
 ```
 fetch https://github.com/ned14/outcome/raw/develop/single-header/outcome.hpp
 ```
 
-On Windows, simply download the raw file from above and place it wherever it suits you.
+If you have `curl` installed:
+
+```
+curl -O -J -L https://github.com/ned14/outcome/raw/develop/single-header/outcome.hpp
+```
+
+Otherwise, simply download the raw file from above and place it wherever it suits you.
 
 ## Pre Boost entry todo:
 
