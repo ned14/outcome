@@ -27,6 +27,15 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "success_failure.hpp"
 
+namespace std
+{
+  namespace experimental
+  {
+    template <class T, class E> class expected;
+    template <class E> class unexpected;
+  }  // namespace experimental
+}  // namespace std
+
 OUTCOME_V2_NAMESPACE_BEGIN
 
 /*! Customisation point for changing what the `OUTCOME_TRY` macros
@@ -34,10 +43,35 @@ do. This function defaults to returning `std::forward<T>(v).as_failure()`.
 \effects Extracts any state apart from value into a `failure_type`.
 \requires The input value to have a `.as_failure()` member function.
 */
-template <class T> OUTCOME_REQUIRES(requires(T &&v){{v.as_failure()}}) decltype(auto) try_operation_return_as(T &&v)
+OUTCOME_TEMPLATE(class T)
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().as_failure()))
+inline decltype(auto) try_operation_return_as(T &&v)
 {
-  return std::forward<T>(v).as_failure();
+  return static_cast<T &&>(v).as_failure();
 }
+/*! Customisation point for changing what the `OUTCOME_TRY` macros do.
+\effects Returns by copy a `std::experimental::unexpected<E>` from an input `std::experimental::expected<T, E>`.
+*/
+template <class T, class E> inline auto try_operation_return_as(const std::experimental::expected<T, E> &v)
+{
+  return std::experimental::unexpected<E>(v.error());
+}
+/*! Customisation point for changing what the `OUTCOME_TRY` macros do.
+\effects Returns by move a `std::experimental::unexpected<E>` from an input `std::experimental::expected<T, E>`.
+*/
+template <class T, class E> inline auto try_operation_return_as(std::experimental::expected<T, E> &&v)
+{
+  return std::experimental::unexpected<E>(static_cast<std::experimental::expected<T, E> &&>(v).error());
+}
+
+namespace detail
+{
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().assume_value()))
+  inline decltype(auto) try_extract_value(T &&v) { return static_cast<T &&>(v).assume_value(); }
+
+  template <class T, class... Args> inline decltype(auto) try_extract_value(T &&v, Args &&... /*unused*/) { return static_cast<T &&>(v).value(); }
+}  // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -74,16 +108,16 @@ OUTCOME_V2_NAMESPACE_END
 //! \exclude
 #define OUTCOME_TRY2(unique, v, ...)                                                                                                                                                                                                                                                                                           \
   OUTCOME_TRYV2(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                                          \
-  auto && (v) = static_cast<decltype(unique) &&>(unique).value()
+  auto && (v) = OUTCOME_V2_NAMESPACE::detail::try_extract_value(static_cast<decltype(unique) &&>(unique))
 
-/*! If the outcome returned by expression ... is not valued, propagate any
+/*! If the `outcome`/`result`/`std::experimental::expected` returned by expression ... is not valued, propagate any
 failure by immediately returning that failure state immediately
 */
 #define OUTCOME_TRYV(...) OUTCOME_TRYV2(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
 
 #if defined(__GNUC__) || defined(__clang__)
 
-/*! If the outcome returned by expression ... is not valued, propagate any
+/*! If the `outcome`/`result`/`std::experimental::expected` returned by expression ... is not valued, propagate any
 failure by immediately returning that failure state immediately, else become the
 unwrapped value as an expression. This makes `OUTCOME_TRYX(expr)` an expression
 which can be used exactly like the `try` operator in other languages.
@@ -97,13 +131,13 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
     auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                \
     if(!res.has_value())                                                                                                                                                                                                                                                                                                       \
       return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                \
-    static_cast<decltype(res) &&>(res).value();                                                                                                                                                                                                                                                                                \
+    OUTCOME_V2_NAMESPACE::detail::try_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                       \
   \
 })
 #endif
 
-/*! If the outcome returned by expression ... is not valued, propagate any
-failure by immediately returning that failure immediately, else set *auto v* to the unwrapped value.
+/*! If the `outcome`/`result`/`std::experimental::expected` returned by expression ... is not valued, propagate any
+failure by immediately returning that failure immediately, else set *auto &&v* to the unwrapped value.
 */
 #define OUTCOME_TRYA(v, ...) OUTCOME_TRY2(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
 
