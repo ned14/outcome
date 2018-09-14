@@ -6,6 +6,12 @@ weight = 80
 ---
 ## v2.1 in progress [[project]](https://github.com/ned14/outcome/projects/1)
 
+- [#150](https://github.com/ned14/outcome/issues/150)
+    - **BREAKING CHANGE** `result<T, E>`, `boost_result<T, E>` and `std_result<T, E>`
+no longer implement hard UB on fetching a value from a valueless instance if `E` is
+a UDT, they now fail to compile with a useful error message. If you wish hard UB,
+use `unchecked<T, E>`, `boost_unchecked<T, E>` or `std_unchecked<T, E>` instead.
+
 - [#140](https://github.com/ned14/outcome/issues/140)
     - Fixed a nasty corner case bug where value type's without a copy constructor
 but with a move constructor would indicate via traits that copy construction

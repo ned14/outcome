@@ -1487,9 +1487,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF dade07176cb5e58eb61fc3618c8a2a02d5d628d5
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-09-04 18:13:50 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE dade0717
+#define OUTCOME_PREVIOUS_COMMIT_REF c678b9221eb4002afd65d84e1211bfff5cf7291a
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-09-05 08:42:15 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c678b922
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -5472,6 +5472,106 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* Policies for result and outcome
+(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Sep 2018
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef OUTCOME_POLICY_FAIL_TO_COMPILE_OBSERVERS_HPP
+#define OUTCOME_POLICY_FAIL_TO_COMPILE_OBSERVERS_HPP
+
+
+
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+#define OUTCOME_FAIL_TO_COMPILE_OBSERVERS_MESSAGE "Attempt to wide observe value, error or " "exception for a result/outcome given an EC or E type which is not void, and for whom " "trait::has_error_code_v<EC>, trait::has_exception_ptr_v<EC>, and trait::has_exception_ptr_v<E> " "are all false. Please specify a NoValuePolicy to tell result/outcome what to do, or else use " "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide " "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."
+
+
+
+
+
+
+
+namespace policy
+{
+  /*! Policy which refuses to compile the wide checks with an error message. Used by `default_policy`
+  to enforce disabling of wide observers.
+
+  Can be used in both `result` and `outcome`.
+  */
+
+
+
+
+  struct fail_to_compile_observers : detail::base
+  {
+    /*! Performs a wide check of state, used in the value() functions. Fails to compile with a static assertion.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void wide_value_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or " "exception for a result/outcome given an EC or E type which is not void, and for whom " "trait::has_error_code_v<EC>, trait::has_exception_ptr_v<EC>, and trait::has_exception_ptr_v<E> " "are all false. Please specify a NoValuePolicy to tell result/outcome what to do, or else use " "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide " "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
+    /*! Performs a wide check of state, used in the error() functions. Fails to compile with a static assertion.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void wide_error_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or " "exception for a result/outcome given an EC or E type which is not void, and for whom " "trait::has_error_code_v<EC>, trait::has_exception_ptr_v<EC>, and trait::has_exception_ptr_v<E> " "are all false. Please specify a NoValuePolicy to tell result/outcome what to do, or else use " "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide " "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
+    /*! Performs a wide check of state, used in the exception() functions. Fails to compile with a static assertion.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void wide_exception_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or " "exception for a result/outcome given an EC or E type which is not void, and for whom " "trait::has_error_code_v<EC>, trait::has_exception_ptr_v<EC>, and trait::has_exception_ptr_v<E> " "are all false. Please specify a NoValuePolicy to tell result/outcome what to do, or else use " "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide " "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
+  };
+} // namespace policy
+
+#undef OUTCOME_FAIL_TO_COMPILE_OBSERVERS_MESSAGE
+
+OUTCOME_V2_NAMESPACE_END
+
+#endif
+/* Policies for result and outcome
 (C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: Oct 2017
 
@@ -5894,7 +5994,7 @@ namespace policy
   trait::has_error_code_v<EC>, error_code_throw_as_system_error<T, EC, E>, //
   std::conditional_t< //
   trait::has_exception_ptr_v<EC> || trait::has_exception_ptr_v<E>, exception_ptr_rethrow<T, EC, E>, //
-  all_narrow //
+  fail_to_compile_observers //
   >>>;
 } // namespace policy
 
@@ -8636,6 +8736,15 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
+namespace std
+{
+  namespace experimental
+  {
+    template <class T, class E> class expected;
+    template <class E> class unexpected;
+  } // namespace experimental
+} // namespace std
+
 OUTCOME_V2_NAMESPACE_BEGIN
 
 /*! Customisation point for changing what the `OUTCOME_TRY` macros
@@ -8647,10 +8756,39 @@ do. This function defaults to returning `std::forward<T>(v).as_failure()`.
 
 
 
-template <class T> OUTCOME_REQUIRES(requires(T &&v){{v.as_failure()}}) decltype(auto) try_operation_return_as(T &&v)
+OUTCOME_TEMPLATE(class T)
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().as_failure()))
+inline decltype(auto) try_operation_return_as(T &&v)
 {
-  return std::forward<T>(v).as_failure();
+  return static_cast<T &&>(v).as_failure();
 }
+/*! Customisation point for changing what the `OUTCOME_TRY` macros do.
+\effects Returns by copy a `std::unexpected<E>` from an input `std::expected<T, E>`.
+*/
+
+
+template <class T, class E> inline auto try_operation_return_as(const std::experimental::expected<T, E> &v)
+{
+  return std::experimental::unexpected<E>(v.error());
+}
+/*! Customisation point for changing what the `OUTCOME_TRY` macros do.
+\effects Returns by move a `std::unexpected<E>` from an input `std::expected<T, E>`.
+*/
+
+
+template <class T, class E> inline auto try_operation_return_as(std::experimental::expected<T, E> &&v)
+{
+  return std::experimental::unexpected<E>(static_cast<std::experimental::expected<T, E> &&>(v).error());
+}
+
+namespace detail
+{
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().assume_value()))
+  inline decltype(auto) try_extract_value(T &&v) { return static_cast<T &&>(v).assume_value(); }
+
+  template <class T, class... Args> inline decltype(auto) try_extract_value(T &&v, Args &&... /*unused*/) { return static_cast<T &&>(v).value(); }
+} // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -8685,7 +8823,7 @@ OUTCOME_V2_NAMESPACE_END
 
 
 //! \exclude
-#define OUTCOME_TRY2(unique, v, ...) OUTCOME_TRYV2(unique, __VA_ARGS__); auto && (v) = static_cast<decltype(unique) &&>(unique).value()
+#define OUTCOME_TRY2(unique, v, ...) OUTCOME_TRYV2(unique, __VA_ARGS__); auto && (v) = OUTCOME_V2_NAMESPACE::detail::try_extract_value(static_cast<decltype(unique) &&>(unique))
 
 
 
@@ -8715,7 +8853,7 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 
 
 
-#define OUTCOME_TRYX(...) ({ auto &&res = (__VA_ARGS__); if(!res.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res)); static_cast<decltype(res) &&>(res).value(); })
+#define OUTCOME_TRYX(...) ({ auto &&res = (__VA_ARGS__); if(!res.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res)); OUTCOME_V2_NAMESPACE::detail::try_extract_value(static_cast<decltype(res) &&>(res)); })
 
 
 

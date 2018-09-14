@@ -1272,9 +1272,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF dade07176cb5e58eb61fc3618c8a2a02d5d628d5
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-09-04 18:13:50 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE dade0717
+#define OUTCOME_PREVIOUS_COMMIT_REF c678b9221eb4002afd65d84e1211bfff5cf7291a
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-09-05 08:42:15 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c678b922
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -6891,6 +6891,15 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
+namespace std
+{
+  namespace experimental
+  {
+    template <class T, class E> class expected;
+    template <class E> class unexpected;
+  } // namespace experimental
+} // namespace std
+
 OUTCOME_V2_NAMESPACE_BEGIN
 
 /*! Customisation point for changing what the `OUTCOME_TRY` macros
@@ -6902,10 +6911,39 @@ do. This function defaults to returning `std::forward<T>(v).as_failure()`.
 
 
 
-template <class T> OUTCOME_REQUIRES(requires(T &&v){{v.as_failure()}}) decltype(auto) try_operation_return_as(T &&v)
+OUTCOME_TEMPLATE(class T)
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().as_failure()))
+inline decltype(auto) try_operation_return_as(T &&v)
 {
-  return std::forward<T>(v).as_failure();
+  return static_cast<T &&>(v).as_failure();
 }
+/*! Customisation point for changing what the `OUTCOME_TRY` macros do.
+\effects Returns by copy a `std::unexpected<E>` from an input `std::expected<T, E>`.
+*/
+
+
+template <class T, class E> inline auto try_operation_return_as(const std::experimental::expected<T, E> &v)
+{
+  return std::experimental::unexpected<E>(v.error());
+}
+/*! Customisation point for changing what the `OUTCOME_TRY` macros do.
+\effects Returns by move a `std::unexpected<E>` from an input `std::expected<T, E>`.
+*/
+
+
+template <class T, class E> inline auto try_operation_return_as(std::experimental::expected<T, E> &&v)
+{
+  return std::experimental::unexpected<E>(static_cast<std::experimental::expected<T, E> &&>(v).error());
+}
+
+namespace detail
+{
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().assume_value()))
+  inline decltype(auto) try_extract_value(T &&v) { return static_cast<T &&>(v).assume_value(); }
+
+  template <class T, class... Args> inline decltype(auto) try_extract_value(T &&v, Args &&... /*unused*/) { return static_cast<T &&>(v).value(); }
+} // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -6940,7 +6978,7 @@ OUTCOME_V2_NAMESPACE_END
 
 
 //! \exclude
-#define OUTCOME_TRY2(unique, v, ...) OUTCOME_TRYV2(unique, __VA_ARGS__); auto && (v) = static_cast<decltype(unique) &&>(unique).value()
+#define OUTCOME_TRY2(unique, v, ...) OUTCOME_TRYV2(unique, __VA_ARGS__); auto && (v) = OUTCOME_V2_NAMESPACE::detail::try_extract_value(static_cast<decltype(unique) &&>(unique))
 
 
 
@@ -6970,7 +7008,7 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 
 
 
-#define OUTCOME_TRYX(...) ({ auto &&res = (__VA_ARGS__); if(!res.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res)); static_cast<decltype(res) &&>(res).value(); })
+#define OUTCOME_TRYX(...) ({ auto &&res = (__VA_ARGS__); if(!res.has_value()) return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res)); OUTCOME_V2_NAMESPACE::detail::try_extract_value(static_cast<decltype(res) &&>(res)); })
 
 
 

@@ -48,10 +48,10 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / constexpr, "Tests that outcome wo
     constexpr result<long, int> g2(g);
     static_assert(g.has_value(), "");
     static_assert(!g.has_error(), "");
-    static_assert(g.value() == 5, "");
+    static_assert(g.assume_value() == 5, "");  // value() with UDT E won't compile
     static_assert(g2.has_value(), "");
     static_assert(!g2.has_error(), "");
-    static_assert(g2.value() == 5, "");
+    static_assert(g2.assume_value() == 5, "");  // value() with UDT E won't compile
     constexpr result<void, int> g3(in_place_type<void>);
     constexpr result<long, int> g4(g3);
     constexpr result<int, void> g5(in_place_type<void>);
@@ -78,11 +78,11 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / constexpr, "Tests that outcome wo
     static_assert(g.has_value(), "");
     static_assert(!g.has_error(), "");
     static_assert(!g.has_exception(), "");
-    static_assert(g.value() == 5, "");
+    static_assert(g.assume_value() == 5, "");  // value() with UDT E won't compile
     static_assert(g2.has_value(), "");
     static_assert(!g2.has_error(), "");
     static_assert(!g2.has_exception(), "");
-    static_assert(g2.value() == 5, "");
+    static_assert(g2.assume_value() == 5, "");  // value() with UDT E won't compile
     constexpr outcome<void, int, char *> g3(in_place_type<void>);
     constexpr outcome<long, int, const char *> g4(g3);
     constexpr outcome<int, void, char *> g5(in_place_type<void>);
