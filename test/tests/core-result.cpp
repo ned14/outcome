@@ -194,7 +194,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
     BOOST_CHECK(m.has_error());
     // BOOST_CHECK(!m.has_exception());
     // BOOST_CHECK_NO_THROW(m.value());
-    BOOST_CHECK_NO_THROW(m.error());
+    // BOOST_CHECK_NO_THROW(m.error());
   }
   if(false)  // NOLINT
   {          // void, void is permitted, but is not constructible

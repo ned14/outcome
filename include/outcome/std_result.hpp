@@ -29,6 +29,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include "detail/trait_std_error_code.hpp"
 #include "detail/trait_std_exception.hpp"
 
+#include "policy/fail_to_compile_observers.hpp"
 #include "policy/result_error_code_throw_as_system_error.hpp"
 #include "policy/result_exception_ptr_rethrow.hpp"
 #include "policy/throw_bad_result_access.hpp"
@@ -48,7 +49,7 @@ namespace policy
   trait::has_error_code_v<EC>, error_code_throw_as_system_error<T, EC, E>,                           //
   std::conditional_t<                                                                                //
   trait::has_exception_ptr_v<EC> || trait::has_exception_ptr_v<E>, exception_ptr_rethrow<T, EC, E>,  //
-  all_narrow                                                                                         //
+  fail_to_compile_observers                                                                          //
   >>>;
 }  // namespace policy
 
