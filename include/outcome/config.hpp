@@ -273,11 +273,17 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_THROW_EXCEPTION(expr) throw expr
 #else
 
+#ifdef __ANDROID__
+#define OUTCOME_DISABLE_EXECINFO
+#endif
+
+#ifndef OUTCOME_DISABLE_EXECINFO
 #ifdef _WIN32
 #include "quickcpplib/include/execinfo_win64.h"
-#elif !defined(__ANDROID__)
+#else
 #include <execinfo.h>
 #endif
+#endif  // OUTCOME_DISABLE_EXECINFO
 #include <cstdio>
 #include <cstdlib>
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -285,12 +291,12 @@ namespace detail
 {
   QUICKCPPLIB_NORETURN inline void do_fatal_exit(const char *expr)
   {
-#if !defined(__ANDROID__)
+#if !defined(OUTCOME_DISABLE_EXECINFO)
     void *bt[16];
     size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0]));                                // NOLINT
 #endif
     fprintf(stderr, "FATAL: Outcome throws exception %s with exceptions disabled\n", expr);  // NOLINT
-#if !defined(__ANDROID__)
+#if !defined(OUTCOME_DISABLE_EXECINFO)
     char **bts = backtrace_symbols(bt, btlen);                                               // NOLINT
     if(bts != nullptr)
     {

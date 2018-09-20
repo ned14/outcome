@@ -1323,9 +1323,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 97cad4a622e2c0720c06345c5e6b458130c76d2d
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-09-14 17:09:24 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 97cad4a6
+#define OUTCOME_PREVIOUS_COMMIT_REF 4cfb3e06c1d901426c92124c2fc223058c0369b9
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-09-20 08:21:47 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4cfb3e06
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1478,6 +1478,11 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_THROW_EXCEPTION(expr) throw expr
 #else
 
+#ifdef __ANDROID__
+#define OUTCOME_DISABLE_EXECINFO
+#endif
+
+#ifndef OUTCOME_DISABLE_EXECINFO
 #ifdef _WIN32
 /* Implements backtrace() et al from glibc on win64
 (C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (4 commits)
@@ -1811,9 +1816,10 @@ _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(l
 #endif
 
 #endif
-#elif !defined(__ANDROID__)
+#else
 #include <execinfo.h>
 #endif
+#endif // OUTCOME_DISABLE_EXECINFO
 #include <cstdio>
 #include <cstdlib>
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -1821,12 +1827,12 @@ namespace detail
 {
   QUICKCPPLIB_NORETURN inline void do_fatal_exit(const char *expr)
   {
-#if !defined(__ANDROID__)
+#if !defined(OUTCOME_DISABLE_EXECINFO)
     void *bt[16];
     size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0])); // NOLINT
 #endif
     fprintf(stderr, "FATAL: Outcome throws exception %s with exceptions disabled\n", expr); // NOLINT
-#if !defined(__ANDROID__)
+#if !defined(OUTCOME_DISABLE_EXECINFO)
     char **bts = backtrace_symbols(bt, btlen); // NOLINT
     if(bts != nullptr)
     {
