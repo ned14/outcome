@@ -9,6 +9,17 @@ list is given in reverse chronological order.
 
 ---
 
+## Dublin C++ users group 2018 *"Deterministic Disappointment"*
+
+*Literature review of the WG21 papers relating to deterministically handling failure, and using libraries such as Outcome to implement the same.*
+
+{{< youtube cbUTAoHy6Ls >}}
+
+{{< slides "d/e/2PACX-1vRR3_ZXU8pC_1oFH6rctPJ1wijWCQY-uGIBEK2SzOLaVnuFjn7Ed76sYs8QE6pUl-oP2nrggw-b4fma" >}}
+
+
+---
+
 ## Meeting C++ 2017 *"Introduction to proposed std::expected&lt;T, E&gt;"*
 
 *Literature review of the several WG21 papers relating to std::expected<T, E>.*
