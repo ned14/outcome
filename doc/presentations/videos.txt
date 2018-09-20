@@ -7,3 +7,8 @@ Video: https://youtu.be/XVofgKH-uu4
 Literature review of the several WG21 papers relating to std::expected<T, E>
 Slides: https://docs.google.com/presentation/d/1XTsnsGIV4HTh_07bjpCk_XG2NWDs6Tlrw8f5rrUHodc/edit?usp=sharing
 Video: https://www.youtube.com/watch?v=JfMBLx7qE0I
+
+20180917, Dublin C++ users group, Deterministic Disappointment
+Literature review of the WG21 papers relating to deterministically handling failure, and using libraries such as Outcome to implement the same.
+Slides: https://docs.google.com/presentation/d/1fSkpD51FKmy8VEO9P86jWN6tOEaBmzHOXo14zLRkFKE/edit?usp=sharing
+Video: https://www.youtube.com/watch?v=cbUTAoHy6Ls

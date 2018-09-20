@@ -17,5 +17,4 @@ detected and used.
 
 Partially working compilers:
 
-- GCC 5.4.1 is highly usable so long as you don't use Outcome in a `constexpr` evaluation context.
 - clang 3.5 - 3.9 can compile varying degrees of the test suite, the problem is lack of complete and unbuggy C++ 14 language support.

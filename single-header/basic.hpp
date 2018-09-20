@@ -1081,6 +1081,9 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef __cpp_variable_templates
 #error Outcome needs variable template support in the compiler
 #endif
+#if !defined(__clang__) && defined(__GNUC__) && __GNUC__ < 6
+#error Due to a bug in nested template variables parsing, Outcome does not work on GCCs earlier than v6.
+#endif
 
 
 
@@ -1272,9 +1275,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF c678b9221eb4002afd65d84e1211bfff5cf7291a
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-09-05 08:42:15 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c678b922
+#define OUTCOME_PREVIOUS_COMMIT_REF 4cfb3e06c1d901426c92124c2fc223058c0369b9
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-09-20 08:21:47 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4cfb3e06
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1427,6 +1430,11 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_THROW_EXCEPTION(expr) throw expr
 #else
 
+#ifdef __ANDROID__
+#define OUTCOME_DISABLE_EXECINFO
+#endif
+
+#ifndef OUTCOME_DISABLE_EXECINFO
 #ifdef _WIN32
 /* Implements backtrace() et al from glibc on win64
 (C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (4 commits)
@@ -1760,9 +1768,10 @@ _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(l
 #endif
 
 #endif
-#elif !defined(__ANDROID__)
+#else
 #include <execinfo.h>
 #endif
+#endif // OUTCOME_DISABLE_EXECINFO
 #include <cstdio>
 #include <cstdlib>
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -1770,12 +1779,12 @@ namespace detail
 {
   QUICKCPPLIB_NORETURN inline void do_fatal_exit(const char *expr)
   {
-#if !defined(__ANDROID__)
+#if !defined(OUTCOME_DISABLE_EXECINFO)
     void *bt[16];
     size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0])); // NOLINT
 #endif
     fprintf(stderr, "FATAL: Outcome throws exception %s with exceptions disabled\n", expr); // NOLINT
-#if !defined(__ANDROID__)
+#if !defined(OUTCOME_DISABLE_EXECINFO)
     char **bts = backtrace_symbols(bt, btlen); // NOLINT
     if(bts != nullptr)
     {
@@ -2609,9 +2618,9 @@ namespace detail
     constexpr void swap(value_storage_trivial &o) noexcept
     {
       // storage is trivial, so just use assignment
-      auto temp = std::move(*this);
-      *this = std::move(o);
-      o = std::move(temp);
+      auto temp = static_cast<value_storage_trivial &&>(*this);
+      *this = static_cast<value_storage_trivial &&>(o);
+      o = static_cast<value_storage_trivial &&>(temp);
     }
   };
   // Used if T is non-trivial
@@ -6918,7 +6927,7 @@ inline decltype(auto) try_operation_return_as(T &&v)
   return static_cast<T &&>(v).as_failure();
 }
 /*! Customisation point for changing what the `OUTCOME_TRY` macros do.
-\effects Returns by copy a `std::unexpected<E>` from an input `std::expected<T, E>`.
+\effects Returns by copy a `std::experimental::unexpected<E>` from an input `std::experimental::expected<T, E>`.
 */
 
 
@@ -6927,7 +6936,7 @@ template <class T, class E> inline auto try_operation_return_as(const std::exper
   return std::experimental::unexpected<E>(v.error());
 }
 /*! Customisation point for changing what the `OUTCOME_TRY` macros do.
-\effects Returns by move a `std::unexpected<E>` from an input `std::expected<T, E>`.
+\effects Returns by move a `std::experimental::unexpected<E>` from an input `std::experimental::expected<T, E>`.
 */
 
 
@@ -6982,7 +6991,7 @@ OUTCOME_V2_NAMESPACE_END
 
 
 
-/*! If the outcome returned by expression ... is not valued, propagate any
+/*! If the `outcome`/`result`/`std::experimental::expected` returned by expression ... is not valued, propagate any
 failure by immediately returning that failure state immediately
 */
 
@@ -6991,7 +7000,7 @@ failure by immediately returning that failure state immediately
 
 #if defined(__GNUC__) || defined(__clang__)
 
-/*! If the outcome returned by expression ... is not valued, propagate any
+/*! If the `outcome`/`result`/`std::experimental::expected` returned by expression ... is not valued, propagate any
 failure by immediately returning that failure state immediately, else become the
 unwrapped value as an expression. This makes `OUTCOME_TRYX(expr)` an expression
 which can be used exactly like the `try` operator in other languages.
@@ -7018,8 +7027,8 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 
 #endif
 
-/*! If the outcome returned by expression ... is not valued, propagate any
-failure by immediately returning that failure immediately, else set *auto v* to the unwrapped value.
+/*! If the `outcome`/`result`/`std::experimental::expected` returned by expression ... is not valued, propagate any
+failure by immediately returning that failure immediately, else set *auto &&v* to the unwrapped value.
 */
 
 
