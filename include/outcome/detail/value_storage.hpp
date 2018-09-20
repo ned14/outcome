@@ -104,9 +104,9 @@ namespace detail
     constexpr void swap(value_storage_trivial &o) noexcept
     {
       // storage is trivial, so just use assignment
-      auto temp = std::move(*this);
-      *this = std::move(o);
-      o = std::move(temp);
+      auto temp = static_cast<value_storage_trivial &&>(*this);
+      *this = static_cast<value_storage_trivial &&>(o);
+      o = static_cast<value_storage_trivial &&>(temp);
     }
   };
   // Used if T is non-trivial

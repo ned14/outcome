@@ -43,6 +43,9 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef __cpp_variable_templates
 #error Outcome needs variable template support in the compiler
 #endif
+#if !defined(__clang__) && defined(__GNUC__) && __GNUC__ < 6
+#error Due to a bug in nested template variables parsing, Outcome does not work on GCCs earlier than v6.
+#endif
 
 #ifdef DOXYGEN_IS_IN_THE_HOUSE
 #define OUTCOME_FORCEINLINE

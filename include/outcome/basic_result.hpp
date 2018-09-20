@@ -39,8 +39,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-template <class R, class S, class NoValuePolicy>                                                                                                                      //
-#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                               // GCC's constraints implementation is buggy
+template <class R, class S, class NoValuePolicy>                                                                                                                                  //
+#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                           // GCC's constraints implementation is buggy
 OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
 #endif
 class basic_result;
