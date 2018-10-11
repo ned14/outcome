@@ -1,12 +1,12 @@
 Herein lie multiple single header editions of Outcome:
 
 <dl>
-  <dt>`basic.hpp`</dt>
+  <dt>`outcome-basic.hpp`</dt>
   <dd>An inclusion of `basic_outcome.hpp` + `try.hpp` which includes as few
   system headers as possible in order to give an absolute minimum compile time
   impact edition of Outcome. See https://github.com/ned14/stl-header-heft.
   </dd>
-  <dt>`experimental.hpp`</dt>
+  <dt>`outcome-experimental.hpp`</dt>
   <dd>An inclusion of `experimental/status_outcome.hpp` + `try.hpp` which
   is the low compile time impact of the basic edition combined with
   `status_code` from https://ned14.github.io/status-code/. If you are on an
