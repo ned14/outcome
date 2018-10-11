@@ -60,11 +60,11 @@ if(NOT PROJECT_IS_DEPENDENCY)
                          "${CMAKE_CURRENT_SOURCE_DIR}/single-header/outcome.hpp"
                          "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome.hpp")
       make_single_header(outcome_hl-pp-basic
-                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/basic.hpp"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/outcome-basic.hpp"
                          "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/basic_outcome.hpp"
                          "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/try.hpp")
       make_single_header(outcome_hl-pp-experimental
-                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/experimental.hpp"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/outcome-experimental.hpp"
                          "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/experimental/status_outcome.hpp"
                          "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/try.hpp")
       make_single_header(outcome_hl-pp-abi
