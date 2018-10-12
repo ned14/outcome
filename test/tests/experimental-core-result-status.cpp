@@ -183,7 +183,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / result, "Tests that the resul
   }
   {  // errored
     error ec(errc::no_link);
-    result<int> m(ec);
+    result<int> m(ec.clone());
     BOOST_CHECK(!m);
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(m.has_error());
@@ -266,32 +266,29 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / result, "Tests that the resul
 #endif
     static_assert(!std::is_default_constructible<decltype(a)>::value, "");
     static_assert(!std::is_nothrow_default_constructible<decltype(a)>::value, "");
-    static_assert(std::is_copy_constructible<decltype(a)>::value, "");
+    static_assert(!std::is_copy_constructible<decltype(a)>::value, "");
 // Quality of implementation of std::optional is poor :(
 #ifndef TESTING_WG21_EXPERIMENTAL_RESULT
-    static_assert(std::is_trivially_copy_constructible<decltype(a)>::value, "");
-    static_assert(std::is_nothrow_copy_constructible<decltype(a)>::value, "");
-    static_assert(std::is_copy_assignable<decltype(a)>::value, "");
-    static_assert(std::is_trivially_copy_assignable<decltype(a)>::value, "");
-    static_assert(std::is_nothrow_copy_assignable<decltype(a)>::value, "");
+    static_assert(!std::is_trivially_copy_constructible<decltype(a)>::value, "");
+    static_assert(!std::is_nothrow_copy_constructible<decltype(a)>::value, "");
+    static_assert(!std::is_copy_assignable<decltype(a)>::value, "");
+    static_assert(!std::is_trivially_copy_assignable<decltype(a)>::value, "");
+    static_assert(!std::is_nothrow_copy_assignable<decltype(a)>::value, "");
 #endif
-    static_assert(std::is_trivially_destructible<decltype(a)>::value, "");
+    static_assert(!std::is_trivially_destructible<decltype(a)>::value, "");
     static_assert(std::is_nothrow_destructible<decltype(a)>::value, "");
 
     // Test void compiles
     result<void> c(in_place_type<void>);
-    result<void> c2(c);
-    (void) c2;
 
     // Test a standard udt compiles
     result<udt> d(in_place_type<udt>);
-    result<udt> d2(d);
     static_assert(!std::is_default_constructible<decltype(d)>::value, "");
     static_assert(!std::is_nothrow_default_constructible<decltype(d)>::value, "");
-    static_assert(std::is_copy_constructible<decltype(d)>::value, "");
+    static_assert(!std::is_copy_constructible<decltype(d)>::value, "");
     static_assert(!std::is_trivially_copy_constructible<decltype(d)>::value, "");
     static_assert(!std::is_nothrow_copy_constructible<decltype(d)>::value, "");
-    static_assert(std::is_copy_assignable<decltype(d)>::value, "");
+    static_assert(!std::is_copy_assignable<decltype(d)>::value, "");
     static_assert(!std::is_trivially_copy_assignable<decltype(d)>::value, "");
     static_assert(!std::is_nothrow_copy_assignable<decltype(d)>::value, "");
     static_assert(std::is_move_assignable<decltype(d)>::value, "");
