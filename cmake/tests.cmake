@@ -10,6 +10,7 @@ set(outcome_TESTS
   "test/tests/default-construction.cpp"
   "test/tests/experimental-core-outcome-status.cpp"
   "test/tests/experimental-core-result-status.cpp"
+  "test/tests/experimental-p0709a.cpp"
   "test/tests/fileopen.cpp"
   "test/tests/hooks.cpp"
   "test/tests/issue0007.cpp"

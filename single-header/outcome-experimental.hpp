@@ -1323,9 +1323,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF b15c90b74a23be9f7f154694725ed02762e4ed6a
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-10-11 17:58:48 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE b15c90b7
+#define OUTCOME_PREVIOUS_COMMIT_REF a312371cd7d52c1709616ca75583299fa896d897
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-10-12 08:59:18 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE a312371c
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -9121,25 +9121,41 @@ template <class DomainType1, class DomainType2> inline bool operator!=(const sta
 {
   return !a.equivalent(b);
 }
-//! True if the status code's are semantically equal via `equivalent()` to the generic code.
-template <class DomainType1> inline bool operator==(const status_code<DomainType1> &a, errc b) noexcept
+//! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
+template <class DomainType1, class T, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
+inline bool
+operator==(const status_code<DomainType1> &a, const T &b)
 {
-  return a.equivalent(generic_code(b));
+  return a.equivalent(make_status_code(b));
 }
-//! True if the status code's are semantically equal via `equivalent()` to the generic code.
-template <class DomainType1> inline bool operator==(errc a, const status_code<DomainType1> &b) noexcept
+//! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
+template <class T, class DomainType1, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
+inline bool
+operator==(const T &a, const status_code<DomainType1> &b)
 {
-  return b.equivalent(generic_code(a));
+  return b.equivalent(make_status_code(a));
 }
-//! True if the status code's are not semantically equal via `equivalent()` to the generic code.
-template <class DomainType1> inline bool operator!=(const status_code<DomainType1> &a, errc b) noexcept
+//! True if the status code's are not semantically equal via `equivalent()` to `make_status_code(T)`.
+template <class DomainType1, class T, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
+inline bool
+operator!=(const status_code<DomainType1> &a, const T &b)
 {
-  return !a.equivalent(generic_code(b));
+  return !a.equivalent(make_status_code(b));
 }
-//! True if the status code's are not semantically equal via `equivalent()` to the generic code.
-template <class DomainType1> inline bool operator!=(errc a, const status_code<DomainType1> &b) noexcept
+//! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
+template <class T, class DomainType1, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
+inline bool
+operator!=(const T &a, const status_code<DomainType1> &b)
 {
-  return !b.equivalent(generic_code(a));
+  return !b.equivalent(make_status_code(a));
 }
 
 SYSTEM_ERROR2_NAMESPACE_END
@@ -9551,25 +9567,41 @@ template <class DomainType1, class DomainType2> inline bool operator!=(const err
 {
   return !static_cast<const status_code<DomainType1> &>(a).equivalent(b);
 }
-//! True if the status code's are semantically equal via `equivalent()` to the generic code.
-template <class DomainType1> inline bool operator==(const errored_status_code<DomainType1> &a, errc b) noexcept
+//! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
+template <class DomainType1, class T, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
+inline bool
+operator==(const errored_status_code<DomainType1> &a, const T &b)
 {
-  return static_cast<const status_code<DomainType1> &>(a).equivalent(generic_code(b));
+  return a.equivalent(make_status_code(b));
 }
-//! True if the status code's are semantically equal via `equivalent()` to the generic code.
-template <class DomainType1> inline bool operator==(errc a, const errored_status_code<DomainType1> &b) noexcept
+//! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
+template <class T, class DomainType1, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
+inline bool
+operator==(const T &a, const errored_status_code<DomainType1> &b)
 {
-  return static_cast<const status_code<DomainType1> &>(b).equivalent(generic_code(a));
+  return b.equivalent(make_status_code(a));
 }
-//! True if the status code's are not semantically equal via `equivalent()` to the generic code.
-template <class DomainType1> inline bool operator!=(const errored_status_code<DomainType1> &a, errc b) noexcept
+//! True if the status code's are not semantically equal via `equivalent()` to `make_status_code(T)`.
+template <class DomainType1, class T, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
+inline bool
+operator!=(const errored_status_code<DomainType1> &a, const T &b)
 {
-  return !static_cast<const status_code<DomainType1> &>(a).equivalent(generic_code(b));
+  return !a.equivalent(make_status_code(b));
 }
-//! True if the status code's are not semantically equal via `equivalent()` to the generic code.
-template <class DomainType1> inline bool operator!=(errc a, const errored_status_code<DomainType1> &b) noexcept
+//! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
+template <class T, class DomainType1, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
+inline bool
+operator!=(const T &a, const errored_status_code<DomainType1> &b)
 {
-  return !static_cast<const status_code<DomainType1> &>(b).equivalent(generic_code(a));
+  return !b.equivalent(make_status_code(a));
 }
 
 
