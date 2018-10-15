@@ -1323,9 +1323,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF a312371cd7d52c1709616ca75583299fa896d897
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-10-12 08:59:18 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE a312371c
+#define OUTCOME_PREVIOUS_COMMIT_REF e769538af83d3b3844cbb24873ee1cd2a8414ddf
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-10-15 18:55:51 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE e769538a
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -8347,7 +8347,7 @@ namespace detail
 //! Trait returning true if the type is a status code.
 template <class T> struct is_status_code
 {
-  static constexpr bool value = detail::is_status_code<typename std::decay<T>::type>::value;
+  static constexpr bool value = detail::is_status_code<typename std::decay<T>::type>::value || detail::is_erased_status_code<typename std::decay<T>::type>::value;
 };
 
 /*! A type erased lightweight status code reflecting empty, success, or failure.
