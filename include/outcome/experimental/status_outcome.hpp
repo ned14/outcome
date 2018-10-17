@@ -110,7 +110,7 @@ namespace experimental
 
   /*! TODO
   */
-  template <class R, class DomainType, class P = std::exception_ptr>  //
+  template <class R, class DomainType = typename SYSTEM_ERROR2_NAMESPACE::generic_code::domain_type, class P = std::exception_ptr>  //
   using status_outcome = basic_outcome<R, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, P, policy::default_status_outcome_policy<R, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, P>>;
 
   //! Namespace for policies

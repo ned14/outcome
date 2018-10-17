@@ -97,7 +97,7 @@ namespace experimental
 
   /*! TODO
   */
-  template <class R, class DomainType>  //
+  template <class R, class DomainType = typename SYSTEM_ERROR2_NAMESPACE::generic_code::domain_type>  //
   using status_result = basic_result<R, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, policy::default_status_result_policy<R, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>>;
 
 }  // namespace experimental
