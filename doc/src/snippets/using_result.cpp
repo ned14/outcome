@@ -125,7 +125,7 @@ outcome::result<void> print_half(const std::string& text)
   {
     if (r.error() == ConversionErrc::TooLong)     // #3
     {
-      OUTCOME_TRY (i, (BigInt::fromString(text)));// #4
+      OUTCOME_TRY (i, BigInt::fromString(text));  // #4
       std::cout << i.half() << std::endl;
     }
     else
