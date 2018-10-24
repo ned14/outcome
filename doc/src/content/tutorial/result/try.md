@@ -8,7 +8,7 @@ tags = ["try"]
 In the implementation of function `print_half` we have seen the usage of the macro {{< api try OUTCOME_TRY >}}:
 
 ```c++
-OUTCOME_TRY (i, (BigInt::fromString(text)));
+OUTCOME_TRY (i, BigInt::fromString(text));
 ```
 
 The `OUTCOME_TRY` macro uses C macro overloading to select between two implementations based on the number of
