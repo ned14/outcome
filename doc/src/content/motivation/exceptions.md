@@ -21,10 +21,11 @@ int a()
 }
 ```
 
+In the Standard C++ terms this means that `f()` is *sequenced before* `g()`. 
 This makes failure handling extremely easy: in a lot of cases you do not have
 to do anything.
 
-But there is run-time cost to be payed when using exceptions.
+But there is also cost to be paid when using exceptions.
 
 This tutorial is in the process of being written. Once done we will explain in detail
 why it is sometimes beneficial not to use exceptions to signal failures.
