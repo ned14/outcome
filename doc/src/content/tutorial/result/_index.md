@@ -1,5 +1,5 @@
 +++
-title = "result<T, EC>"
+title = "result<>"
 description = "Gentle introduction to writing code with simple success-or-failure return types."
 weight = 10
 tags = ["result", "try", "namespace"]
@@ -23,11 +23,15 @@ if it does we want to communicate the failure reason.
 
 {{% snippet "using_result.cpp" "convert_decl" %}}
 
-Class template {{< api "result/#standardese-outcome_v2_xxx__result-R-S-NoValuePolicy-" "result<T, EC>" >}} has two template parameters. The first (`T`) represents the type of the object
-returned from the function upon success; the second (`EC`) is the type of object containing information about the reason
-for failure when the function fails. A `result<T, EC>` object either stores a `T` or an `EC` at any given moment,
-and is therefore conceptually similar to `variant<T, EC>`. `EC` is defaulted to `std::error_code`.
-If both `T` and `EC` are trivially copyable, `result<T, EC>` is also trivially copyable.
+Class template {{< api "result/#standardese-outcome_v2_xxx__result-R-S-NoValuePolicy-" "result<T, EC, NVP>" >}}
+has three template parameters, but the last two have default values. The first
+(`T`) represents the type of the object returned from the function upon success.
+The second (`EC`) is the type of object containing information about the reason
+for failure when the function fails. A result object stores either a `T` or an
+`EC` at any given moment, and is therefore conceptually similar to `variant<T, EC>`. `EC` is defaulted to `std::error_code`. The third parameter (`NVP`) is called a
+no-value policy. We will cover it later.
+
+If both `T` and `EC` are trivially copyable, `result<T, EC, NVP>` is also trivially copyable.
 
 Now, we will define an enumeration describing different failure situations during conversion.
 
