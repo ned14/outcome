@@ -33,10 +33,10 @@ Now, we will define an enumeration describing different failure situations durin
 
 {{% snippet "using_result.cpp" "enum" %}}
 
-Assume we have plugged it into `std::error_code` framework, as described in [this section](../error_code).
+Assume we have plugged it into `std::error_code` framework, as described in [this section](../../motivation/plug_error_code).
 
 One notable effect of such plugging is that `ConversionErrc` is now convertible to `std::error_code`.
-Now we can implement function `convert` as follows: 
+Now we can implement function `convert` as follows:
 
 {{% snippet "using_result.cpp" "convert" %}}
 

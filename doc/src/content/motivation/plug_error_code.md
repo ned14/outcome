@@ -1,5 +1,5 @@
 +++
-title = "Custom error codes"
+title = "Plugging a library into std::error_code"
 description = "Illustrates how you can hook into the std::error_code system from the Standard Library in order to work with your own set of error codes."
 weight = 91
 +++
@@ -49,8 +49,7 @@ contextual conversion to `bool` (which some people use to check if there was an 
 only checks for the numeric value of the error code (without looking at error domain (category)).
 {{% /notice %}}
 
-[1]: The only documentation I'm aware of is the quite old guide by Chris Kohlhoff, founder of
-ASIO and the Networking TS:
+[1]: The only documentation I'm aware of is the quite old guide by Chris Kohlhoff, founder of ASIO and the Networking TS:
 
 - http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-1.html
 - http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-2.html
