@@ -37,7 +37,12 @@ namespace detail
     {
     };
   }
+#if defined(_MSC_VER) && _MSC_VER < 1920
+  // VS2017 with /permissive- chokes on the correct form due to over eager early instantiation.
+  template <class S, class P> inline void basic_outcome_failure_exception_from_error(...) { static_assert(sizeof(S) == 0, "No specialisation for these error and exception types available!"); }
+#else
   template <class S, class P> inline void basic_outcome_failure_exception_from_error(...) = delete;  // No specialisation for these error and exception types available!
+#endif
 
   //! The failure observers implementation of `basic_outcome<R, S, P>`.
   template <class Base, class R, class S, class P, class NoValuePolicy> class basic_outcome_failure_observers : public Base

@@ -87,11 +87,15 @@ inline arithmetic_errc_error make_status_code(arithmetic_errc e)
     return arithmetic_errc_error(SYSTEM_ERROR2_NAMESPACE::in_place, e);
 }
 
-// Tell Outcome that arithmetic_errc is convertible into std::error
-template <> struct OUTCOME_V2_NAMESPACE::trait::is_error_type_enum<error, arithmetic_errc>
-{
-  static constexpr bool value = true;
-};
+OUTCOME_V2_NAMESPACE_BEGIN
+namespace trait {
+    // Tell Outcome that arithmetic_errc is convertible into std::error
+    template <> struct is_error_type_enum<error, arithmetic_errc>
+    {
+      static constexpr bool value = true;
+    };
+}
+OUTCOME_V2_NAMESPACE_END
 // And tell Outcome how to perform the implicit conversion
 inline error make_error_code(arithmetic_errc e)
 {
