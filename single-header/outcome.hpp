@@ -961,9 +961,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 74be03b78dc003b66252545b05a788a565946d33
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2018-07-03 08:34:47 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 74be03b7
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 989b7985c54775a060e5ed8955875539e8c188b9
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2018-10-25 20:55:56 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 989b7985
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1490,9 +1490,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF e769538af83d3b3844cbb24873ee1cd2a8414ddf
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-10-15 18:55:51 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE e769538a
+#define OUTCOME_PREVIOUS_COMMIT_REF 74ec16d010f30b15f2059dac85ff268ab077dd63
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-10-25 20:59:53 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 74ec16d0
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -6367,7 +6367,12 @@ namespace detail
     {
     };
   }
+#if defined(_MSC_VER) && _MSC_VER < 1920
+  // VS2017 with /permissive- chokes on the correct form due to over eager early instantiation.
+  template <class S, class P> inline void basic_outcome_failure_exception_from_error(...) { static_assert(sizeof(S) == 0, "No specialisation for these error and exception types available!"); }
+#else
   template <class S, class P> inline void basic_outcome_failure_exception_from_error(...) = delete; // No specialisation for these error and exception types available!
+#endif
 
   //! The failure observers implementation of `basic_outcome<R, S, P>`.
   template <class Base, class R, class S, class P, class NoValuePolicy> class basic_outcome_failure_observers : public Base
