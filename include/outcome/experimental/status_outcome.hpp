@@ -128,16 +128,9 @@ namespace experimental
       {
         if(!base::_has_value(static_cast<Impl &&>(self)))
         {
-          using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<basic_outcome<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E, status_code_throw>, decltype(self)>;
-#if defined(_MSC_VER) && _MSC_VER < 1920
-          // VS2017 tries a copy construction in the correct implementation despite that Outcome is always a rvalue or lvalue ref! :(
-          basic_outcome<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E, status_code_throw> &_self = (basic_outcome<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E, status_code_throw> &) (self);  // NOLINT
-#else
-          Outcome _self = static_cast<Outcome>(self);  // NOLINT
-#endif
           if(base::_has_exception(static_cast<Impl &&>(self)))
           {
-            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::has_exception_ptr_v<E>>(static_cast<Outcome>(_self)._ptr);
+            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::has_exception_ptr_v<E>>(base::_exception<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self)));
           }
           if(base::_has_error(static_cast<Impl &&>(self)))
           {

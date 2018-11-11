@@ -76,6 +76,9 @@ namespace policy
     template <class Impl> static constexpr auto &&_error(Impl &&self) noexcept { return static_cast<Impl &&>(self)._error; }
 
   public:
+    //! Accesses the current state's exception. No checking of validity is made.
+    template <class R, class S, class P, class NoValuePolicy, class Impl> static inline constexpr auto &&_exception(Impl &&self) noexcept;
+
     /*! Performs a narrow check of state, used in the assume_value() functions.
     \effects None.
     */

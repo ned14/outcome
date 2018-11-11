@@ -50,9 +50,7 @@ namespace policy
       {
         if(base::_has_exception(std::forward<Impl>(self)))
         {
-          using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<basic_outcome<T, EC, E, error_code_throw_as_system_error>, decltype(self)>;
-          Outcome _self = static_cast<Outcome>(self);  // NOLINT
-          detail::_rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
+          detail::_rethrow_exception<trait::has_exception_ptr_v<E>>{base::_exception<T, EC, E, error_code_throw_as_system_error>(std::forward<Impl>(self))};
         }
         if(base::_has_error(std::forward<Impl>(self)))
         {
