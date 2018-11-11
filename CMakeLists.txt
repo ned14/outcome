@@ -132,6 +132,24 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
         add_test(NAME ${target_name} CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
           COMMAND $<TARGET_FILE:${target_name}> --reporter junit --out $<TARGET_FILE:${target_name}>.junit.xml
         )
+        if(MSVC AND NOT CLANG)
+          set(target_name "outcome_hl--${testname}-nopermissive")
+          add_executable(${target_name} "${testsource}")
+          target_link_libraries(${target_name} PRIVATE outcome::hl)
+          target_compile_options(${target_name} PRIVATE /permissive-)
+          set_target_properties(${target_name} PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+            POSITION_INDEPENDENT_CODE ON
+          )
+          #set(target_name "outcome_hl--${testname}-modules")
+          #add_executable(${target_name} "${testsource}")
+          #target_link_libraries(${target_name} PRIVATE outcome::hl)
+          #target_compile_options(${target_name} PRIVATE /experimental:module)
+          #set_target_properties(${target_name} PROPERTIES
+          #  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+          #  POSITION_INDEPENDENT_CODE ON
+          #)
+        endif()
       endif()
     endif()
   endforeach()

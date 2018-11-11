@@ -52,20 +52,20 @@ namespace experimental
     };
     /*!
     */
-    template <class T, class DomainType> struct status_code_throw<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, void> : OUTCOME_V2_NAMESPACE::policy::detail::base
+    template <class T, class DomainType> struct status_code_throw<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, void> : OUTCOME_V2_NAMESPACE::policy::base
     {
-      using _base = OUTCOME_V2_NAMESPACE::policy::detail::base;
+      using _base = OUTCOME_V2_NAMESPACE::policy::base;
       /*! Performs a wide check of state, used in the value() functions.
       \effects TODO
       */
       template <class Impl> static constexpr void wide_value_check(Impl &&self)
       {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+        if(!base::_has_value(static_cast<Impl &&>(self)))
         {
-          if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
+          if(base::_has_error(static_cast<Impl &&>(self)))
           {
 #ifdef __cpp_exceptions
-            self._error.throw_exception();
+            base::_error(static_cast<Impl &&>(self)).throw_exception();
 #else
             OUTCOME_THROW_EXCEPTION(wide_value_check);
 #endif

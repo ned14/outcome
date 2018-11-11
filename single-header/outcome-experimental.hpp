@@ -1323,9 +1323,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 74ec16d010f30b15f2059dac85ff268ab077dd63
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-10-25 20:59:53 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 74ec16d0
+#define OUTCOME_PREVIOUS_COMMIT_REF 809924e3592290af38d809557e18d50f684f931f
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-11-08 19:20:13 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 809924e3
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -2937,10 +2937,7 @@ namespace hooks
 
 namespace policy
 {
-  namespace detail
-  {
-    struct base;
-  } // namespace detail
+  struct base;
 } // namespace policy
 
 namespace detail
@@ -2954,8 +2951,7 @@ namespace detail
     static_assert(trait::type_can_be_used_in_basic_result<EC>, "The type S cannot be used in a basic_result");
     static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "The type S must be void or default constructible");
 
-    friend NoValuePolicy;
-    friend struct policy::detail::base;
+    friend struct policy::base;
     template <class T, class U, class V> friend class basic_result_storage;
     template <class T, class U, class V> friend class basic_result_final;
     template <class T, class U, class V> friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept; // NOLINT
@@ -3936,8 +3932,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
-#ifndef OUTCOME_POLICY_DETAIL_COMMON_HPP
-#define OUTCOME_POLICY_DETAIL_COMMON_HPP
+#ifndef OUTCOME_POLICY_BASE_HPP
+#define OUTCOME_POLICY_BASE_HPP
 
 
 
@@ -3947,65 +3943,86 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  namespace detail
+  struct base
   {
-    struct base
-    {
-    private:
-      template <class Impl>
-      static constexpr
+  protected:
+    //! Invokes noticeable UB!
+    template <class Impl>
+    static constexpr
 #ifdef _MSC_VER
-      __declspec(noreturn)
+    __declspec(noreturn)
 #elif defined(__GNUC__) || defined(__clang__)
         __attribute__((noreturn))
 #endif
-      void _ub(Impl && /*unused*/)
-      {
-        assert(false);
+    void _ub(Impl && /*unused*/)
+    {
+      assert(false);
 #if defined(__GNUC__) || defined(__clang__)
-        __builtin_unreachable();
+      __builtin_unreachable();
 #endif
-      }
+    }
 
-    public:
-      /*! Performs a narrow check of state, used in the assume_value() functions.
-      \effects None.
-      */
+    //! True if the current state's status has its value bit set.
+    template <class Impl> static constexpr bool _has_value(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) != 0; }
+    //! True if the current state's status has its error bit set.
+    template <class Impl> static constexpr bool _has_error(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0; }
+    //! True if the current state's status has its exception bit set.
+    template <class Impl> static constexpr bool _has_exception(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0; }
+    //! True if the current state's status has its error-is-errno bit set.
+    template <class Impl> static constexpr bool _has_error_is_errno(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_error_is_errno) != 0; }
+
+    //! Changes the current state's status value bit.
+    template <class Impl> static constexpr void _set_value(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_value : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_have_value; }
+    //! Changes the current state's status error bit.
+    template <class Impl> static constexpr void _set_error(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_error : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_have_error; }
+    //! Changes the current state's status exception bit.
+    template <class Impl> static constexpr void _set_exception(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_exception : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_have_exception; }
+    //! Changes the current state's status error-is-errno bit.
+    template <class Impl> static constexpr void _set_error_is_errno(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_error_is_errno : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_error_is_errno; }
+
+    //! Accesses the current state's value. No checking of validity is made.
+    template <class Impl> static constexpr auto &&_value(Impl &&self) noexcept { return static_cast<Impl &&>(self)._state._value; }
+    //! Accesses the current state's error. No checking of validity is made.
+    template <class Impl> static constexpr auto &&_error(Impl &&self) noexcept { return static_cast<Impl &&>(self)._error; }
+
+  public:
+    /*! Performs a narrow check of state, used in the assume_value() functions.
+    \effects None.
+    */
 
 
-      template <class Impl> static constexpr void narrow_value_check(Impl &&self) noexcept
+    template <class Impl> static constexpr void narrow_value_check(Impl &&self) noexcept
+    {
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
-        {
-          _ub(self);
-        }
+        _ub(self);
       }
-      /*! Performs a narrow check of state, used in the assume_error() functions
-      \effects None.
-      */
+    }
+    /*! Performs a narrow check of state, used in the assume_error() functions
+    \effects None.
+    */
 
 
-      template <class Impl> static constexpr void narrow_error_check(Impl &&self) noexcept
+    template <class Impl> static constexpr void narrow_error_check(Impl &&self) noexcept
+    {
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
-        {
-          _ub(self);
-        }
+        _ub(self);
       }
-      /*! Performs a narrow check of state, used in the assume_exception() functions
-      \effects None.
-      */
+    }
+    /*! Performs a narrow check of state, used in the assume_exception() functions
+    \effects None.
+    */
 
 
-      template <class Impl> static constexpr void narrow_exception_check(Impl &&self) noexcept
+    template <class Impl> static constexpr void narrow_exception_check(Impl &&self) noexcept
+    {
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
       {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
-        {
-          _ub(self);
-        }
+        _ub(self);
       }
-    };
-  } // namespace detail
+    }
+  };
 } // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
@@ -4022,26 +4039,26 @@ namespace policy
 
 
 
-  struct all_narrow : detail::base
+  struct all_narrow : base
   {
     /*! Performs a wide check of state, used in the value() functions. Calls `narrow_value_check()` and does nothing else.
     \effects None.
     */
 
 
-    template <class Impl> static constexpr void wide_value_check(Impl &&self) { detail::base::narrow_value_check(static_cast<Impl &&>(self)); }
+    template <class Impl> static constexpr void wide_value_check(Impl &&self) { base::narrow_value_check(static_cast<Impl &&>(self)); }
     /*! Performs a wide check of state, used in the error() functions. Calls `narrow_error_check()` and does nothing else.
     \effects None.
     */
 
 
-    template <class Impl> static constexpr void wide_error_check(Impl &&self) { detail::base::narrow_error_check(static_cast<Impl &&>(self)); }
+    template <class Impl> static constexpr void wide_error_check(Impl &&self) { base::narrow_error_check(static_cast<Impl &&>(self)); }
     /*! Performs a wide check of state, used in the exception() functions. Calls `narrow_exception_check()` and does nothing else.
     \effects None.
     */
 
 
-    template <class Impl> static constexpr void wide_exception_check(Impl &&self) { detail::base::narrow_exception_check(static_cast<Impl &&>(self)); }
+    template <class Impl> static constexpr void wide_exception_check(Impl &&self) { base::narrow_exception_check(static_cast<Impl &&>(self)); }
   };
 } // namespace policy
 
@@ -4112,7 +4129,7 @@ namespace policy
 
 
 
-  struct terminate : detail::base
+  struct terminate : base
   {
     /*! Performs a wide check of state, used in the value() functions.
     \effects If result does not have a value, calls `std::terminate()`.
@@ -4121,7 +4138,7 @@ namespace policy
 
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if(!base::_has_value(static_cast<Impl &&>(self)))
       {
         std::abort();
       }
@@ -4133,7 +4150,7 @@ namespace policy
 
     template <class Impl> static constexpr void wide_error_check(Impl &&self) noexcept
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if(!base::_has_error(static_cast<Impl &&>(self)))
       {
         std::abort();
       }
@@ -4145,7 +4162,7 @@ namespace policy
 
     template <class Impl> static constexpr void wide_exception_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+      if(!base::_has_exception(static_cast<Impl &&>(self)))
       {
         std::abort();
       }
@@ -11565,9 +11582,9 @@ namespace experimental
     /*!
     */
 
-    template <class T, class DomainType> struct status_code_throw<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, void> : OUTCOME_V2_NAMESPACE::policy::detail::base
+    template <class T, class DomainType> struct status_code_throw<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, void> : OUTCOME_V2_NAMESPACE::policy::base
     {
-      using _base = OUTCOME_V2_NAMESPACE::policy::detail::base;
+      using _base = OUTCOME_V2_NAMESPACE::policy::base;
       /*! Performs a wide check of state, used in the value() functions.
       \effects TODO
       */
@@ -11575,12 +11592,12 @@ namespace experimental
 
       template <class Impl> static constexpr void wide_value_check(Impl &&self)
       {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+        if(!base::_has_value(static_cast<Impl &&>(self)))
         {
-          if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
+          if(base::_has_error(static_cast<Impl &&>(self)))
           {
 #ifdef __cpp_exceptions
-            self._error.throw_exception();
+            base::_error(static_cast<Impl &&>(self)).throw_exception();
 #else
             OUTCOME_THROW_EXCEPTION(wide_value_check);
 #endif
@@ -11716,9 +11733,9 @@ namespace experimental
     /*!
     */
 
-    template <class T, class DomainType, class E> struct status_code_throw<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E> : OUTCOME_V2_NAMESPACE::policy::detail::base
+    template <class T, class DomainType, class E> struct status_code_throw<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E> : OUTCOME_V2_NAMESPACE::policy::base
     {
-      using _base = OUTCOME_V2_NAMESPACE::policy::detail::base;
+      using _base = OUTCOME_V2_NAMESPACE::policy::base;
       /*! Performs a wide check of state, used in the value() functions.
       \effects See description of class for effects.
       */
@@ -11726,23 +11743,23 @@ namespace experimental
 
       template <class Impl> static constexpr void wide_value_check(Impl &&self)
       {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+        if(!base::_has_value(static_cast<Impl &&>(self)))
         {
           using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<basic_outcome<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E, status_code_throw>, decltype(self)>;
 #if defined(_MSC_VER) && _MSC_VER < 1920
-          // VS2017 tries a copy construction in the correct implementation despite that Outcome is always a reference! :(
+          // VS2017 tries a copy construction in the correct implementation despite that Outcome is always a rvalue or lvalue ref! :(
           basic_outcome<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E, status_code_throw> &_self = (basic_outcome<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E, status_code_throw> &) (self); // NOLINT
 #else
           Outcome _self = static_cast<Outcome>(self); // NOLINT
 #endif
-          if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0)
+          if(base::_has_exception(static_cast<Impl &&>(self)))
           {
             OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::has_exception_ptr_v<E>>(static_cast<Outcome>(_self)._ptr);
           }
-          if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
+          if(base::_has_error(static_cast<Impl &&>(self)))
           {
 #ifdef __cpp_exceptions
-            static_cast<Outcome>(_self).assume_error().throw_exception();
+            base::_error(static_cast<Impl &&>(self)).throw_exception();
 #else
             OUTCOME_THROW_EXCEPTION(wide_value_check);
 #endif

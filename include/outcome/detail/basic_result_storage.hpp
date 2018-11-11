@@ -48,10 +48,7 @@ namespace hooks
 
 namespace policy
 {
-  namespace detail
-  {
-    struct base;
-  }  // namespace detail
+  struct base;
 }  // namespace policy
 
 namespace detail
@@ -65,8 +62,7 @@ namespace detail
     static_assert(trait::type_can_be_used_in_basic_result<EC>, "The type S cannot be used in a basic_result");
     static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "The type S must be void or default constructible");
 
-    friend NoValuePolicy;
-    friend struct policy::detail::base;
+    friend struct policy::base;
     template <class T, class U, class V> friend class basic_result_storage;
     template <class T, class U, class V> friend class basic_result_final;
     template <class T, class U, class V> friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept;        // NOLINT

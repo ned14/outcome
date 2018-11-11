@@ -26,7 +26,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define OUTCOME_POLICY_RESULT_EXCEPTION_PTR_RETHROW_HPP
 
 #include "../bad_access.hpp"
-#include "detail/common.hpp"
+#include "base.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -37,19 +37,19 @@ namespace policy
   `rethrow_exception(policy::exception_ptr(.error()|.exception()))` appropriately.
   */
   template <class T, class EC, class E> struct exception_ptr_rethrow;
-  template <class T, class EC> struct exception_ptr_rethrow<T, EC, void> : detail::base
+  template <class T, class EC> struct exception_ptr_rethrow<T, EC, void> : base
   {
     /*! Performs a wide check of state, used in the value() functions
     \effects If result does not have a value, if it has an error it rethrows that error via `rethrow_exception()`, else it throws `bad_result_access`.
     */
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if(!base::_has_value(std::forward<Impl>(self)))
       {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
+        if(base::_has_error(std::forward<Impl>(self)))
         {
           // ADL
-          rethrow_exception(policy::exception_ptr(std::forward<Impl>(self)._error));
+          rethrow_exception(policy::exception_ptr(base::_error(std::forward<Impl>(self))));
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
@@ -59,7 +59,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if(!base::_has_error(std::forward<Impl>(self)))
       {
         OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }

@@ -26,7 +26,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define OUTCOME_POLICY_RESULT_ERROR_CODE_THROW_AS_SYSTEM_ERROR_HPP
 
 #include "../bad_access.hpp"
-#include "detail/common.hpp"
+#include "base.hpp"
 
 #include <system_error>
 
@@ -39,19 +39,19 @@ namespace policy
   Any wide attempt to access the successful state where there is none calls an
   ADL discovered free function `outcome_throw_as_system_error_with_payload(.error())`.
   */
-  template <class T, class EC> struct error_code_throw_as_system_error<T, EC, void> : detail::base
+  template <class T, class EC> struct error_code_throw_as_system_error<T, EC, void> : base
   {
     /*! Performs a wide check of state, used in the value() functions.
     \effects See description of class for effects.
     */
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if(!base::_has_value(std::forward<Impl>(self)))
       {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
+        if(base::_has_error(std::forward<Impl>(self)))
         {
           // ADL discovered
-          outcome_throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
+          outcome_throw_as_system_error_with_payload(base::_error(std::forward<Impl>(self)));
         }
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
@@ -61,7 +61,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if(!base::_has_error(std::forward<Impl>(self)))
       {
         OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }

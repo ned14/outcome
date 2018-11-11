@@ -25,7 +25,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_POLICY_TERMINATE_HPP
 #define OUTCOME_POLICY_TERMINATE_HPP
 
-#include "detail/common.hpp"
+#include "base.hpp"
 
 #include <cstdlib>
 
@@ -37,14 +37,14 @@ namespace policy
 
   Can be used in both `result` and `outcome`.
   */
-  struct terminate : detail::base
+  struct terminate : base
   {
     /*! Performs a wide check of state, used in the value() functions.
     \effects If result does not have a value, calls `std::terminate()`.
     */
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if(!base::_has_value(static_cast<Impl &&>(self)))
       {
         std::abort();
       }
@@ -54,7 +54,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_error_check(Impl &&self) noexcept
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if(!base::_has_error(static_cast<Impl &&>(self)))
       {
         std::abort();
       }
@@ -64,7 +64,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_exception_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+      if(!base::_has_exception(static_cast<Impl &&>(self)))
       {
         std::abort();
       }
