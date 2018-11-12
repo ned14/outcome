@@ -84,7 +84,7 @@ namespace policy
     */
     template <class Impl> static constexpr void narrow_value_check(Impl &&self) noexcept
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if(!_has_value(self))
       {
         _ub(self);
       }
@@ -94,7 +94,7 @@ namespace policy
     */
     template <class Impl> static constexpr void narrow_error_check(Impl &&self) noexcept
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if(!_has_error(self))
       {
         _ub(self);
       }
@@ -104,7 +104,7 @@ namespace policy
     */
     template <class Impl> static constexpr void narrow_exception_check(Impl &&self) noexcept
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+      if(!_has_exception(self))
       {
         _ub(self);
       }
