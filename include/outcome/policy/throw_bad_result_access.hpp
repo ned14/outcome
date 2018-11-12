@@ -26,7 +26,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define OUTCOME_POLICY_THROW_BAD_RESULT_ACCESS_HPP
 
 #include "../bad_access.hpp"
-#include "detail/common.hpp"
+#include "base.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -36,16 +36,16 @@ namespace policy
 
   Can be used in `result` only.
   */
-  template <class EC> struct throw_bad_result_access : detail::base
+  template <class EC> struct throw_bad_result_access : base
   {
     /*! Performs a wide check of state, used in the value() functions.
     \effects If result does not have a value, it throws `bad_result_access_with<EC>`.
     */
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if(!base::_has_value(std::forward<Impl>(self)))
       {
-        OUTCOME_THROW_EXCEPTION(bad_result_access_with<EC>(std::forward<Impl>(self)._error));
+        OUTCOME_THROW_EXCEPTION(bad_result_access_with<EC>(base::_error(std::forward<Impl>(self))));
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -53,7 +53,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if(!base::_has_error(std::forward<Impl>(self)))
       {
         OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
       }
@@ -63,7 +63,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_exception_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+      if(!base::_has_exception(std::forward<Impl>(self)))
       {
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
       }

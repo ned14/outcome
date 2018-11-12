@@ -39,25 +39,23 @@ namespace policy
   ADL discovered free function `outcome_throw_as_system_error_with_payload(.error())`.
   2. If `trait::has_error_payload_v<EC>` is false, it calls `OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(.error())))`
   */
-  template <class T, class EC, class E> struct error_code_throw_as_system_error : detail::base
+  template <class T, class EC, class E> struct error_code_throw_as_system_error : base
   {
     /*! Performs a wide check of state, used in the value() functions.
     \effects See description of class for effects.
     */
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if(!base::_has_value(std::forward<Impl>(self)))
       {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0)
+        if(base::_has_exception(std::forward<Impl>(self)))
         {
-          using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<basic_outcome<T, EC, E, error_code_throw_as_system_error>, decltype(self)>;
-          Outcome _self = static_cast<Outcome>(self);  // NOLINT
-          detail::_rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
+          detail::_rethrow_exception<trait::has_exception_ptr_v<E>>{base::_exception<T, EC, E, error_code_throw_as_system_error>(std::forward<Impl>(self))};
         }
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
+        if(base::_has_error(std::forward<Impl>(self)))
         {
           // ADL discovered
-          outcome_throw_as_system_error_with_payload(std::forward<Impl>(self)._error);
+          outcome_throw_as_system_error_with_payload(base::_error(std::forward<Impl>(self)));
         }
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
       }
@@ -67,7 +65,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if(!base::_has_error(std::forward<Impl>(self)))
       {
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
       }
@@ -77,7 +75,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_exception_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+      if(!base::_has_exception(std::forward<Impl>(self)))
       {
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
       }

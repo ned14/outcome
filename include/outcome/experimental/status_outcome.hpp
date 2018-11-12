@@ -118,31 +118,24 @@ namespace experimental
   {
     /*!
     */
-    template <class T, class DomainType, class E> struct status_code_throw<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E> : OUTCOME_V2_NAMESPACE::policy::detail::base
+    template <class T, class DomainType, class E> struct status_code_throw<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E> : OUTCOME_V2_NAMESPACE::policy::base
     {
-      using _base = OUTCOME_V2_NAMESPACE::policy::detail::base;
+      using _base = OUTCOME_V2_NAMESPACE::policy::base;
       /*! Performs a wide check of state, used in the value() functions.
       \effects See description of class for effects.
       */
       template <class Impl> static constexpr void wide_value_check(Impl &&self)
       {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+        if(!base::_has_value(static_cast<Impl &&>(self)))
         {
-          using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<basic_outcome<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E, status_code_throw>, decltype(self)>;
-#if defined(_MSC_VER) && _MSC_VER < 1920
-          // VS2017 tries a copy construction in the correct implementation despite that Outcome is always a rvalue or lvalue ref! :(
-          basic_outcome<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E, status_code_throw> &_self = (basic_outcome<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E, status_code_throw> &) (self);  // NOLINT
-#else
-          Outcome _self = static_cast<Outcome>(self);  // NOLINT
-#endif
-          if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0)
+          if(base::_has_exception(static_cast<Impl &&>(self)))
           {
-            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::has_exception_ptr_v<E>>(static_cast<Outcome>(_self)._ptr);
+            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::has_exception_ptr_v<E>>(base::_exception<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self)));
           }
-          if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
+          if(base::_has_error(static_cast<Impl &&>(self)))
           {
 #ifdef __cpp_exceptions
-            static_cast<Outcome>(_self).assume_error().throw_exception();
+            base::_error(static_cast<Impl &&>(self)).throw_exception();
 #else
             OUTCOME_THROW_EXCEPTION(wide_value_check);
 #endif

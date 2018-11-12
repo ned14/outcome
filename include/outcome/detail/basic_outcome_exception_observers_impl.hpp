@@ -27,58 +27,69 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "basic_outcome_exception_observers.hpp"
 
+#include "../policy/base.hpp"
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+namespace policy
+{
+  template <class R, class S, class P, class NoValuePolicy, class Impl> inline constexpr auto &&base::_exception(Impl &&self) noexcept
+  {
+    // Impl will be some internal implementation class which has no knowledge of the _ptr stored
+    // beneath it. So statically cast, preserving rvalue and constness, to the derived class.
+    using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<basic_outcome<R, S, P, NoValuePolicy>, decltype(self)>;
+#if defined(_MSC_VER) && _MSC_VER < 1920
+    // VS2017 tries a copy construction in the correct implementation despite that Outcome is always a rvalue or lvalue ref! :(
+    basic_outcome<R, S, P, NoValuePolicy> &_self = (basic_outcome<R, S, P, NoValuePolicy> &) (self);  // NOLINT
+#else
+    Outcome _self = static_cast<Outcome>(self);
+#endif
+    return static_cast<Outcome>(_self)._ptr;
+  }
+}
 
 namespace detail
 {
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() & noexcept
   {
-    basic_outcome<R, S, P, NoValuePolicy> &self = static_cast<basic_outcome<R, S, P, NoValuePolicy> &>(*this);  // NOLINT
-    NoValuePolicy::narrow_exception_check(self);
-    return self._ptr;
+    NoValuePolicy::narrow_exception_check(*this);
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(*this);
   }
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() const &noexcept
   {
-    const basic_outcome<R, S, P, NoValuePolicy> &self = static_cast<const basic_outcome<R, S, P, NoValuePolicy> &>(*this);  // NOLINT
-    NoValuePolicy::narrow_exception_check(self);
-    return self._ptr;
+    NoValuePolicy::narrow_exception_check(*this);
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(*this);
   }
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() && noexcept
   {
-    basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<basic_outcome<R, S, P, NoValuePolicy> &&>(*this);  // NOLINT
-    NoValuePolicy::narrow_exception_check(self);
-    return static_cast<P &&>(self._ptr);
+    NoValuePolicy::narrow_exception_check(std::move(*this));
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(std::move(*this));
   }
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() const &&noexcept
   {
-    const basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<const basic_outcome<R, S, P, NoValuePolicy> &&>(*this);  // NOLINT
-    NoValuePolicy::narrow_exception_check(self);
-    return static_cast<P &&>(self._ptr);
+    NoValuePolicy::narrow_exception_check(std::move(*this));
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(std::move(*this));
   }
 
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() &
   {
-    basic_outcome<R, S, P, NoValuePolicy> &self = static_cast<basic_outcome<R, S, P, NoValuePolicy> &>(*this);  // NOLINT
-    NoValuePolicy::wide_exception_check(self);
-    return self._ptr;
+    NoValuePolicy::wide_exception_check(*this);
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(*this);
   }
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() const &
   {
-    const basic_outcome<R, S, P, NoValuePolicy> &self = static_cast<const basic_outcome<R, S, P, NoValuePolicy> &>(*this);  // NOLINT
-    NoValuePolicy::wide_exception_check(self);
-    return self._ptr;
+    NoValuePolicy::wide_exception_check(*this);
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(*this);
   }
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() &&
   {
-    basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<basic_outcome<R, S, P, NoValuePolicy> &&>(*this);  // NOLINT
-    NoValuePolicy::wide_exception_check(self);
-    return static_cast<P &&>(self._ptr);
+    NoValuePolicy::wide_exception_check(std::move(*this));
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(std::move(*this));
   }
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() const &&
   {
-    const basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<const basic_outcome<R, S, P, NoValuePolicy> &&>(*this);  // NOLINT
-    NoValuePolicy::wide_exception_check(self);
-    return static_cast<P &&>(self._ptr);
+    NoValuePolicy::wide_exception_check(std::move(*this));
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(std::move(*this));
   }
 }  // namespace detail
 

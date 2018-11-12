@@ -25,7 +25,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_POLICY_ALL_NARROW_HPP
 #define OUTCOME_POLICY_ALL_NARROW_HPP
 
-#include "detail/common.hpp"
+#include "base.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -35,20 +35,20 @@ namespace policy
 
   Can be used in both `result` and `outcome`.
   */
-  struct all_narrow : detail::base
+  struct all_narrow : base
   {
     /*! Performs a wide check of state, used in the value() functions. Calls `narrow_value_check()` and does nothing else.
     \effects None.
     */
-    template <class Impl> static constexpr void wide_value_check(Impl &&self) { detail::base::narrow_value_check(static_cast<Impl &&>(self)); }
+    template <class Impl> static constexpr void wide_value_check(Impl &&self) { base::narrow_value_check(static_cast<Impl &&>(self)); }
     /*! Performs a wide check of state, used in the error() functions. Calls `narrow_error_check()` and does nothing else.
     \effects None.
     */
-    template <class Impl> static constexpr void wide_error_check(Impl &&self) { detail::base::narrow_error_check(static_cast<Impl &&>(self)); }
+    template <class Impl> static constexpr void wide_error_check(Impl &&self) { base::narrow_error_check(static_cast<Impl &&>(self)); }
     /*! Performs a wide check of state, used in the exception() functions. Calls `narrow_exception_check()` and does nothing else.
     \effects None.
     */
-    template <class Impl> static constexpr void wide_exception_check(Impl &&self) { detail::base::narrow_exception_check(static_cast<Impl &&>(self)); }
+    template <class Impl> static constexpr void wide_exception_check(Impl &&self) { base::narrow_exception_check(static_cast<Impl &&>(self)); }
   };
 }  // namespace policy
 

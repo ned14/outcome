@@ -35,7 +35,7 @@ namespace policy
   Any wide attempt to access the successful state where there is none causes:
   `std::rethrow_exception(policy::exception_ptr(.error()|.exception()))` appropriately.
   */
-  template <class T, class EC, class E> struct exception_ptr_rethrow : detail::base
+  template <class T, class EC, class E> struct exception_ptr_rethrow : base
   {
     /*! Performs a wide check of state, used in the value() functions
     \effects If outcome does not have a value, if it has an exception it rethrows that exception via `std::rethrow_exception()`,
@@ -43,17 +43,15 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if(!base::_has_value(std::forward<Impl>(self)))
       {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0)
+        if(base::_has_exception(std::forward<Impl>(self)))
         {
-          using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<basic_outcome<T, EC, E, exception_ptr_rethrow>, decltype(self)>;
-          Outcome _self = static_cast<Outcome>(self);  // NOLINT
-          detail::_rethrow_exception<trait::has_exception_ptr_v<E>>{std::forward<Outcome>(_self)._ptr};
+          detail::_rethrow_exception<trait::has_exception_ptr_v<E>>{base::_exception<T, EC, E, exception_ptr_rethrow>(std::forward<Impl>(self))};
         }
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0)
+        if(base::_has_error(std::forward<Impl>(self)))
         {
-          detail::_rethrow_exception<trait::has_exception_ptr_v<EC>>{std::forward<Impl>(self)._error};
+          detail::_rethrow_exception<trait::has_exception_ptr_v<EC>>{base::_error(std::forward<Impl>(self))};
         }
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
       }
@@ -63,7 +61,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if(!base::_has_error(std::forward<Impl>(self)))
       {
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));
       }
@@ -73,7 +71,7 @@ namespace policy
     */
     template <class Impl> static constexpr void wide_exception_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+      if(!base::_has_exception(std::forward<Impl>(self)))
       {
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no exception"));
       }

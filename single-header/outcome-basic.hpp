@@ -1275,9 +1275,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 74ec16d010f30b15f2059dac85ff268ab077dd63
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-10-25 20:59:53 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 74ec16d0
+#define OUTCOME_PREVIOUS_COMMIT_REF 212187eb6d44d86e9e784331d498b266c339327c
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-11-11 21:33:01 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 212187eb
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -2889,10 +2889,7 @@ namespace hooks
 
 namespace policy
 {
-  namespace detail
-  {
-    struct base;
-  } // namespace detail
+  struct base;
 } // namespace policy
 
 namespace detail
@@ -2906,8 +2903,7 @@ namespace detail
     static_assert(trait::type_can_be_used_in_basic_result<EC>, "The type S cannot be used in a basic_result");
     static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "The type S must be void or default constructible");
 
-    friend NoValuePolicy;
-    friend struct policy::detail::base;
+    friend struct policy::base;
     template <class T, class U, class V> friend class basic_result_storage;
     template <class T, class U, class V> friend class basic_result_final;
     template <class T, class U, class V> friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept; // NOLINT
@@ -3888,8 +3884,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
-#ifndef OUTCOME_POLICY_DETAIL_COMMON_HPP
-#define OUTCOME_POLICY_DETAIL_COMMON_HPP
+#ifndef OUTCOME_POLICY_BASE_HPP
+#define OUTCOME_POLICY_BASE_HPP
 
 
 
@@ -3899,65 +3895,89 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  namespace detail
+  struct base
   {
-    struct base
-    {
-    private:
-      template <class Impl>
-      static constexpr
+  protected:
+    //! Invokes noticeable UB!
+    template <class Impl>
+    static constexpr
 #ifdef _MSC_VER
-      __declspec(noreturn)
+    __declspec(noreturn)
 #elif defined(__GNUC__) || defined(__clang__)
         __attribute__((noreturn))
 #endif
-      void _ub(Impl && /*unused*/)
-      {
-        assert(false);
+    void _ub(Impl && /*unused*/)
+    {
+      assert(false);
 #if defined(__GNUC__) || defined(__clang__)
-        __builtin_unreachable();
+      __builtin_unreachable();
 #endif
-      }
+    }
 
-    public:
-      /*! Performs a narrow check of state, used in the assume_value() functions.
-      \effects None.
-      */
+    //! True if the current state's status has its value bit set.
+    template <class Impl> static constexpr bool _has_value(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) != 0; }
+    //! True if the current state's status has its error bit set.
+    template <class Impl> static constexpr bool _has_error(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0; }
+    //! True if the current state's status has its exception bit set.
+    template <class Impl> static constexpr bool _has_exception(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0; }
+    //! True if the current state's status has its error-is-errno bit set.
+    template <class Impl> static constexpr bool _has_error_is_errno(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_error_is_errno) != 0; }
+
+    //! Changes the current state's status value bit.
+    template <class Impl> static constexpr void _set_value(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_value : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_have_value; }
+    //! Changes the current state's status error bit.
+    template <class Impl> static constexpr void _set_error(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_error : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_have_error; }
+    //! Changes the current state's status exception bit.
+    template <class Impl> static constexpr void _set_exception(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_exception : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_have_exception; }
+    //! Changes the current state's status error-is-errno bit.
+    template <class Impl> static constexpr void _set_error_is_errno(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_error_is_errno : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_error_is_errno; }
+
+    //! Accesses the current state's value. No checking of validity is made.
+    template <class Impl> static constexpr auto &&_value(Impl &&self) noexcept { return static_cast<Impl &&>(self)._state._value; }
+    //! Accesses the current state's error. No checking of validity is made.
+    template <class Impl> static constexpr auto &&_error(Impl &&self) noexcept { return static_cast<Impl &&>(self)._error; }
+
+  public:
+    //! Accesses the current state's exception. No checking of validity is made.
+    template <class R, class S, class P, class NoValuePolicy, class Impl> static inline constexpr auto &&_exception(Impl &&self) noexcept;
+
+    /*! Performs a narrow check of state, used in the assume_value() functions.
+    \effects None.
+    */
 
 
-      template <class Impl> static constexpr void narrow_value_check(Impl &&self) noexcept
+    template <class Impl> static constexpr void narrow_value_check(Impl &&self) noexcept
+    {
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
       {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
-        {
-          _ub(self);
-        }
+        _ub(self);
       }
-      /*! Performs a narrow check of state, used in the assume_error() functions
-      \effects None.
-      */
+    }
+    /*! Performs a narrow check of state, used in the assume_error() functions
+    \effects None.
+    */
 
 
-      template <class Impl> static constexpr void narrow_error_check(Impl &&self) noexcept
+    template <class Impl> static constexpr void narrow_error_check(Impl &&self) noexcept
+    {
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
       {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
-        {
-          _ub(self);
-        }
+        _ub(self);
       }
-      /*! Performs a narrow check of state, used in the assume_exception() functions
-      \effects None.
-      */
+    }
+    /*! Performs a narrow check of state, used in the assume_exception() functions
+    \effects None.
+    */
 
 
-      template <class Impl> static constexpr void narrow_exception_check(Impl &&self) noexcept
+    template <class Impl> static constexpr void narrow_exception_check(Impl &&self) noexcept
+    {
+      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
       {
-        if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
-        {
-          _ub(self);
-        }
+        _ub(self);
       }
-    };
-  } // namespace detail
+    }
+  };
 } // namespace policy
 
 OUTCOME_V2_NAMESPACE_END
@@ -3974,26 +3994,26 @@ namespace policy
 
 
 
-  struct all_narrow : detail::base
+  struct all_narrow : base
   {
     /*! Performs a wide check of state, used in the value() functions. Calls `narrow_value_check()` and does nothing else.
     \effects None.
     */
 
 
-    template <class Impl> static constexpr void wide_value_check(Impl &&self) { detail::base::narrow_value_check(static_cast<Impl &&>(self)); }
+    template <class Impl> static constexpr void wide_value_check(Impl &&self) { base::narrow_value_check(static_cast<Impl &&>(self)); }
     /*! Performs a wide check of state, used in the error() functions. Calls `narrow_error_check()` and does nothing else.
     \effects None.
     */
 
 
-    template <class Impl> static constexpr void wide_error_check(Impl &&self) { detail::base::narrow_error_check(static_cast<Impl &&>(self)); }
+    template <class Impl> static constexpr void wide_error_check(Impl &&self) { base::narrow_error_check(static_cast<Impl &&>(self)); }
     /*! Performs a wide check of state, used in the exception() functions. Calls `narrow_exception_check()` and does nothing else.
     \effects None.
     */
 
 
-    template <class Impl> static constexpr void wide_exception_check(Impl &&self) { detail::base::narrow_exception_check(static_cast<Impl &&>(self)); }
+    template <class Impl> static constexpr void wide_exception_check(Impl &&self) { base::narrow_exception_check(static_cast<Impl &&>(self)); }
   };
 } // namespace policy
 
@@ -4064,7 +4084,7 @@ namespace policy
 
 
 
-  struct terminate : detail::base
+  struct terminate : base
   {
     /*! Performs a wide check of state, used in the value() functions.
     \effects If result does not have a value, calls `std::terminate()`.
@@ -4073,7 +4093,7 @@ namespace policy
 
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if(!base::_has_value(static_cast<Impl &&>(self)))
       {
         std::abort();
       }
@@ -4085,7 +4105,7 @@ namespace policy
 
     template <class Impl> static constexpr void wide_error_check(Impl &&self) noexcept
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if(!base::_has_error(static_cast<Impl &&>(self)))
       {
         std::abort();
       }
@@ -4097,7 +4117,7 @@ namespace policy
 
     template <class Impl> static constexpr void wide_exception_check(Impl &&self)
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+      if(!base::_has_exception(static_cast<Impl &&>(self)))
       {
         std::abort();
       }
@@ -5432,8 +5452,7 @@ class OUTCOME_NODISCARD basic_outcome
   static_assert(trait::type_can_be_used_in_basic_result<P>, "The exception_type cannot be used");
   static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "exception_type must be void or default constructible");
   using base = detail::select_basic_outcome_failure_observers<detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>;
-  friend NoValuePolicy;
-  friend detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>;
+  friend struct policy::base;
   template <class T, class U, class V, class W> friend class basic_outcome;
   template <class T, class U, class V, class W, class X> friend constexpr inline void hooks::override_outcome_exception(basic_outcome<T, U, V, W> *o, X &&v) noexcept; // NOLINT
 
@@ -6795,58 +6814,69 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
+
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+namespace policy
+{
+  template <class R, class S, class P, class NoValuePolicy, class Impl> inline constexpr auto &&base::_exception(Impl &&self) noexcept
+  {
+    // Impl will be some internal implementation class which has no knowledge of the _ptr stored
+    // beneath it. So statically cast, preserving rvalue and constness, to the derived class.
+    using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<basic_outcome<R, S, P, NoValuePolicy>, decltype(self)>;
+#if defined(_MSC_VER) && _MSC_VER < 1920
+    // VS2017 tries a copy construction in the correct implementation despite that Outcome is always a rvalue or lvalue ref! :(
+    basic_outcome<R, S, P, NoValuePolicy> &_self = (basic_outcome<R, S, P, NoValuePolicy> &) (self); // NOLINT
+#else
+    Outcome _self = static_cast<Outcome>(self);
+#endif
+    return static_cast<Outcome>(_self)._ptr;
+  }
+}
 
 namespace detail
 {
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() & noexcept
   {
-    basic_outcome<R, S, P, NoValuePolicy> &self = static_cast<basic_outcome<R, S, P, NoValuePolicy> &>(*this); // NOLINT
-    NoValuePolicy::narrow_exception_check(self);
-    return self._ptr;
+    NoValuePolicy::narrow_exception_check(*this);
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(*this);
   }
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() const &noexcept
   {
-    const basic_outcome<R, S, P, NoValuePolicy> &self = static_cast<const basic_outcome<R, S, P, NoValuePolicy> &>(*this); // NOLINT
-    NoValuePolicy::narrow_exception_check(self);
-    return self._ptr;
+    NoValuePolicy::narrow_exception_check(*this);
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(*this);
   }
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() && noexcept
   {
-    basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<basic_outcome<R, S, P, NoValuePolicy> &&>(*this); // NOLINT
-    NoValuePolicy::narrow_exception_check(self);
-    return static_cast<P &&>(self._ptr);
+    NoValuePolicy::narrow_exception_check(std::move(*this));
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(std::move(*this));
   }
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() const &&noexcept
   {
-    const basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<const basic_outcome<R, S, P, NoValuePolicy> &&>(*this); // NOLINT
-    NoValuePolicy::narrow_exception_check(self);
-    return static_cast<P &&>(self._ptr);
+    NoValuePolicy::narrow_exception_check(std::move(*this));
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(std::move(*this));
   }
 
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() &
   {
-    basic_outcome<R, S, P, NoValuePolicy> &self = static_cast<basic_outcome<R, S, P, NoValuePolicy> &>(*this); // NOLINT
-    NoValuePolicy::wide_exception_check(self);
-    return self._ptr;
+    NoValuePolicy::wide_exception_check(*this);
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(*this);
   }
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() const &
   {
-    const basic_outcome<R, S, P, NoValuePolicy> &self = static_cast<const basic_outcome<R, S, P, NoValuePolicy> &>(*this); // NOLINT
-    NoValuePolicy::wide_exception_check(self);
-    return self._ptr;
+    NoValuePolicy::wide_exception_check(*this);
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(*this);
   }
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() &&
   {
-    basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<basic_outcome<R, S, P, NoValuePolicy> &&>(*this); // NOLINT
-    NoValuePolicy::wide_exception_check(self);
-    return static_cast<P &&>(self._ptr);
+    NoValuePolicy::wide_exception_check(std::move(*this));
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(std::move(*this));
   }
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr const typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &&basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() const &&
   {
-    const basic_outcome<R, S, P, NoValuePolicy> &&self = static_cast<const basic_outcome<R, S, P, NoValuePolicy> &&>(*this); // NOLINT
-    NoValuePolicy::wide_exception_check(self);
-    return static_cast<P &&>(self._ptr);
+    NoValuePolicy::wide_exception_check(std::move(*this));
+    return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(std::move(*this));
   }
 } // namespace detail
 

@@ -25,7 +25,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_POLICY_FAIL_TO_COMPILE_OBSERVERS_HPP
 #define OUTCOME_POLICY_FAIL_TO_COMPILE_OBSERVERS_HPP
 
-#include "detail/common.hpp"
+#include "base.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -44,7 +44,7 @@ namespace policy
 
   Can be used in both `result` and `outcome`.
   */
-  struct fail_to_compile_observers : detail::base
+  struct fail_to_compile_observers : base
   {
     /*! Performs a wide check of state, used in the value() functions. Fails to compile with a static assertion.
     \effects None.
