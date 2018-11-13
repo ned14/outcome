@@ -1,93 +1,91 @@
-/* Example of Outcome used with policies
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (149 commits)
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
-*/
-
 #include "../../../include/outcome.hpp"
+#include "outcome.hpp"
 
-#include <iostream>
+namespace outcome = OUTCOME_V2_NAMESPACE;
 
-using namespace OUTCOME_V2_NAMESPACE;
-
-//! [blank]
-struct blank_policy
+//! [abort_policy]
+struct abort_policy : outcome::policy::base
 {
-  //! Performs a narrow check of state, used in the assume_value() functions.
-  template <class Impl> static constexpr void narrow_value_check(Impl &&self) noexcept;
-
-  //! Performs a narrow check of state, used in the assume_error() functions.
-  template <class Impl> static constexpr void narrow_error_check(Impl &&self) noexcept;
-
-  //! Performs a wide check of state, used in the value() functions.
-  template <class Impl> static constexpr void wide_value_check(Impl &&self);
-
-  //! Performs a wide check of state, used in the error() functions.
-  template <class Impl> static constexpr void wide_error_check(Impl &&self);
-
-
-  /******** These only used if the policy is used in Outcome ********/
-
-  //! Performs a narrow check of state, used in the assume_exception() functions.
-  template <class Impl> static constexpr void narrow_exception_check(Impl &&self) noexcept;
-
-  //! Performs a wide check of state, used in the exception() functions.
-  template <class Impl> static constexpr void wide_exception_check(Impl &&self);
-};
-//! [blank]
-
-using MyOutcomeType = outcome<int>;
-
-//! [cast]
-template <class T, class EC, class E> struct outcome_policy
-{
-  /*! Performs a wide check of state, used in the value() functions.
-
-  \effects If outcome does not have a value, if it has an exception it rethrows it via `std::rethrow_exception()`,
-  if has an error it throws a `std::system_error(error())`, else it throws `bad_outcome_access`.
-  */
-  template <class Impl> static constexpr void wide_value_check(const Impl &self)
+  template <class Impl> static constexpr void wide_value_check(const Impl& self)
   {
-    // All of the have_*() state check functions are always present in all Impl types
-    if(!self.have_value())
-    {
-      if(self.have_exception())
-      {
-        // .value() is implemented by the result part of Outcome. It knows nothing
-        // of outcome's .exception(), so we need to cast to the derived type first.
-        const MyOutcomeType &_self = static_cast<const MyOutcomeType &>(self);
+    if (!base::_has_value(self))
+      std::abort();
+  }
 
-        // Note this will invoke narrow_exception_check() in this policy
-        std::rethrow_exception(_self.assume_exception());
-      }
-      if(self.have_error())
-      {
-        throw std::system_error(make_error_code(self.assume_error()));
-      }
-      throw bad_outcome_access("no value");
-    }
+  template <class Impl> static constexpr void wide_error_check(const Impl& self)
+  {
+    if (!base::_has_error(self))
+      std::abort();
+  }
+
+  template <class Impl> static constexpr void wide_exception_check(const Impl& self)
+  {
+    if (!base::_has_exception(self))
+      std::abort();
   }
 };
-//! [cast]
+//! [abort_policy]
+
+//! [throwing_policy]
+template <typename T, typename EC, typename EP>
+struct throwing_policy : outcome::policy::base
+{
+  static_assert(std::is_convertible<EC, std::error_code>::value, "only EC = error_code");
+
+  template <class Impl> static constexpr void wide_value_check(const Impl& self)
+  {
+    if (!base::_has_value(self))
+    {
+      if (base::_has_error(self))
+        throw std::system_error(base::_error(self));
+      else
+        std::rethrow_exception(base::_exception<T, EC, EP, throwing_policy>(self));
+    }
+  }
+
+  template <class Impl> static constexpr void wide_error_check(const Impl& self)
+  {
+    if (!base::_has_error(self))
+    {
+      if (base::_has_exception(self))
+        std::rethrow_exception(base::_exception<T, EC, EP, throwing_policy>(self));
+      else
+        base::_ub(self);
+    }
+  }
+
+  template <class Impl> static constexpr void wide_exception_check(const Impl& self)
+  {
+    if (!base::_has_exception(self))
+      base::_ub(self);
+  }
+};
+//! [throwing_policy]
+
+//! [outcome_spec]
+template <typename T>
+using strictOutcome
+  = outcome::basic_outcome<T, std::error_code, std::exception_ptr, abort_policy>;
+//! [outcome_spec]
+
+template <typename T, typename EC = std::error_code>
+using throwingOutcome
+  = outcome::basic_outcome<T, EC, std::exception_ptr,
+                           throwing_policy<T, EC, std::exception_ptr>>;
 
 int main()
 {
-  return 0;
+  try
+  {
+    throwingOutcome<int> i = std::error_code{};
+    i.value(); // throws
+    assert(false);
+  }
+  catch(std::system_error const&)
+  {
+  }
+
+  strictOutcome<int> i = 1;
+  assert (i.value() == 1);
+  i.error(); // calls abort()
 }
