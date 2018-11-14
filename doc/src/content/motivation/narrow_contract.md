@@ -58,7 +58,7 @@ pair<int, int> g(int * pi) // expects: pi != nullptr
 ```
 
 The compiler can see that if `pi` is null, the program would have undefined
-behavior. Since undefined behavior cannot ever the programmer's intention, the compiler
+behavior. Since undefined behavior cannot ever be the programmer's intention, the compiler
 assumes that apparently this function is never called with `pi == nullptr`. If so,
 `j` is always `0` and the code can be transformed to a faster one:
 
