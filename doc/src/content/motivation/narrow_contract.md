@@ -4,7 +4,7 @@ description = "Describes narrow-contract functions that do not work for all inpu
 weight = 60
 +++
 
-A program can enter a "disappointing" state for two reasons:
+A program's thread of execution can enter a "disappointing" state for two reasons:
 
 * due to disappointing situation in the environment (operating system, external input),
   or
@@ -58,7 +58,7 @@ pair<int, int> g(int * pi) // expects: pi != nullptr
 ```
 
 The compiler can see that if `pi` is null, the program would have undefined
-behavior. Since undefined behavior is never the programmers intention, the compiler
+behavior. Since undefined behavior cannot ever the programmer's intention, the compiler
 assumes that apparently this function is never called with `pi == nullptr`. If so,
 `j` is always `0` and the code can be transformed to a faster one:
 
