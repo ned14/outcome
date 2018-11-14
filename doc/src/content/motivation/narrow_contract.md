@@ -48,7 +48,7 @@ optionally terminated.
 More, compilers can perform optimizations based on undefined behavior caused by
 dereferencing a null pointer. In the following code:
 
-```
+```c++
 pair<int, int> g(int * pi) // expects: pi != nullptr
 {
   int i = *pi + 1;
@@ -62,7 +62,7 @@ behavior. Since undefined behavior cannot ever be the programmer's intention, th
 assumes that apparently this function is never called with `pi == nullptr`. If so,
 `j` is always `0` and the code can be transformed to a faster one:
 
-```
+```c++
 pair<int, int> g(int * pi) // expects: pi != nullptr
 {
   int i = *pi + 1;
@@ -80,7 +80,7 @@ invalid null pointers. For instance, if a function in your library takes an `int
 and declares that the value of this `int` must never be negative. You can use
 `__builtin_trap()` available in GCC and clang:
 
-```
+```c++
 void h(int i) // expects: i >= 0
 {
   if (i < 0) __builtin_trap();
@@ -98,7 +98,7 @@ This instruction when hit, causes the program to exit abnormally, which means:
 Another tool you could use is `__builtin_unreachable()`, also available in GCC
 and clang:
 
-```
+```c++
 void h(int i) // expects: i >= 0
 {
   if (i < 0) __builtin_unreachable();

@@ -16,6 +16,7 @@ where `EC` is the type storing error information and defaulted to
 `policy::default_policy<T, EC, void>`.
 
 The semantics of `basic_result::value()` are:
+
 1. Calls `NVP::wide_value_check(*this)`.
 2. If `this->has_value() == true` then returns a reference to the contained value,
   otherwise the behavior is undefined.
@@ -38,6 +39,7 @@ When designing your own success-or-failure type using templates
 you want to use. Either create your own, or use one of the predefined policies.
 
 You can also use two predefined aliases for `basic_result<>`:
+
 * {{< api "result/#standardese-outcome_v2_xxx__unchecked-R-S-" "unchecked<T, EC>" >}}: it uses policy {{< api "policies/all_narrow" "all_narrow" >}}, where any observation of a missing value or error is undefined behavior;
 * {{< api "result/#standardese-outcome_v2_xxx__checked-R-S-" "checked<T, EC>" >}}:
   it uses policy {{< api "policies/throw_bad_result_access" "throw_bad_result_access<EC>" >}}, where any observation of a missing value or error throws {{< api "bad_access/#standardese-outcome_v2_xxx__bad_result_access_with-S-" "bad_result_access_with<EC>" >}} or {{< api "bad_access/#standardese-outcome_v2_xxx__bad_result_access" "bad_result_access" >}}
