@@ -7,6 +7,7 @@ weight = 20
 These are the predefined policies built into Outcome:
 
 {{< api "policies/all_narrow" "all_narrow" >}}
+
 If there is an observation of a value/error/exception which is not present,
 the behavior is undefined. However this is a tool-friendly UB using intrinsics
 such as `__builtin_unreachable()` that allows tool to make use of it, e.g.,
@@ -14,11 +15,13 @@ better bug detection or optimizations.
 
 
 {{< api "policies/terminate" "terminate" >}}
+
 Observation of a missing value/error/exception causes the call to
 `std::terminate()`.
 
 
 {{< api "policies/outcome_error_code_throw_as_system_error" "error_code_throw_as_system_error<T, EC, EP>" >}}
+
 This policy assumes that `EC` has the interface of `std::error_code`,
 and `EP` has the interface of `std::exception_ptr`. Upon missing value
 observation:
@@ -36,6 +39,7 @@ Upon missing exception observation throws `bad_outcome_access("no exception")`.
 
 
 {{< api "policies/outcome_exception_ptr_rethrow" "exception_ptr_rethrow<T, EC, EP>" >}}
+
 This policy assumes that both `EC` and `EP` (unless `void`) has the interface of `std::exception_ptr`. Upon missing value observation:
 
 * in instances of `basic_result<>`, rethrows exception pointed to by `EC`;
@@ -51,6 +55,7 @@ Upon missing exception observation throws `bad_outcome_access("no exception")`.
 
 
 {{< api "policies/throw_bad_result_access" "throw_bad_result_access<EC>" >}}
+
 Upon missing value observation throws `bad_result_access_with<EC>(ec)`,
 where `ec` is the value of the stored error. If error is not stored,
 the behavior is undefined.
