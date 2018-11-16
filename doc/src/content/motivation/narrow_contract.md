@@ -31,7 +31,7 @@ analysis or at run-time when observing certain values of objects that are declar
 never to be valid at certain points. One classical example is passing a null pointer
 to functions that expect a pointer to a valid object:
 
-```
+```c++
 int f(int * pi) // expects: pi != nullptr
 {
   return *pi + 1;
