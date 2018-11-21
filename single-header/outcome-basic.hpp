@@ -746,9 +746,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 989b7985c54775a060e5ed8955875539e8c188b9
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2018-10-25 20:55:56 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 989b7985
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 6128ded715ddd86c8ca29df03645f06e299499cb
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2018-11-16 09:11:49 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 6128ded7
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1275,9 +1275,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 212187eb6d44d86e9e784331d498b266c339327c
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-11-11 21:33:01 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 212187eb
+#define OUTCOME_PREVIOUS_COMMIT_REF 4995acdc40c0a888dabcaff80cef30d0a77ed9ea
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2018-11-19 09:06:59 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4995acdc
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -3948,7 +3948,7 @@ namespace policy
 
     template <class Impl> static constexpr void narrow_value_check(Impl &&self) noexcept
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) == 0)
+      if(!_has_value(self))
       {
         _ub(self);
       }
@@ -3960,7 +3960,7 @@ namespace policy
 
     template <class Impl> static constexpr void narrow_error_check(Impl &&self) noexcept
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) == 0)
+      if(!_has_error(self))
       {
         _ub(self);
       }
@@ -3972,7 +3972,7 @@ namespace policy
 
     template <class Impl> static constexpr void narrow_exception_check(Impl &&self) noexcept
     {
-      if((self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) == 0)
+      if(!_has_exception(self))
       {
         _ub(self);
       }
