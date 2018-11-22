@@ -10,6 +10,8 @@ ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/version.
 project(outcome VERSION ${VERSIONSTRING} LANGUAGES C CXX)
 # Also set a *cmake* namespace for this project
 set(PROJECT_NAMESPACE)
+# Set how to build a C++ Module for this project
+set(outcome_INTERFACE_SOURCE "include/outcome.ixx")
 
 # Setup this cmake environment for this project
 include(QuickCppLibSetupProject)
@@ -159,6 +161,9 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   # Turn on C++ 17 and Concepts where possible for the test suite
   foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
     if(feature STREQUAL "cxx_std_17")
+      if(ENABLE_CXX_MODULES)
+        target_compile_features(outcome_hl_ixx PUBLIC cxx_std_17)
+      endif()
       foreach(test_target ${outcome_TEST_TARGETS} ${outcome_EXAMPLE_TARGETS})
         target_compile_features(${test_target} PUBLIC cxx_std_17)
         if(ENABLE_CXX_CONCEPTS)

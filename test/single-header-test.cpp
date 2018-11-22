@@ -1,3 +1,4 @@
+#undef __cpp_modules
 #include "../single-header/outcome.hpp"
 
 int main()
