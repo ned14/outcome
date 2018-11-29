@@ -46,5 +46,5 @@ is available in scope.
 
 {{% notice note %}}
 This is the v2 Outcome designed in response to feedback from a [Boost peer review held in
-May 2017](https://lists.boost.org/boost-announce/2017/06/0510.php). This library has successfully passed the second Boost peer review, and is currently expected to become part of the Boost official release distribution before the 1.69 release.
+May 2017](https://lists.boost.org/boost-announce/2017/06/0510.php). This library has successfully passed the second Boost peer review, and is currently expected to become part of the Boost official release distribution before the 1.70 release (Spring 2019).
 {{% /notice %}}

@@ -1,24 +1,39 @@
 body {
-  font-size: 105% !important;
   text-align: justify;
 }
 h2, h3, h4, h5, h6 {
   text-align: left;
 }
+article section.page h1:first-of-type {
+  font-weight: 900;
+}
+h1 {
+  font-weight: inherit;
+  line-height: 3.25rem;
+}
+h1::after {
+  content: "<hr/>";
+}
 h2 {
   text-transform: none;
+  font-weight: inherit;
+  line-height: 2.55rem;
+}
+h4 {
+  line-height: 1.9rem;
+  font-size: small;
+}
+figure figcaption {
+  margin-top: -2em;
+}
+figure figcaption h4 {
+  text-align: center;
 }
 code, pre {
-  background: none;
-  border: none;
   text-align: left;
 }
 a code {
   color: inherit;
-}
-/* Fix Firefox */
-#body a.highlight {
-  vertical-align: middle;
 }
 a.api-reference {
   font-family: monospace;
@@ -26,51 +41,9 @@ a.api-reference {
 div.footnotes {
   font-size: 85%;
 }
-#tags {
-  float: none;
-  display: flex;
-  /*justify-content: space-around;*/
-  justify-content: center;
-  flex-wrap: wrap;
+article section.page pre .copy-to-clipboard {
+  background-color: #eee;
 }
-#tags a {
-  margin-left: 0.25em;
-  margin-right: 0.25em;
-  margin-bottom: 0.25em;
-}
-
-pre .copy-to-clipboard {
-  background-color: transparent;
-}
-pre .copy-to-clipboard:hover {
-  background-color: #fff7dd;
-}
-
-.copy-to-clipboard {
-  background-image: url(../images/clippy.svg);
-  background-position: 50% 50%;
-  background-size: 16px 16px;
-  background-repeat: no-repeat;
-  width: 27px;
-  height: 1.45rem;
-  top: -1px;
-  margin-bottom: 1px;
-}
-.highlight pre {
-  #border: 2px dashed;
-  border-radius: 5px;
-  box-shadow: 0px 0px 10px #000000;
-}
-div.highlight code + span.copy-to-clipboard {
-  display: inline-block;
-  border: none;
-  vertical-align: unset;
-}
-
-code + span.copy-to-clipboard {
-  display: none;
-}
-
 div.code-snippet {
   position: relative;
 }
@@ -81,7 +54,7 @@ div.code-snippet a.code-snippet-url {
   top: 0.7em;
 }
 
-nav#TableOfContents {
+/*nav#TableOfContents {
   width: 30em;
   float: right;
   text-align: left;
@@ -107,6 +80,31 @@ nav#TableOfContents > ul > li > ul > li > a.highlight {
 }
 nav#TableOfContents > ul > li > ul > li > a.highlight code {
   vertical-align: inherit;
+}*/
+
+#navigation a {
+  color: blue;
+}
+
+.children p {
+  font-size: small;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+.children-li p {
+  font-size: small;
+  font-style: italic;
+}
+ol.children li {
+  margin-top: 0.75em;
+}
+ol.children ol {
+  list-style-type: lower-alpha;
+}
+ol.children ol li {
+  margin-top: 0;
 }
 
 
