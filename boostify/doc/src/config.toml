@@ -1,5 +1,5 @@
-theme = "docdock"
-baseURL = "http://www.boost.org/doc/libs/1_65_1/libs/outcome/doc/html"
+theme = "boostdoc"
+baseURL = "http://www.boost.org/doc/libs/release/libs/outcome/doc/html"
 title = "Boost.Outcome documentation"
 publishDir = "../html"
 pygmentsStyle = "vs"
@@ -7,7 +7,7 @@ pygmentsUseClasses = true
 PygmentsCodeFences = true
 
 [outputs]
-  home = [ "HTML", "RSS", "JSON"]
+  home = [ "HTML" ]
   
 [params]
   snippetsURL = "https://github.com/ned14/boost-outcome/tree/master/doc/src/snippets/"

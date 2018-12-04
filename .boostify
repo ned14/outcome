@@ -15,7 +15,7 @@ exclude_files = [
     r'.*\.vs.*',
     r'^test/single-header-test.cpp$',
     r'^test/constexprs/.*',
-    r'^doc/src/themes/.*'
+    r'^doc/src/themes/docdock/.*'
 ]
 overlay_files = [
     (r'boostify', r''),
