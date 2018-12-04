@@ -65,15 +65,13 @@ cache:
     - hugo_bin
     
 before_install:
- - if [ "$__" = "Documentation" ]; then
-     if [ ! -f "hugo_bin/hugo" ]; then
-       wget -O hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.32.4/hugo_0.32.4_Linux-64bit.tar.gz;
-       mkdir hugo_bin;
-       tar xf hugo.tar.gz -C hugo_bin;
-     fi;
-     ls -l hugo_bin;
-     export PATH=$PATH:`pwd`/hugo_bin;
-   fi
+ - if [ ! -f "hugo_bin/hugo" ]; then
+     wget -O hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.52/hugo_0.52_Linux-64bit.tar.gz;
+     mkdir hugo_bin;
+     tar xf hugo.tar.gz -C hugo_bin;
+   fi;
+   ls -l hugo_bin;
+   export PATH=$PATH:`pwd`/hugo_bin;
    
 script:
  -
@@ -132,8 +130,16 @@ after_success:
      cd boost-outcome;
      git add . || true;
      git commit -a -m "Travis CI updates Boost.Outcome from Outcome" || true;
-     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost-outcome master;  
-     cd ..;     
+     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost-outcome master;
+     cd doc;
+     git clone -b gh-pages --single-branch https://github.com/ned14/boost-outcome html;
+     cd src;
+     hugo;
+     cd ../html;
+     git add . || true;
+     git commit -a -m "Travis CI regenerates Boost.Outcome docs" || true;
+     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost-outcome gh-pages;
+     cd ../..;
    fi
  - bash -x ./update_coveralls.sh `pwd`
 

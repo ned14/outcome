@@ -1,5 +1,5 @@
 theme = "boostdoc"
-baseURL = "http://www.boost.org/doc/libs/release/libs/outcome/doc/html"
+baseURL = "https://ned14.github.io/boost-outcome/"
 title = "Boost.Outcome documentation"
 publishDir = "../html"
 pygmentsStyle = "vs"
