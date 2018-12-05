@@ -15,8 +15,8 @@ exclude_files = [
     r'.*\.vs.*',
     r'^test/single-header-test.cpp$',
     r'^test/constexprs/.*',
-    r'^doc/src/themes/boostdoc/.git'
-    r'^doc/src/themes/docdock/.*'
+    r'^doc/src/themes/boostdoc/.git',
+    r'^doc/src/themes/docdock.*',
 ]
 overlay_files = [
     (r'boostify', r''),
@@ -39,11 +39,13 @@ def fix_auto_test_case(x):
     return ret
 
 # Regexs to replace
-macros = {
+core_macros = {
     r'^OUTCOME_': r'BOOST_OUTCOME_',
     r'([^_])OUTCOME_': r'\1BOOST_OUTCOME_',
     r'^SYSTEM_ERROR2_': r'BOOST_SYSTEM_ERROR2_',
     r'([^_])SYSTEM_ERROR2_': r'\1SYSTEM_ERROR2_',
+}
+source_macros = {
     r'DOXYGEN_': r'BOOST_OUTCOME_DOXYGEN_',
     r'STANDARDESE_': r'BOOST_OUTCOME_STANDARDESE_',
     r'../include/outcome' : r'../include/boost/outcome',
@@ -52,6 +54,7 @@ macros = {
     r'#include "quickcpplib/include/execinfo_win64.h"' : r'#error This example can only compile on POSIX',
     r'#ifdef __cpp_exceptions' : r'#ifndef BOOST_NO_EXCEPTIONS',
 }
+source_macros.update(core_macros)
 transforms = {
     r'^test/tests/.*\.cpp$': {
       r'std::errc([^:])': r'boost::system::errc::errc_t\1',
@@ -66,8 +69,9 @@ transforms = {
       r'std::current_exception': r'boost::current_exception',
       r'std::rethrow_exception': r'boost::rethrow_exception',
     },
-    r'^.*\.hpp$' : macros,
-    r'^.*\.ipp$' : macros,
-    r'^.*\.cpp$' : macros,
-    r'^.*\.h$': macros
+    r'^.*\.hpp$' : source_macros,
+    r'^.*\.ipp$' : source_macros,
+    r'^.*\.cpp$' : source_macros,
+    r'^.*\.h$': source_macros,
+    r'^.*\.md$': core_macros,
 }
