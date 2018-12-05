@@ -11,9 +11,6 @@ h1 {
   font-weight: inherit;
   line-height: 3.25rem;
 }
-h1::after {
-  content: "<hr/>";
-}
 h2 {
   text-transform: none;
   font-weight: inherit;

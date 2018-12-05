@@ -20,3 +20,7 @@
 	branch = master
 	fetchRecurseSubmodules = true
 	ignore = untracked
+[submodule "doc/src/themes/boostdoc"]
+	path = doc/src/themes/boostdoc
+	url = https://github.com/ned14/boostdoc.git
+	branch = master
