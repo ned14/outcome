@@ -5,6 +5,7 @@ publishDir = "../html"
 pygmentsStyle = "vs"
 pygmentsUseClasses = true
 PygmentsCodeFences = true
+enableGitInfo = true
 
 [outputs]
   home = [ "HTML", "RSS", "JSON"]
