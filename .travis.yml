@@ -124,7 +124,7 @@ script:
  
 after_success:
  -
-   if [ "$__" = "cmake tests" ]; then
+   if [ "$__" = "cmake tests" ] && [ "$NAME" = "TravisLinuxWorkerGCC" ]; then
      git clone https://github.com/ned14/boost-outcome;
      python include/outcome/quickcpplib/scripts/boostify.py boost-outcome;
      cd boost-outcome;
