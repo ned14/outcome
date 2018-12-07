@@ -1,11 +1,13 @@
 theme = "boostdoc"
-baseURL = "https://ned14.github.io/boost-outcome/"
 title = "Boost.Outcome documentation"
 publishDir = "../html"
 pygmentsStyle = "vs"
 pygmentsUseClasses = true
 PygmentsCodeFences = true
 enableGitInfo = true
+disableKinds = [ "RSS", "404" ]
+relativeURLs = true
+uglyURLs  = true
 
 [outputs]
   home = [ "HTML" ]
@@ -13,25 +15,3 @@ enableGitInfo = true
 [params]
   snippetsURL = "https://github.com/ned14/boost-outcome/tree/master/doc/src/snippets/"
   editURL = "https://github.com/ned14/boost-outcome/edit/develop/doc/src/content/"
-  
-[[menu.shortcuts]]
-  name = "API reference (standardese)"
-  url = "/standardese/standardese_entities.html"
-  weight = 4
-  
-[[menu.shortcuts]]
-  name = "API reference (doxygen)"
-  url = "/doxygen/namespaceoutcome__v2__xxx.html"
-  weight = 5
-  
-[[menu.shortcuts]]
-  pre = "<h3>More</h3>"
-  name = "<i class='fa fa-github'></i> Standalone Outcome 2.0 github repo"
-  identifier = "ds"
-  url = "https://github.com/ned14/outcome"
-  weight = 10
-  
-[[menu.shortcuts]]
-  name = "<i class='fa fa-bullhorn'></i> Acknowledgements"
-  url = "/credits"
-  weight = 30

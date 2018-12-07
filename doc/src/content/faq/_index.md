@@ -184,7 +184,7 @@ of stack depth might be unwound. This is not a particularly realistic test, but 
 should at least give one an idea of the performance impact of returning Outcome's
 `result` or `outcome` over say returning a plain integer, or throwing an exception.
 
-{{% figure src="results_log.png" title="Log graph comparing GCC 7.2, clang 5.0, Visual Studio 2017.5 and XCode 8.2" %}}
+{{% figure src="/faq/results_log.png" title="Log graph comparing GCC 7.2, clang 5.0, Visual Studio 2017.5 and XCode 8.2" %}}
 
 As you can see, throwing and catching an exception is
 expensive on table-based exception handling implementations such as these, anywhere

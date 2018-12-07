@@ -4,7 +4,7 @@ title = "Home"
 
 # Outcome 2.0 library
 
-{{% boost-copyright %}}{{% children container="dl" style="dt" description="false" depth="2" /%}}{{% /boost-copyright %}}
+{{% boost-copyright %}}
 
 Outcome is a set of tools for reporting and handling function failures in contexts where using C++ exception handling is unsuitable. Such contexts include:
 
