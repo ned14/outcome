@@ -6,6 +6,9 @@ Compiler-specific markup used to mark throwable types as always having default E
 
 *Overridable*: Define before inclusion.
 
-*Default*: 
-- Standalone Outcome: To `__attribute__((visibility("default"))` on GCC and clang when targeting ELF, otherwise nothing.
-- Boost.Outcome: To `BOOST_SYMBOL_VISIBLE`.
+*Default*:<dl>
+<dt>Standalone Outcome:</dt>
+<dd>To `__attribute__((visibility("default"))` on GCC and clang when targeting ELF, otherwise nothing.</dd>
+<dt>Boost.Outcome:</dt>
+<dd>To `BOOST_SYMBOL_VISIBLE`.</dd>
+</dl>

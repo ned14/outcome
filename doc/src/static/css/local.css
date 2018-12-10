@@ -20,6 +20,9 @@ h4 {
   line-height: 1.9rem;
   font-size: small;
 }
+dd {
+  margin-inline-start: 40px;
+}
 figure figcaption {
   margin-top: -2em;
 }
