@@ -50,11 +50,11 @@
 	{{- $numn := add $num $.count }}
 
 {{- (printf "<h%d>" $numn)|safeHTML}}
-	<a href="{{.URL}}" >{{ .Title }}</a>
+	<a href="{{.URL}}" >{{ .Title | markdownify }}</a>
 
 {{- else}}
 {{- (printf "<%s>" $.style)|safeHTML}}
-	<a href="{{.URL}}" >{{ .Title }}</a>
+	<a href="{{.URL}}" >{{ .Title | markdownify }}</a>
 {{- end}}
 
 

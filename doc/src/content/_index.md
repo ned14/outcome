@@ -2,7 +2,7 @@
 title = "Home"
 +++
 
-# Outcome 2.0 library
+# Outcome 2.1 library
 
 {{% boost-copyright %}}
 
@@ -15,7 +15,7 @@ Outcome is a set of tools for reporting and handling function failures in contex
 
   - requirement that failure path of execution should not cost more than the successful path of execution;
 
-  - situations, like in [`filesystem`](http://www.boost.org/doc/libs/1_64_0/libs/filesystem/doc/index.htm) library, where the decision whether the failure should be handled remotely
+  - situations, like in [`filesystem`](http://www.boost.org/doc/libs/release/libs/filesystem/doc/index.htm) library, where the decision whether the failure should be handled remotely
     (use exceptions) or locally cannot be made inside the function and needs to be moved onto the caller,
     and in the latter case launching stack unwinding is not desirable for the aforementioned reasons;
 
