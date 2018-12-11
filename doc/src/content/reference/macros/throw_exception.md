@@ -1,5 +1,6 @@
 +++
 title = "`OUTCOME_THROW_EXCEPTION(expr)`"
+description = "How to throw a C++ exception, or equivalent thereof."
 +++
 
 Throws a C++ exception, or equivalent thereof.

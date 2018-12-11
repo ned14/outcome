@@ -1,5 +1,6 @@
 +++
 title = "`OUTCOME_NODISCARD`"
+description = "How to tell the compiler than the return value of a function should not be discarded without examining it."
 +++
 
 Compiler-specific markup used to tell the compiler than the return value of a function should not be discarded without examining it.

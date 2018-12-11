@@ -1,5 +1,6 @@
 +++
 title = "`OUTCOME_THREAD_LOCAL`"
+description = "How to mark variables as having thread local storage duration."
 +++
 
 Compiler-specific markup used to mark variables as having thread local storage duration.

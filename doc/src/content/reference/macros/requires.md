@@ -1,5 +1,6 @@
 +++
 title = "`OUTCOME_REQUIRES(...)`"
+description = "A C++ 20 `requires(...)`, if available."
 +++
 
 A C++ 20 `requires(...)`, if available.

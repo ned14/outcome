@@ -1,5 +1,6 @@
 +++
 title = "`OUTCOME_DISABLE_EXECINFO`"
+description = "If defined, disables the use of the `<execinfo.h>` header (or the win32 emulation)."
 +++
 
 If defined, disables the use of the `<execinfo.h>` header (or the win32 emulation).

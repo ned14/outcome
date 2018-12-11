@@ -1,5 +1,6 @@
 +++
 title = "`OUTCOME_SYMBOL_VISIBLE`"
+description = "How to mark throwable types as always having default ELF symbol visibility."
 +++
 
 Compiler-specific markup used to mark throwable types as always having default ELF symbol visibility, without which it will be impossible to catch throws of such types across shared library boundaries on ELF only.
