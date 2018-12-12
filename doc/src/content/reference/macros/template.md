@@ -4,6 +4,8 @@ title = "Constrained template macros"
 
 *Overridable*: All of the following macros are overridable, define before inclusion.
 
+*Header*: `<outcome/config.hpp>`
+
 These macros expand into either the syntax for directly specifying constrained templates in C++ 20, or into a SFINAE based emulation for earlier C++ versions. Form of usage looks as follows:
 
 ```c++

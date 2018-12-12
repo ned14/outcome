@@ -3,6 +3,8 @@
 <a href="https://en.cppreference.com/w/cpp/utility/optional" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> {{ .Get 0 }}</a>
   {{- else if hasPrefix (.Get 0) "std::expected" }}
 <a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 {{ .Get 0 }}</a>
+  {{- else if hasPrefix (.Get 0) "std::unexpected" }}
+<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 {{ .Get 0 }}</a>
   {{- else }}
     {{- errorf "Unknown cppreference target %s" (.Get 0) }}
   {{- end }}
@@ -17,5 +19,6 @@
   {{- end }}
   {{- if not $api_found }}
     <!-- errorf "API reference page for %s not found, please use an identifier wholly contained in a page title" (.Get 0) -->
+    <b>API NOT FOUND IN DOCS <code>{{ .Get 0 }}</code></b>
   {{- end }}
 {{- end }}
