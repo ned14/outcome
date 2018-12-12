@@ -1,1 +1,21 @@
-<a href="{{ .Page.Site.BaseURL }}reference/{{ .Get 0 }}" class="api-reference"><i class="fa fa-book" aria-hidden="true"></i> {{ .Get 1 }}</a>
+{{- if hasPrefix (.Get 0) "std" }}
+  {{- if hasPrefix (.Get 0) "std::optional" }}
+<a href="https://en.cppreference.com/w/cpp/utility/optional" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> {{ .Get 0 }}</a>
+  {{- else if hasPrefix (.Get 0) "std::expected" }}
+<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 {{ .Get 0 }}</a>
+  {{- else }}
+    {{- errorf "Unknown cppreference target %s" (.Get 0) }}
+  {{- end }}
+{{- else }}
+  {{- $api_found := false }}
+  {{- $api := .Get 0 }}
+  {{- range .Site.Pages }}
+    {{- if in .Title $api }}
+<a href="{{ .URL }}" class="api-reference"> {{ $api }}</a>
+      {{- $api_found = true }}
+    {{- end }}
+  {{- end }}
+  {{- if not $api_found }}
+    <!-- errorf "API reference page for %s not found, please use an identifier wholly contained in a page title" (.Get 0) -->
+  {{- end }}
+{{- end }}

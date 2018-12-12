@@ -63,7 +63,7 @@
 
 			{{- if $.description}}
 				{{- if .Description}}
-<p>{{.Description}}</p>
+<p>{{.Description | markdownify}}</p>
 				{{- end}}
 			{{- end}}
 
