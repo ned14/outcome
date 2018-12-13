@@ -1,6 +1,8 @@
 {{- if hasPrefix (.Get 0) "std" }}
   {{- if hasPrefix (.Get 0) "std::optional" }}
 <a href="https://en.cppreference.com/w/cpp/utility/optional" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> {{ .Get 0 }}</a>
+  {{- else if hasPrefix (.Get 0) "std::make_error_code" }}
+<a href="https://en.cppreference.com/mwiki/index.php?title=Special%3ASearch&search=make_error_code" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> {{ .Get 0 }}</a>
   {{- else if hasPrefix (.Get 0) "std::expected" }}
 <a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 {{ .Get 0 }}</a>
   {{- else if hasPrefix (.Get 0) "std::unexpected" }}
