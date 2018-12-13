@@ -10,3 +10,5 @@ Some embedded Linux toolchains do not define `<execinfo.h>`, thus disabling C++ 
 *Overridable*: Define before inclusion.
 
 *Default*: Defined if `__ANDROID__` is defined, else undefined.
+
+*Header*: `<outcome/config.hpp>`

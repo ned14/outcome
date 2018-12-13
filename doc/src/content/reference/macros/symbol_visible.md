@@ -13,3 +13,5 @@ Compiler-specific markup used to mark throwable types as always having default E
 <dt>Boost.Outcome:
 <dd>To `BOOST_SYMBOL_VISIBLE`.
 </dl>
+
+*Header*: `<outcome/config.hpp>`

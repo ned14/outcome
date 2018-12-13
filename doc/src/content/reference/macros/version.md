@@ -4,6 +4,8 @@ title = "Version macros"
 
 *Overridable*: None of the following macros are overridable.
 
+*Header*: `<outcome/config.hpp>`
+
 - <a name="version-major"></a>`OUTCOME_VERSION_MAJOR <number>`
 
     Major version for cmake and DLL version stamping.
