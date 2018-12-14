@@ -9,4 +9,6 @@ If without Concepts, a static constexpr bool which is true for types matching th
 
 This concept matches optional-like types such as {{% api "std::optional<T>" %}}. Note it also matches {{% api "std::expected<T, E>" %}}, which also has an optional-like interface. You may thus wish to preferentially match {{% api "ValueOrError<T, E>" %}} for any given `T`.
 
+*Namespace*: `OUTCOME_V2_NAMESPACE::convert`
+
 *Header*: `<outcome/convert.hpp>`

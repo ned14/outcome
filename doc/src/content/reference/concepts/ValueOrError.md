@@ -9,4 +9,6 @@ If without Concepts, a static constexpr bool which is true for types matching th
 
 This concept matches expected-like types such as {{% api "std::expected<T, E>" %}}, one of which is {{% api "basic_result<T, E, NoValuePolicy>" %}}. Be aware it does not differentiate between value-or-error types and value-and-error types if they present the interface matched above.
 
+*Namespace*: `OUTCOME_V2_NAMESPACE::convert`
+
 *Header*: `<outcome/convert.hpp>`

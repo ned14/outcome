@@ -45,7 +45,7 @@ core_macros = {
     r'([^_])OUTCOME_': r'\1BOOST_OUTCOME_',
     r'^SYSTEM_ERROR2_': r'BOOST_SYSTEM_ERROR2_',
     r'([^_])SYSTEM_ERROR2_': r'\1SYSTEM_ERROR2_',
-    r'<outcome/([^>]+)': r'<boost/outcome/\1>',
+    r'<outcome/([^>]+)': r'<boost/outcome/\1',
 }
 source_macros = {
     r'DOXYGEN_': r'BOOST_OUTCOME_DOXYGEN_',
