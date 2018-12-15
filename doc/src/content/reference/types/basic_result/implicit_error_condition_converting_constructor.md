@@ -1,10 +1,11 @@
 +++
 title = "`basic_result(ErrorCondEnum &&)`"
 description = "Implicit `error_type` from `ErrorCondEnum` constructor. Available if `predicate::enable_error_condition_converting_constructor<ErrorCondEnum>` is true. Constexpr, triviality and noexcept propagating."
+categories = ["constructors", "implicit-constructors", "converting-constructors"]
 weight = 200
 +++
 
-Implicit `error_type` from `ErrorCondEnum` constructor. Calls {{% api "hook_result_construction(basic_result<T, E, NoValuePolicy> *, T &&)" %}} with `this` and `ErrorCondEnum`.
+Implicit `error_type` from `ErrorCondEnum` constructor. Calls {{% api "hook_result_construction(basic_result<T, E, NoValuePolicy> *, U &&)" %}} with `this` and `ErrorCondEnum`.
 
 *Requires*: `predicate::enable_error_condition_converting_constructor<R>` is true.
 

@@ -11,6 +11,6 @@ The difference between the `OUTCOME_TRYV(expr)` and `OUTCOME_TRY(expr)` editions
 
 *Definition*: Firstly the expression's temporary is bound to a uniquely named, stack allocated, `auto &&`. If that reference's bound object's `.has_value()` is false, immediately execute `return try_operation_return_as(propagated unique reference);`, propagating the rvalue/lvalue/etc-ness of the original expression.
 
-{{% api "try_operation_return_as(expr)" %}} is as ADL discovered customisation point, the default implementation of which returns a {{% api "failure<E>" %}} for Outcome types, or an {{% api "std::unexpected<E>" %}} for Expected types.
+{{% api "try_operation_return_as(expr)" %}} is a customisation point, the default implementation of which returns a {{% api "failure<E>" %}} for Outcome types, or an {{% api "std::unexpected<E>" %}} for Expected types.
 
 *Header*: `<outcome/try.hpp>`

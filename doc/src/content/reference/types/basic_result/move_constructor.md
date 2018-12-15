@@ -1,6 +1,7 @@
 +++
 title = "`basic_result(basic_result &&)`"
 description = "Move constructor. Constexpr, triviality and noexcept propagating."
+categories = ["constructors", "implicit-constructors", "move-constructors"]
 weight = 110
 +++
 

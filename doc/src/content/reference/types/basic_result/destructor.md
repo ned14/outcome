@@ -1,6 +1,7 @@
 +++
 title = "`~basic_result()`"
 description = "Destructor. Constexpr, triviality and noexcept propagating."
+categories = ["destructors"]
 weight = 150
 +++
 

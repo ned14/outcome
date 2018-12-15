@@ -98,4 +98,19 @@ The second major design difference is that union storage is NOT used, as it is a
 
 ### Public member functions
 
-{{% children description="true" depth="2" %}}
+#### Disabling constructors
+
+{{% children description="true" depth="2" categories="disabling-constructors" %}}
+
+#### Regular member functions
+
+{{% children description="true" depth="2" categories="default-constructors,copy-constructors,move-constructors,copy-assignment,move-assignment,destructors" %}}
+
+#### Converting constructors
+
+{{% children description="true" depth="2" categories="converting-constructors" %}}
+
+#### Inplace constructors
+
+{{% children description="true" depth="2" categories="inplace-constructors" %}}
+
