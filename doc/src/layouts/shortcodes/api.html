@@ -18,14 +18,26 @@
   {{- end }}
 {{- else }}
   {{- $api_found := false }}
+  {{- $api_title := "" }}
+  {{- $api_url := "" }}
   {{- $api := .Get 0 }}
   {{- range .Site.Pages }}
-    {{- if in .Title $api }}
-<a href="{{ .URL }}" class="api-reference"> {{ $api }}</a>
-      {{- $api_found = true }}
+    {{- if in .Title $api -}}
+      {{- if $api_found }}
+        {{- if lt (len .Title) (len $api_title) }}
+          {{- $api_title = .Title }}
+          {{- $api_url = .URL }}
+        {{- end }}
+      {{- else }}
+        {{- $api_title = .Title }}
+        {{- $api_url = .URL }}
+        {{- $api_found = true }}
+      {{- end }}
     {{- end }}
   {{- end }}
-  {{- if not $api_found }}
+  {{- if $api_found -}}
+<a href="{{ $api_url }}" class="api-reference">{{ $api }}</a>
+  {{- else }}
     <!-- errorf "API reference page for %s not found, please use an identifier wholly contained in a page title" (.Get 0) -->
     <b>API NOT FOUND IN DOCS <code>{{ .Get 0 }}</code></b>
   {{- end }}

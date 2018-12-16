@@ -1,6 +1,7 @@
 +++
 title = "`basic_result(const basic_result &)`"
 description = "Copy constructor. Constexpr, triviality and noexcept propagating."
+categories = ["constructors", "implicit-constructors", "copy-constructors"]
 weight = 120
 +++
 

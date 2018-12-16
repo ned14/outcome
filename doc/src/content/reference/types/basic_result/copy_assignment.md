@@ -1,6 +1,7 @@
 +++
 title = "`basic_result &operator=(const basic_result &)`"
 description = "Copy assignment. Constexpr, triviality and noexcept propagating."
+categories = ["operators", "assignment", "copy-assignment"]
 weight = 140
 +++
 

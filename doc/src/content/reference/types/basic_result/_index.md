@@ -33,7 +33,7 @@ A sum type carrying either a `T` or an `E`, with `NoValuePolicy` specifying what
 
 This very light weight inclusion dependencies makes basic result suitable for use in global header files of very large C++ codebases.
 
-### Design rationale:
+### Design rationale
 
 The basic result type is the main workhorse type of the Outcome library, providing a simple sum type with optional values representing success or disappointment. Unlike {{% api "std::expected<T, E>" %}}, Outcome's result type is designed specifically for convenience when implementing failure handling, and it has a number of API differences to facilitate that.
 
@@ -41,7 +41,7 @@ The first major design difference is that basic result models its constructor de
 
 The second major design difference is that union storage is NOT used, as it is assumed that `sizeof(E)` will be small for failure handling. This very considerably reduces load on the compiler, and substantially improves compile times in very large C++ codebases.
 
-### Public member type aliases:
+### Public member type aliases
 
 - `value_type` is `T`.
 - `error_type` is `E`.
@@ -49,7 +49,7 @@ The second major design difference is that union storage is NOT used, as it is a
 - `error_type_if_enabled` is `E` if construction from `T` is available, else it is a usefully named unusable internal type.
 - `rebind<A, B = E, C = NoValuePolicy>` is `basic_result<A, B, C>`.
 
-### Protected member predicate booleans:
+### Protected member predicate booleans
 
 - `predicate::constructors_enabled` is constexpr boolean true if decayed `value_type` and decayed `error_type` are not the same type.
 
@@ -96,6 +96,21 @@ The second major design difference is that union storage is NOT used, as it is a
     1. `predicate::constructors_enabled` is true.
     2. Either, but not both, of `value_type` is explicitly constructible from `Args...` or `error_type` is explicitly constructible from `Args...`.
 
-### Public member functions:
+### Public member functions
 
-{{% children description="true" depth="2" %}}
+#### Disabling constructors
+
+{{% children description="true" depth="2" categories="disabling-constructors" %}}
+
+#### Regular member functions
+
+{{% children description="true" depth="2" categories="default-constructors,copy-constructors,move-constructors,copy-assignment,move-assignment,destructors" %}}
+
+#### Converting constructors
+
+{{% children description="true" depth="2" categories="converting-constructors" %}}
+
+#### Inplace constructors
+
+{{% children description="true" depth="2" categories="inplace-constructors" %}}
+

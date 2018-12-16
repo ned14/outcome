@@ -1,6 +1,7 @@
 +++
 title = "`basic_result &operator=(basic_result &&)`"
 description = "Move assignment. Constexpr, triviality and noexcept propagating."
+categories = ["operators", "assignment", "move-assignment"]
 weight = 130
 +++
 
