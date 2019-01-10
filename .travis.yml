@@ -131,6 +131,10 @@ after_success:
      cd boost-outcome;
      git checkout -b develop origin/develop;
      git checkout master;
+     git remote add outcome https://github.com/ned14/outcome;
+     git fetch outcome;
+     git checkout -b orig-develop outcome/develop;
+     git checkout -b orig-master outcome/master;
      cd ..;
      python outcome/include/outcome/quickcpplib/scripts/boostify_git_repo.py boost-outcome outcome ned14/outcome@;
      cd boost-outcome;
