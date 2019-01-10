@@ -125,22 +125,21 @@ script:
 after_success:
  -
    if [ "$__" = "cmake tests" ] && [ "$NAME" = "TravisLinuxWorkerGCC" ]; then
-     git clone https://github.com/ned14/boost-outcome;
-     python include/outcome/quickcpplib/scripts/boostify.py boost-outcome;
+     cd ..;
+     git clone https://github.com/boostorg/outcome boost-outcome;
+     python outcome/include/outcome/quickcpplib/scripts/boostify_git_repo.py boost-outcome outcome ned14/outcome@;
      cd boost-outcome;
-     git add . || true;
-     git commit -a -m "Travis CI updates Boost.Outcome from Outcome" || true;
-     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost-outcome master;
+     git push https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/boostorg/outcome master || true;
+     git push https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/boostorg/outcome develop || true;
      cd doc;
-     git clone -b gh-pages --single-branch https://github.com/ned14/boost-outcome html;
+     git clone -b gh-pages --single-branch https://github.com/boostorg/outcome html;
      cd src;
      hugo;
      cd ../html;
      git add . || true;
      git commit -a -m "Travis CI regenerates Boost.Outcome docs" || true;
-     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost-outcome gh-pages;
+     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/boostorg/outcome gh-pages;
      cd ../..;
    fi
- - bash -x ./update_coveralls.sh `pwd`
 
 after_failure:

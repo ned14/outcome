@@ -6,7 +6,7 @@ include_files = [
     r'^test/.*$',
     r'^\.clang-.*$',
     r'^\.gitattributes$',
-    r'^\index.html$',
+    r'^index.html$',
 ]
 exclude_files = [
     r'.*quickcpplib.*',

@@ -36,46 +36,39 @@ if(NOT PROJECT_IS_DEPENDENCY)
   if(NOT PYTHONINTERP_FOUND)
     indented_message(WARNING "NOT rebuilding preprocessed edition of library due to python not being installed")
   else()
-    # See if the ply package is installed so pcpp can run
-    execute_process(COMMAND python -c "import ply" RESULT_VARIABLE python_has_ply)
-    if(NOT python_has_ply EQUAL 0)
-      indented_message(WARNING "NOT rebuilding preprocessed edition of library due to installed python not having the ply package installed. "
-        "Do 'pip install ply' to fix. NOTE that doxygen docs will NOT build without the precompiled edition.")
-    else()
-      function(make_single_header target name)
-        add_partial_preprocess(${target}
-                              "${name}"
-                              ${ARGN}
-                              -I ..
-                              --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
-                              --passthru-comments --line-directive # --debug
-                              -U QUICKCPPLIB_ENABLE_VALGRIND
-                              -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
-                              -U STANDARDESE_IS_IN_THE_HOUSE
-                              WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-                              )
-        if(NOT CMAKE_VERSION VERSION_LESS 3.3)
-          add_dependencies(outcome_hl ${target})
-        endif()
-      endfunction()
-      make_single_header(outcome_hl-pp-std
-                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/outcome.hpp"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome.hpp")
-      make_single_header(outcome_hl-pp-basic
-                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/outcome-basic.hpp"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/basic_outcome.hpp"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/try.hpp")
-      make_single_header(outcome_hl-pp-experimental
-                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/outcome-experimental.hpp"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/experimental/status_outcome.hpp"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/try.hpp")
-      make_single_header(outcome_hl-pp-abi
-                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/abi.hpp"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/basic_outcome.hpp"
-                         -D OUTCOME_DISABLE_ABI_PERMUTATION=1
-                         -D QUICKCPPLIB_DISABLE_ABI_PERMUTATION=1
-                         -U OUTCOME_UNSTABLE_VERSION)
-    endif()
+    function(make_single_header target name)
+      add_partial_preprocess(${target}
+                            "${name}"
+                            ${ARGN}
+                            -I ..
+                            --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
+                            --passthru-comments --line-directive # --debug
+                            -U QUICKCPPLIB_ENABLE_VALGRIND
+                            -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
+                            -U STANDARDESE_IS_IN_THE_HOUSE
+                            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                            )
+      if(NOT CMAKE_VERSION VERSION_LESS 3.3)
+        add_dependencies(outcome_hl ${target})
+      endif()
+    endfunction()
+    make_single_header(outcome_hl-pp-std
+                       "${CMAKE_CURRENT_SOURCE_DIR}/single-header/outcome.hpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome.hpp")
+    make_single_header(outcome_hl-pp-basic
+                       "${CMAKE_CURRENT_SOURCE_DIR}/single-header/outcome-basic.hpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/basic_outcome.hpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/try.hpp")
+    make_single_header(outcome_hl-pp-experimental
+                       "${CMAKE_CURRENT_SOURCE_DIR}/single-header/outcome-experimental.hpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/experimental/status_outcome.hpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/try.hpp")
+    make_single_header(outcome_hl-pp-abi
+                       "${CMAKE_CURRENT_SOURCE_DIR}/single-header/abi.hpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/basic_outcome.hpp"
+                       -D OUTCOME_DISABLE_ABI_PERMUTATION=1
+                       -D QUICKCPPLIB_DISABLE_ABI_PERMUTATION=1
+                       -U OUTCOME_UNSTABLE_VERSION)
   endif()
 endif()
 
