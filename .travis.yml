@@ -126,6 +126,8 @@ after_success:
  -
    if [ "$__" = "cmake tests" ] && [ "$NAME" = "TravisLinuxWorkerGCC" ]; then
      pip install --user gitpython;
+     git checkout -b master origin/master;
+     git fetch;
      cd ..;
      git clone https://github.com/boostorg/outcome boost-outcome;
      cd boost-outcome;
@@ -139,7 +141,7 @@ after_success:
      cd ..;
      python outcome/include/outcome/quickcpplib/scripts/boostify_git_repo.py boost-outcome outcome ned14/outcome@;
      cd boost-outcome;
-     git checkout master;
+     git checkout develop;
      git push https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/boostorg/outcome master || true;
      git push https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/boostorg/outcome develop || true;
      cd doc;
