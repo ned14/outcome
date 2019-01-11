@@ -126,8 +126,8 @@ after_success:
  -
    if [ "$__" = "cmake tests" ] && [ "$NAME" = "TravisLinuxWorkerGCC" ]; then
      pip install --user gitpython;
-     git checkout -b master origin/master;
-     git fetch;
+     git remote add outcome https://github.com/ned14/outcome;
+     git fetch outcome;
      cd ..;
      git clone https://github.com/boostorg/outcome boost-outcome;
      cd boost-outcome;
