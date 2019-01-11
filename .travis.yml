@@ -135,9 +135,11 @@ after_success:
      git fetch outcome;
      git checkout -b orig-develop outcome/develop;
      git checkout -b orig-master outcome/master;
+     git checkout master;
      cd ..;
      python outcome/include/outcome/quickcpplib/scripts/boostify_git_repo.py boost-outcome outcome ned14/outcome@;
      cd boost-outcome;
+     git checkout master;
      git push https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/boostorg/outcome master || true;
      git push https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/boostorg/outcome develop || true;
      cd doc;
