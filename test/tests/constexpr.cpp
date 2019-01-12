@@ -35,7 +35,6 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / constexpr, "Tests that outcome wo
   //
   // It can however be trivially destructible as error_code is trivially destructible. That
   // makes possible lots of compiler optimisations
-  static_assert(!std::is_literal_type<result<int>>::value, "result<int> is a literal type!");
   static_assert(std::is_trivially_destructible<result<int>>::value, "result<int> is not trivially destructible!");
   static_assert(std::is_trivially_destructible<result<void>>::value, "result<void> is not trivially destructible!");
 

@@ -65,6 +65,9 @@ cache:
     - hugo_bin
     
 before_install:
+ - git config --global push.default simple
+ - git config --global user.name "Jenkins nedprod CI"
+ - git config --global user.email "foo@nowhere"
  - if [ ! -f "hugo_bin/hugo" ]; then
      wget -O hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.52/hugo_0.52_Linux-64bit.tar.gz;
      mkdir hugo_bin;
@@ -107,9 +110,6 @@ script:
    fi
  - >
    if [ "$__" = "Documentation" ]; then
-     git config --global push.default simple;
-     git config --global user.name "Jenkins nedprod CI";
-     git config --global user.email "foo@nowhere";
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
@@ -126,6 +126,8 @@ after_success:
  -
    if [ "$__" = "cmake tests" ] && [ "$NAME" = "TravisLinuxWorkerGCC" ]; then
      pip install --user gitpython;
+     git remote add outcome https://github.com/ned14/outcome;
+     git fetch outcome;
      cd ..;
      git clone https://github.com/boostorg/outcome boost-outcome;
      cd boost-outcome;
@@ -135,9 +137,11 @@ after_success:
      git fetch outcome;
      git checkout -b orig-develop outcome/develop;
      git checkout -b orig-master outcome/master;
+     git checkout master;
      cd ..;
      python outcome/include/outcome/quickcpplib/scripts/boostify_git_repo.py boost-outcome outcome ned14/outcome@;
      cd boost-outcome;
+     git checkout develop;
      git push https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/boostorg/outcome master || true;
      git push https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/boostorg/outcome develop || true;
      cd doc;
