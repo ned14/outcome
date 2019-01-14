@@ -43,6 +43,9 @@ Distributed under the Boost Software License, Version 1.0.
 #ifdef BOOST_NO_CXX14_VARIABLE_TEMPLATES
 #error Boost.Outcome needs variable template support in the compiler
 #endif
+#if !defined(__clang__) && defined(__GNUC__) && __GNUC__ < 6
+#error Due to a bug in nested template variables parsing, Boost.Outcome does not work on GCCs earlier than v6.
+#endif
 
 #ifndef BOOST_OUTCOME_SYMBOL_VISIBLE
 #define BOOST_OUTCOME_SYMBOL_VISIBLE BOOST_SYMBOL_VISIBLE
