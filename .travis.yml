@@ -144,7 +144,7 @@ after_success:
      git checkout master;
      cd doc/src;
      rm -rf ../html;
-     hugo;
+     HUGO_BOOSTDOCDISABLECOMMONHEADING=1 hugo;
      cd ../html;
      git add . || true;
      cd ../..;
@@ -152,7 +152,7 @@ after_success:
      git checkout develop;
      cd doc/src;
      rm -rf ../html;
-     hugo;
+     HUGO_BOOSTDOCDISABLECOMMONHEADING=1 hugo;
      cd ../html;
      git add . || true;
      cd ../..;
