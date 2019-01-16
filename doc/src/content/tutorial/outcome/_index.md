@@ -5,7 +5,6 @@ weight = 20
 tags = ["outcome"]
 +++
 
-## `outcome<>`
 
 Type {{< api "outcome/#standardese-outcome_v2_xxx__outcome-R-S-P-NoValuePolicy-" "outcome<T, EC, EP, NVP>" >}} represets either a successfully computed value of type `T` or a reason for failure. Failure can be represented by `EC` or `EP` or both. Although usually it will either be an `EC` or an `EP`. `EC` defaults to `std::error_code` and `EP` defaults to `std::exception_ptr`. The distinction is made into two types, `EC` and `EP`:
 

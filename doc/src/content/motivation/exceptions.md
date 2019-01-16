@@ -4,7 +4,6 @@ description = "Exceptions with their good and bad sides."
 weight = 10
 +++
 
-## Exceptions
 
 Exceptions are the default mechanism in C++ for reporting, propagating and
 processing the information about function failures. Their main advantage is

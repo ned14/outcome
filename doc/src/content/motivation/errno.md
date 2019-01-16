@@ -4,7 +4,6 @@ description = "errno with their good and bad sides."
 weight = 20
 +++
 
-## `errno`
 
 The idiom of returning, upon failure, a special value and storing an error code
 (an `int`) inside a global (or thread-local) object `errno` is inherited from C,
@@ -30,7 +29,7 @@ int readValue(const char * filename)
 }
 ```
 
-One advantage (to some and a disadvantage to others) of this technique is that it
+One advantage (to some, and a disadvantage to others) of this technique is that it
 uses familiar control statements (`if` and `return`) to indicate all execution
 paths that handle failures. When we read this code we know when and under what
 conditions it can exit without producing the expected result.
@@ -42,7 +41,7 @@ conditions it can exit without producing the expected result.
 Because on failure, as well as success, we write into a global (or thread-local)
 object, our functions are not *pure*: they have *side effects*. This means many
 useful compiler optimizations (like common subexpression elimination) cannot be
-applied. This chows that it is not only C++ that chooses suboptimal solutions
+applied. This shows that it is not only C++ that chooses suboptimal solutions
 for reporting failures.
 
 Whatever type we return, we always need a special value to spare, which is

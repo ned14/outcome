@@ -4,7 +4,6 @@ description = "Error codes with their good and bad sides."
 weight = 30
 +++
 
-## Error codes
 
 Error codes are reasonable error handling technique, also working in C.
 In this case the information is also stored as an `int`, but returned by value,
@@ -47,5 +46,5 @@ code value. This is quite impossible and does not scale well.
 Because errors are communicated through returned values, we cannot use function's
 return type to return computed values. Computed values are written to function
 *output* parameters, which requires objects to be created before we have values
-to put into them. This requires many objects in unintended state to exist. writing
+to put into them. This requires many objects in unintended state to exist. Writing
 to output parameters often requires an indirection and can incur some run-time cost.  
