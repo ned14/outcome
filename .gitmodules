@@ -8,6 +8,10 @@
 [submodule "doc/src/themes/docdock"]
 	path = doc/src/themes/docdock
 	url = https://github.com/vjeantet/hugo-theme-docdock.git
+[submodule "doc/src/themes/boostdoc"]
+	path = doc/src/themes/boostdoc
+	url = https://github.com/ned14/boostdoc.git
+	branch = master
 [submodule "include/outcome/quickcpplib"]
 	path = include/outcome/quickcpplib
 	url = https://github.com/ned14/quickcpplib
@@ -20,7 +24,3 @@
 	branch = master
 	fetchRecurseSubmodules = true
 	ignore = untracked
-[submodule "doc/src/themes/boostdoc"]
-	path = doc/src/themes/boostdoc
-	url = https://github.com/ned14/boostdoc.git
-	branch = master

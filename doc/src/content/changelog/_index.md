@@ -6,6 +6,9 @@ weight = 80
 ---
 ## v2.1 in progress [[project]](https://github.com/ned14/outcome/projects/1)
 
+- [#162](https://github.com/ned14/outcome/issues/162)
+    - `.has_failure()` was returning false at times when it should have returned true.
+
 - [#152](https://github.com/ned14/outcome/issues/152)
     - GCC 5 no longer can compile Outcome at all due to [https://stackoverflow.com/questions/45607450/gcc5-nested-variable-template-is-not-a-function-template](https://stackoverflow.com/questions/45607450/gcc5-nested-variable-template-is-not-a-function-template).
 Added explicit version trap for GCC 5 to say it can not work. Note this is not a

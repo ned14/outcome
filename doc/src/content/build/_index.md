@@ -143,8 +143,8 @@ add_subdirectory(
 
 Outcome's cmake has the following useful products:
 
-- `outcome::hl` (target): the Outcome header only library. Add this to any
-`target_link_libraries()` in your cmake to bring in Outcome as a header only library. This will also
+- `outcome::hl` (target): the Outcome header-only library. Add this to any
+`target_link_libraries()` in your cmake to bring in Outcome as a header-only library. This will also
 add to your link (via `PUBLIC`) any debugger visualisation support files, any system library
 dependencies and also force all consuming executables to be configured with a minimum
 of C++ 14 as Outcome requires a minimum of that.

@@ -4,7 +4,6 @@ description = "Overview of std::error_code"
 weight = 40
 +++
 
-## `std::error_code`
 
 Type `std::error_code` has been designed to be sufficiently small and trivial
 to be cheaply passed around, and at the same time be able to store sufficient

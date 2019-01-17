@@ -3,7 +3,7 @@ title = "Prerequisites"
 weight = 2
 +++
 
-Outcome is a header only C++ 14 library known to work on these compiler-platform combinations or better:
+Outcome is a header-only C++ 14 library known to work on these compiler-platform combinations or better:
 
 - clang 4.0.1 (LLVM) [FreeBSD, Linux, OS X]
 - GCC 6.3 [Linux]
