@@ -6,6 +6,7 @@ h2, h3, h4, h5, h6 {
 }
 article section.page h1:first-of-type {
   font-weight: 900;
+  text-transform: inherit;
 }
 h1 {
   font-weight: inherit;

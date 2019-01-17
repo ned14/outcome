@@ -10,3 +10,5 @@ Explicit converting copy constructor from compatible `basic_result`. Calls {{% a
 *Requires*: `predicate::enable_compatible_conversion<R, S, P>` is true.
 
 *Complexity*: Same as for the copy constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
+
+*Guarantees*: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked `noexcept`.

@@ -10,3 +10,5 @@ Explicit converting constructor from {{% api "ValueOrError<T, E>" %}} concept ma
 *Requires*: `convert::`{{% api "value_or_error<T, U>" %}} has an available call operator, and if the input is a `basic_result` or `basic_outcome`, then `convert::value_or_error<>` has enabled those inputs for that `convert::value_or_error<>` specialisation.
 
 *Complexity*: Same as for the copy or move constructor from the input's `.value()` or `.error()` respectively. Constexpr, triviality and noexcept of underlying operations is propagated.
+
+*Guarantees*: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked `noexcept`.

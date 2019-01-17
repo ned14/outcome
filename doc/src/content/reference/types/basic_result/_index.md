@@ -3,7 +3,7 @@ title = "`basic_result<T, E, NoValuePolicy>`"
 description = "A sum type carrying either a successful `T`, or a disappointment `E`, with `NoValuePolicy` specifying what to do if one tries to read state which isn't there."
 +++
 
-A sum type carrying either a `T` or an `E`, with `NoValuePolicy` specifying what to do if one tries to read state which isn't there. Either or both of `T` and `E` can be `void` to indicate no value for that state is present.
+A sum type carrying either a `T` or an `E`, with `NoValuePolicy` specifying what to do if one tries to read state which isn't there. Either or both of `T` and `E` can be `void` to indicate no value for that state is present. Note that `E = void` makes basic result into effectively an `optional<T>`, but with `NoValuePolicy` configurable behaviour.
 
 *Requires*: Concept requirements if C++ 20, else static asserted:
 
@@ -31,15 +31,15 @@ A sum type carrying either a `T` or an `E`, with `NoValuePolicy` specifying what
 9. `<cstdlib>`
 10. `<cassert>`
 
-This very light weight inclusion dependencies makes basic result suitable for use in global header files of very large C++ codebases.
+This very light weight set of inclusion dependencies makes basic result suitable for use in global header files of very large C++ codebases.
 
 ### Design rationale
 
-The basic result type is the main workhorse type of the Outcome library, providing a simple sum type with optional values representing success or disappointment. Unlike {{% api "std::expected<T, E>" %}}, Outcome's result type is designed specifically for convenience when implementing failure handling, and it has a number of API differences to facilitate that.
+The basic result type is the main workhorse type of the Outcome library, providing a simple sum type with optional values representing success or disappointment. Unlike {{% api "std::expected<T, E>" %}}, Outcome's result type is designed specifically for convenience when implementing failure handling across very large codebases, and it has a number of API differences to facilitate that.
 
-The first major design difference is that basic result models its constructor design on {{% api "std::variant<...>" %}}, rather than modelling {{% api "std::optional<T>" %}}'s constructor design like `std::expected<T, E>` does. This means that basic result will implicitly construct either a `T` or an `E` if doing so is unambiguous, same as `variant` does. Where implicit construction is ambiguous, the implicit constructors disable and a `T` or `E` can be specified via {{% api "in_place_type_t<T>" %}}, or via {{% api "success_type<T>" %}} or {{% api "failure_type<T>" %}}.
+The first major design difference is that basic result models its constructor design on {{% api "std::variant<...>" %}}, rather than modelling {{% api "std::optional<T>" %}}'s constructor design like `std::expected<T, E>` does. This means that basic result will implicitly construct either a `T` or an `E` if doing so is unambiguous, same as `variant` does. Where implicit construction is ambiguous, the implicit constructors disable and a `T` or `E` can be specified via {{% api "in_place_type_t<T>" %}}, or via {{% api "success_type<T>" %}} or {{% api "failure_type<T>" %}}. We implement a subset of variant's constructors for improved compile time impact, so the implicit and explicit constructor design is split into fixed subsets to reduce SFINAE execution.
 
-The second major design difference is that union storage is NOT used, as it is assumed that `sizeof(E)` will be small for failure handling. This very considerably reduces load on the compiler, and substantially improves compile times in very large C++ codebases.
+The second major design difference is that union storage is NOT used, as it is assumed that `sizeof(E)` will be small for failure handling. This very considerably reduces load on the compiler, and substantially improves compile times in very large C++ 14 codebases, because copies and moves do not need to jump through complex ceremony in order to implement the never-empty guarantees which would be required in a union storage based implementation (C++ 17 onwards does far fewer copy and move constructor instantiations, but it all adds up -- work avoided is always the fastest).
 
 ### Public member type aliases
 
@@ -102,7 +102,7 @@ The second major design difference is that union storage is NOT used, as it is a
 
 {{% children description="true" depth="2" categories="disabling-constructors" %}}
 
-#### Regular member functions
+#### Copy and move constructors and assignment, and destructor
 
 {{% children description="true" depth="2" categories="default-constructors,copy-constructors,move-constructors,copy-assignment,move-assignment,destructors" %}}
 
@@ -113,4 +113,16 @@ The second major design difference is that union storage is NOT used, as it is a
 #### Inplace constructors
 
 {{% children description="true" depth="2" categories="inplace-constructors" %}}
+
+#### Tagged constructors
+
+{{% children description="true" depth="2" categories="tagged-constructors" %}}
+
+#### Observers
+
+{{% children description="true" depth="2" categories="observers" %}}
+
+#### Modifiers
+
+{{% children description="true" depth="2" categories="modifiers" %}}
 

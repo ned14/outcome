@@ -10,3 +10,5 @@ Explicit inplace value constructor. Calls {{% api "hook_result_in_place_construc
 *Requires*: `predicate::enable_inplace_value_constructor<std::initializer_list<U>, Args ...>` is true.
 
 *Complexity*: Same as for the `value_type` constructor which accepts `std::initializer_list<U>, Args ...`. Constexpr, triviality and noexcept of underlying operations is propagated.
+
+*Guarantees*: If an exception is thrown during the operation, the state of the Args is left indeterminate.

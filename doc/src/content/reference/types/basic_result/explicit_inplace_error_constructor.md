@@ -10,3 +10,5 @@ Explicit inplace error constructor. Calls {{% api "hook_result_in_place_construc
 *Requires*: `predicate::enable_inplace_error_constructor<Args ...>` is true.
 
 *Complexity*: Same as for the `error_type` constructor which accepts `Args ...`. Constexpr, triviality and noexcept of underlying operations is propagated.
+
+*Guarantees*: If an exception is thrown during the operation, the state of the Args is left indeterminate.
