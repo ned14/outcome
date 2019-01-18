@@ -99,6 +99,10 @@ OUTCOME_V2_NAMESPACE_END
 //! \exclude
 #define OUTCOME_TRY_CALL_OVERLOAD(name, ...) OUTCOME_TRY_OVERLOAD_GLUE(OUTCOME_TRY_OVERLOAD_MACRO(name, OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
 
+#if !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wparentheses"
+#endif
 
 //! \exclude
 #define OUTCOME_TRYV2(unique, ...)                                                                                                                                                                                                                                                                                             \
@@ -109,6 +113,10 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRY2(unique, v, ...)                                                                                                                                                                                                                                                                                           \
   OUTCOME_TRYV2(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                                          \
   auto && (v) = OUTCOME_V2_NAMESPACE::detail::try_extract_value(static_cast<decltype(unique) &&>(unique))
+
+#if !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
 
 /*! If the `outcome`/`result`/`std::experimental::expected` returned by expression ... is not valued, propagate any
 failure by immediately returning that failure state immediately
