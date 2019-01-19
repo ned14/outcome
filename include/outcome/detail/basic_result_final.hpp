@@ -68,7 +68,7 @@ namespace detail
     /*! Checks if has error or exception.
     \returns True if has error or exception.
     */
-    constexpr bool has_failure() const noexcept { return (this->_state._status & detail::status_have_error) != 0 && (this->_state._status & detail::status_have_exception) != 0; }
+    constexpr bool has_failure() const noexcept { return (this->_state._status & detail::status_have_error) != 0 || (this->_state._status & detail::status_have_exception) != 0; }
 
     /// \output_section Comparison operators
     /*! True if equal to the other basic_result.
