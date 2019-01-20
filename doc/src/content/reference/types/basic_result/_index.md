@@ -96,6 +96,31 @@ The second major design difference is that union storage is NOT used, as it is a
     1. `predicate::constructors_enabled` is true.
     2. Either, but not both, of `value_type` is explicitly constructible from `Args...` or `error_type` is explicitly constructible from `Args...`.
 
+#### Summary of [standard requirements provided](https://en.cppreference.com/w/cpp/named_req)
+
+- ~~`DefaultConstructible`~~, always deleted to force user to choose valued or errored for every result instanced.
+- `MoveConstructible`, if both `value_type` and `error_type` implement move constructors.
+- `CopyConstructible`, if both `value_type` and `error_type` implement copy constructors.
+- `MoveAssignable`, if both `value_type` and `error_type` implement move constructors and move assignment.
+- `CopyAssignable`, if both `value_type` and `error_type` implement copy constructors and copy assignment.
+- `Destructible`
+- `TriviallyCopyable`, if both `value_type` and `error_type` are trivially copyable.
+- `TrivialType`, if both `value_type` and `error_type` are trivial types.
+- `LiteralType`, if both `value_type` and `error_type` are literal types.
+- `StandardLayoutType`, if both `value_type` and `error_type` are standard layout types. If so, layout of `basic_result` in C is guaranteed to be:
+
+    ```c++
+    struct result_layout {
+      value_type value;
+      unsigned int flags;
+      error_type error;
+    };
+    ```
+- `EqualityComparable`, if both `value_type` and `error_type` implement equality comparisons with one another.
+- ~~`LessThanComparable`~~, not implemented due to availability of implicit conversions from `value_type` and `error_type`, this can cause major surprise (i.e. hard to diagnose bugs), so we don't implement these at all.
+~ `Swappable`
+- ~~`Hash`~~, not implemented as a generic implementation of a unique hash for non-valued items which are unequal would require a dependency on RTTI being enabled.
+
 ### Public member functions
 
 #### Disabling constructors
@@ -125,4 +150,10 @@ The second major design difference is that union storage is NOT used, as it is a
 #### Modifiers
 
 {{% children description="true" depth="2" categories="modifiers" %}}
+
+#### Comparisons
+
+See above for why `LessThanComparable` is not implemented.
+
+{{% children description="true" depth="2" categories="comparisons" %}}
 

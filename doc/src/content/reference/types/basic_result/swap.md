@@ -2,7 +2,7 @@
 title = "`void swap(basic_result &)`"
 description = "Swap one basic_result with another. Noexcept propagating."
 categories = ["modifiers"]
-weight = 990
+weight = 900
 +++
 
 Swap one basic_result with another.
