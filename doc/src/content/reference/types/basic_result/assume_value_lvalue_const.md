@@ -1,11 +1,11 @@
 +++
 title = "`const value_type &assume_value() const & noexcept`"
-description = "Narrow contract const lvalue reference observer of any value present. Constexpr propagating."
+description = "Narrow contract const lvalue reference observer of any value present. Constexpr propagating, never throws."
 categories = ["observers"]
 weight = 610
 +++
 
-Narrow contract const lvalue reference observer of any value present. `NoValuePolicy::narrow_value_check()` is first invoked, then the reference to the value is returned.
+Narrow contract const lvalue reference observer of any value present. `NoValuePolicy::narrow_value_check()` is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however `NoValuePolicy::narrow_value_check()` can do something to avoid that.
 
 *Requires*: `value_type` to not be `void`, otherwise return type is `void`.
 
