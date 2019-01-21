@@ -13,17 +13,17 @@ The final option, which this section covers, is to use the ADL discovered event 
 which tell you when a namespace-localised `outcome` or `result` has been:
 
 - Constructed
-  - {{< api "result/#standardese-outcome_v2_xxx__hooks__hook_result_construction-T-U--T--U---" "hook_result_construction(result<T, E> *this, U &&src)" >}}
-  - {{< api "outcome/#standardese-outcome_v2_xxx__hooks__hook_outcome_construction-T-U--T--U---" "hook_outcome_construction(outcome<T, EC, EP> *this, U &&src)" >}}
+  - {{< api "void hook_result_construction(T *, U &&) noexcept" >}}
+  - {{< api "void hook_outcome_construction(T *, U &&) noexcept" >}}
 - In-place constructed
-  - {{< api "result/#standardese-outcome_v2_xxx__hooks__hook_result_in_place_construction-T-U-Args--T--in_place_type_t-U--Args------" "hook_result_in_place_construction(result<T, E> *this, in_place_type_t<T|E>, Args&&... srcs)" >}}
-  - {{< api "outcome/#standardese-outcome_v2_xxx__hooks__hook_outcome_in_place_construction-T-U-Args--T--in_place_type_t-U--Args------" "hook_outcome_in_place_construction(outcome<T, EC, EP> *this, in_place_type_t<T|EC|EP>, Args&&... srcs)" >}}
+  - {{< api "void hook_result_in_place_construction(T *, in_place_type_t<U>, Args &&...) noexcept" >}}
+  - {{< api "void hook_outcome_in_place_construction(T *, in_place_type_t<U>, Args &&...) noexcept" >}}
 - Copied
-  - {{< api "result/#standardese-outcome_v2_xxx__hooks__hook_result_copy_construction-T-U--T--U---" "hook_result_copy_construction(result<T, E> *this, U &&src)" >}}
-  - {{< api "outcome/#standardese-outcome_v2_xxx__hooks__hook_outcome_copy_construction-T-U--T--U---" "hook_outcome_copy_construction(outcome<T, EC, EP> *this, U &&src)" >}}
+  - {{< api "void hook_result_copy_construction(T *, U &&) noexcept" >}}
+  - {{< api "void hook_outcome_copy_construction(T *, U &&) noexcept" >}}
 - Moved
-  - {{< api "result/#standardese-outcome_v2_xxx__hooks__hook_result_move_construction-T-U--T--U---" "hook_result_move_construction(result<T, E> *this, U &&src)" >}}
-  - {{< api "outcome/#standardese-outcome_v2_xxx__hooks__hook_outcome_move_construction-T-U--T--U---" "hook_outcome_move_construction(outcome<T, EC, EP> *this, U &&src)" >}}
+  - {{< api "void hook_result_move_construction(T *, U &&) noexcept" >}}
+  - {{< api "void hook_outcome_move_construction(T *, U &&) noexcept" >}}
 
 One criticism often levelled against these success-or-failure objects is that they do
 not provide as rich a set of facilities as C++ exception throws. This section shows

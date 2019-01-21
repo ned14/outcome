@@ -6,9 +6,9 @@ tags = ["outcome"]
 +++
 
 
-Type {{< api "outcome/#standardese-outcome_v2_xxx__outcome-R-S-P-NoValuePolicy-" "outcome<T, EC, EP, NVP>" >}} represets either a successfully computed value of type `T` or a reason for failure. Failure can be represented by `EC` or `EP` or both. Although usually it will either be an `EC` or an `EP`. `EC` defaults to `std::error_code` and `EP` defaults to `std::exception_ptr`. The distinction is made into two types, `EC` and `EP`:
+Type {{< api "outcome<T, EC, EP, NoValuePolicy>" >}} represets either a successfully computed value of type `T` or a reason for failure. Failure can be represented by `EC` or `EP` or both. Although usually it will either be an `EC` or an `EP`. `EC` defaults to `std::error_code` and `EP` defaults to `std::exception_ptr`. The distinction is made into two types, `EC` and `EP`:
 
-- `EC` represents a failue from lower-layer function which was retured through {{< api "result/#standardese-outcome_v2_xxx__result-R-S-NoValuePolicy-" "result<T, EC>" >}}.
+- `EC` represents a failue from lower-layer function which was retured through {{< api "result<T, E, NoValuePolicy>" >}}.
 - `EP` represents pointer to an exception thrown in a lower-layer function to signal a failure; but at the current level we do not want to proceed with stack unwinding.
 
 

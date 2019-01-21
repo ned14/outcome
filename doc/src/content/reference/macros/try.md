@@ -1,9 +1,9 @@
 +++
 title = "`OUTCOME_TRY(var, expr)`"
-description = "Evaluate an expression which results in a type matching the `ValueOrError<T, E>` concept, assigning `T` to a variable called `var` if successful, immediately returning `E` from the calling function if unsuccessful."
+description = "Evaluate an expression which results in a type matching the `ValueOrError<T, E>` concept, assigning `T` to a variable called `var` if successful, immediately returning `try_operation_return_as(expr)` from the calling function if unsuccessful."
 +++
 
-Evaluate an expression which results in a type matching the {{% api "ValueOrError<T, E>" %}} concept, assigning `T` to a variable called `var` if successful, immediately returning `E` from the calling function if unsuccessful.
+Evaluate an expression which results in a type matching the {{% api "ValueOrError<T, E>" %}} concept, assigning `T` to a variable called `var` if successful, immediately returning {{% api "try_operation_return_as(expr)" %}} from the calling function if unsuccessful.
 
 *Overridable*: Not overridable.
 
