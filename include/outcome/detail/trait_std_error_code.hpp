@@ -65,44 +65,17 @@ namespace policy
 {
   namespace detail
   {
-    struct std_error_code_passthrough
-    {
-    };
-    /* Pass through `make_error_code` function for anything implicitly convertible to `std::error_code`.
-    \requires `T` is implicitly convertible to `std::error_code`.
-    */
-    OUTCOME_TEMPLATE(class T)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, std::error_code>::value))
-    constexpr inline decltype(auto) make_error_code(T &&v, std_error_code_passthrough /*unused*/ = {}) { return std::forward<T>(v); }
-
-    template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
-    struct tuple_passthrough
-    {
-    };
-    /* Pass through `make_error_code` function for any pair or tuple returning the first item.
-    \requires That `make_error_code(std::get<0>(std::declval<T>()))` is a valid expression.
-    */
-    OUTCOME_TEMPLATE(class T)
-    OUTCOME_TREQUIRES(OUTCOME_TEXPR(make_error_code(get<0>(std::declval<T>()))))
-    constexpr inline decltype(auto) make_error_code(T &&v, tuple_passthrough /* unused */ = {}) { return make_error_code(get<0>(std::forward<T>(v))); }
-
-    // Try ADL, if not use fall backs above
-    template <class T> constexpr inline decltype(auto) error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
-
     struct std_enum_overload_tag
     {
     };
   }  // namespace detail
-
-  //! Used by policies to extract a `std::error_code` from some input `T` via ADL discovery of some `make_error_code(T)` function.
-  template <class T> constexpr inline decltype(auto) error_code(T &&v) { return detail::error_code(std::forward<T>(v)); }
 
   //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
   // inline void outcome_throw_as_system_error_with_payload(...) = delete;  // To use the error_code_throw_as_system_error policy with a custom Error type, you must define a outcome_throw_as_system_error_with_payload() free function to say how to handle the payload
   inline void outcome_throw_as_system_error_with_payload(const std::error_code &error) { OUTCOME_THROW_EXCEPTION(std::system_error(error)); }
   OUTCOME_TEMPLATE(class Error)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_code_enum<std::decay_t<Error>>::value || std::is_error_condition_enum<std::decay_t<Error>>::value))
-  inline void outcome_throw_as_system_error_with_payload(Error &&error, detail::std_enum_overload_tag = detail::std_enum_overload_tag()) { OUTCOME_THROW_EXCEPTION(std::system_error(error_code(error))); }
+  inline void outcome_throw_as_system_error_with_payload(Error &&error, detail::std_enum_overload_tag = detail::std_enum_overload_tag()) { OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(error))); }
 }  // namespace policy
 
 //! Namespace for traits
