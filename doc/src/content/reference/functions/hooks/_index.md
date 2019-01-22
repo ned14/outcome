@@ -1,5 +1,5 @@
 +++
-title = "Traits"
+title = "Hooks"
 weight = 30
 +++
 

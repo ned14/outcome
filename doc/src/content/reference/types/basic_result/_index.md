@@ -3,7 +3,7 @@ title = "`basic_result<T, E, NoValuePolicy>`"
 description = "A sum type carrying either a successful `T`, or a disappointment `E`, with `NoValuePolicy` specifying what to do if one tries to read state which isn't there."
 +++
 
-A sum type carrying either a `T` or an `E`, with `NoValuePolicy` specifying what to do if one tries to read state which isn't there. Either or both of `T` and `E` can be `void` to indicate no value for that state is present. Note that `E = void` makes basic result into effectively an `optional<T>`, but with `NoValuePolicy` configurable behaviour.
+A sum type carrying either a `T` or an `E`, with `NoValuePolicy` specifying what to do if one tries to read state which isn't there. Either or both of `T` and `E` can be `void` to indicate no value for that state is present. Note that `E = void` makes basic result into effectively an `optional<T>`, but with `NoValuePolicy` configurable behaviour. Detectable using {{% api "is_basic_result<T>" %}}.
 
 *Requires*: Concept requirements if C++ 20, else static asserted:
 
@@ -120,6 +120,8 @@ The second major design difference is that union storage is NOT used, as it is a
 - ~~`LessThanComparable`~~, not implemented due to availability of implicit conversions from `value_type` and `error_type`, this can cause major surprise (i.e. hard to diagnose bugs), so we don't implement these at all.
 ~ `Swappable`
 - ~~`Hash`~~, not implemented as a generic implementation of a unique hash for non-valued items which are unequal would require a dependency on RTTI being enabled.
+
+Thus `basic_result` meets the `Regular` concept if both `value_type` and `error_type` are `Regular`, except for the lack of a default constructor. Often where one needs a default constructor, wrapping `basic_result` into {{% api "std::optional<T>" %}} will suffice.
 
 ### Public member functions
 

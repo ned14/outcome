@@ -1,4 +1,4 @@
-{{- if hasPrefix (.Get 0) "std" }}
+{{- if and (hasPrefix (.Get 0) "std") (not (hasPrefix (.Get 0) "std::experimental")) }}
   {{- if hasPrefix (.Get 0) "std::optional" }}
 <a href="https://en.cppreference.com/w/cpp/utility/optional" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> {{ .Get 0 }}</a>
   {{- else if hasPrefix (.Get 0) "std::make_error_code" }}

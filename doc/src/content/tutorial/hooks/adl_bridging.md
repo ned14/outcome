@@ -6,7 +6,7 @@ tags = [ "adl-bridging"]
 +++
 
 In a previous section, we used the `failure_info` type to create
-the ADL bridge into the namespace where the ADL discovered {{< api "success_failure/#standardese-outcome_v2_xxx__policy__throw_as_system_error_with_payload-Error--Errorconst--" "throw_as_system_error_with_payload()" >}}
+the ADL bridge into the namespace where the ADL discovered {{< api "throw_as_system_error_with_payload(T &&)" >}}
 function was to be found.
 
 Here we do the same, but more directly by creating a thin clone of `std::error_code`
