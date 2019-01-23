@@ -45,7 +45,11 @@ namespace policy
     {
       if(!base::_has_value(std::forward<Impl>(self)))
       {
-        OUTCOME_THROW_EXCEPTION(bad_result_access_with<EC>(base::_error(std::forward<Impl>(self))));
+        if(base::_has_error(std::forward<Impl>(self)))
+        {
+          OUTCOME_THROW_EXCEPTION(bad_result_access_with<EC>(base::_error(std::forward<Impl>(self))));
+        }
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
       }
     }
     /*! Performs a wide check of state, used in the error() functions
