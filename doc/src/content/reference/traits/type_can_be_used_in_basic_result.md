@@ -12,7 +12,7 @@ A constexpr boolean true for types permissible in `basic_result<T, E, NoValuePol
 - Is not a reference.
 - Is not an {{% api "in_place_type_t<T>" %}}.
 - Is not a {{% api "success_type<T>" %}}.
-- Is not a {{% api "failure_type<E, P>" %}}.
+- Is not a {{% api "failure_type<EC, EP = void>" %}}.
 - Is not an array.
 - Is either `void`, or else is an `Object` and is `Destructible`.
 

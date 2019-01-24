@@ -101,23 +101,6 @@ namespace detail
 
 }  // namespace detail
 
-//! Namespace for policies
-namespace policy
-{
-  namespace detail
-  {
-    struct boost_error_code_passthrough
-    {
-    };
-    /* Pass through `make_error_code` function for anything implicitly convertible to `boost::system::error_code`.
-    \requires `T` is implicitly convertible to `boost::system::error_code`.
-    */
-    OUTCOME_TEMPLATE(class T)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_convertible<T, boost::system::error_code>::value))
-    constexpr inline decltype(auto) make_error_code(T &&v, boost_error_code_passthrough /*unused*/ = {}) { return std::forward<T>(v); }
-  }  // namespace detail
-}  // namespace policy
-
 //! Namespace for traits
 namespace trait
 {

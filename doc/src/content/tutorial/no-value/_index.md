@@ -40,7 +40,7 @@ you want to use. Either create your own, or use one of the predefined policies.
 
 You can also use two predefined aliases for `basic_result<>`:
 
-* {{< api "unchecked<T, EC>" >}}: it uses policy {{< api "all_narrow" >}}, where any observation of a missing value or error is undefined behavior;
-* {{< api "checked<T, EC>" >}}:
+* {{< api "unchecked<T, E = varies>" >}}: it uses policy {{< api "all_narrow" >}}, where any observation of a missing value or error is undefined behavior;
+* {{< api "checked<T, E = varies>" >}}:
   it uses policy {{< api "throw_bad_result_access<EC>" >}}, where any observation of a missing value or error throws {{< api "bad_result_access_with<EC>" >}} or {{< api "bad_result_access" >}}
   respectively.

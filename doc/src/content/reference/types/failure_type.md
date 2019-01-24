@@ -1,5 +1,5 @@
 +++
-title = "`failure_type<EC, E = void>`"
+title = "`failure_type<EC, EP = void>`"
 description = "Type sugar for constructing an unsuccessful result or outcome."
 +++
 
