@@ -23,7 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../include/outcome/experimental/status_result.hpp"
 
-template <class T, class S = SYSTEM_ERROR2_NAMESPACE::system_code> using result = OUTCOME_V2_NAMESPACE::experimental::erased_result<T, S>;
+template <class T, class S = SYSTEM_ERROR2_NAMESPACE::system_code, class NoValuePolicy = OUTCOME_V2_NAMESPACE::experimental::policy::default_status_result_policy<T, S>> using result = OUTCOME_V2_NAMESPACE::experimental::erased_result<T, S, NoValuePolicy>;
 using OUTCOME_V2_NAMESPACE::in_place_type;
 
 #include "quickcpplib/include/boost/test/unit_test.hpp"
@@ -323,7 +323,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / result, "Tests that the resul
 
   // Test direct use of error code enum works
   {
-    constexpr result<int, errc> a(5), b(errc::invalid_argument);
+    constexpr result<int, errc, OUTCOME_V2_NAMESPACE::policy::all_narrow> a(5), b(errc::invalid_argument);
     static_assert(a.value() == 5, "a is not 5");
     static_assert(b.error() == errc::invalid_argument, "b is not errored");
   }

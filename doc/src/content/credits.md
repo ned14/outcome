@@ -11,9 +11,23 @@ description = "Giving thanks to those who made Outcome happen"
 
 * [Hugo](https://gohugo.io) - static website generator of this documentation.
 * [hugo-theme-docdock](https://github.com/vjeantet/hugo-theme-docdock) - the Hugo theme used by this documentation.
-* [Standardese](https://github.com/foonathan/standardese) - the API reference generator
+* [Standardese](https://github.com/foonathan/standardese) - the API reference generator (up until Outcome v2.0)
 
-# Special thanks for Outcome v2
+# Special thanks for Outcome v2.1
+
+Once again Andrzej Krzemienski stands out for a never ceasing flow of excellent questions,
+"what if?"'s, eagle eyed spotting of corner case logic bugs, and design contradictions.
+Thank you Andrzej!
+
+My thanks to the Microsoft Visual C++ compiler team for incorporating Outcome into the
+MSVC test suite, and thus finding many interesting corner case quirks in how best to
+interpret the C++ standard. In some cases, Outcome was refactored to be less ambiguous;
+in others, defects had to be submitted to WG21 because the standard wording was not clear.
+The Visual C++ compiler team were particularly generous with their time in helping track
+down the cause of these issues, complete with submitting pull requests with bug fixes.
+I am very grateful to them.
+
+# Special thanks for Outcome v2.0
 
 For a second time, Charley Bay stepped up as review manager. Given how much work it was
 for the v1 review, I can only say **thank you**.
