@@ -179,7 +179,7 @@ Attempting to access `T` when there is an `E` results in `bad_result_access<E>` 
 Note that this approximates the proposed `expected<T, E>` up for standardisation, see the FAQ for more
 detail.
 */
-template <class R, class S = boost::system::error_code> using boost_checked = boost_result<R, S, policy::throw_bad_result_access<S>>;
+template <class R, class S = boost::system::error_code> using boost_checked = boost_result<R, S, policy::throw_bad_result_access<S, void>>;
 
 OUTCOME_V2_NAMESPACE_END
 
