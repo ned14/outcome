@@ -1,4 +1,4 @@
-{{- if and (hasPrefix (.Get 0) "std") (not (hasPrefix (.Get 0) "std::experimental")) }}
+{{- if and (hasPrefix (.Get 0) "std::") (not (hasPrefix (.Get 0) "std::experimental")) }}
   {{- if hasPrefix (.Get 0) "std::error_code" }}
 <a href="https://en.cppreference.com/w/cpp/error/error_code" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> {{ .Get 0 }}</a>
   {{- else if hasPrefix (.Get 0) "std::exception_ptr" }}
@@ -54,7 +54,7 @@
   {{- if $api_found -}}
 <a href="{{ $api_url }}" class="api-reference">{{ $api }}</a>
   {{- else }}
-    <!-- errorf "API reference page for %s not found, please use an identifier wholly contained in a page title" (.Get 0) -->
+    <!-- errorf "%s: API reference page for '%s' not found, please use an identifier wholly contained in a page title" .Position (.Get 0) -->
     <b>API NOT FOUND IN DOCS <code>{{ .Get 0 }}</code></b>
   {{- end }}
 {{- end }}

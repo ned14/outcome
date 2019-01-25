@@ -3,7 +3,7 @@ title = "`auto failure(T &&, ...)`"
 description = "Returns appropriate type sugar for constructing an unsuccessful result or outcome."
 +++
 
-Returns appropriate type sugar for constructing an unsuccessful result or outcome, usually {{% api "failure_type<EC, E = void>" %}} with a decayed `T`.
+Returns appropriate type sugar for constructing an unsuccessful result or outcome, usually {{% api "failure_type<EC, EP = void>" %}} with a decayed `T`.
 
 Two default overloads are provided, one taking a single parameter returning `failure_type<std::decay_t<T>>`, the other taking two parameters returning `failure_type<std::decay_t<T>, std::decay_t<U>>`. Both overloads perfectly forward their inputs.
 

@@ -5,7 +5,7 @@ categories = ["observers"]
 weight = 910
 +++
 
-Return the output from free function {{% api "failure(U &&)" %}} containing a copy of any errored state. The error state is accessed using {{% api "const error_type &assume_error() const & noexcept" %}}.
+Return the output from free function {{% api "auto failure(T &&, ...)" %}} containing a copy of any errored state. The error state is accessed using {{% api "const error_type &assume_error() const & noexcept" %}}.
 
 *Requires*: Always available.
 
