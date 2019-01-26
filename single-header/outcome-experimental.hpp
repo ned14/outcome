@@ -1167,9 +1167,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 94064e562ae10d588595e6c7b4503b1b1a58c3e9
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-01-16 22:12:53 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 94064e56
+#define OUTCOME_PREVIOUS_COMMIT_REF 84431eb0865dc1e02e4254a2ee89008e1ae252d1
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-01-25 23:04:27 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 84431eb0
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -8809,6 +8809,33 @@ operator!=(const T &a, const errored_status_code<DomainType1> &b)
 }
 
 
+namespace detail
+{
+  template <class T> struct is_errored_status_code
+  {
+    static constexpr bool value = false;
+  };
+  template <class T> struct is_errored_status_code<errored_status_code<T>>
+  {
+    static constexpr bool value = true;
+  };
+  template <class T> struct is_erased_errored_status_code
+  {
+    static constexpr bool value = false;
+  };
+  template <class T> struct is_erased_errored_status_code<errored_status_code<erased<T>>>
+  {
+    static constexpr bool value = true;
+  };
+}
+
+//! Trait returning true if the type is an errored status code.
+template <class T> struct is_errored_status_code
+{
+  static constexpr bool value = detail::is_errored_status_code<typename std::decay<T>::type>::value || detail::is_erased_errored_status_code<typename std::decay<T>::type>::value;
+};
+
+
 SYSTEM_ERROR2_NAMESPACE_END
 
 #endif
@@ -10634,11 +10661,16 @@ namespace detail
 //! Namespace for experimental features
 namespace experimental
 {
+  //! Import whole of system_error2
   using namespace SYSTEM_ERROR2_NAMESPACE;
+  //! Also bring in success and failure free functions
+  using OUTCOME_V2_NAMESPACE::success;
+  using OUTCOME_V2_NAMESPACE::failure;
 
   //! Namespace for policies
   namespace policy
   {
+    using namespace OUTCOME_V2_NAMESPACE::policy;
     template <class T, class EC, class E> struct status_code_throw
     {
       static_assert(!std::is_same<T, T>::value, "policy::status_code_throw not specialised for these types, did you use status_result<T, status_code<DomainType>, E>?");
@@ -10646,9 +10678,9 @@ namespace experimental
     /*!
     */
 
-    template <class T, class DomainType> struct status_code_throw<T, status_code<DomainType>, void> : OUTCOME_V2_NAMESPACE::policy::base
+    template <class T, class DomainType> struct status_code_throw<T, status_code<DomainType>, void> : base
     {
-      using _base = OUTCOME_V2_NAMESPACE::policy::base;
+      using _base = base;
       /*! Performs a wide check of state, used in the value() functions.
       \effects TODO
       */
@@ -10675,17 +10707,22 @@ namespace experimental
 
       template <class Impl> static constexpr void wide_error_check(Impl &&self) { _base::narrow_error_check(static_cast<Impl &&>(self)); }
     };
+    template <class T, class DomainType> struct status_code_throw<T, errored_status_code<DomainType>, void> : status_code_throw<T, status_code<DomainType>, void>
+    {
+      status_code_throw() = default;
+      using status_code_throw<T, status_code<DomainType>, void>::status_code_throw;
+    };
 
     /*! Default policy selector.
     */
 
     template <class T, class EC>
-    using default_status_result_policy = std::conditional_t<                    //
-    std::is_void<EC>::value,                                                    //
-    OUTCOME_V2_NAMESPACE::policy::terminate,                                    //
-    std::conditional_t<is_status_code<EC>::value,                               //
-                       status_code_throw<T, EC, void>,                          //
-                       OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers  //
+    using default_status_result_policy = std::conditional_t<                            //
+    std::is_void<EC>::value,                                                            //
+    OUTCOME_V2_NAMESPACE::policy::terminate,                                            //
+    std::conditional_t<is_status_code<EC>::value || is_errored_status_code<EC>::value,  //
+                       status_code_throw<T, EC, void>,                                  //
+                       OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers          //
                        >>;
   }  // namespace policy
 
@@ -10770,12 +10807,12 @@ namespace experimental
     */
 
     template <class T, class EC, class E>
-    using default_status_outcome_policy = std::conditional_t<                                                                         //
-    std::is_void<EC>::value && std::is_void<E>::value,                                                                                //
-    OUTCOME_V2_NAMESPACE::policy::terminate,                                                                                          //
-    std::conditional_t<is_status_code<EC>::value && (std::is_void<E>::value || OUTCOME_V2_NAMESPACE::trait::has_exception_ptr_v<E>),  //
-                       status_code_throw<T, EC, E>,                                                                                   //
-                       OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers                                                        //
+    using default_status_outcome_policy = std::conditional_t<                                                                                                                //
+    std::is_void<EC>::value && std::is_void<E>::value,                                                                                                                       //
+    OUTCOME_V2_NAMESPACE::policy::terminate,                                                                                                                                 //
+    std::conditional_t<(is_status_code<EC>::value || is_errored_status_code<EC>::value) && (std::is_void<E>::value || OUTCOME_V2_NAMESPACE::trait::has_exception_ptr_v<E>),  //
+                       status_code_throw<T, EC, E>,                                                                                                                          //
+                       OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers                                                                                               //
                        >>;
   }  // namespace policy
 
@@ -10797,9 +10834,9 @@ namespace experimental
     /*!
     */
 
-    template <class T, class DomainType, class E> struct status_code_throw<T, status_code<DomainType>, E> : OUTCOME_V2_NAMESPACE::policy::base
+    template <class T, class DomainType, class E> struct status_code_throw<T, status_code<DomainType>, E> : base
     {
-      using _base = OUTCOME_V2_NAMESPACE::policy::base;
+      using _base = base;
       /*! Performs a wide check of state, used in the value() functions.
       \effects See description of class for effects.
       */
@@ -10835,6 +10872,11 @@ namespace experimental
 
 
       template <class Impl> static constexpr void wide_exception_check(Impl &&self) { _base::narrow_exception_check(static_cast<Impl &&>(self)); }
+    };
+    template <class T, class DomainType, class E> struct status_code_throw<T, errored_status_code<DomainType>, E> : status_code_throw<T, status_code<DomainType>, E>
+    {
+      status_code_throw() = default;
+      using status_code_throw<T, status_code<DomainType>, E>::status_code_throw;
     };
   }  // namespace policy
 

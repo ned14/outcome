@@ -6,6 +6,10 @@ weight = 80
 ---
 ## v2.1 in progress [[project]](https://github.com/ned14/outcome/projects/1)
 
+- `include/outcome/outcome.natvis` is now namespace permuted like the rest of
+Outcome, so debugging Outcome based code in Visual Studio should look much
+prettier than before.
+
 - [#162](https://github.com/ned14/outcome/issues/162)
     - `.has_failure()` was returning false at times when it should have returned true.
 

@@ -98,7 +98,7 @@ namespace experimental
     std::is_void<EC>::value && std::is_void<E>::value,                                                                                                                       //
     OUTCOME_V2_NAMESPACE::policy::terminate,                                                                                                                                 //
     std::conditional_t<(is_status_code<EC>::value || is_errored_status_code<EC>::value) && (std::is_void<E>::value || OUTCOME_V2_NAMESPACE::trait::has_exception_ptr_v<E>),  //
-                       status_code_throw<T, status_code<void>, E>,                                                                                                           //
+                       status_code_throw<T, EC, E>,                                                                                                                          //
                        OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers                                                                                               //
                        >>;
   }  // namespace policy
@@ -118,9 +118,9 @@ namespace experimental
   {
     /*!
     */
-    template <class T, class DomainType, class E> struct status_code_throw<T, status_code<DomainType>, E> : OUTCOME_V2_NAMESPACE::policy::base
+    template <class T, class DomainType, class E> struct status_code_throw<T, status_code<DomainType>, E> : base
     {
-      using _base = OUTCOME_V2_NAMESPACE::policy::base;
+      using _base = base;
       /*! Performs a wide check of state, used in the value() functions.
       \effects See description of class for effects.
       */
@@ -150,6 +150,11 @@ namespace experimental
       \effects TODO
       */
       template <class Impl> static constexpr void wide_exception_check(Impl &&self) { _base::narrow_exception_check(static_cast<Impl &&>(self)); }
+    };
+    template <class T, class DomainType, class E> struct status_code_throw<T, errored_status_code<DomainType>, E> : status_code_throw<T, status_code<DomainType>, E>
+    {
+      status_code_throw() = default;
+      using status_code_throw<T, status_code<DomainType>, E>::status_code_throw;
     };
   }  // namespace policy
 
