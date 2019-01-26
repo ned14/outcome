@@ -51,6 +51,8 @@ Otherwise, simply download the raw file from above and place it wherever it suit
  - [ ] Fix up the C interface to use `status_code`.
    - [ ] Write C macro documentation page
  - [ ] Resurrect the optimisation folding tests (with a better name).
+ - [ ] Rerun native overhead benchmark, make new graph.
+ - [ ] Get all docs snippets compiling again.
 
 ## Commits and tags in this git repository can be verified using:
 <pre>

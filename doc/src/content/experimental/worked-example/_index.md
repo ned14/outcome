@@ -1,6 +1,6 @@
 +++
-title = "Worked example"
-weight = 90
+title = "Worked example: Custom domain"
+weight = 80
 +++
 
 Here follows a worked example of use of Experimental Outcome. It presents
@@ -19,7 +19,7 @@ documentation for proposed `<system_error2>` at https://ned14.github.io/status-c
 deterministic exceptions*](http://wg21.link/P1028), which is the WG21 proposal
 paper for potential `<system_error2>`.
 
-### Goal
+### Goal of this section
 
 We are going to define a simple custom code domain which defines that
 the status code's payload will consist of a POSIX error code, and the
