@@ -54,11 +54,11 @@ overheads, neither of which were strengths of the original prototype Boost.Expec
 By August 2015 "Boost.Monad" was delivering on all those requirements and then some, but it lacked
 maturity through use in other code. Summer 2015 saw the Boost peer review of AFIO v1 which
 was roundly rejected. After considering the ample review feedback, it was realised that
-AFIO v2 would be a very different design, one no longer using futures, memory allocation
+[AFIO v2](https://ned14.github.io/llfio/) would be a very different design, one no longer using futures, memory allocation
 nor C++ exceptions. As AFIO v2 was started from scratch and using Outcome heavily from the
 very beginning (every AFIO v2 API returns a `result<T>`), Outcome began to gain bug fixes and
 shed features, with the non-allocating future-promise implementation being dropped in May
-2016 and a large chunk of metaprogramming being replaced with cleaner variable templates
+2016 and a large chunk of type based metaprogramming being replaced with cleaner variable template metaprogramming
 in June. After CppCon 2016 in September, then began the long process of getting Outcome
 ready for Boost peer review in Q1 2017 which involved a repeated sequence of complete rewrites
 of the tutorial in response to multiple rounds of feedback from the C++ community, with
@@ -72,7 +72,7 @@ so close to Outcome that in January 2017 it was just a few hours work to impleme
 Expected using the core `basic_monad` infrastructure in Outcome. That highly flexible
 policy based design which made monadic future-promise possible made it similarly easy
 to implement a highly conforming Expected, indeed in early 2017 Outcome's Expected was much
-closer to P0323R1 than any other implementation including the LEWG reference implementation.
+closer to [P0323R1](http://wg21.link/P0323) than any other implementation including the LEWG reference implementation.
 And unlike the LEWG reference implementation, Outcome has had eighteen months of that
 finely tuned patina you only get when a library is in use by other code bases.
 
@@ -127,21 +127,50 @@ All that remained before it was ready for a second Boost peer review was the
 documentation. This took four months to write (same time as to write the library itself!),
 and in January 2018 Outcome had its second Boost peer review, which it passed!
 
-## Post-review
+## Outcome v2.1
 
-Outcome passing its review in January had much more consequence than I could have ever
-expected. Unbeknownst to me, the WG21 leadership had interpreted the success of
-Outcome, and especially its divergences from WG21 Expected, as a sign that the C++
-exception handling mechanism was no longer fit for purpose. It was thus resolved
+The changes requsted during the review of v2.0 were fairly modest: `result` and `outcome` would
+be renamed to `basic_result` and `basic_outcome`, and a clean separation of concerns between the
+`basic_*` layer and the "convenience" layer would be created. That suited Outcome nicely,
+as the `basic_*` layer could have minimum possible header dependencies and thus minimum possible build times
+impact, which was great for big iron users with multi-million line C++ codebases. This also
+had the nice side effect of permitting both Boost and `std` implementations to be supported
+concurrently in both Outcome and Boost.Outcome. 
+
+By April 2018, v2.1 was feature complete and entered a six month period of maturation and
+battle hardening under its already extensive userbase. However Outcome passing its review in January 2018 had much more consequence than I could have ever
+expected. Unbeknownst to me, some of the WG21 leadership had interpreted the success of
+Outcome, and especially its divergences from WG21 Expected into a more complete substitute
+for C++ exception handling, as a sign that the C++
+exception handling mechanism was no longer fit for purpose. [It was thus proposed
 to remedy the standard exception handling mechanism into something much more
-efficient, thus rendering Outcome obsolete in future C++ standards.
+efficient, thus rendering Outcome obsolete in future C++ standards (P0709 *Zero overhead exceptions* aka "Herbceptions")](http://wg21.link/P0709).
 
-Just before the review, I had mooted a number of semantic and compile time performance
+Concurrently to that, just before the review of Outcome 2.0, I had mooted a number of semantic and compile time performance
 improvements to `<system_error>` with the proposal that we mildly break Boost.System with
 improvements and see how badly real world code broke in response. This was not widely
-accepted. I therefore wrote an improved `<system_error2>` which fixed all the problems
+accepted at that time (though they have been since incorporated into Boost.System, and proposed
+defect remedies for `<system_error>` for C++ 23). I therefore wrote [an improved `<system_error2>`](https://ned14.github.io/status-code/) which fixed all the problems
 listed at [P0824 (Summary of SG14 discussion on `<system_error>`)](https://wg21.link/P0824)
 and fixed up Outcome so one could use it without any system error implementation,
-or with the STL one or with the proposed improved one.
+or with the STL one or with the proposed improved one. 
 
-To be continued after Jacksonville ...
+This proposed improved `<system_error2>` was proposed by me as the library support for 
+P0709 *Zero overhead exceptions* in [P1095 *Zero overhead deterministic failure*](https://wg21.link/P1095),
+specifically as the implementation of P0709's proposed `std::error` value type. As 
+proposed improved `<system_error2>` is bundled with Outcome in
+[experimental]({{< relref "/experimental" >}}), that means that Outcome and Boost
+users can gain the non-language benefits of one possible implementation of P0709 
+today in any conforming C++ 14 compiler.
+
+At the time of writing, just before Outcome enters Boost (January 2019), Herbceptions have
+been voted upon only by SG14 Low Latency and LEWG, both giving unanimous acclamation. They have yet to be voted upon by the
+rest of the committee. The P1095 proposed implementation of P0709 has been voted upon by
+WG14 *C Programming Language*, where the C-relevant parts were approved in principle by a large majority. So
+the future currently looks hopeful that C, and C++, will gain language support for
+specifying deterministic failure sometime in the 2020s.
+
+In the meantime, Outcome is a peer reviewed, battle tested, library-only implementation
+of *Zero overhead exceptions* with proposed `std::error` available under Experimental.
+Please strongly consider helping us test the proposed `<system_error2>` based `std::error`
+design! The committee would greatly welcome empirical experience.

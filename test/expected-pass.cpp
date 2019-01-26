@@ -126,9 +126,9 @@ namespace stde
     constexpr const E &&error() const && { return base::assume_error(); }
     constexpr E &error() && { return base::assume_error(); }
   };
-  template <class E> class expected<void, E> : public OUTCOME_V2_NAMESPACE::result<void, E, OUTCOME_V2_NAMESPACE::policy::throw_bad_result_access<E>>
+  template <class E> class expected<void, E> : public OUTCOME_V2_NAMESPACE::result<void, E, OUTCOME_V2_NAMESPACE::policy::throw_bad_result_access<E, void>>
   {
-    using base = OUTCOME_V2_NAMESPACE::result<void, E, OUTCOME_V2_NAMESPACE::policy::throw_bad_result_access<E>>;
+    using base = OUTCOME_V2_NAMESPACE::result<void, E, OUTCOME_V2_NAMESPACE::policy::throw_bad_result_access<E, void>>;
 
   public:
     // Inherit base constructors

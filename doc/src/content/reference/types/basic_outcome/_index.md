@@ -1,18 +1,19 @@
 +++
-title = "`basic_result<T, E, NoValuePolicy>`"
-description = "A sum type carrying either a successful `T`, or a disappointment `E`, with `NoValuePolicy` specifying what to do if one tries to read state which isn't there."
+title = "`basic_outcome<T, EC, EP, NoValuePolicy>`"
+description = "A type carrying one of (i) a successful `T` (ii) a disappointment `EC` (iii) a failure `EP` (iv) both a disappointment `EC` and a failure `EP`, with `NoValuePolicy` specifying what to do if one tries to read state which isn't there."
 +++
 
-A sum type carrying either a `T` or an `E`, with `NoValuePolicy` specifying what to do if one tries to read state which isn't there. Either or both of `T` and `E` can be `void` to indicate no value for that state is present. Note that `E = void` makes basic result into effectively an `optional<T>`, but with `NoValuePolicy` configurable behaviour. Detectable using {{% api "is_basic_result<T>" %}}.
+A type carrying one of (i) a successful `T` (ii) a disappointment `EC` (iii) a failure `EP` (iv) both a disappointment `EC` and a failure `EP`, with `NoValuePolicy` specifying what to do if one tries to read state which isn't there. Any one, two, or all of `T`, `EC` and `EP` can be `void` to indicate no value for that state is present. Detectable using {{% api "is_basic_outcome<T>" %}}.
 
 *Requires*: Concept requirements if C++ 20, else static asserted:
 
-- That trait {{% api "type_can_be_used_in_basic_result<R>" %}} is true for both `T` and `E`.
-- That either `E` is `void` or `DefaultConstructible`.
+- That trait {{% api "type_can_be_used_in_basic_result<R>" %}} is true for `T`, `EC` and `EP`.
+- That either `EC` is `void` or `DefaultConstructible`.
+- That either `EP` is `void` or `DefaultConstructible`.
 
 *Namespace*: `OUTCOME_V2_NAMESPACE`
 
-*Header*: `<outcome/basic_result.hpp>`
+*Header*: `<outcome/basic_outcome.hpp>`
 
 *Inclusions*: The very lightest weight of C and C++ header files:
 
@@ -35,19 +36,21 @@ This very light weight set of inclusion dependencies makes basic result suitable
 
 ### Design rationale
 
-The basic result type is the main workhorse type of the Outcome library, providing a simple sum type with optional values representing success or disappointment. Unlike {{% api "std::expected<T, E>" %}}, Outcome's result type is designed specifically for convenience when implementing failure handling across very large codebases, and it has a number of API differences to facilitate that.
-
-The first major design difference is that basic result models its constructor design on {{% api "std::variant<...>" %}}, rather than modelling {{% api "std::optional<T>" %}}'s constructor design like `std::expected<T, E>` does. This means that basic result will implicitly construct either a `T` or an `E` if doing so is unambiguous, same as `variant` does. Where implicit construction is ambiguous, the implicit constructors disable and a `T` or `E` can be specified via {{% api "in_place_type_t<T>" %}}, or via {{% api "success_type<T>" %}} or {{% api "failure_type<T>" %}}. We implement a subset of variant's constructors for improved compile time impact, so the implicit and explicit constructor design is split into fixed subsets to reduce SFINAE execution.
-
-The second major design difference is that union storage is NOT used, as it is assumed that `sizeof(E)` will be small for failure handling. This very considerably reduces load on the compiler, and substantially improves compile times in very large C++ 14 codebases, because copies and moves do not need to jump through complex ceremony in order to implement the never-empty guarantees which would be required in a union storage based implementation (C++ 17 onwards does far fewer copy and move constructor instantiations, but it all adds up -- work avoided is always the fastest).
+To write
 
 ### Public member type aliases
 
 - `value_type` is `T`.
-- `error_type` is `E`.
+- `error_type` is `EC`.
+- `exception_type` is `EP`.
 - `value_type_if_enabled` is `T` if construction from `T` is available, else it is a usefully named unusable internal type.
-- `error_type_if_enabled` is `E` if construction from `E` is available, else it is a usefully named unusable internal type.
-- `rebind<A, B = E, C = NoValuePolicy>` is `basic_result<A, B, C>`.
+- `error_type_if_enabled` is `EC` if construction from `EC` is available, else it is a usefully named unusable internal type.
+- `exception_type_if_enabled` is `EP` if construction from `EP` is available, else it is a usefully named unusable internal type.
+- `rebind<A, B = EC, C = EP, D = NoValuePolicy>` is `basic_outcome<A, B, C, D>`.
+
+
+REST TO DO TOMORROW!
+
 
 ### Protected member predicate booleans
 

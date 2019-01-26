@@ -6649,6 +6649,84 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef OUTCOME_STATUS_RESULT_HPP
 #define OUTCOME_STATUS_RESULT_HPP
+/* Policies for result and outcome
+(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Sep 2018
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file Licence.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+#ifndef OUTCOME_POLICY_FAIL_TO_COMPILE_OBSERVERS_HPP
+#define OUTCOME_POLICY_FAIL_TO_COMPILE_OBSERVERS_HPP
+
+
+
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+
+#define OUTCOME_FAIL_TO_COMPILE_OBSERVERS_MESSAGE                                                                                                                                                                                                                                                                                "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a result/outcome given an EC or E type which is not void, and for whom "                                                                                                                                                                                                                                        "trait::has_error_code_v<EC>, trait::has_exception_ptr_v<EC>, and trait::has_exception_ptr_v<E> "                                                                                                                                                                                                                              "are all false. Please specify a NoValuePolicy to tell result/outcome what to do, or else use "                                                                                                                                                                                                                                "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."
+
+
+
+
+
+
+
+namespace policy
+{
+  /*! Policy which refuses to compile the wide checks with an error message. Used by `default_policy`
+  to enforce disabling of wide observers.
+
+  Can be used in both `result` and `outcome`.
+  */
+
+
+
+
+  struct fail_to_compile_observers : base
+  {
+    /*! Performs a wide check of state, used in the value() functions. Fails to compile with a static assertion.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void wide_value_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a result/outcome given an EC or E type which is not void, and for whom "                                                                                                                                                                                                                                        "trait::has_error_code_v<EC>, trait::has_exception_ptr_v<EC>, and trait::has_exception_ptr_v<E> "                                                                                                                                                                                                                              "are all false. Please specify a NoValuePolicy to tell result/outcome what to do, or else use "                                                                                                                                                                                                                                "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
+    /*! Performs a wide check of state, used in the error() functions. Fails to compile with a static assertion.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void wide_error_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a result/outcome given an EC or E type which is not void, and for whom "                                                                                                                                                                                                                                        "trait::has_error_code_v<EC>, trait::has_exception_ptr_v<EC>, and trait::has_exception_ptr_v<E> "                                                                                                                                                                                                                              "are all false. Please specify a NoValuePolicy to tell result/outcome what to do, or else use "                                                                                                                                                                                                                                "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
+    /*! Performs a wide check of state, used in the exception() functions. Fails to compile with a static assertion.
+    \effects None.
+    */
+
+
+    template <class Impl> static constexpr void wide_exception_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a result/outcome given an EC or E type which is not void, and for whom "                                                                                                                                                                                                                                        "trait::has_error_code_v<EC>, trait::has_exception_ptr_v<EC>, and trait::has_exception_ptr_v<E> "                                                                                                                                                                                                                              "are all false. Please specify a NoValuePolicy to tell result/outcome what to do, or else use "                                                                                                                                                                                                                                "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
+  };
+}  // namespace policy
+
+#undef OUTCOME_FAIL_TO_COMPILE_OBSERVERS_MESSAGE
+
+OUTCOME_V2_NAMESPACE_END
+
+#endif
 /* Proposed SG14 status_code
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
@@ -10556,6 +10634,8 @@ namespace detail
 //! Namespace for experimental features
 namespace experimental
 {
+  using namespace SYSTEM_ERROR2_NAMESPACE;
+
   //! Namespace for policies
   namespace policy
   {
@@ -10566,7 +10646,7 @@ namespace experimental
     /*!
     */
 
-    template <class T, class DomainType> struct status_code_throw<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, void> : OUTCOME_V2_NAMESPACE::policy::base
+    template <class T, class DomainType> struct status_code_throw<T, status_code<DomainType>, void> : OUTCOME_V2_NAMESPACE::policy::base
     {
       using _base = OUTCOME_V2_NAMESPACE::policy::base;
       /*! Performs a wide check of state, used in the value() functions.
@@ -10600,26 +10680,26 @@ namespace experimental
     */
 
     template <class T, class EC>
-    using default_status_result_policy = std::conditional_t<                //
-    std::is_void<EC>::value,                                                //
-    OUTCOME_V2_NAMESPACE::policy::terminate,                                //
-    std::conditional_t<SYSTEM_ERROR2_NAMESPACE::is_status_code<EC>::value,  //
-                       status_code_throw<T, EC, void>,                      //
-                       OUTCOME_V2_NAMESPACE::policy::all_narrow             //
+    using default_status_result_policy = std::conditional_t<                    //
+    std::is_void<EC>::value,                                                    //
+    OUTCOME_V2_NAMESPACE::policy::terminate,                                    //
+    std::conditional_t<is_status_code<EC>::value,                               //
+                       status_code_throw<T, EC, void>,                          //
+                       OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers  //
                        >>;
   }  // namespace policy
 
   /*! TODO
   */
 
-  template <class R, class S = SYSTEM_ERROR2_NAMESPACE::system_code>  //
-  using erased_result = basic_result<R, S, policy::default_status_result_policy<R, S>>;
+  template <class R, class S = system_code, class NoValuePolicy = policy::default_status_result_policy<R, S>>  //
+  using erased_result = basic_result<R, S, NoValuePolicy>;
 
   /*! TODO
   */
 
-  template <class R, class DomainType = typename SYSTEM_ERROR2_NAMESPACE::generic_code::domain_type>  //
-  using status_result = basic_result<R, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, policy::default_status_result_policy<R, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>>;
+  template <class R, class DomainType = typename generic_code::domain_type, class NoValuePolicy = policy::default_status_result_policy<R, status_code<DomainType>>>  //
+  using status_result = basic_result<R, status_code<DomainType>, NoValuePolicy>;
 
 }  // namespace experimental
 
@@ -10690,26 +10770,26 @@ namespace experimental
     */
 
     template <class T, class EC, class E>
-    using default_status_outcome_policy = std::conditional_t<                                                                                                  //
-    std::is_void<EC>::value && std::is_void<E>::value,                                                                                                         //
-    OUTCOME_V2_NAMESPACE::policy::terminate,                                                                                                                   //
-    std::conditional_t<SYSTEM_ERROR2_NAMESPACE::is_status_code<EC>::value && (std::is_void<E>::value || OUTCOME_V2_NAMESPACE::trait::has_exception_ptr_v<E>),  //
-                       status_code_throw<T, EC, E>,                                                                                                            //
-                       OUTCOME_V2_NAMESPACE::policy::all_narrow                                                                                                //
+    using default_status_outcome_policy = std::conditional_t<                                                                         //
+    std::is_void<EC>::value && std::is_void<E>::value,                                                                                //
+    OUTCOME_V2_NAMESPACE::policy::terminate,                                                                                          //
+    std::conditional_t<is_status_code<EC>::value && (std::is_void<E>::value || OUTCOME_V2_NAMESPACE::trait::has_exception_ptr_v<E>),  //
+                       status_code_throw<T, EC, E>,                                                                                   //
+                       OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers                                                        //
                        >>;
   }  // namespace policy
 
   /*! TODO
   */
 
-  template <class R, class S = SYSTEM_ERROR2_NAMESPACE::system_code, class P = std::exception_ptr>  //
-  using erased_outcome = basic_outcome<R, S, P, policy::default_status_outcome_policy<R, S, P>>;
+  template <class R, class S = system_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_status_outcome_policy<R, S, P>>  //
+  using erased_outcome = basic_outcome<R, S, P, NoValuePolicy>;
 
   /*! TODO
   */
 
-  template <class R, class DomainType = typename SYSTEM_ERROR2_NAMESPACE::generic_code::domain_type, class P = std::exception_ptr>  //
-  using status_outcome = basic_outcome<R, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, P, policy::default_status_outcome_policy<R, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, P>>;
+  template <class R, class DomainType = typename generic_code::domain_type, class P = std::exception_ptr, class NoValuePolicy = policy::default_status_outcome_policy<R, status_code<DomainType>, P>>  //
+  using status_outcome = basic_outcome<R, status_code<DomainType>, P, NoValuePolicy>;
 
   //! Namespace for policies
   namespace policy
@@ -10717,7 +10797,7 @@ namespace experimental
     /*!
     */
 
-    template <class T, class DomainType, class E> struct status_code_throw<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E> : OUTCOME_V2_NAMESPACE::policy::base
+    template <class T, class DomainType, class E> struct status_code_throw<T, status_code<DomainType>, E> : OUTCOME_V2_NAMESPACE::policy::base
     {
       using _base = OUTCOME_V2_NAMESPACE::policy::base;
       /*! Performs a wide check of state, used in the value() functions.
@@ -10731,7 +10811,7 @@ namespace experimental
         {
           if(base::_has_exception(static_cast<Impl &&>(self)))
           {
-            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::has_exception_ptr_v<E>>(base::_exception<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self)));
+            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::has_exception_ptr_v<E>>(base::_exception<T, status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self)));
           }
           if(base::_has_error(static_cast<Impl &&>(self)))
           {

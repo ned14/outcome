@@ -21,7 +21,7 @@ template <class R, class S = boost::system::error_code> using unchecked = result
 
 /*! In standalone Outcome, this aliases `std_checked<>`. In Boost.Outcome, this aliases `boost_checked<>`.
 */
-template <class R, class S = boost::system::error_code> using checked = result<R, S, policy::throw_bad_result_access<S>>;
+template <class R, class S = boost::system::error_code> using checked = result<R, S, policy::throw_bad_result_access<S, void>>;
 
 BOOST_OUTCOME_V2_NAMESPACE_END
 
