@@ -1141,9 +1141,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 84431eb0865dc1e02e4254a2ee89008e1ae252d1
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-01-25 23:04:27 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 84431eb0
+#define OUTCOME_PREVIOUS_COMMIT_REF f1923a45184bf6497b3d825da7fde0aebd0ad9f7
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-01-26 15:35:36 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f1923a45
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1168,7 +1168,26 @@ Distributed under the Boost Software License, Version 1.0.
 #include <new>     // for placement in moves etc
 #include <type_traits>
 
-#if __cplusplus >= 201700 || (defined(_MSC_VER) && _HAS_CXX17)
+#ifndef OUTCOME_USE_STD_IN_PLACE_TYPE
+#if defined(_MSC_VER) && _HAS_CXX17
+#define OUTCOME_USE_STD_IN_PLACE_TYPE 1  // MSVC always has std::in_place_type
+#elif __cplusplus >= 201700
+// libstdc++ before GCC 6 doesn't have it, despite claiming C++ 17 support
+#ifdef __has_include
+#if !__has_include(<variant>)
+#define OUTCOME_USE_STD_IN_PLACE_TYPE 0  // must have it if <variant> is present
+#endif
+#endif
+
+#ifndef OUTCOME_USE_STD_IN_PLACE_TYPE
+#define OUTCOME_USE_STD_IN_PLACE_TYPE 1
+#endif
+#else
+#define OUTCOME_USE_STD_IN_PLACE_TYPE 0
+#endif
+#endif
+
+#if OUTCOME_USE_STD_IN_PLACE_TYPE
 #include <utility>  // for in_place_type_t
 
 OUTCOME_V2_NAMESPACE_BEGIN

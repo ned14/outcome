@@ -16,6 +16,7 @@ project
     : requirements
       [ requires cxx14_variable_templates cxx14_constexpr ]
       [ predef-require "!BOOST_COMP_GNUC" or "BOOST_COMP_GNUC >= 6.0" ]
+      [ predef-require "!BOOST_COMP_CLANG" or "BOOST_COMP_CLANG >= 4.0" ]
       <define>BOOST_TEST_MODULE=Outcome
       <library>../../test/build//boost_unit_test_framework
     ;

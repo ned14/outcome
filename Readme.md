@@ -49,6 +49,7 @@ Otherwise, simply download the raw file from above and place it wherever it suit
  - [ ] Run clang-tidy --fixes
  - [X] Fix up the .natvis file, and permanently solve the permuting SHA issue.
  - [ ] Fix up the C interface to use `status_code`.
+   - [ ] Write C macro documentation page
  - [ ] Resurrect the optimisation folding tests (with a better name).
 
 ## Commits and tags in this git repository can be verified using:

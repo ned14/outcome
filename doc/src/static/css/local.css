@@ -8,6 +8,13 @@ article section.page h1:first-of-type {
   font-weight: 900;
   text-transform: inherit;
 }
+article > aside .menu {
+  text-align: left;
+}
+article > aside .menu code {
+  border-left: 0.25em solid transparent;
+  border-right: 0.25em solid transparent;
+}
 h1 {
   font-weight: inherit;
   line-height: 3.25rem;

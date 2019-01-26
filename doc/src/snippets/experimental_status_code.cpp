@@ -27,9 +27,9 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../../../include/outcome/experimental/status_result.hpp"
 
-namespace outcome_e = OUTCOME_V2_NAMESPACE::experimental;
+/* Original note to WG21:
 
-/* This code is to prove that proposed P1028 `std::error` need not be more
+This code is to prove that proposed P1028 `std::error` need not be more
 than two CPU registers in size, yet it can still transport arbitrary
 payload.
 
@@ -51,8 +51,10 @@ by a function with merely `throws(std::error)`, a `std::error` can be
 prove this in code below (see end).
 */
 
-
 /********************** Example boilerplate begins ***********************/
+
+//! [preamble]
+namespace outcome_e = OUTCOME_V2_NAMESPACE::experimental;
 
 // To define a `file_io_error` which participates in the P1028 world
 // of `std::error`, we must first declare, then define, a custom code
@@ -68,7 +70,8 @@ using file_io_error = outcome_e::status_code<_file_io_error_domain>;
 class _file_io_error_domain : public outcome_e::posix_code::domain_type
 {
   using _base = typename outcome_e::posix_code::domain_type;
-
+  //! [preamble]
+  //! [value_type]
 public:
   // This is the value type for `file_io_error`. We add line number and source file path.
   struct value_type
@@ -80,6 +83,7 @@ public:
     const char *file;  // from __FILE__
     // Could also place a backtrace of void *[16] here ...
   };
+  //! [value_type]
 
   // unique id must be from a hard random number source
   constexpr explicit _file_io_error_domain(typename _base::unique_id_type id = 0x230f170194fcc6c7) noexcept : _base(id) {}

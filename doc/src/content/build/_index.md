@@ -3,37 +3,31 @@ title = "Build and install"
 weight = 3
 +++
 
-Outcome v2 is feature complete, meeting the feedback from the Boost peer review in May 2017.
-It is an all new code base, written entirely from scratch during the month of June 2017.
-It has completed three months of maturation, and will shortly be sent back to Boost
-for a second peer review. As a result, consider this library to **beta**
-quality and subject change if a second review demands it.
-
-That said, the essentials here are the same as they were in v1. Indeed most code
-written for v1 should be convertible to v2 without too much effort.
-
 ## Usage as a single header file
 
 Outcome v2 comes in single header file form. This is regenerated per commit. To fetch
 on Linux:
 
 ```
-wget https://github.com/ned14/outcome/raw/develop/single-header/outcome.hpp
+wget https://github.com/ned14/outcome/raw/master/single-header/outcome.hpp
 ```
 
 On BSD:
 
 ```
-fetch https://github.com/ned14/outcome/raw/develop/single-header/outcome.hpp
+fetch https://github.com/ned14/outcome/raw/master/single-header/outcome.hpp
 ```
 
 If you have `curl` installed:
 
 ```
-curl -O -J -L https://github.com/ned14/outcome/raw/develop/single-header/outcome.hpp
+curl -O -J -L https://github.com/ned14/outcome/raw/master/single-header/outcome.hpp
 ```
 
 Otherwise, simply download the raw file from above and place it wherever it suits you.
+If you might be debugging using Microsoft Visual Studio, you may find the debugger
+visualisation file at https://github.com/ned14/outcome/raw/master/include/outcome/outcome.natvis
+useful to include into your build.
 
 
 ## Usage from the Conan package manager
@@ -64,7 +58,7 @@ submodule to your project so you can keep abreast of bug fixes. Here is how:
 ```
 git submodule add https://github.com/ned14/outcome
 cd outcome
-git checkout develop
+git checkout master
 git submodule update --init --recursive
 ```
 
