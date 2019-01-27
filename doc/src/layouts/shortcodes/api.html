@@ -1,5 +1,7 @@
 {{- if and (hasPrefix (.Get 0) "std::") (not (hasPrefix (.Get 0) "std::experimental")) }}
-  {{- if hasPrefix (.Get 0) "std::error_code" }}
+  {{- if hasPrefix (.Get 0) "std::error_category" }}
+<a href="https://en.cppreference.com/w/cpp/error/error_category" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> {{ .Get 0 }}</a>
+  {{- else if hasPrefix (.Get 0) "std::error_code" }}
 <a href="https://en.cppreference.com/w/cpp/error/error_code" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> {{ .Get 0 }}</a>
   {{- else if hasPrefix (.Get 0) "std::exception_ptr" }}
 <a href="https://en.cppreference.com/w/cpp/error/exception_ptr" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> {{ .Get 0 }}</a>

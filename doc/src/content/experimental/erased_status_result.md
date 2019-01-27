@@ -6,7 +6,8 @@ weight = 40
 `erased_status_result` and `erased_status_outcome` are also type aliases to {{< api "basic_result<T, E, NoValuePolicy>" >}}
 and {{< api "basic_outcome<T, EC, EP, NoValuePolicy>" >}}, however they
 alias a basic result or outcome with an `error_type` of `status_code<erased<E>>` instead
-of `status_code<DomainType>`.
+of `status_code<DomainType>`. You will remember from the introduction that erased status
+codes are move-only.
 
 The specifications are:
 
@@ -30,7 +31,7 @@ form because it seems "difficult".
 
 It is actually, in fact, a wise discipline to follow to make all functions return
 move-only types if you care about determinism and performance. Whilst C++ 17 onwards
-does much to have the compiler avoid copies of identical function return values thanks to
+does much to have the compiler avoid copying of identical function return values thanks to
 guaranteed copy elision, when a chain of functions return different types, if the
 programmer forgets to scatter `std::move()` appropriately, copies rather than moves
 tend to occur in non-obvious ways. No doubt future C++ standards will improve on the

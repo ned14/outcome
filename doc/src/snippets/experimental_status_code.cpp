@@ -27,9 +27,9 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../../../include/outcome/experimental/status_result.hpp"
 
-namespace outcome_e = OUTCOME_V2_NAMESPACE::experimental;
+/* Original note to WG21:
 
-/* This code is to prove that proposed P1028 `std::error` need not be more
+This code is to prove that proposed P1028 `std::error` need not be more
 than two CPU registers in size, yet it can still transport arbitrary
 payload.
 
@@ -51,8 +51,10 @@ by a function with merely `throws(std::error)`, a `std::error` can be
 prove this in code below (see end).
 */
 
-
 /********************** Example boilerplate begins ***********************/
+
+//! [preamble]
+namespace outcome_e = OUTCOME_V2_NAMESPACE::experimental;
 
 // To define a `file_io_error` which participates in the P1028 world
 // of `std::error`, we must first declare, then define, a custom code
@@ -68,7 +70,8 @@ using file_io_error = outcome_e::status_code<_file_io_error_domain>;
 class _file_io_error_domain : public outcome_e::posix_code::domain_type
 {
   using _base = typename outcome_e::posix_code::domain_type;
-
+  //! [preamble]
+  //! [value_type]
 public:
   // This is the value type for `file_io_error`. We add line number and source file path.
   struct value_type
@@ -80,28 +83,35 @@ public:
     const char *file;  // from __FILE__
     // Could also place a backtrace of void *[16] here ...
   };
-
+  //! [value_type]
+  //! [constructor]
   // unique id must be from a hard random number source
+  // Use https://www.random.org/cgi-bin/randbyte?nbytes=8&format=h to get a hard random 64 bit id.
+  // Do NOT make up your own value. Do NOT use zero.
   constexpr explicit _file_io_error_domain(typename _base::unique_id_type id = 0x230f170194fcc6c7) noexcept : _base(id) {}
   static inline constexpr const _file_io_error_domain &get();
-
+  //! [constructor]
+  //! [string_ref]
   // Return the name of our custom code domain
   virtual _base::string_ref name() const noexcept override final  // NOLINT
   {
     static string_ref v("file i/o error domain");
     return v;  // NOLINT
   }
-
+  //! [string_ref]
+  //! [message]
   // Return a string describing a specific code. We will return the
   // string returned by our POSIX code base domain, with the source
   // file and line number appended
   virtual _base::string_ref _do_message(const outcome_e::status_code<void> &code) const noexcept override final  // NOLINT
   {
     assert(code.domain() == *this);
-    // Fetch message from base (POSIX)
+
+    // Fetch message from base domain (POSIX)
     auto msg = _base::_do_message(code);
     const auto &c1 = static_cast<const file_io_error &>(code);  // NOLINT
-    const auto &v = c1.value();
+    const value_type &v = c1.value();
+
     // Append my source file and line number
     if(v.file == nullptr)
     {
@@ -114,19 +124,23 @@ public:
       return _base::string_ref("failed to get message from system");
     }
     sprintf(p, "%s (%s:%d)", msg.data(), v.file, v.lineno);
+
     // Return as atomically reference counted string
     return _base::atomic_refcounted_string_ref(p, length);
   }
 };
-
+//! [message]
+//! [constexpr_source]
 // 100% constexpr instantiation
 constexpr _file_io_error_domain file_io_error_domain;
 inline constexpr const _file_io_error_domain &_file_io_error_domain::get()
 {
   return file_io_error_domain;
 }
+//! [constexpr_source]
 
 
+//! [implicit_conversion]
 // Now tell `error` how it can implicitly construct from `file_io_error`.
 // This is done by us defining a free function called `make_status_code()`
 // which is discovered using ADL. `error` is an alias to the refinement
@@ -152,14 +166,13 @@ inline outcome_e::system_code make_status_code(file_io_error v)
   // from the status code returned by `make_status_code_ptr()`.
   return make_status_code_ptr(std::move(v));
 }
+//! [implicit_conversion]
 
 
 /********************** Proof it works begins ***********************/
 
 #include <memory>
 #include <utility>
-
-template <class T, class E = outcome_e::error> using result = outcome_e::erased_result<T, E, outcome_e::policy::default_status_result_policy<T, E>>;
 
 struct file_deleter
 {
@@ -171,12 +184,12 @@ struct file_deleter
 };
 using file_handle = std::unique_ptr<FILE, file_deleter>;
 
-/* As under P1095 deterministic exception throws are identical to returning
-error types from functions, that's what we model here by functions which only
-return failure. The proof being demonstrated is that rich local failure
-types (i.e. `file_io_error`) will auto-decay into `error` implicitly.
-*/
-
+//! [typedef]
+template <class T, class E = outcome_e::error>
+using result =  //
+outcome_e::erased_result<T, E, outcome_e::policy::default_status_result_policy<T, E>>;
+//! [typedef]
+//! [open_file]
 result<file_handle, file_io_error> open_file(const char *path)  // models throws(file_io_error)
 {
   file_handle ret(::fopen(path, "r"));
@@ -189,10 +202,10 @@ result<void> open_resource()  // models throws(std::error)
 {
   for(;;)
   {
-    auto r = open_file("some file");
+    result<file_handle, file_io_error> r = open_file("some file");
     if(r)
       break;
-    auto e = r.error();
+    file_io_error e = r.error();
     if(e != outcome_e::errc::resource_unavailable_try_again)
     {
       // NOTE this implicitly converts from `file_io_error` to `error` via the
@@ -206,16 +219,15 @@ result<void> open_resource()  // models throws(std::error)
 
 int main(void)
 {
-  auto r = open_resource();
+  result<void> r = open_resource();
   if(r)
-  {
     printf("Success!\n");
-  }
   else
   {
     auto e = std::move(r).error();
     // A quick demonstration that the indirection works as indicated
     printf("Returned error has a code domain of '%s', a message of '%s'\n", e.domain().name().c_str(), e.message().c_str());
-    printf("\nAnd semantically comparing it to 'errc::operation_not_permitted' = %d\n", e == outcome_e::errc::operation_not_permitted);
+    printf("\nAnd semantically comparing it to 'errc::no_such_file_or_directory' = %d\n", e == outcome_e::errc::no_such_file_or_directory);
   }
 }
+//! [open_file]

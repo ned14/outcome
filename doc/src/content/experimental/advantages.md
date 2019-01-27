@@ -13,7 +13,8 @@ is not dragged into inclusion by including `<system_error>`.
 
 3. More discipline is imposed on your use of Outcome, leading to
 less ambiguous code which is easier to optimise by the compiler,
-lower cost to maintain, and lower cognitive load to audit for correctness.
+lower cost to maintain, and lower cognitive load to audit code based on
+experimental Outcome for correctness.
 
 4. Code written to `<outcome/experimental>` can be fairly easily dual
 targeted, with just a few switching type aliases, to default Outcome.

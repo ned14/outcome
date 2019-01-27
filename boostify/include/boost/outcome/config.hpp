@@ -147,7 +147,26 @@ exported Boost.Outcome v2 namespace.
 #include <new>     // for placement in moves etc
 #include <type_traits>
 
-#if __cplusplus >= 201700 || _HAS_CXX17
+#ifndef BOOST_OUTCOME_USE_STD_IN_PLACE_TYPE
+#if defined(_MSC_VER) && _HAS_CXX17
+#define BOOST_OUTCOME_USE_STD_IN_PLACE_TYPE 1  // MSVC always has std::in_place_type
+#elif __cplusplus >= 201700
+// libstdc++ before GCC 6 doesn't have it, despite claiming C++ 17 support
+#ifdef __has_include
+#if !__has_include(<variant>)
+#define BOOST_OUTCOME_USE_STD_IN_PLACE_TYPE 0  // must have it if <variant> is present
+#endif
+#endif
+
+#ifndef BOOST_OUTCOME_USE_STD_IN_PLACE_TYPE
+#define BOOST_OUTCOME_USE_STD_IN_PLACE_TYPE 1
+#endif
+#else
+#define BOOST_OUTCOME_USE_STD_IN_PLACE_TYPE 0
+#endif
+#endif
+
+#if BOOST_OUTCOME_USE_STD_IN_PLACE_TYPE
 #include <utility>  // for in_place_type_t
 
 BOOST_OUTCOME_V2_NAMESPACE_BEGIN

@@ -9,14 +9,14 @@ and {{< api "basic_outcome<T, EC, EP, NoValuePolicy>" >}}, just the same as
 and {{< api "std_outcome<T, EC = std::error_code, EP = std::exception_ptr, NoValuePolicy = policy::default_policy<T, EC, EP>>" >}}.
 
 There is however a slight difference in template parameters because the
-payload of `status_code<DomainType>` is determined by `DomainType`, so the
-specification is:
+payload of `status_code<DomainType>` is determined by `DomainType`, so
+instead the specification is:
 
 ```c++
 experimental::status_result<T, DomainType = typename experimental::generic_code::domain_type>
 ```
 
-... instead. The resulting `basic_result` implementation gains an `error_type` of
+The resulting `basic_result` implementation gains an `error_type` of
 `experimental::status_code<DomainType>`.
 
 The same applies to `status_outcome`, where the specification is:

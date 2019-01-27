@@ -47,9 +47,12 @@ Otherwise, simply download the raw file from above and place it wherever it suit
 
  - [x] Raise ABI compliance checker on CI.
  - [ ] Run clang-tidy --fixes
- - [ ] Fix up the .natvis file, and permanently solve the permuting SHA issue.
+ - [X] Fix up the .natvis file, and permanently solve the permuting SHA issue.
  - [ ] Fix up the C interface to use `status_code`.
+   - [ ] Write C macro documentation page
  - [ ] Resurrect the optimisation folding tests (with a better name).
+ - [ ] Rerun native overhead benchmark, make new graph.
+ - [ ] Get all docs snippets compiling again.
 
 ## Commits and tags in this git repository can be verified using:
 <pre>

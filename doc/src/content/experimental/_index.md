@@ -5,8 +5,9 @@ weight = 15
 
 In `<outcome/experimental>`, there ships an Outcome-based simulation of
 the proposed [P1095 *Zero overhead deterministic failure*](https://wg21.link/P1095)
-specific implementation of [P0709 *Zero overhead exceptions: Throwing values*](http://wg21.link/P0709), aka "Herbceptions". This library-only simulation lets you use a close simulacrum
-of potential future C++ lightweight exceptions today in any C++ 14 compiler.
+specific implementation of [P0709 *Zero overhead exceptions: Throwing values*](http://wg21.link/P0709), aka "Herbceptions". This library-only implementation lets you use a close simulacrum
+of potential future C++ lightweight exceptions today in [any C++ 14 compiler
+which Outcome supports]({{< relref "/requirements" >}}).
 
 {{% notice warning %}}
 <b>It is stressed, in the strongest possible terms, that any item inside
@@ -21,7 +22,8 @@ measure.
 {{% /notice %}}
 
 P1095's support library has a reference implementation at https://ned14.github.io/status-code/.
-This is wholly incorporated into Outcome in the `<outcome/experimental/status-code>`
+You will find terse documentation there, and an API reference.
+This library is wholly incorporated into Outcome in the `<outcome/experimental/status-code>`
 directory, with bindings into Outcome provided in the following headers:
 
 - `<outcome/experimental/status_result.hpp>`
