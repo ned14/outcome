@@ -3,9 +3,11 @@
   "name": "Outcome",
   "authors": [ "Niall Douglas" ],
   "maintainers": [ "Niall Douglas" ],
-  "description": "A function failure handling library.",
+  "description": "A deterministic failure handling library partially simulating lightweight exceptions.",
   "std": [ "14" ],
   "category": [
+    "Patterns and Idioms",
+    "Language Features Emulation",
     "Programming Interfaces"
   ]
 }
