@@ -30,7 +30,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include "../../../include/outcome/experimental/result.h"
 
 // Declare our C++ function's returning result type. Only needs to be done once.
-// This declares an `erased_result<size_t, posix_code>`.
+// This declares a `basic_result<size_t, posix_code>`.
 //
 // The first parameter is some unique identifier for this type which will be used
 // whenever we reference this type in the future.
@@ -55,14 +55,7 @@ void print(int v)
   // Is the error returned in the POSIX domain and thus an errno?
   if(CXX_RESULT_ERROR_IS_ERRNO(res))
   {
-#if defined(_MSC_VER) && _MSC_VER < 1920 /* VS2019 */
     fprintf(stderr, "to_string(%d) failed with error code %d (%s)\n", v, res.error.value, strerror(res.error.value));
-#else
-    // If you get a weird compile error here, note that CXX_RESULT_GET_ERRNO()
-    // uses C11 generics, you need a C11 compiler for it to work. If you don't
-    // have a C11 compiler, res.error or res.error.value can be used directly.
-    fprintf(stderr, "to_string(%d) failed with error code %d (%s)\n", v, CXX_RESULT_GET_ERRNO(res), strerror(CXX_RESULT_GET_ERRNO(res)));
-#endif
     return;
   }
   fprintf(stderr, "to_string(%d) failed with unknown error code %d\n", v, res.error.value);

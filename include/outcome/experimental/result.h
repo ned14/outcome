@@ -25,11 +25,11 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_EXPERIMENTAL_RESULT_H
 #define OUTCOME_EXPERIMENTAL_RESULT_H
 
-#define CXX_DECLARE_STATUS_CODE(ident, T)                                                                                                                                                                                                                                                                                      \
+#define CXX_DECLARE_STATUS_CODE(ident, value_type)                                                                                                                                                                                                                                                                             \
   struct cxx_status_code_##ident                                                                                                                                                                                                                                                                                               \
   {                                                                                                                                                                                                                                                                                                                            \
     void *domain;                                                                                                                                                                                                                                                                                                              \
-    T value;                                                                                                                                                                                                                                                                                                                   \
+    value_type value;                                                                                                                                                                                                                                                                                                          \
   };
 
 #define CXX_STATUS_CODE(ident) struct cxx_status_code_##ident
@@ -60,7 +60,5 @@ struct cxx_status_code_posix
 };
 #define CXX_DECLARE_RESULT_ERRNO(ident, R) CXX_DECLARE_RESULT(posix_##ident, R, struct cxx_status_code_posix)
 #define CXX_RESULT_ERRNO(ident) CXX_RESULT(posix_##ident)
-#define CXX_RESULT_GET_ERRNO(r) _Generic((r).error, struct cxx_status_code_posix : ((struct cxx_status_code_posix *) &(r).error)->value, default : (r).error)
-#define CXX_RESULT_SET_ERRNO(r) (errno = CXX_RESULT_HAS_ERROR(r) ? (CXX_RESULT_ERROR_IS_ERRNO(r) ? CXX_RESULT_ERRNO(r) : EAGAIN) : 0)
 
 #endif
