@@ -175,6 +175,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
     if(feature STREQUAL cxx_std_17)
       file(GLOB_RECURSE example_srcs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+           "${CMAKE_CURRENT_SOURCE_DIR}/doc/src/snippets/*.c"
            "${CMAKE_CURRENT_SOURCE_DIR}/doc/src/snippets/*.cpp"
            )
       set(example_bins)
@@ -187,9 +188,11 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
             POSITION_INDEPENDENT_CODE ON
           )
-          target_compile_features(${example_bin} PUBLIC cxx_std_17)
-          if(ENABLE_CXX_CONCEPTS)
-            target_compile_options(${example_bin} PUBLIC -fconcepts)
+          if(NOT example_src MATCHES "[.]c$")
+            target_compile_features(${example_bin} PUBLIC cxx_std_17)
+            if(ENABLE_CXX_CONCEPTS)
+              target_compile_options(${example_bin} PUBLIC -fconcepts)
+            endif()
           endif()
           if(CMAKE_SYSTEM_NAME MATCHES "Linux")
             target_link_libraries(${example_bin} stdc++fs)

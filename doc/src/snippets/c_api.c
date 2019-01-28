@@ -21,41 +21,55 @@ Distributed under the Boost Software License, Version 1.0.
 http://www.boost.org/LICENSE_1_0.txt)
 */
 
-//! [program]
+#include <errno.h>
+
+//! [preamble]
 #include <stdio.h>
 #include <string.h>  // for strerror
-// This header in Outcome is pure C, it provides a suite of C helper macros
-#include "../../../include/outcome/result.h"
+// This header in Experimental Outcome is pure C, it provides a suite of C helper macros
+#include "../../../include/outcome/experimental/result.h"
 
 // Declare our C++ function's returning result type. Only needs to be done once.
-CXX_DECLARE_RESULT_EC(size_t, size_t);
+// This declares an `erased_result<size_t, posix_code>`.
+//
+// The first parameter is some unique identifier for this type which will be used
+// whenever we reference this type in the future.
+CXX_DECLARE_RESULT_ERRNO(to_string_rettype, size_t);
 
-// Tell C about our C++ function
-extern CXX_RESULT_EC(size_t) to_string(char *buffer, size_t bufferlen, int v);
+// Tell C about our extern C++ function `to_string()`
+extern CXX_RESULT_ERRNO(to_string_rettype) _Z9to_stringPcmi(char *buffer, size_t bufferlen, int v);
+//! [preamble]
 
+//! [example]
 void print(int v)
 {
   char buffer[4];
-  CXX_RESULT_EC(size_t) res;
+  CXX_RESULT_ERRNO(to_string_rettype) res;
 
-  res = to_string(buffer, sizeof(buffer), v);
+  res = _Z9to_stringPcmi(buffer, sizeof(buffer), v);
   if(CXX_RESULT_HAS_VALUE(res))
   {
     printf("to_string(%d) fills buffer with '%s' of %zu characters\n", v, buffer, res.value);
     return;
   }
-  // Is the error returned in the std::generic_category domain and thus an errno?
+  // Is the error returned in the POSIX domain and thus an errno?
   if(CXX_RESULT_ERROR_IS_ERRNO(res))
   {
-    // If you get a weird compile error here, note that CXX_RESULT_ERROR()
+#if defined(_MSC_VER) && _MSC_VER < 1920 /* VS2019 */
+    fprintf(stderr, "to_string(%d) failed with error code %d (%s)\n", v, res.error.value, strerror(res.error.value));
+#else
+    // If you get a weird compile error here, note that CXX_RESULT_GET_ERRNO()
     // uses C11 generics, you need a C11 compiler for it to work. If you don't
-    // have a C11 compiler, res.error or res.error.code can be used directly.
-    fprintf(stderr, "to_string(%d) failed with error code %d (%s)\n", v, CXX_RESULT_ERROR(res), strerror(CXX_RESULT_ERROR(res)));
+    // have a C11 compiler, res.error or res.error.value can be used directly.
+    fprintf(stderr, "to_string(%d) failed with error code %d (%s)\n", v, CXX_RESULT_GET_ERRNO(res), strerror(CXX_RESULT_GET_ERRNO(res)));
+#endif
     return;
   }
-  fprintf(stderr, "to_string(%d) failed with unknown error code %d\n", v, CXX_RESULT_ERROR(res));
+  fprintf(stderr, "to_string(%d) failed with unknown error code %d\n", v, res.error.value);
 }
+//! [example]
 
+//! [test]
 int main(void)
 {
   print(9);
@@ -63,4 +77,25 @@ int main(void)
   print(999);
   print(9999);
   return 0;
+}
+//! [test]
+
+extern CXX_RESULT_ERRNO(to_string_rettype) _Z9to_stringPcmi(char *buffer, size_t bufferlen, int v)
+{
+  // Fake a C++ function so it'll compile and run
+  CXX_RESULT_ERRNO(to_string_rettype) ret;
+  memset(&ret, 0, sizeof(ret));
+  char temp[256];
+  sprintf(temp, "%d", v);
+  size_t len = strlen(temp);
+  if(len > bufferlen - 1)
+  {
+    ret.flags |= 18U;
+    ret.error.value = ENOBUFS;
+    return ret;
+  }
+  memcpy(buffer, temp, len + 1);
+  ret.flags |= 1U;
+  ret.value = len;
+  return ret;
 }
