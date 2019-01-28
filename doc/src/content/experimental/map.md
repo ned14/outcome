@@ -7,7 +7,7 @@ Much of the design of Boost.System (which went on to become `<system_error>`)
 has been retained in proposed `<system_error2>`, so an approximate map between
 `<system_error2>` and `<system_error>` and Boost.System can be given:
 
-<table width="100%">
+<table width="100%" cellpadding="5" border="1">
 <colgroup>
  <col width="25%">
  <col width="25%">
@@ -58,7 +58,7 @@ has been retained in proposed `<system_error2>`, so an approximate map between
  </ul>
 </table>
 
-As is obvious, in `<system_error2>` one must be much more specific and accurate
+As is obvious from the above, in `<system_error2>` one must be much more specific and accurate
 with respect to intent and specification and desired semantics than with `<system_error>`. Much
 ambiguity and incorrectness which flies silently in `<system_error>` will
 refuse to compile in `<system_error2>`.

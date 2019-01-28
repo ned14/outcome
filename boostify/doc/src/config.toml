@@ -13,5 +13,5 @@ uglyURLs  = true
   home = [ "HTML" ]
   
 [params]
-  snippetsURL = "https://github.com/ned14/boost-outcome/tree/master/doc/src/snippets/"
-  editURL = "https://github.com/ned14/boost-outcome/edit/develop/doc/src/content/"
+  snippetsURL = "https://github.com/boostorg/outcome/tree/master/doc/src/snippets/"
+  editURL = "https://github.com/boostorg/outcome/edit/develop/doc/src/content/"
