@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
 http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef OUTCOME_STATUS_RESULT_HPP
-#define OUTCOME_STATUS_RESULT_HPP
+#ifndef OUTCOME_EXPERIMENTAL_STATUS_RESULT_HPP
+#define OUTCOME_EXPERIMENTAL_STATUS_RESULT_HPP
 
 #include "../basic_result.hpp"
 #include "../policy/fail_to_compile_observers.hpp"
