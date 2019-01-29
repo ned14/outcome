@@ -110,7 +110,7 @@ template <class EC, class E = void> struct failure_type
   using exception_type = E;
 
 private:
-  bool _have_error, _have_exception;
+  bool _have_error{}, _have_exception{};
   //! The error code
   error_type _error;
   //! The exception

@@ -1,5 +1,5 @@
 /* Configure Outcome with QuickCppLib
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2018 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: August 2015
 
 
@@ -330,7 +330,7 @@ namespace detail
   }
 }  // namespace detail
 OUTCOME_V2_NAMESPACE_END
-#define OUTCOME_THROW_EXCEPTION(expr) OUTCOME_V2_NAMESPACE::detail::do_fatal_exit(#expr)
+#define OUTCOME_THROW_EXCEPTION(expr) OUTCOME_V2_NAMESPACE::detail::do_fatal_exit(#expr), (void) (expr)
 
 #endif
 #endif

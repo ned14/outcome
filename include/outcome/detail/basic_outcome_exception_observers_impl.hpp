@@ -42,11 +42,11 @@ namespace policy
     // VS2017 tries a copy construction in the correct implementation despite that Outcome is always a rvalue or lvalue ref! :(
     basic_outcome<R, S, P, NoValuePolicy> &_self = (basic_outcome<R, S, P, NoValuePolicy> &) (self);  // NOLINT
 #else
-    Outcome _self = static_cast<Outcome>(self);
+    auto _self = static_cast<Outcome>(self);
 #endif
     return static_cast<Outcome>(_self)._ptr;
   }
-}
+}  // namespace policy
 
 namespace detail
 {
