@@ -23,7 +23,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../include/outcome/experimental/status_outcome.hpp"
 
-template <class T, class S = SYSTEM_ERROR2_NAMESPACE::system_code, class P = std::exception_ptr> using outcome = OUTCOME_V2_NAMESPACE::experimental::erased_outcome<T, S, P>;
+#define OUTCOME_PREVENT_CONVERSION_WORKAROUND std
+template <class T, class S = SYSTEM_ERROR2_NAMESPACE::system_code, class P = OUTCOME_PREVENT_CONVERSION_WORKAROUND::exception_ptr> using outcome = OUTCOME_V2_NAMESPACE::experimental::erased_outcome<T, S, P>;
 using OUTCOME_V2_NAMESPACE::in_place_type;
 
 #include "quickcpplib/include/boost/test/unit_test.hpp"
@@ -46,7 +47,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / outcome, "Tests that the outc
     BOOST_CHECK(!m.has_exception());
     BOOST_CHECK_THROW(m.value(), status_error<void>);
     BOOST_CHECK_NO_THROW(m.error());
-    BOOST_CHECK_THROW(std::rethrow_exception(m.failure()), generic_error);
+    BOOST_CHECK_THROW(OUTCOME_PREVENT_CONVERSION_WORKAROUND::rethrow_exception(m.failure()), generic_error);
   }
   {  // errored void
     outcome<void> m(generic_code{errc::bad_address});
@@ -56,7 +57,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / outcome, "Tests that the outc
     BOOST_CHECK(!m.has_exception());
     BOOST_CHECK_THROW(([&m]() -> void { return m.value(); }()), generic_error);
     BOOST_CHECK_NO_THROW(m.error());
-    BOOST_CHECK_THROW(std::rethrow_exception(m.failure()), generic_error);
+    BOOST_CHECK_THROW(OUTCOME_PREVENT_CONVERSION_WORKAROUND::rethrow_exception(m.failure()), generic_error);
   }
   {  // valued int
     outcome<int> m(5);
@@ -104,7 +105,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / outcome, "Tests that the outc
     BOOST_CHECK(m.failure());
     try
     {
-      std::rethrow_exception(m.failure());
+      OUTCOME_PREVENT_CONVERSION_WORKAROUND::rethrow_exception(m.failure());
     }
     catch(const generic_error &ex)
     {
@@ -115,22 +116,22 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / outcome, "Tests that the outc
   }
 #if !defined(__APPLE__) || defined(__cpp_exceptions)
   {  // excepted
-    std::error_code ec(5, std::system_category());
-    auto e = std::make_exception_ptr(std::system_error(ec));  // NOLINT
+    OUTCOME_PREVENT_CONVERSION_WORKAROUND::error_code ec(5, OUTCOME_PREVENT_CONVERSION_WORKAROUND::system_category());
+    auto e = OUTCOME_PREVENT_CONVERSION_WORKAROUND::make_exception_ptr(OUTCOME_PREVENT_CONVERSION_WORKAROUND::system_error(ec));  // NOLINT
     outcome<int> m(e);
     BOOST_CHECK(!m);
     BOOST_CHECK(!m.has_value());
     BOOST_CHECK(!m.has_error());
     BOOST_CHECK(m.has_exception());
-    BOOST_CHECK_THROW(m.value(), std::system_error);
+    BOOST_CHECK_THROW(m.value(), OUTCOME_PREVENT_CONVERSION_WORKAROUND::system_error);
     BOOST_CHECK(m.exception() == e);
 #ifdef __cpp_exceptions
     BOOST_CHECK(m.failure());
     try
     {
-      std::rethrow_exception(m.failure());
+      OUTCOME_PREVENT_CONVERSION_WORKAROUND::rethrow_exception(m.failure());
     }
-    catch(const std::system_error &ex)
+    catch(const OUTCOME_PREVENT_CONVERSION_WORKAROUND::system_error &ex)
     {
       BOOST_CHECK(ex.code() == ec);
       BOOST_CHECK(ex.code().value() == 5);
@@ -141,7 +142,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / outcome, "Tests that the outc
     struct Foo
     {
     };
-    auto e = std::make_exception_ptr(Foo());
+    auto e = OUTCOME_PREVENT_CONVERSION_WORKAROUND::make_exception_ptr(Foo());
     outcome<int> m(e);
     BOOST_CHECK(!m);
     BOOST_CHECK(!m.has_value());
@@ -151,8 +152,8 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / outcome, "Tests that the outc
     BOOST_CHECK(m.exception() == e);
   }
   {  // outcome<void, void> should work
-    std::error_code ec(5, std::system_category());
-    auto e = std::make_exception_ptr(std::system_error(ec));
+    OUTCOME_PREVENT_CONVERSION_WORKAROUND::error_code ec(5, OUTCOME_PREVENT_CONVERSION_WORKAROUND::system_category());
+    auto e = OUTCOME_PREVENT_CONVERSION_WORKAROUND::make_exception_ptr(OUTCOME_PREVENT_CONVERSION_WORKAROUND::system_error(ec));
     outcome<void, void> m(e);
     BOOST_CHECK(!m);
     BOOST_CHECK(!m.has_value());
@@ -193,7 +194,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / outcome, "Tests that the outc
     // Test void compiles
     outcome<void> c(in_place_type<void>);
     // Test int, void compiles
-    outcome<int, void> d(in_place_type<std::exception_ptr>);
+    outcome<int, void> d(in_place_type<OUTCOME_PREVENT_CONVERSION_WORKAROUND::exception_ptr>);
   }
 
   {

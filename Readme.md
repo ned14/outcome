@@ -26,33 +26,39 @@ Outcome v2 comes in single header file form. This is regenerated per commit. To 
 on Linux:
 
 ```
-wget https://github.com/ned14/outcome/raw/develop/single-header/outcome.hpp
+wget https://github.com/ned14/outcome/raw/master/single-header/outcome.hpp
 ```
 
 On BSD:
 
 ```
-fetch https://github.com/ned14/outcome/raw/develop/single-header/outcome.hpp
+fetch https://github.com/ned14/outcome/raw/master/single-header/outcome.hpp
 ```
 
 If you have `curl` installed:
 
 ```
-curl -O -J -L https://github.com/ned14/outcome/raw/develop/single-header/outcome.hpp
+curl -O -J -L https://github.com/ned14/outcome/raw/master/single-header/outcome.hpp
 ```
 
 Otherwise, simply download the raw file from above and place it wherever it suits you.
+If you might be debugging using Microsoft Visual Studio, you may find the debugger
+visualisation file at https://github.com/ned14/outcome/raw/master/include/outcome/outcome.natvis
+useful to include into your build.
 
 ## Pre Boost entry todo:
 
  - [x] Raise ABI compliance checker on CI.
- - [ ] Run clang-tidy --fixes
+ - [ ] Run `clang-tidy --fixes`
  - [X] Fix up the .natvis file, and permanently solve the permuting SHA issue.
- - [ ] Fix up the C interface to use `status_code`.
-   - [ ] Write C macro documentation page
+ - [X] Fix up the C interface to use `status_code`.
+   - [X] Write C macro documentation page
  - [ ] Resurrect the optimisation folding tests (with a better name).
  - [ ] Rerun native overhead benchmark, make new graph.
  - [ ] Get all docs snippets compiling again.
+ - [ ] Reduce depth of Boost.Outcome front index.
+ - [ ] Add page to docs on how to customise ASIO's `async_result` to return
+`outcome::result<T>`, maybe under new section "Integrations"
 
 ## Commits and tags in this git repository can be verified using:
 <pre>
