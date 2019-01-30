@@ -4,10 +4,10 @@
   "authors": [ "Niall Douglas" ],
   "maintainers": [ "Niall Douglas" ],
   "description": "A deterministic failure handling library partially simulating lightweight exceptions.",
-  "std": [ "14" ],
+  "std": [ "proposal" ],
   "category": [
-    "Patterns and Idioms",
-    "Language Features Emulation",
-    "Programming Interfaces"
+    "Patterns",
+    "Emulation",
+    "Programming"
   ]
 }
