@@ -22,7 +22,7 @@ A type carrying one of (i) a successful `T` (ii) a disappointment `EC` (iii) a f
 3. `<iosfwd>`
 4. `<new>`
 5. `<type_traits>`
-6. `<utility>` (C++ 17 or later only, for {{% api "std::in_place_type_t<T>" %}})
+6. If {{% api "OUTCOME_USE_STD_IN_PLACE_TYPE" %}} is `1`, `<utility>` (defaults to `1` for C++ 17 or later only)
 7. If C++ exceptions disabled and `OUTCOME_DISABLE_EXECINFO` undefined only (used to print stack backtraces on "exception throw"):
     1. `<sal.h>` (Windows only)
     2. `<stddef.h>` (Windows only)
@@ -32,11 +32,28 @@ A type carrying one of (i) a successful `T` (ii) a disappointment `EC` (iii) a f
 9. `<cstdlib>`
 10. `<cassert>`
 
-This very light weight set of inclusion dependencies makes basic result suitable for use in global header files of very large C++ codebases.
+This very light weight set of inclusion dependencies makes basic outcome suitable for use in global header files of very large C++ codebases.
 
 ### Design rationale
 
-To write
+`basic_outcome` extends {{% api "basic_result<T, E, NoValuePolicy>" %}} with a third state to transport,
+conventionally (but not necessarily) some sort of "abort" or "exceptional" state which a function can
+return to indicate that not only did the operation fail, but it did so *catastrophically* i.e. please
+abort any attempt to retry the operation.
+
+A perfect alternative is to throw a C++ exception for the abort code path, and indeed most programs
+ought to do exactly that instead of using `basic_outcome`. However there are a number of use cases
+where choosing `basic_outcome` shines:
+
+1. Where C++ exceptions or RTTI is not available, but the ability to fail catastrophically without
+terminating the program is important.
+2. Where deterministic behaviour is required even in the catastrophic failure situation.
+3. In unit test suites of code using Outcome it is extremely convenient to accumulate test failures
+into a `basic_outcome` for later reporting. A similar convenience applies to RPC situations, where
+C++ exception throws need to be accumulated for reporting back to the initiating endpoint.
+4. Where a function is "dual use deterministic" i.e. it can be used deterministically, in which case
+one switches control flow based on `.error()`, or it can be used non-deterministically by throwing
+an exception perhaps carrying a custom payload.
 
 ### Public member type aliases
 
@@ -48,13 +65,15 @@ To write
 - `exception_type_if_enabled` is `EP` if construction from `EP` is available, else it is a usefully named unusable internal type.
 - `rebind<A, B = EC, C = EP, D = NoValuePolicy>` is `basic_outcome<A, B, C, D>`.
 
-
-REST TO DO TOMORROW!
-
-
 ### Protected member predicate booleans
 
-- `predicate::constructors_enabled` is constexpr boolean true if decayed `value_type` and decayed `error_type` are not the same type.
+- `predicate::constructors_enabled` is constexpr boolean true if:
+    1. Decayed `value_type` and decayed `error_type` are not the same type, or both are `void`.
+    2. Decayed `value_type` and decayed `exception_type` are not the same type, or both are `void`.
+    3. Decayed `error_type` and decayed `exception_type` are not the same type, or both are `void`.
+
+---
+
 
 - `predicate::implicit_constructors_enabled` is constexpr boolean true if:
     1. `predicate::constructors_enabled` is true.

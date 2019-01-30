@@ -21,7 +21,7 @@ A sum type carrying either a `T` or an `E`, with `NoValuePolicy` specifying what
 3. `<iosfwd>`
 4. `<new>`
 5. `<type_traits>`
-6. `<utility>` (C++ 17 or later only, for {{% api "std::in_place_type_t<T>" %}})
+6. If {{% api "OUTCOME_USE_STD_IN_PLACE_TYPE" %}} is `1`, `<utility>` (defaults to `1` for C++ 17 or later only)
 7. If C++ exceptions disabled and `OUTCOME_DISABLE_EXECINFO` undefined only (used to print stack backtraces on "exception throw"):
     1. `<sal.h>` (Windows only)
     2. `<stddef.h>` (Windows only)

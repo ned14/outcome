@@ -1,9 +1,11 @@
 +++
 title = "`in_place_type_t<T>`"
-description = "Either `std::in_place_type_t<T>` if C++ 17 or later, else a local emulation."
+description = "Either `std::in_place_type_t<T>` or a local emulation, depending on the
+`OUTCOME_USE_STD_IN_PLACE_TYPE` macro."
 +++
 
-Either `std::in_place_type_t<T>` if C++ 17 or later, else a local emulation.
+Either `std::in_place_type_t<T>` or a local emulation, depending on the
+{{% api "OUTCOME_USE_STD_IN_PLACE_TYPE" %}} macro.
 
 Note that the templated variable `in_place_type` is also aliased or emulated locally.
 
@@ -12,5 +14,3 @@ Note that the templated variable `in_place_type` is also aliased or emulated loc
 *Namespace*: `OUTCOME_V2_NAMESPACE`
 
 *Header*: `<outcome/config.hpp>`
-
-*Inclusions*: `<utility>` if C++ 17 or later only, for {{% api "std::in_place_type_t<T>" %}}.

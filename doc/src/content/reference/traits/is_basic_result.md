@@ -1,6 +1,6 @@
 +++
 title = "`is_basic_result<T>`"
-description = "An integral constant type true for `basic_result<T, E, NoValuePolicy> types."
+description = "An integral constant type true for `basic_result<T, E, NoValuePolicy>` types."
 +++
 
 An integral constant type true for {{% api "basic_result<T, E, NoValuePolicy>" %}} types.

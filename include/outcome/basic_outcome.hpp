@@ -276,12 +276,10 @@ protected:
     using base = detail::outcome_predicates<value_type, error_type, exception_type>;
 
     // Predicate for any constructors to be available at all
-    static constexpr bool constructors_enabled = (!std::is_same<std::decay_t<value_type>, std::decay_t<error_type>>::value          //
-                                                  && !std::is_same<std::decay_t<value_type>, std::decay_t<exception_type>>::value   //
-                                                  && !std::is_same<std::decay_t<error_type>, std::decay_t<exception_type>>::value)  //
-                                                 || (std::is_void<value_type>::value && std::is_void<error_type>::value)            //
-                                                 || (std::is_void<value_type>::value && std::is_void<exception_type>::value)        //
-                                                 || (std::is_void<error_type>::value && std::is_void<exception_type>::value);
+    static constexpr bool constructors_enabled = (!std::is_same<std::decay_t<value_type>, std::decay_t<error_type>>::value || (std::is_void<value_type>::value && std::is_void<error_type>::value))             //
+                                                 && (!std::is_same<std::decay_t<value_type>, std::decay_t<exception_type>>::value || (std::is_void<value_type>::value && std::is_void<exception_type>::value))  //
+                                                 && (!std::is_same<std::decay_t<error_type>, std::decay_t<exception_type>>::value || (std::is_void<error_type>::value && std::is_void<exception_type>::value))  //
+    ;
 
     // Predicate for implicit constructors to be available at all
     static constexpr bool implicit_constructors_enabled = constructors_enabled && base::implicit_constructors_enabled;

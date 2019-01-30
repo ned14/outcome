@@ -56,7 +56,7 @@ useful to include into your build.
  - [ ] Resurrect the optimisation folding tests (with a better name).
  - [ ] Rerun native overhead benchmark, make new graph.
  - [ ] Get all docs snippets compiling again.
- - [ ] Reduce depth of Boost.Outcome front index.
+ - [X] Reduce depth of Boost.Outcome front index.
  - [ ] Add page to docs on how to customise ASIO's `async_result` to return
 `outcome::result<T>`, maybe under new section "Integrations"
 
