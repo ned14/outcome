@@ -49,7 +49,7 @@ useful to include into your build.
 ## Pre Boost entry todo:
 
  - [x] Raise ABI compliance checker on CI.
- - [ ] Run `clang-tidy --fixes`
+ - [X] Run `clang-tidy --fixes`
  - [X] Fix up the .natvis file, and permanently solve the permuting SHA issue.
  - [X] Fix up the C interface to use `status_code`.
    - [X] Write C macro documentation page

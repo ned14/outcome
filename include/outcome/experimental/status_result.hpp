@@ -75,7 +75,7 @@ namespace experimental
 #ifdef __cpp_exceptions
             base::_error(static_cast<Impl &&>(self)).throw_exception();
 #else
-            OUTCOME_THROW_EXCEPTION(wide_value_check);
+            OUTCOME_THROW_EXCEPTION("wide value check failed");
 #endif
           }
         }

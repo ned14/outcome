@@ -51,7 +51,7 @@ namespace policy
           // ADL
           rethrow_exception(policy::exception_ptr(base::_error(std::forward<Impl>(self))));
         }
-        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));  // NOLINT
       }
     }
     /*! Performs a wide check of state, used in the value() functions
@@ -61,7 +61,7 @@ namespace policy
     {
       if(!base::_has_error(std::forward<Impl>(self)))
       {
-        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));  // NOLINT
       }
     }
   };

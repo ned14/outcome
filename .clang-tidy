@@ -1,5 +1,5 @@
 ---
-Checks:          '*,-llvm-header-guard,-google-build-using-namespace,-google-runtime-int,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-modernize-unary-static-assert,-fuchsia-*,-llvm-namespace-comment'
+Checks:          '*,-llvm-header-guard,-google-build-using-namespace,-google-runtime-int,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-modernize-unary-static-assert,-fuchsia-*,-llvm-namespace-comment,-bugprone-exception-escape'
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
 AnalyzeTemporaryDtors: true

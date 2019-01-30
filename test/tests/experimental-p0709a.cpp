@@ -38,15 +38,15 @@ public:
 protected:
   virtual bool _do_failure(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final  // NOLINT
   {
-    assert(code.domain() == *this);
+    assert(code.domain() == *this);                                     // NOLINT
     const auto &c1 = static_cast<const arithmetic_errc_error &>(code);  // NOLINT
     return c1.value() != arithmetic_errc::success;
   }
   virtual bool _do_equivalent(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &, const SYSTEM_ERROR2_NAMESPACE::status_code<void> &) const noexcept override final { return false; }  // NOLINT
-  virtual SYSTEM_ERROR2_NAMESPACE::generic_code _generic_code(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &) const noexcept override final { return {}; }  // NOLINT
-  virtual _base::string_ref _do_message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final  // NOLINT
+  virtual SYSTEM_ERROR2_NAMESPACE::generic_code _generic_code(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &) const noexcept override final { return {}; }                         // NOLINT
+  virtual _base::string_ref _do_message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final                                                          // NOLINT
   {
-    assert(code.domain() == *this);
+    assert(code.domain() == *this);                                     // NOLINT
     const auto &c1 = static_cast<const arithmetic_errc_error &>(code);  // NOLINT
     switch(c1.value())
     {
@@ -135,6 +135,6 @@ int caller2(int i, int j)
 
 int main()
 {
-  printf("%d\n", caller2(5, 6));
+  printf("%d\n", caller2(5, 6));  // NOLINT
   return 0;
 }
