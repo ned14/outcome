@@ -36,17 +36,17 @@ public:
   }
 
 protected:
-  virtual bool _do_failure(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final
+  virtual bool _do_failure(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final  // NOLINT
   {
-    assert(code.domain() == *this);
+    assert(code.domain() == *this);                                     // NOLINT
     const auto &c1 = static_cast<const arithmetic_errc_error &>(code);  // NOLINT
     return c1.value() != arithmetic_errc::success;
   }
-  virtual bool _do_equivalent(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &, const SYSTEM_ERROR2_NAMESPACE::status_code<void> &) const noexcept override final { return false; }
-  virtual SYSTEM_ERROR2_NAMESPACE::generic_code _generic_code(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &) const noexcept override final { return {}; }
-  virtual _base::string_ref _do_message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final  // NOLINT
+  virtual bool _do_equivalent(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &, const SYSTEM_ERROR2_NAMESPACE::status_code<void> &) const noexcept override final { return false; }  // NOLINT
+  virtual SYSTEM_ERROR2_NAMESPACE::generic_code _generic_code(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &) const noexcept override final { return {}; }                         // NOLINT
+  virtual _base::string_ref _do_message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final                                                          // NOLINT
   {
-    assert(code.domain() == *this);
+    assert(code.domain() == *this);                                     // NOLINT
     const auto &c1 = static_cast<const arithmetic_errc_error &>(code);  // NOLINT
     switch(c1.value())
     {
@@ -61,7 +61,7 @@ protected:
     }
     return _base::string_ref("unknown");
   }
-  SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &) const override final { abort(); }
+  SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &) const override final { abort(); }  // NOLINT
 };
 
 constexpr _arithmetic_errc_domain arithmetic_errc_domain;
@@ -97,11 +97,17 @@ inline error make_error_code(arithmetic_errc e)
 result<int, error> safe_divide(int i, int j)
 {
   if(j == 0)
+  {
     return arithmetic_errc::divide_by_zero;
+  }
   if(i == INT_MIN && j == -1)
+  {
     return arithmetic_errc::integer_divide_overflows;
+  }
   if(i % j != 0)
+  {
     return arithmetic_errc::not_integer_division;
+  }
   return i / j;
 }
 
@@ -109,18 +115,26 @@ int caller2(int i, int j)
 {
   auto r = safe_divide(i, j);
   if(r)
+  {
     return r.value();
+  }
   if(r.error() == arithmetic_errc::divide_by_zero)
+  {
     return 0;
+  }
   if(r.error() == arithmetic_errc::not_integer_division)
+  {
     return i / j;  // ignore
+  }
   if(r.error() == arithmetic_errc::integer_divide_overflows)
+  {
     return INT_MIN;
+  }
   return 0;
 }
 
 int main()
 {
-  printf("%d\n", caller2(5, 6));
+  printf("%d\n", caller2(5, 6));  // NOLINT
   return 0;
 }

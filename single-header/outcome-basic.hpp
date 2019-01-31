@@ -25,7 +25,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_BASIC_OUTCOME_HPP
 #define OUTCOME_BASIC_OUTCOME_HPP
 /* Configure Outcome with QuickCppLib
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2018 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: August 2015
 
 
@@ -1141,9 +1141,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF f1923a45184bf6497b3d825da7fde0aebd0ad9f7
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-01-26 15:35:36 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f1923a45
+#define OUTCOME_PREVIOUS_COMMIT_REF c11e7968e008ee45df2b83984a558c2a5c4361b4
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-01-29 22:54:59 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c11e7968
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1662,7 +1662,7 @@ namespace detail
   }
 }  // namespace detail
 OUTCOME_V2_NAMESPACE_END
-#define OUTCOME_THROW_EXCEPTION(expr) OUTCOME_V2_NAMESPACE::detail::do_fatal_exit(#expr)
+#define OUTCOME_THROW_EXCEPTION(expr) OUTCOME_V2_NAMESPACE::detail::do_fatal_exit(#expr), (void) (expr)
 
 #endif
 #endif
@@ -1816,7 +1816,7 @@ public:
   OUTCOME_TEMPLATE(class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<success_type, std::decay_t<U>>::value))
   constexpr explicit success_type(U &&v)
-      : _value(static_cast<U &&>(v))
+      : _value(static_cast<U &&>(v))  // NOLINT
   {
   }
 
@@ -1868,7 +1868,7 @@ template <class EC, class E = void> struct failure_type
   using exception_type = E;
 
 private:
-  bool _have_error, _have_exception;
+  bool _have_error{}, _have_exception{};
   //! The error code
   error_type _error;
   //! The exception
@@ -1910,7 +1910,6 @@ public:
   template <class U>
   constexpr explicit failure_type(in_place_type_t<error_type> /*unused*/, U &&u, error_init_tag /*unused*/ = error_init_tag())
       : _have_error(true)
-      , _have_exception(false)
       , _error(static_cast<U &&>(u))
       , _exception()
   {
@@ -1920,8 +1919,7 @@ public:
 
   template <class U>
   constexpr explicit failure_type(in_place_type_t<exception_type> /*unused*/, U &&u, exception_init_tag /*unused*/ = exception_init_tag())
-      : _have_error(false)
-      , _have_exception(true)
+      : _have_exception(true)
       , _error()
       , _exception(static_cast<U &&>(u))
   {
@@ -2000,7 +1998,7 @@ public:
   OUTCOME_TEMPLATE(class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<U>>::value))
   constexpr explicit failure_type(U &&u)
-      : _error(static_cast<U &&>(u))
+      : _error(static_cast<U &&>(u))  // NOLINT
   {
   }
 
@@ -2057,7 +2055,7 @@ public:
   OUTCOME_TEMPLATE(class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<V>>::value))
   constexpr explicit failure_type(V &&v)
-      : _exception(static_cast<V &&>(v))
+      : _exception(static_cast<V &&>(v))  // NOLINT
   {
   }
 
@@ -3199,7 +3197,7 @@ namespace detail
     {
       if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
       {
-        return this->_state._value == o._state._value;
+        return this->_state._value == o._state._value;  // NOLINT
       }
       if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0)
       {
@@ -3516,7 +3514,7 @@ namespace policy
 #endif
     void _ub(Impl && /*unused*/)
     {
-      assert(false);
+      assert(false);  // NOLINT
 #if defined(__GNUC__) || defined(__clang__)
       __builtin_unreachable();
 #endif
@@ -4721,7 +4719,7 @@ namespace detail
   // VS2017 with /permissive- chokes on the correct form due to over eager early instantiation.
   template <class S, class P> inline void basic_outcome_failure_exception_from_error(...) { static_assert(sizeof(S) == 0, "No specialisation for these error and exception types available!"); }
 #else
-  template <class S, class P> inline void basic_outcome_failure_exception_from_error(...) = delete;  // No specialisation for these error and exception types available!
+  template <class S, class P> inline void basic_outcome_failure_exception_from_error(...) = delete;  // NOLINT No specialisation for these error and exception types available!
 #endif
 
   //! The failure observers implementation of `basic_outcome<R, S, P>`.
@@ -5960,7 +5958,7 @@ public:
   {
     if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
     {
-      return this->_state._value == o._state._value;
+      return this->_state._value == o._state._value;  // NOLINT
     }
     if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0  //
        && (this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
@@ -6045,7 +6043,7 @@ public:
   {
     if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
     {
-      return this->_state._value != o._state._value;
+      return this->_state._value != o._state._value;  // NOLINT
     }
     if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0  //
        && (this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
@@ -6250,7 +6248,7 @@ namespace hooks
 
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_exception(basic_outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept
   {
-    o->_ptr = static_cast<U &&>(v);
+    o->_ptr = static_cast<U &&>(v);  // NOLINT
     o->_state._status |= detail::status_have_exception;
   }
 }  // namespace hooks
@@ -6304,11 +6302,11 @@ namespace policy
     // VS2017 tries a copy construction in the correct implementation despite that Outcome is always a rvalue or lvalue ref! :(
     basic_outcome<R, S, P, NoValuePolicy> &_self = (basic_outcome<R, S, P, NoValuePolicy> &) (self);  // NOLINT
 #else
-    Outcome _self = static_cast<Outcome>(self);
+    Outcome _self = static_cast<Outcome>(self);  // NOLINT
 #endif
     return static_cast<Outcome>(_self)._ptr;
   }
-}
+}  // namespace policy
 
 namespace detail
 {
@@ -6388,7 +6386,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
-namespace std
+namespace std  // NOLINT
 {
   namespace experimental
   {

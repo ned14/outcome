@@ -39,6 +39,7 @@ namespace detail
   {
     template <class DomainType> inline std::exception_ptr basic_outcome_failure_exception_from_error(const SYSTEM_ERROR2_NAMESPACE::status_code<DomainType> &sc, search_detail_adl /*unused*/)
     {
+      (void) sc;
 #ifdef __cpp_exceptions
       try
       {
@@ -51,8 +52,8 @@ namespace detail
 #endif
       return {};
     }
-  }
-}
+  }  // namespace adl
+}  // namespace detail
 
 //! Namespace for traits
 namespace trait
@@ -130,14 +131,14 @@ namespace experimental
         {
           if(base::_has_exception(static_cast<Impl &&>(self)))
           {
-            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::has_exception_ptr_v<E>>(base::_exception<T, status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self)));
+            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::has_exception_ptr_v<E>>(base::_exception<T, status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self)));  // NOLINT
           }
           if(base::_has_error(static_cast<Impl &&>(self)))
           {
 #ifdef __cpp_exceptions
             base::_error(static_cast<Impl &&>(self)).throw_exception();
 #else
-            OUTCOME_THROW_EXCEPTION(wide_value_check);
+            OUTCOME_THROW_EXCEPTION("wide value check failed");
 #endif
           }
         }

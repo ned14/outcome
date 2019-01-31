@@ -49,14 +49,14 @@ useful to include into your build.
 ## Pre Boost entry todo:
 
  - [x] Raise ABI compliance checker on CI.
- - [ ] Run `clang-tidy --fixes`
+ - [X] Run `clang-tidy --fixes`
  - [X] Fix up the .natvis file, and permanently solve the permuting SHA issue.
  - [X] Fix up the C interface to use `status_code`.
    - [X] Write C macro documentation page
  - [ ] Resurrect the optimisation folding tests (with a better name).
  - [ ] Rerun native overhead benchmark, make new graph.
  - [ ] Get all docs snippets compiling again.
- - [ ] Reduce depth of Boost.Outcome front index.
+ - [X] Reduce depth of Boost.Outcome front index.
  - [ ] Add page to docs on how to customise ASIO's `async_result` to return
 `outcome::result<T>`, maybe under new section "Integrations"
 

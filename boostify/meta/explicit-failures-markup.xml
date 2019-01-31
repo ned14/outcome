@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<explicit-failures-markup>
+<explicit-failures-markup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/boostorg/boost/master/status/explicit-failures.xsd">
     <!-- outcome -->
     <library name="outcome">
         <mark-unusable>
@@ -21,7 +22,25 @@
             <note author="Niall Douglas">Complete C++14 support is the minimum requirement.</note>
         </mark-unusable>
         <mark-expected-failures>
-            <toolset name="gcc-8*"/>
+            <test name="comparison"/>
+            <test name="constexpr"/>
+            <test name="core-result"/>
+            <test name="expected-pass"/>
+            <test name="experimental-core-result-status"/>
+            <test name="hooks"/>
+            <test name="issue0007"/>
+            <test name="issue0009"/>
+            <test name="issue0059"/>
+            <test name="issue0061"/>
+            <test name="propagate"/>
+            <toolset name="gcc-8-c++17"/>
+            <toolset name="gcc-8-c++2a"/>
+            <toolset name="gcc-8-gnu17"/>
+            <toolset name="gcc-8-gnu2a"/>
+            <toolset name="gcc-8-c++2a-O2"/>
+            <toolset name="gcc-8-c++2a-warn"/>
+            <toolset name="gcc-8~c++2a"/>
+            <toolset name="gcc-7~c++1z"/>
             <note author="Niall Douglas">GCC 8 currently ICEs with Outcome's unit tests in C++ 17 or later.</note>
         </mark-expected-failures>
     </library>

@@ -27,7 +27,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "success_failure.hpp"
 
-namespace std
+namespace std  // NOLINT
 {
   namespace experimental
   {

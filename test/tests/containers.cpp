@@ -39,7 +39,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / containers, "Tests that outcome w
   std::vector<outcome<std::vector<int>>> vect;
   vect.push_back(std::vector<int>{5, 6, 7, 8});
   vect.push_back(std::vector<int>{1, 2, 3, 4});
-  BOOST_REQUIRE(vect.size() == 2U);
+  BOOST_REQUIRE(vect.size() == 2U);  // NOLINT
   BOOST_CHECK(vect[0].has_value());
   BOOST_CHECK(vect[1].has_value());
   BOOST_CHECK(vect[0].value().size() == 4U);

@@ -33,6 +33,7 @@ project
     [ run tests/containers.cpp ]
     [ run tests/core-outcome.cpp ]
     [ run tests/core-result.cpp ]
+    [ run tests/default-construction.cpp ]
     [ run tests/experimental-core-outcome-status.cpp ]
     [ run tests/experimental-core-result-status.cpp ]
     [ run tests/experimental-p0709a.cpp ]

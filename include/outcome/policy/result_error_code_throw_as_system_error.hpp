@@ -53,7 +53,7 @@ namespace policy
           // ADL discovered
           outcome_throw_as_system_error_with_payload(base::_error(std::forward<Impl>(self)));
         }
-        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));  // NOLINT
       }
     }
     /*! Performs a wide check of state, used in the error() functions
@@ -63,7 +63,7 @@ namespace policy
     {
       if(!base::_has_error(std::forward<Impl>(self)))
       {
-        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));
+        OUTCOME_THROW_EXCEPTION(bad_result_access("no error"));  // NOLINT
       }
     }
   };

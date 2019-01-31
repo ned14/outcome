@@ -40,6 +40,9 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 140 / result, "Construction of non copy co
     NotCopyMoveConstructible() = default;
     NotCopyMoveConstructible(const NotCopyMoveConstructible &o) = delete;
     NotCopyMoveConstructible(NotCopyMoveConstructible &&) = delete;
+    NotCopyMoveConstructible &operator=(const NotCopyMoveConstructible &) = delete;
+    NotCopyMoveConstructible &operator=(NotCopyMoveConstructible &&) = delete;
+    ~NotCopyMoveConstructible() = default;
   };
   struct NotMoveConstructible
   {
@@ -50,6 +53,9 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 140 / result, "Construction of non copy co
     {
     }
     NotMoveConstructible(NotMoveConstructible &&) = delete;
+    NotMoveConstructible &operator=(const NotMoveConstructible &) = delete;
+    NotMoveConstructible &operator=(NotMoveConstructible &&) = delete;
+    ~NotMoveConstructible() = default;
   };
   struct NotCopyConstructible
   {
@@ -57,6 +63,9 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 140 / result, "Construction of non copy co
     NotCopyConstructible() = default;
     NotCopyConstructible(NotCopyConstructible && /*unused*/) noexcept : v(op::moved) {}
     NotCopyConstructible(const NotCopyConstructible & /*unused*/) = delete;
+    NotCopyConstructible &operator=(const NotCopyConstructible &) = delete;
+    NotCopyConstructible &operator=(NotCopyConstructible &&) = delete;
+    ~NotCopyConstructible() = default;
   };
 
   // Uncopyable and immovable items should be neither copyable nor moveable

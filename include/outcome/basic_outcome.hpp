@@ -276,12 +276,10 @@ protected:
     using base = detail::outcome_predicates<value_type, error_type, exception_type>;
 
     // Predicate for any constructors to be available at all
-    static constexpr bool constructors_enabled = (!std::is_same<std::decay_t<value_type>, std::decay_t<error_type>>::value          //
-                                                  && !std::is_same<std::decay_t<value_type>, std::decay_t<exception_type>>::value   //
-                                                  && !std::is_same<std::decay_t<error_type>, std::decay_t<exception_type>>::value)  //
-                                                 || (std::is_void<value_type>::value && std::is_void<error_type>::value)            //
-                                                 || (std::is_void<value_type>::value && std::is_void<exception_type>::value)        //
-                                                 || (std::is_void<error_type>::value && std::is_void<exception_type>::value);
+    static constexpr bool constructors_enabled = (!std::is_same<std::decay_t<value_type>, std::decay_t<error_type>>::value || (std::is_void<value_type>::value && std::is_void<error_type>::value))             //
+                                                 && (!std::is_same<std::decay_t<value_type>, std::decay_t<exception_type>>::value || (std::is_void<value_type>::value && std::is_void<exception_type>::value))  //
+                                                 && (!std::is_same<std::decay_t<error_type>, std::decay_t<exception_type>>::value || (std::is_void<error_type>::value && std::is_void<exception_type>::value))  //
+    ;
 
     // Predicate for implicit constructors to be available at all
     static constexpr bool implicit_constructors_enabled = constructors_enabled && base::implicit_constructors_enabled;
@@ -942,7 +940,7 @@ public:
   {
     if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
     {
-      return this->_state._value == o._state._value;
+      return this->_state._value == o._state._value;  // NOLINT
     }
     if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0  //
        && (this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
@@ -1010,7 +1008,7 @@ public:
   {
     if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
     {
-      return this->_state._value != o._state._value;
+      return this->_state._value != o._state._value;  // NOLINT
     }
     if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0  //
        && (this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
@@ -1194,7 +1192,7 @@ namespace hooks
   */
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_exception(basic_outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept
   {
-    o->_ptr = static_cast<U &&>(v);
+    o->_ptr = static_cast<U &&>(v);  // NOLINT
     o->_state._status |= detail::status_have_exception;
   }
 }  // namespace hooks

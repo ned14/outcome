@@ -72,10 +72,10 @@ namespace policy
 
   //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
   // inline void outcome_throw_as_system_error_with_payload(...) = delete;  // To use the error_code_throw_as_system_error policy with a custom Error type, you must define a outcome_throw_as_system_error_with_payload() free function to say how to handle the payload
-  inline void outcome_throw_as_system_error_with_payload(const std::error_code &error) { OUTCOME_THROW_EXCEPTION(std::system_error(error)); }
+  inline void outcome_throw_as_system_error_with_payload(const std::error_code &error) { OUTCOME_THROW_EXCEPTION(std::system_error(error)); }  // NOLINT
   OUTCOME_TEMPLATE(class Error)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_code_enum<std::decay_t<Error>>::value || std::is_error_condition_enum<std::decay_t<Error>>::value))
-  inline void outcome_throw_as_system_error_with_payload(Error &&error, detail::std_enum_overload_tag = detail::std_enum_overload_tag()) { OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(error))); }
+  inline void outcome_throw_as_system_error_with_payload(Error &&error, detail::std_enum_overload_tag /*unused*/ = detail::std_enum_overload_tag()) { OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(error))); }  // NOLINT
 }  // namespace policy
 
 //! Namespace for traits

@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
 http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef OUTCOME_STATUS_OUTCOME_HPP
-#define OUTCOME_STATUS_OUTCOME_HPP
+#ifndef OUTCOME_EXPERIMENTAL_STATUS_OUTCOME_HPP
+#define OUTCOME_EXPERIMENTAL_STATUS_OUTCOME_HPP
 /* A less simple result type
 (C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: June 2017
@@ -51,7 +51,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef OUTCOME_BASIC_OUTCOME_HPP
 #define OUTCOME_BASIC_OUTCOME_HPP
 /* Configure Outcome with QuickCppLib
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2018 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: August 2015
 
 
@@ -1167,9 +1167,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF f1923a45184bf6497b3d825da7fde0aebd0ad9f7
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-01-26 15:35:36 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f1923a45
+#define OUTCOME_PREVIOUS_COMMIT_REF c11e7968e008ee45df2b83984a558c2a5c4361b4
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-01-29 22:54:59 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c11e7968
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1688,7 +1688,7 @@ namespace detail
   }
 }  // namespace detail
 OUTCOME_V2_NAMESPACE_END
-#define OUTCOME_THROW_EXCEPTION(expr) OUTCOME_V2_NAMESPACE::detail::do_fatal_exit(#expr)
+#define OUTCOME_THROW_EXCEPTION(expr) OUTCOME_V2_NAMESPACE::detail::do_fatal_exit(#expr), (void) (expr)
 
 #endif
 #endif
@@ -1842,7 +1842,7 @@ public:
   OUTCOME_TEMPLATE(class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<success_type, std::decay_t<U>>::value))
   constexpr explicit success_type(U &&v)
-      : _value(static_cast<U &&>(v))
+      : _value(static_cast<U &&>(v))  // NOLINT
   {
   }
 
@@ -1894,7 +1894,7 @@ template <class EC, class E = void> struct failure_type
   using exception_type = E;
 
 private:
-  bool _have_error, _have_exception;
+  bool _have_error{}, _have_exception{};
   //! The error code
   error_type _error;
   //! The exception
@@ -1936,7 +1936,6 @@ public:
   template <class U>
   constexpr explicit failure_type(in_place_type_t<error_type> /*unused*/, U &&u, error_init_tag /*unused*/ = error_init_tag())
       : _have_error(true)
-      , _have_exception(false)
       , _error(static_cast<U &&>(u))
       , _exception()
   {
@@ -1946,8 +1945,7 @@ public:
 
   template <class U>
   constexpr explicit failure_type(in_place_type_t<exception_type> /*unused*/, U &&u, exception_init_tag /*unused*/ = exception_init_tag())
-      : _have_error(false)
-      , _have_exception(true)
+      : _have_exception(true)
       , _error()
       , _exception(static_cast<U &&>(u))
   {
@@ -2026,7 +2024,7 @@ public:
   OUTCOME_TEMPLATE(class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<U>>::value))
   constexpr explicit failure_type(U &&u)
-      : _error(static_cast<U &&>(u))
+      : _error(static_cast<U &&>(u))  // NOLINT
   {
   }
 
@@ -2083,7 +2081,7 @@ public:
   OUTCOME_TEMPLATE(class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<V>>::value))
   constexpr explicit failure_type(V &&v)
-      : _exception(static_cast<V &&>(v))
+      : _exception(static_cast<V &&>(v))  // NOLINT
   {
   }
 
@@ -3225,7 +3223,7 @@ namespace detail
     {
       if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
       {
-        return this->_state._value == o._state._value;
+        return this->_state._value == o._state._value;  // NOLINT
       }
       if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0)
       {
@@ -3542,7 +3540,7 @@ namespace policy
 #endif
     void _ub(Impl && /*unused*/)
     {
-      assert(false);
+      assert(false);  // NOLINT
 #if defined(__GNUC__) || defined(__clang__)
       __builtin_unreachable();
 #endif
@@ -4747,7 +4745,7 @@ namespace detail
   // VS2017 with /permissive- chokes on the correct form due to over eager early instantiation.
   template <class S, class P> inline void basic_outcome_failure_exception_from_error(...) { static_assert(sizeof(S) == 0, "No specialisation for these error and exception types available!"); }
 #else
-  template <class S, class P> inline void basic_outcome_failure_exception_from_error(...) = delete;  // No specialisation for these error and exception types available!
+  template <class S, class P> inline void basic_outcome_failure_exception_from_error(...) = delete;  // NOLINT No specialisation for these error and exception types available!
 #endif
 
   //! The failure observers implementation of `basic_outcome<R, S, P>`.
@@ -5986,7 +5984,7 @@ public:
   {
     if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
     {
-      return this->_state._value == o._state._value;
+      return this->_state._value == o._state._value;  // NOLINT
     }
     if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0  //
        && (this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
@@ -6071,7 +6069,7 @@ public:
   {
     if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
     {
-      return this->_state._value != o._state._value;
+      return this->_state._value != o._state._value;  // NOLINT
     }
     if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0  //
        && (this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
@@ -6276,7 +6274,7 @@ namespace hooks
 
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_exception(basic_outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept
   {
-    o->_ptr = static_cast<U &&>(v);
+    o->_ptr = static_cast<U &&>(v);  // NOLINT
     o->_state._status |= detail::status_have_exception;
   }
 }  // namespace hooks
@@ -6330,11 +6328,11 @@ namespace policy
     // VS2017 tries a copy construction in the correct implementation despite that Outcome is always a rvalue or lvalue ref! :(
     basic_outcome<R, S, P, NoValuePolicy> &_self = (basic_outcome<R, S, P, NoValuePolicy> &) (self);  // NOLINT
 #else
-    Outcome _self = static_cast<Outcome>(self);
+    Outcome _self = static_cast<Outcome>(self);  // NOLINT
 #endif
     return static_cast<Outcome>(_self)._ptr;
   }
-}
+}  // namespace policy
 
 namespace detail
 {
@@ -6459,10 +6457,10 @@ namespace policy
 
   //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
   // inline void outcome_throw_as_system_error_with_payload(...) = delete;  // To use the error_code_throw_as_system_error policy with a custom Error type, you must define a outcome_throw_as_system_error_with_payload() free function to say how to handle the payload
-  inline void outcome_throw_as_system_error_with_payload(const std::error_code &error) { OUTCOME_THROW_EXCEPTION(std::system_error(error)); }
+  inline void outcome_throw_as_system_error_with_payload(const std::error_code &error) { OUTCOME_THROW_EXCEPTION(std::system_error(error)); }  // NOLINT
   OUTCOME_TEMPLATE(class Error)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_code_enum<std::decay_t<Error>>::value || std::is_error_condition_enum<std::decay_t<Error>>::value))
-  inline void outcome_throw_as_system_error_with_payload(Error &&error, detail::std_enum_overload_tag = detail::std_enum_overload_tag()) { OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(error))); }
+  inline void outcome_throw_as_system_error_with_payload(Error &&error, detail::std_enum_overload_tag /*unused*/ = detail::std_enum_overload_tag()) { OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(error))); }  // NOLINT
 }  // namespace policy
 
 //! Namespace for traits
@@ -6666,8 +6664,8 @@ Distributed under the Boost Software License, Version 1.0.
 http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef OUTCOME_STATUS_RESULT_HPP
-#define OUTCOME_STATUS_RESULT_HPP
+#ifndef OUTCOME_EXPERIMENTAL_STATUS_RESULT_HPP
+#define OUTCOME_EXPERIMENTAL_STATUS_RESULT_HPP
 /* Policies for result and outcome
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: Sep 2018
@@ -7146,7 +7144,11 @@ namespace detail
     static_assert(alignof(ErasedType) <= sizeof(ErasedType), "ErasedType must not be over-aligned");
     ErasedType value;
     char padding[N];
-    constexpr padded_erasure_object(const ErasedType &v) noexcept : value(v), padding{} {}
+    constexpr explicit padded_erasure_object(const ErasedType &v) noexcept
+        : value(v)
+        , padding{}
+    {
+    }
   };
 
   template <class To, class From, typename std::enable_if<is_erasure_castable<To, From>::value && (sizeof(To) == sizeof(From)), bool>::type = true> constexpr To erasure_cast(const From &from) noexcept { return bit_cast<To>(from); }
@@ -7164,7 +7166,7 @@ namespace detail
   {
     return bit_cast<To>(padded_erasure_object<From, sizeof(To) - sizeof(From)>{from});
   }
-}
+}  // namespace detail
 SYSTEM_ERROR2_NAMESPACE_END
 
 #ifndef SYSTEM_ERROR2_FATAL
@@ -7287,8 +7289,8 @@ public:
     {
       (void) dest;
       (void) src;
-      assert(dest->_thunk == _checking_string_thunk);
-      assert(src == nullptr || src->_thunk == _checking_string_thunk);
+      assert(dest->_thunk == _checking_string_thunk);  // NOLINT
+      assert(src == nullptr || src->_thunk == _checking_string_thunk);  // NOLINT
       // do nothing
     }
 
@@ -7417,11 +7419,11 @@ public:
 
     static void _refcounted_string_thunk(string_ref *_dest, const string_ref *_src, _thunk_op op) noexcept
     {
-      auto dest = static_cast<atomic_refcounted_string_ref *>(_dest);
-      auto src = static_cast<const atomic_refcounted_string_ref *>(_src);
+      auto dest = static_cast<atomic_refcounted_string_ref *>(_dest);  // NOLINT
+      auto src = static_cast<const atomic_refcounted_string_ref *>(_src);  // NOLINT
       (void) src;
-      assert(dest->_thunk == _refcounted_string_thunk);
-      assert(src == nullptr || src->_thunk == _refcounted_string_thunk);
+      assert(dest->_thunk == _refcounted_string_thunk);  // NOLINT
+      assert(src == nullptr || src->_thunk == _refcounted_string_thunk);  // NOLINT
       switch(op)
       {
       case _thunk_op::copy:
@@ -7430,14 +7432,14 @@ public:
         {
           auto count = dest->_msg()->count.fetch_add(1, std::memory_order_relaxed);
           (void) count;
-          assert(count != 0);
+          assert(count != 0);  // NOLINT
         }
         return;
       }
       case _thunk_op::move:
       {
-        assert(src);
-        auto msrc = const_cast<atomic_refcounted_string_ref *>(src);
+        assert(src);  // NOLINT
+        auto msrc = const_cast<atomic_refcounted_string_ref *>(src);  // NOLINT
         msrc->_begin = msrc->_end = nullptr;
         msrc->_state[0] = msrc->_state[1] = msrc->_state[2] = nullptr;
         return;
@@ -7451,7 +7453,7 @@ public:
           {
             std::atomic_thread_fence(std::memory_order_acquire);
             free((void *) dest->_begin);  // NOLINT
-            delete dest->_msg();
+            delete dest->_msg();  // NOLINT
           }
         }
       }
@@ -7523,12 +7525,12 @@ protected:
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const = 0;
 #else
   // Keep a vtable slot for binary compatibility
-  SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const { abort(); }
+  SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> & /*code*/) const { abort(); }
 #endif
   // For a `status_code<erased<T>>` only, copy from `src` to `dst`. Default implementation uses `memcpy()`.
-  virtual void _do_erased_copy(status_code<void> &dst, const status_code<void> &src, size_t bytes) const { memcpy(&dst, &src, bytes); }
+  virtual void _do_erased_copy(status_code<void> &dst, const status_code<void> &src, size_t bytes) const { memcpy(&dst, &src, bytes); }  // NOLINT
   // For a `status_code<erased<T>>` only, destroy the erased value type. Default implementation does nothing.
-  virtual void _do_erased_destroy(status_code<void> &code, size_t bytes) const noexcept
+  virtual void _do_erased_destroy(status_code<void> &code, size_t bytes) const noexcept  // NOLINT
   {
     (void) code;
     (void) bytes;
@@ -7620,7 +7622,7 @@ namespace detail
     {
       using type = T<Ts...>;
     };
-  };
+  }  // namespace impl
   template <template <class...> class T, class... Ts> using test_apply = impl::test_apply<T, impl::types<Ts...>>;
 
   template <class T, class... Args> using get_make_status_code_result = decltype(make_status_code(std::declval<T>(), std::declval<Args>()...));
@@ -7694,10 +7696,14 @@ public:
   template <class T> bool strictly_equivalent(const status_code<T> &o) const noexcept
   {
     if(_domain && o._domain)
+    {
       return _domain->_do_equivalent(*this, o);
+    }
     // If we are both empty, we are equivalent
     if(!_domain && !o._domain)
-      return true;
+    {
+      return true;  // NOLINT
+    }
     // Otherwise not equivalent
     return false;
   }
@@ -7793,7 +7799,7 @@ namespace detail
     {
     }
   };
-}
+}  // namespace detail
 
 /*! A lightweight, typed, status code reflecting empty, success, or failure.
 This is the main workhorse of the system_error2 library. Its characteristics reflect the value type
@@ -7968,13 +7974,15 @@ public:
                                     && std::is_trivially_copyable<typename DomainType::value_type>::value  //
                                     && detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value,
                                     bool>::type = true>
-  constexpr status_code(const status_code<DomainType> &v) noexcept : _base(typename _base::_value_type_constructor{}, &v.domain(), detail::erasure_cast<value_type>(v.value()))
+  constexpr status_code(const status_code<DomainType> &v) noexcept  // NOLINT
+      : _base(typename _base::_value_type_constructor{}, &v.domain(), detail::erasure_cast<value_type>(v.value()))
   {
   }
   //! Implicit move construction from any other status code if its value type is trivially copyable or move relocating and it would fit into our storage
   template <class DomainType,  //
             typename std::enable_if<detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value, bool>::type = true>
-  SYSTEM_ERROR2_CONSTEXPR14 status_code(status_code<DomainType> &&v) noexcept : _base(typename _base::_value_type_constructor{}, &v.domain(), detail::erasure_cast<value_type>(v.value()))
+  SYSTEM_ERROR2_CONSTEXPR14 status_code(status_code<DomainType> &&v) noexcept  // NOLINT
+      : _base(typename _base::_value_type_constructor{}, &v.domain(), detail::erasure_cast<value_type>(v.value()))
   {
     v._domain = nullptr;
   }
@@ -8033,7 +8041,7 @@ protected:
   //! Move assignment. Not publicly available
   status_error &operator=(status_error &&) = default;
   //! Destructor. Not publicly available.
-  ~status_error() = default;
+  ~status_error() override = default;
 
 public:
   //! The type of the status domain
@@ -8172,7 +8180,7 @@ namespace detail
   struct generic_code_messages
   {
     const char *msgs[256];
-    SYSTEM_ERROR2_CONSTEXPR14 size_t size() const { return sizeof(msgs) / sizeof(*msgs); }
+    SYSTEM_ERROR2_CONSTEXPR14 size_t size() const { return sizeof(msgs) / sizeof(*msgs); }  // NOLINT
     SYSTEM_ERROR2_CONSTEXPR14 const char *operator[](int i) const { return (i < 0 || i >= static_cast<int>(size()) || nullptr == msgs[i]) ? "unknown" : msgs[i]; }  // NOLINT
     SYSTEM_ERROR2_CONSTEXPR14 generic_code_messages()
         : msgs{}
@@ -8289,12 +8297,12 @@ public:
 protected:
   virtual bool _do_failure(const status_code<void> &code) const noexcept override  // NOLINT
   {
-    assert(code.domain() == *this);
+    assert(code.domain() == *this);  // NOLINT
     return static_cast<const generic_code &>(code).value() != errc::success;  // NOLINT
   }
   virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override  // NOLINT
   {
-    assert(code1.domain() == *this);
+    assert(code1.domain() == *this);  // NOLINT
     const auto &c1 = static_cast<const generic_code &>(code1);  // NOLINT
     if(code2.domain() == *this)
     {
@@ -8305,12 +8313,12 @@ protected:
   }
   virtual generic_code _generic_code(const status_code<void> &code) const noexcept override  // NOLINT
   {
-    assert(code.domain() == *this);
+    assert(code.domain() == *this);  // NOLINT
     return static_cast<const generic_code &>(code);  // NOLINT
   }
   virtual _base::string_ref _do_message(const status_code<void> &code) const noexcept override  // NOLINT
   {
-    assert(code.domain() == *this);
+    assert(code.domain() == *this);  // NOLINT
     const auto &c = static_cast<const generic_code &>(code);  // NOLINT
     static SYSTEM_ERROR2_CONSTEXPR14 detail::generic_code_messages msgs;
     return string_ref(msgs[static_cast<int>(c.value())]);
@@ -8318,7 +8326,7 @@ protected:
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override  // NOLINT
   {
-    assert(code.domain() == *this);
+    assert(code.domain() == *this);  // NOLINT
     const auto &c = static_cast<const generic_code &>(code);  // NOLINT
     throw status_error<_generic_code_domain>(c);
   }
@@ -8462,9 +8470,9 @@ namespace detail
 
     constexpr indirecting_domain() noexcept : _base(0xc44f7bdeb2cc50e9 ^ typename StatusCode::domain_type().id() /* unique-ish based on domain's unique id */) {}
     indirecting_domain(const indirecting_domain &) = default;
-    indirecting_domain(indirecting_domain &&) = default;
+    indirecting_domain(indirecting_domain &&) = default;  // NOLINT
     indirecting_domain &operator=(const indirecting_domain &) = default;
-    indirecting_domain &operator=(indirecting_domain &&) = default;
+    indirecting_domain &operator=(indirecting_domain &&) = default;  // NOLINT
     ~indirecting_domain() = default;
 
 #if __cplusplus < 201402 && !defined(_MSC_VER)
@@ -8525,7 +8533,7 @@ namespace detail
     {
       assert(code.domain() == *this);
       auto &c = static_cast<_mycode &>(code);  // NOLINT
-      delete c.value();
+      delete c.value();  // NOLINT
     }
   };
 #if __cplusplus >= 201402 || defined(_MSC_VER)
@@ -8585,11 +8593,11 @@ public:
   //! Copy constructor.
   errored_status_code(const errored_status_code &) = default;
   //! Move constructor.
-  errored_status_code(errored_status_code &&) = default;
+  errored_status_code(errored_status_code &&) = default;  // NOLINT
   //! Copy assignment.
   errored_status_code &operator=(const errored_status_code &) = default;
   //! Move assignment.
-  errored_status_code &operator=(errored_status_code &&) = default;
+  errored_status_code &operator=(errored_status_code &&) = default;  // NOLINT
   ~errored_status_code() = default;
 
   //! Explicitly construct from any similarly erased status code
@@ -8657,7 +8665,7 @@ public:
   explicit errored_status_code(const status_code<erased<ErasedType>> &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
       : errored_status_code(detail::erasure_cast<value_type>(v.value()))  // NOLINT
   {
-    assert(v.domain() == this->domain());
+    assert(v.domain() == this->domain());  // NOLINT
     _check();
   }
 
@@ -8846,7 +8854,7 @@ namespace detail
   {
     static constexpr bool value = true;
   };
-}
+}  // namespace detail
 
 //! Trait returning true if the type is an errored status code.
 template <class T> struct is_errored_status_code
@@ -8937,22 +8945,22 @@ class _posix_code_domain : public status_code_domain
 #ifdef _WIN32
     strerror_s(buffer, sizeof(buffer), c);
 #elif defined(__linux__)
-    char *s = strerror_r(c, buffer, sizeof(buffer));
+    char *s = strerror_r(c, buffer, sizeof(buffer));  // NOLINT
     if(s != nullptr)
     {
-      strncpy(buffer, s, sizeof(buffer));
+      strncpy(buffer, s, sizeof(buffer));  // NOLINT
       buffer[1023] = 0;
     }
 #else
     strerror_r(c, buffer, sizeof(buffer));
 #endif
-    size_t length = strlen(buffer);
+    size_t length = strlen(buffer);  // NOLINT
     auto *p = static_cast<char *>(malloc(length + 1));  // NOLINT
     if(p == nullptr)
     {
       return _base::string_ref("failed to get message from system");
     }
-    memcpy(p, buffer, length + 1);
+    memcpy(p, buffer, length + 1);  // NOLINT
     return _base::atomic_refcounted_string_ref(p, length);
   }
 
@@ -8976,12 +8984,12 @@ public:
 protected:
   virtual bool _do_failure(const status_code<void> &code) const noexcept override  // NOLINT
   {
-    assert(code.domain() == *this);
+    assert(code.domain() == *this);  // NOLINT
     return static_cast<const posix_code &>(code).value() != 0;  // NOLINT
   }
   virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override  // NOLINT
   {
-    assert(code1.domain() == *this);
+    assert(code1.domain() == *this);  // NOLINT
     const auto &c1 = static_cast<const posix_code &>(code1);  // NOLINT
     if(code2.domain() == *this)
     {
@@ -9000,20 +9008,20 @@ protected:
   }
   virtual generic_code _generic_code(const status_code<void> &code) const noexcept override  // NOLINT
   {
-    assert(code.domain() == *this);
+    assert(code.domain() == *this);  // NOLINT
     const auto &c = static_cast<const posix_code &>(code);  // NOLINT
     return generic_code(static_cast<errc>(c.value()));
   }
   virtual string_ref _do_message(const status_code<void> &code) const noexcept override  // NOLINT
   {
-    assert(code.domain() == *this);
+    assert(code.domain() == *this);  // NOLINT
     const auto &c = static_cast<const posix_code &>(code);  // NOLINT
     return _make_string_ref(c.value());
   }
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override  // NOLINT
   {
-    assert(code.domain() == *this);
+    assert(code.domain() == *this);  // NOLINT
     const auto &c = static_cast<const posix_code &>(code);  // NOLINT
     throw status_error<_posix_code_domain>(c);
   }
@@ -10714,7 +10722,7 @@ namespace experimental
 #ifdef __cpp_exceptions
             base::_error(static_cast<Impl &&>(self)).throw_exception();
 #else
-            OUTCOME_THROW_EXCEPTION(wide_value_check);
+            OUTCOME_THROW_EXCEPTION("wide value check failed");
 #endif
           }
         }
@@ -10770,6 +10778,7 @@ namespace detail
   {
     template <class DomainType> inline std::exception_ptr basic_outcome_failure_exception_from_error(const SYSTEM_ERROR2_NAMESPACE::status_code<DomainType> &sc, search_detail_adl /*unused*/)
     {
+      (void) sc;
 #ifdef __cpp_exceptions
       try
       {
@@ -10782,8 +10791,8 @@ namespace detail
 #endif
       return {};
     }
-  }
-}
+  }  // namespace adl
+}  // namespace detail
 
 //! Namespace for traits
 namespace trait
@@ -10867,14 +10876,14 @@ namespace experimental
         {
           if(base::_has_exception(static_cast<Impl &&>(self)))
           {
-            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::has_exception_ptr_v<E>>(base::_exception<T, status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self)));
+            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::has_exception_ptr_v<E>>(base::_exception<T, status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self)));  // NOLINT
           }
           if(base::_has_error(static_cast<Impl &&>(self)))
           {
 #ifdef __cpp_exceptions
             base::_error(static_cast<Impl &&>(self)).throw_exception();
 #else
-            OUTCOME_THROW_EXCEPTION(wide_value_check);
+            OUTCOME_THROW_EXCEPTION("wide value check failed");
 #endif
           }
         }
@@ -10933,7 +10942,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 
 
-namespace std
+namespace std  // NOLINT
 {
   namespace experimental
   {
