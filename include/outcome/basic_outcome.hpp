@@ -350,7 +350,8 @@ protected:
     // Predicate for the implicit converting inplace constructor to be available.
     template <class... Args>
     static constexpr bool enable_inplace_value_error_exception_constructor =  //
-    base::template enable_inplace_value_error_exception_constructor<Args...>;
+    constructors_enabled                                                      //
+    &&base::template enable_inplace_value_error_exception_constructor<Args...>;
     template <class... Args> using choose_inplace_value_error_exception_constructor = typename base::template choose_inplace_value_error_exception_constructor<Args...>;
   };
 

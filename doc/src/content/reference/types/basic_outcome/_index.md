@@ -72,39 +72,65 @@ an exception perhaps carrying a custom payload.
     2. Decayed `value_type` and decayed `exception_type` are not the same type, or both are `void`.
     3. Decayed `error_type` and decayed `exception_type` are not the same type, or both are `void`.
 
----
-
-
 - `predicate::implicit_constructors_enabled` is constexpr boolean true if:
     1. `predicate::constructors_enabled` is true.
     2. Trait {{% api "is_error_type<E>" %}} is not true for both decayed `value_type` and decayed `error_type` at the same time.
     3. `value_type` is not implicitly constructible from `error_type` and `error_type` is not implicitly constructible from `value_type`.<br>OR<br>trait {{% api "is_error_type<E>" %}} is true for decayed `error_type` and `error_type` is not implicitly constructible from `value_type` and `value_type` is an integral type.
+    4. `value_type` is not implicitly constructible from `exception_type`.
+    5. `error_type` is not implicitly constructible from `exception_type`.
+    6. `exception_type` is not implicitly constructible from `value_type`.
+    7. `exception_type` is not implicitly constructible from `error_type`.
 
-- `predicate::enable_value_converting_constructor<R>` is constexpr boolean true if:
+- `predicate::enable_value_converting_constructor<A>` is constexpr boolean true if:
     1. `predicate::constructors_enabled` is true.
-    2. Decayed `R` is not this `basic_result` type.
-    3. Decayed `R` is not an `in_place_type_t`.
-    4. Trait {{% api "is_error_type_enum<E, Enum>" %}} is false for `error_type` and decayed `R`.
-    5. `value_type` is implicitly constructible from `R` and `error_type` is not implicitly constructible from `R`.<br>OR<br>`value_type` is the exact same type as decayed `R` and `value_type` is implicitly constructible from `R`.
+    2. Decayed `A` is not this `basic_outcome` type.
+    3. `predicate::implicit_constructors_enabled` is true.
+    4. Decayed `A` is not an `in_place_type_t`.
+    5. Trait {{% api "is_error_type_enum<E, Enum>" %}} is false for `error_type` and decayed `A`.
+    6. `value_type` is implicitly constructible from `A` and `error_type` is not implicitly constructible from `A`.<br>OR<br>`value_type` is the exact same type as decayed `A` and `value_type` is implicitly constructible from `A`.
+    7. `exception_type` is not implicitly constructible from `A`.
 
-- `predicate::enable_error_converting_constructor<R>` is constexpr boolean true if:
+- `predicate::enable_error_converting_constructor<A>` is constexpr boolean true if:
     1. `predicate::constructors_enabled` is true.
-    2. Decayed `R` is not this `basic_result` type.
-    3. Decayed `R` is not an `in_place_type_t`.
-    4. Trait {{% api "is_error_type_enum<E, Enum>" %}} is false for `error_type` and decayed `R`.
-    5. `value_type` is not implicitly constructible from `R` and `error_type` is implicitly constructible from `R`.<br>OR<br>`error_type` is the exact same type as decayed `R` and `error_type` is implicitly constructible from `R`.
+    2. Decayed `A` is not this `basic_outcome` type.
+    3. `predicate::implicit_constructors_enabled` is true.
+    4. Decayed `A` is not an `in_place_type_t`.
+    5. Trait {{% api "is_error_type_enum<E, Enum>" %}} is false for `error_type` and decayed `A`.
+    6. `value_type` is not implicitly constructible from `A` and `error_type` is implicitly constructible from `A`.<br>OR<br>`error_type` is the exact same type as decayed `A` and `error_type` is implicitly constructible from `A`.
+    7. `exception_type` is not implicitly constructible from `A`.
 
 - `predicate::enable_error_condition_converting_constructor<ErrorCondEnum>` is constexpr boolean true if:
     1. `predicate::constructors_enabled` is true.
-    2. Decayed `ErrorCondEnum` is not this `basic_result` type.
+    2. Decayed `ErrorCondEnum` is not this `basic_outcome` type.
     3. Decayed `ErrorCondEnum` is not an `in_place_type_t`.
     4. Trait {{% api "is_error_type_enum<E, Enum>" %}} is true for `error_type` and decayed `ErrorCondEnum`.
+    5. `exception_type` is not implicitly constructible from `ErrorCondEnum`.
 
-- `predicate::enable_compatible_conversion<R, S, P>` is constexpr boolean true if:
+- `predicate::enable_exception_converting_constructor<A>` is constexpr boolean true if:
     1. `predicate::constructors_enabled` is true.
-    2. `basic_result<R, S, P>` is not this `basic_result` type.
-    3. `R` is `void` OR `value_type` is explicitly constructible from `R`.
-    4. `S` is `void` OR `error_type` is explicitly constructible from `S`.
+    2. Decayed `A` is not this `basic_outcome` type.
+    3. `predicate::implicit_constructors_enabled` is true.
+    4. Decayed `A` is not an `in_place_type_t`.
+    5. `value_type` is not implicitly constructible from `A`.
+    6. `error_type` is not implicitly constructible from `A`.
+    7. `exception_type` is implicitly constructible from `A`.
+
+- `predicate::enable_error_exception_converting_constructor<A, B>` is constexpr boolean true if:
+    1. `predicate::constructors_enabled` is true.
+    2. Decayed `A` is not this `basic_outcome` type.
+    3. `predicate::implicit_constructors_enabled` is true.
+    4. Decayed `A` is not an `in_place_type_t`.
+    5. `value_type` is not implicitly constructible from `A`.
+    6. `error_type` is implicitly constructible from `A`.
+    7. `value_type` is not implicitly constructible from `B`.
+    8. `exception_type` is implicitly constructible from `B`.
+
+- `predicate::enable_compatible_conversion<A, B, C, D>` is constexpr boolean true if:
+    1. `predicate::constructors_enabled` is true.
+    2. `basic_outcome<A, B, C, D>` is not this `basic_outcome` type.
+    3. `A` is `void` OR `value_type` is explicitly constructible from `A`.
+    4. `B` is `void` OR `error_type` is explicitly constructible from `B`.
+    4. `C` is `void` OR `exception_type` is explicitly constructible from `C`.
 
 - `predicate::enable_inplace_value_constructor<Args...>` is constexpr boolean true if:
     1. `predicate::constructors_enabled` is true.
@@ -114,36 +140,43 @@ an exception perhaps carrying a custom payload.
     1. `predicate::constructors_enabled` is true.
     2. `error_type` is `void` OR `error_type` is explicitly constructible from `Args...`.
 
-- `predicate::enable_inplace_value_error_constructor<Args...>` is constexpr boolean true if:
+- `predicate::enable_inplace_exception_constructor<Args...>` is constexpr boolean true if:
     1. `predicate::constructors_enabled` is true.
-    2. Either, but not both, of `value_type` is explicitly constructible from `Args...` or `error_type` is explicitly constructible from `Args...`.
+    2. `exception_type` is `void` OR `exception_type` is explicitly constructible from `Args...`.
+
+- `predicate::enable_inplace_value_error_exception_constructor<Args...>` is constexpr boolean true if:
+    1. `predicate::constructors_enabled` is true.
+    2. `predicate::implicit_constructors_enabled` is true.
+    3. Exactly one of `value_type` is explicitly constructible from `Args...`, or `error_type` is explicitly constructible from `Args...`, or `exception_type` is explicitly constructible
+    from `Args...`.
 
 #### Summary of [standard requirements provided](https://en.cppreference.com/w/cpp/named_req)
 
-- ~~`DefaultConstructible`~~, always deleted to force user to choose valued or errored for every result instanced.
-- `MoveConstructible`, if both `value_type` and `error_type` implement move constructors.
-- `CopyConstructible`, if both `value_type` and `error_type` implement copy constructors.
-- `MoveAssignable`, if both `value_type` and `error_type` implement move constructors and move assignment.
-- `CopyAssignable`, if both `value_type` and `error_type` implement copy constructors and copy assignment.
-- `Destructible`
-- `TriviallyCopyable`, if both `value_type` and `error_type` are trivially copyable.
-- `TrivialType`, if both `value_type` and `error_type` are trivial types.
-- `LiteralType`, if both `value_type` and `error_type` are literal types.
-- `StandardLayoutType`, if both `value_type` and `error_type` are standard layout types. If so, layout of `basic_result` in C is guaranteed to be:
+- ~~`DefaultConstructible`~~, always deleted to force user to choose valued or errored or excepted for every outcome instanced.
+- `MoveConstructible`, if all of `value_type`, `error_type` and `exception_type` implement move constructors.
+- `CopyConstructible`, if all of `value_type`, `error_type` and `exception_type` implement copy constructors.
+- `MoveAssignable`, if all of `value_type`, `error_type` and `exception_type` implement move constructors and move assignment.
+- `CopyAssignable`, if all of `value_type`, `error_type` and `exception_type` implement copy constructors and copy assignment.
+- `Destructible`.
+- `TriviallyCopyable`, if all of `value_type`, `error_type` and `exception_type` are trivially copyable.
+- `TrivialType`, if all of `value_type`, `error_type` and `exception_type` are trivial types.
+- `LiteralType`, if all of `value_type`, `error_type` and `exception_type` are literal types.
+- `StandardLayoutType`, if all of `value_type`, `error_type` and `exception_type` are standard layout types. If so, layout of `basic_outcome` in C is guaranteed to be:
 
     ```c++
-    struct result_layout {
+    struct outcome_layout {
       value_type value;
       unsigned int flags;
       error_type error;
+      exception_type exception;
     };
     ```
-- `EqualityComparable`, if both `value_type` and `error_type` implement equality comparisons with one another.
-- ~~`LessThanComparable`~~, not implemented due to availability of implicit conversions from `value_type` and `error_type`, this can cause major surprise (i.e. hard to diagnose bugs), so we don't implement these at all.
+- `EqualityComparable`, if all of `value_type`, `error_type` and `exception_type` implement equality comparisons with one another.
+- ~~`LessThanComparable`~~, not implemented due to availability of implicit conversions from `value_type`, `error_type` and `exception_type`, this can cause major surprise (i.e. hard to diagnose bugs), so we don't implement these at all.
 ~ `Swappable`
 - ~~`Hash`~~, not implemented as a generic implementation of a unique hash for non-valued items which are unequal would require a dependency on RTTI being enabled.
 
-Thus `basic_result` meets the `Regular` concept if both `value_type` and `error_type` are `Regular`, except for the lack of a default constructor. Often where one needs a default constructor, wrapping `basic_result` into {{% api "std::optional<T>" %}} will suffice.
+Thus `basic_outcome` meets the `Regular` concept if all of `value_type`, `error_type` and `exception_type` are `Regular`, except for the lack of a default constructor. Often where one needs a default constructor, wrapping `basic_outcome` into {{% api "std::optional<T>" %}} will suffice.
 
 ### Public member functions
 
