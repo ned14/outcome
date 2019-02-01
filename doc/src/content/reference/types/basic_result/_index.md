@@ -58,19 +58,21 @@ The second major design difference is that union storage is NOT used, as it is a
     2. Trait {{% api "is_error_type<E>" %}} is not true for both decayed `value_type` and decayed `error_type` at the same time.
     3. `value_type` is not implicitly constructible from `error_type` and `error_type` is not implicitly constructible from `value_type`.<br>OR<br>trait {{% api "is_error_type<E>" %}} is true for decayed `error_type` and `error_type` is not implicitly constructible from `value_type` and `value_type` is an integral type.
 
-- `predicate::enable_value_converting_constructor<R>` is constexpr boolean true if:
+- `predicate::enable_value_converting_constructor<A>` is constexpr boolean true if:
     1. `predicate::constructors_enabled` is true.
-    2. Decayed `R` is not this `basic_result` type.
-    3. Decayed `R` is not an `in_place_type_t`.
-    4. Trait {{% api "is_error_type_enum<E, Enum>" %}} is false for `error_type` and decayed `R`.
-    5. `value_type` is implicitly constructible from `R` and `error_type` is not implicitly constructible from `R`.<br>OR<br>`value_type` is the exact same type as decayed `R` and `value_type` is implicitly constructible from `R`.
+    2. Decayed `A` is not this `basic_result` type.
+    3. `predicate::implicit_constructors_enabled` is true.
+    4. Decayed `A` is not an `in_place_type_t`.
+    5. Trait {{% api "is_error_type_enum<E, Enum>" %}} is false for `error_type` and decayed `A`.
+    6. `value_type` is implicitly constructible from `A` and `error_type` is not implicitly constructible from `A`.<br>OR<br>`value_type` is the exact same type as decayed `A` and `value_type` is implicitly constructible from `A`.
 
-- `predicate::enable_error_converting_constructor<R>` is constexpr boolean true if:
+- `predicate::enable_error_converting_constructor<A>` is constexpr boolean true if:
     1. `predicate::constructors_enabled` is true.
-    2. Decayed `R` is not this `basic_result` type.
-    3. Decayed `R` is not an `in_place_type_t`.
-    4. Trait {{% api "is_error_type_enum<E, Enum>" %}} is false for `error_type` and decayed `R`.
-    5. `value_type` is not implicitly constructible from `R` and `error_type` is implicitly constructible from `R`.<br>OR<br>`error_type` is the exact same type as decayed `R` and `error_type` is implicitly constructible from `R`.
+    2. Decayed `A` is not this `basic_result` type.
+    3. `predicate::implicit_constructors_enabled` is true.
+    4. Decayed `A` is not an `in_place_type_t`.
+    5. Trait {{% api "is_error_type_enum<E, Enum>" %}} is false for `error_type` and decayed `A`.
+    6. `value_type` is not implicitly constructible from `A` and `error_type` is implicitly constructible from `A`.<br>OR<br>`error_type` is the exact same type as decayed `A` and `error_type` is implicitly constructible from `A`.
 
 - `predicate::enable_error_condition_converting_constructor<ErrorCondEnum>` is constexpr boolean true if:
     1. `predicate::constructors_enabled` is true.
@@ -78,11 +80,11 @@ The second major design difference is that union storage is NOT used, as it is a
     3. Decayed `ErrorCondEnum` is not an `in_place_type_t`.
     4. Trait {{% api "is_error_type_enum<E, Enum>" %}} is true for `error_type` and decayed `ErrorCondEnum`.
 
-- `predicate::enable_compatible_conversion<R, S, P>` is constexpr boolean true if:
+- `predicate::enable_compatible_conversion<A, B, C>` is constexpr boolean true if:
     1. `predicate::constructors_enabled` is true.
-    2. `basic_result<R, S, P>` is not this `basic_result` type.
-    3. `R` is `void` OR `value_type` is explicitly constructible from `R`.
-    4. `S` is `void` OR `error_type` is explicitly constructible from `S`.
+    2. `basic_result<A, B, C>` is not this `basic_result` type.
+    3. `A` is `void` OR `value_type` is explicitly constructible from `A`.
+    4. `B` is `void` OR `error_type` is explicitly constructible from `B`.
 
 - `predicate::enable_inplace_value_constructor<Args...>` is constexpr boolean true if:
     1. `predicate::constructors_enabled` is true.
@@ -94,7 +96,8 @@ The second major design difference is that union storage is NOT used, as it is a
 
 - `predicate::enable_inplace_value_error_constructor<Args...>` is constexpr boolean true if:
     1. `predicate::constructors_enabled` is true.
-    2. Either, but not both, of `value_type` is explicitly constructible from `Args...` or `error_type` is explicitly constructible from `Args...`.
+    2. `predicate::implicit_constructors_enabled` is true.
+    3. Either, but not both, of `value_type` is explicitly constructible from `Args...` or `error_type` is explicitly constructible from `Args...`.
 
 #### Summary of [standard requirements provided](https://en.cppreference.com/w/cpp/named_req)
 
@@ -103,7 +106,7 @@ The second major design difference is that union storage is NOT used, as it is a
 - `CopyConstructible`, if both `value_type` and `error_type` implement copy constructors.
 - `MoveAssignable`, if both `value_type` and `error_type` implement move constructors and move assignment.
 - `CopyAssignable`, if both `value_type` and `error_type` implement copy constructors and copy assignment.
-- `Destructible`
+- `Destructible`.
 - `TriviallyCopyable`, if both `value_type` and `error_type` are trivially copyable.
 - `TrivialType`, if both `value_type` and `error_type` are trivial types.
 - `LiteralType`, if both `value_type` and `error_type` are literal types.

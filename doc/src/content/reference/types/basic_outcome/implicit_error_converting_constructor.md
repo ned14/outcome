@@ -1,11 +1,11 @@
 +++
-title = "`basic_result(S &&)`"
+title = "`basic_outcome(S &&)`"
 description = "Implicit `error_type` constructor. Available if `predicate::enable_error_converting_constructor<S>` is true. Constexpr, triviality and noexcept propagating."
 categories = ["constructors", "implicit-constructors", "converting-constructors"]
 weight = 190
 +++
 
-Implicit `error_type` constructor. Calls {{% api "void hook_result_construction(T *, U &&) noexcept" %}} with `this` and `S`.
+Implicit `error_type` constructor. Calls {{% api "void hook_outcome_construction(T *, U &&) noexcept" %}} with `this` and `S`.
 
 *Requires*: `predicate::enable_error_converting_constructor<S>` is true.
 
