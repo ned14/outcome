@@ -12,3 +12,5 @@ Returns true if this result does not compare equal to the other result. Comparis
 *Complexity*: Whatever the underlying `operator!=` have. Constexpr and noexcept of underlying operations is propagated.
 
 *Guarantees*: None.
+
+*Free function alias*: There is a free function `bool operator!=(const basic_result<A, B, C> &, const basic_outcome<A, B, C, D> &)` which forwards perfectly to this function, by reversing the operands.

@@ -1167,9 +1167,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF c11e7968e008ee45df2b83984a558c2a5c4361b4
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-01-29 22:54:59 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c11e7968
+#define OUTCOME_PREVIOUS_COMMIT_REF b0cbb30fbe7e69659f9f5d5721099387e5b22dec
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-01-31 01:07:41 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE b0cbb30f
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -4740,12 +4740,19 @@ namespace detail
     struct search_detail_adl
     {
     };
+    OUTCOME_TEMPLATE(class S)                                                                        //
+    OUTCOME_TREQUIRES(OUTCOME_TEXPR(basic_outcome_failure_exception_from_error(std::declval<S>())))  //
+    inline auto _delayed_lookup_basic_outcome_failure_exception_from_error(const S &ec, search_detail_adl /*unused*/)
+    {
+      // ADL discovered
+      return basic_outcome_failure_exception_from_error(ec);
+    }
   }
 #if defined(_MSC_VER) && _MSC_VER < 1920
   // VS2017 with /permissive- chokes on the correct form due to over eager early instantiation.
-  template <class S, class P> inline void basic_outcome_failure_exception_from_error(...) { static_assert(sizeof(S) == 0, "No specialisation for these error and exception types available!"); }
+  template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) { static_assert(sizeof(S) == 0, "No specialisation for these error and exception types available!"); }
 #else
-  template <class S, class P> inline void basic_outcome_failure_exception_from_error(...) = delete;  // NOLINT No specialisation for these error and exception types available!
+  template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) = delete;  // NOLINT No specialisation for these error and exception types available!
 #endif
 
   //! The failure observers implementation of `basic_outcome<R, S, P>`.
@@ -4767,15 +4774,26 @@ namespace detail
 
     exception_type failure() const noexcept
     {
-      if((this->_state._status & detail::status_have_exception) != 0)
+#ifdef __cpp_exceptions
+      try
+#endif
       {
-        return this->exception();
+        if((this->_state._status & detail::status_have_exception) != 0)
+        {
+          return this->assume_exception();
+        }
+        if((this->_state._status & detail::status_have_error) != 0)
+        {
+          return _delayed_lookup_basic_outcome_failure_exception_from_error(this->assume_error(), adl::search_detail_adl());
+        }
+        return exception_type();
       }
-      if((this->_state._status & detail::status_have_error) != 0)
+#ifdef __cpp_exceptions
+      catch(...)
       {
-        return basic_outcome_failure_exception_from_error(this->error(), adl::search_detail_adl());
+        return std::current_exception();
       }
-      return exception_type();
+#endif
     }
   };
 
@@ -5054,12 +5072,10 @@ protected:
     using base = detail::outcome_predicates<value_type, error_type, exception_type>;
 
     // Predicate for any constructors to be available at all
-    static constexpr bool constructors_enabled = (!std::is_same<std::decay_t<value_type>, std::decay_t<error_type>>::value          //
-                                                  && !std::is_same<std::decay_t<value_type>, std::decay_t<exception_type>>::value   //
-                                                  && !std::is_same<std::decay_t<error_type>, std::decay_t<exception_type>>::value)  //
-                                                 || (std::is_void<value_type>::value && std::is_void<error_type>::value)            //
-                                                 || (std::is_void<value_type>::value && std::is_void<exception_type>::value)        //
-                                                 || (std::is_void<error_type>::value && std::is_void<exception_type>::value);
+    static constexpr bool constructors_enabled = (!std::is_same<std::decay_t<value_type>, std::decay_t<error_type>>::value || (std::is_void<value_type>::value && std::is_void<error_type>::value))             //
+                                                 && (!std::is_same<std::decay_t<value_type>, std::decay_t<exception_type>>::value || (std::is_void<value_type>::value && std::is_void<exception_type>::value))  //
+                                                 && (!std::is_same<std::decay_t<error_type>, std::decay_t<exception_type>>::value || (std::is_void<error_type>::value && std::is_void<exception_type>::value))  //
+    ;
 
     // Predicate for implicit constructors to be available at all
     static constexpr bool implicit_constructors_enabled = constructors_enabled && base::implicit_constructors_enabled;
@@ -5130,7 +5146,8 @@ protected:
     // Predicate for the implicit converting inplace constructor to be available.
     template <class... Args>
     static constexpr bool enable_inplace_value_error_exception_constructor =  //
-    base::template enable_inplace_value_error_exception_constructor<Args...>;
+    constructors_enabled                                                      //
+    &&base::template enable_inplace_value_error_exception_constructor<Args...>;
     template <class... Args> using choose_inplace_value_error_exception_constructor = typename base::template choose_inplace_value_error_exception_constructor<Args...>;
   };
 
@@ -6187,11 +6204,11 @@ public:
   {
     if(this->has_error() && this->has_exception())
     {
-      return failure_type<error_type, exception_type>(this->assume_error(), _ptr);
+      return failure_type<error_type, exception_type>(this->assume_error(), this->assume_exception());
     }
     if(this->has_exception())
     {
-      return failure_type<error_type, exception_type>(in_place_type<exception_type>, _ptr);
+      return failure_type<error_type, exception_type>(in_place_type<exception_type>, this->assume_exception());
     }
     return failure_type<error_type, exception_type>(in_place_type<error_type>, this->assume_error());
   }
@@ -6205,11 +6222,11 @@ public:
   {
     if(this->has_error() && this->has_exception())
     {
-      return failure_type<error_type, exception_type>(static_cast<S &&>(this->assume_error()), static_cast<P &&>(_ptr));
+      return failure_type<error_type, exception_type>(static_cast<S &&>(this->assume_error()), static_cast<P &&>(this->assume_exception()));
     }
     if(this->has_exception())
     {
-      return failure_type<error_type, exception_type>(in_place_type<exception_type>, static_cast<P &&>(_ptr));
+      return failure_type<error_type, exception_type>(in_place_type<exception_type>, static_cast<P &&>(this->assume_exception()));
     }
     return failure_type<error_type, exception_type>(in_place_type<error_type>, static_cast<S &&>(this->assume_error()));
   }
@@ -10770,29 +10787,25 @@ namespace experimental
 OUTCOME_V2_NAMESPACE_END
 
 #endif
-OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
-namespace detail
+SYSTEM_ERROR2_NAMESPACE_BEGIN
+template <class DomainType> inline std::exception_ptr basic_outcome_failure_exception_from_error(const status_code<DomainType> &sc)
 {
-  namespace adl
-  {
-    template <class DomainType> inline std::exception_ptr basic_outcome_failure_exception_from_error(const SYSTEM_ERROR2_NAMESPACE::status_code<DomainType> &sc, search_detail_adl /*unused*/)
-    {
-      (void) sc;
+  (void) sc;
 #ifdef __cpp_exceptions
-      try
-      {
-        sc.throw_exception();
-      }
-      catch(...)
-      {
-        return std::current_exception();
-      }
+  try
+  {
+    sc.throw_exception();
+  }
+  catch(...)
+  {
+    return std::current_exception();
+  }
 #endif
-      return {};
-    }
-  }  // namespace adl
-}  // namespace detail
+  return {};
+}
+SYSTEM_ERROR2_NAMESPACE_END
+
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 //! Namespace for traits
 namespace trait

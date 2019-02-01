@@ -1113,11 +1113,11 @@ public:
   {
     if(this->has_error() && this->has_exception())
     {
-      return failure_type<error_type, exception_type>(this->assume_error(), _ptr);
+      return failure_type<error_type, exception_type>(this->assume_error(), this->assume_exception());
     }
     if(this->has_exception())
     {
-      return failure_type<error_type, exception_type>(in_place_type<exception_type>, _ptr);
+      return failure_type<error_type, exception_type>(in_place_type<exception_type>, this->assume_exception());
     }
     return failure_type<error_type, exception_type>(in_place_type<error_type>, this->assume_error());
   }
@@ -1129,11 +1129,11 @@ public:
   {
     if(this->has_error() && this->has_exception())
     {
-      return failure_type<error_type, exception_type>(static_cast<S &&>(this->assume_error()), static_cast<P &&>(_ptr));
+      return failure_type<error_type, exception_type>(static_cast<S &&>(this->assume_error()), static_cast<P &&>(this->assume_exception()));
     }
     if(this->has_exception())
     {
-      return failure_type<error_type, exception_type>(in_place_type<exception_type>, static_cast<P &&>(_ptr));
+      return failure_type<error_type, exception_type>(in_place_type<exception_type>, static_cast<P &&>(this->assume_exception()));
     }
     return failure_type<error_type, exception_type>(in_place_type<error_type>, static_cast<S &&>(this->assume_error()));
   }

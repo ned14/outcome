@@ -1,5 +1,5 @@
 +++
-title = "`auto as_failure() const &`"
+title = "`failure_type<error_type, exception_type> as_failure() const &`"
 description = "Return the output from free function `failure()` containing a copy of any errored and/or excepted state."
 categories = ["observers"]
 weight = 910
