@@ -1,5 +1,5 @@
 +++
-title = "`exception_type &assume_exception() &`"
+title = "`exception_type &assume_exception() & noexcept`"
 description = "Narrow contract lvalue reference observer of the stored exception. Constexpr propagating, never throws."
 categories = ["observers"]
 weight = 780

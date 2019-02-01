@@ -5,8 +5,8 @@ weight = 40
 +++
 
 You can of course choose your own `E` type so long as it has standard layout
-and is trivially copyable. You would declare that with {{< api "CXX_DECLARE_RESULT(t_ident, t_decl, e_ident, e_decl)" >}},
-refer to it with {{< api "CXX_RESULT(t_ident, e_ident)" >}} and need to do your own
+and is trivially copyable. You would declare that with  api "CXX_DECLARE_RESULT(t_ident, t_decl, e_ident, e_decl)",
+refer to it with  api "CXX_RESULT(t_ident, e_ident)"  and need to do your own
 decoding of errors from your `E` type. By using the `_EC` postfixed macros,
 you are in fact using `E =`
 

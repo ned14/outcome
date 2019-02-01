@@ -31,6 +31,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include "../detail/trait_std_exception.hpp"
 #include "status_result.hpp"
 
+// Boost.Outcome #include "boost/exception_ptr.hpp"
+
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 template <class DomainType> inline std::exception_ptr basic_outcome_failure_exception_from_error(const status_code<DomainType> &sc)
 {

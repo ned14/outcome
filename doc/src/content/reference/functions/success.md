@@ -9,7 +9,7 @@ Two default overloads are provided, one taking a single parameter returning `suc
 
 *Overridable*: By Argument Dependent Lookup (ADL).
 
-*Requires*: Nothing.
+*Requires*: Always available.
 
 *Namespace*: `OUTCOME_V2_NAMESPACE`
 

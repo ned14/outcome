@@ -1206,4 +1206,21 @@ OUTCOME_V2_NAMESPACE_END
 
 #include "detail/basic_outcome_exception_observers_impl.hpp"
 
+#if !defined(NDEBUG)
+OUTCOME_V2_NAMESPACE_BEGIN
+// Check is trivial in all ways except default constructibility and standard layout
+// static_assert(std::is_trivial<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivial!");
+// static_assert(std::is_trivially_default_constructible<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially default constructible!");
+static_assert(std::is_trivially_copyable<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially copyable!");
+static_assert(std::is_trivially_assignable<basic_outcome<int, long, double, policy::all_narrow>, basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially assignable!");
+static_assert(std::is_trivially_destructible<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially destructible!");
+static_assert(std::is_trivially_copy_constructible<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially copy constructible!");
+static_assert(std::is_trivially_move_constructible<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially move constructible!");
+static_assert(std::is_trivially_copy_assignable<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially copy assignable!");
+static_assert(std::is_trivially_move_assignable<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially move assignable!");
+// Can't be standard layout as non-static member data is defined in more than one inherited class
+// static_assert(std::is_standard_layout<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not a standard layout type!");
+OUTCOME_V2_NAMESPACE_END
+#endif
+
 #endif

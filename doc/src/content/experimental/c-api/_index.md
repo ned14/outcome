@@ -1,7 +1,7 @@
 +++
-title = "Using result<T> from C code"
-description = "Interacting with result<T, EC> returning C++ functions from C code."
-weight = 70
+title = "Using Outcome from C code"
+description = "Interacting with `result` returning C++ functions from C code."
+weight = 50
 +++
 
 A long standing problem for C code (or more usually nowadays, the many other programming
@@ -39,5 +39,5 @@ And this is fine for larger projects, but for smaller projects the cost of
 setting up and configuring SWIG is also non-trivial.
 
 What would be really great is if `result<T>` returning `noexcept` C++ functions
-could be used straight from C. And indeed Outcome provides just that facility
+could be used straight from C. And indeed Experimental Outcome provides just that facility
 which this section covers next.

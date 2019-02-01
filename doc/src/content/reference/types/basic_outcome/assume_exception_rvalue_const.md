@@ -1,5 +1,5 @@
 +++
-title = "`const exception_type &&assume_exception() const &&`"
+title = "`const exception_type &&assume_exception() const && noexcept`"
 description = "Narrow contract const rvalue reference observer of the stored exception. Constexpr propagating, never throws."
 categories = ["observers"]
 weight = 782
