@@ -21,16 +21,19 @@ Distributed under the Boost Software License, Version 1.0.
 http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../../include/outcome.hpp"
-
 #include <cstring>  // for memcpy
-
-namespace outcome = OUTCOME_V2_NAMESPACE;
+#include <string>
 
 //! [function]
-// Fill the supplied buffer with the integer v converted to a string, returning
-// length of string minus null terminator
-extern "C" outcome::result<size_t> to_string(char *buffer, size_t bufferlen, int v) noexcept
+#include "../../../include/outcome/experimental/status_result.hpp"
+
+#include "../../../include/outcome/experimental/status-code/include/system_code_from_exception.hpp"
+
+namespace outcome_e = OUTCOME_V2_NAMESPACE::experimental;
+
+// Fill the supplied buffer with the integer v converted to a string,
+// returning length of string minus null terminator
+outcome_e::erased_result<size_t> to_string(char *buffer, size_t bufferlen, int v) noexcept
 {
   try
   {
@@ -39,7 +42,7 @@ extern "C" outcome::result<size_t> to_string(char *buffer, size_t bufferlen, int
 
     // Will this string exceed the supplied buffer?
     if(temp.size() + 1 > bufferlen)
-      return std::errc::no_buffer_space;
+      return outcome_e::errc::no_buffer_space;
 
     // Copy the string into the supplied buffer, and return length of string
     memcpy(buffer, temp.data(), temp.size() + 1);
@@ -47,12 +50,18 @@ extern "C" outcome::result<size_t> to_string(char *buffer, size_t bufferlen, int
   }
   catch(...)
   {
-    // This utility function rethrows the C++ exception, matching it
-    // against every standard library exception and generating an
-    // error code exactly matching it if possible. So, if the
-    // string creation threw std::bad_alloc, that would be converted
-    // into make_error_code(std::errc::not_enough_memory).
-    return outcome::error_from_exception();
+    // This is the <system_error2> analogue of Standard Outcome's
+    // error_from_exception() utility function. It consumes an exception
+    // ptr (defaulted to current exception), and tries to match it to a
+    // standard C++ library exception type, returning a system_code
+    // with an appropriate code domain (generic_code, posix_code,
+    // win32_code).
+    return SYSTEM_ERROR2_NAMESPACE::system_code_from_exception();
   }
 }
 //! [function]
+
+int main()
+{
+  return 0;
+}

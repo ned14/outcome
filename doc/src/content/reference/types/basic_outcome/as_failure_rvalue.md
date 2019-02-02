@@ -1,5 +1,5 @@
 +++
-title = "`auto as_failure() &&`"
+title = "`failure_type<error_type, exception_type> as_failure() &&`"
 description = "Return the output from free function `failure()` containing a move of any errored and/or excepted state."
 categories = ["modifiers"]
 weight = 920

@@ -29,17 +29,16 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "boost_result.hpp"
 
-OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
-namespace detail
+namespace boost
 {
-  namespace adl
+  namespace system
   {
     // Implement the .failure() observer.
-    inline boost::exception_ptr basic_outcome_failure_exception_from_error(const boost::system::error_code &ec, search_detail_adl /*unused*/) { return boost::copy_exception(boost::system::system_error(ec)); }
-  }
-}
+    inline exception_ptr basic_outcome_failure_exception_from_error(const error_code &ec) { return copy_exception(system_error(ec)); }
+  }  // namespace system
+}  // namespace boost
 
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! `basic_outcome` defaulted to use `boost::system::error_code`, `boost::exception_ptr` and a `NoValuePolicy` appropriate for `boost` types.
 

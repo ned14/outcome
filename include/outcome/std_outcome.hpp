@@ -28,15 +28,12 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include "basic_outcome.hpp"
 #include "std_result.hpp"
 
-OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
-namespace detail
+namespace std  // NOLINT
 {
-  namespace adl
-  {
-    inline std::exception_ptr basic_outcome_failure_exception_from_error(const std::error_code &ec, search_detail_adl /*unused*/) { return std::make_exception_ptr(std::system_error(ec)); }
-  }
-}
+  inline exception_ptr basic_outcome_failure_exception_from_error(const error_code &ec) { return make_exception_ptr(system_error(ec)); }
+}  // namespace std
+
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! `basic_outcome` defaulted to use `std::error_code`, `std::exception_ptr` and a `NoValuePolicy` appropriate for `std` types.
 

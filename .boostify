@@ -48,6 +48,7 @@ core_macros = {
     r'([^_])SYSTEM_ERROR2_': r'\1BOOST_OUTCOME_SYSTEM_ERROR2_',
     r'<outcome/([^>]+)': r'<boost/outcome/\1',
     r'status-code/include/': r'status-code/',
+    r'// Boost.Outcome ' : r'',
     r'CXX_': r'BOOST_OUTCOME_C_',
 }
 source_macros = {

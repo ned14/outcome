@@ -19,4 +19,4 @@ Inherits publicly from {{% api "base" %}}, and its narrow value, error and excep
 
 *Namespace*: `OUTCOME_V2_NAMESPACE::policy`
 
-*Header*: `<outcome/policy/exception_ptr_rethrow.hpp>`
+*Header*: `<outcome/policy/result_exception_ptr_rethrow.hpp>`

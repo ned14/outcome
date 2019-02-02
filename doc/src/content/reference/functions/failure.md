@@ -11,7 +11,7 @@ Note that `failure()` overloads are permitted by Outcome to return something oth
 
 *Overridable*: By Argument Dependent Lookup (ADL).
 
-*Requires*: Nothing.
+*Requires*: Always available.
 
 *Namespace*: `OUTCOME_V2_NAMESPACE`
 

@@ -9,6 +9,6 @@ A specialisation of `outcome_throw_as_system_error_with_payload()` for `std::err
 
 *Requires*: Nothing.
 
-*Namespace*: `OUTCOME_V2_NAMESPACE::policy`
+*Namespace*: `std`
 
 *Header*: `<outcome/std_result.hpp>`

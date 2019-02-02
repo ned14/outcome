@@ -161,16 +161,21 @@ an exception perhaps carrying a custom payload.
 - `TriviallyCopyable`, if all of `value_type`, `error_type` and `exception_type` are trivially copyable.
 - `TrivialType`, if all of `value_type`, `error_type` and `exception_type` are trivial types.
 - `LiteralType`, if all of `value_type`, `error_type` and `exception_type` are literal types.
-- `StandardLayoutType`, if all of `value_type`, `error_type` and `exception_type` are standard layout types. If so, layout of `basic_outcome` in C is guaranteed to be:
+- ~~`StandardLayoutType`~~. It is implementation defined if `basic_outcome` can be used by C.
+However all of the three major compilers MSVC, GCC and clang implement C layout of `basic_outcome` as follows:
 
     ```c++
     struct outcome_layout {
-      value_type value;
-      unsigned int flags;
-      error_type error;
+      struct result_layout {
+        value_type value;
+        unsigned int flags;
+        error_type error;
+      };
       exception_type exception;
     };
     ```
+    If you choose standard layout `value_type`, `error_type` and `exception_type`, `basic_outcome`
+works fine from C on MSVC, GCC and clang.
 - `EqualityComparable`, if all of `value_type`, `error_type` and `exception_type` implement equality comparisons with one another.
 - ~~`LessThanComparable`~~, not implemented due to availability of implicit conversions from `value_type`, `error_type` and `exception_type`, this can cause major surprise (i.e. hard to diagnose bugs), so we don't implement these at all.
 ~ `Swappable`
