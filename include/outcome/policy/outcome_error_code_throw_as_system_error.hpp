@@ -50,7 +50,7 @@ namespace policy
       {
         if(base::_has_exception(std::forward<Impl>(self)))
         {
-          detail::_rethrow_exception<trait::has_exception_ptr_v<E>>{base::_exception<T, EC, E, error_code_throw_as_system_error>(std::forward<Impl>(self))};  // NOLINT
+          detail::_rethrow_exception<trait::is_exception_ptr_available<E>::value>{base::_exception<T, EC, E, error_code_throw_as_system_error>(std::forward<Impl>(self))};  // NOLINT
         }
         if(base::_has_error(std::forward<Impl>(self)))
         {

@@ -1,6 +1,6 @@
 +++
 title = "`exception_type failure() const noexcept`"
-description = "Synthesising observer of the stored exception or error. Available if the traits `has_error_code<T>` and `has_exception_ptr<T>` are both true. Never throws."
+description = "Synthesising observer of the stored exception or error. Available if the traits `is_error_code_available<T>` and `is_exception_ptr_available<T>` are both true. Never throws."
 categories = ["observers"]
 weight = 790
 +++
@@ -12,8 +12,8 @@ is invoked. Default overloads for this function are defined in Outcome for {{% a
 and `boost::system::error_code`, these return `std::make_exception_ptr(std::system_error(ec))`
 and `boost::copy_exception(boost::system::system_error(ec))` respectively.
 
-*Requires*: Both the traits {{% api "has_error_code<T>" %}} and
-{{% api "has_exception_ptr<T>" %}} are true.
+*Requires*: Both the traits {{% api "is_error_code_available<T>" %}} and
+{{% api "is_exception_ptr_available<T>" %}} are true.
 
 *Complexity*: Depends on `basic_outcome_failure_exception_from_error(const EC &)`.
 

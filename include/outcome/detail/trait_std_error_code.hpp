@@ -83,40 +83,12 @@ namespace trait
 {
   namespace detail
   {
-    template <class T> using devoid = OUTCOME_V2_NAMESPACE::detail::devoid<T>;
-
-    constexpr inline void make_error_code(...);
-    // Also enable for any pair or tuple whose first item satisfies make_error_code()
-    template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
-    template <class T,                                                        //
-              class R = decltype(make_error_code(get<0>(std::declval<T>())))  //
-              >
-    constexpr inline R make_error_code(T &&);
-
-    template <class T, typename V = std::decay_t<decltype(make_error_code(std::declval<devoid<T>>()))>> struct has_error_code
+    template <> struct _is_error_code_available<std::error_code>
     {
-      static constexpr bool value = false;
-    };
-    template <> struct has_error_code<std::error_code, void>
-    {
-      static constexpr bool value = true;
-    };
-    template <class T> struct has_error_code<T, std::error_code>
-    {
+      // Shortcut this for lower build impact
       static constexpr bool value = true;
     };
   }  // namespace detail
-
-  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
-  Also returns true if `std::error_code` is convertible from T.
-  */
-  template <class T> struct has_error_code : detail::has_error_code<std::decay_t<T>>
-  {
-  };
-  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
-  Also returns true if `std::error_code` is convertible from T.
-  */
-  template <class T> constexpr bool has_error_code_v = has_error_code<std::decay_t<T>>::value;
 
   // std::error_code is an error type
   template <> struct is_error_type<std::error_code>

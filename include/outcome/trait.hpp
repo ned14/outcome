@@ -72,15 +72,62 @@ namespace trait
     static constexpr bool value = false;
   };
 
-  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
-  Also returns true if `std::error_code` is convertible from T.
-  */
-  template <class T> struct has_error_code;
+  namespace detail
+  {
+    template <class T> using devoid = OUTCOME_V2_NAMESPACE::detail::devoid<T>;
+    template <class T> std::add_rvalue_reference_t<devoid<T>> declval() noexcept;
 
-  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
-  Also returns true if `std::exception_ptr` is convertible from T.
+    // From http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4436.pdf
+    namespace detector_impl
+    {
+      template <class...> using void_t = void;
+      template <class Default, class, template <class...> class Op, class... Args> struct detector
+      {
+        static constexpr bool value = false;
+        using type = Default;
+      };
+      template <class Default, template <class...> class Op, class... Args> struct detector<Default, void_t<Op<Args...>>, Op, Args...>
+      {
+        static constexpr bool value = true;
+        using type = Op<Args...>;
+      };
+    }  // namespace detector_impl
+    template <template <class...> class Op, class... Args> using is_detected = detector_impl::detector<void, void, Op, Args...>;
+
+    template <class Arg> using result_of_make_error_code = decltype(make_error_code(declval<Arg>()));
+    template <class Arg> using introspect_make_error_code = is_detected<result_of_make_error_code, Arg>;
+
+    template <class Arg> using result_of_make_exception_ptr = decltype(make_exception_ptr(declval<Arg>()));
+    template <class Arg> using introspect_make_exception_ptr = is_detected<result_of_make_exception_ptr, Arg>;
+
+    template <class T> struct _is_error_code_available
+    {
+      static constexpr bool value = detail::introspect_make_error_code<T>::value;
+    };
+    template <class T> struct _is_exception_ptr_available
+    {
+      static constexpr bool value = detail::introspect_make_exception_ptr<T>::value;
+    };
+  }  // namespace detail
+
+  /*! Trait for whether a free function `make_error_code(T)` exists or not.
+  Also true for `std::error_code` and `boost::system::error_code`.
   */
-  template <class T> struct has_exception_ptr;
+  template <class T> struct is_error_code_available
+  {
+    static constexpr bool value = detail::_is_error_code_available<std::decay_t<T>>::value;
+  };
+  template <class T> constexpr bool is_error_code_available_v = detail::_is_error_code_available<std::decay_t<T>>::value;
+
+  /*! Trait for whether a free function `make_exception_ptr(T)` exists or not.
+  Also true for `std::exception_ptr` and `boost::exception_ptr`.
+  */
+  template <class T> struct is_exception_ptr_available
+  {
+    static constexpr bool value = detail::_is_exception_ptr_available<std::decay<T>>::value;
+  };
+  template <class T> constexpr bool is_exception_ptr_available_v = detail::_is_exception_ptr_available<std::decay<T>>::value;
+
 
 }  // namespace trait
 

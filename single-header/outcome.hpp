@@ -1272,9 +1272,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 422010c07c577ae8728527155b1d35496506f395
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-02-01 23:42:53 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 422010c0
+#define OUTCOME_PREVIOUS_COMMIT_REF 3d112fcca6d115f78534d1653992be6e22ac9a2b
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-02-05 17:14:23 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 3d112fcc
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -2333,19 +2333,66 @@ namespace trait
     static constexpr bool value = false;
   };
 
-  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
-  Also returns true if `std::error_code` is convertible from T.
+  namespace detail
+  {
+    template <class T> using devoid = OUTCOME_V2_NAMESPACE::detail::devoid<T>;
+    template <class T> std::add_rvalue_reference_t<devoid<T>> declval() noexcept;
+
+    // From http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4436.pdf
+    namespace detector_impl
+    {
+      template <class...> using void_t = void;
+      template <class Default, class, template <class...> class Op, class... Args> struct detector
+      {
+        static constexpr bool value = false;
+        using type = Default;
+      };
+      template <class Default, template <class...> class Op, class... Args> struct detector<Default, void_t<Op<Args...>>, Op, Args...>
+      {
+        static constexpr bool value = true;
+        using type = Op<Args...>;
+      };
+    }  // namespace detector_impl
+    template <template <class...> class Op, class... Args> using is_detected = detector_impl::detector<void, void, Op, Args...>;
+
+    template <class Arg> using result_of_make_error_code = decltype(make_error_code(declval<Arg>()));
+    template <class Arg> using introspect_make_error_code = is_detected<result_of_make_error_code, Arg>;
+
+    template <class Arg> using result_of_make_exception_ptr = decltype(make_exception_ptr(declval<Arg>()));
+    template <class Arg> using introspect_make_exception_ptr = is_detected<result_of_make_exception_ptr, Arg>;
+
+    template <class T> struct _is_error_code_available
+    {
+      static constexpr bool value = detail::introspect_make_error_code<T>::value;
+    };
+    template <class T> struct _is_exception_ptr_available
+    {
+      static constexpr bool value = detail::introspect_make_exception_ptr<T>::value;
+    };
+  }  // namespace detail
+
+  /*! Trait for whether a free function `make_error_code(T)` exists or not.
+  Also true for `std::error_code` and `boost::system::error_code`.
   */
 
 
-  template <class T> struct has_error_code;
+  template <class T> struct is_error_code_available
+  {
+    static constexpr bool value = detail::_is_error_code_available<std::decay_t<T>>::value;
+  };
+  template <class T> constexpr bool is_error_code_available_v = detail::_is_error_code_available<std::decay_t<T>>::value;
 
-  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
-  Also returns true if `std::exception_ptr` is convertible from T.
+  /*! Trait for whether a free function `make_exception_ptr(T)` exists or not.
+  Also true for `std::exception_ptr` and `boost::exception_ptr`.
   */
 
 
-  template <class T> struct has_exception_ptr;
+  template <class T> struct is_exception_ptr_available
+  {
+    static constexpr bool value = detail::_is_exception_ptr_available<std::decay<T>>::value;
+  };
+  template <class T> constexpr bool is_exception_ptr_available_v = detail::_is_exception_ptr_available<std::decay<T>>::value;
+
 
 }  // namespace trait
 
@@ -4784,44 +4831,12 @@ namespace trait
 {
   namespace detail
   {
-    template <class T> using devoid = OUTCOME_V2_NAMESPACE::detail::devoid<T>;
-
-    constexpr inline void make_error_code(...);
-    // Also enable for any pair or tuple whose first item satisfies make_error_code()
-    template <size_t N, class T> constexpr inline void get(const T & /*unused*/);
-    template <class T,                                                        //
-              class R = decltype(make_error_code(get<0>(std::declval<T>())))  //
-              >
-    constexpr inline R make_error_code(T &&);
-
-    template <class T, typename V = std::decay_t<decltype(make_error_code(std::declval<devoid<T>>()))>> struct has_error_code
+    template <> struct _is_error_code_available<std::error_code>
     {
-      static constexpr bool value = false;
-    };
-    template <> struct has_error_code<std::error_code, void>
-    {
-      static constexpr bool value = true;
-    };
-    template <class T> struct has_error_code<T, std::error_code>
-    {
+      // Shortcut this for lower build impact
       static constexpr bool value = true;
     };
   }  // namespace detail
-
-  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
-  Also returns true if `std::error_code` is convertible from T.
-  */
-
-
-  template <class T> struct has_error_code : detail::has_error_code<std::decay_t<T>>
-  {
-  };
-  /*! Trait for whether a free function `make_error_code(T)` returning a `std::error_code` exists or not.
-  Also returns true if `std::error_code` is convertible from T.
-  */
-
-
-  template <class T> constexpr bool has_error_code_v = has_error_code<std::decay_t<T>>::value;
 
   // std::error_code is an error type
   template <> struct is_error_type<std::error_code>
@@ -4913,37 +4928,12 @@ namespace trait
 {
   namespace detail
   {
-    template <class T> using devoid = OUTCOME_V2_NAMESPACE::detail::devoid<T>;
-
-    constexpr inline void make_exception_ptr(...);
-    template <class T, typename V = std::decay_t<decltype(make_exception_ptr(std::declval<devoid<T>>()))>> struct has_exception_ptr
-    {
-      static constexpr bool value = false;
-    };
-    template <> struct has_exception_ptr<std::exception_ptr, void>
-    {
-      static constexpr bool value = true;
-    };
-    template <class T> struct has_exception_ptr<T, std::exception_ptr>
+    // Shortcut this for lower build impact
+    template <> struct _is_exception_ptr_available<std::exception_ptr>
     {
       static constexpr bool value = true;
     };
   }  // namespace detail
-
-  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
-  Also returns true if `std::exception_ptr` is convertible from T.
-  */
-
-
-  template <class T> struct has_exception_ptr : detail::has_exception_ptr<std::decay_t<T>>
-  {
-  };
-  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
-  Also returns true if `std::exception_ptr` is convertible from T.
-  */
-
-
-  template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<std::decay_t<T>>::value;
 
   // std::exception_ptr is an error type
   template <> struct is_error_type<std::exception_ptr>
@@ -5391,12 +5381,12 @@ namespace policy
   template <class T, class EC, class E>
   using default_policy = std::conditional_t<  //
   std::is_void<EC>::value && std::is_void<E>::value,
-  terminate,                                                                                         //
-  std::conditional_t<                                                                                //
-  trait::has_error_code_v<EC>, error_code_throw_as_system_error<T, EC, E>,                           //
-  std::conditional_t<                                                                                //
-  trait::has_exception_ptr_v<EC> || trait::has_exception_ptr_v<E>, exception_ptr_rethrow<T, EC, E>,  //
-  fail_to_compile_observers                                                                          //
+  terminate,                                                                                                                     //
+  std::conditional_t<                                                                                                            //
+  trait::is_error_code_available<EC>::value, error_code_throw_as_system_error<T, EC, E>,                                         //
+  std::conditional_t<                                                                                                            //
+  trait::is_exception_ptr_available<EC>::value || trait::is_exception_ptr_available<E>::value, exception_ptr_rethrow<T, EC, E>,  //
+  fail_to_compile_observers                                                                                                      //
   >>>;
 }  // namespace policy
 
@@ -5799,7 +5789,7 @@ namespace detail
   // Select whether to use basic_outcome_failure_observers or not
   template <class Base, class R, class S, class P, class NoValuePolicy>
   using select_basic_outcome_failure_observers =  //
-  std::conditional_t<trait::has_error_code<S>::value && trait::has_exception_ptr<P>::value, basic_outcome_failure_observers<Base, R, S, P, NoValuePolicy>, Base>;
+  std::conditional_t<trait::is_error_code_available<S>::value && trait::is_exception_ptr_available<P>::value, basic_outcome_failure_observers<Base, R, S, P, NoValuePolicy>, Base>;
 
   template <class T, class U, class V> constexpr inline const V &extract_exception_from_failure(const failure_type<U, V> &v) { return v.exception(); }
   template <class T, class U, class V> constexpr inline V &&extract_exception_from_failure(failure_type<U, V> &&v) { return static_cast<failure_type<U, V> &&>(v).exception(); }
@@ -7419,7 +7409,7 @@ namespace policy
       {
         if(base::_has_exception(std::forward<Impl>(self)))
         {
-          detail::_rethrow_exception<trait::has_exception_ptr_v<E>>{base::_exception<T, EC, E, error_code_throw_as_system_error>(std::forward<Impl>(self))};  // NOLINT
+          detail::_rethrow_exception<trait::is_exception_ptr_available<E>::value>{base::_exception<T, EC, E, error_code_throw_as_system_error>(std::forward<Impl>(self))};  // NOLINT
         }
         if(base::_has_error(std::forward<Impl>(self)))
         {
@@ -7514,11 +7504,11 @@ namespace policy
       {
         if(base::_has_exception(std::forward<Impl>(self)))
         {
-          detail::_rethrow_exception<trait::has_exception_ptr_v<E>>{base::_exception<T, EC, E, exception_ptr_rethrow>(std::forward<Impl>(self))};
+          detail::_rethrow_exception<trait::is_exception_ptr_available<E>::value>{base::_exception<T, EC, E, exception_ptr_rethrow>(std::forward<Impl>(self))};
         }
         if(base::_has_error(std::forward<Impl>(self)))
         {
-          detail::_rethrow_exception<trait::has_exception_ptr_v<EC>>{base::_error(std::forward<Impl>(self))};
+          detail::_rethrow_exception<trait::is_exception_ptr_available<EC>::value>{base::_error(std::forward<Impl>(self))};
         }
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));  // NOLINT
       }

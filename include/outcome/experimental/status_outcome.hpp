@@ -27,7 +27,6 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../basic_outcome.hpp"
 
-#include "../detail/trait_std_error_code.hpp"  // FIXME needed as the failure observers require trait::has_error_code<T>
 #include "../detail/trait_std_exception.hpp"
 #include "status_result.hpp"
 
@@ -58,19 +57,12 @@ namespace trait
 {
   namespace detail
   {
-    template <class DomainType> struct has_error_code<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, void>
+    // Shortcut this for lower build impact
+    template <class DomainType> struct _is_error_code_available<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
     {
       static constexpr bool value = true;
     };
-    template <class T, class DomainType> struct has_error_code<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
-    {
-      static constexpr bool value = true;
-    };
-    template <class DomainType> struct has_error_code<SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>, void>
-    {
-      static constexpr bool value = true;
-    };
-    template <class T, class DomainType> struct has_error_code<T, SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>>
+    template <class DomainType> struct _is_error_code_available<SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>>
     {
       static constexpr bool value = true;
     };
@@ -101,12 +93,12 @@ namespace experimental
     /*! Default policy selector.
     */
     template <class T, class EC, class E>
-    using default_status_outcome_policy = std::conditional_t<                                                                                                                //
-    std::is_void<EC>::value && std::is_void<E>::value,                                                                                                                       //
-    OUTCOME_V2_NAMESPACE::policy::terminate,                                                                                                                                 //
-    std::conditional_t<(is_status_code<EC>::value || is_errored_status_code<EC>::value) && (std::is_void<E>::value || OUTCOME_V2_NAMESPACE::trait::has_exception_ptr_v<E>),  //
-                       status_code_throw<T, EC, E>,                                                                                                                          //
-                       OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers                                                                                               //
+    using default_status_outcome_policy = std::conditional_t<                                                                                                                              //
+    std::is_void<EC>::value && std::is_void<E>::value,                                                                                                                                     //
+    OUTCOME_V2_NAMESPACE::policy::terminate,                                                                                                                                               //
+    std::conditional_t<(is_status_code<EC>::value || is_errored_status_code<EC>::value) && (std::is_void<E>::value || OUTCOME_V2_NAMESPACE::trait::is_exception_ptr_available<E>::value),  //
+                       status_code_throw<T, EC, E>,                                                                                                                                        //
+                       OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers                                                                                                             //
                        >>;
   }  // namespace policy
 
@@ -132,7 +124,7 @@ namespace experimental
         {
           if(base::_has_exception(static_cast<Impl &&>(self)))
           {
-            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::has_exception_ptr_v<E>>(base::_exception<T, status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self)));  // NOLINT
+            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::is_exception_ptr_available<E>::value>(base::_exception<T, status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self)));  // NOLINT
           }
           if(base::_has_error(static_cast<Impl &&>(self)))
           {
