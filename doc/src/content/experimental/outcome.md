@@ -1,9 +1,9 @@
 +++
-title = "Example of Outcome"
-weight = 90
+title = "Tying it all together"
+weight = 80
 +++
 
-Firstly let's alias a more convenient form of `erased_result`:
+Firstly let's alias a more convenient form of `status_result`:
 
 {{% snippet "experimental_status_code.cpp" "typedef" %}}
 

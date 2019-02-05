@@ -3,7 +3,7 @@ title = "The main advantages"
 weight = 5
 +++
 
-The main advantages of using `<outcome/experimental>` over default Outcome:
+The main advantages of choosing `<outcome/experimental>` over default Outcome:
 
 1. Codegen is tighter and less verbose[^1], sometimes remarkably so.
 

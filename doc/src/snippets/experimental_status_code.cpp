@@ -187,7 +187,7 @@ using file_handle = std::unique_ptr<FILE, file_deleter>;
 //! [typedef]
 template <class T, class E = outcome_e::error>
 using result =  //
-outcome_e::erased_result<T, E, outcome_e::policy::default_status_result_policy<T, E>>;
+outcome_e::status_result<T, E, outcome_e::policy::default_status_result_policy<T, E>>;
 //! [typedef]
 //! [open_file]
 result<file_handle, file_io_error> open_file(const char *path)  // models throws(file_io_error)

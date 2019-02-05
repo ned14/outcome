@@ -266,8 +266,27 @@ namespace detail
   };
   template <class T, class U> static constexpr bool is_implicitly_constructible = _is_implicitly_constructible<T, U>::value;
 
+#ifndef OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
+#if defined(_MSC_VER) && _HAS_CXX17
+#define OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE 1  // MSVC always has std::is_nothrow_swappable
+#elif __cplusplus >= 201700
+// libstdc++ before GCC 6 doesn't have it, despite claiming C++ 17 support
+#ifdef __has_include
+#if !__has_include(<variant>)
+#define OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE 0
+#endif
+#endif
+
+#ifndef OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
+#define OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE 1
+#endif
+#else
+#define OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE 0
+#endif
+#endif
+
 // True if type is nothrow swappable
-#if !defined(STANDARDESE_IS_IN_THE_HOUSE) && (_HAS_CXX17 || __cplusplus >= 201700)
+#if !defined(STANDARDESE_IS_IN_THE_HOUSE) && OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
 #else
   namespace _is_nothrow_swappable

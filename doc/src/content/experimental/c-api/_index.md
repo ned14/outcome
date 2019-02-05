@@ -1,7 +1,7 @@
 +++
 title = "Using Outcome from C code"
 description = "Interacting with `result` returning C++ functions from C code."
-weight = 50
+weight = 90
 +++
 
 A long standing problem for C code (or more usually nowadays, the many other programming

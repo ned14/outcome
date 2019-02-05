@@ -1167,9 +1167,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF b0cbb30fbe7e69659f9f5d5721099387e5b22dec
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-01-31 01:07:41 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE b0cbb30f
+#define OUTCOME_PREVIOUS_COMMIT_REF 422010c07c577ae8728527155b1d35496506f395
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-02-01 23:42:53 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 422010c0
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1315,8 +1315,27 @@ namespace detail
   };
   template <class T, class U> static constexpr bool is_implicitly_constructible = _is_implicitly_constructible<T, U>::value;
 
+#ifndef OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
+#if defined(_MSC_VER) && _HAS_CXX17
+#define OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE 1  // MSVC always has std::is_nothrow_swappable
+#elif __cplusplus >= 201700
+// libstdc++ before GCC 6 doesn't have it, despite claiming C++ 17 support
+#ifdef __has_include
+#if !__has_include(<variant>)
+#define OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE 0
+#endif
+#endif
+
+#ifndef OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
+#define OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE 1
+#endif
+#else
+#define OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE 0
+#endif
+#endif
+
 // True if type is nothrow swappable
-#if !0 && (_HAS_CXX17 || __cplusplus >= 201700)
+#if !0 && OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
 #else
   namespace _is_nothrow_swappable
@@ -6399,6 +6418,23 @@ namespace detail
 OUTCOME_V2_NAMESPACE_END
 
 #endif
+#if !defined(NDEBUG)
+OUTCOME_V2_NAMESPACE_BEGIN
+// Check is trivial in all ways except default constructibility and standard layout
+// static_assert(std::is_trivial<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivial!");
+// static_assert(std::is_trivially_default_constructible<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially default constructible!");
+static_assert(std::is_trivially_copyable<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially copyable!");
+static_assert(std::is_trivially_assignable<basic_outcome<int, long, double, policy::all_narrow>, basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially assignable!");
+static_assert(std::is_trivially_destructible<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially destructible!");
+static_assert(std::is_trivially_copy_constructible<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially copy constructible!");
+static_assert(std::is_trivially_move_constructible<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially move constructible!");
+static_assert(std::is_trivially_copy_assignable<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially copy assignable!");
+static_assert(std::is_trivially_move_assignable<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially move assignable!");
+// Can't be standard layout as non-static member data is defined in more than one inherited class
+// static_assert(std::is_standard_layout<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not a standard layout type!");
+OUTCOME_V2_NAMESPACE_END
+#endif
+
 #endif
 /* Traits for Outcome
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
@@ -8196,7 +8232,10 @@ namespace detail
 {
   struct generic_code_messages
   {
-    const char *msgs[256];
+    // libc++ defines missing errc macros to integers in the 9xxx range
+    // As much as 10,000 seems wasteful, bear in mind this is all constexpr
+    // and on C++ 14 or later this entire construct disappears.
+    const char *msgs[(ETIME >= 256) ? 10000 : 256];
     SYSTEM_ERROR2_CONSTEXPR14 size_t size() const { return sizeof(msgs) / sizeof(*msgs); }  // NOLINT
     SYSTEM_ERROR2_CONSTEXPR14 const char *operator[](int i) const { return (i < 0 || i >= static_cast<int>(size()) || nullptr == msgs[i]) ? "unknown" : msgs[i]; }  // NOLINT
     SYSTEM_ERROR2_CONSTEXPR14 generic_code_messages()
@@ -10774,19 +10813,15 @@ namespace experimental
   */
 
   template <class R, class S = system_code, class NoValuePolicy = policy::default_status_result_policy<R, S>>  //
-  using erased_result = basic_result<R, S, NoValuePolicy>;
-
-  /*! TODO
-  */
-
-  template <class R, class DomainType = typename generic_code::domain_type, class NoValuePolicy = policy::default_status_result_policy<R, status_code<DomainType>>>  //
-  using status_result = basic_result<R, status_code<DomainType>, NoValuePolicy>;
+  using status_result = basic_result<R, S, NoValuePolicy>;
 
 }  // namespace experimental
 
 OUTCOME_V2_NAMESPACE_END
 
 #endif
+// Boost.Outcome #include "boost/exception_ptr.hpp"
+
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 template <class DomainType> inline std::exception_ptr basic_outcome_failure_exception_from_error(const status_code<DomainType> &sc)
 {
@@ -10817,6 +10852,14 @@ namespace trait
       static constexpr bool value = true;
     };
     template <class T, class DomainType> struct has_error_code<T, SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
+    {
+      static constexpr bool value = true;
+    };
+    template <class DomainType> struct has_error_code<SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>, void>
+    {
+      static constexpr bool value = true;
+    };
+    template <class T, class DomainType> struct has_error_code<T, SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>>
     {
       static constexpr bool value = true;
     };
@@ -10861,13 +10904,7 @@ namespace experimental
   */
 
   template <class R, class S = system_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_status_outcome_policy<R, S, P>>  //
-  using erased_outcome = basic_outcome<R, S, P, NoValuePolicy>;
-
-  /*! TODO
-  */
-
-  template <class R, class DomainType = typename generic_code::domain_type, class P = std::exception_ptr, class NoValuePolicy = policy::default_status_outcome_policy<R, status_code<DomainType>, P>>  //
-  using status_outcome = basic_outcome<R, status_code<DomainType>, P, NoValuePolicy>;
+  using status_outcome = basic_outcome<R, S, P, NoValuePolicy>;
 
   //! Namespace for policies
   namespace policy

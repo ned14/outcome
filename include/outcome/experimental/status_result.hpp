@@ -106,12 +106,7 @@ namespace experimental
   /*! TODO
   */
   template <class R, class S = system_code, class NoValuePolicy = policy::default_status_result_policy<R, S>>  //
-  using erased_result = basic_result<R, S, NoValuePolicy>;
-
-  /*! TODO
-  */
-  template <class R, class DomainType = typename generic_code::domain_type, class NoValuePolicy = policy::default_status_result_policy<R, status_code<DomainType>>>  //
-  using status_result = basic_result<R, status_code<DomainType>, NoValuePolicy>;
+  using status_result = basic_result<R, S, NoValuePolicy>;
 
 }  // namespace experimental
 
