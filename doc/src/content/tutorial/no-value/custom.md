@@ -9,7 +9,10 @@ If you want your `basic_outcome<>` or `basic_result<>` instances to call
 
 {{% snippet "policies.cpp" "abort_policy" %}}
 
-Once the policy is defined, you have to use it when providing your own
+All policies ought to inherit from {{% api "base" %}} in order to provide your policy implementation with
+the internal policy API for accessing and manipulating `result` and `outcome` state.
+
+Once the policy is defined, you have to specify it when providing your own
 `basic_outcome` specialization:
 
 {{% snippet "policies.cpp" "outcome_spec" %}}

@@ -52,7 +52,7 @@ Outcome will be made available by Conan at `<outcome.hpp>`.
 
 ## Usage as a git submodule
 
-Given that v2 is still under development, it is currently best used as a git
+If you are very keen on tracking very latest Outcome, you can add it as a git
 submodule to your project so you can keep abreast of bug fixes. Here is how:
 
 ```
@@ -87,9 +87,12 @@ https://dedi5.nedprod.com/static/files/outcome-v2.0-source-latest.tar.xz
 This tarball is automatically generated when Outcome fully compiles and passes
 all unit tests on all platforms tested by the CIs. This currently includes:
 
-- Linux: GCC 6.3, clang 4.0
+- Linux: GCC 6.5, clang 4.0.1
 - MacOS: XCode 9
-- Windows: VS2017
+- Windows: VS2017.9
+
+It should be emphasised that newer compilers are not tested, so there is
+an unlikely chance that the tarball may not work on a newer compiler.
 
 <hr>
 
