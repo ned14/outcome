@@ -60,7 +60,7 @@ int main()
   //! [explicit]
 #endif
   //! [access]
-  result<udt, err> res(in_place_type<err>, 5);
+  result<udt, err, policy::terminate> res(in_place_type<err>, 5);
 
   // What happens here? What exception type is thrown?
   try
