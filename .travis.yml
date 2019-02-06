@@ -113,7 +113,7 @@ script:
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
-     CXX=g++-6 ctest -S .docs.cmake -V;
+     CXX=clang++-4.0 ctest -S .docs.cmake -V;
      cd doc/html;
      echo "google-site-verification: google5fc8a1f8de4b73f0.html" > google5fc8a1f8de4b73f0.html;
      git add . || true;
