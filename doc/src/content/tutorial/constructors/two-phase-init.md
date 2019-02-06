@@ -13,7 +13,7 @@ variables to various default values, most often using default member initialiser
 Most standard C++ library objects
 and containers have `constexpr` constructors, and thus can be initialised
 during phase 1. If you need to initialise a member variable without
-a `constexpr` constructor, `std::optional<T>` is the usual workaround.
+a `constexpr` constructor, {{% api "std::optional<T>" %}} is the usual workaround.
 
 2. Do the remainder of the construction, the parts which could fail.
 Because phase 1 placed the object into a legally destructible state,
@@ -27,7 +27,7 @@ the successfully constructed object, or the cause of any failure to
 construct the object.
 
 Finally, as a phase 3,
-some simple metaprogramming will implement a `construct<T>{Args...}()`
+some simple metaprogramming will implement a `make<T>{Args...}()`
 free function which will construct any object `T` by calling its
 static initialisation function with `Args...` and returning the
 `result` returned. This isn't as nice as calling `T(Args...)` directly,

@@ -143,23 +143,27 @@ inline outcome::result<file_handle> file_handle::file(file_handle::path_type pat
 //! [file]
 
 //! [construct-declaration]
-template <class T> struct construct
+template <class T> struct make
 {
   outcome::result<T> operator()() const noexcept
-  {  //
-    static_assert(!std::is_same<T, T>::value, "construct<T>() was not specialised for the type T supplied");
+  {                                            //
+    static_assert(!std::is_same<T, T>::value,  //
+                  "make<T>() was not specialised for the type T supplied");
   }
 };
 //! [construct-declaration]
 
 //! [construct-specialisation]
-template <> struct construct<file_handle>
+template <> struct make<file_handle>
 {
   file_handle::path_type _path;
   file_handle::mode _mode{file_handle::mode::read};
   // Any other args, default initialised if necessary, follow here ...
 
-  outcome::result<file_handle> operator()() const noexcept { return file_handle::file(std::move(_path)); }
+  outcome::result<file_handle> operator()() const noexcept  //
+  {
+    return file_handle::file(std::move(_path));
+  }
 };
 //! [construct-specialisation]
 
@@ -173,7 +177,7 @@ int main()
   }
   //! [static-use]
   //! [construct-use]
-  outcome::result<file_handle> fh2 = construct<file_handle>{"hello" /*, file_handle::mode::read */}();
+  outcome::result<file_handle> fh2 = make<file_handle>{"hello" /*, file_handle::mode::read */}();
   if(!fh2)
   {
     std::cerr << "Opening file 'hello' failed with " << fh2.error().message() << std::endl;
