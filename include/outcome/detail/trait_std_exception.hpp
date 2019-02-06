@@ -71,33 +71,12 @@ namespace trait
 {
   namespace detail
   {
-    template <class T> using devoid = OUTCOME_V2_NAMESPACE::detail::devoid<T>;
-
-    constexpr inline void make_exception_ptr(...);
-    template <class T, typename V = std::decay_t<decltype(make_exception_ptr(std::declval<devoid<T>>()))>> struct has_exception_ptr
-    {
-      static constexpr bool value = false;
-    };
-    template <> struct has_exception_ptr<std::exception_ptr, void>
-    {
-      static constexpr bool value = true;
-    };
-    template <class T> struct has_exception_ptr<T, std::exception_ptr>
+    // Shortcut this for lower build impact
+    template <> struct _is_exception_ptr_available<std::exception_ptr>
     {
       static constexpr bool value = true;
     };
   }  // namespace detail
-
-  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
-  Also returns true if `std::exception_ptr` is convertible from T.
-  */
-  template <class T> struct has_exception_ptr : detail::has_exception_ptr<std::decay_t<T>>
-  {
-  };
-  /*! Trait for whether a free function `make_exception_ptr(T)` returning a `std::exception_ptr` exists or not.
-  Also returns true if `std::exception_ptr` is convertible from T.
-  */
-  template <class T> constexpr bool has_exception_ptr_v = has_exception_ptr<std::decay_t<T>>::value;
 
   // std::exception_ptr is an error type
   template <> struct is_error_type<std::exception_ptr>

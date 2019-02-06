@@ -123,7 +123,7 @@ namespace detail
   // Select whether to use basic_outcome_failure_observers or not
   template <class Base, class R, class S, class P, class NoValuePolicy>
   using select_basic_outcome_failure_observers =  //
-  std::conditional_t<trait::has_error_code<S>::value && trait::has_exception_ptr<P>::value, basic_outcome_failure_observers<Base, R, S, P, NoValuePolicy>, Base>;
+  std::conditional_t<trait::is_error_code_available<S>::value && trait::is_exception_ptr_available<P>::value, basic_outcome_failure_observers<Base, R, S, P, NoValuePolicy>, Base>;
 
   template <class T, class U, class V> constexpr inline const V &extract_exception_from_failure(const failure_type<U, V> &v) { return v.exception(); }
   template <class T, class U, class V> constexpr inline V &&extract_exception_from_failure(failure_type<U, V> &&v) { return static_cast<failure_type<U, V> &&>(v).exception(); }

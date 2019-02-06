@@ -24,16 +24,15 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include <cstring>  // for memcpy
 #include <string>
 
-//! [function]
+#include "../../../include/outcome/experimental/status-code/include/system_code_from_exception.hpp"
 #include "../../../include/outcome/experimental/status_result.hpp"
 
-#include "../../../include/outcome/experimental/status-code/include/system_code_from_exception.hpp"
-
+//! [function]
 namespace outcome_e = OUTCOME_V2_NAMESPACE::experimental;
 
 // Fill the supplied buffer with the integer v converted to a string,
 // returning length of string minus null terminator
-outcome_e::erased_result<size_t> to_string(char *buffer, size_t bufferlen, int v) noexcept
+outcome_e::status_result<size_t> to_string(char *buffer, size_t bufferlen, int v) noexcept
 {
   try
   {
@@ -56,7 +55,11 @@ outcome_e::erased_result<size_t> to_string(char *buffer, size_t bufferlen, int v
     // standard C++ library exception type, returning a system_code
     // with an appropriate code domain (generic_code, posix_code,
     // win32_code).
-    return SYSTEM_ERROR2_NAMESPACE::system_code_from_exception();
+    //
+    // Note that using this function requires including
+    // <outcome/experimental/status-code/include/system_code_from_exception.hpp>
+    // It is NOT included by Experimental Outcome by default.
+    return outcome_e::system_code_from_exception();
   }
 }
 //! [function]

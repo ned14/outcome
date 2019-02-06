@@ -26,9 +26,11 @@ of otherwise trivial types)
 
 ---
 
-The above is what the standard officially requires for well defined C and C++ interop.
+The above is what the standard officially requires for *well defined* C and C++ interop.
 However, all of the three major compilers MSVC, GCC and clang are considerably more relaxed.
-Almost-standard-layout C++ types work fine in C, but these requirements are important:
+In those three major compilers, "almost-standard-layout" C++ types work fine in C.
+
+"Almost-standard-layout" C++ types have these requirements:
 
 1. No virtual functions or virtual base classes i.e.
 [`std::is_polymorphic_v<T>`](http://en.cppreference.com/w/cpp/types/is_polymorphic)
@@ -52,4 +54,5 @@ just described).
 Specifically, proposed `status_code` is an almost-standard-layout type,
 and thus while it can't be returned from `extern "C"` functions as the compiler
 will complain, it is perfectly safe to return from C++ functions to C code on the
-three major compilers.
+three major compilers, as it is an "almost-standard-layout" C++ type if `T` is
+an "almost-standard-layout" C++ type.

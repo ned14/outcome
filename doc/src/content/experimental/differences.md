@@ -50,7 +50,8 @@ that when you see the code:
 The same code under `<system_error>` is highly ambiguous as to whether exact
 or inexact comparison is being performed (after all, all there is is "`code1 == code2`",
 so it depends on the types of `code1` and `code2` which usually is not obvious).
-The ambiguity, and high cognitive load during auditing code for correctness, has
+
+    The ambiguity, and high cognitive load during auditing `<system_error>` code for correctness, has
 led to many surprising and unexpected failure handling bugs during the past
 decade in production C++.
 

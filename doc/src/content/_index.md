@@ -47,6 +47,5 @@ Or, if this function is called in another function that also returns `result<T>`
 is available in scope.
 
 {{% notice note %}}
-This is the v2 Outcome designed in response to feedback from a [Boost peer review held in
-May 2017](https://lists.boost.org/boost-announce/2017/06/0510.php). This library has successfully passed the second Boost peer review, and is currently expected to become part of the Boost official release distribution before the 1.70 release (Spring 2019).
+This library joined [the Boost C++ libraries](https://www.boost.org/doc/libs/develop/libs/outcome/doc/html/index.html) in the 1.70 release (Spring 2019). [It can be grafted into much older Boost releases if desired](https://github.com/boostorg/outcome).
 {{% /notice %}}

@@ -44,12 +44,12 @@ namespace policy
   template <class T, class EC, class E>
   using default_policy = std::conditional_t<  //
   std::is_void<EC>::value && std::is_void<E>::value,
-  terminate,                                                                                         //
-  std::conditional_t<                                                                                //
-  trait::has_error_code_v<EC>, error_code_throw_as_system_error<T, EC, E>,                           //
-  std::conditional_t<                                                                                //
-  trait::has_exception_ptr_v<EC> || trait::has_exception_ptr_v<E>, exception_ptr_rethrow<T, EC, E>,  //
-  fail_to_compile_observers                                                                          //
+  terminate,                                                                                                                     //
+  std::conditional_t<                                                                                                            //
+  trait::is_error_code_available<EC>::value, error_code_throw_as_system_error<T, EC, E>,                                         //
+  std::conditional_t<                                                                                                            //
+  trait::is_exception_ptr_available<EC>::value || trait::is_exception_ptr_available<E>::value, exception_ptr_rethrow<T, EC, E>,  //
+  fail_to_compile_observers                                                                                                      //
   >>>;
 }  // namespace policy
 

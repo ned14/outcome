@@ -47,11 +47,11 @@ namespace policy
       {
         if(base::_has_exception(std::forward<Impl>(self)))
         {
-          detail::_rethrow_exception<trait::has_exception_ptr_v<E>>{base::_exception<T, EC, E, exception_ptr_rethrow>(std::forward<Impl>(self))};
+          detail::_rethrow_exception<trait::is_exception_ptr_available<E>::value>{base::_exception<T, EC, E, exception_ptr_rethrow>(std::forward<Impl>(self))};
         }
         if(base::_has_error(std::forward<Impl>(self)))
         {
-          detail::_rethrow_exception<trait::has_exception_ptr_v<EC>>{base::_error(std::forward<Impl>(self))};
+          detail::_rethrow_exception<trait::is_exception_ptr_available<EC>::value>{base::_error(std::forward<Impl>(self))};
         }
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));  // NOLINT
       }

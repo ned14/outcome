@@ -4,9 +4,13 @@ description = ""
 weight = 30
 +++
 
-Now let us call our `result` returning C++ function from C:
+Firstly we need to declare to C our `result` returning C++ function:
 
-{{% snippet "c_api.c" "program" %}}
+{{% snippet "c_api.c" "preamble" %}}
+
+Now let's call the C++ function from C:
+
+{{% snippet "c_api.c" "example" %}}
 
 Running this C program yields:
 

@@ -106,19 +106,12 @@ namespace trait
 {
   namespace detail
   {
-    template <> struct has_error_code<boost::system::error_code, void>
+    // Shortcut these for lower build impact
+    template <> struct _is_error_code_available<boost::system::error_code>
     {
       static constexpr bool value = true;
     };
-    template <class T> struct has_error_code<T, boost::system::error_code>
-    {
-      static constexpr bool value = true;
-    };
-    template <> struct has_exception_ptr<boost::exception_ptr, void>
-    {
-      static constexpr bool value = true;
-    };
-    template <class T> struct has_exception_ptr<T, boost::exception_ptr>
+    template <> struct _is_exception_ptr_available<boost::exception_ptr>
     {
       static constexpr bool value = true;
     };

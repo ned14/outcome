@@ -21,30 +21,33 @@ Distributed under the Boost Software License, Version 1.0.
 http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#define _CRT_SECURE_NO_WARNINGS 1
+
 #include <errno.h>
 
-//! [preamble]
 #include <stdio.h>
 #include <string.h>  // for strerror
 // This header in Experimental Outcome is pure C, it provides a suite of C helper macros
 #include "../../../include/outcome/experimental/result.h"
 
+//! [preamble]
 // Declare our C++ function's returning result type. Only needs to be done once.
-// This declares a `basic_result<size_t, posix_code>`.
+// This declares an `status_result<size_t, system_code>` which is an alias to
+// `basic_result<size_t, status_code<erased<intptr_t>>>`.
 //
 // The first parameter is some unique identifier for this type which will be used
 // whenever we reference this type in the future.
-CXX_DECLARE_RESULT_ERRNO(to_string_rettype, size_t);
+CXX_DECLARE_RESULT_SYSTEM(to_string_rettype, size_t);
 
 // Tell C about our extern C++ function `to_string()`
-extern CXX_RESULT_ERRNO(to_string_rettype) _Z9to_stringPcmi(char *buffer, size_t bufferlen, int v);
+extern CXX_RESULT_SYSTEM(to_string_rettype) _Z9to_stringPcmi(char *buffer, size_t bufferlen, int v);
 //! [preamble]
 
 //! [example]
 void print(int v)
 {
   char buffer[4];
-  CXX_RESULT_ERRNO(to_string_rettype) res;
+  CXX_RESULT_SYSTEM(to_string_rettype) res;
 
   res = _Z9to_stringPcmi(buffer, sizeof(buffer), v);
   if(CXX_RESULT_HAS_VALUE(res))
@@ -55,14 +58,12 @@ void print(int v)
   // Is the error returned in the POSIX domain and thus an errno?
   if(CXX_RESULT_ERROR_IS_ERRNO(res))
   {
-    fprintf(stderr, "to_string(%d) failed with error code %d (%s)\n", v, res.error.value, strerror(res.error.value));
+    fprintf(stderr, "to_string(%d) failed with error code %d (%s)\n", v, (int) res.error.value, strerror((int) res.error.value));
     return;
   }
-  fprintf(stderr, "to_string(%d) failed with unknown error code %d\n", v, res.error.value);
+  fprintf(stderr, "to_string(%d) failed with unknown error code %lld\n", v, (long long) res.error.value);
 }
-//! [example]
 
-//! [test]
 int main(void)
 {
   print(9);
@@ -71,12 +72,12 @@ int main(void)
   print(9999);
   return 0;
 }
-//! [test]
+//! [example]
 
-extern CXX_RESULT_ERRNO(to_string_rettype) _Z9to_stringPcmi(char *buffer, size_t bufferlen, int v)
+extern CXX_RESULT_SYSTEM(to_string_rettype) _Z9to_stringPcmi(char *buffer, size_t bufferlen, int v)
 {
   // Fake a C++ function so it'll compile and run
-  CXX_RESULT_ERRNO(to_string_rettype) ret;
+  CXX_RESULT_SYSTEM(to_string_rettype) ret;
   memset(&ret, 0, sizeof(ret));
   char temp[256];
   sprintf(temp, "%d", v);

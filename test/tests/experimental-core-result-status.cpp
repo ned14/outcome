@@ -23,7 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../include/outcome/experimental/status_result.hpp"
 
-template <class T, class S = SYSTEM_ERROR2_NAMESPACE::system_code, class NoValuePolicy = OUTCOME_V2_NAMESPACE::experimental::policy::default_status_result_policy<T, S>> using result = OUTCOME_V2_NAMESPACE::experimental::erased_result<T, S, NoValuePolicy>;
+template <class T, class S = SYSTEM_ERROR2_NAMESPACE::system_code, class NoValuePolicy = OUTCOME_V2_NAMESPACE::experimental::policy::default_status_result_policy<T, S>> using result = OUTCOME_V2_NAMESPACE::experimental::status_result<T, S, NoValuePolicy>;
 using OUTCOME_V2_NAMESPACE::in_place_type;
 
 #include "quickcpplib/include/boost/test/unit_test.hpp"
