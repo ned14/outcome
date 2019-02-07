@@ -28,9 +28,10 @@ namespace filesystem
   /*! Copies the file at path `from` to path `to`.
   \returns True if file was successfully copied. If false, `ec` is written with
   the error code reported by the operating system.
-  \throws Never throws.
+  \throws May throw an exception if there is some "catastrophic" failure
+  e.g. failure to allocate memory.
   */
-  bool copy_file(const path &from, const path &to, std::error_code &ec) noexcept;
+  bool copy_file(const path &from, const path &to, std::error_code &ec);
 }
 //! [filesystem_api_problem]
 
@@ -79,10 +80,13 @@ namespace filesystem2
   // we need to for some reason.
   inline void outcome_throw_as_system_error_with_payload(failure_info fi)
   {
-    // If the error code is not filesystem related e.g. ENOMEM, throw that as a standard STL exception.
+    // If the error code is not filesystem related e.g. ENOMEM, throw that as a
+    // standard STL exception.
     outcome::try_throw_std_exception_from_error(fi.ec);
-    // Throw the exact same filesystem_error exception which the throwing copy_file() edition does.
-    throw filesystem_error(fi.ec.message(), std::move(fi.path1), std::move(fi.path2), fi.ec);
+    // Throw the exact same filesystem_error exception which the throwing copy_file()
+    // edition does.
+    throw filesystem_error(fi.ec.message(), std::move(fi.path1),  //
+                           std::move(fi.path2), fi.ec);
   }
 }
 //! [filesystem_api_custom_throw]

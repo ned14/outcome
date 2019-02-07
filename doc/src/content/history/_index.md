@@ -7,6 +7,7 @@ Outcome has had an interesting history, and it is worth summarising it here to s
 Boost library comes to life. The following recollections are by Niall Douglas, and may be
 faulty due to his aging memory.
 
+{{<if_boost "graph.png">}}
 {{<mermaid>}}
 gantt
   dateFormat YYYY-MM
@@ -30,6 +31,7 @@ gantt
   Boost.Outcome docs gain BoostDoc theming: crit, done, 2018-12,2d
   Planned release of v2.1 into Boost 1.70: crit, active, 2019-04,2d
 {{</mermaid>}}
+{{</if_boost>}}
 
 ## The genesis of Outcome v1
 

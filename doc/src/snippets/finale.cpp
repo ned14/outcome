@@ -54,7 +54,7 @@ namespace httplib
     std::string url{};  // The failing URL
   };
   // Localise a result implementation to this library
-  template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, failure>;
+  template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, failure, OUTCOME_V2_NAMESPACE::policy::terminate>;
 
   /* Performs a HTTP GET on the url, returning the body if successful,
   a failure with status_code if unsuccessful at the HTTP level, or a

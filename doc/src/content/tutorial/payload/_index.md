@@ -6,13 +6,16 @@ tags = [ "payload", "has_error_code", "make_error_code" ]
 +++
 
 So far in this tutorial, type `EC` in `result<T, EC>` has always been a
-`std::error_code` (though it can be of any type you wish instead). `EC` needs
-in fact to merely satisfy
+`std::error_code` or `boost::system::error_code`. With `NoValuePolicy`
+set to {{% api "default_policy<T, EC, EP>" %}}, `EC` needs
+in fact to merely satisfy the trait
 {{< api "is_error_code_available<T>">}}
-for `EC` to be treated as if an `std::error_code`.
+for `EC` to be treated as if an `error_code`. Outcome specialises that
+trait for `std::error_code` and `boost::system::error_code`,
+hence they "just work".
 
-In turn, `trait::is_error_code_available<EC>` is true if `EC` is an error code,
-or there exists some ADL discovered free function `make_error_code(EC)`.
+If no specialisation exists, `trait::is_error_code_available<EC>` is true
+if there exists some ADL discovered free function `make_error_code(EC)`.
 
 Thus, we can in fact use any custom `EC` type we like, including one carrying additional
 information, or *payload*. This payload can carry anything you like, and you can tell

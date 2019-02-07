@@ -6,22 +6,33 @@ tags = ["outcome"]
 +++
 
 
-Type {{< api "outcome<T, EC, EP, NoValuePolicy>" >}} represets either a successfully computed value of type `T` or a reason for failure. Failure can be represented by `EC` or `EP` or both. Although usually it will either be an `EC` or an `EP`. `EC` defaults to `std::error_code` and `EP` defaults to `std::exception_ptr`. The distinction is made into two types, `EC` and `EP`:
+Type {{< api "outcome<T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy<T, EC, EP>>" >}} represents either a successfully computed value of type `T`, or one or two reasons for failure. Failure can be represented by `EC`, or `EP`, or both, although usually it will either be an `EC` or an `EP`.
+Similarly to `result`, `EC` defaults to `std::error_code`/`boost::system_error_code`, and `EP` defaults to `std::exception_ptr`/`boost::exception_ptr`.
 
-- `EC` represents a failue from lower-layer function which was retured through {{< api "result<T, E, NoValuePolicy>" >}}.
-- `EP` represents pointer to an exception thrown in a lower-layer function to signal a failure; but at the current level we do not want to proceed with stack unwinding.
+The distinction is made into two types, `EC` and `EP`:
 
+- `EC` represents a *recoverable* failure from a lower-layer function, perhaps which was returned through {{< api "result<T, E = varies, NoValuePolicy = policy::default_policy<T, E, void>>" >}}.
+- `EP` represents an *unrecoverable* failure where a C++ exception would ordinarily have been thrown. This is usually a pointer to an exception throw.
+
+It should be emphasised that this distinction is by convention only, but it will be confusing to your
+users if you deviate significantly from this convention.
+
+<hr>
+
+### Legacy codebases
 
 `outcome` is useful for transporting exceptions across layers of the program that were never designed with exception safety in mind.
 
 Consider a program consisting of three layers:
 
+{{<if_boost "layer_chart.gif">}}
 {{<mermaid>}}
 graph BT
     L3["Layer3"]
     L2["Layer2_old"] --> L3
     L1["Layer1"] --> L2
 {{</mermaid>}}
+{{</if_boost>}}
 
 The highest-level layer, `Layer3`, uses exceptions for signalling failures. The middle layer, `Layer2_old`,
 was not designed with exception safety in mind and functions need to return information about failures in return value.

@@ -13,9 +13,15 @@ If we are storing an `std::error_code` throw it as `std::system_error`, which is
 {{% snippet "using_outcome.cpp" "def_z" %}}
 
 Function `has_exception` checks if it is `EP` (`std::exception_ptr`) that is stored, function `exception` accesses it. Similarly, function `error` accesses the `EC` (`std::error_code`) if it is stored.
-`outcome<>` also has a function `has_failure` to check if either `EC` or `EP` is being stored. In fact, the above pattern of "unpacking" `outcome<>`
-is so common that it has been implemented inside function `.value()`, so function `z` could be written as:
+`outcome<>` also has a function `has_failure` to check if either `EC` or `EP` is being stored.
+
+It would seem obvious that the above pattern of "unpacking" `outcome<>`
+is so common that it ought to be implemented inside function `.value()`,
+so function `z` could be written as:
 
 ```c++
 return old::h().value();
-```   
+```
+
+And this is exactly what the aforementioned no-value policy template argument is for, which is described in
+the next section.

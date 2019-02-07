@@ -45,7 +45,7 @@ int main()
     failure1,  // (for rationale, see tutorial on error codes)
     failure2
   };
-  result<udt, err> res(err::failure1);
+  result<udt, err, policy::terminate> res(err::failure1);
 
   // What happens here? What exception type is thrown?
   try

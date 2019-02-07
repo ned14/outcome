@@ -5,34 +5,44 @@ weight = 10
 tags = ["result", "try", "namespace"]
 +++
 
-## Outcome 2.0 namespace
+## Outcome v2 namespace
 
-It is recommended that you refer to entities from this Outcome 2.0 via the following namespace alias:
+It is recommended that you refer to entities from this Outcome v2 via the following namespace alias:
 
 {{% snippet "using_result.cpp" "namespace" %}}
 
-As patches and modifications are applied to this library, namespaces get permuted in order
-not to break any backward compatibility. At some point namespace `outcome::v2` will be defined,
-and this will be the prefered namespace. Until then `OUTCOME_V2_NAMESPACE` denotes the most recently
-updated version, getting closer to `outcome::v2`.
+On standalone Outcome only, as patches and modifications are applied to this library,
+namespaces get permuted in order to not to cause binary incompatibility. At some point
+namespace `outcome_v2` will be defined, and this will be the preferred namespace.
+Until then `OUTCOME_V2_NAMESPACE` denotes the most recently
+updated version, getting closer to `outcome_v2`.
+
+On Boost.Outcome only, as Boost provides no binary compatibility across releases,
+`OUTCOME_V2_NAMESPACE` always expands into `boost::outcome_v2`.
 
 ## Creating `result<>`
 
-We will define a function that converts an `std::string` to an `int`. This function can fail for a number of reasons;
+We will define a function that converts a `std::string` to an `int`. This function can fail for a number of reasons;
 if it does we want to communicate the failure reason.
 
 {{% snippet "using_result.cpp" "convert_decl" %}}
 
-Class template {{< api "result<T, E, NoValuePolicy>" >}}
+Template alias {{< api "result<T, E = varies, NoValuePolicy = policy::default_policy<T, E, void>>" >}}
 has three template parameters, but the last two have default values. The first
 (`T`) represents the type of the object returned from the function upon success.
 The second (`EC`) is the type of object containing information about the reason
 for failure when the function fails. A result object stores either a `T` or an
-`EC` at any given moment, and is therefore conceptually similar to `variant<T, EC>`. `EC` is defaulted to
-`std::error_code`. The third parameter (`NoValuePolicy`) is called a
+`EC` at any given moment, and is therefore conceptually similar to `variant<T, EC>`.
+`EC` is defaulted to `std::error_code` in standalone Outcome, or to `boost::system::error_code`
+in Boost.Outcome[^1]. The third parameter (`NoValuePolicy`) is called a
 no-value policy. We will cover it later.
 
-If both `T` and `EC` are trivially copyable, `result<T, EC, NVP>` is also trivially copyable.
+If both `T` and `EC` are [trivially copyable](https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable), `result<T, EC, NVP>` is also trivially copyable.
+Triviality, complexity and constexpr-ness of each operation (construction, copy construction, assignment,
+destruction etc) is always the intersection of the corresponding operation in `T` and `EC`,
+so for example if both `T` and `EC` are [literal types](https://en.cppreference.com/w/cpp/named_req/LiteralType), so will be `result<T, EC, NVP>`.
+Additionally, if both `T` and `EC` have [standard layout](https://en.cppreference.com/w/cpp/named_req/StandardLayoutType), `result<T, EC, NVP>` has standard layout;
+thus if both `T` and `EC` are C-compatible, so will `result<T, EC, NVP>` be C-compatible.
 
 Now, we will define an enumeration describing different failure situations during conversion.
 
@@ -54,3 +64,5 @@ all implicit conversion is disabled, and you will need to use one of the tagged 
 Or use helper factory functions:
 
 {{% snippet "using_result.cpp" "factory" %}}
+
+[^1]: You can mandate a choice using `std_result<T>` or `boost_result<T>`.
