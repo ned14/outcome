@@ -16,7 +16,7 @@ perhaps kept per-thread to avoid the need to keep mutexes.
 
 {{% snippet "error_code_extended.cpp" "error_code_extended1" %}}
 
-The extended error info is kept in a sixteen item long ring buffer. We continuously
+The extended error info is kept in a sixteen item long, thread local, ring buffer. We continuously
 increment the current index pointer which is a 16 bit value which will wrap after
 65,535. This lets us detect an attempt to access recycled storage, and thus return
 item-not-found instead of the wrong extended error info.

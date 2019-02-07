@@ -57,8 +57,6 @@ useful to include into your build.
  - [ ] Rerun native overhead benchmark, make new graph.
  - [ ] Get all docs snippets compiling again, reflow tutorial.
  - [X] Reduce depth of Boost.Outcome front index.
- - [ ] Add page to docs on how to customise ASIO's `async_result` to return
-`outcome::result<T>`, maybe under new section "Integrations"
  - [ ] Test with LLFIO et al, make sure everything still works.
 
 ## Commits and tags in this git repository can be verified using:

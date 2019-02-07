@@ -146,8 +146,12 @@ namespace error_code_extended
         // Make a custom string for the exception
         std::string str(o->error().message());
         str.append(" [");
-        char **symbols = ::backtrace_symbols(eei->backtrace.data(), eei->items);
-        if(symbols != nullptr)
+        struct unsymbols  // RAII cleaner for symbols
+        {
+          char **_{nullptr};
+          ~unsymbols() { ::free(_); }
+        } symbols{::backtrace_symbols(eei->backtrace.data(), eei->items)};
+        if(symbols._ != nullptr)
         {
           for(size_t n = 0; n < eei->items; n++)
           {
@@ -155,9 +159,8 @@ namespace error_code_extended
             {
               str.append("; ");
             }
-            str.append(symbols[n]);
+            str.append(symbols._[n]);
           }
-          ::free(symbols);  // not exception safe, could leak symbols if appending str fails
         }
         str.append("]");
 
@@ -176,13 +179,27 @@ namespace error_code_extended
   // is used as the source for copy construction our localised outcome
   template <class T, class U> inline void hook_outcome_copy_construction(outcome<T> *res, const result<U> & /*unused*/) noexcept
   {
-    // when copy constructing from a result<T>, poke in an exception
-    poke_exception(res);
+    try
+    {
+      // when copy constructing from a result<T>, poke in an exception
+      poke_exception(res);
+    }
+    catch(...)
+    {
+      // Do nothing
+    }
   }
   template <class T, class U> inline void hook_outcome_move_construction(outcome<T> *res, result<U> && /*unused*/) noexcept
   {
-    // when move constructing from a result<T>, poke in an exception
-    poke_exception(res);
+    try
+    {
+      // when move constructing from a result<T>, poke in an exception
+      poke_exception(res);
+    }
+    catch(...)
+    {
+      // Do nothing
+    }
   }
 }
 //! [error_code_extended5]
