@@ -3,11 +3,11 @@ title = "Incommensurate E types"
 weight = 5
 +++
 
-Back in the tutorial section on Default Actions, we studied a likely very common
-initial choice of `E` type: [a strongly typed enum](../../default-actions/enums).
-We saw how by marking up strongly typed enums to tell the C++ standard library
-what they are, they gain implicit convertibility into `std::error_code`, and we
-then pointed out that you might as well now set `E = std::error_code` as that
+Back in the tutorial section on `result`, we studied a likely very common
+initial choice of `E` type: [a strongly typed enum]({{< relref "/tutorial/essential/result" >}}).
+We saw how [by marking up strongly typed enums to tell the C++ standard library
+what they are]({{< relref "/motivation/plug_error_code" >}}), they gain implicit convertibility into `std::error_code`, and we
+then pointed out that you might as well now always set `E = std::error_code`, as that
 comes with the enormous advantage that you can use the boilerplate saving
 `OUTCOME_TRY` macro when the `E` type is always the same.
 

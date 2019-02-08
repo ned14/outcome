@@ -10,7 +10,7 @@ The deepest method is simply to inherit from `basic_result` or `basic_outcome`, 
 for which you will need to study the source code as that form of customisation is out of scope for this tutorial.
 
 Another option is to supply a custom `NoValuePolicy` which can get you surprisingly
-far into customisation ([see preceding section]({{< relref "/tutorial/no-value/custom" >}})).
+far into customisation ([see preceding section]({{< relref "/tutorial/essential/no-value/custom" >}})).
 
 The final option, which this section covers, is to use the ADL discovered event hooks
 which tell you when a namespace-localised `basic_outcome` or `basic_result` has been:
