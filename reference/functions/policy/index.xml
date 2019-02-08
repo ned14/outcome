@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Policy on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/reference/functions/policy/</link>
+    <description>Recent content in Policy on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Tue, 22 Jan 2019 01:11:40 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/reference/functions/policy/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`auto basic_outcome_failure_exception_from_error(const EC &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/policy/basic_outcome_failure_exception_from_error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/policy/basic_outcome_failure_exception_from_error/</guid>
+      <description>Synthesises an exception type from an error type, used by the exception_type failure() const noexcept observers. ADL discovered. Default overloads for this function are defined in Outcome for  std::error_code and boost::system::error_code, these return std::make_exception_ptr(std::system_error(ec)) and boost::copy_exception(boost::system::system_error(ec)) respectively.
+Overridable: Argument dependent lookup.
+Requires: Nothing.
+Namespace: Namespace of EC type.
+Header: &amp;lt;outcome/std_outcome.hpp&amp;gt;, &amp;lt;outcome/boost_outcome.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`decltype(auto) exception_ptr(T &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/policy/exception_ptr/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/policy/exception_ptr/</guid>
+      <description>Extracts a boost::exception_ptr or  std::exception_ptr from the input via ADL discovery of a suitable make_exception_ptr(T) function.
+Overridable: Argument dependent lookup.
+Requires: Always available.
+Namespace: OUTCOME_V2_NAMESPACE::policy
+Header: &amp;lt;outcome/std_result.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`void outcome_throw_as_system_error_with_payload(BoostErrorCodeEnum &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_enum/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_enum/</guid>
+      <description>A specialisation of outcome_throw_as_system_error_with_payload() for types where boost::system::errc::is_error_code_enum&amp;lt;BoostErrorCodeEnum&amp;gt; or boost::system::errc::is_error_condition_enum&amp;lt;BoostErrorCodeEnum&amp;gt; is true. This executes OUTCOME_THROW_EXCEPTION(expr) with a boost::system::system_error constructed from the result of the ADL discovered free function make_error_code(BoostErrorCodeEnum).
+Overridable: Argument dependent lookup.
+Requires: Either boost::system::errc::is_error_code_enum&amp;lt;T&amp;gt; or boost::system::errc::is_error_condition_enum&amp;lt;T&amp;gt; to be true for a decayed BoostErrorCodeEnum.
+Namespace: boost::system
+Header: &amp;lt;outcome/boost_result.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`void outcome_throw_as_system_error_with_payload(ErrorCodeEnum &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_enum/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_enum/</guid>
+      <description>A specialisation of outcome_throw_as_system_error_with_payload() for types where std::is_error_code_enum&amp;lt;ErrorCodeEnum&amp;gt; or std::is_error_condition_enum&amp;lt;ErrorCodeEnum&amp;gt; is true. This executes OUTCOME_THROW_EXCEPTION(expr) with a  std::system_error constructed from the result of the ADL discovered free function make_error_code(ErrorCodeEnum).
+Overridable: Argument dependent lookup.
+Requires: Either  std::is_error_code_enum&amp;lt;T&amp;gt; or  std::is_error_condition_enum&amp;lt;T&amp;gt; to be true for a decayed ErrorCodeEnum.
+Namespace: std
+Header: &amp;lt;outcome/std_result.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`void outcome_throw_as_system_error_with_payload(const boost::system::error_code &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_error_code/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_error_code/</guid>
+      <description>A specialisation of outcome_throw_as_system_error_with_payload() for boost::system::error_code. This executes OUTCOME_THROW_EXCEPTION(expr) with a boost::system::system_error constructed from the input.
+Overridable: Argument dependent lookup.
+Requires: Nothing.
+Namespace: boost::system
+Header: &amp;lt;outcome/boost_result.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`void outcome_throw_as_system_error_with_payload(const std::error_code &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_error_code/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_error_code/</guid>
+      <description>A specialisation of outcome_throw_as_system_error_with_payload() for std::error_code. This executes OUTCOME_THROW_EXCEPTION(expr) with a  std::system_error constructed from the input.
+Overridable: Argument dependent lookup.
+Requires: Nothing.
+Namespace: std
+Header: &amp;lt;outcome/std_result.hpp&amp;gt;</description>
+    </item>
+    
+  </channel>
+</rss>

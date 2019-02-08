@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>`base` on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/reference/policies/base/</link>
+    <description>Recent content in `base` on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Tue, 22 Jan 2019 01:11:40 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/reference/policies/base/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`static void _ub(Impl &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/ub/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/ub/</guid>
+      <description>This is a special function which does compiler-specific stuff to tell the compiler that this function can never, ever, ever be executed. The compiler&amp;rsquo;s optimiser will hard assume that this function can never be executed, and will prune the possibility of it being executed completely. Generally this means that the code path stops dead, and if execution does proceed down this path, it will run off the end of a branch which doesn&amp;rsquo;t go anywhere.</description>
+    </item>
+    
+    <item>
+      <title>`static bool _has_value(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/has_value/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/has_value/</guid>
+      <description>Returns true if a value is present in the implementation passed in. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static bool _has_error(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/has_error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/has_error/</guid>
+      <description>Returns true if an error is present in the implementation passed in. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static bool _has_exception(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/has_exception/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/has_exception/</guid>
+      <description>Returns true if an exception is present in the implementation passed in. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static bool _has_error_is_errno(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/has_error_is_errno/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/has_error_is_errno/</guid>
+      <description>Returns true if the error code in the implementation passed in has a domain or category matching that of POSIX errno. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static auto &amp;&amp;_value(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/value/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/value/</guid>
+      <description>Returns a reference to the value in the implementation passed in. No checking is done to ensure there is a value. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static auto &amp;&amp;_error(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/error/</guid>
+      <description>Returns a reference to the error in the implementation passed in. No checking is done to ensure there is an error. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static auto &amp;&amp;_exception(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/exception/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/exception/</guid>
+      <description>Returns a reference to the exception in the implementation passed in. No checking is done to ensure there is an error. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static void _set_has_value(Impl &amp;&amp;, bool) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/set_has_value/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/set_has_value/</guid>
+      <description>Sets whether the implementation has a value by setting or clearing the relevant bit in the flags. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static void _set_has_error(Impl &amp;&amp;, bool) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/set_has_error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/set_has_error/</guid>
+      <description>Sets whether the implementation has an error by setting or clearing the relevant bit in the flags. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static void _set_has_exception(Impl &amp;&amp;, bool) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/set_has_exception/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/set_has_exception/</guid>
+      <description>Sets whether the implementation has an exception by setting or clearing the relevant bit in the flags. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static void _set_has_exception(Impl &amp;&amp;, bool) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/set_has_error_is_errno/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/set_has_error_is_errno/</guid>
+      <description>Sets whether the implementation&amp;rsquo;s error code has a domain or category matching that of POSIX errno by setting or clearing the relevant bit in the flags. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static void narrow_value_check(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/narrow_value_check/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/narrow_value_check/</guid>
+      <description>Observer policy performing hard UB if no value is present, by calling static void _ub(Impl &amp;amp;&amp;amp;). Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static void narrow_error_check(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/narrow_error_check/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/narrow_error_check/</guid>
+      <description>Observer policy performing hard UB if no error is present, by calling static void _ub(Impl &amp;amp;&amp;amp;). Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static void narrow_exception_check(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/narrow_exception_check/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/narrow_exception_check/</guid>
+      <description>Observer policy performing hard UB if no exception is present, by calling static void _ub(Impl &amp;amp;&amp;amp;). Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+  </channel>
+</rss>

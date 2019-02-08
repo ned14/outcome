@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>API reference on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/reference/</link>
+    <description>Recent content in API reference on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 11 Jan 2019 20:57:15 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/reference/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+  </channel>
+</rss>

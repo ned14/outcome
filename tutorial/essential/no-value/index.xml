@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>No-value policies on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/tutorial/essential/no-value/</link>
+    <description>Recent content in No-value policies on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/tutorial/essential/no-value/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>A custom no-value policy</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/no-value/custom/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/no-value/custom/</guid>
+      <description>If you want your basic_outcome&amp;lt;&amp;gt; or basic_result&amp;lt;&amp;gt; instances to call std::abort() whenever .value() is called on an object that does not contain a value, or .error() is called on an object that does not contain an error, you will need to define your own no-value policy as follows:
+struct abort_policy : outcome::policy::base { template &amp;lt;classImpl&amp;gt; static constexpr void wide_value_check(Impl &amp;amp;&amp;amp;self) { if(!base::_has_value(std::forward&amp;lt;Impl&amp;gt;(self))) std::abort(); } template &amp;lt;classImpl&amp;gt; static constexpr void wide_error_check(Impl &amp;amp;&amp;amp;self) { if(!</description>
+    </item>
+    
+    <item>
+      <title>Built-in policies</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/no-value/builtin/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/no-value/builtin/</guid>
+      <description>These are the predefined policies built into Outcome:
+all_narrow If there is an observation of a value/error/exception which is not present, the program is put into a hard undefined behaviour situation. However this is a tool-friendly UB using intrinsics such as __builtin_unreachable() that allows tools to make use of it, e.g., better bug detection or optimizations.
+ terminate Observation of a missing value/error/exception causes a call to std::terminate().
+ error_code_throw_as_system_error&amp;lt;T, EC, EP&amp;gt; This policy assumes that EC has the interface of std::error_code, and EP has the interface of std::exception_ptr.</description>
+    </item>
+    
+  </channel>
+</rss>

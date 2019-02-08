@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Inplace Constructors on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/categories/inplace-constructors/</link>
+    <description>Recent content in Inplace Constructors on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	<atom:link href="https://ned14.github.io/outcome/categories/inplace-constructors/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`basic_outcome(A1 &amp;&amp;, A2 &amp;&amp;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/implicit_inplace_value_error_exception_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/implicit_inplace_value_error_exception_constructor/</guid>
+      <description>Implicit inplace value or error or exception constructor. Delegates to an appropriate explicit inplace constructor depending on input.
+Requires: predicate::enable_inplace_value_error_exception_constructor` is true.
+Complexity: Same as for the value_type or error_type or exception_type constructor which accepts A1, A2, Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result(A1 &amp;&amp;, A2 &amp;&amp;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/implicit_inplace_value_error_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_inplace_value_error_constructor/</guid>
+      <description>Implicit inplace value or error constructor. Delegates to an appropriate explicit inplace constructor depending on input.
+Requires: predicate::enable_inplace_value_error_constructor` is true.
+Complexity: Same as for the value_type or error_type constructor which accepts A1, A2, Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_outcome(in_place_type_t&lt;error_type_if_enabled&gt;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_inplace_error_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_inplace_error_constructor/</guid>
+      <description>Explicit inplace error constructor. Calls void hook_outcome_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;error_type&amp;gt; and Args ....
+Requires: predicate::enable_inplace_error_constructor&amp;lt;Args ...&amp;gt; is true.
+Complexity: Same as for the error_type constructor which accepts Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_outcome(in_place_type_t&lt;error_type_if_enabled&gt;, std::initializer_list&lt;U&gt;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_inplace_error_constructor_il/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_inplace_error_constructor_il/</guid>
+      <description>Explicit inplace error constructor. Calls void hook_outcome_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;error_type&amp;gt;, std::initializer_list&amp;lt;U&amp;gt; and Args ....
+Requires: predicate::enable_inplace_error_constructor&amp;lt;std::initializer_list&amp;lt;U&amp;gt;, Args ...&amp;gt; is true.
+Complexity: Same as for the error_type constructor which accepts std::initializer_list&amp;lt;U&amp;gt;, Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_outcome(in_place_type_t&lt;exception_type_if_enabled&gt;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_inplace_exception_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_inplace_exception_constructor/</guid>
+      <description>Explicit inplace exception constructor. Calls void hook_outcome_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;exception_type&amp;gt; and Args ....
+Requires: predicate::enable_inplace_exception_constructor&amp;lt;Args ...&amp;gt; is true.
+Complexity: Same as for the exception_type constructor which accepts Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_outcome(in_place_type_t&lt;exception_type_if_enabled&gt;, std::initializer_list&lt;U&gt;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_inplace_exception_constructor_il/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_inplace_exception_constructor_il/</guid>
+      <description>Explicit inplace exception constructor. Calls void hook_outcome_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;exception_type&amp;gt;, std::initializer_list&amp;lt;U&amp;gt; and Args ....
+Requires: predicate::enable_inplace_exception_constructor&amp;lt;std::initializer_list&amp;lt;U&amp;gt;, Args ...&amp;gt; is true.
+Complexity: Same as for the exception_type constructor which accepts std::initializer_list&amp;lt;U&amp;gt;, Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_outcome(in_place_type_t&lt;value_type_if_enabled&gt;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_inplace_value_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_inplace_value_constructor/</guid>
+      <description>Explicit inplace value constructor. Calls void hook_outcome_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;value_type&amp;gt; and Args ....
+Requires: predicate::enable_inplace_value_constructor&amp;lt;Args ...&amp;gt; is true.
+Complexity: Same as for the value_type constructor which accepts Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_outcome(in_place_type_t&lt;value_type_if_enabled&gt;, std::initializer_list&lt;U&gt;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_inplace_value_constructor_il/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_inplace_value_constructor_il/</guid>
+      <description>Explicit inplace value constructor. Calls void hook_outcome_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;value_type&amp;gt;, &amp;lsquo;std::initializer_list&amp;rsquo; and Args ....
+Requires: predicate::enable_inplace_value_constructor&amp;lt;std::initializer_list&amp;lt;U&amp;gt;, Args ...&amp;gt; is true.
+Complexity: Same as for the value_type constructor which accepts std::initializer_list&amp;lt;U&amp;gt;, Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_result(in_place_type_t&lt;error_type_if_enabled&gt;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_error_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_error_constructor/</guid>
+      <description>Explicit inplace error constructor. Calls void hook_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;error_type&amp;gt; and Args ....
+Requires: predicate::enable_inplace_error_constructor&amp;lt;Args ...&amp;gt; is true.
+Complexity: Same as for the error_type constructor which accepts Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_result(in_place_type_t&lt;error_type_if_enabled&gt;, std::initializer_list&lt;U&gt;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_error_constructor_il/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_error_constructor_il/</guid>
+      <description>Explicit inplace error constructor. Calls void hook_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;error_type&amp;gt;, std::initializer_list&amp;lt;U&amp;gt; and Args ....
+Requires: predicate::enable_inplace_error_constructor&amp;lt;std::initializer_list&amp;lt;U&amp;gt;, Args ...&amp;gt; is true.
+Complexity: Same as for the error_type constructor which accepts std::initializer_list&amp;lt;U&amp;gt;, Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_result(in_place_type_t&lt;value_type_if_enabled&gt;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_value_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_value_constructor/</guid>
+      <description>Explicit inplace value constructor. Calls void hook_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;value_type&amp;gt; and Args ....
+Requires: predicate::enable_inplace_value_constructor&amp;lt;Args ...&amp;gt; is true.
+Complexity: Same as for the value_type constructor which accepts Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_result(in_place_type_t&lt;value_type_if_enabled&gt;, std::initializer_list&lt;U&gt;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_value_constructor_il/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_value_constructor_il/</guid>
+      <description>Explicit inplace value constructor. Calls void hook_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;value_type&amp;gt;, &amp;lsquo;std::initializer_list&amp;rsquo; and Args ....
+Requires: predicate::enable_inplace_value_constructor&amp;lt;std::initializer_list&amp;lt;U&amp;gt;, Args ...&amp;gt; is true.
+Complexity: Same as for the value_type constructor which accepts std::initializer_list&amp;lt;U&amp;gt;, Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+  </channel>
+</rss>

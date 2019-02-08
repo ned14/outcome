@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Macros on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/reference/macros/</link>
+    <description>Recent content in Macros on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 11 Jan 2019 20:57:15 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/reference/macros/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Constrained template macros</title>
+      <link>https://ned14.github.io/outcome/reference/macros/template/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/template/</guid>
+      <description>Overridable: All of the following macros are overridable, define before inclusion.
+Header: &amp;lt;outcome/config.hpp&amp;gt;
+These macros expand into either the syntax for directly specifying constrained templates in C++ 20, or into a SFINAE based emulation for earlier C++ versions. Form of usage looks as follows:
+OUTCOME_TEMPLATE(classErrorCondEnum) OUTCOME_TREQUIRES( // If this is a valid expression  OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))), // If this predicate is true  OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor&amp;lt;ErrorCondEnum&amp;gt;) // Any additional requirements follow here .</description>
+    </item>
+    
+    <item>
+      <title>Version macros</title>
+      <link>https://ned14.github.io/outcome/reference/macros/version/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/version/</guid>
+      <description>Overridable: None of the following macros are overridable.
+Header: &amp;lt;outcome/config.hpp&amp;gt;
+ OUTCOME_VERSION_MAJOR &amp;lt;number&amp;gt;
+Major version for cmake and DLL version stamping.
+ OUTCOME_VERSION_MINOR &amp;lt;number&amp;gt;
+Minor version for cmake and DLL version stamping.
+ OUTCOME_VERSION_PATCH &amp;lt;number&amp;gt;
+Patch version for cmake and DLL version stamping.
+ OUTCOME_VERSION_REVISION &amp;lt;number&amp;gt;
+Revision version for cmake and DLL version stamping.
+ OUTCOME_UNSTABLE_VERSION &amp;lt;number&amp;gt;
+Defined between stable releases of Outcome. It means the inline namespace will be permuted per-commit to ensure ABI uniqueness such that multiple versions of Outcome in a single process space cannot collide.</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_DISABLE_EXECINFO`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/disable_execinfo/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/disable_execinfo/</guid>
+      <description>If defined, disables the use of the &amp;lt;execinfo.h&amp;gt; header (or the win32 emulation).
+Some embedded Linux toolchains do not define &amp;lt;execinfo.h&amp;gt;, thus disabling C++ exceptions on those toolchains produces a failure to find this file. Avoid that problem by defining this macro to disable stack backtrace support entirely.
+Overridable: Define before inclusion.
+Default: Defined if __ANDROID__ is defined, else undefined.
+Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_NODISCARD`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/nodiscard/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/nodiscard/</guid>
+      <description>Compiler-specific markup used to tell the compiler than the return value of a function should not be discarded without examining it.
+Overridable: Define before inclusion.
+Default: To [[nodiscard]] if on C++ 17 or higher, __attribute__((warn_unused_result)) if on clang, SAL _Must_inspect_result_ if on MSVC, otherwise nothing.
+Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_REQUIRES(...)`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/requires/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/requires/</guid>
+      <description>A C++ 20 requires(...), if available.
+Overridable: Define before inclusion.
+Default: To requires(...) if on C++ 20 or later, else to nothing.
+Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_SYMBOL_VISIBLE`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/symbol_visible/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/symbol_visible/</guid>
+      <description>Compiler-specific markup used to mark throwable types as always having default ELF symbol visibility, without which it will be impossible to catch throws of such types across shared library boundaries on ELF only.
+Overridable: Define before inclusion.
+Default: Standalone Outcome: To __attribute__((visibility(&amp;quot;default&amp;quot;)) on GCC and clang when targeting ELF, otherwise nothing. Boost.Outcome: To BOOST_SYMBOL_VISIBLE. 
+Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_THREAD_LOCAL`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/thread_local/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/thread_local/</guid>
+      <description>Compiler-specific markup used to mark variables as having thread local storage duration.
+This isn&amp;rsquo;t used inside Outcome, but is used by its unit test suite.
+ Overridable: Define before inclusion.
+Default: To thread_local if the compiler implements C++ 11 thread_local, else __thread for the one supported compiler (older Mac OS XCode) which does not.
+Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_THROW_EXCEPTION(expr)`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/throw_exception/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/throw_exception/</guid>
+      <description>Throws a C++ exception, or equivalent thereof.
+Overridable: Define before inclusion.
+Default: Standalone Outcome (C++ exceptions enabled): To throw expr Standalone Outcome (C++ exceptions disabled): To OUTCOME_V2_NAMESPACE::detail::do_fatal_exit(#expr) which is a function which prints a useful error message including a stack backtrace (where available) to stderr before calling abort(). Boost.Outcome: To BOOST_THROW_EXCEPTION(expr). 
+Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_TRY(var, expr)`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/try/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/try/</guid>
+      <description>Evaluate an expression which results in a type matching the ValueOrError&amp;lt;T, E&amp;gt; concept, assigning T to a variable called var if successful, immediately returning try_operation_return_as(expr) from the calling function if unsuccessful.
+Overridable: Not overridable.
+Definition: See OUTCOME_TRYV(expr) for most of the mechanics.
+If successful, an auto &amp;amp;&amp;amp;var is initialised to the expression result&amp;rsquo;s .assume_value() if available, else to its .value(). This binds a reference possibly to the T stored inside the bound result of the expression, but possibly also to a temporary emitted from the value observer function.</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/tryv/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/tryv/</guid>
+      <description>Evaluate an expression which results in a type matching the ValueOrError&amp;lt;T, E&amp;gt; concept, continuing execution if successful, immediately returning try_operation_return_as(expr) from the calling function if unsuccessful.
+The difference between the OUTCOME_TRYV(expr) and OUTCOME_TRY(expr) editions is that the latter will set a variable if two or more macro arguments are present (see OUTCOME_TRY(var, expr)). The former requires the T to be void.
+Overridable: Not overridable.
+Definition: Firstly the expression&amp;rsquo;s temporary is bound to a uniquely named, stack allocated, auto &amp;amp;&amp;amp;.</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_TRYX(expr)`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/tryx/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/tryx/</guid>
+      <description>Evaluate an expression which results in a type matching the ValueOrError&amp;lt;T, E&amp;gt; concept, emitting the T if successful, immediately returning try_operation_return_as(expr) from the calling function if unsuccessful.
+Availability: GCC and clang only. Use #ifdef OUTCOME_TRYX to determine if available.
+Overridable: Not overridable.
+Definition: See OUTCOME_TRYV(expr) for most of the mechanics.
+This macro makes use of a proprietary extension in GCC and clang to emit the T from a successful expression. You can thus use OUTCOME_TRYX(expr) directly in expressions e.</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_USE_STD_IN_PLACE_TYPE`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/in_place_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/in_place_type/</guid>
+      <description>How to implement in_place_type_t&amp;lt;T&amp;gt; and in_place_type&amp;lt;T&amp;gt;.
+If set to 1, the &amp;lt;utility&amp;gt; header is included, and std::in_place_type_t&amp;lt;T&amp;gt; is aliased into OUTCOME_V2_NAMESPACE::in_place_type_t&amp;lt;T&amp;gt; along with std::in_place_type&amp;lt;T&amp;gt;.
+If set to 0, a local emulation is used.
+Overridable: Define before inclusion.
+Default: If the current compiler implements C++ 17 or later, if unset this macro is defaulted to 1, otherwise it is defaulted to 0.
+Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/is_nothrow_swappable/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/is_nothrow_swappable/</guid>
+      <description>Whether to implement is_nothrow_swappable&amp;lt;T&amp;gt; as std::is_nothrow_swappable&amp;lt;T&amp;gt;, or else use a local emulation.
+Overridable: Define before inclusion.
+Default: If the current compiler implements C++ 17 or later, if unset this macro is defaulted to 1, otherwise it is defaulted to 0.
+Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
+    </item>
+    
+  </channel>
+</rss>

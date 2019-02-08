@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Observers on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/categories/observers/</link>
+    <description>Recent content in Observers on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	<atom:link href="https://ned14.github.io/outcome/categories/observers/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`auto as_failure() const &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/as_failure_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/as_failure_lvalue/</guid>
+      <description>Return the output from free function auto failure(T &amp;amp;&amp;amp;, ...) containing a copy of any errored state. The error state is accessed using const error_type &amp;amp;assume_error() const &amp;amp; noexcept.
+Requires: Always available.
+Complexity: Whatever that of error_type&amp;rsquo;s copy constructor is.
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`bool has_error() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/has_error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/has_error/</guid>
+      <description>Returns true if an error is present. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`bool has_error() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/has_error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/has_error/</guid>
+      <description>Returns true if an error is present. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`bool has_exception() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/has_exception/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/has_exception/</guid>
+      <description>Returns true if an exception is present. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`bool has_exception() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/has_exception/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/has_exception/</guid>
+      <description>Always returns false for basic_result. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`bool has_failure() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/has_failure/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/has_failure/</guid>
+      <description>Returns true if there is either an error or an exception. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`bool has_failure() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/has_failure/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/has_failure/</guid>
+      <description>Returns true if there is either an error or an exception. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`bool has_value() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/has_value/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/has_value/</guid>
+      <description>Returns true if a value is present. Constexpr where possible. Alias for explicit operator bool() const noexcept.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`bool has_value() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/has_value/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/has_value/</guid>
+      <description>Returns true if a value is present. Constexpr where possible. Alias for explicit operator bool() const noexcept.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`const error_type &amp;&amp;assume_error() const &amp;&amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_error_rvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_error_rvalue_const/</guid>
+      <description>Narrow contract const rvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_error_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`const error_type &amp;&amp;assume_error() const &amp;&amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_rvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_rvalue_const/</guid>
+      <description>Narrow contract const rvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_error_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`const error_type &amp;&amp;error() const &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/error_rvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/error_rvalue_const/</guid>
+      <description>Wide contract const rvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_error_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`const error_type &amp;&amp;error() const &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/error_rvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/error_rvalue_const/</guid>
+      <description>Wide contract const rvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_error_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`const error_type &amp;assume_error() const &amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_error_lvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_error_lvalue_const/</guid>
+      <description>Narrow contract const lvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_error_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`const error_type &amp;assume_error() const &amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_lvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_lvalue_const/</guid>
+      <description>Narrow contract const lvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_error_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`const error_type &amp;error() const &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/error_lvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/error_lvalue_const/</guid>
+      <description>Wide contract const lvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_error_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`const error_type &amp;error() const &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/error_lvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/error_lvalue_const/</guid>
+      <description>Wide contract const lvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_error_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`const exception_type &amp;&amp;assume_exception() const &amp;&amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_exception_rvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_exception_rvalue_const/</guid>
+      <description>Narrow contract const rvalue reference observer of the stored exception. NoValuePolicy::narrow_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_exception_check() does that.
+Requires: exception_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_exception_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`const exception_type &amp;&amp;exception() const &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/exception_rvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/exception_rvalue_const/</guid>
+      <description>Wide contract const rvalue reference observer of the stored exception. NoValuePolicy::wide_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs if NoValuePolicy::wide_exception_check() returns.
+Requires: exception_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_exception_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`const exception_type &amp;assume_exception() const &amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_exception_lvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_exception_lvalue_const/</guid>
+      <description>Narrow contract const lvalue reference observer of the stored exception. NoValuePolicy::narrow_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_exception_check() does that.
+Requires: exception_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_exception_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`const exception_type &amp;exception() const &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/exception_lvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/exception_lvalue_const/</guid>
+      <description>Wide contract const lvalue reference observer of the stored exception. NoValuePolicy::wide_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs if NoValuePolicy::wide_exception_check() returns.
+Requires: exception_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_exception_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`const value_type &amp;&amp;assume_value() const &amp;&amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_value_rvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_value_rvalue_const/</guid>
+      <description>Narrow contract const rvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_value_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`const value_type &amp;&amp;assume_value() const &amp;&amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_rvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_rvalue_const/</guid>
+      <description>Narrow contract const rvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_value_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`const value_type &amp;&amp;value() const &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/value_rvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/value_rvalue_const/</guid>
+      <description>Wide contract const rvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_value_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`const value_type &amp;&amp;value() const &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/value_rvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/value_rvalue_const/</guid>
+      <description>Wide contract const rvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_value_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`const value_type &amp;assume_value() const &amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_value_lvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_value_lvalue_const/</guid>
+      <description>Narrow contract const lvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_value_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`const value_type &amp;assume_value() const &amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_lvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_lvalue_const/</guid>
+      <description>Narrow contract const lvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_value_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`const value_type &amp;value() const &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/value_lvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/value_lvalue_const/</guid>
+      <description>Wide contract const lvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_value_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`const value_type &amp;value() const &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/value_lvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/value_lvalue_const/</guid>
+      <description>Wide contract const lvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_value_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`error_type &amp;&amp;assume_error() &amp;&amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_error_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_error_rvalue/</guid>
+      <description>Narrow contract rvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_error_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`error_type &amp;&amp;assume_error() &amp;&amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_rvalue/</guid>
+      <description>Narrow contract rvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_error_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`error_type &amp;&amp;error() &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/error_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/error_rvalue/</guid>
+      <description>Wide contract rvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_error_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`error_type &amp;&amp;error() &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/error_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/error_rvalue/</guid>
+      <description>Wide contract rvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_error_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`error_type &amp;assume_error() &amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_error_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_error_lvalue/</guid>
+      <description>Narrow contract lvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_error_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`error_type &amp;assume_error() &amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_lvalue/</guid>
+      <description>Narrow contract lvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_error_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`error_type &amp;error() &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/error_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/error_lvalue/</guid>
+      <description>Wide contract lvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_error_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`error_type &amp;error() &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/error_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/error_lvalue/</guid>
+      <description>Wide contract lvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_error_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`exception_type &amp;&amp;assume_exception() &amp;&amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_exception_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_exception_rvalue/</guid>
+      <description>Narrow contract rvalue reference observer of the stored exception. NoValuePolicy::narrow_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_exception_check() does that.
+Requires: exception_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_exception_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`exception_type &amp;&amp;exception() &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/exception_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/exception_rvalue/</guid>
+      <description>Wide contract rvalue reference observer of the stored exception. NoValuePolicy::wide_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs if NoValuePolicy::wide_exception_check() returns.
+Requires: exception_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_exception_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`exception_type &amp;assume_exception() &amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_exception_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_exception_lvalue/</guid>
+      <description>Narrow contract lvalue reference observer of the stored exception. NoValuePolicy::narrow_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_exception_check() does that.
+Requires: exception_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_exception_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`exception_type &amp;exception() &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/exception_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/exception_lvalue/</guid>
+      <description>Wide contract lvalue reference observer of the stored exception. NoValuePolicy::wide_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs if NoValuePolicy::wide_exception_check() returns.
+Requires: exception_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_exception_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`exception_type failure() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/failure/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/failure/</guid>
+      <description>Synthesising observer of the stored exception or error. If an exception is available, returns a copy of that directly. If an error is available, and not an exception, an ADL discovered free function auto basic_outcome_failure_exception_from_error(const EC &amp;amp;) is invoked. Default overloads for this function are defined in Outcome for  std::error_code and boost::system::error_code, these return std::make_exception_ptr(std::system_error(ec)) and boost::copy_exception(boost::system::system_error(ec)) respectively.
+Requires: Both the traits is_error_code_available&amp;lt;T&amp;gt; and is_exception_ptr_available&amp;lt;T&amp;gt; are true.
+Complexity: Depends on basic_outcome_failure_exception_from_error(const EC &amp;amp;).</description>
+    </item>
+    
+    <item>
+      <title>`explicit operator bool() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/operator_bool/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/operator_bool/</guid>
+      <description>Returns true if a value is present. Constexpr where possible. Alias for bool has_value() const noexcept.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`explicit operator bool() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/operator_bool/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/operator_bool/</guid>
+      <description>Returns true if a value is present. Constexpr where possible. Alias for bool has_value() const noexcept.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`failure_type&lt;error_type, exception_type&gt; as_failure() const &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/as_failure_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/as_failure_lvalue/</guid>
+      <description>Return the output from free function auto failure(T &amp;amp;&amp;amp;, ...) containing a copy of any errored and/or excepted state. The error and/or exception state is accessed using const error_type &amp;amp;assume_error() const &amp;amp; noexcept and const exception_type &amp;amp;assume_exception() const &amp;amp; noexcept.
+Requires: Always available.
+Complexity: Whatever that of error_type&amp;rsquo;s and/or exception_type&amp;rsquo;s copy constructor is.
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`static auto &amp;&amp;_error(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/error/</guid>
+      <description>Returns a reference to the error in the implementation passed in. No checking is done to ensure there is an error. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static auto &amp;&amp;_exception(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/exception/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/exception/</guid>
+      <description>Returns a reference to the exception in the implementation passed in. No checking is done to ensure there is an error. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static auto &amp;&amp;_value(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/value/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/value/</guid>
+      <description>Returns a reference to the value in the implementation passed in. No checking is done to ensure there is a value. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static bool _has_error(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/has_error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/has_error/</guid>
+      <description>Returns true if an error is present in the implementation passed in. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static bool _has_error_is_errno(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/has_error_is_errno/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/has_error_is_errno/</guid>
+      <description>Returns true if the error code in the implementation passed in has a domain or category matching that of POSIX errno. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static bool _has_exception(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/has_exception/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/has_exception/</guid>
+      <description>Returns true if an exception is present in the implementation passed in. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static bool _has_value(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/has_value/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/has_value/</guid>
+      <description>Returns true if a value is present in the implementation passed in. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`value_type &amp;&amp;assume_value() &amp;&amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_value_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_value_rvalue/</guid>
+      <description>Narrow contract rvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_value_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`value_type &amp;&amp;assume_value() &amp;&amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_rvalue/</guid>
+      <description>Narrow contract rvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_value_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`value_type &amp;&amp;value() &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/value_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/value_rvalue/</guid>
+      <description>Wide contract rvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_value_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`value_type &amp;&amp;value() &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/value_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/value_rvalue/</guid>
+      <description>Wide contract rvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_value_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`value_type &amp;assume_value() &amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_value_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_value_lvalue/</guid>
+      <description>Narrow contract lvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_value_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`value_type &amp;assume_value() &amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_lvalue/</guid>
+      <description>Narrow contract lvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_value_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`value_type &amp;value() &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/value_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/value_lvalue/</guid>
+      <description>Wide contract lvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_value_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`value_type &amp;value() &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/value_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/value_lvalue/</guid>
+      <description>Wide contract lvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_value_check().
+Guarantees: None.</description>
+    </item>
+    
+  </channel>
+</rss>

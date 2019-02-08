@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>`basic_result&lt;T, E, NoValuePolicy&gt;` on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/reference/types/basic_result/</link>
+    <description>Recent content in `basic_result&lt;T, E, NoValuePolicy&gt;` on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Thu, 31 Jan 2019 01:07:35 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/reference/types/basic_result/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`basic_result() = delete`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/default/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/default/</guid>
+      <description>The default constructor for basic result is always disabled.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result(basic_result &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/move_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/move_constructor/</guid>
+      <description>Move constructor.
+Requires: that value_type and error_type both implement a move constructor.
+Complexity: Same as for value_type&amp;rsquo;s and error_type&amp;rsquo;s move constructors. Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked noexcept.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result(const basic_result &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/copy_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/copy_constructor/</guid>
+      <description>Copy constructor.
+Requires: that value_type and error_type both implement a copy constructor.
+Complexity: Same as for value_type&amp;rsquo;s and error_type&amp;rsquo;s copy constructors. Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked noexcept.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result &amp;operator=(basic_result &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/move_assignment/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/move_assignment/</guid>
+      <description>Move assignment.
+Requires: that value_type and error_type both implement move assignment.
+Complexity: If the value_type for both is present, uses value_type&amp;rsquo;s move assignment operator, else either destructs or move constructs value_type as appropriate. error_type&amp;rsquo;s move assignment operator is always used. Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked noexcept.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result &amp;operator=(const basic_result &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/copy_assignment/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/copy_assignment/</guid>
+      <description>Copy assignment.
+Requires: that value_type and error_type both implement copy assignment.
+Complexity: If the value_type for both is present, uses value_type&amp;rsquo;s copy assignment operator, else either destructs or copy constructs value_type as appropriate. error_type&amp;rsquo;s copy assignment operator is always used. Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked noexcept.</description>
+    </item>
+    
+    <item>
+      <title>`~basic_result()`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/destructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/destructor/</guid>
+      <description>Destructor.
+Requires: Always available.
+Complexity: Same as for value_type&amp;rsquo;s and error_type&amp;rsquo;s destructors. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result(Args...) = delete`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/disabling_catchall/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/disabling_catchall/</guid>
+      <description>Disabling catchall constructor used to give useful diagnostic error when trying to use non-inplace constructors when predicate::constructors_enabled is false.
+Requires: predicate::constructors_enabled is false.
+Complexity: N/A.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result(X &amp;&amp;) = delete`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/disabling_implicit_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/disabling_implicit_constructor/</guid>
+      <description>Disabling implicit constructor used to give useful diagnostic error when trying to use implicit constructors when predicate::implicit_constructors_enabled is false.
+Requires: predicate::implicit_constructors_enabled is false.
+Complexity: N/A.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result(R &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/implicit_value_converting_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_value_converting_constructor/</guid>
+      <description>Implicit value_type constructor. Calls void hook_result_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and R.
+Requires: predicate::enable_value_converting_constructor&amp;lt;R&amp;gt; is true.
+Complexity: Same as for value_type&amp;rsquo;s copy or move constructor. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result(S &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/implicit_error_converting_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_error_converting_constructor/</guid>
+      <description>Implicit error_type constructor. Calls void hook_result_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and S.
+Requires: predicate::enable_error_converting_constructor&amp;lt;S&amp;gt; is true.
+Complexity: Same as for error_type&amp;rsquo;s copy or move constructor. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result(ErrorCondEnum &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/implicit_error_condition_converting_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_error_condition_converting_constructor/</guid>
+      <description>Implicit error_type from ErrorCondEnum constructor. Calls void hook_result_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and ErrorCondEnum.
+Requires: predicate::enable_error_condition_converting_constructor&amp;lt;R&amp;gt; is true.
+Complexity: Same as for error_type&amp;rsquo;s copy or move constructor from the result of make_error_code(ErrorCondEnum). Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the input is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/</guid>
+      <description>Explicit converting constructor from ValueOrError&amp;lt;T, E&amp;gt; concept matching types. Delegates to the basic_result move constructor.
+Requires: convert::value_or_error&amp;lt;T, U&amp;gt; has an available call operator, and if the input is a basic_result or basic_outcome, then convert::value_or_error&amp;lt;&amp;gt; has enabled those inputs for that convert::value_or_error&amp;lt;&amp;gt; specialisation.
+Complexity: Same as for the copy or move constructor from the input&amp;rsquo;s .value() or .error() respectively. Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked noexcept.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_result(const basic_result&lt;R, S, P&gt; &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_copy_converting_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_copy_converting_constructor/</guid>
+      <description>Explicit converting copy constructor from compatible basic_result. Calls void hook_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
+Requires: predicate::enable_compatible_conversion&amp;lt;R, S, P&amp;gt; is true.
+Complexity: Same as for the copy constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked noexcept.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_result(basic_result&lt;R, S, P&gt; &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_move_converting_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_move_converting_constructor/</guid>
+      <description>Explicit converting move constructor from compatible basic_result. Calls void hook_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
+Requires: predicate::enable_compatible_conversion&amp;lt;R, S, P&amp;gt; is true.
+Complexity: Same as for the move constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked noexcept.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_result(in_place_type_t&lt;value_type_if_enabled&gt;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_value_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_value_constructor/</guid>
+      <description>Explicit inplace value constructor. Calls void hook_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;value_type&amp;gt; and Args ....
+Requires: predicate::enable_inplace_value_constructor&amp;lt;Args ...&amp;gt; is true.
+Complexity: Same as for the value_type constructor which accepts Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_result(in_place_type_t&lt;value_type_if_enabled&gt;, std::initializer_list&lt;U&gt;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_value_constructor_il/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_value_constructor_il/</guid>
+      <description>Explicit inplace value constructor. Calls void hook_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;value_type&amp;gt;, &amp;lsquo;std::initializer_list&amp;rsquo; and Args ....
+Requires: predicate::enable_inplace_value_constructor&amp;lt;std::initializer_list&amp;lt;U&amp;gt;, Args ...&amp;gt; is true.
+Complexity: Same as for the value_type constructor which accepts std::initializer_list&amp;lt;U&amp;gt;, Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_result(in_place_type_t&lt;error_type_if_enabled&gt;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_error_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_error_constructor/</guid>
+      <description>Explicit inplace error constructor. Calls void hook_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;error_type&amp;gt; and Args ....
+Requires: predicate::enable_inplace_error_constructor&amp;lt;Args ...&amp;gt; is true.
+Complexity: Same as for the error_type constructor which accepts Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_result(in_place_type_t&lt;error_type_if_enabled&gt;, std::initializer_list&lt;U&gt;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_error_constructor_il/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_error_constructor_il/</guid>
+      <description>Explicit inplace error constructor. Calls void hook_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;error_type&amp;gt;, std::initializer_list&amp;lt;U&amp;gt; and Args ....
+Requires: predicate::enable_inplace_error_constructor&amp;lt;std::initializer_list&amp;lt;U&amp;gt;, Args ...&amp;gt; is true.
+Complexity: Same as for the error_type constructor which accepts std::initializer_list&amp;lt;U&amp;gt;, Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result(A1 &amp;&amp;, A2 &amp;&amp;, Args ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/implicit_inplace_value_error_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_inplace_value_error_constructor/</guid>
+      <description>Implicit inplace value or error constructor. Delegates to an appropriate explicit inplace constructor depending on input.
+Requires: predicate::enable_inplace_value_error_constructor` is true.
+Complexity: Same as for the value_type or error_type constructor which accepts A1, A2, Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result(const success_type&lt;T&gt; &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/implicit_success_copy_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_success_copy_constructor/</guid>
+      <description>Implicit value-from-success-type-sugar copy constructor used to disambiguate the construction of the value type. Note that if T = void, value_type will be default constructed. Calls void hook_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and const success_type&amp;lt;T&amp;gt; &amp;amp;.
+Requires: predicate::enable_compatible_conversion&amp;lt;T, void, void&amp;gt; is true, or T is void.
+Complexity: Same as for the value_type constructor which accepts T, or the value_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result(success_type&lt;T&gt; &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/implicit_success_move_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_success_move_constructor/</guid>
+      <description>Implicit value-from-success-type-sugar move constructor used to disambiguate the construction of the value type. Note that if T = void, value_type will be default constructed. Calls void hook_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and success_type&amp;lt;T&amp;gt; &amp;amp;&amp;amp;.
+Requires: predicate::enable_compatible_conversion&amp;lt;T, void, void&amp;gt; is true, or T is void.
+Complexity: Same as for the value_type constructor which accepts T, or the value_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result(const failure_type&lt;T&gt; &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/implicit_failure_copy_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_failure_copy_constructor/</guid>
+      <description>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void hook_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and const failure_type&amp;lt;T&amp;gt; &amp;amp;.
+Requires: predicate::enable_compatible_conversion&amp;lt;void, T, void&amp;gt; is true, or T is void.
+Complexity: Same as for the error_type constructor which accepts T, or the error_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result(failure_type&lt;T&gt; &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/implicit_failure_move_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_failure_move_constructor/</guid>
+      <description>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void hook_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and failure_type&amp;lt;T&amp;gt; &amp;amp;&amp;amp;.
+Requires: predicate::enable_compatible_conversion&amp;lt;void, T, void&amp;gt; is true, or T is void.
+Complexity: Same as for the error_type constructor which accepts T, or the error_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
+    </item>
+    
+    <item>
+      <title>`explicit operator bool() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/operator_bool/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/operator_bool/</guid>
+      <description>Returns true if a value is present. Constexpr where possible. Alias for bool has_value() const noexcept.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`bool has_value() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/has_value/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/has_value/</guid>
+      <description>Returns true if a value is present. Constexpr where possible. Alias for explicit operator bool() const noexcept.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`bool has_error() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/has_error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/has_error/</guid>
+      <description>Returns true if an error is present. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`bool has_exception() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/has_exception/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/has_exception/</guid>
+      <description>Always returns false for basic_result. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`bool has_failure() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/has_failure/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/has_failure/</guid>
+      <description>Returns true if there is either an error or an exception. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`value_type &amp;assume_value() &amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_lvalue/</guid>
+      <description>Narrow contract lvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_value_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`const value_type &amp;assume_value() const &amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_lvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_lvalue_const/</guid>
+      <description>Narrow contract const lvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_value_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`value_type &amp;&amp;assume_value() &amp;&amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_rvalue/</guid>
+      <description>Narrow contract rvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_value_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`const value_type &amp;&amp;assume_value() const &amp;&amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_rvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_rvalue_const/</guid>
+      <description>Narrow contract const rvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_value_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`value_type &amp;value() &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/value_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/value_lvalue/</guid>
+      <description>Wide contract lvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_value_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`const value_type &amp;value() const &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/value_lvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/value_lvalue_const/</guid>
+      <description>Wide contract const lvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_value_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`value_type &amp;&amp;value() &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/value_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/value_rvalue/</guid>
+      <description>Wide contract rvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_value_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`const value_type &amp;&amp;value() const &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/value_rvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/value_rvalue_const/</guid>
+      <description>Wide contract const rvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
+Requires: value_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_value_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`error_type &amp;assume_error() &amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_lvalue/</guid>
+      <description>Narrow contract lvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_error_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`const error_type &amp;assume_error() const &amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_lvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_lvalue_const/</guid>
+      <description>Narrow contract const lvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_error_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`error_type &amp;&amp;assume_error() &amp;&amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_rvalue/</guid>
+      <description>Narrow contract rvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_error_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`const error_type &amp;&amp;assume_error() const &amp;&amp; noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_rvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_rvalue_const/</guid>
+      <description>Narrow contract const rvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::narrow_error_check().
+Guarantees: An exception is never thrown.</description>
+    </item>
+    
+    <item>
+      <title>`error_type &amp;error() &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/error_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/error_lvalue/</guid>
+      <description>Wide contract lvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_error_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`const error_type &amp;error() const &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/error_lvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/error_lvalue_const/</guid>
+      <description>Wide contract const lvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_error_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`error_type &amp;&amp;error() &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/error_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/error_rvalue/</guid>
+      <description>Wide contract rvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_error_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`const error_type &amp;&amp;error() const &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/error_rvalue_const/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/error_rvalue_const/</guid>
+      <description>Wide contract const rvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
+Requires: error_type to not be void, otherwise return type is void.
+Complexity: Depends on NoValuePolicy::wide_error_check().
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`bool operator==(const basic_result&lt;A, B, C&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/equality_basic_result/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/equality_basic_result/</guid>
+      <description>Returns true if this result compares equal to the other result. Comparison is done using operator== on either value_type or error_type if the currently chosen state is the same for both results, otherwise false is returned.
+Requires: operator== must be a valid expression between value_type and A, and between error_type and B. If value_type is void, then so must be A; similarly for error_type and B.
+Complexity: Whatever the underlying operator== have.</description>
+    </item>
+    
+    <item>
+      <title>`bool operator==(const success_type&lt;A&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/inequality_success_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/inequality_success_type/</guid>
+      <description>Returns true if this result is successful and its value compares equal to the value in the success type sugar. Comparison is done using operator== on value_type and A. If A is void, this call aliases bool has_value() const noexcept.
+Requires: operator== must be a valid expression between value_type and A, or A is void. If value_type is void, then so must be A.
+Complexity: Whatever the underlying operator== has. Constexpr and noexcept of underlying operations is propagated.</description>
+    </item>
+    
+    <item>
+      <title>`bool operator==(const failure_type&lt;A, void&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/equality_failure_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/equality_failure_type/</guid>
+      <description>Returns true if this result is unsuccessful and its error compares equal to the error in the failure type sugar. Comparison is done using operator== on error_type and A. If A is void, this call aliases bool has_error() const noexcept.
+Requires: operator== must be a valid expression between error_type and A, or A is void. If error_type is void, then so must be A.
+Complexity: Whatever the underlying operator== has. Constexpr and noexcept of underlying operations is propagated.</description>
+    </item>
+    
+    <item>
+      <title>`bool operator!=(const basic_result&lt;A, B, C&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/inequality_basic_result/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/inequality_basic_result/</guid>
+      <description>Returns true if this result does not compare equal to the other result. Comparison is done using operator!= on either value_type or error_type if the currently chosen state is the same for both results, otherwise true is returned.
+Requires: operator!= must be a valid expression between value_type and A, and between error_type and B. If value_type is void, then so must be A; similarly for error_type and B.
+Complexity: Whatever the underlying operator!</description>
+    </item>
+    
+    <item>
+      <title>`bool operator!=(const success_type&lt;A&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/equality_success_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/equality_success_type/</guid>
+      <description>Returns true if this result is not successful or its value does not compares equal to the value in the success type sugar. Comparison is done using operator!= on value_type and A. If A is void, this call aliases bool has_error() const noexcept.
+Requires: operator!= must be a valid expression between value_type and A, or A is void. If value_type is void, then so must be A.
+Complexity: Whatever the underlying operator!</description>
+    </item>
+    
+    <item>
+      <title>`bool operator!=(const failure_type&lt;A, void&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/inequality_failure_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/inequality_failure_type/</guid>
+      <description>Returns true if this result is successful or its error does not compare equal to the error in the failure type sugar. Comparison is done using operator!= on error_type and A. If A is void, this call aliases bool has_value() const noexcept.
+Requires: operator!= must be a valid expression between error_type and A, or A is void. If error_type is void, then so must be A.
+Complexity: Whatever the underlying operator!</description>
+    </item>
+    
+    <item>
+      <title>`void swap(basic_result &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/swap/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/swap/</guid>
+      <description>Swap one basic_result with another.
+Requires: Always available.
+Complexity: Same as for the swap() implementations of the value_type and error_type. The noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked noexcept.</description>
+    </item>
+    
+    <item>
+      <title>`auto as_failure() const &amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/as_failure_lvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/as_failure_lvalue/</guid>
+      <description>Return the output from free function auto failure(T &amp;amp;&amp;amp;, ...) containing a copy of any errored state. The error state is accessed using const error_type &amp;amp;assume_error() const &amp;amp; noexcept.
+Requires: Always available.
+Complexity: Whatever that of error_type&amp;rsquo;s copy constructor is.
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`auto as_failure() &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/as_failure_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/as_failure_rvalue/</guid>
+      <description>Return the output from free function auto failure(T &amp;amp;&amp;amp;, ...) containing a move from any errored state, thus leaving the result&amp;rsquo;s error value in a moved-from state. Depending on the choice of error_type, this function may therefore be destructive. The error state is accessed using error_type &amp;amp;&amp;amp;assume_error() &amp;amp;&amp;amp; noexcept.
+Requires: Always available.
+Complexity: Whatever that of error_type&amp;rsquo;s move constructor is.
+Guarantees: None.</description>
+    </item>
+    
+  </channel>
+</rss>

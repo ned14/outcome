@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Move Assignment on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/categories/move-assignment/</link>
+    <description>Recent content in Move Assignment on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	<atom:link href="https://ned14.github.io/outcome/categories/move-assignment/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`basic_outcome &amp;operator=(basic_outcome &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/move_assignment/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/move_assignment/</guid>
+      <description>Move assignment.
+Requires: that value_type, error_type and exception_type all implement move assignment.
+Complexity: If the value_type for both is present, uses value_type&amp;rsquo;s move assignment operator, else either destructs or move constructs value_type as appropriate. error_type&amp;rsquo;s and exception_type&amp;rsquo;s move assignment operator are always used. Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of all three operands on entry is restored, if at least two of the underlying operations are marked noexcept.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result &amp;operator=(basic_result &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/move_assignment/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/move_assignment/</guid>
+      <description>Move assignment.
+Requires: that value_type and error_type both implement move assignment.
+Complexity: If the value_type for both is present, uses value_type&amp;rsquo;s move assignment operator, else either destructs or move constructs value_type as appropriate. error_type&amp;rsquo;s move assignment operator is always used. Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked noexcept.</description>
+    </item>
+    
+  </channel>
+</rss>

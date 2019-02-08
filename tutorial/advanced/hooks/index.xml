@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Hooking events on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/tutorial/advanced/hooks/</link>
+    <description>Recent content in Hooking events on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/tutorial/advanced/hooks/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Keeping state</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/hooks/keeping_state/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/keeping_state/</guid>
+      <description>The first thing we are going to need is somewhere to store the stack backtrace. We could take the easier route and simply store it into an allocated block and keep the pointer as a custom payload in a result&amp;lt;T, std::pair&amp;lt;error_code, std::unique_ptr&amp;lt;stack_backtrace&amp;gt;&amp;gt;&amp;gt; (see previous section on Custom payloads). But let us assume that we care so deeply about bounded execution times that ever calling malloc is unacceptable.
+We therefore are going to need some completely static and trivially typed storage perhaps kept per-thread to avoid the need to keep mutexes.</description>
+    </item>
+    
+    <item>
+      <title>ADL bridging</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/hooks/adl_bridging/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/adl_bridging/</guid>
+      <description>In a previous section, we used the failure_info type to create the ADL bridge into the namespace where the ADL discovered outcome_throw_as_system_error_with_payload() function was to be found.
+Here we do the same, but more directly by creating a thin clone of std::error_code into the local namespace. This ensures that this namespace will be searched by the compiler when discovering the event hooks.
+namespace error_code_extended { // Use the error_code type as the ADL bridge for the hooks by creating a type here  // It can be any type that your localised result uses, including the value type but  // by localising the error code type here you prevent nasty surprises later when the  // value type you use doesn&amp;#39;t trigger the ADL bridge.</description>
+    </item>
+    
+    <item>
+      <title>Hook result</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/hooks/hook_result/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/hook_result/</guid>
+      <description>We now tell Outcome that for every instance of our localised result&amp;lt;T&amp;gt;, that on failure construction only, we want custom code to be run which increments the current slot in TLS storage and writes the current stack backtrace into it.
+namespace error_code_extended { // Specialise the result construction hook for our localised result  // We hook any non-copy, non-move, non-inplace construction, capturing a stack backtrace  // if the result is errored.</description>
+    </item>
+    
+    <item>
+      <title>Custom exception ptr</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/hooks/poke_exception/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/poke_exception/</guid>
+      <description>If you merely want result to capture stack backtraces without calling a memory allocator and retaining any triviality of copy which is important for optimisation, you already have everything you need.
+But let&amp;rsquo;s keep going by intercepting any construction of our localised outcome from our localised result, retrieving any stored backtrace and using it to synthesise an exception ptr with a message text including the backtrace. Firstly let us look at the function which synthesises the exception ptr:</description>
+    </item>
+    
+    <item>
+      <title>Hook outcome</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/hooks/hook_outcome/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/hook_outcome/</guid>
+      <description>The final step is to add ADL discovered event hooks for the very specific case of when our localised outcome is copy or move constructed from our localised result.
+You ought to be very careful that the noexcept-ness of these matches the noexcept-ness of the types in the outcome. You may have noticed that poke_exception() creates a std::string and appends to it. This can throw an exception. If the copy and/or move constructors of T, EC and EP are noexcept, then so will be outcome&amp;rsquo;s copy and/or move constructor.</description>
+    </item>
+    
+  </channel>
+</rss>

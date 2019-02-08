@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Make_error_code on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/tags/make_error_code/</link>
+    <description>Recent content in Make_error_code on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/tags/make_error_code/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Custom payloads</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/payload/</link>
+      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/payload/</guid>
+      <description>So far in this tutorial, type EC in result&amp;lt;T, EC&amp;gt; has always been a std::error_code or boost::system::error_code. With NoValuePolicy set to default_policy&amp;lt;T, EC, EP&amp;gt;, EC needs in fact to merely satisfy the trait is_error_code_available&amp;lt;T&amp;gt; for EC to be treated as if an error_code. Outcome specialises that trait for std::error_code and boost::system::error_code, hence they &amp;ldquo;just work&amp;rdquo;.
+If no specialisation exists, trait::is_error_code_available&amp;lt;EC&amp;gt; is true if there exists some ADL discovered free function make_error_code(EC).</description>
+    </item>
+    
+  </channel>
+</rss>

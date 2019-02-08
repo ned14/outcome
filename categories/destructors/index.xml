@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Destructors on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/categories/destructors/</link>
+    <description>Recent content in Destructors on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	<atom:link href="https://ned14.github.io/outcome/categories/destructors/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`~basic_outcome()`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/destructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/destructor/</guid>
+      <description>Destructor.
+Requires: Always available.
+Complexity: Same as for value_type&amp;rsquo;s, error_type&amp;rsquo;s and exception_type&amp;rsquo;s destructors. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
+    </item>
+    
+    <item>
+      <title>`~basic_result()`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/destructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/destructor/</guid>
+      <description>Destructor.
+Requires: Always available.
+Complexity: Same as for value_type&amp;rsquo;s and error_type&amp;rsquo;s destructors. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
+    </item>
+    
+  </channel>
+</rss>

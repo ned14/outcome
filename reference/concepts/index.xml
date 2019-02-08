@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Concepts on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/reference/concepts/</link>
+    <description>Recent content in Concepts on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 11 Jan 2019 20:57:15 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/reference/concepts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`ValueOrError&lt;T, E&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/concepts/valueorerror/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/concepts/valueorerror/</guid>
+      <description>If on C++ 20 or the Concepts TS is enabled, a boolean concept matching types with a public .has_value() observer which returns bool, a public .value() observer function, and a public .error() observer function.
+If without Concepts, a static constexpr bool which is true for types matching the same requirements, using a SFINAE based emulation.
+This concept matches expected-like types such as  P0323 std::expected&amp;lt;T, E&amp;gt;, one of which is basic_result&amp;lt;T, E, NoValuePolicy&amp;gt;.</description>
+    </item>
+    
+    <item>
+      <title>`ValueOrNone&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/concepts/valueornone/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/concepts/valueornone/</guid>
+      <description>If on C++ 20 or the Concepts TS is enabled, a boolean concept matching types with a public .has_value() observer which returns bool, and a public .value() observer function.
+If without Concepts, a static constexpr bool which is true for types matching the same requirements, using a SFINAE based emulation.
+This concept matches optional-like types such as  std::optional&amp;lt;T&amp;gt;. Note it also matches  P0323 std::expected&amp;lt;T, E&amp;gt;, which also has an optional-like interface.</description>
+    </item>
+    
+  </channel>
+</rss>

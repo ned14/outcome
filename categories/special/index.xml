@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Special on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/categories/special/</link>
+    <description>Recent content in Special on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	<atom:link href="https://ned14.github.io/outcome/categories/special/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`static void _ub(Impl &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/ub/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/ub/</guid>
+      <description>This is a special function which does compiler-specific stuff to tell the compiler that this function can never, ever, ever be executed. The compiler&amp;rsquo;s optimiser will hard assume that this function can never be executed, and will prune the possibility of it being executed completely. Generally this means that the code path stops dead, and if execution does proceed down this path, it will run off the end of a branch which doesn&amp;rsquo;t go anywhere.</description>
+    </item>
+    
+  </channel>
+</rss>

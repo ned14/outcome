@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Converters on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/reference/converters/</link>
+    <description>Recent content in Converters on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 11 Jan 2019 20:57:15 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/reference/converters/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`try_operation_return_as(expr)`</title>
+      <link>https://ned14.github.io/outcome/reference/converters/try_operation_return_as/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/converters/try_operation_return_as/</guid>
+      <description>A customisable converter of ValueOrError&amp;lt;T, E&amp;gt; concept matching types to a returnable failure type.
+Overridable: Argument dependent lookup.
+Default: A number of implementations are provided by default:
+ try_operation_return_as(T &amp;amp;&amp;amp;) which requires T to provide an .as_failure() member function in order to be available. This is selected for all basic_result and basic_outcome types. See auto try_operation_return_as(T &amp;amp;&amp;amp;).
+ Copy and move editions of try_operation_return_as(std::experimental::expected&amp;lt;T, E&amp;gt;) which return a std::experimental::unexpected&amp;lt;E&amp;gt; for the input&amp;rsquo;s .</description>
+    </item>
+    
+    <item>
+      <title>`value_or_error&lt;T, U&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/converters/value_or_error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/converters/value_or_error/</guid>
+      <description>A customisable converter of ValueOrError&amp;lt;T, E&amp;gt; concept matching types. It must have the following form:
+// `T` will be the destination basic_result or basic_outcome. // `U` will be the decayed form of the `ValueOrError&amp;lt;T, E&amp;gt;` concept matching input type. template &amp;lt;classT&amp;gt; struct value_or_error&amp;lt;T, U&amp;gt; { // False to indicate that this converter wants `basic_result`/`basic_outcome` to reject all other `basic_result`  static constexpr bool enable_result_inputs = false; // False to indicate that this converter wants `basic_outcome` to reject all other `basic_outcome`  static constexpr bool enable_outcome_inputs = false; // `X` will be the raw input form of `U`.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Observer Policies on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/categories/observer-policies/</link>
+    <description>Recent content in Observer Policies on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	<atom:link href="https://ned14.github.io/outcome/categories/observer-policies/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`static void narrow_error_check(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/narrow_error_check/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/narrow_error_check/</guid>
+      <description>Observer policy performing hard UB if no error is present, by calling static void _ub(Impl &amp;amp;&amp;amp;). Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static void narrow_exception_check(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/narrow_exception_check/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/narrow_exception_check/</guid>
+      <description>Observer policy performing hard UB if no exception is present, by calling static void _ub(Impl &amp;amp;&amp;amp;). Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static void narrow_value_check(Impl &amp;&amp;) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/narrow_value_check/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/narrow_value_check/</guid>
+      <description>Observer policy performing hard UB if no value is present, by calling static void _ub(Impl &amp;amp;&amp;amp;). Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+  </channel>
+</rss>

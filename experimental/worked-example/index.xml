@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Worked example: Custom domain on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/experimental/worked-example/</link>
+    <description>Recent content in Worked example: Custom domain on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Sat, 26 Jan 2019 23:38:56 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/experimental/worked-example/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Define a custom code domain</title>
+      <link>https://ned14.github.io/outcome/experimental/worked-example/preamble/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/worked-example/preamble/</guid>
+      <description>Firstly let&amp;rsquo;s alias the experimental Outcome namespace into something less tedious to type, declare our custom status code type, and get started on defining the custom status code domain implementation.
+namespace outcome_e = OUTCOME_V2_NAMESPACE::experimental; // To define a `file_io_error` which participates in the P1028 world // of `std::error`, we must first declare, then define, a custom code // domain which extends `posix_code` (the std error coding for POSIX // failures). The following is fairly standard boilerplate for defining // a custom code domain.</description>
+    </item>
+    
+    <item>
+      <title>The payload</title>
+      <link>https://ned14.github.io/outcome/experimental/worked-example/value_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/worked-example/value_type/</guid>
+      <description>We define the code domain&amp;rsquo;s value_type &amp;ndash; the payload to be transported by status codes using this code domain &amp;ndash; to be a POSIX errno value, an integer line number and a const char pointer.
+public: // This is the value type for `file_io_error`. We add line number and source file path.  struct value_type { typename outcome_e::posix_code::value_type errcode; // from POSIX, as we inherit from _posix_code_domain  // Our additional payload  int lineno; // from __LINE__  const char *file; // from __FILE__  // Could also place a backtrace of void *[16] here .</description>
+    </item>
+    
+    <item>
+      <title>The constructor</title>
+      <link>https://ned14.github.io/outcome/experimental/worked-example/constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/worked-example/constructor/</guid>
+      <description>Code domains are 100% constexpr to construct and destruct, as are status codes. This enables the compiler to 100% instantiate both only in its mind, and to emit zero code and thus zero overhead.
+Unfortunately it also means that it must be possible for each domain to be instantiated an infinite number of times, and being 100% in constexpr, any instances never have a unique address in memory either. Thus we cannot compare domains for equivalence using their address in memory, as  std::error_category does.</description>
+    </item>
+    
+    <item>
+      <title>String refs</title>
+      <link>https://ned14.github.io/outcome/experimental/worked-example/string_ref/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/worked-example/string_ref/</guid>
+      <description>&amp;lt;system_error2&amp;gt; does not use std::string to return possibly statically or dynamically allocated strings, and thus avoids dragging in a lot of the standard library which impacts build times.
+Instead status code domains have a string_ref, which has a polymorphic implementation which may or may not manage a dynamic memory allocation using an atomic reference counter. Due to this polymorphism, you don&amp;rsquo;t need to worry which implementation is actually in use under the bonnet when you pass around string_ref instances.</description>
+    </item>
+    
+    <item>
+      <title>Redefining `message()`</title>
+      <link>https://ned14.github.io/outcome/experimental/worked-example/message/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/worked-example/message/</guid>
+      <description>You may remember that our custom _file_io_error_domain inherits from outcome_e::posix_code::domain_type, and thus does not have to implement the many pure virtual functions required by outcome_e::status_code_domain.
+What we do need to do is reimplement _do_message() to append the file and line information to the POSIX error description string returned by outcome_e::posix_code::domain_type. This causes the status code&amp;rsquo;s .message() observer to return a string with the extra payload information represented in text.
+// Return a string describing a specific code.</description>
+    </item>
+    
+    <item>
+      <title>Constexpr domain source</title>
+      <link>https://ned14.github.io/outcome/experimental/worked-example/source/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/worked-example/source/</guid>
+      <description>Back in The constructor, we declared but did not implement a .get() function which returns a constexpr static instance of the domain. We implement this now:
+// 100% constexpr instantiation constexpr _file_io_error_domain file_io_error_domain; inline constexpr const _file_io_error_domain &amp;amp;_file_io_error_domain::get() { return file_io_error_domain; } View this code on Github As this is 100% constexpr, it can be (and is under optimisation) implemented entirely in the mind of the compiler with no run time representation.</description>
+    </item>
+    
+    <item>
+      <title>Implicit conversion</title>
+      <link>https://ned14.github.io/outcome/experimental/worked-example/implicit_conversion/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/worked-example/implicit_conversion/</guid>
+      <description>Back in The payload, we mentioned that there was no default implicit conversion of file_io_error (status_code&amp;lt;_file_io_error_domain&amp;gt;) to error, as error is too small to hold _file_io_error_domain::value_type.
+We can tell the framework about available implicit conversions by defining an ADL discovered free function make_status_code() which takes our custom status code as input, and returns an error:
+// Now tell `error` how it can implicitly construct from `file_io_error`. // This is done by us defining a free function called `make_status_code()` // which is discovered using ADL.</description>
+    </item>
+    
+  </channel>
+</rss>

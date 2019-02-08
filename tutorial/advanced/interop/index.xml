@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Interoperation on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/tutorial/advanced/interop/</link>
+    <description>Recent content in Interoperation on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/tutorial/advanced/interop/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Incommensurate E types</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/interop/problem/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/problem/</guid>
+      <description>Back in the tutorial section on result, we studied a likely very common initial choice of E type: a strongly typed enum. We saw how by marking up strongly typed enums to tell the C++ standard library what they are, they gain implicit convertibility into std::error_code, and we then pointed out that you might as well now always set E = std::error_code, as that comes with the enormous advantage that you can use the boilerplate saving OUTCOME_TRY macro when the E type is always the same.</description>
+    </item>
+    
+    <item>
+      <title>ValueOrError Concept</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/interop/value-or-error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/value-or-error/</guid>
+      <description>Something not really mentioned until now is how Outcome interoperates with the proposed std::expected&amp;lt;T, E&amp;gt;, whose design lands in between outcome::unchecked&amp;lt;T, E&amp;gt; and outcome::checked&amp;lt;T, E&amp;gt;, both of which are simplified aliases for outcome::result&amp;lt;T, E&amp;gt; hard coding the NoValuePolicy to a fixed policy.
+Expected and Outcome are isomorphic to one another in design intent, but interoperation for code using Expected and Outcome ought to be seamless thanks to the proposed ValueOrError concept framework, a subset of which Outcome implements.</description>
+    </item>
+    
+    <item>
+      <title>The HTTP library</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/interop/httplib/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/httplib/</guid>
+      <description>Let us imagine a simple application: it fetches a HTTP page using a HTTP library, sends it through HTML tidy via the htmltidy library, and then writes it to disc using a filelib library. So three third party libraries, two using Outcome in incompatible ways, and the third being a C library just for kicks.
+Let us imagine that the HTTP library has the following public interface:
+// This is some standalone library implementing high level HTTP namespace httplib { // These are the error code that this HTTP library can return  enum classstatus_code { success = 0, // not the HTTP success code of 200  // A subset of all HTTP status codes for brevity  bad_request = 400, access_denied = 401, logon_failed = 402, forbidden = 403, not_found = 404, internal_error = 500 }; // This is the error type that this HTTP library can return  struct failure { status_code status{status_code::success}; std::string url{}; // The failing URL  }; // Localise a result implementation to this library  template &amp;lt;classT&amp;gt; using result = OUTCOME_V2_NAMESPACE::result&amp;lt;T, failure, OUTCOME_V2_NAMESPACE::policy::terminate&amp;gt;; /* Performs a HTTP GET on the url, returning the body if successful, a failure with status_code if unsuccessful at the HTTP level, or a C++ exception throw if something catastrophic happened e.</description>
+    </item>
+    
+    <item>
+      <title>The HTMLTidy library</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/interop/tidylib/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/tidylib/</guid>
+      <description>// There actually is a library for tidying HTML into XHTML called HTMLTidy // See http://www.html-tidy.org/ // HTMLTidy is actually a great tool, I highly recommend it.  // This isn&amp;#39;t the API for Tidy, but let&amp;#39;s assume it&amp;#39;s a C library returning // errno domained error codes. out must be freed with free() after use. extern &amp;#34;C&amp;#34; int tidy_html(char **out, size_t *outlen, const char *in, size_t inlen); View this code on Github A C API may not initially appear to be a T|E based API, but if failure returns some domained error code and causes no other effects, and success returns some value, then it is effectively a &amp;ldquo;split&amp;rdquo; T|E API.</description>
+    </item>
+    
+    <item>
+      <title>The File I/O library</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/interop/filelib/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/filelib/</guid>
+      <description>The File I/O library we shall be using is very similar to the one we saw earlier in this tutorial:
+// You may remember this from the tutorial section on Custom Payloads namespace filelib { // Error code + paths related to a failure. Also causes ADL discovery to check this namespace.  struct failure_info { std::error_code ec; path path1{}, path2{}; }; // Tell Outcome that failure_info is to be treated as a std::error_code  inline const std::error_code &amp;amp;make_error_code(const failure_info &amp;amp;fi) { return fi.</description>
+    </item>
+    
+    <item>
+      <title>The Application</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/interop/app/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/app/</guid>
+      <description>The application is of course also based on Outcome, and like the HTTP library is also of mixed-failure design in that failure can be returned via error code, type erased exception_ptr or indeed a C++ exception throw.
+// This is the namespace of the application which is connecting together the httplib, // filelib and tidylib libraries into a solution. namespace app { // Create an ADL bridge so copy/move hooks will be searched for in this namespace  struct error_code : public std::error_code { // passthrough  using std::error_code::error_code; error_code() = default; error_code(std::error_code ec) : std::error_code(ec) { } }; // Localise an outcome implementation for this namespace  template &amp;lt;classT&amp;gt; using outcome = OUTCOME_V2_NAMESPACE::outcome&amp;lt;T, error_code /*, std::exception_ptr */&amp;gt;; using OUTCOME_V2_NAMESPACE::success; } View this code on Github Here we localise a passthrough error_code solely for the purpose of ADL bridging, otherwise the localised outcome configured is the default one which comes with Outcome.</description>
+    </item>
+    
+    <item>
+      <title>Mapping the HTTP library into the Application 1/2</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/interop/app-map-httplib1/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/app-map-httplib1/</guid>
+      <description>Firstly we are going to need to wrap up httplib::failure into a custom STL exception type before we can type erase it into an exception_ptr instance. Please note that this code is defined in the app namespace:
+namespace app { // Specialise an exception type for httplib errors  struct httplib_error : std::runtime_error { // passthrough  using std::runtime_error::runtime_error; httplib_error(httplib::failure _failure, std::string msg) : std::runtime_error(std::move(msg)) , failure(std::move(_failure)) { } // the original failure  httplib::failure failure; }; // Type erase httplib::result&amp;lt;U&amp;gt; into a httplib_error exception ptr  template &amp;lt;classU&amp;gt; inline std::exception_ptr make_httplib_exception(const httplib::result&amp;lt;U&amp;gt; &amp;amp;src) { std::string str(&amp;#34;httplib failed with error &amp;#34;); switch(src.</description>
+    </item>
+    
+    <item>
+      <title>Mapping the HTTP library into the Application 2/2</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/interop/app-map-httplib2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/app-map-httplib2/</guid>
+      <description>If you remember the tutorial section on the ValueOrError Concept, this is an example of how to implement a custom ValueOrError Concept converter in Outcome:
+// Inject custom ValueOrError conversion OUTCOME_V2_NAMESPACE_BEGIN namespace convert { // Provide custom ValueOrError conversion from httplib::result&amp;lt;U&amp;gt; into any app::outcome&amp;lt;T&amp;gt;  template &amp;lt;classT, classU&amp;gt; struct value_or_error&amp;lt;app::outcome&amp;lt;T&amp;gt;, httplib::result&amp;lt;U&amp;gt;&amp;gt; { // False to indicate that this converter wants `result`/`outcome` to NOT reject all other `result`  static constexpr bool enable_result_inputs = true; // False to indicate that this converter wants `outcome` to NOT reject all other `outcome`  static constexpr bool enable_outcome_inputs = true; template &amp;lt;classX, //  typename = std::enable_if_t&amp;lt;std::is_same&amp;lt;httplib::result&amp;lt;U&amp;gt;, std::decay_t&amp;lt;X&amp;gt;&amp;gt;::value //  &amp;amp;&amp;amp; std::is_constructible&amp;lt;T, U&amp;gt;::value&amp;gt;&amp;gt; //  constexpr app::outcome&amp;lt;T&amp;gt; operator()(X &amp;amp;&amp;amp;src) { // Forward any successful value, else synthesise an exception ptr  return src.</description>
+    </item>
+    
+    <item>
+      <title>Mapping the File I/O library into the Application</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/interop/app-map-filelib/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/app-map-filelib/</guid>
+      <description>To handle the File I/O library, once again we turn to custom ValueOrError converters:
+// Inject custom ValueOrError conversion OUTCOME_V2_NAMESPACE_BEGIN namespace convert { // Provide custom ValueOrError conversion from filelib::result&amp;lt;U&amp;gt; into any app::outcome&amp;lt;T&amp;gt;  template &amp;lt;classT, classU&amp;gt; struct value_or_error&amp;lt;app::outcome&amp;lt;T&amp;gt;, filelib::result&amp;lt;U&amp;gt;&amp;gt; { // True to indicate that this converter wants `result`/`outcome` to NOT reject all other `result`  static constexpr bool enable_result_inputs = true; // False to indicate that this converter wants `outcome` to NOT reject all other `outcome`  static constexpr bool enable_outcome_inputs = true; template &amp;lt;classX, //  typename = std::enable_if_t&amp;lt;std::is_same&amp;lt;filelib::result&amp;lt;U&amp;gt;, std::decay_t&amp;lt;X&amp;gt;&amp;gt;::value //  &amp;amp;&amp;amp; std::is_constructible&amp;lt;T, U&amp;gt;::value&amp;gt;&amp;gt; //  constexpr app::outcome&amp;lt;T&amp;gt; operator()(X &amp;amp;&amp;amp;src) { // Forward any successful value  if(src.</description>
+    </item>
+    
+    <item>
+      <title>Mapping the HTMLTidy library into the Application</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/interop/app-map-tidylib/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/app-map-tidylib/</guid>
+      <description>Once again, we create a custom STL exception type to represent failure from the HTMLTidy library. We also create an app namespace wrapper for the C tidy_html() function which is more C++ friendly.
+namespace app { // Specialise an exception type for tidylib errors  struct tidylib_error : std::system_error { // passthrough  using std::system_error::system_error; tidylib_error() = default; explicit tidylib_error(int c) : std::system_error(c, std::generic_category()) { } }; // Create a C++ invoking wrapper for the tidylib C API, modifying data with the returned data,  // returing a unique_ptr to release storage on scope exit.</description>
+    </item>
+    
+    <item>
+      <title>In use</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/interop/app-go/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/app-go/</guid>
+      <description>This is how you might now write application code using these three libraries:
+namespace app { outcome&amp;lt;void&amp;gt; go() // NOT noexcept, this can throw STL exceptions e.g. bad_alloc  { // Note that explicit construction is required when converting between differing types  // of outcome and result. This makes it explicit what you intend to do as conversion  // may be a lot more expensive than moves.  // Try to GET this URL.</description>
+    </item>
+    
+    <item>
+      <title>Conclusion</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/interop/conclusion/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/conclusion/</guid>
+      <description>This worked example was in fact excessively complex: a quicker route to achieving the same thing would be to add explicit converting constructors to app::error_code for each of the third party library E types. One then could have saved oneself with having to bother injecting custom converters into the OUTCOME_V2_NAMESPACE::convert namespace.
+However there are occasions when you don&amp;rsquo;t have control over the implementation of the destination E type e.g. in callbacks.</description>
+    </item>
+    
+  </channel>
+</rss>

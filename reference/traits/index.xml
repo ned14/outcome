@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Traits on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/reference/traits/</link>
+    <description>Recent content in Traits on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 11 Jan 2019 20:57:15 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/reference/traits/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`is_basic_outcome&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/traits/is_basic_outcome/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/traits/is_basic_outcome/</guid>
+      <description>An integral constant type true for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; types.
+Overridable: Not overridable.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;
+Variable alias: is_basic_outcome_v&amp;lt;T&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`is_basic_result&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/traits/is_basic_result/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/traits/is_basic_result/</guid>
+      <description>An integral constant type true for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; types.
+Overridable: Not overridable.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/basic_result.hpp&amp;gt;
+Variable alias: is_basic_result_v&amp;lt;T&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`is_error_code_available&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/traits/is_error_code_available/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/traits/is_error_code_available/</guid>
+      <description>True if an error code can be constructed from a T e.g. if there exists an ADL discovered free function make_error_code(T).
+Overridable: By template specialisation into the trait namespace.
+Default: True if T is an error code, else to metaprogramming which performs the ADL discovery of make_error_code(T). Note that the STL defines multiple overloads of an ADL discovered free function  std::make_error_code(T) for its error enumerations, as does Boost.System for the Boost error enumerations.</description>
+    </item>
+    
+    <item>
+      <title>`is_error_type&lt;E&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/traits/is_error_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/traits/is_error_type/</guid>
+      <description>A customisable integral constant type true for E types which are to receive error throwing no-value policies.
+Overridable: By template specialisation into the trait namespace.
+Default: False. Specialisations to true exist for:
+ &amp;lt;outcome/boost_result.hpp&amp;gt;
+ boost::system::error_code boost::system::errc::errc_t boost::exception_ptr  &amp;lt;outcome/std_result.hpp&amp;gt;
+ std::error_code std::errc std::exception_ptr   Namespace: OUTCOME_V2_NAMESPACE::trait
+Header: &amp;lt;outcome/trait.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`is_error_type_enum&lt;E, Enum&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/traits/is_error_type_enum/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/traits/is_error_type_enum/</guid>
+      <description>A customisable integral constant type true for E types constructible from Enum types which are to receive error throwing no-value policies
+Overridable: By template specialisation into the trait namespace.
+Default: False. Specialisations exist for:
+ &amp;lt;outcome/boost_result.hpp&amp;gt;
+ boost::system::error_code to boost::system::is_error_condition_enum&amp;lt;Enum&amp;gt;::value.  &amp;lt;outcome/std_result.hpp&amp;gt;
+ std::error_code to std::is_error_condition_enum&amp;lt;Enum&amp;gt;::value.   Namespace: OUTCOME_V2_NAMESPACE::trait
+Header: &amp;lt;outcome/trait.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`is_exception_ptr_available&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/traits/is_exception_ptr_available/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/traits/is_exception_ptr_available/</guid>
+      <description>True if an exception ptr can be constructed from a T e.g. if there exists an ADL discovered free function make_exception_ptr(T).
+Overridable: By template specialisation into the trait namespace.
+Default: True if T is an exception ptr, else to metaprogramming which performs the ADL discovery of make_exception_ptr(T). Note that the STL defines an ADL discovered free function  std::make_exception_ptr(T). Thus this trait will pick up that free function.
+Namespace: OUTCOME_V2_NAMESPACE::trait</description>
+    </item>
+    
+    <item>
+      <title>`is_failure_type&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/traits/is_failure_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/traits/is_failure_type/</guid>
+      <description>An integral constant boolean variable true for failure_type&amp;lt;EC, EP = void&amp;gt; types.
+Overridable: Not overridable.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/success_failure.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`is_success_type&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/traits/is_success_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/traits/is_success_type/</guid>
+      <description>An integral constant boolean variable true for success_type&amp;lt;T&amp;gt; types.
+Overridable: Not overridable.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/success_failure.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`type_can_be_used_in_basic_result&lt;R&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/traits/type_can_be_used_in_basic_result/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/traits/type_can_be_used_in_basic_result/</guid>
+      <description>A constexpr boolean true for types permissible in basic_result&amp;lt;T, E, NoValuePolicy&amp;gt;.
+Overridable: Not overridable.
+Definition: True for a type which:
+ Is not a reference. Is not an in_place_type_t&amp;lt;T&amp;gt;. Is not a success_type&amp;lt;T&amp;gt;. Is not a failure_type&amp;lt;EC, EP = void&amp;gt;. Is not an array. Is either void, or else is an Object and is Destructible.  Namespace: OUTCOME_V2_NAMESPACE::trait
+Header: &amp;lt;outcome/trait.hpp&amp;gt;</description>
+    </item>
+    
+  </channel>
+</rss>

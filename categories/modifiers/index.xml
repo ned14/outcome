@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Modifiers on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/categories/modifiers/</link>
+    <description>Recent content in Modifiers on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	<atom:link href="https://ned14.github.io/outcome/categories/modifiers/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`auto as_failure() &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/as_failure_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/as_failure_rvalue/</guid>
+      <description>Return the output from free function auto failure(T &amp;amp;&amp;amp;, ...) containing a move from any errored state, thus leaving the result&amp;rsquo;s error value in a moved-from state. Depending on the choice of error_type, this function may therefore be destructive. The error state is accessed using error_type &amp;amp;&amp;amp;assume_error() &amp;amp;&amp;amp; noexcept.
+Requires: Always available.
+Complexity: Whatever that of error_type&amp;rsquo;s move constructor is.
+Guarantees: None.</description>
+    </item>
+    
+    <item>
+      <title>`failure_type&lt;error_type, exception_type&gt; as_failure() &amp;&amp;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/as_failure_rvalue/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/as_failure_rvalue/</guid>
+      <description>Return the output from free function auto failure(T &amp;amp;&amp;amp;, ...) containing a move from any errored and/or excepted state, thus leaving the outcome&amp;rsquo;s error and exception values in a moved-from state. Depending on the choice of error_type and/or exception_type, this function may therefore be destructive. The error and exception states are accessed using error_type &amp;amp;&amp;amp;assume_error() &amp;amp;&amp;amp; noexcept and exception_type &amp;amp;&amp;amp;assume_exception() &amp;amp;&amp;amp; noexcept.
+Requires: Always available.
+Complexity: Whatever that of error_type&amp;rsquo;s and/or exception_type&amp;rsquo;s move constructor is.</description>
+    </item>
+    
+    <item>
+      <title>`static void _set_has_error(Impl &amp;&amp;, bool) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/set_has_error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/set_has_error/</guid>
+      <description>Sets whether the implementation has an error by setting or clearing the relevant bit in the flags. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static void _set_has_exception(Impl &amp;&amp;, bool) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/set_has_exception/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/set_has_exception/</guid>
+      <description>Sets whether the implementation has an exception by setting or clearing the relevant bit in the flags. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static void _set_has_exception(Impl &amp;&amp;, bool) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/set_has_error_is_errno/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/set_has_error_is_errno/</guid>
+      <description>Sets whether the implementation&amp;rsquo;s error code has a domain or category matching that of POSIX errno by setting or clearing the relevant bit in the flags. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`static void _set_has_value(Impl &amp;&amp;, bool) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/base/set_has_value/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/base/set_has_value/</guid>
+      <description>Sets whether the implementation has a value by setting or clearing the relevant bit in the flags. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
+      <title>`void swap(basic_outcome &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/swap/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/swap/</guid>
+      <description>Swap one basic_outcome with another.
+Requires: Always available.
+Complexity: Same as for the swap() implementations of the value_type, error_type and exception_type. The noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of all three operands on entry is restored, if at least two of the underlying operations is marked noexcept.</description>
+    </item>
+    
+    <item>
+      <title>`void swap(basic_result &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/swap/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/swap/</guid>
+      <description>Swap one basic_result with another.
+Requires: Always available.
+Complexity: Same as for the swap() implementations of the value_type and error_type. The noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked noexcept.</description>
+    </item>
+    
+  </channel>
+</rss>

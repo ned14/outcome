@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Comparisons on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/categories/comparisons/</link>
+    <description>Recent content in Comparisons on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	<atom:link href="https://ned14.github.io/outcome/categories/comparisons/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`bool operator!=(const basic_outcome&lt;A, B, C, D&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/inequality_basic_outcome/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/inequality_basic_outcome/</guid>
+      <description>Returns true if this outcome does not compare equal to the other outcome. Comparison is done using operator!= on value_type, error_type and/or exception_type if the currently chosen state is the same for both outcomes, otherwise true is returned.
+Requires: operator!= must be a valid expression between value_type and A, and between error_type and B, and between exception_type and C. If value_type is void, then so must be A; similarly for error_type and B; similarly for exception_type and C.</description>
+    </item>
+    
+    <item>
+      <title>`bool operator!=(const basic_result&lt;A, B, C&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/inequality_basic_result/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/inequality_basic_result/</guid>
+      <description>Returns true if this result does not compare equal to the other result. Comparison is done using operator!= on either value_type or error_type if the currently chosen state is the same for both results, otherwise true is returned.
+Requires: operator!= must be a valid expression between value_type and A, and between error_type and B. If value_type is void, then so must be A; similarly for error_type and B.
+Complexity: Whatever the underlying operator!</description>
+    </item>
+    
+    <item>
+      <title>`bool operator!=(const basic_result&lt;A, B, C&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/inequality_basic_result/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/inequality_basic_result/</guid>
+      <description>Returns true if this outcome does not compare equal to the other result. Comparison is done using operator!= on value_type or error_type if the currently chosen state is the same for both outcome and result, otherwise true is returned. Note that an excepted outcome is always unequal to a result.
+Requires: operator!= must be a valid expression between value_type and A, and between error_type and B. If value_type is void, then so must be A; similarly for error_type and B.</description>
+    </item>
+    
+    <item>
+      <title>`bool operator!=(const failure_type&lt;A, B&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/inequality_failure_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/inequality_failure_type/</guid>
+      <description>Returns true if this outcome is successful or its error or exception does not compare equal to the error in the failure type sugar. Comparison is done using operator!= on error_type and A and on exception_type and B.
+Requires: operator!= must be a valid expression between error_type and A, or A is void; operator!= must be a valid expression between exception_type and B, or B is void. If error_type is void, then so must be A; if exception_type is void, then so must be B.</description>
+    </item>
+    
+    <item>
+      <title>`bool operator!=(const failure_type&lt;A, void&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/inequality_failure_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/inequality_failure_type/</guid>
+      <description>Returns true if this result is successful or its error does not compare equal to the error in the failure type sugar. Comparison is done using operator!= on error_type and A. If A is void, this call aliases bool has_value() const noexcept.
+Requires: operator!= must be a valid expression between error_type and A, or A is void. If error_type is void, then so must be A.
+Complexity: Whatever the underlying operator!</description>
+    </item>
+    
+    <item>
+      <title>`bool operator!=(const success_type&lt;A&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/equality_success_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/equality_success_type/</guid>
+      <description>Returns true if this outcome is not successful or its value does not compares equal to the value in the success type sugar. Comparison is done using operator!= on value_type and A. If A is void, this call aliases bool has_error() const noexcept.
+Requires: operator!= must be a valid expression between value_type and A, or A is void. If value_type is void, then so must be A.
+Complexity: Whatever the underlying operator!</description>
+    </item>
+    
+    <item>
+      <title>`bool operator!=(const success_type&lt;A&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/equality_success_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/equality_success_type/</guid>
+      <description>Returns true if this result is not successful or its value does not compares equal to the value in the success type sugar. Comparison is done using operator!= on value_type and A. If A is void, this call aliases bool has_error() const noexcept.
+Requires: operator!= must be a valid expression between value_type and A, or A is void. If value_type is void, then so must be A.
+Complexity: Whatever the underlying operator!</description>
+    </item>
+    
+    <item>
+      <title>`bool operator==(const basic_outcome&lt;A, B, C, D&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/equality_basic_outcome/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/equality_basic_outcome/</guid>
+      <description>Returns true if this outcome compares equal to the other outcome. Comparison is done using operator== on value_type or error_type and/or exception_type if the currently chosen state is the same for both outcomes, otherwise false is returned.
+Requires: operator== must be a valid expression between value_type and A, and between error_type and B, and between exception_type and C. If value_type is void, then so must be A; similarly for error_type and B; similarly for exception_type and C.</description>
+    </item>
+    
+    <item>
+      <title>`bool operator==(const basic_result&lt;A, B, C&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/equality_basic_result/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/equality_basic_result/</guid>
+      <description>Returns true if this outcome compares equal to the other result. Comparison is done using operator== on value_type or error_type if the currently chosen state is the same for both outcome and result, otherwise false is returned. Note that if the outcome is excepted, it will never compare equal to a result.
+Requires: operator== must be a valid expression between value_type and A, and between error_type and B. If value_type is void, then so must be A; similarly for error_type and B.</description>
+    </item>
+    
+    <item>
+      <title>`bool operator==(const basic_result&lt;A, B, C&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/equality_basic_result/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/equality_basic_result/</guid>
+      <description>Returns true if this result compares equal to the other result. Comparison is done using operator== on either value_type or error_type if the currently chosen state is the same for both results, otherwise false is returned.
+Requires: operator== must be a valid expression between value_type and A, and between error_type and B. If value_type is void, then so must be A; similarly for error_type and B.
+Complexity: Whatever the underlying operator== have.</description>
+    </item>
+    
+    <item>
+      <title>`bool operator==(const failure_type&lt;A, B&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/equality_failure_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/equality_failure_type/</guid>
+      <description>Returns true if this outcome is unsuccessful and its error compares equal to the error in the failure type sugar. Comparison is done using operator== on error_type and A and on exception_type and B.
+Requires: operator== must be a valid expression between error_type and A, or A is void; operator== must be a valid expression between exception_type and B, or B is void. If error_type is void, then so must be A; if exception_type is void, then so must be B.</description>
+    </item>
+    
+    <item>
+      <title>`bool operator==(const failure_type&lt;A, void&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/equality_failure_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/equality_failure_type/</guid>
+      <description>Returns true if this result is unsuccessful and its error compares equal to the error in the failure type sugar. Comparison is done using operator== on error_type and A. If A is void, this call aliases bool has_error() const noexcept.
+Requires: operator== must be a valid expression between error_type and A, or A is void. If error_type is void, then so must be A.
+Complexity: Whatever the underlying operator== has. Constexpr and noexcept of underlying operations is propagated.</description>
+    </item>
+    
+    <item>
+      <title>`bool operator==(const success_type&lt;A&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/inequality_success_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/inequality_success_type/</guid>
+      <description>Returns true if this result is successful and its value compares equal to the value in the success type sugar. Comparison is done using operator== on value_type and A. If A is void, this call aliases bool has_value() const noexcept.
+Requires: operator== must be a valid expression between value_type and A, or A is void. If value_type is void, then so must be A.
+Complexity: Whatever the underlying operator== has. Constexpr and noexcept of underlying operations is propagated.</description>
+    </item>
+    
+    <item>
+      <title>`bool operator==(const success_type&lt;A&gt; &amp;) const`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/inequality_success_type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/inequality_success_type/</guid>
+      <description>Returns true if this result is successful and its value compares equal to the value in the success type sugar. Comparison is done using operator== on value_type and A. If A is void, this call aliases bool has_value() const noexcept.
+Requires: operator== must be a valid expression between value_type and A, or A is void. If value_type is void, then so must be A.
+Complexity: Whatever the underlying operator== has. Constexpr and noexcept of underlying operations is propagated.</description>
+    </item>
+    
+  </channel>
+</rss>

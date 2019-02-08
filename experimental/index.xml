@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Experimental on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/experimental/</link>
+    <description>Recent content in Experimental on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Sat, 26 Jan 2019 21:01:46 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/experimental/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The main advantages</title>
+      <link>https://ned14.github.io/outcome/experimental/advantages/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/advantages/</guid>
+      <description>The main advantages of choosing &amp;lt;outcome/experimental&amp;gt; over default Outcome:
+ Codegen is tighter and less verbose1, sometimes remarkably so.
+ Build time impact is markedly lower, barely above the inclusion of naked &amp;lt;basic_result.hpp&amp;gt;, as the STL allocator machinery and std::string et al is not dragged into inclusion by including &amp;lt;system_error&amp;gt;. Note that &amp;lt;outcome/experimental/status_outcome.hpp&amp;gt; bring in &amp;lt;exception&amp;gt;, however &amp;lt;outcome/experimental/status_result.hpp&amp;gt; brings in no extra system headers.
+ More discipline is imposed on your use of Outcome, leading to less ambiguous code which is easier to optimise by the compiler, lower cost to maintain, and lower cognitive load to audit code based on experimental Outcome for correctness.</description>
+    </item>
+    
+    <item>
+      <title>Approximate map between error code designs</title>
+      <link>https://ned14.github.io/outcome/experimental/map/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/map/</guid>
+      <description>Much of the design of Boost.System (which went on to become &amp;lt;system_error&amp;gt;) has been retained in proposed &amp;lt;system_error2&amp;gt;, so an approximate map between &amp;lt;system_error2&amp;gt; and &amp;lt;system_error&amp;gt; and Boost.System can be given:
+  C++ 17 &amp;lt;system_error&amp;gt;Boost.SystemProposed &amp;lt;system_error2&amp;gt;  std::errc boost::system::errc experimental::errc (almost identical)  std::error_category boost::system::error_category experimental::status_code_domain  std::generic_category boost::system::generic_category experimental::generic_code_domain  std::system_category boost::system::system_category One of: experimental::posix_code_domain (POSIX systems) experimental::win32_code_domain (Microsoft Windows) experimental::nt_code_domain (Microsoft Windows)   std::error_condition boost::system::error_condition No equivalent (deliberately removed as hindsight proved it to be a design mistake leading to much confusing and hard to audit for correctness code)  std::error_code boost::system::error_code One of: experimental::status_code&amp;lt;DomainType&amp;gt; const experimental::status_code&amp;lt;void&amp;gt; &amp;amp; experimental::status_code&amp;lt;erased&amp;lt;intptr_t&amp;gt;&amp;gt; (aliased to experimental::system_code) experimental::errored_status_code&amp;lt;DomainType&amp;gt; const experimental::errored_status_code&amp;lt;void&amp;gt; &amp;amp; experimental::errored_status_code&amp;lt;erased&amp;lt;intptr_t&amp;gt;&amp;gt; (aliased to experimental::error)   std::system_error boost::system::system_error One of: const experimental::status_error&amp;lt;void&amp;gt; &amp;amp; experimental::status_error&amp;lt;DomainType&amp;gt;   As is obvious from the above, in &amp;lt;system_error2&amp;gt; one must be much more specific and accurate with respect to intent and specification and desired semantics than with &amp;lt;system_error&amp;gt;.</description>
+    </item>
+    
+    <item>
+      <title>Major differences</title>
+      <link>https://ned14.github.io/outcome/experimental/differences/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/differences/</guid>
+      <description>The major design differences between &amp;lt;system_error&amp;gt; and proposed &amp;lt;system_error2&amp;gt; are as follows:
+ experimental::status_code&amp;lt;DomainType&amp;gt; can represent warnings and form-of-success codes as well as failure codes. experimental::errored_status_code&amp;lt;DomainType&amp;gt; is more similar to std::error_code, in that it can only represent failures (this is enforced by C++ 20 contract or runtime assertion check).
+ The code&amp;rsquo;s domain implementation defines the payload type to be transported around by experimental::status_code&amp;lt;DomainType&amp;gt;, rather than it being hardcoded to int as in std::error_code.</description>
+    </item>
+    
+    <item>
+      <title>`status_result` and `status_outcome`</title>
+      <link>https://ned14.github.io/outcome/experimental/status_result/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/status_result/</guid>
+      <description>status_result and status_outcome are type aliases to basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; and basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; in the usual way, but with a defaulted NoValuePolicy which selects on the basis of status_code&amp;lt;DomainType&amp;gt; instead.
+If the E type is not some status_code&amp;lt;&amp;gt;, the default policy selector will complain.
+ The specifications are:
+experimental::status_result&amp;lt;T, E = experimental::system_code&amp;gt; experimental::status_outcome&amp;lt;T, E = experimental::system_code, EP = std::exception_ptr&amp;gt;  So, the default E is the erased status code system_code, which can represent any generic_code, posix_code, win32_code, nt_code, com_code and many other integer error and status codings.</description>
+    </item>
+    
+    <item>
+      <title>Tying it all together</title>
+      <link>https://ned14.github.io/outcome/experimental/outcome/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/outcome/</guid>
+      <description>Firstly let&amp;rsquo;s alias a more convenient form of status_result:
+template &amp;lt;classT, classE = outcome_e::error&amp;gt; using result = // outcome_e::status_result&amp;lt;T, E, outcome_e::policy::default_status_result_policy&amp;lt;T, E&amp;gt;&amp;gt;; View this code on Github (The defaulting of default_result_policy is superfluous, it&amp;rsquo;s already the default)
+What follows now is very standard Outcome code. Indeed, it would compile just fine under standard Outcome with only a few typedefs.
+result&amp;lt;file_handle, file_io_error&amp;gt; open_file(const char *path) // models throws(file_io_error) { file_handle ret(::fopen(path, &amp;#34;r&amp;#34;)); if(ret) return ret; return file_io_error({errno, __LINE__, __FILE__}); } result&amp;lt;void&amp;gt; open_resource() // models throws(std::error) { for(;;) { result&amp;lt;file_handle, file_io_error&amp;gt; r = open_file(&amp;#34;some file&amp;#34;); if(r) break; file_io_error e = r.</description>
+    </item>
+    
+  </channel>
+</rss>

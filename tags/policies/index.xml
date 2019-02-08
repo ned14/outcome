@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Policies on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/tags/policies/</link>
+    <description>Recent content in Policies on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/tags/policies/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>No-value policies</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/no-value/</link>
+      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/no-value/</guid>
+      <description>In the previous section we have seen that it would be useful if calling member function .value() on object of type outcome&amp;lt;T&amp;gt; that did not contain a value, would cause an exception to be thrown according to some user-defined policy.
+Let us consider result&amp;lt;T&amp;gt; first. It is an alias to basic_result&amp;lt;T, E, NoValuePolicy&amp;gt;, where E is the type storing error information and defaulted to std::error_code/boost::system::error_code, and NoValuePolicy is a no-value policy defaulted to default_policy&amp;lt;T, EC, EP&amp;gt;.</description>
+    </item>
+    
+  </channel>
+</rss>

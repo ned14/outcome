@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Motivation on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/motivation/</link>
+    <description>Recent content in Motivation on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 11 Jan 2019 20:57:15 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/motivation/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Exceptions</title>
+      <link>https://ned14.github.io/outcome/motivation/exceptions/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/motivation/exceptions/</guid>
+      <description>Exceptions are the default mechanism in C++ for reporting, propagating and processing the information about function failures. Their main advantage is the ability to describe the &amp;ldquo;success dependency&amp;rdquo; between functions: if you want to say that calling function g() depends on the successful execution of function f(), you just put g() below f() and that&amp;rsquo;s it:
+int a() { f(); g(); // don&amp;#39;t call g() and further if f() fails  return h(); // don&amp;#39;t call h() if g() fails }  In the C++ Standard terms this means that f() is sequenced before g().</description>
+    </item>
+    
+    <item>
+      <title>errno</title>
+      <link>https://ned14.github.io/outcome/motivation/errno/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/motivation/errno/</guid>
+      <description>The idiom of returning, upon failure, a special value and storing an error code (an int) inside a global (or thread-local) object errno is inherited from C, and used in its Standard Library:
+int readValue(const char * filename) { FILE* f = fopen(filename, &amp;#34;r&amp;#34;); if (f == NULL) return 0; // special value indicating failure  // keep errno value set by fopen()  int i; int r = fscanf(f, &amp;#34;%d&amp;#34;, &amp;amp;i); if (r == 0 || r == EOF) { // special values: i not read  errno = ENODATA; // choose error value to return  return 0; fclose(f); errno = 0; // clear error info (success)  return i; }  One advantage (to some, and a disadvantage to others) of this technique is that it uses familiar control statements (if and return) to indicate all execution paths that handle failures.</description>
+    </item>
+    
+    <item>
+      <title>Error codes</title>
+      <link>https://ned14.github.io/outcome/motivation/error_codes/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/motivation/error_codes/</guid>
+      <description>Error codes are reasonable error handling technique, also working in C. In this case the information is also stored as an int, but returned by value, which makes it possible to make functions pure (side-effect-free and referentially transparent).
+int readInt(const char * filename, int&amp;amp; val) { FILE* fd; int r = openFile(filename, /*out*/ fd); if (r != 0) return r; // return whatever error openFile() returned  r = readInt(fd, /*out*/ val); if (r !</description>
+    </item>
+    
+    <item>
+      <title>std::error_code</title>
+      <link>https://ned14.github.io/outcome/motivation/std_error_code/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/motivation/std_error_code/</guid>
+      <description>Type std::error_code has been designed to be sufficiently small and trivial to be cheaply passed around, and at the same time be able to store sufficient information to represent any error situation from any library/sub-system in the world without a clash. Its representation is basically:
+classerror_code { error_category* domain; // domain from which the error originates  int value; // numeric value of error within the domain };  Here, domain indicates the library from which the error originates.</description>
+    </item>
+    
+    <item>
+      <title>Plugging a library into std::error_code</title>
+      <link>https://ned14.github.io/outcome/motivation/plug_error_code/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/motivation/plug_error_code/</guid>
+      <description>This section illustrates how you can hook into the std::error_code system from the Standard Library in order to work with your own set of error codes. As is usually the case in C++, doing this is straightforward but requires typing boilerplate to tell the C++ STL about your custom error type. This is not part of Outcome library, but we still provide this short guide here, because how to do this is not well documented [1].</description>
+    </item>
+    
+    <item>
+      <title>Narrow contracts</title>
+      <link>https://ned14.github.io/outcome/motivation/narrow_contract/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/motivation/narrow_contract/</guid>
+      <description>A program&amp;rsquo;s thread of execution can enter a &amp;ldquo;disappointing&amp;rdquo; state for two reasons:
+ due to disappointing situation in the environment (operating system, external input), or due to a bug in the program.  The key to handling these disappointments correctly is to identify to which category they belong, and use the tools adequate for a given category. In this tutorial when we say &amp;ldquo;error&amp;rdquo; or &amp;ldquo;failure&amp;rdquo; we only refer to the first category.</description>
+    </item>
+    
+  </channel>
+</rss>

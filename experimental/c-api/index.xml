@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Using Outcome from C code on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/experimental/c-api/</link>
+    <description>Recent content in Using Outcome from C code on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Tue, 05 Feb 2019 17:14:18 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/experimental/c-api/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Limitations</title>
+      <link>https://ned14.github.io/outcome/experimental/c-api/limitations/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/c-api/limitations/</guid>
+      <description>C++ has excellent two-way compatibility with the C ABI, but there are some limitations you must observe to write C++ code which C code can call without marshalling at the ABI boundary:
+ A C++ function may not throw exceptions if it is safe to call from C, and so should always be marked noexcept.
+ A C++ function should be annotated with extern &amp;quot;C&amp;quot; to prevent its symbol being mangled, and thus give it the C rather than C++ ABI.</description>
+    </item>
+    
+    <item>
+      <title>Example C&#43;&#43; function</title>
+      <link>https://ned14.github.io/outcome/experimental/c-api/example/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/c-api/example/</guid>
+      <description>Let us start with a simple C++ function which we wish to make available to C code:
+namespace outcome_e = OUTCOME_V2_NAMESPACE::experimental; // Fill the supplied buffer with the integer v converted to a string, // returning length of string minus null terminator outcome_e::status_result&amp;lt;size_t&amp;gt; to_string(char *buffer, size_t bufferlen, int v) noexcept { try { // Could throw an exception!  std::string temp(std::to_string(v)); // Will this string exceed the supplied buffer?  if(temp.</description>
+    </item>
+    
+    <item>
+      <title>Calling it from C</title>
+      <link>https://ned14.github.io/outcome/experimental/c-api/example2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/c-api/example2/</guid>
+      <description>Firstly we need to declare to C our result returning C++ function:
+// Declare our C++ function&amp;#39;s returning result type. Only needs to be done once. // This declares an `status_result&amp;lt;size_t, system_code&amp;gt;` which is an alias to // `basic_result&amp;lt;size_t, status_code&amp;lt;erased&amp;lt;intptr_t&amp;gt;&amp;gt;&amp;gt;`. // // The first parameter is some unique identifier for this type which will be used // whenever we reference this type in the future. CXX_DECLARE_RESULT_SYSTEM(to_string_rettype, size_t); // Tell C about our extern C++ function `to_string()` extern CXX_RESULT_SYSTEM(to_string_rettype) _Z9to_stringPcmi(char *buffer, size_t bufferlen, int v); View this code on Github Now let&amp;rsquo;s call the C++ function from C:</description>
+    </item>
+    
+    <item>
+      <title>C Macro API Reference</title>
+      <link>https://ned14.github.io/outcome/experimental/c-api/reference/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/c-api/reference/</guid>
+      <description>The C macro API header &amp;lt;outcome/experimental/result.h&amp;gt; consists of these macros:
+ CXX_DECLARE_RESULT(ident, T, E) Declares to C a basic_result type uniquely identified by ident. T is available at the member variable .value, and E is available at the member variable .error. CXX_RESULT(ident) A reference to a previously declared result type with unique ident. CXX_RESULT_HAS_VALUE(r) Evaluates to 1 (true) if the input result has a value. CXX_RESULT_HAS_ERROR(r) Evaluates to 1 (true) if the input result has an error.</description>
+    </item>
+    
+  </channel>
+</rss>

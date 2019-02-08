@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Policies on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/reference/policies/</link>
+    <description>Recent content in Policies on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 11 Jan 2019 20:57:15 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/reference/policies/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`all_narrow`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/all_narrow/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/all_narrow/</guid>
+      <description>Policy class defining that hard undefined behaviour should occur on incorrect narrow and wide value, error or exception observation.
+Inherits publicly from base, and simply defines its wide value, error and exception observer policies to call their corresponding narrow editions.
+Included by &amp;lt;basic_result.hpp&amp;gt;, and so is always available when basic_result is available.
+Requires: Nothing.
+Namespace: OUTCOME_V2_NAMESPACE::policy
+Header: &amp;lt;outcome/policy/all_narrow.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`error_code_throw_as_system_error&lt;T, EC, EP&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/error_code_throw_as_system_error_outcome/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/error_code_throw_as_system_error_outcome/</guid>
+      <description>Note: This policy class specialisation can only be used with basic_outcome, not basic_result. Use error_code_throw_as_system_error&amp;lt;T, EC, void&amp;gt; with basic_result.
+Policy class defining that on incorrect wide value observation, EP ought to be rethrown if possible, then the ADL discovered free function outcome_throw_as_system_error_with_payload(impl.assume_error()) should be called. Some precanned overloads of that function are listed here.
+Incorrect wide error observation performs:
+OUTCOME_THROW_EXCEPTION(bad_outcome_access(&amp;#34;no error&amp;#34;));  Incorrect wide exception observation performs:
+OUTCOME_THROW_EXCEPTION(bad_outcome_access(&amp;#34;no exception&amp;#34;));  Inherits publicly from base, and its narrow value, error and exception observer policies are inherited from there.</description>
+    </item>
+    
+    <item>
+      <title>`error_code_throw_as_system_error&lt;T, EC, void&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/error_code_throw_as_system_error_result/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/error_code_throw_as_system_error_result/</guid>
+      <description>Note: This policy class specialisation can only be used with basic_result, not basic_outcome. Use error_code_throw_as_system_error&amp;lt;T, EC, EP&amp;gt; with basic_outcome.
+Policy class defining that the ADL discovered free function outcome_throw_as_system_error_with_payload(impl.assume_error()) should be called on incorrect wide value observation. Some precanned overloads of that function are listed here.
+Incorrect wide error observation performs:
+OUTCOME_THROW_EXCEPTION(bad_result_access(&amp;#34;no error&amp;#34;));  Inherits publicly from base, and its narrow value, error and exception observer policies are inherited from there.</description>
+    </item>
+    
+    <item>
+      <title>`exception_ptr_rethrow&lt;T, EC, EP&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/exception_ptr_rethrow_outcome/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/exception_ptr_rethrow_outcome/</guid>
+      <description>Note: This policy class specialisation can only be used with basic_outcome, not basic_result. Use exception_ptr_rethrow&amp;lt;T, EC, void&amp;gt; with basic_result.
+Policy class defining that the ADL discovered free function rethrow_exception(impl.assume_exception()) if possible, followed by rethrow_exception(impl.assume_error()) should be called on incorrect wide value observation. Generally this will ADL discover  std::rethrow_exception() or boost::rethrow_exception() depending on the EC type.
+Incorrect wide error observation performs:
+OUTCOME_THROW_EXCEPTION(bad_outcome_access(&amp;#34;no error&amp;#34;));  Incorrect wide exception observation performs:
+OUTCOME_THROW_EXCEPTION(bad_outcome_access(&amp;#34;no exception&amp;#34;));  Inherits publicly from base, and its narrow value, error and exception observer policies are inherited from there.</description>
+    </item>
+    
+    <item>
+      <title>`exception_ptr_rethrow&lt;T, EC, void&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/exception_ptr_rethrow_result/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/exception_ptr_rethrow_result/</guid>
+      <description>Note: This policy class specialisation can only be used with basic_result, not basic_outcome. Use exception_ptr_rethrow&amp;lt;T, EC, EP&amp;gt; with basic_outcome.
+Policy class defining that the ADL discovered free function rethrow_exception(impl.assume_error()) should be called on incorrect wide value observation. Generally this will ADL discover  std::rethrow_exception() or boost::rethrow_exception() depending on the EC type.
+Incorrect wide error observation performs:
+OUTCOME_THROW_EXCEPTION(bad_result_access(&amp;#34;no error&amp;#34;));  Inherits publicly from base, and its narrow value, error and exception observer policies are inherited from there.</description>
+    </item>
+    
+    <item>
+      <title>`fail_to_compile_observers`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/fail_to_compile_observers/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/fail_to_compile_observers/</guid>
+      <description>Upon attempting to compile the wide observer policy functions, the following static assertion occurs which fails the build:
+ Attempt to wide observe value, error or exception for a result/outcome given an EC or E type which is not void, and for whom trait::has_error_code_v, trait::has_exception_ptr_v, and trait::has_exception_ptr_v are all false. Please specify a NoValuePolicy to tell result/outcome what to do, or else use a more specific convenience type alias such as uncheckedto indicate you want the wide observers to be narrow, or checkedto indicate you always want an exception throw etc.</description>
+    </item>
+    
+    <item>
+      <title>`terminate`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/terminate/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/terminate/</guid>
+      <description>Policy class defining that  std::terminate() should be called on incorrect wide value, error or exception observation.
+Inherits publicly from base, and its narrow value, error and exception observer policies are inherited from there.
+Included by &amp;lt;basic_result.hpp&amp;gt;, and so is always available when basic_result is available.
+Requires: Nothing.
+Namespace: OUTCOME_V2_NAMESPACE::policy
+Header: &amp;lt;outcome/policy/terminate.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`throw_bad_result_access&lt;EC&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/policies/throw_bad_result_access/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/policies/throw_bad_result_access/</guid>
+      <description>Policy class defining that bad_result_access_with&amp;lt;EC&amp;gt; should be thrown on incorrect wide value observation. The primary purpose of this policy is to enable standing in for  P0323 std::expected&amp;lt;T, E&amp;gt; which throws a bad_expected_access&amp;lt;E&amp;gt; on incorrect wide value observation. This is why it is only ever EC which is thrown with bad_result_access_with&amp;lt;EC&amp;gt; on value observation only, and only when there is an error available.
+If used in basic_outcome, and the outcome is exceptioned and so no error is available, incorrect wide value observation performs instead:</description>
+    </item>
+    
+  </channel>
+</rss>

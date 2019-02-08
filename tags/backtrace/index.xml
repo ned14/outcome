@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Backtrace on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/tags/backtrace/</link>
+    <description>Recent content in Backtrace on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	<atom:link href="https://ned14.github.io/outcome/tags/backtrace/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Keeping state</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/hooks/keeping_state/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/keeping_state/</guid>
+      <description>The first thing we are going to need is somewhere to store the stack backtrace. We could take the easier route and simply store it into an allocated block and keep the pointer as a custom payload in a result&amp;lt;T, std::pair&amp;lt;error_code, std::unique_ptr&amp;lt;stack_backtrace&amp;gt;&amp;gt;&amp;gt; (see previous section on Custom payloads). But let us assume that we care so deeply about bounded execution times that ever calling malloc is unacceptable.
+We therefore are going to need some completely static and trivially typed storage perhaps kept per-thread to avoid the need to keep mutexes.</description>
+    </item>
+    
+  </channel>
+</rss>

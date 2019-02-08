@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Exception on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/tags/exception/</link>
+    <description>Recent content in Exception on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	<atom:link href="https://ned14.github.io/outcome/tags/exception/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Inspecting outcome&lt;T, EC, EP&gt;</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/outcome/inspecting/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/outcome/inspecting/</guid>
+      <description>Continuing with the previous example, in Layer3 we have function z which again reports failures via exceptions. It will call function h from Layer2_old which returns outcome&amp;lt;int&amp;gt; (which may store a double or an std::error_code or an std::exception_ptr). The goal is to unpack it to either the successful return value int or to throw an appropriate exception: if we are storing an std::exception_ptr just rethrow it. If we are storing an std::error_code throw it as std::system_error, which is designed to store std::error_code&amp;rsquo;s:</description>
+    </item>
+    
+  </channel>
+</rss>

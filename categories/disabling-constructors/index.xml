@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Disabling Constructors on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/categories/disabling-constructors/</link>
+    <description>Recent content in Disabling Constructors on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	<atom:link href="https://ned14.github.io/outcome/categories/disabling-constructors/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`basic_outcome(Args...) = delete`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/disabling_catchall/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/disabling_catchall/</guid>
+      <description>Disabling catchall constructor used to give useful diagnostic error when trying to use non-inplace constructors when predicate::constructors_enabled is false.
+Requires: predicate::constructors_enabled is false.
+Complexity: N/A.</description>
+    </item>
+    
+    <item>
+      <title>`basic_outcome(X &amp;&amp;) = delete`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/disabling_implicit_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/disabling_implicit_constructor/</guid>
+      <description>Disabling implicit constructor used to give useful diagnostic error when trying to use implicit constructors when predicate::implicit_constructors_enabled is false.
+Requires: predicate::implicit_constructors_enabled is false.
+Complexity: N/A.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result(Args...) = delete`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/disabling_catchall/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/disabling_catchall/</guid>
+      <description>Disabling catchall constructor used to give useful diagnostic error when trying to use non-inplace constructors when predicate::constructors_enabled is false.
+Requires: predicate::constructors_enabled is false.
+Complexity: N/A.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result(X &amp;&amp;) = delete`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/disabling_implicit_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/disabling_implicit_constructor/</guid>
+      <description>Disabling implicit constructor used to give useful diagnostic error when trying to use implicit constructors when predicate::implicit_constructors_enabled is false.
+Requires: predicate::implicit_constructors_enabled is false.
+Complexity: N/A.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Value on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/tags/value/</link>
+    <description>Recent content in Value on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	<atom:link href="https://ned14.github.io/outcome/tags/value/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Auto-throwing filesystem_error</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/payload/copy_file3/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/payload/copy_file3/</guid>
+      <description>Something not mentioned at all until now (and properly described in the next section, Default actions) is that Outcome can be programmed take various actions when the user tries to observe .value() when there is no value, and so on for the other possible state observations.
+Seeing as we are replacing the throwing overload of copy_file() in the Filesystem TS with a result returning edition instead, it would make sense if an attempt to observe the value of an unsuccessful fs_result threw the exact same filesystem_error as the Filesystem TS does.</description>
+    </item>
+    
+    <item>
+      <title>Inspecting outcome&lt;T, EC, EP&gt;</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/outcome/inspecting/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/outcome/inspecting/</guid>
+      <description>Continuing with the previous example, in Layer3 we have function z which again reports failures via exceptions. It will call function h from Layer2_old which returns outcome&amp;lt;int&amp;gt; (which may store a double or an std::error_code or an std::exception_ptr). The goal is to unpack it to either the successful return value int or to throw an appropriate exception: if we are storing an std::exception_ptr just rethrow it. If we are storing an std::error_code throw it as std::system_error, which is designed to store std::error_code&amp;rsquo;s:</description>
+    </item>
+    
+    <item>
+      <title>Inspecting result&lt;T, EC&gt;</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/result/inspecting/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/result/inspecting/</guid>
+      <description>Suppose we will be writing a function print_half that takes an integer number (however big) represented as an std::string and outputs a number which is twice smaller:
+outcome::result&amp;lt;void&amp;gt; print_half(const std::string&amp;amp; text); View this code on Github The type result&amp;lt;void&amp;gt; means that there is no value to be retuned upon success, but that the operation might still fail, and we may be interested in inspecting the cause of the failure. The class template result&amp;lt;&amp;gt; is declared with the attribute [[nodiscard]], which means the compiler will warn you if you forget to inspect the returned object (in C++ 17 or later).</description>
+    </item>
+    
+  </channel>
+</rss>

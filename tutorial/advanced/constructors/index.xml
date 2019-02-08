@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Result returning constructors on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/tutorial/advanced/constructors/</link>
+    <description>Recent content in Result returning constructors on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/tutorial/advanced/constructors/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Two phase construction</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/constructors/two-phase-init/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/constructors/two-phase-init/</guid>
+      <description>The first thing to do is to break your object&amp;rsquo;s construction into two phases:
+ Place the object into a state where it can be legally destructed without doing any initialisation which could throw an exception (i.e. everything done in phase 1 is constexpr). This phase usually involves initialising member variables to various default values, most often using default member initialisers. Most standard C++ library objects and containers have constexpr constructors, and thus can be initialised during phase 1.</description>
+    </item>
+    
+    <item>
+      <title>A file handle</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/constructors/file_handle/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/constructors/file_handle/</guid>
+      <description>Borrowing from llfio::file_handle which uses this design pattern1, here is a simplified file_handle implementation:
+classfile_handle { int _fd{-1}; // file descriptor  struct stat _stat { 0 }; // stat of the fd at open  // Phase 1 private constexpr constructor  constexpr file_handle() {} public: using path_type = filesystem::path; //! The behaviour of the handle: does it read, read and write, or atomic append?  enum classmode : unsigned char // bit 0 set means writable  { unchanged = 0, none = 2, //!</description>
+    </item>
+    
+    <item>
+      <title>Phase 2 construction</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/constructors/static-constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/constructors/static-constructor/</guid>
+      <description>Its phase 2 constructor:
+// Phase 2 static member constructor function, which cannot throw inline outcome::result&amp;lt;file_handle&amp;gt; file_handle::file(file_handle::path_type path, file_handle::mode mode) noexcept { // Perform phase 1 of object construction  file_handle ret; // Perform phase 2 of object construction  int flags = 0; switch(mode) { case mode::attr_read: case mode::read: flags = O_RDONLY; break; case mode::attr_write: case mode::write: flags = O_RDWR; break; case mode::append: flags = O_APPEND; break; default: return std::errc::invalid_argument; } ret.</description>
+    </item>
+    
+    <item>
+      <title>Phase 3</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/constructors/metaprogrammg1/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/constructors/metaprogrammg1/</guid>
+      <description>We have built our first two phases of construction for file_handle, and for some users they might be happy writing:
+outcome::result&amp;lt;file_handle&amp;gt; fh1 = file_handle::file(&amp;#34;hello&amp;#34; /*, file_handle::mode::read */); if(!fh1) { std::cerr &amp;lt;&amp;lt; &amp;#34;Opening file &amp;#39;hello&amp;#39; failed with &amp;#34; &amp;lt;&amp;lt; fh1.error().message() &amp;lt;&amp;lt; std::endl; } View this code on Github &amp;hellip; and be done with it.
+But wouldn&amp;rsquo;t it be nicer if we could instead write:
+outcome::result&amp;lt;file_handle&amp;gt; fh2 = make&amp;lt;file_handle&amp;gt;{&amp;#34;hello&amp;#34; /*, file_handle::mode::read */}(); if(!</description>
+    </item>
+    
+    <item>
+      <title>construct&lt;T&gt;</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/constructors/metaprogrammg2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/constructors/metaprogrammg2/</guid>
+      <description>First, we need a base definition for make&amp;lt;T&amp;gt;:
+template &amp;lt;classT&amp;gt; struct make { outcome::result&amp;lt;T&amp;gt; operator()() const noexcept { //  static_assert(!std::is_same&amp;lt;T, T&amp;gt;::value, //  &amp;#34;make&amp;lt;T&amp;gt;() was not specialised for the type T supplied&amp;#34;); } }; View this code on Github This fails a static assert if the type is ever instantiated unspecialised.
+We then specialise for make&amp;lt;file_handle&amp;gt;:
+template &amp;lt;&amp;gt; struct make&amp;lt;file_handle&amp;gt; { file_handle::path_type _path; file_handle::mode _mode{file_handle::mode::read}; // Any other args, default initialised if necessary, follow here .</description>
+    </item>
+    
+    <item>
+      <title>Alternatives</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/constructors/metaprogrammg3/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/constructors/metaprogrammg3/</guid>
+      <description>No doubt many will dislike the two-stage invocation pattern i.e.
+make&amp;lt;file_handle&amp;gt;{&amp;#34;hello&amp;#34;}();  So let us examine the most obvious alternative: a templated free function make&amp;lt;T&amp;gt;.
+Due to the inability to partially specialise templated functions in C++, you need to use tagged overloading e.g.
+template&amp;lt;class... Args&amp;gt; inline outcome::result&amp;lt;file_handle&amp;gt; make(std::in_place_type_t&amp;lt;file_handle&amp;gt;, Args&amp;amp;&amp;amp; ... args) { return file_handle::file(std::forward&amp;lt;Args&amp;gt;(args)...); } ... // Now you must always write this: make(std::in_place_type&amp;lt;file_handle&amp;gt;, &amp;#34;hello&amp;#34;);  Tagged overloading is fine for smaller projects, but for larger code bases:</description>
+    </item>
+    
+  </channel>
+</rss>

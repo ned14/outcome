@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Functions on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/reference/functions/</link>
+    <description>Recent content in Functions on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 11 Jan 2019 20:57:15 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/reference/functions/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`auto failure(T &amp;&amp;, ...)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/failure/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/failure/</guid>
+      <description>Returns appropriate type sugar for constructing an unsuccessful result or outcome, usually failure_type&amp;lt;EC, EP = void&amp;gt; with a decayed T.
+Two default overloads are provided, one taking a single parameter returning failure_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;&amp;gt;, the other taking two parameters returning failure_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;, std::decay_t&amp;lt;U&amp;gt;&amp;gt;. Both overloads perfectly forward their inputs.
+Note that failure() overloads are permitted by Outcome to return something other than failure_type. For example, basic_result&amp;rsquo;s auto as_failure() const &amp;amp; returns whatever type failure() returns, and OUTCOME_TRY(var, expr) by default returns for failure whatever .</description>
+    </item>
+    
+    <item>
+      <title>`auto success(T &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/success/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/success/</guid>
+      <description>Returns appropriate type sugar for constructing a successful result or outcome, usually success_type&amp;lt;T&amp;gt; with a decayed T.
+Two default overloads are provided, one taking a single parameter returning success_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;&amp;gt; and perfectly forwarding the input. The other overload takes no parameters, and returns success_type&amp;lt;void&amp;gt;, which usually causes the construction of the receiving basic_result or basic_outcome&amp;rsquo;s with a default construction of their value type.
+Overridable: By Argument Dependent Lookup (ADL).
+Requires: Always available.</description>
+    </item>
+    
+    <item>
+      <title>`auto try_operation_return_as(T &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/try_operation_return_as_t/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/try_operation_return_as_t/</guid>
+      <description>This implementation of try_operation_return_as(expr) returns whatever the input type&amp;rsquo;s .as_failure() member function returns. basic_result and basic_outcome provide such a member function, see auto as_failure() const &amp;amp;.
+Requires: That the expression std::declval&amp;lt;T&amp;gt;().as_failure() is a valid expression.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`std::error_code error_from_exception(std::exception_ptr &amp;&amp;ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/error_from_exception/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/error_from_exception/</guid>
+      <description>This function saves writing boilerplate by rethrowing ep within a try block, with a long sequence of catch() handlers, one for every standard C++ exception type which has a near or exact equivalent code in  std::errc.
+If matched, ep is set to a default constructed  std::exception_ptr, and a  std::error_code is constructed using the ADL discovered free function make_error_code() upon the std::errc enumeration value matching the thrown exception.</description>
+    </item>
+    
+    <item>
+      <title>`std::experimental::unexpected&lt;E&gt; try_operation_return_as(std::experimental::expected&lt;T, E&gt;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/try_operation_return_as_expected/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/try_operation_return_as_expected/</guid>
+      <description>This implementation of try_operation_return_as(expr) returns an unexpected for any expected input. This allows the use of functions returning std::experimental::expected&amp;lt;T, E&amp;gt; in OUTCOME_TRY(...).
+Requires: Always available.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`void try_throw_std_exception_from_error(std::error_code ec, const std::string &amp;msg = std::string{})`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/try_throw_std_exception_from_error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/try_throw_std_exception_from_error/</guid>
+      <description>This function saves writing boilerplate by throwing a standard library exception type equivalent to the supplied error code, with an optional custom message.
+If the function returns, there is no standard library exception type equivalent to the supplied error code. The following codes produce the following exception throws:
+ EINVAL std::invalid_argument EDOM std::domain_error E2BIG std::length_error ERANGE std::out_of_range EOVERFLOW std::overflow_error ENOMEM std::bad_alloc  The choice to refer to POSIX errno values above reflects the matching algorithm.</description>
+    </item>
+    
+  </channel>
+</rss>

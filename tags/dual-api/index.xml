@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Dual Api on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/tags/dual-api/</link>
+    <description>Recent content in Dual Api on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	<atom:link href="https://ned14.github.io/outcome/tags/dual-api/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The Filesystem TS</title>
+      <link>https://ned14.github.io/outcome/tutorial/advanced/payload/copy_file/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/advanced/payload/copy_file/</guid>
+      <description>Something which has long annoyed the purists in the C++ leadership is the problem of dual overloads in error_code capable standard library APIs.
+Consider the copy_file() API from the Filesystem TS:
+namespace filesystem { /*! Copies the file at path `from` to path `to`. \returns True if file was successfully copied. \throws On failure throws `filesystem_error(ec.message(), from, to, ec)` with `ec` being the error code reported by the operating system. */ bool copy_file(const path &amp;amp;from, const path &amp;amp;to); /*!</description>
+    </item>
+    
+  </channel>
+</rss>

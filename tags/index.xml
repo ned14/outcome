@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/tags/</link>
+    <description>Recent content in Tags on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Adl Bridging</title>
+      <link>https://ned14.github.io/outcome/tags/adl-bridging/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/adl-bridging/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Backtrace</title>
+      <link>https://ned14.github.io/outcome/tags/backtrace/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/backtrace/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Best Practice</title>
+      <link>https://ned14.github.io/outcome/tags/best-practice/</link>
+      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/best-practice/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Constructors</title>
+      <link>https://ned14.github.io/outcome/tags/constructors/</link>
+      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/constructors/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Conventions</title>
+      <link>https://ned14.github.io/outcome/tags/conventions/</link>
+      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/conventions/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Default Actions</title>
+      <link>https://ned14.github.io/outcome/tags/default-actions/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/default-actions/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Dual Api</title>
+      <link>https://ned14.github.io/outcome/tags/dual-api/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/dual-api/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Error</title>
+      <link>https://ned14.github.io/outcome/tags/error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/error/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Exception</title>
+      <link>https://ned14.github.io/outcome/tags/exception/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/exception/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Has_error_code</title>
+      <link>https://ned14.github.io/outcome/tags/has_error_code/</link>
+      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/has_error_code/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Hooks</title>
+      <link>https://ned14.github.io/outcome/tags/hooks/</link>
+      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/hooks/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Idioms</title>
+      <link>https://ned14.github.io/outcome/tags/idioms/</link>
+      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/idioms/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Make_error_code</title>
+      <link>https://ned14.github.io/outcome/tags/make_error_code/</link>
+      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/make_error_code/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Namespace</title>
+      <link>https://ned14.github.io/outcome/tags/namespace/</link>
+      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/namespace/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Nodiscard</title>
+      <link>https://ned14.github.io/outcome/tags/nodiscard/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/nodiscard/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Outcome</title>
+      <link>https://ned14.github.io/outcome/tags/outcome/</link>
+      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/outcome/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Payload</title>
+      <link>https://ned14.github.io/outcome/tags/payload/</link>
+      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/payload/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Policies</title>
+      <link>https://ned14.github.io/outcome/tags/policies/</link>
+      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/policies/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Result</title>
+      <link>https://ned14.github.io/outcome/tags/result/</link>
+      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/result/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Try</title>
+      <link>https://ned14.github.io/outcome/tags/try/</link>
+      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/try/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Value</title>
+      <link>https://ned14.github.io/outcome/tags/value/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/value/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Value or Error</title>
+      <link>https://ned14.github.io/outcome/tags/value-or-error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/value-or-error/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
