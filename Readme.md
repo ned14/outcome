@@ -56,8 +56,10 @@ useful to include into your build.
  - [ ] Resurrect the optimisation folding tests (with a better name).
  - [ ] Rerun native overhead benchmark, make new graph.
  - [ ] Get all docs snippets compiling again, reflow tutorial.
+   - [ ] Write tutorial/essential/conventions.
  - [X] Reduce depth of Boost.Outcome front index.
  - [ ] Test with LLFIO et al, make sure everything still works.
+ - [ ] Fix Boost.Outcome, which has become broken. Index generation is broken.
 
 ## Commits and tags in this git repository can be verified using:
 <pre>

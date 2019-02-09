@@ -35,7 +35,7 @@ through no-value policies.
 
 When designing your own success-or-failure type using templates
 `basic_result<>` or `basic_outcome<>` you have to decide what no-value policy
-you want to use. Either create your own, or [use one of the predefined policies]({{< relref "/tutorial/no-value/builtin" >}}).
+you want to use. Either create your own, or [use one of the predefined policies]({{< relref "/tutorial/essential/no-value/builtin" >}}).
 
 You can also use one of the two other predefined aliases for `basic_result<>`:
 
