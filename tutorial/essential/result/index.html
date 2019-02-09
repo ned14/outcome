@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-08T22:25:22 UTC">
+<meta name="revised" content="2019-02-09T14:50:50 UTC">
 <title>result&lt;&gt; :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -29,7 +29,7 @@
     
 	
   
-    <p>Outcome 2.0 library documentation</p>
+    <p>Outcome 2.1 library documentation</p>
 
   
 
@@ -39,7 +39,7 @@
     <nav class="shortcuts">
             <li class="" role="">
                 <a href="https://github.com/ned14/outcome"  rel="noopener">
-                  <i class='fa fa-github'></i> Outcome 2.0 github repo
+                  <i class='fa fa-github'></i> Outcome 2.1 github repo
                 </a>
             </li>
             <li class="" role="">
@@ -133,6 +133,13 @@
             <i class="fa fa-angle-down fa-lg category-icon"></i>
       </div>
         <ul>
+      <li data-nav-id="/outcome/tutorial/essential/before/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/before/">
+            Before we begin
+          </a>
+        </div>
+    </li>
     <li data-nav-id="/outcome/tutorial/essential/result/" class="dd-item parent active haschildren
         ">
       <div>
@@ -2275,6 +2282,7 @@
     <option value="/outcome/tutorial/essential/" >
   - 
    Essential</option> 
+      <option value="/outcome/tutorial/essential/before/" >-- Before we begin</option>
     <option value="/outcome/tutorial/essential/result/"  selected>
   -- 
    result&lt;&gt;</option> 
@@ -2335,27 +2343,6 @@
     
     
     
-
-
-
-<h2 id="outcome-v2-namespace">Outcome v2 namespace</h2>
-
-<p>It is recommended that you refer to entities from this Outcome v2 via the following namespace alias:</p>
-
-<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">namespace</span> <span class="n">outcome</span> <span class="o">=</span> <span class="n">OUTCOME_V2_NAMESPACE</span><span class="p">;</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_result.cpp#L8" class="code-snippet-url" target="_blank">View this code on Github</a></div>
-
-
-<p>On standalone Outcome only, as patches and modifications are applied to this library,
-namespaces get permuted in order to not to cause binary incompatibility. At some point
-namespace <code>outcome_v2</code> will be defined, and this will be the preferred namespace.
-Until then <code>OUTCOME_V2_NAMESPACE</code> denotes the most recently
-updated version, getting closer to <code>outcome_v2</code>.</p>
-
-<p>On Boost.Outcome only, as Boost provides no binary compatibility across releases,
-<code>OUTCOME_V2_NAMESPACE</code> always expands into <code>boost::outcome_v2</code>.</p>
-
-<h2 id="creating-result">Creating <code>result&lt;&gt;</code></h2>
 
 <p>We will define a function that converts a <code>std::string</code> to an <code>int</code>. This function can fail for a number of reasons;
 if it does we want to communicate the failure reason.</p>
@@ -2448,7 +2435,7 @@ all implicit conversion is disabled, and you will need to use one of the tagged 
     
         <div class="chevrons">
     <div id="navigation">
-<a class="nav nav-prev" href="/outcome/tutorial/essential/" title="Essential"> <i class="fa fa-chevron-left"></i><label>Essential</label></a>
+<a class="nav nav-prev" href="/outcome/tutorial/essential/before/" title="Before we begin"> <i class="fa fa-chevron-left"></i><label>Before we begin</label></a>
     <a class="nav nav-next" href="/outcome/tutorial/essential/result/inspecting/" title="Inspecting result&lt;T, EC&gt;" style="margin-right: 0px;"><label>Inspecting result<T, EC></label><i class="fa fa-chevron-right"></i></a></div>
   </div>
 
@@ -2474,7 +2461,7 @@ all implicit conversion is disabled, and you will need to use one of the tagged 
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 08/02/2019
+        <i class='fa fa-calendar'></i> Last update on 09/02/2019
     </div>
     
 

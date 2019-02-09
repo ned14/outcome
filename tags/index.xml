@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/tags/</link>
     <description>Recent content in Tags on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 09 Feb 2019 14:45:47 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/tags/index.xml" rel="self" type="application/rss+xml" />
     
@@ -31,7 +31,7 @@
     <item>
       <title>Best Practice</title>
       <link>https://ned14.github.io/outcome/tags/best-practice/</link>
-      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      <pubDate>Sat, 09 Feb 2019 14:45:47 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/best-practice/</guid>
       <description></description>
@@ -49,7 +49,7 @@
     <item>
       <title>Conventions</title>
       <link>https://ned14.github.io/outcome/tags/conventions/</link>
-      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      <pubDate>Sat, 09 Feb 2019 14:45:47 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/conventions/</guid>
       <description></description>
@@ -112,7 +112,7 @@
     <item>
       <title>Idioms</title>
       <link>https://ned14.github.io/outcome/tags/idioms/</link>
-      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      <pubDate>Sat, 09 Feb 2019 14:45:47 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/idioms/</guid>
       <description></description>
@@ -130,7 +130,7 @@
     <item>
       <title>Namespace</title>
       <link>https://ned14.github.io/outcome/tags/namespace/</link>
-      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      <pubDate>Sat, 09 Feb 2019 14:45:47 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/namespace/</guid>
       <description></description>
@@ -164,6 +164,15 @@
     </item>
     
     <item>
+      <title>Playpen</title>
+      <link>https://ned14.github.io/outcome/tags/playpen/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/playpen/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Policies</title>
       <link>https://ned14.github.io/outcome/tags/policies/</link>
       <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
@@ -175,7 +184,7 @@
     <item>
       <title>Result</title>
       <link>https://ned14.github.io/outcome/tags/result/</link>
-      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      <pubDate>Sat, 09 Feb 2019 14:45:47 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/result/</guid>
       <description></description>
@@ -184,7 +193,7 @@
     <item>
       <title>Try</title>
       <link>https://ned14.github.io/outcome/tags/try/</link>
-      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      <pubDate>Sat, 09 Feb 2019 14:45:47 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/try/</guid>
       <description></description>

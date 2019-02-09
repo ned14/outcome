@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-08T22:25:33 UTC">
+<meta name="revised" content="2019-02-09T14:51:00 UTC">
 <title>Result :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -29,7 +29,7 @@
     
 	
   
-    <p>Outcome 2.0 library documentation</p>
+    <p>Outcome 2.1 library documentation</p>
 
   
 
@@ -39,7 +39,7 @@
     <nav class="shortcuts">
             <li class="" role="">
                 <a href="https://github.com/ned14/outcome"  rel="noopener">
-                  <i class='fa fa-github'></i> Outcome 2.0 github repo
+                  <i class='fa fa-github'></i> Outcome 2.1 github repo
                 </a>
             </li>
             <li class="" role="">
@@ -131,6 +131,13 @@
       <a href="/outcome/tutorial/essential/">Essential</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
+      <li data-nav-id="/outcome/tutorial/essential/before/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/before/">
+            Before we begin
+          </a>
+        </div>
+    </li>
     <li data-nav-id="/outcome/tutorial/essential/result/" class="dd-item haschildren
         ">
       <div>
@@ -2327,8 +2334,8 @@
         <h2 class="post-title"><a href="/outcome/tutorial/essential/result/">result&lt;&gt;</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Outcome v2 namespace It is recommended that you refer to entities from this Outcome v2 via the following namespace alias:
-namespace outcome = OUTCOME_V2_NAMESPACE; View this code on Github On standalone Outcome only, as patches and modifications are applied to this library, namespaces get permuted in order to not to cause binary incompatibility. At some point namespace outcome_v2 will be defined, and this will be the preferred namespace. Until then OUTCOME_V2_NAMESPACE denotes the most recently updated version, getting closer to outcome_v2. <a class="read-more" href="/outcome/tutorial/essential/result/">&raquo;</a></p>
+        <p>We will define a function that converts a std::string to an int. This function can fail for a number of reasons; if it does we want to communicate the failure reason.
+outcome::result&lt;int&gt; convert(const std::string&amp; str) noexcept; View this code on Github Template alias result&lt;T, E = varies, NoValuePolicy = policy::default_policy&lt;T, E, void&gt;&gt; has three template parameters, but the last two have default values. The first (T) represents the type of the object returned from the function upon success. <a class="read-more" href="/outcome/tutorial/essential/result/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          
@@ -2379,7 +2386,7 @@ namespace outcome = OUTCOME_V2_NAMESPACE; View this code on Github On standalone
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 08/02/2019
+        <i class='fa fa-calendar'></i> Last update on 09/02/2019
     </div>
     
 

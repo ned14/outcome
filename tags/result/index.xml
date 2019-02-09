@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/tags/result/</link>
     <description>Recent content in Result on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 09 Feb 2019 14:45:47 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/tags/result/index.xml" rel="self" type="application/rss+xml" />
     
@@ -13,11 +13,11 @@
     <item>
       <title>result&lt;&gt;</title>
       <link>https://ned14.github.io/outcome/tutorial/essential/result/</link>
-      <pubDate>Fri, 08 Feb 2019 22:18:08 +0000</pubDate>
+      <pubDate>Sat, 09 Feb 2019 14:45:47 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/result/</guid>
-      <description>Outcome v2 namespace It is recommended that you refer to entities from this Outcome v2 via the following namespace alias:
-namespace outcome = OUTCOME_V2_NAMESPACE; View this code on Github On standalone Outcome only, as patches and modifications are applied to this library, namespaces get permuted in order to not to cause binary incompatibility. At some point namespace outcome_v2 will be defined, and this will be the preferred namespace. Until then OUTCOME_V2_NAMESPACE denotes the most recently updated version, getting closer to outcome_v2.</description>
+      <description>We will define a function that converts a std::string to an int. This function can fail for a number of reasons; if it does we want to communicate the failure reason.
+outcome::result&amp;lt;int&amp;gt; convert(const std::string&amp;amp; str) noexcept; View this code on Github Template alias result&amp;lt;T, E = varies, NoValuePolicy = policy::default_policy&amp;lt;T, E, void&amp;gt;&amp;gt; has three template parameters, but the last two have default values. The first (T) represents the type of the object returned from the function upon success.</description>
     </item>
     
   </channel>

@@ -27,9 +27,8 @@ struct abort_policy : outcome::policy::base { template &amp;lt;classImpl&amp;gt;
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/no-value/builtin/</guid>
       <description>These are the predefined policies built into Outcome:
-all_narrow If there is an observation of a value/error/exception which is not present, the program is put into a hard undefined behaviour situation. However this is a tool-friendly UB using intrinsics such as __builtin_unreachable() that allows tools to make use of it, e.g., better bug detection or optimizations.
- terminate Observation of a missing value/error/exception causes a call to std::terminate().
- error_code_throw_as_system_error&amp;lt;T, EC, EP&amp;gt; This policy assumes that EC has the interface of std::error_code, and EP has the interface of std::exception_ptr.</description>
+all_narrow If there is an observation of a value/error/exception which is not present, the program is put into a hard undefined behaviour situation. The compiler literally compiles no code for an invalid observation &amp;ndash; the CPU &amp;ldquo;runs off&amp;rdquo; into the unknown.
+As bad as this may sound, it generates the most optimal code, and such hard UB is very tool-friendly for detection e.</description>
     </item>
     
   </channel>

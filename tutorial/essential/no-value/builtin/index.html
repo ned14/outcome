@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-08T22:25:23 UTC">
+<meta name="revised" content="2019-02-09T14:50:50 UTC">
 <title>Built-in policies :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -29,7 +29,7 @@
     
 	
   
-    <p>Outcome 2.0 library documentation</p>
+    <p>Outcome 2.1 library documentation</p>
 
   
 
@@ -39,7 +39,7 @@
     <nav class="shortcuts">
             <li class="" role="">
                 <a href="https://github.com/ned14/outcome"  rel="noopener">
-                  <i class='fa fa-github'></i> Outcome 2.0 github repo
+                  <i class='fa fa-github'></i> Outcome 2.1 github repo
                 </a>
             </li>
             <li class="" role="">
@@ -133,6 +133,13 @@
             <i class="fa fa-angle-down fa-lg category-icon"></i>
       </div>
         <ul>
+      <li data-nav-id="/outcome/tutorial/essential/before/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/before/">
+            Before we begin
+          </a>
+        </div>
+    </li>
     <li data-nav-id="/outcome/tutorial/essential/result/" class="dd-item haschildren
         ">
       <div>
@@ -2275,6 +2282,7 @@
     <option value="/outcome/tutorial/essential/" >
   - 
    Essential</option> 
+      <option value="/outcome/tutorial/essential/before/" >-- Before we begin</option>
     <option value="/outcome/tutorial/essential/result/" >
   -- 
    result&lt;&gt;</option>
@@ -2340,10 +2348,16 @@
 <a href="/outcome/reference/policies/all_narrow/" class="api-reference">all_narrow</a>
 
 <p>If there is an observation of a value/error/exception which is not present,
-the program is put into a hard undefined behaviour situation. However this
-is a tool-friendly UB using intrinsics
-such as <code>__builtin_unreachable()</code> that allows tools to make use of it, e.g.,
-better bug detection or optimizations.</p>
+the program is put into a <strong>hard undefined behaviour</strong> situation. The
+compiler <em>literally</em> compiles no code for an invalid observation &ndash; the
+CPU &ldquo;runs off&rdquo; into the unknown.</p>
+
+<p>As bad as this may sound, it generates the most optimal code, and such
+hard UB is very tool-friendly for detection e.g. undefined behaviour
+sanitiser, valgrind memcheck, etc.</p>
+
+<p>If you are considering choosing this policy, definitely read
+<a href="/outcome/reference/policies/base/ub/" class="api-reference">static void _ub(Impl &amp;&amp;)</a> first.</p>
 
 <hr>
 
@@ -2434,7 +2448,7 @@ throws <code>bad_outcome_access</code> for all no-value/error/exception observat
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 08/02/2019
+        <i class='fa fa-calendar'></i> Last update on 09/02/2019
     </div>
     
 

@@ -11,6 +11,16 @@
     
     
     <item>
+      <title>Before we begin</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/before/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/before/</guid>
+      <description>Outcome v2 namespace It is recommended that you refer to entities from this Outcome v2 via the following namespace alias:
+namespace outcome = OUTCOME_V2_NAMESPACE; View this code on Github On standalone Outcome only, as patches and modifications are applied to this library, namespaces get permuted in order to not to cause binary incompatibility. At some point namespace outcome_v2 will be defined, and this will be the preferred namespace. Until then OUTCOME_V2_NAMESPACE denotes the most recently updated version, getting closer to outcome_v2.</description>
+    </item>
+    
+    <item>
       <title>Incommensurate E types</title>
       <link>https://ned14.github.io/outcome/tutorial/advanced/interop/problem/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -171,9 +181,8 @@ namespace error_code_extended { // Use the error_code type as the ADL bridge for
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/no-value/builtin/</guid>
       <description>These are the predefined policies built into Outcome:
-all_narrow If there is an observation of a value/error/exception which is not present, the program is put into a hard undefined behaviour situation. However this is a tool-friendly UB using intrinsics such as __builtin_unreachable() that allows tools to make use of it, e.g., better bug detection or optimizations.
- terminate Observation of a missing value/error/exception causes a call to std::terminate().
- error_code_throw_as_system_error&amp;lt;T, EC, EP&amp;gt; This policy assumes that EC has the interface of std::error_code, and EP has the interface of std::exception_ptr.</description>
+all_narrow If there is an observation of a value/error/exception which is not present, the program is put into a hard undefined behaviour situation. The compiler literally compiles no code for an invalid observation &amp;ndash; the CPU &amp;ldquo;runs off&amp;rdquo; into the unknown.
+As bad as this may sound, it generates the most optimal code, and such hard UB is very tool-friendly for detection e.</description>
     </item>
     
     <item>
@@ -2221,7 +2230,7 @@ Complexity: Whatever that of error_type&amp;rsquo;s and/or exception_type&amp;rs
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/_header/</guid>
-      <description>Outcome 2.0 library documentation</description>
+      <description>Outcome 2.1 library documentation</description>
     </item>
     
     <item>
@@ -2230,7 +2239,7 @@ Complexity: Whatever that of error_type&amp;rsquo;s and/or exception_type&amp;rs
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1001 commits   @akrzemi1 39 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1002 commits   @akrzemi1 39 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>

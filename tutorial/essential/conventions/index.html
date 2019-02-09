@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-08T22:25:25 UTC">
+<meta name="revised" content="2019-02-09T14:50:52 UTC">
 <title>Conventions :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -29,7 +29,7 @@
     
 	
   
-    <p>Outcome 2.0 library documentation</p>
+    <p>Outcome 2.1 library documentation</p>
 
   
 
@@ -39,7 +39,7 @@
     <nav class="shortcuts">
             <li class="" role="">
                 <a href="https://github.com/ned14/outcome"  rel="noopener">
-                  <i class='fa fa-github'></i> Outcome 2.0 github repo
+                  <i class='fa fa-github'></i> Outcome 2.1 github repo
                 </a>
             </li>
             <li class="" role="">
@@ -133,6 +133,13 @@
             <i class="fa fa-angle-down fa-lg category-icon"></i>
       </div>
         <ul>
+      <li data-nav-id="/outcome/tutorial/essential/before/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/before/">
+            Before we begin
+          </a>
+        </div>
+    </li>
     <li data-nav-id="/outcome/tutorial/essential/result/" class="dd-item haschildren
         ">
       <div>
@@ -2274,6 +2281,7 @@
     <option value="/outcome/tutorial/essential/" >
   - 
    Essential</option> 
+      <option value="/outcome/tutorial/essential/before/" >-- Before we begin</option>
     <option value="/outcome/tutorial/essential/result/" >
   -- 
    result&lt;&gt;</option>
@@ -2333,7 +2341,40 @@
     
     
 
-<p>TODO</p>
+
+
+<p>You now know everything you need to get started with using Outcome
+immediately.</p>
+
+<p>The initial temptation for most beginners will be to use a bespoke
+strongly typed enumeration on a case by case basis i.e. a &ldquo;once off&rdquo;
+custom <code>E</code> type. This is usually due to experience in other languages
+with sum types e.g. Rust, Haskell, Swift etc.</p>
+
+<p>However this is C++! Not Rust, not Swift, not Haskell! I must caution you to always avoid using
+custom <code>E</code> types in library code. The reason is that every time
+library A using custom <code>E1</code> type must interface with library B
+using custom <code>E2</code> type, you must map between those <code>E1</code> and <code>E2</code>
+types.</p>
+
+<p>This is information lossy, i.e. fidelity of failure gets lost
+after multiple translations. It also involves writing, and then
+<em>maintaining</em>, a lot of annoying boilerplate. It leaks internal
+implementation detail, and fails to separate concerns.</p>
+
+<p>All this may be acceptable in application code, but please avoid
+doing this in library code. Moreover, the C++ 11 standard library
+specifically ships <code>&lt;system_error&gt;</code> for the purpose of wrapping up
+individual custom <code>E</code> types into a generic framework where disparate
+custom <code>E</code> types can discover and interact with one another.
+That ships with every C++ compiler. Please use it.</p>
+
+<hr />
+
+<h3 id="tl-dr">tl;dr;</h3>
+
+<p>Please <a href="/outcome/motivation/plug_error_code/">plug your library into <code>std::error_code</code></a>,
+or <a href="/outcome/experimental/">equivalent</a>, and do not expose custom <code>E</code> types in ANY public API.</p>
 
 
 
@@ -2367,7 +2408,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 08/02/2019
+        <i class='fa fa-calendar'></i> Last update on 09/02/2019
     </div>
     
 
