@@ -5,23 +5,6 @@ weight = 10
 tags = ["result", "try", "namespace"]
 +++
 
-## Outcome v2 namespace
-
-It is recommended that you refer to entities from this Outcome v2 via the following namespace alias:
-
-{{% snippet "using_result.cpp" "namespace" %}}
-
-On standalone Outcome only, as patches and modifications are applied to this library,
-namespaces get permuted in order to not to cause binary incompatibility. At some point
-namespace `outcome_v2` will be defined, and this will be the preferred namespace.
-Until then `OUTCOME_V2_NAMESPACE` denotes the most recently
-updated version, getting closer to `outcome_v2`.
-
-On Boost.Outcome only, as Boost provides no binary compatibility across releases,
-`OUTCOME_V2_NAMESPACE` always expands into `boost::outcome_v2`.
-
-## Creating `result<>`
-
 We will define a function that converts a `std::string` to an `int`. This function can fail for a number of reasons;
 if it does we want to communicate the failure reason.
 

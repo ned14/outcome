@@ -9,10 +9,16 @@ These are the predefined policies built into Outcome:
 {{< api "all_narrow" >}}
 
 If there is an observation of a value/error/exception which is not present,
-the program is put into a hard undefined behaviour situation. However this
-is a tool-friendly UB using intrinsics
-such as `__builtin_unreachable()` that allows tools to make use of it, e.g.,
-better bug detection or optimizations.
+the program is put into a **hard undefined behaviour** situation. The
+compiler *literally* compiles no code for an invalid observation -- the
+CPU "runs off" into the unknown.
+
+As bad as this may sound, it generates the most optimal code, and such
+hard UB is very tool-friendly for detection e.g. undefined behaviour
+sanitiser, valgrind memcheck, etc.
+
+If you are considering choosing this policy, definitely read
+{{% api "static void _ub(Impl &&)" %}} first.
 
 <hr>
 
