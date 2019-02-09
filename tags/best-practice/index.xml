@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/tags/best-practice/</link>
     <description>Recent content in Best Practice on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Sat, 09 Feb 2019 14:45:47 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 09 Feb 2019 15:18:26 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/tags/best-practice/index.xml" rel="self" type="application/rss+xml" />
     
@@ -13,12 +13,12 @@
     <item>
       <title>Conventions</title>
       <link>https://ned14.github.io/outcome/tutorial/essential/conventions/</link>
-      <pubDate>Sat, 09 Feb 2019 14:45:47 +0000</pubDate>
+      <pubDate>Sat, 09 Feb 2019 15:18:26 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/conventions/</guid>
       <description>You now know everything you need to get started with using Outcome immediately.
 The initial temptation for most beginners will be to use a bespoke strongly typed enumeration on a case by case basis i.e. a &amp;ldquo;once off&amp;rdquo; custom E type. This is usually due to experience in other languages with sum types e.g. Rust, Haskell, Swift etc.
-However this is C++! Not Rust, not Swift, not Haskell! I must caution you to always avoid using custom E types in library code.</description>
+However this is C++! Not Rust, not Swift, not Haskell! I must caution you to always avoid using custom E types in public APIs.</description>
     </item>
     
   </channel>

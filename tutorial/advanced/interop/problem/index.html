@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-09T14:50:49 UTC">
+<meta name="revised" content="2019-02-09T15:23:21 UTC">
 <title>Incommensurate E types :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2352,7 +2352,7 @@
     
     
     
-    <p>Back in the tutorial section on <code>result</code>, we studied a likely very common
+    <p>Back in the essential tutorial section on <code>result</code>, we studied a likely very common
 initial choice of <code>E</code> type: <a href="/outcome/tutorial/essential/result/">a strongly typed enum</a>.
 We saw how <a href="/outcome/motivation/plug_error_code/">by marking up strongly typed enums to tell the C++ standard library
 what they are</a>, they gain implicit convertibility into <code>std::error_code</code>, and we
@@ -2368,7 +2368,7 @@ some domain specific piece of code.</p>
 <p>However it is unreasonable to expect that any non-trivial codebase can make do
 with <code>E = std::error_code</code>. This is why Outcome allows you to use <a href="../../payload">custom <code>E</code>
 types which carry payload</a> in addition to an error code, yet
-still have the Default Actions of <code>std::error_code</code>, including <a href="../../payload/copy_file3">lazy custom exception
+still have that custom type treated as if a <code>std::error_code</code>, including <a href="../../payload/copy_file3">lazy custom exception
 throw synthesis</a>.</p>
 
 <p>All this is good, but if library A uses <code>result&lt;T, libraryA::failure_info&gt;</code>,
@@ -2399,10 +2399,10 @@ is not one-one.</p></li>
 <li><p>One can type erase the third party&rsquo;s failure type into some application
 failure type, which can later be reconstituted if necessary. This is the cleanest
 solution with the least coupling issues and no problems with mis-mapping, but
-it almost certainly requires the use of <code>malloc</code> which the previous two did not.</p></li>
+it almost certainly requires the use of <code>malloc</code>, which the previous two did not.</p></li>
 </ol>
 
-<p>Things get even more complication in the presence of callbacks. If in the
+<p>Things get even more complicated in the presence of callbacks. If in the
 callback you supply to library A, you call library B, you may need to insert
 switch statement maps or other mechanisms to convert library B&rsquo;s failures into
 something library A can understand, and then somehow extract that out &ndash; preferably
@@ -2434,7 +2434,7 @@ issues, next.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 08/02/2019
+        <i class='fa fa-calendar'></i> Last update on 09/02/2019
     </div>
     
 

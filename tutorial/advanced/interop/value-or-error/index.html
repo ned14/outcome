@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-09T14:50:49 UTC">
+<meta name="revised" content="2019-02-09T15:23:22 UTC">
 <title>ValueOrError Concept :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2355,20 +2355,20 @@
     
 
 <p>Something not really mentioned until now is how Outcome interoperates with the proposed
-<a href="https://wg21.link/P0323"><code>std::expected&lt;T, E&gt;</code></a>, whose design lands in between <code>outcome::unchecked&lt;T, E&gt;</code>
-and <code>outcome::checked&lt;T, E&gt;</code>, both of which are simplified aliases for <code>outcome::result&lt;T, E&gt;</code> <a href="../../policies">hard
-coding the <code>NoValuePolicy</code> to a fixed policy</a>.</p>
 
-<p>Expected and Outcome are <a href="../../../faq/#why-doesn-t-outcome-duplicate-std-expected-t-e-s-design">isomorphic to one another in design intent</a>, but interoperation
-for code using Expected and Outcome ought to be seamless thanks to the proposed <a href="https://wg21.link/P0786"><code>ValueOrError</code>
+<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 std::expected&lt;T, E&gt;</a>, whose design lands in between <a href="/outcome/reference/aliases/unchecked/" class="api-reference">unchecked&lt;T, E = varies&gt;</a>
+and <a href="/outcome/reference/aliases/checked/" class="api-reference">checked&lt;T, E = varies&gt;</a>, both of which are type aliases hard coding no-value
+policies <a href="/outcome/tutorial/essential/no-value/builtin/">as previously covered in this tutorial</a>.</p>
+
+<p>Expected and Outcome are <a href="/outcome/faq/#why-doesn-t-outcome-duplicate-std-expected-t-e-s-design">isomorphic to one another in design intent</a>, but interoperation
+for code using Expected and Outcome ought to be seamless thanks to the <a href="https://wg21.link/P0786">proposed <code>ValueOrError</code>
 concept framework</a>, a subset of which Outcome implements.</p>
 
-<p>Outcome&rsquo;s <code>result&lt;X, Y&gt;</code> will explicitly construct from any type matching the <code>ValueOrError</code>
+<p>Outcome&rsquo;s <code>result&lt;X, Y&gt;</code> will explicitly construct from any type matching the <a href="/outcome/reference/concepts/valueorerror/" class="api-reference">ValueOrError&lt;T, E&gt;</a>
 concept, which includes <code>std::expected&lt;A, B&gt;</code>, if <code>A</code> is constructible to <code>X</code> and <code>B</code> is
 constructible to <code>Y</code>. The <code>ValueOrError</code> concept in turn is true if and only if the input type has:</p>
 
 <ol>
-<li>A <code>value_type</code> and <code>error_type</code> member typedefs.</li>
 <li>A <code>.has_value()</code> observer returning a <code>bool</code>.</li>
 <li><code>.value()</code> and <code>.error()</code> observers.</li>
 </ol>
@@ -2415,7 +2415,7 @@ is demonstrated in the worked example, next.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 08/02/2019
+        <i class='fa fa-calendar'></i> Last update on 09/02/2019
     </div>
     
 

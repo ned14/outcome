@@ -15,7 +15,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/value-or-error/</guid>
-      <description>Something not really mentioned until now is how Outcome interoperates with the proposed std::expected&amp;lt;T, E&amp;gt;, whose design lands in between outcome::unchecked&amp;lt;T, E&amp;gt; and outcome::checked&amp;lt;T, E&amp;gt;, both of which are simplified aliases for outcome::result&amp;lt;T, E&amp;gt; hard coding the NoValuePolicy to a fixed policy.
+      <description>Something not really mentioned until now is how Outcome interoperates with the proposed  P0323 std::expected&amp;lt;T, E&amp;gt;, whose design lands in between unchecked&amp;lt;T, E = varies&amp;gt; and checked&amp;lt;T, E = varies&amp;gt;, both of which are type aliases hard coding no-value policies as previously covered in this tutorial.
 Expected and Outcome are isomorphic to one another in design intent, but interoperation for code using Expected and Outcome ought to be seamless thanks to the proposed ValueOrError concept framework, a subset of which Outcome implements.</description>
     </item>
     
