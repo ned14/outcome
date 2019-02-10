@@ -1,21 +1,21 @@
 Herein lie multiple single header editions of Outcome:
 
 <dl>
-  <dt>`outcome-basic.hpp`</dt>
-  <dd>An inclusion of `basic_outcome.hpp` + `try.hpp` which includes as few
+  <dt><code>&lt;outcome-basic.hpp&gt;</code></dt>
+  <dd>An inclusion of <code>basic_outcome.hpp</code> + <code>try.hpp</code> which includes as few
   system headers as possible in order to give an absolute minimum compile time
-  impact edition of Outcome. See https://github.com/ned14/stl-header-heft.
+  impact edition of Outcome. See <a href="https://github.com/ned14/stl-header-heft">https://github.com/ned14/stl-header-heft</a>.
   </dd>
-  <dt>`outcome-experimental.hpp`</dt>
-  <dd>An inclusion of `experimental/status_outcome.hpp` + `try.hpp` which
+  <dt><code>&lt;outcome-experimental.hpp&gt;</code></dt>
+  <dd>An inclusion of <code>experimental/status_outcome.hpp</code> + <code>try.hpp</code> which
   is the low compile time impact of the basic edition combined with
-  `status_code` from https://ned14.github.io/status-code/. If you are on an
+  <code>status_code</code> from <a href="https://ned14.github.io/status-code/">https://ned14.github.io/status-code/</a>. If you are on an
   embedded system where binary bloat must be absolutely avoided, and don't
-  mind the potentially unstable `status_code`, this is definitely the edition
+  mind the potentially unstable <code>status_code</code>, this is definitely the edition
   for you.
   </dd>
-  <dt>`outcome.hpp`</dt>
-  <dd>An inclusion of `outcome.hpp` which brings in all the specialisations
-  for the `std` STL types, plus iostreams support. If you don't know which
+  <dt><code>&lt;outcome.hpp&gt;</code></dt>
+  <dd>An inclusion of <code>outcome.hpp</code> which brings in all the specialisations
+  for the <code>std</code> STL types, plus iostreams support. If you don't know which
   edition to use, you should use this one, it ought to "just work".</dd>
 </dl>

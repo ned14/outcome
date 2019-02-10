@@ -34,7 +34,7 @@ namespace boost
   namespace system
   {
     // Implement the .failure() observer.
-    inline exception_ptr basic_outcome_failure_exception_from_error(const error_code &ec) { return copy_exception(system_error(ec)); }
+    inline boost::exception_ptr basic_outcome_failure_exception_from_error(const boost::system::error_code &ec) { return boost::copy_exception(boost::system::system_error(ec)); }
   }  // namespace system
 }  // namespace boost
 

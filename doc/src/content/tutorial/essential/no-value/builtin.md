@@ -6,22 +6,42 @@ weight = 20
 
 These are the predefined policies built into Outcome:
 
+<hr style="border-color: black;">
+
+&nbsp;
+
 {{< api "all_narrow" >}}
 
 If there is an observation of a value/error/exception which is not present,
-the program is put into a hard undefined behaviour situation. However this
-is a tool-friendly UB using intrinsics
-such as `__builtin_unreachable()` that allows tools to make use of it, e.g.,
-better bug detection or optimizations.
+the program is put into a **hard undefined behaviour** situation. The
+compiler *literally* compiles no code for an invalid observation -- the
+CPU "runs off" into the unknown.
 
-<hr>
+As bad as this may sound, it generates the most optimal code, and such
+hard UB is very tool-friendly for detection e.g. undefined behaviour
+sanitiser, valgrind memcheck, etc.
+
+If you are considering choosing this policy, definitely read
+{{% api "static void _ub(Impl &&)" %}} first.
+
+Note that {{< api "unchecked<T, E = varies>" >}} aliases a `basic_result`
+with the `all_narrow` no-value policy.
+
+<hr style="border-color: black;">
+
+&nbsp;
 
 {{< api "terminate" >}}
 
 Observation of a missing value/error/exception causes a call to
 `std::terminate()`.
 
-<hr>
+Note that configuring `EC = void` or `EP = void` causes
+{{% api "default_policy" %}} to choose `terminate` as the no-value policy.
+
+<hr style="border-color: black;">
+
+&nbsp;
 
 {{< api "error_code_throw_as_system_error<T, EC, EP>" >}}
 
@@ -42,7 +62,14 @@ Upon missing exception observation throws `bad_outcome_access("no exception")`.
 
 Overloads are provided for `boost::system::error_code` and `boost::exception_ptr`.
 
-<hr>
+Note that if {{% api "is_error_code_available<T>" %}} is true for `EC`,
+and (if `basic_outcome`) {{% api "is_exception_ptr_available<T>" %}}
+is true for `EP`, {{% api "default_policy" %}} chooses
+`error_code_throw_as_system_error<T, EC, EP>` as the no-value policy.
+
+<hr style="border-color: black;">
+
+&nbsp;
 
 {{< api "exception_ptr_rethrow<T, EC, EP>" >}}
 
@@ -61,7 +88,14 @@ Upon missing exception observation throws `bad_outcome_access("no exception")`.
 
 Overloads are provided for `boost::exception_ptr`.
 
-<hr>
+Note that if {{% api "is_exception_ptr_available<T>" %}} is true for `EC`,
+or (if `basic_outcome`) {{% api "is_exception_ptr_available<T>" %}}
+is true for `EP`, {{% api "default_policy" %}} chooses
+`exception_ptr_rethrow<T, EC, EP>` as the no-value policy.
+
+<hr style="border-color: black;">
+
+&nbsp;
 
 {{< api "throw_bad_result_access<EC>" >}}
 
@@ -73,3 +107,6 @@ Upon missing error observation throws `bad_result_access("no error")`.
 
 This policy can be used with `basic_outcome<>` instances, where it always
 throws `bad_outcome_access` for all no-value/error/exception observations.
+
+Note that {{< api "checked<T, E = varies>" >}} aliases a `basic_result`
+with the `throw_bad_result_access<EC>` no-value policy.

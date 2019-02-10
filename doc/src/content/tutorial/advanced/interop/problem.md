@@ -3,7 +3,7 @@ title = "Incommensurate E types"
 weight = 5
 +++
 
-Back in the tutorial section on `result`, we studied a likely very common
+Back in the essential tutorial section on `result`, we studied a likely very common
 initial choice of `E` type: [a strongly typed enum]({{< relref "/tutorial/essential/result" >}}).
 We saw how [by marking up strongly typed enums to tell the C++ standard library
 what they are]({{< relref "/motivation/plug_error_code" >}}), they gain implicit convertibility into `std::error_code`, and we
@@ -19,7 +19,7 @@ some domain specific piece of code.
 However it is unreasonable to expect that any non-trivial codebase can make do
 with `E = std::error_code`. This is why Outcome allows you to use [custom `E`
 types which carry payload](../../payload) in addition to an error code, yet
-still have the Default Actions of `std::error_code`, including [lazy custom exception
+still have that custom type treated as if a `std::error_code`, including [lazy custom exception
 throw synthesis](../../payload/copy_file3).
 
 All this is good, but if library A uses `result<T, libraryA::failure_info>`,
@@ -49,10 +49,10 @@ is not one-one.
 3. One can type erase the third party's failure type into some application
 failure type, which can later be reconstituted if necessary. This is the cleanest
 solution with the least coupling issues and no problems with mis-mapping, but
-it almost certainly requires the use of `malloc` which the previous two did not.
+it almost certainly requires the use of `malloc`, which the previous two did not.
 
 
-Things get even more complication in the presence of callbacks. If in the
+Things get even more complicated in the presence of callbacks. If in the
 callback you supply to library A, you call library B, you may need to insert
 switch statement maps or other mechanisms to convert library B's failures into
 something library A can understand, and then somehow extract that out -- preferably

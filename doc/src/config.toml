@@ -16,7 +16,7 @@ enableGitInfo = true
   
 [[menu.shortcuts]]
   pre = "<h3>More</h3>"
-  name = "<i class='fa fa-github'></i> Outcome 2.0 github repo"
+  name = "<i class='fa fa-github'></i> Outcome 2.1 github repo"
   identifier = "ds"
   url = "https://github.com/ned14/outcome"
   weight = 10
