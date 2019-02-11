@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-09T15:23:23 UTC">
+<meta name="revised" content="2019-02-11T13:47:18 UTC">
 <title>The File I/O library :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -387,14 +387,14 @@
       <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib1/" class="dd-item">
         <div>
           <a href="/outcome/tutorial/advanced/interop/app-map-httplib1/">
-            Mapping the HTTP library into the Application <sup>1</sup>&frasl;<sub>2</sub>
+            Mapping the HTTP library into the Application <code>1/2</code>
           </a>
         </div>
     </li>
       <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib2/" class="dd-item">
         <div>
           <a href="/outcome/tutorial/advanced/interop/app-map-httplib2/">
-            Mapping the HTTP library into the Application <sup>2</sup>&frasl;<sub>2</sub>
+            Mapping the HTTP library into the Application <code>2/2</code>
           </a>
         </div>
     </li>
@@ -2303,8 +2303,8 @@
       <option value="/outcome/tutorial/advanced/interop/tidylib/" >--- The HTMLTidy library</option>
       <option value="/outcome/tutorial/advanced/interop/filelib/"  selected>--- The File I/O library</option>
       <option value="/outcome/tutorial/advanced/interop/app/" >--- The Application</option>
-      <option value="/outcome/tutorial/advanced/interop/app-map-httplib1/" >--- Mapping the HTTP library into the Application 1/2</option>
-      <option value="/outcome/tutorial/advanced/interop/app-map-httplib2/" >--- Mapping the HTTP library into the Application 2/2</option>
+      <option value="/outcome/tutorial/advanced/interop/app-map-httplib1/" >--- Mapping the HTTP library into the Application `1/2`</option>
+      <option value="/outcome/tutorial/advanced/interop/app-map-httplib2/" >--- Mapping the HTTP library into the Application `2/2`</option>
       <option value="/outcome/tutorial/advanced/interop/app-map-filelib/" >--- Mapping the File I/O library into the Application</option>
       <option value="/outcome/tutorial/advanced/interop/app-map-tidylib/" >--- Mapping the HTMLTidy library into the Application</option>
       <option value="/outcome/tutorial/advanced/interop/app-go/" >--- In use</option>
@@ -2358,7 +2358,8 @@ in this tutorial</a>:</p>
 <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="c1">// You may remember this from the tutorial section on Custom Payloads
 </span><span class="c1"></span><span class="k">namespace</span> <span class="n">filelib</span>
 <span class="p">{</span>
-  <span class="c1">// Error code + paths related to a failure. Also causes ADL discovery to check this namespace.
+  <span class="c1">// Error code + paths related to a failure. Also causes ADL discovery
+</span><span class="c1"></span>  <span class="c1">// to check this namespace.
 </span><span class="c1"></span>  <span class="k">struct</span> <span class="n">failure_info</span>
   <span class="p">{</span>
     <span class="n">std</span><span class="o">::</span><span class="n">error_code</span> <span class="n">ec</span><span class="p">;</span>
@@ -2371,19 +2372,22 @@ in this tutorial</a>:</p>
   <span class="c1">// Tell Outcome that no-value observation should throw a custom exception
 </span><span class="c1"></span>  <span class="kr">inline</span> <span class="kt">void</span> <span class="n">outcome_throw_as_system_error_with_payload</span><span class="p">(</span><span class="n">failure_info</span> <span class="n">fi</span><span class="p">)</span>
   <span class="p">{</span>
-    <span class="c1">// If the error code is not filesystem related e.g. ENOMEM, throw that as a standard STL exception.
+    <span class="c1">// If the error code is not filesystem related e.g. ENOMEM, throw that
+</span><span class="c1"></span>    <span class="c1">// as a standard STL exception.
 </span><span class="c1"></span>    <span class="n">OUTCOME_V2_NAMESPACE</span><span class="o">::</span><span class="n">try_throw_std_exception_from_error</span><span class="p">(</span><span class="n">fi</span><span class="p">.</span><span class="n">ec</span><span class="p">);</span>
-    <span class="c1">// Throw the exact same filesystem_error exception which the throwing copy_file() edition does.
+    <span class="c1">// Throw the exact same filesystem_error exception which the throwing
+</span><span class="c1"></span>    <span class="c1">// copy_file() edition does.
 </span><span class="c1"></span>    <span class="k">throw</span> <span class="nf">filesystem_error</span><span class="p">(</span><span class="n">fi</span><span class="p">.</span><span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">(),</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">fi</span><span class="p">.</span><span class="n">path1</span><span class="p">),</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">fi</span><span class="p">.</span><span class="n">path2</span><span class="p">),</span> <span class="n">fi</span><span class="p">.</span><span class="n">ec</span><span class="p">);</span>
   <span class="p">}</span>
 
   <span class="c1">// Localise a result implementation specific to this namespace.
 </span><span class="c1"></span>  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">T</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">result</span> <span class="o">=</span> <span class="n">OUTCOME_V2_NAMESPACE</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">failure_info</span><span class="o">&gt;</span><span class="p">;</span>
 
-  <span class="c1">// Writes a chunk of data to some file. Returns bytes written, or failure_info. Never throws exceptions.
+  <span class="c1">// Writes a chunk of data to some file. Returns bytes written, or
+</span><span class="c1"></span>  <span class="c1">// failure_info. Never throws exceptions.
 </span><span class="c1"></span>  <span class="n">result</span><span class="o">&lt;</span><span class="n">size_t</span><span class="o">&gt;</span> <span class="n">write_file</span><span class="p">(</span><span class="n">string_view</span> <span class="n">chunk</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/finale.cpp#L93" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+<span class="p">}</span>  <span class="c1">// namespace filelib
+</span><span class="c1"></span></code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/finale.cpp#L95" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>This uses the advanced Outcome feature of programming the lazy synthesis of

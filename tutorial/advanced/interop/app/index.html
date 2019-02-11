@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-09T15:23:23 UTC">
+<meta name="revised" content="2019-02-11T13:47:18 UTC">
 <title>The Application :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -387,14 +387,14 @@
       <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib1/" class="dd-item">
         <div>
           <a href="/outcome/tutorial/advanced/interop/app-map-httplib1/">
-            Mapping the HTTP library into the Application <sup>1</sup>&frasl;<sub>2</sub>
+            Mapping the HTTP library into the Application <code>1/2</code>
           </a>
         </div>
     </li>
       <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib2/" class="dd-item">
         <div>
           <a href="/outcome/tutorial/advanced/interop/app-map-httplib2/">
-            Mapping the HTTP library into the Application <sup>2</sup>&frasl;<sub>2</sub>
+            Mapping the HTTP library into the Application <code>2/2</code>
           </a>
         </div>
     </li>
@@ -2303,8 +2303,8 @@
       <option value="/outcome/tutorial/advanced/interop/tidylib/" >--- The HTMLTidy library</option>
       <option value="/outcome/tutorial/advanced/interop/filelib/" >--- The File I/O library</option>
       <option value="/outcome/tutorial/advanced/interop/app/"  selected>--- The Application</option>
-      <option value="/outcome/tutorial/advanced/interop/app-map-httplib1/" >--- Mapping the HTTP library into the Application 1/2</option>
-      <option value="/outcome/tutorial/advanced/interop/app-map-httplib2/" >--- Mapping the HTTP library into the Application 2/2</option>
+      <option value="/outcome/tutorial/advanced/interop/app-map-httplib1/" >--- Mapping the HTTP library into the Application `1/2`</option>
+      <option value="/outcome/tutorial/advanced/interop/app-map-httplib2/" >--- Mapping the HTTP library into the Application `2/2`</option>
       <option value="/outcome/tutorial/advanced/interop/app-map-filelib/" >--- Mapping the File I/O library into the Application</option>
       <option value="/outcome/tutorial/advanced/interop/app-map-tidylib/" >--- Mapping the HTMLTidy library into the Application</option>
       <option value="/outcome/tutorial/advanced/interop/app-go/" >--- In use</option>
@@ -2372,10 +2372,12 @@ type erased <code>exception_ptr</code> or indeed a C++ exception throw.</p>
     <span class="p">}</span>
   <span class="p">};</span>
   <span class="c1">// Localise an outcome implementation for this namespace
-</span><span class="c1"></span>  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">T</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">outcome</span> <span class="o">=</span> <span class="n">OUTCOME_V2_NAMESPACE</span><span class="o">::</span><span class="n">outcome</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">error_code</span> <span class="cm">/*, std::exception_ptr */</span><span class="o">&gt;</span><span class="p">;</span>
+</span><span class="c1"></span>  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">T</span><span class="o">&gt;</span>
+  <span class="k">using</span> <span class="n">outcome</span> <span class="o">=</span>  <span class="c1">//
+</span><span class="c1"></span>  <span class="n">OUTCOME_V2_NAMESPACE</span><span class="o">::</span><span class="n">outcome</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">error_code</span> <span class="cm">/*, std::exception_ptr */</span><span class="o">&gt;</span><span class="p">;</span>
   <span class="k">using</span> <span class="n">OUTCOME_V2_NAMESPACE</span><span class="o">::</span><span class="n">success</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/finale.cpp#L156" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+<span class="p">}</span>  <span class="c1">// namespace app
+</span><span class="c1"></span></code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/finale.cpp#L162" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>Here we localise a passthrough <code>error_code</code> solely for the purpose of ADL bridging, otherwise
@@ -2401,7 +2403,7 @@ converted to a C++ exception throw.</p>
         <div class="chevrons">
     <div id="navigation">
 <a class="nav nav-prev" href="/outcome/tutorial/advanced/interop/filelib/" title="The File I/O library"> <i class="fa fa-chevron-left"></i><label>The File I/O library</label></a>
-    <a class="nav nav-next" href="/outcome/tutorial/advanced/interop/app-map-httplib1/" title="Mapping the HTTP library into the Application 1/2" style="margin-right: 0px;"><label>Mapping the HTTP library into the Application <sup>1</sup>&frasl;<sub>2</sub></label><i class="fa fa-chevron-right"></i></a></div>
+    <a class="nav nav-next" href="/outcome/tutorial/advanced/interop/app-map-httplib1/" title="Mapping the HTTP library into the Application `1/2`" style="margin-right: 0px;"><label>Mapping the HTTP library into the Application <code>1/2</code></label><i class="fa fa-chevron-right"></i></a></div>
   </div>
 
   </section>

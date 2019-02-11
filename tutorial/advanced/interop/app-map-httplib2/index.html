@@ -5,8 +5,8 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-09T15:23:24 UTC">
-<title>Mapping the HTTP library into the Application 2/2 :: Outcome documentation</title>
+<meta name="revised" content="2019-02-11T13:47:19 UTC">
+<title>Mapping the HTTP library into the Application `2/2` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
 <link href="/outcome/css/nucleus.css" rel="stylesheet">
@@ -387,14 +387,14 @@
       <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib1/" class="dd-item">
         <div>
           <a href="/outcome/tutorial/advanced/interop/app-map-httplib1/">
-            Mapping the HTTP library into the Application <sup>1</sup>&frasl;<sub>2</sub>
+            Mapping the HTTP library into the Application <code>1/2</code>
           </a>
         </div>
     </li>
       <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib2/" class="dd-item active">
         <div>
           <a href="/outcome/tutorial/advanced/interop/app-map-httplib2/">
-            Mapping the HTTP library into the Application <sup>2</sup>&frasl;<sub>2</sub>
+            Mapping the HTTP library into the Application <code>2/2</code>
           </a>
         </div>
     </li>
@@ -2303,8 +2303,8 @@
       <option value="/outcome/tutorial/advanced/interop/tidylib/" >--- The HTMLTidy library</option>
       <option value="/outcome/tutorial/advanced/interop/filelib/" >--- The File I/O library</option>
       <option value="/outcome/tutorial/advanced/interop/app/" >--- The Application</option>
-      <option value="/outcome/tutorial/advanced/interop/app-map-httplib1/" >--- Mapping the HTTP library into the Application 1/2</option>
-      <option value="/outcome/tutorial/advanced/interop/app-map-httplib2/"  selected>--- Mapping the HTTP library into the Application 2/2</option>
+      <option value="/outcome/tutorial/advanced/interop/app-map-httplib1/" >--- Mapping the HTTP library into the Application `1/2`</option>
+      <option value="/outcome/tutorial/advanced/interop/app-map-httplib2/"  selected>--- Mapping the HTTP library into the Application `2/2`</option>
       <option value="/outcome/tutorial/advanced/interop/app-map-filelib/" >--- Mapping the File I/O library into the Application</option>
       <option value="/outcome/tutorial/advanced/interop/app-map-tidylib/" >--- Mapping the HTMLTidy library into the Application</option>
       <option value="/outcome/tutorial/advanced/interop/app-go/" >--- In use</option>
@@ -2348,7 +2348,7 @@
       </div>
     
 
-    <h1>Mapping the HTTP library into the Application <sup>2</sup>&frasl;<sub>2</sub></h1>
+    <h1>Mapping the HTTP library into the Application <code>2/2</code></h1>
     
     
     
@@ -2360,19 +2360,22 @@ in Outcome:</p>
 </span><span class="c1"></span><span class="n">OUTCOME_V2_NAMESPACE_BEGIN</span>
 <span class="k">namespace</span> <span class="n">convert</span>
 <span class="p">{</span>
-  <span class="c1">// Provide custom ValueOrError conversion from httplib::result&lt;U&gt; into any app::outcome&lt;T&gt;
-</span><span class="c1"></span>  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">T</span><span class="p">,</span> <span class="k">class</span><span class="err"> </span><span class="nc">U</span><span class="o">&gt;</span> <span class="k">struct</span> <span class="n">value_or_error</span><span class="o">&lt;</span><span class="n">app</span><span class="o">::</span><span class="n">outcome</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">httplib</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">U</span><span class="o">&gt;&gt;</span>
+  <span class="c1">// Provide custom ValueOrError conversion from
+</span><span class="c1"></span>  <span class="c1">// httplib::result&lt;U&gt; into any app::outcome&lt;T&gt;
+</span><span class="c1"></span>  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">T</span><span class="p">,</span> <span class="k">class</span><span class="err"> </span><span class="nc">U</span><span class="o">&gt;</span>  <span class="c1">//
+</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">value_or_error</span><span class="o">&lt;</span><span class="n">app</span><span class="o">::</span><span class="n">outcome</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">httplib</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">U</span><span class="o">&gt;&gt;</span>
   <span class="p">{</span>
-    <span class="c1">// False to indicate that this converter wants `result`/`outcome` to NOT reject all other `result`
+    <span class="c1">// False to indicate that this converter wants `result`/`outcome`
+</span><span class="c1"></span>    <span class="c1">// to NOT reject all other `result`
 </span><span class="c1"></span>    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">enable_result_inputs</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="c1">// False to indicate that this converter wants `outcome` to NOT reject all other `outcome`
+    <span class="c1">// False to indicate that this converter wants `outcome` to NOT
+</span><span class="c1"></span>    <span class="c1">// reject all other `outcome`
 </span><span class="c1"></span>    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">enable_outcome_inputs</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
 
     <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">X</span><span class="p">,</span>                                                                              <span class="c1">//
 </span><span class="c1"></span>              <span class="k">typename</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">enable_if_t</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">is_same</span><span class="o">&lt;</span><span class="n">httplib</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">U</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">decay_t</span><span class="o">&lt;</span><span class="n">X</span><span class="o">&gt;&gt;::</span><span class="n">value</span>  <span class="c1">//
 </span><span class="c1"></span>                                          <span class="o">&amp;&amp;</span> <span class="n">std</span><span class="o">::</span><span class="n">is_constructible</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">U</span><span class="o">&gt;::</span><span class="n">value</span><span class="o">&gt;&gt;</span>                   <span class="c1">//
-</span><span class="c1"></span>    <span class="k">constexpr</span> <span class="n">app</span><span class="o">::</span><span class="n">outcome</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span>
-    <span class="k">operator</span><span class="p">()(</span><span class="n">X</span> <span class="o">&amp;&amp;</span><span class="n">src</span><span class="p">)</span>
+</span><span class="c1"></span>    <span class="k">constexpr</span> <span class="n">app</span><span class="o">::</span><span class="n">outcome</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="k">operator</span><span class="p">()(</span><span class="n">X</span> <span class="o">&amp;&amp;</span><span class="n">src</span><span class="p">)</span>
     <span class="p">{</span>
       <span class="c1">// Forward any successful value, else synthesise an exception ptr
 </span><span class="c1"></span>      <span class="k">return</span> <span class="n">src</span><span class="p">.</span><span class="n">has_value</span><span class="p">()</span> <span class="o">?</span>                              <span class="c1">//
@@ -2381,36 +2384,50 @@ in Outcome:</p>
              <span class="n">app</span><span class="o">::</span><span class="n">outcome</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">{</span><span class="n">app</span><span class="o">::</span><span class="n">make_httplib_exception</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">X</span><span class="o">&gt;</span><span class="p">(</span><span class="n">src</span><span class="p">))};</span>
     <span class="p">}</span>
   <span class="p">};</span>
-<span class="p">}</span>
-<span class="n">OUTCOME_V2_NAMESPACE_END</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/finale.cpp#L232" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+<span class="p">}</span>  <span class="c1">// namespace convert
+</span><span class="c1"></span><span class="n">OUTCOME_V2_NAMESPACE_END</span>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/finale.cpp#L241" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>The first thing that you should note is that these custom converters must be injected
 directly into the <code>OUTCOME_V2_NAMESPACE::convert</code> namespace, and they must partially
-or completely specialise <code>struct value_or_error&lt;DEST, SRC&gt;</code>.</p>
+or completely specialise <a href="/outcome/reference/converters/value_or_error/" class="api-reference">value_or_error&lt;T, U&gt;</a>. Here we specialise the
+converter for <code>ValueOrError</code> conversions from <code>httplib::result&lt;U&gt;</code> to <code>app::outcome&lt;T&gt;</code>
+i.e. from our third party HTTP library&rsquo;s error type into our application&rsquo;s <code>outcome</code>
+type (which is unique to our application, as we hard code an <code>app</code>-local error type).</p>
 
 <p>The second thing to note is that you need to set <code>enable_result_inputs</code> and <code>enable_outcome_inputs</code>
-appropriately. The reason that these are here is because of a chicken-or-egg problem
-whereby the <code>ValueOrError</code> infrastructure needs to be defined before <code>result</code> can be defined, and
-we also wish to permit inclusion of <code>result</code> without needing to include <code>outcome</code>.
-So this is a slightly irritating workaround, but one with low impact.</p>
+appropriately, otherwise <code>result</code> and <code>outcome</code> inputs will not be matched by this
+converter<sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>. In this converter, we really do wish to convert other <code>result</code> and
+<code>outcome</code> inputs, so we mark these booleans as <code>true</code>.</p>
 
-<p>The third thing to note is the SFINAE on <code>operator()</code>. If the SFINAE fails, the <code>ValueOrError</code>
-converting constructor disables. Obviously, if you are using Concept requirements,
-that works too. Note the requirement that SFINAEd <code>X</code> matches <code>httplib::result&lt;U&gt;</code>, and that
-<code>T</code> is constructible from <code>U</code>.</p>
+<p>The third thing to note is the requirements on <code>operator()</code>. If the requirements are
+not met, the <code>ValueOrError</code> converting constructor in <code>basic_result</code> and <code>basic_outcome</code>
+disables. Note the requirement that the decayed <code>operator()</code> input <code>X</code> matches
+<code>httplib::result&lt;U&gt;</code>, and that <code>T</code> is constructible from <code>U</code>. This means that the
+<a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="api-reference">explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)</a> and <a href="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/" class="api-reference">explicit basic_outcome(ValueOrError&lt;T, E&gt; &amp;&amp;)</a>
+constructors are available if, and only if, the input type is a <code>httplib::result&lt;U&gt;</code>,
+and the result&rsquo;s value type is constructible from the input&rsquo;s value type.</p>
 
 <p>If <code>operator()</code> is available, it naturally converts a <code>httplib::result&lt;U&gt;</code> into an
 <code>app::outcome&lt;T&gt;</code> by either forwarding any success as-is, or calling <code>app::make_httplib_exception()</code>
 to type erase the <code>httplib::failure</code> into an <code>app::httplib_error</code>.</p>
+<div class="footnotes">
+
+<hr />
+
+<ol>
+<li id="fn:1">Here we refer to <code>result</code> and <code>outcome</code> as defined by this specific Outcome library. If <code>result</code> or <code>outcome</code> from another Outcome implementation is seen, those <strong>always</strong> must get parsed via the <code>ValueOrError</code> matching conversion framework.
+ <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
+</ol>
+</div>
 
 
     
     
         <div class="chevrons">
     <div id="navigation">
-<a class="nav nav-prev" href="/outcome/tutorial/advanced/interop/app-map-httplib1/" title="Mapping the HTTP library into the Application 1/2"> <i class="fa fa-chevron-left"></i><label>Mapping the HTTP library into the Application <sup>1</sup>&frasl;<sub>2</sub></label></a>
+<a class="nav nav-prev" href="/outcome/tutorial/advanced/interop/app-map-httplib1/" title="Mapping the HTTP library into the Application `1/2`"> <i class="fa fa-chevron-left"></i><label>Mapping the HTTP library into the Application <code>1/2</code></label></a>
     <a class="nav nav-next" href="/outcome/tutorial/advanced/interop/app-map-filelib/" title="Mapping the File I/O library into the Application" style="margin-right: 0px;"><label>Mapping the File I/O library into the Application</label><i class="fa fa-chevron-right"></i></a></div>
   </div>
 
@@ -2426,7 +2443,7 @@ to type erase the <code>httplib::failure</code> into an <code>app::httplib_error
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 08/02/2019
+        <i class='fa fa-calendar'></i> Last update on 11/02/2019
     </div>
     
 

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-09T15:23:22 UTC">
+<meta name="revised" content="2019-02-11T13:47:17 UTC">
 <title>ValueOrError Concept :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -387,14 +387,14 @@
       <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib1/" class="dd-item">
         <div>
           <a href="/outcome/tutorial/advanced/interop/app-map-httplib1/">
-            Mapping the HTTP library into the Application <sup>1</sup>&frasl;<sub>2</sub>
+            Mapping the HTTP library into the Application <code>1/2</code>
           </a>
         </div>
     </li>
       <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib2/" class="dd-item">
         <div>
           <a href="/outcome/tutorial/advanced/interop/app-map-httplib2/">
-            Mapping the HTTP library into the Application <sup>2</sup>&frasl;<sub>2</sub>
+            Mapping the HTTP library into the Application <code>2/2</code>
           </a>
         </div>
     </li>
@@ -2303,8 +2303,8 @@
       <option value="/outcome/tutorial/advanced/interop/tidylib/" >--- The HTMLTidy library</option>
       <option value="/outcome/tutorial/advanced/interop/filelib/" >--- The File I/O library</option>
       <option value="/outcome/tutorial/advanced/interop/app/" >--- The Application</option>
-      <option value="/outcome/tutorial/advanced/interop/app-map-httplib1/" >--- Mapping the HTTP library into the Application 1/2</option>
-      <option value="/outcome/tutorial/advanced/interop/app-map-httplib2/" >--- Mapping the HTTP library into the Application 2/2</option>
+      <option value="/outcome/tutorial/advanced/interop/app-map-httplib1/" >--- Mapping the HTTP library into the Application `1/2`</option>
+      <option value="/outcome/tutorial/advanced/interop/app-map-httplib2/" >--- Mapping the HTTP library into the Application `2/2`</option>
       <option value="/outcome/tutorial/advanced/interop/app-map-filelib/" >--- Mapping the File I/O library into the Application</option>
       <option value="/outcome/tutorial/advanced/interop/app-map-tidylib/" >--- Mapping the HTMLTidy library into the Application</option>
       <option value="/outcome/tutorial/advanced/interop/app-go/" >--- In use</option>
@@ -2357,15 +2357,16 @@
 <p>Something not really mentioned until now is how Outcome interoperates with the proposed
 
 <a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 std::expected&lt;T, E&gt;</a>, whose design lands in between <a href="/outcome/reference/aliases/unchecked/" class="api-reference">unchecked&lt;T, E = varies&gt;</a>
-and <a href="/outcome/reference/aliases/checked/" class="api-reference">checked&lt;T, E = varies&gt;</a>, both of which are type aliases hard coding no-value
-policies <a href="/outcome/tutorial/essential/no-value/builtin/">as previously covered in this tutorial</a>.</p>
+and <a href="/outcome/reference/aliases/checked/" class="api-reference">checked&lt;T, E = varies&gt;</a> (both of which are type aliases hard coding no-value
+policies <a href="/outcome/tutorial/essential/no-value/builtin/">as previously covered in this tutorial</a>).</p>
 
 <p>Expected and Outcome are <a href="/outcome/faq/#why-doesn-t-outcome-duplicate-std-expected-t-e-s-design">isomorphic to one another in design intent</a>, but interoperation
 for code using Expected and Outcome ought to be seamless thanks to the <a href="https://wg21.link/P0786">proposed <code>ValueOrError</code>
 concept framework</a>, a subset of which Outcome implements.</p>
 
-<p>Outcome&rsquo;s <code>result&lt;X, Y&gt;</code> will explicitly construct from any type matching the <a href="/outcome/reference/concepts/valueorerror/" class="api-reference">ValueOrError&lt;T, E&gt;</a>
-concept, which includes <code>std::expected&lt;A, B&gt;</code>, if <code>A</code> is constructible to <code>X</code> and <code>B</code> is
+<p>The <a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="api-reference">explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)</a> and <a href="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/" class="api-reference">explicit basic_outcome(ValueOrError&lt;T, E&gt; &amp;&amp;)</a>
+constructors will explicitly construct from any type matching the <a href="/outcome/reference/concepts/valueorerror/" class="api-reference">ValueOrError&lt;T, E&gt;</a>
+concept, which includes <code>std::expected&lt;A, B&gt;</code>, if <code>A</code> is constructible to <code>X</code>, and <code>B</code> is
 constructible to <code>Y</code>. The <code>ValueOrError</code> concept in turn is true if and only if the input type has:</p>
 
 <ol>
@@ -2415,7 +2416,7 @@ is demonstrated in the worked example, next.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 09/02/2019
+        <i class='fa fa-calendar'></i> Last update on 11/02/2019
     </div>
     
 

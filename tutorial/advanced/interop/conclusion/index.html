@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-09T15:23:24 UTC">
+<meta name="revised" content="2019-02-11T13:47:20 UTC">
 <title>Conclusion :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -387,14 +387,14 @@
       <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib1/" class="dd-item">
         <div>
           <a href="/outcome/tutorial/advanced/interop/app-map-httplib1/">
-            Mapping the HTTP library into the Application <sup>1</sup>&frasl;<sub>2</sub>
+            Mapping the HTTP library into the Application <code>1/2</code>
           </a>
         </div>
     </li>
       <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib2/" class="dd-item">
         <div>
           <a href="/outcome/tutorial/advanced/interop/app-map-httplib2/">
-            Mapping the HTTP library into the Application <sup>2</sup>&frasl;<sub>2</sub>
+            Mapping the HTTP library into the Application <code>2/2</code>
           </a>
         </div>
     </li>
@@ -2303,8 +2303,8 @@
       <option value="/outcome/tutorial/advanced/interop/tidylib/" >--- The HTMLTidy library</option>
       <option value="/outcome/tutorial/advanced/interop/filelib/" >--- The File I/O library</option>
       <option value="/outcome/tutorial/advanced/interop/app/" >--- The Application</option>
-      <option value="/outcome/tutorial/advanced/interop/app-map-httplib1/" >--- Mapping the HTTP library into the Application 1/2</option>
-      <option value="/outcome/tutorial/advanced/interop/app-map-httplib2/" >--- Mapping the HTTP library into the Application 2/2</option>
+      <option value="/outcome/tutorial/advanced/interop/app-map-httplib1/" >--- Mapping the HTTP library into the Application `1/2`</option>
+      <option value="/outcome/tutorial/advanced/interop/app-map-httplib2/" >--- Mapping the HTTP library into the Application `2/2`</option>
       <option value="/outcome/tutorial/advanced/interop/app-map-filelib/" >--- Mapping the File I/O library into the Application</option>
       <option value="/outcome/tutorial/advanced/interop/app-map-tidylib/" >--- Mapping the HTMLTidy library into the Application</option>
       <option value="/outcome/tutorial/advanced/interop/app-go/" >--- In use</option>
@@ -2356,13 +2356,17 @@
 to achieving the same thing would be to add explicit converting constructors
 to <code>app::error_code</code> for each of the third party library <code>E</code> types.
 One then could have saved oneself with having to bother injecting
-custom converters into the <code>OUTCOME_V2_NAMESPACE::convert</code> namespace.</p>
+custom converters into the <code>OUTCOME_V2_NAMESPACE::convert</code> namespace.
+If you control your application&rsquo;s <code>E</code> type, then that is probably a
+better, and certainly simpler, approach.</p>
 
 <p>However there are occasions when you don&rsquo;t have control over the
 implementation of the destination <code>E</code> type e.g. in callbacks. Outcome&rsquo;s <code>ValueOrError</code>
 infrastructure lets you inject custom interop code for any pair
 of incommensurate third party <code>E</code> types, without needing to modify either&rsquo;s
-source code. This is without doubt a &ldquo;power users&rdquo; feature, but
+source code.</p>
+
+<p>This is without doubt a &ldquo;power users&rdquo; feature, but
 one which will prove useful as <code>T|E</code> based C++ code proliferates.</p>
 
 
@@ -2386,7 +2390,7 @@ one which will prove useful as <code>T|E</code> based C++ code proliferates.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 08/02/2019
+        <i class='fa fa-calendar'></i> Last update on 11/02/2019
     </div>
     
 
