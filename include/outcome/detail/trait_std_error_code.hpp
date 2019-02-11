@@ -40,7 +40,7 @@ namespace detail
 #ifndef _WIN32
        || error.category() == std::system_category()
 #endif
-       )
+    )
     {
       state._status |= status_error_is_errno;
     }
@@ -51,7 +51,7 @@ namespace detail
 #ifndef _WIN32
        || error.category() == std::system_category()
 #endif
-       )
+    )
     {
       state._status |= status_error_is_errno;
     }
@@ -65,10 +65,20 @@ namespace policy
 {
   namespace detail
   {
+    /* Pass through `make_error_code` function for `std::error_code`.
+     */
+    inline std::error_code make_error_code(std::error_code v) { return v; }
+
+    // Try ADL, if not use fall backs above
+    template <class T> constexpr inline decltype(auto) error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
+
     struct std_enum_overload_tag
     {
     };
   }  // namespace detail
+
+  //! Used by policies to extract an error code from some input `T` via ADL discovery of some `make_error_code(T)` function.
+  template <class T> constexpr inline decltype(auto) error_code(T &&v) { return detail::error_code(std::forward<T>(v)); }
 
   //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
   // inline void outcome_throw_as_system_error_with_payload(...) = delete;  // To use the error_code_throw_as_system_error policy with a custom Error type, you must define a outcome_throw_as_system_error_with_payload() free function to say how to handle the payload
