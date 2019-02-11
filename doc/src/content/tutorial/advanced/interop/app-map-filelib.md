@@ -10,4 +10,6 @@ converters:
 
 Note that the conversion exactly duplicates the implementation of
 `throw_as_system_error_with_payload(failure_info fi)` from
-namespace `filelib`.
+namespace `filelib`. In a production implementation, you probably
+ought to call that function and catch the exception it throws
+into a pointer, as that would be more long term maintainable. 

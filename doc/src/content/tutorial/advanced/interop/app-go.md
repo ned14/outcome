@@ -7,19 +7,25 @@ This is how you might now write application code using these three libraries:
 
 {{% snippet "finale.cpp" "app_go" %}}
 
-Many will wish that the explicit converting wrappers around third party
-library APIs were not there. Note that in C++ 17 you should be able to
-dispense with the angle bracketed type as the compiler can now deduce that.
-But one must still wrap all third party API invocations with `outcome()`
-i.e. explicit construction to namespace-localised `outcome`.
-This is a deliberate design decision: in Outcome, all *converting*
-construction is always explicit, except when the source is `success` or
-`failure` type sugar. And down the line when others come to maintain
-this code, we think it will be very useful to be explicit on this because
-user defined code that we customised earlier is being executed.
+The curiosity will be surely the `ext()` markup function, which needs
+explaining. It was felt
+important during Outcome's design that `ValueOrError` conversions never
+be implicit, as they almost always represent a transition across an
+ABI or semantic boundary. They are also usually non-trivial to implement
+and compile, and it was felt important that the programmer ought to
+always mark the semantic boundary transition at the point of every use,
+as considerable amounts of code may execute.
 
-Note also that we are able to use `TRY` throughout this function,
-and most especially note that we never, at any stage, needed to modify
-the source code of `httplib`, `tidylib` nor `filelib`, or inject
+How the end user chooses to mark up their code is up to them, however
+above we use a simple `ext()` function to mark up that the function
+being called is *external* to the application. This ticks our box of
+requiring the documentation, at the point of use, of every transition
+in failure handling boundaries.
+
+Note that we are able to use `TRY` as normal throughout this function.
+Everything "just works".
+
+And most especially note that we never, **at any stage**, needed to modify
+the source code of `httplib`, `tidylib` nor `filelib`, nor inject
 custom things into their namespaces. This entire worked example was
-achieved solely by `app` based customisation points and via `convert`.
+achieved solely by `app` based customisation points, and via `convert`.

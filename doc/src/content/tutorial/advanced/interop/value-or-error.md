@@ -6,15 +6,16 @@ tags = [ "value-or-error" ]
 
 Something not really mentioned until now is how Outcome interoperates with the proposed
 {{% api "std::expected<T, E>" %}}, whose design lands in between {{% api "unchecked<T, E = varies>" %}}
-and {{% api "checked<T, E = varies>" %}}, both of which are type aliases hard coding no-value
-policies [as previously covered in this tutorial]({{< relref "/tutorial/essential/no-value/builtin" >}}).
+and {{% api "checked<T, E = varies>" %}} (both of which are type aliases hard coding no-value
+policies [as previously covered in this tutorial]({{< relref "/tutorial/essential/no-value/builtin" >}})).
 
 Expected and Outcome are [isomorphic to one another in design intent]({{< relref "/faq" >}}#why-doesn-t-outcome-duplicate-std-expected-t-e-s-design), but interoperation
 for code using Expected and Outcome ought to be seamless thanks to the [proposed `ValueOrError`
 concept framework](https://wg21.link/P0786), a subset of which Outcome implements.
 
-Outcome's `result<X, Y>` will explicitly construct from any type matching the {{% api "ValueOrError<T, E>" %}}
-concept, which includes `std::expected<A, B>`, if `A` is constructible to `X` and `B` is
+The {{% api "explicit basic_result(ValueOrError<T, E> &&)" %}} and {{% api "explicit basic_outcome(ValueOrError<T, E> &&)" %}}
+constructors will explicitly construct from any type matching the {{% api "ValueOrError<T, E>" %}}
+concept, which includes `std::expected<A, B>`, if `A` is constructible to `X`, and `B` is
 constructible to `Y`. The `ValueOrError` concept in turn is true if and only if the input type has:
 
 1. A `.has_value()` observer returning a `bool`.
