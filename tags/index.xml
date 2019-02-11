@@ -20,6 +20,15 @@
     </item>
     
     <item>
+      <title>Asio</title>
+      <link>https://ned14.github.io/outcome/tags/asio/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/asio/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Backtrace</title>
       <link>https://ned14.github.io/outcome/tags/backtrace/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -133,6 +142,15 @@
       <pubDate>Sat, 09 Feb 2019 14:45:47 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/namespace/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Networking Ts</title>
+      <link>https://ned14.github.io/outcome/tags/networking-ts/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tags/networking-ts/</guid>
       <description></description>
     </item>
     

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-11T15:16:12 UTC">
+<meta name="revised" content="2019-02-11T16:40:14 UTC">
 <title>Inspecting outcome&lt;T, EC, EP&gt; :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -432,11 +432,20 @@
     </li>
         </ul>
     </li>
-    <li data-nav-id="/outcome/recipes/" class="dd-item
+    <li data-nav-id="/outcome/recipes/" class="dd-item haschildren
         ">
       <div>
-      <a href="/outcome/recipes/">Recipes</a>
+      <a href="/outcome/recipes/">Recipes</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
+        <ul>
+      <li data-nav-id="/outcome/recipes/asio-integration/" class="dd-item">
+        <div>
+          <a href="/outcome/recipes/asio-integration/">
+            ASIO/Networking TS
+          </a>
+        </div>
+    </li>
+        </ul>
     </li>
     <li data-nav-id="/outcome/experimental/" class="dd-item haschildren
         ">
@@ -2363,7 +2372,7 @@ If we are storing an <code>std::error_code</code> throw it as <code>std::system_
   <span class="k">else</span>
     <span class="k">throw</span> <span class="n">std</span><span class="o">::</span><span class="n">system_error</span><span class="p">{</span><span class="n">o</span><span class="p">.</span><span class="n">error</span><span class="p">()};</span>
 <span class="p">}</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_outcome.cpp#L41" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_outcome.cpp#L64" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>Function <code>has_exception</code> checks if it is <code>EP</code> (<code>std::exception_ptr</code>) that is stored, function <code>exception</code> accesses it. Similarly, function <code>error</code> accesses the <code>EC</code> (<code>std::error_code</code>) if it is stored.

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-11T15:16:12 UTC">
+<meta name="revised" content="2019-02-11T16:40:14 UTC">
 <title>outcome&lt;&gt; :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -432,11 +432,20 @@
     </li>
         </ul>
     </li>
-    <li data-nav-id="/outcome/recipes/" class="dd-item
+    <li data-nav-id="/outcome/recipes/" class="dd-item haschildren
         ">
       <div>
-      <a href="/outcome/recipes/">Recipes</a>
+      <a href="/outcome/recipes/">Recipes</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
+        <ul>
+      <li data-nav-id="/outcome/recipes/asio-integration/" class="dd-item">
+        <div>
+          <a href="/outcome/recipes/asio-integration/">
+            ASIO/Networking TS
+          </a>
+        </div>
+    </li>
+        </ul>
     </li>
     <li data-nav-id="/outcome/experimental/" class="dd-item haschildren
         ">
@@ -2396,7 +2405,7 @@ and be able to rethrow it in <code>Layer3</code>.</p>
 
 <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">auto</span> <span class="nf">f</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">int</span><span class="p">;</span>  <span class="c1">// throws on failure
 </span><span class="c1"></span><span class="k">auto</span> <span class="nf">g</span><span class="p">()</span> <span class="k">noexcept</span> <span class="o">-&gt;</span> <span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">;</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_outcome.cpp#L7" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_outcome.cpp#L30" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>In <code>Layer2_old</code> we cannot use exceptions, so its function <code>h</code> uses return type <code>outcome&lt;&gt;</code> to report failures. It is using functions <code>f</code> and <code>g</code> and reports their failures inside <code>outcome&lt;&gt;</code>:</p>
@@ -2412,7 +2421,7 @@ and be able to rethrow it in <code>Layer3</code>.</p>
     <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">current_exception</span><span class="p">();</span> <span class="c1">// #2
 </span><span class="c1"></span>  <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_outcome.cpp#L27" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_outcome.cpp#L50" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>#1. Operator <code>TRY</code> can forward failures encoded in <code>result&lt;T, EC&gt;</code> as <code>outcome&lt;T, EC, EP&gt;</code> without any loss in information. You can also use <code>TRY</code> to forward failure from one <code>outcome&lt;&gt;</code> to another.</p>
