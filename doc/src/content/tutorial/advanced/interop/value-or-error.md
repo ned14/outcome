@@ -24,14 +24,17 @@ constructible to `Y`. The `ValueOrError` concept in turn is true if and only if 
 ## Implementation
 
 Outcome's machinery for implementing `ValueOrError` conversion is user extensible by injection
-of specialisations of the `value_or_error<DEST, SRC>` type into the `OUTCOME_V2_NAMESPACE::convert` namespace.
+of specialisations of the {{% api "value_or_error<T, U>" %}} type into the `OUTCOME_V2_NAMESPACE::convert` namespace.
 
-Outcome's default `convert::value_or_error<DEST, SRC>` implementation explicitly excludes Outcome `result`
-and `outcome` types from the default mechanism as there is a major gotcha:
-Outcome's `.value()` is often not callable in constexpr as it can throw, which makes this mechanism pretty much
-useless for constexpr code. Thus separate explicit converting constructors exist which constexpr convert
-from any Outcome type (though note that `result` construction from `outcome` does use the
-`ValueOrError` mechanism).
+Outcome's default `convert::value_or_error<T, U>` implementation explicitly
+excludes Outcome `result` and `outcome` types from the default mechanism as
+there is a major gotcha: the `ValueOrError` matched type's `.value()` is often
+not callable in constexpr as it can throw, which makes this conversion mechanism
+pretty much useless for constexpr code. Besides, `outcome` has a converting
+constructor overload for `result` inputs which is constexpr capable.
 
-Examples of how to implement your own `convert::value_or_error<DEST, SRC>` converter
+Note that if you do enable `outcome` inputs, a `result` will match an input
+`outcome`, but silently dropping any exception state. This is probably undesirable.
+
+Examples of how to implement your own `convert::value_or_error<T, U>` converter
 is demonstrated in the worked example, next.

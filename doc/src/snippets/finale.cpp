@@ -53,7 +53,9 @@ namespace httplib
     status_code status{status_code::success};
     std::string url{};  // The failing URL
   };
-  // Localise a result implementation to this library
+  // Localise a result implementation to this library, holding
+  // the logic error of incorrect observation to mean program
+  // termination.
   template <class T>
   using result =  //
   OUTCOME_V2_NAMESPACE::result<T, failure, OUTCOME_V2_NAMESPACE::policy::terminate>;
@@ -138,7 +140,8 @@ namespace filelib
 //! [tidylib]
 // There actually is a library for tidying HTML into XHTML called HTMLTidy
 // See http://www.html-tidy.org/
-// HTMLTidy is actually a great tool, I highly recommend it.
+// HTMLTidy is actually a great tool for dealing with 1990s-era tag soup
+// HTML, I highly recommend it.
 
 // This isn't the API for Tidy, but let's assume it's a C library returning
 // errno domained error codes. out must be freed with free() after use.

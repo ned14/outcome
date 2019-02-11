@@ -11,6 +11,7 @@ type erased `exception_ptr` or indeed a C++ exception throw.
 
 Here we localise a passthrough `error_code` solely for the purpose of ADL bridging, otherwise
 the localised `outcome` configured is the default one which comes with Outcome.
+[We covered this technique of "passthrough `error_code`" earlier in this tutorial]({{< relref "/tutorial/advanced/hooks/adl_bridging" >}}).
 
 The way we are going to configure interop is as follows:
 
