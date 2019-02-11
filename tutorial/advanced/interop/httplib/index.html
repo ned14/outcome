@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-11T16:40:13 UTC">
+<meta name="revised" content="2019-02-11T17:21:37 UTC">
 <title>The HTTP library :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2397,7 +2397,9 @@ incompatible ways, and the third being a C library just for kicks.</p>
     <span class="n">status_code</span> <span class="n">status</span><span class="p">{</span><span class="n">status_code</span><span class="o">::</span><span class="n">success</span><span class="p">};</span>
     <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">url</span><span class="p">{};</span>  <span class="c1">// The failing URL
 </span><span class="c1"></span>  <span class="p">};</span>
-  <span class="c1">// Localise a result implementation to this library
+  <span class="c1">// Localise a result implementation to this library, holding
+</span><span class="c1"></span>  <span class="c1">// the logic error of incorrect observation to mean program
+</span><span class="c1"></span>  <span class="c1">// termination.
 </span><span class="c1"></span>  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">T</span><span class="o">&gt;</span>
   <span class="k">using</span> <span class="n">result</span> <span class="o">=</span>  <span class="c1">//
 </span><span class="c1"></span>  <span class="n">OUTCOME_V2_NAMESPACE</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">failure</span><span class="p">,</span> <span class="n">OUTCOME_V2_NAMESPACE</span><span class="o">::</span><span class="n">policy</span><span class="o">::</span><span class="n">terminate</span><span class="o">&gt;</span><span class="p">;</span>

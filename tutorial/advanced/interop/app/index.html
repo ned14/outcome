@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-11T16:40:14 UTC">
+<meta name="revised" content="2019-02-11T17:21:38 UTC">
 <title>The Application :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2393,11 +2393,12 @@ type erased <code>exception_ptr</code> or indeed a C++ exception throw.</p>
 </span><span class="c1"></span>  <span class="n">OUTCOME_V2_NAMESPACE</span><span class="o">::</span><span class="n">outcome</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">error_code</span> <span class="cm">/*, std::exception_ptr */</span><span class="o">&gt;</span><span class="p">;</span>
   <span class="k">using</span> <span class="n">OUTCOME_V2_NAMESPACE</span><span class="o">::</span><span class="n">success</span><span class="p">;</span>
 <span class="p">}</span>  <span class="c1">// namespace app
-</span><span class="c1"></span></code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/finale.cpp#L162" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</span><span class="c1"></span></code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/finale.cpp#L165" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>Here we localise a passthrough <code>error_code</code> solely for the purpose of ADL bridging, otherwise
-the localised <code>outcome</code> configured is the default one which comes with Outcome.</p>
+the localised <code>outcome</code> configured is the default one which comes with Outcome.
+<a href="/outcome/tutorial/advanced/hooks/adl_bridging/">We covered this technique of &ldquo;passthrough <code>error_code</code>&rdquo; earlier in this tutorial</a>.</p>
 
 <p>The way we are going to configure interop is as follows:</p>
 
@@ -2434,7 +2435,7 @@ converted to a C++ exception throw.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 08/02/2019
+        <i class='fa fa-calendar'></i> Last update on 11/02/2019
     </div>
     
 

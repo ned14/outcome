@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-11T16:40:12 UTC">
+<meta name="revised" content="2019-02-11T17:21:37 UTC">
 <title>ValueOrError Concept :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2393,16 +2393,19 @@ constructible to <code>Y</code>. The <code>ValueOrError</code> concept in turn i
 <h2 id="implementation">Implementation</h2>
 
 <p>Outcome&rsquo;s machinery for implementing <code>ValueOrError</code> conversion is user extensible by injection
-of specialisations of the <code>value_or_error&lt;DEST, SRC&gt;</code> type into the <code>OUTCOME_V2_NAMESPACE::convert</code> namespace.</p>
+of specialisations of the <a href="/outcome/reference/converters/value_or_error/" class="api-reference">value_or_error&lt;T, U&gt;</a> type into the <code>OUTCOME_V2_NAMESPACE::convert</code> namespace.</p>
 
-<p>Outcome&rsquo;s default <code>convert::value_or_error&lt;DEST, SRC&gt;</code> implementation explicitly excludes Outcome <code>result</code>
-and <code>outcome</code> types from the default mechanism as there is a major gotcha:
-Outcome&rsquo;s <code>.value()</code> is often not callable in constexpr as it can throw, which makes this mechanism pretty much
-useless for constexpr code. Thus separate explicit converting constructors exist which constexpr convert
-from any Outcome type (though note that <code>result</code> construction from <code>outcome</code> does use the
-<code>ValueOrError</code> mechanism).</p>
+<p>Outcome&rsquo;s default <code>convert::value_or_error&lt;T, U&gt;</code> implementation explicitly
+excludes Outcome <code>result</code> and <code>outcome</code> types from the default mechanism as
+there is a major gotcha: the <code>ValueOrError</code> matched type&rsquo;s <code>.value()</code> is often
+not callable in constexpr as it can throw, which makes this conversion mechanism
+pretty much useless for constexpr code. Besides, <code>outcome</code> has a converting
+constructor overload for <code>result</code> inputs which is constexpr capable.</p>
 
-<p>Examples of how to implement your own <code>convert::value_or_error&lt;DEST, SRC&gt;</code> converter
+<p>Note that if you do enable <code>outcome</code> inputs, a <code>result</code> will match an input
+<code>outcome</code>, but silently dropping any exception state. This is probably undesirable.</p>
+
+<p>Examples of how to implement your own <code>convert::value_or_error&lt;T, U&gt;</code> converter
 is demonstrated in the worked example, next.</p>
 
 

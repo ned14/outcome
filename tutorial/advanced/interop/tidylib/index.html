@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-11T16:40:13 UTC">
+<meta name="revised" content="2019-02-11T17:21:37 UTC">
 <title>The HTMLTidy library :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2370,12 +2370,13 @@
     
     <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="c1">// There actually is a library for tidying HTML into XHTML called HTMLTidy
 </span><span class="c1">// See http://www.html-tidy.org/
-</span><span class="c1">// HTMLTidy is actually a great tool, I highly recommend it.
+</span><span class="c1">// HTMLTidy is actually a great tool for dealing with 1990s-era tag soup
+</span><span class="c1">// HTML, I highly recommend it.
 </span><span class="c1"></span>
 <span class="c1">// This isn&#39;t the API for Tidy, but let&#39;s assume it&#39;s a C library returning
 </span><span class="c1">// errno domained error codes. out must be freed with free() after use.
 </span><span class="c1"></span><span class="k">extern</span> <span class="s">&#34;C&#34;</span> <span class="kt">int</span> <span class="n">tidy_html</span><span class="p">(</span><span class="kt">char</span> <span class="o">**</span><span class="n">out</span><span class="p">,</span> <span class="n">size_t</span> <span class="o">*</span><span class="n">outlen</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">in</span><span class="p">,</span> <span class="n">size_t</span> <span class="n">inlen</span><span class="p">);</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/finale.cpp#L139" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/finale.cpp#L141" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>A C API may not initially appear to be a <code>T|E</code> based API, but if failure
