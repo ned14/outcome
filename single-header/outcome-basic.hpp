@@ -659,9 +659,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    51ba91416d557eecbe16b72e0ee6a453ac9131d5
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2018-12-15 13:10:02 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 51ba9141
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    01e18d3e6549400646f41b79de318994eac95f25
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-02-11 10:00:33 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 01e18d3e
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1141,9 +1141,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 4d0d18fc840ff3d8c0fb07e98df7a571c61b9921
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-02-06 10:43:58 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4d0d18fc
+#define OUTCOME_PREVIOUS_COMMIT_REF 8f8fcba74fad4c89fdd2e3bf49fc12678eb1270e
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-02-11 13:38:11 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 8f8fcba7
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -4788,8 +4788,8 @@ namespace detail
       return basic_outcome_failure_exception_from_error(ec);
     }
   }
-#if defined(_MSC_VER) && _MSC_VER < 1920
-  // VS2017 with /permissive- chokes on the correct form due to over eager early instantiation.
+#if defined(_MSC_VER) && _MSC_VER <= 1920  // VS2019
+  // VS2017 and VS2019 with /permissive- chokes on the correct form due to over eager early instantiation.
   template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) { static_assert(sizeof(S) == 0, "No specialisation for these error and exception types available!"); }
 #else
   template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) = delete;  // NOLINT No specialisation for these error and exception types available!

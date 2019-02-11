@@ -36,18 +36,22 @@ namespace policy
 {
   namespace detail
   {
-    /* Pass through `make_exception_ptr` function for `boost::exception_ptr`.
-    The reason this needs to be here, declared before the rest of Outcome,
-    is that there is no boost::make_exception_ptr as Boost still uses the old
-    naming boost::copy_exception. Therefore the ADL discovered make_exception_ptr
-    doesn't work, hence this hacky pre-declaration here.
+    /* Pass through `make_error_code` function for `boost::system::error_code`.
+     */
+    inline boost::system::error_code make_error_code(boost::system::error_code v) { return v; }
 
-    I was tempted to just inject a boost::make_exception_ptr, but I can see
-    Boost doing that itself at some point. This hack should keep working after.
-    */
+    /* Pass through `make_exception_ptr` function for `boost::exception_ptr`.
+        The reason this needs to be here, declared before the rest of Outcome,
+        is that there is no boost::make_exception_ptr as Boost still uses the old
+        naming boost::copy_exception. Therefore the ADL discovered make_exception_ptr
+        doesn't work, hence this hacky pre-declaration here.
+
+        I was tempted to just inject a boost::make_exception_ptr, but I can see
+        Boost doing that itself at some point. This hack should keep working after.
+        */
     inline boost::exception_ptr make_exception_ptr(boost::exception_ptr v) { return v; }
-  }
-}
+  }  // namespace detail
+}  // namespace policy
 OUTCOME_V2_NAMESPACE_END
 
 #include "std_result.hpp"
@@ -66,9 +70,9 @@ namespace boost
       OUTCOME_TEMPLATE(class Error)
       OUTCOME_TREQUIRES(OUTCOME_TPRED(is_error_code_enum<std::decay_t<Error>>::value || is_error_condition_enum<std::decay_t<Error>>::value))
       inline void outcome_throw_as_system_error_with_payload(Error &&error) { OUTCOME_THROW_EXCEPTION(system_error(make_error_code(error))); }
-    }
-  }
-}
+    }  // namespace errc
+  }    // namespace system
+}  // namespace boost
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -81,7 +85,7 @@ namespace detail
 #ifndef _WIN32
        || error.category() == boost::system::system_category()
 #endif
-       )
+    )
     {
       state._status |= status_error_is_errno;
     }
@@ -92,7 +96,7 @@ namespace detail
 #ifndef _WIN32
        || error.category() == boost::system::system_category()
 #endif
-       )
+    )
     {
       state._status |= status_error_is_errno;
     }

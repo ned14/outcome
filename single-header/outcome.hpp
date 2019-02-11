@@ -790,9 +790,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    51ba91416d557eecbe16b72e0ee6a453ac9131d5
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2018-12-15 13:10:02 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 51ba9141
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    01e18d3e6549400646f41b79de318994eac95f25
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-02-11 10:00:33 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 01e18d3e
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1272,9 +1272,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 4d0d18fc840ff3d8c0fb07e98df7a571c61b9921
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-02-06 10:43:58 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4d0d18fc
+#define OUTCOME_PREVIOUS_COMMIT_REF 8f8fcba74fad4c89fdd2e3bf49fc12678eb1270e
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-02-11 13:38:11 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 8f8fcba7
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -4788,7 +4788,7 @@ namespace detail
 #ifndef _WIN32
        || error.category() == std::system_category()
 #endif
-       )
+    )
     {
       state._status |= status_error_is_errno;
     }
@@ -4799,7 +4799,7 @@ namespace detail
 #ifndef _WIN32
        || error.category() == std::system_category()
 #endif
-       )
+    )
     {
       state._status |= status_error_is_errno;
     }
@@ -4813,10 +4813,21 @@ namespace policy
 {
   namespace detail
   {
+    /* Pass through `make_error_code` function for `std::error_code`.
+     */
+
+    inline std::error_code make_error_code(std::error_code v) { return v; }
+
+    // Try ADL, if not use fall backs above
+    template <class T> constexpr inline decltype(auto) error_code(T &&v) { return make_error_code(std::forward<T>(v)); }
+
     struct std_enum_overload_tag
     {
     };
   }  // namespace detail
+
+  //! Used by policies to extract an error code from some input `T` via ADL discovery of some `make_error_code(T)` function.
+  template <class T> constexpr inline decltype(auto) error_code(T &&v) { return detail::error_code(std::forward<T>(v)); }
 
   //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
   // inline void outcome_throw_as_system_error_with_payload(...) = delete;  // To use the error_code_throw_as_system_error policy with a custom Error type, you must define a outcome_throw_as_system_error_with_payload() free function to say how to handle the payload
@@ -4977,7 +4988,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-#define OUTCOME_FAIL_TO_COMPILE_OBSERVERS_MESSAGE                                                                                                                                                                                                                                                                                "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a result/outcome given an EC or E type which is not void, and for whom "                                                                                                                                                                                                                                        "trait::has_error_code_v<EC>, trait::has_exception_ptr_v<EC>, and trait::has_exception_ptr_v<E> "                                                                                                                                                                                                                              "are all false. Please specify a NoValuePolicy to tell result/outcome what to do, or else use "                                                                                                                                                                                                                                "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."
+#define OUTCOME_FAIL_TO_COMPILE_OBSERVERS_MESSAGE                                                                                                                                                                                                                                                                                "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a basic_result/basic_outcome given an EC or EP type which is not void, and for whom "                                                                                                                                                                                                                           "trait::is_error_code_available<EC>, trait::is_exception_ptr_available<EC>, and trait::is_exception_ptr_available<EP> "                                                                                                                                                                                                        "are all false. Please specify a NoValuePolicy to tell basic_result/basic_outcome what to do, or else use "                                                                                                                                                                                                                    "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."
 
 
 
@@ -5003,19 +5014,19 @@ namespace policy
     */
 
 
-    template <class Impl> static constexpr void wide_value_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a result/outcome given an EC or E type which is not void, and for whom "                                                                                                                                                                                                                                        "trait::has_error_code_v<EC>, trait::has_exception_ptr_v<EC>, and trait::has_exception_ptr_v<E> "                                                                                                                                                                                                                              "are all false. Please specify a NoValuePolicy to tell result/outcome what to do, or else use "                                                                                                                                                                                                                                "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
+    template <class Impl> static constexpr void wide_value_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a basic_result/basic_outcome given an EC or EP type which is not void, and for whom "                                                                                                                                                                                                                           "trait::is_error_code_available<EC>, trait::is_exception_ptr_available<EC>, and trait::is_exception_ptr_available<EP> "                                                                                                                                                                                                        "are all false. Please specify a NoValuePolicy to tell basic_result/basic_outcome what to do, or else use "                                                                                                                                                                                                                    "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
     /*! Performs a wide check of state, used in the error() functions. Fails to compile with a static assertion.
     \effects None.
     */
 
 
-    template <class Impl> static constexpr void wide_error_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a result/outcome given an EC or E type which is not void, and for whom "                                                                                                                                                                                                                                        "trait::has_error_code_v<EC>, trait::has_exception_ptr_v<EC>, and trait::has_exception_ptr_v<E> "                                                                                                                                                                                                                              "are all false. Please specify a NoValuePolicy to tell result/outcome what to do, or else use "                                                                                                                                                                                                                                "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
+    template <class Impl> static constexpr void wide_error_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a basic_result/basic_outcome given an EC or EP type which is not void, and for whom "                                                                                                                                                                                                                           "trait::is_error_code_available<EC>, trait::is_exception_ptr_available<EC>, and trait::is_exception_ptr_available<EP> "                                                                                                                                                                                                        "are all false. Please specify a NoValuePolicy to tell basic_result/basic_outcome what to do, or else use "                                                                                                                                                                                                                    "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
     /*! Performs a wide check of state, used in the exception() functions. Fails to compile with a static assertion.
     \effects None.
     */
 
 
-    template <class Impl> static constexpr void wide_exception_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a result/outcome given an EC or E type which is not void, and for whom "                                                                                                                                                                                                                                        "trait::has_error_code_v<EC>, trait::has_exception_ptr_v<EC>, and trait::has_exception_ptr_v<E> "                                                                                                                                                                                                                              "are all false. Please specify a NoValuePolicy to tell result/outcome what to do, or else use "                                                                                                                                                                                                                                "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
+    template <class Impl> static constexpr void wide_exception_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a basic_result/basic_outcome given an EC or EP type which is not void, and for whom "                                                                                                                                                                                                                           "trait::is_error_code_available<EC>, trait::is_exception_ptr_available<EC>, and trait::is_exception_ptr_available<EP> "                                                                                                                                                                                                        "are all false. Please specify a NoValuePolicy to tell basic_result/basic_outcome what to do, or else use "                                                                                                                                                                                                                    "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
   };
 }  // namespace policy
 
@@ -5643,8 +5654,8 @@ namespace detail
       return basic_outcome_failure_exception_from_error(ec);
     }
   }
-#if defined(_MSC_VER) && _MSC_VER < 1920
-  // VS2017 with /permissive- chokes on the correct form due to over eager early instantiation.
+#if defined(_MSC_VER) && _MSC_VER <= 1920  // VS2019
+  // VS2017 and VS2019 with /permissive- chokes on the correct form due to over eager early instantiation.
   template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) { static_assert(sizeof(S) == 0, "No specialisation for these error and exception types available!"); }
 #else
   template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) = delete;  // NOLINT No specialisation for these error and exception types available!

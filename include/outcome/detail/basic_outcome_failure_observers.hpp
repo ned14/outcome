@@ -44,8 +44,8 @@ namespace detail
       return basic_outcome_failure_exception_from_error(ec);
     }
   }
-#if defined(_MSC_VER) && _MSC_VER < 1920
-  // VS2017 with /permissive- chokes on the correct form due to over eager early instantiation.
+#if defined(_MSC_VER) && _MSC_VER <= 1920  // VS2019
+  // VS2017 and VS2019 with /permissive- chokes on the correct form due to over eager early instantiation.
   template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) { static_assert(sizeof(S) == 0, "No specialisation for these error and exception types available!"); }
 #else
   template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) = delete;  // NOLINT No specialisation for these error and exception types available!

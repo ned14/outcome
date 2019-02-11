@@ -53,15 +53,19 @@ namespace httplib
     status_code status{status_code::success};
     std::string url{};  // The failing URL
   };
-  // Localise a result implementation to this library
-  template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, failure, OUTCOME_V2_NAMESPACE::policy::terminate>;
+  // Localise a result implementation to this library, holding
+  // the logic error of incorrect observation to mean program
+  // termination.
+  template <class T>
+  using result =  //
+  OUTCOME_V2_NAMESPACE::result<T, failure, OUTCOME_V2_NAMESPACE::policy::terminate>;
 
   /* Performs a HTTP GET on the url, returning the body if successful,
   a failure with status_code if unsuccessful at the HTTP level, or a
   C++ exception throw if something catastrophic happened e.g. bad_alloc
   */
   result<std::string> get(std::string url);
-}
+}  // namespace httplib
 //! [httplib]
 
 namespace httplib
@@ -75,14 +79,14 @@ namespace httplib
     return failure{status_code::not_found, url};
 #endif
   }
-}
+}  // namespace httplib
 
 namespace filelib
 {
-  using std::experimental::filesystem::path;
-  using std::experimental::filesystem::filesystem_error;
   using QUICKCPPLIB_NAMESPACE::string_view::string_view;
-}
+  using std::experimental::filesystem::filesystem_error;
+  using std::experimental::filesystem::path;
+}  // namespace filelib
 
 namespace app
 {
@@ -93,7 +97,8 @@ namespace app
 // You may remember this from the tutorial section on Custom Payloads
 namespace filelib
 {
-  // Error code + paths related to a failure. Also causes ADL discovery to check this namespace.
+  // Error code + paths related to a failure. Also causes ADL discovery
+  // to check this namespace.
   struct failure_info
   {
     std::error_code ec;
@@ -106,18 +111,21 @@ namespace filelib
   // Tell Outcome that no-value observation should throw a custom exception
   inline void outcome_throw_as_system_error_with_payload(failure_info fi)
   {
-    // If the error code is not filesystem related e.g. ENOMEM, throw that as a standard STL exception.
+    // If the error code is not filesystem related e.g. ENOMEM, throw that
+    // as a standard STL exception.
     OUTCOME_V2_NAMESPACE::try_throw_std_exception_from_error(fi.ec);
-    // Throw the exact same filesystem_error exception which the throwing copy_file() edition does.
+    // Throw the exact same filesystem_error exception which the throwing
+    // copy_file() edition does.
     throw filesystem_error(fi.ec.message(), std::move(fi.path1), std::move(fi.path2), fi.ec);
   }
 
   // Localise a result implementation specific to this namespace.
   template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, failure_info>;
 
-  // Writes a chunk of data to some file. Returns bytes written, or failure_info. Never throws exceptions.
+  // Writes a chunk of data to some file. Returns bytes written, or
+  // failure_info. Never throws exceptions.
   result<size_t> write_file(string_view chunk) noexcept;
-}
+}  // namespace filelib
 //! [filelib]
 
 namespace filelib
@@ -127,12 +135,13 @@ namespace filelib
     (void) chunk;
     return failure_info{make_error_code(std::errc::no_space_on_device), "somepath"};
   }
-}
+}  // namespace filelib
 
 //! [tidylib]
 // There actually is a library for tidying HTML into XHTML called HTMLTidy
 // See http://www.html-tidy.org/
-// HTMLTidy is actually a great tool, I highly recommend it.
+// HTMLTidy is actually a great tool for dealing with 1990s-era tag soup
+// HTML, I highly recommend it.
 
 // This isn't the API for Tidy, but let's assume it's a C library returning
 // errno domained error codes. out must be freed with free() after use.
@@ -169,9 +178,11 @@ namespace app
     }
   };
   // Localise an outcome implementation for this namespace
-  template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_code /*, std::exception_ptr */>;
+  template <class T>
+  using outcome =  //
+  OUTCOME_V2_NAMESPACE::outcome<T, error_code /*, std::exception_ptr */>;
   using OUTCOME_V2_NAMESPACE::success;
-}
+}  // namespace app
 //! [app]
 
 //! [app_map_httplib1]
@@ -193,7 +204,8 @@ namespace app
   };
 
   // Type erase httplib::result<U> into a httplib_error exception ptr
-  template <class U> inline std::exception_ptr make_httplib_exception(const httplib::result<U> &src)
+  template <class U>  //
+  inline std::exception_ptr make_httplib_exception(const httplib::result<U> &src)
   {
     std::string str("httplib failed with error ");
     switch(src.error().status)
@@ -225,7 +237,7 @@ namespace app
     str.append("]");
     return std::make_exception_ptr(httplib_error(src.error(), std::move(str)));
   }
-}
+}  // namespace app
 //! [app_map_httplib1]
 
 //! [app_map_httplib2]
@@ -233,19 +245,22 @@ namespace app
 OUTCOME_V2_NAMESPACE_BEGIN
 namespace convert
 {
-  // Provide custom ValueOrError conversion from httplib::result<U> into any app::outcome<T>
-  template <class T, class U> struct value_or_error<app::outcome<T>, httplib::result<U>>
+  // Provide custom ValueOrError conversion from
+  // httplib::result<U> into any app::outcome<T>
+  template <class T, class U>  //
+  struct value_or_error<app::outcome<T>, httplib::result<U>>
   {
-    // False to indicate that this converter wants `result`/`outcome` to NOT reject all other `result`
+    // False to indicate that this converter wants `result`/`outcome`
+    // to NOT reject all other `result`
     static constexpr bool enable_result_inputs = true;
-    // False to indicate that this converter wants `outcome` to NOT reject all other `outcome`
+    // False to indicate that this converter wants `outcome` to NOT
+    // reject all other `outcome`
     static constexpr bool enable_outcome_inputs = true;
 
     template <class X,                                                                              //
               typename = std::enable_if_t<std::is_same<httplib::result<U>, std::decay_t<X>>::value  //
                                           && std::is_constructible<T, U>::value>>                   //
-    constexpr app::outcome<T>
-    operator()(X &&src)
+    constexpr app::outcome<T> operator()(X &&src)
     {
       // Forward any successful value, else synthesise an exception ptr
       return src.has_value() ?                              //
@@ -254,7 +269,7 @@ namespace convert
              app::outcome<T>{app::make_httplib_exception(std::forward<X>(src))};
     }
   };
-}
+}  // namespace convert
 OUTCOME_V2_NAMESPACE_END
 //! [app_map_httplib2]
 
@@ -262,26 +277,29 @@ namespace app
 {
   static outcome<int> test_value_or_error2 = OUTCOME_V2_NAMESPACE::convert::value_or_error<outcome<int>, httplib::result<int>>{}(httplib::result<int>{5});
   static outcome<int> test_value_or_error3(httplib::result<int>{5});
-}
+}  // namespace app
 
 //! [app_map_filelib]
 // Inject custom ValueOrError conversion
 OUTCOME_V2_NAMESPACE_BEGIN
 namespace convert
 {
-  // Provide custom ValueOrError conversion from filelib::result<U> into any app::outcome<T>
-  template <class T, class U> struct value_or_error<app::outcome<T>, filelib::result<U>>
+  // Provide custom ValueOrError conversion from filelib::result<U>
+  // into any app::outcome<T>
+  template <class T, class U>  //
+  struct value_or_error<app::outcome<T>, filelib::result<U>>
   {
-    // True to indicate that this converter wants `result`/`outcome` to NOT reject all other `result`
+    // True to indicate that this converter wants `result`/`outcome`
+    // to NOT reject all other `result`
     static constexpr bool enable_result_inputs = true;
-    // False to indicate that this converter wants `outcome` to NOT reject all other `outcome`
+    // False to indicate that this converter wants `outcome` to NOT
+    // reject all other `outcome`
     static constexpr bool enable_outcome_inputs = true;
 
     template <class X,                                                                              //
               typename = std::enable_if_t<std::is_same<filelib::result<U>, std::decay_t<X>>::value  //
                                           && std::is_constructible<T, U>::value>>                   //
-    constexpr app::outcome<T>
-    operator()(X &&src)
+    constexpr app::outcome<T> operator()(X &&src)
     {
       // Forward any successful value
       if(src.has_value())
@@ -289,13 +307,15 @@ namespace convert
         return {std::forward<X>(src).value()};
       }
 
-      // Synthesise a filesystem_error, exactly as if someone had called src.value()
+      // Synthesise a filesystem_error, exactly as if someone had
+      // called src.value()
       auto &fi = src.error();
       OUTCOME_V2_NAMESPACE::try_throw_std_exception_from_error(fi.ec);  // might throw
-      return {std::make_exception_ptr(filelib::filesystem_error(fi.ec.message(), std::move(fi.path1), std::move(fi.path2), fi.ec))};
+      return {std::make_exception_ptr(                                  //
+      filelib::filesystem_error(fi.ec.message(), std::move(fi.path1), std::move(fi.path2), fi.ec))};
     }
   };
-}
+}  // namespace convert
 OUTCOME_V2_NAMESPACE_END
 //! [app_map_filelib]
 
@@ -337,12 +357,18 @@ namespace app
     // Return a unique ptr to release storage on scope exit
     return std::unique_ptr<char, call_free>(out);
   }
-}
+}  // namespace app
 //! [app_map_tidylib]
 
 //! [app_go]
 namespace app
 {
+  // A markup function to indicate when we are ValueOrError converting
+  template <class T> inline outcome<typename T::value_type> ext(T &&v)
+  {  //
+    return outcome<typename T::value_type>(std::move(v));
+  }
+
   outcome<void> go()  // NOT noexcept, this can throw STL exceptions e.g. bad_alloc
   {
     // Note that explicit construction is required when converting between differing types
@@ -354,7 +380,7 @@ namespace app
     // that into a httplib_error exception type which is stored as an exception ptr. The
     // TRY operation below will return that exception ptr to be rethrown in the caller.
     // Otherwise the fetched data is returned in a std::string data.
-    OUTCOME_TRY(data, (outcome<std::string>(httplib::get("http://www.nedproductions.biz/"))));
+    OUTCOME_TRY(data, ext(httplib::get("http://www.nedproductions.biz/")));
     string_view data_view(data);
 
     // HTML tidy the fetched data. If the C library fails due to an error corresponding to
@@ -364,14 +390,14 @@ namespace app
     // TRY operation below will return that exception ptr to be rethrown in the caller.
     // Otherwise the tidied data is returned into holdmem, with the string view updated to
     // point at the tidied data.
-    OUTCOME_TRY(holdmem, (tidy_html(data_view)));
+    OUTCOME_TRY(holdmem, ext(tidy_html(data_view)));
 
     // Write the tidied data to some file. If the write fails, synthesise a filesystem_error
     // exception ptr exactly as if one called filelib::write_file(data_view).value().
-    OUTCOME_TRY(written, (outcome<size_t>(filelib::write_file(data_view))));
+    OUTCOME_TRY(written, ext(filelib::write_file(data_view)));
     return success();
   }
-}
+}  // namespace app
 //! [app_go]
 
 int main()

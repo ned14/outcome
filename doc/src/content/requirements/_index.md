@@ -29,3 +29,15 @@ correctly, if you need an alternative.
 - Early editions of Visual Studio 2017 have many corner case problems.
 The latest point release, VS2017.9, only has a few known problems,
 and should be relatively unsurprising for most use cases.
+
+---
+
+"C++ 14" compilers which do not work, and will not work until their
+maintainers fix them:
+
+- GCC 5, due to a bug in nested template variables parsing which was fixed
+in GCC 6. I appreciate that this upsets a lot of users. Please raise your
+upset at https://gcc.gnu.org/bugzilla/. In the meantime, you can get fairly
+far in Outcome with even clang 3.5.
+- Any compiler which uses the libstdc++ version which comes with GCC 5, as it does
+not implement enough of the C++ 14 standard library for Outcome to compile.
