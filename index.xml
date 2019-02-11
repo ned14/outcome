@@ -2240,7 +2240,7 @@ Complexity: Whatever that of error_type&amp;rsquo;s and/or exception_type&amp;rs
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1004 commits   @akrzemi1 39 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1005 commits   @akrzemi1 39 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>
@@ -2589,6 +2589,19 @@ Header: &amp;lt;outcome/boost_result.hpp&amp;gt;</description>
       <description>A type alias to either std_checked&amp;lt;T, E = std::error_code&amp;gt; (standalone edition) or boost_checked&amp;lt;T, E = boost::system::error_code&amp;gt; (Boost edition). This means that checked&amp;lt;T&amp;gt; uses the appropriate default alias depending on which edition of Outcome is in use.
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/result.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`decltype(auto) error_code(T &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/policy/error_code/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/policy/error_code/</guid>
+      <description>Extracts a boost::system::error_code or  std::error_code from the input via ADL discovery of a suitable make_error_code(T) function.
+Overridable: Argument dependent lookup.
+Requires: Always available.
+Namespace: OUTCOME_V2_NAMESPACE::policy
+Header: &amp;lt;outcome/std_result.hpp&amp;gt;</description>
     </item>
     
     <item>

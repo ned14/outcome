@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-11T13:47:17 UTC">
+<meta name="revised" content="2019-02-11T15:16:10 UTC">
 <title>Prerequisites :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2147,6 +2147,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/functions/policy/error_code/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/policy/error_code/">
+            <code>decltype(auto) error_code(T &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/functions/policy/exception_ptr/" class="dd-item">
         <div>
           <a href="/outcome/reference/functions/policy/exception_ptr/">
@@ -2348,6 +2355,20 @@ The latest point release, VS2017.9, only has a few known problems,
 and should be relatively unsurprising for most use cases.</li>
 </ul>
 
+<hr />
+
+<p>&ldquo;C++ 14&rdquo; compilers which do not work, and will not work until their
+maintainers fix them:</p>
+
+<ul>
+<li>GCC 5, due to a bug in nested template variables parsing which was fixed
+in GCC 6. I appreciate that this upsets a lot of users. Please raise your
+upset at <a href="https://gcc.gnu.org/bugzilla/">https://gcc.gnu.org/bugzilla/</a>. In the meantime, you can get fairly
+far in Outcome with even clang 3.5.</li>
+<li>Any compiler which uses the libstdc++ version which comes with GCC 5, as it does
+not implement enough of the C++ 14 standard library for Outcome to compile.</li>
+</ul>
+
 
 
     
@@ -2370,7 +2391,7 @@ and should be relatively unsurprising for most use cases.</li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 06/02/2019
+        <i class='fa fa-calendar'></i> Last update on 11/02/2019
     </div>
     
 

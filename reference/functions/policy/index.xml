@@ -24,6 +24,19 @@ Header: &amp;lt;outcome/std_outcome.hpp&amp;gt;, &amp;lt;outcome/boost_outcome.h
     </item>
     
     <item>
+      <title>`decltype(auto) error_code(T &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/policy/error_code/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/policy/error_code/</guid>
+      <description>Extracts a boost::system::error_code or  std::error_code from the input via ADL discovery of a suitable make_error_code(T) function.
+Overridable: Argument dependent lookup.
+Requires: Always available.
+Namespace: OUTCOME_V2_NAMESPACE::policy
+Header: &amp;lt;outcome/std_result.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
       <title>`decltype(auto) exception_ptr(T &amp;&amp;)`</title>
       <link>https://ned14.github.io/outcome/reference/functions/policy/exception_ptr/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
