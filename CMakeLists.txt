@@ -176,7 +176,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   # Add in the documentation snippets
   foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
     if(feature STREQUAL cxx_std_17)
-      file(GLOB_RECURSE example_srcs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+      file(GLOB example_srcs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
            "${CMAKE_CURRENT_SOURCE_DIR}/doc/src/snippets/*.c"
            "${CMAKE_CURRENT_SOURCE_DIR}/doc/src/snippets/*.cpp"
            )
