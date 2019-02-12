@@ -7,7 +7,7 @@ Outcome has had an interesting history, and it is worth summarising it here to s
 Boost library comes to life. The following recollections are by Niall Douglas, and may be
 faulty due to his aging memory.
 
-{{<if_boost "graph.png">}}
+{{<if_boost "/history/graph.png">}}
 {{<mermaid>}}
 gantt
   dateFormat YYYY-MM

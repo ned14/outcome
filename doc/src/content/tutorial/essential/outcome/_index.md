@@ -25,7 +25,7 @@ users if you deviate significantly from this convention.
 
 Consider a program consisting of three layers:
 
-{{<if_boost "layer_chart.gif">}}
+{{<if_boost "/tutorial/essential/outcome/layer_chart.gif">}}
 {{<mermaid>}}
 graph BT
     L3["Layer3"]

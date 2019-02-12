@@ -5,86 +5,10 @@ weight = 30
 
 {{% toc %}}
 
-## Can I use Outcome to write zero overhead deterministic exceptions as is proposed to enter C++ 23?
-
-Technically yes:
-
-```c++
-// Switch this to 0 if you have deterministic exceptions support in your compiler
-#define OUTCOME_DETERMINISTIC_EXCEPTIONS_USE_EMULATION 1
-
-#include "outcome/try.hpp"
-#include "outcome/experimental/status_result.hpp"
-
-/*! Declare an API which throws a deterministic exception. Will compile into
-deterministic exceptions, or an emulation.
-*/
-#if OUTCOME_DETERMINISTIC_EXCEPTIONS_USE_EMULATION
-#define OUTCOME_THROWS_API(rettype, errtype, ...) ::OUTCOME_V2_NAMESPACE::experimental::status_result<rettype, errtype> __VA_ARGS__ noexcept
-#else
-#define OUTCOME_THROWS_API(rettype, errtype, ...) rettype __VA_ARGS__ throws(errtype)
-#endif
-
-/*! Declare an API which deterministically throws the default std::error.
-Will compile into deterministic exceptions, or an emulation.
-*/
-#if OUTCOME_DETERMINISTIC_EXCEPTIONS_USE_EMULATION
-#define OUTCOME_THROWS_ERROR_API(rettype, ...) ::OUTCOME_V2_NAMESPACE::experimental::status_result<rettype, ::SYSTEM_ERROR2_NAMESPACE::error> __VA_ARGS__ noexcept
-#else
-#define OUTCOME_THROWS_ERROR_API(rettype, ...) rettype __VA_ARGS__ throws(std::error)
-#endif
-
-/*! Throws a deterministic exception. Will compile into deterministic exceptions,
-or an emulation.
-*/
-#if OUTCOME_DETERMINISTIC_EXCEPTIONS_USE_EMULATION
-#define OUTCOME_THROW(...) return ::OUTCOME_V2_NAMESPACE::failure(__VA_ARGS__)
-#else
-#define OUTCOME_THROW(...) throw(__VA_ARGS__)
-#endif
-
-/*! Call an API. Will compile into deterministic exceptions, or an emulation.
-*/
-#if OUTCOME_DETERMINISTIC_EXCEPTIONS_USE_EMULATION
-#define OUTCOME_CALL_API(...) OUTCOME_TRY(...)
-#else
-#define OUTCOME_CALL_API(...) (__VA_ARGS__)
-#endif
-
-/*! Catch any deterministic exceptions thrown by an expression into a ValueOrError
-concept matching type.
-*/
-#if OUTCOME_DETERMINISTIC_EXCEPTIONS_USE_EMULATION
-#define OUTCOME_CATCH_EXPR(...) (...)
-#else
-#define OUTCOME_CATCH_EXPR(...) catch(__VA_ARGS__)
-#endif
-```
-
-You would then have to write your code in this quite unnatural form:
-
-```c++
-// Throws ::SYSTEM_ERROR2_NAMESPACE::error, the proposed std::error for P0709 Zero
-// overhead deterministic exceptions
-OUTCOME_THROWS_ERROR_API(int, foo(double x))
-{
-  if(x < INT_MIN || x > INT_MAX)
-    OUTCOME_THROW(::SYSTEM_ERROR2_NAMESPACE::errc::result_out_of_range);
-  return static_cast<int>(x);
-}
-...
-int v = OUTCOME_CALL_API(foo(5.0));
-```
-
-As much as it is technically feasible, it is probably not worth inudating your
-C++ code with so many macros, especially as Outcome will continue to work just fine
-in future C++ compilers.
-
-
 ## Is Outcome safe to use in extern APIs?
 
 Outcome is specifically designed for use in the public interfaces of multi-million
-line codebases. Its layout is hard coded to:
+line codebases. `result`'s layout is hard coded to:
 
 ```c
 struct
@@ -95,62 +19,66 @@ struct
 };
 ```
 
-This is, of course, C-compatible and Outcome provides [a macro-based C interface](../tutorial/c-api)
-for C code needing to call `extern "C"` C++ functions returning a `result<T, EC>`.
+This is C-compatible if `T` and `EC` are C-compatible. {{% api "std::error_code" %}}
+is *probably* C-compatible, but its layout is not standardised (though there is a
+normative note in the standard about its layout). Hence Outcome cannot provide a
+C macro API for standard Outcome, but we can for [Experimental Outcome]({{< relref "/experimental/c-api" >}}).
 
 
 ## Does Outcome have a stable ABI and API?
 
-Until Outcome passes a second Boost peer review and enters Boost, no. Once into Boost,
-Outcome's ABI and API will be formally fixed as the v2 interface one year after its first Boost release.
-Thereafter the [ABI compliance checker](https://lvc.github.io/abi-compliance-checker/)
+Right now, no. Though the data layout shown above is not expected to change.
+
+Outcome's ABI and API will be formally fixed as **the** v2 interface approximatelyoneone year after its first Boost release. Thereafter the
+[ABI compliance checker](https://lvc.github.io/abi-compliance-checker/)
 will be run per-commit to ensure Outcome's ABI and API remains stable.
 
-Note that the stable ABI and API guarantee will only apply to standalone Outcome, not to Boost.Outcome.
-Boost.Outcome has dependencies on other parts of Boost which are not stable across releases.
+Note that the stable ABI and API guarantee will only apply to standalone
+Outcome, not to Boost.Outcome. Boost.Outcome has dependencies on other
+parts of Boost which are not stable across releases.
 
 
-## Why two types `result<>`  and `outcome<>` rather than just one?
+## Why two types `result<>`  and `outcome<>`, rather than just one?
 
-The two types represent slightly different things. Using two types allows expressing programmer's intentions more directly.
+`result` is the simple, success OR failure type.
 
-Function signature `result<T> f() noexcept` means that any failures in `f` are exclusively reported by returning an error code. 
+`outcome` extends `result` with a third state to transport, conventionally (but not necessarily) some sort of "abort" or "exceptional" state which a function can return to indicate that not only did the operation fail, but it did so *catastrophically* i.e. please abort any attempt to retry the operation.
 
-Similarly, signature `result<T> f()` means that in addition to the above, some failures in `f` are signalled by throwing exceptions. 
+A perfect alternative to using `outcome` is to throw a C++ exception for the abort code path, and indeed most programs ought to do exactly that instead of using `outcome`. However there are a number of use cases where choosing `outcome` shines:
 
-Now, signature `outcome<T> g() noexcept` means that in the lower layers of the implementation we have two kinds of libraries/modules: some report failures via error codes, and some by throwing exceptions. But at the level of our interface we do not want to throw exceptions; so we forward both error codes and exceptions unaltered. The callers can easily tell which type of failure reporting was chosen, and extract it appropriately.
-
-Additionally, `outcome<T>` can store both `EC` and `EP` at the same time. The caller of the function can choose whether to inspect the exception that provides more information and context, or to go with the error code which can be processed faster and in a more uniform way.
-
-This implies that `outcome<>` has different interface that allows you to ask whether we are storing an exception or an error code to rethrow the stored exception but to return by value the error code, etc.
-
-There is one additional possibility. When you know there will be no error codes returned -- only exceptions thrown, but at some layer you want to temporarily change the stack unwinding into returning failures through return values, you can use signature:
-
-```c++
-result<T, std::exception_ptr> f() noexcept;
-```
+1. Where C++ exceptions or RTTI is not available, but the ability to fail catastrophically without terminating the program is important.
+2. Where deterministic behaviour is required even in the catastrophic failure situation.
+3. In unit test suites of code using Outcome it is extremely convenient to accumulate test failures into an `outcome` for later reporting. A similar convenience applies to RPC situations, where C++ exception throws need to be accumulated for reporting back to the initiating endpoint.
+4. Where a function is "dual use deterministic" i.e. it can be used deterministically, in which case one switches control flow based on `.error()`, or it can be used non-deterministically by throwing an exception perhaps carrying a custom payload.
 
 
 ## How badly will including Outcome in my public interface affect compile times?
 
-Outcome is dependent on `<system_error>`, which unfortunately includes `<string>` and thus
-drags in quite a lot of other stuff. If your public interface already includes `<string>`,
-then the impact of including Outcome will be very low. If you do not include `<string>`,
+The quick answer is that it depends on how much convenience you want.
+
+The convenience header `<result.hpp>` is dependent on `<system_error>` or Boost.System, which unfortunately includes `<string>` and thus
+drags in quite a lot of other slow-to-parse stuff. If your public interface already includes `<string>`,
+then the impact of additionally including Outcome will be low. If you do not include `<string>`,
 unfortunately impact may be relatively quite high, depending on the total impact of your
 public interface files.
 
-Measures are being taken to remedy this situation however. The first is that C++ Modules
-will eliminate much of the impact of being dependent on `<string>`, and Outcome will make
-use of C++ Modules where enabled as soon as a compiler does not ICE on Outcome (i.e. Modules
-support is implemented specifically for the Microsoft compiler, but said compiler still
-internal compiler errors when attempting to create an Outcome Module. Microsoft are aware
-of the cause and hope to fix it within the next year or two).
+If you've been extremely careful to avoid ever including the most of the STL headers
+into your interfaces in order to maximise build performance, then `<basic_result.hpp>`
+can have as few dependencies as:
 
-Longer term, SG14 the WG21 study group for low latency/high performance C++ are working on
-a `<system_error2>` which remedies some of the problems in `<system_error>`. The dependency
-on `<string>` has been removed, and thus any `<system_error2>` would be considerably lower
-impact. An Outcome v3 is likely to support any proposed `<system_error2>`, and
-that is likely many years away yet as ISO standardisation takes time.
+1. `<cstdint>`
+2. `<initializer_list>`
+3. `<iosfwd>`
+4. `<new>`
+5. `<type_traits>`
+6. `<cstdio>`
+7. `<cstdlib>`
+8. `<cassert>`
+
+These, apart from `<iosfwd>`, tend to be very low build time impact in most standard
+library implementations.
+
+(See reference documentation for {{% api "basic_result<T, E, NoValuePolicy>" %}} for more detail.
 
 
 ## Is Outcome suitable for fixed latency/predictable execution coding such as for high frequency trading or audio?
@@ -161,15 +89,16 @@ Outcome works perfectly with C++ exceptions and RTTI globally disabled.
 
 Outcome's entire design premise is that its users are happy to exchange a small, predictable constant overhead
 during successful code paths, in exchange for completely predictable failure code paths.
+
 In contrast, table-based exception handling gives zero run time overhead for the
 successful code path, and completely unpredictable (and very expensive) overhead
 for failure code paths.
 
-For code where predictability of execution no matter the code path is paramount,
+For code where predictability of execution, no matter the code path, is paramount,
 writing all your code to use Outcome is not a bad place to start. Obviously enough,
 do choose a non-throwing policy when configuring `outcome` or `result` such as
-`policy::all_narrow` to guarantee that exceptions can never be thrown by Outcome
-(or use the convenience typedef for `result`, `unchecked` which uses `policy::all_narrow`).
+{{% api "all_narrow" %}} to guarantee that exceptions can never be thrown by Outcome
+(or use the convenience typedef for `result`, {{% api "unchecked<T, E = varies>" %}} which uses `policy::all_narrow`).
 
 
 ## What kind of performance benefits will using Outcome in my code bring?
