@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-12T14:54:49 UTC">
+<meta name="revised" content="2019-02-12T16:44:53 UTC">
 <title>Frequently asked questions :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2373,7 +2373,8 @@ C macro API for standard Outcome, but we can for <a href="/outcome/experimental/
 
 <p>Right now, no. Though the data layout shown above is not expected to change.</p>
 
-<p>Outcome&rsquo;s ABI and API will be formally fixed as <strong>the</strong> v2 interface approximatelyoneone year after its first Boost release. Thereafter the
+<p>Outcome&rsquo;s ABI and API will be formally fixed as <strong>the</strong> v2 interface approximately
+one year after its first Boost release. Thereafter the
 <a href="https://lvc.github.io/abi-compliance-checker/">ABI compliance checker</a>
 will be run per-commit to ensure Outcome&rsquo;s ABI and API remains stable.</p>
 
@@ -2422,7 +2423,8 @@ can have as few dependencies as:</p>
 </ol>
 
 <p>These, apart from <code>&lt;iosfwd&gt;</code>, tend to be very low build time impact in most standard
-library implementations.</p>
+library implementations. If you include only <code>&lt;basic_result.hpp&gt;</code>, and manually configure
+<code>basic_result&lt;&gt;</code> by hand, compile time impact will be minimised.</p>
 
 <p>(See reference documentation for <a href="/outcome/reference/types/basic_result/" class="api-reference">basic_result&lt;T, E, NoValuePolicy&gt;</a> for more detail.</p>
 

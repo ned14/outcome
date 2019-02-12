@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-12T14:54:55 UTC">
+<meta name="revised" content="2019-02-12T16:45:01 UTC">
 <title>`const error_type &amp;assume_error() const &amp; noexcept` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2450,7 +2450,9 @@
     
     <p>Narrow contract const lvalue reference observer of the stored error. <code>NoValuePolicy::narrow_error_check()</code> is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless <code>NoValuePolicy::narrow_error_check()</code> does that.</p>
 
-<p><em>Requires</em>: <code>error_type</code> to not be <code>void</code>, otherwise return type is <code>void</code>.</p>
+<p>Note that if <code>error_type</code> is <code>void</code>, only a <code>const</code> overload returning <code>void</code> is present.</p>
+
+<p><em>Requires</em>: Always available.</p>
 
 <p><em>Complexity</em>: Depends on <code>NoValuePolicy::narrow_error_check()</code>.</p>
 
@@ -2477,7 +2479,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 31/01/2019
+        <i class='fa fa-calendar'></i> Last update on 12/02/2019
     </div>
     
 

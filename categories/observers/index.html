@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-12T14:54:59 UTC">
+<meta name="revised" content="2019-02-12T16:45:06 UTC">
 <title>Observers :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2533,7 +2533,8 @@ Guarantees: Never throws an exception. <a class="read-more" href="/outcome/refer
     </header>
     <section class="post-excerpt">
         <p>Narrow contract const rvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_error_check().
 Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/reference/types/basic_outcome/assume_error_rvalue_const/">&raquo;</a></p>
     </section>
@@ -2580,7 +2581,7 @@ Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/re
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 19/01/2019
+        <i class='fa fa-calendar'></i> Last update on 12/02/2019
     </div>
     
 

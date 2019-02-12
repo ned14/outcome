@@ -124,7 +124,8 @@ Guarantees: Never throws an exception.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_error_rvalue_const/</guid>
       <description>Narrow contract const rvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_error_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -136,7 +137,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_rvalue_const/</guid>
       <description>Narrow contract const rvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_error_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -148,7 +150,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/error_rvalue_const/</guid>
       <description>Wide contract const rvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_error_check().
 Guarantees: None.</description>
     </item>
@@ -160,7 +163,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/error_rvalue_const/</guid>
       <description>Wide contract const rvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_error_check().
 Guarantees: None.</description>
     </item>
@@ -172,7 +176,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_error_lvalue_const/</guid>
       <description>Narrow contract const lvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_error_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -184,7 +189,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_lvalue_const/</guid>
       <description>Narrow contract const lvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_error_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -196,7 +202,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/error_lvalue_const/</guid>
       <description>Wide contract const lvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_error_check().
 Guarantees: None.</description>
     </item>
@@ -208,7 +215,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/error_lvalue_const/</guid>
       <description>Wide contract const lvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_error_check().
 Guarantees: None.</description>
     </item>
@@ -220,7 +228,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_exception_rvalue_const/</guid>
       <description>Narrow contract const rvalue reference observer of the stored exception. NoValuePolicy::narrow_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_exception_check() does that.
-Requires: exception_type to not be void, otherwise return type is void.
+Note that if exception_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_exception_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -232,7 +241,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/exception_rvalue_const/</guid>
       <description>Wide contract const rvalue reference observer of the stored exception. NoValuePolicy::wide_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs if NoValuePolicy::wide_exception_check() returns.
-Requires: exception_type to not be void, otherwise return type is void.
+Note that if exception_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_exception_check().
 Guarantees: None.</description>
     </item>
@@ -244,7 +254,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_exception_lvalue_const/</guid>
       <description>Narrow contract const lvalue reference observer of the stored exception. NoValuePolicy::narrow_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_exception_check() does that.
-Requires: exception_type to not be void, otherwise return type is void.
+Note that if exception_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_exception_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -256,7 +267,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/exception_lvalue_const/</guid>
       <description>Wide contract const lvalue reference observer of the stored exception. NoValuePolicy::wide_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs if NoValuePolicy::wide_exception_check() returns.
-Requires: exception_type to not be void, otherwise return type is void.
+Note that if exception_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_exception_check().
 Guarantees: None.</description>
     </item>
@@ -268,7 +280,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_value_rvalue_const/</guid>
       <description>Narrow contract const rvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_value_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -280,7 +293,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_rvalue_const/</guid>
       <description>Narrow contract const rvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_value_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -292,7 +306,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/value_rvalue_const/</guid>
       <description>Wide contract const rvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_value_check().
 Guarantees: None.</description>
     </item>
@@ -304,7 +319,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/value_rvalue_const/</guid>
       <description>Wide contract const rvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_value_check().
 Guarantees: None.</description>
     </item>
@@ -316,7 +332,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_value_lvalue_const/</guid>
       <description>Narrow contract const lvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_value_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -328,7 +345,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_lvalue_const/</guid>
       <description>Narrow contract const lvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_value_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -340,7 +358,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/value_lvalue_const/</guid>
       <description>Wide contract const lvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_value_check().
 Guarantees: None.</description>
     </item>
@@ -352,7 +371,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/value_lvalue_const/</guid>
       <description>Wide contract const lvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_value_check().
 Guarantees: None.</description>
     </item>
@@ -364,7 +384,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_error_rvalue/</guid>
       <description>Narrow contract rvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_error_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -376,7 +397,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_rvalue/</guid>
       <description>Narrow contract rvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_error_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -388,7 +410,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/error_rvalue/</guid>
       <description>Wide contract rvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_error_check().
 Guarantees: None.</description>
     </item>
@@ -400,7 +423,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/error_rvalue/</guid>
       <description>Wide contract rvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_error_check().
 Guarantees: None.</description>
     </item>
@@ -412,7 +436,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_error_lvalue/</guid>
       <description>Narrow contract lvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_error_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -424,7 +449,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_error_lvalue/</guid>
       <description>Narrow contract lvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_error_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -436,7 +462,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/error_lvalue/</guid>
       <description>Wide contract lvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_error_check().
 Guarantees: None.</description>
     </item>
@@ -448,7 +475,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/error_lvalue/</guid>
       <description>Wide contract lvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_error_check().
 Guarantees: None.</description>
     </item>
@@ -460,7 +488,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_exception_rvalue/</guid>
       <description>Narrow contract rvalue reference observer of the stored exception. NoValuePolicy::narrow_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_exception_check() does that.
-Requires: exception_type to not be void, otherwise return type is void.
+Note that if exception_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_exception_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -472,7 +501,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/exception_rvalue/</guid>
       <description>Wide contract rvalue reference observer of the stored exception. NoValuePolicy::wide_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs if NoValuePolicy::wide_exception_check() returns.
-Requires: exception_type to not be void, otherwise return type is void.
+Note that if exception_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_exception_check().
 Guarantees: None.</description>
     </item>
@@ -484,7 +514,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_exception_lvalue/</guid>
       <description>Narrow contract lvalue reference observer of the stored exception. NoValuePolicy::narrow_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_exception_check() does that.
-Requires: exception_type to not be void, otherwise return type is void.
+Note that if exception_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_exception_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -496,7 +527,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/exception_lvalue/</guid>
       <description>Wide contract lvalue reference observer of the stored exception. NoValuePolicy::wide_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs if NoValuePolicy::wide_exception_check() returns.
-Requires: exception_type to not be void, otherwise return type is void.
+Note that if exception_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_exception_check().
 Guarantees: None.</description>
     </item>
@@ -639,7 +671,8 @@ Guarantees: Never throws an exception.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_value_rvalue/</guid>
       <description>Narrow contract rvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_value_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -651,7 +684,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_rvalue/</guid>
       <description>Narrow contract rvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_value_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -663,7 +697,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/value_rvalue/</guid>
       <description>Wide contract rvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_value_check().
 Guarantees: None.</description>
     </item>
@@ -675,7 +710,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/value_rvalue/</guid>
       <description>Wide contract rvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_value_check().
 Guarantees: None.</description>
     </item>
@@ -687,7 +723,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_value_lvalue/</guid>
       <description>Narrow contract lvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_value_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -699,7 +736,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/assume_value_lvalue/</guid>
       <description>Narrow contract lvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_value_check().
 Guarantees: An exception is never thrown.</description>
     </item>
@@ -711,7 +749,8 @@ Guarantees: An exception is never thrown.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/value_lvalue/</guid>
       <description>Wide contract lvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_value_check().
 Guarantees: None.</description>
     </item>
@@ -723,7 +762,8 @@ Guarantees: None.</description>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/value_lvalue/</guid>
       <description>Wide contract lvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_value_check().
 Guarantees: None.</description>
     </item>

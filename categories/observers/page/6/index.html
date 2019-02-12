@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-12T14:55:00 UTC">
+<meta name="revised" content="2019-02-12T16:45:06 UTC">
 <title>Observers :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2393,7 +2393,8 @@ Guarantees: Never throws an exception. <a class="read-more" href="/outcome/refer
     </header>
     <section class="post-excerpt">
         <p>Narrow contract rvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_value_check().
 Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/reference/types/basic_outcome/assume_value_rvalue/">&raquo;</a></p>
     </section>
@@ -2413,7 +2414,8 @@ Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/re
     </header>
     <section class="post-excerpt">
         <p>Narrow contract rvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_value_check().
 Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/reference/types/basic_result/assume_value_rvalue/">&raquo;</a></p>
     </section>
@@ -2433,7 +2435,8 @@ Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/re
     </header>
     <section class="post-excerpt">
         <p>Wide contract rvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_value_check().
 Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_outcome/value_rvalue/">&raquo;</a></p>
     </section>
@@ -2453,7 +2456,8 @@ Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_outc
     </header>
     <section class="post-excerpt">
         <p>Wide contract rvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_value_check().
 Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_result/value_rvalue/">&raquo;</a></p>
     </section>
@@ -2473,7 +2477,8 @@ Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_resu
     </header>
     <section class="post-excerpt">
         <p>Narrow contract lvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_value_check().
 Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/reference/types/basic_outcome/assume_value_lvalue/">&raquo;</a></p>
     </section>
@@ -2493,7 +2498,8 @@ Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/re
     </header>
     <section class="post-excerpt">
         <p>Narrow contract lvalue reference observer of any value present. NoValuePolicy::narrow_value_check() is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however NoValuePolicy::narrow_value_check() can do something to avoid that.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_value_check().
 Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/reference/types/basic_result/assume_value_lvalue/">&raquo;</a></p>
     </section>
@@ -2513,7 +2519,8 @@ Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/re
     </header>
     <section class="post-excerpt">
         <p>Wide contract lvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_value_check().
 Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_outcome/value_lvalue/">&raquo;</a></p>
     </section>
@@ -2533,7 +2540,8 @@ Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_outc
     </header>
     <section class="post-excerpt">
         <p>Wide contract lvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
-Requires: value_type to not be void, otherwise return type is void.
+Note that if value_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_value_check().
 Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_result/value_lvalue/">&raquo;</a></p>
     </section>

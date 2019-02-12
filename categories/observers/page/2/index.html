@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-12T14:54:59 UTC">
+<meta name="revised" content="2019-02-12T16:45:06 UTC">
 <title>Observers :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2355,7 +2355,8 @@
     </header>
     <section class="post-excerpt">
         <p>Narrow contract const rvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_error_check().
 Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/reference/types/basic_result/assume_error_rvalue_const/">&raquo;</a></p>
     </section>
@@ -2375,7 +2376,8 @@ Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/re
     </header>
     <section class="post-excerpt">
         <p>Wide contract const rvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_error_check().
 Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_outcome/error_rvalue_const/">&raquo;</a></p>
     </section>
@@ -2395,7 +2397,8 @@ Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_outc
     </header>
     <section class="post-excerpt">
         <p>Wide contract const rvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_error_check().
 Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_result/error_rvalue_const/">&raquo;</a></p>
     </section>
@@ -2415,7 +2418,8 @@ Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_resu
     </header>
     <section class="post-excerpt">
         <p>Narrow contract const lvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_error_check().
 Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/reference/types/basic_outcome/assume_error_lvalue_const/">&raquo;</a></p>
     </section>
@@ -2435,7 +2439,8 @@ Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/re
     </header>
     <section class="post-excerpt">
         <p>Narrow contract const lvalue reference observer of the stored error. NoValuePolicy::narrow_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_error_check() does that.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_error_check().
 Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/reference/types/basic_result/assume_error_lvalue_const/">&raquo;</a></p>
     </section>
@@ -2455,7 +2460,8 @@ Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/re
     </header>
     <section class="post-excerpt">
         <p>Wide contract const lvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_error_check().
 Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_outcome/error_lvalue_const/">&raquo;</a></p>
     </section>
@@ -2475,7 +2481,8 @@ Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_outc
     </header>
     <section class="post-excerpt">
         <p>Wide contract const lvalue reference observer of the stored error. NoValuePolicy::wide_error_check() is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if NoValuePolicy::wide_error_check() returns.
-Requires: error_type to not be void, otherwise return type is void.
+Note that if error_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_error_check().
 Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_result/error_lvalue_const/">&raquo;</a></p>
     </section>
@@ -2495,7 +2502,8 @@ Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_resu
     </header>
     <section class="post-excerpt">
         <p>Narrow contract const rvalue reference observer of the stored exception. NoValuePolicy::narrow_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_exception_check() does that.
-Requires: exception_type to not be void, otherwise return type is void.
+Note that if exception_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_exception_check().
 Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/reference/types/basic_outcome/assume_exception_rvalue_const/">&raquo;</a></p>
     </section>
@@ -2515,7 +2523,8 @@ Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/re
     </header>
     <section class="post-excerpt">
         <p>Wide contract const rvalue reference observer of the stored exception. NoValuePolicy::wide_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs if NoValuePolicy::wide_exception_check() returns.
-Requires: exception_type to not be void, otherwise return type is void.
+Note that if exception_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::wide_exception_check().
 Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_outcome/exception_rvalue_const/">&raquo;</a></p>
     </section>
@@ -2535,7 +2544,8 @@ Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_outc
     </header>
     <section class="post-excerpt">
         <p>Narrow contract const lvalue reference observer of the stored exception. NoValuePolicy::narrow_exception_check() is first invoked, then the reference to the exception is returned. As a valid default constructed exception is always present, no undefined behaviour occurs unless NoValuePolicy::narrow_exception_check() does that.
-Requires: exception_type to not be void, otherwise return type is void.
+Note that if exception_type is void, only a const overload returning void is present.
+Requires: Always available.
 Complexity: Depends on NoValuePolicy::narrow_exception_check().
 Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/reference/types/basic_outcome/assume_exception_lvalue_const/">&raquo;</a></p>
     </section>
@@ -2585,7 +2595,7 @@ Guarantees: An exception is never thrown. <a class="read-more" href="/outcome/re
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 20/01/2019
+        <i class='fa fa-calendar'></i> Last update on 12/02/2019
     </div>
     
 

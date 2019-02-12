@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-12T14:54:54 UTC">
+<meta name="revised" content="2019-02-12T16:45:00 UTC">
 <title>`value_type &amp;&amp;assume_value() &amp;&amp; noexcept` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2429,7 +2429,9 @@
     
     <p>Narrow contract rvalue reference observer of any value present. <code>NoValuePolicy::narrow_value_check()</code> is first invoked, then the reference to the value is returned. The convention is that hard undefined behaviour occurs if no value is actually present, however <code>NoValuePolicy::narrow_value_check()</code> can do something to avoid that.</p>
 
-<p><em>Requires</em>: <code>value_type</code> to not be <code>void</code>, otherwise return type is <code>void</code>.</p>
+<p>Note that if <code>value_type</code> is <code>void</code>, only a <code>const</code> overload returning <code>void</code> is present.</p>
+
+<p><em>Requires</em>: Always available.</p>
 
 <p><em>Complexity</em>: Depends on <code>NoValuePolicy::narrow_value_check()</code>.</p>
 
@@ -2456,7 +2458,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 20/01/2019
+        <i class='fa fa-calendar'></i> Last update on 12/02/2019
     </div>
     
 
