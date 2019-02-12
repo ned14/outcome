@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-12T13:26:33 UTC">
+<meta name="revised" content="2019-02-12T14:12:45 UTC">
 <title>Frequently asked questions :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2345,7 +2345,7 @@
 <li><a href="#why-two-types-result-and-outcome-rather-than-just-one">Why two types <code>result&lt;&gt;</code>  and <code>outcome&lt;&gt;</code>, rather than just one?</a></li>
 <li><a href="#how-badly-will-including-outcome-in-my-public-interface-affect-compile-times">How badly will including Outcome in my public interface affect compile times?</a></li>
 <li><a href="#is-outcome-suitable-for-fixed-latency-predictable-execution-coding-such-as-for-high-frequency-trading-or-audio">Is Outcome suitable for fixed latency/predictable execution coding such as for high frequency trading or audio?</a></li>
-<li><a href="#what-kind-of-performance-benefits-will-using-outcome-in-my-code-bring">What kind of performance benefits will using Outcome in my code bring?</a></li>
+<li><a href="#what-kind-of-runtime-performance-impact-will-using-outcome-in-my-code-introduce">What kind of runtime performance impact will using Outcome in my code introduce?</a></li>
 <li><a href="#why-is-implicit-default-construction-disabled">Why is implicit default construction disabled?</a></li>
 <li><a href="#how-far-away-from-the-proposed-std-expected-t-e-is-outcome-s-checked-t-e">How far away from the proposed <code>std::expected&lt;T, E&gt;</code> is Outcome&rsquo;s <code>checked&lt;T, E&gt;</code>?</a></li>
 <li><a href="#why-doesn-t-outcome-duplicate-std-expected-t-e-s-design">Why doesn&rsquo;t Outcome duplicate <code>std::expected&lt;T, E&gt;</code>&rsquo;s design?</a></li>
@@ -2445,44 +2445,65 @@ do choose a non-throwing policy when configuring <code>outcome</code> or <code>r
 <a href="/outcome/reference/policies/all_narrow/" class="api-reference">all_narrow</a> to guarantee that exceptions can never be thrown by Outcome
 (or use the convenience typedef for <code>result</code>, <a href="/outcome/reference/aliases/unchecked/" class="api-reference">unchecked&lt;T, E = varies&gt;</a> which uses <code>policy::all_narrow</code>).</p>
 
-<h2 id="what-kind-of-performance-benefits-will-using-outcome-in-my-code-bring">What kind of performance benefits will using Outcome in my code bring?</h2>
+<h2 id="what-kind-of-runtime-performance-impact-will-using-outcome-in-my-code-introduce">What kind of runtime performance impact will using Outcome in my code introduce?</h2>
 
 <p>It is very hard to say anything definitive about performance impacts in codebases one
 has never seen. Each codebase is unique. However to come up with some form of measure,
-we timed returning an error via each of the main mechanisms, doing so over ten stack
-frames. A stack frame is defined to be something called by the compiler whilst
-unwinding the stack between the point of returning the error and the thing which handles
-the error, so for example ten stack allocated objects might be destructed, or ten levels
+we timed traversing ten stack frames via each of the main mechanisms, including the
+&ldquo;do nothing&rdquo; (null) case.</p>
+
+<p>A stack frame is defined to be something called by the compiler whilst
+unwinding the stack between the point of return in the ultimate callee and the base
+caller, so for example ten stack allocated objects might be destructed, or ten levels
 of stack depth might be unwound. This is not a particularly realistic test, but it
 should at least give one an idea of the performance impact of returning Outcome&rsquo;s
 <code>result</code> or <code>outcome</code> over say returning a plain integer, or throwing an exception.</p>
 
 <figure>
     <img src="/outcome/faq/results_log.png"/> <figcaption>
-            <h4>Log graph comparing GCC 7.2, clang 5.0, Visual Studio 2017.5 and XCode 8.2</h4>
+            <h4>Log graph comparing GCC 7.4, clang 8.0 and Visual Studio 2017.9 on x64, for exceptions-globally-disabled, ordinary and link-time-optimised build configurations.</h4>
         </figcaption>
 </figure>
 
 <p>As you can see, throwing and catching an exception is
 expensive on table-based exception handling implementations such as these, anywhere
-between 16,000 and 36,000 CPU cycles. Simple integer returns are always going to be
-the fastest as they do the least work, and that costs 90 to 100 CPU cycles.</p>
+between 26,000 and 43,000 CPU cycles. And this is the <em>hot path</em> situation, this
+benchmark is a loop around hot cached code. If the tables are paged out onto storage,
+you are talking about <strong>millions</strong> of CPU cycles.</p>
 
-<p>Note that returning a <code>result&lt;int, std::error_code&gt;</code> with an int (result-error-value)
-is no additional runtime overhead over returning a naked int on most compilers.</p>
+<p>Simple integer returns (i.e. do nothing null case)
+are always going to be the fastest as they do the least work, and that costs 80 to 90
+CPU cycles on this Intel Skylake CPU.</p>
 
-<p>Returning a <code>result&lt;int, std::error_code&gt;</code> with an error code (result-error-error)
-is no additional runtime overhead over returning a naked int on most compilers.</p>
+<p>Note that returning a <code>result&lt;int, std::error_code&gt;</code> with a &ldquo;success (error code)&rdquo;
+is no more than 5% added runtime overhead over returning a naked int on GCC and clang. On MSVC
+it costs an extra 20% or so, mainly due to poor code optimisation in the VS2017.9 compiler. Note that &ldquo;success
+(experimental status code)&rdquo; optimises much better, and has almost no overhead over a
+naked int.</p>
+
+<p>Returning a <code>result&lt;int, std::error_code&gt;</code> with a &ldquo;failure (error code)&rdquo;
+is less than 5% runtime overhead over returning a success on GCC, clang and MSVC.</p>
 
 <p>You might wonder what happens if type <code>E</code> has a non-trivial destructor, thus making the
 <code>result&lt;T, E&gt;</code> have a non-trivial destructor? We tested <code>E = std::exception_ptr</code> and
-found no performance difference to <code>E = std::error_code</code> for returning a value. Returning an error
-was obviously much slower at anywhere between 300 and 1,500 CPU cycles due to returning
-an exception pointer being at least two atomic operations per stack frame, but that is
+found less than a 5% overhead to <code>E = std::error_code</code> for returning success. Returning a failure
+was obviously much slower at anywhere between 300 and 1,100 CPU cycles, due to the
+dynamic memory allocation and free of the exception ptr, plus at least two atomic operations per stack frame, but that is
 still two orders of magnitude better than throwing and catching an exception.</p>
 
 <p>We conclude that if failure is anything but extremely rare in your C++ codebase,
-using Outcome instead of throwing and catching exceptions ought to be quicker overall.</p>
+using Outcome instead of throwing and catching exceptions ought to be quicker overall:</p>
+
+<ul>
+<li>Experimental Outcome is statistically indistinguishable from the null case, for
+both returning success and failure, on all compilers.</li>
+<li>Standard Outcome is less than 5%
+worse than the null case for returning successes on GCC and clang, and less than 10% worse than
+the null case for returning failures on GCC and clang.</li>
+<li>Standard Outcome optimises
+poorly on VS2017.9, indeed markedly worse than on previous point releases, so let&rsquo;s
+hope that Microsoft fix that soon. It currently has a less than 20% overhead on the null case.</li>
+</ul>
 
 <h2 id="why-is-implicit-default-construction-disabled">Why is implicit default construction disabled?</h2>
 
@@ -2519,8 +2540,11 @@ of these forms as is the most appropriate for the use case:</p>
 
 <h2 id="how-far-away-from-the-proposed-std-expected-t-e-is-outcome-s-checked-t-e">How far away from the proposed <code>std::expected&lt;T, E&gt;</code> is Outcome&rsquo;s <code>checked&lt;T, E&gt;</code>?</h2>
 
-<p>Not far, in fact after the Boost.Outcome peer review in May 2017, Expected moved
-much closer to Outcome. Here are the remaining differences which represent the
+<p>Not far, in fact after the first Boost.Outcome peer review in May 2017, Expected moved
+much closer to Outcome, and Outcome deliberately provides <a href="/outcome/reference/aliases/checked/" class="api-reference">checked&lt;T, E = varies&gt;</a>
+as a semantic equivalent.</p>
+
+<p>Here are the remaining differences which represent the
 divergence of consensus opinion between the Boost peer review and WG21 on the proper
 design for this object:</p>
 
@@ -2543,13 +2567,14 @@ Expected permits <code>T</code> and <code>E</code> to be the same.</li>
 <ul>
 <li><code>checked&lt;T, E&gt;</code> does not provide <code>operator*()</code> nor <code>operator-&gt;</code></li>
 <li><code>checked&lt;T, E&gt;</code> <code>.error()</code> is wide (i.e. throws on no-value) like <code>.value()</code>.
-Expected&rsquo;s <code>.error()</code> is narrow (UB on no-error). (<code>checked&lt;T, E&gt;</code> provides
-<code>.assume_value()</code> and <code>.assume_error()</code> for narrow (UB causing) observers)</li>
+Expected&rsquo;s <code>.error()</code> is narrow (UB on no-error). [<code>checked&lt;T, E&gt;</code> provides
+<code>.assume_value()</code> and <code>.assume_error()</code> for narrow (UB causing) observers].</li>
 </ul></li>
 <li><code>checked&lt;T, E&gt;</code> uses <code>success&lt;T&gt;</code> and <code>failure&lt;E&gt;</code> type sugars for disambiguation.
 Expected uses <code>unexpected&lt;E&gt;</code> only.</li>
 <li><code>checked&lt;T, E&gt;</code> requires <code>E</code> to be default constructible.</li>
-<li><code>checked&lt;T, E&gt;</code> defaults <code>E</code> to <code>std::error_code</code>. Expected does not default <code>E</code>.</li>
+<li><code>checked&lt;T, E&gt;</code> defaults <code>E</code> to <code>std::error_code</code> or <code>boost::system::error_code</code>.
+Expected does not default <code>E</code>.</li>
 </ol>
 
 <p>In fact, the two are sufficiently close in design that a highly conforming <code>expected&lt;T, E&gt;</code>
@@ -2672,7 +2697,7 @@ during use. This results in tighter, less verbose, more succinct code. The cost 
 learning curve and more complex mental model than when programming with Expected.</p></li>
 
 <li><p>Outcome has facilities to make easier interoperation between multiple third
-party libraries each using incommensurate Outcome configurations. Expected does
+party libraries each using incommensurate Outcome (or Expected) configurations. Expected does
 not do any of this, but subsequent WG21 papers do propose various interoperation
 mechanisms, <a href="https://wg21.link/P0786">one of which</a> Outcome implements so code using Expected will seamlessly
 interoperate with code using Outcome.</p></li>
@@ -2700,7 +2725,7 @@ interoperate with code using Outcome.</p></li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 11/02/2019
+        <i class='fa fa-calendar'></i> Last update on 12/02/2019
     </div>
     
 
