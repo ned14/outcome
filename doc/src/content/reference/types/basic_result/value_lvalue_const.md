@@ -7,7 +7,9 @@ weight = 650
 
 Wide contract const lvalue reference observer of any value present. `NoValuePolicy::wide_value_check()` is first invoked, then the reference to the value is returned.
 
-*Requires*: `value_type` to not be `void`, otherwise return type is `void`.
+Note that if `value_type` is `void`, only a `const` overload returning `void` is present.
+
+*Requires*: Always available.
 
 *Complexity*: Depends on `NoValuePolicy::wide_value_check()`.
 

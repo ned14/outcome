@@ -29,7 +29,8 @@ C macro API for standard Outcome, but we can for [Experimental Outcome]({{< relr
 
 Right now, no. Though the data layout shown above is not expected to change.
 
-Outcome's ABI and API will be formally fixed as **the** v2 interface approximatelyoneone year after its first Boost release. Thereafter the
+Outcome's ABI and API will be formally fixed as **the** v2 interface approximately
+one year after its first Boost release. Thereafter the
 [ABI compliance checker](https://lvc.github.io/abi-compliance-checker/)
 will be run per-commit to ensure Outcome's ABI and API remains stable.
 
@@ -76,7 +77,8 @@ can have as few dependencies as:
 8. `<cassert>`
 
 These, apart from `<iosfwd>`, tend to be very low build time impact in most standard
-library implementations.
+library implementations. If you include only `<basic_result.hpp>`, and manually configure
+`basic_result<>` by hand, compile time impact will be minimised.
 
 (See reference documentation for {{% api "basic_result<T, E, NoValuePolicy>" %}} for more detail.
 

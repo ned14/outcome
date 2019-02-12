@@ -7,7 +7,9 @@ weight = 740
 
 Wide contract lvalue reference observer of the stored error. `NoValuePolicy::wide_error_check()` is first invoked, then the reference to the error is returned. As a valid default constructed error is always present, no undefined behaviour occurs if `NoValuePolicy::wide_error_check()` returns.
 
-*Requires*: `error_type` to not be `void`, otherwise return type is `void`.
+Note that if `error_type` is `void`, only a `const` overload returning `void` is present.
+
+*Requires*: Always available.
 
 *Complexity*: Depends on `NoValuePolicy::wide_error_check()`.
 
