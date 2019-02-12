@@ -119,7 +119,7 @@ else:
         ('gcc74', r'g++-7 -std=c++17 -O3 -g -o %s -I../..'),
         ('gcc74-lto', r'g++-7 -std=c++17 -O3 -g -flto -o %s -I../..'),
         ('clang80', r'clang++-8 -std=c++17 -O3 -g -o %s -I../..'),
-        ('clang80-lto', r'clang++-8 -std=c++17 -O3 -g -flto -o %s'),  # not working yet
+        #('clang80-lto', r'clang++-8 -std=c++17 -O3 -g -flto -o %s'),  not working yet
     ]
 
 SOURCES=10
