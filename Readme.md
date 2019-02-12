@@ -60,6 +60,7 @@ useful to include into your build.
  - [X] Reduce depth of Boost.Outcome front index.
  - [X] Test with LLFIO et al, make sure everything still works.
  - [ ] Fix Boost.Outcome, which has become broken. Index generation is broken.
+   - [ ] Read through all the Boost.Outcome docs, make sure they render okay.
 
 ## Commits and tags in this git repository can be verified using:
 <pre>
