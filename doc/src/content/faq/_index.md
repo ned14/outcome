@@ -101,40 +101,59 @@ do choose a non-throwing policy when configuring `outcome` or `result` such as
 (or use the convenience typedef for `result`, {{% api "unchecked<T, E = varies>" %}} which uses `policy::all_narrow`).
 
 
-## What kind of performance benefits will using Outcome in my code bring?
+## What kind of runtime performance impact will using Outcome in my code introduce?
 
 It is very hard to say anything definitive about performance impacts in codebases one
 has never seen. Each codebase is unique. However to come up with some form of measure,
-we timed returning an error via each of the main mechanisms, doing so over ten stack
-frames. A stack frame is defined to be something called by the compiler whilst
-unwinding the stack between the point of returning the error and the thing which handles
-the error, so for example ten stack allocated objects might be destructed, or ten levels
+we timed traversing ten stack frames via each of the main mechanisms, including the
+"do nothing" (null) case.
+
+A stack frame is defined to be something called by the compiler whilst
+unwinding the stack between the point of return in the ultimate callee and the base
+caller, so for example ten stack allocated objects might be destructed, or ten levels
 of stack depth might be unwound. This is not a particularly realistic test, but it
 should at least give one an idea of the performance impact of returning Outcome's
 `result` or `outcome` over say returning a plain integer, or throwing an exception.
 
-{{% figure src="/faq/results_log.png" title="Log graph comparing GCC 7.2, clang 5.0, Visual Studio 2017.5 and XCode 8.2" %}}
+{{% figure src="/faq/results_log.png" title="Log graph comparing GCC 7.4, clang 8.0 and Visual Studio 2017.9 on x64, for exceptions-globally-disabled, ordinary and link-time-optimised build configurations." %}}
 
 As you can see, throwing and catching an exception is
 expensive on table-based exception handling implementations such as these, anywhere
-between 16,000 and 36,000 CPU cycles. Simple integer returns are always going to be
-the fastest as they do the least work, and that costs 90 to 100 CPU cycles.
+between 26,000 and 43,000 CPU cycles. And this is the *hot path* situation, this
+benchmark is a loop around hot cached code. If the tables are paged out onto storage,
+you are talking about **millions** of CPU cycles.
 
-Note that returning a `result<int, std::error_code>` with an int (result-error-value)
-is no additional runtime overhead over returning a naked int on most compilers.
+Simple integer returns (i.e. do nothing null case)
+are always going to be the fastest as they do the least work, and that costs 80 to 90
+CPU cycles on this Intel Skylake CPU.
 
-Returning a `result<int, std::error_code>` with an error code (result-error-error)
-is no additional runtime overhead over returning a naked int on most compilers.
+Note that returning a `result<int, std::error_code>` with a "success (error code)"
+is no more than 5% added runtime overhead over returning a naked int on GCC and clang. On MSVC
+it costs an extra 20% or so, mainly due to poor code optimisation in the VS2017.9 compiler. Note that "success
+(experimental status code)" optimises much better, and has almost no overhead over a
+naked int.
+
+Returning a `result<int, std::error_code>` with a "failure (error code)"
+is less than 5% runtime overhead over returning a success on GCC, clang and MSVC.
 
 You might wonder what happens if type `E` has a non-trivial destructor, thus making the
 `result<T, E>` have a non-trivial destructor? We tested `E = std::exception_ptr` and
-found no performance difference to `E = std::error_code` for returning a value. Returning an error
-was obviously much slower at anywhere between 300 and 1,500 CPU cycles due to returning
-an exception pointer being at least two atomic operations per stack frame, but that is
+found less than a 5% overhead to `E = std::error_code` for returning success. Returning a failure
+was obviously much slower at anywhere between 300 and 1,100 CPU cycles, due to the
+dynamic memory allocation and free of the exception ptr, plus at least two atomic operations per stack frame, but that is
 still two orders of magnitude better than throwing and catching an exception.
 
 We conclude that if failure is anything but extremely rare in your C++ codebase,
-using Outcome instead of throwing and catching exceptions ought to be quicker overall.
+using Outcome instead of throwing and catching exceptions ought to be quicker overall:
+
+- Experimental Outcome is statistically indistinguishable from the null case, for
+both returning success and failure, on all compilers.
+- Standard Outcome is less than 5%
+worse than the null case for returning successes on GCC and clang, and less than 10% worse than
+the null case for returning failures on GCC and clang.
+- Standard Outcome optimises
+poorly on VS2017.9, indeed markedly worse than on previous point releases, so let's
+hope that Microsoft fix that soon. It currently has a less than 20% overhead on the null case.
 
 
 ## Why is implicit default construction disabled?
@@ -171,8 +190,11 @@ of these forms as is the most appropriate for the use case:
 
 ## How far away from the proposed `std::expected<T, E>` is Outcome's `checked<T, E>`?
 
-Not far, in fact after the Boost.Outcome peer review in May 2017, Expected moved
-much closer to Outcome. Here are the remaining differences which represent the
+Not far, in fact after the first Boost.Outcome peer review in May 2017, Expected moved
+much closer to Outcome, and Outcome deliberately provides {{% api "checked<T, E = varies>" %}}
+as a semantic equivalent.
+
+Here are the remaining differences which represent the
 divergence of consensus opinion between the Boost peer review and WG21 on the proper
 design for this object:
 
@@ -192,12 +214,13 @@ Expected permits `T` and `E` to be the same.
 7. `checked<T, E>` models `std::variant<...>`. Expected models `std::optional<T>`. Thus:
    - `checked<T, E>` does not provide `operator*()` nor `operator->`
    - `checked<T, E>` `.error()` is wide (i.e. throws on no-value) like `.value()`.
-   Expected's `.error()` is narrow (UB on no-error). (`checked<T, E>` provides
-   `.assume_value()` and `.assume_error()` for narrow (UB causing) observers)
+   Expected's `.error()` is narrow (UB on no-error). [`checked<T, E>` provides
+   `.assume_value()` and `.assume_error()` for narrow (UB causing) observers].
 8. `checked<T, E>` uses `success<T>` and `failure<E>` type sugars for disambiguation.
 Expected uses `unexpected<E>` only.
 9. `checked<T, E>` requires `E` to be default constructible.
-10. `checked<T, E>` defaults `E` to `std::error_code`. Expected does not default `E`.
+10. `checked<T, E>` defaults `E` to `std::error_code` or `boost::system::error_code`.
+Expected does not default `E`.
 
 In fact, the two are sufficiently close in design that a highly conforming `expected<T, E>`
 can be implemented by wrapping up `checked<T, E>` with the differing functionality:
@@ -228,7 +251,7 @@ during use. This results in tighter, less verbose, more succinct code. The cost 
 learning curve and more complex mental model than when programming with Expected.
 
 5. Outcome has facilities to make easier interoperation between multiple third
-party libraries each using incommensurate Outcome configurations. Expected does
+party libraries each using incommensurate Outcome (or Expected) configurations. Expected does
 not do any of this, but subsequent WG21 papers do propose various interoperation
 mechanisms, [one of which](https://wg21.link/P0786) Outcome implements so code using Expected will seamlessly
 interoperate with code using Outcome.
