@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-13T20:36:32 UTC">
+<meta name="revised" content="2019-02-13T21:07:03 UTC">
 <title>ASIO/Networking TS :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2337,11 +2337,11 @@
     
     
 
-<p><em>Thanks to <a href="https://github.com/cstratopoulos">Christos Stratopoulos</a> for this recipe.</em></p>
+<p><em>Thanks to <a href="https://github.com/cstratopoulos">Christos Stratopoulos</a> for this Outcome recipe.</em></p>
 
 <hr />
 
-<h3 id="introduction">Introduction</h3>
+<h3 id="use-case">Use case</h3>
 
 <p><a href="https://www.boost.org/doc/libs/develop/doc/html/boost_asio.html">Boost.ASIO</a>
 and <a href="https://think-async.com/Asio/">standalone ASIO</a> provide the
@@ -2403,8 +2403,14 @@ so much boilerplate if you have a Coroutines supporting compiler:</p>
 </code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/boost-only/asio_integration.cpp#L67" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
-<p>However the default ASIO implementation appears to currently always throw exceptions
-from its Coroutines token implementation. This recipe fixes that:</p>
+<p>The default ASIO implementation always throws exceptions on failure through
+its coroutine token transformation. The <a href="https://www.boost.org/doc/libs/develop/doc/html/boost_asio/reference/experimental__redirect_error.html"><code>redirect_error</code></a>
+token transformation recovers the option to use the <code>error_code</code> interface,
+but it suffers from the <a href="/outcome/motivation/error_codes/">same drawbacks</a>
+that make pure error codes unappealing in the synchronous case.</p>
+
+<p>This recipe fixes that by making it possible for coroutinised
+i/o in ASIO to return a <code>result&lt;T&gt;</code>:</p>
 
 <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++">  <span class="c1">// Asynchronously read data, suspending this coroutine until completion,
 </span><span class="c1"></span>  <span class="c1">// returning the bytes of the data read into the result, or any failure.
@@ -2425,11 +2431,139 @@ from its Coroutines token implementation. This recipe fixes that:</p>
 
 <h3 id="implementation">Implementation</h3>
 
-<p>Todo</p>
+<div class="notices warning" ><p>The below involves a lot of ASIO voodoo. <strong>NO SUPPORT WILL BE GIVEN HERE FOR THE ASIO
+CODE BELOW</strong>. Please raise any questions or problems that you have with how to implement
+this sort of stuff in ASIO
+on <a href="https://stackoverflow.com/questions/tagged/boost-asio">Stackoverflow #boost-asio</a>.</p>
+</div>
+
+
+<p>The real world, production-level recipe can be found at the bottom of this page.
+You ought to use that in any real world use case.</p>
+
+<p>It is however worth providing a walkthrough of a simplified edition of the real world
+recipe, as a lot of barely documented ASIO voodoo is involved. You should not
+use the code presented next in your own code, it is too simplified. But it should
+help you understand how the real implementation works.</p>
+
+<p>Firstly we need to define some helper type sugar and a factory function for wrapping
+any arbitrary third party completion token with that type sugar:</p>
+
+<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">namespace</span> <span class="n">detail</span>
+<span class="p">{</span>
+  <span class="c1">// Type sugar for wrapping an external completion token
+</span><span class="c1"></span>  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">CompletionToken</span><span class="o">&gt;</span> <span class="k">struct</span> <span class="n">as_result_t</span>
+  <span class="p">{</span>
+    <span class="n">CompletionToken</span> <span class="n">token</span><span class="p">;</span>
+  <span class="p">};</span>
+<span class="p">}</span>  <span class="c1">// namespace detail
+</span><span class="c1"></span>
+<span class="c1">// Factory function for wrapping a third party completion token with
+</span><span class="c1">// our type sugar
+</span><span class="c1"></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">CompletionToken</span><span class="o">&gt;</span>  <span class="c1">//
+</span><span class="c1"></span><span class="kr">inline</span> <span class="k">auto</span> <span class="n">as_result</span><span class="p">(</span><span class="n">CompletionToken</span> <span class="o">&amp;&amp;</span><span class="n">token</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">return</span> <span class="n">detail</span><span class="o">::</span><span class="n">as_result_t</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">decay_t</span><span class="o">&lt;</span><span class="n">CompletionToken</span><span class="o">&gt;&gt;</span><span class="p">{</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">CompletionToken</span><span class="o">&gt;</span><span class="p">(</span><span class="n">token</span><span class="p">)};</span>
+<span class="p">};</span>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/boost-only/asio_integration.cpp#L93" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+
+
+<p>Next we tell ASIO about a new completion token it ought to recognise by specialising
+<a href="https://www.boost.org/doc/libs/develop/doc/html/boost_asio/reference/async_result.html"><code>async_result</code></a>:</p>
+
+<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="c1">// Tell ASIO about a new kind of completion token, the kind returned
+</span><span class="c1">// from our as_result() factory function. This implementation is
+</span><span class="c1">// for functions with handlers void(error_code, T) only.
+</span><span class="c1"></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">CompletionToken</span><span class="p">,</span> <span class="k">class</span><span class="err"> </span><span class="nc">T</span><span class="o">&gt;</span>                        <span class="c1">//
+</span><span class="c1"></span><span class="k">struct</span> <span class="n">asio</span><span class="o">::</span><span class="n">async_result</span><span class="o">&lt;</span><span class="n">detail</span><span class="o">::</span><span class="n">as_result_t</span><span class="o">&lt;</span><span class="n">CompletionToken</span><span class="o">&gt;</span><span class="p">,</span>  <span class="c1">//
+</span><span class="c1"></span>                          <span class="kt">void</span><span class="p">(</span><span class="n">error_code</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span><span class="o">&gt;</span>                   <span class="c1">//
+</span><span class="c1"></span>
+    <span class="c1">// NOTE we subclass for an async result taking an outcome::result
+</span><span class="c1"></span>    <span class="c1">// as its completion handler. We will mangle the void(error_code, T)
+</span><span class="c1"></span>    <span class="c1">// completion handler into this completion handler below.
+</span><span class="c1"></span>    <span class="o">:</span> <span class="k">public</span> <span class="n">asio</span><span class="o">::</span><span class="n">async_result</span><span class="o">&lt;</span><span class="n">CompletionToken</span><span class="p">,</span> <span class="kt">void</span><span class="p">(</span><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">error_code</span><span class="o">&gt;</span><span class="p">)</span><span class="o">&gt;</span>
+<span class="p">{</span>
+  <span class="c1">// The result type we shall return
+</span><span class="c1"></span>  <span class="k">using</span> <span class="n">result_type</span> <span class="o">=</span> <span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">error_code</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="k">using</span> <span class="n">_base</span> <span class="o">=</span> <span class="n">asio</span><span class="o">::</span><span class="n">async_result</span><span class="o">&lt;</span><span class="n">CompletionToken</span><span class="p">,</span> <span class="kt">void</span><span class="p">(</span><span class="n">result_type</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="c1">// The awaitable type to be returned by the initiating function,
+</span><span class="c1"></span>  <span class="c1">// the co_await of which will yield a result_type
+</span><span class="c1"></span>  <span class="k">using</span> <span class="n">return_type</span> <span class="o">=</span> <span class="k">typename</span> <span class="n">_base</span><span class="o">::</span><span class="n">return_type</span><span class="p">;</span>
+
+  <span class="c1">// Get what would be the completion handler for the async_result
+</span><span class="c1"></span>  <span class="c1">// whose completion handler is void(result_type)
+</span><span class="c1"></span>  <span class="k">using</span> <span class="n">result_type_completion_handler_type</span> <span class="o">=</span>  <span class="c1">//
+</span><span class="c1"></span>  <span class="k">typename</span> <span class="n">_base</span><span class="o">::</span><span class="n">completion_handler_type</span><span class="p">;</span>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/boost-only/asio_integration.cpp#L112" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+
+
+<p>The tricky part to understand is that our <code>async_result</code> specialisation inherits
+from an <code>async_result</code> for the supplied completion token type with a completion
+handler which consumes a <code>result&lt;T&gt;</code>. Our <code>async_result</code> is actually therefore
+the base <code>async_result</code>, but we layer on top a <code>completion_handler_type</code> with
+the <code>void(error_code, size_t)</code> signature which constructs from that a <code>result</code>:</p>
+
+<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++">  <span class="c1">// Wrap that completion handler with void(error_code, T) converting
+</span><span class="c1"></span>  <span class="c1">// handler
+</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">completion_handler_type</span>
+  <span class="p">{</span>
+    <span class="c1">// Pass through unwrapped completion token
+</span><span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">U</span><span class="o">&gt;</span>
+    <span class="n">completion_handler_type</span><span class="p">(</span><span class="o">::</span><span class="n">detail</span><span class="o">::</span><span class="n">as_result_t</span><span class="o">&lt;</span><span class="n">U</span><span class="o">&gt;</span> <span class="o">&amp;&amp;</span><span class="n">ch</span><span class="p">)</span>
+        <span class="o">:</span> <span class="n">_handler</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">U</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ch</span><span class="p">.</span><span class="n">token</span><span class="p">))</span>
+    <span class="p">{</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Our completion handler spec
+</span><span class="c1"></span>    <span class="kt">void</span> <span class="k">operator</span><span class="p">()(</span><span class="n">error_code</span> <span class="n">ec</span><span class="p">,</span> <span class="n">T</span> <span class="n">v</span><span class="p">)</span>
+    <span class="p">{</span>
+      <span class="c1">// Call the underlying completion handler, whose
+</span><span class="c1"></span>      <span class="c1">// completion function is void(result_type)
+</span><span class="c1"></span>      <span class="k">if</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+      <span class="p">{</span>
+        <span class="c1">// Complete with a failed result
+</span><span class="c1"></span>        <span class="n">_handler</span><span class="p">(</span><span class="n">result_type</span><span class="p">(</span><span class="n">outcome</span><span class="o">::</span><span class="n">failure</span><span class="p">(</span><span class="n">ec</span><span class="p">)));</span>
+        <span class="k">return</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="c1">// Complete with a successful result
+</span><span class="c1"></span>      <span class="n">_handler</span><span class="p">(</span><span class="n">result_type</span><span class="p">(</span><span class="n">outcome</span><span class="o">::</span><span class="n">success</span><span class="p">(</span><span class="n">v</span><span class="p">)));</span>
+    <span class="p">}</span>
+
+    <span class="n">result_type_completion_handler_type</span> <span class="n">_handler</span><span class="p">;</span>
+  <span class="p">};</span>
+
+  <span class="c1">// Initialise base with the underlying completion handler
+</span><span class="c1"></span>  <span class="n">async_result</span><span class="p">(</span><span class="n">completion_handler_type</span> <span class="o">&amp;</span><span class="n">h</span><span class="p">)</span>
+      <span class="o">:</span> <span class="n">_base</span><span class="p">(</span><span class="n">h</span><span class="p">.</span><span class="n">_handler</span><span class="p">)</span>
+  <span class="p">{</span>
+  <span class="p">}</span>
+
+  <span class="k">using</span> <span class="n">_base</span><span class="o">::</span><span class="n">get</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/boost-only/asio_integration.cpp#L137" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+
+
+<p>To use, simply wrap the third party completion token with <code>as_result</code> to cause
+ASIO to return from <code>co_await</code> a <code>result</code> instead of throwing exceptions on
+failure:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
+<span class="n">asio</span><span class="o">::</span><span class="n">experimental</span><span class="o">::</span><span class="n">await_token</span> <span class="n">token</span> <span class="o">=</span>
+  <span class="n">co_await</span> <span class="n">asio</span><span class="o">::</span><span class="n">experimental</span><span class="o">::</span><span class="n">this_coro</span><span class="o">::</span><span class="n">token</span><span class="p">();</span>
+
+<span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">size_t</span><span class="p">,</span> <span class="n">error_code</span><span class="o">&gt;</span> <span class="n">bytesread</span> <span class="o">=</span>
+  <span class="n">co_await</span> <span class="n">skt</span><span class="p">.</span><span class="n">async_read_some</span><span class="p">(</span><span class="n">asio</span><span class="o">::</span><span class="n">buffer</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span> <span class="n">as_result</span><span class="p">(</span><span class="n">token</span><span class="p">));</span>
+</code></pre></div>
+<p>The real world production-level implementation below is a lot more complex than the
+above which has been deliberately simplified to aid exposition. The above
+should help you get up and running with the below, eventually.</p>
+
+<p>One again I would like to remind you that Outcome is not the appropriate place
+to seek help with ASIO voodoo. Please ask on
+<a href="https://stackoverflow.com/questions/tagged/boost-asio">Stackoverflow #boost-asio</a>.</p>
 
 <hr />
 
-<p>Here follows a real world, production-level adapation of Outcome into
+<p>Here follows the real world, production-level adapation of Outcome into
 ASIO, written and maintained by <a href="https://github.com/cstratopoulos">Christos Stratopoulos</a>.
 If the following does not load due to Javascript being disabled, you can visit the gist at
 <a href="https://gist.github.com/cstratopoulos/901b5cdd41d07c6ce6d83798b09ecf9b">https://gist.github.com/cstratopoulos/901b5cdd41d07c6ce6d83798b09ecf9b</a>.</p>
@@ -2465,7 +2599,7 @@ If the following does not load due to Javascript being disabled, you can visit t
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 11/02/2019
+        <i class='fa fa-calendar'></i> Last update on 13/02/2019
     </div>
     
 

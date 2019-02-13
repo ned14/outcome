@@ -2280,8 +2280,8 @@ Complexity: Whatever that of error_type&amp;rsquo;s and/or exception_type&amp;rs
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/recipes/asio-integration/</guid>
-      <description>Thanks to Christos Stratopoulos for this recipe.
-Introduction Boost.ASIO and standalone ASIO provide the async_result customisation point for adapting arbitrary third party libraries, such as Outcome, into ASIO.
+      <description>Thanks to Christos Stratopoulos for this Outcome recipe.
+Use case Boost.ASIO and standalone ASIO provide the async_result customisation point for adapting arbitrary third party libraries, such as Outcome, into ASIO.
 Historically in ASIO you need to pass completion handler instances to the ASIO asynchronous i/o initiation functions. These get executed when the i/o completes.
 // Dynamically allocate a buffer to read into. This must be move-only  // so it can be attached to the completion handler, hence the unique_ptr.</description>
     </item>
@@ -2292,7 +2292,8 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1016 commits   @akrzemi1 39 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors HAHAHUGOSHORTCODE-0xc000bd4000-1-HBHB
+This pretty, modern C++ documentation  Hugo - static website generator of this documentation. hugo-theme-docdock - the Hugo theme used by this documentation. Standardese - the API reference generator (up until Outcome v2.0)  Special thanks for Outcome v2.1 Once again Andrzej Krzemienski stands out for a never ceasing flow of excellent questions, &amp;ldquo;what if?&amp;rdquo;&amp;rsquo;s, eagle eyed spotting of corner case logic bugs, and design contradictions. Thank you Andrzej!</description>
     </item>
     
     <item>

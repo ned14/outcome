@@ -15,8 +15,8 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/recipes/asio-integration/</guid>
-      <description>Thanks to Christos Stratopoulos for this recipe.
-Introduction Boost.ASIO and standalone ASIO provide the async_result customisation point for adapting arbitrary third party libraries, such as Outcome, into ASIO.
+      <description>Thanks to Christos Stratopoulos for this Outcome recipe.
+Use case Boost.ASIO and standalone ASIO provide the async_result customisation point for adapting arbitrary third party libraries, such as Outcome, into ASIO.
 Historically in ASIO you need to pass completion handler instances to the ASIO asynchronous i/o initiation functions. These get executed when the i/o completes.
 // Dynamically allocate a buffer to read into. This must be move-only  // so it can be attached to the completion handler, hence the unique_ptr.</description>
     </item>
