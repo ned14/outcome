@@ -28,6 +28,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include "config.hpp"
 
 #include "boost/exception_ptr.hpp"
+#include "boost/system/system_error.hpp"
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -56,8 +57,6 @@ OUTCOME_V2_NAMESPACE_END
 
 #include "std_result.hpp"
 
-#include "boost/system/error_code.hpp"
-#include "boost/system/system_error.hpp"
 
 // ADL injection of outcome_throw_as_system_error_with_payload
 namespace boost
