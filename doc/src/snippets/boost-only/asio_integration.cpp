@@ -152,7 +152,7 @@ struct asio::async_result<detail::as_result_t<CompletionToken>,  //
       // completion function is void(result_type)
       if(ec)
       {
-        // Complet with a failed result
+        // Complete with a failed result
         _handler(result_type(outcome::failure(ec)));
         return;
       }
