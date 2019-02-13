@@ -129,8 +129,6 @@ after_success:
      git remote add outcome https://github.com/ned14/outcome;
      git fetch outcome;
      git submodule update --init;
-     ls -l doc/src/themes;
-     ls -l doc/src/themes/boostdoc;
      cd ..;
      git clone https://github.com/boostorg/outcome boost-outcome;
      cd boost-outcome;
