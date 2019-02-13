@@ -1,20 +1,25 @@
 #include "timing.h"
-#include "../include/outcome/result.hpp"
 #include <stdio.h>
-#include <exception>
 #include "function.h"
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS)
+#include <exception>
+#endif
 
 #define ITERATIONS 100000
-#define CPU_US_PER_CLOCK (1000000000000.0/(3292.0*1000000.0))
 
 extern volatile int counter;
 volatile int counter, forcereturn;
 
 int main(void)
 {
-  usCount start=GetUsCount();
-  while(GetUsCount()-start<1*1000000000000LL);
-  start=GetUsCount();
+#ifdef _WIN32
+  SetThreadAffinityMask(GetCurrentThread(), 2ULL);
+#endif
+  {
+    usCount start=GetUsCount();
+    while(GetUsCount()-start<1*1000000000000LL);
+  }
+  auto start = ticksclock();
   for(int n=0; n<ITERATIONS; n++)
   {
 #if !defined(_CPPUNWIND) && !defined(__EXCEPTIONS)
@@ -29,9 +34,9 @@ int main(void)
     }
 #endif
   }
-  double time=GetUsCount()-start;
-  time/=ITERATIONS;
-  double ticks=time/CPU_US_PER_CLOCK/*/NESTING*/;
+  auto end = ticksclock();
+  double ticks=end-start;
+  ticks/=ITERATIONS;
   printf("%f\n", ticks);
   return 0;
 }

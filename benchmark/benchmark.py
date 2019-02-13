@@ -26,7 +26,7 @@ class ErrorHandlingSystem(object):
 
     def generate_sources(self, no):
         "Generate no source files calling into one another"
-        for n in xrange(0, no):
+        for n in range(0, no):
             with open("source%04d.cpp" % n, 'wt') as oh:
                 oh.write(self.preamble(n))
                 oh.write(r'''extern volatile int counter;
@@ -45,6 +45,7 @@ struct RAII { RAII() { ++counter; } ~RAII() { --counter; } };
                 else:
                     oh.write(self.function_final())
         with open("function.h", 'wt') as oh:
+            oh.write(self.preamble(no-1))
             oh.write(self.function_cont("funct%04d" % (no-1)) + ';\n')
             oh.write("#define FUNCTION funct%04d\n" % (no-1))
             oh.write("#define NESTING %d\n" % (no))
@@ -79,6 +80,18 @@ class ResultExceptionError(ResultExceptionValue):
     def function_final(self):
         return r'''{ return std::make_exception_ptr(std::exception()); }'''
         
+class ResultExperimentalValue(ErrorHandlingSystem):
+    def preamble(self, idx):
+        return '#include "../include/outcome/experimental/status_result.hpp"\n'
+    def function_cont(self, name):
+        return 'extern OUTCOME_V2_NAMESPACE::experimental::status_result<int> %s(int par)' % name
+    def function_final(self):
+        return r'''{ return par; }'''
+
+class ResultExperimentalError(ResultExperimentalValue):
+    def function_final(self):
+        return r'''{ return OUTCOME_V2_NAMESPACE::experimental::errc::io_error; }'''
+
 matrix = [
     ('integer-returns', ErrorHandlingSystem),
     ('exception-throw', ExceptionThrow),
@@ -86,13 +99,15 @@ matrix = [
     ('result-error-error', ResultErrorError),
     ('result-excpt-value', ResultExceptionValue),
     ('result-excpt-error', ResultExceptionError),
+    ('result-exper-value', ResultExperimentalValue),
+    ('result-exper-error', ResultExperimentalError),
 ]
 
 if sys.platform == 'win32':
     compilers = [
-        ('msvc1912-noexcept', r'cl /nologo /std:c++latest /O2 /Gy /MD /Fe%s /I..\\..'),
-        ('msvc1912', r'cl /nologo /std:c++latest /O2 /Gy /MD /EHsc /Fe%s /I..\\..'),
-        ('msvc1912-ltcg', r'cl /nologo /std:c++latest /O2 /Gy /GL /MD /EHsc /Fe%s /I..\\..'),
+        ('msvc1916-noexcept', r'cl /nologo /std:c++17 /O2 /Gy /MD /Fe%s /I..\\..'),
+        ('msvc1916', r'cl /nologo /std:c++17 /O2 /Gy /MD /EHsc /Fe%s /I..\\..'),
+        ('msvc1916-ltcg', r'cl /nologo /std:c++17 /O2 /Gy /GL /MD /EHsc /Fe%s /I..\\..'),
     ]
 elif sys.platform == 'darwin':
     compilers = [
@@ -100,11 +115,11 @@ elif sys.platform == 'darwin':
     ]
 else:
     compilers = [
-        ('gcc72-noexcept', r'g++-7 -std=c++17 -fno-exceptions -O3 -g -o %s -I../..'),
-        ('gcc72', r'g++-7 -std=c++17 -O3 -g -o %s -I../..'),
-        ('gcc72-lto', r'g++-7 -std=c++17 -O3 -g -flto -o %s -I../..'),
-        ('clang50', r'clang++-5.0 -std=c++17 -O3 -g -o %s -I../..'),
-#        ('clang40-lto', r'clang++-4.0 -std=c++14 -O3 -g -flto -o %s'),  not working yet
+        ('gcc74-noexcept', r'g++-7 -std=c++17 -fno-exceptions -O3 -g -o %s -I../..'),
+        ('gcc74', r'g++-7 -std=c++17 -O3 -g -o %s -I../..'),
+        ('gcc74-lto', r'g++-7 -std=c++17 -O3 -g -flto -o %s -I../..'),
+        ('clang80', r'clang++-8 -std=c++17 -O3 -g -o %s -I../..'),
+        #('clang80-lto', r'clang++-8 -std=c++17 -O3 -g -flto -o %s'),  not working yet
     ]
 
 SOURCES=10
@@ -129,7 +144,7 @@ with open('results-'+sys.platform+'.csv', 'wt') as resultsh:
                 instance.generate_sources(SOURCES)
                 args = shlex.split(compiler[1] % exename)
                 args.append("runner.cpp")
-                for n in xrange(0, SOURCES):
+                for n in range(0, SOURCES):
                     args.append("source%04d.cpp" % n)
                 if sys.platform == 'win32':
                     args.append("/link")
@@ -145,7 +160,7 @@ with open('results-'+sys.platform+'.csv', 'wt') as resultsh:
                     print(e.output)
                     raise
             finally:
-                for n in xrange(0, SOURCES):
+                for n in range(0, SOURCES):
                     if os.path.exists("source%04d.cpp" % n):
                         os.remove("source%04d.cpp" % n)
                     if os.path.exists("source%04d.obj" % n):
