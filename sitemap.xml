@@ -34,7 +34,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/motivation/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -74,7 +74,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -89,7 +89,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -129,7 +129,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -144,7 +144,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/concepts/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -179,7 +179,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/motivation/errno/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -189,7 +189,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/converters/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -219,7 +219,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/motivation/error_codes/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -264,7 +264,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/traits/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -289,7 +289,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/policies/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -304,7 +304,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/videos/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -314,7 +314,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/motivation/std_error_code/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -349,7 +349,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/motivation/plug_error_code/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -359,7 +359,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -374,7 +374,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/aliases/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -389,12 +389,12 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/motivation/narrow_contract/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/functions/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -444,7 +444,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/basic_result/default/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -459,7 +459,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/basic_result/move_constructor/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -469,7 +469,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/basic_result/copy_constructor/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -479,7 +479,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/basic_result/move_assignment/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -489,7 +489,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/basic_result/copy_assignment/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -499,7 +499,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/basic_result/destructor/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -509,7 +509,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/basic_result/disabling_catchall/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -519,7 +519,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/basic_result/disabling_implicit_constructor/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -604,7 +604,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -729,7 +729,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/basic_result/implicit_inplace_value_error_constructor/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -1179,7 +1179,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/categories/assignment/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1197,7 +1197,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/categories/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1209,18 +1209,18 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/template/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ned14.github.io/outcome/tags/constructors/</loc>
-    <lastmod>2019-02-08T22:18:08+00:00</lastmod>
-    <priority>0</priority>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/categories/constructors/</loc>
     <lastmod>2019-01-21T18:00:41+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://ned14.github.io/outcome/tags/constructors/</loc>
+    <lastmod>2019-02-08T22:18:08+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1238,13 +1238,13 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/categories/copy-assignment/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/categories/copy-constructors/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1256,19 +1256,19 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/categories/default-constructors/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/categories/destructors/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/categories/disabling-constructors/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1345,13 +1345,13 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/categories/move-assignment/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/categories/move-constructors/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1387,7 +1387,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/categories/operators/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1459,37 +1459,37 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/version/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/disable_execinfo/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/nodiscard/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/requires/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/symbol_visible/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/thread_local/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/throw_exception/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -1519,12 +1519,12 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/concepts/valueorerror/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/concepts/valueornone/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -1674,12 +1674,12 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/traits/is_error_type/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/traits/is_error_type_enum/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>
@@ -1774,7 +1774,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/converters/value_or_error/</loc>
-    <lastmod>2019-01-17T22:42:01+00:00</lastmod>
+    <lastmod>2019-01-17T21:24:36+00:00</lastmod>
   </url>
   
   <url>

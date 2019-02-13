@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-12T16:45:03 UTC">
+<meta name="revised" content="2019-02-13T20:36:32 UTC">
 <title>ASIO/Networking TS :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2354,26 +2354,25 @@ completes.</p>
 
 <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++">  <span class="c1">// Dynamically allocate a buffer to read into. This must be move-only
 </span><span class="c1"></span>  <span class="c1">// so it can be attached to the completion handler, hence the unique_ptr.
-</span><span class="c1"></span>  <span class="k">auto</span> <span class="n">buffer</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">byte</span><span class="o">&gt;&gt;&gt;</span><span class="p">(</span><span class="mi">1024</span><span class="p">);</span>  
+</span><span class="c1"></span>  <span class="k">auto</span> <span class="n">buffer</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">byte</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="mi">1024</span><span class="p">);</span>
 
   <span class="c1">// Begin an asynchronous socket read, upon completion invoke
 </span><span class="c1"></span>  <span class="c1">// the lambda function specified
-</span><span class="c1"></span>  <span class="n">asio</span><span class="o">::</span><span class="n">async_read</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span>
-    <span class="n">asio</span><span class="o">::</span><span class="n">buffer</span><span class="p">(</span><span class="n">buffer</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">(),</span> <span class="n">buffer</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">()),</span>
-    
-    <span class="c1">// Retain lifetime of the i/o buffer until completion
-</span><span class="c1"></span>    <span class="p">[</span><span class="n">buffer</span><span class="p">](</span><span class="k">const</span> <span class="n">error_code</span> <span class="o">&amp;</span><span class="n">ec</span><span class="p">,</span> <span class="n">size_t</span> <span class="n">bytes</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// Handle the buffer read
-</span><span class="c1"></span>      <span class="k">if</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span>
-      <span class="p">{</span>
-        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Buffer read failed with &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-        <span class="k">return</span><span class="p">;</span>
-      <span class="p">}</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Read &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">bytes</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; bytes into buffer&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-      
-      <span class="c1">// buffer will be dynamically freed now
-</span><span class="c1"></span>  <span class="p">});</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/boost-only/asio_integration.cpp#L42" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</span><span class="c1"></span>  <span class="n">skt</span><span class="p">.</span><span class="n">async_read_some</span><span class="p">(</span><span class="n">asio</span><span class="o">::</span><span class="n">buffer</span><span class="p">(</span><span class="n">buffer</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">(),</span> <span class="n">buffer</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">()),</span>
+
+                      <span class="c1">// Retain lifetime of the i/o buffer until completion
+</span><span class="c1"></span>                      <span class="p">[</span><span class="n">buffer</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">buffer</span><span class="p">)](</span><span class="k">const</span> <span class="n">error_code</span> <span class="o">&amp;</span><span class="n">ec</span><span class="p">,</span> <span class="n">size_t</span> <span class="n">bytes</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="c1">// Handle the buffer read
+</span><span class="c1"></span>                        <span class="k">if</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+                        <span class="p">{</span>
+                          <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Buffer read failed with &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+                          <span class="k">return</span><span class="p">;</span>
+                        <span class="p">}</span>
+                        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Read &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">bytes</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; bytes into buffer&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+                        <span class="c1">// buffer will be dynamically freed now
+</span><span class="c1"></span>                      <span class="p">});</span>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/boost-only/asio_integration.cpp#L41" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>One of the big value adds of the Coroutines TS is the ability to not have to write
@@ -2383,23 +2382,25 @@ so much boilerplate if you have a Coroutines supporting compiler:</p>
 </span><span class="c1"></span>  <span class="c1">// operation executes, we can use stack allocation instead of dynamic
 </span><span class="c1"></span>  <span class="c1">// allocation
 </span><span class="c1"></span>  <span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
-  
+
   <span class="c1">// Get an ASIO completion token for the current coroutine (requires
 </span><span class="c1"></span>  <span class="c1">// Coroutines TS)
-</span><span class="c1"></span>  <span class="k">auto</span> <span class="n">token</span> <span class="o">=</span> <span class="n">co_await</span> <span class="n">asio</span><span class="o">::</span><span class="n">experimental</span><span class="o">::</span><span class="n">this_coro</span><span class="o">::</span><span class="n">token</span><span class="p">();</span>
+</span><span class="c1"></span>  <span class="n">asio</span><span class="o">::</span><span class="n">experimental</span><span class="o">::</span><span class="n">await_token</span> <span class="n">token</span> <span class="o">=</span>  <span class="c1">//
+</span><span class="c1"></span>  <span class="n">co_await</span> <span class="n">asio</span><span class="o">::</span><span class="n">experimental</span><span class="o">::</span><span class="n">this_coro</span><span class="o">::</span><span class="n">token</span><span class="p">();</span>
 
   <span class="c1">// Asynchronously read data, suspending this coroutine until completion,
 </span><span class="c1"></span>  <span class="c1">// returning the bytes of the data read into the result.
 </span><span class="c1"></span>  <span class="k">try</span>
   <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">read</span> <span class="o">=</span> <span class="n">co_await</span> <span class="n">asio</span><span class="o">::</span><span class="n">async_read</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">token</span><span class="p">);</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Read &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">bytes</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; bytes into buffer&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">size_t</span> <span class="n">bytesread</span> <span class="o">=</span>  <span class="c1">//
+</span><span class="c1"></span>    <span class="n">co_await</span> <span class="n">skt</span><span class="p">.</span><span class="n">async_read_some</span><span class="p">(</span><span class="n">asio</span><span class="o">::</span><span class="n">buffer</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span> <span class="n">token</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Read &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">bytesread</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; bytes into buffer&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="k">catch</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">system_error</span> <span class="o">&amp;</span><span class="n">e</span><span class="p">)</span>
   <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Buffer read failed with &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">e</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Buffer read failed with &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
   <span class="p">}</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/boost-only/asio_integration.cpp#L69" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/boost-only/asio_integration.cpp#L67" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>However the default ASIO implementation appears to currently always throw exceptions
@@ -2407,17 +2408,17 @@ from its Coroutines token implementation. This recipe fixes that:</p>
 
 <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++">  <span class="c1">// Asynchronously read data, suspending this coroutine until completion,
 </span><span class="c1"></span>  <span class="c1">// returning the bytes of the data read into the result, or any failure.
-</span><span class="c1"></span>  <span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">size_t</span><span class="o">&gt;</span> <span class="n">read</span> <span class="o">=</span> <span class="c1">//
-</span><span class="c1"></span>    <span class="n">co_await</span> <span class="n">asio</span><span class="o">::</span><span class="n">async_read</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span> <span class="n">buffers</span><span class="p">,</span> <span class="n">as_result</span><span class="p">(</span><span class="n">token</span><span class="p">));</span>
-  
+</span><span class="c1"></span>  <span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">size_t</span><span class="p">,</span> <span class="n">error_code</span><span class="o">&gt;</span> <span class="n">bytesread</span> <span class="o">=</span>  <span class="c1">//
+</span><span class="c1"></span>  <span class="n">co_await</span> <span class="n">skt</span><span class="p">.</span><span class="n">async_read_some</span><span class="p">(</span><span class="n">asio</span><span class="o">::</span><span class="n">buffer</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span> <span class="n">as_result</span><span class="p">(</span><span class="n">token</span><span class="p">));</span>
+
   <span class="c1">// Usage is exactly like ordinary Outcome. Note the lack of exception throw!
-</span><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">read</span><span class="p">.</span><span class="n">has_error</span><span class="p">())</span>
+</span><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">bytesread</span><span class="p">.</span><span class="n">has_error</span><span class="p">())</span>
   <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Buffer read failed with &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">read</span><span class="p">.</span><span class="n">error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Buffer read failed with &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">bytesread</span><span class="p">.</span><span class="n">error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
     <span class="k">return</span><span class="p">;</span>
   <span class="p">}</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Read &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">bytes</span><span class="p">.</span><span class="n">value</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; bytes into buffer&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/boost-only/asio_integration.cpp#L95" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Read &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">bytesread</span><span class="p">.</span><span class="n">value</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; bytes into buffer&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/boost-only/asio_integration.cpp#L194" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <hr />
