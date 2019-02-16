@@ -43,13 +43,16 @@ namespace detail
       // ADL discovered
       return basic_outcome_failure_exception_from_error(ec);
     }
-  }
+  }                                        // namespace adl
 #if defined(_MSC_VER) && _MSC_VER <= 1920  // VS2019
   // VS2017 and VS2019 with /permissive- chokes on the correct form due to over eager early instantiation.
   template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) { static_assert(sizeof(S) == 0, "No specialisation for these error and exception types available!"); }
 #else
   template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) = delete;  // NOLINT No specialisation for these error and exception types available!
 #endif
+
+  template <class exception_type> inline exception_type current_exception_or_fatal(std::exception_ptr e) { std::rethrow_exception(e); }
+  template <> inline std::exception_ptr current_exception_or_fatal<std::exception_ptr>(std::exception_ptr e) { return e; }
 
   //! The failure observers implementation of `basic_outcome<R, S, P>`.
   template <class Base, class R, class S, class P, class NoValuePolicy> class basic_outcome_failure_observers : public Base
@@ -83,7 +86,9 @@ namespace detail
 #ifdef __cpp_exceptions
       catch(...)
       {
-        return std::current_exception();
+        // Return the failure if exception_type is std::exception_ptr,
+        // otherwise terminate same as throwing an exception inside noexcept
+        return current_exception_or_fatal<exception_type>(std::current_exception());
       }
 #endif
     }
