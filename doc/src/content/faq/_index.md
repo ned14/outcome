@@ -1,3 +1,4 @@
+
 +++
 title = "Frequently asked questions"
 weight = 30
@@ -156,6 +157,15 @@ the null case for returning failures on GCC and clang.
 - Standard Outcome optimises
 poorly on VS2017.9, indeed markedly worse than on previous point releases, so let's
 hope that Microsoft fix that soon. It currently has a less than 20% overhead on the null case.
+
+
+## Can I use result<T,EC> across DLL boundaries?
+
+The class template result<T, EC> itself has been designed to be safe for inter-DLL usage.
+The only question is whether the T and especially the EC are safe for inter-DLL usage.
+Specifically std::error_code is not guaranteed to be safe because standard does not recognize existance of DLLs or shared libraries, although [some](https://stackoverflow.com/a/32656333/700825) implementations of standard library may provide this guarantee voluntarily.
+boost::system::error_code currently(version [1.69](https://www.boost.org/doc/libs/1_69_0/libs/system/doc/html/system.html#ref_synopsis)) explicitly offers this guarantee, and can be used across DLL boundaries.
+
 
 
 ## Why is implicit default construction disabled?
