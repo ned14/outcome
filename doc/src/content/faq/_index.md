@@ -38,6 +38,41 @@ Note that the stable ABI and API guarantee will only apply to standalone
 Outcome, not to Boost.Outcome. Boost.Outcome has dependencies on other
 parts of Boost which are not stable across releases.
 
+Note also that the types you configure a `result` or `outcome` with also need
+to be ABI stable if `result` or `outcome` is to be ABI stable.
+
+
+## Can I use `result<T, EC>` across DLL/shared object boundaries?
+
+A known problem with using DLLs (and to smaller extent shared libraries) is that global
+objects may get duplicated: one instance in the executable and one in the DLL. This
+behaviour is not incorrect according to the C++ Standard, as the Standard does not
+recognize the existence of DLLs or shared libraries. Therefore, program designs that
+depend on globals having unique addresses may become compromised when used in a program
+using DLLs.
+
+Nothing in Outcome depends on the addresses of globals, plus the guaranteed fixed data
+layout (see answer above) means that different versions of Outcome can be used in
+different DLLs, and it probably will work okay (it is still not advised that you do that
+as that is an ODR violation).
+However, one of the most likely candidate for `EC` -- `std::error_code` -- does depend
+on the addresses of globals for correct functioning.
+
+The standard library is required to implement globally unique addresses for the standard library
+provided {{% api "std::error_category" %}} implementations e.g. `std::system_category()`.
+User defined error code categories may **not** have unique global addresses, and thus
+introduce misoperation.
+
+`boost::system::error_code`, since version 1.69 does offer an *opt-in* guarantee
+that it does not depend on the addresses of globals **if** the user defined error code
+category *opts-in* to the 64-bit comparison mechanism. This can be seen in the specification of
+`error_category::operator==` in
+[Boost.System synopsis](https://www.boost.org/doc/libs/1_69_0/libs/system/doc/html/system.html#ref_synopsis).
+
+Alternatively, the `status_code` in [Experimental Outcome](({{< relref "/experimental/differences" >}})),
+due to its more modern design, does not suffer from any problems from being used in shared
+libraries in any configuration.
+
 
 ## Why two types `result<>`  and `outcome<>`, rather than just one?
 
@@ -224,27 +259,6 @@ The conclusion to take away from this is that if you are targeting a low end CPU
 table-based EH still delivers significant performance improvements for the success
 code path. Unless determinism in failure is critically important, you should not
 use Outcome on in-order execution CPUs.
-
-
-
-## Can I use `result<T, EC>` across DLL boundaries?
-
-A known problem with uing DLLs (and to smaller extent shared libraries) is that globals
-objects may get duplicated: one instance in the executable and one in the DLL. This
-behavior is not incorrect according to the C++ Standard, as the Standard does not
-recognize the existence of DLLs or shared libraries. Therefore, the designs that
-depend on globals having unique address may become compromized when used in a program
-using DLLs.
- 
-The class template `result<T, EC>` itself does not depend on the addresses of globals,
-thus it is safe for inter-DLL usage. However, one of the most likely candidate for `EC`
--- `std::error_code` -- does depend on the addresses of globals. While some implementations
-of the Standard Library may (and do) implement a DLL-safe `error_code`, it is not guaranteed generally.
-
-In contrast, `boost::system::error_code`, since version 1.69 does offer an explicit guarantee
-that it does not depend on the addresses of globals. This can be seen in the specification of
-`error_category::operator==` in [Boost.System synopsis](https://www.boost.org/doc/libs/1_69_0/libs/system/doc/html/system.html#ref_synopsis).
-
 
 
 ## Why is implicit default construction disabled?
