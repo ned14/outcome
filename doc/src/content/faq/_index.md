@@ -226,6 +226,27 @@ code path. Unless determinism in failure is critically important, you should not
 use Outcome on in-order execution CPUs.
 
 
+
+## Can I use `result<T, EC>` across DLL boundaries?
+
+A known problem with uing DLLs (and to smaller extent shared libraries) is that globals
+objects may get duplicated: one instance in the executable and one in the DLL. This
+behavior is not incorrect according to the C++ Standard, as the Standard does not
+recognize the existence of DLLs or shared libraries. Therefore, the designs that
+depend on globals having unique address may become compromized when used in a program
+using DLLs.
+ 
+The class template `result<T, EC>` itself does not depend on the addresses of globals,
+thus it is safe for inter-DLL usage. However, one of the most likely candidate for `EC`
+-- `std::error_code` -- does depend on the addresses of globals. While some implementations
+of the Standard Library may (and do) implement a DLL-safe `error_code`, it is not guaranteed generally.
+
+In contrast, `boost::system::error_code`, since version 1.69 does offer an explicit guarantee
+that it does not depend on the addresses of globals. This can be seen in the specification of
+`error_category::operator==` in [Boost.System synopsis](https://www.boost.org/doc/libs/1_69_0/libs/system/doc/html/system.html#ref_synopsis).
+
+
+
 ## Why is implicit default construction disabled?
 
 This was one of the more interesting points of discussion during the peer review of
