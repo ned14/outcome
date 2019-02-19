@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-19T06:52:26 UTC">
+<meta name="revised" content="2019-02-19T10:44:41 UTC">
 <title>Frequently asked questions :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2342,6 +2342,7 @@
 <ul>
 <li><a href="#is-outcome-safe-to-use-in-extern-apis">Is Outcome safe to use in extern APIs?</a></li>
 <li><a href="#does-outcome-have-a-stable-abi-and-api">Does Outcome have a stable ABI and API?</a></li>
+<li><a href="#can-i-use-result-t-ec-across-dll-shared-object-boundaries">Can I use <code>result&lt;T, EC&gt;</code> across DLL/shared object boundaries?</a></li>
 <li><a href="#why-two-types-result-and-outcome-rather-than-just-one">Why two types <code>result&lt;&gt;</code>  and <code>outcome&lt;&gt;</code>, rather than just one?</a></li>
 <li><a href="#how-badly-will-including-outcome-in-my-public-interface-affect-compile-times">How badly will including Outcome in my public interface affect compile times?</a></li>
 <li><a href="#is-outcome-suitable-for-fixed-latency-predictable-execution-coding-such-as-for-high-frequency-trading-or-audio">Is Outcome suitable for fixed latency/predictable execution coding such as for high frequency trading or audio?</a></li>
@@ -2351,7 +2352,6 @@
 <li><a href="#mid-tier-cpu-arm-cortex-a72">Mid tier CPU: ARM Cortex A72</a></li>
 <li><a href="#low-end-cpus-intel-silvermont-x64-and-arm-cortex-a53">Low end CPUs: Intel Silvermont x64 and ARM Cortex A53</a></li>
 </ul></li>
-<li><a href="#can-i-use-result-t-ec-across-dll-boundaries">Can I use <code>result&lt;T, EC&gt;</code> across DLL boundaries?</a></li>
 <li><a href="#why-is-implicit-default-construction-disabled">Why is implicit default construction disabled?</a></li>
 <li><a href="#how-far-away-from-the-proposed-std-expected-t-e-is-outcome-s-checked-t-e">How far away from the proposed <code>std::expected&lt;T, E&gt;</code> is Outcome&rsquo;s <code>checked&lt;T, E&gt;</code>?</a></li>
 <li><a href="#why-doesn-t-outcome-duplicate-std-expected-t-e-s-design">Why doesn&rsquo;t Outcome duplicate <code>std::expected&lt;T, E&gt;</code>&rsquo;s design?</a></li>
@@ -2387,6 +2387,41 @@ will be run per-commit to ensure Outcome&rsquo;s ABI and API remains stable.</p>
 <p>Note that the stable ABI and API guarantee will only apply to standalone
 Outcome, not to Boost.Outcome. Boost.Outcome has dependencies on other
 parts of Boost which are not stable across releases.</p>
+
+<p>Note also that the types you configure a <code>result</code> or <code>outcome</code> with also need
+to be ABI stable if <code>result</code> or <code>outcome</code> is to be ABI stable.</p>
+
+<h2 id="can-i-use-result-t-ec-across-dll-shared-object-boundaries">Can I use <code>result&lt;T, EC&gt;</code> across DLL/shared object boundaries?</h2>
+
+<p>A known problem with using DLLs (and to smaller extent shared libraries) is that global
+objects may get duplicated: one instance in the executable and one in the DLL. This
+behaviour is not incorrect according to the C++ Standard, as the Standard does not
+recognize the existence of DLLs or shared libraries. Therefore, program designs that
+depend on globals having unique addresses may become compromised when used in a program
+using DLLs.</p>
+
+<p>Nothing in Outcome depends on the addresses of globals, plus the guaranteed fixed data
+layout (see answer above) means that different versions of Outcome can be used in
+different DLLs, and it probably will work okay (it is still not advised that you do that
+as that is an ODR violation).
+However, one of the most likely candidate for <code>EC</code> &ndash; <code>std::error_code</code> &ndash; does depend
+on the addresses of globals for correct functioning.</p>
+
+<p>The standard library is required to implement globally unique addresses for the standard library
+provided 
+<a href="https://en.cppreference.com/w/cpp/error/error_category" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> std::error_category</a> implementations e.g. <code>std::system_category()</code>.
+User defined error code categories may <strong>not</strong> have unique global addresses, and thus
+introduce misoperation.</p>
+
+<p><code>boost::system::error_code</code>, since version 1.69 does offer an <em>opt-in</em> guarantee
+that it does not depend on the addresses of globals <strong>if</strong> the user defined error code
+category <em>opts-in</em> to the 64-bit comparison mechanism. This can be seen in the specification of
+<code>error_category::operator==</code> in
+<a href="https://www.boost.org/doc/libs/1_69_0/libs/system/doc/html/system.html#ref_synopsis">Boost.System synopsis</a>.</p>
+
+<p>Alternatively, the <code>status_code</code> in <a href="(/outcome/experimental/differences/)">Experimental Outcome</a>,
+due to its more modern design, does not suffer from any problems from being used in shared
+libraries in any configuration.</p>
 
 <h2 id="why-two-types-result-and-outcome-rather-than-just-one">Why two types <code>result&lt;&gt;</code>  and <code>outcome&lt;&gt;</code>, rather than just one?</h2>
 
@@ -2592,24 +2627,6 @@ the Cortex A53, because of having to write multiple values to the stack to creat
 table-based EH still delivers significant performance improvements for the success
 code path. Unless determinism in failure is critically important, you should not
 use Outcome on in-order execution CPUs.</p>
-
-<h2 id="can-i-use-result-t-ec-across-dll-boundaries">Can I use <code>result&lt;T, EC&gt;</code> across DLL boundaries?</h2>
-
-<p>A known problem with uing DLLs (and to smaller extent shared libraries) is that globals
-objects may get duplicated: one instance in the executable and one in the DLL. This
-behavior is not incorrect according to the C++ Standard, as the Standard does not
-recognize the existence of DLLs or shared libraries. Therefore, the designs that
-depend on globals having unique address may become compromized when used in a program
-using DLLs.</p>
-
-<p>The class template <code>result&lt;T, EC&gt;</code> itself does not depend on the addresses of globals,
-thus it is safe for inter-DLL usage. However, one of the most likely candidate for <code>EC</code>
-&ndash; <code>std::error_code</code> &ndash; does depend on the addresses of globals. While some implementations
-of the Standard Library may (and do) implement a DLL-safe <code>error_code</code>, it is not guaranteed generally.</p>
-
-<p>In contrast, <code>boost::system::error_code</code>, since version 1.69 does offer an explicit guarantee
-that it does not depend on the addresses of globals. This can be seen in the specification of
-<code>error_category::operator==</code> in <a href="https://www.boost.org/doc/libs/1_69_0/libs/system/doc/html/system.html#ref_synopsis">Boost.System synopsis</a>.</p>
 
 <h2 id="why-is-implicit-default-construction-disabled">Why is implicit default construction disabled?</h2>
 
@@ -2831,7 +2848,7 @@ interoperate with code using Outcome.</p></li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 18/02/2019
+        <i class='fa fa-calendar'></i> Last update on 19/02/2019
     </div>
     
 
