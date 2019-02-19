@@ -117,7 +117,14 @@ of stack depth might be unwound. This is not a particularly realistic test, but 
 should at least give one an idea of the performance impact of returning Outcome's
 `result` or `outcome` over say returning a plain integer, or throwing an exception.
 
-{{% figure src="/faq/results_log.png" title="Log graph comparing GCC 7.4, clang 8.0 and Visual Studio 2017.9 on x64, for exceptions-globally-disabled, ordinary and link-time-optimised build configurations." %}}
+### High end CPU: Intel Skylake x64
+
+This is a high end CPU with very significant ability to cache, predict, parallelise
+and execute out-of-order such that tight, repeated loops perform very well. It has
+a large μop cache able to wholly contain the test loop, meaning that these results
+are a **best case** performance.
+
+{{% figure src="/faq/results_skylake_log.png" title="Log graph comparing GCC 7.4, clang 8.0 and Visual Studio 2017.9 on x64, for exceptions-globally-disabled, ordinary and link-time-optimised build configurations." %}}
 
 As you can see, throwing and catching an exception is
 expensive on table-based exception handling implementations such as these, anywhere
@@ -148,14 +155,75 @@ still two orders of magnitude better than throwing and catching an exception.
 We conclude that if failure is anything but extremely rare in your C++ codebase,
 using Outcome instead of throwing and catching exceptions ought to be quicker overall:
 
-- Experimental Outcome is statistically indistinguishable from the null case, for
-both returning success and failure, on all compilers.
+- Experimental Outcome is statistically indistinguishable from the null case on this
+high end CPU, for both returning success and failure, on all compilers.
 - Standard Outcome is less than 5%
 worse than the null case for returning successes on GCC and clang, and less than 10% worse than
 the null case for returning failures on GCC and clang.
 - Standard Outcome optimises
 poorly on VS2017.9, indeed markedly worse than on previous point releases, so let's
 hope that Microsoft fix that soon. It currently has a less than 20% overhead on the null case.
+
+### Mid tier CPU: ARM Cortex A72
+
+This is a four year old mid tier CPU used in many high end mobile phones and tablets
+of its day, with good ability to cache, predict, parallelise
+and execute out-of-order such that tight, repeated loops perform very well. It has
+a μop cache able to wholly contain the test loop, meaning that these results
+are a **best case** performance.
+
+{{% figure src="/faq/results_arm_a72_log.png" title="Log graph comparing GCC 7.3 and clang 7.3 on ARM64, for exceptions-globally-disabled, ordinary and link-time-optimised build configurations." %}}
+
+This ARM chip is a very consistent performer -- null case, success, or failure, all take
+almost exactly the same CPU cycles. Choosing Outcome, in any configuration, makes no
+difference to not using Outcome at all. Throwing and catching a C++ exception costs
+about 90,000 CPU cycles, whereas the null case/Outcome costs about 130 - 140 CPU cycles.
+
+There is very little to say about this CPU, other than Outcome is zero overhead on it. The same
+applied to the ARM Cortex A15 incidentally, which I test cased extensively when
+deciding on the Outcome v2 design back after the first peer review. The v2 design
+was chosen partially because of such consistent performance on ARM.
+
+### Low end CPUs: Intel Silvermont x64 and ARM Cortex A53
+
+These are low end CPUs with a mostly or wholly in-order execution core. They have a small
+or no μop cache, meaning that the CPU must always decode the instruction stream.
+These results represent an execution environment more typical of CPUs two decades
+ago, back when table-based EH created a big performance win if you never threw
+an exception.
+
+{{% figure src="/faq/results_silvermont_log.png" title="Log graph comparing GCC 7.3 and clang 7.3 on x64, for exceptions-globally-disabled, ordinary and link-time-optimised build configurations." %}}
+{{% figure src="/faq/results_arm_a53_log.png" title="Log graph comparing GCC 7.3 and clang 7.3 on ARM64, for exceptions-globally-disabled, ordinary and link-time-optimised build configurations." %}}
+
+The first thing to mention is that clang generates very high performance code for
+in-order cores, far better than GCC. It is said that this is due to a very large investment by
+Apple in clang/LLVM for their devices sustained over many years. In any case, if you're
+targeting in-order CPUs, don't use GCC if you can use clang instead!
+
+For the null case, Silvermont and Cortex A53 are quite similar in terms of CPU clock cycles. Ditto
+for throwing and catching a C++ exception (approx 150,000 CPU cycles). However the Cortex
+A53 does far better with Outcome than Silvermont, a 15% versus 100% overhead for Standard
+Outcome, and a 4% versus 20% overhead for Experimental Outcome.
+
+Much of this large difference is in fact due to calling convention differences. x64 permits up to 8 bytes
+to be returned from functions by CPU register. `result<int>` consumes 24 bytes, so on x64
+the compiler writes the return value to the stack. However ARM64 permits up to 64 bytes
+to be returned in registers, so `result<int>` is returned via CPU registers on ARM64.
+
+On higher end CPUs, memory is read and written in cache lines (32 or 64 bytes), and
+reads and writes are coalesced and batched together by the out-of-order execution core. On these
+low end CPUs, memory is read and written sequentially per assembler instruction,
+so only one load or one store to L1
+cache can occur at a time. This makes writing the stack particularly slow on in-order
+CPUs. Memory operations which "disappear" on higher end CPUs take considerable time
+on low end CPUs. This particularly punishes Silvermont in a way which does not punish
+the Cortex A53, because of having to write multiple values to the stack to create the
+24 byte object to be returned.
+
+The conclusion to take away from this is that if you are targeting a low end CPU,
+table-based EH still delivers significant performance improvements for the success
+code path. Unless determinism in failure is critically important, you should not
+use Outcome on in-order execution CPUs.
 
 
 ## Why is implicit default construction disabled?
