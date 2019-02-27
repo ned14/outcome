@@ -25,6 +25,19 @@ normative note in the standard about its layout). Hence Outcome cannot provide a
 C macro API for standard Outcome, but we can for [Experimental Outcome]({{< relref "/experimental/c-api" >}}).
 
 
+## Does Outcome implement over-alignment?
+
+Variant-based alternatives to Outcome such as {{% api "std::expected<T, E>" %}}
+would use `std::aligned_union` to ensure appropriate over-alignment for the storage of
+either a `T` or an `E`. This discovers the over-alignment for a type using
+`std::alignment_of`, which is defaulted to `alignof()`.
+
+Outcome uses `struct`-based storage, as described above. Any over-alignment of
+`result` or `outcome` will follow the ordinary alignment and padding rules for
+`struct` on your compiler. Traits such as `std::alignment_of`, or other standard
+library facilities, are not used.
+
+
 ## Does Outcome have a stable ABI and API?
 
 Right now, no. Though the data layout shown above is not expected to change.
@@ -90,7 +103,7 @@ with unbounded execution times such as `malloc()`, `dynamic_cast<>()` or `throw`
 Outcome works perfectly with C++ exceptions and RTTI globally disabled.
 
 Outcome's entire design premise is that its users are happy to exchange a small, predictable constant overhead
-during successful code paths, in exchange for completely predictable failure code paths.
+during successful code paths, in exchange for predictable failure code paths.
 
 In contrast, table-based exception handling gives zero run time overhead for the
 successful code path, and completely unpredictable (and very expensive) overhead
