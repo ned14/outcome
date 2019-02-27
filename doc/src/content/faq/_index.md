@@ -51,6 +51,41 @@ Note that the stable ABI and API guarantee will only apply to standalone
 Outcome, not to Boost.Outcome. Boost.Outcome has dependencies on other
 parts of Boost which are not stable across releases.
 
+Note also that the types you configure a `result` or `outcome` with also need
+to be ABI stable if `result` or `outcome` is to be ABI stable.
+
+
+## Can I use `result<T, EC>` across DLL/shared object boundaries?
+
+A known problem with using DLLs (and to smaller extent shared libraries) is that global
+objects may get duplicated: one instance in the executable and one in the DLL. This
+behaviour is not incorrect according to the C++ Standard, as the Standard does not
+recognize the existence of DLLs or shared libraries. Therefore, program designs that
+depend on globals having unique addresses may become compromised when used in a program
+using DLLs.
+
+Nothing in Outcome depends on the addresses of globals, plus the guaranteed fixed data
+layout (see answer above) means that different versions of Outcome can be used in
+different DLLs, and it probably will work okay (it is still not advised that you do that
+as that is an ODR violation).
+However, one of the most likely candidate for `EC` -- `std::error_code` -- does depend
+on the addresses of globals for correct functioning.
+
+The standard library is required to implement globally unique addresses for the standard library
+provided {{% api "std::error_category" %}} implementations e.g. `std::system_category()`.
+User defined error code categories may **not** have unique global addresses, and thus
+introduce misoperation.
+
+`boost::system::error_code`, since version 1.69 does offer an *opt-in* guarantee
+that it does not depend on the addresses of globals **if** the user defined error code
+category *opts-in* to the 64-bit comparison mechanism. This can be seen in the specification of
+`error_category::operator==` in
+[Boost.System synopsis](https://www.boost.org/doc/libs/1_69_0/libs/system/doc/html/system.html#ref_synopsis).
+
+Alternatively, the `status_code` in [Experimental Outcome](({{< relref "/experimental/differences" >}})),
+due to its more modern design, does not suffer from any problems from being used in shared
+libraries in any configuration.
+
 
 ## Why two types `result<>`  and `outcome<>`, rather than just one?
 
