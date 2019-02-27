@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-19T10:44:41 UTC">
+<meta name="revised" content="2019-02-27T20:58:14 UTC">
 <title>Frequently asked questions :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2341,6 +2341,7 @@
 <li>
 <ul>
 <li><a href="#is-outcome-safe-to-use-in-extern-apis">Is Outcome safe to use in extern APIs?</a></li>
+<li><a href="#does-outcome-implement-over-alignment">Does Outcome implement over-alignment?</a></li>
 <li><a href="#does-outcome-have-a-stable-abi-and-api">Does Outcome have a stable ABI and API?</a></li>
 <li><a href="#can-i-use-result-t-ec-across-dll-shared-object-boundaries">Can I use <code>result&lt;T, EC&gt;</code> across DLL/shared object boundaries?</a></li>
 <li><a href="#why-two-types-result-and-outcome-rather-than-just-one">Why two types <code>result&lt;&gt;</code>  and <code>outcome&lt;&gt;</code>, rather than just one?</a></li>
@@ -2374,6 +2375,19 @@ line codebases. <code>result</code>&rsquo;s layout is hard coded to:</p>
 is <em>probably</em> C-compatible, but its layout is not standardised (though there is a
 normative note in the standard about its layout). Hence Outcome cannot provide a
 C macro API for standard Outcome, but we can for <a href="/outcome/experimental/c-api/">Experimental Outcome</a>.</p>
+
+<h2 id="does-outcome-implement-over-alignment">Does Outcome implement over-alignment?</h2>
+
+<p>Variant-based alternatives to Outcome such as 
+<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 std::expected&lt;T, E&gt;</a>
+would use <code>std::aligned_union</code> to ensure appropriate over-alignment for the storage of
+either a <code>T</code> or an <code>E</code>. This discovers the over-alignment for a type using
+<code>std::alignment_of</code>, which is defaulted to <code>alignof()</code>.</p>
+
+<p>Outcome uses <code>struct</code>-based storage, as described above. Any over-alignment of
+<code>result</code> or <code>outcome</code> will follow the ordinary alignment and padding rules for
+<code>struct</code> on your compiler. Traits such as <code>std::alignment_of</code>, or other standard
+library facilities, are not used.</p>
 
 <h2 id="does-outcome-have-a-stable-abi-and-api">Does Outcome have a stable ABI and API?</h2>
 
@@ -2476,7 +2490,7 @@ with unbounded execution times such as <code>malloc()</code>, <code>dynamic_cast
 Outcome works perfectly with C++ exceptions and RTTI globally disabled.</p>
 
 <p>Outcome&rsquo;s entire design premise is that its users are happy to exchange a small, predictable constant overhead
-during successful code paths, in exchange for completely predictable failure code paths.</p>
+during successful code paths, in exchange for predictable failure code paths.</p>
 
 <p>In contrast, table-based exception handling gives zero run time overhead for the
 successful code path, and completely unpredictable (and very expensive) overhead
@@ -2848,7 +2862,7 @@ interoperate with code using Outcome.</p></li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 19/02/2019
+        <i class='fa fa-calendar'></i> Last update on 27/02/2019
     </div>
     
 
