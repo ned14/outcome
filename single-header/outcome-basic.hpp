@@ -50,17 +50,16 @@ Distributed under the Boost Software License, Version 1.0.
 
 #ifndef OUTCOME_V2_CONFIG_HPP
 #define OUTCOME_V2_CONFIG_HPP
-//! \brief Major version for cmake and DLL version stamping \ingroup config
+/*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_MAJOR    2
-//! \brief Minor version for cmake and DLL version stamping \ingroup config
+/*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_MINOR    0
-//! \brief Patch version for cmake and DLL version stamping \ingroup config
+/*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_PATCH    0
-//! \brief Revision version for cmake and DLL version stamping \ingroup config
+/*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_REVISION 0  // Revision version for cmake and DLL version stamping
 
-//! \brief Defined between stable releases of Outcome. It means the inline namespace
-//! will be permuted per-commit to ensure ABI uniqueness. \ingroup config
+/*! AWAITING HUGO JSON CONVERSION TOOL */
 #ifndef OUTCOME_DISABLE_ABI_PERMUTATION
 #define OUTCOME_UNSTABLE_VERSION
 #endif
@@ -659,9 +658,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    01e18d3e6549400646f41b79de318994eac95f25
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-02-11 10:00:33 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 01e18d3e
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    51ba91416d557eecbe16b72e0ee6a453ac9131d5
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2018-12-15 13:10:02 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 51ba9141
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -989,11 +988,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 
 
-
-
-
-
-
 #ifndef OUTCOME_SYMBOL_VISIBLE
 #define OUTCOME_SYMBOL_VISIBLE QUICKCPPLIB_SYMBOL_VISIBLE
 #endif
@@ -1141,9 +1135,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 8f8fcba74fad4c89fdd2e3bf49fc12678eb1270e
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-02-11 13:38:11 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 8f8fcba7
+#define OUTCOME_PREVIOUS_COMMIT_REF 8f0870b8c3474fa6e77a858389e4788281798991
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-02-28 21:57:27 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 8f0870b8
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1160,7 +1154,6 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_V2_NAMESPACE_EXPORT_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(OUTCOME_V2)
 #define OUTCOME_V2_NAMESPACE_END QUICKCPPLIB_BIND_NAMESPACE_END(OUTCOME_V2)
 #endif
-
 
 #include <cstdint>  // for uint32_t etc
 #include <initializer_list>
@@ -1196,12 +1189,16 @@ using std::in_place_type;
 OUTCOME_V2_NAMESPACE_END
 #else
 OUTCOME_V2_NAMESPACE_BEGIN
-//! Aliases `std::in_place_type_t<T>` if on C++ 17 or later, else defined locally.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+type definition template <class T> in_place_type_t. Potential doc page: `in_place_type_t<T>`
+*/
 template <class T> struct in_place_type_t
 {
   explicit in_place_type_t() = default;
 };
-//! Aliases `std::in_place_type<T>` if on C++ 17 or later, else defined locally.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 template <class T> constexpr in_place_type_t<T> in_place_type{};
 OUTCOME_V2_NAMESPACE_END
 #endif
@@ -1800,38 +1797,23 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
-/*! Type sugar for implicitly constructing a `basic_result<>` with a successful state.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+type definition template <class T> success_type. Potential doc page: `success_type<T>`
 */
 template <class T> struct success_type
 {
-  //! The type of the successful state.
   using value_type = T;
 
 private:
-  //! The value of the successful state.
   value_type _value;
 
 public:
-  /// \output_section Default, copy/move constructors and assignment
-  //! Default constructor
   success_type() = default;
-  //! Copy constructor
   success_type(const success_type &) = default;
-  //! Move constructor
   success_type(success_type &&) = default;  // NOLINT
-  //! Copy assignment
   success_type &operator=(const success_type &) = default;
-  //! Move assignment
   success_type &operator=(success_type &&) = default;  // NOLINT
-  //! Destructor
   ~success_type() = default;
-  /*! Initialising constructor
-
-  \requires That `U` is not `success_type`.
-  */
-
-
-
   OUTCOME_TEMPLATE(class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<success_type, std::decay_t<U>>::value))
   constexpr explicit success_type(U &&v)
@@ -1839,27 +1821,13 @@ public:
   {
   }
 
-  /// \output_section Observers
-  /*! Access value.
-  \returns Reference to the held `value_type` according to overload.
-  \group success_type_value
-  */
-
-
-
   constexpr value_type &value() & { return _value; }
-  /// \group success_type_value
   constexpr const value_type &value() const & { return _value; }
-  /// \group success_type_value
   constexpr value_type &&value() && { return static_cast<value_type &&>(_value); }
-  /// \group success_type_value
   constexpr const value_type &&value() const && { return static_cast<value_type &&>(_value); }
 };
-/*! Type sugar for implicitly constructing a `basic_result<>` with a successful state.
-*/
 template <> struct success_type<void>
 {
-  //! The type of the successful state.
   using value_type = void;
 };
 /*! Returns type sugar for implicitly constructing a `basic_result<T>` with a successful state,
@@ -1877,20 +1845,17 @@ template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v)
   return success_type<std::decay_t<T>>{static_cast<T &&>(v)};
 }
 
-/*! Type sugar for implicitly constructing a `basic_result<>` with a failure state of error code and exception.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+type definition template <class EC, class E = void> failure_type. Potential doc page: `failure_type<EC, EP = void>`
 */
 template <class EC, class E = void> struct failure_type
 {
-  //! The type of the error code
   using error_type = EC;
-  //! The type of the exception
   using exception_type = E;
 
 private:
   bool _have_error{}, _have_exception{};
-  //! The error code
   error_type _error;
-  //! The exception
   exception_type _exception;
 
   struct error_init_tag
@@ -1901,20 +1866,12 @@ private:
   };
 
 public:
-  /// \output_section Default, copy/move constructors and assignment
-  //! Default constructor
   failure_type() = default;
-  //! Copy constructor
   failure_type(const failure_type &) = default;
-  //! Move constructor
   failure_type(failure_type &&) = default;  // NOLINT
-  //! Copy assignment
   failure_type &operator=(const failure_type &) = default;
-  //! Move assignment
   failure_type &operator=(failure_type &&) = default;  // NOLINT
-  //! Destructor
   ~failure_type() = default;
-  //! Initialising constructor
   template <class U, class V>
   constexpr explicit failure_type(U &&u, V &&v)
       : _have_error(true)
@@ -1923,9 +1880,6 @@ public:
       , _exception(static_cast<V &&>(v))
   {
   }
-  /*! Initialising constructor for `error_type` only.
-  */
-
   template <class U>
   constexpr explicit failure_type(in_place_type_t<error_type> /*unused*/, U &&u, error_init_tag /*unused*/ = error_init_tag())
       : _have_error(true)
@@ -1933,9 +1887,6 @@ public:
       , _exception()
   {
   }
-  /*! Initialising constructor for `exception_type` only.
-  */
-
   template <class U>
   constexpr explicit failure_type(in_place_type_t<exception_type> /*unused*/, U &&u, exception_init_tag /*unused*/ = exception_init_tag())
       : _have_exception(true)
@@ -1944,76 +1895,34 @@ public:
   {
   }
 
-  /// \output_section Observers
-  //! True if has error
   constexpr bool has_error() const { return _have_error; }
-  //! True if has exception
   constexpr bool has_exception() const { return _have_exception; }
 
-  /*! Access error.
-  \returns Reference to the held `error_type` according to overload.
-  \group failure_type_error
-  */
-
-
-
   constexpr error_type &error() & { return _error; }
-  /// \group failure_type_error
   constexpr const error_type &error() const & { return _error; }
-  /// \group failure_type_error
   constexpr error_type &&error() && { return static_cast<error_type &&>(_error); }
-  /// \group failure_type_error
   constexpr const error_type &&error() const && { return static_cast<error_type &&>(_error); }
 
-  /*! Access exception.
-  \returns Reference to the held `exception_type` according to overload.
-  \group failure_type_exception
-  */
-
-
-
   constexpr exception_type &exception() & { return _exception; }
-  /// \group failure_type_exception
   constexpr const exception_type &exception() const & { return _exception; }
-  /// \group failure_type_exception
   constexpr exception_type &&exception() && { return static_cast<exception_type &&>(_exception); }
-  /// \group failure_type_exception
   constexpr const exception_type &&exception() const && { return static_cast<exception_type &&>(_exception); }
 };
-/*! Type sugar for implicitly constructing a `basic_result<>` with a failure state of error code.
-*/
 template <class EC> struct failure_type<EC, void>
 {
-  //! The type of the error code
   using error_type = EC;
-  //! The type of the exception
   using exception_type = void;
 
 private:
-  //! The error code
   error_type _error;
 
 public:
-  /// \output_section Default, copy/move constructors and assignment
-  //! Default constructor
   failure_type() = default;
-  //! Copy constructor
   failure_type(const failure_type &) = default;
-  //! Move constructor
   failure_type(failure_type &&) = default;  // NOLINT
-  //! Copy assignment
   failure_type &operator=(const failure_type &) = default;
-  //! Move assignment
   failure_type &operator=(failure_type &&) = default;  // NOLINT
-  //! Destructor
   ~failure_type() = default;
-  /*! Initialising constructor
-
-  \requires That `U` is not `failure_type`.
-  */
-
-
-
   OUTCOME_TEMPLATE(class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<U>>::value))
   constexpr explicit failure_type(U &&u)
@@ -2021,56 +1930,26 @@ public:
   {
   }
 
-  /// \output_section Observers
-  /*! Access error.
-  \returns Reference to the held `error_type` according to overload.
-  \group failure_type_error2
-  */
-
-
-
   constexpr error_type &error() & { return _error; }
-  /// \group failure_type_error2
   constexpr const error_type &error() const & { return _error; }
-  /// \group failure_type_error2
   constexpr error_type &&error() && { return static_cast<error_type &&>(_error); }
-  /// \group failure_type_error2
   constexpr const error_type &&error() const && { return static_cast<error_type &&>(_error); }
 };
-/*! Type sugar for implicitly constructing a `basic_result<>` with a failure state of exception.
-*/
 template <class E> struct failure_type<void, E>
 {
-  //! The type of the error code
   using error_type = void;
-  //! The type of the exception
   using exception_type = E;
 
 private:
-  //! The exception
   exception_type _exception;
 
 public:
-  /// \output_section Default, copy/move constructors and assignment
-  //! Default constructor
   failure_type() = default;
-  //! Copy constructor
   failure_type(const failure_type &) = default;
-  //! Move constructor
   failure_type(failure_type &&) = default;  // NOLINT
-  //! Copy assignment
   failure_type &operator=(const failure_type &) = default;
-  //! Move assignment
   failure_type &operator=(failure_type &&) = default;  // NOLINT
-  //! Destructor
   ~failure_type() = default;
-  /*! Initialising constructor
-
-  \requires That `V` is not `failure_type`.
-  */
-
-
-
   OUTCOME_TEMPLATE(class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<V>>::value))
   constexpr explicit failure_type(V &&v)
@@ -2078,31 +1957,20 @@ public:
   {
   }
 
-  /// \output_section Observers
-  /*! Access exception.
-  \returns Reference to the held `exception_type` according to overload.
-  \group failure_type_exception2
-  */
-
-
-
   constexpr exception_type &exception() & { return _exception; }
-  /// \group failure_type_exception2
   constexpr const exception_type &exception() const & { return _exception; }
-  /// \group failure_type_exception2
   constexpr exception_type &&exception() && { return static_cast<exception_type &&>(_exception); }
-  /// \group failure_type_exception2
   constexpr const exception_type &&exception() const && { return static_cast<exception_type &&>(_exception); }
 };
-/*! Returns type sugar for implicitly constructing a `basic_result<T>` with a failure state.
-\effects Copies or moves the failure state supplied into the returned type sugar.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
 */
 template <class EC> inline constexpr failure_type<std::decay_t<EC>> failure(EC &&v)
 {
   return failure_type<std::decay_t<EC>>{static_cast<EC &&>(v)};
 }
-/*! Returns type sugar for implicitly constructing a `basic_result<T>` with a failure state.
-\effects Copies or moves the failure state supplied into the returned type sugar.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
 */
 template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, E &&w)
 {
@@ -2129,10 +1997,14 @@ namespace detail
   };
 }  // namespace detail
 
-//! True if the type is a success type
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 template <class T> static constexpr bool is_success_type = detail::is_success_type<std::decay_t<T>>::value;
 
-//! True if the type is a failure type
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 template <class T> static constexpr bool is_failure_type = detail::is_failure_type<std::decay_t<T>>::value;
 
 OUTCOME_V2_NAMESPACE_END
@@ -2169,24 +2041,11 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
-//! Namespace for traits
 namespace trait
 {
-  /*! Requirements predicate for permitting type to be used in `basic_result`/`basic_outcome`.
-
-  - Is not a reference.
-  - Is not an `in_place_type_t<>`.
-  - Is not a `success_type<>`.
-  - Is not a `failure_type<>`.
-  - Is not an array.
-  - Is `void`, or else is an Object and is Destructible.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   template <class R>                                                             //
@@ -2200,13 +2059,9 @@ namespace trait
                                   && std::is_destructible<R>::value))            //
    );
 
-  /*! Trait for whether a type is an error type or not. This is specialised by
-  later code to enable implicit conversion for when the value type is `bool` and the
-  error type is convertible to `bool`, something which ordinarily would disable
-  all implicit constructors.
-  */
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+type definition  is_error_type. Potential doc page: NOT FOUND
+*/
 
 
   template <class E> struct is_error_type
@@ -2214,13 +2069,9 @@ namespace trait
     static constexpr bool value = false;
   };
 
-  /*! Trait for whether a type is an error type enum or not. This is specialised by
-  later code to enable implicit conversion from such enum types.
-  \tparam E The error type.
-  \tparam Enum The enum type.
-  */
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+type definition  is_error_type_enum. Potential doc page: NOT FOUND
+*/
 
 
   template <class E, class Enum> struct is_error_type_enum
@@ -2266,9 +2117,9 @@ namespace trait
     };
   }  // namespace detail
 
-  /*! Trait for whether a free function `make_error_code(T)` exists or not.
-  Also true for `std::error_code` and `boost::system::error_code`.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+type definition  is_error_code_available. Potential doc page: NOT FOUND
+*/
 
 
   template <class T> struct is_error_code_available
@@ -2277,9 +2128,9 @@ namespace trait
   };
   template <class T> constexpr bool is_error_code_available_v = detail::_is_error_code_available<std::decay_t<T>>::value;
 
-  /*! Trait for whether a free function `make_exception_ptr(T)` exists or not.
-  Also true for `std::exception_ptr` and `boost::exception_ptr`.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+type definition  is_exception_ptr_available. Potential doc page: NOT FOUND
+*/
 
 
   template <class T> struct is_exception_ptr_available
@@ -2660,12 +2511,9 @@ namespace detail
   template <class R, class S, class NoValuePolicy> class basic_result_final;
 }
 
-//! Namespace containing hooks used for intercepting and manipulating `basic_result`/`basic_outcome`
 namespace hooks
 {
-  //! Get the sixteen bits of spare storage in a `basic_result` or `basic_outcome`.
   template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept;
-  //! Sets the sixteen bits of spare storage in a `basic_result` or `basic_outcome`.
   template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
 }  // namespace hooks
 
@@ -2676,7 +2524,6 @@ namespace policy
 
 namespace detail
 {
-  //! The base implementation type of `basic_result<R, EC, NoValuePolicy>`.
   template <class R, class EC, class NoValuePolicy>                                                                                                                                    //
   OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<EC> && (std::is_void<EC>::value || std::is_default_constructible<EC>::value))  //
   class basic_result_storage
@@ -2782,7 +2629,6 @@ OUTCOME_V2_NAMESPACE_END
 #endif
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Namespace for injected convertibility
 namespace convert
 {
 #if defined(__cpp_concepts)
@@ -2865,28 +2711,15 @@ namespace convert
     };
   }  // namespace detail
 
-  /*! Default converter for types matching the `ValueOrError` concept.
-  You can partially or fully specialise this converter for your own user defined types by
-  injecting specialisations into the `convert` namespace.
-  */
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+type definition  value_or_error. Potential doc page: NOT FOUND
+*/
 
 
   template <class T, class U> struct value_or_error
   {
-    //! False to indicate that this converter wants `basic_result`/`basic_outcome` to reject all other `basic_result`
     static constexpr bool enable_result_inputs = false;
-    //! False to indicate that this converter wants `basic_outcome` to reject all other `basic_outcome`
     static constexpr bool enable_outcome_inputs = false;
-    /*! Default converter for types matching the `ValueOrError` concept.
-    \requires `std::decay_t<X>` to be the same type as `U`;
-    `ValueOrError<U>` to be true, `U`'s `value_type` be constructible into `T`'s `value_type`
-    and `U`'s `error_type` be constructible into `T`'s `error_type`.
-    */
-
-
-
-
     OUTCOME_TEMPLATE(class X)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_same<U, std::decay_t<X>>::value                                                                                                                                                    //
                                     &&ValueOrError<U>                                                                                                                                                                          //
@@ -2958,75 +2791,48 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  //! The error observers implementation of `basic_result<R, EC, NoValuePolicy>`.
   template <class Base, class EC, class NoValuePolicy> class basic_result_error_observers : public Base
   {
   public:
     using error_type = EC;
     using Base::Base;
 
-    /// \output_section Narrow state observers
-    /*! Access error without runtime checks.
-    \preconditions The basic_result to have a failed state, otherwise it is undefined behaviour.
-    \returns Reference to the held `error_type` according to overload.
-    \group assume_error
-    */
-
-
-
-
     constexpr error_type &assume_error() & noexcept
     {
       NoValuePolicy::narrow_error_check(static_cast<basic_result_error_observers &>(*this));
       return this->_error;
     }
-    /// \group assume_error
     constexpr const error_type &assume_error() const &noexcept
     {
       NoValuePolicy::narrow_error_check(static_cast<const basic_result_error_observers &>(*this));
       return this->_error;
     }
-    /// \group assume_error
     constexpr error_type &&assume_error() && noexcept
     {
       NoValuePolicy::narrow_error_check(static_cast<basic_result_error_observers &&>(*this));
       return static_cast<error_type &&>(this->_error);
     }
-    /// \group assume_error
     constexpr const error_type &&assume_error() const &&noexcept
     {
       NoValuePolicy::narrow_error_check(static_cast<const basic_result_error_observers &&>(*this));
       return static_cast<const error_type &&>(this->_error);
     }
 
-    /// \output_section Wide state observers
-    /*! Access error with runtime checks.
-    \returns Reference to the held `error_type` according to overload.
-    \requires The basic_result to have a failed state, else whatever `NoValuePolicy` says ought to happen.
-    \group error
-    */
-
-
-
-
     constexpr error_type &error() &
     {
       NoValuePolicy::wide_error_check(static_cast<basic_result_error_observers &>(*this));
       return this->_error;
     }
-    /// \group error
     constexpr const error_type &error() const &
     {
       NoValuePolicy::wide_error_check(static_cast<const basic_result_error_observers &>(*this));
       return this->_error;
     }
-    /// \group error
     constexpr error_type &&error() &&
     {
       NoValuePolicy::wide_error_check(static_cast<basic_result_error_observers &&>(*this));
       return static_cast<error_type &&>(this->_error);
     }
-    /// \group error
     constexpr const error_type &&error() const &&
     {
       NoValuePolicy::wide_error_check(static_cast<const basic_result_error_observers &&>(*this));
@@ -3037,17 +2843,7 @@ namespace detail
   {
   public:
     using Base::Base;
-    /// \output_section Narrow state observers
-    /*! Access error without runtime checks.
-    */
-
     constexpr void assume_error() const noexcept { NoValuePolicy::narrow_error_check(*this); }
-    /// \output_section Wide state observers
-    /*! Access error with runtime checks.
-    \requires The basic_result to have a failed state, else whatever `NoValuePolicy` says ought to happen.
-    */
-
-
     constexpr void error() const { NoValuePolicy::wide_error_check(*this); }
   };
 }  // namespace detail
@@ -3087,75 +2883,48 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  //! The value observers implementation of `basic_result<R, EC, NoValuePolicy>`.
   template <class Base, class R, class NoValuePolicy> class basic_result_value_observers : public Base
   {
   public:
     using value_type = R;
     using Base::Base;
 
-    /// \output_section Narrow state observers
-    /*! Access value without runtime checks.
-    \preconditions The basic_result to have a successful state, otherwise it is undefined behaviour.
-    \returns Reference to the held `value_type` according to overload.
-    \group assume_value
-    */
-
-
-
-
     constexpr value_type &assume_value() & noexcept
     {
       NoValuePolicy::narrow_value_check(static_cast<basic_result_value_observers &>(*this));
       return this->_state._value;  // NOLINT
     }
-    /// \group assume_value
     constexpr const value_type &assume_value() const &noexcept
     {
       NoValuePolicy::narrow_value_check(static_cast<const basic_result_value_observers &>(*this));
       return this->_state._value;  // NOLINT
     }
-    /// \group assume_value
     constexpr value_type &&assume_value() && noexcept
     {
       NoValuePolicy::narrow_value_check(static_cast<basic_result_value_observers &&>(*this));
       return static_cast<value_type &&>(this->_state._value);  // NOLINT
     }
-    /// \group assume_value
     constexpr const value_type &&assume_value() const &&noexcept
     {
       NoValuePolicy::narrow_value_check(static_cast<const basic_result_value_observers &&>(*this));
       return static_cast<const value_type &&>(this->_state._value);  // NOLINT
     }
 
-    /// \output_section Wide state observers
-    /*! Access value with runtime checks.
-    \returns Reference to the held `value_type` according to overload.
-    \requires The basic_result to have a successful state, else whatever `NoValuePolicy` says ought to happen.
-    \group value
-    */
-
-
-
-
     constexpr value_type &value() &
     {
       NoValuePolicy::wide_value_check(static_cast<basic_result_value_observers &>(*this));
       return this->_state._value;  // NOLINT
     }
-    /// \group value
     constexpr const value_type &value() const &
     {
       NoValuePolicy::wide_value_check(static_cast<const basic_result_value_observers &>(*this));
       return this->_state._value;  // NOLINT
     }
-    /// \group value
     constexpr value_type &&value() &&
     {
       NoValuePolicy::wide_value_check(static_cast<basic_result_value_observers &&>(*this));
       return static_cast<value_type &&>(this->_state._value);  // NOLINT
     }
-    /// \group value
     constexpr const value_type &&value() const &&
     {
       NoValuePolicy::wide_value_check(static_cast<const basic_result_value_observers &&>(*this));
@@ -3167,17 +2936,7 @@ namespace detail
   public:
     using Base::Base;
 
-    /// \output_section Narrow state observers
-    /*! Access value without runtime checks.
-    */
-
     constexpr void assume_value() const noexcept { NoValuePolicy::narrow_value_check(*this); }
-    /// \output_section Wide state observers
-    /*! Access value with runtime checks.
-    \requires The basic_result to have a successful state, else whatever `NoValuePolicy` says ought to happen.
-    */
-
-
     constexpr void value() const { NoValuePolicy::wide_value_check(*this); }
   };
 }  // namespace detail
@@ -3191,7 +2950,6 @@ namespace detail
 {
   template <class R, class EC, class NoValuePolicy> using select_basic_result_impl = basic_result_error_observers<basic_result_value_observers<basic_result_storage<R, EC, NoValuePolicy>, R, NoValuePolicy>, EC, NoValuePolicy>;
 
-  //! The assembled implementation type of `basic_result<R, S, NoValuePolicy>`.
   template <class R, class S, class NoValuePolicy>
   class basic_result_final
 
@@ -3205,55 +2963,11 @@ namespace detail
   public:
     using base::base;
 
-    /// \output_section State check observers
-    /*! Checks if has value.
-    \returns True if has value.
-    */
-
-
     constexpr explicit operator bool() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
-    /*! Checks if has value.
-    \returns True if has value.
-    */
-
-
     constexpr bool has_value() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
-    /*! Checks if has error.
-    \returns True if has error.
-    */
-
-
     constexpr bool has_error() const noexcept { return (this->_state._status & detail::status_have_error) != 0; }
-    /*! Checks if has exception.
-    \returns True if has exception.
-    */
-
-
     constexpr bool has_exception() const noexcept { return (this->_state._status & detail::status_have_exception) != 0; }
-    /*! Checks if has error or exception.
-    \returns True if has error or exception.
-    */
-
-
     constexpr bool has_failure() const noexcept { return (this->_state._status & detail::status_have_error) != 0 || (this->_state._status & detail::status_have_exception) != 0; }
-
-    /// \output_section Comparison operators
-    /*! True if equal to the other basic_result.
-    \param o The other basic_result to compare to.
-
-    \requires That both `value_type`'s have an `operator==` available;
-    that both `error_type`'s have an `operator==` available.
-    \effects Calls the `operator==` operation on any common stored state.
-    Otherwise returns false. Ignores spare storage.
-    \throws Any exception the individual `operator==` operations might throw.
-    */
-
-
-
-
-
-
-
 
     OUTCOME_TEMPLATE(class T, class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<R>>() == std::declval<detail::devoid<T>>()),  //
@@ -3271,21 +2985,6 @@ namespace detail
       }
       return false;
     }
-    /*! True if equal to the success type sugar.
-    \param o The success type sugar to compare to.
-
-    \requires That both `value_type`'s have an `operator==` available.
-    \effects Calls the `operator==` operation on any common stored state.
-    Otherwise returns false. Ignores spare storage.
-    \throws Any exception the individual `operator==` operations might throw.
-    */
-
-
-
-
-
-
-
     OUTCOME_TEMPLATE(class T)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<R>() == std::declval<T>()))
     constexpr bool operator==(const success_type<T> &o) const noexcept(  //
@@ -3297,35 +2996,11 @@ namespace detail
       }
       return false;
     }
-    /*! True if equal to the success type sugar.
-    \param o The success type sugar to compare to.
-
-    \effects True if the result is valued.
-    */
-
-
-
-
     constexpr bool operator==(const success_type<void> &o) const noexcept
     {
       (void) o;
       return (this->_state._status & detail::status_have_value) != 0;
     }
-    /*! True if equal to the failure type sugar.
-    \param o The failure type sugar to compare to.
-
-    \requires That both `error_type`'s have an `operator==` available.
-    \effects Calls the `operator==` operation on any common stored state.
-    Otherwise returns false. Ignores spare storage.
-    \throws Any exception the individual `operator==` operations might throw.
-    */
-
-
-
-
-
-
-
     OUTCOME_TEMPLATE(class T)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<S>() == std::declval<T>()))
     constexpr bool operator==(const failure_type<T, void> &o) const noexcept(  //
@@ -3337,23 +3012,6 @@ namespace detail
       }
       return false;
     }
-    /*! True if not equal to the other basic_result.
-    \param o The other basic_result to compare to.
-
-    \requires That both `value_type`'s have an `operator!=` available;
-    that both `error_type`'s have an `operator!=` available.
-    \effects Calls the `operator!=` operation on any common stored state.
-    Otherwise returns true. Ignores spare storage.
-    \throws Any exception the individual `operator!=` operations might throw.
-    */
-
-
-
-
-
-
-
-
     OUTCOME_TEMPLATE(class T, class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<R>>() != std::declval<detail::devoid<T>>()),  //
                       OUTCOME_TEXPR(std::declval<detail::devoid<S>>() != std::declval<detail::devoid<U>>()))
@@ -3370,21 +3028,6 @@ namespace detail
       }
       return true;
     }
-    /*! True if not equal to the success type sugar.
-    \param o The success type sugar to compare to.
-
-    \requires That both `value_type`'s have an `operator!=` available.
-    \effects Calls the `operator!=` operation on any common stored state.
-    Otherwise returns true. Ignores spare storage.
-    \throws Any exception the individual `operator!=` operations might throw.
-    */
-
-
-
-
-
-
-
     OUTCOME_TEMPLATE(class T)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<R>() != std::declval<T>()))
     constexpr bool operator!=(const success_type<T> &o) const noexcept(  //
@@ -3396,35 +3039,11 @@ namespace detail
       }
       return false;
     }
-    /*! True if not equal to the success type sugar.
-    \param o The success type sugar to compare to.
-
-    \effects False if the result is valued.
-    */
-
-
-
-
     constexpr bool operator!=(const success_type<void> &o) const noexcept
     {
       (void) o;
       return (this->_state._status & detail::status_have_value) == 0;
     }
-    /*! True if not equal to the failure type sugar.
-    \param o The failure type sugar to compare to.
-
-    \requires That both `error_type`'s have an `operator!=` available.
-    \effects Calls the `operator!=` operation on any common stored state.
-    Otherwise returns true. Ignores spare storage.
-    \throws Any exception the individual `operator!=` operations might throw.
-    */
-
-
-
-
-
-
-
     OUTCOME_TEMPLATE(class T)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<S>() != std::declval<T>()))
     constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(  //
@@ -3437,69 +3056,9 @@ namespace detail
       return true;
     }
   };
-  /*! True if the basic_result is equal to the success type sugar.
-  \param a The success type sugar to compare.
-  \param b The basic_result to compare.
-
-  \effects If a valid expression to do so, calls the `operator==` operation on the successful item returning true if equal. Otherwise returns false.
-  \remarks Implemented as `b == a`.
-  \throws Any exception the `operator==` operation might throw.
-  */
-
-
-
-
-
-
-
   template <class T, class U, class V, class W> constexpr inline bool operator==(const success_type<W> &a, const basic_result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
-  /*! True if the basic_result is equal to the failure type sugar.
-  \param a The failure type sugar to compare.
-  \param b The basic_result to compare.
-
-  \effects If a valid expression to do so, calls the `operator==` operation on the failure item returning true if equal. Otherwise returns false.
-  \remarks Implemented as `b == a`.
-  \throws Any exception the `operator==` operation might throw.
-  */
-
-
-
-
-
-
-
   template <class T, class U, class V, class W> constexpr inline bool operator==(const failure_type<W, void> &a, const basic_result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
-  /*! True if the basic_result is not equal to the success type sugar.
-  \param a The success type sugar to compare.
-  \param b The basic_result to compare.
-
-  \effects If a valid expression to do so, calls the `operator!=` operation on the successful item returning true if not equal. Otherwise returns false.
-  \remarks Implemented as `b != a`.
-  \throws Any exception the `operator!=` operation might throw.
-  */
-
-
-
-
-
-
-
   template <class T, class U, class V, class W> constexpr inline bool operator!=(const success_type<W> &a, const basic_result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
-  /*! True if the basic_result is not equal to the failure type sugar.
-  \param a The failure type sugar to compare.
-  \param b The basic_result to compare.
-
-  \effects If a valid expression to do so, calls the `operator!=` operation on the failure item returning true if not equal. Otherwise returns false.
-  \remarks Implemented as `b != a`.
-  \throws Any exception the `operator!=` operation might throw.
-  */
-
-
-
-
-
-
-
   template <class T, class U, class V, class W> constexpr inline bool operator!=(const failure_type<W, void> &a, const basic_result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
 }  // namespace detail
 
@@ -3567,10 +3126,14 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+
+
   struct base
   {
   protected:
-    //! Invokes noticeable UB!
     template <class Impl>
     static constexpr
 #ifdef _MSC_VER
@@ -3583,40 +3146,26 @@ namespace policy
       assert(false);  // NOLINT
 #if defined(__GNUC__) || defined(__clang__)
       __builtin_unreachable();
+#elif defined(_MSC_VER)
+      __assume(0);
 #endif
     }
 
-    //! True if the current state's status has its value bit set.
     template <class Impl> static constexpr bool _has_value(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) != 0; }
-    //! True if the current state's status has its error bit set.
     template <class Impl> static constexpr bool _has_error(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0; }
-    //! True if the current state's status has its exception bit set.
     template <class Impl> static constexpr bool _has_exception(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0; }
-    //! True if the current state's status has its error-is-errno bit set.
     template <class Impl> static constexpr bool _has_error_is_errno(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_error_is_errno) != 0; }
 
-    //! Changes the current state's status value bit.
     template <class Impl> static constexpr void _set_has_value(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_value : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_have_value; }
-    //! Changes the current state's status error bit.
     template <class Impl> static constexpr void _set_has_error(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_error : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_have_error; }
-    //! Changes the current state's status exception bit.
     template <class Impl> static constexpr void _set_has_exception(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_exception : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_have_exception; }
-    //! Changes the current state's status error-is-errno bit.
     template <class Impl> static constexpr void _set_has_error_is_errno(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_error_is_errno : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_error_is_errno; }
 
-    //! Accesses the current state's value. No checking of validity is made.
     template <class Impl> static constexpr auto &&_value(Impl &&self) noexcept { return static_cast<Impl &&>(self)._state._value; }
-    //! Accesses the current state's error. No checking of validity is made.
     template <class Impl> static constexpr auto &&_error(Impl &&self) noexcept { return static_cast<Impl &&>(self)._error; }
 
   public:
-    //! Accesses the current state's exception. No checking of validity is made.
     template <class R, class S, class P, class NoValuePolicy, class Impl> static inline constexpr auto &&_exception(Impl &&self) noexcept;
-
-    /*! Performs a narrow check of state, used in the assume_value() functions.
-    \effects None.
-    */
-
 
     template <class Impl> static constexpr void narrow_value_check(Impl &&self) noexcept
     {
@@ -3625,11 +3174,6 @@ namespace policy
         _ub(self);
       }
     }
-    /*! Performs a narrow check of state, used in the assume_error() functions
-    \effects None.
-    */
-
-
     template <class Impl> static constexpr void narrow_error_check(Impl &&self) noexcept
     {
       if(!_has_error(self))
@@ -3637,11 +3181,6 @@ namespace policy
         _ub(self);
       }
     }
-    /*! Performs a narrow check of state, used in the assume_exception() functions
-    \effects None.
-    */
-
-
     template <class Impl> static constexpr void narrow_exception_check(Impl &&self) noexcept
     {
       if(!_has_exception(self))
@@ -3659,32 +3198,15 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  /*! Policy which treats wide checks as narrow checks.
-
-  Can be used in both `result` and `outcome`.
-  */
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+type definition  all_narrow. Potential doc page: `all_narrow`
+*/
 
 
   struct all_narrow : base
   {
-    /*! Performs a wide check of state, used in the value() functions. Calls `narrow_value_check()` and does nothing else.
-    \effects None.
-    */
-
-
     template <class Impl> static constexpr void wide_value_check(Impl &&self) { base::narrow_value_check(static_cast<Impl &&>(self)); }
-    /*! Performs a wide check of state, used in the error() functions. Calls `narrow_error_check()` and does nothing else.
-    \effects None.
-    */
-
-
     template <class Impl> static constexpr void wide_error_check(Impl &&self) { base::narrow_error_check(static_cast<Impl &&>(self)); }
-    /*! Performs a wide check of state, used in the exception() functions. Calls `narrow_exception_check()` and does nothing else.
-    \effects None.
-    */
-
-
     template <class Impl> static constexpr void wide_exception_check(Impl &&self) { base::narrow_exception_check(static_cast<Impl &&>(self)); }
   };
 }  // namespace policy
@@ -3727,20 +3249,13 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  /*! Policy implementing any wide attempt to access the successful state as calling `std::abort`
-
-  Can be used in both `result` and `outcome`.
-  */
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+type definition  terminate. Potential doc page: `terminate`
+*/
 
 
   struct terminate : base
   {
-    /*! Performs a wide check of state, used in the value() functions.
-    \effects If result does not have a value, calls `std::terminate()`.
-    */
-
-
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
       if(!base::_has_value(static_cast<Impl &&>(self)))
@@ -3748,11 +3263,6 @@ namespace policy
         std::abort();
       }
     }
-    /*! Performs a wide check of state, used in the error() functions
-    \effects If result does not have an error, calls `std::terminate()`.
-    */
-
-
     template <class Impl> static constexpr void wide_error_check(Impl &&self) noexcept
     {
       if(!base::_has_error(static_cast<Impl &&>(self)))
@@ -3760,11 +3270,6 @@ namespace policy
         std::abort();
       }
     }
-    /*! Performs a wide check of state, used in the exception() functions
-    \effects If outcome does not have an exception, calls `std::terminate()`.
-    */
-
-
     template <class Impl> static constexpr void wide_exception_check(Impl &&self)
     {
       if(!base::_has_exception(static_cast<Impl &&>(self)))
@@ -3875,87 +3380,61 @@ namespace detail
   };
 }  // namespace detail
 
-//! True if a `basic_result`
+/*! AWAITING HUGO JSON CONVERSION TOOL
+type alias template <class T> is_basic_result. Potential doc page: `is_basic_result<T>`
+*/
 template <class T> using is_basic_result = detail::is_basic_result<std::decay_t<T>>;
-//! True if a `basic_result`
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 template <class T> static constexpr bool is_basic_result_v = detail::is_basic_result<std::decay_t<T>>::value;
 
-//! Namespace for ADL discovered hooks into events in `result` and `outcome`.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 namespace hooks
 {
-  /*! The default instantiation hook implementation called when a `result` is first created
-  by conversion from one of its possible types. Does nothing.
-  \param 1 Some `result<...>` being constructed.
-  \param 2 The source data.
-
-  WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
-  */
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   template <class T, class U> constexpr inline void hook_result_construction(T * /*unused*/, U && /*unused*/) noexcept {}
-  /*! The default instantiation hook implementation called when a `result` is created by copying
-  from another `result`. Does nothing.
-  \param 1 Some `result<...>` being constructed.
-  \param 2 The source data.
-
-  WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
-  */
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   template <class T, class U> constexpr inline void hook_result_copy_construction(T * /*unused*/, U && /*unused*/) noexcept {}
-  /*! The default instantiation hook implementation called when a `result` is created by moving
-  from another `result`. Does nothing.
-  \param 1 Some `result<...>` being constructed.
-  \param 2 The source data.
-
-  WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
-  */
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   template <class T, class U> constexpr inline void hook_result_move_construction(T * /*unused*/, U && /*unused*/) noexcept {}
-  /*! The default instantiation hook implementation called when a `result` is created by in place
-  construction. Does nothing.
-  \param 1 Some `result<...>` being constructed.
-  \param 2 The type of in place construction occurring.
-  \param 3 The source data.
-
-  WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
-  */
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   template <class T, class U, class... Args> constexpr inline void hook_result_in_place_construction(T * /*unused*/, in_place_type_t<U> /*unused*/, Args &&... /*unused*/) noexcept {}
 
-  //! Retrieves the 16 bits of spare storage in result/outcome.
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+
+
   template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept { return (r->_state._status >> detail::status_2byte_shift) & 0xffff; }
-  //! Sets the 16 bits of spare storage in result/outcome.
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+
+
   template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept { r->_state._status |= (v << detail::status_2byte_shift); }
 }  // namespace hooks
 
-/*! Used to return from functions either (i) a successful value (ii) a cause of failure. `constexpr` capable.
-
-\tparam R The optional type of the successful result (use `void` to disable). Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-\tparam S The optional type of the failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`. Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-\tparam NoValuePolicy Policy on how to interpret type `S` when a wide observation of a not present value occurs.
-
-Any `R` (`value_type`) state can be observed using the member functions `.value()` and `.assume_value()`. Any `S` (`error_type`) state can be
-observed using the member functions `.error()` and `.assume_error()`.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+type definition template <class R, class S, class NoValuePolicy> basic_result. Potential doc page: `basic_result<T, E, NoValuePolicy>`
 */
 template <class R, class S, class NoValuePolicy>                                                                                                                                  //
 #if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                           // GCC's constraints implementation is buggy
@@ -3989,22 +3468,16 @@ class OUTCOME_NODISCARD basic_result : public detail::basic_result_final<R, S, N
   };
 
 public:
-  /// \output_section Member types
-  //! The success type.
   using value_type = R;
-  //! The failure type.
   using error_type = S;
 
-  //! Used to disable in place type construction when `value_type` and `error_type` are ambiguous.
   using value_type_if_enabled = typename base::_value_type;
-  //! Used to disable in place type construction when `value_type` and `error_type` are ambiguous.
   using error_type_if_enabled = typename base::_error_type;
 
-  //! Used to rebind this result to a different result type.
   template <class T, class U = S, class V = NoValuePolicy> using rebind = basic_result<T, U, V>;
 
 protected:
-  //! Requirement predicates for result.
+  // Requirement predicates for result.
   struct predicate
   {
     using base = detail::result_predicates<value_type, error_type>;
@@ -4015,42 +3488,42 @@ protected:
     // Predicate for implicit constructors to be available at all
     static constexpr bool implicit_constructors_enabled = constructors_enabled && base::implicit_constructors_enabled;
 
-    //! Predicate for the value converting constructor to be available.
+    // Predicate for the value converting constructor to be available.
     template <class T>
     static constexpr bool enable_value_converting_constructor =  //
     constructors_enabled                                         //
     && !std::is_same<std::decay_t<T>, basic_result>::value       // not my type
     && base::template enable_value_converting_constructor<T>;
 
-    //! Predicate for the error converting constructor to be available.
+    // Predicate for the error converting constructor to be available.
     template <class T>
     static constexpr bool enable_error_converting_constructor =  //
     constructors_enabled                                         //
     && !std::is_same<std::decay_t<T>, basic_result>::value       // not my type
     && base::template enable_error_converting_constructor<T>;
 
-    //! Predicate for the error condition converting constructor to be available.
+    // Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>
     static constexpr bool enable_error_condition_converting_constructor =  //
     constructors_enabled                                                   //
     && !std::is_same<std::decay_t<ErrorCondEnum>, basic_result>::value     // not my type
     && base::template enable_error_condition_converting_constructor<ErrorCondEnum>;
 
-    //! Predicate for the converting copy constructor from a compatible input to be available.
+    // Predicate for the converting copy constructor from a compatible input to be available.
     template <class T, class U, class V>
     static constexpr bool enable_compatible_conversion =          //
     constructors_enabled                                          //
     && !std::is_same<basic_result<T, U, V>, basic_result>::value  // not my type
     && base::template enable_compatible_conversion<T, U, V>;
 
-    //! Predicate for the inplace construction of value to be available.
+    // Predicate for the inplace construction of value to be available.
     template <class... Args>
     static constexpr bool enable_inplace_value_constructor =  //
     constructors_enabled                                      //
     && (std::is_void<value_type>::value                       //
         || std::is_constructible<value_type, Args...>::value);
 
-    //! Predicate for the inplace construction of error to be available.
+    // Predicate for the inplace construction of error to be available.
     template <class... Args>
     static constexpr bool enable_inplace_error_constructor =  //
     constructors_enabled                                      //
@@ -4066,52 +3539,50 @@ protected:
   };
 
 public:
-  /// \output_section Default, copy/move constructors and assignment
-  //! Default construction is not permitted.
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+
+
   basic_result() = delete;
-  //! Move construction available if `value_type` and `error_type` implement it.
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+
+
   basic_result(basic_result && /*unused*/) = default;  // NOLINT
-  //! Copy construction available if `value_type` and `error_type` implement it.
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+
+
   basic_result(const basic_result & /*unused*/) = default;
-  //! Move assignment available if `value_type` and `error_type` implement it.
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+
+
   basic_result &operator=(basic_result && /*unused*/) = default;  // NOLINT
-  //! Copy assignment available if `value_type` and `error_type` implement it.
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+
+
   basic_result &operator=(const basic_result & /*unused*/) = default;
   ~basic_result() = default;
 
-  /// \output_section Disabling constructors
-  /*! Disabling constructor for when all constructors are disabled.
-  \tparam 2
-  \exclude
-
-  \requires `value_type` and `error_type` to be the same type.
-  \effects Declares a catch-all constructor which is deleted to give a clear error message to the user
-  that identical `value_type` and `error_type` is not supported, whilst also preserving compile-time introspection.
-  */
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class Arg, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!predicate::constructors_enabled && (sizeof...(Args) >= 0)))
   basic_result(Arg && /*unused*/, Args &&... /*unused*/) = delete;  // NOLINT basic_result<T, T> is NOT SUPPORTED, see docs!
 
-  /*! Disabling implicit constructor for when implicit constructors are disabled.
-  \tparam 1
-  \exclude
-
-  \requires `value_type` and `error_type` to be ambiguous.
-  \effects Declares a value type constructor which is deleted to give a clear error message to the user
-  that `value_type` and `error_type` are ambiguous, whilst also preserving compile-time introspection.
-  */
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -4119,26 +3590,9 @@ public:
                                    && (detail::is_implicitly_constructible<value_type, T> || detail::is_implicitly_constructible<error_type, T>) )))
   basic_result(T && /*unused*/, implicit_constructors_disabled_tag /*unused*/ = implicit_constructors_disabled_tag()) = delete;  // NOLINT Implicit constructors disabled, use explicit in_place_type<T>, success() or failure(). see docs!
 
-  /// \output_section Converting constructors
-  /*! Implicit converting constructor to a successful basic_result.
-  \tparam 1
-  \exclude
-  \param 1
-  \exclude
-  \param t The value from which to initialise the `value_type`.
-
-  \effects Initialises the basic_result with a `value_type`.
-  \requires Type T is implicitly constructible to `value_type`, is not implicitly constructible to `error_type`, and is not `basic_result<R, S>` and not `in_place_type<>`.
-  \throws Any exception the construction of `value_type(T)` might throw.
-  */
-
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -4149,27 +3603,9 @@ public:
     using namespace hooks;
     hook_result_construction(this, static_cast<T &&>(t));
   }
-  /*! Implicit converting constructor to a failure basic_result.
-  \tparam 1
-  \exclude
-  \param 1
-  \exclude
-  \param t The value from which to initialise the `error_type`.
-
-  \effects Initialises the basic_result with a `error_type`.
-  \requires Type T is implicitly constructible to `error_type`,
-  is not implicitly constructible to `value_type`, and is not `basic_result<R, S>` and not `in_place_type<>`.
-  \throws Any exception the construction of `error_type(T)` might throw.
-  */
-
-
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -4180,33 +3616,9 @@ public:
     using namespace hooks;
     hook_result_construction(this, static_cast<T &&>(t));
   }
-  /*! Implicit special error condition converting constructor to a failure basic_result.
-  \tparam 1
-  \exclude
-  \tparam 2
-  \exclude
-  \param 1
-  \exclude
-  \param t The error condition from which to initialise the `error_type`.
-
-  \effects Initialises the basic_result with a `error_type` constructed via `make_error_code(t)`.
-  \requires `std::is_error_condition_enum<ErrorCondEnum>` must be true,
-  `ErrorCondEnum` is not implicitly constructible to `value_type` nor `error_type`, and is not `basic_result<R, S>` and not `in_place_type<>`;
-  Finally, the expression `error_type(make_error_code(ErrorCondEnum()))` must be valid.
-  \throws Any exception the construction of `error_type(make_error_code(t))` might throw.
-  */
-
-
-
-
-
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class ErrorCondEnum)
@@ -4219,33 +3631,9 @@ public:
     hook_result_construction(this, static_cast<ErrorCondEnum &&>(t));
   }
 
-  /*! Explicit converting constructor from a compatible `ValueOrError` type.
-  \tparam 1
-  \exclude
-  \tparam 2
-  \exclude
-  \param 1
-  \exclude
-  \param o The input for which a `convert::value_or_error<basic_result, std::decay_t<T>>{}(std::forward<T>(o))` is available.
-
-  \effects Initialises the basic_result with the contents of the compatible input.
-  \requires That `convert::value_or_error<basic_result, std::decay_t<T>>{}(std::forward<T>(o))` be available. The
-  default implementation will consume `T`'s matching the `ValueOrError` concept type.
-  `ValueOrError` concept matches any type with a `value_type`,
-  an `error_type`, a `.value()`, an `.error()` and a `.has_value()`.
-  */
-
-
-
-
-
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -4255,21 +3643,9 @@ public:
   : basic_result{convert::value_or_error<basic_result, std::decay_t<T>>{}(static_cast<T &&>(o))}
   {
   }
-  /*! Explicit converting copy constructor from a compatible basic_result type.
-  \tparam 3
-  \exclude
-  \param o The compatible basic_result.
-
-  \effects Initialises the basic_result with a copy of the compatible basic_result.
-  \requires Both basic_result's `value_type` and `error_type` need to be constructible, or the source can be `void`.
-  \throws Any exception the construction of `value_type(T)` and `error_type(U)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T, class U, class V)
@@ -4280,21 +3656,9 @@ public:
     using namespace hooks;
     hook_result_copy_construction(this, o);
   }
-  /*! Explicit converting move constructor from a compatible basic_result type.
-  \tparam 3
-  \exclude
-  \param o The compatible basic_result.
-
-  \effects Initialises the basic_result with a move of the compatible basic_result.
-  \requires Both basic_result's `value_type` and `error_type` need to be constructible, or the source can be `void`.
-  \throws Any exception the construction of `value_type(T)` and `error_type(U)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T, class U, class V)
@@ -4306,24 +3670,9 @@ public:
     hook_result_move_construction(this, static_cast<basic_result<T, U, V> &&>(o));
   }
 
-  /// \output_section In place constructors
-  /*! Explicit inplace constructor to a successful basic_result.
-  \tparam 1
-  \exclude
-  \param _ Tag type to indicate we are doing in place construction of `value_type`.
-  \param args Arguments with which to in place construct.
-
-  \effects Initialises the basic_result with a `value_type`.
-  \requires `value_type` is void or `Args...` are constructible to `value_type`.
-  \throws Any exception the construction of `value_type(Args...)` might throw.
-  */
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class... Args)
@@ -4334,25 +3683,9 @@ public:
     using namespace hooks;
     hook_result_in_place_construction(this, in_place_type<value_type>, static_cast<Args &&>(args)...);
   }
-  /*! Explicit inplace constructor to a successful basic_result.
-  \tparam 2
-  \exclude
-  \param _ Tag type to indicate we are doing in place construction of `value_type`.
-  \param il An initializer list with which to in place construct.
-  \param args Arguments with which to in place construct.
-
-  \effects Initialises the basic_result with a `value_type`.
-  \requires The initializer list + `Args...` are constructible to `value_type`.
-  \throws Any exception the construction of `value_type(il, Args...)` might throw.
-  */
-
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class U, class... Args)
@@ -4363,23 +3696,9 @@ public:
     using namespace hooks;
     hook_result_in_place_construction(this, in_place_type<value_type>, il, static_cast<Args &&>(args)...);
   }
-  /*! Explicit inplace constructor to a failure basic_result.
-  \tparam 1
-  \exclude
-  \param _ Tag type to indicate we are doing in place construction of `error_type`.
-  \param args Arguments with which to in place construct.
-
-  \effects Initialises the basic_result with a `error_type`.
-  \requires `error_type` is void or `Args...` are constructible to `error_type`.
-  \throws Any exception the construction of `error_type(Args...)` might throw.
-  */
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class... Args)
@@ -4390,25 +3709,9 @@ public:
     using namespace hooks;
     hook_result_in_place_construction(this, in_place_type<error_type>, static_cast<Args &&>(args)...);
   }
-  /*! Explicit inplace constructor to a failure basic_result.
-  \tparam 2
-  \exclude
-  \param _ Tag type to indicate we are doing in place construction of `error_type`.
-  \param il An initializer list with which to in place construct.
-  \param args Arguments with which to in place construct.
-
-  \effects Initialises the basic_result with a `error_type`.
-  \requires The initializer list + `Args...` are constructible to `error_type`.
-  \throws Any exception the construction of `error_type(il, Args...)` might throw.
-  */
-
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class U, class... Args)
@@ -4419,21 +3722,9 @@ public:
     using namespace hooks;
     hook_result_in_place_construction(this, in_place_type<error_type>, il, static_cast<Args &&>(args)...);
   }
-  /*! Implicit inplace constructor to successful or failure basic_result.
-  \tparam 3
-  \exclude
-  \param args Arguments with which to in place construct.
-
-  \effects Calls the appropriate `in_place_type_t<...>` constructor depending on constructibility of args.
-  \requires That the args can construct exactly one of `value_type` or `error_type`.
-  \throws Any exception the `in_place_type_t<...>` constructor might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class A1, class A2, class... Args)
@@ -4450,18 +3741,9 @@ public:
     // hook_result_in_place_construction(in_place_type<typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>>, this);
   }
 
-  /// \output_section Tagged constructors
-  /*! Implicit tagged constructor of a successful basic_result.
-  \param o The compatible success type sugar.
-
-  \effects Initialises the basic_result with a default constructed success type.
-  \requires `value_type` to be default constructible, or `void`.
-  \throws Any exception the construction of `value_type()` might throw.
-  */
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   constexpr basic_result(const success_type<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)  // NOLINT
@@ -4470,21 +3752,9 @@ public:
     using namespace hooks;
     hook_result_copy_construction(this, o);
   }
-  /*! Implicit tagged constructor of a successful basic_result.
-  \tparam 1
-  \exclude
-  \param o The compatible success type sugar.
-
-  \effects Initialises the basic_result with a copy of the value in the type sugar.
-  \requires Both basic_result and success' `value_type` need to be constructible, or the source can be `void`.
-  \throws Any exception the construction of `value_type(T)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -4495,21 +3765,9 @@ public:
     using namespace hooks;
     hook_result_copy_construction(this, o);
   }
-  /*! Implicit tagged constructor of a successful basic_result.
-  \tparam 1
-  \exclude
-  \param o The compatible success type sugar.
-
-  \effects Initialises the basic_result with a move of the value in the type sugar.
-  \requires Both basic_result and success' `value_type` need to be constructible. The source cannot be `void`.
-  \throws Any exception the construction of `value_type(T)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -4520,21 +3778,9 @@ public:
     using namespace hooks;
     hook_result_move_construction(this, static_cast<success_type<T> &&>(o));
   }
-  /*! Implicit tagged constructor of a failure basic_result.
-  \tparam 1
-  \exclude
-  \param o The compatible failure type sugar.
-
-  \effects Initialises the basic_result with a copy of the error in the type sugar.
-  \requires Both basic_result and failure's `error_type` need to be constructible, or the source can be `void`.
-  \throws Any exception the construction of `error_type(T)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -4545,21 +3791,9 @@ public:
     using namespace hooks;
     hook_result_copy_construction(this, o);
   }
-  /*! Implicit tagged constructor of a failure basic_result.
-  \tparam 1
-  \exclude
-  \param o The compatible failure type sugar.
-
-  \effects Initialises the basic_result with a move of the error in the type sugar.
-  \requires Both basic_result and failure's `error_type` need to be constructible, or the source can be `void`.
-  \throws Any exception the construction of `error_type(T)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -4571,12 +3805,9 @@ public:
     hook_result_move_construction(this, static_cast<failure_type<T> &&>(o));
   }
 
-  /// \output_section Swap
-  /*! Swaps this basic_result with another basic_result
-  \effects Any `R` and/or `S` is swapped along with the metadata tracking them.
-  \throws If the swap of value or error can throw, the throwing swap is done first.
-  */
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   void swap(basic_result &o) noexcept(detail::is_nothrow_swappable<value_type>::value &&std::is_nothrow_move_constructible<value_type>::value  //
@@ -4596,23 +3827,22 @@ public:
     }
   }
 
-  /// \output_section Converters
-  /*! Returns this basic_result as a `failure_type` with any errored state copied.
-  \requires This basic_result to have a failed state, else whatever `assume_error()` would do.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   auto as_failure() const & { return failure(this->assume_error()); }
-  /*! Returns this basic_result as a `failure_type` with any errored state moved.
-  \requires This basic_result to have a failed state, else whatever `assume_error()` would do.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   auto as_failure() && { return failure(static_cast<basic_result &&>(*this).assume_error()); }
 };
 
-/*! Specialise swap for basic_result.
-\effects Calls `a.swap(b)`.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
 */
 template <class R, class S, class P> inline void swap(basic_result<R, S, P> &a, basic_result<R, S, P> &b) noexcept(noexcept(a.swap(b)))
 {
@@ -4674,47 +3904,20 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  //! The exception observers implementation of `basic_outcome<R, S, P>`.
   template <class Base, class R, class S, class P, class NoValuePolicy> class basic_outcome_exception_observers : public Base
   {
   public:
     using exception_type = P;
     using Base::Base;
 
-    /// \output_section Narrow state observers
-    /*! Access exception without runtime checks.
-    \preconditions The outcome to have an exception state, otherwise it is undefined behaviour.
-    \returns Reference to the held `exception_type` according to overload.
-    \group assume_exception
-    */
-
-
-
-
     constexpr inline exception_type &assume_exception() & noexcept;
-    /// \group assume_exception
     constexpr inline const exception_type &assume_exception() const &noexcept;
-    /// \group assume_exception
     constexpr inline exception_type &&assume_exception() && noexcept;
-    /// \group assume_exception
     constexpr inline const exception_type &&assume_exception() const &&noexcept;
 
-    /// \output_section Wide state observers
-    /*! Access exception with runtime checks.
-    \returns Reference to the held `exception_type` according to overload.
-    \requires The outcome to have an exception state, else whatever `NoValuePolicy` says ought to happen.
-    \group exception
-    */
-
-
-
-
     constexpr inline exception_type &exception() &;
-    /// \group exception
     constexpr inline const exception_type &exception() const &;
-    /// \group exception
     constexpr inline exception_type &&exception() &&;
-    /// \group exception
     constexpr inline const exception_type &&exception() const &&;
   };
 
@@ -4723,17 +3926,7 @@ namespace detail
   {
   public:
     using Base::Base;
-    /// \output_section Narrow state observers
-    /*! Access exception without runtime checks.
-    */
-
     constexpr void assume_exception() const noexcept { NoValuePolicy::narrow_exception_check(this); }
-    /// \output_section Wide state observers
-    /*! Access exception with runtime checks.
-    \requires The outcome to have an exception state, else whatever `NoValuePolicy` says ought to happen.
-    */
-
-
     constexpr void exception() const { NoValuePolicy::wide_exception_check(this); }
   };
 
@@ -4787,7 +3980,7 @@ namespace detail
       // ADL discovered
       return basic_outcome_failure_exception_from_error(ec);
     }
-  }
+  }                                        // namespace adl
 #if defined(_MSC_VER) && _MSC_VER <= 1920  // VS2019
   // VS2017 and VS2019 with /permissive- chokes on the correct form due to over eager early instantiation.
   template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) { static_assert(sizeof(S) == 0, "No specialisation for these error and exception types available!"); }
@@ -4795,22 +3988,14 @@ namespace detail
   template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) = delete;  // NOLINT No specialisation for these error and exception types available!
 #endif
 
-  //! The failure observers implementation of `basic_outcome<R, S, P>`.
+  template <class exception_type> inline exception_type current_exception_or_fatal(std::exception_ptr e) { std::rethrow_exception(e); }
+  template <> inline std::exception_ptr current_exception_or_fatal<std::exception_ptr>(std::exception_ptr e) { return e; }
+
   template <class Base, class R, class S, class P, class NoValuePolicy> class basic_outcome_failure_observers : public Base
   {
   public:
     using exception_type = P;
     using Base::Base;
-
-    /// \output_section Synthesising state observers
-    /*! Synthesise exception where possible.
-    \requires `trait::has_error_code_v<S>` and `trait::has_exception_ptr_v<P>` to be true, else it does not appear.
-    \returns A synthesised exception type: if excepted, `exception()`; if errored, `xxx::make_exception_ptr(xxx::system_error(error()))`;
-    otherwise a default constructed exception type.
-    */
-
-
-
 
     exception_type failure() const noexcept
     {
@@ -4831,7 +4016,9 @@ namespace detail
 #ifdef __cpp_exceptions
       catch(...)
       {
-        return std::current_exception();
+        // Return the failure if exception_type is std::exception_ptr,
+        // otherwise terminate same as throwing an exception inside noexcept
+        return current_exception_or_fatal<exception_type>(std::current_exception());
       }
 #endif
     }
@@ -4951,91 +4138,52 @@ namespace detail
   };
 }  // namespace detail
 
-//! True if an outcome
+/*! AWAITING HUGO JSON CONVERSION TOOL
+type alias template <class T> is_basic_outcome. Potential doc page: `is_basic_outcome<T>`
+*/
 template <class T> using is_basic_outcome = detail::is_basic_outcome<std::decay_t<T>>;
-//! True if an outcome
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 template <class T> static constexpr bool is_basic_outcome_v = detail::is_basic_outcome<std::decay_t<T>>::value;
 
 namespace hooks
 {
-  /*! The default instantiation hook implementation called when a `outcome` is first created
-  by conversion from one of its possible types. Does nothing.
-  \param 1 Some `outcome<...>` being constructed.
-  \param 2 The source data.
-
-  WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
-  */
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   template <class T, class... U> constexpr inline void hook_outcome_construction(T * /*unused*/, U &&... /*unused*/) noexcept {}
-  /*! The default instantiation hook implementation called when a `outcome` is created by copying
-  from another `outcome` or `result`. Does nothing.
-  \param 1 Some `outcome<...>` being constructed.
-  \param 2 The source data.
-
-  WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
-  */
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   template <class T, class U> constexpr inline void hook_outcome_copy_construction(T * /*unused*/, U && /*unused*/) noexcept {}
-  /*! The default instantiation hook implementation called when a `outcome` is created by moving
-  from another `outcome` or `result`. Does nothing.
-  \param 1 Some `outcome<...>` being constructed.
-  \param 2 The source data.
-
-  WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
-  */
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   template <class T, class U> constexpr inline void hook_outcome_move_construction(T * /*unused*/, U && /*unused*/) noexcept {}
-  /*! The default instantiation hook implementation called when a `outcome` is created by in place
-  construction. Does nothing.
-  \param 1 Some `outcome<...>` being constructed.
-  \param 2 The type of in place construction occurring.
-  \param 3 The source data.
-
-  WARNING: The compiler is permitted to elide calls to constructors, and thus this hook may not get called when you think it should!
-  */
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   template <class T, class U, class... Args> constexpr inline void hook_outcome_in_place_construction(T * /*unused*/, in_place_type_t<U> /*unused*/, Args &&... /*unused*/) noexcept {}
 
-  //! Used in hook implementations to override the exception to something other than what was constructed.
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+
+
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_exception(basic_outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept;
 }  // namespace hooks
 
-/*! Used to return from functions one of (i) a successful value (ii) a cause of failure (ii) a different cause of failure. `constexpr` capable.
-
-\tparam R The optional type of the successful result (use `void` to disable). Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-\tparam S The optional type of the first failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`. Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-\tparam P The optional type of the second failure result (use `void` to disable). Must be either `void` or `DefaultConstructible`. Cannot be a reference, a `in_place_type_t<>`, `success<>`, `failure<>`, an array, a function or non-destructible.
-\tparam NoValuePolicy Policy on how to interpret types `S` and `P` when a wide observation of a not present value occurs.
-
-This is an extension of `basic_result<R, S>` and it allows an alternative failure to be stored of type `P`, which can be observed
-with the member functions `.exception()` and `.assume_exception()`. The `P` state takes precedence during no-value observation
-over any `S` state, and it is possible to store `S + P` simultaneously such that `basic_outcome` could have any one the states:
-
-1. `R` (`value_type`)
-2. `S` (`error_type`)
-3. `P` (`exception_type`)
-4. `S + P` (`error_type + exception_type`)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+type definition template <class R, class S, class P, class NoValuePolicy> basic_outcome. Potential doc page: `basic_outcome<T, EC, EP, NoValuePolicy>`
 */
 template <class R, class S, class P, class NoValuePolicy>                                                                            //
 OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))  //
@@ -5094,19 +4242,14 @@ class OUTCOME_NODISCARD basic_outcome
   };
 
 public:
-  /// \output_section Member types
-  //! The success type.
   using value_type = R;
-  //! The failure type.
   using error_type = S;
-  //! The exception type
   using exception_type = P;
 
-  //! Used to rebind this outcome to a different outcome type
   template <class T, class U = S, class V = P, class W = NoValuePolicy> using rebind = basic_outcome<T, U, V, W>;
 
 protected:
-  //! Requirement predicates for outcome.
+  // Requirement predicates for outcome.
   struct predicate
   {
     using base = detail::outcome_predicates<value_type, error_type, exception_type>;
@@ -5120,21 +4263,21 @@ protected:
     // Predicate for implicit constructors to be available at all
     static constexpr bool implicit_constructors_enabled = constructors_enabled && base::implicit_constructors_enabled;
 
-    //! Predicate for the value converting constructor to be available.
+    // Predicate for the value converting constructor to be available.
     template <class T>
     static constexpr bool enable_value_converting_constructor =  //
     constructors_enabled                                         //
     && !std::is_same<std::decay_t<T>, basic_outcome>::value      // not my type
     && base::template enable_value_converting_constructor<T>;
 
-    //! Predicate for the error converting constructor to be available.
+    // Predicate for the error converting constructor to be available.
     template <class T>
     static constexpr bool enable_error_converting_constructor =  //
     constructors_enabled                                         //
     && !std::is_same<std::decay_t<T>, basic_outcome>::value      // not my type
     && base::template enable_error_converting_constructor<T>;
 
-    //! Predicate for the error condition converting constructor to be available.
+    // Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>
     static constexpr bool enable_error_condition_converting_constructor =  //
     constructors_enabled                                                   //
@@ -5155,28 +4298,28 @@ protected:
     && !std::is_same<std::decay_t<T>, basic_outcome>::value                // not my type
     && base::template enable_error_exception_converting_constructor<T, U>;
 
-    //! Predicate for the converting constructor from a compatible input to be available.
+    // Predicate for the converting constructor from a compatible input to be available.
     template <class T, class U, class V, class W>
     static constexpr bool enable_compatible_conversion =               //
     constructors_enabled                                               //
     && !std::is_same<basic_outcome<T, U, V, W>, basic_outcome>::value  // not my type
     && base::template enable_compatible_conversion<T, U, V, W>;
 
-    //! Predicate for the inplace construction of value to be available.
+    // Predicate for the inplace construction of value to be available.
     template <class... Args>
     static constexpr bool enable_inplace_value_constructor =  //
     constructors_enabled                                      //
     && (std::is_void<value_type>::value                       //
         || std::is_constructible<value_type, Args...>::value);
 
-    //! Predicate for the inplace construction of error to be available.
+    // Predicate for the inplace construction of error to be available.
     template <class... Args>
     static constexpr bool enable_inplace_error_constructor =  //
     constructors_enabled                                      //
     && (std::is_void<error_type>::value                       //
         || std::is_constructible<error_type, Args...>::value);
 
-    //! Predicate for the inplace construction of exception to be available.
+    // Predicate for the inplace construction of exception to be available.
     template <class... Args>
     static constexpr bool enable_inplace_exception_constructor =  //
     constructors_enabled                                          //
@@ -5192,50 +4335,26 @@ protected:
   };
 
 public:
-  //! Used to disable in place type construction when `value_type` is ambiguous with `error_type` or `exception_type`.
   using value_type_if_enabled = std::conditional_t<std::is_same<value_type, error_type>::value || std::is_same<value_type, exception_type>::value, disable_in_place_value_type, value_type>;
-  //! Used to disable in place type construction when `error_type` is ambiguous with `value_type` or `exception_type`.
   using error_type_if_enabled = std::conditional_t<std::is_same<error_type, value_type>::value || std::is_same<error_type, exception_type>::value, disable_in_place_error_type, error_type>;
-  //! Used to disable in place type construction when `exception_type` is ambiguous with `value_type` or `error_type`.
   using exception_type_if_enabled = std::conditional_t<std::is_same<exception_type, value_type>::value || std::is_same<exception_type, error_type>::value, disable_in_place_exception_type, exception_type>;
 
 protected:
   detail::devoid<exception_type> _ptr;
 
 public:
-  /// \output_section Disabling constructors
-  /*! Disabling constructor for when all constructors are disabled.
-  \tparam 2
-  \exclude
-
-  \requires Any one of `value_type`, `error_type` and `exception_type` to be the same type.
-  \effects Declares a catch-all constructor which is deleted to give a clear error message to the user
-  that identical `value_type`, `error_type` or `exception_type` is not supported, whilst also preserving compile-time introspection.
-  */
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class Arg, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED((!predicate::constructors_enabled && sizeof...(Args) >= 0)))
   basic_outcome(Arg && /*unused*/, Args &&... /*unused*/) = delete;  // NOLINT basic_outcome<> with any of the same type is NOT SUPPORTED, see docs!
 
-  /*! Disabling implicit constructor for when implicit constructors are disabled.
-  \tparam 1
-  \exclude
-
-  \requires Any one of `value_type`, `error_type` and `exception_type` to be ambiguous.
-  \effects Declares a value type constructor which is deleted to give a clear error message to the user
-  that `value_type` or `error_type` or `exception_type` are ambiguous, whilst also preserving compile-time introspection.
-  */
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -5243,26 +4362,9 @@ public:
                                    && (detail::is_implicitly_constructible<value_type, T> || detail::is_implicitly_constructible<error_type, T> || detail::is_implicitly_constructible<exception_type, T>) )))
   basic_outcome(T && /*unused*/, implicit_constructors_disabled_tag /*unused*/ = implicit_constructors_disabled_tag()) = delete;  // NOLINT Implicit constructors disabled, use explicit in_place_type<T>, success() or failure(). see docs!
 
-  /// \output_section Converting constructors
-  /*! Converting constructor to a successful outcome.
-  \tparam 1
-  \exclude
-  \param 1
-  \exclude
-  \param t The value from which to initialise the `value_type`.
-
-  \effects Initialises the outcome with a `value_type`.
-  \requires Type T is implicitly constructible to `value_type`, is not implicitly constructible to `error_type`, is not implicitly constructible to `exception_type` and is not `outcome<R, S, P>` and not `in_place_type<>`.
-  \throws Any exception the construction of `value_type(T)` might throw.
-  */
-
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -5274,27 +4376,9 @@ public:
     using namespace hooks;
     hook_outcome_construction(this, static_cast<T &&>(t));
   }
-  /*! Converting constructor to an errored outcome.
-  \tparam 1
-  \exclude
-  \param 1
-  \exclude
-  \param t The value from which to initialise the `error_type`.
-
-  \effects Initialises the outcome with a `error_type`.
-  \requires Type T is implicitly constructible to `error_type`,
-  is not implicitly constructible to `value_type`, is not implicitly constructible to `exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
-  \throws Any exception the construction of `error_type(T)` might throw.
-  */
-
-
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -5306,33 +4390,9 @@ public:
     using namespace hooks;
     hook_outcome_construction(this, static_cast<T &&>(t));
   }
-  /*! Special error condition converting constructor to an errored outcome.
-  \tparam 1
-  \exclude
-  \tparam 2
-  \exclude
-  \param 1
-  \exclude
-  \param t The error condition from which to initialise the `error_type`.
-
-  \effects Initialises the outcome with a `error_type` constructed via `make_error_code(t)`.
-  \requires `std::is_error_condition_enum<ErrorCondEnum>` must be true,
-  `ErrorCondEnum` is not implicitly constructible to `value_type`, `error_type` nor `exception_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`;
-  Finally, the expression `error_type(make_error_code(ErrorCondEnum()))` must be valid.
-  \throws Any exception the construction of `error_type(make_error_code(t))` might throw.
-  */
-
-
-
-
-
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class ErrorCondEnum)
@@ -5344,27 +4404,9 @@ public:
     using namespace hooks;
     hook_outcome_construction(this, static_cast<ErrorCondEnum &&>(t));
   }
-  /*! Converting constructor to an excepted outcome.
-  \tparam 1
-  \exclude
-  \param 1
-  \exclude
-  \param t The value from which to initialise the `exception_type`.
-
-  \effects Initialises the outcome with a `exception_type`.
-  \requires Type T is implicitly constructible to `exception_type`,
-  is not implicitly constructible to `value_type`, is not implicitly constructible to `error_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
-  \throws Any exception the construction of `exception_type(T)` might throw.
-  */
-
-
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -5377,29 +4419,9 @@ public:
     this->_state._status |= detail::status_have_exception;
     hook_outcome_construction(this, static_cast<T &&>(t));
   }
-  /*! Converting constructor to an errored + excepted outcome.
-  \tparam 2
-  \exclude
-  \param 2
-  \exclude
-  \param a The value from which to initialise the `errot_type`.
-  \param b The value from which to initialise the `exception_type`.
-
-  \effects Initialises the outcome with `error_type` and `exception_type`.
-  \requires Type T is implicitly constructible to `error_type`, type U is implicitly constructible to `exception_type`,
-  neither is implicitly constructible to `value_type`, and is not `outcome<R, S, P>` and not `in_place_type<>`.
-  \throws Any exception the construction of `error_type(T)` or `exception_type(U)` might throw.
-  */
-
-
-
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T, class U)
@@ -5413,37 +4435,9 @@ public:
     hook_outcome_construction(this, static_cast<T &&>(a), static_cast<U &&>(b));
   }
 
-  /*! Explicit converting constructor from a compatible `ValueOrError` type.
-  \tparam 1
-  \exclude
-  \tparam 2
-  \exclude
-  \tparam 3
-  \exclude
-  \param 1
-  \exclude
-  \param o The input for which a `convert::value_or_error<outcome, std::decay_t<T>>{}(std::forward<T>(o))` is available.
-
-  \effects Initialises the outcome with the contents of the compatible input.
-  \requires That `convert::value_or_error<outcome, std::decay_t<T>>{}(std::forward<T>(o))` be available. The
-  default implementation will consume `T`'s matching the `ValueOrError` concept type.
-  `ValueOrError` concept matches any type with a `value_type`,
-  an `error_type`, a `.value()`, an `.error()` and a `.has_value()`.
-  */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -5454,21 +4448,9 @@ public:
   : basic_outcome{convert::value_or_error<basic_outcome, std::decay_t<T>>{}(static_cast<T &&>(o))}
   {
   }
-  /*! Explicit converting copy constructor from a compatible outcome type.
-  \tparam 4
-  \exclude
-  \param o The compatible outcome.
-
-  \effects Initialises the outcome with a copy of the compatible outcome.
-  \requires Both outcome's `value_type`, `error_type`, and `exception_type` need to be constructible, or the source `void`.
-  \throws Any exception the construction of `value_type(T)`, `error_type(U)` or `exception_type(V)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
@@ -5480,21 +4462,9 @@ public:
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
   }
-  /*! Explicit converting move constructor from a compatible outcome type.
-  \tparam 4
-  \exclude
-  \param o The compatible outcome.
-
-  \effects Initialises the outcome with a move of the compatible outcome.
-  \requires Both outcome's `value_type`, `error_type`, and `exception_type` need to be constructible, or the source `void`.
-  \throws Any exception the construction of `value_type(T)`, `error_type(U)` or `exception_type(V)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
@@ -5506,21 +4476,9 @@ public:
     using namespace hooks;
     hook_outcome_move_construction(this, static_cast<basic_outcome<T, U, V, W> &&>(o));
   }
-  /*! Explicit converting copy constructor from a compatible result type.
-  \tparam 3
-  \exclude
-  \param o The compatible result.
-
-  \effects Initialises the outcome with a copy of the compatible result.
-  \requires Both outcome's `value_type` and `error_type` need to be constructible, or the source `void`.
-  \throws Any exception the construction of `value_type(T)`, `error_type(U)` or `exception_type()` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T, class U, class V)
@@ -5532,21 +4490,9 @@ public:
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
   }
-  /*! Explicit converting move constructor from a compatible result type.
-  \tparam 3
-  \exclude
-  \param o The compatible result.
-
-  \effects Initialises the outcome with a move of the compatible result.
-  \requires Both outcome's `value_type` and `error_type` need to be constructible, or the source `void`.
-  \throws Any exception the construction of `value_type(T)`, `error_type(U)` or `exception_type()` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T, class U, class V)
@@ -5560,24 +4506,9 @@ public:
   }
 
 
-  /// \output_section In place constructors
-  /*! Inplace constructor to a successful value.
-  \tparam 1
-  \exclude
-  \param _ Tag type to indicate we are doing in place construction of `value_type`.
-  \param args Arguments with which to in place construct.
-
-  \effects Initialises the outcome with a `value_type`.
-  \requires `value_type` is void or `Args...` are constructible to `value_type`.
-  \throws Any exception the construction of `value_type(Args...)` might throw.
-  */
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class... Args)
@@ -5589,25 +4520,9 @@ public:
     using namespace hooks;
     hook_outcome_in_place_construction(this, in_place_type<value_type>, static_cast<Args &&>(args)...);
   }
-  /*! Inplace constructor to a successful value.
-  \tparam 2
-  \exclude
-  \param _ Tag type to indicate we are doing in place construction of `value_type`.
-  \param il An initializer list with which to in place construct.
-  \param args Arguments with which to in place construct.
-
-  \effects Initialises the outcome with a `value_type`.
-  \requires The initializer list + `Args...` are constructible to `value_type`.
-  \throws Any exception the construction of `value_type(il, Args...)` might throw.
-  */
-
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class U, class... Args)
@@ -5619,23 +4534,9 @@ public:
     using namespace hooks;
     hook_outcome_in_place_construction(this, in_place_type<value_type>, il, static_cast<Args &&>(args)...);
   }
-  /*! Inplace constructor to an unsuccessful error.
-  \tparam 1
-  \exclude
-  \param _ Tag type to indicate we are doing in place construction of `error_type`.
-  \param args Arguments with which to in place construct.
-
-  \effects Initialises the outcome with a `error_type`.
-  \requires `error_type` is void or `Args...` are constructible to `error_type`.
-  \throws Any exception the construction of `error_type(Args...)` might throw.
-  */
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class... Args)
@@ -5647,25 +4548,9 @@ public:
     using namespace hooks;
     hook_outcome_in_place_construction(this, in_place_type<error_type>, static_cast<Args &&>(args)...);
   }
-  /*! Inplace constructor to an unsuccessful error.
-  \tparam 2
-  \exclude
-  \param _ Tag type to indicate we are doing in place construction of `error_type`.
-  \param il An initializer list with which to in place construct.
-  \param args Arguments with which to in place construct.
-
-  \effects Initialises the outcome with a `error_type`.
-  \requires The initializer list + `Args...` are constructible to `error_type`.
-  \throws Any exception the construction of `error_type(il, Args...)` might throw.
-  */
-
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class U, class... Args)
@@ -5677,23 +4562,9 @@ public:
     using namespace hooks;
     hook_outcome_in_place_construction(this, in_place_type<error_type>, il, static_cast<Args &&>(args)...);
   }
-  /*! Inplace constructor to an unsuccessful exception.
-  \tparam 1
-  \exclude
-  \param _ Tag type to indicate we are doing in place construction of `exception_type`.
-  \param args Arguments with which to in place construct.
-
-  \effects Initialises the outcome with an `exception_type`.
-  \requires `exception_type` is void or `Args...` are constructible to `exception_type`.
-  \throws Any exception the construction of `exception_type(Args...)` might throw.
-  */
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class... Args)
@@ -5706,25 +4577,9 @@ public:
     this->_state._status |= detail::status_have_exception;
     hook_outcome_in_place_construction(this, in_place_type<exception_type>, static_cast<Args &&>(args)...);
   }
-  /*! Inplace constructor to an unsuccessful exception.
-  \tparam 2
-  \exclude
-  \param _ Tag type to indicate we are doing in place construction of `exception_type`.
-  \param il An initializer list with which to in place construct.
-  \param args Arguments with which to in place construct.
-
-  \effects Initialises the outcome with an `exception_type`.
-  \requires The initializer list + `Args...` are constructible to `exception_type`.
-  \throws Any exception the construction of `exception_type(il, Args...)` might throw.
-  */
-
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class U, class... Args)
@@ -5737,21 +4592,9 @@ public:
     this->_state._status |= detail::status_have_exception;
     hook_outcome_in_place_construction(this, in_place_type<exception_type>, il, static_cast<Args &&>(args)...);
   }
-  /*! Implicit inplace constructor to successful value, or unsuccessful error, or unsuccessful exception.
-  \tparam 3
-  \exclude
-  \param args Arguments with which to in place construct.
-
-  \effects Calls the appropriate `in_place_type_t<...>` constructor depending on constructibility of args.
-  \requires That the args can construct exactly one of `value_type` or `error_type` or `exception_type`.
-  \throws Any exception the `in_place_type_t<...>` constructor might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class A1, class A2, class... Args)
@@ -5761,18 +4604,9 @@ public:
   {
   }
 
-  /// \output_section Tagged constructors
-  /*! Implicit tagged constructor of a successful outcome.
-  \param o The compatible success type sugar.
-
-  \effects Initialises the outcome with a default constructed success type.
-  \requires  `value_type` to be default constructible, or `void`.
-  \throws Any exception the construction of `value_type()` might throw.
-  */
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   constexpr basic_outcome(const success_type<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)  // NOLINT
@@ -5781,21 +4615,9 @@ public:
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
   }
-  /*! Implicit tagged constructor of a successful outcome.
-  \tparam 1
-  \exclude
-  \param o The compatible success type sugar.
-
-  \effects Initialises the outcome with a copy of the value in the type sugar.
-  \requires Both outcome and success' `value_type` need to be constructible. The source cannot be `void`.
-  \throws Any exception the construction of `value_type(T)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -5806,21 +4628,9 @@ public:
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
   }
-  /*! Implicit tagged constructor of a successful outcome.
-  \tparam 1
-  \exclude
-  \param o The compatible success type sugar.
-
-  \effects Initialises the outcome with a move of the value in the type sugar.
-  \requires Both outcome and success' `value_type` need to be constructible. The source cannot be `void`.
-  \throws Any exception the construction of `value_type(T)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -5832,21 +4642,9 @@ public:
     hook_outcome_move_construction(this, static_cast<success_type<T> &&>(o));
   }
 
-  /*! Implicit tagged constructor of a failure outcome.
-  \tparam 1
-  \exclude
-  \param o The compatible failure type sugar.
-
-  \effects Initialises the outcome with a copy of the error in the type sugar.
-  \requires Outcome's `error_type` needs to be constructible from failure's `error_type`.
-  \throws Any exception the construction of `error_type(T)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -5858,21 +4656,9 @@ public:
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
   }
-  /*! Implicit tagged constructor of a failure outcome.
-  \tparam 1
-  \exclude
-  \param o The compatible failure type sugar.
-
-  \effects Initialises the outcome with a copy of the exception in the type sugar.
-  \requires Outcome's `exception_type` needs to be constructible from failure's `error_type`.
-  \throws Any exception the construction of `exception_type(T)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -5885,21 +4671,9 @@ public:
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
   }
-  /*! Implicit tagged constructor of a failure outcome.
-  \tparam 2
-  \exclude
-  \param o The compatible failure type sugar.
-
-  \effects Initialises the outcome with a copy of the error and exception in the type sugar.
-  \requires Both outcome and failure's `error_type` and `exception_type` need to be constructible, or the source can be `void`.
-  \throws Any exception the construction of `error_type(T)` and `exception_type(U)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T, class U)
@@ -5920,21 +4694,9 @@ public:
     hook_outcome_copy_construction(this, o);
   }
 
-  /*! Implicit tagged constructor of a failure outcome.
-  \tparam 1
-  \exclude
-  \param o The compatible failure type sugar.
-
-  \effects Initialises the outcome with a move of the error in the type sugar.
-  \requires Outcome's `error_type` needs to be constructible from failure's `error_type`.
-  \throws Any exception the construction of `error_type(T)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -5946,21 +4708,9 @@ public:
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
   }
-  /*! Implicit tagged constructor of a failure outcome.
-  \tparam 1
-  \exclude
-  \param o The compatible failure type sugar.
-
-  \effects Initialises the outcome with a move of the exception in the type sugar.
-  \requires Outcome's `exception_type` needs to be constructible from failure's `error_type`.
-  \throws Any exception the construction of `exception_type(T)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T)
@@ -5973,21 +4723,9 @@ public:
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
   }
-  /*! Implicit tagged constructor of a failure outcome.
-  \tparam 2
-  \exclude
-  \param o The compatible failure type sugar.
-
-  \effects Initialises the outcome with a move of the error and exception in the type sugar.
-  \requires Both outcome and failure's `error_type` and `exception_type` need to be constructible, or the source can be `void`.
-  \throws Any exception the construction of `error_type(T)` and `exception_type(U)` might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T, class U)
@@ -6008,26 +4746,16 @@ public:
     hook_outcome_move_construction(this, static_cast<failure_type<T, U> &&>(o));
   }
 
-  /// \output_section Comparison operators
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+
+
   using base::operator==;
   using base::operator!=;
-  /*! True if equal to the other outcome.
-  \param o The other outcome to compare to.
-
-  \requires That both `value_type`'s have an `operator==` available;
-  that both `error_type`'s have an `operator==` available;
-  that both `exception_type`'s have an `operator==` available.
-  \effects Calls the `operator==` operation on any common stored state.
-  Otherwise returns false. Ignores spare storage.
-  \throws Any exception the individual `operator==` operations might throw.
-  */
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
@@ -6058,21 +4786,9 @@ public:
     }
     return false;
   }
-  /*! True if equal to the failure type sugar.
-  \param o The failure type sugar to compare to.
-
-  \requires That both `error_type`'s have an `operator==` available;
-  that both `exception_type`'s have an `operator==` available.
-  \effects Calls the `operator==` operation on any common stored state.
-  Otherwise returns false. Ignores spare storage.
-  \throws Any exception the individual `operator==` operations might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T, class U)
@@ -6096,23 +4812,9 @@ public:
     }
     return false;
   }
-  /*! True if not equal to the other outcome.
-  \param o The other outcome to compare to.
-
-  \requires That both `value_type`'s have an `operator!=` available;
-  that both `error_type`'s have an `operator!=` available;
-  that both `exception_type`'s have an `operator!=` available.
-  \effects Calls the `operator!=` operation on any common stored state.
-  Otherwise returns true. Ignores spare storage.
-  \throws Any exception the individual `operator!=` operations might throw.
-  */
-
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
@@ -6143,21 +4845,9 @@ public:
     }
     return true;
   }
-  /*! True if not equal to the failure type sugar.
-  \param o The failure type sugar to compare to.
-
-  \requires That both `error_type`'s have an `operator!=` available;
-  that both `exception_type`'s have an `operator!=` available.
-  \effects Calls the `operator!=` operation on any common stored state.
-  Otherwise returns true. Ignores spare storage.
-  \throws Any exception the individual `operator!=` operations might throw.
-  */
-
-
-
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   OUTCOME_TEMPLATE(class T, class U)
@@ -6182,14 +4872,9 @@ public:
     return true;
   }
 
-  /// \output_section Swap
-  /*! Swaps this result with another result
-  \effects Any `R` and/or `S` is swapped along with the metadata tracking them.
-  \throws If the swap of value or error or exception can throw, the throwing swap is done first.
-  If more than one of those can throw, the object is left in an indeterminate state should a throw occur.
-  */
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   void swap(basic_outcome &o) noexcept(detail::is_nothrow_swappable<value_type>::value &&std::is_nothrow_move_constructible<value_type>::value    //
@@ -6234,10 +4919,9 @@ public:
 #endif
   }
 
-  /// \output_section Converters
-  /*! Returns this outcome as a `failure_type` with any errored and/or excepted state copied.
-  \requires This outcome to have a failed state, else whatever `assume_error()` would do.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   failure_type<error_type, exception_type> as_failure() const &
@@ -6253,9 +4937,9 @@ public:
     return failure_type<error_type, exception_type>(in_place_type<error_type>, this->assume_error());
   }
 
-  /*! Returns this outcome as a `failure_type` with any errored and/or excepted state moved.
-  \requires This outcome to have a failed state, else whatever `assume_error()` would do.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   failure_type<error_type, exception_type> as_failure() &&
@@ -6272,15 +4956,8 @@ public:
   }
 };
 
-/*! True if the result is equal to the outcome
-\tparam 7
-\exclude
-\param a The result to compare.
-\param b The outcome to compare.
-
-\remarks Implemented as `b == a`.
-\requires That the expression `b == a` is a valid expression.
-\throws Any exception that `b == a` might throw.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
 */
 OUTCOME_TEMPLATE(class T, class U, class V,  //
                  class R, class S, class P, class N)
@@ -6290,15 +4967,8 @@ noexcept(std::declval<basic_outcome<R, S, P, N>>() == std::declval<basic_result<
 {
   return b == a;
 }
-/*! True if the result is not equal to the outcome
-\tparam 7
-\exclude
-\param a The result to compare.
-\param b The outcome to compare.
-
-\remarks Implemented as `b != a`.
-\requires That the expression `b != a` is a valid expression.
-\throws Any exception that `b != a` might throw.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
 */
 OUTCOME_TEMPLATE(class T, class U, class V,  //
                  class R, class S, class P, class N)
@@ -6308,8 +4978,8 @@ noexcept(std::declval<basic_outcome<R, S, P, N>>() != std::declval<basic_result<
 {
   return b != a;
 }
-/*! Specialise swap for outcome.
-\effects Calls `a.swap(b)`.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
 */
 template <class R, class S, class P, class N> inline void swap(basic_outcome<R, S, P, N> &a, basic_outcome<R, S, P, N> &b) noexcept(noexcept(a.swap(b)))
 {
@@ -6318,15 +4988,9 @@ template <class R, class S, class P, class N> inline void swap(basic_outcome<R, 
 
 namespace hooks
 {
-  /*! Used to set/override an exception during a construction hook implementation.
-  \param o The outcome you wish to change.
-  \param v Exception to be set.
-
-  \effects Sets the exception of the outcome to the given value.
-  */
-
-
-
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
 
 
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_exception(basic_outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept
@@ -6497,10 +5161,8 @@ namespace std  // NOLINT
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
-/*! Customisation point for changing what the `OUTCOME_TRY` macros
-do. This function defaults to returning `std::forward<T>(v).as_failure()`.
-\effects Extracts any state apart from value into a `failure_type`.
-\requires The input value to have a `.as_failure()` member function.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
 */
 OUTCOME_TEMPLATE(class T)
 OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().as_failure()))
@@ -6508,15 +5170,15 @@ inline decltype(auto) try_operation_return_as(T &&v)
 {
   return static_cast<T &&>(v).as_failure();
 }
-/*! Customisation point for changing what the `OUTCOME_TRY` macros do.
-\effects Returns by copy a `std::experimental::unexpected<E>` from an input `std::experimental::expected<T, E>`.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
 */
 template <class T, class E> inline auto try_operation_return_as(const std::experimental::expected<T, E> &v)
 {
   return std::experimental::unexpected<E>(v.error());
 }
-/*! Customisation point for changing what the `OUTCOME_TRY` macros do.
-\effects Returns by move a `std::experimental::unexpected<E>` from an input `std::experimental::expected<T, E>`.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
 */
 template <class T, class E> inline auto try_operation_return_as(std::experimental::expected<T, E> &&v)
 {
@@ -6534,28 +5196,17 @@ namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
-//! \exclude
 #define OUTCOME_TRY_GLUE2(x, y) x##y
-//! \exclude
 #define OUTCOME_TRY_GLUE(x, y) OUTCOME_TRY_GLUE2(x, y)
-//! \exclude
 #define OUTCOME_TRY_UNIQUE_NAME OUTCOME_TRY_GLUE(_outcome_try_unique_name_temporary, __COUNTER__)
 
-//! \exclude
 #define OUTCOME_TRY_RETURN_ARG_COUNT(_1_, _2_, _3_, _4_, _5_, _6_, _7_, _8_, count, ...) count
-//! \exclude
 #define OUTCOME_TRY_EXPAND_ARGS(args) OUTCOME_TRY_RETURN_ARG_COUNT args
-//! \exclude
 #define OUTCOME_TRY_COUNT_ARGS_MAX8(...) OUTCOME_TRY_EXPAND_ARGS((__VA_ARGS__, 8, 7, 6, 5, 4, 3, 2, 1, 0))
-//! \exclude
 #define OUTCOME_TRY_OVERLOAD_MACRO2(name, count) name##count
-//! \exclude
 #define OUTCOME_TRY_OVERLOAD_MACRO1(name, count) OUTCOME_TRY_OVERLOAD_MACRO2(name, count)
-//! \exclude
 #define OUTCOME_TRY_OVERLOAD_MACRO(name, count) OUTCOME_TRY_OVERLOAD_MACRO1(name, count)
-//! \exclude
 #define OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
-//! \exclude
 #define OUTCOME_TRY_CALL_OVERLOAD(name, ...) OUTCOME_TRY_OVERLOAD_GLUE(OUTCOME_TRY_OVERLOAD_MACRO(name, OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
 
 #if !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 8
@@ -6563,12 +5214,10 @@ OUTCOME_V2_NAMESPACE_END
 #pragma GCC diagnostic ignored "-Wparentheses"
 #endif
 
-//! \exclude
 #define OUTCOME_TRYV2(unique, ...)                                                                                                                                                                                                                                                                                               auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                              if(!(unique).has_value())                                                                                                                                                                                                                                                                                                      return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 
 
 
-//! \exclude
 #define OUTCOME_TRY2(unique, v, ...)                                                                                                                                                                                                                                                                                             OUTCOME_TRYV2(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                                            auto && (v) = OUTCOME_V2_NAMESPACE::detail::try_extract_value(static_cast<decltype(unique) &&>(unique))
 
 
@@ -6577,21 +5226,15 @@ OUTCOME_V2_NAMESPACE_END
 #pragma GCC diagnostic pop
 #endif
 
-/*! If the `outcome`/`result`/`std::experimental::expected` returned by expression ... is not valued, propagate any
-failure by immediately returning that failure state immediately
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_TRYV(...) OUTCOME_TRYV2(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
 
 #if defined(__GNUC__) || defined(__clang__)
 
-/*! If the `outcome`/`result`/`std::experimental::expected` returned by expression ... is not valued, propagate any
-failure by immediately returning that failure state immediately, else become the
-unwrapped value as an expression. This makes `OUTCOME_TRYX(expr)` an expression
-which can be used exactly like the `try` operator in other languages.
-
-\remarks This macro makes use of a proprietary extension in GCC and clang and is not
-portable. The macro is not made available on unsupported compilers,
-so you can test for its presence using `#ifdef OUTCOME_TRYX`.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_TRYX(...)                                                                                                                                                                                                                                                                                                        ({                                                                                                                                                                                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                    if(!res.has_value())                                                                                                                                                                                                                                                                                                             return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                    OUTCOME_V2_NAMESPACE::detail::try_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                         })
 
@@ -6603,52 +5246,21 @@ so you can test for its presence using `#ifdef OUTCOME_TRYX`.
 
 #endif
 
-/*! If the `outcome`/`result`/`std::experimental::expected` returned by expression ... is not valued, propagate any
-failure by immediately returning that failure immediately, else set *auto &&v* to the unwrapped value.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_TRYA(v, ...) OUTCOME_TRY2(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
 
-//! \exclude
 #define OUTCOME_TRY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME_TRYA(a, b, c, d, e, f, g, h)
-//! \exclude
 #define OUTCOME_TRY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME_TRYA(a, b, c, d, e, f, g)
-//! \exclude
 #define OUTCOME_TRY_INVOKE_TRY6(a, b, c, d, e, f) OUTCOME_TRYA(a, b, c, d, e, f)
-//! \exclude
 #define OUTCOME_TRY_INVOKE_TRY5(a, b, c, d, e) OUTCOME_TRYA(a, b, c, d, e)
-//! \exclude
 #define OUTCOME_TRY_INVOKE_TRY4(a, b, c, d) OUTCOME_TRYA(a, b, c, d)
-//! \exclude
 #define OUTCOME_TRY_INVOKE_TRY3(a, b, c) OUTCOME_TRYA(a, b, c)
-//! \exclude
 #define OUTCOME_TRY_INVOKE_TRY2(a, b) OUTCOME_TRYA(a, b)
-//! \exclude
 #define OUTCOME_TRY_INVOKE_TRY1(a) OUTCOME_TRYV(a)
-/*! This uses C macro overloading to select between `OUTCOME_TRYV(...)` and `OUTCOME_TRYA(v, ...)`
-based on whether there is one or two or more arguments to the macro.
-
-It can surprise people as template parameters are not recognised by the C preprocessor. For example:
-
-```c++
-OUTCOME_TRY(foo<int, long>());
-```
-
-Here the programmer obviously intends this to be an `OUTCOME_TRYV(...)`, but the C macro overload
-mechanism will perceive this as setting the variable `foo<int,` to the result of the function call
-`long>()`. This will fail to compile.
-
-One solution is to simply wrap all function calls with brackets so the C preprocessor breaks
-them correctly e.g.
-
-```c++
-OUTCOME_TRY((foo<int, long>()));
-OUTCOME_TRY(foovalue, (foo<int, long>()));
-```
-
-This solution also avoids ever exceeding eight C macro input parameters, as overloading is
-only implemented up to eight parameters.
-
-The other solution is to call `OUTCOME_TRYV` or `OUTCOME_TRYA` directly as appropriate.
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_TRY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRY_INVOKE_TRY, __VA_ARGS__)
 

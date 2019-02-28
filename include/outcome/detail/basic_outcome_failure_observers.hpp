@@ -54,19 +54,12 @@ namespace detail
   template <class exception_type> inline exception_type current_exception_or_fatal(std::exception_ptr e) { std::rethrow_exception(e); }
   template <> inline std::exception_ptr current_exception_or_fatal<std::exception_ptr>(std::exception_ptr e) { return e; }
 
-  //! The failure observers implementation of `basic_outcome<R, S, P>`.
   template <class Base, class R, class S, class P, class NoValuePolicy> class basic_outcome_failure_observers : public Base
   {
   public:
     using exception_type = P;
     using Base::Base;
 
-    /// \output_section Synthesising state observers
-    /*! Synthesise exception where possible.
-    \requires `trait::has_error_code_v<S>` and `trait::has_exception_ptr_v<P>` to be true, else it does not appear.
-    \returns A synthesised exception type: if excepted, `exception()`; if errored, `xxx::make_exception_ptr(xxx::system_error(error()))`;
-    otherwise a default constructed exception type.
-    */
     exception_type failure() const noexcept
     {
 #ifdef __cpp_exceptions

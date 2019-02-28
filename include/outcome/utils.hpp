@@ -33,17 +33,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 OUTCOME_V2_NAMESPACE_BEGIN
 
 #ifdef __cpp_exceptions
-/*! Utility function which tries to match the exception in the pointer provided
-to an equivalent error code. Ought to work for all standard STL types.
-\param ep The pointer to an exception to convert. If matched, on exit this is
-reset to a null pointer.
-\param not_matched The error code to return if we could not match the exception.
-Note that a null pointer in returns a null error code.
-
-\effects Rethrows the exception in the pointer, and via a long sequence of `catch`
-clauses attempts to match the equivalent error code. If a match is found, the
-pointer is reset to null. If a match is not found, *not_matched* is returned instead
-and the pointer is left unmodified.
+/*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
 */
 inline std::error_code error_from_exception(std::exception_ptr &&ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
 {
@@ -111,15 +102,8 @@ inline std::error_code error_from_exception(std::exception_ptr &&ep = std::curre
   return not_matched;
 }
 
-/*! Utility function which tries to throw the equivalent STL exception type for
-some given error code, not including `system_error`.
-\param ec The error code to try to convert into a STL exception throw.
-\param msg Optional custom message for the STL exception type.
-
-\effects If the input error code has a category of `generic_category()` (all platforms)
-or `system_category()` (POSIX only), throw the STL exception type matching
-the `errno` domained code if one is available. For example, `ENOMEM` would cause
-`std::bad_alloc()` to be thrown.
+/*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
 */
 inline void try_throw_std_exception_from_error(std::error_code ec, const std::string &msg = std::string{})
 {

@@ -37,12 +37,9 @@ namespace detail
   template <class R, class S, class NoValuePolicy> class basic_result_final;
 }
 
-//! Namespace containing hooks used for intercepting and manipulating `basic_result`/`basic_outcome`
 namespace hooks
 {
-  //! Get the sixteen bits of spare storage in a `basic_result` or `basic_outcome`.
   template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept;
-  //! Sets the sixteen bits of spare storage in a `basic_result` or `basic_outcome`.
   template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
 }  // namespace hooks
 
@@ -53,7 +50,6 @@ namespace policy
 
 namespace detail
 {
-  //! The base implementation type of `basic_result<R, EC, NoValuePolicy>`.
   template <class R, class EC, class NoValuePolicy>                                                                                                                                    //
   OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<EC> && (std::is_void<EC>::value || std::is_default_constructible<EC>::value))  //
   class basic_result_storage

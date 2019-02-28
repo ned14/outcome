@@ -29,7 +29,6 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Namespace for injected convertibility
 namespace convert
 {
 #if defined(__cpp_concepts)
@@ -102,21 +101,13 @@ namespace convert
     };
   }  // namespace detail
 
-  /*! Default converter for types matching the `ValueOrError` concept.
-  You can partially or fully specialise this converter for your own user defined types by
-  injecting specialisations into the `convert` namespace.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+type definition  value_or_error. Potential doc page: NOT FOUND
+*/
   template <class T, class U> struct value_or_error
   {
-    //! False to indicate that this converter wants `basic_result`/`basic_outcome` to reject all other `basic_result`
     static constexpr bool enable_result_inputs = false;
-    //! False to indicate that this converter wants `basic_outcome` to reject all other `basic_outcome`
     static constexpr bool enable_outcome_inputs = false;
-    /*! Default converter for types matching the `ValueOrError` concept.
-    \requires `std::decay_t<X>` to be the same type as `U`;
-    `ValueOrError<U>` to be true, `U`'s `value_type` be constructible into `T`'s `value_type`
-    and `U`'s `error_type` be constructible into `T`'s `error_type`.
-    */
     OUTCOME_TEMPLATE(class X)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_same<U, std::decay_t<X>>::value                                                                                                                                                    //
                                     &&ValueOrError<U>                                                                                                                                                                          //

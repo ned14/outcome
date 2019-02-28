@@ -30,7 +30,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-/*! In standalone Outcome, this aliases `std_outcome<>`. In Boost.Outcome, this aliases `boost_outcome<>`.
+/*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
 */
 template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_policy<R, S, P>>  //
 using outcome = std_outcome<R, S, P, NoValuePolicy>;

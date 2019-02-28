@@ -33,15 +33,11 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  /*! Policy implementing any wide attempt to access the successful state as calling `std::abort`
-
-  Can be used in both `result` and `outcome`.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+type definition  terminate. Potential doc page: `terminate`
+*/
   struct terminate : base
   {
-    /*! Performs a wide check of state, used in the value() functions.
-    \effects If result does not have a value, calls `std::terminate()`.
-    */
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
       if(!base::_has_value(static_cast<Impl &&>(self)))
@@ -49,9 +45,6 @@ namespace policy
         std::abort();
       }
     }
-    /*! Performs a wide check of state, used in the error() functions
-    \effects If result does not have an error, calls `std::terminate()`.
-    */
     template <class Impl> static constexpr void wide_error_check(Impl &&self) noexcept
     {
       if(!base::_has_error(static_cast<Impl &&>(self)))
@@ -59,9 +52,6 @@ namespace policy
         std::abort();
       }
     }
-    /*! Performs a wide check of state, used in the exception() functions
-    \effects If outcome does not have an exception, calls `std::terminate()`.
-    */
     template <class Impl> static constexpr void wide_exception_check(Impl &&self)
     {
       if(!base::_has_exception(static_cast<Impl &&>(self)))

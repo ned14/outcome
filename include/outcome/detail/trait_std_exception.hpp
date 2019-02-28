@@ -31,7 +31,6 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
-//! Namespace for policies
 namespace policy
 {
   namespace detail
@@ -44,7 +43,9 @@ namespace policy
     template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
   }  // namespace detail
 
-  //! Used by policies to extract a `std::exception_ptr` from some input `T` via ADL discovery of some `make_exception_ptr(T)` function.
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
+*/
   template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return detail::exception_ptr(std::forward<T>(v)); }
 
   namespace detail
@@ -66,7 +67,6 @@ namespace policy
   }  // namespace detail
 }  // namespace policy
 
-//! Namespace for traits
 namespace trait
 {
   namespace detail

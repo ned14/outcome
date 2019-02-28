@@ -33,10 +33,12 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
+*/
   struct base
   {
   protected:
-    //! Invokes noticeable UB!
     template <class Impl>
     static constexpr
 #ifdef _MSC_VER
@@ -54,36 +56,22 @@ namespace policy
 #endif
     }
 
-    //! True if the current state's status has its value bit set.
     template <class Impl> static constexpr bool _has_value(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) != 0; }
-    //! True if the current state's status has its error bit set.
     template <class Impl> static constexpr bool _has_error(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0; }
-    //! True if the current state's status has its exception bit set.
     template <class Impl> static constexpr bool _has_exception(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0; }
-    //! True if the current state's status has its error-is-errno bit set.
     template <class Impl> static constexpr bool _has_error_is_errno(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_error_is_errno) != 0; }
 
-    //! Changes the current state's status value bit.
     template <class Impl> static constexpr void _set_has_value(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_value : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_have_value; }
-    //! Changes the current state's status error bit.
     template <class Impl> static constexpr void _set_has_error(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_error : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_have_error; }
-    //! Changes the current state's status exception bit.
     template <class Impl> static constexpr void _set_has_exception(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_exception : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_have_exception; }
-    //! Changes the current state's status error-is-errno bit.
     template <class Impl> static constexpr void _set_has_error_is_errno(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_error_is_errno : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_error_is_errno; }
 
-    //! Accesses the current state's value. No checking of validity is made.
     template <class Impl> static constexpr auto &&_value(Impl &&self) noexcept { return static_cast<Impl &&>(self)._state._value; }
-    //! Accesses the current state's error. No checking of validity is made.
     template <class Impl> static constexpr auto &&_error(Impl &&self) noexcept { return static_cast<Impl &&>(self)._error; }
 
   public:
-    //! Accesses the current state's exception. No checking of validity is made.
     template <class R, class S, class P, class NoValuePolicy, class Impl> static inline constexpr auto &&_exception(Impl &&self) noexcept;
 
-    /*! Performs a narrow check of state, used in the assume_value() functions.
-    \effects None.
-    */
     template <class Impl> static constexpr void narrow_value_check(Impl &&self) noexcept
     {
       if(!_has_value(self))
@@ -91,9 +79,6 @@ namespace policy
         _ub(self);
       }
     }
-    /*! Performs a narrow check of state, used in the assume_error() functions
-    \effects None.
-    */
     template <class Impl> static constexpr void narrow_error_check(Impl &&self) noexcept
     {
       if(!_has_error(self))
@@ -101,9 +86,6 @@ namespace policy
         _ub(self);
       }
     }
-    /*! Performs a narrow check of state, used in the assume_exception() functions
-    \effects None.
-    */
     template <class Impl> static constexpr void narrow_exception_check(Impl &&self) noexcept
     {
       if(!_has_exception(self))

@@ -31,23 +31,13 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  /*! Policy which treats wide checks as narrow checks.
-
-  Can be used in both `result` and `outcome`.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+type definition  all_narrow. Potential doc page: `all_narrow`
+*/
   struct all_narrow : base
   {
-    /*! Performs a wide check of state, used in the value() functions. Calls `narrow_value_check()` and does nothing else.
-    \effects None.
-    */
     template <class Impl> static constexpr void wide_value_check(Impl &&self) { base::narrow_value_check(static_cast<Impl &&>(self)); }
-    /*! Performs a wide check of state, used in the error() functions. Calls `narrow_error_check()` and does nothing else.
-    \effects None.
-    */
     template <class Impl> static constexpr void wide_error_check(Impl &&self) { base::narrow_error_check(static_cast<Impl &&>(self)); }
-    /*! Performs a wide check of state, used in the exception() functions. Calls `narrow_exception_check()` and does nothing else.
-    \effects None.
-    */
     template <class Impl> static constexpr void wide_exception_check(Impl &&self) { base::narrow_exception_check(static_cast<Impl &&>(self)); }
   };
 }  // namespace policy

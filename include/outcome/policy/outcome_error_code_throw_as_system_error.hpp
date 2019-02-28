@@ -31,19 +31,11 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  /*! Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
-  Any wide attempt to access the successful state where there is none causes
-  an attempt to rethrow `E` if `trait::has_exception_ptr_v<E>` is true, else:
-
-  1. If `trait::has_error_payload_v<EC>` is true, it calls an
-  ADL discovered free function `outcome_throw_as_system_error_with_payload(.error())`.
-  2. If `trait::has_error_payload_v<EC>` is false, it calls `OUTCOME_THROW_EXCEPTION(std::system_error(policy::error_code(.error())))`
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+type definition  error_code_throw_as_system_error. Potential doc page: NOT FOUND
+*/
   template <class T, class EC, class E> struct error_code_throw_as_system_error : base
   {
-    /*! Performs a wide check of state, used in the value() functions.
-    \effects See description of class for effects.
-    */
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
       if(!base::_has_value(std::forward<Impl>(self)))
@@ -60,9 +52,6 @@ namespace policy
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));  // NOLINT
       }
     }
-    /*! Performs a wide check of state, used in the error() functions
-    \effects If result does not have an error, it throws `bad_outcome_access`.
-    */
     template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
       if(!base::_has_error(std::forward<Impl>(self)))
@@ -70,9 +59,6 @@ namespace policy
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));  // NOLINT
       }
     }
-    /*! Performs a wide check of state, used in the exception() functions
-    \effects If result does not have an exception, it throws `bad_outcome_access`.
-    */
     template <class Impl> static constexpr void wide_exception_check(Impl &&self)
     {
       if(!base::_has_exception(std::forward<Impl>(self)))

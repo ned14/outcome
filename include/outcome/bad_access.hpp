@@ -31,7 +31,9 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Thrown when you try to access state in a `result<R, S>` which isn't present.
+/*! AWAITING HUGO JSON CONVERSION TOOL 
+type definition  bad_result_access. Potential doc page: `bad_result_access`
+*/
 class OUTCOME_SYMBOL_VISIBLE bad_result_access : public std::logic_error
 {
 public:
@@ -41,7 +43,9 @@ public:
   }
 };
 
-//! Thrown when you try to access a value in a `result<R, S>` which isn't present.
+/*! AWAITING HUGO JSON CONVERSION TOOL 
+type definition template <class S> bad_result_access_with. Potential doc page: `bad_result_access_with<EC>`
+*/
 template <class S> class OUTCOME_SYMBOL_VISIBLE bad_result_access_with : public bad_result_access
 {
   S _error;
@@ -52,18 +56,27 @@ public:
       , _error(std::move(v))
   {
   }
-  //! Observes the error
-  //! \group result_error
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
+*/
   const S &error() const & { return _error; }
-  //! \group result_error
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
+*/
   S &error() & { return _error; }
-  //! \group result_error
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
+*/
   const S &&error() const && { return _error; }
-  //! \group result_error
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
+*/
   S &&error() && { return _error; }
 };
 
-//! Thrown when you try to access state in a `outcome<T, EC, E>` which isn't present.
+/*! AWAITING HUGO JSON CONVERSION TOOL 
+type definition  bad_outcome_access. Potential doc page: `bad_outcome_access`
+*/
 class OUTCOME_SYMBOL_VISIBLE bad_outcome_access : public std::logic_error
 {
 public:

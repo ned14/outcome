@@ -32,13 +32,11 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  /*! Policy which throws `bad_result_access_with<EC>` or `bad_result_access` during wide checks.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+type definition  throw_bad_result_access. Potential doc page: NOT FOUND
+*/
   template <class EC, class EP> struct throw_bad_result_access : base
   {
-    /*! Performs a wide check of state, used in the value() functions.
-    \effects If result does not have a value, it throws `bad_result_access_with<EC>`.
-    */
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
       if(!base::_has_value(std::forward<Impl>(self)))
@@ -46,9 +44,6 @@ namespace policy
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));  // NOLINT
       }
     }
-    /*! Performs a wide check of state, used in the error() functions
-    \effects If result does not have an error, it throws `bad_result_access`.
-    */
     template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
       if(!base::_has_error(std::forward<Impl>(self)))
@@ -56,9 +51,6 @@ namespace policy
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));  // NOLINT
       }
     }
-    /*! Performs a wide check of state, used in the exception() functions
-    \effects If result does not have an exception, it throws `bad_outcome_access`.
-    */
     template <class Impl> static constexpr void wide_exception_check(Impl &&self)
     {
       if(!base::_has_exception(std::forward<Impl>(self)))
@@ -69,9 +61,6 @@ namespace policy
   };
   template <class EC> struct throw_bad_result_access<EC, void> : base
   {
-    /*! Performs a wide check of state, used in the value() functions.
-    \effects If result does not have a value, it throws `bad_result_access_with<EC>`.
-    */
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
       if(!base::_has_value(std::forward<Impl>(self)))
@@ -83,9 +72,6 @@ namespace policy
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));  // NOLINT
       }
     }
-    /*! Performs a wide check of state, used in the error() functions
-    \effects If result does not have an error, it throws `bad_result_access`.
-    */
     template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
       if(!base::_has_error(std::forward<Impl>(self)))

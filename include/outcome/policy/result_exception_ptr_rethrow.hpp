@@ -32,16 +32,12 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  /*! Policy interpreting `EC` or `E` as a type for which `trait::has_exception_ptr_v<EC|E>` is true.
-  Any wide attempt to access the successful state where there is none causes:
-  `rethrow_exception(policy::exception_ptr(.error()|.exception()))` appropriately.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
+*/
   template <class T, class EC, class E> struct exception_ptr_rethrow;
   template <class T, class EC> struct exception_ptr_rethrow<T, EC, void> : base
   {
-    /*! Performs a wide check of state, used in the value() functions
-    \effects If result does not have a value, if it has an error it rethrows that error via `rethrow_exception()`, else it throws `bad_result_access`.
-    */
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
       if(!base::_has_value(std::forward<Impl>(self)))
@@ -54,9 +50,6 @@ namespace policy
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));  // NOLINT
       }
     }
-    /*! Performs a wide check of state, used in the value() functions
-    \effects If result does not have a value, if it has an error it throws that error, else it throws `bad_result_access`.
-    */
     template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
       if(!base::_has_error(std::forward<Impl>(self)))
