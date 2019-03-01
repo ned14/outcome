@@ -29,16 +29,19 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-/*! In standalone Outcome, this aliases `std_result<>`. In Boost.Outcome, this aliases `boost_result<>`.
+/*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
 */
 template <class R, class S = std::error_code, class NoValuePolicy = policy::default_policy<R, S, void>>  //
 using result = std_result<R, S, NoValuePolicy>;
 
-/*! In standalone Outcome, this aliases `std_unchecked<>`. In Boost.Outcome, this aliases `boost_checked<>`.
+/*! AWAITING HUGO JSON CONVERSION TOOL 
+type alias template <class R, class S = std::error_code> unchecked. Potential doc page: `unchecked<T, E = varies>`
 */
 template <class R, class S = std::error_code> using unchecked = result<R, S, policy::all_narrow>;
 
-/*! In standalone Outcome, this aliases `std_checked<>`. In Boost.Outcome, this aliases `boost_checked<>`.
+/*! AWAITING HUGO JSON CONVERSION TOOL 
+type alias template <class R, class S = std::error_code> checked. Potential doc page: `checked<T, E = varies>`
 */
 template <class R, class S = std::error_code> using checked = result<R, S, policy::throw_bad_result_access<S, void>>;
 

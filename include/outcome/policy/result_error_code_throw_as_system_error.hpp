@@ -35,15 +35,11 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace policy
 {
   template <class T, class EC, class E> struct error_code_throw_as_system_error;
-  /*! Policy interpreting `EC` as a type for which `trait::has_error_code_v<EC>` is true.
-  Any wide attempt to access the successful state where there is none calls an
-  ADL discovered free function `outcome_throw_as_system_error_with_payload(.error())`.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
+*/
   template <class T, class EC> struct error_code_throw_as_system_error<T, EC, void> : base
   {
-    /*! Performs a wide check of state, used in the value() functions.
-    \effects See description of class for effects.
-    */
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
       if(!base::_has_value(std::forward<Impl>(self)))
@@ -56,9 +52,6 @@ namespace policy
         OUTCOME_THROW_EXCEPTION(bad_result_access("no value"));  // NOLINT
       }
     }
-    /*! Performs a wide check of state, used in the error() functions
-    \effects If result does not have an error, it throws `bad_result_access`.
-    */
     template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
       if(!base::_has_error(std::forward<Impl>(self)))

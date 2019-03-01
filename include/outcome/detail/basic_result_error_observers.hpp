@@ -31,67 +31,48 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  //! The error observers implementation of `basic_result<R, EC, NoValuePolicy>`.
   template <class Base, class EC, class NoValuePolicy> class basic_result_error_observers : public Base
   {
   public:
     using error_type = EC;
     using Base::Base;
 
-    /// \output_section Narrow state observers
-    /*! Access error without runtime checks.
-    \preconditions The basic_result to have a failed state, otherwise it is undefined behaviour.
-    \returns Reference to the held `error_type` according to overload.
-    \group assume_error
-    */
     constexpr error_type &assume_error() & noexcept
     {
       NoValuePolicy::narrow_error_check(static_cast<basic_result_error_observers &>(*this));
       return this->_error;
     }
-    /// \group assume_error
     constexpr const error_type &assume_error() const &noexcept
     {
       NoValuePolicy::narrow_error_check(static_cast<const basic_result_error_observers &>(*this));
       return this->_error;
     }
-    /// \group assume_error
     constexpr error_type &&assume_error() && noexcept
     {
       NoValuePolicy::narrow_error_check(static_cast<basic_result_error_observers &&>(*this));
       return static_cast<error_type &&>(this->_error);
     }
-    /// \group assume_error
     constexpr const error_type &&assume_error() const &&noexcept
     {
       NoValuePolicy::narrow_error_check(static_cast<const basic_result_error_observers &&>(*this));
       return static_cast<const error_type &&>(this->_error);
     }
 
-    /// \output_section Wide state observers
-    /*! Access error with runtime checks.
-    \returns Reference to the held `error_type` according to overload.
-    \requires The basic_result to have a failed state, else whatever `NoValuePolicy` says ought to happen.
-    \group error
-    */
     constexpr error_type &error() &
     {
       NoValuePolicy::wide_error_check(static_cast<basic_result_error_observers &>(*this));
       return this->_error;
     }
-    /// \group error
     constexpr const error_type &error() const &
     {
       NoValuePolicy::wide_error_check(static_cast<const basic_result_error_observers &>(*this));
       return this->_error;
     }
-    /// \group error
     constexpr error_type &&error() &&
     {
       NoValuePolicy::wide_error_check(static_cast<basic_result_error_observers &&>(*this));
       return static_cast<error_type &&>(this->_error);
     }
-    /// \group error
     constexpr const error_type &&error() const &&
     {
       NoValuePolicy::wide_error_check(static_cast<const basic_result_error_observers &&>(*this));
@@ -102,14 +83,7 @@ namespace detail
   {
   public:
     using Base::Base;
-    /// \output_section Narrow state observers
-    /*! Access error without runtime checks.
-    */
     constexpr void assume_error() const noexcept { NoValuePolicy::narrow_error_check(*this); }
-    /// \output_section Wide state observers
-    /*! Access error with runtime checks.
-    \requires The basic_result to have a failed state, else whatever `NoValuePolicy` says ought to happen.
-    */
     constexpr void error() const { NoValuePolicy::wide_error_check(*this); }
   };
 }  // namespace detail

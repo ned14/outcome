@@ -60,7 +60,6 @@ namespace detail
 
 }  // namespace detail
 
-//! Namespace for policies
 namespace policy
 {
   namespace detail
@@ -77,10 +76,14 @@ namespace policy
     };
   }  // namespace detail
 
-  //! Used by policies to extract an error code from some input `T` via ADL discovery of some `make_error_code(T)` function.
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
+*/
   template <class T> constexpr inline decltype(auto) error_code(T &&v) { return detail::error_code(std::forward<T>(v)); }
 
-  //! Override to define what the policies which throw a system error with payload ought to do for some particular `result.error()`.
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
+*/
   // inline void outcome_throw_as_system_error_with_payload(...) = delete;  // To use the error_code_throw_as_system_error policy with a custom Error type, you must define a outcome_throw_as_system_error_with_payload() free function to say how to handle the payload
   inline void outcome_throw_as_system_error_with_payload(const std::error_code &error) { OUTCOME_THROW_EXCEPTION(std::system_error(error)); }  // NOLINT
   OUTCOME_TEMPLATE(class Error)
@@ -88,7 +91,6 @@ namespace policy
   inline void outcome_throw_as_system_error_with_payload(Error &&error, detail::std_enum_overload_tag /*unused*/ = detail::std_enum_overload_tag()) { OUTCOME_THROW_EXCEPTION(std::system_error(make_error_code(error))); }  // NOLINT
 }  // namespace policy
 
-//! Namespace for traits
 namespace trait
 {
   namespace detail

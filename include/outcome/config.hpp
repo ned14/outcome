@@ -55,13 +55,8 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_TEXPR(...) typename = decltype(__VA_ARGS__)
 #define OUTCOME_TPRED(...) typename = std::enable_if_t<__VA_ARGS__>
 #define OUTCOME_REQUIRES(...) requires __VA_ARGS__
-/*! \mainpage
-\htmlonly
-<script type="text/javascript">
-window.location.href = "https://ned14.github.io/outcome/"
-</script>
-If you are not redirected automatically, follow this link to <a href='https://ned14.github.io/outcome/'>https://ned14.github.io/outcome/</a>.
-\endhtmlonly
+/*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
 */
 #endif
 
@@ -92,34 +87,6 @@ If you are not redirected automatically, follow this link to <a href='https://ne
 
 #include "quickcpplib/include/import.h"
 
-#ifdef STANDARDESE_IS_IN_THE_HOUSE
-/*! The namespace configuration of this Outcome v2. Consists of a sequence
-of bracketed tokens later fused by the preprocessor into namespace and C++ module names.
-*/
-#define OUTCOME_V2
-//! The Outcome namespace
-namespace outcome_v2_xxx
-{
-}
-/*! The namespace of this Outcome v2.
-*/
-#define OUTCOME_V2_NAMESPACE outcome_v2_xxx
-/*! Expands into the appropriate namespace markup to enter the Outcome v2 namespace.
-*/
-#define OUTCOME_V2_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                             \
-  namespace outcome_v2_xxx                                                                                                                                                                                                                                                                                                     \
-  {
-/*! Expands into the appropriate namespace markup to enter the C++ module
-exported Outcome v2 namespace.
-*/
-#define OUTCOME_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                      \
-  export namespace outcome_v2_xxx                                                                                                                                                                                                                                                                                              \
-  {
-/*! \brief Expands into the appropriate namespace markup to exit the Outcome v2 namespace.
-\ingroup config
-*/
-#define OUTCOME_V2_NAMESPACE_END }
-#else
 
 #if defined(OUTCOME_UNSTABLE_VERSION)
 #include "revision.hpp"
@@ -138,7 +105,6 @@ exported Outcome v2 namespace.
 #define OUTCOME_V2_NAMESPACE_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(OUTCOME_V2)
 #define OUTCOME_V2_NAMESPACE_EXPORT_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(OUTCOME_V2)
 #define OUTCOME_V2_NAMESPACE_END QUICKCPPLIB_BIND_NAMESPACE_END(OUTCOME_V2)
-#endif
 #endif
 
 #include <cstdint>  // for uint32_t etc
@@ -175,12 +141,16 @@ using std::in_place_type;
 OUTCOME_V2_NAMESPACE_END
 #else
 OUTCOME_V2_NAMESPACE_BEGIN
-//! Aliases `std::in_place_type_t<T>` if on C++ 17 or later, else defined locally.
+/*! AWAITING HUGO JSON CONVERSION TOOL 
+type definition template <class T> in_place_type_t. Potential doc page: `in_place_type_t<T>`
+*/
 template <class T> struct in_place_type_t
 {
   explicit in_place_type_t() = default;
 };
-//! Aliases `std::in_place_type<T>` if on C++ 17 or later, else defined locally.
+/*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
+*/
 template <class T> constexpr in_place_type_t<T> in_place_type{};
 OUTCOME_V2_NAMESPACE_END
 #endif

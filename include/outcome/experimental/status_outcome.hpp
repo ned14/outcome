@@ -52,7 +52,6 @@ SYSTEM_ERROR2_NAMESPACE_END
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Namespace for traits
 namespace trait
 {
   namespace detail
@@ -84,14 +83,10 @@ namespace trait
 }  // namespace trait
 
 
-//! Namespace for experimental features
 namespace experimental
 {
-  //! Namespace for policies
   namespace policy
   {
-    /*! Default policy selector.
-    */
     template <class T, class EC, class E>
     using default_status_outcome_policy = std::conditional_t<                                                                                                                              //
     std::is_void<EC>::value && std::is_void<E>::value,                                                                                                                                     //
@@ -102,22 +97,17 @@ namespace experimental
                        >>;
   }  // namespace policy
 
-  /*! TODO
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
+*/
   template <class R, class S = system_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_status_outcome_policy<R, S, P>>  //
   using status_outcome = basic_outcome<R, S, P, NoValuePolicy>;
 
-  //! Namespace for policies
   namespace policy
   {
-    /*!
-    */
     template <class T, class DomainType, class E> struct status_code_throw<T, status_code<DomainType>, E> : base
     {
       using _base = base;
-      /*! Performs a wide check of state, used in the value() functions.
-      \effects See description of class for effects.
-      */
       template <class Impl> static constexpr void wide_value_check(Impl &&self)
       {
         if(!base::_has_value(static_cast<Impl &&>(self)))
@@ -136,13 +126,7 @@ namespace experimental
           }
         }
       }
-      /*! Performs a wide check of state, used in the error() functions
-      \effects TODO
-      */
       template <class Impl> static constexpr void wide_error_check(Impl &&self) { _base::narrow_error_check(static_cast<Impl &&>(self)); }
-      /*! Performs a wide check of state, used in the exception() functions
-      \effects TODO
-      */
       template <class Impl> static constexpr void wide_exception_check(Impl &&self) { _base::narrow_exception_check(static_cast<Impl &&>(self)); }
     };
     template <class T, class DomainType, class E> struct status_code_throw<T, errored_status_code<DomainType>, E> : status_code_throw<T, status_code<DomainType>, E>

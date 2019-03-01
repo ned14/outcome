@@ -31,39 +31,20 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  //! The exception observers implementation of `basic_outcome<R, S, P>`.
   template <class Base, class R, class S, class P, class NoValuePolicy> class basic_outcome_exception_observers : public Base
   {
   public:
     using exception_type = P;
     using Base::Base;
 
-    /// \output_section Narrow state observers
-    /*! Access exception without runtime checks.
-    \preconditions The outcome to have an exception state, otherwise it is undefined behaviour.
-    \returns Reference to the held `exception_type` according to overload.
-    \group assume_exception
-    */
     constexpr inline exception_type &assume_exception() & noexcept;
-    /// \group assume_exception
     constexpr inline const exception_type &assume_exception() const &noexcept;
-    /// \group assume_exception
     constexpr inline exception_type &&assume_exception() && noexcept;
-    /// \group assume_exception
     constexpr inline const exception_type &&assume_exception() const &&noexcept;
 
-    /// \output_section Wide state observers
-    /*! Access exception with runtime checks.
-    \returns Reference to the held `exception_type` according to overload.
-    \requires The outcome to have an exception state, else whatever `NoValuePolicy` says ought to happen.
-    \group exception
-    */
     constexpr inline exception_type &exception() &;
-    /// \group exception
     constexpr inline const exception_type &exception() const &;
-    /// \group exception
     constexpr inline exception_type &&exception() &&;
-    /// \group exception
     constexpr inline const exception_type &&exception() const &&;
   };
 
@@ -72,14 +53,7 @@ namespace detail
   {
   public:
     using Base::Base;
-    /// \output_section Narrow state observers
-    /*! Access exception without runtime checks.
-    */
     constexpr void assume_exception() const noexcept { NoValuePolicy::narrow_exception_check(this); }
-    /// \output_section Wide state observers
-    /*! Access exception with runtime checks.
-    \requires The outcome to have an exception state, else whatever `NoValuePolicy` says ought to happen.
-    */
     constexpr void exception() const { NoValuePolicy::wide_exception_check(this); }
   };
 

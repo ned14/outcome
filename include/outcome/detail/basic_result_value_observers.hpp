@@ -31,67 +31,48 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  //! The value observers implementation of `basic_result<R, EC, NoValuePolicy>`.
   template <class Base, class R, class NoValuePolicy> class basic_result_value_observers : public Base
   {
   public:
     using value_type = R;
     using Base::Base;
 
-    /// \output_section Narrow state observers
-    /*! Access value without runtime checks.
-    \preconditions The basic_result to have a successful state, otherwise it is undefined behaviour.
-    \returns Reference to the held `value_type` according to overload.
-    \group assume_value
-    */
     constexpr value_type &assume_value() & noexcept
     {
       NoValuePolicy::narrow_value_check(static_cast<basic_result_value_observers &>(*this));
       return this->_state._value;  // NOLINT
     }
-    /// \group assume_value
     constexpr const value_type &assume_value() const &noexcept
     {
       NoValuePolicy::narrow_value_check(static_cast<const basic_result_value_observers &>(*this));
       return this->_state._value;  // NOLINT
     }
-    /// \group assume_value
     constexpr value_type &&assume_value() && noexcept
     {
       NoValuePolicy::narrow_value_check(static_cast<basic_result_value_observers &&>(*this));
       return static_cast<value_type &&>(this->_state._value);  // NOLINT
     }
-    /// \group assume_value
     constexpr const value_type &&assume_value() const &&noexcept
     {
       NoValuePolicy::narrow_value_check(static_cast<const basic_result_value_observers &&>(*this));
       return static_cast<const value_type &&>(this->_state._value);  // NOLINT
     }
 
-    /// \output_section Wide state observers
-    /*! Access value with runtime checks.
-    \returns Reference to the held `value_type` according to overload.
-    \requires The basic_result to have a successful state, else whatever `NoValuePolicy` says ought to happen.
-    \group value
-    */
     constexpr value_type &value() &
     {
       NoValuePolicy::wide_value_check(static_cast<basic_result_value_observers &>(*this));
       return this->_state._value;  // NOLINT
     }
-    /// \group value
     constexpr const value_type &value() const &
     {
       NoValuePolicy::wide_value_check(static_cast<const basic_result_value_observers &>(*this));
       return this->_state._value;  // NOLINT
     }
-    /// \group value
     constexpr value_type &&value() &&
     {
       NoValuePolicy::wide_value_check(static_cast<basic_result_value_observers &&>(*this));
       return static_cast<value_type &&>(this->_state._value);  // NOLINT
     }
-    /// \group value
     constexpr const value_type &&value() const &&
     {
       NoValuePolicy::wide_value_check(static_cast<const basic_result_value_observers &&>(*this));
@@ -103,14 +84,7 @@ namespace detail
   public:
     using Base::Base;
 
-    /// \output_section Narrow state observers
-    /*! Access value without runtime checks.
-    */
     constexpr void assume_value() const noexcept { NoValuePolicy::narrow_value_check(*this); }
-    /// \output_section Wide state observers
-    /*! Access value with runtime checks.
-    \requires The basic_result to have a successful state, else whatever `NoValuePolicy` says ought to happen.
-    */
     constexpr void value() const { NoValuePolicy::wide_value_check(*this); }
   };
 }  // namespace detail

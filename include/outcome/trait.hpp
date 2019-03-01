@@ -29,18 +29,11 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
-//! Namespace for traits
 namespace trait
 {
-  /*! Requirements predicate for permitting type to be used in `basic_result`/`basic_outcome`.
-
-  - Is not a reference.
-  - Is not an `in_place_type_t<>`.
-  - Is not a `success_type<>`.
-  - Is not a `failure_type<>`.
-  - Is not an array.
-  - Is `void`, or else is an Object and is Destructible.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
+*/
   template <class R>                                                             //
   static constexpr bool type_can_be_used_in_basic_result =                       //
   (!std::is_reference<R>::value                                                  //
@@ -52,21 +45,17 @@ namespace trait
                                   && std::is_destructible<R>::value))            //
    );
 
-  /*! Trait for whether a type is an error type or not. This is specialised by
-  later code to enable implicit conversion for when the value type is `bool` and the
-  error type is convertible to `bool`, something which ordinarily would disable
-  all implicit constructors.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+type definition  is_error_type. Potential doc page: NOT FOUND
+*/
   template <class E> struct is_error_type
   {
     static constexpr bool value = false;
   };
 
-  /*! Trait for whether a type is an error type enum or not. This is specialised by
-  later code to enable implicit conversion from such enum types.
-  \tparam E The error type.
-  \tparam Enum The enum type.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+type definition  is_error_type_enum. Potential doc page: NOT FOUND
+*/
   template <class E, class Enum> struct is_error_type_enum
   {
     static constexpr bool value = false;
@@ -110,18 +99,18 @@ namespace trait
     };
   }  // namespace detail
 
-  /*! Trait for whether a free function `make_error_code(T)` exists or not.
-  Also true for `std::error_code` and `boost::system::error_code`.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+type definition  is_error_code_available. Potential doc page: NOT FOUND
+*/
   template <class T> struct is_error_code_available
   {
     static constexpr bool value = detail::_is_error_code_available<std::decay_t<T>>::value;
   };
   template <class T> constexpr bool is_error_code_available_v = detail::_is_error_code_available<std::decay_t<T>>::value;
 
-  /*! Trait for whether a free function `make_exception_ptr(T)` exists or not.
-  Also true for `std::exception_ptr` and `boost::exception_ptr`.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+type definition  is_exception_ptr_available. Potential doc page: NOT FOUND
+*/
   template <class T> struct is_exception_ptr_available
   {
     static constexpr bool value = detail::_is_exception_ptr_available<std::decay<T>>::value;

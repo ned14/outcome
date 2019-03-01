@@ -35,30 +35,8 @@ namespace std  // NOLINT
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-/*! `basic_outcome` defaulted to use `std::error_code`, `std::exception_ptr` and a `NoValuePolicy` appropriate for `std` types.
-
-`NoValuePolicy` defaults to a policy selected according to the characteristics of types `S` and `P`:
-
-1. If `.value()` called when there is no `value_type` but there is an `exception_type`:
-   - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-exception-ptr-v" "trait::has_exception_ptr_v<P>" >}} \end is true,
-then `std::rethrow_exception(exception()|make_exception_ptr(exception()))`
-[\verbatim {{<api "policies/outcome_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, P>">}} \end]
-2. If `.value()` called when there is no `value_type` but there is an `error_type`:
-   - If \verbatim {{<api "success_failure/#unexposed-entity-outcome-v2-xxx-trait-has-error-code-v" "trait::has_error_code_v<S>" >}} \end is true,
-then `throw std::system_error(error()|make_error_code(error()))`
-[\verbatim {{<api "policies/outcome_error_code_throw_as_system_error/" "policy::error_code_throw_as_system_error<S>">}} \end]
-   - If `trait::has_exception_ptr_v<S>`, then `std::rethrow_exception(error()|make_exception_ptr(error()))`
-[\verbatim {{<api "policies/result_exception_ptr_rethrow/" "policy::exception_ptr_rethrow<R, S, void>">}} \end]
-   - If `S` is `void`, call `std::terminate()` [\verbatim {{<api "policies/terminate/" "policy::terminate">}} \end]
-   - If `S` is none of the above, then it is undefined behaviour [\verbatim {{<api "policies/all_narrow/" "policy::all_narrow">}} \end]
-3. If `.exception()` called when there is no `exception_type`:
-   - If `trait::has_exception_ptr_v<P>`,
-or if `P` is `void`, do `throw bad_outcome_access()`
-   - If `P` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
-4. If `.error()` called when there is no `error_type`:
-   - If `trait::has_error_code_v<S>`, or if `trait::has_exception_ptr_v<S>`,
-or if `S` is `void`, do `throw bad_outcome_access()`
-   - If `S` is none of the above, then it is undefined behaviour [`policy::all_narrow`]
+/*! AWAITING HUGO JSON CONVERSION TOOL 
+SIGNATURE NOT RECOGNISED
 */
 template <class R, class S = std::error_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_policy<R, S, P>>  //
 using std_outcome = basic_outcome<R, S, P, NoValuePolicy>;

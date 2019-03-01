@@ -39,24 +39,10 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  /*! Policy which refuses to compile the wide checks with an error message. Used by `default_policy`
-  to enforce disabling of wide observers.
-
-  Can be used in both `result` and `outcome`.
-  */
   struct fail_to_compile_observers : base
   {
-    /*! Performs a wide check of state, used in the value() functions. Fails to compile with a static assertion.
-    \effects None.
-    */
     template <class Impl> static constexpr void wide_value_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, OUTCOME_FAIL_TO_COMPILE_OBSERVERS_MESSAGE); }
-    /*! Performs a wide check of state, used in the error() functions. Fails to compile with a static assertion.
-    \effects None.
-    */
     template <class Impl> static constexpr void wide_error_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, OUTCOME_FAIL_TO_COMPILE_OBSERVERS_MESSAGE); }
-    /*! Performs a wide check of state, used in the exception() functions. Fails to compile with a static assertion.
-    \effects None.
-    */
     template <class Impl> static constexpr void wide_exception_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, OUTCOME_FAIL_TO_COMPILE_OBSERVERS_MESSAGE); }
   };
 }  // namespace policy

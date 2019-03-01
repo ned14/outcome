@@ -31,16 +31,11 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
-  /*! Policy interpreting `EC` or `E` as a type for which `trait::has_exception_ptr_v<EC|E>` is true.
-  Any wide attempt to access the successful state where there is none causes:
-  `std::rethrow_exception(policy::exception_ptr(.error()|.exception()))` appropriately.
-  */
+  /*! AWAITING HUGO JSON CONVERSION TOOL 
+type definition  exception_ptr_rethrow. Potential doc page: NOT FOUND
+*/
   template <class T, class EC, class E> struct exception_ptr_rethrow : base
   {
-    /*! Performs a wide check of state, used in the value() functions
-    \effects If outcome does not have a value, if it has an exception it rethrows that exception via `std::rethrow_exception()`,
-    if it has an error it rethrows that error via `std::rethrow_exception()`, else it throws `bad_outcome_access`.
-    */
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
     {
       if(!base::_has_value(std::forward<Impl>(self)))
@@ -56,9 +51,6 @@ namespace policy
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));  // NOLINT
       }
     }
-    /*! Performs a wide check of state, used in the error() functions
-    \effects If outcome does not have an error, it throws `bad_outcome_access`.
-    */
     template <class Impl> static constexpr void wide_error_check(Impl &&self)
     {
       if(!base::_has_error(std::forward<Impl>(self)))
@@ -66,9 +58,6 @@ namespace policy
         OUTCOME_THROW_EXCEPTION(bad_outcome_access("no error"));  // NOLINT
       }
     }
-    /*! Performs a wide check of state, used in the exception() functions
-    \effects If result does not have an exception, it throws `bad_outcome_access`.
-    */
     template <class Impl> static constexpr void wide_exception_check(Impl &&self)
     {
       if(!base::_has_exception(std::forward<Impl>(self)))
