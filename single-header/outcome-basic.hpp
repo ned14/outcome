@@ -1135,9 +1135,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 8f0870b8c3474fa6e77a858389e4788281798991
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-02-28 21:57:27 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 8f0870b8
+#define OUTCOME_PREVIOUS_COMMIT_REF b93403b9a55355b8f6783320c8d2db2c14b3517d
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-02-28 22:02:20 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE b93403b9
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -3814,17 +3814,61 @@ SIGNATURE NOT RECOGNISED
                                       &&detail::is_nothrow_swappable<error_type>::value &&std::is_nothrow_move_constructible<error_type>::value)
   {
     using std::swap;
-    // If value swap can throw, do it first
-    if(!noexcept(this->_state.swap(o._state)))
+#ifdef __cpp_exceptions
+    constexpr bool value_throws = !noexcept(this->_state.swap(o._state));
+    constexpr bool error_throws = !noexcept(swap(this->_error, o._error));
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4127)  // conditional expression is constant
+#endif
+    // Do throwing swap first
+    if(value_throws && !error_throws)
     {
       this->_state.swap(o._state);
       swap(this->_error, o._error);
+    }
+    else if((!value_throws && error_throws) || (!value_throws && !error_throws))
+    {
+      swap(this->_error, o._error);
+      this->_state.swap(o._state);
     }
     else
     {
-      swap(this->_error, o._error);
+      // So both can throw
       this->_state.swap(o._state);
+      try
+      {
+        swap(this->_error, o._error);
+      }
+      catch(...)
+      {
+        // Prevent has_value() == has_error()
+        if(this->has_value())
+        {
+          this->_state._status &= ~detail::status_have_error;
+        }
+        else
+        {
+          this->_state._status |= detail::status_have_error;
+        }
+        if(o.has_value())
+        {
+          o._state._status &= ~detail::status_have_error;
+        }
+        else
+        {
+          o._state._status |= detail::status_have_error;
+        }
+        throw;
+      }
     }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+#else
+    this->_state.swap(o._state);
+    swap(this->_error, o._error);
+#endif
   }
 
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -4882,15 +4926,16 @@ SIGNATURE NOT RECOGNISED
                                        &&detail::is_nothrow_swappable<exception_type>::value &&std::is_nothrow_move_constructible<exception_type>::value)
   {
     using std::swap;
+#ifdef __cpp_exceptions
     constexpr bool value_throws = !noexcept(this->_state.swap(o._state));
-    constexpr bool error_throws = !noexcept(swap(this->_ptr, o._ptr));
+    constexpr bool error_throws = !noexcept(swap(this->_error, o._error));
     constexpr bool exception_throws = !noexcept(swap(this->_ptr, o._ptr));
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4127)  // conditional expression is constant
 #endif
     // Do throwing swap first
-    if(value_throws && !error_throws && !exception_throws)
+    if((value_throws && !error_throws && !exception_throws) || (!value_throws && !error_throws && !exception_throws))
     {
       this->_state.swap(o._state);
       swap(this->_error, o._error);
@@ -4910,12 +4955,47 @@ SIGNATURE NOT RECOGNISED
     }
     else
     {
+      // Two or more can throw
       this->_state.swap(o._state);
-      swap(this->_error, o._error);
-      swap(this->_ptr, o._ptr);
+      bool exception_threw = false;
+      try
+      {
+        swap(this->_error, o._error);
+        exception_threw = true;
+        swap(this->_ptr, o._ptr);
+      }
+      catch(...)
+      {
+        // Prevent has_value() == has_error() or has_value() == has_exception()
+        auto check = [exception_threw](basic_outcome *t) {
+          if(t->has_value() && (t->has_error() || t->has_exception()))
+          {
+            t->_state._status &= ~(detail::status_have_error | detail::status_have_exception);
+          }
+          if(!t->has_value() && !(t->has_error() || t->has_exception()))
+          {
+            if(exception_threw)
+            {
+              t->_state._status |= detail::status_have_exception;
+            }
+            else
+            {
+              t->_state._status |= detail::status_have_error;
+            }
+          }
+        };
+        check(this);
+        check(&o);
+        throw;
+      }
     }
 #ifdef _MSC_VER
 #pragma warning(pop)
+#endif
+#else
+    this->_state.swap(o._state);
+    swap(this->_error, o._error);
+    swap(this->_ptr, o._ptr);
 #endif
   }
 

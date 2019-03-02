@@ -38,6 +38,36 @@ Outcome uses `struct`-based storage, as described above. Any over-alignment of
 library facilities, are not used.
 
 
+## Does Outcome implement the no-fail, strong or basic exception guarantee?
+
+([You can read about the meaning of these guarantees at cppreference.com](https://en.cppreference.com/w/cpp/language/exceptions#Exception_safety))
+
+If for the following operations:
+
+- `swap(&)`
+
+... the corresponding operation in **all** of `value_type`, `error_type` (and `exception_type`
+for `outcome`) is `noexcept(true)`, then `result` and `outcome`'s operation is `noexcept(true)`.
+This propagates the no-fail exception guarantee of the underlying types.
+
+If no more than **one** of the underlying types has a throwing operation, `result` and
+`outcome` perform that operation *first* before all others. This implements the strong
+exception guarantee.
+
+If *two or more* of the underlying types has a throwing operation, then only the basic
+exception guarantee is provided. Be aware that values and errors may become mismatched
+in this situation e.g. the value might get swapped, but if the error fails to swap,
+the two results or outcomes would end up with mismatched values. Note that metadata
+is always kept consistent, so it is not possible for any result or outcome to enter
+an invalid state.
+
+Todo:
+
+- `operator=(const &)`
+- `operator=(&&)`
+
+
+
 ## Does Outcome have a stable ABI and API?
 
 Right now, no. Though the data layout shown above is not expected to change.
