@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Iostream on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/reference/functions/iostream/</link>
+    <description>Recent content in Iostream on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Sun, 03 Mar 2019 21:04:29 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/reference/functions/iostream/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>`std::istream &amp;operator&gt;&gt;(std::istream &amp;, basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/iostream/outcome_operator_in/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/iostream/outcome_operator_in/</guid>
+      <description>Deserialises a basic_outcome from a std::istream.
+Serialisation format is:
+&amp;lt;unsigned int flags&amp;gt;&amp;lt;space&amp;gt;&amp;lt;value_type if set and not void&amp;gt;&amp;lt;error_type if set and not void&amp;gt;&amp;lt;exception_type if set and not void&amp;gt;  Overridable: Not overridable.
+Requires: That operator&amp;gt;&amp;gt; is a valid expression for std::istream and T, EC and EP.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/iostream_support.hpp&amp;gt; (must be explicitly included manually).</description>
+    </item>
+    
+    <item>
+      <title>`std::istream &amp;operator&gt;&gt;(std::istream &amp;, basic_result&lt;T, E, NoValuePolicy&gt; &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/iostream/result_operator_in/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/iostream/result_operator_in/</guid>
+      <description>Deserialises a basic_result from a std::istream.
+Serialisation format is:
+&amp;lt;unsigned int flags&amp;gt;&amp;lt;space&amp;gt;&amp;lt;value_type if set and not void&amp;gt;&amp;lt;error_type if set and not void&amp;gt;  Overridable: Not overridable.
+Requires: That operator&amp;gt;&amp;gt; is a valid expression for std::istream and T and E.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/iostream_support.hpp&amp;gt; (must be explicitly included manually).</description>
+    </item>
+    
+    <item>
+      <title>`std::ostream &amp;operator&lt;&lt;(std::ostream &amp;, const basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/iostream/outcome_operator_out/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/iostream/outcome_operator_out/</guid>
+      <description>Serialises a basic_outcome to a std::ostream.
+Serialisation format is:
+&amp;lt;unsigned int flags&amp;gt;&amp;lt;space&amp;gt;&amp;lt;value_type if set and not void&amp;gt;&amp;lt;error_type if set and not void&amp;gt;&amp;lt;exception_type if set and not void&amp;gt;  This is the wrong function to use if you wish to print human readable output. Use std::string print(const basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; &amp;amp;) instead.
+Overridable: Not overridable.
+Requires: That operator&amp;lt;&amp;lt; is a valid expression for std::ostream and T, EC and EP.
+Namespace: OUTCOME_V2_NAMESPACE</description>
+    </item>
+    
+    <item>
+      <title>`std::ostream &amp;operator&lt;&lt;(std::ostream &amp;, const basic_result&lt;T, E, NoValuePolicy&gt; &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/iostream/result_operator_out/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/iostream/result_operator_out/</guid>
+      <description>Serialises a basic_result to a std::ostream.
+Serialisation format is:
+&amp;lt;unsigned int flags&amp;gt;&amp;lt;space&amp;gt;&amp;lt;value_type if set and not void&amp;gt;&amp;lt;error_type if set and not void&amp;gt;  This is the wrong function to use if you wish to print human readable output. Use std::string print(const basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; &amp;amp;) instead.
+Overridable: Not overridable.
+Requires: That operator&amp;lt;&amp;lt; is a valid expression for std::ostream and T and E.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/iostream_support.hpp&amp;gt; (must be explicitly included manually).</description>
+    </item>
+    
+    <item>
+      <title>`std::string print(const basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/iostream/outcome_print/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/iostream/outcome_print/</guid>
+      <description>Returns a string containing a human readable rendition of the basic_outcome.
+Overridable: Not overridable.
+Requires: Always available.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/iostream_support.hpp&amp;gt; (must be explicitly included manually).</description>
+    </item>
+    
+    <item>
+      <title>`std::string print(const basic_result&lt;T, E, NoValuePolicy&gt; &amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/iostream/result_print/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/iostream/result_print/</guid>
+      <description>Returns a string containing a human readable rendition of the basic_result.
+Overridable: Not overridable.
+Requires: Always available.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/iostream_support.hpp&amp;gt; (must be explicitly included manually).</description>
+    </item>
+    
+  </channel>
+</rss>

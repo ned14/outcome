@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-03T00:16:07 UTC">
+<meta name="revised" content="2019-03-03T21:09:29 UTC">
 <title>History :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -339,6 +339,90 @@
       <a href="/outcome/tutorial/advanced/interop/">Interoperation</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/problem/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/problem/">
+            Incommensurate E types
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/value-or-error/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/value-or-error/">
+            ValueOrError Concept
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/httplib/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/httplib/">
+            The HTTP library
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/tidylib/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/tidylib/">
+            The HTMLTidy library
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/filelib/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/filelib/">
+            The File I/O library
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/app/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/app/">
+            The Application
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib1/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/app-map-httplib1/">
+            Mapping the HTTP library into the Application <code>1/2</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib2/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/app-map-httplib2/">
+            Mapping the HTTP library into the Application <code>2/2</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-filelib/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/app-map-filelib/">
+            Mapping the File I/O library into the Application
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-tidylib/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/app-map-tidylib/">
+            Mapping the HTMLTidy library into the Application
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/app-go/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/app-go/">
+            In use
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/conclusion/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/conclusion/">
+            Conclusion
+          </a>
+        </div>
+    </li>
         </ul>
     </li>
         </ul>
@@ -2054,6 +2138,56 @@
         <div>
           <a href="/outcome/reference/functions/hooks/set_spare_storage/">
             <code>void set_spare_storage(basic_result|basic_outcome *, uint16_t) noexcept</code>
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/outcome/reference/functions/iostream/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/reference/functions/iostream/">Iostream</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/reference/functions/iostream/outcome_operator_in/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/outcome_operator_in/">
+            <code>std::istream &amp;operator&gt;&gt;(std::istream &amp;, basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/result_operator_in/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/result_operator_in/">
+            <code>std::istream &amp;operator&gt;&gt;(std::istream &amp;, basic_result&lt;T, E, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/outcome_operator_out/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/outcome_operator_out/">
+            <code>std::ostream &amp;operator&lt;&lt;(std::ostream &amp;, const basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/result_operator_out/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/result_operator_out/">
+            <code>std::ostream &amp;operator&lt;&lt;(std::ostream &amp;, const basic_result&lt;T, E, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/outcome_print/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/outcome_print/">
+            <code>std::string print(const basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/result_print/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/result_print/">
+            <code>std::string print(const basic_result&lt;T, E, NoValuePolicy&gt; &amp;)</code>
           </a>
         </div>
     </li>

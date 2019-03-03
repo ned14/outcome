@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-03T00:16:07 UTC">
+<meta name="revised" content="2019-03-03T21:09:29 UTC">
 <title>Using Outcome from C code :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -485,45 +485,52 @@
       <a href="/outcome/experimental/worked-example/">Worked example: Custom domain</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/functions/failure/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/worked-example/preamble/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/failure/">
-            <code>auto failure(T &amp;&amp;, ...)</code>
+          <a href="/outcome/experimental/worked-example/preamble/">
+            Define a custom code domain
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/success/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/worked-example/value_type/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/success/">
-            <code>auto success(T &amp;&amp;)</code>
+          <a href="/outcome/experimental/worked-example/value_type/">
+            The payload
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/try_operation_return_as_t/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/worked-example/constructor/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/try_operation_return_as_t/">
-            <code>auto try_operation_return_as(T &amp;&amp;)</code>
+          <a href="/outcome/experimental/worked-example/constructor/">
+            The constructor
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/error_from_exception/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/worked-example/string_ref/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/error_from_exception/">
-            <code>std::error_code error_from_exception(std::exception_ptr &amp;&amp;ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept</code>
+          <a href="/outcome/experimental/worked-example/string_ref/">
+            String refs
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/try_operation_return_as_expected/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/worked-example/message/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/try_operation_return_as_expected/">
-            <code>std::experimental::unexpected&lt;E&gt; try_operation_return_as(std::experimental::expected&lt;T, E&gt;)</code>
+          <a href="/outcome/experimental/worked-example/message/">
+            Redefining <code>message()</code>
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/try_throw_std_exception_from_error/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/worked-example/source/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/try_throw_std_exception_from_error/">
-            <code>void try_throw_std_exception_from_error(std::error_code ec, const std::string &amp;msg = std::string{})</code>
+          <a href="/outcome/experimental/worked-example/source/">
+            Constexpr domain source
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/experimental/worked-example/implicit_conversion/" class="dd-item">
+        <div>
+          <a href="/outcome/experimental/worked-example/implicit_conversion/">
+            Implicit conversion
           </a>
         </div>
     </li>
@@ -2133,6 +2140,56 @@
         <div>
           <a href="/outcome/reference/functions/hooks/set_spare_storage/">
             <code>void set_spare_storage(basic_result|basic_outcome *, uint16_t) noexcept</code>
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/outcome/reference/functions/iostream/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/reference/functions/iostream/">Iostream</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/reference/functions/iostream/outcome_operator_in/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/outcome_operator_in/">
+            <code>std::istream &amp;operator&gt;&gt;(std::istream &amp;, basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/result_operator_in/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/result_operator_in/">
+            <code>std::istream &amp;operator&gt;&gt;(std::istream &amp;, basic_result&lt;T, E, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/outcome_operator_out/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/outcome_operator_out/">
+            <code>std::ostream &amp;operator&lt;&lt;(std::ostream &amp;, const basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/result_operator_out/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/result_operator_out/">
+            <code>std::ostream &amp;operator&lt;&lt;(std::ostream &amp;, const basic_result&lt;T, E, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/outcome_print/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/outcome_print/">
+            <code>std::string print(const basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/result_print/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/result_print/">
+            <code>std::string print(const basic_result&lt;T, E, NoValuePolicy&gt; &amp;)</code>
           </a>
         </div>
     </li>
