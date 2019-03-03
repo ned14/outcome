@@ -846,26 +846,56 @@ SIGNATURE NOT RECOGNISED
       }
       catch(...)
       {
-        // Prevent has_value() == has_error() or has_value() == has_exception()
-        auto check = [exception_threw](basic_outcome *t) {
-          if(t->has_value() && (t->has_error() || t->has_exception()))
+        // Try to put it back
+        bool error_is_mine = !exception_threw;
+        try
+        {
+          if(exception_threw)
           {
-            t->_state._status &= ~(detail::status_have_error | detail::status_have_exception);
+            swap(this->_error, o._error);
+            error_is_mine = true;
           }
-          if(!t->has_value() && !(t->has_error() || t->has_exception()))
+          this->_state.swap(o._state);
+          // If that succeeded, continue by rethrowing the exception
+        }
+        catch(...)
+        {
+          if(error_is_mine)
           {
-            if(exception_threw)
+            try
             {
-              t->_state._status |= detail::status_have_exception;
+              swap(this->_error, o._error);
+              error_is_mine = false;
             }
-            else
+            catch(...)
             {
-              t->_state._status |= detail::status_have_error;
             }
           }
-        };
-        check(this);
-        check(&o);
+          // Prevent has_value() == has_error() or has_value() == has_exception()
+          auto check = [](basic_outcome *t, bool set_error) {
+            if(t->has_value() && (t->has_error() || t->has_exception()))
+            {
+              // We know the value swapped and is now set, so clear error and exception
+              t->_state._status &= ~(detail::status_have_error | detail::status_have_exception);
+            }
+            if(!t->has_value() && !(t->has_error() || t->has_exception()))
+            {
+              // We know the value swapped and is now unset, so either set exception or error
+              if(set_error)
+              {
+                t->_state._status |= detail::status_have_error;
+              }
+              else
+              {
+                t->_state._status |= detail::status_have_exception;
+              }
+            }
+          };
+          // If my value is unset and error is not mine, set error
+          check(this, !error_is_mine);
+          // If other's value is unset and error is not mine, set error
+          check(&o, !error_is_mine);
+        }
         throw;
       }
     }

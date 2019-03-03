@@ -497,65 +497,13 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  void swap(basic_result &o) noexcept(detail::is_nothrow_swappable<value_type>::value &&std::is_nothrow_move_constructible<value_type>::value  //
-                                      &&detail::is_nothrow_swappable<error_type>::value &&std::is_nothrow_move_constructible<error_type>::value)
+  constexpr void swap(basic_result &o) noexcept(detail::is_nothrow_swappable<value_type>::value &&std::is_nothrow_move_constructible<value_type>::value  //
+                                                &&detail::is_nothrow_swappable<error_type>::value &&std::is_nothrow_move_constructible<error_type>::value)
   {
     using std::swap;
-#ifdef __cpp_exceptions
     constexpr bool value_throws = !noexcept(this->_state.swap(o._state));
     constexpr bool error_throws = !noexcept(swap(this->_error, o._error));
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4127)  // conditional expression is constant
-#endif
-    // Do throwing swap first
-    if(value_throws && !error_throws)
-    {
-      this->_state.swap(o._state);
-      swap(this->_error, o._error);
-    }
-    else if((!value_throws && error_throws) || (!value_throws && !error_throws))
-    {
-      swap(this->_error, o._error);
-      this->_state.swap(o._state);
-    }
-    else
-    {
-      // So both can throw
-      this->_state.swap(o._state);
-      try
-      {
-        swap(this->_error, o._error);
-      }
-      catch(...)
-      {
-        // Prevent has_value() == has_error()
-        if(this->has_value())
-        {
-          this->_state._status &= ~detail::status_have_error;
-        }
-        else
-        {
-          this->_state._status |= detail::status_have_error;
-        }
-        if(o.has_value())
-        {
-          o._state._status &= ~detail::status_have_error;
-        }
-        else
-        {
-          o._state._status |= detail::status_have_error;
-        }
-        throw;
-      }
-    }
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#else
-    this->_state.swap(o._state);
-    swap(this->_error, o._error);
-#endif
+    detail::basic_result_storage_swap<value_throws, error_throws>(*this, o);
   }
 
   /*! AWAITING HUGO JSON CONVERSION TOOL
