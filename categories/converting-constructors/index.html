@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-28T22:04:49 UTC">
+<meta name="revised" content="2019-03-03T00:16:14 UTC">
 <title>Converting Constructors :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2528,7 +2528,7 @@ Complexity: Same as for the copy or move constructor from the input&rsquo;s .val
         <p>Explicit converting move constructor from compatible basic_outcome. Calls void hook_outcome_move_construction(T *, U &amp;&amp;) noexcept with this and the input.
 Requires: predicate::enable_compatible_conversion&lt;A, B, C, D&gt; is true.
 Complexity: Same as for the move constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of all three operands on entry is restored, if at least two of the underlying operations are marked noexcept. <a class="read-more" href="/outcome/reference/types/basic_outcome/explicit_move_converting_constructor/">&raquo;</a></p>
+Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct. <a class="read-more" href="/outcome/reference/types/basic_outcome/explicit_move_converting_constructor/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          
@@ -2573,7 +2573,7 @@ Guarantees: If an exception is thrown during the operation, the state of all thr
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 25/01/2019
+        <i class='fa fa-calendar'></i> Last update on 03/03/2019
     </div>
     
 

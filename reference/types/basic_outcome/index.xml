@@ -28,7 +28,7 @@
       <description>Move constructor.
 Requires: that value_type, error_type and exception_type all implement a move constructor.
 Complexity: Same as for value_type&amp;rsquo;s, error_type&amp;rsquo;s and exception_type&amp;rsquo;s move constructors. Constexpr, triviality and noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of all three operands on entry is restored, if at least two of the underlying operations are marked noexcept.</description>
+Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
     </item>
     
     <item>
@@ -40,7 +40,7 @@ Guarantees: If an exception is thrown during the operation, the state of all thr
       <description>Copy constructor.
 Requires: that value_type, error_type and exception_type all implement a copy constructor.
 Complexity: Same as for value_type&amp;rsquo;s, error_type&amp;rsquo;s and exception_type&amp;rsquo;s copy constructors. Constexpr, triviality and noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of all three operands on entry is restored, if at least two of the underlying operations are marked noexcept.</description>
+Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
     </item>
     
     <item>
@@ -52,7 +52,7 @@ Guarantees: If an exception is thrown during the operation, the state of all thr
       <description>Move assignment.
 Requires: that value_type, error_type and exception_type all implement move assignment.
 Complexity: If the value_type for both is present, uses value_type&amp;rsquo;s move assignment operator, else either destructs or move constructs value_type as appropriate. error_type&amp;rsquo;s and exception_type&amp;rsquo;s move assignment operator are always used. Constexpr, triviality and noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of all three operands on entry is restored, if at least two of the underlying operations are marked noexcept.</description>
+Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
     </item>
     
     <item>
@@ -64,7 +64,7 @@ Guarantees: If an exception is thrown during the operation, the state of all thr
       <description>Copy assignment.
 Requires: that value_type, error_type and exception_type all implement copy assignment.
 Complexity: If the value_type for both is present, uses value_type&amp;rsquo;s copy assignment operator, else either destructs or copy constructs value_type as appropriate. error_type&amp;rsquo;s and exception_type&amp;rsquo;s copy assignment operator is always used. Constexpr, triviality and noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of all three operands on entry is restored, if at least two of the underlying operations are marked noexcept.</description>
+Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
     </item>
     
     <item>
@@ -176,7 +176,7 @@ Complexity: Same as for the copy or move constructor from the input&amp;rsquo;s 
       <description>Explicit converting copy constructor from compatible basic_outcome. Calls void hook_outcome_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
 Requires: predicate::enable_compatible_conversion&amp;lt;A, B, C, D&amp;gt; is true.
 Complexity: Same as for the copy constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of all three operands on entry is restored, if at least two of the underlying operations are marked noexcept.</description>
+Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
     </item>
     
     <item>
@@ -188,7 +188,7 @@ Guarantees: If an exception is thrown during the operation, the state of all thr
       <description>Explicit converting move constructor from compatible basic_outcome. Calls void hook_outcome_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
 Requires: predicate::enable_compatible_conversion&amp;lt;A, B, C, D&amp;gt; is true.
 Complexity: Same as for the move constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of all three operands on entry is restored, if at least two of the underlying operations are marked noexcept.</description>
+Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
     </item>
     
     <item>
@@ -200,7 +200,7 @@ Guarantees: If an exception is thrown during the operation, the state of all thr
       <description>Explicit converting copy constructor from compatible basic_result. Calls void hook_outcome_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
 Requires: predicate::enable_compatible_conversion&amp;lt;A, B, void, C&amp;gt; is true.
 Complexity: Same as for the copy constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked noexcept.</description>
+Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
     </item>
     
     <item>
@@ -212,7 +212,7 @@ Guarantees: If an exception is thrown during the operation, the state of both op
       <description>Explicit converting move constructor from compatible basic_result. Calls void hook_outcome_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
 Requires: predicate::enable_compatible_conversion&amp;lt;A, B, void, C&amp;gt; is true.
 Complexity: Same as for the move constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked noexcept.</description>
+Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
     </item>
     
     <item>
@@ -861,7 +861,7 @@ Requires: operator!= must be a valid expression between error_type and A, or A i
       <description>Swap one basic_outcome with another.
 Requires: Always available.
 Complexity: Same as for the swap() implementations of the value_type, error_type and exception_type. The noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of all three operands on entry is restored, if at least two of the underlying operations is marked noexcept.</description>
+Guarantees: If an exception is thrown during the operation, the state of all three operands on entry is guaranteed restored, if at least two of the underlying operations is marked noexcept. If one or zero is marked noexcept, an attempt is made to undo the partially completed operation.</description>
     </item>
     
     <item>

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-28T22:04:50 UTC">
+<meta name="revised" content="2019-03-03T00:16:14 UTC">
 <title>Constructors :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2415,7 +2415,7 @@ Guarantees: If an exception is thrown during the operation, the state of the Arg
         <p>Explicit converting constructor from ValueOrError&lt;T, E&gt; concept matching types. Delegates to the basic_result move constructor.
 Requires: convert::value_or_error&lt;T, U&gt; has an available call operator, and if the input is a basic_result or basic_outcome, then convert::value_or_error&lt;&gt; has enabled those inputs for that convert::value_or_error&lt;&gt; specialisation.
 Complexity: Same as for the copy or move constructor from the input&rsquo;s .value() or .error() respectively. Constexpr, triviality and noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked noexcept. <a class="read-more" href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/">&raquo;</a></p>
+Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct. <a class="read-more" href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          
@@ -2435,7 +2435,7 @@ Guarantees: If an exception is thrown during the operation, the state of both op
         <p>Explicit converting move constructor from compatible basic_result. Calls void hook_result_move_construction(T *, U &amp;&amp;) noexcept with this and the input.
 Requires: predicate::enable_compatible_conversion&lt;R, S, P&gt; is true.
 Complexity: Same as for the move constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked noexcept. <a class="read-more" href="/outcome/reference/types/basic_result/explicit_move_converting_constructor/">&raquo;</a></p>
+Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct. <a class="read-more" href="/outcome/reference/types/basic_result/explicit_move_converting_constructor/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          
@@ -2455,7 +2455,7 @@ Guarantees: If an exception is thrown during the operation, the state of both op
         <p>Explicit converting copy constructor from compatible basic_result. Calls void hook_result_copy_construction(T *, U &amp;&amp;) noexcept with this and the input.
 Requires: predicate::enable_compatible_conversion&lt;R, S, P&gt; is true.
 Complexity: Same as for the copy constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked noexcept. <a class="read-more" href="/outcome/reference/types/basic_result/explicit_copy_converting_constructor/">&raquo;</a></p>
+Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct. <a class="read-more" href="/outcome/reference/types/basic_result/explicit_copy_converting_constructor/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          

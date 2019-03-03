@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-28T22:04:41 UTC">
+<meta name="revised" content="2019-03-03T00:16:05 UTC">
 <title>Frequently asked questions :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2342,6 +2342,7 @@
 <ul>
 <li><a href="#is-outcome-safe-to-use-in-extern-apis">Is Outcome safe to use in extern APIs?</a></li>
 <li><a href="#does-outcome-implement-over-alignment">Does Outcome implement over-alignment?</a></li>
+<li><a href="#does-outcome-implement-the-no-fail-strong-or-basic-exception-guarantee">Does Outcome implement the no-fail, strong or basic exception guarantee?</a></li>
 <li><a href="#does-outcome-have-a-stable-abi-and-api">Does Outcome have a stable ABI and API?</a></li>
 <li><a href="#can-i-use-result-t-ec-across-dll-shared-object-boundaries">Can I use <code>result&lt;T, EC&gt;</code> across DLL/shared object boundaries?</a></li>
 <li><a href="#why-two-types-result-and-outcome-rather-than-just-one">Why two types <code>result&lt;&gt;</code>  and <code>outcome&lt;&gt;</code>, rather than just one?</a></li>
@@ -2388,6 +2389,50 @@ either a <code>T</code> or an <code>E</code>. This discovers the over-alignment 
 <code>result</code> or <code>outcome</code> will follow the ordinary alignment and padding rules for
 <code>struct</code> on your compiler. Traits such as <code>std::alignment_of</code>, or other standard
 library facilities, are not used.</p>
+
+<h2 id="does-outcome-implement-the-no-fail-strong-or-basic-exception-guarantee">Does Outcome implement the no-fail, strong or basic exception guarantee?</h2>
+
+<p>(<a href="https://en.cppreference.com/w/cpp/language/exceptions#Exception_safety">You can read about the meaning of these guarantees at cppreference.com</a>)</p>
+
+<p>If for the following operations:</p>
+
+<ul>
+<li>Construction</li>
+<li>Assignment</li>
+<li>Swap</li>
+</ul>
+
+<p>&hellip; the corresponding operation in <strong>all</strong> of <code>value_type</code>, <code>error_type</code> (and
+<code>exception_type</code> for <code>outcome</code>) is <code>noexcept(true)</code>, then <code>result</code> and
+<code>outcome</code>&rsquo;s operation is <code>noexcept(true)</code>. This propagates the no-fail exception
+guarantee of the underlying types. Otherwise the basic guarantee applies for all
+but Swap, under the same rules as for the <code>struct</code> layout type given above e.g.
+value would be constructed first, then the flags, then the error. If the error
+throws, value and status bits would be as if the failure had not occurred, same
+as for aborting the construction of any <code>struct</code> type.</p>
+
+<p>It is recognised that these weak guarantees may be unsuitable for some people,
+so Outcome implements <code>swap()</code> with much stronger guarantees, as one can refine,
+without too much work, one&rsquo;s own classes from <code>result</code> and <code>outcome</code> implementing
+stronger guarantees using <code>swap()</code> as the primitive building block.</p>
+
+<p>Therefore for the Swap operation only,
+if no more than <strong>one</strong> of the underlying types has a throwing swap, <code>result</code> and
+<code>outcome</code> perform that operation <em>first</em> before all others. This implements the strong
+exception guarantee.</p>
+
+<p>If <em>two or more</em> of the underlying types has a throwing swap, then only the basic
+exception guarantee is provided. Be aware that values and errors may become mismatched
+in this situation e.g. the value might get swapped, but if the error fails to swap,
+and then the value fails to get swapped back, the two results or outcomes would end
+up with mismatched values and errors. In that situation, the flags are forced into
+a consistent state i.e. there cannot be a valued <em>and</em> errored result, nor a result
+with neither value nor error. In this sense the basic guarantee is met, however
+correct program operation when values and errors have become mismatched is unlikely.</p>
+
+<p>The simple solution to avoiding this situation, or indeed to ensure the strong exception
+guarantee for all operations, is to always choose your error and exception types to
+have non-throwing constructors, assignments and swaps e.g. <code>error_code</code> and <code>exception_ptr</code>.</p>
 
 <h2 id="does-outcome-have-a-stable-abi-and-api">Does Outcome have a stable ABI and API?</h2>
 
@@ -2862,7 +2907,7 @@ interoperate with code using Outcome.</p></li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 27/02/2019
+        <i class='fa fa-calendar'></i> Last update on 03/03/2019
     </div>
     
 

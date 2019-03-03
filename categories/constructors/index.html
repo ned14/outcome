@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-28T22:04:49 UTC">
+<meta name="revised" content="2019-03-03T00:16:14 UTC">
 <title>Constructors :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2526,7 +2526,7 @@ Complexity: N/A. <a class="read-more" href="/outcome/reference/types/basic_outco
         <p>Move constructor.
 Requires: that value_type, error_type and exception_type all implement a move constructor.
 Complexity: Same as for value_type&rsquo;s, error_type&rsquo;s and exception_type&rsquo;s move constructors. Constexpr, triviality and noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of all three operands on entry is restored, if at least two of the underlying operations are marked noexcept. <a class="read-more" href="/outcome/reference/types/basic_outcome/move_constructor/">&raquo;</a></p>
+Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct. <a class="read-more" href="/outcome/reference/types/basic_outcome/move_constructor/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          
@@ -2571,7 +2571,7 @@ Guarantees: If an exception is thrown during the operation, the state of all thr
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 25/01/2019
+        <i class='fa fa-calendar'></i> Last update on 26/01/2019
     </div>
     
 

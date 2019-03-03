@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-02-28T22:04:48 UTC">
+<meta name="revised" content="2019-03-03T00:16:13 UTC">
 <title>`void swap(basic_outcome &amp;)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2454,7 +2454,7 @@
 
 <p><em>Complexity</em>: Same as for the <code>swap()</code> implementations of the <code>value_type</code>, <code>error_type</code> and <code>exception_type</code>. The noexcept of underlying operations is propagated.</p>
 
-<p><em>Guarantees</em>: If an exception is thrown during the operation, the state of all three operands on entry is restored, if at least two of the underlying operations is marked <code>noexcept</code>.</p>
+<p><em>Guarantees</em>: If an exception is thrown during the operation, the state of all three operands on entry is guaranteed restored, if at least two of the underlying operations is marked <code>noexcept</code>. If one or zero is marked <code>noexcept</code>, an attempt is made to undo the partially completed operation. If that too fails, the flag bits are forced to something consistent such that there can be no simultaneously valued and errored/excepted state, or valueless and errorless/exceptionless.</p>
 
 
     
@@ -2477,7 +2477,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 31/01/2019
+        <i class='fa fa-calendar'></i> Last update on 03/03/2019
     </div>
     
 
