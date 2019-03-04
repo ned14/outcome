@@ -11,4 +11,4 @@ Explicit converting constructor from {{% api "ValueOrError<T, E>" %}} concept ma
 
 *Complexity*: Same as for the copy or move constructor from the input's `.value()` or `.error()` respectively. Constexpr, triviality and noexcept of underlying operations is propagated.
 
-*Guarantees*: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked `noexcept`.
+*Guarantees*: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a `struct`.

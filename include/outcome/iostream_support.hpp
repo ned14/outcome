@@ -93,12 +93,12 @@ namespace detail
   inline std::string safe_message(const std::error_code &ec) { return " (" + ec.message() + ")"; }
 }  // namespace detail
 
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 OUTCOME_TEMPLATE(class R, class S, class P)
 OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lvalueref<R>()), OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lvalueref<S>()))
-inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
+inline std::istream &operator>>(std::istream &s, basic_result<R, S, P> &v)
 {
   s >> v._iostreams_state();
   if(v.has_error())
@@ -107,12 +107,12 @@ inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
   }
   return s;
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 OUTCOME_TEMPLATE(class R, class S, class P)
 OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lvalueref<R>()), OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lvalueref<S>()))
-inline std::ostream &operator<<(std::ostream &s, const result<R, S, P> &v)
+inline std::ostream &operator<<(std::ostream &s, const basic_result<R, S, P> &v)
 {
   s << v._iostreams_state();
   if(v.has_error())
@@ -121,10 +121,10 @@ inline std::ostream &operator<<(std::ostream &s, const result<R, S, P> &v)
   }
   return s;
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class R, class S, class P> inline std::string print(const detail::basic_result_final<R, S, P> &v)
+template <class R, class S, class P> inline std::string print(const basic_result<R, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -137,10 +137,10 @@ template <class R, class S, class P> inline std::string print(const detail::basi
   }
   return s.str();
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class S, class P> inline std::string print(const detail::basic_result_final<void, S, P> &v)
+template <class S, class P> inline std::string print(const basic_result<void, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -153,10 +153,10 @@ template <class S, class P> inline std::string print(const detail::basic_result_
   }
   return s.str();
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class R, class P> inline std::string print(const detail::basic_result_final<R, void, P> &v)
+template <class R, class P> inline std::string print(const basic_result<R, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -169,10 +169,10 @@ template <class R, class P> inline std::string print(const detail::basic_result_
   }
   return s.str();
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class P> inline std::string print(const detail::basic_result_final<void, void, P> &v)
+template <class P> inline std::string print(const basic_result<void, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -186,7 +186,7 @@ template <class P> inline std::string print(const detail::basic_result_final<voi
   return s.str();
 }
 
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 OUTCOME_TEMPLATE(class R, class S, class P, class N)
@@ -204,7 +204,7 @@ inline std::istream &operator>>(std::istream &s, outcome<R, S, P, N> &v)
   }
   return s;
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 OUTCOME_TEMPLATE(class R, class S, class P, class N)
@@ -222,7 +222,7 @@ inline std::ostream &operator<<(std::ostream &s, const outcome<R, S, P, N> &v)
   }
   return s;
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 template <class R, class S, class P, class N> inline std::string print(const outcome<R, S, P, N> &v)
@@ -233,7 +233,7 @@ template <class R, class S, class P, class N> inline std::string print(const out
   {
     s << "{ ";
   }
-  s << print(static_cast<const detail::basic_result_final<R, S, N> &>(v));
+  s << print(static_cast<const basic_result<R, S, N> &>(static_cast<const detail::basic_result_final<R, S, N> &>(v)));  // NOLINT
   if(total > 1)
   {
     s << ", ";

@@ -38,6 +38,49 @@ Outcome uses `struct`-based storage, as described above. Any over-alignment of
 library facilities, are not used.
 
 
+## Does Outcome implement the no-fail, strong or basic exception guarantee?
+
+([You can read about the meaning of these guarantees at cppreference.com](https://en.cppreference.com/w/cpp/language/exceptions#Exception_safety))
+
+If for the following operations:
+
+- Construction
+- Assignment
+- Swap
+
+... the corresponding operation in **all** of `value_type`, `error_type` (and
+`exception_type` for `outcome`) is `noexcept(true)`, then `result` and
+`outcome`'s operation is `noexcept(true)`. This propagates the no-fail exception
+guarantee of the underlying types. Otherwise the basic guarantee applies for all
+but Swap, under the same rules as for the `struct` layout type given above e.g.
+value would be constructed first, then the flags, then the error. If the error
+throws, value and status bits would be as if the failure had not occurred, same
+as for aborting the construction of any `struct` type.
+
+It is recognised that these weak guarantees may be unsuitable for some people,
+so Outcome implements `swap()` with much stronger guarantees, as one can refine,
+without too much work, one's own classes from `result` and `outcome` implementing
+stronger guarantees using `swap()` as the primitive building block.
+
+Therefore for the Swap operation only, 
+if no more than **one** of the underlying types has a throwing swap, `result` and
+`outcome` perform that operation *first* before all others. This implements the strong
+exception guarantee.
+
+If *two or more* of the underlying types has a throwing swap, then only the basic
+exception guarantee is provided. Be aware that values and errors may become mismatched
+in this situation e.g. the value might get swapped, but if the error fails to swap,
+and then the value fails to get swapped back, the two results or outcomes would end
+up with mismatched values and errors. In that situation, the flags are forced into
+a consistent state i.e. there cannot be a valued *and* errored result, nor a result
+with neither value nor error. In this sense the basic guarantee is met, however
+correct program operation when values and errors have become mismatched is unlikely.
+
+The simple solution to avoiding this situation, or indeed to ensure the strong exception
+guarantee for all operations, is to always choose your error and exception types to
+have non-throwing constructors, assignments and swaps e.g. `error_code` and `exception_ptr`.
+
+
 ## Does Outcome have a stable ABI and API?
 
 Right now, no. Though the data layout shown above is not expected to change.

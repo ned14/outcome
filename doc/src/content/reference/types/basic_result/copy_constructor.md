@@ -11,4 +11,4 @@ Copy constructor.
 
 *Complexity*: Same as for `value_type`'s and `error_type`'s copy constructors. Constexpr, triviality and noexcept of underlying operations is propagated.
 
-*Guarantees*: If an exception is thrown during the operation, the state of both operands on entry is restored, if at least one of the underlying operations is marked `noexcept`.
+*Guarantees*: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a `struct`.

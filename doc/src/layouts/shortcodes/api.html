@@ -1,4 +1,4 @@
-{{- if and (hasPrefix (.Get 0) "std::") (not (hasPrefix (.Get 0) "std::experimental")) }}
+{{- if and (hasPrefix (.Get 0) "std::") (not (hasPrefix (.Get 0) "std::experimental")) (not (in (.Get 0) "print(")) }}
   {{- if hasPrefix (.Get 0) "std::errc" }}
 <a href="https://en.cppreference.com/w/cpp/error/errc" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> {{ .Get 0 }}</a>
   {{- else if hasPrefix (.Get 0) "std::error_category" }}
