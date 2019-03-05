@@ -7,9 +7,9 @@ project(BoostOutcome LANGUAGES CXX)
 add_library(boost_outcome INTERFACE)
 add_library(Boost::outcome ALIAS boost_outcome)
 
-target_include_directories(boost_outcome PUBLIC include)
+target_include_directories(boost_outcome INTERFACE include)
 
-target_link_libraries(boost_outcome PUBLIC
+target_link_libraries(boost_outcome INTERFACE
   Boost::config
   Boost::exception
   Boost::system
