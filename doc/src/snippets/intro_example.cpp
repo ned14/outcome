@@ -40,13 +40,12 @@ struct LibError : std::runtime_error
 void use_string(string) {}
 
 //! [signature]
-auto read_data_from_file(string_view path) noexcept
-  -> outcome::result<string>;
+outcome::result<string> data_from_file(string_view path) noexcept;
 //! [signature]
 
 int main() {
 //! [inspect]
-if (auto rslt = read_data_from_file("config.cfg"))
+if (outcome::result<string> rslt = data_from_file("config.cfg"))
   use_string(rslt.value());                   // returns string
 else
   throw LibError{rslt.error(), "config.cfg"}; // returns error_code
@@ -54,26 +53,22 @@ else
 }
 
 //! [implementation]
-auto process(const string& content) noexcept
-  -> outcome::result<int>;
+outcome::result<int> process(const string& content) noexcept;
 
-auto get_int_from_file(string_view path) noexcept
-  -> outcome::result<int>
+outcome::result<int> int_from_file(string_view path) noexcept
 {
-  OUTCOME_TRY(str, read_data_from_file(path));
-  // if control gets here read_data_from_file() has succeeded
+  OUTCOME_TRY(str, data_from_file(path));
+  // if control gets here data_from_file() has succeeded
   return process(str);  // decltype(str) == string
 }
 //! [implementation]
 
-auto process(const string&) noexcept
-  -> outcome::result<int>
+outcome::result<int> process(const string&) noexcept
 {
   return outcome::success(1);
 }
 
-auto read_data_from_file(string_view) noexcept
-  -> outcome::result<string>
+outcome::result<string> data_from_file(string_view) noexcept
 {
   return outcome::success("1");
 }
