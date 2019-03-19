@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-06T11:35:39 UTC">
+<meta name="revised" content="2019-03-19T22:06:25 UTC">
 <title>Outcome :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2427,7 +2427,7 @@
         <h2 class="post-title"><a href="/outcome/tutorial/essential/outcome/">outcome&lt;&gt;</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Type outcome&lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt; represents either a successfully computed value of type T, or one or two reasons for failure. Failure can be represented by EC, or EP, or both, although usually it will either be an EC or an EP. Similarly to result, EC defaults to std::error_code/boost::system_error_code, and EP defaults to std::exception_ptr/boost::exception_ptr.
+        <p>Type outcome&lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt; represents either a successfully computed value of type T, or one or two reasons for failure. Failure can be represented by EC, or EP, or both, although usually it will either be an EC or an EP. Similarly to result, EC defaults to std::error_code/boost::system::error_code, and EP defaults to std::exception_ptr/boost::exception_ptr.
 The distinction is made into two types, EC and EP: <a class="read-more" href="/outcome/tutorial/essential/outcome/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
@@ -2475,7 +2475,7 @@ The distinction is made into two types, EC and EP: <a class="read-more" href="/o
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 11/02/2019
+        <i class='fa fa-calendar'></i> Last update on 19/03/2019
     </div>
     
 

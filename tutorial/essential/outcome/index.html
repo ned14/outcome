@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-06T11:35:27 UTC">
+<meta name="revised" content="2019-03-19T22:06:15 UTC">
 <title>outcome&lt;&gt; :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2412,7 +2412,7 @@
 
 
 <p>Type <a href="/outcome/reference/aliases/outcome/" class="api-reference">outcome&lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</a> represents either a successfully computed value of type <code>T</code>, or one or two reasons for failure. Failure can be represented by <code>EC</code>, or <code>EP</code>, or both, although usually it will either be an <code>EC</code> or an <code>EP</code>.
-Similarly to <code>result</code>, <code>EC</code> defaults to <code>std::error_code</code>/<code>boost::system_error_code</code>, and <code>EP</code> defaults to <code>std::exception_ptr</code>/<code>boost::exception_ptr</code>.</p>
+Similarly to <code>result</code>, <code>EC</code> defaults to <code>std::error_code</code>/<code>boost::system::error_code</code>, and <code>EP</code> defaults to <code>std::exception_ptr</code>/<code>boost::exception_ptr</code>.</p>
 
 <p>The distinction is made into two types, <code>EC</code> and <code>EP</code>:</p>
 
@@ -2507,7 +2507,7 @@ and be able to rethrow it in <code>Layer3</code>.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 11/02/2019
+        <i class='fa fa-calendar'></i> Last update on 19/03/2019
     </div>
     
 

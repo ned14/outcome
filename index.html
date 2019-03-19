@@ -6,7 +6,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-06T11:35:38 UTC">
+<meta name="revised" content="2019-03-19T22:06:24 UTC">
 <title>Home :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2425,35 +2425,32 @@ guaranteed and is C-compatible for <code>result&lt;T, E&gt;</code><sup class="fo
 
 <h2 id="sample-usage">Sample usage</h2>
 
-<p>The main workhorse in the Outcome library is <code>result&lt;T&gt;</code>: it represents either a successfully computed value of type <code>T</code>, or a <code>std::error_code</code>/<code>boost::system_error_code</code><sup class="footnote-ref" id="fnref:2"><a href="#fn:2">2</a></sup> representing the reason for failure. You use it in the function&rsquo;s return type:</p>
+<p>The main workhorse in the Outcome library is <code>result&lt;T&gt;</code>: it represents either a successfully computed value of type <code>T</code>, or a <code>std::error_code</code>/<code>boost::system::error_code</code><sup class="footnote-ref" id="fnref:2"><a href="#fn:2">2</a></sup> representing the reason for failure. You use it in the function&rsquo;s return type:</p>
 
-<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">auto</span> <span class="nf">read_data_from_file</span><span class="p">(</span><span class="n">string_view</span> <span class="n">path</span><span class="p">)</span> <span class="k">noexcept</span>
-  <span class="o">-&gt;</span> <span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">;</span>
+<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">data_from_file</span><span class="p">(</span><span class="n">string_view</span> <span class="n">path</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 </code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/intro_example.cpp#L43" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>It is possible to inspect the state manually:</p>
 
-<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">if</span> <span class="p">(</span><span class="k">auto</span> <span class="n">rslt</span> <span class="o">=</span> <span class="n">read_data_from_file</span><span class="p">(</span><span class="s">&#34;config.cfg&#34;</span><span class="p">))</span>
+<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">if</span> <span class="p">(</span><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">rslt</span> <span class="o">=</span> <span class="n">data_from_file</span><span class="p">(</span><span class="s">&#34;config.cfg&#34;</span><span class="p">))</span>
   <span class="n">use_string</span><span class="p">(</span><span class="n">rslt</span><span class="p">.</span><span class="n">value</span><span class="p">());</span>                   <span class="c1">// returns string
 </span><span class="c1"></span><span class="k">else</span>
   <span class="k">throw</span> <span class="n">LibError</span><span class="p">{</span><span class="n">rslt</span><span class="p">.</span><span class="n">error</span><span class="p">(),</span> <span class="s">&#34;config.cfg&#34;</span><span class="p">};</span> <span class="c1">// returns error_code
-</span><span class="c1"></span></code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/intro_example.cpp#L49" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</span><span class="c1"></span></code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/intro_example.cpp#L48" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>Or, if this function is called in another function that also returns <code>result&lt;T&gt;</code>, you can use a dedicated control statement:</p>
 
-<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">auto</span> <span class="nf">process</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">content</span><span class="p">)</span> <span class="k">noexcept</span>
-  <span class="o">-&gt;</span> <span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">;</span>
+<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">process</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">content</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
-<span class="k">auto</span> <span class="nf">get_int_from_file</span><span class="p">(</span><span class="n">string_view</span> <span class="n">path</span><span class="p">)</span> <span class="k">noexcept</span>
-  <span class="o">-&gt;</span> <span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span>
+<span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">int_from_file</span><span class="p">(</span><span class="n">string_view</span> <span class="n">path</span><span class="p">)</span> <span class="k">noexcept</span>
 <span class="p">{</span>
-  <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">read_data_from_file</span><span class="p">(</span><span class="n">path</span><span class="p">));</span>
-  <span class="c1">// if control gets here read_data_from_file() has succeeded
-</span><span class="c1"></span>  <span class="k">return</span> <span class="n">process</span><span class="p">(</span><span class="n">str</span><span class="p">);</span>  <span class="c1">// decltype(str) == string
+  <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">data_from_file</span><span class="p">(</span><span class="n">path</span><span class="p">));</span>
+  <span class="c1">// if control gets here data_from_file() has succeeded
+</span><span class="c1"></span>  <span class="k">return</span> <span class="nf">process</span><span class="p">(</span><span class="n">str</span><span class="p">);</span>  <span class="c1">// decltype(str) == string
 </span><span class="c1"></span><span class="p">}</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/intro_example.cpp#L57" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/intro_example.cpp#L56" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p><code>OUTCOME_TRY</code> is a control statement. If the returned <code>result&lt;T&gt;</code> object contains an error information, the enclosing function is immediately returned with <code>result&lt;U&gt;</code> containing the same failure information; otherwise an automatic object of type <code>T</code>
@@ -2469,7 +2466,7 @@ is available in scope.</p>
 <ol>
 <li id="fn:1">If you choose a C-compatible <code>T</code> and <code>E</code> type.
  <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
-<li id="fn:2"><code>result&lt;T&gt;</code> defaults to <code>std::error_code</code> for Standalone Outcome, and to <code>boost::system_error_code</code> for Boost.Outcome. You can mandate a choice using <code>std_result&lt;T&gt;</code> or <code>boost_result&lt;T&gt;</code>.
+<li id="fn:2"><code>result&lt;T&gt;</code> defaults to <code>std::error_code</code> for Standalone Outcome, and to <code>boost::system::error_code</code> for Boost.Outcome. You can mandate a choice using <code>std_result&lt;T&gt;</code> or <code>boost_result&lt;T&gt;</code>.
  <a class="footnote-return" href="#fnref:2"><sup>[return]</sup></a></li>
 </ol>
 </div>
@@ -2496,7 +2493,7 @@ is available in scope.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 06/02/2019
+        <i class='fa fa-calendar'></i> Last update on 19/03/2019
     </div>
     
 
