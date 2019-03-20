@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-20T11:40:12 UTC">
+<meta name="revised" content="2019-03-20T12:29:01 UTC">
 <title>Custom payloads :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2412,9 +2412,9 @@
 
 <p>So far in this tutorial, type <code>EC</code> in <code>result&lt;T, EC&gt;</code> has always been a
 <code>std::error_code</code> or <code>boost::system::error_code</code>. With <code>NoValuePolicy</code>
-set to <a href="/outcome/reference/aliases/default_policy/" class="api-reference">default_policy&lt;T, EC, EP&gt;</a>, <code>EC</code> needs
+set to <a href="/outcome/reference/aliases/default_policy/" class="api-reference"><code>default_policy&lt;T, EC, EP&gt;</code></a>, <code>EC</code> needs
 in fact to merely satisfy the trait
-<a href="/outcome/reference/traits/is_error_code_available/" class="api-reference">is_error_code_available&lt;T&gt;</a>
+<a href="/outcome/reference/traits/is_error_code_available/" class="api-reference"><code>is_error_code_available&lt;T&gt;</code></a>
 for <code>EC</code> to be treated as if an <code>error_code</code>. Outcome specialises that
 trait for <code>std::error_code</code> and <code>boost::system::error_code</code>,
 hence they &ldquo;just work&rdquo;.</p>

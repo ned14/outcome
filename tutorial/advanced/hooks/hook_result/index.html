@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-20T11:40:12 UTC">
+<meta name="revised" content="2019-03-20T12:29:01 UTC">
 <title>Hook result :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2438,13 +2438,13 @@ slot in TLS storage and writes the current stack backtrace into it.</p>
 </code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/error_code_extended.cpp#L113" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
-<p>The only non-obvious part above is the call to <a href="/outcome/reference/functions/hooks/set_spare_storage/" class="api-reference">void set_spare_storage(basic_result|basic_outcome *, uint16_t) noexcept</a>.</p>
+<p>The only non-obvious part above is the call to <a href="/outcome/reference/functions/hooks/set_spare_storage/" class="api-reference"><code>void set_spare_storage(basic_result|basic_outcome *, uint16_t) noexcept</code></a>.</p>
 
 <p>Both <code>result</code> and <code>outcome</code> keep their internal state metadata in a <code>uint32_t</code>,
 half of which is not used by Outcome. As it can be very useful to keep a small
 unique number attached to any particular <code>result</code> or <code>outcome</code> instance, we
 permit user code to set those sixteen bits to anything they feel like.
-The corresponding function to retrieve those sixteen bits is <a href="/outcome/reference/functions/hooks/spare_storage/" class="api-reference">uint16_t spare_storage(const basic_result|basic_outcome *) noexcept</a>.</p>
+The corresponding function to retrieve those sixteen bits is <a href="/outcome/reference/functions/hooks/spare_storage/" class="api-reference"><code>uint16_t spare_storage(const basic_result|basic_outcome *) noexcept</code></a>.</p>
 
 <p>The state of the sixteen bits of spare storage are ignored during comparison operations.</p>
 

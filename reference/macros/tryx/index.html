@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-20T11:40:23 UTC">
+<meta name="revised" content="2019-03-20T12:29:12 UTC">
 <title>`OUTCOME_TRYX(expr)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2423,17 +2423,17 @@
     
     
     
-    <p>Evaluate an expression which results in a type matching the <code>ValueOrError&lt;T, E&gt;</code> concept, emitting the <code>T</code> if successful, immediately returning <a href="/outcome/reference/converters/try_operation_return_as/" class="api-reference">try_operation_return_as(expr)</a> from the calling function if unsuccessful.</p>
+    <p>Evaluate an expression which results in a type matching the <code>ValueOrError&lt;T, E&gt;</code> concept, emitting the <code>T</code> if successful, immediately returning <a href="/outcome/reference/converters/try_operation_return_as/" class="api-reference"><code>try_operation_return_as(expr)</code></a> from the calling function if unsuccessful.</p>
 
 <p><em>Availability</em>: GCC and clang only. Use <code>#ifdef OUTCOME_TRYX</code> to determine if available.</p>
 
 <p><em>Overridable</em>: Not overridable.</p>
 
-<p><em>Definition</em>: See <a href="/outcome/reference/macros/tryv/" class="api-reference">OUTCOME_TRYV(expr)</a> for most of the mechanics.</p>
+<p><em>Definition</em>: See <a href="/outcome/reference/macros/tryv/" class="api-reference"><code>OUTCOME_TRYV(expr)</code></a> for most of the mechanics.</p>
 
 <p>This macro makes use of a proprietary extension in GCC and clang to emit the <code>T</code> from a successful expression. You can thus use <code>OUTCOME_TRYX(expr)</code> directly in expressions e.g. <code>auto x = y + OUTCOME_TRYX(foo(z));</code>.</p>
 
-<p>Be aware there are compiler quirks in preserving the rvalue/lvalue/etc-ness of emitted <code>T</code>&rsquo;s, specifically copy or move constructors may be called unexpectedly and/or copy elision not work as expected. If these prove to be problematic, use <a href="/outcome/reference/macros/try/" class="api-reference">OUTCOME_TRY(var, expr)</a> instead.</p>
+<p>Be aware there are compiler quirks in preserving the rvalue/lvalue/etc-ness of emitted <code>T</code>&rsquo;s, specifically copy or move constructors may be called unexpectedly and/or copy elision not work as expected. If these prove to be problematic, use <a href="/outcome/reference/macros/try/" class="api-reference"><code>OUTCOME_TRY(var, expr)</code></a> instead.</p>
 
 <p><em>Header</em>: <code>&lt;outcome/try.hpp&gt;</code></p>
 

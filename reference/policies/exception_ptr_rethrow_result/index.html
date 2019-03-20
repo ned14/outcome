@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-20T11:40:25 UTC">
+<meta name="revised" content="2019-03-20T12:29:14 UTC">
 <title>`exception_ptr_rethrow&lt;T, EC, void&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2421,7 +2421,7 @@
     
     
     
-    <p><em>Note</em>: This policy class specialisation can only be used with <code>basic_result</code>, not <code>basic_outcome</code>. Use <a href="/outcome/reference/policies/exception_ptr_rethrow_outcome/" class="api-reference">exception_ptr_rethrow&lt;T, EC, EP&gt;</a> with <code>basic_outcome</code>.</p>
+    <p><em>Note</em>: This policy class specialisation can only be used with <code>basic_result</code>, not <code>basic_outcome</code>. Use <a href="/outcome/reference/policies/exception_ptr_rethrow_outcome/" class="api-reference"><code>exception_ptr_rethrow&lt;T, EC, EP&gt;</code></a> with <code>basic_outcome</code>.</p>
 
 <p>Policy class defining that the ADL discovered free function <code>rethrow_exception(impl.assume_error())</code> should be called on incorrect wide value observation. Generally this will ADL discover 
 <a href="https://en.cppreference.com/w/cpp/error/rethrow_exception" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::rethrow_exception()</code></a> or <code>boost::rethrow_exception()</code> depending on the <code>EC</code> type.</p>
@@ -2429,7 +2429,7 @@
 <p>Incorrect wide error observation performs:</p>
 <div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">OUTCOME_THROW_EXCEPTION</span><span class="p">(</span><span class="n">bad_result_access</span><span class="p">(</span><span class="s">&#34;no error&#34;</span><span class="p">));</span>
 </code></pre></div>
-<p>Inherits publicly from <a href="/outcome/reference/policies/base/" class="api-reference">base</a>, and its narrow value, error and exception observer policies are inherited from there.</p>
+<p>Inherits publicly from <a href="/outcome/reference/policies/base/" class="api-reference"><code>base</code></a>, and its narrow value, error and exception observer policies are inherited from there.</p>
 
 <p><em>Requires</em>: Nothing.</p>
 

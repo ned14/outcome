@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-20T11:40:12 UTC">
+<meta name="revised" content="2019-03-20T12:29:01 UTC">
 <title>Frequently asked questions :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2576,7 +2576,7 @@ can have as few dependencies as:</p>
 library implementations. If you include only <code>&lt;basic_result.hpp&gt;</code>, and manually configure
 <code>basic_result&lt;&gt;</code> by hand, compile time impact will be minimised.</p>
 
-<p>(See reference documentation for <a href="/outcome/reference/types/basic_result/" class="api-reference">basic_result&lt;T, E, NoValuePolicy&gt;</a> for more detail.</p>
+<p>(See reference documentation for <a href="/outcome/reference/types/basic_result/" class="api-reference"><code>basic_result&lt;T, E, NoValuePolicy&gt;</code></a> for more detail.</p>
 
 <h2 id="is-outcome-suitable-for-fixed-latency-predictable-execution-coding-such-as-for-high-frequency-trading-or-audio">Is Outcome suitable for fixed latency/predictable execution coding such as for high frequency trading or audio?</h2>
 
@@ -2594,8 +2594,8 @@ for failure code paths.</p>
 <p>For code where predictability of execution, no matter the code path, is paramount,
 writing all your code to use Outcome is not a bad place to start. Obviously enough,
 do choose a non-throwing policy when configuring <code>outcome</code> or <code>result</code> such as
-<a href="/outcome/reference/policies/all_narrow/" class="api-reference">all_narrow</a> to guarantee that exceptions can never be thrown by Outcome
-(or use the convenience typedef for <code>result</code>, <a href="/outcome/reference/aliases/unchecked/" class="api-reference">unchecked&lt;T, E = varies&gt;</a> which uses <code>policy::all_narrow</code>).</p>
+<a href="/outcome/reference/policies/all_narrow/" class="api-reference"><code>all_narrow</code></a> to guarantee that exceptions can never be thrown by Outcome
+(or use the convenience typedef for <code>result</code>, <a href="/outcome/reference/aliases/unchecked/" class="api-reference"><code>unchecked&lt;T, E = varies&gt;</code></a> which uses <code>policy::all_narrow</code>).</p>
 
 <h2 id="what-kind-of-runtime-performance-impact-will-using-outcome-in-my-code-introduce">What kind of runtime performance impact will using Outcome in my code introduce?</h2>
 
@@ -2773,7 +2773,7 @@ of these forms as is the most appropriate for the use case:</p>
 <h2 id="how-far-away-from-the-proposed-std-expected-t-e-is-outcome-s-checked-t-e">How far away from the proposed <code>std::expected&lt;T, E&gt;</code> is Outcome&rsquo;s <code>checked&lt;T, E&gt;</code>?</h2>
 
 <p>Not far, in fact after the first Boost.Outcome peer review in May 2017, Expected moved
-much closer to Outcome, and Outcome deliberately provides <a href="/outcome/reference/aliases/checked/" class="api-reference">checked&lt;T, E = varies&gt;</a>
+much closer to Outcome, and Outcome deliberately provides <a href="/outcome/reference/aliases/checked/" class="api-reference"><code>checked&lt;T, E = varies&gt;</code></a>
 as a semantic equivalent.</p>
 
 <p>Here are the remaining differences which represent the

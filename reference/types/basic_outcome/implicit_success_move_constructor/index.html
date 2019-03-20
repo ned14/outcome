@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-20T11:40:16 UTC">
+<meta name="revised" content="2019-03-20T12:29:06 UTC">
 <title>`basic_outcome(success_type&lt;T&gt; &amp;&amp;)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2499,7 +2499,7 @@
     
     
     <p>Implicit value-from-success-type-sugar move constructor used to disambiguate the construction of the value type.
-Note that if <code>T = void</code>, <code>value_type</code> will be default constructed.  Calls <a href="/outcome/reference/functions/hooks/hook_outcome_move_construction/" class="api-reference">void hook_outcome_move_construction(T *, U &amp;&amp;) noexcept</a> with <code>this</code> and <code>success_type&lt;T&gt; &amp;&amp;</code>.</p>
+Note that if <code>T = void</code>, <code>value_type</code> will be default constructed.  Calls <a href="/outcome/reference/functions/hooks/hook_outcome_move_construction/" class="api-reference"><code>void hook_outcome_move_construction(T *, U &amp;&amp;) noexcept</code></a> with <code>this</code> and <code>success_type&lt;T&gt; &amp;&amp;</code>.</p>
 
 <p><em>Requires</em>: <code>predicate::enable_compatible_conversion&lt;T, void, void&gt;</code> is true, or <code>T</code> is <code>void</code>.</p>
 

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-20T11:40:24 UTC">
+<meta name="revised" content="2019-03-20T12:29:13 UTC">
 <title>`auto try_operation_return_as(T &amp;&amp;)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2425,8 +2425,8 @@
     
     
     
-    <p>This implementation of <a href="/outcome/reference/converters/try_operation_return_as/" class="api-reference">try_operation_return_as(expr)</a> returns whatever the input type&rsquo;s <code>.as_failure()</code> member function returns.
-<code>basic_result</code> and <code>basic_outcome</code> provide such a member function, see <a href="/outcome/reference/types/basic_result/as_failure_lvalue/" class="api-reference">auto as_failure() const &amp;</a>.</p>
+    <p>This implementation of <a href="/outcome/reference/converters/try_operation_return_as/" class="api-reference"><code>try_operation_return_as(expr)</code></a> returns whatever the input type&rsquo;s <code>.as_failure()</code> member function returns.
+<code>basic_result</code> and <code>basic_outcome</code> provide such a member function, see <a href="/outcome/reference/types/basic_result/as_failure_lvalue/" class="api-reference"><code>auto as_failure() const &amp;</code></a>.</p>
 
 <p><em>Requires</em>: That the expression <code>std::declval&lt;T&gt;().as_failure()</code> is a valid expression.</p>
 

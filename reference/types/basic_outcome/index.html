@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-20T11:40:24 UTC">
+<meta name="revised" content="2019-03-20T12:29:13 UTC">
 <title>`basic_outcome&lt;T, EC, EP, NoValuePolicy&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2501,12 +2501,12 @@
 
 
 
-<p>A type carrying one of (i) a successful <code>T</code> (ii) a disappointment <code>EC</code> (iii) a failure <code>EP</code> (iv) both a disappointment <code>EC</code> and a failure <code>EP</code>, with <code>NoValuePolicy</code> specifying what to do if one tries to read state which isn&rsquo;t there. Any one, two, or all of <code>T</code>, <code>EC</code> and <code>EP</code> can be <code>void</code> to indicate no value for that state is present. Detectable using <a href="/outcome/reference/traits/is_basic_outcome/" class="api-reference">is_basic_outcome&lt;T&gt;</a>.</p>
+<p>A type carrying one of (i) a successful <code>T</code> (ii) a disappointment <code>EC</code> (iii) a failure <code>EP</code> (iv) both a disappointment <code>EC</code> and a failure <code>EP</code>, with <code>NoValuePolicy</code> specifying what to do if one tries to read state which isn&rsquo;t there. Any one, two, or all of <code>T</code>, <code>EC</code> and <code>EP</code> can be <code>void</code> to indicate no value for that state is present. Detectable using <a href="/outcome/reference/traits/is_basic_outcome/" class="api-reference"><code>is_basic_outcome&lt;T&gt;</code></a>.</p>
 
 <p><em>Requires</em>: Concept requirements if C++ 20, else static asserted:</p>
 
 <ul>
-<li>That trait <a href="/outcome/reference/traits/type_can_be_used_in_basic_result/" class="api-reference">type_can_be_used_in_basic_result&lt;R&gt;</a> is true for <code>T</code>, <code>EC</code> and <code>EP</code>.</li>
+<li>That trait <a href="/outcome/reference/traits/type_can_be_used_in_basic_result/" class="api-reference"><code>type_can_be_used_in_basic_result&lt;R&gt;</code></a> is true for <code>T</code>, <code>EC</code> and <code>EP</code>.</li>
 <li>That either <code>EC</code> is <code>void</code> or <code>DefaultConstructible</code>.</li>
 <li>That either <code>EP</code> is <code>void</code> or <code>DefaultConstructible</code>.</li>
 </ul>
@@ -2523,7 +2523,7 @@
 <li><code>&lt;iosfwd&gt;</code></li>
 <li><code>&lt;new&gt;</code></li>
 <li><code>&lt;type_traits&gt;</code></li>
-<li>If <a href="/outcome/reference/macros/in_place_type/" class="api-reference">OUTCOME_USE_STD_IN_PLACE_TYPE</a> is <code>1</code>, <code>&lt;utility&gt;</code> (defaults to <code>1</code> for C++ 17 or later only)</li>
+<li>If <a href="/outcome/reference/macros/in_place_type/" class="api-reference"><code>OUTCOME_USE_STD_IN_PLACE_TYPE</code></a> is <code>1</code>, <code>&lt;utility&gt;</code> (defaults to <code>1</code> for C++ 17 or later only)</li>
 <li>If C++ exceptions disabled and <code>OUTCOME_DISABLE_EXECINFO</code> undefined only (used to print stack backtraces on &ldquo;exception throw&rdquo;):
 
 <ol>
@@ -2541,7 +2541,7 @@
 
 <h3 id="design-rationale">Design rationale</h3>
 
-<p><code>basic_outcome</code> extends <a href="/outcome/reference/types/basic_result/" class="api-reference">basic_result&lt;T, E, NoValuePolicy&gt;</a> with a third state to transport,
+<p><code>basic_outcome</code> extends <a href="/outcome/reference/types/basic_result/" class="api-reference"><code>basic_result&lt;T, E, NoValuePolicy&gt;</code></a> with a third state to transport,
 conventionally (but not necessarily) some sort of &ldquo;abort&rdquo; or &ldquo;exceptional&rdquo; state which a function can
 return to indicate that not only did the operation fail, but it did so <em>catastrophically</em> i.e. please
 abort any attempt to retry the operation.</p>
@@ -2589,8 +2589,8 @@ an exception perhaps carrying a custom payload.</li>
 
 <ol>
 <li><code>predicate::constructors_enabled</code> is true.</li>
-<li>Trait <a href="/outcome/reference/traits/is_error_type/" class="api-reference">is_error_type&lt;E&gt;</a> is not true for both decayed <code>value_type</code> and decayed <code>error_type</code> at the same time.</li>
-<li><code>value_type</code> is not implicitly constructible from <code>error_type</code> and <code>error_type</code> is not implicitly constructible from <code>value_type</code>.<br>OR<br>trait <a href="/outcome/reference/traits/is_error_type/" class="api-reference">is_error_type&lt;E&gt;</a> is true for decayed <code>error_type</code> and <code>error_type</code> is not implicitly constructible from <code>value_type</code> and <code>value_type</code> is an integral type.</li>
+<li>Trait <a href="/outcome/reference/traits/is_error_type/" class="api-reference"><code>is_error_type&lt;E&gt;</code></a> is not true for both decayed <code>value_type</code> and decayed <code>error_type</code> at the same time.</li>
+<li><code>value_type</code> is not implicitly constructible from <code>error_type</code> and <code>error_type</code> is not implicitly constructible from <code>value_type</code>.<br>OR<br>trait <a href="/outcome/reference/traits/is_error_type/" class="api-reference"><code>is_error_type&lt;E&gt;</code></a> is true for decayed <code>error_type</code> and <code>error_type</code> is not implicitly constructible from <code>value_type</code> and <code>value_type</code> is an integral type.</li>
 <li><code>value_type</code> is not implicitly constructible from <code>exception_type</code>.</li>
 <li><code>error_type</code> is not implicitly constructible from <code>exception_type</code>.</li>
 <li><code>exception_type</code> is not implicitly constructible from <code>value_type</code>.</li>
@@ -2604,7 +2604,7 @@ an exception perhaps carrying a custom payload.</li>
 <li>Decayed <code>A</code> is not this <code>basic_outcome</code> type.</li>
 <li><code>predicate::implicit_constructors_enabled</code> is true.</li>
 <li>Decayed <code>A</code> is not an <code>in_place_type_t</code>.</li>
-<li>Trait <a href="/outcome/reference/traits/is_error_type_enum/" class="api-reference">is_error_type_enum&lt;E, Enum&gt;</a> is false for <code>error_type</code> and decayed <code>A</code>.</li>
+<li>Trait <a href="/outcome/reference/traits/is_error_type_enum/" class="api-reference"><code>is_error_type_enum&lt;E, Enum&gt;</code></a> is false for <code>error_type</code> and decayed <code>A</code>.</li>
 <li><code>value_type</code> is implicitly constructible from <code>A</code> and <code>error_type</code> is not implicitly constructible from <code>A</code>.<br>OR<br><code>value_type</code> is the exact same type as decayed <code>A</code> and <code>value_type</code> is implicitly constructible from <code>A</code>.</li>
 <li><code>exception_type</code> is not implicitly constructible from <code>A</code>.</li>
 </ol></li>
@@ -2616,7 +2616,7 @@ an exception perhaps carrying a custom payload.</li>
 <li>Decayed <code>A</code> is not this <code>basic_outcome</code> type.</li>
 <li><code>predicate::implicit_constructors_enabled</code> is true.</li>
 <li>Decayed <code>A</code> is not an <code>in_place_type_t</code>.</li>
-<li>Trait <a href="/outcome/reference/traits/is_error_type_enum/" class="api-reference">is_error_type_enum&lt;E, Enum&gt;</a> is false for <code>error_type</code> and decayed <code>A</code>.</li>
+<li>Trait <a href="/outcome/reference/traits/is_error_type_enum/" class="api-reference"><code>is_error_type_enum&lt;E, Enum&gt;</code></a> is false for <code>error_type</code> and decayed <code>A</code>.</li>
 <li><code>value_type</code> is not implicitly constructible from <code>A</code> and <code>error_type</code> is implicitly constructible from <code>A</code>.<br>OR<br><code>error_type</code> is the exact same type as decayed <code>A</code> and <code>error_type</code> is implicitly constructible from <code>A</code>.</li>
 <li><code>exception_type</code> is not implicitly constructible from <code>A</code>.</li>
 </ol></li>
@@ -2627,7 +2627,7 @@ an exception perhaps carrying a custom payload.</li>
 <li><code>predicate::constructors_enabled</code> is true.</li>
 <li>Decayed <code>ErrorCondEnum</code> is not this <code>basic_outcome</code> type.</li>
 <li>Decayed <code>ErrorCondEnum</code> is not an <code>in_place_type_t</code>.</li>
-<li>Trait <a href="/outcome/reference/traits/is_error_type_enum/" class="api-reference">is_error_type_enum&lt;E, Enum&gt;</a> is true for <code>error_type</code> and decayed <code>ErrorCondEnum</code>.</li>
+<li>Trait <a href="/outcome/reference/traits/is_error_type_enum/" class="api-reference"><code>is_error_type_enum&lt;E, Enum&gt;</code></a> is true for <code>error_type</code> and decayed <code>ErrorCondEnum</code>.</li>
 <li><code>exception_type</code> is not implicitly constructible from <code>ErrorCondEnum</code>.</li>
 </ol></li>
 

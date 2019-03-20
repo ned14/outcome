@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-20T11:40:20 UTC">
+<meta name="revised" content="2019-03-20T12:29:09 UTC">
 <title>`bool operator!=(const success_type&lt;A&gt; &amp;) const` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2498,7 +2498,7 @@
     
     
     
-    <p>Returns true if this outcome is not successful or its value does not compares equal to the value in the success type sugar. Comparison is done using <code>operator!=</code> on <code>value_type</code> and <code>A</code>. If <code>A</code> is <code>void</code>, this call aliases <a href="/outcome/reference/types/basic_outcome/has_error/" class="api-reference">bool has_error() const noexcept</a>.</p>
+    <p>Returns true if this outcome is not successful or its value does not compares equal to the value in the success type sugar. Comparison is done using <code>operator!=</code> on <code>value_type</code> and <code>A</code>. If <code>A</code> is <code>void</code>, this call aliases <a href="/outcome/reference/types/basic_outcome/has_error/" class="api-reference"><code>bool has_error() const noexcept</code></a>.</p>
 
 <p><em>Requires</em>: <code>operator!=</code> must be a valid expression between <code>value_type</code> and <code>A</code>, or <code>A</code> is <code>void</code>. If <code>value_type</code> is <code>void</code>, then so must be <code>A</code>.</p>
 

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-20T11:40:23 UTC">
+<meta name="revised" content="2019-03-20T12:29:12 UTC">
 <title>`OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2423,16 +2423,16 @@
     
     
     
-    <p>Evaluate an expression which results in a type matching the <a href="/outcome/reference/concepts/valueorerror/" class="api-reference">ValueOrError&lt;T, E&gt;</a> concept, continuing execution if successful, immediately returning <a href="/outcome/reference/converters/try_operation_return_as/" class="api-reference">try_operation_return_as(expr)</a> from the calling function if unsuccessful.</p>
+    <p>Evaluate an expression which results in a type matching the <a href="/outcome/reference/concepts/valueorerror/" class="api-reference"><code>ValueOrError&lt;T, E&gt;</code></a> concept, continuing execution if successful, immediately returning <a href="/outcome/reference/converters/try_operation_return_as/" class="api-reference"><code>try_operation_return_as(expr)</code></a> from the calling function if unsuccessful.</p>
 
-<p>The difference between the <code>OUTCOME_TRYV(expr)</code> and <code>OUTCOME_TRY(expr)</code> editions is that the latter will set a variable if two or more macro arguments are present (see <a href="/outcome/reference/macros/try/" class="api-reference">OUTCOME_TRY(var, expr)</a>). The former requires the <code>T</code> to be <code>void</code>.</p>
+<p>The difference between the <code>OUTCOME_TRYV(expr)</code> and <code>OUTCOME_TRY(expr)</code> editions is that the latter will set a variable if two or more macro arguments are present (see <a href="/outcome/reference/macros/try/" class="api-reference"><code>OUTCOME_TRY(var, expr)</code></a>). The former requires the <code>T</code> to be <code>void</code>.</p>
 
 <p><em>Overridable</em>: Not overridable.</p>
 
 <p><em>Definition</em>: Firstly the expression&rsquo;s temporary is bound to a uniquely named, stack allocated, <code>auto &amp;&amp;</code>. If that reference&rsquo;s bound object&rsquo;s <code>.has_value()</code> is false, immediately execute <code>return try_operation_return_as(propagated unique reference);</code>, propagating the rvalue/lvalue/etc-ness of the original expression.</p>
 
-<p><a href="/outcome/reference/converters/try_operation_return_as/" class="api-reference">try_operation_return_as(expr)</a> is a customisation point, the default implementation of which returns a <a href="/outcome/reference/functions/failure/" class="api-reference">failure(T &amp;&amp;, ...)</a> for Outcome types, or an 
-<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 <code>std::unexpected&lt;E&gt;</code></a> for Expected types. See <a href="/outcome/reference/functions/try_operation_return_as_t/" class="api-reference">auto try_operation_return_as(T &amp;&amp;)</a> and <a href="/outcome/reference/functions/try_operation_return_as_expected/" class="api-reference">std::experimental::unexpected&lt;E&gt; try_operation_return_as(std::experimental::expected&lt;T, E&gt;)</a>.</p>
+<p><a href="/outcome/reference/converters/try_operation_return_as/" class="api-reference"><code>try_operation_return_as(expr)</code></a> is a customisation point, the default implementation of which returns a <a href="/outcome/reference/functions/failure/" class="api-reference"><code>failure(T &amp;&amp;, ...)</code></a> for Outcome types, or an 
+<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 <code>std::unexpected&lt;E&gt;</code></a> for Expected types. See <a href="/outcome/reference/functions/try_operation_return_as_t/" class="api-reference"><code>auto try_operation_return_as(T &amp;&amp;)</code></a> and <a href="/outcome/reference/functions/try_operation_return_as_expected/" class="api-reference"><code>std::experimental::unexpected&lt;E&gt; try_operation_return_as(std::experimental::expected&lt;T, E&gt;)</code></a>.</p>
 
 <p><em>Header</em>: <code>&lt;outcome/try.hpp&gt;</code></p>
 

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-20T11:40:26 UTC">
+<meta name="revised" content="2019-03-20T12:29:15 UTC">
 <title>`try_operation_return_as(expr)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2412,16 +2412,16 @@
     
     
     
-    <p>A customisable converter of <a href="/outcome/reference/concepts/valueorerror/" class="api-reference">ValueOrError&lt;T, E&gt;</a> concept matching types to a returnable failure type.</p>
+    <p>A customisable converter of <a href="/outcome/reference/concepts/valueorerror/" class="api-reference"><code>ValueOrError&lt;T, E&gt;</code></a> concept matching types to a returnable failure type.</p>
 
 <p><em>Overridable</em>: Argument dependent lookup.</p>
 
 <p><em>Default</em>: A number of implementations are provided by default:</p>
 
 <ol>
-<li><p><code>try_operation_return_as(T &amp;&amp;)</code> which requires <code>T</code> to provide an <code>.as_failure()</code> member function in order to be available. This is selected for all <code>basic_result</code> and <code>basic_outcome</code> types. See <a href="/outcome/reference/functions/try_operation_return_as_t/" class="api-reference">auto try_operation_return_as(T &amp;&amp;)</a>.</p></li>
+<li><p><code>try_operation_return_as(T &amp;&amp;)</code> which requires <code>T</code> to provide an <code>.as_failure()</code> member function in order to be available. This is selected for all <code>basic_result</code> and <code>basic_outcome</code> types. See <a href="/outcome/reference/functions/try_operation_return_as_t/" class="api-reference"><code>auto try_operation_return_as(T &amp;&amp;)</code></a>.</p></li>
 
-<li><p>Copy and move editions of <code>try_operation_return_as(std::experimental::expected&lt;T, E&gt;)</code> which return a <code>std::experimental::unexpected&lt;E&gt;</code> for the input&rsquo;s <code>.error()</code> member function. See <a href="/outcome/reference/functions/try_operation_return_as_expected/" class="api-reference">std::experimental::unexpected&lt;E&gt; try_operation_return_as(std::experimental::expected&lt;T, E&gt;)</a>.</p></li>
+<li><p>Copy and move editions of <code>try_operation_return_as(std::experimental::expected&lt;T, E&gt;)</code> which return a <code>std::experimental::unexpected&lt;E&gt;</code> for the input&rsquo;s <code>.error()</code> member function. See <a href="/outcome/reference/functions/try_operation_return_as_expected/" class="api-reference"><code>std::experimental::unexpected&lt;E&gt; try_operation_return_as(std::experimental::expected&lt;T, E&gt;)</code></a>.</p></li>
 </ol>
 
 <p><em>Namespace</em>: <code>OUTCOME_V2_NAMESPACE</code></p>

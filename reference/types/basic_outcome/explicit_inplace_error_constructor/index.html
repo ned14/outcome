@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-20T11:40:16 UTC">
+<meta name="revised" content="2019-03-20T12:29:05 UTC">
 <title>`explicit basic_outcome(in_place_type_t&lt;error_type_if_enabled&gt;, Args ...)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2498,7 +2498,7 @@
     
     
     
-    <p>Explicit inplace error constructor. Calls <a href="/outcome/reference/functions/hooks/hook_outcome_in_place_construction/" class="api-reference">void hook_outcome_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</a> with <code>this</code>, <code>in_place_type&lt;error_type&gt;</code> and <code>Args ...</code>.</p>
+    <p>Explicit inplace error constructor. Calls <a href="/outcome/reference/functions/hooks/hook_outcome_in_place_construction/" class="api-reference"><code>void hook_outcome_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code></a> with <code>this</code>, <code>in_place_type&lt;error_type&gt;</code> and <code>Args ...</code>.</p>
 
 <p><em>Requires</em>: <code>predicate::enable_inplace_error_constructor&lt;Args ...&gt;</code> is true.</p>
 
