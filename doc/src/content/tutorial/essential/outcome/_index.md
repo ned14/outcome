@@ -7,7 +7,7 @@ tags = ["outcome"]
 
 
 Type {{< api "outcome<T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy<T, EC, EP>>" >}} represents either a successfully computed value of type `T`, or one or two reasons for failure. Failure can be represented by `EC`, or `EP`, or both, although usually it will either be an `EC` or an `EP`.
-Similarly to `result`, `EC` defaults to `std::error_code`/`boost::system_error_code`, and `EP` defaults to `std::exception_ptr`/`boost::exception_ptr`.
+Similarly to `result`, `EC` defaults to `std::error_code`/`boost::system::error_code`, and `EP` defaults to `std::exception_ptr`/`boost::exception_ptr`.
 
 The distinction is made into two types, `EC` and `EP`:
 

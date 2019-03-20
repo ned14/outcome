@@ -25,7 +25,7 @@ Outcome is a set of tools for reporting and handling function failures in contex
   - one needs to propagate exceptions through layers that do not implement exception throw safety;
 
   - there is an external requirement (such as a company-wide policy) that failure handling paths are explicitly indicated in the code.
-  
+
   - where interoperation with C code, without having to resort to C++ exception wrapper shims, is important.
 
 Outcome addresses failure handling through returning a special type from functions, which is able to store either a successfully computed value (or `void`), or the information about failure. Outcome also comes with a set of idioms for dealing with such types.
@@ -36,7 +36,7 @@ guaranteed and is C-compatible for `result<T, E>`[^1], thus making Outcome based
 
 ## Sample usage
 
-The main workhorse in the Outcome library is `result<T>`: it represents either a successfully computed value of type `T`, or a `std::error_code`/`boost::system_error_code`[^2] representing the reason for failure. You use it in the function's return type:
+The main workhorse in the Outcome library is `result<T>`: it represents either a successfully computed value of type `T`, or a `std::error_code`/`boost::system::error_code`[^2] representing the reason for failure. You use it in the function's return type:
 
 {{% snippet "intro_example.cpp" "signature" %}}
 
@@ -57,4 +57,4 @@ This library joined [the Boost C++ libraries](https://www.boost.org/doc/libs/dev
 
 [^1]: If you choose a C-compatible `T` and `E` type.
 
-[^2]: `result<T>` defaults to `std::error_code` for Standalone Outcome, and to `boost::system_error_code` for Boost.Outcome. You can mandate a choice using `std_result<T>` or `boost_result<T>`.
+[^2]: `result<T>` defaults to `std::error_code` for Standalone Outcome, and to `boost::system::error_code` for Boost.Outcome. You can mandate a choice using `std_result<T>` or `boost_result<T>`.
