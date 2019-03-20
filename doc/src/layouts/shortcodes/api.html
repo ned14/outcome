@@ -62,7 +62,7 @@
     {{- end }}
   {{- end }}
   {{- if $api_found -}}
-<a href="{{ $api_url }}" class="api-reference">{{ $api }}</a>
+<a href="{{ $api_url }}" class="api-reference"><code>{{ $api }}</code></a>
   {{- else }}
     {{- errorf "%s: API reference page for '%s' not found, please use an identifier wholly contained in a page title" .Position (.Get 0) }}
     <b>API NOT FOUND IN DOCS <code>{{ .Get 0 }}</code></b>
