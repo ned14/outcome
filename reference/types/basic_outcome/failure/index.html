@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-19T22:06:22 UTC">
+<meta name="revised" content="2019-03-20T11:40:19 UTC">
 <title>`exception_type failure() const noexcept` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2502,7 +2502,7 @@
 returns a copy of that directly. If an error is available, and not an exception, an
 ADL discovered free function <a href="/outcome/reference/functions/policy/basic_outcome_failure_exception_from_error/" class="api-reference">auto basic_outcome_failure_exception_from_error(const EC &amp;)</a>
 is invoked. Default overloads for this function are defined in Outcome for 
-<a href="https://en.cppreference.com/w/cpp/error/error_code" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> std::error_code</a>
+<a href="https://en.cppreference.com/w/cpp/error/error_code" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::error_code</code></a>
 and <code>boost::system::error_code</code>, these return <code>std::make_exception_ptr(std::system_error(ec))</code>
 and <code>boost::copy_exception(boost::system::system_error(ec))</code> respectively.</p>
 

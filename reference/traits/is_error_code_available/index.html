@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-19T22:06:27 UTC">
+<meta name="revised" content="2019-03-20T11:40:25 UTC">
 <title>`is_error_code_available&lt;T&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2424,7 +2424,7 @@
 <p><em>Overridable</em>: By template specialisation into the <code>trait</code> namespace.</p>
 
 <p><em>Default</em>: True if <code>T</code> is an error code, else to metaprogramming which performs the ADL discovery of <code>make_error_code(T)</code>. Note that the STL defines multiple overloads of an ADL discovered free function 
-<a href="https://en.cppreference.com/mwiki/index.php?title=Special%3ASearch&search=make_error_code" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> std::make_error_code(T)</a> for its error enumerations, as does Boost.System for the Boost error enumerations. Thus this trait will pick up those free functions for those error types.</p>
+<a href="https://en.cppreference.com/mwiki/index.php?title=Special%3ASearch&search=make_error_code" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::make_error_code(T)</code></a> for its error enumerations, as does Boost.System for the Boost error enumerations. Thus this trait will pick up those free functions for those error types.</p>
 
 <p><em>Namespace</em>: <code>OUTCOME_V2_NAMESPACE::trait</code></p>
 

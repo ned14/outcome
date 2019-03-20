@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-19T22:06:26 UTC">
+<meta name="revised" content="2019-03-20T11:40:24 UTC">
 <title>`auto basic_outcome_failure_exception_from_error(const EC &amp;)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2437,7 +2437,7 @@
     <p>Synthesises an exception type from an error type, used by the <a href="/outcome/reference/types/basic_outcome/failure/" class="api-reference">exception_type failure() const noexcept</a>
 observers. ADL discovered. Default
 overloads for this function are defined in Outcome for 
-<a href="https://en.cppreference.com/w/cpp/error/error_code" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> std::error_code</a>
+<a href="https://en.cppreference.com/w/cpp/error/error_code" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::error_code</code></a>
 and <code>boost::system::error_code</code>, these return <code>std::make_exception_ptr(std::system_error(ec))</code>
 and <code>boost::copy_exception(boost::system::system_error(ec))</code> respectively.</p>
 

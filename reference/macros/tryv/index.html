@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-19T22:06:26 UTC">
+<meta name="revised" content="2019-03-20T11:40:23 UTC">
 <title>`OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2432,7 +2432,7 @@
 <p><em>Definition</em>: Firstly the expression&rsquo;s temporary is bound to a uniquely named, stack allocated, <code>auto &amp;&amp;</code>. If that reference&rsquo;s bound object&rsquo;s <code>.has_value()</code> is false, immediately execute <code>return try_operation_return_as(propagated unique reference);</code>, propagating the rvalue/lvalue/etc-ness of the original expression.</p>
 
 <p><a href="/outcome/reference/converters/try_operation_return_as/" class="api-reference">try_operation_return_as(expr)</a> is a customisation point, the default implementation of which returns a <a href="/outcome/reference/functions/failure/" class="api-reference">failure(T &amp;&amp;, ...)</a> for Outcome types, or an 
-<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 std::unexpected&lt;E&gt;</a> for Expected types. See <a href="/outcome/reference/functions/try_operation_return_as_t/" class="api-reference">auto try_operation_return_as(T &amp;&amp;)</a> and <a href="/outcome/reference/functions/try_operation_return_as_expected/" class="api-reference">std::experimental::unexpected&lt;E&gt; try_operation_return_as(std::experimental::expected&lt;T, E&gt;)</a>.</p>
+<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 <code>std::unexpected&lt;E&gt;</code></a> for Expected types. See <a href="/outcome/reference/functions/try_operation_return_as_t/" class="api-reference">auto try_operation_return_as(T &amp;&amp;)</a> and <a href="/outcome/reference/functions/try_operation_return_as_expected/" class="api-reference">std::experimental::unexpected&lt;E&gt; try_operation_return_as(std::experimental::expected&lt;T, E&gt;)</a>.</p>
 
 <p><em>Header</em>: <code>&lt;outcome/try.hpp&gt;</code></p>
 
@@ -2457,7 +2457,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 27/01/2019
+        <i class='fa fa-calendar'></i> Last update on 28/01/2019
     </div>
     
 

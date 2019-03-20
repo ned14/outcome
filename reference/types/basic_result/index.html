@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-19T22:06:27 UTC">
+<meta name="revised" content="2019-03-20T11:40:24 UTC">
 <title>`basic_result&lt;T, E, NoValuePolicy&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2520,11 +2520,11 @@
 <h3 id="design-rationale">Design rationale</h3>
 
 <p>The basic result type is the main workhorse type of the Outcome library, providing a simple sum type with optional values representing success or disappointment. Unlike 
-<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 std::expected&lt;T, E&gt;</a>, Outcome&rsquo;s result type is designed specifically for convenience when implementing failure handling across very large codebases, and it has a number of API differences to facilitate that.</p>
+<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 <code>std::expected&lt;T, E&gt;</code></a>, Outcome&rsquo;s result type is designed specifically for convenience when implementing failure handling across very large codebases, and it has a number of API differences to facilitate that.</p>
 
 <p>The first major design difference is that basic result models its constructor design on 
-<a href="https://en.cppreference.com/w/cpp/utility/variant" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> std::variant&lt;...&gt;</a>, rather than modelling 
-<a href="https://en.cppreference.com/w/cpp/utility/optional" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> std::optional&lt;T&gt;</a>&rsquo;s constructor design like <code>std::expected&lt;T, E&gt;</code> does. This means that basic result will implicitly construct either a <code>T</code> or an <code>E</code> if doing so is unambiguous, same as <code>variant</code> does. Where implicit construction is ambiguous, the implicit constructors disable and a <code>T</code> or <code>E</code> can be specified via <a href="/outcome/reference/types/in_place_type_t/" class="api-reference">in_place_type_t&lt;T&gt;</a>, or via <a href="/outcome/reference/types/success_type/" class="api-reference">success_type&lt;T&gt;</a> or <a href="/outcome/reference/traits/is_failure_type/" class="api-reference">failure_type&lt;T&gt;</a>. We implement a subset of variant&rsquo;s constructors for improved compile time impact, so the implicit and explicit constructor design is split into fixed subsets to reduce SFINAE execution.</p>
+<a href="https://en.cppreference.com/w/cpp/utility/variant" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::variant&lt;...&gt;</code></a>, rather than modelling 
+<a href="https://en.cppreference.com/w/cpp/utility/optional" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::optional&lt;T&gt;</code></a>&rsquo;s constructor design like <code>std::expected&lt;T, E&gt;</code> does. This means that basic result will implicitly construct either a <code>T</code> or an <code>E</code> if doing so is unambiguous, same as <code>variant</code> does. Where implicit construction is ambiguous, the implicit constructors disable and a <code>T</code> or <code>E</code> can be specified via <a href="/outcome/reference/types/in_place_type_t/" class="api-reference">in_place_type_t&lt;T&gt;</a>, or via <a href="/outcome/reference/types/success_type/" class="api-reference">success_type&lt;T&gt;</a> or <a href="/outcome/reference/traits/is_failure_type/" class="api-reference">failure_type&lt;T&gt;</a>. We implement a subset of variant&rsquo;s constructors for improved compile time impact, so the implicit and explicit constructor design is split into fixed subsets to reduce SFINAE execution.</p>
 
 <p>The second major design difference is that union storage is NOT used, as it is assumed that <code>sizeof(E)</code> will be small for failure handling. This very considerably reduces load on the compiler, and substantially improves compile times in very large C++ 14 codebases, because copies and moves do not need to jump through complex ceremony in order to implement the never-empty guarantees which would be required in a union storage based implementation (C++ 17 onwards does far fewer copy and move constructor instantiations, but it all adds up &ndash; work avoided is always the fastest).</p>
 
@@ -2644,7 +2644,7 @@
 </ul>
 
 <p>Thus <code>basic_result</code> meets the <code>Regular</code> concept if both <code>value_type</code> and <code>error_type</code> are <code>Regular</code>, except for the lack of a default constructor. Often where one needs a default constructor, wrapping <code>basic_result</code> into 
-<a href="https://en.cppreference.com/w/cpp/utility/optional" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> std::optional&lt;T&gt;</a> will suffice.</p>
+<a href="https://en.cppreference.com/w/cpp/utility/optional" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::optional&lt;T&gt;</code></a> will suffice.</p>
 
 <h3 id="public-member-functions">Public member functions</h3>
 

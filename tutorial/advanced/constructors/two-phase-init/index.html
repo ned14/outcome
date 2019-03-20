@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-19T22:06:14 UTC">
+<meta name="revised" content="2019-03-20T11:40:11 UTC">
 <title>Two phase construction :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2423,7 +2423,7 @@ Most standard C++ library objects
 and containers have <code>constexpr</code> constructors, and thus can be initialised
 during phase 1. If you need to initialise a member variable without
 a <code>constexpr</code> constructor, 
-<a href="https://en.cppreference.com/w/cpp/utility/optional" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> std::optional&lt;T&gt;</a> is the usual workaround.</p></li>
+<a href="https://en.cppreference.com/w/cpp/utility/optional" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::optional&lt;T&gt;</code></a> is the usual workaround.</p></li>
 
 <li><p>Do the remainder of the construction, the parts which could fail.
 Because phase 1 placed the object into a legally destructible state,

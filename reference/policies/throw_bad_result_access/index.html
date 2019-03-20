@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-19T22:06:28 UTC">
+<meta name="revised" content="2019-03-20T11:40:26 UTC">
 <title>`throw_bad_result_access&lt;EC&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2422,7 +2422,7 @@
     
     
     <p>Policy class defining that <a href="/outcome/reference/types/bad_result_access_with/" class="api-reference">bad_result_access_with&lt;EC&gt;</a> should be thrown on incorrect wide value observation. The primary purpose of this policy is to enable standing in for 
-<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 std::expected&lt;T, E&gt;</a> which throws a <code>bad_expected_access&lt;E&gt;</code> on incorrect wide value observation. This is why it is only ever <code>EC</code> which is thrown with <code>bad_result_access_with&lt;EC&gt;</code> on value observation only, and only when there is an error available.</p>
+<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 <code>std::expected&lt;T, E&gt;</code></a> which throws a <code>bad_expected_access&lt;E&gt;</code> on incorrect wide value observation. This is why it is only ever <code>EC</code> which is thrown with <code>bad_result_access_with&lt;EC&gt;</code> on value observation only, and only when there is an error available.</p>
 
 <p>If used in <code>basic_outcome</code>, and the outcome is exceptioned and so no error is available, incorrect wide value observation performs instead:</p>
 <div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">OUTCOME_THROW_EXCEPTION</span><span class="p">(</span><span class="n">bad_result_access</span><span class="p">(</span><span class="s">&#34;no value&#34;</span><span class="p">));</span>
@@ -2462,7 +2462,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 27/01/2019
+        <i class='fa fa-calendar'></i> Last update on 28/01/2019
     </div>
     
 
