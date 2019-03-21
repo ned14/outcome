@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-20T20:17:40 UTC">
+<meta name="revised" content="2019-03-21T17:12:58 UTC">
 <title>result&lt;&gt; :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2479,11 +2479,15 @@ all implicit conversion is disabled, and you will need to use one of the tagged 
 </code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_result.cpp#L85" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
-<p>Or use helper factory functions:</p>
+<p>Or use helper functions:</p>
 
 <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">r</span> <span class="o">=</span> <span class="n">outcome</span><span class="o">::</span><span class="n">failure</span><span class="p">(</span><span class="n">ConversionErrc</span><span class="o">::</span><span class="n">EmptyString</span><span class="p">);</span>
 <span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">outcome</span><span class="o">::</span><span class="n">success</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
 </code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_result.cpp#L93" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+
+
+<div class="notices note" ><p>Functions <code>failure()</code> and <code>success()</code> return special types convertible to <code>result</code> (and <code>outcome</code>); these types should not be used directly in the program.</p>
+</div>
 
 <div class="footnotes">
 
@@ -2527,7 +2531,7 @@ all implicit conversion is disabled, and you will need to use one of the tagged 
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 09/02/2019
+        <i class='fa fa-calendar'></i> Last update on 21/03/2019
     </div>
     
 
