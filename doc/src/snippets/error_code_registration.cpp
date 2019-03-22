@@ -39,7 +39,7 @@ namespace detail
       case ConversionErrc::EmptyString:
         return "converting empty string";
       case ConversionErrc::IllegalChar:
-        return "got non-digit chatr when converting to a number";
+        return "got non-digit char when converting to a number";
       case ConversionErrc::TooLong:
         return "the number would not fit into memory";
       default:
