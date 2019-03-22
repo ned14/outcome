@@ -5,7 +5,7 @@ weight = 20
 tags = ["nodiscard", "value", "error", "try"]
 +++
 
-Suppose we will be writing a function `print_half` that takes an integer number (however big) represented as an `std::string` and outputs a number which is twice smaller:
+Suppose we will be writing a function `print_half` that takes a `std::string` representing an integer and prints half the integer:
 
 {{% snippet "using_result.cpp" "half_decl" %}}
 
