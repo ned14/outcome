@@ -45,7 +45,7 @@ Second overhead is experienced when throwing an exception and trying to find the
 handler. Since nearly any function can throw an exception of any time, this is
 a dynamic memory allocation. The type of an exception is erased and a run-time type
 identification (RTTI) is required to asses the type of the active exception object.
-The worse time required for matching exceptions against handlers cannot be easily
+The worst case time required for matching exceptions against handlers cannot be easily
 predicted and therefore exceptions are not suitable for real-time or low-latency
 systems.
 

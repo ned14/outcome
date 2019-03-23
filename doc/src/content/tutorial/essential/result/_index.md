@@ -10,7 +10,7 @@ if it does we want to communicate the failure reason.
 
 {{% snippet "using_result.cpp" "convert_decl" %}}
 
-Template alias {{< api "result<T, E = varies, NoValuePolicy = policy::default_policy<T, E, void>>" >}}
+Template alias {{< api "result<T, EC = varies, NoValuePolicy = policy::default_policy<T, EC, void>>" >}}
 has three template parameters, but the last two have default values. The first
 (`T`) represents the type of the object returned from the function upon success.
 The second (`EC`) is the type of object containing information about the reason
@@ -31,7 +31,7 @@ Now, we will define an enumeration describing different failure situations durin
 
 {{% snippet "using_result.cpp" "enum" %}}
 
-Assume we have plugged it into `std::error_code` framework, as described in [this section](../../motivation/plug_error_code).
+Assume we have plugged it into `std::error_code` framework, as described in [this section](../../../motivation/plug_error_code).
 
 One notable effect of such plugging is that `ConversionErrc` is now convertible to `std::error_code`.
 Now we can implement function `convert` as follows:
