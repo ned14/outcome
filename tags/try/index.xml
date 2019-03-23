@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/tags/try/</link>
     <description>Recent content in Try on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Thu, 21 Mar 2019 18:06:23 +0100</lastBuildDate>
+    <lastBuildDate>Sat, 23 Mar 2019 21:56:56 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/tags/try/index.xml" rel="self" type="application/rss+xml" />
     
@@ -16,8 +16,8 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/result/inspecting/</guid>
-      <description>Suppose we will be writing a function print_half that takes an integer number (however big) represented as an std::string and outputs a number which is twice smaller:
-outcome::result&amp;lt;void&amp;gt; print_half(const std::string&amp;amp; text); View this code on Github The type result&amp;lt;void&amp;gt; means that there is no value to be retuned upon success, but that the operation might still fail, and we may be interested in inspecting the cause of the failure. The class template result&amp;lt;&amp;gt; is declared with the attribute [[nodiscard]], which means the compiler will warn you if you forget to inspect the returned object (in C++ 17 or later).</description>
+      <description>Suppose we will be writing a function print_half that takes a std::string representing an integer and prints half the integer:
+outcome::result&amp;lt;void&amp;gt; print_half(const std::string&amp;amp; text); View this code on Github The type result&amp;lt;void&amp;gt; means that there is no value to be returned upon success, but that the operation might still fail, and we may be interested in inspecting the cause of the failure. The class template result&amp;lt;&amp;gt; is declared with the attribute [[nodiscard]], which means the compiler will warn you if you forget to inspect the returned object (in C++ 17 or later).</description>
     </item>
     
     <item>
@@ -34,7 +34,7 @@ auto&amp;amp;&amp;amp; __result = BigInt::fromString(text); if (!__result) retur
     <item>
       <title>result&lt;&gt;</title>
       <link>https://ned14.github.io/outcome/tutorial/essential/result/</link>
-      <pubDate>Thu, 21 Mar 2019 18:06:23 +0100</pubDate>
+      <pubDate>Sat, 23 Mar 2019 21:56:56 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/result/</guid>
       <description>We will define a function that converts a std::string to an int. This function can fail for a number of reasons; if it does we want to communicate the failure reason.

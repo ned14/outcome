@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-03-21T17:13:08 UTC">
+<meta name="revised" content="2019-03-23T22:01:18 UTC">
 <title>Error :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2427,8 +2427,8 @@
         <h2 class="post-title"><a href="/outcome/tutorial/essential/result/inspecting/">Inspecting result&lt;T, EC&gt;</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Suppose we will be writing a function print_half that takes an integer number (however big) represented as an std::string and outputs a number which is twice smaller:
-outcome::result&lt;void&gt; print_half(const std::string&amp; text); View this code on Github The type result&lt;void&gt; means that there is no value to be retuned upon success, but that the operation might still fail, and we may be interested in inspecting the cause of the failure. The class template result&lt;&gt; is declared with the attribute [[nodiscard]], which means the compiler will warn you if you forget to inspect the returned object (in C++ 17 or later). <a class="read-more" href="/outcome/tutorial/essential/result/inspecting/">&raquo;</a></p>
+        <p>Suppose we will be writing a function print_half that takes a std::string representing an integer and prints half the integer:
+outcome::result&lt;void&gt; print_half(const std::string&amp; text); View this code on Github The type result&lt;void&gt; means that there is no value to be returned upon success, but that the operation might still fail, and we may be interested in inspecting the cause of the failure. The class template result&lt;&gt; is declared with the attribute [[nodiscard]], which means the compiler will warn you if you forget to inspect the returned object (in C++ 17 or later). <a class="read-more" href="/outcome/tutorial/essential/result/inspecting/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          
@@ -2481,7 +2481,7 @@ outcome::result&lt;void&gt; print_half(const std::string&amp; text); View this c
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 08/02/2019
+        <i class='fa fa-calendar'></i> Last update on 22/03/2019
     </div>
     
 
