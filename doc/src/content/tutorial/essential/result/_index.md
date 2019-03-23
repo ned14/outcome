@@ -10,7 +10,7 @@ if it does we want to communicate the failure reason.
 
 {{% snippet "using_result.cpp" "convert_decl" %}}
 
-Template alias {{< api "result<T, EC = varies, NoValuePolicy = policy::default_policy<T, EC, void>>" >}}
+Template alias {{< api "result<T, E = varies, NoValuePolicy = policy::default_policy<T, E, void>>" >}}
 has three template parameters, but the last two have default values. The first
 (`T`) represents the type of the object returned from the function upon success.
 The second (`EC`) is the type of object containing information about the reason
