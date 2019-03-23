@@ -49,7 +49,8 @@ Or use helper functions:
 {{% snippet "using_result.cpp" "factory" %}}
 
 {{% notice note %}}
-Functions `failure()` and `success()` return special types convertible to `result` (and `outcome`); these types should not be used directly in the program.
+The functions {{< api "auto failure(T &&, ...)" >}} and {{< api "auto success(T &&)" >}} return special
+types implicitly convertible to failed or successful `result` (and `outcome`).
 {{% /notice %}}
 
 [^1]: You can mandate a choice using `std_result<T>` or `boost_result<T>`.
