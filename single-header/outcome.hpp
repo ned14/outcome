@@ -789,9 +789,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    51ba91416d557eecbe16b72e0ee6a453ac9131d5
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2018-12-15 13:10:02 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 51ba9141
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    01e18d3e6549400646f41b79de318994eac95f25
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-02-11 10:00:33 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 01e18d3e
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -6337,7 +6337,7 @@ SIGNATURE NOT RECOGNISED
 */
 OUTCOME_TEMPLATE(class R, class S, class P)
 OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lvalueref<R>()), OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lvalueref<S>()))
-inline std::istream &operator>>(std::istream &s, result<R, S, P> &v)
+inline std::istream &operator>>(std::istream &s, basic_result<R, S, P> &v)
 {
   s >> v._iostreams_state();
   if(v.has_error())
@@ -6351,7 +6351,7 @@ SIGNATURE NOT RECOGNISED
 */
 OUTCOME_TEMPLATE(class R, class S, class P)
 OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lvalueref<R>()), OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lvalueref<S>()))
-inline std::ostream &operator<<(std::ostream &s, const result<R, S, P> &v)
+inline std::ostream &operator<<(std::ostream &s, const basic_result<R, S, P> &v)
 {
   s << v._iostreams_state();
   if(v.has_error())
@@ -6363,7 +6363,7 @@ inline std::ostream &operator<<(std::ostream &s, const result<R, S, P> &v)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class R, class S, class P> inline std::string print(const detail::basic_result_final<R, S, P> &v)
+template <class R, class S, class P> inline std::string print(const basic_result<R, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -6379,7 +6379,7 @@ template <class R, class S, class P> inline std::string print(const detail::basi
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class S, class P> inline std::string print(const detail::basic_result_final<void, S, P> &v)
+template <class S, class P> inline std::string print(const basic_result<void, S, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -6395,7 +6395,7 @@ template <class S, class P> inline std::string print(const detail::basic_result_
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class R, class P> inline std::string print(const detail::basic_result_final<R, void, P> &v)
+template <class R, class P> inline std::string print(const basic_result<R, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -6411,7 +6411,7 @@ template <class R, class P> inline std::string print(const detail::basic_result_
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class P> inline std::string print(const detail::basic_result_final<void, void, P> &v)
+template <class P> inline std::string print(const basic_result<void, void, P> &v)
 {
   std::stringstream s;
   if(v.has_value())
@@ -6472,7 +6472,7 @@ template <class R, class S, class P, class N> inline std::string print(const out
   {
     s << "{ ";
   }
-  s << print(static_cast<const detail::basic_result_final<R, S, N> &>(v));
+  s << print(static_cast<const basic_result<R, S, N> &>(static_cast<const detail::basic_result_final<R, S, N> &>(v)));  // NOLINT
   if(total > 1)
   {
     s << ", ";

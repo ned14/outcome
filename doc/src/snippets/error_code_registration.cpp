@@ -16,7 +16,7 @@ namespace std
 {
   // Tell the C++ 11 STL metaprogramming that enum ConversionErrc
   // is registered with the standard error code system
-  template <> struct is_error_code_enum<ConversionErrc> : std::true_type
+  template <> struct is_error_code_enum<ConversionErrc> : true_type
   {
   };
 }
@@ -39,7 +39,7 @@ namespace detail
       case ConversionErrc::EmptyString:
         return "converting empty string";
       case ConversionErrc::IllegalChar:
-        return "got non-digit chatr when converting to a number";
+        return "got non-digit char when converting to a number";
       case ConversionErrc::TooLong:
         return "the number would not fit into memory";
       default:
