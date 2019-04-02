@@ -29,10 +29,10 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 OUTCOME_V2_NAMESPACE_BEGIN
 
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 type definition template <class T> success_type. Potential doc page: `success_type<T>`
 */
-template <class T> struct success_type
+template <class T> struct OUTCOME_NODISCARD success_type
 {
   using value_type = T;
 
@@ -58,7 +58,7 @@ public:
   constexpr value_type &&value() && { return static_cast<value_type &&>(_value); }
   constexpr const value_type &&value() const && { return static_cast<value_type &&>(_value); }
 };
-template <> struct success_type<void>
+template <> struct OUTCOME_NODISCARD success_type<void>
 {
   using value_type = void;
 };
@@ -77,10 +77,10 @@ template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v)
   return success_type<std::decay_t<T>>{static_cast<T &&>(v)};
 }
 
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 type definition template <class EC, class E = void> failure_type. Potential doc page: `failure_type<EC, EP = void>`
 */
-template <class EC, class E = void> struct failure_type
+template <class EC, class E = void> struct OUTCOME_NODISCARD failure_type
 {
   using error_type = EC;
   using exception_type = E;
@@ -140,7 +140,7 @@ public:
   constexpr exception_type &&exception() && { return static_cast<exception_type &&>(_exception); }
   constexpr const exception_type &&exception() const && { return static_cast<exception_type &&>(_exception); }
 };
-template <class EC> struct failure_type<EC, void>
+template <class EC> struct OUTCOME_NODISCARD failure_type<EC, void>
 {
   using error_type = EC;
   using exception_type = void;
@@ -167,7 +167,7 @@ public:
   constexpr error_type &&error() && { return static_cast<error_type &&>(_error); }
   constexpr const error_type &&error() const && { return static_cast<error_type &&>(_error); }
 };
-template <class E> struct failure_type<void, E>
+template <class E> struct OUTCOME_NODISCARD failure_type<void, E>
 {
   using error_type = void;
   using exception_type = E;
@@ -194,14 +194,14 @@ public:
   constexpr exception_type &&exception() && { return static_cast<exception_type &&>(_exception); }
   constexpr const exception_type &&exception() const && { return static_cast<exception_type &&>(_exception); }
 };
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 template <class EC> inline constexpr failure_type<std::decay_t<EC>> failure(EC &&v)
 {
   return failure_type<std::decay_t<EC>>{static_cast<EC &&>(v)};
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, E &&w)
@@ -229,12 +229,12 @@ namespace detail
   };
 }  // namespace detail
 
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 template <class T> static constexpr bool is_success_type = detail::is_success_type<std::decay_t<T>>::value;
 
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 template <class T> static constexpr bool is_failure_type = detail::is_failure_type<std::decay_t<T>>::value;
