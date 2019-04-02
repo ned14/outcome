@@ -4,7 +4,10 @@ weight = 80
 +++
 
 ---
-## v2.1 in progress [[project]](https://github.com/ned14/outcome/projects/1)
+## v2.1 XXth Apr 2019 (Boost 1.70) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1)
+
+- [#180](https://github.com/ned14/outcome/issues/180)
+    - `success()` and `failure()` now produce types marked `[[nodiscard]]`.
 
 - `include/outcome/outcome.natvis` is now namespace permuted like the rest of
 Outcome, so debugging Outcome based code in Visual Studio should look much

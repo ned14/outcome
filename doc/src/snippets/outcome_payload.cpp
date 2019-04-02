@@ -7,7 +7,7 @@ namespace filesystem
 {
   using std::experimental::filesystem::path;
   bool copy_file(const path &from, const path &to) { return false; }
-  bool copy_file(const path &from, const path &to, std::error_code &ec) noexcept { return false; }
+  bool copy_file(const path &from, const path &to, std::error_code &ec) { return false; }
 }
 namespace filesystem2
 {
