@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-04-02T19:20:13 UTC">
+<meta name="revised" content="2019-04-26T15:45:55 UTC">
 <title>Narrow contracts :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2466,11 +2466,14 @@ and declares that the value of this <code>int</code> must never be negative. You
   <span class="c1">// normal program logic follows ...
 </span><span class="c1"></span><span class="p">}</span>
 </code></pre></div>
-<p>This instruction when hit, causes the program to exit abnormally, which means:
-* a debugger can be launched,
-* static analyzer can warn you if it can detect a program flow that reaches this
-  point,
-* UB-sanitizer can log error message when it hits it.</p>
+<p>This instruction when hit, causes the program to exit abnormally, which means:</p>
+
+<ul>
+<li>a debugger can be launched,</li>
+<li>static analyzer can warn you if it can detect a program flow that reaches this
+point,</li>
+<li>UB-sanitizer can log error message when it hits it.</li>
+</ul>
 
 <p>Another tool you could use is <code>__builtin_unreachable()</code>, also available in GCC
 and clang:</p>
@@ -2518,7 +2521,7 @@ to pass <code>j</code> instead?&ldquo;.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 01/02/2019
+        <i class='fa fa-calendar'></i> Last update on 26/04/2019
     </div>
     
 
