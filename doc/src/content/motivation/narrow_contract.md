@@ -91,6 +91,7 @@ void h(int i) // expects: i >= 0
 ```
 
 This instruction when hit, causes the program to exit abnormally, which means:
+
 * a debugger can be launched,
 * static analyzer can warn you if it can detect a program flow that reaches this
   point,
