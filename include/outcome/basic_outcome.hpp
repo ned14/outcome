@@ -813,6 +813,7 @@ SIGNATURE NOT RECOGNISED
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4127)  // conditional expression is constant
+#pragma warning(disable : 4297)  // function assumed to not throw an exception but does
 #endif
     // Do throwing swap first
     if((value_throws && !error_throws && !exception_throws) || (!value_throws && !error_throws && !exception_throws))
