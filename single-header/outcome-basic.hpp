@@ -658,9 +658,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    01e18d3e6549400646f41b79de318994eac95f25
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-02-11 10:00:33 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 01e18d3e
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    d408e4a465b30f47d41d49c7a751d9a04e659b78
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-05-09 09:35:22 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE d408e4a4
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1135,9 +1135,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF b93403b9a55355b8f6783320c8d2db2c14b3517d
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-02-28 22:02:20 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE b93403b9
+#define OUTCOME_PREVIOUS_COMMIT_REF 7e7d94bce47d810e8d0b7ad93d7011be2f027e58
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-05-08 09:38:26 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 7e7d94bc
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -4977,6 +4977,7 @@ SIGNATURE NOT RECOGNISED
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4127)  // conditional expression is constant
+#pragma warning(disable : 4297)  // function assumed to not throw an exception but does
 #endif
     // Do throwing swap first
     if((value_throws && !error_throws && !exception_throws) || (!value_throws && !error_throws && !exception_throws))

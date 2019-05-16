@@ -684,9 +684,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    01e18d3e6549400646f41b79de318994eac95f25
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-02-11 10:00:33 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 01e18d3e
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    d408e4a465b30f47d41d49c7a751d9a04e659b78
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-05-09 09:35:22 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE d408e4a4
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1161,9 +1161,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF b93403b9a55355b8f6783320c8d2db2c14b3517d
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-02-28 22:02:20 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE b93403b9
+#define OUTCOME_PREVIOUS_COMMIT_REF 7e7d94bce47d810e8d0b7ad93d7011be2f027e58
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-05-08 09:38:26 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 7e7d94bc
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -5003,6 +5003,7 @@ SIGNATURE NOT RECOGNISED
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4127)  // conditional expression is constant
+#pragma warning(disable : 4297)  // function assumed to not throw an exception but does
 #endif
     // Do throwing swap first
     if((value_throws && !error_throws && !exception_throws) || (!value_throws && !error_throws && !exception_throws))
@@ -5705,9 +5706,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef SYSTEM_ERROR2_CONSTEXPR14
 #if 0 || __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! Defined to be `constexpr` when on C++ 14 or better compilers. Usually automatic, can be overriden.
 #define SYSTEM_ERROR2_CONSTEXPR14 constexpr
 #else
 #define SYSTEM_ERROR2_CONSTEXPR14
@@ -5771,29 +5770,31 @@ SIGNATURE NOT RECOGNISED
 #endif
 
 #ifndef SYSTEM_ERROR2_NAMESPACE
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! The system_error2 namespace name.
 #define SYSTEM_ERROR2_NAMESPACE system_error2
-/*! AWAITING HUGO JSON CONVERSION TOOL */
+//! Begins the system_error2 namespace.
 #define SYSTEM_ERROR2_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                            namespace system_error2                                                                                                                                                                                                                                                                                                        {
 
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! Ends the system_error2 namespace.
 #define SYSTEM_ERROR2_NAMESPACE_END }
 #endif
 
-/*! AWAITING HUGO JSON CONVERSION TOOL */
+//! Namespace for the library
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 
-/*! AWAITING HUGO JSON CONVERSION TOOL */
+//! Namespace for user specialised traits
 namespace traits
 {
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type definition  is_move_relocating. Potential doc page: NOT FOUND
-*/
+  /*! Specialise to true if you guarantee that a type is move relocating (i.e.
+  its move constructor equals copying bits from old to new, old is left in a
+  default constructed state, and calling the destructor on a default constructed
+  instance is trivial). All trivially copyable types are move relocating by
+  definition, and that is the unspecialised implementation.
+  */
+
+
+
 
 
   template <class T> struct is_move_relocating
@@ -5818,8 +5819,12 @@ namespace detail
   Our bit_cast is only guaranteed to be constexpr when both the input and output
   arguments are either integrals or enums. However, this covers most use cases
   since the vast majority of status_codes have an underlying type that is either
-  an integral or enum.
+  an integral or enum. We still attempt a constexpr union-based type pun for non-array
+  input types, which some compilers accept. For array inputs, we fall back to
+  non-constexpr memmove.
   */
+
+
 
 
 
@@ -5832,6 +5837,8 @@ namespace detail
 
   template <class To, class From> using is_static_castable = std::integral_constant<bool, is_integral_or_enum<To>::value && is_integral_or_enum<From>::value>;
 
+  template <class To, class From> using is_union_castable = std::integral_constant<bool, !is_static_castable<To, From>::value && !std::is_array<To>::value && !std::is_array<From>::value>;
+
   template <class To, class From> using is_bit_castable = std::integral_constant<bool, sizeof(To) == sizeof(From) && traits::is_move_relocating<To>::value && traits::is_move_relocating<From>::value>;
 
   template <class To, class From> union bit_cast_union {
@@ -5839,9 +5846,40 @@ namespace detail
     To target;
   };
 
-  template <class To, class From, typename std::enable_if<is_bit_castable<To, From>::value && is_static_castable<To, From>::value, bool>::type = true> constexpr To bit_cast(const From &from) noexcept { return static_cast<To>(from); }
+  template <class To, class From,
+            typename std::enable_if<                //
+            is_bit_castable<To, From>::value        //
+            && is_static_castable<To, From>::value  //
+            && !is_union_castable<To, From>::value,  //
+            bool>::type = true>  //
+  constexpr To bit_cast(const From &from) noexcept
+  {
+    return static_cast<To>(from);
+  }
 
-  template <class To, class From, typename std::enable_if<is_bit_castable<To, From>::value && !is_static_castable<To, From>::value, bool>::type = true> constexpr To bit_cast(const From &from) noexcept { return bit_cast_union<To, From>{from}.target; }
+  template <class To, class From,
+            typename std::enable_if<                 //
+            is_bit_castable<To, From>::value         //
+            && !is_static_castable<To, From>::value  //
+            && is_union_castable<To, From>::value,    //
+            bool>::type = true>  //
+  constexpr To bit_cast(const From &from) noexcept
+  {
+    return bit_cast_union<To, From>{from}.target;
+  }
+
+  template <class To, class From,
+            typename std::enable_if<                 //
+            is_bit_castable<To, From>::value         //
+            && !is_static_castable<To, From>::value  //
+            && !is_union_castable<To, From>::value,   //
+            bool>::type = true>  //
+  To bit_cast(const From &from) noexcept
+  {
+    bit_cast_union<To, From> ret;
+    memmove(&ret.source, &from, sizeof(ret.source));
+    return ret.target;
+  }
 
   /* erasure_cast performs a bit_cast with additional rules to handle types
   of differing sizes. For integral & enum types, it may perform a narrowing
@@ -5914,7 +5952,7 @@ namespace detail
 #ifndef __APPLE__
     extern "C" ptrdiff_t write(int, const void *, size_t);
 #endif
-  }
+  }  // namespace avoid_stdio_include
   inline void do_fatal_exit(const char *msg)
   {
     using namespace avoid_stdio_include;
@@ -5924,9 +5962,7 @@ namespace detail
   }
 }  // namespace detail
 SYSTEM_ERROR2_NAMESPACE_END
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! Prints msg to stderr, and calls `std::terminate()`. Can be overriden via predefinition.
 #define SYSTEM_ERROR2_FATAL(msg) ::SYSTEM_ERROR2_NAMESPACE::detail::do_fatal_exit(msg)
 #endif
 
@@ -5935,14 +5971,17 @@ SIGNATURE NOT RECOGNISED
 
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
+/*! The main workhorse of the system_error2 library, can be typed (`status_code<DomainType>`), erased-immutable (`status_code<void>`) or erased-mutable (`status_code<erased<T>>`).
+
+Be careful of placing these into containers! Equality and inequality operators are
+*semantic* not exact. Therefore two distinct items will test true! To help prevent
+surprise on this, `operator<` and `std::hash<>` are NOT implemented in order to
+trap potential incorrectness. Define your own custom comparison functions for your
+container which perform exact comparisons.
 */
 template <class DomainType> class status_code;
 class _generic_code_domain;
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  generic_code. Potential doc page: NOT FOUND
-*/
+//! The generic code is a status code with the generic code domain, which is that of `errc` (POSIX).
 using generic_code = status_code<_generic_code_domain>;
 
 namespace detail
@@ -5960,83 +5999,58 @@ namespace detail
   };
 }  // namespace detail
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type definition  status_code_domain. Potential doc page: NOT FOUND
-*/
+/*! Abstract base class for a coding domain of a status code.
+ */
 class status_code_domain
 {
   template <class DomainType> friend class status_code;
   template <class StatusCode> friend class indirecting_domain;
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  unique_id_type. Potential doc page: NOT FOUND
-*/
-
-
+  //! Type of the unique id for this domain.
   using unique_id_type = unsigned long long;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type definition  string_ref. Potential doc page: NOT FOUND
-*/
+  /*! (Potentially thread safe) Reference to a message string.
+
+  Be aware that you cannot add payload to implementations of this class.
+  You get exactly the `void *[3]` array to keep state, this is usually
+  sufficient for a `std::shared_ptr<>` or a `std::string`.
+
+  You can install a handler to be called when this object is copied,
+  moved and destructed. This takes the form of a C function pointer.
+  */
+
+
+
+
+
+
 
 
   class string_ref
   {
   public:
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  value_type. Potential doc page: `value_type &value() &`
-*/
-
-
+    //! The value type
     using value_type = const char;
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  size_type. Potential doc page: NOT FOUND
-*/
-
-
+    //! The size type
     using size_type = size_t;
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  pointer. Potential doc page: NOT FOUND
-*/
-
-
+    //! The pointer type
     using pointer = const char *;
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  const_pointer. Potential doc page: NOT FOUND
-*/
-
-
+    //! The const pointer type
     using const_pointer = const char *;
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  iterator. Potential doc page: NOT FOUND
-*/
-
-
+    //! The iterator type
     using iterator = const char *;
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  const_iterator. Potential doc page: NOT FOUND
-*/
-
-
+    //! The const iterator type
     using const_iterator = const char *;
 
   protected:
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-type definition  _thunk_op. Potential doc page: NOT FOUND
-*/
-
-
+    //! The operation occurring
     enum class _thunk_op
     {
       copy,
       move,
       destruct
     };
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  _thunk_spec. Potential doc page: NOT FOUND
-*/
-
-
+    //! The prototype of the handler function. Copies can throw, moves and destructs cannot.
     using _thunk_spec = void (*)(string_ref *dest, const string_ref *src, _thunk_op op);
 #ifndef NDEBUG
   private:
@@ -6051,33 +6065,17 @@ type alias  _thunk_spec. Potential doc page: NOT FOUND
 
   protected:
 #endif
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Pointers to beginning and end of character range
     pointer _begin{}, _end{};
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Three `void*` of state
     void *_state[3]{};  // at least the size of a shared_ptr
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Handler for when operations occur
     const _thunk_spec _thunk{nullptr};
 
     constexpr explicit string_ref(_thunk_spec thunk) noexcept : _thunk(thunk) {}
 
   public:
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Construct from a C string literal
     SYSTEM_ERROR2_CONSTEXPR14 explicit string_ref(const char *str, size_type len = static_cast<size_type>(-1), void *state0 = nullptr, void *state1 = nullptr, void *state2 = nullptr,
 #ifndef NDEBUG
                                                   _thunk_spec thunk = _checking_string_thunk
@@ -6090,11 +6088,7 @@ SIGNATURE NOT RECOGNISED
                                                                _thunk(thunk)
     {
     }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Copy construct the derived implementation.
     string_ref(const string_ref &o)
         : _begin(o._begin)
         , _end(o._end)
@@ -6106,11 +6100,7 @@ SIGNATURE NOT RECOGNISED
         _thunk(this, &o, _thunk_op::copy);
       }
     }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Move construct the derived implementation.
     string_ref(string_ref &&o) noexcept : _begin(o._begin), _end(o._end), _state{o._state[0], o._state[1], o._state[2]}, _thunk(o._thunk)
     {
       if(_thunk != nullptr)
@@ -6118,11 +6108,7 @@ SIGNATURE NOT RECOGNISED
         _thunk(this, &o, _thunk_op::move);
       }
     }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Copy assignment
     string_ref &operator=(const string_ref &o)
     {
       if(this != &o)
@@ -6146,11 +6132,7 @@ SIGNATURE NOT RECOGNISED
       }
       return *this;
     }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Move assignment
     string_ref &operator=(string_ref &&o) noexcept
     {
       if(this != &o)
@@ -6160,11 +6142,7 @@ SIGNATURE NOT RECOGNISED
       }
       return *this;
     }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Destruction
     ~string_ref()
     {
       if(_thunk != nullptr)
@@ -6174,72 +6152,30 @@ SIGNATURE NOT RECOGNISED
       _begin = _end = nullptr;
     }
 
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Returns whether the reference is empty or not
     SYSTEM_ERROR2_NODISCARD bool empty() const noexcept { return _begin == _end; }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Returns the size of the string
     size_type size() const noexcept { return _end - _begin; }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Returns a null terminated C string
     const_pointer c_str() const noexcept { return _begin; }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Returns a null terminated C string
     const_pointer data() const noexcept { return _begin; }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Returns the beginning of the string
     iterator begin() noexcept { return _begin; }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Returns the beginning of the string
     const_iterator begin() const noexcept { return _begin; }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Returns the beginning of the string
     const_iterator cbegin() const noexcept { return _begin; }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Returns the end of the string
     iterator end() noexcept { return _end; }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Returns the end of the string
     const_iterator end() const noexcept { return _end; }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Returns the end of the string
     const_iterator cend() const noexcept { return _end; }
   };
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type definition  atomic_refcounted_string_ref. Potential doc page: NOT FOUND
-*/
-
+  /*! A reference counted, threadsafe reference to a message string.
+   */
 
   class atomic_refcounted_string_ref : public string_ref
   {
@@ -6294,11 +6230,7 @@ type definition  atomic_refcounted_string_ref. Potential doc page: NOT FOUND
     }
 
   public:
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Construct from a C string literal allocated using `malloc()`.
     explicit atomic_refcounted_string_ref(const char *str, size_type len = static_cast<size_type>(-1), void *state1 = nullptr, void *state2 = nullptr) noexcept : string_ref(str, len, new(std::nothrow) _allocated_msg, state1, state2, _refcounted_string_thunk)
     {
       if(_msg() == nullptr)
@@ -6316,107 +6248,49 @@ private:
   unique_id_type _id;
 
 protected:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+  /*! Use [https://www.random.org/cgi-bin/randbyte?nbytes=8&format=h](https://www.random.org/cgi-bin/randbyte?nbytes=8&format=h) to get a random 64 bit id.
+
+  Do NOT make up your own value. Do NOT use zero.
+  */
+
 
 
   constexpr explicit status_code_domain(unique_id_type id) noexcept : _id(id) {}
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! No public copying at type erased level
   status_code_domain(const status_code_domain &) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! No public moving at type erased level
   status_code_domain(status_code_domain &&) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! No public assignment at type erased level
   status_code_domain &operator=(const status_code_domain &) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! No public assignment at type erased level
   status_code_domain &operator=(status_code_domain &&) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! No public destruction at type erased level
   ~status_code_domain() = default;
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! True if the unique ids match.
   constexpr bool operator==(const status_code_domain &o) const noexcept { return _id == o._id; }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! True if the unique ids do not match.
   constexpr bool operator!=(const status_code_domain &o) const noexcept { return _id != o._id; }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! True if this unique is lower than the other's unique id.
   constexpr bool operator<(const status_code_domain &o) const noexcept { return _id < o._id; }
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Returns the unique id used to identify identical category instances.
   constexpr unique_id_type id() const noexcept { return _id; }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Name of this category.
   virtual string_ref name() const noexcept = 0;
 
 protected:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! True if code means failure.
   virtual bool _do_failure(const status_code<void> &code) const noexcept = 0;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! True if code is (potentially non-transitively) equivalent to another code in another domain.
   virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept = 0;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Returns the generic code closest to this code, if any.
   virtual generic_code _generic_code(const status_code<void> &code) const noexcept = 0;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Return a reference to a string textually representing a code.
   virtual string_ref _do_message(const status_code<void> &code) const noexcept = 0;
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Throw a code as a C++ exception.
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const = 0;
 #else
   // Keep a vtable slot for binary compatibility
@@ -6447,25 +6321,19 @@ SYSTEM_ERROR2_NAMESPACE_END
 #else
 
 SYSTEM_ERROR2_NAMESPACE_BEGIN
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type definition  in_place_t. Potential doc page: NOT FOUND
-*/
+//! Aliases `std::in_place_t` if on C++ 17 or later, else defined locally.
 struct in_place_t
 {
   explicit in_place_t() = default;
 };
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! Aliases `std::in_place` if on C++ 17 or later, else defined locally.
 constexpr in_place_t in_place{};
 SYSTEM_ERROR2_NAMESPACE_END
 #endif
 
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! Namespace for user injected mixins
 namespace mixins
 {
   template <class Base, class T> struct mixin : public Base
@@ -6474,8 +6342,8 @@ namespace mixins
   };
 }  // namespace mixins
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
+/*! A tag for an erased value type for `status_code<D>`.
+Available only if `ErasedType` satisfies `traits::is_move_relocating<ErasedType>::value`.
 */
 template <class ErasedType,  //
           typename std::enable_if<traits::is_move_relocating<ErasedType>::value, bool>::type = true>
@@ -6530,124 +6398,68 @@ namespace detail
   template <class... Args> using safe_get_make_status_code_result = test_apply<get_make_status_code_result, Args...>;
 }  // namespace detail
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type definition template <class T> is_status_code. Potential doc page: NOT FOUND
-*/
+//! Trait returning true if the type is a status code.
 template <class T> struct is_status_code
 {
   static constexpr bool value = detail::is_status_code<typename std::decay<T>::type>::value || detail::is_erased_status_code<typename std::decay<T>::type>::value;
 };
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
+/*! A type erased lightweight status code reflecting empty, success, or failure.
+Differs from `status_code<erased<>>` by being always available irrespective of
+the domain's value type, but cannot be copied, moved, nor destructed. Thus one
+always passes this around by const lvalue reference.
 */
 template <> class status_code<void>
 {
   template <class T> friend class status_code;
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  domain_type. Potential doc page: NOT FOUND
-*/
-
-
+  //! The type of the domain.
   using domain_type = void;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  value_type. Potential doc page: `value_type &value() &`
-*/
-
-
+  //! The type of the status code.
   using value_type = void;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  string_ref. Potential doc page: NOT FOUND
-*/
-
-
+  //! The type of a reference to a message string.
   using string_ref = typename status_code_domain::string_ref;
 
 protected:
   const status_code_domain *_domain{nullptr};
 
 protected:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! No default construction at type erased level
   status_code() = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! No public copying at type erased level
   status_code(const status_code &) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! No public moving at type erased level
   status_code(status_code &&) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! No public assignment at type erased level
   status_code &operator=(const status_code &) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! No public assignment at type erased level
   status_code &operator=(status_code &&) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! No public destruction at type erased level
   ~status_code() = default;
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Used to construct a non-empty type erased status code
   constexpr explicit status_code(const status_code_domain *v) noexcept : _domain(v) {}
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Return the status code domain.
   constexpr const status_code_domain &domain() const noexcept { return *_domain; }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! True if the status code is empty.
   SYSTEM_ERROR2_NODISCARD constexpr bool empty() const noexcept { return _domain == nullptr; }
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Return a reference to a string textually representing a code.
   string_ref message() const noexcept { return (_domain != nullptr) ? _domain->_do_message(*this) : string_ref("(empty)"); }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! True if code means success.
   bool success() const noexcept { return (_domain != nullptr) ? !_domain->_do_failure(*this) : false; }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! True if code means failure.
   bool failure() const noexcept { return (_domain != nullptr) ? _domain->_do_failure(*this) : false; }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+  /*! True if code is strictly (and potentially non-transitively) semantically equivalent to another code in another domain.
+  Note that usually non-semantic i.e. pure value comparison is used when the other status code has the same domain.
+  As `equivalent()` will try mapping to generic code, this usually captures when two codes have the same semantic
+  meaning in `equivalent()`.
+  */
+
+
 
 
   template <class T> bool strictly_equivalent(const status_code<T> &o) const noexcept
@@ -6664,18 +6476,16 @@ SIGNATURE NOT RECOGNISED
     // Otherwise not equivalent
     return false;
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+  /*! True if code is equivalent, by any means, to another code in another domain (guaranteed transitive).
+  Firstly `strictly_equivalent()` is run in both directions. If neither succeeds, each domain is asked
+  for the equivalent generic code and those are compared.
+  */
+
 
 
   template <class T> inline bool equivalent(const status_code<T> &o) const noexcept;
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Throw a code as a C++ exception.
   SYSTEM_ERROR2_NORETURN void throw_exception() const { _domain->_do_throw_exception(*this); }
 #endif
 };
@@ -6697,23 +6507,11 @@ namespace detail
     using _base = status_code<void>;
 
   public:
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  domain_type. Potential doc page: NOT FOUND
-*/
-
-
+    //! The type of the domain.
     using domain_type = typename get_domain_value_type<DomainType>::domain_type;
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  value_type. Potential doc page: `value_type &value() &`
-*/
-
-
+    //! The type of the status code.
     using value_type = typename get_domain_value_type<DomainType>::value_type;
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  string_ref. Potential doc page: NOT FOUND
-*/
-
-
+    //! The type of a reference to a message string.
     using string_ref = typename domain_type::string_ref;
 
 #ifndef NDEBUG
@@ -6724,18 +6522,10 @@ type alias  string_ref. Potential doc page: NOT FOUND
 #endif
 
     // Replace the type erased implementations with type aware implementations for better codegen
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Return the status code domain.
     constexpr const domain_type &domain() const noexcept { return *static_cast<const domain_type *>(this->_domain); }
 
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Reset the code to empty.
     SYSTEM_ERROR2_CONSTEXPR14 void clear() noexcept
     {
       this->_value.~value_type();
@@ -6744,30 +6534,14 @@ SIGNATURE NOT RECOGNISED
     }
 
 #if __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Return a reference to the `value_type`.
     constexpr value_type &value() & noexcept { return this->_value; }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Return a reference to the `value_type`.
     constexpr value_type &&value() && noexcept { return this->_value; }
 #endif
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Return a reference to the `value_type`.
     constexpr const value_type &value() const &noexcept { return this->_value; }
-    /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+    //! Return a reference to the `value_type`.
     constexpr const value_type &&value() const &&noexcept { return this->_value; }
 
   protected:
@@ -6796,8 +6570,16 @@ SIGNATURE NOT RECOGNISED
   };
 }  // namespace detail
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type definition template <class DomainType> status_code. Potential doc page: NOT FOUND
+/*! A lightweight, typed, status code reflecting empty, success, or failure.
+This is the main workhorse of the system_error2 library. Its characteristics reflect the value type
+set by its domain type, so if that value type is move-only or trivial, so is this.
+
+An ADL discovered helper function `make_status_code(T, Args...)` is looked up by one of the constructors.
+If it is found, and it generates a status code compatible with this status code, implicit construction
+is made available.
+
+You may mix in custom member functions and member function overrides by injecting a specialisation of
+`mixins::mixin<Base, YourDomainType>`. Your mixin must inherit from `Base`.
 */
 template <class DomainType> class status_code : public mixins::mixin<detail::status_code_storage<DomainType>, DomainType>
 {
@@ -6805,71 +6587,31 @@ template <class DomainType> class status_code : public mixins::mixin<detail::sta
   using _base = mixins::mixin<detail::status_code_storage<DomainType>, DomainType>;
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  domain_type. Potential doc page: NOT FOUND
-*/
-
-
+  //! The type of the domain.
   using domain_type = DomainType;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  value_type. Potential doc page: `value_type &value() &`
-*/
-
-
+  //! The type of the status code.
   using value_type = typename domain_type::value_type;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  string_ref. Potential doc page: NOT FOUND
-*/
-
-
+  //! The type of a reference to a message string.
   using string_ref = typename domain_type::string_ref;
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Default construction to empty
   status_code() = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Copy constructor
   status_code(const status_code &) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Move constructor
   status_code(status_code &&) = default;  // NOLINT
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Copy assignment
   status_code &operator=(const status_code &) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Move assignment
   status_code &operator=(status_code &&) = default;  // NOLINT
   ~status_code() = default;
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Return a copy of the code.
   SYSTEM_ERROR2_CONSTEXPR14 status_code clone() const { return *this; }
 
   /***** KEEP THESE IN SYNC WITH ERRORED_STATUS_CODE *****/
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Implicit construction from any type where an ADL discovered `make_status_code(T, Args ...)` returns a `status_code`.
   template <class T, class... Args,                                                                            //
             class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
             typename std::enable_if<!std::is_same<typename std::decay<T>::type, status_code>::value            // not copy/move of self
@@ -6882,47 +6624,33 @@ SIGNATURE NOT RECOGNISED
   : status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
   {
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Explicit in-place construction.
   template <class... Args>
   constexpr explicit status_code(in_place_t /*unused */, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args &&...>::value)
       : _base(typename _base::_value_type_constructor{}, &domain_type::get(), static_cast<Args &&>(args)...)
   {
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Explicit in-place construction from initialiser list.
   template <class T, class... Args>
   constexpr explicit status_code(in_place_t /*unused */, std::initializer_list<T> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<T>, Args &&...>::value)
       : _base(typename _base::_value_type_constructor{}, &domain_type::get(), il, static_cast<Args &&>(args)...)
   {
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Explicit copy construction from a `value_type`.
   constexpr explicit status_code(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
       : _base(typename _base::_value_type_constructor{}, &domain_type::get(), v)
   {
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Explicit move construction from a `value_type`.
   constexpr explicit status_code(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
       : _base(typename _base::_value_type_constructor{}, &domain_type::get(), static_cast<value_type &&>(v))
   {
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+  /*! Explicit construction from an erased status code. Available only if
+  `value_type` is trivially copyable or move relocating, and `sizeof(status_code) <= sizeof(status_code<erased<>>)`.
+  Does not check if domains are equal.
+  */
+
 
 
   template <class ErasedType,  //
@@ -6935,22 +6663,14 @@ SIGNATURE NOT RECOGNISED
 #endif
   }
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Assignment from a `value_type`.
   SYSTEM_ERROR2_CONSTEXPR14 status_code &operator=(const value_type &v) noexcept(std::is_nothrow_copy_assignable<value_type>::value)
   {
     this->_value = v;
     return *this;
   }
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Return a reference to a string textually representing a code.
   string_ref message() const noexcept { return this->_domain ? string_ref(this->domain()._do_message(*this)) : string_ref("(empty)"); }
 };
 
@@ -6963,8 +6683,14 @@ namespace traits
 }  // namespace traits
 
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
+/*! Type erased, move-only status_code, unlike `status_code<void>` which cannot be moved nor destroyed. Available
+only if `erased<>` is available, which is when the domain's type is trivially
+copyable or is move relocatable, and if the size of the domain's typed error code is less than or equal to
+this erased error code. Copy construction is disabled, but if you want a copy call `.clone()`.
+
+An ADL discovered helper function `make_status_code(T, Args...)` is looked up by one of the constructors.
+If it is found, and it generates a status code compatible with this status code, implicit construction
+is made available.
 */
 template <class ErasedType> class status_code<erased<ErasedType>> : public mixins::mixin<detail::status_code_storage<erased<ErasedType>>, erased<ErasedType>>
 {
@@ -6972,55 +6698,23 @@ template <class ErasedType> class status_code<erased<ErasedType>> : public mixin
   using _base = mixins::mixin<detail::status_code_storage<erased<ErasedType>>, erased<ErasedType>>;
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  domain_type. Potential doc page: NOT FOUND
-*/
-
-
+  //! The type of the domain (void, as it is erased).
   using domain_type = void;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  value_type. Potential doc page: `value_type &value() &`
-*/
-
-
+  //! The type of the erased status code.
   using value_type = ErasedType;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  string_ref. Potential doc page: NOT FOUND
-*/
-
-
+  //! The type of a reference to a message string.
   using string_ref = typename _base::string_ref;
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Default construction to empty
   status_code() = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Copy constructor
   status_code(const status_code &) = delete;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Move constructor
   status_code(status_code &&) = default;  // NOLINT
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Copy assignment
   status_code &operator=(const status_code &) = delete;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Move assignment
   status_code &operator=(status_code &&) = default;  // NOLINT
   ~status_code()
   {
@@ -7030,11 +6724,7 @@ SIGNATURE NOT RECOGNISED
     }
   }
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Return a copy of the erased code by asking the domain to perform the erased copy.
   status_code clone() const
   {
     if(nullptr == this->_domain)
@@ -7047,11 +6737,7 @@ SIGNATURE NOT RECOGNISED
   }
 
   /***** KEEP THESE IN SYNC WITH ERRORED_STATUS_CODE *****/
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Implicit copy construction from any other status code if its value type is trivially copyable and it would fit into our storage
   template <class DomainType,                                                                              //
             typename std::enable_if<!detail::is_erased_status_code<status_code<DomainType>>::value         //
                                     && std::is_trivially_copyable<typename DomainType::value_type>::value  //
@@ -7061,11 +6747,7 @@ SIGNATURE NOT RECOGNISED
       : _base(typename _base::_value_type_constructor{}, &v.domain(), detail::erasure_cast<value_type>(v.value()))
   {
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Implicit move construction from any other status code if its value type is trivially copyable or move relocating and it would fit into our storage
   template <class DomainType,  //
             typename std::enable_if<detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value, bool>::type = true>
   SYSTEM_ERROR2_CONSTEXPR14 status_code(status_code<DomainType> &&v) noexcept  // NOLINT
@@ -7073,11 +6755,7 @@ SIGNATURE NOT RECOGNISED
   {
     v._domain = nullptr;
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Implicit construction from any type where an ADL discovered `make_status_code(T, Args ...)` returns a `status_code`.
   template <class T, class... Args,                                                                            //
             class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
             typename std::enable_if<!std::is_same<typename std::decay<T>::type, status_code>::value            // not copy/move of self
@@ -7091,17 +6769,9 @@ SIGNATURE NOT RECOGNISED
   }
 
   /**** By rights ought to be removed in any formal standard ****/
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Reset the code to empty.
   SYSTEM_ERROR2_CONSTEXPR14 void clear() noexcept { *this = status_code(); }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Return the erased `value_type` by value.
   constexpr value_type value() const noexcept { return this->_value; }
 };
 
@@ -7120,71 +6790,36 @@ SYSTEM_ERROR2_NAMESPACE_END
 
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
+/*! Exception type representing a thrown status_code
 */
 template <class DomainType> class status_error;
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
+/*! The erased type edition of status_error.
 */
 template <> class status_error<void> : public std::exception
 {
 protected:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Constructs an instance. Not publicly available.
   status_error() = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Copy constructor. Not publicly available
   status_error(const status_error &) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Move constructor. Not publicly available
   status_error(status_error &&) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Copy assignment. Not publicly available
   status_error &operator=(const status_error &) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Move assignment. Not publicly available
   status_error &operator=(status_error &&) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Destructor. Not publicly available.
   ~status_error() override = default;
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  domain_type. Potential doc page: NOT FOUND
-*/
-
-
+  //! The type of the status domain
   using domain_type = void;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  status_code_type. Potential doc page: NOT FOUND
-*/
-
-
+  //! The type of the status code
   using status_code_type = status_code<void>;
 };
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type definition template <class DomainType> status_error. Potential doc page: NOT FOUND
+/*! Exception type representing a thrown status_code
 */
 template <class DomainType> class status_error : public status_error<void>
 {
@@ -7192,60 +6827,28 @@ template <class DomainType> class status_error : public status_error<void>
   typename DomainType::string_ref _msgref;
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  domain_type. Potential doc page: NOT FOUND
-*/
-
-
+  //! The type of the status domain
   using domain_type = DomainType;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  status_code_type. Potential doc page: NOT FOUND
-*/
-
-
+  //! The type of the status code
   using status_code_type = status_code<DomainType>;
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Constructs an instance
   explicit status_error(status_code<DomainType> code)
       : _code(static_cast<status_code<DomainType> &&>(code))
       , _msgref(_code.message())
   {
   }
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Return an explanatory string
   virtual const char *what() const noexcept override { return _msgref.c_str(); }  // NOLINT
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Returns a reference to the code
   const status_code_type &code() const & { return _code; }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Returns a reference to the code
   status_code_type &code() & { return _code; }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Returns a reference to the code
   const status_code_type &&code() const && { return _code; }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Returns a reference to the code
   status_code_type &&code() && { return _code; }
 };
 
@@ -7256,9 +6859,7 @@ SYSTEM_ERROR2_NAMESPACE_END
 
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type definition  errc. Potential doc page: `std::error_code error_from_exception(std::exception_ptr &&ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept`
-*/
+//! The generic error coding (POSIX)
 enum class errc : int
 {
   success = 0,
@@ -7439,8 +7040,7 @@ namespace detail
   };
 }  // namespace detail
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type definition  _generic_code_domain. Potential doc page: NOT FOUND
+/*! The implementation of the domain for generic status codes, those mapped by `errc` (POSIX).
 */
 class _generic_code_domain : public status_code_domain
 {
@@ -7449,20 +7049,12 @@ class _generic_code_domain : public status_code_domain
   using _base = status_code_domain;
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  value_type. Potential doc page: `value_type &value() &`
-*/
-
-
+  //! The value type of the generic code, which is an `errc` as per POSIX.
   using value_type = errc;
   using string_ref = _base::string_ref;
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Default constructor
   constexpr explicit _generic_code_domain(typename _base::unique_id_type id = 0x746d6354f4f733e9) noexcept : _base(id) {}
   _generic_code_domain(const _generic_code_domain &) = default;
   _generic_code_domain(_generic_code_domain &&) = default;
@@ -7470,11 +7062,7 @@ SIGNATURE NOT RECOGNISED
   _generic_code_domain &operator=(_generic_code_domain &&) = default;
   ~_generic_code_domain() = default;
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Constexpr singleton getter. Returns the constexpr generic_code_domain variable.
   static inline constexpr const _generic_code_domain &get();
 
   virtual _base::string_ref name() const noexcept override { return string_ref("generic domain"); }  // NOLINT
@@ -7516,13 +7104,9 @@ protected:
   }
 #endif
 };
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  generic_error. Potential doc page: NOT FOUND
-*/
+//! A specialisation of `status_error` for the generic code domain.
 using generic_error = status_error<_generic_code_domain>;
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! A constexpr source variable for the generic code domain, which is that of `errc` (POSIX). Returned by `_generic_code_domain::get()`.
 constexpr _generic_code_domain generic_code_domain;
 inline constexpr const _generic_code_domain &_generic_code_domain::get()
 {
@@ -7564,23 +7148,17 @@ template <class T> inline bool status_code<void>::equivalent(const status_code<T
   // If we are both empty, we are equivalent, otherwise not equivalent
   return (!_domain && !o._domain);
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are semantically equal via `equivalent()`.
 template <class DomainType1, class DomainType2> inline bool operator==(const status_code<DomainType1> &a, const status_code<DomainType2> &b) noexcept
 {
   return a.equivalent(b);
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are not semantically equal via `equivalent()`.
 template <class DomainType1, class DomainType2> inline bool operator!=(const status_code<DomainType1> &a, const status_code<DomainType2> &b) noexcept
 {
   return !a.equivalent(b);
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
 template <class DomainType1, class T,                                                                       //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
@@ -7589,9 +7167,7 @@ operator==(const status_code<DomainType1> &a, const T &b)
 {
   return a.equivalent(make_status_code(b));
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
 template <class T, class DomainType1,                                                                       //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
@@ -7600,9 +7176,7 @@ operator==(const T &a, const status_code<DomainType1> &b)
 {
   return b.equivalent(make_status_code(a));
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are not semantically equal via `equivalent()` to `make_status_code(T)`.
 template <class DomainType1, class T,                                                                       //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
@@ -7611,9 +7185,7 @@ operator!=(const status_code<DomainType1> &a, const T &b)
 {
   return !a.equivalent(make_status_code(b));
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
 template <class T, class DomainType1,                                                                       //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
@@ -7742,8 +7314,10 @@ namespace detail
 #endif
 }  // namespace detail
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
+/*! Make an erased status code which indirects to a dynamically allocated status code.
+This is useful for shoehorning a rich status code with large value type into a small
+erased status code like `system_code`, with which the status code generated by this
+function is compatible. Note that this function can throw due to `bad_alloc`.
 */
 template <class T, typename std::enable_if<is_status_code<T>::value, bool>::type = true>  //
 inline status_code<erased<typename std::add_pointer<typename std::decay<T>::type>::type>> make_status_code_ptr(T &&v)
@@ -7757,8 +7331,14 @@ SYSTEM_ERROR2_NAMESPACE_END
 #endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type definition template <class DomainType> errored_status_code. Potential doc page: NOT FOUND
+/*! A `status_code` which is always a failure. The closest equivalent to
+`std::error_code`, except it cannot be modified, and is templated.
+
+Differences from `status_code`:
+
+- Never successful (this contract is checked on construction, if fails then it
+terminates the process).
+- Is immutable.
 */
 template <class DomainType> class errored_status_code : public status_code<DomainType>
 {
@@ -7775,66 +7355,30 @@ template <class DomainType> class errored_status_code : public status_code<Domai
   }
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! The type of the erased error code.
   using typename _base::value_type;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! The type of a reference to a message string.
   using typename _base::string_ref;
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Default constructor.
   errored_status_code() = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Copy constructor.
   errored_status_code(const errored_status_code &) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Move constructor.
   errored_status_code(errored_status_code &&) = default;  // NOLINT
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Copy assignment.
   errored_status_code &operator=(const errored_status_code &) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Move assignment.
   errored_status_code &operator=(errored_status_code &&) = default;  // NOLINT
   ~errored_status_code() = default;
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Explicitly construct from any similarly erased status code
   explicit errored_status_code(const _base &o) noexcept(std::is_nothrow_copy_constructible<_base>::value)
       : _base(o)
   {
     _check();
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Explicitly construct from any similarly erased status code
   explicit errored_status_code(_base &&o) noexcept(std::is_nothrow_move_constructible<_base>::value)
       : _base(static_cast<_base &&>(o))
   {
@@ -7842,11 +7386,7 @@ SIGNATURE NOT RECOGNISED
   }
 
   /***** KEEP THESE IN SYNC WITH STATUS_CODE *****/
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Implicit construction from any type where an ADL discovered `make_status_code(T, Args ...)` returns a `status_code`.
   template <class T, class... Args,                                                                              //
             class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type,    // Safe ADL lookup of make_status_code(), returns void if not found
             typename std::enable_if<!std::is_same<typename std::decay<T>::type, errored_status_code>::value      // not copy/move of self
@@ -7859,51 +7399,37 @@ SIGNATURE NOT RECOGNISED
   {
     _check();
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Explicit in-place construction.
   template <class... Args>
   explicit errored_status_code(in_place_t _, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args &&...>::value)
       : _base(_, static_cast<Args &&>(args)...)
   {
     _check();
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Explicit in-place construction from initialiser list.
   template <class T, class... Args>
   explicit errored_status_code(in_place_t _, std::initializer_list<T> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<T>, Args &&...>::value)
       : _base(_, il, static_cast<Args &&>(args)...)
   {
     _check();
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Explicit copy construction from a `value_type`.
   explicit errored_status_code(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
       : _base(v)
   {
     _check();
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Explicit move construction from a `value_type`.
   explicit errored_status_code(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
       : _base(static_cast<value_type &&>(v))
   {
     _check();
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+  /*! Explicit construction from an erased status code. Available only if
+  `value_type` is trivially destructible and `sizeof(status_code) <= sizeof(status_code<erased<>>)`.
+  Does not check if domains are equal.
+  */
+
 
 
   template <class ErasedType,  //
@@ -7915,11 +7441,7 @@ SIGNATURE NOT RECOGNISED
     _check();
   }
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Return a const reference to the `value_type`.
   constexpr const value_type &value() const &noexcept { return this->_value; }
 };
 
@@ -7948,53 +7470,25 @@ public:
   using value_type = typename _base::value_type;
   using string_ref = typename _base::string_ref;
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Default construction to empty
   errored_status_code() = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Copy constructor
   errored_status_code(const errored_status_code &) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Move constructor
   errored_status_code(errored_status_code &&) = default;  // NOLINT
-                                                          /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+                                                          //! Copy assignment
   errored_status_code &operator=(const errored_status_code &) = default;
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Move assignment
   errored_status_code &operator=(errored_status_code &&) = default;  // NOLINT
   ~errored_status_code() = default;
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Explicitly construct from any similarly erased status code
   explicit errored_status_code(const _base &o) noexcept(std::is_nothrow_copy_constructible<_base>::value)
       : _base(o)
   {
     _check();
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Explicitly construct from any similarly erased status code
   explicit errored_status_code(_base &&o) noexcept(std::is_nothrow_move_constructible<_base>::value)
       : _base(static_cast<_base &&>(o))
   {
@@ -8002,11 +7496,7 @@ SIGNATURE NOT RECOGNISED
   }
 
   /***** KEEP THESE IN SYNC WITH STATUS_CODE *****/
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Implicit copy construction from any other status code if its value type is trivially copyable and it would fit into our storage
   template <class DomainType,                                                                              //
             typename std::enable_if<!detail::is_erased_status_code<status_code<DomainType>>::value         //
                                     && std::is_trivially_copyable<typename DomainType::value_type>::value  //
@@ -8016,11 +7506,7 @@ SIGNATURE NOT RECOGNISED
   {
     _check();
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Implicit move construction from any other status code if its value type is trivially copyable or move relocating and it would fit into our storage
   template <class DomainType,  //
             typename std::enable_if<detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value,
                                     bool>::type = true>
@@ -8028,11 +7514,7 @@ SIGNATURE NOT RECOGNISED
   {
     _check();
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Implicit construction from any type where an ADL discovered `make_status_code(T, Args ...)` returns a `status_code`.
   template <class T, class... Args,                                                                              //
             class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type,    // Safe ADL lookup of make_status_code(), returns void if not found
             typename std::enable_if<!std::is_same<typename std::decay<T>::type, errored_status_code>::value      // not copy/move of self
@@ -8045,11 +7527,7 @@ SIGNATURE NOT RECOGNISED
   {
     _check();
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Return the erased `value_type` by value.
   constexpr value_type value() const noexcept { return this->_value; }
 };
 
@@ -8062,51 +7540,37 @@ namespace traits
 }  // namespace traits
 
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are semantically equal via `equivalent()`.
 template <class DomainType1, class DomainType2> inline bool operator==(const errored_status_code<DomainType1> &a, const errored_status_code<DomainType2> &b) noexcept
 {
   return a.equivalent(static_cast<const status_code<DomainType2> &>(b));
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are semantically equal via `equivalent()`.
 template <class DomainType1, class DomainType2> inline bool operator==(const status_code<DomainType1> &a, const errored_status_code<DomainType2> &b) noexcept
 {
   return a.equivalent(static_cast<const status_code<DomainType2> &>(b));
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are semantically equal via `equivalent()`.
 template <class DomainType1, class DomainType2> inline bool operator==(const errored_status_code<DomainType1> &a, const status_code<DomainType2> &b) noexcept
 {
   return static_cast<const status_code<DomainType1> &>(a).equivalent(b);
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are not semantically equal via `equivalent()`.
 template <class DomainType1, class DomainType2> inline bool operator!=(const errored_status_code<DomainType1> &a, const errored_status_code<DomainType2> &b) noexcept
 {
   return !a.equivalent(static_cast<const status_code<DomainType2> &>(b));
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are not semantically equal via `equivalent()`.
 template <class DomainType1, class DomainType2> inline bool operator!=(const status_code<DomainType1> &a, const errored_status_code<DomainType2> &b) noexcept
 {
   return !a.equivalent(static_cast<const status_code<DomainType2> &>(b));
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are not semantically equal via `equivalent()`.
 template <class DomainType1, class DomainType2> inline bool operator!=(const errored_status_code<DomainType1> &a, const status_code<DomainType2> &b) noexcept
 {
   return !static_cast<const status_code<DomainType1> &>(a).equivalent(b);
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
 template <class DomainType1, class T,                                                                       //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
@@ -8115,9 +7579,7 @@ operator==(const errored_status_code<DomainType1> &a, const T &b)
 {
   return a.equivalent(make_status_code(b));
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
 template <class T, class DomainType1,                                                                       //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
@@ -8126,9 +7588,7 @@ operator==(const T &a, const errored_status_code<DomainType1> &b)
 {
   return b.equivalent(make_status_code(a));
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are not semantically equal via `equivalent()` to `make_status_code(T)`.
 template <class DomainType1, class T,                                                                       //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
@@ -8137,9 +7597,7 @@ operator!=(const errored_status_code<DomainType1> &a, const T &b)
 {
   return !a.equivalent(make_status_code(b));
 }
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
 template <class T, class DomainType1,                                                                       //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
@@ -8170,9 +7628,7 @@ namespace detail
   };
 }  // namespace detail
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type definition template <class T> is_errored_status_code. Potential doc page: NOT FOUND
-*/
+//! Trait returning true if the type is an errored status code.
 template <class T> struct is_errored_status_code
 {
   static constexpr bool value = detail::is_errored_status_code<typename std::decay<T>::type>::value || detail::is_erased_errored_status_code<typename std::decay<T>::type>::value;
@@ -8242,17 +7698,12 @@ http://www.boost.org/LICENSE_1_0.txt)
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 
 class _posix_code_domain;
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  posix_code. Potential doc page: NOT FOUND
-*/
+//! A POSIX error code, those returned by `errno`.
 using posix_code = status_code<_posix_code_domain>;
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  posix_error. Potential doc page: NOT FOUND
-*/
+//! A specialisation of `status_error` for the POSIX error code domain.
 using posix_error = status_error<_posix_code_domain>;
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type definition  _posix_code_domain. Potential doc page: NOT FOUND
+/*! The implementation of the domain for POSIX error codes, those returned by `errno`.
 */
 class _posix_code_domain : public status_code_domain
 {
@@ -8286,19 +7737,11 @@ class _posix_code_domain : public status_code_domain
   }
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  value_type. Potential doc page: `value_type &value() &`
-*/
-
-
+  //! The value type of the POSIX code, which is an `int`
   using value_type = int;
   using _base::string_ref;
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Default constructor
   constexpr explicit _posix_code_domain(typename _base::unique_id_type id = 0xa59a56fe5f310933) noexcept : _base(id) {}
   _posix_code_domain(const _posix_code_domain &) = default;
   _posix_code_domain(_posix_code_domain &&) = default;
@@ -8306,11 +7749,7 @@ SIGNATURE NOT RECOGNISED
   _posix_code_domain &operator=(_posix_code_domain &&) = default;
   ~_posix_code_domain() = default;
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Constexpr singleton getter. Returns constexpr posix_code_domain variable.
   static inline constexpr const _posix_code_domain &get();
 
   virtual string_ref name() const noexcept override { return string_ref("posix domain"); }  // NOLINT
@@ -8360,9 +7799,7 @@ protected:
   }
 #endif
 };
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! A constexpr source variable for the POSIX code domain, which is that of `errno`. Returned by `_posix_code_domain::get()`.
 constexpr _posix_code_domain posix_code_domain;
 inline constexpr const _posix_code_domain &_posix_code_domain::get()
 {
@@ -8438,9 +7875,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! \exclude
 namespace win32
 {
   // A Win32 DWORD
@@ -8456,17 +7891,12 @@ namespace win32
 
 class _win32_code_domain;
 class _com_code_domain;
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  win32_code. Potential doc page: NOT FOUND
-*/
+//! (Windows only) A Win32 error code, those returned by `GetLastError()`.
 using win32_code = status_code<_win32_code_domain>;
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  win32_error. Potential doc page: NOT FOUND
-*/
+//! (Windows only) A specialisation of `status_error` for the Win32 error code domain.
 using win32_error = status_error<_win32_code_domain>;
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type definition  _win32_code_domain. Potential doc page: NOT FOUND
+/*! (Windows only) The implementation of the domain for Win32 error codes, those returned by `GetLastError()`.
 */
 class _win32_code_domain : public status_code_domain
 {
@@ -8558,11 +7988,7 @@ case 0x2751: return EHOSTUNREACH;
     }
     return -1;
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Construct from a Win32 error code
   static _base::string_ref _make_string_ref(win32::DWORD c) noexcept
   {
     wchar_t buffer[32768];
@@ -8602,20 +8028,12 @@ SIGNATURE NOT RECOGNISED
   }
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  value_type. Potential doc page: `value_type &value() &`
-*/
-
-
+  //! The value type of the win32 code, which is a `win32::DWORD`
   using value_type = win32::DWORD;
   using _base::string_ref;
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Default constructor
   constexpr explicit _win32_code_domain(typename _base::unique_id_type id = 0x8cd18ee72d680f1b) noexcept : _base(id) {}
   _win32_code_domain(const _win32_code_domain &) = default;
   _win32_code_domain(_win32_code_domain &&) = default;
@@ -8623,11 +8041,7 @@ SIGNATURE NOT RECOGNISED
   _win32_code_domain &operator=(_win32_code_domain &&) = default;
   ~_win32_code_domain() = default;
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Constexpr singleton getter. Returns the constexpr win32_code_domain variable.
   static inline constexpr const _win32_code_domain &get();
 
   virtual string_ref name() const noexcept override { return string_ref("win32 domain"); }  // NOLINT
@@ -8677,9 +8091,7 @@ protected:
   }
 #endif
 };
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! (Windows only) A constexpr source variable for the win32 code domain, which is that of `GetLastError()` (Windows). Returned by `_win32_code_domain::get()`.
 constexpr _win32_code_domain win32_code_domain;
 inline constexpr const _win32_code_domain &_win32_code_domain::get()
 {
@@ -8691,9 +8103,7 @@ SYSTEM_ERROR2_NAMESPACE_END
 #endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! \exclude
 namespace win32
 {
   // A Win32 NTSTATUS
@@ -8705,17 +8115,12 @@ namespace win32
 }
 
 class _nt_code_domain;
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  nt_code. Potential doc page: NOT FOUND
-*/
+//! (Windows only) A NT error code, those returned by NT kernel functions.
 using nt_code = status_code<_nt_code_domain>;
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  nt_error. Potential doc page: NOT FOUND
-*/
+//! (Windows only) A specialisation of `status_error` for the NT error code domain.
 using nt_error = status_error<_nt_code_domain>;
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type definition  _nt_code_domain. Potential doc page: NOT FOUND
+/*! (Windows only) The implementation of the domain for NT error codes, those returned by NT kernel functions.
 */
 class _nt_code_domain : public status_code_domain
 {
@@ -9861,11 +9266,7 @@ case 0xc000cf1b: return 0x18e;
     }
     return static_cast<win32::DWORD>(-1);
   }
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Construct from a NT error code
   static _base::string_ref _make_string_ref(win32::NTSTATUS c) noexcept
   {
     wchar_t buffer[32768];
@@ -9906,20 +9307,12 @@ SIGNATURE NOT RECOGNISED
   }
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  value_type. Potential doc page: `value_type &value() &`
-*/
-
-
+  //! The value type of the NT code, which is a `win32::NTSTATUS`
   using value_type = win32::NTSTATUS;
   using _base::string_ref;
 
 public:
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Default constructor
   constexpr explicit _nt_code_domain(typename _base::unique_id_type id = 0x93f3b4487e4af25b) noexcept : _base(id) {}
   _nt_code_domain(const _nt_code_domain &) = default;
   _nt_code_domain(_nt_code_domain &&) = default;
@@ -9927,11 +9320,7 @@ SIGNATURE NOT RECOGNISED
   _nt_code_domain &operator=(_nt_code_domain &&) = default;
   ~_nt_code_domain() = default;
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-
-
+  //! Constexpr singleton getter. Returns the constexpr nt_code_domain variable.
   static inline constexpr const _nt_code_domain &get();
 
   virtual string_ref name() const noexcept override { return string_ref("NT domain"); }  // NOLINT
@@ -9989,9 +9378,7 @@ protected:
   }
 #endif
 };
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
+//! (Windows only) A constexpr source variable for the NT code domain, which is that of NT kernel functions. Returned by `_nt_code_domain::get()`.
 constexpr _nt_code_domain nt_code_domain;
 inline constexpr const _nt_code_domain &_nt_code_domain::get()
 {
@@ -10005,8 +9392,19 @@ SYSTEM_ERROR2_NAMESPACE_END
 #endif
 
 SYSTEM_ERROR2_NAMESPACE_BEGIN
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  system_code. Potential doc page: NOT FOUND
+/*! An erased-mutable status code suitably large for all the system codes
+which can be returned on this system.
+
+For Windows, these might be:
+
+    - `com_code` (`HRESULT`)  [you need to include "com_code.hpp" explicitly for this]
+    - `nt_code` (`LONG`)
+    - `win32_code` (`DWORD`)
+
+For POSIX, `posix_code` is possible.
+
+You are guaranteed that `system_code` can be transported by the compiler
+in exactly two CPU registers.
 */
 using system_code = status_code<erased<intptr_t>>;
 
@@ -10020,8 +9418,22 @@ SYSTEM_ERROR2_NAMESPACE_END
 #endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-type alias  error. Potential doc page: `error_type &error() &`
+/*! An erased `system_code` which is always a failure. The closest equivalent to
+`std::error_code`, except it cannot be null and cannot be modified.
+
+This refines `system_code` into an `error` object meeting the requirements of
+[P0709 Zero-overhead deterministic exceptions](https://wg21.link/P0709).
+
+Differences from `system_code`:
+
+- Always a failure (this is checked at construction, and if not the case,
+the program is terminated as this is a logic error)
+- No default construction.
+- No empty state possible.
+- Is immutable.
+
+As with `system_code`, it remains guaranteed to be two CPU registers in size,
+and move relocating.
 */
 using error = errored_status_code<erased<system_code::value_type>>;
 
