@@ -658,9 +658,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    d408e4a465b30f47d41d49c7a751d9a04e659b78
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-05-09 09:35:22 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE d408e4a4
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    73bc53d556d797a8447eb251054548cb3db594bc
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-05-21 10:06:04 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 73bc53d5
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -956,7 +956,13 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_TEMPLATE(...) template <__VA_ARGS__
 #define QUICKCPPLIB_TREQUIRES(...) , __VA_ARGS__ >
 #define QUICKCPPLIB_TEXPR(...) typename = decltype(__VA_ARGS__)
-#define QUICKCPPLIB_TPRED(...) typename = std::enable_if_t<__VA_ARGS__>
+#ifdef _MSC_VER
+// MSVC gives an error if every specialisation of a template is always ill-formed, so
+// the more powerful SFINAE form below causes pukeage :(
+#define QUICKCPPLIB_TPRED(...) typename = typename std::enable_if<(__VA_ARGS__)>::type
+#else
+#define QUICKCPPLIB_TPRED(...) typename std::enable_if<(__VA_ARGS__), bool>::type = true
+#endif
 #define QUICKCPPLIB_REQUIRES(...)
 #endif
 
@@ -1135,9 +1141,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 7e7d94bce47d810e8d0b7ad93d7011be2f027e58
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-05-08 09:38:26 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 7e7d94bc
+#define OUTCOME_PREVIOUS_COMMIT_REF 3a8bc94c0e94596f8af6f020f17c4330c2c6dfaa
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-05-16 08:51:57 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 3a8bc94c
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
