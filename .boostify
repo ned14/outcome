@@ -63,6 +63,7 @@ source_macros = {
 source_macros.update(core_macros)
 transforms = {
     r'^test/tests/.*\.cpp$': {
+      r'"[^"]+/../include/outcome/([^"]+)"': r'<boost/outcome/\1>',
       r'std::errc([^:])': r'boost::system::errc::errc_t\1',
       r'std::errc::': r'boost::system::errc::',
       r'std::error_code': r'boost::system::error_code',
