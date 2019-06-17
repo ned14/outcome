@@ -10,6 +10,11 @@ weight = 80
     - Fix issue #190 in Boost edition where unit test suite was not runnable from
 the Boost release distro.
 
+- [#182](https://github.com/ned14/outcome/issues/182)
+    - Fix issue #182 where `trait::is_exception_ptr_available<T>` was always true,
+thus causing much weirdness, like not printing diagnostics and trying to feed
+everything to `make_exception_ptr()`.
+
 ---
 ## v2.1 12th Apr 2019 (Boost 1.70) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1)
 

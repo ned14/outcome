@@ -113,9 +113,9 @@ type definition  is_exception_ptr_available. Potential doc page: NOT FOUND
 */
   template <class T> struct is_exception_ptr_available
   {
-    static constexpr bool value = detail::_is_exception_ptr_available<std::decay<T>>::value;
+    static constexpr bool value = detail::_is_exception_ptr_available<std::decay_t<T>>::value;
   };
-  template <class T> constexpr bool is_exception_ptr_available_v = detail::_is_exception_ptr_available<std::decay<T>>::value;
+  template <class T> constexpr bool is_exception_ptr_available_v = detail::_is_exception_ptr_available<std::decay_t<T>>::value;
 
 
 }  // namespace trait
