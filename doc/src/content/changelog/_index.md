@@ -4,7 +4,14 @@ weight = 80
 +++
 
 ---
-## v2.1 XXth Apr 2019 (Boost 1.70) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1)
+## v2.2 XXth July 2019 (Boost 1.71) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2)
+
+- [#190](https://github.com/ned14/outcome/issues/190)
+    - Fix issue #190 in Boost edition where unit test suite was not runnable from
+the Boost release distro.
+
+---
+## v2.1 12th Apr 2019 (Boost 1.70) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1)
 
 - [#180](https://github.com/ned14/outcome/issues/180)
     - `success()` and `failure()` now produce types marked `[[nodiscard]]`.
