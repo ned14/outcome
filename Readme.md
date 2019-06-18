@@ -46,22 +46,6 @@ If you might be debugging using Microsoft Visual Studio, you may find the debugg
 visualisation file at https://github.com/ned14/outcome/raw/master/include/outcome/outcome.natvis
 useful to include into your build.
 
-## Pre Boost entry todo:
-
- - [x] Raise ABI compliance checker on CI.
- - [X] Run `clang-tidy --fixes`
- - [X] Fix up the .natvis file, and permanently solve the permuting SHA issue.
- - [X] Fix up the C interface to use `status_code`.
-   - [X] Write C macro documentation page
- - [ ] Resurrect the optimisation folding tests (with a better name).
- - [X] Rerun native overhead benchmark, make new graph.
- - [X] Get all docs snippets compiling again, reflow tutorial.
-   - [X] Write tutorial/essential/conventions.
- - [X] Reduce depth of Boost.Outcome front index.
- - [X] Test with LLFIO et al, make sure everything still works.
- - [X] Fix Boost.Outcome, which has become broken. Index generation is broken.
-   - [ ] Read through all the Boost.Outcome docs, make sure they render okay.
-
 ## Commits and tags in this git repository can be verified using:
 <pre>
 -----BEGIN PGP PUBLIC KEY BLOCK-----

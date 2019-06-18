@@ -32,6 +32,14 @@ h4 {
 dd {
   margin-inline-start: 40px;
 }
+blockquote {
+  border-left: 4px solid #ccc;
+  background: #f9f9f9;
+  font-style: italic;
+  padding-left: 4em;
+  padding-right: 4em;
+  quotes: "\201C""\201D""\2018""\2019";
+}
 figure figcaption {
   margin-top: -2em;
 }

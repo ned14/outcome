@@ -1,5 +1,5 @@
-/* Unit testing for outcomes
-(C) 2013-2019 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
+/* Sets Outcome version
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (4 commits)
 
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,31 +21,16 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../include/outcome/result.hpp"
-#include "../../include/outcome/try.hpp"
-#include "quickcpplib/include/boost/test/unit_test.hpp"
+/*! AWAITING HUGO JSON CONVERSION TOOL */
+#define OUTCOME_VERSION_MAJOR    2
+/*! AWAITING HUGO JSON CONVERSION TOOL */
+#define OUTCOME_VERSION_MINOR    2
+/*! AWAITING HUGO JSON CONVERSION TOOL */
+#define OUTCOME_VERSION_PATCH    0 
+/*! AWAITING HUGO JSON CONVERSION TOOL */
+#define OUTCOME_VERSION_REVISION 0  // Revision version for cmake and DLL version stamping
 
-namespace issue0095
-{
-  namespace out = OUTCOME_V2_NAMESPACE;
-
-  struct E
-  {
-  };
-  // struct F : E {};
-  struct F
-  {
-    operator E() const { return E{}; }  // NOLINT
-  };
-
-  out::result<int, F> f() { return F{}; }
-  out::result<int, E> e()
-  {
-    OUTCOME_TRY(i, (f()));
-    return i;
-  }
-}  // namespace issue0095
-BOOST_OUTCOME_AUTO_TEST_CASE(issues / 95 / outcome, "operator conversions on E type cause TRY to fail")
-{
-  BOOST_CHECK(issue0095::e().has_error());
-}
+/*! AWAITING HUGO JSON CONVERSION TOOL */
+#ifndef OUTCOME_DISABLE_ABI_PERMUTATION
+#define OUTCOME_UNSTABLE_VERSION
+#endif

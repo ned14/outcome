@@ -1,5 +1,5 @@
-/* Unit testing for outcomes
-(C) 2013-2019 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
+/* UPDATED BY SCRIPT
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (225 commits)
 
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,31 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../include/outcome/result.hpp"
-#include "../../include/outcome/try.hpp"
-#include "quickcpplib/include/boost/test/unit_test.hpp"
-
-namespace issue0095
-{
-  namespace out = OUTCOME_V2_NAMESPACE;
-
-  struct E
-  {
-  };
-  // struct F : E {};
-  struct F
-  {
-    operator E() const { return E{}; }  // NOLINT
-  };
-
-  out::result<int, F> f() { return F{}; }
-  out::result<int, E> e()
-  {
-    OUTCOME_TRY(i, (f()));
-    return i;
-  }
-}  // namespace issue0095
-BOOST_OUTCOME_AUTO_TEST_CASE(issues / 95 / outcome, "operator conversions on E type cause TRY to fail")
-{
-  BOOST_CHECK(issue0095::e().has_error());
-}
+// Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
+#define OUTCOME_PREVIOUS_COMMIT_REF f8bbb463a3a7f8e0e1ad2c74f8583d30b5fa54f1
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-06-18 10:00:57 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f8bbb463
