@@ -1,5 +1,5 @@
 /* A less simple result type
-(C) 2018-2019 Niall Douglas <http://www.nedproductions.biz/> (26 commits)
+(C) 2018-2019 Niall Douglas <http://www.nedproductions.biz/> (17 commits)
 File Created: Apr 2018
 
 
@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_EXPERIMENTAL_STATUS_OUTCOME_HPP
 #define OUTCOME_EXPERIMENTAL_STATUS_OUTCOME_HPP
 /* A less simple result type
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: June 2017
 
 
@@ -34,7 +34,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,14 +44,14 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_BASIC_OUTCOME_HPP
 #define OUTCOME_BASIC_OUTCOME_HPP
 /* Configure Outcome with QuickCppLib
-(C) 2015-2018 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2019 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: August 2015
 
 
@@ -76,10 +76,33 @@ Distributed under the Boost Software License, Version 1.0.
 
 #ifndef OUTCOME_V2_CONFIG_HPP
 #define OUTCOME_V2_CONFIG_HPP
+/* Sets Outcome version
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (4 commits)
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_MAJOR    2
 /*! AWAITING HUGO JSON CONVERSION TOOL */
-#define OUTCOME_VERSION_MINOR    0
+#define OUTCOME_VERSION_MINOR    2
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_PATCH    0
 /*! AWAITING HUGO JSON CONVERSION TOOL */
@@ -684,9 +707,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    73bc53d556d797a8447eb251054548cb3db594bc
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-05-21 10:06:04 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 73bc53d5
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    d4d2f29dbbf4ec33ba20a0027ecdc6bc34ac013c
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-05-24 19:22:15 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE d4d2f29d
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1166,10 +1189,33 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
+/* UPDATED BY SCRIPT
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (225 commits)
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 3a8bc94c0e94596f8af6f020f17c4330c2c6dfaa
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-05-16 08:51:57 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 3a8bc94c
+#define OUTCOME_PREVIOUS_COMMIT_REF f8bbb463a3a7f8e0e1ad2c74f8583d30b5fa54f1
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-06-18 10:00:57 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f8bbb463
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1721,7 +1767,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* A very simple result type
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
 File Created: June 2017
 
 
@@ -1730,7 +1776,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -1740,14 +1786,14 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_BASIC_RESULT_HPP
 #define OUTCOME_BASIC_RESULT_HPP
 /* Says how to convert value, error and exception types
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
 File Created: Nov 2017
 
 
@@ -1756,7 +1802,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -1766,14 +1812,14 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_CONVERT_HPP
 #define OUTCOME_CONVERT_HPP
 /* Storage for a very simple basic_result type
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
 File Created: Oct 2017
 
 
@@ -1782,7 +1828,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -1792,14 +1838,14 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_BASIC_RESULT_STORAGE_HPP
 #define OUTCOME_BASIC_RESULT_STORAGE_HPP
 /* Type sugar for success and failure
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (25 commits)
 File Created: July 2017
 
 
@@ -1808,7 +1854,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -1818,8 +1864,8 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_SUCCESS_FAILURE_HPP
@@ -2043,7 +2089,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* Traits for Outcome
-(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2018-2019 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
 File Created: March 2018
 
 
@@ -2052,7 +2098,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -2062,8 +2108,8 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_TRAIT_HPP
@@ -2167,9 +2213,9 @@ type definition  is_exception_ptr_available. Potential doc page: NOT FOUND
 
   template <class T> struct is_exception_ptr_available
   {
-    static constexpr bool value = detail::_is_exception_ptr_available<std::decay<T>>::value;
+    static constexpr bool value = detail::_is_exception_ptr_available<std::decay_t<T>>::value;
   };
-  template <class T> constexpr bool is_exception_ptr_available_v = detail::_is_exception_ptr_available<std::decay<T>>::value;
+  template <class T> constexpr bool is_exception_ptr_available_v = detail::_is_exception_ptr_available<std::decay_t<T>>::value;
 
 
 }  // namespace trait
@@ -2178,7 +2224,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* Essentially an internal optional implementation :)
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: June 2017
 
 
@@ -2187,7 +2233,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -2197,8 +2243,8 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_VALUE_STORAGE_HPP
@@ -2861,7 +2907,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* Finaliser for a very simple result type
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Oct 2017
 
 
@@ -2870,7 +2916,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -2880,14 +2926,14 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_BASIC_RESULT_FINAL_HPP
 #define OUTCOME_BASIC_RESULT_FINAL_HPP
 /* Error observers for a very simple basic_result type
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
 File Created: Oct 2017
 
 
@@ -2896,7 +2942,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -2906,8 +2952,8 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_BASIC_RESULT_ERROR_OBSERVERS_HPP
@@ -2979,7 +3025,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* Value observers for a very simple basic_result type
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
 File Created: Oct 2017
 
 
@@ -2988,7 +3034,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -2998,8 +3044,8 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_RESULT_VALUE_OBSERVERS_HPP
@@ -3194,7 +3240,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* Policies for result and outcome
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (13 commits)
 File Created: Oct 2017
 
 
@@ -3203,7 +3249,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -3213,14 +3259,14 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_POLICY_ALL_NARROW_HPP
 #define OUTCOME_POLICY_ALL_NARROW_HPP
 /* Policies for result and outcome
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (6 commits) and Andrzej Krzemieński <akrzemi1@gmail.com> (1 commit)
 File Created: Oct 2017
 
 
@@ -3229,7 +3275,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -3239,8 +3285,8 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_POLICY_BASE_HPP
@@ -3343,7 +3389,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* Policies for result and outcome
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
 File Created: Oct 2017
 
 
@@ -3352,7 +3398,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -3362,8 +3408,8 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_POLICY_TERMINATE_HPP
@@ -3992,7 +4038,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* Exception observers for outcome type
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (3 commits)
 File Created: Oct 2017
 
 
@@ -4001,7 +4047,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -4011,8 +4057,8 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_BASIC_OUTCOME_EXCEPTION_OBSERVERS_HPP
@@ -4056,7 +4102,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* Failure observers for outcome type
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (7 commits)
 File Created: Oct 2017
 
 
@@ -4065,7 +4111,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -4075,8 +4121,8 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_BASIC_OUTCOME_FAILURE_OBSERVERS_HPP
@@ -5193,7 +5239,7 @@ OUTCOME_V2_NAMESPACE_END
 #pragma clang diagnostic pop
 #endif
 /* Exception observers for outcome type
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
 File Created: Oct 2017
 
 
@@ -5202,7 +5248,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -5212,8 +5258,8 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_BASIC_OUTCOME_EXCEPTION_OBSERVERS_IMPL_HPP
@@ -5309,7 +5355,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* Traits for Outcome
-(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2018-2019 Niall Douglas <http://www.nedproductions.biz/> (3 commits)
 File Created: March 2018
 
 
@@ -5318,7 +5364,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -5328,8 +5374,8 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_TRAIT_STD_EXCEPTION_HPP
@@ -5403,7 +5449,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* A very simple result type
-(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2018-2019 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
 File Created: Apr 2018
 
 
@@ -5412,7 +5458,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -5422,14 +5468,14 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_EXPERIMENTAL_STATUS_RESULT_HPP
 #define OUTCOME_EXPERIMENTAL_STATUS_RESULT_HPP
 /* Policies for result and outcome
-(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2018-2019 Niall Douglas <http://www.nedproductions.biz/> (4 commits)
 File Created: Sep 2018
 
 
@@ -5438,7 +5484,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -5448,8 +5494,8 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_POLICY_FAIL_TO_COMPILE_OBSERVERS_HPP
@@ -9638,7 +9684,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* Try operation macros
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: July 2017
 
 
@@ -9647,7 +9693,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -9657,8 +9703,8 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_TRY_HPP

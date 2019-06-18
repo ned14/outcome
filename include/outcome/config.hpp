@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_V2_CONFIG_HPP
 #define OUTCOME_V2_CONFIG_HPP
 
-#include "version.hpp"
+#include "detail/version.hpp"
 
 // Pull in detection of __MINGW64_VERSION_MAJOR
 #if defined(__MINGW32__) && !defined(DOXYGEN_IS_IN_THE_HOUSE)
@@ -89,7 +89,7 @@ SIGNATURE NOT RECOGNISED
 
 
 #if defined(OUTCOME_UNSTABLE_VERSION)
-#include "revision.hpp"
+#include "detail/revision.hpp"
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))

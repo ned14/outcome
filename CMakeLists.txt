@@ -28,7 +28,7 @@ include(QuickCppLibUtils)
 include(QuickCppLibPolicies)
 
 # Parse the version we tell cmake directly from the version header file
-ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/version.hpp" VERSIONSTRING)
+ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/detail/version.hpp" VERSIONSTRING)
 # Sets the usual PROJECT_NAME etc
 project(outcome VERSION ${VERSIONSTRING} LANGUAGES C CXX)
 # Also set a *cmake* namespace for this project
@@ -46,11 +46,11 @@ endif()
 
 if(NOT PROJECT_IS_DEPENDENCY)
   # This file should be updated with the last git SHA next commit
-  UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/revision.hpp")
+  UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/detail/revision.hpp")
   # Need to also possibly update the .natvis file
-  file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/revision.hpp" namespace_permuter REGEX "OUTCOME_PREVIOUS_COMMIT_UNIQUE (.+)")
+  file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/detail/revision.hpp" namespace_permuter REGEX "OUTCOME_PREVIOUS_COMMIT_UNIQUE (.+)")
   if(NOT namespace_permuter MATCHES "OUTCOME_PREVIOUS_COMMIT_UNIQUE (.+)")
-    indented_message(FATAL_ERROR "FATAL: ${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/revision.hpp was not parseable")
+    indented_message(FATAL_ERROR "FATAL: ${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/detail/revision.hpp was not parseable")
   endif()
   set(namespace_permuter "${CMAKE_MATCH_1}")
   file(READ "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/outcome.natvis" natvis_contents)
