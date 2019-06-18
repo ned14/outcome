@@ -56,7 +56,7 @@ Requires: operator!= must be a valid expression between error_type and A, or A i
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/inequality_failure_type/</guid>
-      <description>Returns true if this result is successful or its error does not compare equal to the error in the failure type sugar. Comparison is done using operator!= on error_type and A. If A is void, this call aliases bool has_value() const noexcept.
+      <description>Returns true if this result is successful or its error does not compare equal to the error in the failure type sugar. Comparison is done using operator!= on error_type and A. If A is void, this call aliases bool has_value() const noexcept .
 Requires: operator!= must be a valid expression between error_type and A, or A is void. If error_type is void, then so must be A.
 Complexity: Whatever the underlying operator!</description>
     </item>
@@ -67,7 +67,7 @@ Complexity: Whatever the underlying operator!</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/equality_success_type/</guid>
-      <description>Returns true if this outcome is not successful or its value does not compares equal to the value in the success type sugar. Comparison is done using operator!= on value_type and A. If A is void, this call aliases bool has_error() const noexcept.
+      <description>Returns true if this outcome is not successful or its value does not compares equal to the value in the success type sugar. Comparison is done using operator!= on value_type and A. If A is void, this call aliases bool has_error() const noexcept .
 Requires: operator!= must be a valid expression between value_type and A, or A is void. If value_type is void, then so must be A.
 Complexity: Whatever the underlying operator!</description>
     </item>
@@ -78,7 +78,7 @@ Complexity: Whatever the underlying operator!</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/equality_success_type/</guid>
-      <description>Returns true if this result is not successful or its value does not compares equal to the value in the success type sugar. Comparison is done using operator!= on value_type and A. If A is void, this call aliases bool has_error() const noexcept.
+      <description>Returns true if this result is not successful or its value does not compares equal to the value in the success type sugar. Comparison is done using operator!= on value_type and A. If A is void, this call aliases bool has_error() const noexcept .
 Requires: operator!= must be a valid expression between value_type and A, or A is void. If value_type is void, then so must be A.
 Complexity: Whatever the underlying operator!</description>
     </item>
@@ -130,9 +130,9 @@ Requires: operator== must be a valid expression between error_type and A, or A i
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/equality_failure_type/</guid>
-      <description>Returns true if this result is unsuccessful and its error compares equal to the error in the failure type sugar. Comparison is done using operator== on error_type and A. If A is void, this call aliases bool has_error() const noexcept.
+      <description>Returns true if this result is unsuccessful and its error compares equal to the error in the failure type sugar. Comparison is done using operator== on error_type and A. If A is void, this call aliases bool has_error() const noexcept .
 Requires: operator== must be a valid expression between error_type and A, or A is void. If error_type is void, then so must be A.
-Complexity: Whatever the underlying operator== has. Constexpr and noexcept of underlying operations is propagated.</description>
+Complexity: Whatever the underlying operator== has.</description>
     </item>
     
     <item>
@@ -141,9 +141,9 @@ Complexity: Whatever the underlying operator== has. Constexpr and noexcept of un
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/inequality_success_type/</guid>
-      <description>Returns true if this result is successful and its value compares equal to the value in the success type sugar. Comparison is done using operator== on value_type and A. If A is void, this call aliases bool has_value() const noexcept.
+      <description>Returns true if this result is successful and its value compares equal to the value in the success type sugar. Comparison is done using operator== on value_type and A. If A is void, this call aliases bool has_value() const noexcept .
 Requires: operator== must be a valid expression between value_type and A, or A is void. If value_type is void, then so must be A.
-Complexity: Whatever the underlying operator== has. Constexpr and noexcept of underlying operations is propagated.</description>
+Complexity: Whatever the underlying operator== has.</description>
     </item>
     
     <item>
@@ -152,9 +152,9 @@ Complexity: Whatever the underlying operator== has. Constexpr and noexcept of un
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/inequality_success_type/</guid>
-      <description>Returns true if this result is successful and its value compares equal to the value in the success type sugar. Comparison is done using operator== on value_type and A. If A is void, this call aliases bool has_value() const noexcept.
+      <description>Returns true if this result is successful and its value compares equal to the value in the success type sugar. Comparison is done using operator== on value_type and A. If A is void, this call aliases bool has_value() const noexcept .
 Requires: operator== must be a valid expression between value_type and A, or A is void. If value_type is void, then so must be A.
-Complexity: Whatever the underlying operator== has. Constexpr and noexcept of underlying operations is propagated.</description>
+Complexity: Whatever the underlying operator== has.</description>
     </item>
     
   </channel>

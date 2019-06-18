@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:23 UTC">
+<meta name="revised" content="2019-06-18T21:08:08 UTC">
 <title>`value_or_error&lt;T, U&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2412,7 +2412,8 @@
     
     
     
-    <p>A customisable converter of <a href="/outcome/reference/concepts/valueorerror/" class="api-reference"><code>ValueOrError&lt;T, E&gt;</code></a> concept matching types. It must have the following form:</p>
+    <p>A customisable converter of <a href="/outcome/reference/concepts/valueorerror/" class="api-reference"><code>ValueOrError&lt;T, E&gt;</code></a>
+ concept matching types. It must have the following form:</p>
 <div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="c1">// `T` will be the destination basic_result or basic_outcome.
 </span><span class="c1">// `U` will be the decayed form of the `ValueOrError&lt;T, E&gt;` concept matching input type.
 </span><span class="c1"></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">T</span><span class="o">&gt;</span> <span class="k">struct</span> <span class="n">value_or_error</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">U</span><span class="o">&gt;</span>

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:18 UTC">
+<meta name="revised" content="2019-06-18T21:08:02 UTC">
 <title>`failure_type&lt;error_type, exception_type&gt; as_failure() const &amp;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2498,7 +2498,10 @@
     
     
     
-    <p>Return the output from free function <a href="/outcome/reference/functions/failure/" class="api-reference"><code>auto failure(T &amp;&amp;, ...)</code></a> containing a copy of any errored and/or excepted state. The error and/or exception state is accessed using <a href="/outcome/reference/types/basic_outcome/assume_error_lvalue_const/" class="api-reference"><code>const error_type &amp;assume_error() const &amp; noexcept</code></a> and <a href="/outcome/reference/types/basic_outcome/assume_exception_lvalue_const/" class="api-reference"><code>const exception_type &amp;assume_exception() const &amp; noexcept</code></a>.</p>
+    <p>Return the output from free function <a href="/outcome/reference/functions/failure/" class="api-reference"><code>auto failure(T &amp;&amp;, ...)</code></a>
+ containing a copy of any errored and/or excepted state. The error and/or exception state is accessed using <a href="/outcome/reference/types/basic_outcome/assume_error_lvalue_const/" class="api-reference"><code>const error_type &amp;assume_error() const &amp; noexcept</code></a>
+ and <a href="/outcome/reference/types/basic_outcome/assume_exception_lvalue_const/" class="api-reference"><code>const exception_type &amp;assume_exception() const &amp; noexcept</code></a>
+.</p>
 
 <p><em>Requires</em>: Always available.</p>
 

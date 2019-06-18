@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:20 UTC">
+<meta name="revised" content="2019-06-18T21:08:05 UTC">
 <title>Observers :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2444,7 +2444,7 @@ Complexity: Depends on basic_outcome_failure_exception_from_error(const EC &amp;
         <h2 class="post-title"><a href="/outcome/reference/types/basic_outcome/operator_bool/">`explicit operator bool() const noexcept`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Returns true if a value is present. Constexpr where possible. Alias for bool has_value() const noexcept.
+        <p>Returns true if a value is present. Constexpr where possible. Alias for bool has_value() const noexcept .
 Requires: Always available.
 Complexity: Constant time.
 Guarantees: Never throws an exception. <a class="read-more" href="/outcome/reference/types/basic_outcome/operator_bool/">&raquo;</a></p>
@@ -2464,7 +2464,7 @@ Guarantees: Never throws an exception. <a class="read-more" href="/outcome/refer
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/operator_bool/">`explicit operator bool() const noexcept`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Returns true if a value is present. Constexpr where possible. Alias for bool has_value() const noexcept.
+        <p>Returns true if a value is present. Constexpr where possible. Alias for bool has_value() const noexcept .
 Requires: Always available.
 Complexity: Constant time.
 Guarantees: Never throws an exception. <a class="read-more" href="/outcome/reference/types/basic_result/operator_bool/">&raquo;</a></p>
@@ -2484,7 +2484,7 @@ Guarantees: Never throws an exception. <a class="read-more" href="/outcome/refer
         <h2 class="post-title"><a href="/outcome/reference/types/basic_outcome/as_failure_lvalue/">`failure_type&lt;error_type, exception_type&gt; as_failure() const &amp;`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Return the output from free function auto failure(T &amp;&amp;, ...) containing a copy of any errored and/or excepted state. The error and/or exception state is accessed using const error_type &amp;assume_error() const &amp; noexcept and const exception_type &amp;assume_exception() const &amp; noexcept.
+        <p>Return the output from free function auto failure(T &amp;&amp;, ...) containing a copy of any errored and/or excepted state. The error and/or exception state is accessed using const error_type &amp;assume_error() const &amp; noexcept and const exception_type &amp;assume_exception() const &amp; noexcept .
 Requires: Always available.
 Complexity: Whatever that of error_type&rsquo;s and/or exception_type&rsquo;s copy constructor is.
 Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_outcome/as_failure_lvalue/">&raquo;</a></p>

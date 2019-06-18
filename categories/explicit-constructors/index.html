@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:19 UTC">
+<meta name="revised" content="2019-06-18T21:08:04 UTC">
 <title>Explicit Constructors :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2402,7 +2402,7 @@
         <h2 class="post-title"><a href="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/">`explicit basic_outcome(ValueOrError&lt;T, E&gt; &amp;&amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Explicit converting constructor from ValueOrError&lt;T, E&gt; concept matching types. Delegates to the basic_result move constructor explicit basic_outcome(basic_result&lt;A, B, C&gt; &amp;&amp;).
+        <p>Explicit converting constructor from ValueOrError&lt;T, E&gt; concept matching types. Delegates to the basic_result move constructor explicit basic_outcome(basic_result&lt;A, B, C&gt; &amp;&amp;) .
 Requires: convert::value_or_error&lt;T, U&gt; has an available call operator, and if the input is a basic_result or basic_outcome, then convert::value_or_error&lt;&gt; has enabled those inputs for that convert::value_or_error&lt;&gt; specialisation.
 Complexity: Same as for the copy or move constructor from the input&rsquo;s .value() or .error() respectively. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/">&raquo;</a></p>
     </section>

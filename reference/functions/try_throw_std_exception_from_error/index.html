@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:24 UTC">
+<meta name="revised" content="2019-06-18T21:08:09 UTC">
 <title>`void try_throw_std_exception_from_error(std::error_code ec, const std::string &amp;msg = std::string{})` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2449,11 +2449,14 @@ throws:</p>
 
 <p>The choice to refer to POSIX <code>errno</code> values above reflects the matching algorithm.
 As 
-<a href="https://en.cppreference.com/w/cpp/error/errc" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::errc</code></a> exactly maps POSIX <code>errno</code>, on all platforms
+<a href="https://en.cppreference.com/w/cpp/error/errc" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::errc</code></a>
+ exactly maps POSIX <code>errno</code>, on all platforms
 
-<a href="https://en.cppreference.com/w/cpp/error/generic_category" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::generic_category</code></a> error codes are matched by this function.
+<a href="https://en.cppreference.com/w/cpp/error/generic_category" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::generic_category</code></a>
+ error codes are matched by this function.
 Only on POSIX platforms only are 
-<a href="https://en.cppreference.com/w/cpp/error/system_category" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::system_category</code></a> error codes
+<a href="https://en.cppreference.com/w/cpp/error/system_category" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::system_category</code></a>
+ error codes
 also matched by this function.</p>
 
 <p><em>Overridable</em>: Not overridable.</p>

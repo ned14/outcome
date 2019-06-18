@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:11 UTC">
+<meta name="revised" content="2019-06-18T21:07:55 UTC">
 <title>Mapping the HTTP library into the Application `2/2` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2457,7 +2457,8 @@ in Outcome:</p>
 
 <p>The first thing that you should note is that these custom converters must be injected
 directly into the <code>OUTCOME_V2_NAMESPACE::convert</code> namespace, and they must partially
-or completely specialise <a href="/outcome/reference/converters/value_or_error/" class="api-reference"><code>value_or_error&lt;T, U&gt;</code></a>. Here we specialise the
+or completely specialise <a href="/outcome/reference/converters/value_or_error/" class="api-reference"><code>value_or_error&lt;T, U&gt;</code></a>
+. Here we specialise the
 converter for <code>ValueOrError</code> conversions from <code>httplib::result&lt;U&gt;</code> to <code>app::outcome&lt;T&gt;</code>
 i.e. from our third party HTTP library&rsquo;s error type into our application&rsquo;s <code>outcome</code>
 type (which is unique to our application, as we hard code an <code>app</code>-local error type).</p>
@@ -2471,7 +2472,9 @@ converter<sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>. In 
 not met, the <code>ValueOrError</code> converting constructor in <code>basic_result</code> and <code>basic_outcome</code>
 disables. Note the requirement that the decayed <code>operator()</code> input <code>X</code> matches
 <code>httplib::result&lt;U&gt;</code>, and that <code>T</code> is constructible from <code>U</code>. This means that the
-<a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="api-reference"><code>explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)</code></a> and <a href="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/" class="api-reference"><code>explicit basic_outcome(ValueOrError&lt;T, E&gt; &amp;&amp;)</code></a>
+<a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="api-reference"><code>explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)</code></a>
+ and <a href="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/" class="api-reference"><code>explicit basic_outcome(ValueOrError&lt;T, E&gt; &amp;&amp;)</code></a>
+
 constructors are available if, and only if, the input type is a <code>httplib::result&lt;U&gt;</code>,
 and the result&rsquo;s value type is constructible from the input&rsquo;s value type.</p>
 

@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/types/basic_outcome/</link>
     <description>Recent content in `basic_outcome&lt;T, EC, EP, NoValuePolicy&gt;` on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:43 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/types/basic_outcome/index.xml" rel="self" type="application/rss+xml" />
     
@@ -162,7 +162,7 @@ Complexity: Same as for error_type&amp;rsquo;s and exception_type&amp;rsquo;s co
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/</guid>
-      <description>Explicit converting constructor from ValueOrError&amp;lt;T, E&amp;gt; concept matching types. Delegates to the basic_result move constructor explicit basic_outcome(basic_result&amp;lt;A, B, C&amp;gt; &amp;amp;&amp;amp;).
+      <description>Explicit converting constructor from ValueOrError&amp;lt;T, E&amp;gt; concept matching types. Delegates to the basic_result move constructor explicit basic_outcome(basic_result&amp;lt;A, B, C&amp;gt; &amp;amp;&amp;amp;) .
 Requires: convert::value_or_error&amp;lt;T, U&amp;gt; has an available call operator, and if the input is a basic_result or basic_outcome, then convert::value_or_error&amp;lt;&amp;gt; has enabled those inputs for that convert::value_or_error&amp;lt;&amp;gt; specialisation.
 Complexity: Same as for the copy or move constructor from the input&amp;rsquo;s .value() or .error() respectively. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
     </item>
@@ -393,7 +393,7 @@ Complexity: Same as for the error_type and exception_type constructors which acc
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/operator_bool/</guid>
-      <description>Returns true if a value is present. Constexpr where possible. Alias for bool has_value() const noexcept.
+      <description>Returns true if a value is present. Constexpr where possible. Alias for bool has_value() const noexcept .
 Requires: Always available.
 Complexity: Constant time.
 Guarantees: Never throws an exception.</description>
@@ -405,7 +405,7 @@ Guarantees: Never throws an exception.</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/has_value/</guid>
-      <description>Returns true if a value is present. Constexpr where possible. Alias for explicit operator bool() const noexcept.
+      <description>Returns true if a value is present. Constexpr where possible. Alias for explicit operator bool() const noexcept .
 Requires: Always available.
 Complexity: Constant time.
 Guarantees: Never throws an exception.</description>
@@ -796,9 +796,9 @@ Requires: operator== must be a valid expression between value_type and A, and be
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/inequality_success_type/</guid>
-      <description>Returns true if this result is successful and its value compares equal to the value in the success type sugar. Comparison is done using operator== on value_type and A. If A is void, this call aliases bool has_value() const noexcept.
+      <description>Returns true if this result is successful and its value compares equal to the value in the success type sugar. Comparison is done using operator== on value_type and A. If A is void, this call aliases bool has_value() const noexcept .
 Requires: operator== must be a valid expression between value_type and A, or A is void. If value_type is void, then so must be A.
-Complexity: Whatever the underlying operator== has. Constexpr and noexcept of underlying operations is propagated.</description>
+Complexity: Whatever the underlying operator== has.</description>
     </item>
     
     <item>
@@ -837,7 +837,7 @@ Requires: operator!= must be a valid expression between value_type and A, and be
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/equality_success_type/</guid>
-      <description>Returns true if this outcome is not successful or its value does not compares equal to the value in the success type sugar. Comparison is done using operator!= on value_type and A. If A is void, this call aliases bool has_error() const noexcept.
+      <description>Returns true if this outcome is not successful or its value does not compares equal to the value in the success type sugar. Comparison is done using operator!= on value_type and A. If A is void, this call aliases bool has_error() const noexcept .
 Requires: operator!= must be a valid expression between value_type and A, or A is void. If value_type is void, then so must be A.
 Complexity: Whatever the underlying operator!</description>
     </item>
@@ -870,7 +870,7 @@ Guarantees: If an exception is thrown during the operation, the state of all thr
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/as_failure_lvalue/</guid>
-      <description>Return the output from free function auto failure(T &amp;amp;&amp;amp;, ...) containing a copy of any errored and/or excepted state. The error and/or exception state is accessed using const error_type &amp;amp;assume_error() const &amp;amp; noexcept and const exception_type &amp;amp;assume_exception() const &amp;amp; noexcept.
+      <description>Return the output from free function auto failure(T &amp;amp;&amp;amp;, ...) containing a copy of any errored and/or excepted state. The error and/or exception state is accessed using const error_type &amp;amp;assume_error() const &amp;amp; noexcept and const exception_type &amp;amp;assume_exception() const &amp;amp; noexcept .
 Requires: Always available.
 Complexity: Whatever that of error_type&amp;rsquo;s and/or exception_type&amp;rsquo;s copy constructor is.
 Guarantees: None.</description>
@@ -882,7 +882,7 @@ Guarantees: None.</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/as_failure_rvalue/</guid>
-      <description>Return the output from free function auto failure(T &amp;amp;&amp;amp;, ...) containing a move from any errored and/or excepted state, thus leaving the outcome&amp;rsquo;s error and exception values in a moved-from state. Depending on the choice of error_type and/or exception_type, this function may therefore be destructive. The error and exception states are accessed using error_type &amp;amp;&amp;amp;assume_error() &amp;amp;&amp;amp; noexcept and exception_type &amp;amp;&amp;amp;assume_exception() &amp;amp;&amp;amp; noexcept.
+      <description>Return the output from free function auto failure(T &amp;amp;&amp;amp;, ...) containing a move from any errored and/or excepted state, thus leaving the outcome&amp;rsquo;s error and exception values in a moved-from state. Depending on the choice of error_type and/or exception_type, this function may therefore be destructive. The error and exception states are accessed using error_type &amp;amp;&amp;amp;assume_error() &amp;amp;&amp;amp; noexcept and exception_type &amp;amp;&amp;amp;assume_exception() &amp;amp;&amp;amp; noexcept .
 Requires: Always available.
 Complexity: Whatever that of error_type&amp;rsquo;s and/or exception_type&amp;rsquo;s move constructor is.</description>
     </item>

@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/aliases/</link>
     <description>Recent content in Aliases on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:43 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/aliases/index.xml" rel="self" type="application/rss+xml" />
     
@@ -16,8 +16,8 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/aliases/boost_checked/</guid>
-      <description>A type alias to a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; configured with boost::system::error_code and policy::throw_bad_result_access&amp;lt;EC&amp;gt;.
-This type alias always references the boost edition of things, unlike checked&amp;lt;T, E = varies&amp;gt; which references either this alias or std_checked&amp;lt;T, E = std::error_code&amp;gt;.
+      <description>A type alias to a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; configured with boost::system::error_code and policy::throw_bad_result_access&amp;lt;EC&amp;gt; .
+This type alias always references the boost edition of things, unlike checked&amp;lt;T, E = varies&amp;gt; which references either this alias or std_checked&amp;lt;T, E = std::error_code&amp;gt; .
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/boost_result.hpp&amp;gt;</description>
     </item>
@@ -28,8 +28,8 @@ Header: &amp;lt;outcome/boost_result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/aliases/boost_outcome/</guid>
-      <description>A type alias to a basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; configured with boost::system::error_code, boost::exception_ptr and policy::default_policy.
-This type alias always references the std edition of things, unlike outcome&amp;lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&amp;lt;T, EC, EP&amp;gt;&amp;gt; which references either this alias or std_outcome&amp;lt;T, EC = std::error_code, EP = std::exception_ptr, NoValuePolicy = policy::default_policy&amp;lt;T, EC, EP&amp;gt;&amp;gt;.
+      <description>A type alias to a basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; configured with boost::system::error_code , boost::exception_ptr and policy::default_policy .
+This type alias always references the std edition of things, unlike outcome&amp;lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&amp;lt;T, EC, EP&amp;gt;&amp;gt; which references either this alias or std_outcome&amp;lt;T, EC = std::error_code, EP = std::exception_ptr, NoValuePolicy = policy::default_policy&amp;lt;T, EC, EP&amp;gt;&amp;gt; .
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/boost_outcome.hpp&amp;gt;</description>
     </item>
@@ -40,8 +40,8 @@ Header: &amp;lt;outcome/boost_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/aliases/boost_result/</guid>
-      <description>A type alias to a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; configured with boost::system::error_code and policy::default_policy.
-This type alias always references the boost edition of things, unlike result&amp;lt;T, E = varies, NoValuePolicy = policy::default_policy&amp;lt;T, E, void&amp;gt;&amp;gt; which references either this alias or std_result&amp;lt;T, E = std::error_code, NoValuePolicy = policy::default_policy&amp;lt;T, E, void&amp;gt;&amp;gt;.
+      <description>A type alias to a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; configured with boost::system::error_code and policy::default_policy .
+This type alias always references the boost edition of things, unlike result&amp;lt;T, E = varies, NoValuePolicy = policy::default_policy&amp;lt;T, E, void&amp;gt;&amp;gt; which references either this alias or std_result&amp;lt;T, E = std::error_code, NoValuePolicy = policy::default_policy&amp;lt;T, E, void&amp;gt;&amp;gt; .
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/boost_result.hpp&amp;gt;</description>
     </item>
@@ -52,8 +52,8 @@ Header: &amp;lt;outcome/boost_result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/aliases/boost_unchecked/</guid>
-      <description>A type alias to a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; configured with boost::system::error_code and policy::all_narrow.
-This type alias always references the boost edition of things, unlike unchecked&amp;lt;T, E = varies&amp;gt; which references either this alias or std_unchecked&amp;lt;T, E = std::error_code&amp;gt;.
+      <description>A type alias to a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; configured with boost::system::error_code and policy::all_narrow .
+This type alias always references the boost edition of things, unlike unchecked&amp;lt;T, E = varies&amp;gt; which references either this alias or std_unchecked&amp;lt;T, E = std::error_code&amp;gt; .
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/boost_result.hpp&amp;gt;</description>
     </item>
@@ -76,10 +76,9 @@ Header: &amp;lt;outcome/result.hpp&amp;gt;</description>
       
       <guid>https://ned14.github.io/outcome/reference/aliases/default_policy/</guid>
       <description>A type alias to a no-value policy selected based on traits matching of T, EC and EP. It is defined as follows:
- If EC and EP is void, choose terminate.
+ If EC and EP is void, choose terminate .
  If is_error_code_available&amp;lt;T&amp;gt; true for EC, choose error_code_throw_as_system_error&amp;lt;T, EC, EP&amp;gt; for basic_outcome or error_code_throw_as_system_error&amp;lt;T, EC, void&amp;gt; for basic_result.
- If is_exception_ptr_available&amp;lt;T&amp;gt; true for EC or EP, choose exception_ptr_rethrow&amp;lt;T, EC, EP&amp;gt; for basic_outcome or exception_ptr_rethrow&amp;lt;T, EC, void&amp;gt; for basic_result.
- Else choose fail_to_compile_observers, which fails the build with a useful message.</description>
+ If is_exception_ptr_available&amp;lt;T&amp;gt; true for EC or EP, choose exception_ptr_rethrow&amp;lt;T, EC, EP&amp;gt; for basic_outcome or exception_ptr_rethrow&amp;lt;T, EC, void&amp;gt; for basic_result.</description>
     </item>
     
     <item>
@@ -88,7 +87,7 @@ Header: &amp;lt;outcome/result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/aliases/outcome/</guid>
-      <description>A type alias to either std_outcome&amp;lt;T, EC = std::error_code, EP = std::exception_ptr, NoValuePolicy = policy::default_policy&amp;lt;T, EC, EP&amp;gt;&amp;gt; (standalone edition) or boost_outcome&amp;lt;T, EC = boost::system::error_code, EP = boost::exception_ptr, NoValuePolicy = policy::default_policy&amp;lt;T, EC, EP&amp;gt;&amp;gt; (Boost edition), and policy::default_policy. This means that outcome&amp;lt;T&amp;gt; uses the appropriate default alias depending on which edition of Outcome is in use.
+      <description>A type alias to either std_outcome&amp;lt;T, EC = std::error_code, EP = std::exception_ptr, NoValuePolicy = policy::default_policy&amp;lt;T, EC, EP&amp;gt;&amp;gt; (standalone edition) or boost_outcome&amp;lt;T, EC = boost::system::error_code, EP = boost::exception_ptr, NoValuePolicy = policy::default_policy&amp;lt;T, EC, EP&amp;gt;&amp;gt; (Boost edition), and policy::default_policy . This means that outcome&amp;lt;T&amp;gt; uses the appropriate default alias depending on which edition of Outcome is in use.
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/outcome.hpp&amp;gt;</description>
     </item>
@@ -99,7 +98,7 @@ Header: &amp;lt;outcome/outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/aliases/result/</guid>
-      <description>A type alias to either std_result&amp;lt;T, E = std::error_code, NoValuePolicy = policy::default_policy&amp;lt;T, E, void&amp;gt;&amp;gt; (standalone edition) or boost_result&amp;lt;T, E = boost::system::error_code, NoValuePolicy = policy::default_policy&amp;lt;T, E, void&amp;gt;&amp;gt; (Boost edition), and policy::default_policy. This means that result&amp;lt;T&amp;gt; uses the appropriate default alias depending on which edition of Outcome is in use.
+      <description>A type alias to either std_result&amp;lt;T, E = std::error_code, NoValuePolicy = policy::default_policy&amp;lt;T, E, void&amp;gt;&amp;gt; (standalone edition) or boost_result&amp;lt;T, E = boost::system::error_code, NoValuePolicy = policy::default_policy&amp;lt;T, E, void&amp;gt;&amp;gt; (Boost edition), and policy::default_policy . This means that result&amp;lt;T&amp;gt; uses the appropriate default alias depending on which edition of Outcome is in use.
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/result.hpp&amp;gt;</description>
     </item>
@@ -110,8 +109,8 @@ Header: &amp;lt;outcome/result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/aliases/std_checked/</guid>
-      <description>A type alias to a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; configured with  std::error_code and policy::throw_bad_result_access&amp;lt;EC&amp;gt;.
-This type alias always references the std edition of things, unlike checked&amp;lt;T, E = varies&amp;gt; which references either this alias or boost_checked&amp;lt;T, E = boost::system::error_code&amp;gt;.
+      <description>A type alias to a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; configured with  std::error_code and policy::throw_bad_result_access&amp;lt;EC&amp;gt; .
+This type alias always references the std edition of things, unlike checked&amp;lt;T, E = varies&amp;gt; which references either this alias or boost_checked&amp;lt;T, E = boost::system::error_code&amp;gt; .
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/std_result.hpp&amp;gt;</description>
     </item>
@@ -122,8 +121,8 @@ Header: &amp;lt;outcome/std_result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/aliases/std_outcome/</guid>
-      <description>A type alias to a basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; configured with  std::error_code,  std::exception_ptr and policy::default_policy.
-This type alias always references the std edition of things, unlike outcome&amp;lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&amp;lt;T, EC, EP&amp;gt;&amp;gt; which references either this alias or boost_outcome&amp;lt;T, EC = boost::system::error_code, EP = boost::exception_ptr, NoValuePolicy = policy::default_policy&amp;lt;T, EC, EP&amp;gt;&amp;gt;.
+      <description>A type alias to a basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; configured with  std::error_code ,  std::exception_ptr and policy::default_policy .
+This type alias always references the std edition of things, unlike outcome&amp;lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&amp;lt;T, EC, EP&amp;gt;&amp;gt; which references either this alias or boost_outcome&amp;lt;T, EC = boost::system::error_code, EP = boost::exception_ptr, NoValuePolicy = policy::default_policy&amp;lt;T, EC, EP&amp;gt;&amp;gt; .
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/std_outcome.hpp&amp;gt;</description>
     </item>
@@ -134,8 +133,8 @@ Header: &amp;lt;outcome/std_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/aliases/std_result/</guid>
-      <description>A type alias to a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; configured with  std::error_code and policy::default_policy.
-This type alias always references the std edition of things, unlike result&amp;lt;T, E = varies, NoValuePolicy = policy::default_policy&amp;lt;T, E, void&amp;gt;&amp;gt; which references either this alias or boost_result&amp;lt;T, E = boost::system::error_code, NoValuePolicy = policy::default_policy&amp;lt;T, E, void&amp;gt;&amp;gt;.
+      <description>A type alias to a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; configured with  std::error_code and policy::default_policy .
+This type alias always references the std edition of things, unlike result&amp;lt;T, E = varies, NoValuePolicy = policy::default_policy&amp;lt;T, E, void&amp;gt;&amp;gt; which references either this alias or boost_result&amp;lt;T, E = boost::system::error_code, NoValuePolicy = policy::default_policy&amp;lt;T, E, void&amp;gt;&amp;gt; .
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/std_result.hpp&amp;gt;</description>
     </item>
@@ -146,8 +145,8 @@ Header: &amp;lt;outcome/std_result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/aliases/std_unchecked/</guid>
-      <description>A type alias to a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; configured with  std::error_code and policy::all_narrow.
-This type alias always references the std edition of things, unlike unchecked&amp;lt;T, E = varies&amp;gt; which references either this alias or boost_unchecked&amp;lt;T, E = boost::system::error_code&amp;gt;.
+      <description>A type alias to a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; configured with  std::error_code and policy::all_narrow .
+This type alias always references the std edition of things, unlike unchecked&amp;lt;T, E = varies&amp;gt; which references either this alias or boost_unchecked&amp;lt;T, E = boost::system::error_code&amp;gt; .
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/std_result.hpp&amp;gt;</description>
     </item>

@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/converters/</link>
     <description>Recent content in Converters on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:43 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/converters/index.xml" rel="self" type="application/rss+xml" />
     
@@ -19,7 +19,7 @@
       <description>A customisable converter of ValueOrError&amp;lt;T, E&amp;gt; concept matching types to a returnable failure type.
 Overridable: Argument dependent lookup.
 Default: A number of implementations are provided by default:
- try_operation_return_as(T &amp;amp;&amp;amp;) which requires T to provide an .as_failure() member function in order to be available. This is selected for all basic_result and basic_outcome types. See auto try_operation_return_as(T &amp;amp;&amp;amp;).
+ try_operation_return_as(T &amp;amp;&amp;amp;) which requires T to provide an .as_failure() member function in order to be available. This is selected for all basic_result and basic_outcome types. See auto try_operation_return_as(T &amp;amp;&amp;amp;) .
  Copy and move editions of try_operation_return_as(std::experimental::expected&amp;lt;T, E&amp;gt;) which return a std::experimental::unexpected&amp;lt;E&amp;gt; for the input&amp;rsquo;s .</description>
     </item>
     

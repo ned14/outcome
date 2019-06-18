@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:10 UTC">
+<meta name="revised" content="2019-06-18T21:07:55 UTC">
 <title>Frequently asked questions :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2407,6 +2407,7 @@
 <li><a href="#why-is-implicit-default-construction-disabled">Why is implicit default construction disabled?</a></li>
 <li><a href="#how-far-away-from-the-proposed-std-expected-t-e-is-outcome-s-checked-t-e">How far away from the proposed <code>std::expected&lt;T, E&gt;</code> is Outcome&rsquo;s <code>checked&lt;T, E&gt;</code>?</a></li>
 <li><a href="#why-doesn-t-outcome-duplicate-std-expected-t-e-s-design">Why doesn&rsquo;t Outcome duplicate <code>std::expected&lt;T, E&gt;</code>&rsquo;s design?</a></li>
+<li><a href="#is-outcome-riddled-with-undefined-behaviour-for-const-const-containing-and-reference-containing-types">Is Outcome riddled with undefined behaviour for const, const-containing and reference-containing types?</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -2423,6 +2424,7 @@ line codebases. <code>result</code>&rsquo;s layout is hard coded to:</p>
 <span class="p">};</span></code></pre></div>
 <p>This is C-compatible if <code>T</code> and <code>EC</code> are C-compatible. 
 <a href="https://en.cppreference.com/w/cpp/error/error_code" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::error_code</code></a>
+
 is <em>probably</em> C-compatible, but its layout is not standardised (though there is a
 normative note in the standard about its layout). Hence Outcome cannot provide a
 C macro API for standard Outcome, but we can for <a href="/outcome/experimental/c-api/">Experimental Outcome</a>.</p>
@@ -2431,6 +2433,7 @@ C macro API for standard Outcome, but we can for <a href="/outcome/experimental/
 
 <p>Variant-based alternatives to Outcome such as 
 <a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 <code>std::expected&lt;T, E&gt;</code></a>
+
 would use <code>std::aligned_union</code> to ensure appropriate over-alignment for the storage of
 either a <code>T</code> or an <code>E</code>. This discovers the over-alignment for a type using
 <code>std::alignment_of</code>, which is defaulted to <code>alignof()</code>.</p>
@@ -2518,7 +2521,8 @@ on the addresses of globals for correct functioning.</p>
 
 <p>The standard library is required to implement globally unique addresses for the standard library
 provided 
-<a href="https://en.cppreference.com/w/cpp/error/error_category" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::error_category</code></a> implementations e.g. <code>std::system_category()</code>.
+<a href="https://en.cppreference.com/w/cpp/error/error_category" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::error_category</code></a>
+ implementations e.g. <code>std::system_category()</code>.
 User defined error code categories may <strong>not</strong> have unique global addresses, and thus
 introduce misoperation.</p>
 
@@ -2576,7 +2580,8 @@ can have as few dependencies as:</p>
 library implementations. If you include only <code>&lt;basic_result.hpp&gt;</code>, and manually configure
 <code>basic_result&lt;&gt;</code> by hand, compile time impact will be minimised.</p>
 
-<p>(See reference documentation for <a href="/outcome/reference/types/basic_result/" class="api-reference"><code>basic_result&lt;T, E, NoValuePolicy&gt;</code></a> for more detail.</p>
+<p>(See reference documentation for <a href="/outcome/reference/types/basic_result/" class="api-reference"><code>basic_result&lt;T, E, NoValuePolicy&gt;</code></a>
+ for more detail.</p>
 
 <h2 id="is-outcome-suitable-for-fixed-latency-predictable-execution-coding-such-as-for-high-frequency-trading-or-audio">Is Outcome suitable for fixed latency/predictable execution coding such as for high frequency trading or audio?</h2>
 
@@ -2594,8 +2599,10 @@ for failure code paths.</p>
 <p>For code where predictability of execution, no matter the code path, is paramount,
 writing all your code to use Outcome is not a bad place to start. Obviously enough,
 do choose a non-throwing policy when configuring <code>outcome</code> or <code>result</code> such as
-<a href="/outcome/reference/policies/all_narrow/" class="api-reference"><code>all_narrow</code></a> to guarantee that exceptions can never be thrown by Outcome
-(or use the convenience typedef for <code>result</code>, <a href="/outcome/reference/aliases/unchecked/" class="api-reference"><code>unchecked&lt;T, E = varies&gt;</code></a> which uses <code>policy::all_narrow</code>).</p>
+<a href="/outcome/reference/policies/all_narrow/" class="api-reference"><code>all_narrow</code></a>
+ to guarantee that exceptions can never be thrown by Outcome
+(or use the convenience typedef for <code>result</code>, <a href="/outcome/reference/aliases/unchecked/" class="api-reference"><code>unchecked&lt;T, E = varies&gt;</code></a>
+ which uses <code>policy::all_narrow</code>).</p>
 
 <h2 id="what-kind-of-runtime-performance-impact-will-using-outcome-in-my-code-introduce">What kind of runtime performance impact will using Outcome in my code introduce?</h2>
 
@@ -2774,6 +2781,7 @@ of these forms as is the most appropriate for the use case:</p>
 
 <p>Not far, in fact after the first Boost.Outcome peer review in May 2017, Expected moved
 much closer to Outcome, and Outcome deliberately provides <a href="/outcome/reference/aliases/checked/" class="api-reference"><code>checked&lt;T, E = varies&gt;</code></a>
+
 as a semantic equivalent.</p>
 
 <p>Here are the remaining differences which represent the
@@ -2935,6 +2943,88 @@ mechanisms, <a href="https://wg21.link/P0786">one of which</a> Outcome implement
 interoperate with code using Outcome.</p></li>
 </ol>
 
+<h2 id="is-outcome-riddled-with-undefined-behaviour-for-const-const-containing-and-reference-containing-types">Is Outcome riddled with undefined behaviour for const, const-containing and reference-containing types?</h2>
+
+<p>The short answer is yes, but it probably won&rsquo;t matter to you in practice.</p>
+
+<p>The longer answer is that the same problem affects lots of C++ out there,
+so lots of production code will break if Outcome ever breaks on this.</p>
+
+<p>Before the C++ 14 standard, placement new into storage which used to contain
+a const type was straight out always undefined behaviour, period. Thus all
+assignment to a <code>result&lt;const T&gt;</code>, or indeed an <code>optional&lt;const T&gt;</code>, is always
+undefined behaviour before C++ 14. From <code>[basic.life]</code> for the C++ 11 standard:</p>
+
+<blockquote>
+<p>Creating a new object at the storage location that a const object with static,
+thread, or automatic storage duration occupies or, at the storage location
+that such a const object used to occupy before its lifetime ended results
+in undefined behavior.</p>
+</blockquote>
+
+<p>This being excessively restrictive, from C++ 14 onwards, <code>[basic_life]</code> now states:</p>
+
+<blockquote>
+<p>If, after the lifetime of an object has ended and before the storage which
+the object occupied is reused or released, a new object is created at the
+storage location which the original object occupied, a pointer that
+pointed to the original object, a reference that referred to the original
+object, or the name of the original object will automatically refer to the
+new object and, once the lifetime of the new object has started, can be
+used to manipulate the new object, if:</p>
+
+<p>— the storage for the new object exactly overlays the storage location which
+    the original object occupied, and</p>
+
+<p>— the new object is of the same type as the original object (ignoring the
+    top-level cv-qualifiers), and</p>
+
+<p>— the type of the original object is not const-qualified, and, if a class type,
+    does not contain any non-static data member whose type is const-qualified
+    or a reference type, and</p>
+
+<p>— neither the original object nor the new object is a potentially-overlapping
+    subobject</p>
+</blockquote>
+
+<p>Leaving aside my personal objections to giving placement new of non-const
+non-reference types magical pointer renaming powers, the upshot is that if
+you want defined behaviour for placement new of types containing const types
+or references, you must store the pointer returned by placement new, and use
+that pointer for all further reference to the newly created object. This
+obviously adds eight bytes of storage to a <code>result&lt;const T&gt;</code>, which is highly
+undesirable given all the care and attention paid to keeping it small. The alternative
+is to use 
+<a href="https://en.cppreference.com/w/cpp/utility/launder" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::launder</code></a>
+, which was added in C++ 17, to &lsquo;launder&rsquo;
+the storage into which we placement new before each and every use of that
+storage. This forces the compiler to reload the object stored by placement
+new on every occasion, and not assume it is can be constant propagated, which
+impacts codegen quality.</p>
+
+<p>As neither situation is obviously desirable, after much thought I have
+decided to simply do nothing apart from add this FAQ entry. I would say that
+because Outcome is 100% header-only, the compiler can always see that
+assignment performs placement new, and thus the compiler always knows that the
+preceding const or reference object is dead, and there is now a new const
+or reference object in its place. I appreciate that this is a hand waving
+response, and code using Outcome will still contain undefined behaviour if
+you use a const type, or a type containing const or reference types.</p>
+
+<p>However the reality on the ground is that a ton of production C++ code does
+placement new of types potentially containing const or reference types, and
+it is highly unlikely that C++ compilers will, in practice, break all that
+production code, especially as the template type supplied to library code is often
+outside one&rsquo;s control. If, however, compilers do end up moving ahead on
+optimising this aggressively, Outcome will need to add laundering for any
+type containing const or reference types, for which one needs Reflection
+into the language in any case. We shall thus wait until later to see what
+happens.</p>
+
+<p>If you wish to be kept abreast of changes on this topic, please add yourself
+to <a href="https://github.com/ned14/outcome/issues/185">https://github.com/ned14/outcome/issues/185</a> which is the issue tracking
+this bug.</p>
+
 
 
     
@@ -2957,7 +3047,7 @@ interoperate with code using Outcome.</p></li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/03/2019
+        <i class='fa fa-calendar'></i> Last update on 18/06/2019
     </div>
     
 

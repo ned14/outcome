@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:09 UTC">
+<meta name="revised" content="2019-06-18T21:07:53 UTC">
 <title>ValueOrError Concept :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2422,16 +2422,22 @@
 
 <p>Something not really mentioned until now is how Outcome interoperates with the proposed
 
-<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 <code>std::expected&lt;T, E&gt;</code></a>, whose design lands in between <a href="/outcome/reference/aliases/unchecked/" class="api-reference"><code>unchecked&lt;T, E = varies&gt;</code></a>
-and <a href="/outcome/reference/aliases/checked/" class="api-reference"><code>checked&lt;T, E = varies&gt;</code></a> (both of which are type aliases hard coding no-value
+<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 <code>std::expected&lt;T, E&gt;</code></a>
+, whose design lands in between <a href="/outcome/reference/aliases/unchecked/" class="api-reference"><code>unchecked&lt;T, E = varies&gt;</code></a>
+
+and <a href="/outcome/reference/aliases/checked/" class="api-reference"><code>checked&lt;T, E = varies&gt;</code></a>
+ (both of which are type aliases hard coding no-value
 policies <a href="/outcome/tutorial/essential/no-value/builtin/">as previously covered in this tutorial</a>).</p>
 
 <p>Expected and Outcome are <a href="/outcome/faq/#why-doesn-t-outcome-duplicate-std-expected-t-e-s-design">isomorphic to one another in design intent</a>, but interoperation
 for code using Expected and Outcome ought to be seamless thanks to the <a href="https://wg21.link/P0786">proposed <code>ValueOrError</code>
 concept framework</a>, a subset of which Outcome implements.</p>
 
-<p>The <a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="api-reference"><code>explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)</code></a> and <a href="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/" class="api-reference"><code>explicit basic_outcome(ValueOrError&lt;T, E&gt; &amp;&amp;)</code></a>
+<p>The <a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="api-reference"><code>explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)</code></a>
+ and <a href="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/" class="api-reference"><code>explicit basic_outcome(ValueOrError&lt;T, E&gt; &amp;&amp;)</code></a>
+
 constructors will explicitly construct from any type matching the <a href="/outcome/reference/concepts/valueorerror/" class="api-reference"><code>ValueOrError&lt;T, E&gt;</code></a>
+
 concept, which includes <code>std::expected&lt;A, B&gt;</code>, if <code>A</code> is constructible to <code>X</code>, and <code>B</code> is
 constructible to <code>Y</code>. The <code>ValueOrError</code> concept in turn is true if and only if the input type has:</p>
 
@@ -2443,7 +2449,8 @@ constructible to <code>Y</code>. The <code>ValueOrError</code> concept in turn i
 <h2 id="implementation">Implementation</h2>
 
 <p>Outcome&rsquo;s machinery for implementing <code>ValueOrError</code> conversion is user extensible by injection
-of specialisations of the <a href="/outcome/reference/converters/value_or_error/" class="api-reference"><code>value_or_error&lt;T, U&gt;</code></a> type into the <code>OUTCOME_V2_NAMESPACE::convert</code> namespace.</p>
+of specialisations of the <a href="/outcome/reference/converters/value_or_error/" class="api-reference"><code>value_or_error&lt;T, U&gt;</code></a>
+ type into the <code>OUTCOME_V2_NAMESPACE::convert</code> namespace.</p>
 
 <p>Outcome&rsquo;s default <code>convert::value_or_error&lt;T, U&gt;</code> implementation explicitly
 excludes Outcome <code>result</code> and <code>outcome</code> types from the default mechanism as

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:23 UTC">
+<meta name="revised" content="2019-06-18T21:08:07 UTC">
 <title>`outcome&lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2423,7 +2423,10 @@
     
     
     
-    <p>A type alias to either <a href="/outcome/reference/aliases/std_outcome/" class="api-reference"><code>std_outcome&lt;T, EC = std::error_code, EP = std::exception_ptr, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code></a> (standalone edition) or <a href="/outcome/reference/aliases/boost_outcome/" class="api-reference"><code>boost_outcome&lt;T, EC = boost::system::error_code, EP = boost::exception_ptr, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code></a> (Boost edition), and <code>policy::</code><a href="/outcome/reference/aliases/default_policy/" class="api-reference"><code>default_policy</code></a>. This means that <code>outcome&lt;T&gt;</code> uses the appropriate default alias depending on which edition of Outcome is in use.</p>
+    <p>A type alias to either <a href="/outcome/reference/aliases/std_outcome/" class="api-reference"><code>std_outcome&lt;T, EC = std::error_code, EP = std::exception_ptr, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code></a>
+ (standalone edition) or <a href="/outcome/reference/aliases/boost_outcome/" class="api-reference"><code>boost_outcome&lt;T, EC = boost::system::error_code, EP = boost::exception_ptr, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code></a>
+ (Boost edition), and <code>policy::</code><a href="/outcome/reference/aliases/default_policy/" class="api-reference"><code>default_policy</code></a>
+. This means that <code>outcome&lt;T&gt;</code> uses the appropriate default alias depending on which edition of Outcome is in use.</p>
 
 <p><em>Namespace</em>: <code>OUTCOME_V2_NAMESPACE</code></p>
 

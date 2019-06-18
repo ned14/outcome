@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/traits/</link>
     <description>Recent content in Traits on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:43 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/traits/index.xml" rel="self" type="application/rss+xml" />
     
@@ -85,7 +85,7 @@ Header: &amp;lt;outcome/trait.hpp&amp;gt;</description>
       <guid>https://ned14.github.io/outcome/reference/traits/is_exception_ptr_available/</guid>
       <description>True if an exception ptr can be constructed from a T e.g. if there exists an ADL discovered free function make_exception_ptr(T).
 Overridable: By template specialisation into the trait namespace.
-Default: True if T is an exception ptr, else to metaprogramming which performs the ADL discovery of make_exception_ptr(T). Note that the STL defines an ADL discovered free function  std::make_exception_ptr(T). Thus this trait will pick up that free function.
+Default: True if T is an exception ptr, else to metaprogramming which performs the ADL discovery of make_exception_ptr(T). Note that the STL defines an ADL discovered free function  std::make_exception_ptr(T) . Thus this trait will pick up that free function.
 Namespace: OUTCOME_V2_NAMESPACE::trait</description>
     </item>
     
@@ -122,7 +122,7 @@ Header: &amp;lt;outcome/success_failure.hpp&amp;gt;</description>
       <description>A constexpr boolean true for types permissible in basic_result&amp;lt;T, E, NoValuePolicy&amp;gt;.
 Overridable: Not overridable.
 Definition: True for a type which:
- Is not a reference. Is not an in_place_type_t&amp;lt;T&amp;gt;. Is not a success_type&amp;lt;T&amp;gt;. Is not a failure_type&amp;lt;EC, EP = void&amp;gt;. Is not an array. Is either void, or else is an Object and is Destructible.  Namespace: OUTCOME_V2_NAMESPACE::trait
+ Is not a reference. Is not an in_place_type_t&amp;lt;T&amp;gt; . Is not a success_type&amp;lt;T&amp;gt; . Is not a failure_type&amp;lt;EC, EP = void&amp;gt; . Is not an array. Is either void, or else is an Object and is Destructible.  Namespace: OUTCOME_V2_NAMESPACE::trait
 Header: &amp;lt;outcome/trait.hpp&amp;gt;</description>
     </item>
     

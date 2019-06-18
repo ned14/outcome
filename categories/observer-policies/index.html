@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:20 UTC">
+<meta name="revised" content="2019-06-18T21:08:04 UTC">
 <title>Observer Policies :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2400,7 +2400,7 @@
         <h2 class="post-title"><a href="/outcome/reference/policies/base/narrow_error_check/">`static void narrow_error_check(Impl &amp;&amp;) noexcept`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Observer policy performing hard UB if no error is present, by calling static void _ub(Impl &amp;&amp;). Constexpr where possible.
+        <p>Observer policy performing hard UB if no error is present, by calling static void _ub(Impl &amp;&amp;) . Constexpr where possible.
 Requires: Always available.
 Complexity: Constant time.
 Guarantees: Never throws an exception. <a class="read-more" href="/outcome/reference/policies/base/narrow_error_check/">&raquo;</a></p>
@@ -2420,7 +2420,7 @@ Guarantees: Never throws an exception. <a class="read-more" href="/outcome/refer
         <h2 class="post-title"><a href="/outcome/reference/policies/base/narrow_exception_check/">`static void narrow_exception_check(Impl &amp;&amp;) noexcept`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Observer policy performing hard UB if no exception is present, by calling static void _ub(Impl &amp;&amp;). Constexpr where possible.
+        <p>Observer policy performing hard UB if no exception is present, by calling static void _ub(Impl &amp;&amp;) . Constexpr where possible.
 Requires: Always available.
 Complexity: Constant time.
 Guarantees: Never throws an exception. <a class="read-more" href="/outcome/reference/policies/base/narrow_exception_check/">&raquo;</a></p>
@@ -2440,7 +2440,7 @@ Guarantees: Never throws an exception. <a class="read-more" href="/outcome/refer
         <h2 class="post-title"><a href="/outcome/reference/policies/base/narrow_value_check/">`static void narrow_value_check(Impl &amp;&amp;) noexcept`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Observer policy performing hard UB if no value is present, by calling static void _ub(Impl &amp;&amp;). Constexpr where possible.
+        <p>Observer policy performing hard UB if no value is present, by calling static void _ub(Impl &amp;&amp;) . Constexpr where possible.
 Requires: Always available.
 Complexity: Constant time.
 Guarantees: Never throws an exception. <a class="read-more" href="/outcome/reference/policies/base/narrow_value_check/">&raquo;</a></p>

@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/types/</link>
     <description>Recent content in Types on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:43 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/types/index.xml" rel="self" type="application/rss+xml" />
     
@@ -16,7 +16,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/bad_outcome_access/</guid>
-      <description>Exception type publicly inheriting from  std::logic_error indicating an incorrect observation of value or error or exception occurred by basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt;.
+      <description>Exception type publicly inheriting from  std::logic_error indicating an incorrect observation of value or error or exception occurred by basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; .
 No member functions are added in addition to std::logic_error. Typical .what() strings are:
  &amp;quot;no value&amp;quot; &amp;quot;no error&amp;quot; &amp;quot;no exception&amp;quot;  Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE
@@ -29,8 +29,8 @@ Header: &amp;lt;outcome/bad_access.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/bad_result_access_with/</guid>
-      <description>Exception type publicly inheriting from bad_result_access, and thus also  std::logic_error, indicating an incorrect observation of value occurred. The error value at the time of the exception throw is moved or copied into this type, and is available using the .error() observer which comes in lvalue ref, const lvalue ref, rvalue ref, and const rvalue ref overloads.
-The primary purpose of this exception type is to enable standing in for  P0323 std::expected&amp;lt;T, E&amp;gt;&amp;rsquo;s bad_expected_access&amp;lt;E&amp;gt; which is thrown on incorrect wide value observation.</description>
+      <description>Exception type publicly inheriting from bad_result_access , and thus also  std::logic_error , indicating an incorrect observation of value occurred. The error value at the time of the exception throw is moved or copied into this type, and is available using the .error() observer which comes in lvalue ref, const lvalue ref, rvalue ref, and const rvalue ref overloads.
+The primary purpose of this exception type is to enable standing in for  P0323 std::expected&amp;lt;T, E&amp;gt; &amp;rsquo;s bad_expected_access&amp;lt;E&amp;gt; which is thrown on incorrect wide value observation.</description>
     </item>
     
     <item>
@@ -39,7 +39,7 @@ The primary purpose of this exception type is to enable standing in for  P0323 s
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/bad_result_access/</guid>
-      <description>Exception type publicly inheriting from  std::logic_error indicating an incorrect observation of value or error occurred by basic_result&amp;lt;T, E, NoValuePolicy&amp;gt;.
+      <description>Exception type publicly inheriting from  std::logic_error indicating an incorrect observation of value or error occurred by basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; .
 No member functions are added in addition to std::logic_error. Typical .what() strings are:
  &amp;quot;no value&amp;quot; &amp;quot;no error&amp;quot;  Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE
@@ -52,7 +52,7 @@ Header: &amp;lt;outcome/bad_access.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/failure_type/</guid>
-      <description>Type sugar for constructing an unsuccessful result or outcome. Generally not constructed directly, but via the free function failure(T &amp;amp;&amp;amp;, ...). Detectable using is_failure_type&amp;lt;T&amp;gt;.
+      <description>Type sugar for constructing an unsuccessful result or outcome. Generally not constructed directly, but via the free function failure(T &amp;amp;&amp;amp;, ...) . Detectable using is_failure_type&amp;lt;T&amp;gt; .
 This is a regular wrapper type, with defaulted default, copy and move constructor, defaulted assignment, and defaulted destructor.
 Member type aliases error_type and exception_type indicate EC and E.
 There is an explicit initialising constructor taking any types U and V which will forward construct the contained error_type and exception_type respectively.</description>
@@ -77,7 +77,7 @@ Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/success_type/</guid>
-      <description>Type sugar for constructing a successful result or outcome. Generally not constructed directly, but via the free function success(T &amp;amp;&amp;amp;). Detectable using is_success_type&amp;lt;T&amp;gt;.
+      <description>Type sugar for constructing a successful result or outcome. Generally not constructed directly, but via the free function success(T &amp;amp;&amp;amp;) . Detectable using is_success_type&amp;lt;T&amp;gt; .
 This is a regular wrapper type, with defaulted default, copy and move constructor, defaulted assignment, and defaulted destructor.
 A member type alias value_type indicates T.
 There is an explicit initialising constructor taking any type U which is not a success_type&amp;lt;T&amp;gt;, and which will forward construct the contained T from that U.</description>

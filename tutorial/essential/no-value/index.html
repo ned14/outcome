@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:10 UTC">
+<meta name="revised" content="2019-06-18T21:07:55 UTC">
 <title>No-value policies :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2414,10 +2414,12 @@
 function <code>.value()</code> on object of type <code>outcome&lt;T&gt;</code> that did not contain a value,
 would cause an exception to be thrown according to some user-defined policy.</p>
 
-<p>Let us consider <code>result&lt;T&gt;</code> first. It is an alias to <a href="/outcome/reference/types/basic_result/" class="api-reference"><code>basic_result&lt;T, E, NoValuePolicy&gt;</code></a>,
+<p>Let us consider <code>result&lt;T&gt;</code> first. It is an alias to <a href="/outcome/reference/types/basic_result/" class="api-reference"><code>basic_result&lt;T, E, NoValuePolicy&gt;</code></a>
+,
 where <code>E</code> is the type storing error information and defaulted to
 <code>std::error_code</code>/<code>boost::system::error_code</code>, and <code>NoValuePolicy</code>
-is a <em>no-value policy</em> defaulted to <a href="/outcome/reference/aliases/default_policy/" class="api-reference"><code>default_policy&lt;T, EC, EP&gt;</code></a>.</p>
+is a <em>no-value policy</em> defaulted to <a href="/outcome/reference/aliases/default_policy/" class="api-reference"><code>default_policy&lt;T, EC, EP&gt;</code></a>
+.</p>
 
 <p>The semantics of <code>basic_result::value()</code> are:</p>
 
@@ -2436,8 +2438,10 @@ default policy (<code>policy::default_policy&lt;T, EC, void&gt;</code>) for <cod
 <li>otherwise no effect.</li>
 </ul>
 
-<div class="notices note" ><p>Class templates <a href="/outcome/reference/types/basic_result/" class="api-reference"><code>basic_result&lt;T, E, NoValuePolicy&gt;</code></a> and <a href="/outcome/reference/types/basic_outcome/" class="api-reference"><code>basic_outcome&lt;T, EC, EP, NoValuePolicy&gt;</code></a>
-never use exceptions. Any exception-related logic is provided exclusively
+<div class="notices note" ><p>Class templates <a href="/outcome/reference/types/basic_result/" class="api-reference"><code>basic_result&lt;T, E, NoValuePolicy&gt;</code></a>
+ and <a href="/outcome/reference/types/basic_outcome/" class="api-reference"><code>basic_outcome&lt;T, EC, EP, NoValuePolicy&gt;</code></a></p>
+
+<p>never use exceptions. Any exception-related logic is provided exclusively
 through no-value policies.</p>
 </div>
 
@@ -2449,9 +2453,15 @@ you want to use. Either create your own, or <a href="/outcome/tutorial/essential
 <p>You can also use one of the two other predefined aliases for <code>basic_result&lt;&gt;</code>:</p>
 
 <ul>
-<li><a href="/outcome/reference/aliases/unchecked/" class="api-reference"><code>unchecked&lt;T, E = varies&gt;</code></a>: it uses policy <a href="/outcome/reference/policies/all_narrow/" class="api-reference"><code>all_narrow</code></a>, where any observation of a missing value or error is undefined behavior;</li>
-<li><a href="/outcome/reference/aliases/checked/" class="api-reference"><code>checked&lt;T, E = varies&gt;</code></a>:
-it uses policy <a href="/outcome/reference/policies/throw_bad_result_access/" class="api-reference"><code>throw_bad_result_access&lt;EC&gt;</code></a>, where any observation of a missing value or error throws <a href="/outcome/reference/types/bad_result_access_with/" class="api-reference"><code>bad_result_access_with&lt;EC&gt;</code></a> or <a href="/outcome/reference/types/bad_result_access/" class="api-reference"><code>bad_result_access</code></a>
+<li><a href="/outcome/reference/aliases/unchecked/" class="api-reference"><code>unchecked&lt;T, E = varies&gt;</code></a>
+: it uses policy <a href="/outcome/reference/policies/all_narrow/" class="api-reference"><code>all_narrow</code></a>
+, where any observation of a missing value or error is undefined behavior;</li>
+<li><a href="/outcome/reference/aliases/checked/" class="api-reference"><code>checked&lt;T, E = varies&gt;</code></a>
+:
+it uses policy <a href="/outcome/reference/policies/throw_bad_result_access/" class="api-reference"><code>throw_bad_result_access&lt;EC&gt;</code></a>
+, where any observation of a missing value or error throws <a href="/outcome/reference/types/bad_result_access_with/" class="api-reference"><code>bad_result_access_with&lt;EC&gt;</code></a>
+ or <a href="/outcome/reference/types/bad_result_access/" class="api-reference"><code>bad_result_access</code></a>
+
 respectively.</li>
 </ul>
 <div class="footnotes">

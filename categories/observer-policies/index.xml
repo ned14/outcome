@@ -15,7 +15,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/policies/base/narrow_error_check/</guid>
-      <description>Observer policy performing hard UB if no error is present, by calling static void _ub(Impl &amp;amp;&amp;amp;). Constexpr where possible.
+      <description>Observer policy performing hard UB if no error is present, by calling static void _ub(Impl &amp;amp;&amp;amp;) . Constexpr where possible.
 Requires: Always available.
 Complexity: Constant time.
 Guarantees: Never throws an exception.</description>
@@ -27,7 +27,7 @@ Guarantees: Never throws an exception.</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/policies/base/narrow_exception_check/</guid>
-      <description>Observer policy performing hard UB if no exception is present, by calling static void _ub(Impl &amp;amp;&amp;amp;). Constexpr where possible.
+      <description>Observer policy performing hard UB if no exception is present, by calling static void _ub(Impl &amp;amp;&amp;amp;) . Constexpr where possible.
 Requires: Always available.
 Complexity: Constant time.
 Guarantees: Never throws an exception.</description>
@@ -39,7 +39,7 @@ Guarantees: Never throws an exception.</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/policies/base/narrow_value_check/</guid>
-      <description>Observer policy performing hard UB if no value is present, by calling static void _ub(Impl &amp;amp;&amp;amp;). Constexpr where possible.
+      <description>Observer policy performing hard UB if no value is present, by calling static void _ub(Impl &amp;amp;&amp;amp;) . Constexpr where possible.
 Requires: Always available.
 Complexity: Constant time.
 Guarantees: Never throws an exception.</description>

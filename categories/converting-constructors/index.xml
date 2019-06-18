@@ -105,7 +105,7 @@ Complexity: Same as for error_type&amp;rsquo;s copy or move constructor. Constex
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/</guid>
-      <description>Explicit converting constructor from ValueOrError&amp;lt;T, E&amp;gt; concept matching types. Delegates to the basic_result move constructor explicit basic_outcome(basic_result&amp;lt;A, B, C&amp;gt; &amp;amp;&amp;amp;).
+      <description>Explicit converting constructor from ValueOrError&amp;lt;T, E&amp;gt; concept matching types. Delegates to the basic_result move constructor explicit basic_outcome(basic_result&amp;lt;A, B, C&amp;gt; &amp;amp;&amp;amp;) .
 Requires: convert::value_or_error&amp;lt;T, U&amp;gt; has an available call operator, and if the input is a basic_result or basic_outcome, then convert::value_or_error&amp;lt;&amp;gt; has enabled those inputs for that convert::value_or_error&amp;lt;&amp;gt; specialisation.
 Complexity: Same as for the copy or move constructor from the input&amp;rsquo;s .value() or .error() respectively. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
     </item>

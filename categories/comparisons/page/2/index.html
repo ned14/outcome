@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:18 UTC">
+<meta name="revised" content="2019-06-18T21:08:03 UTC">
 <title>Comparisons :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2420,9 +2420,9 @@ Requires: operator== must be a valid expression between error_type and A, or A i
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/equality_failure_type/">`bool operator==(const failure_type&lt;A, void&gt; &amp;) const`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Returns true if this result is unsuccessful and its error compares equal to the error in the failure type sugar. Comparison is done using operator== on error_type and A. If A is void, this call aliases bool has_error() const noexcept.
+        <p>Returns true if this result is unsuccessful and its error compares equal to the error in the failure type sugar. Comparison is done using operator== on error_type and A. If A is void, this call aliases bool has_error() const noexcept .
 Requires: operator== must be a valid expression between error_type and A, or A is void. If error_type is void, then so must be A.
-Complexity: Whatever the underlying operator== has. Constexpr and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_result/equality_failure_type/">&raquo;</a></p>
+Complexity: Whatever the underlying operator== has. <a class="read-more" href="/outcome/reference/types/basic_result/equality_failure_type/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          
@@ -2439,9 +2439,9 @@ Complexity: Whatever the underlying operator== has. Constexpr and noexcept of un
         <h2 class="post-title"><a href="/outcome/reference/types/basic_outcome/inequality_success_type/">`bool operator==(const success_type&lt;A&gt; &amp;) const`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Returns true if this result is successful and its value compares equal to the value in the success type sugar. Comparison is done using operator== on value_type and A. If A is void, this call aliases bool has_value() const noexcept.
+        <p>Returns true if this result is successful and its value compares equal to the value in the success type sugar. Comparison is done using operator== on value_type and A. If A is void, this call aliases bool has_value() const noexcept .
 Requires: operator== must be a valid expression between value_type and A, or A is void. If value_type is void, then so must be A.
-Complexity: Whatever the underlying operator== has. Constexpr and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_outcome/inequality_success_type/">&raquo;</a></p>
+Complexity: Whatever the underlying operator== has. <a class="read-more" href="/outcome/reference/types/basic_outcome/inequality_success_type/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          
@@ -2458,9 +2458,9 @@ Complexity: Whatever the underlying operator== has. Constexpr and noexcept of un
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/inequality_success_type/">`bool operator==(const success_type&lt;A&gt; &amp;) const`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Returns true if this result is successful and its value compares equal to the value in the success type sugar. Comparison is done using operator== on value_type and A. If A is void, this call aliases bool has_value() const noexcept.
+        <p>Returns true if this result is successful and its value compares equal to the value in the success type sugar. Comparison is done using operator== on value_type and A. If A is void, this call aliases bool has_value() const noexcept .
 Requires: operator== must be a valid expression between value_type and A, or A is void. If value_type is void, then so must be A.
-Complexity: Whatever the underlying operator== has. Constexpr and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_result/inequality_success_type/">&raquo;</a></p>
+Complexity: Whatever the underlying operator== has. <a class="read-more" href="/outcome/reference/types/basic_result/inequality_success_type/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          

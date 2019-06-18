@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:21 UTC">
+<meta name="revised" content="2019-06-18T21:08:06 UTC">
 <title>`ValueOrError&lt;T, E&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2417,7 +2417,9 @@
 <p>If without Concepts, a static constexpr bool which is true for types matching the same requirements, using a SFINAE based emulation.</p>
 
 <p>This concept matches expected-like types such as 
-<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 <code>std::expected&lt;T, E&gt;</code></a>, one of which is <a href="/outcome/reference/types/basic_result/" class="api-reference"><code>basic_result&lt;T, E, NoValuePolicy&gt;</code></a>. Be aware it does not differentiate between value-or-error types and value-and-error types if they present the interface matched above.</p>
+<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 <code>std::expected&lt;T, E&gt;</code></a>
+, one of which is <a href="/outcome/reference/types/basic_result/" class="api-reference"><code>basic_result&lt;T, E, NoValuePolicy&gt;</code></a>
+. Be aware it does not differentiate between value-or-error types and value-and-error types if they present the interface matched above.</p>
 
 <p><em>Namespace</em>: <code>OUTCOME_V2_NAMESPACE::convert</code></p>
 

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:20 UTC">
+<meta name="revised" content="2019-06-18T21:08:05 UTC">
 <title>Try :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2428,7 +2428,7 @@ outcome::result&lt;void&gt; print_half(const std::string&amp; text); View this c
         <h2 class="post-title"><a href="/outcome/tutorial/essential/result/try/">TRY operations</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>In the implementation of function print_half we have seen the usage of the macro OUTCOME_TRYV(expr)/OUTCOME_TRY(expr):
+        <p>In the implementation of function print_half we have seen the usage of the macro OUTCOME_TRYV(expr)/OUTCOME_TRY(expr) :
 OUTCOME_TRY (i, BigInt::fromString(text));  The OUTCOME_TRY macro uses C macro overloading to select between two implementations based on the number of input parameters. If there is exactly one input parameter i.e. without the i, the control statement is roughly equivalent to:
 auto&amp;&amp; __result = BigInt::fromString(text); if (!__result) return __result.as_failure();  Where __result is a compile time generated unique name. <a class="read-more" href="/outcome/tutorial/essential/result/try/">&raquo;</a></p>
     </section>

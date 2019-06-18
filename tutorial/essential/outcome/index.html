@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:10 UTC">
+<meta name="revised" content="2019-06-18T21:07:55 UTC">
 <title>outcome&lt;&gt; :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2411,13 +2411,15 @@
 
 
 
-<p>Type <a href="/outcome/reference/aliases/outcome/" class="api-reference"><code>outcome&lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code></a> represents either a successfully computed value of type <code>T</code>, or one or two reasons for failure. Failure can be represented by <code>EC</code>, or <code>EP</code>, or both, although usually it will either be an <code>EC</code> or an <code>EP</code>.
+<p>Type <a href="/outcome/reference/aliases/outcome/" class="api-reference"><code>outcome&lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code></a>
+ represents either a successfully computed value of type <code>T</code>, or one or two reasons for failure. Failure can be represented by <code>EC</code>, or <code>EP</code>, or both, although usually it will either be an <code>EC</code> or an <code>EP</code>.
 Similarly to <code>result</code>, <code>EC</code> defaults to <code>std::error_code</code>/<code>boost::system::error_code</code>, and <code>EP</code> defaults to <code>std::exception_ptr</code>/<code>boost::exception_ptr</code>.</p>
 
 <p>The distinction is made into two types, <code>EC</code> and <code>EP</code>:</p>
 
 <ul>
-<li><code>EC</code> represents a <em>recoverable</em> failure from a lower-layer function, perhaps which was returned through <a href="/outcome/reference/aliases/result/" class="api-reference"><code>result&lt;T, E = varies, NoValuePolicy = policy::default_policy&lt;T, E, void&gt;&gt;</code></a>.</li>
+<li><code>EC</code> represents a <em>recoverable</em> failure from a lower-layer function, perhaps which was returned through <a href="/outcome/reference/aliases/result/" class="api-reference"><code>result&lt;T, E = varies, NoValuePolicy = policy::default_policy&lt;T, E, void&gt;&gt;</code></a>
+.</li>
 <li><code>EP</code> represents an <em>unrecoverable</em> failure where a C++ exception would ordinarily have been thrown. This is usually a pointer to an exception throw.</li>
 </ul>
 

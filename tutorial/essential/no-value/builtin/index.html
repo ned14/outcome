@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:09 UTC">
+<meta name="revised" content="2019-06-18T21:07:54 UTC">
 <title>Built-in policies :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2417,6 +2417,7 @@
 
 <a href="/outcome/reference/policies/all_narrow/" class="api-reference"><code>all_narrow</code></a>
 
+
 <p>If there is an observation of a value/error/exception which is not present,
 the program is put into a <strong>hard undefined behaviour</strong> situation. The
 compiler <em>literally</em> compiles no code for an invalid observation &ndash; the
@@ -2427,9 +2428,11 @@ hard UB is very tool-friendly for detection e.g. undefined behaviour
 sanitiser, valgrind memcheck, etc.</p>
 
 <p>If you are considering choosing this policy, definitely read
-<a href="/outcome/reference/policies/base/ub/" class="api-reference"><code>static void _ub(Impl &amp;&amp;)</code></a> first.</p>
+<a href="/outcome/reference/policies/base/ub/" class="api-reference"><code>static void _ub(Impl &amp;&amp;)</code></a>
+ first.</p>
 
-<p>Note that <a href="/outcome/reference/aliases/unchecked/" class="api-reference"><code>unchecked&lt;T, E = varies&gt;</code></a> aliases a <code>basic_result</code>
+<p>Note that <a href="/outcome/reference/aliases/unchecked/" class="api-reference"><code>unchecked&lt;T, E = varies&gt;</code></a>
+ aliases a <code>basic_result</code>
 with the <code>all_narrow</code> no-value policy.</p>
 
 <hr style="border-color: black;">
@@ -2438,17 +2441,20 @@ with the <code>all_narrow</code> no-value policy.</p>
 
 <a href="/outcome/reference/policies/terminate/" class="api-reference"><code>terminate</code></a>
 
+
 <p>Observation of a missing value/error/exception causes a call to
 <code>std::terminate()</code>.</p>
 
 <p>Note that configuring <code>EC = void</code> or <code>EP = void</code> causes
-<a href="/outcome/reference/aliases/default_policy/" class="api-reference"><code>default_policy</code></a> to choose <code>terminate</code> as the no-value policy.</p>
+<a href="/outcome/reference/aliases/default_policy/" class="api-reference"><code>default_policy</code></a>
+ to choose <code>terminate</code> as the no-value policy.</p>
 
 <hr style="border-color: black;">
 
 <p>&nbsp;</p>
 
 <a href="/outcome/reference/policies/error_code_throw_as_system_error_outcome/" class="api-reference"><code>error_code_throw_as_system_error&lt;T, EC, EP&gt;</code></a>
+
 
 <p>This policy assumes that <code>EC</code> has the interface of <code>std::error_code</code>,
 and <code>EP</code> has the interface of <code>std::exception_ptr</code>. Upon missing value
@@ -2471,9 +2477,12 @@ and then thrown as <code>system_error</code>.</li>
 
 <p>Overloads are provided for <code>boost::system::error_code</code> and <code>boost::exception_ptr</code>.</p>
 
-<p>Note that if <a href="/outcome/reference/traits/is_error_code_available/" class="api-reference"><code>is_error_code_available&lt;T&gt;</code></a> is true for <code>EC</code>,
+<p>Note that if <a href="/outcome/reference/traits/is_error_code_available/" class="api-reference"><code>is_error_code_available&lt;T&gt;</code></a>
+ is true for <code>EC</code>,
 and (if <code>basic_outcome</code>) <a href="/outcome/reference/traits/is_exception_ptr_available/" class="api-reference"><code>is_exception_ptr_available&lt;T&gt;</code></a>
-is true for <code>EP</code>, <a href="/outcome/reference/aliases/default_policy/" class="api-reference"><code>default_policy</code></a> chooses
+
+is true for <code>EP</code>, <a href="/outcome/reference/aliases/default_policy/" class="api-reference"><code>default_policy</code></a>
+ chooses
 <code>error_code_throw_as_system_error&lt;T, EC, EP&gt;</code> as the no-value policy.</p>
 
 <hr style="border-color: black;">
@@ -2481,6 +2490,7 @@ is true for <code>EP</code>, <a href="/outcome/reference/aliases/default_policy/
 <p>&nbsp;</p>
 
 <a href="/outcome/reference/policies/exception_ptr_rethrow_outcome/" class="api-reference"><code>exception_ptr_rethrow&lt;T, EC, EP&gt;</code></a>
+
 
 <p>This policy assumes that either <code>EC</code> or <code>EP</code> (unless <code>void</code>) has the interface of <code>std::exception_ptr</code>. Upon missing value observation:</p>
 
@@ -2501,9 +2511,12 @@ otherwise rethrows <code>EC</code>.</li>
 
 <p>Overloads are provided for <code>boost::exception_ptr</code>.</p>
 
-<p>Note that if <a href="/outcome/reference/traits/is_exception_ptr_available/" class="api-reference"><code>is_exception_ptr_available&lt;T&gt;</code></a> is true for <code>EC</code>,
+<p>Note that if <a href="/outcome/reference/traits/is_exception_ptr_available/" class="api-reference"><code>is_exception_ptr_available&lt;T&gt;</code></a>
+ is true for <code>EC</code>,
 or (if <code>basic_outcome</code>) <a href="/outcome/reference/traits/is_exception_ptr_available/" class="api-reference"><code>is_exception_ptr_available&lt;T&gt;</code></a>
-is true for <code>EP</code>, <a href="/outcome/reference/aliases/default_policy/" class="api-reference"><code>default_policy</code></a> chooses
+
+is true for <code>EP</code>, <a href="/outcome/reference/aliases/default_policy/" class="api-reference"><code>default_policy</code></a>
+ chooses
 <code>exception_ptr_rethrow&lt;T, EC, EP&gt;</code> as the no-value policy.</p>
 
 <hr style="border-color: black;">
@@ -2511,6 +2524,7 @@ is true for <code>EP</code>, <a href="/outcome/reference/aliases/default_policy/
 <p>&nbsp;</p>
 
 <a href="/outcome/reference/policies/throw_bad_result_access/" class="api-reference"><code>throw_bad_result_access&lt;EC&gt;</code></a>
+
 
 <p>Upon missing value observation throws <code>bad_result_access_with&lt;EC&gt;(ec)</code>,
 where <code>ec</code> is the value of the stored error. If error is not stored,
@@ -2521,7 +2535,8 @@ the behaviour is undefined.</p>
 <p>This policy can be used with <code>basic_outcome&lt;&gt;</code> instances, where it always
 throws <code>bad_outcome_access</code> for all no-value/error/exception observations.</p>
 
-<p>Note that <a href="/outcome/reference/aliases/checked/" class="api-reference"><code>checked&lt;T, E = varies&gt;</code></a> aliases a <code>basic_result</code>
+<p>Note that <a href="/outcome/reference/aliases/checked/" class="api-reference"><code>checked&lt;T, E = varies&gt;</code></a>
+ aliases a <code>basic_result</code>
 with the <code>throw_bad_result_access&lt;EC&gt;</code> no-value policy.</p>
 
 

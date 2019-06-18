@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:17 UTC">
+<meta name="revised" content="2019-06-18T21:08:02 UTC">
 <title>`exception_type failure() const noexcept` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2501,13 +2501,17 @@
     <p>Synthesising observer of the stored exception or error. If an exception is available,
 returns a copy of that directly. If an error is available, and not an exception, an
 ADL discovered free function <a href="/outcome/reference/functions/policy/basic_outcome_failure_exception_from_error/" class="api-reference"><code>auto basic_outcome_failure_exception_from_error(const EC &amp;)</code></a>
+
 is invoked. Default overloads for this function are defined in Outcome for 
 <a href="https://en.cppreference.com/w/cpp/error/error_code" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::error_code</code></a>
+
 and <code>boost::system::error_code</code>, these return <code>std::make_exception_ptr(std::system_error(ec))</code>
 and <code>boost::copy_exception(boost::system::system_error(ec))</code> respectively.</p>
 
-<p><em>Requires</em>: Both the traits <a href="/outcome/reference/traits/is_error_code_available/" class="api-reference"><code>is_error_code_available&lt;T&gt;</code></a> and
-<a href="/outcome/reference/traits/is_exception_ptr_available/" class="api-reference"><code>is_exception_ptr_available&lt;T&gt;</code></a> are true.</p>
+<p><em>Requires</em>: Both the traits <a href="/outcome/reference/traits/is_error_code_available/" class="api-reference"><code>is_error_code_available&lt;T&gt;</code></a>
+ and
+<a href="/outcome/reference/traits/is_exception_ptr_available/" class="api-reference"><code>is_exception_ptr_available&lt;T&gt;</code></a>
+ are true.</p>
 
 <p><em>Complexity</em>: Depends on <code>basic_outcome_failure_exception_from_error(const EC &amp;)</code>.</p>
 

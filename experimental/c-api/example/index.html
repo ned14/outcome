@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:09 UTC">
+<meta name="revised" content="2019-06-18T21:07:54 UTC">
 <title>Example C&#43;&#43; function :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2445,7 +2445,8 @@ the <code>to_string()</code> function returns (in concrete types) <code>basic_re
 
 <p>The standard Outcome function referenced is documented at
 
-<a href="https://en.cppreference.com/w/cpp/error/error_code" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::error_code error_from_exception(std::exception_ptr &amp;&amp;ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept</code></a>.
+<a href="https://en.cppreference.com/w/cpp/error/error_code" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::error_code error_from_exception(std::exception_ptr &amp;&amp;ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept</code></a>
+.
 The proposed <code>&lt;system_error2&gt;</code> reference library implementation provides an identically named
 function taking similar parameters, but it returns a <code>outcome_e::system_code</code> (<code>status_code&lt;erased&lt;intptr_t&gt;&gt;</code>) instead of a <code>std::error_code</code>.</p>
 

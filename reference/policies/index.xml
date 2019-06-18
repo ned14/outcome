@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/policies/</link>
     <description>Recent content in Policies on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:43 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/policies/index.xml" rel="self" type="application/rss+xml" />
     
@@ -17,7 +17,7 @@
       
       <guid>https://ned14.github.io/outcome/reference/policies/all_narrow/</guid>
       <description>Policy class defining that hard undefined behaviour should occur on incorrect narrow and wide value, error or exception observation.
-Inherits publicly from base, and simply defines its wide value, error and exception observer policies to call their corresponding narrow editions.
+Inherits publicly from base , and simply defines its wide value, error and exception observer policies to call their corresponding narrow editions.
 Included by &amp;lt;basic_result.hpp&amp;gt;, and so is always available when basic_result is available.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::policy
@@ -34,7 +34,7 @@ Header: &amp;lt;outcome/policy/all_narrow.hpp&amp;gt;</description>
 Policy class defining that on incorrect wide value observation, EP ought to be rethrown if possible, then the ADL discovered free function outcome_throw_as_system_error_with_payload(impl.assume_error()) should be called. Some precanned overloads of that function are listed here.
 Incorrect wide error observation performs:
 OUTCOME_THROW_EXCEPTION(bad_outcome_access(&amp;#34;no error&amp;#34;));  Incorrect wide exception observation performs:
-OUTCOME_THROW_EXCEPTION(bad_outcome_access(&amp;#34;no exception&amp;#34;));  Inherits publicly from base, and its narrow value, error and exception observer policies are inherited from there.</description>
+OUTCOME_THROW_EXCEPTION(bad_outcome_access(&amp;#34;no exception&amp;#34;));  Inherits publicly from base , and its narrow value, error and exception observer policies are inherited from there.</description>
     </item>
     
     <item>
@@ -46,7 +46,7 @@ OUTCOME_THROW_EXCEPTION(bad_outcome_access(&amp;#34;no exception&amp;#34;));  In
       <description>Note: This policy class specialisation can only be used with basic_result, not basic_outcome. Use error_code_throw_as_system_error&amp;lt;T, EC, EP&amp;gt; with basic_outcome.
 Policy class defining that the ADL discovered free function outcome_throw_as_system_error_with_payload(impl.assume_error()) should be called on incorrect wide value observation. Some precanned overloads of that function are listed here.
 Incorrect wide error observation performs:
-OUTCOME_THROW_EXCEPTION(bad_result_access(&amp;#34;no error&amp;#34;));  Inherits publicly from base, and its narrow value, error and exception observer policies are inherited from there.</description>
+OUTCOME_THROW_EXCEPTION(bad_result_access(&amp;#34;no error&amp;#34;));  Inherits publicly from base , and its narrow value, error and exception observer policies are inherited from there.</description>
     </item>
     
     <item>
@@ -59,7 +59,7 @@ OUTCOME_THROW_EXCEPTION(bad_result_access(&amp;#34;no error&amp;#34;));  Inherit
 Policy class defining that the ADL discovered free function rethrow_exception(impl.assume_exception()) if possible, followed by rethrow_exception(impl.assume_error()) should be called on incorrect wide value observation. Generally this will ADL discover  std::rethrow_exception() or boost::rethrow_exception() depending on the EC type.
 Incorrect wide error observation performs:
 OUTCOME_THROW_EXCEPTION(bad_outcome_access(&amp;#34;no error&amp;#34;));  Incorrect wide exception observation performs:
-OUTCOME_THROW_EXCEPTION(bad_outcome_access(&amp;#34;no exception&amp;#34;));  Inherits publicly from base, and its narrow value, error and exception observer policies are inherited from there.</description>
+OUTCOME_THROW_EXCEPTION(bad_outcome_access(&amp;#34;no exception&amp;#34;));  Inherits publicly from base , and its narrow value, error and exception observer policies are inherited from there.</description>
     </item>
     
     <item>
@@ -71,7 +71,7 @@ OUTCOME_THROW_EXCEPTION(bad_outcome_access(&amp;#34;no exception&amp;#34;));  In
       <description>Note: This policy class specialisation can only be used with basic_result, not basic_outcome. Use exception_ptr_rethrow&amp;lt;T, EC, EP&amp;gt; with basic_outcome.
 Policy class defining that the ADL discovered free function rethrow_exception(impl.assume_error()) should be called on incorrect wide value observation. Generally this will ADL discover  std::rethrow_exception() or boost::rethrow_exception() depending on the EC type.
 Incorrect wide error observation performs:
-OUTCOME_THROW_EXCEPTION(bad_result_access(&amp;#34;no error&amp;#34;));  Inherits publicly from base, and its narrow value, error and exception observer policies are inherited from there.</description>
+OUTCOME_THROW_EXCEPTION(bad_result_access(&amp;#34;no error&amp;#34;));  Inherits publicly from base , and its narrow value, error and exception observer policies are inherited from there.</description>
     </item>
     
     <item>
@@ -91,7 +91,7 @@ OUTCOME_THROW_EXCEPTION(bad_result_access(&amp;#34;no error&amp;#34;));  Inherit
       
       <guid>https://ned14.github.io/outcome/reference/policies/terminate/</guid>
       <description>Policy class defining that  std::terminate() should be called on incorrect wide value, error or exception observation.
-Inherits publicly from base, and its narrow value, error and exception observer policies are inherited from there.
+Inherits publicly from base , and its narrow value, error and exception observer policies are inherited from there.
 Included by &amp;lt;basic_result.hpp&amp;gt;, and so is always available when basic_result is available.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::policy

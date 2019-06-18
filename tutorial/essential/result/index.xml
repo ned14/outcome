@@ -26,7 +26,7 @@ outcome::result&amp;lt;void&amp;gt; print_half(const std::string&amp;amp; text);
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/result/try/</guid>
-      <description>In the implementation of function print_half we have seen the usage of the macro OUTCOME_TRYV(expr)/OUTCOME_TRY(expr):
+      <description>In the implementation of function print_half we have seen the usage of the macro OUTCOME_TRYV(expr)/OUTCOME_TRY(expr) :
 OUTCOME_TRY (i, BigInt::fromString(text));  The OUTCOME_TRY macro uses C macro overloading to select between two implementations based on the number of input parameters. If there is exactly one input parameter i.e. without the i, the control statement is roughly equivalent to:
 auto&amp;amp;&amp;amp; __result = BigInt::fromString(text); if (!__result) return __result.as_failure();  Where __result is a compile time generated unique name.</description>
     </item>

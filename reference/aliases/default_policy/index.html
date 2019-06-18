@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:22 UTC">
+<meta name="revised" content="2019-06-18T21:08:07 UTC">
 <title>`default_policy&lt;T, EC, EP&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2426,13 +2426,21 @@
     <p>A type alias to a no-value policy selected based on traits matching of <code>T</code>, <code>EC</code> and <code>EP</code>. It is defined as follows:</p>
 
 <ol>
-<li><p>If <code>EC</code> and <code>EP</code> is <code>void</code>, choose <a href="/outcome/reference/policies/terminate/" class="api-reference"><code>terminate</code></a>.</p></li>
+<li><p>If <code>EC</code> and <code>EP</code> is <code>void</code>, choose <a href="/outcome/reference/policies/terminate/" class="api-reference"><code>terminate</code></a>
+.</p></li>
 
-<li><p>If <a href="/outcome/reference/traits/is_error_code_available/" class="api-reference"><code>is_error_code_available&lt;T&gt;</code></a> true for <code>EC</code>, choose <a href="/outcome/reference/policies/error_code_throw_as_system_error_outcome/" class="api-reference"><code>error_code_throw_as_system_error&lt;T, EC, EP&gt;</code></a> for <code>basic_outcome</code> or <a href="/outcome/reference/policies/error_code_throw_as_system_error_result/" class="api-reference"><code>error_code_throw_as_system_error&lt;T, EC, void&gt;</code></a> for <code>basic_result</code>.</p></li>
+<li><p>If <a href="/outcome/reference/traits/is_error_code_available/" class="api-reference"><code>is_error_code_available&lt;T&gt;</code></a>
+ true for <code>EC</code>, choose <a href="/outcome/reference/policies/error_code_throw_as_system_error_outcome/" class="api-reference"><code>error_code_throw_as_system_error&lt;T, EC, EP&gt;</code></a>
+ for <code>basic_outcome</code> or <a href="/outcome/reference/policies/error_code_throw_as_system_error_result/" class="api-reference"><code>error_code_throw_as_system_error&lt;T, EC, void&gt;</code></a>
+ for <code>basic_result</code>.</p></li>
 
-<li><p>If <a href="/outcome/reference/traits/is_exception_ptr_available/" class="api-reference"><code>is_exception_ptr_available&lt;T&gt;</code></a> true for <code>EC</code> or <code>EP</code>, choose <a href="/outcome/reference/policies/exception_ptr_rethrow_outcome/" class="api-reference"><code>exception_ptr_rethrow&lt;T, EC, EP&gt;</code></a> for <code>basic_outcome</code> or <a href="/outcome/reference/policies/exception_ptr_rethrow_result/" class="api-reference"><code>exception_ptr_rethrow&lt;T, EC, void&gt;</code></a> for <code>basic_result</code>.</p></li>
+<li><p>If <a href="/outcome/reference/traits/is_exception_ptr_available/" class="api-reference"><code>is_exception_ptr_available&lt;T&gt;</code></a>
+ true for <code>EC</code> or <code>EP</code>, choose <a href="/outcome/reference/policies/exception_ptr_rethrow_outcome/" class="api-reference"><code>exception_ptr_rethrow&lt;T, EC, EP&gt;</code></a>
+ for <code>basic_outcome</code> or <a href="/outcome/reference/policies/exception_ptr_rethrow_result/" class="api-reference"><code>exception_ptr_rethrow&lt;T, EC, void&gt;</code></a>
+ for <code>basic_result</code>.</p></li>
 
-<li><p>Else choose <a href="/outcome/reference/policies/fail_to_compile_observers/" class="api-reference"><code>fail_to_compile_observers</code></a>, which fails the build with a useful message.</p></li>
+<li><p>Else choose <a href="/outcome/reference/policies/fail_to_compile_observers/" class="api-reference"><code>fail_to_compile_observers</code></a>
+, which fails the build with a useful message.</p></li>
 </ol>
 
 <p><em>Namespace</em>: <code>OUTCOME_V2_NAMESPACE::policy</code></p>

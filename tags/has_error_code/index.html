@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:19 UTC">
+<meta name="revised" content="2019-06-18T21:08:04 UTC">
 <title>Has_error_code :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2400,7 +2400,7 @@
         <h2 class="post-title"><a href="/outcome/tutorial/advanced/payload/">Custom payloads</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>So far in this tutorial, type EC in result&lt;T, EC&gt; has always been a std::error_code or boost::system::error_code. With NoValuePolicy set to default_policy&lt;T, EC, EP&gt;, EC needs in fact to merely satisfy the trait is_error_code_available&lt;T&gt; for EC to be treated as if an error_code. Outcome specialises that trait for std::error_code and boost::system::error_code, hence they &ldquo;just work&rdquo;.
+        <p>So far in this tutorial, type EC in result&lt;T, EC&gt; has always been a std::error_code or boost::system::error_code. With NoValuePolicy set to default_policy&lt;T, EC, EP&gt; , EC needs in fact to merely satisfy the trait is_error_code_available&lt;T&gt; for EC to be treated as if an error_code. Outcome specialises that trait for std::error_code and boost::system::error_code, hence they &ldquo;just work&rdquo;.
 If no specialisation exists, trait::is_error_code_available&lt;EC&gt; is true if there exists some ADL discovered free function make_error_code(EC). <a class="read-more" href="/outcome/tutorial/advanced/payload/">&raquo;</a></p>
     </section>
     <footer class=" footline" >

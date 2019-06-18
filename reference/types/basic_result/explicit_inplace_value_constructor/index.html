@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:14 UTC">
+<meta name="revised" content="2019-06-18T21:07:59 UTC">
 <title>`explicit basic_result(in_place_type_t&lt;value_type_if_enabled&gt;, Args ...)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2477,7 +2477,8 @@
     
     
     
-    <p>Explicit inplace value constructor. Calls <a href="/outcome/reference/functions/hooks/hook_result_in_place_construction/" class="api-reference"><code>void hook_result_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code></a> with <code>this</code>, <code>in_place_type&lt;value_type&gt;</code> and <code>Args ...</code>.</p>
+    <p>Explicit inplace value constructor. Calls <a href="/outcome/reference/functions/hooks/hook_result_in_place_construction/" class="api-reference"><code>void hook_result_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code></a>
+ with <code>this</code>, <code>in_place_type&lt;value_type&gt;</code> and <code>Args ...</code>.</p>
 
 <p><em>Requires</em>: <code>predicate::enable_inplace_value_constructor&lt;Args ...&gt;</code> is true.</p>
 

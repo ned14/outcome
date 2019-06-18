@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/functions/</link>
     <description>Recent content in Functions on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:43 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/functions/index.xml" rel="self" type="application/rss+xml" />
     
@@ -39,7 +39,7 @@ Requires: Always available.</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/try_operation_return_as_t/</guid>
-      <description>This implementation of try_operation_return_as(expr) returns whatever the input type&amp;rsquo;s .as_failure() member function returns. basic_result and basic_outcome provide such a member function, see auto as_failure() const &amp;amp;.
+      <description>This implementation of try_operation_return_as(expr) returns whatever the input type&amp;rsquo;s .as_failure() member function returns. basic_result and basic_outcome provide such a member function, see auto as_failure() const &amp;amp; .
 Requires: That the expression std::declval&amp;lt;T&amp;gt;().as_failure() is a valid expression.
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
@@ -51,8 +51,8 @@ Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/error_from_exception/</guid>
-      <description>This function saves writing boilerplate by rethrowing ep within a try block, with a long sequence of catch() handlers, one for every standard C++ exception type which has a near or exact equivalent code in  std::errc.
-If matched, ep is set to a default constructed  std::exception_ptr, and a  std::error_code is constructed using the ADL discovered free function make_error_code() upon the std::errc enumeration value matching the thrown exception.</description>
+      <description>This function saves writing boilerplate by rethrowing ep within a try block, with a long sequence of catch() handlers, one for every standard C++ exception type which has a near or exact equivalent code in  std::errc .
+If matched, ep is set to a default constructed  std::exception_ptr , and a  std::error_code is constructed using the ADL discovered free function make_error_code() upon the std::errc enumeration value matching the thrown exception.</description>
     </item>
     
     <item>

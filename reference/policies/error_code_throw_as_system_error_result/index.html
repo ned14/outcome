@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:22 UTC">
+<meta name="revised" content="2019-06-18T21:08:07 UTC">
 <title>`error_code_throw_as_system_error&lt;T, EC, void&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2421,14 +2421,16 @@
     
     
     
-    <p><em>Note</em>: This policy class specialisation can only be used with <code>basic_result</code>, not <code>basic_outcome</code>. Use <a href="/outcome/reference/policies/error_code_throw_as_system_error_outcome/" class="api-reference"><code>error_code_throw_as_system_error&lt;T, EC, EP&gt;</code></a> with <code>basic_outcome</code>.</p>
+    <p><em>Note</em>: This policy class specialisation can only be used with <code>basic_result</code>, not <code>basic_outcome</code>. Use <a href="/outcome/reference/policies/error_code_throw_as_system_error_outcome/" class="api-reference"><code>error_code_throw_as_system_error&lt;T, EC, EP&gt;</code></a>
+ with <code>basic_outcome</code>.</p>
 
 <p>Policy class defining that the ADL discovered free function <code>outcome_throw_as_system_error_with_payload(impl.assume_error())</code> should be called on incorrect wide value observation. <a href="/outcome/reference/functions/policy/">Some precanned overloads of that function are listed here</a>.</p>
 
 <p>Incorrect wide error observation performs:</p>
 <div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">OUTCOME_THROW_EXCEPTION</span><span class="p">(</span><span class="n">bad_result_access</span><span class="p">(</span><span class="s">&#34;no error&#34;</span><span class="p">));</span>
 </code></pre></div>
-<p>Inherits publicly from <a href="/outcome/reference/policies/base/" class="api-reference"><code>base</code></a>, and its narrow value, error and exception observer policies are inherited from there.</p>
+<p>Inherits publicly from <a href="/outcome/reference/policies/base/" class="api-reference"><code>base</code></a>
+, and its narrow value, error and exception observer policies are inherited from there.</p>
 
 <p><em>Requires</em>: Nothing.</p>
 

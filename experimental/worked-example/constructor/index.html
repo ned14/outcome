@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:10 UTC">
+<meta name="revised" content="2019-06-18T21:07:55 UTC">
 <title>The constructor :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2412,7 +2412,8 @@ zero code and thus zero overhead.</p>
 number of times, and being 100% in constexpr, any instances never have a unique
 address in memory either. Thus we cannot compare domains for equivalence using
 their address in memory, as 
-<a href="https://en.cppreference.com/w/cpp/error/error_category" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::error_category</code></a> does.</p>
+<a href="https://en.cppreference.com/w/cpp/error/error_category" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::error_category</code></a>
+ does.</p>
 
 <p>We solve this by using a <em>very</em> random 64 bit number taken from a hard random
 number source. The website <a href="https://www.random.org/cgi-bin/randbyte?nbytes=8&amp;format=h">https://www.random.org/cgi-bin/randbyte?nbytes=8&amp;format=h</a>

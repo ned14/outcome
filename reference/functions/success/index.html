@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:21 UTC">
+<meta name="revised" content="2019-06-18T21:08:06 UTC">
 <title>`auto success(T &amp;&amp;)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2425,7 +2425,8 @@
     
     
     
-    <p>Returns appropriate type sugar for constructing a successful result or outcome, usually <a href="/outcome/reference/types/success_type/" class="api-reference"><code>success_type&lt;T&gt;</code></a> with a decayed <code>T</code>.</p>
+    <p>Returns appropriate type sugar for constructing a successful result or outcome, usually <a href="/outcome/reference/types/success_type/" class="api-reference"><code>success_type&lt;T&gt;</code></a>
+ with a decayed <code>T</code>.</p>
 
 <p>Two default overloads are provided, one taking a single parameter returning <code>success_type&lt;std::decay_t&lt;T&gt;&gt;</code> and perfectly forwarding the input. The other overload takes no parameters, and returns <code>success_type&lt;void&gt;</code>, which usually causes the construction of the receiving <code>basic_result</code> or <code>basic_outcome</code>&rsquo;s with a default construction of their value type.</p>
 

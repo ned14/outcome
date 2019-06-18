@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/functions/hooks/</link>
     <description>Recent content in Hooks on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:43 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/functions/hooks/index.xml" rel="self" type="application/rss+xml" />
     
@@ -16,7 +16,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/spare_storage/</guid>
-      <description>Returns the sixteen bits of spare storage in the specified result or outcome. You can set these bits using void set_spare_storage(basic_result|basic_outcome *, uint16_t) noexcept.
+      <description>Returns the sixteen bits of spare storage in the specified result or outcome. You can set these bits using void set_spare_storage(basic_result|basic_outcome *, uint16_t) noexcept .
 Overridable: Not overridable.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -29,7 +29,7 @@ Header: &amp;lt;outcome/basic_result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_outcome_construction/</guid>
-      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt;, generally invoked by the implicit constructors of basic_outcome. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the implicit constructors of basic_outcome. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -42,7 +42,7 @@ Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_outcome_construction2/</guid>
-      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt;, generally invoked by the implicit constructors of basic_outcome which consume two arguments. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the implicit constructors of basic_outcome which consume two arguments. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -55,7 +55,7 @@ Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_outcome_copy_construction/</guid>
-      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt;, generally invoked by the converting copy constructors of basic_outcome (NOT the standard copy constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the converting copy constructors of basic_outcome (NOT the standard copy constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -68,7 +68,7 @@ Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_outcome_copy_construction2/</guid>
-      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt;, generally invoked by the converting copy constructors of basic_outcome (NOT the standard copy constructor) which consume two arguments. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the converting copy constructors of basic_outcome (NOT the standard copy constructor) which consume two arguments. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -81,7 +81,7 @@ Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_outcome_in_place_construction/</guid>
-      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt;, generally invoked by the in-place constructors of basic_outcome. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the in-place constructors of basic_outcome. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -94,7 +94,7 @@ Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_outcome_move_construction/</guid>
-      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt;, generally invoked by the converting move constructors of basic_outcome (NOT the standard move constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the converting move constructors of basic_outcome (NOT the standard move constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -107,7 +107,7 @@ Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_outcome_move_construction2/</guid>
-      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt;, generally invoked by the converting move constructors of basic_outcome (NOT the standard move constructor) which consume two arguments. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the converting move constructors of basic_outcome (NOT the standard move constructor) which consume two arguments. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -120,7 +120,7 @@ Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_result_construction/</guid>
-      <description>One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt;, generally invoked by the implicit constructors of basic_result. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , generally invoked by the implicit constructors of basic_result. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -133,7 +133,7 @@ Header: &amp;lt;outcome/basic_result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_result_copy_construction/</guid>
-      <description>One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt;, generally invoked by the converting copy constructors of basic_result (NOT the standard copy constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , generally invoked by the converting copy constructors of basic_result (NOT the standard copy constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -146,7 +146,7 @@ Header: &amp;lt;outcome/basic_result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_result_in_place_construction/</guid>
-      <description>One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt;, generally invoked by the in-place constructors of basic_result. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , generally invoked by the in-place constructors of basic_result. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -159,7 +159,7 @@ Header: &amp;lt;outcome/basic_result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_result_move_construction/</guid>
-      <description>One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt;, generally invoked by the converting move constructors of basic_result (NOT the standard move constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , generally invoked by the converting move constructors of basic_result (NOT the standard move constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -182,7 +182,7 @@ The only reason that this function exists is because some people have very corne
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/set_spare_storage/</guid>
-      <description>Sets the sixteen bits of spare storage in the specified result or outcome. You can retrieve these bits later using uint16_t spare_storage(const basic_result|basic_outcome *) noexcept.
+      <description>Sets the sixteen bits of spare storage in the specified result or outcome. You can retrieve these bits later using uint16_t spare_storage(const basic_result|basic_outcome *) noexcept .
 Overridable: Not overridable.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks

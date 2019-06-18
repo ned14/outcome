@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/macros/</link>
     <description>Recent content in Macros on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 08 Feb 2019 22:18:08 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 08 Feb 2019 22:18:43 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/macros/index.xml" rel="self" type="application/rss+xml" />
     
@@ -135,7 +135,7 @@ If successful, an auto &amp;amp;&amp;amp;var is initialised to the expression re
       
       <guid>https://ned14.github.io/outcome/reference/macros/tryv/</guid>
       <description>Evaluate an expression which results in a type matching the ValueOrError&amp;lt;T, E&amp;gt; concept, continuing execution if successful, immediately returning try_operation_return_as(expr) from the calling function if unsuccessful.
-The difference between the OUTCOME_TRYV(expr) and OUTCOME_TRY(expr) editions is that the latter will set a variable if two or more macro arguments are present (see OUTCOME_TRY(var, expr)). The former requires the T to be void.
+The difference between the OUTCOME_TRYV(expr) and OUTCOME_TRY(expr) editions is that the latter will set a variable if two or more macro arguments are present (see OUTCOME_TRY(var, expr) ). The former requires the T to be void.
 Overridable: Not overridable.
 Definition: Firstly the expression&amp;rsquo;s temporary is bound to a uniquely named, stack allocated, auto &amp;amp;&amp;amp;.</description>
     </item>

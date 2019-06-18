@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:22 UTC">
+<meta name="revised" content="2019-06-18T21:08:06 UTC">
 <title>`boost_outcome&lt;T, EC = boost::system::error_code, EP = boost::exception_ptr, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2423,9 +2423,15 @@
     
     
     
-    <p>A type alias to a <a href="/outcome/reference/types/basic_outcome/" class="api-reference"><code>basic_outcome&lt;T, EC, EP, NoValuePolicy&gt;</code></a> configured with <a href="/outcome/reference/aliases/boost_checked/" class="api-reference"><code>boost::system::error_code</code></a>, <a href="/outcome/reference/aliases/boost_outcome/" class="api-reference"><code>boost::exception_ptr</code></a> and <code>policy::</code><a href="/outcome/reference/aliases/default_policy/" class="api-reference"><code>default_policy</code></a>.</p>
+    <p>A type alias to a <a href="/outcome/reference/types/basic_outcome/" class="api-reference"><code>basic_outcome&lt;T, EC, EP, NoValuePolicy&gt;</code></a>
+ configured with <a href="/outcome/reference/aliases/boost_checked/" class="api-reference"><code>boost::system::error_code</code></a>
+, <a href="/outcome/reference/aliases/boost_outcome/" class="api-reference"><code>boost::exception_ptr</code></a>
+ and <code>policy::</code><a href="/outcome/reference/aliases/default_policy/" class="api-reference"><code>default_policy</code></a>
+.</p>
 
-<p>This type alias always references the <code>std</code> edition of things, unlike <a href="/outcome/reference/aliases/outcome/" class="api-reference"><code>outcome&lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code></a> which references either this alias or <a href="/outcome/reference/aliases/std_outcome/" class="api-reference"><code>std_outcome&lt;T, EC = std::error_code, EP = std::exception_ptr, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code></a>.</p>
+<p>This type alias always references the <code>std</code> edition of things, unlike <a href="/outcome/reference/aliases/outcome/" class="api-reference"><code>outcome&lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code></a>
+ which references either this alias or <a href="/outcome/reference/aliases/std_outcome/" class="api-reference"><code>std_outcome&lt;T, EC = std::error_code, EP = std::exception_ptr, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code></a>
+.</p>
 
 <p><em>Namespace</em>: <code>OUTCOME_V2_NAMESPACE</code></p>
 

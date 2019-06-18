@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:10 UTC">
+<meta name="revised" content="2019-06-18T21:07:55 UTC">
 <title>Hook result :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2046,104 +2046,6 @@
       <a href="/outcome/reference/functions/hooks/">Hooks</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/functions/hooks/spare_storage/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/spare_storage/">
-            <code>uint16_t spare_storage(const basic_result|basic_outcome *) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_construction/">
-            <code>void hook_outcome_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_construction2/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_construction2/">
-            <code>void hook_outcome_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_copy_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_copy_construction/">
-            <code>void hook_outcome_copy_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_copy_construction2/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_copy_construction2/">
-            <code>void hook_outcome_copy_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_in_place_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_in_place_construction/">
-            <code>void hook_outcome_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_move_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_move_construction/">
-            <code>void hook_outcome_move_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_move_construction2/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_move_construction2/">
-            <code>void hook_outcome_move_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_construction/">
-            <code>void hook_result_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_copy_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_copy_construction/">
-            <code>void hook_result_copy_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_in_place_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_in_place_construction/">
-            <code>void hook_result_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_move_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_move_construction/">
-            <code>void hook_result_move_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/override_outcome_exception/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/override_outcome_exception/">
-            <code>void override_outcome_exception(basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/set_spare_storage/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/set_spare_storage/">
-            <code>void set_spare_storage(basic_result|basic_outcome *, uint16_t) noexcept</code>
-          </a>
-        </div>
-    </li>
         </ul>
     </li>
     <li data-nav-id="/outcome/reference/functions/iostream/" class="dd-item haschildren
@@ -2438,13 +2340,15 @@ slot in TLS storage and writes the current stack backtrace into it.</p>
 </code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/error_code_extended.cpp#L113" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
-<p>The only non-obvious part above is the call to <a href="/outcome/reference/functions/hooks/set_spare_storage/" class="api-reference"><code>void set_spare_storage(basic_result|basic_outcome *, uint16_t) noexcept</code></a>.</p>
+<p>The only non-obvious part above is the call to <a href="/outcome/reference/functions/hooks/set_spare_storage/" class="api-reference"><code>void set_spare_storage(basic_result|basic_outcome *, uint16_t) noexcept</code></a>
+.</p>
 
 <p>Both <code>result</code> and <code>outcome</code> keep their internal state metadata in a <code>uint32_t</code>,
 half of which is not used by Outcome. As it can be very useful to keep a small
 unique number attached to any particular <code>result</code> or <code>outcome</code> instance, we
 permit user code to set those sixteen bits to anything they feel like.
-The corresponding function to retrieve those sixteen bits is <a href="/outcome/reference/functions/hooks/spare_storage/" class="api-reference"><code>uint16_t spare_storage(const basic_result|basic_outcome *) noexcept</code></a>.</p>
+The corresponding function to retrieve those sixteen bits is <a href="/outcome/reference/functions/hooks/spare_storage/" class="api-reference"><code>uint16_t spare_storage(const basic_result|basic_outcome *) noexcept</code></a>
+.</p>
 
 <p>The state of the sixteen bits of spare storage are ignored during comparison operations.</p>
 

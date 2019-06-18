@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T10:14:10 UTC">
+<meta name="revised" content="2019-06-18T21:07:55 UTC">
 <title>TRY operations :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2411,7 +2411,8 @@
     
     
 
-<p>In the implementation of function <code>print_half</code> we have seen the usage of the macro <a href="/outcome/reference/macros/tryv/" class="api-reference"><code>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)</code></a>:</p>
+<p>In the implementation of function <code>print_half</code> we have seen the usage of the macro <a href="/outcome/reference/macros/tryv/" class="api-reference"><code>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)</code></a>
+:</p>
 <div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">OUTCOME_TRY</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">BigInt</span><span class="o">::</span><span class="n">fromString</span><span class="p">(</span><span class="n">text</span><span class="p">));</span>
 </code></pre></div>
 <p>The <code>OUTCOME_TRY</code> macro uses C macro overloading to select between two implementations based on the number of
