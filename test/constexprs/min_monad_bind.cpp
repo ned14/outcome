@@ -1,3 +1,7 @@
+/* Canned codegen quality test sequences
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+*/
+
 #include "../../include/boost/outcome.hpp"
 
 using namespace boost::outcome;

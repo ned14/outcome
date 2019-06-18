@@ -1,3 +1,7 @@
+/* Single header test
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+*/
+
 #undef __cpp_modules
 #include "../single-header/outcome.hpp"
 

@@ -1,3 +1,8 @@
+/* Documentation snippet
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Mar 2017
+*/
+
 //! [error_code_registration]
 #include <iostream>
 #include <string>        // for string printing

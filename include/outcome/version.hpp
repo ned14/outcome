@@ -1,7 +1,11 @@
+/* Sets Outcome version
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+*/
+
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_MAJOR    2
 /*! AWAITING HUGO JSON CONVERSION TOOL */
-#define OUTCOME_VERSION_MINOR    0
+#define OUTCOME_VERSION_MINOR    2
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_PATCH    0 
 /*! AWAITING HUGO JSON CONVERSION TOOL */

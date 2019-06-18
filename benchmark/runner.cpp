@@ -1,3 +1,8 @@
+/* Benchmark test runner
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Mar 2017
+*/
+
 #include "timing.h"
 #include <stdio.h>
 #include "function.h"

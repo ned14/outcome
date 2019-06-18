@@ -1,3 +1,8 @@
+/* Documentation snippet
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+File Created: Mar 2017
+*/
+
 #include "../../../include/outcome/outcome.hpp"
 
 #if(_HAS_CXX17 || __cplusplus >= 201700)
