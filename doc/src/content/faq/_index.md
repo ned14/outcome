@@ -416,3 +416,80 @@ party libraries each using incommensurate Outcome (or Expected) configurations. 
 not do any of this, but subsequent WG21 papers do propose various interoperation
 mechanisms, [one of which](https://wg21.link/P0786) Outcome implements so code using Expected will seamlessly
 interoperate with code using Outcome.
+
+
+## Is Outcome riddled with undefined behaviour for const, const-containing and reference-containing types?
+
+The short answer is yes, but it probably won't matter to you in practice.
+
+The longer answer is that the same problem affects lots of C++ out there,
+so lots of production code will break if Outcome ever breaks on this.
+
+Before the C++ 14 standard, placement new into storage which used to contain
+a const type was straight out always undefined behaviour, period. Thus all
+assignment to a `result<const T>`, or indeed an `optional<const T>`, is always
+undefined behaviour before C++ 14. From `[basic.life]` for the C++ 11 standard:
+
+> Creating a new object at the storage location that a const object with static, 
+> thread, or automatic storage duration occupies or, at the storage location
+> that such a const object used to occupy before its lifetime ended results
+> in undefined behavior. 
+
+This being excessively restrictive, from C++ 14 onwards, `[basic_life]` now states:
+
+> If, after the lifetime of an object has ended and before the storage which
+> the object occupied is reused or released, a new object is created at the
+> storage location which the original object occupied, a pointer that
+> pointed to the original object, a reference that referred to the original
+> object, or the name of the original object will automatically refer to the
+> new object and, once the lifetime of the new object has started, can be
+> used to manipulate the new object, if:
+>
+>   — the storage for the new object exactly overlays the storage location which
+>     the original object occupied, and
+>
+>   — the new object is of the same type as the original object (ignoring the
+>     top-level cv-qualifiers), and
+>
+>   — the type of the original object is not const-qualified, and, if a class type,
+>     does not contain any non-static data member whose type is const-qualified
+>     or a reference type, and
+>
+>   — neither the original object nor the new object is a potentially-overlapping
+>     subobject
+
+Leaving aside my personal objections to giving placement new of non-const
+non-reference types magical pointer renaming powers, the upshot is that if
+you want defined behaviour for placement new of types containing const types
+or references, you must store the pointer returned by placement new, and use
+that pointer for all further reference to the newly created object. This
+obviously adds eight bytes of storage to a `result<const T>`, which is highly
+undesirable given all the care and attention paid to keeping it small. The alternative
+is to use {{% api "std::launder" %}}, which was added in C++ 17, to 'launder'
+the storage into which we placement new before each and every use of that
+storage. This forces the compiler to reload the object stored by placement
+new on every occasion, and not assume it is can be constant propagated, which
+impacts codegen quality.
+
+As neither situation is obviously desirable, after much thought I have
+decided to simply do nothing apart from add this FAQ entry. I would say that
+because Outcome is 100% header-only, the compiler can always see that
+assignment performs placement new, and thus the compiler always knows that the
+preceding const or reference object is dead, and there is now a new const
+or reference object in its place. I appreciate that this is a hand waving
+response, and code using Outcome will still contain undefined behaviour if
+you use a const type, or a type containing const or reference types.
+
+However the reality on the ground is that a ton of production C++ code does
+placement new of types potentially containing const or reference types, and
+it is highly unlikely that C++ compilers will, in practice, break all that
+production code, especially as the template type supplied to library code is often
+outside one's control. If, however, compilers do end up moving ahead on
+optimising this aggressively, Outcome will need to add laundering for any
+type containing const or reference types, for which one needs Reflection
+into the language in any case. We shall thus wait until later to see what
+happens.
+
+If you wish to be kept abreast of changes on this topic, please add yourself
+to https://github.com/ned14/outcome/issues/185 which is the issue tracking
+this bug.
