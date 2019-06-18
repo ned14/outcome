@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-17T21:18:34 UTC">
+<meta name="revised" content="2019-06-18T10:14:09 UTC">
 <title>A custom no-value policy :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2432,7 +2432,7 @@
       <span class="n">std</span><span class="o">::</span><span class="n">abort</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/policies.cpp#L6" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/policies.cpp#L30" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>All policies ought to inherit from <a href="/outcome/reference/policies/base/" class="api-reference"><code>base</code></a> in order to provide your policy implementation with
@@ -2444,7 +2444,7 @@ the internal policy API for accessing and manipulating <code>result</code> and <
 <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
 <span class="k">using</span> <span class="n">strictOutcome</span> <span class="o">=</span>  <span class="c1">//
 </span><span class="c1"></span><span class="n">outcome</span><span class="o">::</span><span class="n">basic_outcome</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">exception_ptr</span><span class="p">,</span> <span class="n">abort_policy</span><span class="o">&gt;</span><span class="p">;</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/policies.cpp#L64" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/policies.cpp#L88" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 

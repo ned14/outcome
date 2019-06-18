@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-17T21:18:35 UTC">
+<meta name="revised" content="2019-06-18T10:14:10 UTC">
 <title>Inspecting result&lt;T, EC&gt; :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2412,7 +2412,7 @@
     <p>Suppose we will be writing a function <code>print_half</code> that takes a <code>std::string</code> representing an integer and prints half the integer:</p>
 
 <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span> <span class="n">print_half</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">text</span><span class="p">);</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_result.cpp#L114" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_result.cpp#L138" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>The type <code>result&lt;void&gt;</code> means that there is no value to be returned upon success, but that the operation might still fail, and we may be interested in inspecting the cause of the failure. The class template <code>result&lt;&gt;</code> is declared with the attribute <code>[[nodiscard]]</code>, which means the compiler will warn you if you forget to inspect the returned object (in C++ 17 or later).</p>
@@ -2439,7 +2439,7 @@
   <span class="p">}</span>
   <span class="k">return</span> <span class="n">outcome</span><span class="o">::</span><span class="n">success</span><span class="p">();</span>                      <span class="c1">// #6
 </span><span class="c1"></span><span class="p">}</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_result.cpp#L118" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_result.cpp#L142" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>#1. You test if <code>result&lt;&gt;</code> object represents a successful operation with contextual conversion to <code>bool</code>.</p>
@@ -2451,7 +2451,7 @@
 <p>#4. Macro <code>OUTCOME_TRY</code> represents a control statement. It implies that the expression in the second argument returns a <code>result&lt;&gt;</code>. The function is defined as:</p>
 
 <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="cm">/*static*/</span> <span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">BigInt</span><span class="o">&gt;</span> <span class="n">BigInt</span><span class="o">::</span><span class="n">fromString</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">s</span><span class="p">)</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_result.cpp#L107" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_result.cpp#L131" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>Our control statement means: if <code>fromString</code> returned failure, this same error information should be returned from <code>print_half</code>, even though the type of <code>result&lt;&gt;</code> is different. If <code>fromString</code> returned success, we create  variable <code>i</code> of type <code>BigInt</code> with the value returned from <code>fromString</code>. If control goes to subsequent line, it means <code>fromString</code> succeeded and variable of type <code>BigInt</code> is in scope.</p>
