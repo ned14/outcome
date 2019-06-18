@@ -1,5 +1,5 @@
 /* A very simple result type
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
 File Created: June 2017
 
 
@@ -8,7 +8,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,8 +18,8 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef OUTCOME_STD_RESULT_HPP

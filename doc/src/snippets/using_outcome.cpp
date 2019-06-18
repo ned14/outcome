@@ -1,5 +1,5 @@
 /* Example of Outcome
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (149 commits)
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (3 commits), Krzemienski <sg0897542@global.ad.sabre.com> (3 commits) and Andrzej Krzemienski <akrzemi1@gmail.com> (3 commits)
 
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -7,7 +7,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License in the accompanying file
 Licence.txt or at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,8 +17,8 @@ limitations under the License.
 
 
 Distributed under the Boost Software License, Version 1.0.
-(See accompanying file Licence.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt)
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #include "../../../include/outcome.hpp"

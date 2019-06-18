@@ -1,5 +1,5 @@
 /* Configure Outcome with QuickCppLib
-(C) 2015-2018 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2019 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: August 2015
 
 

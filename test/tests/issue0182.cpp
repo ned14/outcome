@@ -1,5 +1,5 @@
 /* Unit testing for outcomes
-(C) 2013-2019 Niall Douglas <http://www.nedproductions.biz/> (149 commits)
+(C) 2013-2019 Niall Douglas <http://www.nedproductions.biz/> (1 commit)
 
 
 Licensed under the Apache License, Version 2.0 (the "License");
