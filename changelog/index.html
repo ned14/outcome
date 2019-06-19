@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-18T21:07:56 UTC">
+<meta name="revised" content="2019-06-19T09:16:53 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2390,6 +2390,19 @@
 
 <h2 id="v2-2-xxth-july-2019-boost-1-71-release-https-github-com-ned14-outcome-releases-tag-v2-2">v2.2 XXth July 2019 (Boost 1.71) <a href="https://github.com/ned14/outcome/releases/tag/v2.2">[release]</a></h2>
 
+<h3 id="open-bugs-not-fixed">Open bugs not fixed:</h3>
+
+<ul>
+<li><a href="https://github.com/ned14/outcome/issues/185">#185</a>
+
+<ul>
+<li>Add FAQ item explaining issue #185, and why we will do nothing to
+fix it right now.</li>
+</ul></li>
+</ul>
+
+<h3 id="bug-fixes">Bug fixes:</h3>
+
 <ul>
 <li><p><a href="https://github.com/ned14/outcome/issues/190">#190</a></p>
 
@@ -2404,6 +2417,20 @@ the Boost release distro.</li>
 <li>Fix issue #182 where <code>trait::is_exception_ptr_available&lt;T&gt;</code> was always true,
 thus causing much weirdness, like not printing diagnostics and trying to feed
 everything to <code>make_exception_ptr()</code>.</li>
+</ul></li>
+</ul>
+
+<h3 id="enhancements">Enhancements:</h3>
+
+<ul>
+<li><a href="https://github.com/ned14/outcome/issues/184">#184</a>
+
+<ul>
+<li>As per request from Boost release managers, relocated <code>version.hpp</code> and
+<code>revision.hpp</code> into detail, and added the Boost licence boilerplate to the top
+of every source file which was missing one (I think). Also took the opportunity
+to run the licence restamping script over all Outcome, so copyright dates are now
+up to date.</li>
 </ul></li>
 </ul>
 
@@ -2569,7 +2596,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 17/06/2019
+        <i class='fa fa-calendar'></i> Last update on 19/06/2019
     </div>
     
 
