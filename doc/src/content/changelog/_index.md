@@ -6,6 +6,14 @@ weight = 80
 ---
 ## v2.2 XXth July 2019 (Boost 1.71) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2)
 
+### Open bugs not fixed:
+
+- [#185](https://github.com/ned14/outcome/issues/185)
+    - Add FAQ item explaining issue #185, and why we will do nothing to
+fix it right now.
+
+### Bug fixes:
+
 - [#190](https://github.com/ned14/outcome/issues/190)
     - Fix issue #190 in Boost edition where unit test suite was not runnable from
 the Boost release distro.
@@ -14,6 +22,15 @@ the Boost release distro.
     - Fix issue #182 where `trait::is_exception_ptr_available<T>` was always true,
 thus causing much weirdness, like not printing diagnostics and trying to feed
 everything to `make_exception_ptr()`.
+
+### Enhancements:
+
+- [#184](https://github.com/ned14/outcome/issues/184)
+    - As per request from Boost release managers, relocated `version.hpp` and
+`revision.hpp` into detail, and added the Boost licence boilerplate to the top
+of every source file which was missing one (I think). Also took the opportunity
+to run the licence restamping script over all Outcome, so copyright dates are now
+up to date.
 
 ---
 ## v2.1 12th Apr 2019 (Boost 1.70) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1)
