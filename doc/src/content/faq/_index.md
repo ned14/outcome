@@ -423,11 +423,37 @@ interoperate with code using Outcome.
 The short answer is yes, but it probably won't matter to you in practice.
 
 The longer answer is that the same problem affects lots of C++ out there,
-so lots of production code will break if Outcome ever breaks on this.
+so lots of production code will break if Outcome ever breaks on this. The
+potentially sometime-in-the-future affected code sequence would be:
+
+```c++
+struct const_containing_type
+{
+    const int no;                      // only concerns const and reference types
+    const_containing_type(int n) : no(n) {}
+};
+
+extern void external_function(int, const result<const_containing_type> &);
+
+int example_const_propagation2()
+{
+  result<const_containing_type> a{5};
+  const int &x = a.value().no;
+  external_function(x, a);             // might call an outcome function which calls placement new!
+  return x;                            // does this reload x, or assume it hasn't changed?
+}
+```
+
+GCCs up to v10, clangs up to v9 and MSVCs up to VS2019.1 <u><b>do</b></u> reload `x` after
+the call of an unknown function, even though it has constant type. This may change
+in future compilers due to changes in the C++ standard to encourage such
+optimisations.
+
+### Brief history of C++ standard changes
 
 Before the C++ 14 standard, placement new into storage which used to contain
-a const type was straight out always undefined behaviour, period. Thus all
-assignment to a `result<const T>`, or indeed an `optional<const T>`, is always
+a const type was straight out always undefined behaviour, period. Thus all use of
+placement new within a `result<const_containing_type>`, or indeed an `optional<const_containing_type>`, is always
 undefined behaviour before C++ 14. From `[basic.life]` for the C++ 11 standard:
 
 > Creating a new object at the storage location that a const object with static, 
@@ -463,7 +489,7 @@ non-reference types magical pointer renaming powers, the upshot is that if
 you want defined behaviour for placement new of types containing const types
 or references, you must store the pointer returned by placement new, and use
 that pointer for all further reference to the newly created object. This
-obviously adds eight bytes of storage to a `result<const T>`, which is highly
+obviously adds eight bytes of storage to a `result<const_containing_type>`, which is highly
 undesirable given all the care and attention paid to keeping it small. The alternative
 is to use {{% api "std::launder" %}}, which was added in C++ 17, to 'launder'
 the storage into which we placement new before each and every use of that
@@ -473,12 +499,12 @@ impacts codegen quality.
 
 As neither situation is obviously desirable, after much thought I have
 decided to simply do nothing apart from add this FAQ entry. I would say that
-because Outcome is 100% header-only, the compiler can always see that
-assignment performs placement new, and thus the compiler always knows that the
+because Outcome is 100% header-only, the compiler can always see the
+calls of placement new, and thus the compiler always knows that the
 preceding const or reference object is dead, and there is now a new const
 or reference object in its place. I appreciate that this is a hand waving
 response, and code using Outcome will still contain undefined behaviour if
-you use a const type, or a type containing const or reference types.
+you use it with a const type, or a type containing const or reference types.
 
 However the reality on the ground is that a ton of production C++ code does
 placement new of types potentially containing const or reference types, and
@@ -489,6 +515,8 @@ optimising this aggressively, Outcome will need to add laundering for any
 type containing const or reference types, for which one needs Reflection
 into the language in any case. We shall thus wait until later to see what
 happens.
+
+### Summary
 
 If you wish to be kept abreast of changes on this topic, please add yourself
 to https://github.com/ned14/outcome/issues/185 which is the issue tracking
