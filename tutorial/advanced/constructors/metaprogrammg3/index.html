@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-19T09:16:53 UTC">
+<meta name="revised" content="2019-06-20T10:19:04 UTC">
 <title>Alternatives :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -442,6 +442,13 @@
         <div>
           <a href="/outcome/recipes/asio-integration/">
             ASIO/Networking TS
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/recipes/foreign-try/" class="dd-item">
+        <div>
+          <a href="/outcome/recipes/foreign-try/">
+            Extending <code>OUTCOME_TRY</code>
           </a>
         </div>
     </li>
@@ -1941,97 +1948,6 @@
       <a href="/outcome/reference/aliases/">Aliases</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/aliases/boost_checked/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/boost_checked/">
-            <code>boost_checked&lt;T, E = boost::system::error_code&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/boost_outcome/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/boost_outcome/">
-            <code>boost_outcome&lt;T, EC = boost::system::error_code, EP = boost::exception_ptr, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/boost_result/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/boost_result/">
-            <code>boost_result&lt;T, E = boost::system::error_code, NoValuePolicy = policy::default_policy&lt;T, E, void&gt;&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/boost_unchecked/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/boost_unchecked/">
-            <code>boost_unchecked&lt;T, E = boost::system::error_code&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/checked/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/checked/">
-            <code>checked&lt;T, E = varies&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/default_policy/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/default_policy/">
-            <code>default_policy&lt;T, EC, EP&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/outcome/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/outcome/">
-            <code>outcome&lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/result/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/result/">
-            <code>result&lt;T, E = varies, NoValuePolicy = policy::default_policy&lt;T, E, void&gt;&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/std_checked/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/std_checked/">
-            <code>std_checked&lt;T, E = std::error_code&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/std_outcome/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/std_outcome/">
-            <code>std_outcome&lt;T, EC = std::error_code, EP = std::exception_ptr, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/std_result/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/std_result/">
-            <code>std_result&lt;T, E = std::error_code, NoValuePolicy = policy::default_policy&lt;T, E, void&gt;&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/std_unchecked/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/std_unchecked/">
-            <code>std_unchecked&lt;T, E = std::error_code&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/unchecked/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/unchecked/">
-            <code>unchecked&lt;T, E = varies&gt;</code>
-          </a>
-        </div>
-    </li>
         </ul>
     </li>
     <li data-nav-id="/outcome/reference/functions/" class="dd-item haschildren
@@ -2267,10 +2183,24 @@
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/try_operation_return_as_t/" class="dd-item">
+      <li data-nav-id="/outcome/reference/functions/try_operation_has_value/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/try_operation_return_as_t/">
-            <code>auto try_operation_return_as(T &amp;&amp;)</code>
+          <a href="/outcome/reference/functions/try_operation_has_value/">
+            <code>bool try_operation_has_value(X)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/try_operation_extract_value/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/try_operation_extract_value/">
+            <code>decltype(auto) try_operation_extract_value(X)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/try_operation_return_as/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/try_operation_return_as/">
+            <code>decltype(auto) try_operation_return_as(X)</code>
           </a>
         </div>
     </li>
@@ -2278,13 +2208,6 @@
         <div>
           <a href="/outcome/reference/functions/error_from_exception/">
             <code>std::error_code error_from_exception(std::exception_ptr &amp;&amp;ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/try_operation_return_as_expected/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/try_operation_return_as_expected/">
-            <code>std::experimental::unexpected&lt;E&gt; try_operation_return_as(std::experimental::expected&lt;T, E&gt;)</code>
           </a>
         </div>
     </li>

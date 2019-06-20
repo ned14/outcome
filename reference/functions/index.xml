@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/functions/</link>
     <description>Recent content in Functions on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Sat, 09 Feb 2019 14:45:47 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 09 Feb 2019 15:18:26 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/functions/index.xml" rel="self" type="application/rss+xml" />
     
@@ -34,13 +34,38 @@ Requires: Always available.</description>
     </item>
     
     <item>
-      <title>`auto try_operation_return_as(T &amp;&amp;)`</title>
-      <link>https://ned14.github.io/outcome/reference/functions/try_operation_return_as_t/</link>
+      <title>`bool try_operation_has_value(X)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/try_operation_has_value/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://ned14.github.io/outcome/reference/functions/try_operation_return_as_t/</guid>
-      <description>This implementation of try_operation_return_as(expr) returns whatever the input type&amp;rsquo;s .as_failure() member function returns. basic_result and basic_outcome provide such a member function, see auto as_failure() const &amp;amp; .
-Requires: That the expression std::declval&amp;lt;T&amp;gt;().as_failure() is a valid expression.
+      <guid>https://ned14.github.io/outcome/reference/functions/try_operation_has_value/</guid>
+      <description>This default implementation returns whatever the .has_value() member function returns.
+Requires: That the expression std::declval&amp;lt;T&amp;gt;().has_value() is a valid expression.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`decltype(auto) try_operation_extract_value(X)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/try_operation_extract_value/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/try_operation_extract_value/</guid>
+      <description>This default implementation returns whatever the .assume_value() or .value() member functions return, preferentially choosing the former where both are available.
+Requires: That the expression std::declval&amp;lt;T&amp;gt;().assume_value() and/or std::declval&amp;lt;T&amp;gt;().value() is a valid expression.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`decltype(auto) try_operation_return_as(X)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/try_operation_return_as/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/try_operation_return_as/</guid>
+      <description>This default implementation preferentially returns whatever the input type&amp;rsquo;s .as_failure() member function returns. basic_result and basic_outcome provide such a member function, see auto as_failure() const &amp;amp; .
+If .as_failure() is not available, it will also match any .error() member function, which it wraps into a failure type sugar using failure(T &amp;amp;&amp;amp;, ...) .
+Requires: That the expression std::declval&amp;lt;T&amp;gt;().as_failure() and/or std::declval&amp;lt;T&amp;gt;().error() is a valid expression.
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
     </item>
@@ -53,18 +78,6 @@ Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
       <guid>https://ned14.github.io/outcome/reference/functions/error_from_exception/</guid>
       <description>This function saves writing boilerplate by rethrowing ep within a try block, with a long sequence of catch() handlers, one for every standard C++ exception type which has a near or exact equivalent code in  std::errc .
 If matched, ep is set to a default constructed  std::exception_ptr , and a  std::error_code is constructed using the ADL discovered free function make_error_code() upon the std::errc enumeration value matching the thrown exception.</description>
-    </item>
-    
-    <item>
-      <title>`std::experimental::unexpected&lt;E&gt; try_operation_return_as(std::experimental::expected&lt;T, E&gt;)`</title>
-      <link>https://ned14.github.io/outcome/reference/functions/try_operation_return_as_expected/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/reference/functions/try_operation_return_as_expected/</guid>
-      <description>This implementation of try_operation_return_as(expr) returns an unexpected for any expected input. This allows the use of functions returning std::experimental::expected&amp;lt;T, E&amp;gt; in OUTCOME_TRY(...).
-Requires: Always available.
-Namespace: OUTCOME_V2_NAMESPACE
-Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
     </item>
     
     <item>

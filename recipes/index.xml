@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/recipes/</link>
     <description>Recent content in Recipes on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Sat, 09 Feb 2019 14:45:47 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 09 Feb 2019 15:18:26 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/recipes/index.xml" rel="self" type="application/rss+xml" />
     
@@ -20,6 +20,16 @@
 Use case Boost.ASIO and standalone ASIO provide the async_result customisation point for adapting arbitrary third party libraries, such as Outcome, into ASIO.
 Historically in ASIO you need to pass completion handler instances to the ASIO asynchronous i/o initiation functions. These get executed when the i/o completes.
 // Dynamically allocate a buffer to read into. This must be move-only  // so it can be attached to the completion handler, hence the unique_ptr.</description>
+    </item>
+    
+    <item>
+      <title>Extending `OUTCOME_TRY`</title>
+      <link>https://ned14.github.io/outcome/recipes/foreign-try/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/recipes/foreign-try/</guid>
+      <description>Outcome&amp;rsquo;s OUTCOME_TRY(var, expr) operation is fully extensible to accept as input any foreign types. It already recognises types matching the ValueOrError&amp;lt;T, E&amp;gt; concept, which is to say all types which have:
+ A public .has_value() member function which returns a bool. A public .assume_value()/.value() member function, with the former chosen preferentially if available. A public .as_failure()/.error() member function, with the former chosen preferentially if available.  This should automatically handle std::expected&amp;lt;T, E&amp;gt; and many others.</description>
     </item>
     
   </channel>

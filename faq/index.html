@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-19T09:16:52 UTC">
+<meta name="revised" content="2019-06-20T10:19:03 UTC">
 <title>Frequently asked questions :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -439,6 +439,13 @@
         <div>
           <a href="/outcome/recipes/asio-integration/">
             ASIO/Networking TS
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/recipes/foreign-try/" class="dd-item">
+        <div>
+          <a href="/outcome/recipes/foreign-try/">
+            Extending <code>OUTCOME_TRY</code>
           </a>
         </div>
     </li>
@@ -2264,10 +2271,24 @@
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/try_operation_return_as_t/" class="dd-item">
+      <li data-nav-id="/outcome/reference/functions/try_operation_has_value/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/try_operation_return_as_t/">
-            <code>auto try_operation_return_as(T &amp;&amp;)</code>
+          <a href="/outcome/reference/functions/try_operation_has_value/">
+            <code>bool try_operation_has_value(X)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/try_operation_extract_value/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/try_operation_extract_value/">
+            <code>decltype(auto) try_operation_extract_value(X)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/try_operation_return_as/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/try_operation_return_as/">
+            <code>decltype(auto) try_operation_return_as(X)</code>
           </a>
         </div>
     </li>
@@ -2275,13 +2296,6 @@
         <div>
           <a href="/outcome/reference/functions/error_from_exception/">
             <code>std::error_code error_from_exception(std::exception_ptr &amp;&amp;ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/try_operation_return_as_expected/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/try_operation_return_as_expected/">
-            <code>std::experimental::unexpected&lt;E&gt; try_operation_return_as(std::experimental::expected&lt;T, E&gt;)</code>
           </a>
         </div>
     </li>
@@ -2956,8 +2970,8 @@ so lots of production code will break if Outcome ever breaks on this. The
 potentially sometime-in-the-future affected code sequence would be:</p>
 <div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">struct</span> <span class="n">const_containing_type</span>
 <span class="p">{</span>
-    <span class="k">const</span> <span class="kt">int</span> <span class="n">no</span><span class="p">;</span>                      <span class="c1">// only concerns const and reference types
-</span><span class="c1"></span>    <span class="n">const_containing_type</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="o">:</span> <span class="n">no</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="p">{}</span>
+  <span class="k">const</span> <span class="kt">int</span> <span class="n">no</span><span class="p">;</span>                        <span class="c1">// only concerns const and reference types
+</span><span class="c1"></span>  <span class="n">const_containing_type</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="o">:</span> <span class="n">no</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="p">{}</span>
 <span class="p">};</span>
 
 <span class="k">extern</span> <span class="kt">void</span> <span class="nf">external_function</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="k">const</span> <span class="n">result</span><span class="o">&lt;</span><span class="n">const_containing_type</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="p">);</span>
@@ -3076,7 +3090,7 @@ this bug.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 19/06/2019
+        <i class='fa fa-calendar'></i> Last update on 20/06/2019
     </div>
     
 

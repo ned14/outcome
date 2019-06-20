@@ -2292,7 +2292,7 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1052 commits   @akrzemi1 45 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1053 commits   @akrzemi1 45 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>
@@ -2305,6 +2305,16 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
 Header: &amp;lt;outcome/config.hpp&amp;gt;
 These macros expand into either the syntax for directly specifying constrained templates in C++ 20, or into a SFINAE based emulation for earlier C++ versions. Form of usage looks as follows:
 OUTCOME_TEMPLATE(classErrorCondEnum) OUTCOME_TREQUIRES( // If this is a valid expression  OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))), // If this predicate is true  OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor&amp;lt;ErrorCondEnum&amp;gt;) // Any additional requirements follow here .</description>
+    </item>
+    
+    <item>
+      <title>Extending `OUTCOME_TRY`</title>
+      <link>https://ned14.github.io/outcome/recipes/foreign-try/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/recipes/foreign-try/</guid>
+      <description>Outcome&amp;rsquo;s OUTCOME_TRY(var, expr) operation is fully extensible to accept as input any foreign types. It already recognises types matching the ValueOrError&amp;lt;T, E&amp;gt; concept, which is to say all types which have:
+ A public .has_value() member function which returns a bool. A public .assume_value()/.value() member function, with the former chosen preferentially if available. A public .as_failure()/.error() member function, with the former chosen preferentially if available.  This should automatically handle std::expected&amp;lt;T, E&amp;gt; and many others.</description>
     </item>
     
     <item>
@@ -2407,10 +2417,11 @@ Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/macros/try/</guid>
-      <description>Evaluate an expression which results in a type matching the ValueOrError&amp;lt;T, E&amp;gt; concept, assigning T to a variable called var if successful, immediately returning try_operation_return_as(expr) from the calling function if unsuccessful.
+      <description>Evaluate an expression which results in a type matching the following customisation points, assigning T to a variable called var if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
+ try_operation_has_value(X)  try_operation_return_as(X)  try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
 Overridable: Not overridable.
 Definition: See OUTCOME_TRYV(expr) for most of the mechanics.
-If successful, an auto &amp;amp;&amp;amp;var is initialised to the expression result&amp;rsquo;s .assume_value() if available, else to its .value(). This binds a reference possibly to the T stored inside the bound result of the expression, but possibly also to a temporary emitted from the value observer function.</description>
+If successful, an auto &amp;amp;&amp;amp;var is initialised to the expression result&amp;rsquo;s .</description>
     </item>
     
     <item>
@@ -2419,10 +2430,9 @@ If successful, an auto &amp;amp;&amp;amp;var is initialised to the expression re
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/macros/tryv/</guid>
-      <description>Evaluate an expression which results in a type matching the ValueOrError&amp;lt;T, E&amp;gt; concept, continuing execution if successful, immediately returning try_operation_return_as(expr) from the calling function if unsuccessful.
-The difference between the OUTCOME_TRYV(expr) and OUTCOME_TRY(expr) editions is that the latter will set a variable if two or more macro arguments are present (see OUTCOME_TRY(var, expr) ). The former requires the T to be void.
-Overridable: Not overridable.
-Definition: Firstly the expression&amp;rsquo;s temporary is bound to a uniquely named, stack allocated, auto &amp;amp;&amp;amp;.</description>
+      <description>Evaluate an expression which results in a type matching the following customisation points, continuing execution if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
+ try_operation_has_value(X)  try_operation_return_as(X)  try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
+The difference between the OUTCOME_TRYV(expr) and OUTCOME_TRY(expr) editions is that the latter will set a variable if two or more macro arguments are present (see OUTCOME_TRY(var, expr) ).</description>
     </item>
     
     <item>
@@ -2431,11 +2441,11 @@ Definition: Firstly the expression&amp;rsquo;s temporary is bound to a uniquely 
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/macros/tryx/</guid>
-      <description>Evaluate an expression which results in a type matching the ValueOrError&amp;lt;T, E&amp;gt; concept, emitting the T if successful, immediately returning try_operation_return_as(expr) from the calling function if unsuccessful.
+      <description>Evaluate an expression which results in a type matching the following customisation points, emitting the T if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
+ try_operation_has_value(X)  try_operation_return_as(X)  try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
 Availability: GCC and clang only. Use #ifdef OUTCOME_TRYX to determine if available.
 Overridable: Not overridable.
-Definition: See OUTCOME_TRYV(expr) for most of the mechanics.
-This macro makes use of a proprietary extension in GCC and clang to emit the T from a successful expression. You can thus use OUTCOME_TRYX(expr) directly in expressions e.</description>
+Definition: See OUTCOME_TRYV(expr) for most of the mechanics.</description>
     </item>
     
     <item>
@@ -2537,18 +2547,6 @@ Requires: Always available.</description>
     </item>
     
     <item>
-      <title>`auto try_operation_return_as(T &amp;&amp;)`</title>
-      <link>https://ned14.github.io/outcome/reference/functions/try_operation_return_as_t/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/reference/functions/try_operation_return_as_t/</guid>
-      <description>This implementation of try_operation_return_as(expr) returns whatever the input type&amp;rsquo;s .as_failure() member function returns. basic_result and basic_outcome provide such a member function, see auto as_failure() const &amp;amp; .
-Requires: That the expression std::declval&amp;lt;T&amp;gt;().as_failure() is a valid expression.
-Namespace: OUTCOME_V2_NAMESPACE
-Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
-    </item>
-    
-    <item>
       <title>`bad_outcome_access`</title>
       <link>https://ned14.github.io/outcome/reference/types/bad_outcome_access/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -2582,6 +2580,18 @@ No member functions are added in addition to std::logic_error. Typical .what() s
  &amp;quot;no value&amp;quot; &amp;quot;no error&amp;quot;  Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/bad_access.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`bool try_operation_has_value(X)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/try_operation_has_value/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/try_operation_has_value/</guid>
+      <description>This default implementation returns whatever the .has_value() member function returns.
+Requires: That the expression std::declval&amp;lt;T&amp;gt;().has_value() is a valid expression.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
     </item>
     
     <item>
@@ -2667,6 +2677,31 @@ Overridable: Argument dependent lookup.
 Requires: Always available.
 Namespace: OUTCOME_V2_NAMESPACE::policy
 Header: &amp;lt;outcome/std_result.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`decltype(auto) try_operation_extract_value(X)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/try_operation_extract_value/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/try_operation_extract_value/</guid>
+      <description>This default implementation returns whatever the .assume_value() or .value() member functions return, preferentially choosing the former where both are available.
+Requires: That the expression std::declval&amp;lt;T&amp;gt;().assume_value() and/or std::declval&amp;lt;T&amp;gt;().value() is a valid expression.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`decltype(auto) try_operation_return_as(X)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/try_operation_return_as/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/try_operation_return_as/</guid>
+      <description>This default implementation preferentially returns whatever the input type&amp;rsquo;s .as_failure() member function returns. basic_result and basic_outcome provide such a member function, see auto as_failure() const &amp;amp; .
+If .as_failure() is not available, it will also match any .error() member function, which it wraps into a failure type sugar using failure(T &amp;amp;&amp;amp;, ...) .
+Requires: That the expression std::declval&amp;lt;T&amp;gt;().as_failure() and/or std::declval&amp;lt;T&amp;gt;().error() is a valid expression.
+Namespace: OUTCOME_V2_NAMESPACE
+Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
     </item>
     
     <item>
@@ -2902,18 +2937,6 @@ If matched, ep is set to a default constructed  std::exception_ptr , and a  std:
     </item>
     
     <item>
-      <title>`std::experimental::unexpected&lt;E&gt; try_operation_return_as(std::experimental::expected&lt;T, E&gt;)`</title>
-      <link>https://ned14.github.io/outcome/reference/functions/try_operation_return_as_expected/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/reference/functions/try_operation_return_as_expected/</guid>
-      <description>This implementation of try_operation_return_as(expr) returns an unexpected for any expected input. This allows the use of functions returning std::experimental::expected&amp;lt;T, E&amp;gt; in OUTCOME_TRY(...).
-Requires: Always available.
-Namespace: OUTCOME_V2_NAMESPACE
-Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
-    </item>
-    
-    <item>
       <title>`std::istream &amp;operator&gt;&gt;(std::istream &amp;, basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)`</title>
       <link>https://ned14.github.io/outcome/reference/functions/iostream/outcome_operator_in/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -3089,8 +3112,7 @@ If used in basic_outcome, and the outcome is exceptioned and so no error is avai
       <description>A customisable converter of ValueOrError&amp;lt;T, E&amp;gt; concept matching types to a returnable failure type.
 Overridable: Argument dependent lookup.
 Default: A number of implementations are provided by default:
- try_operation_return_as(T &amp;amp;&amp;amp;) which requires T to provide an .as_failure() member function in order to be available. This is selected for all basic_result and basic_outcome types. See auto try_operation_return_as(T &amp;amp;&amp;amp;) .
- Copy and move editions of try_operation_return_as(std::experimental::expected&amp;lt;T, E&amp;gt;) which return a std::experimental::unexpected&amp;lt;E&amp;gt; for the input&amp;rsquo;s .</description>
+ try_operation_return_as(T &amp;amp;&amp;amp;) which requires T to provide an .as_failure() member function in order to be available. This is selected for all basic_result and basic_outcome types. See &amp;#34;/home/travis/build/ned14/outcome/doc/src/content/reference/converters/try_operation_return_as.md:12:198&amp;#34;: API reference page for &amp;#39;auto try_operation_return_as(T &amp;amp;&amp;amp;)&amp;#39; not found, please use an identifier wholly contained in a page title API NOT FOUND IN DOCS auto try_operation_return_as(T &amp;amp;&amp;amp;) .</description>
     </item>
     
     <item>

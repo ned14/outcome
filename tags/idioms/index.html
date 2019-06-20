@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-19T09:17:01 UTC">
+<meta name="revised" content="2019-06-20T10:19:12 UTC">
 <title>Idioms :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -439,6 +439,13 @@
         <div>
           <a href="/outcome/recipes/asio-integration/">
             ASIO/Networking TS
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/recipes/foreign-try/" class="dd-item">
+        <div>
+          <a href="/outcome/recipes/foreign-try/">
+            Extending <code>OUTCOME_TRY</code>
           </a>
         </div>
     </li>
@@ -2264,10 +2271,24 @@
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/try_operation_return_as_t/" class="dd-item">
+      <li data-nav-id="/outcome/reference/functions/try_operation_has_value/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/try_operation_return_as_t/">
-            <code>auto try_operation_return_as(T &amp;&amp;)</code>
+          <a href="/outcome/reference/functions/try_operation_has_value/">
+            <code>bool try_operation_has_value(X)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/try_operation_extract_value/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/try_operation_extract_value/">
+            <code>decltype(auto) try_operation_extract_value(X)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/try_operation_return_as/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/try_operation_return_as/">
+            <code>decltype(auto) try_operation_return_as(X)</code>
           </a>
         </div>
     </li>
@@ -2275,13 +2296,6 @@
         <div>
           <a href="/outcome/reference/functions/error_from_exception/">
             <code>std::error_code error_from_exception(std::exception_ptr &amp;&amp;ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/try_operation_return_as_expected/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/try_operation_return_as_expected/">
-            <code>std::experimental::unexpected&lt;E&gt; try_operation_return_as(std::experimental::expected&lt;T, E&gt;)</code>
           </a>
         </div>
     </li>

@@ -11,6 +11,16 @@
     
     
     <item>
+      <title>Extending `OUTCOME_TRY`</title>
+      <link>https://ned14.github.io/outcome/recipes/foreign-try/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/recipes/foreign-try/</guid>
+      <description>Outcome&amp;rsquo;s OUTCOME_TRY(var, expr) operation is fully extensible to accept as input any foreign types. It already recognises types matching the ValueOrError&amp;lt;T, E&amp;gt; concept, which is to say all types which have:
+ A public .has_value() member function which returns a bool. A public .assume_value()/.value() member function, with the former chosen preferentially if available. A public .as_failure()/.error() member function, with the former chosen preferentially if available.  This should automatically handle std::expected&amp;lt;T, E&amp;gt; and many others.</description>
+    </item>
+    
+    <item>
       <title>Inspecting result&lt;T, EC&gt;</title>
       <link>https://ned14.github.io/outcome/tutorial/essential/result/inspecting/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>

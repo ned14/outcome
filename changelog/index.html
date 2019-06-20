@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-19T09:16:53 UTC">
+<meta name="revised" content="2019-06-20T10:19:04 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -439,6 +439,13 @@
         <div>
           <a href="/outcome/recipes/asio-integration/">
             ASIO/Networking TS
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/recipes/foreign-try/" class="dd-item">
+        <div>
+          <a href="/outcome/recipes/foreign-try/">
+            Extending <code>OUTCOME_TRY</code>
           </a>
         </div>
     </li>
@@ -2264,10 +2271,24 @@
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/try_operation_return_as_t/" class="dd-item">
+      <li data-nav-id="/outcome/reference/functions/try_operation_has_value/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/try_operation_return_as_t/">
-            <code>auto try_operation_return_as(T &amp;&amp;)</code>
+          <a href="/outcome/reference/functions/try_operation_has_value/">
+            <code>bool try_operation_has_value(X)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/try_operation_extract_value/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/try_operation_extract_value/">
+            <code>decltype(auto) try_operation_extract_value(X)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/try_operation_return_as/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/try_operation_return_as/">
+            <code>decltype(auto) try_operation_return_as(X)</code>
           </a>
         </div>
     </li>
@@ -2275,13 +2296,6 @@
         <div>
           <a href="/outcome/reference/functions/error_from_exception/">
             <code>std::error_code error_from_exception(std::exception_ptr &amp;&amp;ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/try_operation_return_as_expected/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/try_operation_return_as_expected/">
-            <code>std::experimental::unexpected&lt;E&gt; try_operation_return_as(std::experimental::expected&lt;T, E&gt;)</code>
           </a>
         </div>
     </li>
@@ -2388,22 +2402,45 @@
 
 <hr />
 
-<h2 id="v2-2-xxth-july-2019-boost-1-71-release-https-github-com-ned14-outcome-releases-tag-v2-2">v2.2 XXth July 2019 (Boost 1.71) <a href="https://github.com/ned14/outcome/releases/tag/v2.2">[release]</a></h2>
+<h2 id="v2-1-1-xxth-july-2019-boost-1-71-release-https-github-com-ned14-outcome-releases-tag-v2-1-1">v2.1.1 XXth July 2019 (Boost 1.71) <a href="https://github.com/ned14/outcome/releases/tag/v2.1.1">[release]</a></h2>
 
-<h3 id="open-bugs-not-fixed">Open bugs not fixed:</h3>
+<h3 id="enhancements">Enhancements:</h3>
 
 <ul>
-<li><a href="https://github.com/ned14/outcome/issues/185">#185</a>
+<li><p><a href="https://github.com/ned14/outcome/issues/184">#184</a></p>
+
+<ul>
+<li>As per request from Boost release managers, relocated <code>version.hpp</code> and
+<code>revision.hpp</code> into detail, and added the Boost licence boilerplate to the top
+of every source file which was missing one (I think). Also took the opportunity
+to run the licence restamping script over all Outcome, so copyright dates are now
+up to date.</li>
+</ul></li>
+
+<li><p><a href="https://github.com/ned14/outcome/issues/185">#185</a></p>
 
 <ul>
 <li>Add FAQ item explaining issue #185, and why we will do nothing to
 fix it right now.</li>
+</ul></li>
+
+<li><p><a href="https://github.com/ned14/outcome/issues/189">#189</a></p>
+
+<ul>
+<li>Refactored the <code>OUTCOME_TRY</code> implementation to use more clarified
+customisation points capable of accepting very foreign inputs. Removed the
+<code>std::experimental::expected&lt;T, E&gt;</code> specialisations, as those are no longer
+necessary. Fixed the documentation for the customisation points which
+previously claimed that they are ADL discovered, which they are not. Added
+a recipe describing how to add in support for foreign input types.</li>
 </ul></li>
 </ul>
 
 <h3 id="bug-fixes">Bug fixes:</h3>
 
 <ul>
+<li><p><code>OUTCOME_VERSION_MINOR</code> hadn&rsquo;t been updated to 1.</p></li>
+
 <li><p><a href="https://github.com/ned14/outcome/issues/190">#190</a></p>
 
 <ul>
@@ -2417,20 +2454,6 @@ the Boost release distro.</li>
 <li>Fix issue #182 where <code>trait::is_exception_ptr_available&lt;T&gt;</code> was always true,
 thus causing much weirdness, like not printing diagnostics and trying to feed
 everything to <code>make_exception_ptr()</code>.</li>
-</ul></li>
-</ul>
-
-<h3 id="enhancements">Enhancements:</h3>
-
-<ul>
-<li><a href="https://github.com/ned14/outcome/issues/184">#184</a>
-
-<ul>
-<li>As per request from Boost release managers, relocated <code>version.hpp</code> and
-<code>revision.hpp</code> into detail, and added the Boost licence boilerplate to the top
-of every source file which was missing one (I think). Also took the opportunity
-to run the licence restamping script over all Outcome, so copyright dates are now
-up to date.</li>
 </ul></li>
 </ul>
 
@@ -2596,7 +2619,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 19/06/2019
+        <i class='fa fa-calendar'></i> Last update on 20/06/2019
     </div>
     
 

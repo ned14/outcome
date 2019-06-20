@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-19T09:16:52 UTC">
+<meta name="revised" content="2019-06-20T10:19:03 UTC">
 <title>Videos :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -439,6 +439,13 @@
         <div>
           <a href="/outcome/recipes/asio-integration/">
             ASIO/Networking TS
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/recipes/foreign-try/" class="dd-item">
+        <div>
+          <a href="/outcome/recipes/foreign-try/">
+            Extending <code>OUTCOME_TRY</code>
           </a>
         </div>
     </li>
@@ -2199,55 +2206,6 @@
       <a href="/outcome/reference/functions/policy/">Policy</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/functions/policy/basic_outcome_failure_exception_from_error/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/basic_outcome_failure_exception_from_error/">
-            <code>auto basic_outcome_failure_exception_from_error(const EC &amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/error_code/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/error_code/">
-            <code>decltype(auto) error_code(T &amp;&amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/exception_ptr/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/exception_ptr/">
-            <code>decltype(auto) exception_ptr(T &amp;&amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_enum/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_enum/">
-            <code>void outcome_throw_as_system_error_with_payload(BoostErrorCodeEnum &amp;&amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_enum/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_enum/">
-            <code>void outcome_throw_as_system_error_with_payload(ErrorCodeEnum &amp;&amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_error_code/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_error_code/">
-            <code>void outcome_throw_as_system_error_with_payload(const boost::system::error_code &amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_error_code/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_error_code/">
-            <code>void outcome_throw_as_system_error_with_payload(const std::error_code &amp;)</code>
-          </a>
-        </div>
-    </li>
         </ul>
     </li>
       <li data-nav-id="/outcome/reference/functions/failure/" class="dd-item">
@@ -2264,10 +2222,24 @@
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/try_operation_return_as_t/" class="dd-item">
+      <li data-nav-id="/outcome/reference/functions/try_operation_has_value/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/try_operation_return_as_t/">
-            <code>auto try_operation_return_as(T &amp;&amp;)</code>
+          <a href="/outcome/reference/functions/try_operation_has_value/">
+            <code>bool try_operation_has_value(X)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/try_operation_extract_value/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/try_operation_extract_value/">
+            <code>decltype(auto) try_operation_extract_value(X)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/try_operation_return_as/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/try_operation_return_as/">
+            <code>decltype(auto) try_operation_return_as(X)</code>
           </a>
         </div>
     </li>
@@ -2275,13 +2247,6 @@
         <div>
           <a href="/outcome/reference/functions/error_from_exception/">
             <code>std::error_code error_from_exception(std::exception_ptr &amp;&amp;ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/try_operation_return_as_expected/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/try_operation_return_as_expected/">
-            <code>std::experimental::unexpected&lt;E&gt; try_operation_return_as(std::experimental::expected&lt;T, E&gt;)</code>
           </a>
         </div>
     </li>
