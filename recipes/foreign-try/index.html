@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-20T10:19:12 UTC">
+<meta name="revised" content="2019-06-20T21:25:59 UTC">
 <title>Extending `OUTCOME_TRY` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2411,10 +2411,10 @@ concept, which is to say all types which have:</p>
 
 <ul>
 <li>A public <code>.has_value()</code> member function which returns a <code>bool</code>.</li>
-<li>A public <code>.assume_value()</code>/<code>.value()</code> member function, with the former
-chosen preferentially if available.</li>
-<li>A public <code>.as_failure()</code>/<code>.error()</code> member function, with the former
-chosen preferentially if available.</li>
+<li>In order of preference, a public <code>.assume_value()</code>/<code>.value()</code> member
+function.</li>
+<li>In order of preference, a public <code>.as_failure()</code>/<code>.assume_error()</code>/<code>.error()</code>
+member function.</li>
 </ul>
 
 <p>This should automatically handle <code>std::expected&lt;T, E&gt;</code> and many others.</p>

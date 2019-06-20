@@ -17,7 +17,7 @@
       
       <guid>https://ned14.github.io/outcome/recipes/foreign-try/</guid>
       <description>Outcome&amp;rsquo;s OUTCOME_TRY(var, expr) operation is fully extensible to accept as input any foreign types. It already recognises types matching the ValueOrError&amp;lt;T, E&amp;gt; concept, which is to say all types which have:
- A public .has_value() member function which returns a bool. A public .assume_value()/.value() member function, with the former chosen preferentially if available. A public .as_failure()/.error() member function, with the former chosen preferentially if available.  This should automatically handle std::expected&amp;lt;T, E&amp;gt; and many others.</description>
+ A public .has_value() member function which returns a bool. In order of preference, a public .assume_value()/.value() member function. In order of preference, a public .as_failure()/.assume_error()/.error() member function.  This should automatically handle std::expected&amp;lt;T, E&amp;gt; and many others.</description>
     </item>
     
     <item>
