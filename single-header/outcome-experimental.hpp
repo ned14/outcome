@@ -102,9 +102,9 @@ Distributed under the Boost Software License, Version 1.0.
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_MAJOR    2
 /*! AWAITING HUGO JSON CONVERSION TOOL */
-#define OUTCOME_VERSION_MINOR    2
+#define OUTCOME_VERSION_MINOR    1
 /*! AWAITING HUGO JSON CONVERSION TOOL */
-#define OUTCOME_VERSION_PATCH    0
+#define OUTCOME_VERSION_PATCH    1
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_REVISION 0  // Revision version for cmake and DLL version stamping
 
@@ -1213,9 +1213,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF f8bbb463a3a7f8e0e1ad2c74f8583d30b5fa54f1
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-06-18 10:00:57 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f8bbb463
+#define OUTCOME_PREVIOUS_COMMIT_REF 504c1d87450483f93bfea14c758848be6f2f0b49
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-06-20 08:25:53 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 504c1d87
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -9712,49 +9712,77 @@ Distributed under the Boost Software License, Version 1.0.
 
 
 
-namespace std  // NOLINT
-{
-  namespace experimental
-  {
-    template <class T, class E> class expected;
-    template <class E> class unexpected;
-  }  // namespace experimental
-}  // namespace std
-
 OUTCOME_V2_NAMESPACE_BEGIN
+
+namespace detail
+{
+  struct has_value_overload
+  {
+  };
+  struct as_failure_overload
+  {
+  };
+  struct assume_error_overload
+  {
+  };
+  struct error_overload
+  {
+  };
+  struct assume_value_overload
+  {
+  };
+  struct value_overload
+  {
+  };
+}  // namespace detail
+
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+OUTCOME_TEMPLATE(class T)
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().has_value()))
+inline bool try_operation_has_value(T &&v, detail::has_value_overload = {})
+{
+  return v.has_value();
+}
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 OUTCOME_TEMPLATE(class T)
 OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().as_failure()))
-inline decltype(auto) try_operation_return_as(T &&v)
+inline decltype(auto) try_operation_return_as(T &&v, detail::as_failure_overload = {})
 {
   return static_cast<T &&>(v).as_failure();
 }
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class T, class E> inline auto try_operation_return_as(const std::experimental::expected<T, E> &v)
+OUTCOME_TEMPLATE(class T, class... Args)
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().error()))
+inline decltype(auto) try_operation_return_as(T &&v, detail::error_overload = {}, Args && ... /*unused*/)
 {
-  return std::experimental::unexpected<E>(v.error());
+  return failure(static_cast<T &&>(v).error());
+}
+
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+OUTCOME_TEMPLATE(class T)
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().assume_value()))
+inline decltype(auto) try_operation_extract_value(T &&v, detail::assume_value_overload = {})
+{
+  return static_cast<T &&>(v).assume_value();
 }
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class T, class E> inline auto try_operation_return_as(std::experimental::expected<T, E> &&v)
+OUTCOME_TEMPLATE(class T, class... Args)
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().value()))
+inline decltype(auto) try_operation_extract_value(T &&v, detail::value_overload = {}, Args && ... /*unused*/)
 {
-  return std::experimental::unexpected<E>(static_cast<std::experimental::expected<T, E> &&>(v).error());
+  return static_cast<T &&>(v).value();
 }
-
-namespace detail
-{
-  OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().assume_value()))
-  inline decltype(auto) try_extract_value(T &&v) { return static_cast<T &&>(v).assume_value(); }
-
-  template <class T, class... Args> inline decltype(auto) try_extract_value(T &&v, Args &&... /*unused*/) { return static_cast<T &&>(v).value(); }
-}  // namespace detail
 
 OUTCOME_V2_NAMESPACE_END
 
@@ -9776,11 +9804,11 @@ OUTCOME_V2_NAMESPACE_END
 #pragma GCC diagnostic ignored "-Wparentheses"
 #endif
 
-#define OUTCOME_TRYV2(unique, ...)                                                                                                                                                                                                                                                                                               auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                              if(!(unique).has_value())                                                                                                                                                                                                                                                                                                      return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRYV2(unique, ...)                                                                                                                                                                                                                                                                                               auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                              if(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))                                                                                                                                                                                                                                                                                           return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 
 
 
-#define OUTCOME_TRY2(unique, v, ...)                                                                                                                                                                                                                                                                                             OUTCOME_TRYV2(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                                            auto && (v) = OUTCOME_V2_NAMESPACE::detail::try_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRY2(unique, v, ...)                                                                                                                                                                                                                                                                                             OUTCOME_TRYV2(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                                            auto && (v) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 
 
 
@@ -9798,8 +9826,7 @@ SIGNATURE NOT RECOGNISED
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYX(...)                                                                                                                                                                                                                                                                                                        ({                                                                                                                                                                                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                    if(!res.has_value())                                                                                                                                                                                                                                                                                                             return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                    OUTCOME_V2_NAMESPACE::detail::try_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                         })
-
+#define OUTCOME_TRYX(...)                                                                                                                                                                                                                                                                                                        ({                                                                                                                                                                                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                    if(!OUTCOME_V2_NAMESPACE::try_operation_has_value(res))                                                                                                                                                                                                                                                                                                return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                    OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                       })
 
 
 

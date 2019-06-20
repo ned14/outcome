@@ -1,9 +1,15 @@
 +++
 title = "`OUTCOME_TRYX(expr)`"
-description = "Evaluate an expression which results in a type matching the `ValueOrError<T, E>` concept, emitting the `T` if successful, immediately returning `try_operation_return_as(expr)` from the calling function if unsuccessful."
+description = "Evaluate an expression which results in an understood type, emitting the `T` if successful, immediately returning `try_operation_return_as(X)` from the calling function if unsuccessful."
 +++
 
-Evaluate an expression which results in a type matching the `ValueOrError<T, E>` concept, emitting the `T` if successful, immediately returning {{% api "try_operation_return_as(expr)" %}} from the calling function if unsuccessful.
+Evaluate an expression which results in a type matching the following customisation points, emitting the `T` if successful, immediately returning {{% api "try_operation_return_as(X)" %}} from the calling function if unsuccessful:
+
+- {{% api "try_operation_has_value(X)" %}}
+- {{% api "try_operation_return_as(X)" %}}
+- {{% api "try_operation_extract_value(X)" %}}
+
+Default overloads for these customisation points are provided. See [the recipe for supporting foreign input to `OUTCOME_TRY`]({{% relref "/recipes/foreign-try" %}}).
 
 *Availability*: GCC and clang only. Use `#ifdef OUTCOME_TRYX` to determine if available.
 

@@ -1,9 +1,15 @@
 +++
 title = "`OUTCOME_TRY(var, expr)`"
-description = "Evaluate an expression which results in a type matching the `ValueOrError<T, E>` concept, assigning `T` to a variable called `var` if successful, immediately returning `try_operation_return_as(expr)` from the calling function if unsuccessful."
+description = "Evaluate an expression which results in an understood type, assigning `T` to a variable called `var` if successful, immediately returning `try_operation_return_as(X)` from the calling function if unsuccessful."
 +++
 
-Evaluate an expression which results in a type matching the {{% api "ValueOrError<T, E>" %}} concept, assigning `T` to a variable called `var` if successful, immediately returning {{% api "try_operation_return_as(expr)" %}} from the calling function if unsuccessful.
+Evaluate an expression which results in a type matching the following customisation points, assigning `T` to a variable called `var` if successful, immediately returning {{% api "try_operation_return_as(X)" %}} from the calling function if unsuccessful:
+
+- {{% api "try_operation_has_value(X)" %}}
+- {{% api "try_operation_return_as(X)" %}}
+- {{% api "try_operation_extract_value(X)" %}}
+
+Default overloads for these customisation points are provided. See [the recipe for supporting foreign input to `OUTCOME_TRY`]({{% relref "/recipes/foreign-try" %}}).
 
 *Overridable*: Not overridable.
 

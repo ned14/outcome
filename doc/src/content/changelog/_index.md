@@ -4,24 +4,7 @@ weight = 80
 +++
 
 ---
-## v2.2 XXth July 2019 (Boost 1.71) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2)
-
-### Open bugs not fixed:
-
-- [#185](https://github.com/ned14/outcome/issues/185)
-    - Add FAQ item explaining issue #185, and why we will do nothing to
-fix it right now.
-
-### Bug fixes:
-
-- [#190](https://github.com/ned14/outcome/issues/190)
-    - Fix issue #190 in Boost edition where unit test suite was not runnable from
-the Boost release distro.
-
-- [#182](https://github.com/ned14/outcome/issues/182)
-    - Fix issue #182 where `trait::is_exception_ptr_available<T>` was always true,
-thus causing much weirdness, like not printing diagnostics and trying to feed
-everything to `make_exception_ptr()`.
+## v2.1.1 XXth July 2019 (Boost 1.71) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.1)
 
 ### Enhancements:
 
@@ -31,6 +14,31 @@ everything to `make_exception_ptr()`.
 of every source file which was missing one (I think). Also took the opportunity
 to run the licence restamping script over all Outcome, so copyright dates are now
 up to date.
+
+- [#185](https://github.com/ned14/outcome/issues/185)
+    - Add FAQ item explaining issue #185, and why we will do nothing to
+fix it right now.
+
+- [#189](https://github.com/ned14/outcome/issues/189)
+    - Refactored the `OUTCOME_TRY` implementation to use more clarified
+customisation points capable of accepting very foreign inputs. Removed the
+`std::experimental::expected<T, E>` specialisations, as those are no longer
+necessary. Fixed the documentation for the customisation points which
+previously claimed that they are ADL discovered, which they are not. Added
+a recipe describing how to add in support for foreign input types.
+
+### Bug fixes:
+
+- `OUTCOME_VERSION_MINOR` hadn't been updated to 1.
+
+- [#190](https://github.com/ned14/outcome/issues/190)
+    - Fix issue #190 in Boost edition where unit test suite was not runnable from
+the Boost release distro.
+
+- [#182](https://github.com/ned14/outcome/issues/182)
+    - Fix issue #182 where `trait::is_exception_ptr_available<T>` was always true,
+thus causing much weirdness, like not printing diagnostics and trying to feed
+everything to `make_exception_ptr()`.
 
 ---
 ## v2.1 12th Apr 2019 (Boost 1.70) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1)
