@@ -10,10 +10,10 @@ It already recognises types matching the {{% api "ValueOrError<T, E>" %}}
 concept, which is to say all types which have:
 
 - A public `.has_value()` member function which returns a `bool`.
-- A public `.assume_value()`/`.value()` member function, with the former
-chosen preferentially if available.
-- A public `.as_failure()`/`.error()` member function, with the former
-chosen preferentially if available.
+- In order of preference, a public `.assume_value()`/`.value()` member
+function.
+- In order of preference, a public `.as_failure()`/`.assume_error()`/`.error()`
+member function.
 
 This should automatically handle `std::expected<T, E>` and many others.
 

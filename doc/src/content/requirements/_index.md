@@ -21,11 +21,11 @@ Partially working compilers (this was last updated January 2019):
 
 - clang 3.5 - 3.9 can compile varying degrees of the test suite, the
 problem is lack of complete and unbuggy C++ 14 language support.
-- GCC's 7 and 8 have internal compiler error bugs in their constexpr
-implementation which tend to be triggered by using Outcome in constexpr.
-If you don't use Outcome in constexpr, you won't see these problems.
-GCC 6 also seems to be more reliable. clang and Visual Studio work
-correctly, if you need an alternative. 
+- Older point releases of GCCs 7 and 8 have internal compiler error bugs
+in their constexpr implementation which tend to be triggered by using
+Outcome in constexpr. If you don't use Outcome in constexpr, you won't
+see these problems. If you need your GCC to not ICE, upgrade to the
+very latest point release, the constexpr ICE has been since fixed.
 - Early editions of Visual Studio 2017 have many corner case problems.
 The latest point release, VS2017.9, only has a few known problems,
 and should be relatively unsurprising for most use cases.
