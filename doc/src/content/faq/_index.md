@@ -429,8 +429,8 @@ potentially sometime-in-the-future affected code sequence would be:
 ```c++
 struct const_containing_type
 {
-    const int no;                      // only concerns const and reference types
-    const_containing_type(int n) : no(n) {}
+  const int no;                        // only concerns const and reference types
+  const_containing_type(int n) : no(n) {}
 };
 
 extern void external_function(int, const result<const_containing_type> &);
