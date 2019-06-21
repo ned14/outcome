@@ -472,12 +472,13 @@ namespace app { // A markup function to indicate when we are ValueOrError conver
     </item>
     
     <item>
-      <title>Plugging a library into std::error_code</title>
+      <title>Plugging a library into std::error_code`</title>
       <link>https://ned14.github.io/outcome/motivation/plug_error_code/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/motivation/plug_error_code/</guid>
-      <description>This section illustrates how you can hook into the std::error_code system from the Standard Library in order to work with your own set of error codes. As is usually the case in C++, doing this is straightforward but requires typing boilerplate to tell the C++ STL about your custom error type. This is not part of Outcome library, but we still provide this short guide here, because how to do this is not well documented [1].</description>
+      <description>See here for this guide, but for boost::system::error_code.
+This section illustrates how you can hook into the std::error_code system from the Standard Library in order to work with your own set of error codes. As is usually the case in C++, doing this is straightforward but requires typing boilerplate to tell the C++ STL about your custom error type. This is not part of Outcome library, but we still provide this short guide here, because how to do this is not well documented [1].</description>
     </item>
     
     <item>
@@ -511,6 +512,16 @@ template &amp;lt;&amp;gt; struct make&amp;lt;file_handle&amp;gt; { file_handle::
       <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/conclusion/</guid>
       <description>This worked example was in fact excessively complex: a quicker route to achieving the same thing would be to add explicit converting constructors to app::error_code for each of the third party library E types. One then could have saved oneself with having to bother injecting custom converters into the OUTCOME_V2_NAMESPACE::convert namespace. If you control your application&amp;rsquo;s E type, then that is probably a better, and certainly simpler, approach.
 However there are occasions when you don&amp;rsquo;t have control over the implementation of the destination E type e.</description>
+    </item>
+    
+    <item>
+      <title>Plugging a library into boost::system::error_code</title>
+      <link>https://ned14.github.io/outcome/motivation/plug_error_code2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/motivation/plug_error_code2/</guid>
+      <description>See here for this guide, but for std::error_code.
+This section illustrates how you can hook into the boost::system::error_code system from the Boost in order to work with your own set of error codes. As is usually the case in C++, doing this is straightforward but requires typing boilerplate to tell Boost.System about your custom error type. This is not part of Outcome library, but we still provide this short guide here, because how to do this is not well documented [1].</description>
     </item>
     
     <item>
@@ -2292,7 +2303,8 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1055 commits   @akrzemi1 45 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors HAHAHUGOSHORTCODE-0xc000c6a000-1-HBHB
+This pretty, modern C++ documentation  Hugo - static website generator of this documentation. hugo-theme-docdock - the Hugo theme used by this documentation. Standardese - the API reference generator (up until Outcome v2.0)  Special thanks for Outcome v2.1 Once again Andrzej Krzemienski stands out for a never ceasing flow of excellent questions, &amp;ldquo;what if?&amp;rdquo;&amp;rsquo;s, eagle eyed spotting of corner case logic bugs, and design contradictions. Thank you Andrzej!</description>
     </item>
     
     <item>

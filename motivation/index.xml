@@ -51,12 +51,23 @@ classerror_code { error_category* domain; // domain from which the error origina
     </item>
     
     <item>
-      <title>Plugging a library into std::error_code</title>
+      <title>Plugging a library into std::error_code`</title>
       <link>https://ned14.github.io/outcome/motivation/plug_error_code/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/motivation/plug_error_code/</guid>
-      <description>This section illustrates how you can hook into the std::error_code system from the Standard Library in order to work with your own set of error codes. As is usually the case in C++, doing this is straightforward but requires typing boilerplate to tell the C++ STL about your custom error type. This is not part of Outcome library, but we still provide this short guide here, because how to do this is not well documented [1].</description>
+      <description>See here for this guide, but for boost::system::error_code.
+This section illustrates how you can hook into the std::error_code system from the Standard Library in order to work with your own set of error codes. As is usually the case in C++, doing this is straightforward but requires typing boilerplate to tell the C++ STL about your custom error type. This is not part of Outcome library, but we still provide this short guide here, because how to do this is not well documented [1].</description>
+    </item>
+    
+    <item>
+      <title>Plugging a library into boost::system::error_code</title>
+      <link>https://ned14.github.io/outcome/motivation/plug_error_code2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/motivation/plug_error_code2/</guid>
+      <description>See here for this guide, but for std::error_code.
+This section illustrates how you can hook into the boost::system::error_code system from the Boost in order to work with your own set of error codes. As is usually the case in C++, doing this is straightforward but requires typing boilerplate to tell Boost.System about your custom error type. This is not part of Outcome library, but we still provide this short guide here, because how to do this is not well documented [1].</description>
     </item>
     
     <item>

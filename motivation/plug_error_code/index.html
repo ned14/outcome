@@ -5,8 +5,8 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-21T20:51:19 UTC">
-<title>Plugging a library into std::error_code :: Outcome documentation</title>
+<meta name="revised" content="2019-06-21T21:49:27 UTC">
+<title>Plugging a library into std::error_code` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
 <link href="/outcome/css/nucleus.css" rel="stylesheet">
@@ -107,7 +107,14 @@
       <li data-nav-id="/outcome/motivation/plug_error_code/" class="dd-item active">
         <div>
           <a href="/outcome/motivation/plug_error_code/">
-            Plugging a library into std::error_code
+            Plugging a library into std::error_code`
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/motivation/plug_error_code2/" class="dd-item">
+        <div>
+          <a href="/outcome/motivation/plug_error_code2/">
+            Plugging a library into boost::system::error_code
           </a>
         </div>
     </li>
@@ -2352,7 +2359,8 @@
       <option value="/outcome/motivation/errno/" >- errno</option>
       <option value="/outcome/motivation/error_codes/" >- Error codes</option>
       <option value="/outcome/motivation/std_error_code/" >- std::error_code</option>
-      <option value="/outcome/motivation/plug_error_code/"  selected>- Plugging a library into std::error_code</option>
+      <option value="/outcome/motivation/plug_error_code/"  selected>- Plugging a library into std::error_code`</option>
+      <option value="/outcome/motivation/plug_error_code2/" >- Plugging a library into boost::system::error_code</option>
       <option value="/outcome/motivation/narrow_contract/" >- Narrow contracts</option>
   
     <option value="/outcome/tutorial/" >
@@ -2393,11 +2401,13 @@
       </div>
     
 
-    <h1>Plugging a library into std::error_code</h1>
+    <h1>Plugging a library into std::error_code`</h1>
     
     
     
-    <p>This section illustrates how you can hook into the <code>std::error_code</code> system from
+    <p><a href="/outcome/motivation/plug_error_code2/">See here for this guide, but for <code>boost::system::error_code</code></a>.</p>
+
+<p>This section illustrates how you can hook into the <code>std::error_code</code> system from
 the Standard Library in order to work with your own set of error codes. As is usually
 the case in C++, doing this is straightforward but requires typing boilerplate
 to tell the C++ STL about your custom error type. This is not part of Outcome library,
@@ -2564,7 +2574,7 @@ only checks for the numeric value of the error code (without looking at error do
         <div class="chevrons">
     <div id="navigation">
 <a class="nav nav-prev" href="/outcome/motivation/std_error_code/" title="std::error_code"> <i class="fa fa-chevron-left"></i><label>std::error_code</label></a>
-    <a class="nav nav-next" href="/outcome/motivation/narrow_contract/" title="Narrow contracts" style="margin-right: 0px;"><label>Narrow contracts</label><i class="fa fa-chevron-right"></i></a></div>
+    <a class="nav nav-next" href="/outcome/motivation/plug_error_code2/" title="Plugging a library into boost::system::error_code" style="margin-right: 0px;"><label>Plugging a library into boost::system::error_code</label><i class="fa fa-chevron-right"></i></a></div>
   </div>
 
   </section>
@@ -2579,7 +2589,7 @@ only checks for the numeric value of the error code (without looking at error do
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 11/02/2019
+        <i class='fa fa-calendar'></i> Last update on 21/06/2019
     </div>
     
 

@@ -5,8 +5,8 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-21T21:49:25 UTC">
-<title>The File I/O library :: Outcome documentation</title>
+<meta name="revised" content="2019-06-21T21:49:27 UTC">
+<title>Plugging a library into boost::system::error_code :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
 <link href="/outcome/css/nucleus.css" rel="stylesheet">
@@ -22,7 +22,7 @@
 
     
   </head>
-  <body data-url="/outcome/tutorial/advanced/interop/filelib/">
+  <body data-url="/outcome/motivation/plug_error_code2/">
     
       <header>
   <div class="logo">
@@ -69,10 +69,11 @@
       <a href="/outcome/build/">Build and install</a>
       </div>
     </li>
-    <li data-nav-id="/outcome/motivation/" class="dd-item haschildren
+    <li data-nav-id="/outcome/motivation/" class="dd-item parent haschildren
         ">
       <div>
-      <a href="/outcome/motivation/">Motivation</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      <a href="/outcome/motivation/">Motivation</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i>
       </div>
         <ul>
       <li data-nav-id="/outcome/motivation/exceptions/" class="dd-item">
@@ -110,7 +111,7 @@
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/motivation/plug_error_code2/" class="dd-item">
+      <li data-nav-id="/outcome/motivation/plug_error_code2/" class="dd-item active">
         <div>
           <a href="/outcome/motivation/plug_error_code2/">
             Plugging a library into boost::system::error_code
@@ -126,11 +127,10 @@
     </li>
         </ul>
     </li>
-    <li data-nav-id="/outcome/tutorial/" class="dd-item parent haschildren
+    <li data-nav-id="/outcome/tutorial/" class="dd-item haschildren
         ">
       <div>
-      <a href="/outcome/tutorial/">Tutorial</a>
-            <i class="fa fa-angle-down fa-lg category-icon"></i>
+      <a href="/outcome/tutorial/">Tutorial</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
     <li data-nav-id="/outcome/tutorial/essential/" class="dd-item haschildren
@@ -213,11 +213,10 @@
     </li>
         </ul>
     </li>
-    <li data-nav-id="/outcome/tutorial/advanced/" class="dd-item parent haschildren
+    <li data-nav-id="/outcome/tutorial/advanced/" class="dd-item haschildren
         ">
       <div>
-      <a href="/outcome/tutorial/advanced/">Advanced</a>
-            <i class="fa fa-angle-down fa-lg category-icon"></i>
+      <a href="/outcome/tutorial/advanced/">Advanced</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
     <li data-nav-id="/outcome/tutorial/advanced/payload/" class="dd-item haschildren
@@ -342,11 +341,10 @@
     </li>
         </ul>
     </li>
-    <li data-nav-id="/outcome/tutorial/advanced/interop/" class="dd-item parent haschildren
+    <li data-nav-id="/outcome/tutorial/advanced/interop/" class="dd-item haschildren
         ">
       <div>
-      <a href="/outcome/tutorial/advanced/interop/">Interoperation</a>
-            <i class="fa fa-angle-down fa-lg category-icon"></i>
+      <a href="/outcome/tutorial/advanced/interop/">Interoperation</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
       <li data-nav-id="/outcome/tutorial/advanced/interop/problem/" class="dd-item">
@@ -377,7 +375,7 @@
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/tutorial/advanced/interop/filelib/" class="dd-item active">
+      <li data-nav-id="/outcome/tutorial/advanced/interop/filelib/" class="dd-item">
         <div>
           <a href="/outcome/tutorial/advanced/interop/filelib/">
             The File I/O library
@@ -2356,42 +2354,17 @@
     <option value="/outcome/build/" >
    Build and install</option>
     <option value="/outcome/motivation/" >
-   Motivation</option>
+   Motivation</option> 
+      <option value="/outcome/motivation/exceptions/" >- Exceptions</option>
+      <option value="/outcome/motivation/errno/" >- errno</option>
+      <option value="/outcome/motivation/error_codes/" >- Error codes</option>
+      <option value="/outcome/motivation/std_error_code/" >- std::error_code</option>
+      <option value="/outcome/motivation/plug_error_code/" >- Plugging a library into std::error_code`</option>
+      <option value="/outcome/motivation/plug_error_code2/"  selected>- Plugging a library into boost::system::error_code</option>
+      <option value="/outcome/motivation/narrow_contract/" >- Narrow contracts</option>
+  
     <option value="/outcome/tutorial/" >
-   Tutorial</option> 
-    <option value="/outcome/tutorial/essential/" >
-  - 
-   Essential</option>
-    <option value="/outcome/tutorial/advanced/" >
-  - 
-   Advanced</option> 
-    <option value="/outcome/tutorial/advanced/payload/" >
-  -- 
-   Custom payloads</option>
-    <option value="/outcome/tutorial/advanced/constructors/" >
-  -- 
-   Result returning constructors</option>
-    <option value="/outcome/tutorial/advanced/hooks/" >
-  -- 
-   Hooking events</option>
-    <option value="/outcome/tutorial/advanced/interop/" >
-  -- 
-   Interoperation</option> 
-      <option value="/outcome/tutorial/advanced/interop/problem/" >--- Incommensurate E types</option>
-      <option value="/outcome/tutorial/advanced/interop/value-or-error/" >--- ValueOrError Concept</option>
-      <option value="/outcome/tutorial/advanced/interop/httplib/" >--- The HTTP library</option>
-      <option value="/outcome/tutorial/advanced/interop/tidylib/" >--- The HTMLTidy library</option>
-      <option value="/outcome/tutorial/advanced/interop/filelib/"  selected>--- The File I/O library</option>
-      <option value="/outcome/tutorial/advanced/interop/app/" >--- The Application</option>
-      <option value="/outcome/tutorial/advanced/interop/app-map-httplib1/" >--- Mapping the HTTP library into the Application `1/2`</option>
-      <option value="/outcome/tutorial/advanced/interop/app-map-httplib2/" >--- Mapping the HTTP library into the Application `2/2`</option>
-      <option value="/outcome/tutorial/advanced/interop/app-map-filelib/" >--- Mapping the File I/O library into the Application</option>
-      <option value="/outcome/tutorial/advanced/interop/app-map-tidylib/" >--- Mapping the HTMLTidy library into the Application</option>
-      <option value="/outcome/tutorial/advanced/interop/app-go/" >--- In use</option>
-      <option value="/outcome/tutorial/advanced/interop/conclusion/" >--- Conclusion</option>
-  
-  
-  
+   Tutorial</option>
     <option value="/outcome/recipes/" >
    Recipes</option>
     <option value="/outcome/experimental/" >
@@ -2428,61 +2401,183 @@
       </div>
     
 
-    <h1>The File I/O library</h1>
+    <h1>Plugging a library into boost::system::error_code</h1>
     
     
     
-    <p>The File I/O library we shall be using is very similar <a href="../../payload/copy_file2">to the one we saw earlier
-in this tutorial</a>:</p>
+    <p><a href="/outcome/motivation/plug_error_code/">See here for this guide, but for <code>std::error_code</code></a>.</p>
 
-<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="c1">// You may remember this from the tutorial section on Custom Payloads
-</span><span class="c1"></span><span class="k">namespace</span> <span class="n">filelib</span>
+<p>This section illustrates how you can hook into the <code>boost::system::error_code</code> system from
+the Boost in order to work with your own set of error codes. As is usually
+the case in C++, doing this is straightforward but requires typing boilerplate
+to tell Boost.System about your custom error type. This is not part of Outcome library,
+but we still provide this short guide here, because how to do this is not well documented [1].</p>
+
+<p>Suppose you want to report all reasons for failure in converting a <code>std::string</code> to a non-negative <code>int</code>.
+The list is:</p>
+
+<ul>
+<li><code>EmptyString</code> &ndash; the input string is empty,</li>
+<li><code>IllegalChar</code> &ndash; input contains characters that are not digits,</li>
+<li><code>TooLong</code> &ndash; input represents a number, but this number would not fit into a variable of type <code>int</code>.</li>
+</ul>
+
+<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="cp">#include</span> <span class="cpf">&lt;boost/system/error_code.hpp&gt;  // bring in boost::system::error_code et al</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;string&gt;  // for string printing</span><span class="cp">
+</span><span class="cp"></span>
+<span class="c1">// This is the custom error code enum
+</span><span class="c1"></span><span class="k">enum</span> <span class="k">class</span><span class="err"> </span><span class="nc">ConversionErrc</span>
 <span class="p">{</span>
-  <span class="c1">// Error code + paths related to a failure. Also causes ADL discovery
-</span><span class="c1"></span>  <span class="c1">// to check this namespace.
-</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">failure_info</span>
+  <span class="n">Success</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1">// 0 should not represent an error
+</span><span class="c1"></span>  <span class="n">EmptyString</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="n">IllegalChar</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+  <span class="n">TooLong</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="k">namespace</span> <span class="n">boost</span>
+<span class="p">{</span>
+  <span class="k">namespace</span> <span class="n">system</span>
   <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">error_code</span> <span class="n">ec</span><span class="p">;</span>
-    <span class="n">path</span> <span class="n">path1</span><span class="p">{},</span> <span class="n">path2</span><span class="p">{};</span>
+    <span class="c1">// Tell the C++ 11 STL metaprogramming that enum ConversionErrc
+</span><span class="c1"></span>    <span class="c1">// is registered with the standard error code system
+</span><span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;&gt;</span> <span class="k">struct</span> <span class="n">is_error_code_enum</span><span class="o">&lt;</span><span class="n">ConversionErrc</span><span class="o">&gt;</span> <span class="o">:</span> <span class="n">std</span><span class="o">::</span><span class="n">true_type</span>
+    <span class="p">{</span>
+    <span class="p">};</span>
+  <span class="p">}</span>  <span class="c1">// namespace system
+</span><span class="c1"></span><span class="p">}</span>  <span class="c1">// namespace boost
+</span><span class="c1"></span>
+<span class="k">namespace</span> <span class="n">detail</span>
+<span class="p">{</span>
+  <span class="c1">// Define a custom error code category derived from boost::system::error_category
+</span><span class="c1"></span>  <span class="k">class</span><span class="err"> </span><span class="nc">ConversionErrc_category</span> <span class="o">:</span> <span class="k">public</span> <span class="n">boost</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">error_category</span>
+  <span class="p">{</span>
+  <span class="k">public</span><span class="o">:</span>
+    <span class="c1">// Return a short descriptive name for the category
+</span><span class="c1"></span>    <span class="k">virtual</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span> <span class="k">override</span> <span class="k">final</span> <span class="p">{</span> <span class="k">return</span> <span class="s">&#34;ConversionError&#34;</span><span class="p">;</span> <span class="p">}</span>
+    <span class="c1">// Return what each enum means in text
+</span><span class="c1"></span>    <span class="k">virtual</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">message</span><span class="p">(</span><span class="kt">int</span> <span class="n">c</span><span class="p">)</span> <span class="k">const</span> <span class="k">override</span> <span class="k">final</span>
+    <span class="p">{</span>
+      <span class="k">switch</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">ConversionErrc</span><span class="o">&gt;</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+      <span class="p">{</span>
+      <span class="k">case</span> <span class="n">ConversionErrc</span><span class="o">::</span><span class="nl">Success</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#34;conversion successful&#34;</span><span class="p">;</span>
+      <span class="k">case</span> <span class="n">ConversionErrc</span><span class="o">::</span><span class="nl">EmptyString</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#34;converting empty string&#34;</span><span class="p">;</span>
+      <span class="k">case</span> <span class="n">ConversionErrc</span><span class="o">::</span><span class="nl">IllegalChar</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#34;got non-digit char when converting to a number&#34;</span><span class="p">;</span>
+      <span class="k">case</span> <span class="n">ConversionErrc</span><span class="o">::</span><span class="nl">TooLong</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#34;the number would not fit into memory&#34;</span><span class="p">;</span>
+      <span class="k">default</span><span class="o">:</span>
+        <span class="k">return</span> <span class="s">&#34;unknown&#34;</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="c1">// OPTIONAL: Allow generic error conditions to be compared to me
+</span><span class="c1"></span>    <span class="k">virtual</span> <span class="n">boost</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">error_condition</span> <span class="n">default_error_condition</span><span class="p">(</span><span class="kt">int</span> <span class="n">c</span><span class="p">)</span> <span class="k">const</span> <span class="k">noexcept</span> <span class="k">override</span> <span class="k">final</span>
+    <span class="p">{</span>
+      <span class="k">switch</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">ConversionErrc</span><span class="o">&gt;</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+      <span class="p">{</span>
+      <span class="k">case</span> <span class="n">ConversionErrc</span><span class="o">::</span><span class="nl">EmptyString</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">make_error_condition</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">errc</span><span class="o">::</span><span class="n">invalid_argument</span><span class="p">);</span>
+      <span class="k">case</span> <span class="n">ConversionErrc</span><span class="o">::</span><span class="nl">IllegalChar</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">make_error_condition</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">errc</span><span class="o">::</span><span class="n">invalid_argument</span><span class="p">);</span>
+      <span class="k">case</span> <span class="n">ConversionErrc</span><span class="o">::</span><span class="nl">TooLong</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">make_error_condition</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">errc</span><span class="o">::</span><span class="n">result_out_of_range</span><span class="p">);</span>
+      <span class="k">default</span><span class="o">:</span>
+        <span class="c1">// I have no mapping for this code
+</span><span class="c1"></span>        <span class="k">return</span> <span class="n">boost</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">error_condition</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="o">*</span><span class="k">this</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
   <span class="p">};</span>
-
-  <span class="c1">// Tell Outcome that failure_info is to be treated as a std::error_code
-</span><span class="c1"></span>  <span class="kr">inline</span> <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span> <span class="o">&amp;</span><span class="n">make_error_code</span><span class="p">(</span><span class="k">const</span> <span class="n">failure_info</span> <span class="o">&amp;</span><span class="n">fi</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">fi</span><span class="p">.</span><span class="n">ec</span><span class="p">;</span> <span class="p">}</span>
-
-  <span class="c1">// Tell Outcome that no-value observation should throw a custom exception
-</span><span class="c1"></span>  <span class="kr">inline</span> <span class="kt">void</span> <span class="n">outcome_throw_as_system_error_with_payload</span><span class="p">(</span><span class="n">failure_info</span> <span class="n">fi</span><span class="p">)</span>
-  <span class="p">{</span>
-    <span class="c1">// If the error code is not filesystem related e.g. ENOMEM, throw that
-</span><span class="c1"></span>    <span class="c1">// as a standard STL exception.
-</span><span class="c1"></span>    <span class="n">OUTCOME_V2_NAMESPACE</span><span class="o">::</span><span class="n">try_throw_std_exception_from_error</span><span class="p">(</span><span class="n">fi</span><span class="p">.</span><span class="n">ec</span><span class="p">);</span>
-    <span class="c1">// Throw the exact same filesystem_error exception which the throwing
-</span><span class="c1"></span>    <span class="c1">// copy_file() edition does.
-</span><span class="c1"></span>    <span class="k">throw</span> <span class="nf">filesystem_error</span><span class="p">(</span><span class="n">fi</span><span class="p">.</span><span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">(),</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">fi</span><span class="p">.</span><span class="n">path1</span><span class="p">),</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">fi</span><span class="p">.</span><span class="n">path2</span><span class="p">),</span> <span class="n">fi</span><span class="p">.</span><span class="n">ec</span><span class="p">);</span>
-  <span class="p">}</span>
-
-  <span class="c1">// Localise a result implementation specific to this namespace.
-</span><span class="c1"></span>  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">T</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">result</span> <span class="o">=</span> <span class="n">OUTCOME_V2_NAMESPACE</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">failure_info</span><span class="o">&gt;</span><span class="p">;</span>
-
-  <span class="c1">// Writes a chunk of data to some file. Returns bytes written, or
-</span><span class="c1"></span>  <span class="c1">// failure_info. Never throws exceptions.
-</span><span class="c1"></span>  <span class="n">result</span><span class="o">&lt;</span><span class="n">size_t</span><span class="o">&gt;</span> <span class="n">write_file</span><span class="p">(</span><span class="n">string_view</span> <span class="n">chunk</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
-<span class="p">}</span>  <span class="c1">// namespace filelib
-</span><span class="c1"></span></code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/finale.cpp#L97" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+<span class="p">}</span>  <span class="c1">// namespace detail
+</span><span class="c1"></span>
+<span class="c1">// Define the linkage for this function to be used by external code.
+</span><span class="c1">// This would be the usual __declspec(dllexport) or __declspec(dllimport)
+</span><span class="c1">// if we were in a Windows DLL etc. But for this example use a global
+</span><span class="c1">// instance but with inline linkage so multiple definitions do not collide.
+</span><span class="c1"></span><span class="cp">#define THIS_MODULE_API_DECL extern inline
+</span><span class="cp"></span>
+<span class="c1">// Declare a global function returning a static instance of the custom category
+</span><span class="c1"></span><span class="n">THIS_MODULE_API_DECL</span> <span class="k">const</span> <span class="n">detail</span><span class="o">::</span><span class="n">ConversionErrc_category</span> <span class="o">&amp;</span><span class="n">ConversionErrc_category</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="k">static</span> <span class="n">detail</span><span class="o">::</span><span class="n">ConversionErrc_category</span> <span class="n">c</span><span class="p">;</span>
+  <span class="k">return</span> <span class="n">c</span><span class="p">;</span>
+<span class="p">}</span>
 
 
-<p>This uses the advanced Outcome feature of programming the lazy synthesis of
-custom C++ exception throws from a payload carrying <code>E</code> type called <code>failure_info</code>.
-Like the HTTP library, it too template aliases a localised <code>result</code> implementation
-into its namespace with ADL bridging so Outcome customisation points can be
-discovered.</p>
+<span class="c1">// Overload the global make_error_code() free function with our
+</span><span class="c1">// custom enum. It will be found via ADL by the compiler if needed.
+</span><span class="c1"></span><span class="kr">inline</span> <span class="n">boost</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">error_code</span> <span class="n">make_error_code</span><span class="p">(</span><span class="n">ConversionErrc</span> <span class="n">e</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">ConversionErrc_category</span><span class="p">()};</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="n">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="c1">// Note that we can now supply ConversionErrc directly to error_code
+</span><span class="c1"></span>  <span class="n">boost</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">error_code</span> <span class="n">ec</span> <span class="o">=</span> <span class="n">ConversionErrc</span><span class="o">::</span><span class="n">IllegalChar</span><span class="p">;</span>
+
+  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;ConversionErrc::IllegalChar is printed by boost::system::error_code as &#34;</span>
+    <span class="o">&lt;&lt;</span> <span class="n">ec</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; with explanatory message &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+  <span class="c1">// We can compare ConversionErrc containing error codes to generic conditions
+</span><span class="c1"></span>  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;ec is equivalent to boost::system::errc::invalid_argument = &#34;</span>
+    <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">ec</span> <span class="o">==</span> <span class="n">std</span><span class="o">::</span><span class="n">errc</span><span class="o">::</span><span class="n">invalid_argument</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;ec is equivalent to boost::system::errc::result_out_of_range = &#34;</span>
+    <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">ec</span> <span class="o">==</span> <span class="n">std</span><span class="o">::</span><span class="n">errc</span><span class="o">::</span><span class="n">result_out_of_range</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/boost-only/error_code_registration.cpp#L26" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+
+
+<p>This might look like a lot of extra boilerplate over simply using your custom
+error code enum directly, but look at the advantages:</p>
+
+<ol>
+<li>Any code which can speak <code>boost::system::error_code</code> can now work with errors from your
+code, AND without being recompiled.</li>
+<li><code>boost::system::system_error</code> can now wrap your custom error codes seamlessly, allowing
+your custom error code to be converted into a C++ exception <em>and back out again</em>
+without losing information.</li>
+<li><code>boost::system::error_code</code> knows how to print itself, and will print your custom error
+code without extra work from you. As usually you&rsquo;d need to define a print routine
+for any custom error code you&rsquo;d write anyway, there is actually very little extra
+boilerplate here.</li>
+<li>If you implement the <code>default_error_condition()</code> override, you can allow code
+exclusively written to understand <code>boost::system::errc</code> alone to examine your custom error
+code domain for equivalence to the standard error conditions, AND without being
+recompiled.</li>
+</ol>
+
+<div class="notices note" ><p>This documentation recommends that when you define your custom <code>enum</code> for representing
+<code>error_code</code>s, you should always make sure that value 0 never represents an actual error:
+it should either represent a success or should not be provided at all. If you only
+intend to use your <code>enum</code> inside <code>result&lt;&gt;</code> or <code>outcome&lt;&gt;</code> you can just start your
+enumerations from 1. If you intend to also return <code>boost::system::error_code</code> directly from
+functions, you should probably define value 0 as success, so that you are able to
+inform about function&rsquo;s success by returning <code>MyEnum::Success</code>. This is because <code>error_code</code>&rsquo;s
+contextual conversion to <code>bool</code> (which some people use to check if there was an error or not)
+only checks for the numeric value of the error code (without looking at error domain (category)).</p>
+</div>
+
+
+<p>[1]: The only documentation I&rsquo;m aware of is the quite old guide by Chris Kohlhoff, founder of ASIO and the Networking TS:</p>
+
+<ul>
+<li><a href="http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-1.html">http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-1.html</a></li>
+<li><a href="http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-2.html">http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-2.html</a></li>
+<li><a href="http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-3.html">http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-3.html</a></li>
+<li><a href="http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-4.html">http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-4.html</a></li>
+<li><a href="http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-5.html">http://blog.think-async.com/2010/04/system-error-support-in-c0x-part-5.html</a></li>
+</ul>
 
 
     
     
         <div class="chevrons">
     <div id="navigation">
-<a class="nav nav-prev" href="/outcome/tutorial/advanced/interop/tidylib/" title="The HTMLTidy library"> <i class="fa fa-chevron-left"></i><label>The HTMLTidy library</label></a>
-    <a class="nav nav-next" href="/outcome/tutorial/advanced/interop/app/" title="The Application" style="margin-right: 0px;"><label>The Application</label><i class="fa fa-chevron-right"></i></a></div>
+<a class="nav nav-prev" href="/outcome/motivation/plug_error_code/" title="Plugging a library into std::error_code`"> <i class="fa fa-chevron-left"></i><label>Plugging a library into std::error_code`</label></a>
+    <a class="nav nav-next" href="/outcome/motivation/narrow_contract/" title="Narrow contracts" style="margin-right: 0px;"><label>Narrow contracts</label><i class="fa fa-chevron-right"></i></a></div>
   </div>
 
   </section>
@@ -2497,13 +2592,13 @@ discovered.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 11/02/2019
+        <i class='fa fa-calendar'></i> Last update on 21/06/2019
     </div>
     
 
     
     <div class="github-link">
-      <a href="https://github.com/ned14/outcome/edit/develop/doc/src/content/tutorial/advanced/interop/filelib.md" target="blank"><i class="fa fa-code-fork"></i>
+      <a href="https://github.com/ned14/outcome/edit/develop/doc/src/content/motivation/plug_error_code2.md" target="blank"><i class="fa fa-code-fork"></i>
         Improve this page</a>
     </div>
     

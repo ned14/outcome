@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-21T20:51:20 UTC">
+<meta name="revised" content="2019-06-21T21:49:27 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -106,7 +106,14 @@
       <li data-nav-id="/outcome/motivation/plug_error_code/" class="dd-item">
         <div>
           <a href="/outcome/motivation/plug_error_code/">
-            Plugging a library into std::error_code
+            Plugging a library into std::error_code`
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/motivation/plug_error_code2/" class="dd-item">
+        <div>
+          <a href="/outcome/motivation/plug_error_code2/">
+            Plugging a library into boost::system::error_code
           </a>
         </div>
     </li>
@@ -2416,6 +2423,8 @@ customisation points capable of accepting very foreign inputs. Removed the
 necessary. Fixed the documentation for the customisation points which
 previously claimed that they are ADL discovered, which they are not. Added
 a recipe describing how to add in support for foreign input types.</dd>
+<dt><a href="https://github.com/ned14/outcome/issues/183">#183</a></dt>
+<dd>Added a separate <code>motivation/plug_error_code</code> specifically for Boost.</dd>
 </dl>
 
 <h3 id="bug-fixes">Bug fixes:</h3>
