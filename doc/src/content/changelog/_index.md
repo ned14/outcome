@@ -27,6 +27,9 @@ necessary. Fixed the documentation for the customisation points which
 previously claimed that they are ADL discovered, which they are not. Added
 a recipe describing how to add in support for foreign input types.
 
+[#183](https://github.com/ned14/outcome/issues/183)
+: Added a separate `motivation/plug_error_code` specifically for Boost.
+
 ### Bug fixes:
 
 -

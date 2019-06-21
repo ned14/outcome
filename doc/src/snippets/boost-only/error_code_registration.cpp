@@ -1,0 +1,131 @@
+/* Documentation snippet
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (3 commits), Luke Peterson <hazelnusse@gmail.com> (2 commits), Andrzej Krzemienski <akrzemi1@gmail.com> (2 commits) and Andrzej Krzemieński <akrzemi1@gmail.com> (1 commit)
+File Created: Mar 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+//! [error_code_registration]
+#include <boost/system/error_code.hpp>  // bring in boost::system::error_code et al
+#include <iostream>
+#include <string>  // for string printing
+
+// This is the custom error code enum
+enum class ConversionErrc
+{
+  Success = 0,  // 0 should not represent an error
+  EmptyString = 1,
+  IllegalChar = 2,
+  TooLong = 3,
+};
+
+namespace boost
+{
+  namespace system
+  {
+    // Tell the C++ 11 STL metaprogramming that enum ConversionErrc
+    // is registered with the standard error code system
+    template <> struct is_error_code_enum<ConversionErrc> : std::true_type
+    {
+    };
+  }  // namespace system
+}  // namespace boost
+
+namespace detail
+{
+  // Define a custom error code category derived from boost::system::error_category
+  class ConversionErrc_category : public boost::system::error_category
+  {
+  public:
+    // Return a short descriptive name for the category
+    virtual const char *name() const noexcept override final { return "ConversionError"; }
+    // Return what each enum means in text
+    virtual std::string message(int c) const override final
+    {
+      switch(static_cast<ConversionErrc>(c))
+      {
+      case ConversionErrc::Success:
+        return "conversion successful";
+      case ConversionErrc::EmptyString:
+        return "converting empty string";
+      case ConversionErrc::IllegalChar:
+        return "got non-digit char when converting to a number";
+      case ConversionErrc::TooLong:
+        return "the number would not fit into memory";
+      default:
+        return "unknown";
+      }
+    }
+    // OPTIONAL: Allow generic error conditions to be compared to me
+    virtual boost::system::error_condition default_error_condition(int c) const noexcept override final
+    {
+      switch(static_cast<ConversionErrc>(c))
+      {
+      case ConversionErrc::EmptyString:
+        return make_error_condition(boost::system::errc::invalid_argument);
+      case ConversionErrc::IllegalChar:
+        return make_error_condition(boost::system::errc::invalid_argument);
+      case ConversionErrc::TooLong:
+        return make_error_condition(boost::system::errc::result_out_of_range);
+      default:
+        // I have no mapping for this code
+        return boost::system::error_condition(c, *this);
+      }
+    }
+  };
+}  // namespace detail
+
+// Define the linkage for this function to be used by external code.
+// This would be the usual __declspec(dllexport) or __declspec(dllimport)
+// if we were in a Windows DLL etc. But for this example use a global
+// instance but with inline linkage so multiple definitions do not collide.
+#define THIS_MODULE_API_DECL extern inline
+
+// Declare a global function returning a static instance of the custom category
+THIS_MODULE_API_DECL const detail::ConversionErrc_category &ConversionErrc_category()
+{
+  static detail::ConversionErrc_category c;
+  return c;
+}
+
+
+// Overload the global make_error_code() free function with our
+// custom enum. It will be found via ADL by the compiler if needed.
+inline boost::system::error_code make_error_code(ConversionErrc e)
+{
+  return {static_cast<int>(e), ConversionErrc_category()};
+}
+
+int main(void)
+{
+  // Note that we can now supply ConversionErrc directly to error_code
+  boost::system::error_code ec = ConversionErrc::IllegalChar;
+
+  std::cout << "ConversionErrc::IllegalChar is printed by boost::system::error_code as "
+    << ec << " with explanatory message " << ec.message() << std::endl;
+
+  // We can compare ConversionErrc containing error codes to generic conditions
+  std::cout << "ec is equivalent to boost::system::errc::invalid_argument = "
+    << (ec == std::errc::invalid_argument) << std::endl;
+  std::cout << "ec is equivalent to boost::system::errc::result_out_of_range = "
+    << (ec == std::errc::result_out_of_range) << std::endl;
+  return 0;
+}
+//! [error_code_registration]
