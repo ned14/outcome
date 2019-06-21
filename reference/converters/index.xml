@@ -5,22 +5,10 @@
     <link>https://ned14.github.io/outcome/reference/converters/</link>
     <description>Recent content in Converters on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Mon, 11 Feb 2019 13:38:04 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 11 Feb 2019 15:13:33 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/converters/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>`try_operation_return_as(expr)`</title>
-      <link>https://ned14.github.io/outcome/reference/converters/try_operation_return_as/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/reference/converters/try_operation_return_as/</guid>
-      <description>A customisable converter of ValueOrError&amp;lt;T, E&amp;gt; concept matching types to a returnable failure type.
-Overridable: Argument dependent lookup.
-Default: A number of implementations are provided by default:
- try_operation_return_as(T &amp;amp;&amp;amp;) which requires T to provide an .as_failure() member function in order to be available. This is selected for all basic_result and basic_outcome types. See &amp;#34;/home/travis/build/ned14/outcome/doc/src/content/reference/converters/try_operation_return_as.md:12:198&amp;#34;: API reference page for &amp;#39;auto try_operation_return_as(T &amp;amp;&amp;amp;)&amp;#39; not found, please use an identifier wholly contained in a page title API NOT FOUND IN DOCS auto try_operation_return_as(T &amp;amp;&amp;amp;) .</description>
-    </item>
     
     <item>
       <title>`value_or_error&lt;T, U&gt;`</title>

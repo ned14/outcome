@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-20T21:25:59 UTC">
+<meta name="revised" content="2019-06-21T20:51:27 UTC">
 <title>Extending `OUTCOME_TRY` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -721,13 +721,6 @@
       <a href="/outcome/reference/converters/">Converters</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/converters/try_operation_return_as/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/converters/try_operation_return_as/">
-            <code>try_operation_return_as(expr)</code>
-          </a>
-        </div>
-    </li>
       <li data-nav-id="/outcome/reference/converters/value_or_error/" class="dd-item">
         <div>
           <a href="/outcome/reference/converters/value_or_error/">
@@ -2405,9 +2398,9 @@
 <p>Outcome&rsquo;s <a href="/outcome/reference/macros/try/" class="api-reference"><code>OUTCOME_TRY(var, expr)</code></a>
  operation is fully extensible
 to accept as input any foreign types.
-It already recognises types matching the <a href="/outcome/reference/concepts/valueorerror/" class="api-reference"><code>ValueOrError&lt;T, E&gt;</code></a>
-
-concept, which is to say all types which have:</p>
+It already recognises types matching the
+<a href="/outcome/reference/concepts/valueorerror/" class="api-reference"><code>ValueOrError&lt;T, E&gt;</code></a>
+ concept, which is to say all types which have:</p>
 
 <ul>
 <li>A public <code>.has_value()</code> member function which returns a <code>bool</code>.</li>
@@ -2417,29 +2410,39 @@ function.</li>
 member function.</li>
 </ul>
 
-<p>This should automatically handle <code>std::expected&lt;T, E&gt;</code> and many others.</p>
+<p>This should automatically handle inputs of <code>std::expected&lt;T, E&gt;</code>, and many others.</p>
 
 <p><code>OUTCOME_TRY</code> has the following free function customisation points:</p>
 
 <dl>
-<dt><a href="/outcome/reference/functions/try_operation_has_value/" class="api-reference"><code>try_operation_has_value(X)</code></a>
+<dt><code>OUTCOME_V2_NAMESPACE::</code><a href="/outcome/reference/functions/try_operation_has_value/" class="api-reference"><code>try_operation_has_value(X)</code></a>
 
 <dd>Returns a `bool` which is true if the input to TRY has a value.
-<dt><a href="/outcome/reference/functions/try_operation_return_as/" class="api-reference"><code>try_operation_return_as(X)</code></a>
+<dt><code>OUTCOME_V2_NAMESPACE::</code><a href="/outcome/reference/functions/try_operation_return_as/" class="api-reference"><code>try_operation_return_as(X)</code></a>
 
 <dd>Returns a suitable <a href="/outcome/reference/types/failure_type/" class="api-reference"><code>failure_type&lt;EC, EP = void&gt;</code></a>
  which
 is returned immediately to cause stack unwind. Ought to preserve rvalue
 semantics (i.e. if passed an rvalue, move the error state into the failure
 type).
-<dt><a href="/outcome/reference/functions/try_operation_extract_value/" class="api-reference"><code>try_operation_extract_value(X)</code></a>
+<dt><code>OUTCOME_V2_NAMESPACE::</code><a href="/outcome/reference/functions/try_operation_extract_value/" class="api-reference"><code>try_operation_extract_value(X)</code></a>
 
 <dd>Extracts a value type from the input for the `TRY` to set its variable.
 Ought to preserve rvalue semantics (i.e. if passed an rvalue, move the value).
 </dl>
 
-<p>The specialisations of these must be injected into the <code>OUTCOME_V2_NAMESPACE</code>.
-Let us work through an applied example.</p>
+<p>New overloads of these to support additional input types must be injected into
+the <code>OUTCOME_V2_NAMESPACE</code> namespace before the compiler parses the relevant
+<code>OUTCOME_TRY</code> in order to be found. This is called &lsquo;early binding&rsquo; in the two
+phase name lookup model in C++. This was chosen over &lsquo;late binding&rsquo;, where an
+<code>OUTCOME_TRY</code> in a templated piece of code could look up overloads introduced after
+parsing the template containing the <code>OUTCOME_TRY</code>, because it has much lower
+impact on build times, as binding is done once at the point of parse, instead
+of on every occasion at the point of instantiation. If you are careful to ensure
+that you inject the overloads which you need early in the parse of the
+translation unit, all will be well.</p>
+
+<p>Let us work through an applied example.</p>
 
 <hr />
 
@@ -2572,7 +2575,7 @@ new_code(0) returns failure argument out of domain
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 20/06/2019
+        <i class='fa fa-calendar'></i> Last update on 21/06/2019
     </div>
     
 

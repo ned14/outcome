@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/macros/</link>
     <description>Recent content in Macros on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Mon, 11 Feb 2019 13:38:04 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 11 Feb 2019 15:13:33 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/macros/index.xml" rel="self" type="application/rss+xml" />
     
@@ -123,7 +123,7 @@ Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
       
       <guid>https://ned14.github.io/outcome/reference/macros/try/</guid>
       <description>Evaluate an expression which results in a type matching the following customisation points, assigning T to a variable called var if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
- try_operation_has_value(X)  try_operation_return_as(X)  try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
+ OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
 Overridable: Not overridable.
 Definition: See OUTCOME_TRYV(expr) for most of the mechanics.
 If successful, an auto &amp;amp;&amp;amp;var is initialised to the expression result&amp;rsquo;s .</description>
@@ -136,7 +136,7 @@ If successful, an auto &amp;amp;&amp;amp;var is initialised to the expression re
       
       <guid>https://ned14.github.io/outcome/reference/macros/tryv/</guid>
       <description>Evaluate an expression which results in a type matching the following customisation points, continuing execution if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
- try_operation_has_value(X)  try_operation_return_as(X)  try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
+ OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
 The difference between the OUTCOME_TRYV(expr) and OUTCOME_TRY(expr) editions is that the latter will set a variable if two or more macro arguments are present (see OUTCOME_TRY(var, expr) ).</description>
     </item>
     
@@ -147,7 +147,7 @@ The difference between the OUTCOME_TRYV(expr) and OUTCOME_TRY(expr) editions is 
       
       <guid>https://ned14.github.io/outcome/reference/macros/tryx/</guid>
       <description>Evaluate an expression which results in a type matching the following customisation points, emitting the T if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
- try_operation_has_value(X)  try_operation_return_as(X)  try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
+ OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
 Availability: GCC and clang only. Use #ifdef OUTCOME_TRYX to determine if available.
 Overridable: Not overridable.
 Definition: See OUTCOME_TRYV(expr) for most of the mechanics.</description>
