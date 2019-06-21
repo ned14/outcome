@@ -1,15 +1,15 @@
 +++
-title = "Plugging a library into std::error_code`"
-description = "Illustrates how you can hook into the `std::error_code` system from the Standard Library in order to work with your own set of error codes."
-weight = 50
+title = "Plugging a library into boost::system::error_code"
+description = "Illustrates how you can hook into the `boost::system::error_code` system from Boost in order to work with your own set of error codes."
+weight = 55
 +++
 
-[See here for this guide, but for `boost::system::error_code`]({{% relref "plug_error_code2" %}}).
+[See here for this guide, but for `std::error_code`]({{% relref "plug_error_code" %}}).
 
-This section illustrates how you can hook into the `std::error_code` system from
-the Standard Library in order to work with your own set of error codes. As is usually
+This section illustrates how you can hook into the `boost::system::error_code` system from
+the Boost in order to work with your own set of error codes. As is usually
 the case in C++, doing this is straightforward but requires typing boilerplate
-to tell the C++ STL about your custom error type. This is not part of Outcome library,
+to tell Boost.System about your custom error type. This is not part of Outcome library,
 but we still provide this short guide here, because how to do this is not well documented [1].
 
 Suppose you want to report all reasons for failure in converting a `std::string` to a non-negative `int`.
@@ -19,22 +19,22 @@ The list is:
 * `IllegalChar` -- input contains characters that are not digits,
 * `TooLong` -- input represents a number, but this number would not fit into a variable of type `int`.
 
-{{% snippet "error_code_registration.cpp" "error_code_registration" %}}
+{{% snippet "boost-only/error_code_registration.cpp" "error_code_registration" %}}
 
 This might look like a lot of extra boilerplate over simply using your custom
 error code enum directly, but look at the advantages:
 
-1. Any code which can speak `std::error_code` can now work with errors from your
+1. Any code which can speak `boost::system::error_code` can now work with errors from your
    code, AND without being recompiled.
-2. `std::system_error` can now wrap your custom error codes seamlessly, allowing
+2. `boost::system::system_error` can now wrap your custom error codes seamlessly, allowing
    your custom error code to be converted into a C++ exception *and back out again*
    without losing information.
-3. `std::error_code` knows how to print itself, and will print your custom error
+3. `boost::system::error_code` knows how to print itself, and will print your custom error
    code without extra work from you. As usually you'd need to define a print routine
    for any custom error code you'd write anyway, there is actually very little extra
    boilerplate here.
 4. If you implement the `default_error_condition()` override, you can allow code
-   exclusively written to understand `std::errc` alone to examine your custom error
+   exclusively written to understand `boost::system::errc` alone to examine your custom error
    code domain for equivalence to the standard error conditions, AND without being
    recompiled.
 
@@ -43,7 +43,7 @@ This documentation recommends that when you define your custom `enum` for repres
 `error_code`s, you should always make sure that value 0 never represents an actual error:
 it should either represent a success or should not be provided at all. If you only
 intend to use your `enum` inside `result<>` or `outcome<>` you can just start your
-enumerations from 1. If you intend to also return `std::error_code` directly from
+enumerations from 1. If you intend to also return `boost::system::error_code` directly from
 functions, you should probably define value 0 as success, so that you are able to
 inform about function's success by returning `MyEnum::Success`. This is because `error_code`'s
 contextual conversion to `bool` (which some people use to check if there was an error or not)

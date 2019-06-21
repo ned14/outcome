@@ -5,9 +5,9 @@ description = "Evaluate an expression which results in an understood type, assig
 
 Evaluate an expression which results in a type matching the following customisation points, assigning `T` to a variable called `var` if successful, immediately returning {{% api "try_operation_return_as(X)" %}} from the calling function if unsuccessful:
 
-- {{% api "try_operation_has_value(X)" %}}
-- {{% api "try_operation_return_as(X)" %}}
-- {{% api "try_operation_extract_value(X)" %}}
+- `OUTCOME_V2_NAMESPACE::`{{% api "try_operation_has_value(X)" %}}
+- `OUTCOME_V2_NAMESPACE::`{{% api "try_operation_return_as(X)" %}}
+- `OUTCOME_V2_NAMESPACE::`{{% api "try_operation_extract_value(X)" %}}
 
 Default overloads for these customisation points are provided. See [the recipe for supporting foreign input to `OUTCOME_TRY`]({{% relref "/recipes/foreign-try" %}}).
 
