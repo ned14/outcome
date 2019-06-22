@@ -44,6 +44,11 @@ the Boost release distro.
 thus causing much weirdness, like not printing diagnostics and trying to feed
 everything to `make_exception_ptr()`.
 
+[#194](https://github.com/ned14/outcome/issues/192)
+: Fix issue #192 where the `std::basic_outcome_failure_exception_from_error()`
+was being defined twice for translation units which combine standalone and
+Boost Outcome's.
+
 ---
 ## v2.1 12th Apr 2019 (Boost 1.70) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1)
 

@@ -28,10 +28,13 @@ Distributed under the Boost Software License, Version 1.0.
 #include "basic_outcome.hpp"
 #include "std_result.hpp"
 
+#ifndef STD_BASIC_OUTCOME_FAILURE_EXCEPTION_FROM_ERROR
+#define STD_BASIC_OUTCOME_FAILURE_EXCEPTION_FROM_ERROR
 namespace std  // NOLINT
 {
   inline exception_ptr basic_outcome_failure_exception_from_error(const error_code &ec) { return make_exception_ptr(system_error(ec)); }
 }  // namespace std
+#endif
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 

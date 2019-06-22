@@ -15,7 +15,9 @@ function.
 - In order of preference, a public `.as_failure()`/`.assume_error()`/`.error()`
 member function.
 
-This should automatically handle inputs of `std::expected<T, E>`, and many others.
+This should automatically handle inputs of `std::expected<T, E>`, and many others,
+including intermixing Boost.Outcome and standalone Outcome within the same
+translation unit.
 
 `OUTCOME_TRY` has the following free function customisation points:
 
