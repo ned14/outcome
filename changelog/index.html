@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-21T21:49:27 UTC">
+<meta name="revised" content="2019-06-22T20:25:11 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2439,6 +2439,10 @@ the Boost release distro.</dd>
 <dd>Fix issue #182 where <code>trait::is_exception_ptr_available&lt;T&gt;</code> was always true,
 thus causing much weirdness, like not printing diagnostics and trying to feed
 everything to <code>make_exception_ptr()</code>.</dd>
+<dt><a href="https://github.com/ned14/outcome/issues/192">#194</a></dt>
+<dd>Fix issue #192 where the <code>std::basic_outcome_failure_exception_from_error()</code>
+was being defined twice for translation units which combine standalone and
+Boost Outcome&rsquo;s.</dd>
 </dl>
 
 <hr />
@@ -2603,7 +2607,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 21/06/2019
+        <i class='fa fa-calendar'></i> Last update on 22/06/2019
     </div>
     
 
