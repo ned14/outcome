@@ -29,6 +29,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "boost_result.hpp"
 
+#ifndef BOOST_SYSTEM_BASIC_OUTCOME_FAILURE_EXCEPTION_FROM_ERROR
+#define BOOST_SYSTEM_BASIC_OUTCOME_FAILURE_EXCEPTION_FROM_ERROR
 namespace boost
 {
   namespace system
@@ -37,6 +39,7 @@ namespace boost
     inline boost::exception_ptr basic_outcome_failure_exception_from_error(const boost::system::error_code &ec) { return boost::copy_exception(boost::system::system_error(ec)); }
   }  // namespace system
 }  // namespace boost
+#endif
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
