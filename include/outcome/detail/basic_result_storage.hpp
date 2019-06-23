@@ -186,8 +186,21 @@ namespace detail
   {
     template <class R, class EC, class NoValuePolicy> constexpr basic_result_storage_swap(basic_result_storage<R, EC, NoValuePolicy> &a, basic_result_storage<R, EC, NoValuePolicy> &b)
     {
-      using std::swap;
-      swap(a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
+      struct _
+      {
+        unsigned &a, &b;
+        bool all_good{false};
+        ~_()
+        {
+          if(!all_good)
+          {
+            // We lost one of the values
+            a |= status_lost_consistency;
+            b |= status_lost_consistency;
+          }
+        }
+      } _{a._msvc_nonpermissive_state()._status, b._msvc_nonpermissive_state()._status};
+      strong_swap(_.all_good, a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
       a._msvc_nonpermissive_state().swap(b._msvc_nonpermissive_state());
     }
   };
@@ -199,19 +212,33 @@ namespace detail
       using std::swap;
       // Swap value and status first, if it throws, status will remain unchanged
       a._msvc_nonpermissive_state().swap(b._msvc_nonpermissive_state());
+      bool all_good = false;
       try
       {
-        swap(a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
+        strong_swap(all_good, a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
       }
       catch(...)
       {
-        // First try to put the value and status back
-        try
+        if(!all_good)
         {
-          a._msvc_nonpermissive_state().swap(b._msvc_nonpermissive_state());
-          // If that succeeded, continue by rethrowing the exception
+          a._msvc_nonpermissive_state()._status |= detail::status_lost_consistency;
+          b._msvc_nonpermissive_state()._status |= detail::status_lost_consistency;
         }
-        catch(...)
+        else
+        {
+          // We may still be able to rescue tis
+          // First try to put the value and status back
+          try
+          {
+            a._msvc_nonpermissive_state().swap(b._msvc_nonpermissive_state());
+            // If that succeeded, continue by rethrowing the exception
+          }
+          catch(...)
+          {
+            all_good = false;
+          }
+        }
+        if(!all_good)
         {
           // We are now trapped. The value swapped, the error did not,
           // trying to restore the value failed. We now have
@@ -221,6 +248,7 @@ namespace detail
             bool has_value = (x._state._status & detail::status_have_value) != 0;
             bool has_error = (x._state._status & detail::status_have_error) != 0;
             bool has_exception = (x._state._status & detail::status_have_exception) != 0;
+            x._state._status |= detail::status_lost_consistency;
             if(has_value == (has_error || has_exception))
             {
               if(has_value)

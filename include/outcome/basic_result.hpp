@@ -497,12 +497,12 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  constexpr void swap(basic_result &o) noexcept(detail::is_nothrow_swappable<value_type>::value &&std::is_nothrow_move_constructible<value_type>::value  //
-                                                &&detail::is_nothrow_swappable<error_type>::value &&std::is_nothrow_move_constructible<error_type>::value)
+  constexpr void swap(basic_result &o) noexcept((std::is_void<value_type>::value || detail::is_nothrow_swappable<value_type>::value)  //
+                                                &&(std::is_void<error_type>::value || detail::is_nothrow_swappable<error_type>::value))
   {
     using std::swap;
-    constexpr bool value_throws = !noexcept(this->_state.swap(o._state));
-    constexpr bool error_throws = !noexcept(swap(this->_error, o._error));
+    constexpr bool value_throws = !std::is_void<value_type>::value && !noexcept(this->_state.swap(o._state));
+    constexpr bool error_throws = !std::is_void<error_type>::value && !noexcept(swap(this->_error, o._error));
     detail::basic_result_storage_swap<value_throws, error_throws>(*this, o);
   }
 
