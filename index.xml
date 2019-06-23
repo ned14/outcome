@@ -1518,6 +1518,18 @@ Guarantees: Never throws an exception.</description>
     </item>
     
     <item>
+      <title>`bool has_lost_consistency() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/has_lost_consistency/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/has_lost_consistency/</guid>
+      <description>Returns true if a preceding swap involving this object failed to preserve the strong guarantee. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
       <title>`value_type &amp;assume_value() &amp; noexcept`</title>
       <link>https://ned14.github.io/outcome/reference/types/basic_outcome/assume_value_lvalue/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -2216,8 +2228,7 @@ Guarantees: If an exception is thrown during the operation, the state of all thr
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/swap/</guid>
       <description>Swap one basic_result with another.
 Requires: Always available.
-Complexity: Same as for the swap() implementations of the value_type and error_type. The noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of both operands on entry is guaranteed restored, if at least one of the underlying operations is marked noexcept. If neither is marked noexcept, an attempt is made to undo the partially completed operation.</description>
+Complexity: If the move constructor and move assignment for value_type and error_type are noexcept, the complexity is the same as for the swap() implementations of the value_type and error_type. Otherwise, complexity is not preserved, as strong_swap(bool &amp;amp;all_good, T &amp;amp;a, T &amp;amp;b) is used instead of swap(). This function defaults to using one move construction and two assignments, and it will attempt extra move assignments in order to restore the state upon entry if a failure occurs.</description>
     </item>
     
     <item>
@@ -2303,7 +2314,7 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1058 commits   @akrzemi1 45 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1060 commits   @akrzemi1 45 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>
@@ -3377,6 +3388,15 @@ Overridable: Not overridable.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
 Header: &amp;lt;outcome/basic_result.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`void strong_swap(bool &amp;all_good, T &amp;a, T &amp;b)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/strong_swap/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/strong_swap/</guid>
+      <description>The standard swap() function provides the weak guarantee i.e. that no resources are lost. This ADL discovered function provides the strong guarantee instead: that if any of these operations throw an exception (i) move construct to temporary (ii) move assign b to a (iii) move assign temporary to b, an attempt is made to restore the exact pre-swapped state upon entry, and if that recovery too fails, then the boolean all_good will be false during stack unwind from the exception throw, to indicate that state has been lost.</description>
     </item>
     
     <item>

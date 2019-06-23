@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-22T23:17:39 UTC">
+<meta name="revised" content="2019-06-23T15:52:28 UTC">
 <title>Types :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -303,6 +303,41 @@
       <a href="/outcome/tutorial/advanced/hooks/">Hooking events</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/keeping_state/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/hooks/keeping_state/">
+            Keeping state
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/adl_bridging/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/hooks/adl_bridging/">
+            ADL bridging
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/hook_result/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/hooks/hook_result/">
+            Hook result
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/poke_exception/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/hooks/poke_exception/">
+            Custom exception ptr
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/hook_outcome/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/hooks/hook_outcome/">
+            Hook outcome
+          </a>
+        </div>
+    </li>
         </ul>
     </li>
     <li data-nav-id="/outcome/tutorial/advanced/interop/" class="dd-item haschildren
@@ -1685,6 +1720,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/has_lost_consistency/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/has_lost_consistency/">
+            <code>bool has_lost_consistency() const noexcept</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/types/basic_result/assume_value_lvalue/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_result/assume_value_lvalue/">
@@ -2266,6 +2308,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/functions/strong_swap/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/strong_swap/">
+            <code>void strong_swap(bool &amp;all_good, T &amp;a, T &amp;b)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/functions/try_throw_std_exception_from_error/" class="dd-item">
         <div>
           <a href="/outcome/reference/functions/try_throw_std_exception_from_error/">
@@ -2611,6 +2660,8 @@
 <p>Always returns false for <code>basic_result</code>. Constexpr, never throws.</p><li>
 	<a href="/outcome/reference/types/basic_result/has_failure/" ><code>bool has_failure() const noexcept</code></a>
 <p>Returns true if there is either an error or an exception. Constexpr, never throws.</p><li>
+	<a href="/outcome/reference/types/basic_result/has_lost_consistency/" ><code>bool has_lost_consistency() const noexcept</code></a>
+<p>Returns true if a preceding swap involving this object failed to preserve the strong guarantee. Constexpr, never throws.</p><li>
 	<a href="/outcome/reference/types/basic_result/assume_value_lvalue/" ><code>value_type &amp;assume_value() &amp; noexcept</code></a>
 <p>Narrow contract lvalue reference observer of any value present. Constexpr propagating, never throws.</p><li>
 	<a href="/outcome/reference/types/basic_result/assume_value_lvalue_const/" ><code>const value_type &amp;assume_value() const &amp; noexcept</code></a>
@@ -2656,7 +2707,7 @@
 	<a href="/outcome/reference/types/basic_result/inequality_failure_type/" ><code>bool operator!=(const failure_type&lt;A, void&gt; &amp;) const</code></a>
 <p>Returns true if this result does not compare equal to the failure type sugar. Constexpr and noexcept propagating.</p><li>
 	<a href="/outcome/reference/types/basic_result/swap/" ><code>void swap(basic_result &amp;)</code></a>
-<p>Swap one basic_result with another. Noexcept propagating.</p><li>
+<p>Swap one basic_result with another, with the strong guarantee. Noexcept propagating.</p><li>
 	<a href="/outcome/reference/types/basic_result/as_failure_lvalue/" ><code>auto as_failure() const &amp;</code></a>
 <p>Return the output from free function <code>failure()</code> containing a copy of any errored state.</p><li>
 	<a href="/outcome/reference/types/basic_result/as_failure_rvalue/" ><code>auto as_failure() &amp;&amp;</code></a>
@@ -2701,7 +2752,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 11/02/2019
+        <i class='fa fa-calendar'></i> Last update on 12/02/2019
     </div>
     
 

@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/functions/</link>
     <description>Recent content in Functions on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Mon, 11 Feb 2019 18:03:59 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 12 Feb 2019 14:02:37 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/functions/index.xml" rel="self" type="application/rss+xml" />
     
@@ -78,6 +78,15 @@ Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
       <guid>https://ned14.github.io/outcome/reference/functions/error_from_exception/</guid>
       <description>This function saves writing boilerplate by rethrowing ep within a try block, with a long sequence of catch() handlers, one for every standard C++ exception type which has a near or exact equivalent code in  std::errc .
 If matched, ep is set to a default constructed  std::exception_ptr , and a  std::error_code is constructed using the ADL discovered free function make_error_code() upon the std::errc enumeration value matching the thrown exception.</description>
+    </item>
+    
+    <item>
+      <title>`void strong_swap(bool &amp;all_good, T &amp;a, T &amp;b)`</title>
+      <link>https://ned14.github.io/outcome/reference/functions/strong_swap/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/functions/strong_swap/</guid>
+      <description>The standard swap() function provides the weak guarantee i.e. that no resources are lost. This ADL discovered function provides the strong guarantee instead: that if any of these operations throw an exception (i) move construct to temporary (ii) move assign b to a (iii) move assign temporary to b, an attempt is made to restore the exact pre-swapped state upon entry, and if that recovery too fails, then the boolean all_good will be false during stack unwind from the exception throw, to indicate that state has been lost.</description>
     </item>
     
     <item>

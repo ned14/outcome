@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-22T23:17:37 UTC">
+<meta name="revised" content="2019-06-23T15:52:26 UTC">
 <title>No-value policies :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -730,10 +730,59 @@
       <a href="/outcome/reference/converters/">Converters</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/converters/value_or_error/" class="dd-item">
+      <li data-nav-id="/outcome/reference/policies/all_narrow/" class="dd-item">
         <div>
-          <a href="/outcome/reference/converters/value_or_error/">
-            <code>value_or_error&lt;T, U&gt;</code>
+          <a href="/outcome/reference/policies/all_narrow/">
+            <code>all_narrow</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/error_code_throw_as_system_error_outcome/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/error_code_throw_as_system_error_outcome/">
+            <code>error_code_throw_as_system_error&lt;T, EC, EP&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/error_code_throw_as_system_error_result/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/error_code_throw_as_system_error_result/">
+            <code>error_code_throw_as_system_error&lt;T, EC, void&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/exception_ptr_rethrow_outcome/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/exception_ptr_rethrow_outcome/">
+            <code>exception_ptr_rethrow&lt;T, EC, EP&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/exception_ptr_rethrow_result/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/exception_ptr_rethrow_result/">
+            <code>exception_ptr_rethrow&lt;T, EC, void&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/fail_to_compile_observers/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/fail_to_compile_observers/">
+            <code>fail_to_compile_observers</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/terminate/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/terminate/">
+            <code>terminate</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/throw_bad_result_access/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/throw_bad_result_access/">
+            <code>throw_bad_result_access&lt;EC&gt;</code>
           </a>
         </div>
     </li>
@@ -1721,6 +1770,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/has_lost_consistency/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/has_lost_consistency/">
+            <code>bool has_lost_consistency() const noexcept</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/types/basic_result/assume_value_lvalue/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_result/assume_value_lvalue/">
@@ -2302,6 +2358,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/functions/strong_swap/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/strong_swap/">
+            <code>void strong_swap(bool &amp;all_good, T &amp;a, T &amp;b)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/functions/try_throw_std_exception_from_error/" class="dd-item">
         <div>
           <a href="/outcome/reference/functions/try_throw_std_exception_from_error/">
@@ -2516,7 +2579,7 @@ respectively.</li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 11/02/2019
+        <i class='fa fa-calendar'></i> Last update on 12/02/2019
     </div>
     
 

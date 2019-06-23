@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-22T23:17:45 UTC">
+<meta name="revised" content="2019-06-23T15:52:34 UTC">
 <title>`void swap(basic_result &amp;)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -1721,6 +1721,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/has_lost_consistency/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/has_lost_consistency/">
+            <code>bool has_lost_consistency() const noexcept</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/types/basic_result/assume_value_lvalue/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_result/assume_value_lvalue/">
@@ -2302,6 +2309,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/functions/strong_swap/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/strong_swap/">
+            <code>void strong_swap(bool &amp;all_good, T &amp;a, T &amp;b)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/functions/try_throw_std_exception_from_error/" class="dd-item">
         <div>
           <a href="/outcome/reference/functions/try_throw_std_exception_from_error/">
@@ -2417,6 +2431,7 @@
       <option value="/outcome/reference/types/basic_result/has_error/" >--- `bool has_error() const noexcept`</option>
       <option value="/outcome/reference/types/basic_result/has_exception/" >--- `bool has_exception() const noexcept`</option>
       <option value="/outcome/reference/types/basic_result/has_failure/" >--- `bool has_failure() const noexcept`</option>
+      <option value="/outcome/reference/types/basic_result/has_lost_consistency/" >--- `bool has_lost_consistency() const noexcept`</option>
       <option value="/outcome/reference/types/basic_result/assume_value_lvalue/" >--- `value_type &amp;assume_value() &amp; noexcept`</option>
       <option value="/outcome/reference/types/basic_result/assume_value_lvalue_const/" >--- `const value_type &amp;assume_value() const &amp; noexcept`</option>
       <option value="/outcome/reference/types/basic_result/assume_value_rvalue/" >--- `value_type &amp;&amp;assume_value() &amp;&amp; noexcept`</option>
@@ -2495,9 +2510,11 @@
 
 <p><em>Requires</em>: Always available.</p>
 
-<p><em>Complexity</em>: Same as for the <code>swap()</code> implementations of the <code>value_type</code> and <code>error_type</code>. The noexcept of underlying operations is propagated.</p>
+<p><em>Complexity</em>: If the move constructor and move assignment for <code>value_type</code> and <code>error_type</code> are noexcept, the complexity is the same as for the <code>swap()</code> implementations of the <code>value_type</code> and <code>error_type</code>. Otherwise, complexity is not preserved, as <a href="/outcome/reference/functions/strong_swap/" class="api-reference"><code>strong_swap(bool &amp;all_good, T &amp;a, T &amp;b)</code></a>
+ is used instead of <code>swap()</code>. This function defaults to using one move construction and two assignments, and it will attempt extra move assignments in order to restore the state upon entry if a failure occurs.</p>
 
-<p><em>Guarantees</em>: If an exception is thrown during the operation, the state of both operands on entry is guaranteed restored, if at least one of the underlying operations is marked <code>noexcept</code>. If neither is marked <code>noexcept</code>, an attempt is made to undo the partially completed operation. If that too fails, the flag bits are forced to something consistent such that there can be no simultaneously valued and errored state, or valueless and errorless.</p>
+<p><em>Guarantees</em>: If an exception is thrown during the swap operation, the state of both operands on entry is attempted to be restored, in order to implement the strong guarantee. If that too fails, the flag bits are forced to something consistent such that there can be no simultaneously valued and errored state, or valueless and errorless. The flag <a href="/outcome/reference/types/basic_result/has_lost_consistency/" class="api-reference"><code>has_lost_consistency()</code></a>
+ becomes true for both operands, which are now likely in an inconsistent state.</p>
 
 
     
@@ -2520,7 +2537,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/03/2019
+        <i class='fa fa-calendar'></i> Last update on 23/06/2019
     </div>
     
 

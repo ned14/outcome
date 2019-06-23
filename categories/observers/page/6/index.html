@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-22T23:17:48 UTC">
+<meta name="revised" content="2019-06-23T15:52:37 UTC">
 <title>Observers :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -1718,6 +1718,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/has_lost_consistency/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/has_lost_consistency/">
+            <code>bool has_lost_consistency() const noexcept</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/types/basic_result/assume_value_lvalue/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_result/assume_value_lvalue/">
@@ -2299,6 +2306,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/functions/strong_swap/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/strong_swap/">
+            <code>void strong_swap(bool &amp;all_good, T &amp;a, T &amp;b)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/functions/try_throw_std_exception_from_error/" class="dd-item">
         <div>
           <a href="/outcome/reference/functions/try_throw_std_exception_from_error/">
@@ -2404,12 +2418,34 @@
 	
 	    <a class="newer-posts" href="/outcome/categories/observers/page/5/">&larr; Previous Pages</a>
 	
-	<span class="page-number">Page 6 of 6</span>
+	<span class="page-number">Page 6 of 7</span>
+	
+	    <a class="older-posts" href="/outcome/categories/observers/page/7/">Next Pages &rarr;</a>
 	
 </nav>
 
 </div>
 
+
+   <article class="post reference">
+    <header class="post-header">
+        <h2 class="post-title"><a href="/outcome/reference/policies/base/has_error_is_errno/">`static bool _has_error_is_errno(Impl &amp;&amp;) noexcept`</a></h2>
+    </header>
+    <section class="post-excerpt">
+        <p>Returns true if the error code in the implementation passed in has a domain or category matching that of POSIX errno. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception. <a class="read-more" href="/outcome/reference/policies/base/has_error_is_errno/">&raquo;</a></p>
+    </section>
+    <footer class=" footline" >
+         
+        
+
+        
+        
+
+    </footer>
+</article>
 
    <article class="post reference">
     <header class="post-header">
@@ -2598,27 +2634,6 @@ Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_outc
     </footer>
 </article>
 
-   <article class="post reference">
-    <header class="post-header">
-        <h2 class="post-title"><a href="/outcome/reference/types/basic_result/value_lvalue/">`value_type &amp;value() &amp;`</a></h2>
-    </header>
-    <section class="post-excerpt">
-        <p>Wide contract lvalue reference observer of any value present. NoValuePolicy::wide_value_check() is first invoked, then the reference to the value is returned.
-Note that if value_type is void, only a const overload returning void is present.
-Requires: Always available.
-Complexity: Depends on NoValuePolicy::wide_value_check().
-Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_result/value_lvalue/">&raquo;</a></p>
-    </section>
-    <footer class=" footline" >
-         
-        
-
-        
-        
-
-    </footer>
-</article>
-
 
 <div style="margin-bottom:2rem"></div>
 
@@ -2626,7 +2641,9 @@ Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_resu
 	
 	    <a class="newer-posts" href="/outcome/categories/observers/page/5/">&larr; Previous Pages</a>
 	
-	<span class="page-number">Page 6 of 6</span>
+	<span class="page-number">Page 6 of 7</span>
+	
+	    <a class="older-posts" href="/outcome/categories/observers/page/7/">Next Pages &rarr;</a>
 	
 </nav>
 
@@ -2653,7 +2670,7 @@ Guarantees: None. <a class="read-more" href="/outcome/reference/types/basic_resu
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 11/02/2019
+        <i class='fa fa-calendar'></i> Last update on 12/02/2019
     </div>
     
 

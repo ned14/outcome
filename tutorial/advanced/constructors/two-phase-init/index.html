@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-22T23:17:37 UTC">
+<meta name="revised" content="2019-06-23T15:52:25 UTC">
 <title>Two phase construction :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -1721,6 +1721,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/has_lost_consistency/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/has_lost_consistency/">
+            <code>bool has_lost_consistency() const noexcept</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/types/basic_result/assume_value_lvalue/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_result/assume_value_lvalue/">
@@ -2302,6 +2309,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/functions/strong_swap/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/strong_swap/">
+            <code>void strong_swap(bool &amp;all_good, T &amp;a, T &amp;b)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/functions/try_throw_std_exception_from_error/" class="dd-item">
         <div>
           <a href="/outcome/reference/functions/try_throw_std_exception_from_error/">
@@ -2359,6 +2373,32 @@
    Motivation</option>
     <option value="/outcome/tutorial/" >
    Tutorial</option> 
+    <option value="/outcome/tutorial/essential/" >
+  - 
+   Essential</option>
+    <option value="/outcome/tutorial/advanced/" >
+  - 
+   Advanced</option> 
+    <option value="/outcome/tutorial/advanced/payload/" >
+  -- 
+   Custom payloads</option>
+    <option value="/outcome/tutorial/advanced/constructors/" >
+  -- 
+   Result returning constructors</option> 
+      <option value="/outcome/tutorial/advanced/constructors/two-phase-init/"  selected>--- Two phase construction</option>
+      <option value="/outcome/tutorial/advanced/constructors/file_handle/" >--- A file handle</option>
+      <option value="/outcome/tutorial/advanced/constructors/static-constructor/" >--- Phase 2 construction</option>
+      <option value="/outcome/tutorial/advanced/constructors/metaprogrammg1/" >--- Phase 3</option>
+      <option value="/outcome/tutorial/advanced/constructors/metaprogrammg2/" >--- construct&lt;T&gt;</option>
+      <option value="/outcome/tutorial/advanced/constructors/metaprogrammg3/" >--- Alternatives</option>
+  
+    <option value="/outcome/tutorial/advanced/hooks/" >
+  -- 
+   Hooking events</option>
+    <option value="/outcome/tutorial/advanced/interop/" >
+  -- 
+   Interoperation</option>
+  
   
     <option value="/outcome/recipes/" >
    Recipes</option>
@@ -2456,7 +2496,7 @@ fails via returning <code>result</code>, completely avoiding C++ exception throw
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 11/02/2019
+        <i class='fa fa-calendar'></i> Last update on 12/02/2019
     </div>
     
 

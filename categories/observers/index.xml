@@ -94,6 +94,18 @@ Guarantees: Never throws an exception.</description>
     </item>
     
     <item>
+      <title>`bool has_lost_consistency() const noexcept`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/has_lost_consistency/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/has_lost_consistency/</guid>
+      <description>Returns true if a preceding swap involving this object failed to preserve the strong guarantee. Constexpr where possible.
+Requires: Always available.
+Complexity: Constant time.
+Guarantees: Never throws an exception.</description>
+    </item>
+    
+    <item>
       <title>`bool has_value() const noexcept`</title>
       <link>https://ned14.github.io/outcome/reference/types/basic_outcome/has_value/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-22T23:17:47 UTC">
+<meta name="revised" content="2019-06-23T15:52:36 UTC">
 <title>Modifiers :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -1718,6 +1718,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/has_lost_consistency/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/has_lost_consistency/">
+            <code>bool has_lost_consistency() const noexcept</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/types/basic_result/assume_value_lvalue/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_result/assume_value_lvalue/">
@@ -2299,6 +2306,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/functions/strong_swap/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/strong_swap/">
+            <code>void strong_swap(bool &amp;all_good, T &amp;a, T &amp;b)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/functions/try_throw_std_exception_from_error/" class="dd-item">
         <div>
           <a href="/outcome/reference/functions/try_throw_std_exception_from_error/">
@@ -2555,8 +2569,7 @@ Guarantees: If an exception is thrown during the operation, the state of all thr
     <section class="post-excerpt">
         <p>Swap one basic_result with another.
 Requires: Always available.
-Complexity: Same as for the swap() implementations of the value_type and error_type. The noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of both operands on entry is guaranteed restored, if at least one of the underlying operations is marked noexcept. If neither is marked noexcept, an attempt is made to undo the partially completed operation. <a class="read-more" href="/outcome/reference/types/basic_result/swap/">&raquo;</a></p>
+Complexity: If the move constructor and move assignment for value_type and error_type are noexcept, the complexity is the same as for the swap() implementations of the value_type and error_type. Otherwise, complexity is not preserved, as strong_swap(bool &amp;all_good, T &amp;a, T &amp;b) is used instead of swap(). This function defaults to using one move construction and two assignments, and it will attempt extra move assignments in order to restore the state upon entry if a failure occurs. <a class="read-more" href="/outcome/reference/types/basic_result/swap/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          
@@ -2599,7 +2612,7 @@ Guarantees: If an exception is thrown during the operation, the state of both op
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/03/2019
+        <i class='fa fa-calendar'></i> Last update on 23/06/2019
     </div>
     
 
