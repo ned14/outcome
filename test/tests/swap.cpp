@@ -24,18 +24,140 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
+#ifdef __cpp_exceptions
+template <bool mc, bool ma> struct Throwy
+{
+  int count{0}, inc{0}, id{0};
+  Throwy(int c, int d, int i = 1) noexcept
+      : count(c)
+      , inc(i)
+      , id(d)
+  {
+  }
+  Throwy(const Throwy &) = delete;
+  Throwy &operator=(const Throwy &) = delete;
+  Throwy(Throwy &&o) noexcept(!mc)
+      : count(o.count - o.inc)
+      , inc(o.inc)
+      , id(o.id)  // NOLINT
+  {
+    if(mc)
+    {
+      std::cout << id << " move constructor count = " << count << std::endl;
+      if(!count)
+      {
+        throw std::bad_alloc();
+      }
+    }
+    o.count = 0;
+    o.inc = 0;
+    o.id = 0;
+  }
+  Throwy &operator=(Throwy &&o) noexcept(!ma)
+  {
+    count = o.count - o.inc;
+    if(ma)
+    {
+      std::cout << o.id << " move assignment count = " << count << std::endl;
+      if(!count)
+      {
+        throw std::bad_alloc();
+      }
+    }
+    inc = o.inc;
+    id = o.id;
+    o.count = 0;
+    o.inc = 0;
+    o.id = 0;
+    return *this;
+  }
+  ~Throwy() = default;
+};
+enum class ErrorCode
+{
+  dummy
+};
+template <bool mc, bool ma> using resulty = OUTCOME_V2_NAMESPACE::result<Throwy<mc, ma>, ErrorCode, OUTCOME_V2_NAMESPACE::policy::all_narrow>;
+template <class T> constexpr inline std::add_lvalue_reference_t<T> lvalueref();
+#endif
 
 BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / swap, "Tests that the outcome swaps as intended")
 {
   using namespace OUTCOME_V2_NAMESPACE;
-  outcome<std::string> a("niall"), b("douglas");
-  BOOST_CHECK(a.value() == "niall");
-  BOOST_CHECK(b.value() == "douglas");
-  swap(a, b);
-  BOOST_CHECK(a.value() == "douglas");
-  BOOST_CHECK(b.value() == "niall");
-  a = std::errc::not_enough_memory;
-  swap(a, b);
-  BOOST_CHECK(a.value() == "niall");
-  BOOST_CHECK(b.error() == std::errc::not_enough_memory);
+  {  // Does swap actually swap?
+    outcome<std::string> a("niall"), b("douglas");
+    BOOST_CHECK(a.value() == "niall");
+    BOOST_CHECK(b.value() == "douglas");
+    swap(a, b);
+    BOOST_CHECK(a.value() == "douglas");
+    BOOST_CHECK(b.value() == "niall");
+    a = std::errc::not_enough_memory;
+    swap(a, b);
+    BOOST_CHECK(a.value() == "niall");
+    BOOST_CHECK(b.error() == std::errc::not_enough_memory);
+    BOOST_CHECK(!a.has_lost_consistency());
+    BOOST_CHECK(!b.has_lost_consistency());
+  }
+#ifdef __cpp_exceptions
+  {  // Is noexcept propagated?
+    using nothrow_t = Throwy<false, false>;
+    using nothrow = resulty<false, false>;
+    static_assert(std::is_nothrow_move_constructible<nothrow_t>::value, "throwy not correct!");
+    static_assert(std::is_nothrow_move_assignable<nothrow_t>::value, "throwy not correct!");
+    static_assert(std::is_nothrow_move_constructible<nothrow>::value, "type not correct!");
+    static_assert(std::is_nothrow_move_assignable<nothrow>::value, "type not correct!");
+
+    static_assert(detail::is_nothrow_swappable<nothrow_t>::value, "is_nothrow_swappable is not correct!");
+
+    static_assert(noexcept(nothrow(0, 0)), "type has a throwing value constructor!");
+    nothrow a(1, 78), b(1, 65);
+    a.swap(b);
+    static_assert(noexcept(a.swap(b)), "type has a throwing swap!");
+  }
+  {  // Does swap implement the strong guarantee?
+    using throwy_t = Throwy<true, true>;
+    using throwy = resulty<true, true>;
+    static_assert(!std::is_nothrow_move_constructible<throwy_t>::value, "throwy not correct!");
+    static_assert(!std::is_nothrow_move_assignable<throwy_t>::value, "throwy not correct!");
+    static_assert(!std::is_nothrow_move_constructible<throwy>::value, "type not correct!");
+    static_assert(!std::is_nothrow_move_assignable<throwy>::value, "type not correct!");
+
+    static_assert(!detail::is_nothrow_swappable<throwy_t>::value, "is_nothrow_swappable is not correct!");
+
+    {
+      throwy a(3, 78), b(4, 65);
+      a.swap(b);
+      static_assert(!noexcept(a.swap(b)), "type has a non-throwing swap!");
+      BOOST_CHECK(a.value().id == 65);
+      BOOST_CHECK(b.value().id == 78);
+      try
+      {
+        a.swap(b);  // fails on first assignment
+        BOOST_REQUIRE(false);
+      }
+      catch(const std::bad_alloc & /*unused*/)
+      {
+        BOOST_CHECK(a.value().id == 65);  // ensure it is perfectly restored
+        BOOST_CHECK(b.value().id == 78);
+      }
+      BOOST_CHECK(!a.has_lost_consistency());
+      BOOST_CHECK(!b.has_lost_consistency());
+    }
+    std::cout << std::endl;
+    {
+      throwy a(2, 78), b(3, 65);  // fails on second assignment, cannot restore
+      try
+      {
+        a.swap(b);
+        BOOST_REQUIRE(false);
+      }
+      catch(const std::bad_alloc & /*unused*/)
+      {
+        BOOST_CHECK(a.has_lost_consistency());  // both must be marked tainted
+        BOOST_CHECK(b.has_lost_consistency());
+      }
+    }
+    std::cout << std::endl;
+  }
+#endif
 }

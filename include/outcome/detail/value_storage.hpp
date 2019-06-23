@@ -31,13 +31,88 @@ OUTCOME_V2_NAMESPACE_BEGIN
 
 namespace detail
 {
+  template <class T, bool nothrow> struct strong_swap_impl
+  {
+    constexpr strong_swap_impl(bool &allgood, T &a, T &b)
+    {
+      allgood = true;
+      using std::swap;
+      swap(a, b);
+    }
+  };
+#ifdef __cpp_exceptions
+  template <class T> struct strong_swap_impl<T, false>
+  {
+    strong_swap_impl(bool &allgood, T &a, T &b)
+    {
+      allgood = true;
+      T v(static_cast<T &&>(a));
+      try
+      {
+        a = static_cast<T &&>(b);
+      }
+      catch(...)
+      {
+        // Try to put back a
+        try
+        {
+          a = static_cast<T &&>(v);
+          // fall through as all good
+        }
+        catch(...)
+        {
+          // failed to completely restore
+          allgood = false;
+          // throw away second exception
+        }
+        throw;  // rethrow original exception
+      }
+      // b has been moved to a, try to move v to b
+      try
+      {
+        b = static_cast<T &&>(v);
+      }
+      catch(...)
+      {
+        // Try to restore a to b, and v to a
+        try
+        {
+          b = static_cast<T &&>(a);
+          a = static_cast<T &&>(v);
+          // fall through as all good
+        }
+        catch(...)
+        {
+          // failed to completely restore
+          allgood = false;
+          // throw away second exception
+        }
+        throw;  // rethrow original exception
+      }
+    }
+  };
+#endif
+}  // namespace detail
+
+/*!
+ */
+OUTCOME_TEMPLATE(class T)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_move_constructible<T>::value &&std::is_move_assignable<T>::value))
+constexpr inline void strong_swap(bool &allgood, T &a, T &b) noexcept(detail::is_nothrow_swappable<T>::value)
+{
+  detail::strong_swap_impl<T, detail::is_nothrow_swappable<T>::value>(allgood, a, b);
+}
+
+namespace detail
+{
   using status_bitfield_type = uint32_t;
 
   // WARNING: These bits are not tracked by abi-dumper, but changing them will break ABI!
   static constexpr status_bitfield_type status_have_value = (1U << 0U);
   static constexpr status_bitfield_type status_have_error = (1U << 1U);
   static constexpr status_bitfield_type status_have_exception = (1U << 2U);
-  static constexpr status_bitfield_type status_error_is_errno = (1U << 4U);  // can errno be set from this error?
+  static constexpr status_bitfield_type status_lost_consistency = (1U << 3U);  // failed to complete a strong swap
+  static constexpr status_bitfield_type status_error_is_errno = (1U << 4U);    // can errno be set from this error?
   // bit 7 unused
   // bits 8-15 unused
   // bits 16-31 used for user supplied 16 bit value
@@ -53,7 +128,10 @@ namespace detail
       devoid<T> _value;
     };
     status_bitfield_type _status{0};
-    constexpr value_storage_trivial() noexcept : _empty{} {}
+    constexpr value_storage_trivial() noexcept
+        : _empty{}
+    {
+    }
     // Special from-void catchall constructor, always constructs default T irrespective of whether void is valued or not (can do no better if T cannot be copied)
     struct disable_void_catchall
     {
@@ -118,11 +196,14 @@ namespace detail
       value_type _value;
     };
     status_bitfield_type _status{0};
-    value_storage_nontrivial() noexcept : _empty{} {}
+    value_storage_nontrivial() noexcept
+        : _empty{}
+    {
+    }
     value_storage_nontrivial &operator=(const value_storage_nontrivial &) = default;                                        // if reaches here, copy assignment is trivial
     value_storage_nontrivial &operator=(value_storage_nontrivial &&) = default;                                             // NOLINT if reaches here, move assignment is trivial
     value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(std::is_nothrow_move_constructible<value_type>::value)  // NOLINT
-    : _status(o._status)
+        : _status(o._status)
     {
       if(this->_status & status_have_value)
       {
@@ -206,7 +287,7 @@ namespace detail
         this->_status &= ~status_have_value;
       }
     }
-    constexpr void swap(value_storage_nontrivial &o) noexcept(detail::is_nothrow_swappable<value_type>::value &&std::is_nothrow_move_constructible<value_type>::value)
+    constexpr void swap(value_storage_nontrivial &o) noexcept(detail::is_nothrow_swappable<value_type>::value)
     {
       using std::swap;
       if((_status & status_have_value) == 0 && (o._status & status_have_value) == 0)
@@ -216,7 +297,21 @@ namespace detail
       }
       if((_status & status_have_value) != 0 && (o._status & status_have_value) != 0)
       {
-        swap(_value, o._value);  // NOLINT
+        struct _
+        {
+          unsigned &a, &b;
+          bool all_good{false};
+          ~_()
+          {
+            if(!all_good)
+            {
+              // We lost one of the values
+              a |= status_lost_consistency;
+              b |= status_lost_consistency;
+            }
+          }
+        } _{_status, o._status};
+        strong_swap(_.all_good, _value, o._value);
         swap(_status, o._status);
         return;
       }
