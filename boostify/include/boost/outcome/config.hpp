@@ -289,7 +289,10 @@ namespace detail
 #if !defined(STANDARDESE_IS_IN_THE_HOUSE) && BOOST_OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
 #else
-  template <class T> using is_nothrow_swappable = std::is_nothrow_move_constructible<T>::value && std::is_nothrow_move_assignable<T>::value;
+  template <class T> struct is_nothrow_swappable
+  {
+    static constexpr bool value = std::is_nothrow_move_constructible<T>::value && std::is_nothrow_move_assignable<T>::value;
+  };
 #endif
 }  // namespace detail
 BOOST_OUTCOME_V2_NAMESPACE_END
