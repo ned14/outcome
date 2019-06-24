@@ -1708,14 +1708,14 @@
 	"content": "Overridable: All of the following macros are overridable, define before inclusion.\nHeader: \u0026lt;outcome/config.hpp\u0026gt;\nThese macros expand into either the syntax for directly specifying constrained templates in C++ 20, or into a SFINAE based emulation for earlier C++ versions. Form of usage looks as follows:\nOUTCOME_TEMPLATE(classErrorCondEnum) OUTCOME_TREQUIRES( // If this is a valid expression  OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))), // If this predicate is true  OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor\u0026lt;ErrorCondEnum\u0026gt;) // Any additional requirements follow here ...  ) constexpr basic_result(ErrorCondEnum \u0026amp;\u0026amp;t, error_condition_converting_constructor_tag /*unused*/ = {});  Be aware that slightly different semantics occur for real C++ 20 constrained templates than for the SFINAE emulation.\n OUTCOME_TEMPLATE(template args ...)\nBegins a constrained template declaration.\n OUTCOME_TREQUIRES(requirements ...)\nSpecifies the requirements for the constrained template to be available for selection by the compiler.\n OUTCOME_TEXPR(expression)\nA requirement that the given expression is valid.\n OUTCOME_TPRED(boolean)\nA requirement that the given constant time expression is true.\n  "
 },
 {
-	"uri": "https://ned14.github.io/outcome/categories/constructors/",
+	"uri": "https://ned14.github.io/outcome/tags/constructors/",
 	"title": "Constructors",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://ned14.github.io/outcome/tags/constructors/",
+	"uri": "https://ned14.github.io/outcome/categories/constructors/",
 	"title": "Constructors",
 	"tags": [],
 	"description": "",
@@ -2615,7 +2615,7 @@
 	"title": "`void strong_swap(bool &amp;all_good, T &amp;a, T &amp;b)`",
 	"tags": [],
 	"description": "Tries to perform a strong guarantee swap.",
-	"content": "The standard swap() function provides the weak guarantee i.e. that no resources are lost. This ADL discovered function provides the strong guarantee instead: that if any of these operations throw an exception (i) move construct to temporary (ii) move assign b to a (iii) move assign temporary to b, an attempt is made to restore the exact pre-swapped state upon entry, and if that recovery too fails, then the boolean all_good will be false during stack unwind from the exception throw, to indicate that state has been lost.\nThis function is used within basic_result::swap() if, and only if, either or both of value_type or error_type have a throwing move constructor or move assignment. It permits you to customise the implementation of the strong guarantee swap in Outcome with a more efficient implementation.\nOverridable: By Argument Dependent Lookup (ADL).\nRequires: That T is both move constructible and move assignable.\nNamespace: OUTCOME_V2_NAMESPACE\nHeader: \u0026lt;outcome/basic_result.hpp\u0026gt;\n"
+	"content": "The standard swap() function provides the weak guarantee i.e. that no resources are lost. This ADL discovered function provides the strong guarantee instead: that if any of these operations throw an exception (i) move construct to temporary (ii) move assign b to a (iii) move assign temporary to b, an attempt is made to restore the exact pre-swapped state upon entry, and if that recovery too fails, then the boolean all_good will be false during stack unwind from the exception throw, to indicate that state has been lost.\nThis function is used within basic_result::swap(basic_result \u0026amp;) if, and only if, either or both of value_type or error_type have a throwing move constructor or move assignment. It permits you to customise the implementation of the strong guarantee swap in Outcome with a more efficient implementation.\nOverridable: By Argument Dependent Lookup (ADL).\nRequires: That T is both move constructible and move assignable.\nNamespace: OUTCOME_V2_NAMESPACE\nHeader: \u0026lt;outcome/basic_result.hpp\u0026gt;\n"
 },
 {
 	"uri": "https://ned14.github.io/outcome/reference/functions/try_throw_std_exception_from_error/",

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-23T15:52:41 UTC">
+<meta name="revised" content="2019-06-24T20:12:55 UTC">
 <title>`void strong_swap(bool &amp;all_good, T &amp;a, T &amp;b)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2457,7 +2457,8 @@
     
     <p>The standard <code>swap()</code> function provides the weak guarantee i.e. that no resources are lost. This ADL discovered function provides the strong guarantee instead: that if any of these operations throw an exception (i) move construct to temporary (ii) move assign <code>b</code> to <code>a</code> (iii) move assign temporary to <code>b</code>, an attempt is made to restore the exact pre-swapped state upon entry, and if that recovery too fails, then the boolean <code>all_good</code> will be false during stack unwind from the exception throw, to indicate that state has been lost.</p>
 
-<p>This function is used within <code>basic_result::swap()</code> if, and only if, either or both of <code>value_type</code> or <code>error_type</code> have a throwing move constructor or move assignment. It permits you to customise the implementation of the strong guarantee swap in Outcome with a more efficient implementation.</p>
+<p>This function is used within <code>basic_result::</code><a href="/outcome/reference/types/basic_result/swap/" class="api-reference"><code>swap(basic_result &amp;)</code></a>
+ if, and only if, either or both of <code>value_type</code> or <code>error_type</code> have a throwing move constructor or move assignment. It permits you to customise the implementation of the strong guarantee swap in Outcome with a more efficient implementation.</p>
 
 <p><em>Overridable</em>: By Argument Dependent Lookup (ADL).</p>
 
@@ -2488,7 +2489,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 23/06/2019
+        <i class='fa fa-calendar'></i> Last update on 24/06/2019
     </div>
     
 
