@@ -5,7 +5,7 @@ weight = 47
 tags = ["constructors"]
 +++
 
-An oft asked question during conference talks on Expected/Outcome is how to
+An oft-asked question during conference talks on Expected/Outcome is how to
 exclusively use `result` to implement constructor failure. This is asked because
 whilst almost every member function in a class can return a `result`, constructors
 do not return values and thus cannot return a `result`. The implication is
