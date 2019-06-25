@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-24T20:51:47 UTC">
+<meta name="revised" content="2019-06-25T16:04:04 UTC">
 <title>Modifiers :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2547,10 +2547,9 @@ Guarantees: Never throws an exception. <a class="read-more" href="/outcome/refer
         <h2 class="post-title"><a href="/outcome/reference/types/basic_outcome/swap/">`void swap(basic_outcome &amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Swap one basic_outcome with another.
+        <p>Swap one basic_outcome with another, with the strong guarantee. Constexpr if move constructors and move assignments of value_type, error_type and exception_type are noexcept.
 Requires: Always available.
-Complexity: Same as for the swap() implementations of the value_type, error_type and exception_type. The noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of all three operands on entry is guaranteed restored, if at least two of the underlying operations is marked noexcept. If one or zero is marked noexcept, an attempt is made to undo the partially completed operation. <a class="read-more" href="/outcome/reference/types/basic_outcome/swap/">&raquo;</a></p>
+Complexity: If the move constructor and move assignment for value_type, error_type and exception_type are noexcept, the complexity is the same as for the swap() implementations of the value_type, error_type and exception_type. Otherwise, complexity is not preserved, as strong_swap(bool &amp;all_good, T &amp;a, T &amp;b) is used instead of swap(). <a class="read-more" href="/outcome/reference/types/basic_outcome/swap/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          
@@ -2567,9 +2566,9 @@ Guarantees: If an exception is thrown during the operation, the state of all thr
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/swap/">`void swap(basic_result &amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Swap one basic_result with another.
+        <p>Swap one basic_result with another, with the strong guarantee. Constexpr if move constructors and move assignments of value_type and error_type are noexcept.
 Requires: Always available.
-Complexity: If the move constructor and move assignment for value_type and error_type are noexcept, the complexity is the same as for the swap() implementations of the value_type and error_type. Otherwise, complexity is not preserved, as strong_swap(bool &amp;all_good, T &amp;a, T &amp;b) is used instead of swap(). This function defaults to using one move construction and two assignments, and it will attempt extra move assignments in order to restore the state upon entry if a failure occurs. <a class="read-more" href="/outcome/reference/types/basic_result/swap/">&raquo;</a></p>
+Complexity: If the move constructor and move assignment for value_type and error_type are noexcept, the complexity is the same as for the swap() implementations of the value_type and error_type. Otherwise, complexity is not preserved, as strong_swap(bool &amp;all_good, T &amp;a, T &amp;b) is used instead of swap(). <a class="read-more" href="/outcome/reference/types/basic_result/swap/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          
@@ -2612,7 +2611,7 @@ Complexity: If the move constructor and move assignment for value_type and error
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 23/06/2019
+        <i class='fa fa-calendar'></i> Last update on 25/06/2019
     </div>
     
 

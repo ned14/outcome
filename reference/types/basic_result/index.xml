@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/types/basic_result/</link>
     <description>Recent content in `basic_result&lt;T, E, NoValuePolicy&gt;` on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Wed, 13 Feb 2019 20:26:37 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 13 Feb 2019 20:27:16 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/types/basic_result/index.xml" rel="self" type="application/rss+xml" />
     
@@ -626,9 +626,9 @@ Complexity: Whatever the underlying operator!</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/swap/</guid>
-      <description>Swap one basic_result with another.
+      <description>Swap one basic_result with another, with the strong guarantee. Constexpr if move constructors and move assignments of value_type and error_type are noexcept.
 Requires: Always available.
-Complexity: If the move constructor and move assignment for value_type and error_type are noexcept, the complexity is the same as for the swap() implementations of the value_type and error_type. Otherwise, complexity is not preserved, as strong_swap(bool &amp;amp;all_good, T &amp;amp;a, T &amp;amp;b) is used instead of swap(). This function defaults to using one move construction and two assignments, and it will attempt extra move assignments in order to restore the state upon entry if a failure occurs.</description>
+Complexity: If the move constructor and move assignment for value_type and error_type are noexcept, the complexity is the same as for the swap() implementations of the value_type and error_type. Otherwise, complexity is not preserved, as strong_swap(bool &amp;amp;all_good, T &amp;amp;a, T &amp;amp;b) is used instead of swap().</description>
     </item>
     
     <item>

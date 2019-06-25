@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-24T20:51:45 UTC">
+<meta name="revised" content="2019-06-25T16:04:02 UTC">
 <title>`void swap(basic_outcome &amp;)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2526,13 +2526,15 @@
     
     
     
-    <p>Swap one basic_outcome with another.</p>
+    <p>Swap one basic_outcome with another, with the strong guarantee. Constexpr if move constructors and move assignments of <code>value_type</code>, <code>error_type</code> and <code>exception_type</code> are noexcept.</p>
 
 <p><em>Requires</em>: Always available.</p>
 
-<p><em>Complexity</em>: Same as for the <code>swap()</code> implementations of the <code>value_type</code>, <code>error_type</code> and <code>exception_type</code>. The noexcept of underlying operations is propagated.</p>
+<p><em>Complexity</em>: If the move constructor and move assignment for <code>value_type</code>, <code>error_type</code> and <code>exception_type</code> are noexcept, the complexity is the same as for the <code>swap()</code> implementations of the <code>value_type</code>, <code>error_type</code> and <code>exception_type</code>. Otherwise, complexity is not preserved, as <a href="/outcome/reference/functions/strong_swap/" class="api-reference"><code>strong_swap(bool &amp;all_good, T &amp;a, T &amp;b)</code></a>
+ is used instead of <code>swap()</code>. This function defaults to using one move construction and two assignments, and it will attempt extra move assignments in order to restore the state upon entry if a failure occurs.</p>
 
-<p><em>Guarantees</em>: If an exception is thrown during the operation, the state of all three operands on entry is guaranteed restored, if at least two of the underlying operations is marked <code>noexcept</code>. If one or zero is marked <code>noexcept</code>, an attempt is made to undo the partially completed operation. If that too fails, the flag bits are forced to something consistent such that there can be no simultaneously valued and errored/excepted state, or valueless and errorless/exceptionless.</p>
+<p><em>Guarantees</em>: If an exception is thrown during the swap operation, the state of all three operands on entry is attempted to be restored, in order to implement the strong guarantee. If that too fails, the flag bits are forced to something consistent such that there can be no simultaneously valued and errored/excepted state, or valueless and errorless/exceptionless. The flag <a href="/outcome/reference/types/basic_result/has_lost_consistency/" class="api-reference"><code>has_lost_consistency()</code></a>
+ becomes true for both operands, which are now likely in an inconsistent state.</p>
 
 
     
@@ -2555,7 +2557,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/03/2019
+        <i class='fa fa-calendar'></i> Last update on 25/06/2019
     </div>
     
 

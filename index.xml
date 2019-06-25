@@ -2214,10 +2214,9 @@ Complexity: Whatever the underlying operator!</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/swap/</guid>
-      <description>Swap one basic_outcome with another.
+      <description>Swap one basic_outcome with another, with the strong guarantee. Constexpr if move constructors and move assignments of value_type, error_type and exception_type are noexcept.
 Requires: Always available.
-Complexity: Same as for the swap() implementations of the value_type, error_type and exception_type. The noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the state of all three operands on entry is guaranteed restored, if at least two of the underlying operations is marked noexcept. If one or zero is marked noexcept, an attempt is made to undo the partially completed operation.</description>
+Complexity: If the move constructor and move assignment for value_type, error_type and exception_type are noexcept, the complexity is the same as for the swap() implementations of the value_type, error_type and exception_type. Otherwise, complexity is not preserved, as strong_swap(bool &amp;amp;all_good, T &amp;amp;a, T &amp;amp;b) is used instead of swap().</description>
     </item>
     
     <item>
@@ -2226,9 +2225,9 @@ Guarantees: If an exception is thrown during the operation, the state of all thr
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/swap/</guid>
-      <description>Swap one basic_result with another.
+      <description>Swap one basic_result with another, with the strong guarantee. Constexpr if move constructors and move assignments of value_type and error_type are noexcept.
 Requires: Always available.
-Complexity: If the move constructor and move assignment for value_type and error_type are noexcept, the complexity is the same as for the swap() implementations of the value_type and error_type. Otherwise, complexity is not preserved, as strong_swap(bool &amp;amp;all_good, T &amp;amp;a, T &amp;amp;b) is used instead of swap(). This function defaults to using one move construction and two assignments, and it will attempt extra move assignments in order to restore the state upon entry if a failure occurs.</description>
+Complexity: If the move constructor and move assignment for value_type and error_type are noexcept, the complexity is the same as for the swap() implementations of the value_type and error_type. Otherwise, complexity is not preserved, as strong_swap(bool &amp;amp;all_good, T &amp;amp;a, T &amp;amp;b) is used instead of swap().</description>
     </item>
     
     <item>
@@ -2314,7 +2313,8 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1060 commits   @akrzemi1 45 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors HAHAHUGOSHORTCODE-0xc000490a00-1-HBHB
+This pretty, modern C++ documentation  Hugo - static website generator of this documentation. hugo-theme-docdock - the Hugo theme used by this documentation. Standardese - the API reference generator (up until Outcome v2.0)  Special thanks for Outcome v2.1 Once again Andrzej Krzemienski stands out for a never ceasing flow of excellent questions, &amp;ldquo;what if?&amp;rdquo;&amp;rsquo;s, eagle eyed spotting of corner case logic bugs, and design contradictions. Thank you Andrzej!</description>
     </item>
     
     <item>

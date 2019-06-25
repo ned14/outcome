@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-24T20:51:49 UTC">
+<meta name="revised" content="2019-06-25T16:04:06 UTC">
 <title>`basic_outcome&lt;T, EC, EP, NoValuePolicy&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2931,7 +2931,7 @@ works fine from C on MSVC, GCC and clang.</p></li>
 
 <ol class="children children-li"><li>
     <a href="/outcome/reference/types/basic_outcome/swap/" ><code>void swap(basic_outcome &amp;)</code></a>
-<p>Swap one basic_outcome with another. Noexcept propagating.</p><li>
+<p>Swap one basic_outcome with another, with the strong guarantee. Noexcept propagating.</p><li>
     <a href="/outcome/reference/types/basic_outcome/as_failure_rvalue/" ><code>failure_type&lt;error_type, exception_type&gt; as_failure() &amp;&amp;</code></a>
 <p>Return the output from free function <code>failure()</code> containing a move of any errored and/or excepted state.</p></li></ol>
 

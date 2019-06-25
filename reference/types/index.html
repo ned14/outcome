@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-24T20:51:39 UTC">
+<meta name="revised" content="2019-06-25T16:03:55 UTC">
 <title>Types :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2597,7 +2597,7 @@
 	<a href="/outcome/reference/types/basic_outcome/inequality_failure_type/" ><code>bool operator!=(const failure_type&lt;A, B&gt; &amp;) const</code></a>
 <p>Returns true if this outcome does not compare equal to the failure type sugar. Constexpr and noexcept propagating.</p><li>
 	<a href="/outcome/reference/types/basic_outcome/swap/" ><code>void swap(basic_outcome &amp;)</code></a>
-<p>Swap one basic_outcome with another. Noexcept propagating.</p><li>
+<p>Swap one basic_outcome with another, with the strong guarantee. Noexcept propagating.</p><li>
 	<a href="/outcome/reference/types/basic_outcome/as_failure_lvalue/" ><code>failure_type&lt;error_type, exception_type&gt; as_failure() const &amp;</code></a>
 <p>Return the output from free function <code>failure()</code> containing a copy of any errored and/or excepted state.</p><li>
 	<a href="/outcome/reference/types/basic_outcome/as_failure_rvalue/" ><code>failure_type&lt;error_type, exception_type&gt; as_failure() &amp;&amp;</code></a>
