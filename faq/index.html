@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-06-25T16:03:54 UTC">
+<meta name="revised" content="2019-06-25T16:20:25 UTC">
 <title>Frequently asked questions :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2497,27 +2497,26 @@ throws, value and status bits would be as if the failure had not occurred, same
 as for aborting the construction of any <code>struct</code> type.</p>
 
 <p>It is recognised that these weak guarantees may be unsuitable for some people,
-so Outcome implements <code>swap()</code> with much stronger guarantees, as one can refine,
-without too much work, one&rsquo;s own classes from <code>result</code> and <code>outcome</code> implementing
-stronger guarantees using <code>swap()</code> as the primitive building block.</p>
+so Outcome implements <code>swap()</code> with much stronger guarantees, as one can locally refine,
+without too much work, one&rsquo;s own custom classes from <code>result</code> and <code>outcome</code> implementing
+stronger guarantees for construction and assignment using <code>swap()</code> as the primitive
+building block.</p>
 
-<p>Therefore for the Swap operation only,
-if no more than <strong>one</strong> of the underlying types has a throwing swap, <code>result</code> and
-<code>outcome</code> perform that operation <em>first</em> before all others. This implements the strong
-exception guarantee.</p>
+<p>The core ADL discovered implementation of strong guarantee swap is <a href="/outcome/reference/functions/strong_swap/" class="api-reference"><code>strong_swap(bool &amp;all_good, T &amp;a, T &amp;b)</code></a>
+.
+This can be overloaded by third party code with custom strong guarantee swap
+implementations, same as for <code>std::swap()</code>. Because strong guarantee swap may fail
+when trying to restore input state during handling of failure to swap, the
+<code>all_good</code> boolean becomes false if restoration fails, at which point both
+results/outcomes get marked as tainted via <a href="/outcome/reference/types/basic_result/has_lost_consistency/" class="api-reference"><code>has_lost_consistency()</code></a>
+.</p>
 
-<p>If <em>two or more</em> of the underlying types has a throwing swap, then only the basic
-exception guarantee is provided. Be aware that values and errors may become mismatched
-in this situation e.g. the value might get swapped, but if the error fails to swap,
-and then the value fails to get swapped back, the two results or outcomes would end
-up with mismatched values and errors. In that situation, the flags are forced into
-a consistent state i.e. there cannot be a valued <em>and</em> errored result, nor a result
-with neither value nor error. In this sense the basic guarantee is met, however
-correct program operation when values and errors have become mismatched is unlikely.</p>
-
-<p>The simple solution to avoiding this situation, or indeed to ensure the strong exception
-guarantee for all operations, is to always choose your error and exception types to
-have non-throwing constructors, assignments and swaps e.g. <code>error_code</code> and <code>exception_ptr</code>.</p>
+<p>It is <strong>up to you</strong> to check this flag to see if known good state has been lost,
+as Outcome never does so on your behalf. The simple solution to avoiding having
+to deal with this situation is to always choose your value, error and exception
+types to have non-throwing move constructors and move assignments. This causes
+the strong swap implementation to no longer be used, as it is no longer required,
+and standard swap is used instead.</p>
 
 <h2 id="does-outcome-have-a-stable-abi-and-api">Does Outcome have a stable ABI and API?</h2>
 
@@ -3104,7 +3103,7 @@ this bug.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 20/06/2019
+        <i class='fa fa-calendar'></i> Last update on 25/06/2019
     </div>
     
 
