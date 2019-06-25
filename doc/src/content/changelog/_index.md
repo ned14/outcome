@@ -35,6 +35,10 @@ a recipe describing how to add in support for foreign input types.
 -
 : `OUTCOME_VERSION_MINOR` hadn't been updated to 1.
 
+[#181](https://github.com/ned14/outcome/issues/181)
+: Fix issue #181 where Outcome didn't actually implement the strong swap guarantee,
+despite being documented as doing so.
+
 [#190](https://github.com/ned14/outcome/issues/190)
 : Fix issue #190 in Boost edition where unit test suite was not runnable from
 the Boost release distro.

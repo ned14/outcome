@@ -25,9 +25,18 @@ Distributed under the Boost Software License, Version 1.0.
 #include "quickcpplib/include/boost/test/unit_test.hpp"
 
 #ifdef __cpp_exceptions
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4297)  // function assumed not to throw an exception but does
+#endif
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wterminate"
+#endif
 template <bool mc, bool ma> struct Throwy
 {
   int count{0}, inc{0}, id{0};
+  Throwy() = default;
   Throwy(int c, int d, int i = 1) noexcept
       : count(c)
       , inc(i)
@@ -73,12 +82,24 @@ template <bool mc, bool ma> struct Throwy
   }
   ~Throwy() = default;
 };
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 enum class ErrorCode
 {
   dummy
 };
-template <bool mc, bool ma> using resulty = OUTCOME_V2_NAMESPACE::result<Throwy<mc, ma>, ErrorCode, OUTCOME_V2_NAMESPACE::policy::all_narrow>;
-template <class T> constexpr inline std::add_lvalue_reference_t<T> lvalueref();
+enum class ErrorCode2
+{
+  dummy
+};
+template <bool mc, bool ma> using resulty1 = OUTCOME_V2_NAMESPACE::result<Throwy<mc, ma>, ErrorCode, OUTCOME_V2_NAMESPACE::policy::all_narrow>;
+template <bool mc, bool ma> using resulty2 = OUTCOME_V2_NAMESPACE::result<ErrorCode, Throwy<mc, ma>, OUTCOME_V2_NAMESPACE::policy::all_narrow>;
+template <bool mc, bool ma> using outcomey1 = OUTCOME_V2_NAMESPACE::outcome<ErrorCode, Throwy<mc, ma>, ErrorCode2, OUTCOME_V2_NAMESPACE::policy::all_narrow>;
+template <bool mc, bool ma> using outcomey2 = OUTCOME_V2_NAMESPACE::outcome<ErrorCode, ErrorCode2, Throwy<mc, ma>, OUTCOME_V2_NAMESPACE::policy::all_narrow>;
 #endif
 
 BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / swap, "Tests that the outcome swaps as intended")
@@ -101,7 +122,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / swap, "Tests that the outcome swa
 #ifdef __cpp_exceptions
   {  // Is noexcept propagated?
     using nothrow_t = Throwy<false, false>;
-    using nothrow = resulty<false, false>;
+    using nothrow = resulty1<false, false>;
     static_assert(std::is_nothrow_move_constructible<nothrow_t>::value, "throwy not correct!");
     static_assert(std::is_nothrow_move_assignable<nothrow_t>::value, "throwy not correct!");
     static_assert(std::is_nothrow_move_constructible<nothrow>::value, "type not correct!");
@@ -114,9 +135,25 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / swap, "Tests that the outcome swa
     a.swap(b);
     static_assert(noexcept(a.swap(b)), "type has a throwing swap!");
   }
+  {  // Is noexcept propagated?
+    using nothrow_t = Throwy<false, false>;
+    using nothrow = resulty2<false, false>;
+    static_assert(std::is_nothrow_move_constructible<nothrow_t>::value, "throwy not correct!");
+    static_assert(std::is_nothrow_move_assignable<nothrow_t>::value, "throwy not correct!");
+    static_assert(std::is_nothrow_move_constructible<nothrow>::value, "type not correct!");
+    static_assert(std::is_nothrow_move_assignable<nothrow>::value, "type not correct!");
+
+    static_assert(detail::is_nothrow_swappable<nothrow_t>::value, "is_nothrow_swappable is not correct!");
+
+    static_assert(noexcept(nothrow(0, 0)), "type has a throwing value constructor!");
+    nothrow a(1, 78), b(1, 65);
+    a.swap(b);
+    static_assert(noexcept(a.swap(b)), "type has a throwing swap!");
+  }
+
   {  // Does swap implement the strong guarantee?
     using throwy_t = Throwy<true, true>;
-    using throwy = resulty<true, true>;
+    using throwy = resulty1<true, true>;
     static_assert(!std::is_nothrow_move_constructible<throwy_t>::value, "throwy not correct!");
     static_assert(!std::is_nothrow_move_assignable<throwy_t>::value, "throwy not correct!");
     static_assert(!std::is_nothrow_move_constructible<throwy>::value, "type not correct!");
@@ -139,6 +176,173 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / swap, "Tests that the outcome swa
       {
         BOOST_CHECK(a.value().id == 65);  // ensure it is perfectly restored
         BOOST_CHECK(b.value().id == 78);
+      }
+      BOOST_CHECK(!a.has_lost_consistency());
+      BOOST_CHECK(!b.has_lost_consistency());
+    }
+    std::cout << std::endl;
+    {
+      throwy a(2, 78), b(3, 65);  // fails on second assignment, cannot restore
+      try
+      {
+        a.swap(b);
+        BOOST_REQUIRE(false);
+      }
+      catch(const std::bad_alloc & /*unused*/)
+      {
+        BOOST_CHECK(a.has_lost_consistency());  // both must be marked tainted
+        BOOST_CHECK(b.has_lost_consistency());
+      }
+    }
+    std::cout << std::endl;
+  }
+  {  // Does swap implement the strong guarantee?
+    using throwy_t = Throwy<true, true>;
+    using throwy = resulty2<true, true>;
+    static_assert(!std::is_nothrow_move_constructible<throwy_t>::value, "throwy not correct!");
+    static_assert(!std::is_nothrow_move_assignable<throwy_t>::value, "throwy not correct!");
+    static_assert(!std::is_nothrow_move_constructible<throwy>::value, "type not correct!");
+    static_assert(!std::is_nothrow_move_assignable<throwy>::value, "type not correct!");
+
+    static_assert(!detail::is_nothrow_swappable<throwy_t>::value, "is_nothrow_swappable is not correct!");
+
+    {
+      throwy a(3, 78), b(4, 65);
+      a.swap(b);
+      static_assert(!noexcept(a.swap(b)), "type has a non-throwing swap!");
+      BOOST_CHECK(a.error().id == 65);
+      BOOST_CHECK(b.error().id == 78);
+      try
+      {
+        a.swap(b);  // fails on first assignment
+        BOOST_REQUIRE(false);
+      }
+      catch(const std::bad_alloc & /*unused*/)
+      {
+        BOOST_CHECK(a.error().id == 65);  // ensure it is perfectly restored
+        BOOST_CHECK(b.error().id == 78);
+      }
+      BOOST_CHECK(!a.has_lost_consistency());
+      BOOST_CHECK(!b.has_lost_consistency());
+    }
+    std::cout << std::endl;
+    {
+      throwy a(2, 78), b(3, 65);  // fails on second assignment, cannot restore
+      try
+      {
+        a.swap(b);
+        BOOST_REQUIRE(false);
+      }
+      catch(const std::bad_alloc & /*unused*/)
+      {
+        BOOST_CHECK(a.has_lost_consistency());  // both must be marked tainted
+        BOOST_CHECK(b.has_lost_consistency());
+      }
+    }
+    std::cout << std::endl;
+  }
+
+  {  // Is noexcept propagated?
+    using nothrow_t = Throwy<false, false>;
+    using nothrow = outcomey1<false, false>;
+    static_assert(std::is_nothrow_move_constructible<nothrow_t>::value, "throwy not correct!");
+    static_assert(std::is_nothrow_move_assignable<nothrow_t>::value, "throwy not correct!");
+    static_assert(std::is_nothrow_move_constructible<nothrow>::value, "type not correct!");
+    static_assert(std::is_nothrow_move_assignable<nothrow>::value, "type not correct!");
+
+    static_assert(detail::is_nothrow_swappable<nothrow_t>::value, "is_nothrow_swappable is not correct!");
+
+    static_assert(noexcept(nothrow(0, 0)), "type has a throwing value constructor!");
+    nothrow a(1, 78), b(1, 65);
+    a.swap(b);
+    static_assert(noexcept(a.swap(b)), "type has a throwing swap!");
+  }
+  {  // Is noexcept propagated?
+    using nothrow_t = Throwy<false, false>;
+    using nothrow = outcomey1<false, false>;
+    static_assert(std::is_nothrow_move_constructible<nothrow_t>::value, "throwy not correct!");
+    static_assert(std::is_nothrow_move_assignable<nothrow_t>::value, "throwy not correct!");
+    static_assert(std::is_nothrow_move_constructible<nothrow>::value, "type not correct!");
+    static_assert(std::is_nothrow_move_assignable<nothrow>::value, "type not correct!");
+
+    static_assert(detail::is_nothrow_swappable<nothrow_t>::value, "is_nothrow_swappable is not correct!");
+
+    static_assert(noexcept(nothrow(0, 0)), "type has a throwing value constructor!");
+    nothrow a(1, 78), b(1, 65);
+    a.swap(b);
+    static_assert(noexcept(a.swap(b)), "type has a throwing swap!");
+  }
+
+  {  // Does swap implement the strong guarantee?
+    using throwy_t = Throwy<true, true>;
+    using throwy = outcomey1<true, true>;
+    static_assert(!std::is_nothrow_move_constructible<throwy_t>::value, "throwy not correct!");
+    static_assert(!std::is_nothrow_move_assignable<throwy_t>::value, "throwy not correct!");
+    static_assert(!std::is_nothrow_move_constructible<throwy>::value, "type not correct!");
+    static_assert(!std::is_nothrow_move_assignable<throwy>::value, "type not correct!");
+
+    static_assert(!detail::is_nothrow_swappable<throwy_t>::value, "is_nothrow_swappable is not correct!");
+
+    {
+      throwy a(3, 78), b(4, 65);
+      a.swap(b);
+      static_assert(!noexcept(a.swap(b)), "type has a non-throwing swap!");
+      BOOST_CHECK(a.error().id == 65);
+      BOOST_CHECK(b.error().id == 78);
+      try
+      {
+        a.swap(b);  // fails on first assignment
+        BOOST_REQUIRE(false);
+      }
+      catch(const std::bad_alloc & /*unused*/)
+      {
+        BOOST_CHECK(a.error().id == 65);  // ensure it is perfectly restored
+        BOOST_CHECK(b.error().id == 78);
+      }
+      BOOST_CHECK(!a.has_lost_consistency());
+      BOOST_CHECK(!b.has_lost_consistency());
+    }
+    std::cout << std::endl;
+    {
+      throwy a(2, 78), b(3, 65);  // fails on second assignment, cannot restore
+      try
+      {
+        a.swap(b);
+        BOOST_REQUIRE(false);
+      }
+      catch(const std::bad_alloc & /*unused*/)
+      {
+        BOOST_CHECK(a.has_lost_consistency());  // both must be marked tainted
+        BOOST_CHECK(b.has_lost_consistency());
+      }
+    }
+    std::cout << std::endl;
+  }
+  {  // Does swap implement the strong guarantee?
+    using throwy_t = Throwy<true, true>;
+    using throwy = outcomey2<true, true>;
+    static_assert(!std::is_nothrow_move_constructible<throwy_t>::value, "throwy not correct!");
+    static_assert(!std::is_nothrow_move_assignable<throwy_t>::value, "throwy not correct!");
+    static_assert(!std::is_nothrow_move_constructible<throwy>::value, "type not correct!");
+    static_assert(!std::is_nothrow_move_assignable<throwy>::value, "type not correct!");
+
+    static_assert(!detail::is_nothrow_swappable<throwy_t>::value, "is_nothrow_swappable is not correct!");
+
+    {
+      throwy a(3, 78), b(4, 65);
+      a.swap(b);
+      static_assert(!noexcept(a.swap(b)), "type has a non-throwing swap!");
+      BOOST_CHECK(a.exception().id == 65);
+      BOOST_CHECK(b.exception().id == 78);
+      try
+      {
+        a.swap(b);  // fails on first assignment
+        BOOST_REQUIRE(false);
+      }
+      catch(const std::bad_alloc & /*unused*/)
+      {
+        BOOST_CHECK(a.exception().id == 65);  // ensure it is perfectly restored
+        BOOST_CHECK(b.exception().id == 78);
       }
       BOOST_CHECK(!a.has_lost_consistency());
       BOOST_CHECK(!b.has_lost_consistency());

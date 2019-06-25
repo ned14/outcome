@@ -58,27 +58,24 @@ throws, value and status bits would be as if the failure had not occurred, same
 as for aborting the construction of any `struct` type.
 
 It is recognised that these weak guarantees may be unsuitable for some people,
-so Outcome implements `swap()` with much stronger guarantees, as one can refine,
-without too much work, one's own classes from `result` and `outcome` implementing
-stronger guarantees using `swap()` as the primitive building block.
+so Outcome implements `swap()` with much stronger guarantees, as one can locally refine,
+without too much work, one's own custom classes from `result` and `outcome` implementing
+stronger guarantees for construction and assignment using `swap()` as the primitive
+building block.
 
-Therefore for the Swap operation only, 
-if no more than **one** of the underlying types has a throwing swap, `result` and
-`outcome` perform that operation *first* before all others. This implements the strong
-exception guarantee.
+The core ADL discovered implementation of strong guarantee swap is {{% api "strong_swap(bool &all_good, T &a, T &b)" %}}.
+This can be overloaded by third party code with custom strong guarantee swap
+implementations, same as for `std::swap()`. Because strong guarantee swap may fail
+when trying to restore input state during handling of failure to swap, the
+`all_good` boolean becomes false if restoration fails, at which point both
+results/outcomes get marked as tainted via {{% api "has_lost_consistency()" %}}.
 
-If *two or more* of the underlying types has a throwing swap, then only the basic
-exception guarantee is provided. Be aware that values and errors may become mismatched
-in this situation e.g. the value might get swapped, but if the error fails to swap,
-and then the value fails to get swapped back, the two results or outcomes would end
-up with mismatched values and errors. In that situation, the flags are forced into
-a consistent state i.e. there cannot be a valued *and* errored result, nor a result
-with neither value nor error. In this sense the basic guarantee is met, however
-correct program operation when values and errors have become mismatched is unlikely.
-
-The simple solution to avoiding this situation, or indeed to ensure the strong exception
-guarantee for all operations, is to always choose your error and exception types to
-have non-throwing constructors, assignments and swaps e.g. `error_code` and `exception_ptr`.
+It is **up to you** to check this flag to see if known good state has been lost,
+as Outcome never does so on your behalf. The simple solution to avoiding having
+to deal with this situation is to always choose your value, error and exception
+types to have non-throwing move constructors and move assignments. This causes
+the strong swap implementation to no longer be used, as it is no longer required,
+and standard swap is used instead.
 
 
 ## Does Outcome have a stable ABI and API?
