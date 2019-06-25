@@ -5,7 +5,7 @@ categories = ["modifiers"]
 weight = 900
 +++
 
-Swap one basic_result with another.
+Swap one basic_result with another, with the strong guarantee. Constexpr if move constructors and move assignments of `value_type` and `error_type` are noexcept.
 
 *Requires*: Always available.
 
