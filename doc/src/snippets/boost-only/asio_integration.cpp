@@ -170,13 +170,13 @@ struct asio::async_result<detail::as_result_t<CompletionToken>,  //
         std::move(init)(
           // we wrap the handler in the converting completion_handler from
           // above, and pass along the args
-          completion_handler<std::decay_t<decltype(handler)>{
+          completion_handler<std::decay_t<decltype(handler)>>{
             std::forward<decltype(handler)>(handler)},
           std::forward<decltype(initArgs)>(initArgs)...);
       },
       // the new initiation is called with the handler unwrapped from
       // the token, and the original initiation arguments.
-      token.token_,
+      token.token,
       std::forward<Args>(args)...);
   }
 };
