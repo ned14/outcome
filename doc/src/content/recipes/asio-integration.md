@@ -66,11 +66,12 @@ Next we tell ASIO about a new completion token it ought to recognise by speciali
 
 {{% snippet "boost-only/asio_integration.cpp" "async_result1" %}}
 
-The tricky part to understand is that our `async_result` specialisation inherits
-from an `async_result` for the supplied completion token type with a completion
-handler which consumes a `result<T>`. Our `async_result` is actually therefore
-the base `async_result`, but we layer on top a `completion_handler_type` with
-the `void(error_code, size_t)` signature which constructs from that a `result`:
+The tricky part to understand is that our `async_result` specialization is going 
+to initiate the asynchronous operation by deferring to an `async_result` for the
+supplied completion token type with a completion handler which consumes `result<T>`.
+Our `async_result` is actually therefore a simple wrapper over this underlying
+`async_result`, but we inject a completion handler with the
+`void(error_code, size_t)` signature which constructs from that a `result`:
 
 {{% snippet "boost-only/asio_integration.cpp" "async_result2" %}}
 
@@ -80,11 +81,9 @@ failure:
 
 ```c++
 char buffer[1024];
-asio::experimental::await_token token =
-  co_await asio::experimental::this_coro::token();
 
 outcome::result<size_t, error_code> bytesread =
-  co_await skt.async_read_some(asio::buffer(buffer), as_result(token));
+  co_await skt.async_read_some(asio::buffer(buffer), as_result(asio::use_awaitable));
 ```
 
 The real world production-level implementation below is a lot more complex than the
