@@ -182,7 +182,7 @@ struct asio::async_result<detail::as_result_t<CompletionToken>,  //
 };
 //! [async_result2]
 
-asio::experimental::awaitable<void> outcome_(asio::ip::tcp::socket skt)
+asio::awaitable<void> outcome_(asio::ip::tcp::socket skt)
 {
   char buffer[1024];
 
