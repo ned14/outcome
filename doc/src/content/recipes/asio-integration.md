@@ -66,10 +66,19 @@ Next we tell ASIO about a new completion token it ought to recognise by speciali
 
 {{% snippet "boost-only/asio_integration.cpp" "async_result1" %}}
 
-The tricky part to understand is that our `async_result` specialization is going 
-to initiate the asynchronous operation by deferring to an `async_result` for the
+There are a couple tricky parts to understand. First of all, we want our
+`async_result` specialization to work, in particular, with the `async_result` for
+ASIO's
+[`use_awaitable_t` completion token](https://www.boost.org/doc/libs/develop/doc/html/boost_asio/reference/use_awaitable_t.html).
+With this token, the `async_result` specialization takes the form with a static
+`initiate` method which defers initiation of the asynchronous operation until,
+for example,
+`co_await` is called on the returned `awaitable`. Thus, our `async_result`
+specialization will take the same form. With this in mind, we need only
+understand how our specialization will implement its `initiate` method. The trick
+is that it will pass the initiation work off to an `async_result` for the
 supplied completion token type with a completion handler which consumes `result<T>`.
-Our `async_result` is actually therefore a simple wrapper over this underlying
+Our `async_result` is thus just a simple wrapper over this underlying
 `async_result`, but we inject a completion handler with the
 `void(error_code, size_t)` signature which constructs from that a `result`:
 
