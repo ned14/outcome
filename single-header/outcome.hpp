@@ -812,9 +812,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    d4d2f29dbbf4ec33ba20a0027ecdc6bc34ac013c
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-05-24 19:22:15 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE d4d2f29d
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    ab1f9fff8cbe5596a98a3b74f1e74b089b83169a
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-06-27 08:37:46 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE ab1f9fff
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1318,9 +1318,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 0c35dcf2c4f5118db656d731b77389f81c27201b
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-06-27 08:35:23 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 0c35dcf2
+#define OUTCOME_PREVIOUS_COMMIT_REF 1bc8e7eceabdd8cd287603c11a6b1a544866387a
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-07-24 17:23:41 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 1bc8e7ec
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -2778,7 +2778,9 @@ namespace detail
     static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "The type S must be void or default constructible");
 
     friend struct policy::base;
-    template <class T, class U, class V> friend class basic_result_storage;
+    template <class T, class U, class V>                                                                                                                                              //
+    OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<T> &&trait::type_can_be_used_in_basic_result<U> && (std::is_void<U>::value || std::is_default_constructible<U>::value))  //
+    friend class basic_result_storage;
     template <class T, class U, class V> friend class basic_result_final;
     template <class T, class U, class V> friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept;        // NOLINT
     template <class T, class U, class V> friend constexpr inline void hooks::set_spare_storage(detail::basic_result_final<T, U, V> *r, uint16_t v) noexcept;  // NOLINT
@@ -3005,7 +3007,7 @@ namespace convert
   */
 
 
-  template <class U> concept bool ValueOrNone = requires(U a)
+  template <class U> concept ValueOrNone = requires(U a)
   {
     {
       a.has_value()
@@ -3020,7 +3022,7 @@ namespace convert
 
 
 
-  template <class U> concept bool ValueOrError = requires(U a)
+  template <class U> concept ValueOrError = requires(U a)
   {
     {
       a.has_value()
@@ -5269,7 +5271,9 @@ class OUTCOME_NODISCARD basic_outcome
   static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "exception_type must be void or default constructible");
   using base = detail::select_basic_outcome_failure_observers<detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>;
   friend struct policy::base;
-  template <class T, class U, class V, class W> friend class basic_outcome;
+  template <class T, class U, class V, class W> //
+  OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<V> && (std::is_void<V>::value || std::is_default_constructible<V>::value))  //
+  friend class basic_outcome;
   template <class T, class U, class V, class W, class X> friend constexpr inline void hooks::override_outcome_exception(basic_outcome<T, U, V, W> *o, X &&v) noexcept;  // NOLINT
 
   struct implicit_constructors_disabled_tag
