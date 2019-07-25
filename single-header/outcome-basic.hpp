@@ -1187,9 +1187,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 1bc8e7eceabdd8cd287603c11a6b1a544866387a
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-07-24 17:23:41 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 1bc8e7ec
+#define OUTCOME_PREVIOUS_COMMIT_REF 960da029cc07e24f80687cb74655f49069fc4401
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-07-25 09:41:15 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 960da029
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -2897,12 +2897,17 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace convert
 {
 #if defined(__cpp_concepts)
+#if __GNUC__ < 7 && !defined(__clang__)
+#define OUTCOME_GCC6_CONCEPT_BOOL bool
+#else
+#define OUTCOME_GCC6_CONCEPT_BOOL
+#endif
   /* The `ValueOrNone` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
 
 
-  template <class U> concept ValueOrNone = requires(U a)
+  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrNone = requires(U a)
   {
     {
       a.has_value()
@@ -2917,7 +2922,7 @@ namespace convert
 
 
 
-  template <class U> concept ValueOrError = requires(U a)
+  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrError = requires(U a)
   {
     {
       a.has_value()
