@@ -60,7 +60,9 @@ namespace detail
     static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "The type S must be void or default constructible");
 
     friend struct policy::base;
-    template <class T, class U, class V> friend class basic_result_storage;
+    template <class T, class U, class V>                                                                                                                                              //
+    OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<T> &&trait::type_can_be_used_in_basic_result<U> && (std::is_void<U>::value || std::is_default_constructible<U>::value))  //
+    friend class basic_result_storage;
     template <class T, class U, class V> friend class basic_result_final;
     template <class T, class U, class V> friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept;        // NOLINT
     template <class T, class U, class V> friend constexpr inline void hooks::set_spare_storage(detail::basic_result_final<T, U, V> *r, uint16_t v) noexcept;  // NOLINT
