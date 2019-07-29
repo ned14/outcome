@@ -22,8 +22,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include <boost/asio/async_result.hpp>
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/use_awaitable.hpp>
 #include <boost/asio/buffer.hpp>
-#include <boost/asio/experimental.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/outcome.hpp>
 
@@ -61,7 +62,7 @@ void old(asio::ip::tcp::socket skt)
   //! [old-use-case]
 }
 
-asio::experimental::awaitable<void> new_(asio::ip::tcp::socket skt)
+asio::awaitable<void> new_(asio::ip::tcp::socket skt)
 {
   //! [new-use-case]
   // As coroutines suspend the calling thread whilst an asynchronous
@@ -69,17 +70,14 @@ asio::experimental::awaitable<void> new_(asio::ip::tcp::socket skt)
   // allocation
   char buffer[1024];
 
-  // Get an ASIO completion token for the current coroutine (requires
-  // Coroutines TS)
-  asio::experimental::await_token token =  //
-  co_await asio::experimental::this_coro::token();
-
   // Asynchronously read data, suspending this coroutine until completion,
   // returning the bytes of the data read into the result.
   try
   {
+    // The use_awaitable completion token represents the current coroutine
+    // (requires Coroutines TS)
     size_t bytesread =  //
-    co_await skt.async_read_some(asio::buffer(buffer), token);
+    co_await skt.async_read_some(asio::buffer(buffer), asio::use_awaitable);
     std::cout << "Read " << bytesread << " bytes into buffer" << std::endl;
   }
   catch(const std::system_error &e)
@@ -116,35 +114,21 @@ template <class CompletionToken, class T>                        //
 struct asio::async_result<detail::as_result_t<CompletionToken>,  //
                           void(error_code, T)>                   //
 
-    // NOTE we subclass for an async result taking an outcome::result
-    // as its completion handler. We will mangle the void(error_code, T)
-    // completion handler into this completion handler below.
-    : public asio::async_result<CompletionToken, void(outcome::result<T, error_code>)>
 {
   // The result type we shall return
   using result_type = outcome::result<T, error_code>;
-  using _base = asio::async_result<CompletionToken, void(result_type)>;
   // The awaitable type to be returned by the initiating function,
   // the co_await of which will yield a result_type
-  using return_type = typename _base::return_type;
+  using return_type = //
+  typename asio::async_result<CompletionToken, void(result_type)> //
+  ::return_type;
 
-  // Get what would be the completion handler for the async_result
-  // whose completion handler is void(result_type)
-  using result_type_completion_handler_type =  //
-  typename _base::completion_handler_type;
   //! [async_result1]
   //! [async_result2]
-  // Wrap that completion handler with void(error_code, T) converting
+  // Wrap a completion handler with void(error_code, T) converting
   // handler
-  struct completion_handler_type
-  {
-    // Pass through unwrapped completion token
-    template <class U>
-    completion_handler_type(::detail::as_result_t<U> &&ch)
-        : _handler(std::forward<U>(ch.token))
-    {
-    }
-
+  template <class Handler>
+  struct completion_handler {
     // Our completion handler spec
     void operator()(error_code ec, T v)
     {
@@ -160,23 +144,47 @@ struct asio::async_result<detail::as_result_t<CompletionToken>,  //
       _handler(result_type(outcome::success(v)));
     }
 
-    result_type_completion_handler_type _handler;
+    Handler _handler;
   };
 
-  // Initialise base with the underlying completion handler
-  async_result(completion_handler_type &h)
-      : _base(h._handler)
+  // NOTE the initiate member function initiates the async operation,
+  // and we want to defer to what would be the initiation of the
+  // async_result whose handler signature is void(result_type).
+  template <class Initiation, class... Args>
+  static return_type
+  initiate(
+    Initiation&& init,
+    detail::as_result_t<CompletionToken>&& token,
+    Args&&... args)
   {
+    // The async_initiate<CompletionToken, void(result_type)> helper
+    // function will invoke the async initiation method of the
+    // async_result<CompletionToken, void(result_type)>, as desired.
+    // Instead of CompletionToken and void(result_type)	we start with
+    // detail::as_result_t<CompletionToken> and void(ec, T), so
+    // the inputs need to be massaged then passed along.
+    return asio::async_initiate<CompletionToken, void(result_type)>(
+      // create a new initiation which wraps the provided init
+      [init = std::forward<Initiation>(init)](
+        auto&& handler, auto&&... initArgs) mutable {
+        std::move(init)(
+          // we wrap the handler in the converting completion_handler from
+          // above, and pass along the args
+          completion_handler<std::decay_t<decltype(handler)>>{
+            std::forward<decltype(handler)>(handler)},
+          std::forward<decltype(initArgs)>(initArgs)...);
+      },
+      // the new initiation is called with the handler unwrapped from
+      // the token, and the original initiation arguments.
+      token.token,
+      std::forward<Args>(args)...);
   }
-
-  using _base::get;
 };
 //! [async_result2]
 
-asio::experimental::awaitable<void> outcome_(asio::ip::tcp::socket skt)
+asio::awaitable<void> outcome_(asio::ip::tcp::socket skt)
 {
   char buffer[1024];
-  asio::experimental::await_token token = co_await asio::experimental::this_coro::token();
 
 #if 0
   {  // debug
@@ -194,7 +202,7 @@ asio::experimental::awaitable<void> outcome_(asio::ip::tcp::socket skt)
   // Asynchronously read data, suspending this coroutine until completion,
   // returning the bytes of the data read into the result, or any failure.
   outcome::result<size_t, error_code> bytesread =  //
-  co_await skt.async_read_some(asio::buffer(buffer), as_result(token));
+  co_await skt.async_read_some(asio::buffer(buffer), as_result(asio::use_awaitable));
 
   // Usage is exactly like ordinary Outcome. Note the lack of exception throw!
   if(bytesread.has_error())
