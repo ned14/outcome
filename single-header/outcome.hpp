@@ -812,9 +812,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    ab1f9fff8cbe5596a98a3b74f1e74b089b83169a
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-06-27 08:37:46 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE ab1f9fff
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    d9e794eeff852e87206cef7d5d5ce8a7299f6df8
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-07-29 10:10:50 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE d9e794ee
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1318,9 +1318,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 960da029cc07e24f80687cb74655f49069fc4401
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-07-25 09:41:15 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 960da029
+#define OUTCOME_PREVIOUS_COMMIT_REF dd50d7d677495e0ac6d2f3d9154dd82c59326e28
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-07-25 09:52:54 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE dd50d7d6
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -2771,6 +2771,9 @@ namespace detail
   template <bool value_throws, bool error_throws> struct basic_result_storage_swap;
   template <class R, class EC, class NoValuePolicy>                                                                                                                                    //
   OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<EC> && (std::is_void<EC>::value || std::is_default_constructible<EC>::value))  //
+  class basic_result_storage;
+  template <class R, class EC, class NoValuePolicy>                                                                                                                                    //
+  OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<EC> && (std::is_void<EC>::value || std::is_default_constructible<EC>::value))  //
   class basic_result_storage
   {
     static_assert(trait::type_can_be_used_in_basic_result<R>, "The type R cannot be used in a basic_result");
@@ -3002,7 +3005,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace convert
 {
 #if defined(__cpp_concepts)
-#if __GNUC__ < 7 && !defined(__clang__)
+#if !defined(_MSC_VER) && !defined(__clang__) && __GNUC__ < 7
 #define OUTCOME_GCC6_CONCEPT_BOOL bool
 #else
 #define OUTCOME_GCC6_CONCEPT_BOOL
