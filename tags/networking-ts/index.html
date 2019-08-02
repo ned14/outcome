@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-08-02T09:20:40 UTC">
+<meta name="revised" content="2019-08-02T09:41:22 UTC">
 <title>Networking Ts :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -445,7 +445,14 @@
       <li data-nav-id="/outcome/recipes/asio-integration/" class="dd-item">
         <div>
           <a href="/outcome/recipes/asio-integration/">
-            ASIO/Networking TS
+            ASIO/Networking TS : Boost &lt; 1.70
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/recipes/asio-integration-1-70/" class="dd-item">
+        <div>
+          <a href="/outcome/recipes/asio-integration-1-70/">
+            ASIO/Networking TS: Boost &gt;= 1.70
           </a>
         </div>
     </li>
@@ -2425,13 +2432,39 @@
 
    <article class="post recipes">
     <header class="post-header">
-        <h2 class="post-title"><a href="/outcome/recipes/asio-integration/">ASIO/Networking TS</a></h2>
+        <h2 class="post-title"><a href="/outcome/recipes/asio-integration/">ASIO/Networking TS : Boost &lt; 1.70</a></h2>
     </header>
     <section class="post-excerpt">
         <p>Thanks to Christos Stratopoulos for this Outcome recipe.
+Compatibility note This recipe targets Boost versions before 1.70, where coroutine support is based around the asio::experimental::this_coro::token completion token. For integration with Boost versions 1.70 and onward, see this recipe.
 Use case Boost.ASIO and standalone ASIO provide the async_result customisation point for adapting arbitrary third party libraries, such as Outcome, into ASIO.
-Historically in ASIO you need to pass completion handler instances to the ASIO asynchronous i/o initiation functions. These get executed when the i/o completes.
-// Dynamically allocate a buffer to read into. This must be move-only  // so it can be attached to the completion handler, hence the unique_ptr. <a class="read-more" href="/outcome/recipes/asio-integration/">&raquo;</a></p>
+Historically in ASIO you need to pass completion handler instances to the ASIO asynchronous i/o initiation functions. <a class="read-more" href="/outcome/recipes/asio-integration/">&raquo;</a></p>
+    </section>
+    <footer class=" footline" >
+         
+        
+
+        
+          
+            
+                <a class="label label-default" href="https://ned14.github.io/outcome/tags/asio/">asio</a>
+            
+                <a class="label label-default" href="https://ned14.github.io/outcome/tags/networking-ts/">networking-ts</a>
+            
+        
+
+    </footer>
+</article>
+
+   <article class="post recipes">
+    <header class="post-header">
+        <h2 class="post-title"><a href="/outcome/recipes/asio-integration-1-70/">ASIO/Networking TS: Boost &gt;= 1.70</a></h2>
+    </header>
+    <section class="post-excerpt">
+        <p>Thanks to Christos Stratopoulos for this Outcome recipe.
+Compatibility note This recipe targets Boost versions including and after 1.70, where coroutine support is based around the asio::use_awaitable completion token. For integration with Boost versions before 1.70, see this recipe.
+Use case Boost.ASIO and standalone ASIO provide the async_result customisation point for adapting arbitrary third party libraries, such as Outcome, into ASIO.
+Historically in ASIO you need to pass completion handler instances to the ASIO asynchronous i/o initiation functions. <a class="read-more" href="/outcome/recipes/asio-integration-1-70/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          
@@ -2480,7 +2513,7 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 28/02/2019
+        <i class='fa fa-calendar'></i> Last update on 29/07/2019
     </div>
     
 

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-08-02T09:20:44 UTC">
+<meta name="revised" content="2019-08-02T09:41:26 UTC">
 <title>`void hook_outcome_move_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -445,7 +445,14 @@
       <li data-nav-id="/outcome/recipes/asio-integration/" class="dd-item">
         <div>
           <a href="/outcome/recipes/asio-integration/">
-            ASIO/Networking TS
+            ASIO/Networking TS : Boost &lt; 1.70
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/recipes/asio-integration-1-70/" class="dd-item">
+        <div>
+          <a href="/outcome/recipes/asio-integration-1-70/">
+            ASIO/Networking TS: Boost &gt;= 1.70
           </a>
         </div>
     </li>
@@ -2379,6 +2386,63 @@
    Experimental</option>
     <option value="/outcome/reference/" >
    API reference</option> 
+    <option value="/outcome/reference/macros/" >
+  - 
+   Macros</option>
+    <option value="/outcome/reference/concepts/" >
+  - 
+   Concepts</option>
+    <option value="/outcome/reference/converters/" >
+  - 
+   Converters</option>
+    <option value="/outcome/reference/traits/" >
+  - 
+   Traits</option>
+    <option value="/outcome/reference/policies/" >
+  - 
+   Policies</option>
+    <option value="/outcome/reference/types/" >
+  - 
+   Types</option>
+    <option value="/outcome/reference/aliases/" >
+  - 
+   Aliases</option>
+    <option value="/outcome/reference/functions/" >
+  - 
+   Functions</option> 
+    <option value="/outcome/reference/functions/hooks/" >
+  -- 
+   Hooks</option> 
+      <option value="/outcome/reference/functions/hooks/spare_storage/" >--- `uint16_t spare_storage(const basic_result|basic_outcome *) noexcept`</option>
+      <option value="/outcome/reference/functions/hooks/hook_outcome_construction/" >--- `void hook_outcome_construction(T *, U &amp;&amp;) noexcept`</option>
+      <option value="/outcome/reference/functions/hooks/hook_outcome_construction2/" >--- `void hook_outcome_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept`</option>
+      <option value="/outcome/reference/functions/hooks/hook_outcome_copy_construction/" >--- `void hook_outcome_copy_construction(T *, U &amp;&amp;) noexcept`</option>
+      <option value="/outcome/reference/functions/hooks/hook_outcome_copy_construction2/" >--- `void hook_outcome_copy_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept`</option>
+      <option value="/outcome/reference/functions/hooks/hook_outcome_in_place_construction/" >--- `void hook_outcome_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept`</option>
+      <option value="/outcome/reference/functions/hooks/hook_outcome_move_construction/" >--- `void hook_outcome_move_construction(T *, U &amp;&amp;) noexcept`</option>
+      <option value="/outcome/reference/functions/hooks/hook_outcome_move_construction2/"  selected>--- `void hook_outcome_move_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept`</option>
+      <option value="/outcome/reference/functions/hooks/hook_result_construction/" >--- `void hook_result_construction(T *, U &amp;&amp;) noexcept`</option>
+      <option value="/outcome/reference/functions/hooks/hook_result_copy_construction/" >--- `void hook_result_copy_construction(T *, U &amp;&amp;) noexcept`</option>
+      <option value="/outcome/reference/functions/hooks/hook_result_in_place_construction/" >--- `void hook_result_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept`</option>
+      <option value="/outcome/reference/functions/hooks/hook_result_move_construction/" >--- `void hook_result_move_construction(T *, U &amp;&amp;) noexcept`</option>
+      <option value="/outcome/reference/functions/hooks/override_outcome_exception/" >--- `void override_outcome_exception(basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; *, U &amp;&amp;) noexcept`</option>
+      <option value="/outcome/reference/functions/hooks/set_spare_storage/" >--- `void set_spare_storage(basic_result|basic_outcome *, uint16_t) noexcept`</option>
+  
+    <option value="/outcome/reference/functions/iostream/" >
+  -- 
+   Iostream</option>
+    <option value="/outcome/reference/functions/policy/" >
+  -- 
+   Policy</option>
+      <option value="/outcome/reference/functions/failure/" >-- `auto failure(T &amp;&amp;, ...)`</option>
+      <option value="/outcome/reference/functions/success/" >-- `auto success(T &amp;&amp;)`</option>
+      <option value="/outcome/reference/functions/try_operation_has_value/" >-- `bool try_operation_has_value(X)`</option>
+      <option value="/outcome/reference/functions/try_operation_extract_value/" >-- `decltype(auto) try_operation_extract_value(X)`</option>
+      <option value="/outcome/reference/functions/try_operation_return_as/" >-- `decltype(auto) try_operation_return_as(X)`</option>
+      <option value="/outcome/reference/functions/error_from_exception/" >-- `std::error_code error_from_exception(std::exception_ptr &amp;&amp;ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept`</option>
+      <option value="/outcome/reference/functions/strong_swap/" >-- `void strong_swap(bool &amp;all_good, T &amp;a, T &amp;b)`</option>
+      <option value="/outcome/reference/functions/try_throw_std_exception_from_error/" >-- `void try_throw_std_exception_from_error(std::error_code ec, const std::string &amp;msg = std::string{})`</option>
+  
   
     <option value="/outcome/faq/" >
    Frequently asked questions</option>
@@ -2446,7 +2510,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 28/02/2019
+        <i class='fa fa-calendar'></i> Last update on 02/03/2019
     </div>
     
 

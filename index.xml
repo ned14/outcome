@@ -2296,15 +2296,27 @@ Complexity: Whatever that of error_type&amp;rsquo;s and/or exception_type&amp;rs
     </item>
     
     <item>
-      <title>ASIO/Networking TS</title>
+      <title>ASIO/Networking TS : Boost &lt; 1.70</title>
       <link>https://ned14.github.io/outcome/recipes/asio-integration/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/recipes/asio-integration/</guid>
       <description>Thanks to Christos Stratopoulos for this Outcome recipe.
+Compatibility note This recipe targets Boost versions before 1.70, where coroutine support is based around the asio::experimental::this_coro::token completion token. For integration with Boost versions 1.70 and onward, see this recipe.
 Use case Boost.ASIO and standalone ASIO provide the async_result customisation point for adapting arbitrary third party libraries, such as Outcome, into ASIO.
-Historically in ASIO you need to pass completion handler instances to the ASIO asynchronous i/o initiation functions. These get executed when the i/o completes.
-// Dynamically allocate a buffer to read into. This must be move-only  // so it can be attached to the completion handler, hence the unique_ptr.</description>
+Historically in ASIO you need to pass completion handler instances to the ASIO asynchronous i/o initiation functions.</description>
+    </item>
+    
+    <item>
+      <title>ASIO/Networking TS: Boost &gt;= 1.70</title>
+      <link>https://ned14.github.io/outcome/recipes/asio-integration-1-70/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/recipes/asio-integration-1-70/</guid>
+      <description>Thanks to Christos Stratopoulos for this Outcome recipe.
+Compatibility note This recipe targets Boost versions including and after 1.70, where coroutine support is based around the asio::use_awaitable completion token. For integration with Boost versions before 1.70, see this recipe.
+Use case Boost.ASIO and standalone ASIO provide the async_result customisation point for adapting arbitrary third party libraries, such as Outcome, into ASIO.
+Historically in ASIO you need to pass completion handler instances to the ASIO asynchronous i/o initiation functions.</description>
     </item>
     
     <item>
@@ -2313,8 +2325,7 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors HAHAHUGOSHORTCODE-0xc000b26000-1-HBHB
-This pretty, modern C++ documentation  Hugo - static website generator of this documentation. hugo-theme-docdock - the Hugo theme used by this documentation. Standardese - the API reference generator (up until Outcome v2.0)  Special thanks for Outcome v2.1 Once again Andrzej Krzemienski stands out for a never ceasing flow of excellent questions, &amp;ldquo;what if?&amp;rdquo;&amp;rsquo;s, eagle eyed spotting of corner case logic bugs, and design contradictions. Thank you Andrzej!</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1073 commits   @akrzemi1 45 commits   @cstratopoulos 8 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>
