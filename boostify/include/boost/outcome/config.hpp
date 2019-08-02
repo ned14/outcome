@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef BOOST_OUTCOME_V2_CONFIG_HPP
 #define BOOST_OUTCOME_V2_CONFIG_HPP
 
-#include "version.hpp"
+#include "detail/version.hpp"
 
 // Pull in detection of __MINGW64_VERSION_MAJOR
 #if defined(__MINGW32__) && !defined(DOXYGEN_IS_IN_THE_HOUSE)

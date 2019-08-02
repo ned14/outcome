@@ -32,10 +32,15 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace convert
 {
 #if defined(__cpp_concepts)
+#if !defined(_MSC_VER) && !defined(__clang__) && __GNUC__ < 7
+#define OUTCOME_GCC6_CONCEPT_BOOL bool
+#else
+#define OUTCOME_GCC6_CONCEPT_BOOL
+#endif
   /* The `ValueOrNone` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
-  template <class U> concept bool ValueOrNone = requires(U a)
+  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrNone = requires(U a)
   {
     {
       a.has_value()
@@ -47,7 +52,7 @@ namespace convert
   \requires That `U::value_type` and `U::error_type` exist;
   that `std::declval<U>().has_value()` returns a `bool`, `std::declval<U>().value()` and  `std::declval<U>().error()` exists.
   */
-  template <class U> concept bool ValueOrError = requires(U a)
+  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrError = requires(U a)
   {
     {
       a.has_value()
@@ -101,7 +106,7 @@ namespace convert
     };
   }  // namespace detail
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL 
+  /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  value_or_error. Potential doc page: NOT FOUND
 */
   template <class T, class U> struct value_or_error
