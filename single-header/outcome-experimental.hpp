@@ -7867,7 +7867,7 @@ class _posix_code_domain : public status_code_domain
     char buffer[1024] = "";
 #ifdef _WIN32
     strerror_s(buffer, sizeof(buffer), c);
-#elif defined(__linux__)
+#elif defined(__gnu_linux__)
     char *s = strerror_r(c, buffer, sizeof(buffer));  // NOLINT
     if(s != nullptr)
     {
