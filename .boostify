@@ -54,7 +54,7 @@ core_macros = {
 source_macros = {
     r'DOXYGEN_': r'BOOST_OUTCOME_DOXYGEN_',
     r'STANDARDESE_': r'BOOST_OUTCOME_STANDARDESE_',
-    r'../include/outcome' : r'../include/boost/outcome',
+    r'\.\./include/outcome' : r'../include/boost/outcome',
     r'#include "quickcpplib/include/boost/test/unit_test.hpp"' : r'#include <boost/test/unit_test.hpp>\n#include <boost/test/unit_test_monitor.hpp>',
     r'BOOST_OUTCOME_AUTO_TEST_CASE\((.*)' : fix_auto_test_case,
     r'#include "quickcpplib/include/execinfo_win64.h"' : r'#error This example can only compile on POSIX',
@@ -63,7 +63,7 @@ source_macros = {
 source_macros.update(core_macros)
 transforms = {
     r'^test/tests/.*\.cpp$': {
-      r'"[^"]+/../boost/include/outcome/([^"]+)"': r'<boost/outcome/\1>',
+      r'"[^"]+/\.\./include/boost/outcome/([^"]+)"': r'<boost/outcome/\1>',
       r'std::errc([^:])': r'boost::system::errc::errc_t\1',
       r'std::errc::': r'boost::system::errc::',
       r'std::error_code': r'boost::system::error_code',
