@@ -41,6 +41,18 @@ namespace detail
 
 }  // namespace detail
 
+namespace trait
+{
+  template <class ErasedType> struct is_move_relocating<SYSTEM_ERROR2_NAMESPACE::status_code<SYSTEM_ERROR2_NAMESPACE::erased<ErasedType>>>
+  {
+    static constexpr bool value = true;
+  };
+  template <class ErasedType> struct is_move_relocating<SYSTEM_ERROR2_NAMESPACE::errored_status_code<SYSTEM_ERROR2_NAMESPACE::erased<ErasedType>>>
+  {
+    static constexpr bool value = true;
+  };
+}  // namespace trait
+
 namespace experimental
 {
   using namespace SYSTEM_ERROR2_NAMESPACE;

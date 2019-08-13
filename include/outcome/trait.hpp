@@ -117,6 +117,14 @@ type definition  is_exception_ptr_available. Potential doc page: NOT FOUND
   };
   template <class T> constexpr bool is_exception_ptr_available_v = detail::_is_exception_ptr_available<std::decay_t<T>>::value;
 
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+  */
+  template <class T> struct is_move_relocating
+  {
+    static constexpr bool value = std::is_trivially_copyable<T>::value;
+  };
+  template <class T> constexpr bool is_move_relocating_v = is_move_relocating<T>::value;
+
 
 }  // namespace trait
 

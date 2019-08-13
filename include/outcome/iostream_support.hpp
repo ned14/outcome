@@ -36,7 +36,20 @@ namespace detail
 {
   template <class T> typename std::add_lvalue_reference<T>::type lvalueref() noexcept;
 
-  template <class T> inline std::ostream &operator<<(std::ostream &s, const value_storage_trivial<T> &v)
+  template <class T, class E> inline std::ostream &operator<<(std::ostream &s, const value_storage_trivial<T, E> &v)
+  {
+    s << v._status << " ";
+    if((v._status & status_have_value) != 0)
+    {
+      s << v._value;  // NOLINT
+    }
+    else if((v._status & status_have_error) != 0)
+    {
+      s << v._error;  // NOLINT
+    }
+    return s;
+  }
+  template <class T> inline std::ostream &operator<<(std::ostream &s, const value_storage_trivial<T, void> &v)
   {
     s << v._status << " ";
     if((v._status & status_have_value) != 0)
@@ -45,12 +58,34 @@ namespace detail
     }
     return s;
   }
-  inline std::ostream &operator<<(std::ostream &s, const value_storage_trivial<void> &v)
+  template <class E> inline std::ostream &operator<<(std::ostream &s, const value_storage_trivial<void, E> &v)
+  {
+    s << v._status << " ";
+    if((v._status & status_have_error) != 0)
+    {
+      s << v._error;  // NOLINT
+    }
+    return s;
+  }
+  inline std::ostream &operator<<(std::ostream &s, const value_storage_trivial<void, void> &v)
   {
     s << v._status << " ";
     return s;
   }
-  template <class T> inline std::ostream &operator<<(std::ostream &s, const value_storage_nontrivial<T> &v)
+  template <class T, class E> inline std::ostream &operator<<(std::ostream &s, const value_storage_nontrivial<T, E> &v)
+  {
+    s << v._status << " ";
+    if((v._status & status_have_value) != 0)
+    {
+      s << v._value;  // NOLINT
+    }
+    else if((v._status & status_have_error) != 0)
+    {
+      s << v._error;  // NOLINT
+    }
+    return s;
+  }
+  template <class T> inline std::ostream &operator<<(std::ostream &s, const value_storage_nontrivial<T, void> &v)
   {
     s << v._status << " ";
     if((v._status & status_have_value) != 0)
@@ -59,9 +94,56 @@ namespace detail
     }
     return s;
   }
-  template <class T> inline std::istream &operator>>(std::istream &s, value_storage_trivial<T> &v)
+  template <class E> inline std::ostream &operator<<(std::ostream &s, const value_storage_nontrivial<void, E> &v)
   {
-    v = value_storage_trivial<T>();
+    s << v._status << " ";
+    if((v._status & status_have_error) != 0)
+    {
+      s << v._error;  // NOLINT
+    }
+    return s;
+  }
+  template <class T, class E> inline std::istream &operator>>(std::istream &s, value_storage_trivial<T, E> &v)
+  {
+    v = value_storage_trivial<T, E>();
+    s >> v._status;
+    if((v._status & status_have_value) != 0)
+    {
+      new(&v._value) decltype(v._value)();  // NOLINT
+      s >> v._value;                        // NOLINT
+    }
+    else if((v._status & status_have_error) != 0)
+    {
+      new(&v._error) decltype(v._error)();  // NOLINT
+      s >> v._error;                        // NOLINT
+    }
+    return s;
+  }
+  inline std::istream &operator>>(std::istream &s, value_storage_trivial<void, void> &v)
+  {
+    v = value_storage_trivial<void, void>();
+    s >> v._status;
+    return s;
+  }
+  template <class T, class E> inline std::istream &operator>>(std::istream &s, value_storage_nontrivial<T, E> &v)
+  {
+    v = value_storage_nontrivial<T, E>();
+    s >> v._status;
+    if((v._status & status_have_value) != 0)
+    {
+      new(&v._value) decltype(v._value)();  // NOLINT
+      s >> v._value;                        // NOLINT
+    }
+    else if((v._status & status_have_error) != 0)
+    {
+      new(&v._error) decltype(v._error)();  // NOLINT
+      s >> v._error;                        // NOLINT
+    }
+    return s;
+  }
+  template <class T> inline std::istream &operator>>(std::istream &s, value_storage_nontrivial<T, void> &v)
+  {
+    v = value_storage_nontrivial<T, void>();
     s >> v._status;
     if((v._status & status_have_value) != 0)
     {
@@ -70,20 +152,14 @@ namespace detail
     }
     return s;
   }
-  inline std::istream &operator>>(std::istream &s, value_storage_trivial<devoid<void>> &v)
+  template <class E> inline std::istream &operator>>(std::istream &s, value_storage_nontrivial<void, E> &v)
   {
-    v = value_storage_trivial<devoid<void>>();
+    v = value_storage_nontrivial<void, E>();
     s >> v._status;
-    return s;
-  }
-  template <class T> inline std::istream &operator>>(std::istream &s, value_storage_nontrivial<T> &v)
-  {
-    v = value_storage_nontrivial<T>();
-    s >> v._status;
-    if((v._status & status_have_value) != 0)
+    if((v._status & status_have_error) != 0)
     {
-      new(&v._value) decltype(v._value)();  // NOLINT
-      s >> v._value;                        // NOLINT
+      new(&v._error) decltype(v._error)();  // NOLINT
+      s >> v._error;                        // NOLINT
     }
     return s;
   }
@@ -101,10 +177,6 @@ OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lva
 inline std::istream &operator>>(std::istream &s, basic_result<R, S, P> &v)
 {
   s >> v._iostreams_state();
-  if(v.has_error())
-  {
-    s >> v.assume_error();
-  }
   return s;
 }
 /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -115,10 +187,6 @@ OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lva
 inline std::ostream &operator<<(std::ostream &s, const basic_result<R, S, P> &v)
 {
   s << v._iostreams_state();
-  if(v.has_error())
-  {
-    s << v.assume_error();
-  }
   return s;
 }
 /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -131,7 +199,7 @@ template <class R, class S, class P> inline std::string print(const basic_result
   {
     s << v.value();
   }
-  if(v.has_error())
+  else if(v.has_error())
   {
     s << v.error() << detail::safe_message(v.error());
   }
@@ -147,7 +215,7 @@ template <class S, class P> inline std::string print(const basic_result<void, S,
   {
     s << "(+void)";
   }
-  if(v.has_error())
+  else if(v.has_error())
   {
     s << v.error() << detail::safe_message(v.error());
   }
@@ -163,7 +231,7 @@ template <class R, class P> inline std::string print(const basic_result<R, void,
   {
     s << v.value();
   }
-  if(v.has_error())
+  else if(v.has_error())
   {
     s << "(-void)";
   }
@@ -179,7 +247,7 @@ template <class P> inline std::string print(const basic_result<void, void, P> &v
   {
     s << "(+void)";
   }
-  if(v.has_error())
+  else if(v.has_error())
   {
     s << "(-void)";
   }
@@ -194,10 +262,6 @@ OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::istream>() >> detail::lva
 inline std::istream &operator>>(std::istream &s, outcome<R, S, P, N> &v)
 {
   s >> v._iostreams_state();
-  if(v.has_error())
-  {
-    s >> v.assume_error();
-  }
   if(v.has_exception())
   {
     s >> v.assume_exception();
@@ -212,10 +276,6 @@ OUTCOME_TREQUIRES(OUTCOME_TEXPR(detail::lvalueref<std::ostream>() << detail::lva
 inline std::ostream &operator<<(std::ostream &s, const outcome<R, S, P, N> &v)
 {
   s << v._iostreams_state();
-  if(v.has_error())
-  {
-    s << v.assume_error();
-  }
   if(v.has_exception())
   {
     s << v.assume_exception();
