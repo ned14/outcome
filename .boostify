@@ -63,8 +63,8 @@ source_macros = {
 source_macros.update(core_macros)
 transforms = {
     r'^test/tests/.*\.cpp$': {
-      r'"[^"]+/\.\./include/boost/outcome/([^"]+)"': r'<boost/outcome/\1>',
       r'"[^"]+/\.\./include/outcome/([^"]+)"': r'<boost/outcome/\1>',
+      r'"[^"]+/\.\./include/outcome.hpp"': r'<boost/outcome.hpp>',
       r'std::errc([^:])': r'boost::system::errc::errc_t\1',
       r'std::errc::': r'boost::system::errc::',
       r'std::error_code': r'boost::system::error_code',
@@ -76,6 +76,9 @@ transforms = {
       r'std::make_exception_ptr': r'boost::copy_exception',
       r'std::current_exception': r'boost::current_exception',
       r'std::rethrow_exception': r'boost::rethrow_exception',
+    },
+    r'^test/expected-pass\.cpp$': {
+      r'"\.\./include/outcome/([^"]+)"': r'<boost/outcome/\1>',
     },
     r'^.*\.hpp$' : source_macros,
     r'^.*\.ipp$' : source_macros,
