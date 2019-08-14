@@ -1213,9 +1213,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF cfd7e606c1b33b060c2e45debea190e912de2f24
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-08-14 08:12:06 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE cfd7e606
+#define OUTCOME_PREVIOUS_COMMIT_REF 799984f247c1beaac7ae2bcbe8379b7ad04d97bb
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-08-14 09:39:40 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 799984f2
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -3459,7 +3459,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace convert
 {
 #if defined(__cpp_concepts)
-#if !defined(_MSC_VER) && !defined(__clang__) && __GNUC__ < 7
+#if !defined(_MSC_VER) && !defined(__clang__) && __GNUC__ < 8
 #define OUTCOME_GCC6_CONCEPT_BOOL bool
 #else
 #define OUTCOME_GCC6_CONCEPT_BOOL
@@ -3841,7 +3841,7 @@ namespace detail
     {
       if((this->_state._status & detail::status_have_error) != 0)
       {
-        return this->_error == o.error();
+        return this->_state._error == o.error();
       }
       return false;
     }

@@ -93,7 +93,7 @@ namespace detail
     {
       if((this->_state._status & detail::status_have_error) != 0)
       {
-        return this->_error == o.error();
+        return this->_state._error == o.error();
       }
       return false;
     }
