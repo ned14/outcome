@@ -27,6 +27,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../config.hpp"
 
+#include <cassert>
+
 OUTCOME_V2_NAMESPACE_BEGIN
 
 namespace detail
@@ -110,7 +112,7 @@ namespace detail
   // Common implementation for the throwing heterogeneous strong swap
   template <class T, class U> struct strong_swap_throwing_impl
   {
-    constexpr strong_swap_throwing_impl(bool &allgood, T &destA, T &srcA, U &destB, U &srcB)
+    strong_swap_throwing_impl(bool &allgood, T &destA, T &srcA, U &destB, U &srcB)
     {
       allgood = true;
       bool donotrestore = false;
@@ -304,16 +306,6 @@ namespace detail
         : _empty{}
     {
     }
-    // Special from-void catchall constructor, always constructs default T irrespective of whether void is valued or not (can do no better if T cannot be copied)
-    struct disable_void_catchall
-    {
-    };
-    using void_value_storage_trivial = std::conditional_t<std::is_void<T>::value, disable_void_catchall, value_storage_trivial<void, E>>;
-    explicit constexpr value_storage_trivial(const void_value_storage_trivial &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
-        : _value()
-        , _status(o._status & status_srconly_mask)
-    {
-    }
     value_storage_trivial(const value_storage_trivial &) = default;             // NOLINT
     value_storage_trivial(value_storage_trivial &&) = default;                  // NOLINT
     value_storage_trivial &operator=(const value_storage_trivial &) = default;  // NOLINT
@@ -322,6 +314,16 @@ namespace detail
     constexpr explicit value_storage_trivial(status_bitfield_type status)
         : _empty()
         , _status(status & status_srconly_mask)
+    {
+    }
+    constexpr explicit value_storage_trivial(in_place_type_t<_value_type> /*unused*/, void_type /*unused*/) noexcept(std::is_nothrow_default_constructible<value_type>::value)
+        : _value()
+        , _status(status_have_value)
+    {
+    }
+    constexpr explicit value_storage_trivial(in_place_type_t<_error_type> /*unused*/, void_type /*unused*/) noexcept(std::is_nothrow_default_constructible<error_type>::value)
+        : _error()
+        , _status(status_have_error)
     {
     }
     template <class... Args>
@@ -352,7 +354,8 @@ namespace detail
     template <class U, class V>
     static constexpr bool enable_converting_constructor =                                                     //
     (!std::is_same<std::decay_t<U>, value_type>::value || !std::is_same<std::decay_t<V>, error_type>::value)  //
-    && std::is_constructible<value_type, U>::value &&std::is_constructible<error_type, V>::value;
+    && (std::is_void<U>::value || std::is_constructible<value_type, U>::value) && (std::is_void<V>::value || std::is_constructible<error_type, V>::value);
+
     OUTCOME_TEMPLATE(class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U, V>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<U, V> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
@@ -363,7 +366,8 @@ namespace detail
     OUTCOME_TEMPLATE(class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U, V>))
     constexpr explicit value_storage_trivial(value_storage_trivial<U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
-        : value_storage_trivial(((o._status & status_have_value) != 0) ? value_storage_trivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : (((o._status & status_have_error) != 0) ? value_storage_trivial(in_place_type<error_type>, static_cast<V &&>(o._error)) : value_storage_trivial()))  // NOLINT
+        : value_storage_trivial(((o._status & status_have_value) != 0) ? value_storage_trivial(in_place_type<value_type>, static_cast<devoid<U> &&>(o._value)) :
+                                                                         (((o._status & status_have_error) != 0) ? value_storage_trivial(in_place_type<error_type>, static_cast<devoid<V> &&>(o._error)) : value_storage_trivial()))  // NOLINT
     {
       _status = o._status;
     }
@@ -444,6 +448,29 @@ namespace detail
       {
         this->_status &= ~status_have_value;
         new(&_value) _value_type_;  // NOLINT
+        _status = o._status;
+      }
+      else if(this->_status & status_have_error)
+      {
+        this->_status &= ~status_have_error;
+        new(&_error) _error_type_(o._error);  // NOLINT
+        _status = o._status;
+      }
+    }
+    // Special from-void constructor, constructs default E if void errored
+    explicit value_storage_nontrivial(const value_storage_trivial<T, void> &o) noexcept(std::is_nothrow_default_constructible<error_type>::value)
+        : _status(o._status)
+    {
+      if(this->_status & status_have_value)
+      {
+        this->_status &= ~status_have_value;
+        new(&_value) _value_type_(o._value);  // NOLINT
+        _status = o._status;
+      }
+      else if(this->_status & status_have_error)
+      {
+        this->_status &= ~status_have_error;
+        new(&_error) _error_type_;  // NOLINT
         _status = o._status;
       }
     }
@@ -598,7 +625,7 @@ namespace detail
       // value-error?
       if((_status & (status_have_value | status_have_error)) == status_have_value && (o._status & (status_have_value | status_have_error)) == status_have_error)
       {
-        this->_value.~_value_type_();                                     // NOLINT
+        this->_value.~_value_type_();                                       // NOLINT
         new(&_error) _error_type_(static_cast<_error_type_ &&>(o._error));  // NOLINT
         _status = o._status;
         o._status |= status_is_moved_from;
@@ -607,14 +634,14 @@ namespace detail
       // value-error?
       if((_status & (status_have_value | status_have_error)) == status_have_error && (o._status & (status_have_value | status_have_error)) == status_have_value)
       {
-        this->_error.~error_type();  // NOLINT
+        this->_error.~error_type();                                         // NOLINT
         new(&_value) _value_type_(static_cast<_value_type_ &&>(o._value));  // NOLINT
         _status = o._status;
         o._status |= status_is_moved_from;
         return *this;
       }
       // Did I forget any scenario?
-      abort();
+      assert(false);
     }
     value_storage_nontrivial &operator=(const value_storage_nontrivial &o) noexcept(std::is_nothrow_copy_constructible<value_type>::value &&std::is_nothrow_copy_assignable<value_type>::value &&std::is_nothrow_copy_constructible<error_type>::value &&std::is_nothrow_copy_assignable<error_type>::value)
     {
@@ -669,7 +696,7 @@ namespace detail
       // value-error?
       if((_status & (status_have_value | status_have_error)) == status_have_value && (o._status & (status_have_value | status_have_error)) == status_have_error)
       {
-        this->_value.~_value_type_();  // NOLINT
+        this->_value.~_value_type_();         // NOLINT
         new(&_error) _error_type_(o._error);  // NOLINT
         _status = o._status;
         return *this;
@@ -677,13 +704,13 @@ namespace detail
       // value-error?
       if((_status & (status_have_value | status_have_error)) == status_have_error && (o._status & (status_have_value | status_have_error)) == status_have_value)
       {
-        this->_error.~_error_type_();  // NOLINT
+        this->_error.~_error_type_();         // NOLINT
         new(&_value) _value_type_(o._value);  // NOLINT
         _status = o._status;
         return *this;
       }
       // Did I forget any scenario?
-      abort();
+      assert(false);
     }
 
     constexpr void swap(value_storage_nontrivial &o) noexcept(detail::is_nothrow_swappable<value_type>::value &&detail::is_nothrow_swappable<error_type>::value)
@@ -743,12 +770,12 @@ namespace detail
         if((o._status & (status_have_value | status_have_error)) == status_have_value)
         {
           new(&_value) _value_type_(static_cast<_value_type_ &&>(o._value));  // NOLINT
-          o._value.~_value_type_();                                         // NOLINT
+          o._value.~_value_type_();                                           // NOLINT
         }
         else if((o._status & (status_have_value | status_have_error)) == status_have_error)
         {
           new(&_error) _error_type_(static_cast<_error_type_ &&>(o._error));  // NOLINT
-          o._error.~_error_type_();                                                  // NOLINT
+          o._error.~_error_type_();                                           // NOLINT
         }
         swap(_status, o._status);
         return;
@@ -759,12 +786,12 @@ namespace detail
         if((_status & (status_have_value | status_have_error)) == status_have_value)
         {
           new(&o._value) _value_type_(static_cast<_value_type_ &&>(_value));  // NOLINT
-          this->_value.~_value_type_();                                     // NOLINT
+          this->_value.~_value_type_();                                       // NOLINT
         }
         else if((_status & (status_have_value | status_have_error)) == status_have_error)
         {
           new(&o._error) _error_type_(static_cast<_error_type_ &&>(_error));  // NOLINT
-          this->_error.~_error_type_();                                     // NOLINT
+          this->_error.~_error_type_();                                       // NOLINT
         }
         swap(_status, o._status);
         return;
@@ -791,7 +818,7 @@ namespace detail
         swap(_status, o._status);
         return;
       }
-      // value-error?
+      // error-value?
       if((_status & (status_have_value | status_have_error)) == status_have_error && (o._status & (status_have_value | status_have_error)) == status_have_value)
       {
         struct _
@@ -813,7 +840,7 @@ namespace detail
         return;
       }
       // Did I forget any scenario?
-      abort();
+      assert(false);
     }
   };
   template <class Base> struct value_storage_delete_copy_constructor : Base  // NOLINT
@@ -865,39 +892,96 @@ namespace detail
     value_storage_nontrivial_move_assignment(const value_storage_nontrivial_move_assignment &) = default;
     value_storage_nontrivial_move_assignment(value_storage_nontrivial_move_assignment &&) = default;  // NOLINT
     value_storage_nontrivial_move_assignment &operator=(const value_storage_nontrivial_move_assignment &o) = default;
-    value_storage_nontrivial_move_assignment &operator=(value_storage_nontrivial_move_assignment &&o) noexcept(std::is_nothrow_move_assignable<value_type>::value)  // NOLINT
+    value_storage_nontrivial_move_assignment &
+    operator=(value_storage_nontrivial_move_assignment &&o) noexcept(std::is_nothrow_move_constructible<value_type>::value &&std::is_nothrow_move_assignable<value_type>::value &&std::is_nothrow_move_constructible<error_type>::value &&std::is_nothrow_move_assignable<error_type>::value)  // NOLINT
     {
+      // empty-empty?
+      if((this->_status & (status_have_value | status_have_error)) == 0 && (o._status & (status_have_value | status_have_error)) == 0)
+      {
+        this->_value = static_cast<value_type &&>(o._value);  // NOLINT
+        this->_status = o._status;
+        o._status |= status_is_moved_from;
+        return *this;
+      }
+      // value-value?
       if((this->_status & (status_have_value | status_have_error)) == status_have_value && (o._status & (status_have_value | status_have_error)) == status_have_value)
       {
         this->_value = static_cast<value_type &&>(o._value);  // NOLINT
+        this->_status = o._status;
+        o._status |= status_is_moved_from;
+        return *this;
       }
-      else if((this->_status & (status_have_value | status_have_error)) == status_have_error && (o._status & (status_have_value | status_have_error)) == status_have_error)
+      // error-error?
+      if((this->_status & (status_have_value | status_have_error)) == status_have_error && (o._status & (status_have_value | status_have_error)) == status_have_error)
       {
         this->_error = static_cast<error_type &&>(o._error);  // NOLINT
+        this->_status = o._status;
+        o._status |= status_is_moved_from;
+        return *this;
       }
-      else if((this->_status & (status_have_value | status_have_error)) == status_have_value && (o._status & (status_have_value | status_have_error)) == 0)
+      // value-empty?
+      if((this->_status & (status_have_value | status_have_error)) == status_have_value && (o._status & (status_have_value | status_have_error)) == 0)
       {
         if(!trait::template is_move_relocating<value_type>::value || !(this->_status & status_is_moved_from))
         {
           this->_value.~value_type();  // NOLINT
         }
+        this->_status = o._status;
+        o._status |= status_is_moved_from;
+        return *this;
       }
-      else if((this->_status & (status_have_value | status_have_error)) == status_have_error && (o._status & (status_have_value | status_have_error)) == 0)
+      // error-empty?
+      if((this->_status & (status_have_value | status_have_error)) == status_have_error && (o._status & (status_have_value | status_have_error)) == 0)
       {
         if(!trait::template is_move_relocating<error_type>::value || !(this->_status & status_is_moved_from))
         {
           this->_error.~error_type();  // NOLINT
         }
+        this->_status = o._status;
+        o._status |= status_is_moved_from;
+        return *this;
       }
-      else if((this->_status & (status_have_value | status_have_error)) == 0 && (o._status & (status_have_value | status_have_error)) == status_have_value)
+      // empty-value?
+      if((this->_status & (status_have_value | status_have_error)) == 0 && (o._status & (status_have_value | status_have_error)) == status_have_value)
       {
         new(&this->_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        this->_status = o._status;
+        o._status |= status_is_moved_from;
+        return *this;
       }
-      else if((this->_status & (status_have_value | status_have_error)) == 0 && (o._status & (status_have_value | status_have_error)) == status_have_error)
+      // empty-error?
+      if((this->_status & (status_have_value | status_have_error)) == 0 && (o._status & (status_have_value | status_have_error)) == status_have_error)
       {
         new(&this->_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        this->_status = o._status;
+        o._status |= status_is_moved_from;
+        return *this;
       }
-      o._status |= status_is_moved_from;
+      // value-error?
+      if((this->_status & (status_have_value | status_have_error)) == status_have_value && (o._status & (status_have_value | status_have_error)) == status_have_error)
+      {
+        if(!trait::template is_move_relocating<value_type>::value || !(this->_status & status_is_moved_from))
+        {
+          this->_value.~value_type();  // NOLINT
+        }
+        new(&this->_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        this->_status = o._status;
+        o._status |= status_is_moved_from;
+        return *this;
+      }
+      // error-value?
+      if((this->_status & (status_have_value | status_have_error)) == status_have_error && (o._status & (status_have_value | status_have_error)) == status_have_value)
+      {
+        if(!trait::template is_move_relocating<error_type>::value || !(this->_status & status_is_moved_from))
+        {
+          this->_error.~error_type();  // NOLINT
+        }
+        new(&this->_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        this->_status = o._status;
+        o._status |= status_is_moved_from;
+        return *this;
+      }
+      assert(false);
       return *this;
     }
   };
@@ -910,44 +994,95 @@ namespace detail
     value_storage_nontrivial_copy_assignment(const value_storage_nontrivial_copy_assignment &) = default;
     value_storage_nontrivial_copy_assignment(value_storage_nontrivial_copy_assignment &&) = default;              // NOLINT
     value_storage_nontrivial_copy_assignment &operator=(value_storage_nontrivial_copy_assignment &&o) = default;  // NOLINT
-    value_storage_nontrivial_copy_assignment &operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(std::is_nothrow_copy_assignable<value_type>::value)
+    value_storage_nontrivial_copy_assignment &
+    operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(std::is_nothrow_copy_constructible<value_type>::value &&std::is_nothrow_copy_assignable<value_type>::value &&std::is_nothrow_copy_constructible<error_type>::value &&std::is_nothrow_copy_assignable<error_type>::value)
     {
+      // empty-empty?
+      if((this->_status & (status_have_value | status_have_error)) == 0 && (o._status & (status_have_value | status_have_error)) == 0)
+      {
+        this->_value = o._value;  // NOLINT
+        this->_status = o._status;
+        return *this;
+      }
+      // value-value?
       if((this->_status & (status_have_value | status_have_error)) == status_have_value && (o._status & (status_have_value | status_have_error)) == status_have_value)
       {
         this->_value = o._value;  // NOLINT
+        this->_status = o._status;
+        return *this;
       }
-      else if((this->_status & (status_have_value | status_have_error)) == status_have_error && (o._status & (status_have_value | status_have_error)) == status_have_error)
+      // error-error?
+      if((this->_status & (status_have_value | status_have_error)) == status_have_error && (o._status & (status_have_value | status_have_error)) == status_have_error)
       {
         this->_error = o._error;  // NOLINT
+        this->_status = o._status;
+        return *this;
       }
-      else if((this->_status & (status_have_value | status_have_error)) == status_have_value && (o._status & (status_have_value | status_have_error)) == 0)
+      // value-empty?
+      if((this->_status & (status_have_value | status_have_error)) == status_have_value && (o._status & (status_have_value | status_have_error)) == 0)
       {
         if(!trait::template is_move_relocating<value_type>::value || !(this->_status & status_is_moved_from))
         {
           this->_value.~value_type();  // NOLINT
         }
+        this->_status = o._status;
+        return *this;
       }
-      else if((this->_status & (status_have_value | status_have_error)) == status_have_error && (o._status & (status_have_value | status_have_error)) == 0)
+      // error-empty?
+      if((this->_status & (status_have_value | status_have_error)) == status_have_error && (o._status & (status_have_value | status_have_error)) == 0)
       {
         if(!trait::template is_move_relocating<error_type>::value || !(this->_status & status_is_moved_from))
         {
           this->_error.~error_type();  // NOLINT
         }
+        this->_status = o._status;
+        return *this;
       }
-      else if((this->_status & (status_have_value | status_have_error)) == 0 && (o._status & (status_have_value | status_have_error)) == status_have_value)
+      // empty-value?
+      if((this->_status & (status_have_value | status_have_error)) == 0 && (o._status & (status_have_value | status_have_error)) == status_have_value)
       {
         new(&this->_value) value_type(o._value);  // NOLINT
+        this->_status = o._status;
+        return *this;
       }
-      else if((this->_status & (status_have_value | status_have_error)) == 0 && (o._status & (status_have_value | status_have_error)) == status_have_error)
+      // empty-error?
+      if((this->_status & (status_have_value | status_have_error)) == 0 && (o._status & (status_have_value | status_have_error)) == status_have_error)
       {
         new(&this->_error) error_type(o._error);  // NOLINT
+        this->_status = o._status;
+        return *this;
       }
+      // value-error?
+      if((this->_status & (status_have_value | status_have_error)) == status_have_value && (o._status & (status_have_value | status_have_error)) == status_have_error)
+      {
+        if(!trait::template is_move_relocating<value_type>::value || !(this->_status & status_is_moved_from))
+        {
+          this->_value.~value_type();  // NOLINT
+        }
+        new(&this->_error) error_type(o._error);  // NOLINT
+        this->_status = o._status;
+        return *this;
+      }
+      // error-value?
+      if((this->_status & (status_have_value | status_have_error)) == status_have_error && (o._status & (status_have_value | status_have_error)) == status_have_value)
+      {
+        if(!trait::template is_move_relocating<error_type>::value || !(this->_status & status_is_moved_from))
+        {
+          this->_error.~error_type();  // NOLINT
+        }
+        new(&this->_value) value_type(o._value);  // NOLINT
+        this->_status = o._status;
+        return *this;
+      }
+      assert(false);
       return *this;
     }
   };
 
   // We don't actually need all of std::is_trivial<>, std::is_trivially_copyable<> is sufficient
-  template <class T, class E> using value_storage_select_trivality = std::conditional_t<std::is_trivially_copyable<devoid<T>>::value && std::is_trivially_copyable<devoid<E>>::value, value_storage_trivial<T, E>, value_storage_nontrivial<T, E>>;
+  template <class T, class E>
+  using value_storage_select_trivality =
+  std::conditional_t<std::is_trivially_copy_constructible<devoid<T>>::value && std::is_trivially_copyable<devoid<T>>::value && std::is_trivially_copy_constructible<devoid<E>>::value && std::is_trivially_copyable<devoid<E>>::value, value_storage_trivial<T, E>, value_storage_nontrivial<T, E>>;
   template <class T, class E> using value_storage_select_move_constructor = std::conditional_t<std::is_move_constructible<devoid<T>>::value, value_storage_select_trivality<T, E>, value_storage_delete_move_constructor<value_storage_select_trivality<T, E>>>;
   template <class T, class E> using value_storage_select_copy_constructor = std::conditional_t<std::is_copy_constructible<devoid<T>>::value && std::is_copy_constructible<devoid<E>>::value, value_storage_select_move_constructor<T, E>, value_storage_delete_copy_constructor<value_storage_select_move_constructor<T, E>>>;
   template <class T, class E>

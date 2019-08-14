@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010"> 
-  <Type Name="outcome_v2_3511c427::basic_outcome&lt;*&gt;">
+  <Type Name="outcome_v2_cfd7e606::basic_outcome&lt;*&gt;">
     <DisplayString Condition="(_state._status &amp; 0xff) == 0">empty</DisplayString>
     <DisplayString Condition="(_state._status &amp; 1) == 1">value {{{_state._value}}}</DisplayString>
-    <DisplayString Condition="(_state._status &amp; 2) == 2">error {{{_error}}}</DisplayString>
+    <DisplayString Condition="(_state._status &amp; 2) == 2">error {{{_state._error}}}</DisplayString>
     <DisplayString Condition="(_state._status &amp; 4) == 4">exception {{{_ptr}}}</DisplayString>
-    <DisplayString Condition="(_state._status &amp; 6) == 6">error + exception {{{_error}}} + {{{_ptr}}}</DisplayString>
-    <DisplayString Condition="(_state._status &amp; 18) == 18">error (errno) {{{_error}}}</DisplayString>
-    <DisplayString Condition="(_state._status &amp; 22) == 22">error (errno) + exception {{{_error}}} + {{{_ptr}}}</DisplayString>
+    <DisplayString Condition="(_state._status &amp; 6) == 6">error + exception {{{_state._error}}} + {{{_ptr}}}</DisplayString>
+    <DisplayString Condition="(_state._status &amp; 18) == 18">error (errno) {{{_state._error}}}</DisplayString>
+    <DisplayString Condition="(_state._status &amp; 22) == 22">error (errno) + exception {{{_state._error}}} + {{{_ptr}}}</DisplayString>
     <DisplayString>unknown</DisplayString>
     <Expand>
       <Item Condition="(_state._status &amp; 1) == 1" Name="[value]">_state._value</Item>
-      <Item Condition="(_state._status &amp; 2) == 2" Name="[error]">_error</Item>
+      <Item Condition="(_state._status &amp; 2) == 2" Name="[error]">_state._error</Item>
       <Item Condition="(_state._status &amp; 4) == 4" Name="[exception]">_ptr</Item>
     </Expand>
   </Type>
-  <Type Name="outcome_v2_3511c427::basic_result&lt;*&gt;">
+  <Type Name="outcome_v2_cfd7e606::basic_result&lt;*&gt;">
     <DisplayString Condition="(_state._status &amp; 0xff) == 0">empty</DisplayString>
     <DisplayString Condition="(_state._status &amp; 1) == 1">value {{{_state._value}}}</DisplayString>
-    <DisplayString Condition="(_state._status &amp; 2) == 2">error {{{_error}}}</DisplayString>
-    <DisplayString Condition="(_state._status &amp; 18) == 18">error (errno) {{{_error}}}</DisplayString>
+    <DisplayString Condition="(_state._status &amp; 2) == 2">error {{{_state._error}}}</DisplayString>
+    <DisplayString Condition="(_state._status &amp; 18) == 18">error (errno) {{{_state._error}}}</DisplayString>
     <DisplayString>unknown</DisplayString>
     <Expand>
       <Item Condition="(_state._status &amp; 1) == 1" Name="[value]">_state._value</Item>
-      <Item Condition="(_state._status &amp; 2) == 2" Name="[error]">_error</Item>
+      <Item Condition="(_state._status &amp; 2) == 2" Name="[error]">_state._error</Item>
     </Expand>
   </Type>
 </AutoVisualizer>
