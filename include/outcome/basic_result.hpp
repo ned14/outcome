@@ -505,6 +505,15 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
+  constexpr bool has_failure() const noexcept
+  {
+    // Used by TRY, so assume status_have_value can never occur
+    return this->_state._status & detail::status_have_error;
+  }
+
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
   auto as_failure() const & { return failure(this->assume_error()); }
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
@@ -512,7 +521,7 @@ SIGNATURE NOT RECOGNISED
   auto as_failure() &&
   {
     auto ret = failure(static_cast<basic_result &&>(*this).assume_error());
-    if((this->_state._status & (detail::status_have_value | detail::status_have_error)) == detail::status_have_error)
+    if((this->_state._status & detail::status_have_error) == detail::status_have_error)
     {
       this->_state._status |= detail::status_is_moved_from;
     }

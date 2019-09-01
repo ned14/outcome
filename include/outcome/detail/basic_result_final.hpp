@@ -47,12 +47,11 @@ namespace detail
   public:
     using base::base;
 
-    constexpr explicit operator bool() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
-    constexpr bool has_value() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
-    constexpr bool has_error() const noexcept { return (this->_state._status & detail::status_have_error) != 0; }
-    constexpr bool has_exception() const noexcept { return (this->_state._status & detail::status_have_exception) != 0; }
-    constexpr bool has_lost_consistency() const noexcept { return (this->_state._status & detail::status_lost_consistency) != 0; }
-    constexpr bool has_failure() const noexcept { return (this->_state._status & detail::status_have_error) != 0 || (this->_state._status & detail::status_have_exception) != 0; }
+    constexpr explicit operator bool() const noexcept { return (this->_state._status & detail::status_have_value) == detail::status_have_value; }
+    constexpr bool has_value() const noexcept { return (this->_state._status & detail::status_have_value) == detail::status_have_value; }
+    constexpr bool has_error() const noexcept { return (this->_state._status & detail::status_have_error) == detail::status_have_error; }
+    constexpr bool has_exception() const noexcept { return (this->_state._status & detail::status_have_exception) == detail::status_have_exception; }
+    constexpr bool has_lost_consistency() const noexcept { return (this->_state._status & detail::status_lost_consistency) == detail::status_lost_consistency; }
 
     OUTCOME_TEMPLATE(class T, class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<R>>() == std::declval<detail::devoid<T>>()),  //

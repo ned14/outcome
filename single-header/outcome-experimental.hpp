@@ -707,9 +707,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    d9e794eeff852e87206cef7d5d5ce8a7299f6df8
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-07-29 10:10:50 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE d9e794ee
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    292c07714059286ab8a7b14c6737268b70b567e2
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-08-29 19:59:28 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 292c0771
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1046,6 +1046,9 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_SYMBOL_VISIBLE
 #define OUTCOME_SYMBOL_VISIBLE QUICKCPPLIB_SYMBOL_VISIBLE
 #endif
+#ifndef OUTCOME_FORCEINLINE
+#define OUTCOME_FORCEINLINE QUICKCPPLIB_FORCEINLINE
+#endif
 #ifndef OUTCOME_NODISCARD
 #define OUTCOME_NODISCARD QUICKCPPLIB_NODISCARD
 #endif
@@ -1213,9 +1216,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 9283dde48af67c7f64c58ed6d67dbe3b19fc61ee
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-08-14 10:06:02 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 9283dde4
+#define OUTCOME_PREVIOUS_COMMIT_REF be4d9cba31a1d75453a4beb6da10fa88688cfe1b
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-08-30 20:31:20 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE be4d9cba
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -2505,9 +2508,8 @@ namespace detail
   static constexpr status_bitfield_type status_have_exception = (1U << 2U);
   static constexpr status_bitfield_type status_lost_consistency = (1U << 3U);  // failed to complete a strong swap
   static constexpr status_bitfield_type status_error_is_errno = (1U << 4U);    // can errno be set from this error?
-  // bits 5, 6, 7 unused
-  static constexpr status_bitfield_type status_is_moved_from = (1U << 8U);  // has been moved from
-  // bits 9-15 unused
+  static constexpr status_bitfield_type status_is_moved_from = (1U << 5U);     // has been moved from
+  // bits 6-15 unused
   static constexpr status_bitfield_type status_srconly_mask = (0x00ffU);
   // bits 16-31 used for user supplied 16 bit value
   static constexpr status_bitfield_type status_2byte_shift = 16;
@@ -2777,25 +2779,26 @@ namespace detail
 #pragma warning(push)
 #pragma warning(disable : 4127)  // conditional expression is constant
 #endif
+#if defined(__GNUC__) && defined(OUTCOME_FORCEINLINE)
+    OUTCOME_FORCEINLINE  // GCC dislikes inlining this
+#endif
     ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<T>::value)
     {
-      if(this->_status & status_have_value)
+      if(!std::is_trivially_destructible<_value_type_>::value && this->_status & status_have_value)
       {
         // If not move relocating, or not moved from, call the destructor
         if(!trait::template is_move_relocating<value_type>::value || !(this->_status & status_is_moved_from))
         {
           this->_value.~_value_type_();  // NOLINT
         }
-        this->_status &= ~status_have_value;
       }
-      else if(this->_status & status_have_error)
+      else if(!std::is_trivially_destructible<_error_type_>::value && this->_status & status_have_error)
       {
         // If not move relocating, or not moved from, call the destructor
         if(!trait::template is_move_relocating<error_type>::value || !(this->_status & status_is_moved_from))
         {
           this->_error.~_error_type_();  // NOLINT
         }
-        this->_status &= ~status_have_error;
       }
     }
 #ifdef _MSC_VER
@@ -3795,12 +3798,11 @@ namespace detail
   public:
     using base::base;
 
-    constexpr explicit operator bool() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
-    constexpr bool has_value() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
-    constexpr bool has_error() const noexcept { return (this->_state._status & detail::status_have_error) != 0; }
-    constexpr bool has_exception() const noexcept { return (this->_state._status & detail::status_have_exception) != 0; }
-    constexpr bool has_lost_consistency() const noexcept { return (this->_state._status & detail::status_lost_consistency) != 0; }
-    constexpr bool has_failure() const noexcept { return (this->_state._status & detail::status_have_error) != 0 || (this->_state._status & detail::status_have_exception) != 0; }
+    constexpr explicit operator bool() const noexcept { return (this->_state._status & detail::status_have_value) == detail::status_have_value; }
+    constexpr bool has_value() const noexcept { return (this->_state._status & detail::status_have_value) == detail::status_have_value; }
+    constexpr bool has_error() const noexcept { return (this->_state._status & detail::status_have_error) == detail::status_have_error; }
+    constexpr bool has_exception() const noexcept { return (this->_state._status & detail::status_have_exception) == detail::status_have_exception; }
+    constexpr bool has_lost_consistency() const noexcept { return (this->_state._status & detail::status_lost_consistency) == detail::status_lost_consistency; }
 
     OUTCOME_TEMPLATE(class T, class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<R>>() == std::declval<detail::devoid<T>>()),  //
@@ -4653,6 +4655,17 @@ SIGNATURE NOT RECOGNISED
 */
 
 
+  constexpr bool has_failure() const noexcept
+  {
+    // Used by TRY, so assume status_have_value can never occur
+    return this->_state._status & detail::status_have_error;
+  }
+
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+
+
   auto as_failure() const & { return failure(this->assume_error()); }
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
@@ -4662,7 +4675,7 @@ SIGNATURE NOT RECOGNISED
   auto as_failure() &&
   {
     auto ret = failure(static_cast<basic_result &&>(*this).assume_error());
-    if((this->_state._status & (detail::status_have_value | detail::status_have_error)) == detail::status_have_error)
+    if((this->_state._status & detail::status_have_error) == detail::status_have_error)
     {
       this->_state._status |= detail::status_is_moved_from;
     }
@@ -5794,6 +5807,13 @@ SIGNATURE NOT RECOGNISED
 */
 
 
+  constexpr bool has_failure() const noexcept { return (this->_state._status & (detail::status_have_value|detail::status_have_error|detail::status_have_exception)) != detail::status_have_value; }
+
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+
+
   failure_type<error_type, exception_type> as_failure() const &
   {
     if(this->has_error() && this->has_exception())
@@ -6244,7 +6264,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef SYSTEM_ERROR2_ERRORED_STATUS_CODE_HPP
 #define SYSTEM_ERROR2_ERRORED_STATUS_CODE_HPP
 /* Proposed SG14 status_code
-(C) 2018 - 2019 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
 
 
@@ -6296,7 +6316,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef SYSTEM_ERROR2_STATUS_ERROR_HPP
 #define SYSTEM_ERROR2_STATUS_ERROR_HPP
 /* Proposed SG14 status_code
-(C) 2018 - 2019 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
 
 
@@ -6348,7 +6368,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef SYSTEM_ERROR2_STATUS_CODE_DOMAIN_HPP
 #define SYSTEM_ERROR2_STATUS_CODE_DOMAIN_HPP
 /* Proposed SG14 status_code
-(C) 2018 - 2019 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
 
 
@@ -6456,15 +6476,6 @@ http://www.boost.org/LICENSE_1_0.txt)
 #endif
 #ifndef SYSTEM_ERROR2_NODISCARD
 #define SYSTEM_ERROR2_NODISCARD
-#endif
-
-#ifndef SYSTEM_ERROR2_TRIVIAL_ABI
-#if 0 || __clang_major__ >= 7
-//! Defined to be `[[clang::trivial_abi]]` when on a new enough clang compiler. Usually automatic, can be overriden.
-#define SYSTEM_ERROR2_TRIVIAL_ABI [[clang::trivial_abi]]
-#else
-#define SYSTEM_ERROR2_TRIVIAL_ABI
-#endif
 #endif
 
 #ifndef SYSTEM_ERROR2_NAMESPACE
@@ -7107,7 +7118,7 @@ Differs from `status_code<erased<>>` by being always available irrespective of
 the domain's value type, but cannot be copied, moved, nor destructed. Thus one
 always passes this around by const lvalue reference.
 */
-template <> class SYSTEM_ERROR2_TRIVIAL_ABI status_code<void>
+template <> class status_code<void>
 {
   template <class T> friend class status_code;
 
@@ -7137,10 +7148,7 @@ protected:
   ~status_code() = default;
 
   //! Used to construct a non-empty type erased status code
-  constexpr explicit status_code(const status_code_domain *v) noexcept
-      : _domain(v)
-  {
-  }
+  constexpr explicit status_code(const status_code_domain *v) noexcept : _domain(v) {}
 
 public:
   //! Return the status code domain.
@@ -7203,7 +7211,7 @@ namespace detail
     using domain_type = status_code_domain;
     using value_type = ErasedType;
   };
-  template <class DomainType> class SYSTEM_ERROR2_TRIVIAL_ABI status_code_storage : public status_code<void>
+  template <class DomainType> class status_code_storage : public status_code<void>
   {
     using _base = status_code<void>;
 
@@ -7248,12 +7256,7 @@ namespace detail
   protected:
     status_code_storage() = default;
     status_code_storage(const status_code_storage &) = default;
-    SYSTEM_ERROR2_CONSTEXPR14 status_code_storage(status_code_storage &&o) noexcept
-        : _base(static_cast<status_code_storage &&>(o))
-        , _value(static_cast<status_code_storage &&>(o)._value)
-    {
-      o._domain = nullptr;
-    }
+    SYSTEM_ERROR2_CONSTEXPR14 status_code_storage(status_code_storage &&o) noexcept : _base(static_cast<status_code_storage &&>(o)), _value(static_cast<status_code_storage &&>(o)._value) { o._domain = nullptr; }
     status_code_storage &operator=(const status_code_storage &) = default;
     SYSTEM_ERROR2_CONSTEXPR14 status_code_storage &operator=(status_code_storage &&o) noexcept
     {
@@ -7287,7 +7290,7 @@ is made available.
 You may mix in custom member functions and member function overrides by injecting a specialisation of
 `mixins::mixin<Base, YourDomainType>`. Your mixin must inherit from `Base`.
 */
-template <class DomainType> class SYSTEM_ERROR2_TRIVIAL_ABI status_code : public mixins::mixin<detail::status_code_storage<DomainType>, DomainType>
+template <class DomainType> class status_code : public mixins::mixin<detail::status_code_storage<DomainType>, DomainType>
 {
   template <class T> friend class status_code;
   using _base = mixins::mixin<detail::status_code_storage<DomainType>, DomainType>;
@@ -7327,7 +7330,7 @@ public:
 
                                     bool>::type = true>
   constexpr status_code(T &&v, Args &&... args) noexcept(noexcept(make_status_code(std::declval<T>(), std::declval<Args>()...)))  // NOLINT
-      : status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
+  : status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
   {
   }
   //! Explicit in-place construction.
@@ -7398,7 +7401,7 @@ An ADL discovered helper function `make_status_code(T, Args...)` is looked up by
 If it is found, and it generates a status code compatible with this status code, implicit construction
 is made available.
 */
-template <class ErasedType> class SYSTEM_ERROR2_TRIVIAL_ABI status_code<erased<ErasedType>> : public mixins::mixin<detail::status_code_storage<erased<ErasedType>>, erased<ErasedType>>
+template <class ErasedType> class status_code<erased<ErasedType>> : public mixins::mixin<detail::status_code_storage<erased<ErasedType>>, erased<ErasedType>>
 {
   template <class T> friend class status_code;
   using _base = mixins::mixin<detail::status_code_storage<erased<ErasedType>>, erased<ErasedType>>;
@@ -7470,7 +7473,7 @@ public:
                                     && std::is_constructible<status_code, MakeStatusCodeResult>::value,        // ADLed status code is compatible
                                     bool>::type = true>
   constexpr status_code(T &&v, Args &&... args) noexcept(noexcept(make_status_code(std::declval<T>(), std::declval<Args>()...)))  // NOLINT
-      : status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
+  : status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
   {
   }
 
@@ -7652,178 +7655,102 @@ enum class errc : int
 
 namespace detail
 {
-  SYSTEM_ERROR2_CONSTEXPR14 inline const char *generic_code_message(errc code) noexcept
+  struct generic_code_messages
   {
-    switch(code)
+    // libc++ defines missing errc macros to integers in the 9xxx range
+    // As much as 10,000 seems wasteful, bear in mind this is all constexpr
+    // and on C++ 14 or later this entire construct disappears.
+    const char *msgs[(ETIME >= 256) ? 10000 : 256];
+    SYSTEM_ERROR2_CONSTEXPR14 size_t size() const { return sizeof(msgs) / sizeof(*msgs); }  // NOLINT
+    SYSTEM_ERROR2_CONSTEXPR14 const char *operator[](int i) const { return (i < 0 || i >= static_cast<int>(size()) || nullptr == msgs[i]) ? "unknown" : msgs[i]; }  // NOLINT
+    SYSTEM_ERROR2_CONSTEXPR14 generic_code_messages()
+        : msgs{}
     {
-    case errc::success:
-      return "Success";
-    case errc::address_family_not_supported:
-      return "Address family not supported by protocol";
-    case errc::address_in_use:
-      return "Address already in use";
-    case errc::address_not_available:
-      return "Cannot assign requested address";
-    case errc::already_connected:
-      return "Transport endpoint is already connected";
-    case errc::argument_list_too_long:
-      return "Argument list too long";
-    case errc::argument_out_of_domain:
-      return "Numerical argument out of domain";
-    case errc::bad_address:
-      return "Bad address";
-    case errc::bad_file_descriptor:
-      return "Bad file descriptor";
-    case errc::bad_message:
-      return "Bad message";
-    case errc::broken_pipe:
-      return "Broken pipe";
-    case errc::connection_aborted:
-      return "Software caused connection abort";
-    case errc::connection_already_in_progress:
-      return "Operation already in progress";
-    case errc::connection_refused:
-      return "Connection refused";
-    case errc::connection_reset:
-      return "Connection reset by peer";
-    case errc::cross_device_link:
-      return "Invalid cross-device link";
-    case errc::destination_address_required:
-      return "Destination address required";
-    case errc::device_or_resource_busy:
-      return "Device or resource busy";
-    case errc::directory_not_empty:
-      return "Directory not empty";
-    case errc::executable_format_error:
-      return "Exec format error";
-    case errc::file_exists:
-      return "File exists";
-    case errc::file_too_large:
-      return "File too large";
-    case errc::filename_too_long:
-      return "File name too long";
-    case errc::function_not_supported:
-      return "Function not implemented";
-    case errc::host_unreachable:
-      return "No route to host";
-    case errc::identifier_removed:
-      return "Identifier removed";
-    case errc::illegal_byte_sequence:
-      return "Invalid or incomplete multibyte or wide character";
-    case errc::inappropriate_io_control_operation:
-      return "Inappropriate ioctl for device";
-    case errc::interrupted:
-      return "Interrupted system call";
-    case errc::invalid_argument:
-      return "Invalid argument";
-    case errc::invalid_seek:
-      return "Illegal seek";
-    case errc::io_error:
-      return "Input/output error";
-    case errc::is_a_directory:
-      return "Is a directory";
-    case errc::message_size:
-      return "Message too long";
-    case errc::network_down:
-      return "Network is down";
-    case errc::network_reset:
-      return "Network dropped connection on reset";
-    case errc::network_unreachable:
-      return "Network is unreachable";
-    case errc::no_buffer_space:
-      return "No buffer space available";
-    case errc::no_child_process:
-      return "No child processes";
-    case errc::no_link:
-      return "Link has been severed";
-    case errc::no_lock_available:
-      return "No locks available";
-    case errc::no_message:
-      return "No message of desired type";
-    case errc::no_protocol_option:
-      return "Protocol not available";
-    case errc::no_space_on_device:
-      return "No space left on device";
-    case errc::no_stream_resources:
-      return "Out of streams resources";
-    case errc::no_such_device_or_address:
-      return "No such device or address";
-    case errc::no_such_device:
-      return "No such device";
-    case errc::no_such_file_or_directory:
-      return "No such file or directory";
-    case errc::no_such_process:
-      return "No such process";
-    case errc::not_a_directory:
-      return "Not a directory";
-    case errc::not_a_socket:
-      return "Socket operation on non-socket";
-    case errc::not_a_stream:
-      return "Device not a stream";
-    case errc::not_connected:
-      return "Transport endpoint is not connected";
-    case errc::not_enough_memory:
-      return "Cannot allocate memory";
-#if ENOTSUP != EOPNOTSUPP
-    case errc::not_supported:
-      return "Operation not supported";
-#endif
-    case errc::operation_canceled:
-      return "Operation canceled";
-    case errc::operation_in_progress:
-      return "Operation now in progress";
-    case errc::operation_not_permitted:
-      return "Operation not permitted";
-    case errc::operation_not_supported:
-      return "Operation not supported";
-#if EAGAIN != EWOULDBLOCK
-    case errc::operation_would_block:
-      return "Resource temporarily unavailable";
-#endif
-    case errc::owner_dead:
-      return "Owner died";
-    case errc::permission_denied:
-      return "Permission denied";
-    case errc::protcol_error:
-      return "Protocol error";
-    case errc::protocol_not_supported:
-      return "Protocol not supported";
-    case errc::read_only_file_system:
-      return "Read-only file system";
-    case errc::resource_deadlock_would_occur:
-      return "Resource deadlock avoided";
-    case errc::resource_unavailable_try_again:
-      return "Resource temporarily unavailable";
-    case errc::result_out_of_range:
-      return "Numerical result out of range";
-    case errc::state_not_recoverable:
-      return "State not recoverable";
-    case errc::stream_timeout:
-      return "Timer expired";
-    case errc::text_file_busy:
-      return "Text file busy";
-    case errc::timed_out:
-      return "Connection timed out";
-    case errc::too_many_files_open_in_system:
-      return "Too many open files in system";
-    case errc::too_many_files_open:
-      return "Too many open files";
-    case errc::too_many_links:
-      return "Too many links";
-    case errc::too_many_symbolic_link_levels:
-      return "Too many levels of symbolic links";
-    case errc::value_too_large:
-      return "Value too large for defined data type";
-    case errc::wrong_protocol_type:
-      return "Protocol wrong type for socket";
-    default:
-      return "unknown";
+      msgs[0] = "Success";
+
+      msgs[EAFNOSUPPORT] = "Address family not supported by protocol";
+      msgs[EADDRINUSE] = "Address already in use";
+      msgs[EADDRNOTAVAIL] = "Cannot assign requested address";
+      msgs[EISCONN] = "Transport endpoint is already connected";
+      msgs[E2BIG] = "Argument list too long";
+      msgs[EDOM] = "Numerical argument out of domain";
+      msgs[EFAULT] = "Bad address";
+      msgs[EBADF] = "Bad file descriptor";
+      msgs[EBADMSG] = "Bad message";
+      msgs[EPIPE] = "Broken pipe";
+      msgs[ECONNABORTED] = "Software caused connection abort";
+      msgs[EALREADY] = "Operation already in progress";
+      msgs[ECONNREFUSED] = "Connection refused";
+      msgs[ECONNRESET] = "Connection reset by peer";
+      msgs[EXDEV] = "Invalid cross-device link";
+      msgs[EDESTADDRREQ] = "Destination address required";
+      msgs[EBUSY] = "Device or resource busy";
+      msgs[ENOTEMPTY] = "Directory not empty";
+      msgs[ENOEXEC] = "Exec format error";
+      msgs[EEXIST] = "File exists";
+      msgs[EFBIG] = "File too large";
+      msgs[ENAMETOOLONG] = "File name too long";
+      msgs[ENOSYS] = "Function not implemented";
+      msgs[EHOSTUNREACH] = "No route to host";
+      msgs[EIDRM] = "Identifier removed";
+      msgs[EILSEQ] = "Invalid or incomplete multibyte or wide character";
+      msgs[ENOTTY] = "Inappropriate ioctl for device";
+      msgs[EINTR] = "Interrupted system call";
+      msgs[EINVAL] = "Invalid argument";
+      msgs[ESPIPE] = "Illegal seek";
+      msgs[EIO] = "Input/output error";
+      msgs[EISDIR] = "Is a directory";
+      msgs[EMSGSIZE] = "Message too long";
+      msgs[ENETDOWN] = "Network is down";
+      msgs[ENETRESET] = "Network dropped connection on reset";
+      msgs[ENETUNREACH] = "Network is unreachable";
+      msgs[ENOBUFS] = "No buffer space available";
+      msgs[ECHILD] = "No child processes";
+      msgs[ENOLINK] = "Link has been severed";
+      msgs[ENOLCK] = "No locks available";
+      msgs[ENOMSG] = "No message of desired type";
+      msgs[ENOPROTOOPT] = "Protocol not available";
+      msgs[ENOSPC] = "No space left on device";
+      msgs[ENOSR] = "Out of streams resources";
+      msgs[ENXIO] = "No such device or address";
+      msgs[ENODEV] = "No such device";
+      msgs[ENOENT] = "No such file or directory";
+      msgs[ESRCH] = "No such process";
+      msgs[ENOTDIR] = "Not a directory";
+      msgs[ENOTSOCK] = "Socket operation on non-socket";
+      msgs[ENOSTR] = "Device not a stream";
+      msgs[ENOTCONN] = "Transport endpoint is not connected";
+      msgs[ENOMEM] = "Cannot allocate memory";
+      msgs[ENOTSUP] = "Operation not supported";
+      msgs[ECANCELED] = "Operation canceled";
+      msgs[EINPROGRESS] = "Operation now in progress";
+      msgs[EPERM] = "Operation not permitted";
+      msgs[EOPNOTSUPP] = "Operation not supported";
+      msgs[EWOULDBLOCK] = "Resource temporarily unavailable";
+      msgs[EOWNERDEAD] = "Owner died";
+      msgs[EACCES] = "Permission denied";
+      msgs[EPROTO] = "Protocol error";
+      msgs[EPROTONOSUPPORT] = "Protocol not supported";
+      msgs[EROFS] = "Read-only file system";
+      msgs[EDEADLK] = "Resource deadlock avoided";
+      msgs[EAGAIN] = "Resource temporarily unavailable";
+      msgs[ERANGE] = "Numerical result out of range";
+      msgs[ENOTRECOVERABLE] = "State not recoverable";
+      msgs[ETIME] = "Timer expired";
+      msgs[ETXTBSY] = "Text file busy";
+      msgs[ETIMEDOUT] = "Connection timed out";
+      msgs[ENFILE] = "Too many open files in system";
+      msgs[EMFILE] = "Too many open files";
+      msgs[EMLINK] = "Too many links";
+      msgs[ELOOP] = "Too many levels of symbolic links";
+      msgs[EOVERFLOW] = "Value too large for defined data type";
+      msgs[EPROTOTYPE] = "Protocol wrong type for socket";
     }
-  }
+  };
 }  // namespace detail
 
 /*! The implementation of the domain for generic status codes, those mapped by `errc` (POSIX).
- */
+*/
 class _generic_code_domain : public status_code_domain
 {
   template <class> friend class status_code;
@@ -7851,12 +7778,12 @@ public:
 protected:
   virtual bool _do_failure(const status_code<void> &code) const noexcept override  // NOLINT
   {
-    assert(code.domain() == *this);                                           // NOLINT
+    assert(code.domain() == *this);  // NOLINT
     return static_cast<const generic_code &>(code).value() != errc::success;  // NOLINT
   }
   virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override  // NOLINT
   {
-    assert(code1.domain() == *this);                            // NOLINT
+    assert(code1.domain() == *this);  // NOLINT
     const auto &c1 = static_cast<const generic_code &>(code1);  // NOLINT
     if(code2.domain() == *this)
     {
@@ -7867,19 +7794,20 @@ protected:
   }
   virtual generic_code _generic_code(const status_code<void> &code) const noexcept override  // NOLINT
   {
-    assert(code.domain() == *this);                  // NOLINT
+    assert(code.domain() == *this);  // NOLINT
     return static_cast<const generic_code &>(code);  // NOLINT
   }
   virtual _base::string_ref _do_message(const status_code<void> &code) const noexcept override  // NOLINT
   {
-    assert(code.domain() == *this);                           // NOLINT
+    assert(code.domain() == *this);  // NOLINT
     const auto &c = static_cast<const generic_code &>(code);  // NOLINT
-    return string_ref(detail::generic_code_message(c.value()));
+    static SYSTEM_ERROR2_CONSTEXPR14 detail::generic_code_messages msgs;
+    return string_ref(msgs[static_cast<int>(c.value())]);
   }
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override  // NOLINT
   {
-    assert(code.domain() == *this);                           // NOLINT
+    assert(code.domain() == *this);  // NOLINT
     const auto &c = static_cast<const generic_code &>(code);  // NOLINT
     throw status_error<_generic_code_domain>(c);
   }
@@ -7943,7 +7871,8 @@ template <class DomainType1, class DomainType2> inline bool operator!=(const sta
 template <class DomainType1, class T,                                                                       //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool operator==(const status_code<DomainType1> &a, const T &b)
+inline bool
+operator==(const status_code<DomainType1> &a, const T &b)
 {
   return a.equivalent(make_status_code(b));
 }
@@ -7951,7 +7880,8 @@ inline bool operator==(const status_code<DomainType1> &a, const T &b)
 template <class T, class DomainType1,                                                                       //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool operator==(const T &a, const status_code<DomainType1> &b)
+inline bool
+operator==(const T &a, const status_code<DomainType1> &b)
 {
   return b.equivalent(make_status_code(a));
 }
@@ -7959,7 +7889,8 @@ inline bool operator==(const T &a, const status_code<DomainType1> &b)
 template <class DomainType1, class T,                                                                       //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool operator!=(const status_code<DomainType1> &a, const T &b)
+inline bool
+operator!=(const status_code<DomainType1> &a, const T &b)
 {
   return !a.equivalent(make_status_code(b));
 }
@@ -7967,7 +7898,8 @@ inline bool operator!=(const status_code<DomainType1> &a, const T &b)
 template <class T, class DomainType1,                                                                       //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool operator!=(const T &a, const status_code<DomainType1> &b)
+inline bool
+operator!=(const T &a, const status_code<DomainType1> &b)
 {
   return !b.equivalent(make_status_code(a));
 }
@@ -10456,6 +10388,9 @@ namespace detail
   struct has_value_overload
   {
   };
+  struct has_failure_overload
+  {
+  };
   struct as_failure_overload
   {
   };
@@ -10471,36 +10406,53 @@ namespace detail
   struct value_overload
   {
   };
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().has_value()))
+  constexpr inline bool has_has_value(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_has_value(...) { return false; }
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().has_failure()))
+  constexpr inline bool has_has_failure(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_has_failure(...) { return false; }
   OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
-  constexpr inline bool has_as_failure(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_as_failure(...) { return false; }
+  constexpr inline bool has_as_failure(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_as_failure(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().assume_error()))
-  constexpr inline bool has_assume_error(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_assume_error(...) { return false; }
+  constexpr inline bool has_assume_error(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_assume_error(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().error()))
-  constexpr inline bool has_error(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_error(...) { return false; }
+  constexpr inline bool has_error(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_error(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().assume_value()))
-  constexpr inline bool has_assume_value(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_assume_value(...) { return false; }
+  constexpr inline bool has_assume_value(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_assume_value(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().value()))
-  constexpr inline bool has_value(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_value(...) { return false; }
+  constexpr inline bool has_value(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_value(...) { return false; }
 }  // namespace detail
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 OUTCOME_TEMPLATE(class T)
-OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().has_value()))
-constexpr inline bool try_operation_has_value(T &&v, detail::has_value_overload = {})
+OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::has_has_value<T>(5) && !detail::has_has_failure<T>(5)))
+constexpr inline bool try_operation_has_failure(T &&v, detail::has_value_overload = {})
 {
-  return v.has_value();
+  return !v.has_value();
+}
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+OUTCOME_TEMPLATE(class T)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::has_has_failure<T>(5)))
+constexpr inline bool try_operation_has_failure(T &&v, detail::has_failure_overload = {})
+{
+  return v.has_failure();
 }
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -10570,7 +10522,7 @@ OUTCOME_V2_NAMESPACE_END
 #pragma GCC diagnostic ignored "-Wparentheses"
 #endif
 
-#define OUTCOME_TRYV2(unique, ...)                                                                                                                                                                                                                                                                                               auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                              if(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))                                                                                                                                                                                                                                                                     return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRYV2(unique, ...)                                                                                                                                                                                                                                                                                               auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                              if(OUTCOME_V2_NAMESPACE::try_operation_has_failure(unique))                                                                                                                                                                                                                                                                    return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 
 
 
@@ -10592,7 +10544,7 @@ SIGNATURE NOT RECOGNISED
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYX(...)                                                                                                                                                                                                                                                                                                        ({                                                                                                                                                                                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                    if(!OUTCOME_V2_NAMESPACE::try_operation_has_value(res))                                                                                                                                                                                                                                                                          return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                    OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                       })
+#define OUTCOME_TRYX(...)                                                                                                                                                                                                                                                                                                        ({                                                                                                                                                                                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                    if(OUTCOME_V2_NAMESPACE::try_operation_has_failure(res))                                                                                                                                                                                                                                                                         return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                    OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                       })
 
 
 

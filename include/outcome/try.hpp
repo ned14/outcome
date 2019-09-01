@@ -34,6 +34,9 @@ namespace detail
   struct has_value_overload
   {
   };
+  struct has_failure_overload
+  {
+  };
   struct as_failure_overload
   {
   };
@@ -49,36 +52,53 @@ namespace detail
   struct value_overload
   {
   };
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().has_value()))
+  constexpr inline bool has_has_value(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_has_value(...) { return false; }
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().has_failure()))
+  constexpr inline bool has_has_failure(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_has_failure(...) { return false; }
   OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
-  constexpr inline bool has_as_failure(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_as_failure(...) { return false; }
+  constexpr inline bool has_as_failure(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_as_failure(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().assume_error()))
-  constexpr inline bool has_assume_error(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_assume_error(...) { return false; }
+  constexpr inline bool has_assume_error(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_assume_error(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().error()))
-  constexpr inline bool has_error(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_error(...) { return false; }
+  constexpr inline bool has_error(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_error(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().assume_value()))
-  constexpr inline bool has_assume_value(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_assume_value(...) { return false; }
+  constexpr inline bool has_assume_value(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_assume_value(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().value()))
-  constexpr inline bool has_value(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_value(...) { return false; }
+  constexpr inline bool has_value(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_value(...) { return false; }
 }  // namespace detail
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 OUTCOME_TEMPLATE(class T)
-OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().has_value()))
-constexpr inline bool try_operation_has_value(T &&v, detail::has_value_overload = {})
+OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::has_has_value<T>(5) && !detail::has_has_failure<T>(5)))
+constexpr inline bool try_operation_has_failure(T &&v, detail::has_value_overload = {})
 {
-  return v.has_value();
+  return !v.has_value();
+}
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+OUTCOME_TEMPLATE(class T)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::has_has_failure<T>(5)))
+constexpr inline bool try_operation_has_failure(T &&v, detail::has_failure_overload = {})
+{
+  return v.has_failure();
 }
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -150,7 +170,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #define OUTCOME_TRYV2(unique, ...)                                                                                                                                                                                                                                                                                             \
   auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                            \
-  if(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))                                                                                                                                                                                                                                                                   \
+  if(OUTCOME_V2_NAMESPACE::try_operation_has_failure(unique))                                                                                                                                                                                                                                                                  \
   return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 #define OUTCOME_TRY2(unique, v, ...)                                                                                                                                                                                                                                                                                           \
   OUTCOME_TRYV2(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                                          \
@@ -173,7 +193,7 @@ SIGNATURE NOT RECOGNISED
 #define OUTCOME_TRYX(...)                                                                                                                                                                                                                                                                                                      \
   ({                                                                                                                                                                                                                                                                                                                           \
     auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                \
-    if(!OUTCOME_V2_NAMESPACE::try_operation_has_value(res))                                                                                                                                                                                                                                                                    \
+    if(OUTCOME_V2_NAMESPACE::try_operation_has_failure(res))                                                                                                                                                                                                                                                                   \
       return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                \
     OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                     \
   })

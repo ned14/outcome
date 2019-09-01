@@ -812,9 +812,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    d9e794eeff852e87206cef7d5d5ce8a7299f6df8
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-07-29 10:10:50 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE d9e794ee
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    292c07714059286ab8a7b14c6737268b70b567e2
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-08-29 19:59:28 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 292c0771
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1151,6 +1151,9 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_SYMBOL_VISIBLE
 #define OUTCOME_SYMBOL_VISIBLE QUICKCPPLIB_SYMBOL_VISIBLE
 #endif
+#ifndef OUTCOME_FORCEINLINE
+#define OUTCOME_FORCEINLINE QUICKCPPLIB_FORCEINLINE
+#endif
 #ifndef OUTCOME_NODISCARD
 #define OUTCOME_NODISCARD QUICKCPPLIB_NODISCARD
 #endif
@@ -1318,9 +1321,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 9283dde48af67c7f64c58ed6d67dbe3b19fc61ee
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-08-14 10:06:02 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 9283dde4
+#define OUTCOME_PREVIOUS_COMMIT_REF be4d9cba31a1d75453a4beb6da10fa88688cfe1b
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-08-30 20:31:20 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE be4d9cba
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -2584,9 +2587,8 @@ namespace detail
   static constexpr status_bitfield_type status_have_exception = (1U << 2U);
   static constexpr status_bitfield_type status_lost_consistency = (1U << 3U);  // failed to complete a strong swap
   static constexpr status_bitfield_type status_error_is_errno = (1U << 4U);    // can errno be set from this error?
-  // bits 5, 6, 7 unused
-  static constexpr status_bitfield_type status_is_moved_from = (1U << 8U);  // has been moved from
-  // bits 9-15 unused
+  static constexpr status_bitfield_type status_is_moved_from = (1U << 5U);     // has been moved from
+  // bits 6-15 unused
   static constexpr status_bitfield_type status_srconly_mask = (0x00ffU);
   // bits 16-31 used for user supplied 16 bit value
   static constexpr status_bitfield_type status_2byte_shift = 16;
@@ -2856,25 +2858,26 @@ namespace detail
 #pragma warning(push)
 #pragma warning(disable : 4127)  // conditional expression is constant
 #endif
+#if defined(__GNUC__) && defined(OUTCOME_FORCEINLINE)
+    OUTCOME_FORCEINLINE  // GCC dislikes inlining this
+#endif
     ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<T>::value)
     {
-      if(this->_status & status_have_value)
+      if(!std::is_trivially_destructible<_value_type_>::value && this->_status & status_have_value)
       {
         // If not move relocating, or not moved from, call the destructor
         if(!trait::template is_move_relocating<value_type>::value || !(this->_status & status_is_moved_from))
         {
           this->_value.~_value_type_();  // NOLINT
         }
-        this->_status &= ~status_have_value;
       }
-      else if(this->_status & status_have_error)
+      else if(!std::is_trivially_destructible<_error_type_>::value && this->_status & status_have_error)
       {
         // If not move relocating, or not moved from, call the destructor
         if(!trait::template is_move_relocating<error_type>::value || !(this->_status & status_is_moved_from))
         {
           this->_error.~_error_type_();  // NOLINT
         }
-        this->_status &= ~status_have_error;
       }
     }
 #ifdef _MSC_VER
@@ -3874,12 +3877,11 @@ namespace detail
   public:
     using base::base;
 
-    constexpr explicit operator bool() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
-    constexpr bool has_value() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
-    constexpr bool has_error() const noexcept { return (this->_state._status & detail::status_have_error) != 0; }
-    constexpr bool has_exception() const noexcept { return (this->_state._status & detail::status_have_exception) != 0; }
-    constexpr bool has_lost_consistency() const noexcept { return (this->_state._status & detail::status_lost_consistency) != 0; }
-    constexpr bool has_failure() const noexcept { return (this->_state._status & detail::status_have_error) != 0 || (this->_state._status & detail::status_have_exception) != 0; }
+    constexpr explicit operator bool() const noexcept { return (this->_state._status & detail::status_have_value) == detail::status_have_value; }
+    constexpr bool has_value() const noexcept { return (this->_state._status & detail::status_have_value) == detail::status_have_value; }
+    constexpr bool has_error() const noexcept { return (this->_state._status & detail::status_have_error) == detail::status_have_error; }
+    constexpr bool has_exception() const noexcept { return (this->_state._status & detail::status_have_exception) == detail::status_have_exception; }
+    constexpr bool has_lost_consistency() const noexcept { return (this->_state._status & detail::status_lost_consistency) == detail::status_lost_consistency; }
 
     OUTCOME_TEMPLATE(class T, class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<R>>() == std::declval<detail::devoid<T>>()),  //
@@ -4732,6 +4734,17 @@ SIGNATURE NOT RECOGNISED
 */
 
 
+  constexpr bool has_failure() const noexcept
+  {
+    // Used by TRY, so assume status_have_value can never occur
+    return this->_state._status & detail::status_have_error;
+  }
+
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+
+
   auto as_failure() const & { return failure(this->assume_error()); }
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
@@ -4741,7 +4754,7 @@ SIGNATURE NOT RECOGNISED
   auto as_failure() &&
   {
     auto ret = failure(static_cast<basic_result &&>(*this).assume_error());
-    if((this->_state._status & (detail::status_have_value | detail::status_have_error)) == detail::status_have_error)
+    if((this->_state._status & detail::status_have_error) == detail::status_have_error)
     {
       this->_state._status |= detail::status_is_moved_from;
     }
@@ -6582,6 +6595,13 @@ SIGNATURE NOT RECOGNISED
 */
 
 
+  constexpr bool has_failure() const noexcept { return (this->_state._status & (detail::status_have_value|detail::status_have_error|detail::status_have_exception)) != detail::status_have_value; }
+
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+
+
   failure_type<error_type, exception_type> as_failure() const &
   {
     if(this->has_error() && this->has_exception())
@@ -7296,6 +7316,9 @@ namespace detail
   struct has_value_overload
   {
   };
+  struct has_failure_overload
+  {
+  };
   struct as_failure_overload
   {
   };
@@ -7311,36 +7334,53 @@ namespace detail
   struct value_overload
   {
   };
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().has_value()))
+  constexpr inline bool has_has_value(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_has_value(...) { return false; }
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().has_failure()))
+  constexpr inline bool has_has_failure(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_has_failure(...) { return false; }
   OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
-  constexpr inline bool has_as_failure(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_as_failure(...) { return false; }
+  constexpr inline bool has_as_failure(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_as_failure(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().assume_error()))
-  constexpr inline bool has_assume_error(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_assume_error(...) { return false; }
+  constexpr inline bool has_assume_error(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_assume_error(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().error()))
-  constexpr inline bool has_error(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_error(...) { return false; }
+  constexpr inline bool has_error(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_error(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().assume_value()))
-  constexpr inline bool has_assume_value(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_assume_value(...) { return false; }
+  constexpr inline bool has_assume_value(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_assume_value(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().value()))
-  constexpr inline bool has_value(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_value(...) { return false; }
+  constexpr inline bool has_value(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_value(...) { return false; }
 }  // namespace detail
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 OUTCOME_TEMPLATE(class T)
-OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().has_value()))
-constexpr inline bool try_operation_has_value(T &&v, detail::has_value_overload = {})
+OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::has_has_value<T>(5) && !detail::has_has_failure<T>(5)))
+constexpr inline bool try_operation_has_failure(T &&v, detail::has_value_overload = {})
 {
-  return v.has_value();
+  return !v.has_value();
+}
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+OUTCOME_TEMPLATE(class T)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::has_has_failure<T>(5)))
+constexpr inline bool try_operation_has_failure(T &&v, detail::has_failure_overload = {})
+{
+  return v.has_failure();
 }
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -7410,7 +7450,7 @@ OUTCOME_V2_NAMESPACE_END
 #pragma GCC diagnostic ignored "-Wparentheses"
 #endif
 
-#define OUTCOME_TRYV2(unique, ...)                                                                                                                                                                                                                                                                                               auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                              if(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))                                                                                                                                                                                                                                                                     return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRYV2(unique, ...)                                                                                                                                                                                                                                                                                               auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                              if(OUTCOME_V2_NAMESPACE::try_operation_has_failure(unique))                                                                                                                                                                                                                                                                    return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 
 
 
@@ -7432,7 +7472,7 @@ SIGNATURE NOT RECOGNISED
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYX(...)                                                                                                                                                                                                                                                                                                        ({                                                                                                                                                                                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                    if(!OUTCOME_V2_NAMESPACE::try_operation_has_value(res))                                                                                                                                                                                                                                                                          return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                    OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                       })
+#define OUTCOME_TRYX(...)                                                                                                                                                                                                                                                                                                        ({                                                                                                                                                                                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                    if(OUTCOME_V2_NAMESPACE::try_operation_has_failure(res))                                                                                                                                                                                                                                                                         return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                    OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                       })
 
 
 

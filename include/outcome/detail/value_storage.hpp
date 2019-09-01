@@ -270,9 +270,8 @@ namespace detail
   static constexpr status_bitfield_type status_have_exception = (1U << 2U);
   static constexpr status_bitfield_type status_lost_consistency = (1U << 3U);  // failed to complete a strong swap
   static constexpr status_bitfield_type status_error_is_errno = (1U << 4U);    // can errno be set from this error?
-  // bits 5, 6, 7 unused
-  static constexpr status_bitfield_type status_is_moved_from = (1U << 8U);  // has been moved from
-  // bits 9-15 unused
+  static constexpr status_bitfield_type status_is_moved_from = (1U << 5U);     // has been moved from
+  // bits 6-15 unused
   static constexpr status_bitfield_type status_srconly_mask = (0x00ffU);
   // bits 16-31 used for user supplied 16 bit value
   static constexpr status_bitfield_type status_2byte_shift = 16;
@@ -542,25 +541,26 @@ namespace detail
 #pragma warning(push)
 #pragma warning(disable : 4127)  // conditional expression is constant
 #endif
+#if defined(__GNUC__) && defined(OUTCOME_FORCEINLINE)
+    OUTCOME_FORCEINLINE  // GCC dislikes inlining this
+#endif
     ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<T>::value)
     {
-      if(this->_status & status_have_value)
+      if(!std::is_trivially_destructible<_value_type_>::value && this->_status & status_have_value)
       {
         // If not move relocating, or not moved from, call the destructor
         if(!trait::template is_move_relocating<value_type>::value || !(this->_status & status_is_moved_from))
         {
           this->_value.~_value_type_();  // NOLINT
         }
-        this->_status &= ~status_have_value;
       }
-      else if(this->_status & status_have_error)
+      else if(!std::is_trivially_destructible<_error_type_>::value && this->_status & status_have_error)
       {
         // If not move relocating, or not moved from, call the destructor
         if(!trait::template is_move_relocating<error_type>::value || !(this->_status & status_is_moved_from))
         {
           this->_error.~_error_type_();  // NOLINT
         }
-        this->_status &= ~status_have_error;
       }
     }
 #ifdef _MSC_VER

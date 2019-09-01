@@ -887,6 +887,11 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
+  constexpr bool has_failure() const noexcept { return (this->_state._status & (detail::status_have_value|detail::status_have_error|detail::status_have_exception)) != detail::status_have_value; }
+
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
   failure_type<error_type, exception_type> as_failure() const &
   {
     if(this->has_error() && this->has_exception())
