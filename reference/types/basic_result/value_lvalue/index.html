@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-08-14T10:10:07 UTC">
+<meta name="revised" content="2019-09-05T14:03:28 UTC">
 <title>`value_type &amp;value() &amp;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2386,98 +2386,6 @@
    Experimental</option>
     <option value="/outcome/reference/" >
    API reference</option> 
-    <option value="/outcome/reference/macros/" >
-  - 
-   Macros</option>
-    <option value="/outcome/reference/concepts/" >
-  - 
-   Concepts</option>
-    <option value="/outcome/reference/converters/" >
-  - 
-   Converters</option>
-    <option value="/outcome/reference/traits/" >
-  - 
-   Traits</option>
-    <option value="/outcome/reference/policies/" >
-  - 
-   Policies</option>
-    <option value="/outcome/reference/types/" >
-  - 
-   Types</option> 
-    <option value="/outcome/reference/types/basic_outcome/" >
-  -- 
-   `basic_outcome&lt;T, EC, EP, NoValuePolicy&gt;`</option>
-    <option value="/outcome/reference/types/basic_result/" >
-  -- 
-   `basic_result&lt;T, E, NoValuePolicy&gt;`</option> 
-      <option value="/outcome/reference/types/basic_result/default/" >--- `basic_result() = delete`</option>
-      <option value="/outcome/reference/types/basic_result/move_constructor/" >--- `basic_result(basic_result &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_result/copy_constructor/" >--- `basic_result(const basic_result &amp;)`</option>
-      <option value="/outcome/reference/types/basic_result/move_assignment/" >--- `basic_result &amp;operator=(basic_result &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_result/copy_assignment/" >--- `basic_result &amp;operator=(const basic_result &amp;)`</option>
-      <option value="/outcome/reference/types/basic_result/destructor/" >--- `~basic_result()`</option>
-      <option value="/outcome/reference/types/basic_result/disabling_catchall/" >--- `basic_result(Args...) = delete`</option>
-      <option value="/outcome/reference/types/basic_result/disabling_implicit_constructor/" >--- `basic_result(X &amp;&amp;) = delete`</option>
-      <option value="/outcome/reference/types/basic_result/implicit_value_converting_constructor/" >--- `basic_result(R &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_result/implicit_error_converting_constructor/" >--- `basic_result(S &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_result/implicit_error_condition_converting_constructor/" >--- `basic_result(ErrorCondEnum &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" >--- `explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_result/explicit_copy_converting_constructor/" >--- `explicit basic_result(const basic_result&lt;R, S, P&gt; &amp;)`</option>
-      <option value="/outcome/reference/types/basic_result/explicit_move_converting_constructor/" >--- `explicit basic_result(basic_result&lt;R, S, P&gt; &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_result/explicit_inplace_value_constructor/" >--- `explicit basic_result(in_place_type_t&lt;value_type_if_enabled&gt;, Args ...)`</option>
-      <option value="/outcome/reference/types/basic_result/explicit_inplace_value_constructor_il/" >--- `explicit basic_result(in_place_type_t&lt;value_type_if_enabled&gt;, std::initializer_list&lt;U&gt;, Args ...)`</option>
-      <option value="/outcome/reference/types/basic_result/explicit_inplace_error_constructor/" >--- `explicit basic_result(in_place_type_t&lt;error_type_if_enabled&gt;, Args ...)`</option>
-      <option value="/outcome/reference/types/basic_result/explicit_inplace_error_constructor_il/" >--- `explicit basic_result(in_place_type_t&lt;error_type_if_enabled&gt;, std::initializer_list&lt;U&gt;, Args ...)`</option>
-      <option value="/outcome/reference/types/basic_result/implicit_inplace_value_error_constructor/" >--- `basic_result(A1 &amp;&amp;, A2 &amp;&amp;, Args ...)`</option>
-      <option value="/outcome/reference/types/basic_result/implicit_success_copy_constructor/" >--- `basic_result(const success_type&lt;T&gt; &amp;)`</option>
-      <option value="/outcome/reference/types/basic_result/implicit_success_move_constructor/" >--- `basic_result(success_type&lt;T&gt; &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_result/implicit_failure_copy_constructor/" >--- `basic_result(const failure_type&lt;T&gt; &amp;)`</option>
-      <option value="/outcome/reference/types/basic_result/implicit_failure_move_constructor/" >--- `basic_result(failure_type&lt;T&gt; &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_result/operator_bool/" >--- `explicit operator bool() const noexcept`</option>
-      <option value="/outcome/reference/types/basic_result/has_value/" >--- `bool has_value() const noexcept`</option>
-      <option value="/outcome/reference/types/basic_result/has_error/" >--- `bool has_error() const noexcept`</option>
-      <option value="/outcome/reference/types/basic_result/has_exception/" >--- `bool has_exception() const noexcept`</option>
-      <option value="/outcome/reference/types/basic_result/has_failure/" >--- `bool has_failure() const noexcept`</option>
-      <option value="/outcome/reference/types/basic_result/has_lost_consistency/" >--- `bool has_lost_consistency() const noexcept`</option>
-      <option value="/outcome/reference/types/basic_result/assume_value_lvalue/" >--- `value_type &amp;assume_value() &amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_result/assume_value_lvalue_const/" >--- `const value_type &amp;assume_value() const &amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_result/assume_value_rvalue/" >--- `value_type &amp;&amp;assume_value() &amp;&amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_result/assume_value_rvalue_const/" >--- `const value_type &amp;&amp;assume_value() const &amp;&amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_result/value_lvalue/"  selected>--- `value_type &amp;value() &amp;`</option>
-      <option value="/outcome/reference/types/basic_result/value_lvalue_const/" >--- `const value_type &amp;value() const &amp;`</option>
-      <option value="/outcome/reference/types/basic_result/value_rvalue/" >--- `value_type &amp;&amp;value() &amp;&amp;`</option>
-      <option value="/outcome/reference/types/basic_result/value_rvalue_const/" >--- `const value_type &amp;&amp;value() const &amp;&amp;`</option>
-      <option value="/outcome/reference/types/basic_result/assume_error_lvalue/" >--- `error_type &amp;assume_error() &amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_result/assume_error_lvalue_const/" >--- `const error_type &amp;assume_error() const &amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_result/assume_error_rvalue/" >--- `error_type &amp;&amp;assume_error() &amp;&amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_result/assume_error_rvalue_const/" >--- `const error_type &amp;&amp;assume_error() const &amp;&amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_result/error_lvalue/" >--- `error_type &amp;error() &amp;`</option>
-      <option value="/outcome/reference/types/basic_result/error_lvalue_const/" >--- `const error_type &amp;error() const &amp;`</option>
-      <option value="/outcome/reference/types/basic_result/error_rvalue/" >--- `error_type &amp;&amp;error() &amp;&amp;`</option>
-      <option value="/outcome/reference/types/basic_result/error_rvalue_const/" >--- `const error_type &amp;&amp;error() const &amp;&amp;`</option>
-      <option value="/outcome/reference/types/basic_result/equality_basic_result/" >--- `bool operator==(const basic_result&lt;A, B, C&gt; &amp;) const`</option>
-      <option value="/outcome/reference/types/basic_result/inequality_success_type/" >--- `bool operator==(const success_type&lt;A&gt; &amp;) const`</option>
-      <option value="/outcome/reference/types/basic_result/equality_failure_type/" >--- `bool operator==(const failure_type&lt;A, void&gt; &amp;) const`</option>
-      <option value="/outcome/reference/types/basic_result/inequality_basic_result/" >--- `bool operator!=(const basic_result&lt;A, B, C&gt; &amp;) const`</option>
-      <option value="/outcome/reference/types/basic_result/equality_success_type/" >--- `bool operator!=(const success_type&lt;A&gt; &amp;) const`</option>
-      <option value="/outcome/reference/types/basic_result/inequality_failure_type/" >--- `bool operator!=(const failure_type&lt;A, void&gt; &amp;) const`</option>
-      <option value="/outcome/reference/types/basic_result/swap/" >--- `void swap(basic_result &amp;)`</option>
-      <option value="/outcome/reference/types/basic_result/as_failure_lvalue/" >--- `auto as_failure() const &amp;`</option>
-      <option value="/outcome/reference/types/basic_result/as_failure_rvalue/" >--- `auto as_failure() &amp;&amp;`</option>
-  
-      <option value="/outcome/reference/types/bad_outcome_access/" >-- `bad_outcome_access`</option>
-      <option value="/outcome/reference/types/bad_result_access_with/" >-- `bad_result_access_with&lt;EC&gt;`</option>
-      <option value="/outcome/reference/types/bad_result_access/" >-- `bad_result_access`</option>
-      <option value="/outcome/reference/types/failure_type/" >-- `failure_type&lt;EC, EP = void&gt;`</option>
-      <option value="/outcome/reference/types/in_place_type_t/" >-- `in_place_type_t&lt;T&gt;`</option>
-      <option value="/outcome/reference/types/success_type/" >-- `success_type&lt;T&gt;`</option>
-  
-    <option value="/outcome/reference/aliases/" >
-  - 
-   Aliases</option>
-    <option value="/outcome/reference/functions/" >
-  - 
-   Functions</option>
   
     <option value="/outcome/faq/" >
    Frequently asked questions</option>
@@ -2544,7 +2452,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 20/03/2019
+        <i class='fa fa-calendar'></i> Last update on 22/03/2019
     </div>
     
 
