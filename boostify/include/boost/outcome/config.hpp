@@ -52,11 +52,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 // Weird that Boost.Config doesn't define a BOOST_NO_CXX17_NODISCARD
 #ifndef BOOST_OUTCOME_NODISCARD
-#ifdef __has_cpp_attribute
-#if __has_cpp_attribute(nodiscard)
+#if defined(__has_cpp_attribute) && __has_cpp_attribute(nodiscard)
 #define BOOST_OUTCOME_NODISCARD [[nodiscard]]
-#endif
-#elif defined(__clang__)
+#elif defined(__clang__) || defined(__GNUC__)
 #define BOOST_OUTCOME_NODISCARD __attribute__((warn_unused_result))
 #elif defined(_MSC_VER)
 // _Must_inspect_result_ expands into this
