@@ -76,7 +76,7 @@ if(NOT PROJECT_IS_DEPENDENCY)
       add_partial_preprocess(${target}
                             "${name}"
                             ${ARGN}
-                            -I ..
+                            -I ../quickcpplib/include
                             --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
                             --passthru-comments --line-directive # --debug
                             -U QUICKCPPLIB_ENABLE_VALGRIND

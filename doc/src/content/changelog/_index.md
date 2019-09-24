@@ -4,7 +4,20 @@ weight = 80
 +++
 
 ---
-## v2.1.1 XXth July 2019 (Boost 1.71) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.1)
+## v2.1.2 ? (Boost 1.72) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.2)
+
+### Enhancements:
+
+- Outcome is now `make install`-able, and cmake `find_package()` can find it. Note that
+you must separately install and `find_package()` Outcome's dependency, quickcpplib, else
+`find_package()` of Outcome will fail.
+
+### Bug fixes:
+
+-
+
+---
+## v2.1.1 19th August 2019 (Boost 1.71) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.1)
 
 ### Enhancements:
 

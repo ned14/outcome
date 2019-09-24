@@ -681,9 +681,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    d9e794eeff852e87206cef7d5d5ce8a7299f6df8
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-07-29 10:10:50 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE d9e794ee
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    2cda70fdc2fe4deb86f57b8be4a8fc09a1a504e0
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-09-24 16:40:56 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 2cda70fd
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1187,9 +1187,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF dd50d7d677495e0ac6d2f3d9154dd82c59326e28
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-07-25 09:52:54 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE dd50d7d6
+#define OUTCOME_PREVIOUS_COMMIT_REF 20917c3cb065178bd702658aa61c4e01943a904a
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-09-24 16:42:51 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 20917c3c
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -2900,7 +2900,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace convert
 {
 #if defined(__cpp_concepts)
-#if !defined(_MSC_VER) && !defined(__clang__) && __GNUC__ < 7
+#if !defined(_MSC_VER) && !defined(__clang__) && __GNUC__ < 9
 #define OUTCOME_GCC6_CONCEPT_BOOL bool
 #else
 #define OUTCOME_GCC6_CONCEPT_BOOL
@@ -3565,7 +3565,7 @@ OUTCOME_V2_NAMESPACE_END
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 template <class R, class S, class NoValuePolicy>                                                                                                                                  //
-#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                           // GCC's constraints implementation is buggy
+#if !defined(__GNUC__) || __GNUC__ >= 10                                                                                                                                           // GCC's constraints implementation is buggy
 OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
 #endif
 class basic_result;
@@ -3711,7 +3711,7 @@ SIGNATURE NOT RECOGNISED
 type definition template <class R, class S, class NoValuePolicy> basic_result. Potential doc page: `basic_result<T, E, NoValuePolicy>`
 */
 template <class R, class S, class NoValuePolicy>                                                                                                                                  //
-#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                           // GCC's constraints implementation is buggy
+#if !defined(__GNUC__) || __GNUC__ >= 10                                                                                                                                           // GCC's constraints implementation is buggy
 OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
 #endif
 class OUTCOME_NODISCARD basic_result : public detail::basic_result_final<R, S, NoValuePolicy>

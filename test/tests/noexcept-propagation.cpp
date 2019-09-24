@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include "../../include/outcome/outcome.hpp"
-#include "quickcpplib/include/boost/test/unit_test.hpp"
+#include "quickcpplib/boost/test/unit_test.hpp"
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4127)  // conditional expression is constant

@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 #include "../../include/outcome/outcome.hpp"
-#include "quickcpplib/include/boost/test/unit_test.hpp"
+#include "quickcpplib/boost/test/unit_test.hpp"
 
 BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / comparison, "Tests that the outcome can compare to compatible outcomes")
 {
