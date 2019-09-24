@@ -812,9 +812,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    f744cf9d0142596d71c96a82e2b5d0b6855e56bb
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-09-19 09:52:42 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE f744cf9d
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    2cda70fdc2fe4deb86f57b8be4a8fc09a1a504e0
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-09-24 16:40:56 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 2cda70fd
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1318,9 +1318,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 2954530fd4556c59c7e2f9696b42af4a952e9ee7
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-09-19 09:53:37 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 2954530f
+#define OUTCOME_PREVIOUS_COMMIT_REF 20917c3cb065178bd702658aa61c4e01943a904a
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-09-24 16:42:51 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 20917c3c
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1596,9 +1596,29 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
+/* Implements backtrace() et al from glibc on win64
+(C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (4 commits)
+File Created: Mar 2016
 
-#include "../include/execinfo_win64.h"
 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
 #include <stdlib.h>  // for abort
 #include <string.h>
 
