@@ -812,9 +812,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    d9e794eeff852e87206cef7d5d5ce8a7299f6df8
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-07-29 10:10:50 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE d9e794ee
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    f744cf9d0142596d71c96a82e2b5d0b6855e56bb
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-09-19 09:52:42 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE f744cf9d
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1318,9 +1318,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF dd50d7d677495e0ac6d2f3d9154dd82c59326e28
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-07-25 09:52:54 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE dd50d7d6
+#define OUTCOME_PREVIOUS_COMMIT_REF 2954530fd4556c59c7e2f9696b42af4a952e9ee7
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-09-19 09:53:37 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 2954530f
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1596,29 +1596,9 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-/* Implements backtrace() et al from glibc on win64
-(C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (4 commits)
-File Created: Mar 2016
 
+#include "../include/execinfo_win64.h"
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-    (See accompanying file Licence.txt or copy at
-          http://www.boost.org/LICENSE_1_0.txt)
-*/
 #include <stdlib.h>  // for abort
 #include <string.h>
 
@@ -3005,7 +2985,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace convert
 {
 #if defined(__cpp_concepts)
-#if !defined(_MSC_VER) && !defined(__clang__) && __GNUC__ < 7
+#if !defined(_MSC_VER) && !defined(__clang__) && __GNUC__ < 9
 #define OUTCOME_GCC6_CONCEPT_BOOL bool
 #else
 #define OUTCOME_GCC6_CONCEPT_BOOL
@@ -3670,7 +3650,7 @@ OUTCOME_V2_NAMESPACE_END
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 template <class R, class S, class NoValuePolicy>                                                                                                                                  //
-#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                           // GCC's constraints implementation is buggy
+#if !defined(__GNUC__) || __GNUC__ >= 10                                                                                                                                           // GCC's constraints implementation is buggy
 OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
 #endif
 class basic_result;
@@ -3816,7 +3796,7 @@ SIGNATURE NOT RECOGNISED
 type definition template <class R, class S, class NoValuePolicy> basic_result. Potential doc page: `basic_result<T, E, NoValuePolicy>`
 */
 template <class R, class S, class NoValuePolicy>                                                                                                                                  //
-#if !defined(__GNUC__) || __GNUC__ >= 8                                                                                                                                           // GCC's constraints implementation is buggy
+#if !defined(__GNUC__) || __GNUC__ >= 10                                                                                                                                           // GCC's constraints implementation is buggy
 OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
 #endif
 class OUTCOME_NODISCARD basic_result : public detail::basic_result_final<R, S, NoValuePolicy>

@@ -32,7 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <_mingw.h>
 #endif
 
-#include "quickcpplib/include/config.hpp"
+#include "quickcpplib/config.hpp"
 
 #ifndef __cpp_variadic_templates
 #error Outcome needs variadic template support in the compiler
@@ -85,7 +85,7 @@ SIGNATURE NOT RECOGNISED
 #define OUTCOME_REQUIRES(...) QUICKCPPLIB_REQUIRES(__VA_ARGS__)
 #endif
 
-#include "quickcpplib/include/import.h"
+#include "quickcpplib/import.h"
 
 
 #if defined(OUTCOME_UNSTABLE_VERSION)
@@ -279,7 +279,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #ifndef OUTCOME_DISABLE_EXECINFO
 #ifdef _WIN32
-#include "quickcpplib/include/execinfo_win64.h"
+#include "quickcpplib/execinfo_win64.h"
 #else
 #include <execinfo.h>
 #endif
