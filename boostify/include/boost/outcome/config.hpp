@@ -50,13 +50,16 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef BOOST_OUTCOME_SYMBOL_VISIBLE
 #define BOOST_OUTCOME_SYMBOL_VISIBLE BOOST_SYMBOL_VISIBLE
 #endif
+#ifdef __has_cpp_attribute
+#define BOOST_OUTCOME_HAS_CPP_ATTRIBUTE(attr) __has_cpp_attribute(attr)
+#else
+#define BOOST_OUTCOME_HAS_CPP_ATTRIBUTE(attr) (0)
+#endif
 // Weird that Boost.Config doesn't define a BOOST_NO_CXX17_NODISCARD
 #ifndef BOOST_OUTCOME_NODISCARD
-#ifdef __has_cpp_attribute
-#if __has_cpp_attribute(nodiscard)
+#if BOOST_OUTCOME_HAS_CPP_ATTRIBUTE(nodiscard)
 #define BOOST_OUTCOME_NODISCARD [[nodiscard]]
-#endif
-#elif defined(__clang__)
+#elif defined(__clang__)  // deliberately not GCC
 #define BOOST_OUTCOME_NODISCARD __attribute__((warn_unused_result))
 #elif defined(_MSC_VER)
 // _Must_inspect_result_ expands into this

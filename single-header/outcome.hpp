@@ -812,9 +812,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    2cda70fdc2fe4deb86f57b8be4a8fc09a1a504e0
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-09-24 16:40:56 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 2cda70fd
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    c035910c060880c9391ceb6af414bdef632df0cf
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-09-25 15:07:42 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE c035910c
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -940,8 +940,14 @@ extern "C" void _mm_pause();
 #endif
 #endif
 
+#ifdef __has_cpp_attribute
+#define QUICKCPPLIB_HAS_CPP_ATTRIBUTE(attr) __has_cpp_attribute(attr)
+#else
+#define QUICKCPPLIB_HAS_CPP_ATTRIBUTE(attr) (0)
+#endif
+
 #if !defined(QUICKCPPLIB_NORETURN)
-#ifdef __cpp_attributes
+#if QUICKCPPLIB_HAS_CPP_ATTRIBUTE(noreturn)
 #define QUICKCPPLIB_NORETURN [[noreturn]]
 #elif defined(_MSC_VER)
 #define QUICKCPPLIB_NORETURN __declspec(noreturn)
@@ -958,11 +964,9 @@ extern "C" void _mm_pause();
 #endif
 #endif
 #ifndef QUICKCPPLIB_NODISCARD
-#ifdef __has_cpp_attribute
-#if __has_cpp_attribute(nodiscard)
+#if QUICKCPPLIB_HAS_CPP_ATTRIBUTE(nodiscard)
 #define QUICKCPPLIB_NODISCARD [[nodiscard]]
-#endif
-#elif defined(__clang__)
+#elif defined(__clang__)  // deliberately not GCC
 #define QUICKCPPLIB_NODISCARD __attribute__((warn_unused_result))
 #elif defined(_MSC_VER)
 // _Must_inspect_result_ expands into this
@@ -1318,9 +1322,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 20917c3cb065178bd702658aa61c4e01943a904a
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-09-24 16:42:51 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 20917c3c
+#define OUTCOME_PREVIOUS_COMMIT_REF f21cb02cf178d5d0020cdd9c64e2971b2d611285
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-09-30 09:34:09 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f21cb02c
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
