@@ -8,13 +8,26 @@ weight = 80
 
 ### Enhancements:
 
-- Outcome is now `make install`-able, and cmake `find_package()` can find it. Note that
-you must separately install and `find_package()` Outcome's dependency, quickcpplib, else
-`find_package()` of Outcome will fail.
+Improved compatibility with cmake tooling
+: Standalone outcome is now `make install`-able, and cmake `find_package()` can find it.
+Note that you must separately install and `find_package()` Outcome's dependency, quickcpplib,
+else `find_package()` of Outcome will fail.
+
+Breaking change!
+: The git submodule mechanism used by standalone Outcome of specifying dependent libraries
+has been replaced with a cmake superbuild of dependencies mechanism instead. Upon cmake
+configure, an internal copy of quickcpplib will be git cloned, built and installed into the
+build directory from where an internal `find_package()` uses it. This breaks the use of
+the unconfigured Outcome repo as an implementation of Outcome, one must now do one of:
+ 1. Add Outcome as subdirectory to cmake build
+ 2. Use cmake superbuild (i.e. `ExternalProject_Add()`) to build and install Outcome into
+ a local installation.
+ 3. Use one of the single header editions.
 
 ### Bug fixes:
 
--
+[#184](https://github.com/ned14/outcome/issues/207)
+: The detection of `[[nodiscard]]` support in the compiler was very mildly broken.
 
 ---
 ## v2.1.1 19th August 2019 (Boost 1.71) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.1)

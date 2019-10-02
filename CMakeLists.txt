@@ -38,10 +38,100 @@ set(outcome_INTERFACE_SOURCE "include/outcome.ixx")
 
 # Setup this cmake environment for this project
 include(QuickCppLibSetupProject)
-if(NOT CLANG AND CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.9)
-  option(ENABLE_CXX_CONCEPTS "Enable the Concepts TS in the compiler (defaults to ON if GCC)" ON)
-else()
-  option(ENABLE_CXX_CONCEPTS "Enable the Concepts TS in the compiler (defaults to ON if GCC)" OFF)
+
+include(CheckCXXSourceCompiles)
+# Do we have the Concepts TS?
+function(CheckCXXHasConcepts iter)
+  set(CMAKE_REQUIRED_FLAGS ${ARGN})
+  check_cxx_source_compiles("
+#if !defined(_MSC_VER) && !defined(__clang__) && __GNUC__ < 9
+#define OUTCOME_GCC6_CONCEPT_BOOL bool
+#else
+#define OUTCOME_GCC6_CONCEPT_BOOL
+#endif
+template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrNone = requires(U a)
+{
+  {
+    a.has_value()
+  }
+  ->bool;
+  {a.value()};
+};
+int main() { return 0; }
+" CXX_HAS_CONCEPTS${iter})
+  set(CXX_HAS_CONCEPTS${iter} ${CXX_HAS_CONCEPTS${iter}} PARENT_SCOPE)
+endfunction()
+set(HAVE_CONCEPTS 0)
+set(CXX_CONCEPTS_FLAGS)
+CheckCXXHasConcepts(_BY_DEFAULT)
+if(CXX_HAS_CONCEPTS_BY_DEFAULT)
+  set(HAVE_CONCEPTS 1)
+endif()
+if(NOT HAVE_CONCEPTS)
+  if(CLANG OR GCC)
+    CheckCXXHasConcepts(_CLANG_GCC -fconcepts)
+    if(CXX_HAS_CONCEPTS_CLANG_GCC)
+      set(CXX_CONCEPTS_FLAGS -fconcepts -DOUTCOME_HAVE_CONCEPTS=1)
+      set(HAVE_CONCEPTS 1)
+    endif()
+  endif()
+endif()
+
+# Do we have the Coroutines TS?
+function(CheckCXXHasCoroutines iter)
+  set(CMAKE_REQUIRED_FLAGS ${ARGN})
+  check_cxx_source_compiles("
+#if __has_include(<coroutine>)
+#include <coroutine>
+using std::suspend_never;
+#elif __has_include(<experimental/coroutine>)
+#include <experimental/coroutine>
+using std::experimental::suspend_never;
+#endif
+class resumable{
+public:
+  struct promise_type
+  {
+    resumable get_return_object() { return {}; }
+    auto initial_suspend() { return suspend_never(); }
+    auto final_suspend() { return suspend_never(); }
+    int return_value(int x) { return x; }
+    void unhandled_exception() {}
+  };
+  bool resume() { return true; }
+  int get() { return 0; }
+};
+resumable g() { co_return 0; }
+int main() { return g().get(); }
+" CXX_HAS_COROUTINES${iter})
+  set(CXX_HAS_COROUTINES${iter} ${CXX_HAS_COROUTINES${iter}} PARENT_SCOPE)
+endfunction()
+set(HAVE_COROUTINES 0)
+set(CXX_COROUTINES_FLAGS)
+CheckCXXHasCoroutines(_BY_DEFAULT)
+if(CXX_HAS_COROUTINES_BY_DEFAULT)
+  set(HAVE_COROUTINES 1)
+endif()
+if(NOT HAVE_COROUTINES)
+  if(MSVC)
+    CheckCXXHasCoroutines(_MSVC "/EHsc /await")
+    if(CXX_HAS_COROUTINES_MSVC)
+      set(CXX_COROUTINES_FLAGS /await /DOUTCOME_HAVE_COROUTINES=1)
+      set(HAVE_COROUTINES 1)
+    endif()
+  endif()
+  if(CLANG OR GCC)
+    CheckCXXHasCoroutines(_CLANG_GCC "-fcoroutines-ts")
+    if(CXX_HAS_COROUTINES_CLANG_GCC)
+      set(CXX_COROUTINES_FLAGS -fcoroutines-ts -DOUTCOME_HAVE_COROUTINES=1)
+      set(HAVE_COROUTINES 1)
+    endif()
+    CheckCXXHasCoroutines(_CLANG_GCC_LIBCXX "-stdlib=libc++ -fcoroutines-ts")
+    if(CXX_HAS_COROUTINES_CLANG_GCC_LIBCXX)
+      set(CXX_COROUTINES_FLAGS -stdlib=libc++ -fcoroutines-ts -DOUTCOME_HAVE_COROUTINES=1)
+      set(HAVE_COROUTINES 1)
+    endif()
+  endif()
 endif()
 
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the unit tests")
@@ -62,7 +152,10 @@ if(NOT PROJECT_IS_DEPENDENCY)
   endif()
 endif()
 # Find my library dependencies
-find_quickcpplib_library(quickcpplib 1.0 REQUIRED)
+find_quickcpplib_library(quickcpplib
+  GIT_REPOSITORY "https://github.com/ned14/quickcpplib.git"
+  REQUIRED
+)
 
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(QuickCppLibMakeHeaderOnlyLibrary)
@@ -133,6 +226,11 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   list_filter(outcome_TESTS EXCLUDE REGEX "constexprs")
   include(QuickCppLibMakeStandardTests)
   
+  # Enable Concepts and Coroutines for my tests, if they were available
+  foreach(target ${outcome_TEST_TARGETS})
+    target_compile_options(${target} PRIVATE ${CXX_CONCEPTS_FLAGS} ${CXX_COROUTINES_FLAGS})
+  endforeach()
+  
   # Duplicate all tests into C++ exceptions disabled forms
   set(noexcept_tests)
   foreach(testsource ${outcome_TESTS})
@@ -149,6 +247,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
 #          target_compile_options(${target_name} PRIVATE /permissive-)  # test bug report #142
         endif()
         target_link_libraries(${target_name} PRIVATE outcome::hl)
+        target_compile_options(${target_name} PRIVATE ${CXX_CONCEPTS_FLAGS} ${CXX_COROUTINES_FLAGS})
         set_target_properties(${target_name} PROPERTIES
           RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
           POSITION_INDEPENDENT_CODE ON
@@ -163,7 +262,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
           add_executable(${target_name} "${testsource}")
           add_dependencies(_hl ${target_name})
           target_link_libraries(${target_name} PRIVATE outcome::hl)
-          target_compile_options(${target_name} PRIVATE /permissive-)
+          target_compile_options(${target_name} PRIVATE /permissive- ${CXX_CONCEPTS_FLAGS} ${CXX_COROUTINES_FLAGS})
           set_target_properties(${target_name} PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
             POSITION_INDEPENDENT_CODE ON
@@ -212,15 +311,12 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
     set(LATEST_CXX_FEATURE "cxx_std_${UNIT_TESTS_CXX_VERSION}")
   endif()
   if(LATEST_CXX_FEATURE)
-    # Turn on latest C++ and Concepts where possible for the test suite
+    # Turn on latest C++ where possible for the test suite
     if(ENABLE_CXX_MODULES)
       target_compile_features(outcome_hl_ixx PUBLIC ${LATEST_CXX_FEATURE})
     endif()
     foreach(test_target ${outcome_TEST_TARGETS} ${outcome_EXAMPLE_TARGETS})
       target_compile_features(${test_target} PUBLIC ${LATEST_CXX_FEATURE})
-      if(ENABLE_CXX_CONCEPTS)
-        target_compile_options(${test_target} PUBLIC -fconcepts)
-      endif()
     endforeach()
   endif()
   
@@ -243,9 +339,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
           )
           if(NOT example_src MATCHES "[.]c$")
             target_compile_features(${example_bin} PUBLIC cxx_std_17)
-            if(ENABLE_CXX_CONCEPTS)
-              target_compile_options(${example_bin} PUBLIC -fconcepts)
-            endif()
+            target_compile_options(${example_bin} PUBLIC ${CXX_CONCEPTS_FLAGS} ${CXX_COROUTINES_FLAGS})
             if(CMAKE_SYSTEM_NAME MATCHES "Linux")
               target_link_libraries(${example_bin} stdc++fs)
             elseif(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
