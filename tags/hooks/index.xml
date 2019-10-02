@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/tags/hooks/</link>
     <description>Recent content in Hooks on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 26 Apr 2019 17:43:41 +0200</lastBuildDate>
+    <lastBuildDate>Fri, 22 Mar 2019 13:58:05 -0700</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/tags/hooks/index.xml" rel="self" type="application/rss+xml" />
     
@@ -13,7 +13,7 @@
     <item>
       <title>Hooking events</title>
       <link>https://ned14.github.io/outcome/tutorial/advanced/hooks/</link>
-      <pubDate>Fri, 26 Apr 2019 17:43:41 +0200</pubDate>
+      <pubDate>Fri, 22 Mar 2019 13:58:05 -0700</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/</guid>
       <description>Outcome provides multiple methods for user code to intercept various events which occur. The deepest method is simply to inherit from basic_result or basic_outcome, and override member functions, for which you will need to study the source code as that form of customisation is out of scope for this tutorial.

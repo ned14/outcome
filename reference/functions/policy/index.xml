@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/functions/policy/</link>
     <description>Recent content in Policy on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 26 Apr 2019 17:43:41 +0200</lastBuildDate>
+    <lastBuildDate>Fri, 22 Mar 2019 13:58:05 -0700</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/functions/policy/index.xml" rel="self" type="application/rss+xml" />
     
@@ -55,9 +55,9 @@ Header: &amp;lt;outcome/std_result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_enum/</guid>
-      <description>A specialisation of outcome_throw_as_system_error_with_payload() for types where boost::system::errc::is_error_code_enum&amp;lt;BoostErrorCodeEnum&amp;gt; or boost::system::errc::is_error_condition_enum&amp;lt;BoostErrorCodeEnum&amp;gt; is true. This executes OUTCOME_THROW_EXCEPTION(expr) with a boost::system::system_error constructed from the result of the ADL discovered free function make_error_code(BoostErrorCodeEnum).
+      <description>A specialisation of outcome_throw_as_system_error_with_payload() for types where boost::system::is_error_code_enum&amp;lt;BoostErrorCodeEnum&amp;gt; or boost::system::is_error_condition_enum&amp;lt;BoostErrorCodeEnum&amp;gt; is true. This executes OUTCOME_THROW_EXCEPTION(expr) with a boost::system::system_error constructed from the result of the ADL discovered free function make_error_code(BoostErrorCodeEnum).
 Overridable: Argument dependent lookup.
-Requires: Either boost::system::errc::is_error_code_enum&amp;lt;T&amp;gt; or boost::system::errc::is_error_condition_enum&amp;lt;T&amp;gt; to be true for a decayed BoostErrorCodeEnum.
+Requires: Either boost::system::is_error_code_enum&amp;lt;T&amp;gt; or boost::system::is_error_condition_enum&amp;lt;T&amp;gt; to be true for a decayed BoostErrorCodeEnum.
 Namespace: boost::system
 Header: &amp;lt;outcome/boost_result.hpp&amp;gt;</description>
     </item>
