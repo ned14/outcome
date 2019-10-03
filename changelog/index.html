@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-10-02T09:30:27 UTC">
+<meta name="revised" content="2019-10-03T13:52:47 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2427,15 +2427,32 @@
 
 <h3 id="enhancements">Enhancements:</h3>
 
-<ul>
-<li>Outcome is now <code>make install</code>-able, and cmake <code>find_package()</code> can find it. Note that
-you must separately install and <code>find_package()</code> Outcome&rsquo;s dependency, quickcpplib, else
-<code>find_package()</code> of Outcome will fail.</li>
-</ul>
+<dl>
+<dt>Improved compatibility with cmake tooling</dt>
+<dd>Standalone outcome is now <code>make install</code>-able, and cmake <code>find_package()</code> can find it.
+Note that you must separately install and <code>find_package()</code> Outcome&rsquo;s dependency, quickcpplib,
+else <code>find_package()</code> of Outcome will fail.</dd>
+<dt>Breaking change!</dt>
+<dd>The git submodule mechanism used by standalone Outcome of specifying dependent libraries
+has been replaced with a cmake superbuild of dependencies mechanism instead. Upon cmake
+configure, an internal copy of quickcpplib will be git cloned, built and installed into the
+build directory from where an internal <code>find_package()</code> uses it. This breaks the use of
+the unconfigured Outcome repo as an implementation of Outcome, one must now do one of:
+
+<ol>
+<li>Add Outcome as subdirectory to cmake build</li>
+<li>Use cmake superbuild (i.e. <code>ExternalProject_Add()</code>) to build and install Outcome into
+a local installation.</li>
+<li>Use one of the single header editions.</li>
+</ol></dd>
+</dl>
 
 <h3 id="bug-fixes">Bug fixes:</h3>
 
-<p>-</p>
+<dl>
+<dt><a href="https://github.com/ned14/outcome/issues/207">#184</a></dt>
+<dd>The detection of <code>[[nodiscard]]</code> support in the compiler was very mildly broken.</dd>
+</dl>
 
 <hr />
 
@@ -2647,7 +2664,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 24/09/2019
+        <i class='fa fa-calendar'></i> Last update on 02/10/2019
     </div>
     
 
