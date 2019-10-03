@@ -42,8 +42,8 @@ if(NOT quickcpplib_done)
     set(CTEST_QUICKCPPLIB_CLONE_DIR "${CMAKE_BINARY_DIR}/quickcpplib")
   else()
     # We must be being called from a ctest script. No way of knowing what the build directory
-    # will be, so simply clone into the source directory
-    set(CTEST_QUICKCPPLIB_CLONE_DIR "${CMAKE_SOURCE_DIR}/quickcpplib")
+    # will be, so simply clone into the current directory
+    set(CTEST_QUICKCPPLIB_CLONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/quickcpplib")
   endif()
   if(CTEST_QUICKCPPLIB_CLONE_DIR)
     file(MAKE_DIRECTORY "${CTEST_QUICKCPPLIB_CLONE_DIR}")
