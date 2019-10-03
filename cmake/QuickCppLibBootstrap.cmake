@@ -40,13 +40,15 @@ if(NOT quickcpplib_done)
     # Place into root binary directory, as we want to share quickcpplib
     find_package(quickcpplib QUIET CONFIG NO_DEFAULT_PATH PATHS "${CMAKE_BINARY_DIR}/quickcpplib/repo")
     if(NOT quickcpplib_FOUND)
-      message(STATUS "quickcpplib not found, cloning git repository and installing into build directory")
+      message(STATUS "quickcpplib not found, cloning git repository and installing into build directory ...")
       include(FindGit)
-      execute_process(COMMAND ${GIT_EXECUTABLE} clone "https://github.com/ned14/quickcpplib.git" repo
+      execute_process(COMMAND "${GIT_EXECUTABLE}" clone "https://github.com/ned14/quickcpplib.git" repo
         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/quickcpplib"
+        OUTPUT_VARIABLE cloneout
+        ERROR_VARIABLE errout
       )
       if(NOT EXISTS "${CMAKE_BINARY_DIR}/quickcpplib/repo/cmakelib")
-        message(FATAL_ERROR "FATAL: Failed to git clone quickcpplib!")
+        message(FATAL_ERROR "FATAL: Failed to git clone quickcpplib!\n\nstdout was: ${cloneout}\n\nstderr was: ${errout}")
       endif()
     endif()
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_BINARY_DIR}/quickcpplib/repo/cmakelib")
