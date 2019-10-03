@@ -82,6 +82,7 @@ outcome::std_result<int> abc()
   static_assert(std::is_convertible<error, std::error_code>::value, "error code is not implicitly constructible from custom enum");
   std::error_code ec = error::test;  // custom enum is definitely convertible to error code
   OUTCOME_TRY(test());               // hence this should compile, as implicit conversions work here
+  (void) ec;
 
   // But explicit conversions are required between dissimilar basic_result, implicit conversions are disabled
   static_assert(std::is_constructible<outcome::std_result<int>, enum_result<int>>::value, "basic_result with error code is not explicitly constructible from basic_result with custom enum");

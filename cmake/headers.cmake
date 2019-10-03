@@ -8,6 +8,7 @@ set(outcome_HEADERS
   "include/outcome/boost_result.hpp"
   "include/outcome/config.hpp"
   "include/outcome/convert.hpp"
+  "include/outcome/coroutine_support.hpp"
   "include/outcome/detail/basic_outcome_exception_observers.hpp"
   "include/outcome/detail/basic_outcome_exception_observers_impl.hpp"
   "include/outcome/detail/basic_outcome_failure_observers.hpp"

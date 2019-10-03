@@ -7,6 +7,7 @@ set(outcome_TESTS
   "test/tests/containers.cpp"
   "test/tests/core-outcome.cpp"
   "test/tests/core-result.cpp"
+  "test/tests/coroutine-support.cpp"
   "test/tests/default-construction.cpp"
   "test/tests/experimental-core-outcome-status.cpp"
   "test/tests/experimental-core-result-status.cpp"
