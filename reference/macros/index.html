@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-10-03T13:52:44 UTC">
+<meta name="revised" content="2019-10-03T17:37:49 UTC">
 <title>Macros :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -626,6 +626,27 @@
         <div>
           <a href="/outcome/reference/macros/version/">
             Version macros
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_try/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_try/">
+            <code>OUTCOME_CO_TRY(var, expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv/">
+            <code>OUTCOME_CO_TRYV(expr)/OUTCOME_CO_TRY(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryx/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryx/">
+            <code>OUTCOME_CO_TRYX(expr)</code>
           </a>
         </div>
     </li>
@@ -1911,6 +1932,13 @@
     </li>
         </ul>
     </li>
+      <li data-nav-id="/outcome/reference/types/awaitable/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/awaitable/">
+            <code>awaitable&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/types/bad_outcome_access/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/bad_outcome_access/">
@@ -1950,6 +1978,13 @@
         <div>
           <a href="/outcome/reference/types/success_type/">
             <code>success_type&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/task/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/task/">
+            <code>task&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2390,6 +2425,9 @@
    Macros</option> 
       <option value="/outcome/reference/macros/template/" >-- Constrained template macros</option>
       <option value="/outcome/reference/macros/version/" >-- Version macros</option>
+      <option value="/outcome/reference/macros/co_try/" >-- `OUTCOME_CO_TRY(var, expr)`</option>
+      <option value="/outcome/reference/macros/co_tryv/" >-- `OUTCOME_CO_TRYV(expr)/OUTCOME_CO_TRY(expr)`</option>
+      <option value="/outcome/reference/macros/co_tryx/" >-- `OUTCOME_CO_TRYX(expr)`</option>
       <option value="/outcome/reference/macros/disable_execinfo/" >-- `OUTCOME_DISABLE_EXECINFO`</option>
       <option value="/outcome/reference/macros/nodiscard/" >-- `OUTCOME_NODISCARD`</option>
       <option value="/outcome/reference/macros/requires/" >-- `OUTCOME_REQUIRES(...)`</option>
@@ -2462,6 +2500,12 @@
 <ol class="children children-li"><li>
 	<a href="/outcome/reference/macros/template/" >Constrained template macros</a><li>
 	<a href="/outcome/reference/macros/version/" >Version macros</a><li>
+	<a href="/outcome/reference/macros/co_try/" ><code>OUTCOME_CO_TRY(var, expr)</code></a>
+<p>Evaluate within a coroutine an expression which results in an understood type, assigning <code>T</code> to a variable called <code>var</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
+	<a href="/outcome/reference/macros/co_tryv/" ><code>OUTCOME_CO_TRYV(expr)/OUTCOME_CO_TRY(expr)</code></a>
+<p>Evaluate from within a coroutine an expression which results in an understood type, continuing execution if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
+	<a href="/outcome/reference/macros/co_tryx/" ><code>OUTCOME_CO_TRYX(expr)</code></a>
+<p>Evaluate from within a coroutine an expression which results in an understood type, emitting the <code>T</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
 	<a href="/outcome/reference/macros/disable_execinfo/" ><code>OUTCOME_DISABLE_EXECINFO</code></a>
 <p>If defined, disables the use of the <code>&lt;execinfo.h&gt;</code> header (or the win32 emulation).</p><li>
 	<a href="/outcome/reference/macros/nodiscard/" ><code>OUTCOME_NODISCARD</code></a>

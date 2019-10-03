@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/</link>
     <description>Recent content in Home on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Sat, 23 Mar 2019 21:48:45 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 23 Mar 2019 21:50:44 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/index.xml" rel="self" type="application/rss+xml" />
     
@@ -2371,6 +2371,41 @@ Defined between stable releases of Outcome. It means the inline namespace will b
     </item>
     
     <item>
+      <title>`OUTCOME_CO_TRY(var, expr)`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/co_try/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/co_try/</guid>
+      <description>Evaluate within a coroutine an expression which results in a type matching the following customisation points, assigning T to a variable called var if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
+ OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
+Overridable: Not overridable.
+Definition: See OUTCOME_CO_TRYV(expr) for most of the mechanics.</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_CO_TRYV(expr)/OUTCOME_CO_TRY(expr)`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/co_tryv/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/co_tryv/</guid>
+      <description>Evaluate from within a coroutine an expression which results in a type matching the following customisation points, continuing execution if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
+ OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
+The difference between the OUTCOME_CO_TRYV(expr) and OUTCOME_CO_TRY(expr) editions is that the latter will set a variable if two or more macro arguments are present (see OUTCOME_CO_TRY(var, expr) ).</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_CO_TRYX(expr)`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/co_tryx/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/co_tryx/</guid>
+      <description>Evaluate within a coroutine an expression which results in a type matching the following customisation points, emitting the T if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
+ OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
+Availability: GCC and clang only. Use #ifdef OUTCOME_CO_TRYX to determine if available.
+Overridable: Not overridable.</description>
+    </item>
+    
+    <item>
       <title>`OUTCOME_DISABLE_EXECINFO`</title>
       <link>https://ned14.github.io/outcome/reference/macros/disable_execinfo/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -2577,6 +2612,17 @@ Note that failure() overloads are permitted by Outcome to return something other
 Two default overloads are provided, one taking a single parameter returning success_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;&amp;gt; and perfectly forwarding the input. The other overload takes no parameters, and returns success_type&amp;lt;void&amp;gt;, which usually causes the construction of the receiving basic_result or basic_outcome&amp;rsquo;s with a default construction of their value type.
 Overridable: By Argument Dependent Lookup (ADL).
 Requires: Always available.</description>
+    </item>
+    
+    <item>
+      <title>`awaitable&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/awaitable/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/awaitable/</guid>
+      <description>This is very similar to task&amp;lt;T&amp;gt; , except that execution of the awaitable&amp;lt;T&amp;gt; returning function begins immediately, and if the function never suspends during the course of its execution, no suspend-resume cycle occurs. Functions which return awaitable&amp;lt;T&amp;gt; are therefore suitable for tasks which may require suspension, but will often complete immediately.
+Example of use (must be called from within a coroutinised function):
+awaitable&amp;lt;int&amp;gt; func(int x) { co_return x + 1; } .</description>
     </item>
     
     <item>
@@ -3110,6 +3156,15 @@ Header: &amp;lt;outcome/std_result.hpp&amp;gt;</description>
 This is a regular wrapper type, with defaulted default, copy and move constructor, defaulted assignment, and defaulted destructor.
 A member type alias value_type indicates T.
 There is an explicit initialising constructor taking any type U which is not a success_type&amp;lt;T&amp;gt;, and which will forward construct the contained T from that U.</description>
+    </item>
+    
+    <item>
+      <title>`task&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/task/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/task/</guid>
+      <description>This is very similar to awaitable&amp;lt;T&amp;gt; , except that execution of the task&amp;lt;T&amp;gt; returning function suspends immediately. Functions which return task&amp;lt;T&amp;gt; are therefore suitable for tasks which you need to instantiate right now, but whose execution will occur elsewhere e.g. in a separate kernel thread. Because of the very common use case of using worker threads to execute the body of tasks, the completion status is kept in an atomic, and thus synchronises the writing of the coroutine&amp;rsquo;s result with other threads.</description>
     </item>
     
     <item>

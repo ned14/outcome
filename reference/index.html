@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-10-03T13:52:45 UTC">
+<meta name="revised" content="2019-10-03T17:37:50 UTC">
 <title>API reference :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -625,6 +625,27 @@
         <div>
           <a href="/outcome/reference/macros/version/">
             Version macros
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_try/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_try/">
+            <code>OUTCOME_CO_TRY(var, expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv/">
+            <code>OUTCOME_CO_TRYV(expr)/OUTCOME_CO_TRY(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryx/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryx/">
+            <code>OUTCOME_CO_TRYX(expr)</code>
           </a>
         </div>
     </li>
@@ -1910,6 +1931,13 @@
     </li>
         </ul>
     </li>
+      <li data-nav-id="/outcome/reference/types/awaitable/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/awaitable/">
+            <code>awaitable&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/types/bad_outcome_access/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/bad_outcome_access/">
@@ -1949,6 +1977,13 @@
         <div>
           <a href="/outcome/reference/types/success_type/">
             <code>success_type&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/task/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/task/">
+            <code>task&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2448,6 +2483,12 @@
 	<a href="/outcome/reference/macros/" >Macros</a><ol><li>
 	<a href="/outcome/reference/macros/template/" >Constrained template macros</a><li>
 	<a href="/outcome/reference/macros/version/" >Version macros</a><li>
+	<a href="/outcome/reference/macros/co_try/" ><code>OUTCOME_CO_TRY(var, expr)</code></a>
+<p>Evaluate within a coroutine an expression which results in an understood type, assigning <code>T</code> to a variable called <code>var</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
+	<a href="/outcome/reference/macros/co_tryv/" ><code>OUTCOME_CO_TRYV(expr)/OUTCOME_CO_TRY(expr)</code></a>
+<p>Evaluate from within a coroutine an expression which results in an understood type, continuing execution if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
+	<a href="/outcome/reference/macros/co_tryx/" ><code>OUTCOME_CO_TRYX(expr)</code></a>
+<p>Evaluate from within a coroutine an expression which results in an understood type, emitting the <code>T</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
 	<a href="/outcome/reference/macros/disable_execinfo/" ><code>OUTCOME_DISABLE_EXECINFO</code></a>
 <p>If defined, disables the use of the <code>&lt;execinfo.h&gt;</code> header (or the win32 emulation).</p><li>
 	<a href="/outcome/reference/macros/nodiscard/" ><code>OUTCOME_NODISCARD</code></a>
@@ -2521,6 +2562,8 @@
 <p>A type carrying one of (i) a successful <code>T</code> (ii) a disappointment <code>EC</code> (iii) a failure <code>EP</code> (iv) both a disappointment <code>EC</code> and a failure <code>EP</code>, with <code>NoValuePolicy</code> specifying what to do if one tries to read state which isn&rsquo;t there.</p><li>
 	<a href="/outcome/reference/types/basic_result/" ><code>basic_result&lt;T, E, NoValuePolicy&gt;</code></a>
 <p>A sum type carrying either a successful <code>T</code>, or a disappointment <code>E</code>, with <code>NoValuePolicy</code> specifying what to do if one tries to read state which isn&rsquo;t there.</p><li>
+	<a href="/outcome/reference/types/awaitable/" ><code>awaitable&lt;T&gt;</code></a>
+<p>An eagerly evaluated coroutine awaitable with Outcome customisation.</p><li>
 	<a href="/outcome/reference/types/bad_outcome_access/" ><code>bad_outcome_access</code></a>
 <p>Exception type publicly inheriting from <code>std::logic_error</code> indicating an incorrect observation of value or error or exception occurred.</p><li>
 	<a href="/outcome/reference/types/bad_result_access_with/" ><code>bad_result_access_with&lt;EC&gt;</code></a>
@@ -2532,7 +2575,9 @@
 	<a href="/outcome/reference/types/in_place_type_t/" ><code>in_place_type_t&lt;T&gt;</code></a>
 <p>Either <code>std::in_place_type_t&lt;T&gt;</code> or a local emulation, depending on the <code>OUTCOME_USE_STD_IN_PLACE_TYPE</code> macro.</p><li>
 	<a href="/outcome/reference/types/success_type/" ><code>success_type&lt;T&gt;</code></a>
-<p>Type sugar for constructing a successful result or outcome.</p></li></ol><li>
+<p>Type sugar for constructing a successful result or outcome.</p><li>
+	<a href="/outcome/reference/types/task/" ><code>task&lt;T&gt;</code></a>
+<p>A lazily evaluated coroutine awaitable with Outcome customisation.</p></li></ol><li>
 	<a href="/outcome/reference/aliases/" >Aliases</a><ol><li>
 	<a href="/outcome/reference/aliases/boost_checked/" ><code>boost_checked&lt;T, E = boost::system::error_code&gt;</code></a>
 <p>A type alias to a <code>basic_result</code> configured with <code>boost::system::error_code</code> and <code>policy::throw_bad_result_access&lt;EC&gt;</code>.</p><li>
