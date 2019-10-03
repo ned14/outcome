@@ -40,7 +40,6 @@ if(NOT quickcpplib_done)
     # Place into root binary directory, as we want to share quickcpplib
     find_package(quickcpplib QUIET CONFIG NO_DEFAULT_PATH PATHS "${CMAKE_BINARY_DIR}/quickcpplib/repo")
     if(NOT quickcpplib_FOUND)
-      include(ExternalProject)
       message(STATUS "quickcpplib not found, cloning git repository and installing into build directory")
       include(FindGit)
       execute_process(COMMAND ${GIT_EXECUTABLE} clone "https://github.com/ned14/quickcpplib.git" repo
