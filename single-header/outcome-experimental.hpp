@@ -707,9 +707,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    c035910c060880c9391ceb6af414bdef632df0cf
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-09-25 15:07:42 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE c035910c
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    7f26fcca68e1d3e313954e4b2760a4fe89d30589
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-10-03 13:05:18 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 7f26fcca
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1217,9 +1217,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF f21cb02cf178d5d0020cdd9c64e2971b2d611285
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-09-30 09:34:09 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f21cb02c
+#define OUTCOME_PREVIOUS_COMMIT_REF 6e25457ff7b50cdb3da72a8d719cade150bb9b7a
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-10-03 13:50:33 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 6e25457f
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -10032,6 +10032,14 @@ OUTCOME_V2_NAMESPACE_END
 
 
 
+#define OUTCOME_CO_TRYV2(unique, ...)                                                                                                                                                                                                                                                                                               auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                              if(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))                                                                                                                                                                                                                                                                     co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+
+
+
+#define OUTCOME_CO_TRY2(unique, v, ...)                                                                                                                                                                                                                                                                                             OUTCOME_CO_TRYV2(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                                            auto && (v) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+
+
+
 #if !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 8
 #pragma GCC diagnostic pop
 #endif
@@ -10040,6 +10048,11 @@ OUTCOME_V2_NAMESPACE_END
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_TRYV(...) OUTCOME_TRYV2(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
+
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME_CO_TRYV(...) OUTCOME_CO_TRYV2(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
 
 #if defined(__GNUC__) || defined(__clang__)
 
@@ -10053,12 +10066,28 @@ SIGNATURE NOT RECOGNISED
 
 
 
+
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME_CO_TRYX(...)                                                                                                                                                                                                                                                                                                        ({                                                                                                                                                                                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                    if(!OUTCOME_V2_NAMESPACE::try_operation_has_value(res))                                                                                                                                                                                                                                                                          co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                    OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                       })
+
+
+
+
+
+
 #endif
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_TRYA(v, ...) OUTCOME_TRY2(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
+
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME_CO_TRYA(v, ...) OUTCOME_CO_TRY2(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
 
 #define OUTCOME_TRY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME_TRYA(a, b, c, d, e, f, g, h)
 #define OUTCOME_TRY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME_TRYA(a, b, c, d, e, f, g)
@@ -10072,5 +10101,18 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_TRY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRY_INVOKE_TRY, __VA_ARGS__)
+
+#define OUTCOME_CO_TRY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME_CO_TRYA(a, b, c, d, e, f, g, h)
+#define OUTCOME_CO_TRY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME_CO_TRYA(a, b, c, d, e, f, g)
+#define OUTCOME_CO_TRY_INVOKE_TRY6(a, b, c, d, e, f) OUTCOME_CO_TRYA(a, b, c, d, e, f)
+#define OUTCOME_CO_TRY_INVOKE_TRY5(a, b, c, d, e) OUTCOME_CO_TRYA(a, b, c, d, e)
+#define OUTCOME_CO_TRY_INVOKE_TRY4(a, b, c, d) OUTCOME_CO_TRYA(a, b, c, d)
+#define OUTCOME_CO_TRY_INVOKE_TRY3(a, b, c) OUTCOME_CO_TRYA(a, b, c)
+#define OUTCOME_CO_TRY_INVOKE_TRY2(a, b) OUTCOME_CO_TRYA(a, b)
+#define OUTCOME_CO_TRY_INVOKE_TRY1(a) OUTCOME_CO_TRYV(a)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME_CO_TRY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_CO_TRY_INVOKE_TRY, __VA_ARGS__)
 
 #endif
