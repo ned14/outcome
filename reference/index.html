@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-10-04T11:49:06 UTC">
+<meta name="revised" content="2019-10-04T15:01:11 UTC">
 <title>API reference :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -1931,13 +1931,6 @@
     </li>
         </ul>
     </li>
-      <li data-nav-id="/outcome/reference/types/awaitable/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/types/awaitable/">
-            <code>awaitable&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
       <li data-nav-id="/outcome/reference/types/bad_outcome_access/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/bad_outcome_access/">
@@ -1977,13 +1970,6 @@
         <div>
           <a href="/outcome/reference/types/success_type/">
             <code>success_type&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/types/task/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/types/task/">
-            <code>task&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2034,6 +2020,20 @@
         <div>
           <a href="/outcome/reference/aliases/default_policy/">
             <code>default_policy&lt;T, EC, EP&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/eager/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/eager/">
+            <code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/lazy/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/lazy/">
+            <code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2562,8 +2562,6 @@
 <p>A type carrying one of (i) a successful <code>T</code> (ii) a disappointment <code>EC</code> (iii) a failure <code>EP</code> (iv) both a disappointment <code>EC</code> and a failure <code>EP</code>, with <code>NoValuePolicy</code> specifying what to do if one tries to read state which isn&rsquo;t there.</p><li>
 	<a href="/outcome/reference/types/basic_result/" ><code>basic_result&lt;T, E, NoValuePolicy&gt;</code></a>
 <p>A sum type carrying either a successful <code>T</code>, or a disappointment <code>E</code>, with <code>NoValuePolicy</code> specifying what to do if one tries to read state which isn&rsquo;t there.</p><li>
-	<a href="/outcome/reference/types/awaitable/" ><code>awaitable&lt;T&gt;</code></a>
-<p>An eagerly evaluated coroutine awaitable with Outcome customisation.</p><li>
 	<a href="/outcome/reference/types/bad_outcome_access/" ><code>bad_outcome_access</code></a>
 <p>Exception type publicly inheriting from <code>std::logic_error</code> indicating an incorrect observation of value or error or exception occurred.</p><li>
 	<a href="/outcome/reference/types/bad_result_access_with/" ><code>bad_result_access_with&lt;EC&gt;</code></a>
@@ -2575,9 +2573,7 @@
 	<a href="/outcome/reference/types/in_place_type_t/" ><code>in_place_type_t&lt;T&gt;</code></a>
 <p>Either <code>std::in_place_type_t&lt;T&gt;</code> or a local emulation, depending on the <code>OUTCOME_USE_STD_IN_PLACE_TYPE</code> macro.</p><li>
 	<a href="/outcome/reference/types/success_type/" ><code>success_type&lt;T&gt;</code></a>
-<p>Type sugar for constructing a successful result or outcome.</p><li>
-	<a href="/outcome/reference/types/task/" ><code>task&lt;T&gt;</code></a>
-<p>A lazily evaluated coroutine awaitable with Outcome customisation.</p></li></ol><li>
+<p>Type sugar for constructing a successful result or outcome.</p></li></ol><li>
 	<a href="/outcome/reference/aliases/" >Aliases</a><ol><li>
 	<a href="/outcome/reference/aliases/boost_checked/" ><code>boost_checked&lt;T, E = boost::system::error_code&gt;</code></a>
 <p>A type alias to a <code>basic_result</code> configured with <code>boost::system::error_code</code> and <code>policy::throw_bad_result_access&lt;EC&gt;</code>.</p><li>
@@ -2591,6 +2587,10 @@
 <p>A type alias to a <code>std_checked&lt;T, E&gt;</code> (standalone edition) or <code>boost_checked&lt;T, E&gt;</code> (Boost edition).</p><li>
 	<a href="/outcome/reference/aliases/default_policy/" ><code>default_policy&lt;T, EC, EP&gt;</code></a>
 <p>A type alias to a no-value policy selected based on traits matching of <code>T</code>, <code>EC</code> and <code>EP</code>.</p><li>
+	<a href="/outcome/reference/aliases/eager/" ><code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code></a>
+<p>An eagerly evaluated coroutine awaitable with Outcome customisation.</p><li>
+	<a href="/outcome/reference/aliases/lazy/" ><code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code></a>
+<p>A lazily evaluated coroutine awaitable with Outcome customisation.</p><li>
 	<a href="/outcome/reference/aliases/outcome/" ><code>outcome&lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code></a>
 <p>A type alias to a <code>std_outcome&lt;T, EC, EP, NoValuePolicy&gt;</code> (standalone edition) or <code>boost_outcome&lt;T, EC, EP, NoValuePolicy&gt;</code> (Boost edition).</p><li>
 	<a href="/outcome/reference/aliases/result/" ><code>result&lt;T, E = varies, NoValuePolicy = policy::default_policy&lt;T, E, void&gt;&gt;</code></a>
@@ -2656,7 +2656,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 26/04/2019
+        <i class='fa fa-calendar'></i> Last update on 16/05/2019
     </div>
     
 

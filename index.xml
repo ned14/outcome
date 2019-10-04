@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/</link>
     <description>Recent content in Home on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 26 Apr 2019 17:43:41 +0200</lastBuildDate>
+    <lastBuildDate>Thu, 16 May 2019 09:51:57 +0100</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/index.xml" rel="self" type="application/rss+xml" />
     
@@ -2325,7 +2325,7 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1100 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @gusrb406 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1101 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @gusrb406 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>
@@ -2615,17 +2615,6 @@ Requires: Always available.</description>
     </item>
     
     <item>
-      <title>`awaitable&lt;T&gt;`</title>
-      <link>https://ned14.github.io/outcome/reference/types/awaitable/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/reference/types/awaitable/</guid>
-      <description>This is very similar to task&amp;lt;T&amp;gt; , except that execution of the awaitable&amp;lt;T&amp;gt; returning function begins immediately, and if the function never suspends during the course of its execution, no suspend-resume cycle occurs. Functions which return awaitable&amp;lt;T&amp;gt; are therefore suitable for tasks which may require suspension, but will often complete immediately.
-Example of use (must be called from within a coroutinised function):
-awaitable&amp;lt;int&amp;gt; func(int x) { co_return x + 1; } .</description>
-    </item>
-    
-    <item>
       <title>`bad_outcome_access`</title>
       <link>https://ned14.github.io/outcome/reference/types/bad_outcome_access/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -2793,6 +2782,16 @@ Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
  If EC and EP is void, choose terminate .
  If is_error_code_available&amp;lt;T&amp;gt; true for EC, choose error_code_throw_as_system_error&amp;lt;T, EC, EP&amp;gt; for basic_outcome or error_code_throw_as_system_error&amp;lt;T, EC, void&amp;gt; for basic_result.
  If is_exception_ptr_available&amp;lt;T&amp;gt; true for EC or EP, choose exception_ptr_rethrow&amp;lt;T, EC, EP&amp;gt; for basic_outcome or exception_ptr_rethrow&amp;lt;T, EC, void&amp;gt; for basic_result.</description>
+    </item>
+    
+    <item>
+      <title>`eager&lt;T&gt;/atomic_eager&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/aliases/eager/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/aliases/eager/</guid>
+      <description>This is very similar to lazy&amp;lt;T&amp;gt; , except that execution of the eager&amp;lt;T&amp;gt; returning function begins immediately, and if the function never suspends during the course of its execution, no suspend-resume cycle occurs. Functions which return eager&amp;lt;T&amp;gt; are therefore suitable for tasks which may require suspension, but will often complete immediately.
+atomic_eager&amp;lt;T&amp;gt; is like eager&amp;lt;T&amp;gt;, except that the setting of the coroutine result performs an atomic release, whilst the checking of whether the coroutine has finished is an atomic acquire.</description>
     </item>
     
     <item>
@@ -2984,6 +2983,15 @@ Header: &amp;lt;outcome/success_failure.hpp&amp;gt;</description>
     </item>
     
     <item>
+      <title>`lazy&lt;T&gt;/atomic_lazy&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/aliases/lazy/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/aliases/lazy/</guid>
+      <description>This is very similar to eager&amp;lt;T&amp;gt; , except that execution of the lazy&amp;lt;T&amp;gt; returning function suspends immediately. Functions which return lazy&amp;lt;T&amp;gt; are therefore suitable for tasks which you need to instantiate right now, but whose execution will occur elsewhere e.g. in a separate kernel thread. Because of the very common use case of using worker threads to execute the body of lazily executed coroutines, most people will want to use atomic_lazy&amp;lt;T&amp;gt; instead of lazy&amp;lt;T&amp;gt;.</description>
+    </item>
+    
+    <item>
       <title>`outcome&lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;`</title>
       <link>https://ned14.github.io/outcome/reference/aliases/outcome/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -3156,15 +3164,6 @@ Header: &amp;lt;outcome/std_result.hpp&amp;gt;</description>
 This is a regular wrapper type, with defaulted default, copy and move constructor, defaulted assignment, and defaulted destructor.
 A member type alias value_type indicates T.
 There is an explicit initialising constructor taking any type U which is not a success_type&amp;lt;T&amp;gt;, and which will forward construct the contained T from that U.</description>
-    </item>
-    
-    <item>
-      <title>`task&lt;T&gt;`</title>
-      <link>https://ned14.github.io/outcome/reference/types/task/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/reference/types/task/</guid>
-      <description>This is very similar to awaitable&amp;lt;T&amp;gt; , except that execution of the task&amp;lt;T&amp;gt; returning function suspends immediately. Functions which return task&amp;lt;T&amp;gt; are therefore suitable for tasks which you need to instantiate right now, but whose execution will occur elsewhere e.g. in a separate kernel thread. Because of the very common use case of using worker threads to execute the body of tasks, the completion status is kept in an atomic, and thus synchronises the writing of the coroutine&amp;rsquo;s result with other threads.</description>
     </item>
     
     <item>

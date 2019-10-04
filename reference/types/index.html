@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-10-04T11:49:08 UTC">
+<meta name="revised" content="2019-10-04T15:01:13 UTC">
 <title>Types :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -1932,13 +1932,6 @@
     </li>
         </ul>
     </li>
-      <li data-nav-id="/outcome/reference/types/awaitable/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/types/awaitable/">
-            <code>awaitable&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
       <li data-nav-id="/outcome/reference/types/bad_outcome_access/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/bad_outcome_access/">
@@ -1978,13 +1971,6 @@
         <div>
           <a href="/outcome/reference/types/success_type/">
             <code>success_type&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/types/task/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/types/task/">
-            <code>task&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2035,6 +2021,20 @@
         <div>
           <a href="/outcome/reference/aliases/default_policy/">
             <code>default_policy&lt;T, EC, EP&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/eager/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/eager/">
+            <code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/lazy/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/lazy/">
+            <code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2444,14 +2444,12 @@
     <option value="/outcome/reference/types/basic_result/" >
   -- 
    `basic_result&lt;T, E, NoValuePolicy&gt;`</option>
-      <option value="/outcome/reference/types/awaitable/" >-- `awaitable&lt;T&gt;`</option>
       <option value="/outcome/reference/types/bad_outcome_access/" >-- `bad_outcome_access`</option>
       <option value="/outcome/reference/types/bad_result_access_with/" >-- `bad_result_access_with&lt;EC&gt;`</option>
       <option value="/outcome/reference/types/bad_result_access/" >-- `bad_result_access`</option>
       <option value="/outcome/reference/types/failure_type/" >-- `failure_type&lt;EC, EP = void&gt;`</option>
       <option value="/outcome/reference/types/in_place_type_t/" >-- `in_place_type_t&lt;T&gt;`</option>
       <option value="/outcome/reference/types/success_type/" >-- `success_type&lt;T&gt;`</option>
-      <option value="/outcome/reference/types/task/" >-- `task&lt;T&gt;`</option>
   
     <option value="/outcome/reference/aliases/" >
   - 
@@ -2756,8 +2754,6 @@
 <p>Return the output from free function <code>failure()</code> containing a copy of any errored state.</p><li>
 	<a href="/outcome/reference/types/basic_result/as_failure_rvalue/" ><code>auto as_failure() &amp;&amp;</code></a>
 <p>Return the output from free function <code>failure()</code> containing a move of any errored state.</p></li></ol><li>
-	<a href="/outcome/reference/types/awaitable/" ><code>awaitable&lt;T&gt;</code></a>
-<p>An eagerly evaluated coroutine awaitable with Outcome customisation.</p><li>
 	<a href="/outcome/reference/types/bad_outcome_access/" ><code>bad_outcome_access</code></a>
 <p>Exception type publicly inheriting from <code>std::logic_error</code> indicating an incorrect observation of value or error or exception occurred.</p><li>
 	<a href="/outcome/reference/types/bad_result_access_with/" ><code>bad_result_access_with&lt;EC&gt;</code></a>
@@ -2769,9 +2765,7 @@
 	<a href="/outcome/reference/types/in_place_type_t/" ><code>in_place_type_t&lt;T&gt;</code></a>
 <p>Either <code>std::in_place_type_t&lt;T&gt;</code> or a local emulation, depending on the <code>OUTCOME_USE_STD_IN_PLACE_TYPE</code> macro.</p><li>
 	<a href="/outcome/reference/types/success_type/" ><code>success_type&lt;T&gt;</code></a>
-<p>Type sugar for constructing a successful result or outcome.</p><li>
-	<a href="/outcome/reference/types/task/" ><code>task&lt;T&gt;</code></a>
-<p>A lazily evaluated coroutine awaitable with Outcome customisation.</p></li></ol>
+<p>Type sugar for constructing a successful result or outcome.</p></li></ol>
 
 
 
@@ -2800,7 +2794,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 26/04/2019
+        <i class='fa fa-calendar'></i> Last update on 16/05/2019
     </div>
     
 

@@ -5,21 +5,10 @@
     <link>https://ned14.github.io/outcome/reference/types/</link>
     <description>Recent content in Types on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 26 Apr 2019 17:43:41 +0200</lastBuildDate>
+    <lastBuildDate>Thu, 16 May 2019 09:51:57 +0100</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/types/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>`awaitable&lt;T&gt;`</title>
-      <link>https://ned14.github.io/outcome/reference/types/awaitable/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/reference/types/awaitable/</guid>
-      <description>This is very similar to task&amp;lt;T&amp;gt; , except that execution of the awaitable&amp;lt;T&amp;gt; returning function begins immediately, and if the function never suspends during the course of its execution, no suspend-resume cycle occurs. Functions which return awaitable&amp;lt;T&amp;gt; are therefore suitable for tasks which may require suspension, but will often complete immediately.
-Example of use (must be called from within a coroutinised function):
-awaitable&amp;lt;int&amp;gt; func(int x) { co_return x + 1; } .</description>
-    </item>
     
     <item>
       <title>`bad_outcome_access`</title>
@@ -92,15 +81,6 @@ Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
 This is a regular wrapper type, with defaulted default, copy and move constructor, defaulted assignment, and defaulted destructor.
 A member type alias value_type indicates T.
 There is an explicit initialising constructor taking any type U which is not a success_type&amp;lt;T&amp;gt;, and which will forward construct the contained T from that U.</description>
-    </item>
-    
-    <item>
-      <title>`task&lt;T&gt;`</title>
-      <link>https://ned14.github.io/outcome/reference/types/task/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/reference/types/task/</guid>
-      <description>This is very similar to awaitable&amp;lt;T&amp;gt; , except that execution of the task&amp;lt;T&amp;gt; returning function suspends immediately. Functions which return task&amp;lt;T&amp;gt; are therefore suitable for tasks which you need to instantiate right now, but whose execution will occur elsewhere e.g. in a separate kernel thread. Because of the very common use case of using worker threads to execute the body of tasks, the completion status is kept in an atomic, and thus synchronises the writing of the coroutine&amp;rsquo;s result with other threads.</description>
     </item>
     
   </channel>

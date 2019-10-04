@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/aliases/</link>
     <description>Recent content in Aliases on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 26 Apr 2019 17:43:41 +0200</lastBuildDate>
+    <lastBuildDate>Thu, 16 May 2019 09:51:57 +0100</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/aliases/index.xml" rel="self" type="application/rss+xml" />
     
@@ -79,6 +79,25 @@ Header: &amp;lt;outcome/result.hpp&amp;gt;</description>
  If EC and EP is void, choose terminate .
  If is_error_code_available&amp;lt;T&amp;gt; true for EC, choose error_code_throw_as_system_error&amp;lt;T, EC, EP&amp;gt; for basic_outcome or error_code_throw_as_system_error&amp;lt;T, EC, void&amp;gt; for basic_result.
  If is_exception_ptr_available&amp;lt;T&amp;gt; true for EC or EP, choose exception_ptr_rethrow&amp;lt;T, EC, EP&amp;gt; for basic_outcome or exception_ptr_rethrow&amp;lt;T, EC, void&amp;gt; for basic_result.</description>
+    </item>
+    
+    <item>
+      <title>`eager&lt;T&gt;/atomic_eager&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/aliases/eager/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/aliases/eager/</guid>
+      <description>This is very similar to lazy&amp;lt;T&amp;gt; , except that execution of the eager&amp;lt;T&amp;gt; returning function begins immediately, and if the function never suspends during the course of its execution, no suspend-resume cycle occurs. Functions which return eager&amp;lt;T&amp;gt; are therefore suitable for tasks which may require suspension, but will often complete immediately.
+atomic_eager&amp;lt;T&amp;gt; is like eager&amp;lt;T&amp;gt;, except that the setting of the coroutine result performs an atomic release, whilst the checking of whether the coroutine has finished is an atomic acquire.</description>
+    </item>
+    
+    <item>
+      <title>`lazy&lt;T&gt;/atomic_lazy&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/aliases/lazy/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/aliases/lazy/</guid>
+      <description>This is very similar to eager&amp;lt;T&amp;gt; , except that execution of the lazy&amp;lt;T&amp;gt; returning function suspends immediately. Functions which return lazy&amp;lt;T&amp;gt; are therefore suitable for tasks which you need to instantiate right now, but whose execution will occur elsewhere e.g. in a separate kernel thread. Because of the very common use case of using worker threads to execute the body of lazily executed coroutines, most people will want to use atomic_lazy&amp;lt;T&amp;gt; instead of lazy&amp;lt;T&amp;gt;.</description>
     </item>
     
     <item>

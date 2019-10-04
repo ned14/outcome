@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-10-04T11:49:09 UTC">
+<meta name="revised" content="2019-10-04T15:01:13 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -1930,13 +1930,6 @@
     </li>
         </ul>
     </li>
-      <li data-nav-id="/outcome/reference/types/awaitable/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/types/awaitable/">
-            <code>awaitable&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
       <li data-nav-id="/outcome/reference/types/bad_outcome_access/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/bad_outcome_access/">
@@ -1976,13 +1969,6 @@
         <div>
           <a href="/outcome/reference/types/success_type/">
             <code>success_type&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/types/task/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/types/task/">
-            <code>task&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2033,6 +2019,20 @@
         <div>
           <a href="/outcome/reference/aliases/default_policy/">
             <code>default_policy&lt;T, EC, EP&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/eager/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/eager/">
+            <code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/lazy/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/lazy/">
+            <code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2489,13 +2489,13 @@ enabling of C++ Concepts support occurring.</dd>
 <dd>Support for C++ Coroutines has been added. This comes in two parts, firstly there is
 now an <code>OUTCOME_CO_TRY()</code> operation suitable for performing the <code>TRY</code> operation from
 within a C++ Coroutine. Secondly, in the header <code>outcome/coroutine_support.hpp</code> there are
-implementations of <code>awaitable&lt;OutcomeType&gt;</code> and <code>task&lt;OutcomeType&gt;</code> which let you more
+implementations of <code>eager&lt;OutcomeType&gt;</code> and <code>lazy&lt;OutcomeType&gt;</code> which let you more
 naturally and efficiently use <code>basic_result</code> or <code>basic_outcome</code> from within C++
 Coroutines &ndash; specifically, if the result or outcome will construct from an exception
 pointer, exceptions thrown in the coroutine return an errored or excepted result with
 the thrown exception instead of throwing the exception through the coroutine machinery
 (which in current compilers, has a high likelihood of blowing up the program). Both
-<code>awaitable&lt;T&gt;</code> and <code>task&lt;T&gt;</code> can accept any <code>T</code> as well. Both have been tested and found
+<code>eager&lt;T&gt;</code> and <code>lazy&lt;T&gt;</code> can accept any <code>T</code> as well. Both have been tested and found
 working on VS2019 and clang 9.</dd>
 </dl>
 
@@ -2716,7 +2716,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/10/2019
+        <i class='fa fa-calendar'></i> Last update on 04/10/2019
     </div>
     
 
