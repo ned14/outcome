@@ -34,13 +34,13 @@ enabling of C++ Concepts support occurring.
 : Support for C++ Coroutines has been added. This comes in two parts, firstly there is
 now an `OUTCOME_CO_TRY()` operation suitable for performing the `TRY` operation from
 within a C++ Coroutine. Secondly, in the header `outcome/coroutine_support.hpp` there are
-implementations of `awaitable<OutcomeType>` and `task<OutcomeType>` which let you more
+implementations of `eager<OutcomeType>` and `lazy<OutcomeType>` which let you more
 naturally and efficiently use `basic_result` or `basic_outcome` from within C++
 Coroutines -- specifically, if the result or outcome will construct from an exception
 pointer, exceptions thrown in the coroutine return an errored or excepted result with
 the thrown exception instead of throwing the exception through the coroutine machinery
 (which in current compilers, has a high likelihood of blowing up the program). Both
-`awaitable<T>` and `task<T>` can accept any `T` as well. Both have been tested and found
+`eager<T>` and `lazy<T>` can accept any `T` as well. Both have been tested and found
 working on VS2019 and clang 9.
 
 ### Bug fixes:

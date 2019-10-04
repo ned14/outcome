@@ -28,105 +28,82 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/try.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
-inline OUTCOME_V2_NAMESPACE::awaitable<OUTCOME_V2_NAMESPACE::result<int>> awaitable_int(int x)
+namespace coroutines
 {
-  co_return x + 1;
-}
-inline OUTCOME_V2_NAMESPACE::task<OUTCOME_V2_NAMESPACE::result<int>> task_int(int x)
-{
-  co_return x + 1;
-}
-inline OUTCOME_V2_NAMESPACE::awaitable<OUTCOME_V2_NAMESPACE::result<int>> awaitable_error()
-{
-  co_return std::errc::not_enough_memory;
-}
-inline OUTCOME_V2_NAMESPACE::task<OUTCOME_V2_NAMESPACE::result<int>> task_error()
-{
-  co_return std::errc::not_enough_memory;
-}
-inline OUTCOME_V2_NAMESPACE::awaitable<OUTCOME_V2_NAMESPACE::result<void>> awaitable_void()
-{
-  co_return std::errc::not_enough_memory;
-}
-inline OUTCOME_V2_NAMESPACE::task<OUTCOME_V2_NAMESPACE::result<void>> task_void()
-{
-  co_return std::errc::not_enough_memory;
-}
+  template <class T> using eager = OUTCOME_V2_NAMESPACE::awaitables::eager<T>;
+  template <class T> using lazy = OUTCOME_V2_NAMESPACE::awaitables::lazy<T>;
+  template <class T, class E = std::error_code> using result = OUTCOME_V2_NAMESPACE::result<T, E>;
 
-template <class U, class... Args> inline OUTCOME_V2_NAMESPACE::awaitable<OUTCOME_V2_NAMESPACE::result<std::string>> awaitable_coawait(U &&f, Args... args)
-{
-  OUTCOME_CO_TRY(co_await f(args...));
-  co_return "hi";
-}
-template <class U, class... Args> inline OUTCOME_V2_NAMESPACE::task<OUTCOME_V2_NAMESPACE::result<std::string>> task_coawait(U &&f, Args... args)
-{
-  OUTCOME_CO_TRY(co_await f(args...));
-  co_return "hi";
-}
+  inline eager<result<int>> eager_int(int x) { co_return x + 1; }
+  inline lazy<result<int>> lazy_int(int x) { co_return x + 1; }
+  inline eager<result<int>> eager_error() { co_return std::errc::not_enough_memory; }
+  inline lazy<result<int>> lazy_error() { co_return std::errc::not_enough_memory; }
+  inline eager<result<void>> eager_void() { co_return std::errc::not_enough_memory; }
+  inline lazy<result<void>> lazy_void() { co_return std::errc::not_enough_memory; }
+
+  template <class U, class... Args> inline eager<result<std::string>> eager_coawait(U &&f, Args... args)
+  {
+    OUTCOME_CO_TRY(co_await f(args...));
+    co_return "hi";
+  }
+  template <class U, class... Args> inline lazy<result<std::string>> lazy_coawait(U &&f, Args... args)
+  {
+    OUTCOME_CO_TRY(co_await f(args...));
+    co_return "hi";
+  }
 
 #ifdef __cpp_exceptions
-struct custom_exception_type
-{
-};
-inline OUTCOME_V2_NAMESPACE::task<OUTCOME_V2_NAMESPACE::result<int, std::exception_ptr>> result_exception(std::exception_ptr e)
-{
-  std::rethrow_exception(e);
-  co_return 5;
-}
+  struct custom_exception_type
+  {
+  };
+  inline lazy<result<int, std::exception_ptr>> result_exception(std::exception_ptr e)
+  {
+    std::rethrow_exception(e);
+    co_return 5;
+  }
 
-inline OUTCOME_V2_NAMESPACE::task<OUTCOME_V2_NAMESPACE::outcome<int>> outcome_exception(std::exception_ptr e)
-{
-  std::rethrow_exception(e);
-  co_return 5;
-}
+  inline lazy<OUTCOME_V2_NAMESPACE::outcome<int>> outcome_exception(std::exception_ptr e)
+  {
+    std::rethrow_exception(e);
+    co_return 5;
+  }
 #endif
 
-inline OUTCOME_V2_NAMESPACE::awaitable<int> awaitable_int2(int x)
-{
-  co_return x + 1;
-}
-inline OUTCOME_V2_NAMESPACE::task<int> task_int2(int x)
-{
-  co_return x + 1;
-}
-inline OUTCOME_V2_NAMESPACE::awaitable<void> awaitable_void2()
-{
-  co_return;
-}
-inline OUTCOME_V2_NAMESPACE::task<void> task_void2()
-{
-  co_return;
-}
+  inline eager<int> eager_int2(int x) { co_return x + 1; }
+  inline lazy<int> lazy_int2(int x) { co_return x + 1; }
+  inline eager<void> eager_void2() { co_return; }
+  inline lazy<void> lazy_void2() { co_return; }
+}  // namespace coroutines
 
-BOOST_OUTCOME_AUTO_TEST_CASE(works / result / coroutine, "Tests that results are awaitable and task awaitable")
+BOOST_OUTCOME_AUTO_TEST_CASE(works / result / coroutine, "Tests that results are eager and lazy awaitable")
 {
-  using namespace OUTCOME_V2_NAMESPACE;
-  auto awaitable_await = [](auto t) { return t.await_resume(); };
-  auto task_await = [](auto t) {
+  using namespace coroutines;
+  auto eager_await = [](auto t) { return t.await_resume(); };
+  auto lazy_await = [](auto t) {
     t.await_suspend({});
     return t.await_resume();
   };
 
-  BOOST_CHECK(awaitable_await(awaitable_int(5)).value() == 6);
-  BOOST_CHECK(task_await(task_int(5)).value() == 6);
-  BOOST_CHECK(awaitable_await(awaitable_error()).error() == std::errc::not_enough_memory);
-  BOOST_CHECK(task_await(task_error()).error() == std::errc::not_enough_memory);
-  BOOST_CHECK(awaitable_await(awaitable_void()).error() == std::errc::not_enough_memory);
-  BOOST_CHECK(task_await(task_void()).error() == std::errc::not_enough_memory);
+  BOOST_CHECK(eager_await(eager_int(5)).value() == 6);
+  BOOST_CHECK(lazy_await(lazy_int(5)).value() == 6);
+  BOOST_CHECK(eager_await(eager_error()).error() == std::errc::not_enough_memory);
+  BOOST_CHECK(lazy_await(lazy_error()).error() == std::errc::not_enough_memory);
+  BOOST_CHECK(eager_await(eager_void()).error() == std::errc::not_enough_memory);
+  BOOST_CHECK(lazy_await(lazy_void()).error() == std::errc::not_enough_memory);
 
-  BOOST_CHECK(awaitable_await(awaitable_coawait(awaitable_int, 5)).value() == "hi");
-  BOOST_CHECK(task_await(task_coawait(task_int, 5)).value() == "hi");
+  BOOST_CHECK(eager_await(eager_coawait(eager_int, 5)).value() == "hi");
+  BOOST_CHECK(lazy_await(lazy_coawait(lazy_int, 5)).value() == "hi");
 
 #ifdef __cpp_exceptions
   auto e = std::make_exception_ptr(custom_exception_type());
-  BOOST_CHECK_THROW(task_await(result_exception(e)).value(), custom_exception_type);
-  BOOST_CHECK_THROW(task_await(outcome_exception(e)).value(), custom_exception_type);
+  BOOST_CHECK_THROW(lazy_await(result_exception(e)).value(), custom_exception_type);
+  BOOST_CHECK_THROW(lazy_await(outcome_exception(e)).value(), custom_exception_type);
 #endif
 
-  BOOST_CHECK(awaitable_await(awaitable_int2(5)) == 6);
-  BOOST_CHECK(task_await(task_int2(5)) == 6);
-  awaitable_await(awaitable_void2());
-  task_await(task_void2());
+  BOOST_CHECK(eager_await(eager_int2(5)) == 6);
+  BOOST_CHECK(lazy_await(lazy_int2(5)) == 6);
+  eager_await(eager_void2());
+  lazy_await(lazy_void2());
 }
 #else
 int main(void)

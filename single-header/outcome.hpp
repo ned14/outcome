@@ -25,8 +25,34 @@ Distributed under the Boost Software License, Version 1.0.
 #if defined(__cpp_modules) && !defined(GENERATING_OUTCOME_MODULE_INTERFACE)
 import outcome_v2_0;
 #else
-/* iostream specialisations for result and outcome
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (21 commits)
+/* Tells C++ coroutines about Outcome's result
+(C) 2019 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
+File Created: Oct 2019
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+#ifndef OUTCOME_COROUTINE_SUPPORT_HPP
+#define OUTCOME_COROUTINE_SUPPORT_HPP
+/* Tries to convert an exception ptr into its equivalent error code
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
 File Created: July 2017
 
 
@@ -49,112 +75,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef OUTCOME_IOSTREAM_SUPPORT_HPP
-#define OUTCOME_IOSTREAM_SUPPORT_HPP
-/* A less simple result type
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (79 commits)
-File Created: June 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-    (See accompanying file Licence.txt or copy at
-          http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-#ifndef OUTCOME_OUTCOME_HPP
-#define OUTCOME_OUTCOME_HPP
-/* A very simple result type
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (99 commits)
-File Created: June 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-    (See accompanying file Licence.txt or copy at
-          http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-#ifndef OUTCOME_RESULT_HPP
-#define OUTCOME_RESULT_HPP
-/* A very simple result type
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
-File Created: June 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-    (See accompanying file Licence.txt or copy at
-          http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-#ifndef OUTCOME_STD_RESULT_HPP
-#define OUTCOME_STD_RESULT_HPP
-/* A very simple result type
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
-File Created: June 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-    (See accompanying file Licence.txt or copy at
-          http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-#ifndef OUTCOME_BASIC_RESULT_HPP
-#define OUTCOME_BASIC_RESULT_HPP
+#ifndef OUTCOME_UTILS_HPP
+#define OUTCOME_UTILS_HPP
 /* Configure Outcome with QuickCppLib
 (C) 2015-2019 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: August 2015
@@ -812,9 +734,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    7f26fcca68e1d3e313954e4b2760a4fe89d30589
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-10-03 13:05:18 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 7f26fcca
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    0008aa6404a6bcce0066ebf94dc3716951c2831b
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-10-04 08:58:30 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 0008aa64
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1322,9 +1244,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 6e25457ff7b50cdb3da72a8d719cade150bb9b7a
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-10-03 13:50:33 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 6e25457f
+#define OUTCOME_PREVIOUS_COMMIT_REF 4788ad6f0b5a8abfbd7f8ef0716203345aa1cce8
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-10-04 11:46:43 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4788ad6f
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1867,6 +1789,540 @@ OUTCOME_V2_NAMESPACE_END
 #endif
 
 #endif
+#include <exception>
+#include <system_error>
+
+OUTCOME_V2_NAMESPACE_BEGIN
+
+#ifdef __cpp_exceptions
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+inline std::error_code error_from_exception(std::exception_ptr &&ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
+{
+  if(!ep)
+  {
+    return {};
+  }
+  try
+  {
+    std::rethrow_exception(ep);
+  }
+  catch(const std::invalid_argument & /*unused*/)
+  {
+    ep = std::exception_ptr();
+    return std::make_error_code(std::errc::invalid_argument);
+  }
+  catch(const std::domain_error & /*unused*/)
+  {
+    ep = std::exception_ptr();
+    return std::make_error_code(std::errc::argument_out_of_domain);
+  }
+  catch(const std::length_error & /*unused*/)
+  {
+    ep = std::exception_ptr();
+    return std::make_error_code(std::errc::argument_list_too_long);
+  }
+  catch(const std::out_of_range & /*unused*/)
+  {
+    ep = std::exception_ptr();
+    return std::make_error_code(std::errc::result_out_of_range);
+  }
+  catch(const std::logic_error & /*unused*/) /* base class for this group */
+  {
+    ep = std::exception_ptr();
+    return std::make_error_code(std::errc::invalid_argument);
+  }
+  catch(const std::system_error &e) /* also catches ios::failure */
+  {
+    ep = std::exception_ptr();
+    return e.code();
+  }
+  catch(const std::overflow_error & /*unused*/)
+  {
+    ep = std::exception_ptr();
+    return std::make_error_code(std::errc::value_too_large);
+  }
+  catch(const std::range_error & /*unused*/)
+  {
+    ep = std::exception_ptr();
+    return std::make_error_code(std::errc::result_out_of_range);
+  }
+  catch(const std::runtime_error & /*unused*/) /* base class for this group */
+  {
+    ep = std::exception_ptr();
+    return std::make_error_code(std::errc::resource_unavailable_try_again);
+  }
+  catch(const std::bad_alloc & /*unused*/)
+  {
+    ep = std::exception_ptr();
+    return std::make_error_code(std::errc::not_enough_memory);
+  }
+  catch(...)
+  {
+  }
+  return not_matched;
+}
+
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+inline void try_throw_std_exception_from_error(std::error_code ec, const std::string &msg = std::string{})
+{
+  if(!ec || (ec.category() != std::generic_category()
+#ifndef _WIN32
+             && ec.category() != std::system_category()
+#endif
+             ))
+  {
+    return;
+  }
+  switch(ec.value())
+  {
+  case EINVAL:
+    throw msg.empty() ? std::invalid_argument("invalid argument") : std::invalid_argument(msg);
+  case EDOM:
+    throw msg.empty() ? std::domain_error("domain error") : std::domain_error(msg);
+  case E2BIG:
+    throw msg.empty() ? std::length_error("length error") : std::length_error(msg);
+  case ERANGE:
+    throw msg.empty() ? std::out_of_range("out of range") : std::out_of_range(msg);
+  case EOVERFLOW:
+    throw msg.empty() ? std::overflow_error("overflow error") : std::overflow_error(msg);
+  case ENOMEM:
+    throw std::bad_alloc();
+  }
+}
+#endif
+
+OUTCOME_V2_NAMESPACE_END
+
+#endif
+#include <atomic>
+#include <cassert>
+
+#ifdef __cpp_coroutines
+#if __has_include(<coroutine>)
+#include <coroutine>
+OUTCOME_V2_NAMESPACE_BEGIN
+namespace awaitables
+{
+  template <class Promise = void> using coroutine_handle = std::coroutine_handle<Promise>;
+  template <class... Args> using coroutine_traits = std::coroutine_traits<Args...>;
+  using std::suspend_always;
+  using std::suspend_never;
+}  // namespace awaitables
+OUTCOME_V2_NAMESPACE_END
+#define OUTCOME_FOUND_COROUTINE_HEADER 1
+#elif __has_include(<experimental/coroutine>)
+#include <experimental/coroutine>
+OUTCOME_V2_NAMESPACE_BEGIN
+namespace awaitables
+{
+  template <class Promise = void> using coroutine_handle = std::experimental::coroutine_handle<Promise>;
+  template <class... Args> using coroutine_traits = std::experimental::coroutine_traits<Args...>;
+  using std::experimental::suspend_always;
+  using std::experimental::suspend_never;
+}  // namespace awaitables
+OUTCOME_V2_NAMESPACE_END
+#define OUTCOME_FOUND_COROUTINE_HEADER 1
+#endif
+#endif
+
+#ifdef OUTCOME_FOUND_COROUTINE_HEADER
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
+namespace awaitables
+{
+  namespace detail
+  {
+    struct error_type_not_found
+    {
+    };
+    struct exception_type_not_found
+    {
+    };
+    template <class T> struct type_found
+    {
+      using type = T;
+    };
+    template <class T, class U = typename T::error_type> constexpr inline type_found<U> extract_error_type(int /*unused*/) { return {}; }
+    template <class T> constexpr inline type_found<error_type_not_found> extract_error_type(...) { return {}; }
+    template <class T, class U = typename T::exception_type> constexpr inline type_found<U> extract_exception_type(int /*unused*/) { return {}; }
+    template <class T> constexpr inline type_found<exception_type_not_found> extract_exception_type(...) { return {}; }
+
+    OUTCOME_TEMPLATE(class T, class U)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_constructible<U, T>::value))
+    inline bool try_set_error(T &e, U *result)
+    {
+      new(result) U(e);
+      return true;
+    }
+    template <class T> inline bool try_set_error(T & /*unused*/, ...) { return false; }
+    OUTCOME_TEMPLATE(class T, class U)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_constructible<U, T>::value))
+    inline void set_or_rethrow(T &e, U *result) { new(result) U(e); }
+    template <class T> inline void set_or_rethrow(T &e, ...) { rethrow_exception(e); }
+    template <class T> class fake_atomic
+    {
+      T _v;
+
+    public:
+      constexpr fake_atomic(T v)
+          : _v(v)
+      {
+      }
+      T load(std::memory_order /*unused*/) { return _v; }
+      void store(T v, std::memory_order /*unused*/) { _v = v; }
+    };
+
+    template <class Awaitable, bool suspend_initial, bool use_atomic, bool is_void> struct outcome_promise_type
+    {
+      using container_type = typename Awaitable::container_type;
+      using result_set_type = std::conditional_t<use_atomic, std::atomic<bool>, fake_atomic<bool>>;
+      union {
+        OUTCOME_V2_NAMESPACE::detail::empty_type _default{};
+        container_type result;
+      };
+      result_set_type result_set{false};
+      coroutine_handle<> continuation;
+
+      outcome_promise_type() {}
+      outcome_promise_type(const outcome_promise_type &) = delete;
+      outcome_promise_type(outcome_promise_type &&) = delete;
+      outcome_promise_type &operator=(const outcome_promise_type &) = delete;
+      outcome_promise_type &operator=(outcome_promise_type &&) = delete;
+      ~outcome_promise_type()
+      {
+        if(result_set.load(std::memory_order_acquire))
+        {
+          result.~container_type();
+        }
+      }
+      auto get_return_object() { return Awaitable{*this}; }
+      void return_value(container_type &&value)
+      {
+        assert(!result_set.load(std::memory_order_acquire));
+        if(result_set.load(std::memory_order_acquire))
+        {
+          result.~container_type();
+        }
+        new(&result) container_type(static_cast<container_type &&>(value));
+        result_set.store(true, std::memory_order_release);
+      }
+      void return_value(const container_type &value)
+      {
+        assert(!result_set.load(std::memory_order_acquire));
+        if(result_set.load(std::memory_order_acquire))
+        {
+          result.~container_type();
+        }
+        new(&result) container_type(value);
+        result_set.store(true, std::memory_order_release);
+      }
+      void unhandled_exception()
+      {
+        assert(!result_set.load(std::memory_order_acquire));
+        if(result_set.load(std::memory_order_acquire))
+        {
+          result.~container_type();
+        }
+#ifdef __cpp_exceptions
+        auto e = std::current_exception();
+        auto ec = error_from_exception(static_cast<decltype(e) &&>(e), {});
+        // Try to set error code first
+        if(!ec || !detail::try_set_error(ec, &result))
+        {
+          detail::set_or_rethrow(e, &result);
+        }
+#else
+        std::terminate();
+#endif
+        result_set.store(true, std::memory_order_release);
+      }
+      auto initial_suspend() noexcept
+      {
+        struct awaiter
+        {
+          bool await_ready() noexcept { return !suspend_initial; }
+          void await_resume() noexcept {}
+          void await_suspend(coroutine_handle<> /*unused*/) {}
+        };
+        return awaiter{};
+      }
+      auto final_suspend()
+      {
+        struct awaiter
+        {
+          bool await_ready() noexcept { return false; }
+          void await_resume() noexcept {}
+          void await_suspend(coroutine_handle<outcome_promise_type> self)
+          {
+            if(self.promise().continuation)
+            {
+              return self.promise().continuation.resume();
+            }
+          }
+        };
+        return awaiter{};
+      }
+    };
+    template <class Awaitable, bool suspend_initial, bool use_atomic> struct outcome_promise_type<Awaitable, suspend_initial, use_atomic, true>
+    {
+      using container_type = void;
+      using result_set_type = std::conditional_t<use_atomic, std::atomic<bool>, fake_atomic<bool>>;
+      result_set_type result_set{false};
+      coroutine_handle<> continuation;
+
+      outcome_promise_type() {}
+      outcome_promise_type(const outcome_promise_type &) = delete;
+      outcome_promise_type(outcome_promise_type &&) = delete;
+      outcome_promise_type &operator=(const outcome_promise_type &) = delete;
+      outcome_promise_type &operator=(outcome_promise_type &&) = delete;
+      ~outcome_promise_type() = default;
+      auto get_return_object() { return Awaitable{*this}; }
+      void return_void()
+      {
+        assert(!result_set.load(std::memory_order_acquire));
+        result_set.store(true, std::memory_order_release);
+      }
+      void unhandled_exception()
+      {
+        assert(!result_set.load(std::memory_order_acquire));
+        std::rethrow_exception(std::current_exception());
+      }
+      auto initial_suspend() noexcept
+      {
+        struct awaiter
+        {
+          bool await_ready() noexcept { return !suspend_initial; }
+          void await_resume() noexcept {}
+          void await_suspend(coroutine_handle<> /*unused*/) {}
+        };
+        return awaiter{};
+      }
+      auto final_suspend()
+      {
+        struct awaiter
+        {
+          bool await_ready() noexcept { return false; }
+          void await_resume() noexcept {}
+          void await_suspend(coroutine_handle<outcome_promise_type> self)
+          {
+            if(self.promise().continuation)
+            {
+              return self.promise().continuation.resume();
+            }
+          }
+        };
+        return awaiter{};
+      }
+    };
+    template <class Awaitable, bool suspend_initial, bool use_atomic> constexpr inline auto move_result_from_promise_if_not_void(outcome_promise_type<Awaitable, suspend_initial, use_atomic, false> &p) { return static_cast<typename Awaitable::container_type &&>(p.result); }
+    template <class Awaitable, bool suspend_initial, bool use_atomic> constexpr inline void move_result_from_promise_if_not_void(outcome_promise_type<Awaitable, suspend_initial, use_atomic, true> & /*unused*/) {}
+
+    template <class Cont, bool suspend_initial, bool use_atomic> struct OUTCOME_NODISCARD awaitable
+    {
+      using container_type = Cont;
+      using promise_type = outcome_promise_type<awaitable, suspend_initial, use_atomic, std::is_void<container_type>::value>;
+      coroutine_handle<promise_type> _h;
+
+      awaitable(awaitable &&o) noexcept
+          : _h(static_cast<coroutine_handle<promise_type> &&>(o._h))
+      {
+        o._h = nullptr;
+      }
+      ~awaitable()
+      {
+        if(_h)
+        {
+          _h.destroy();
+        }
+      }
+      explicit awaitable(promise_type &p)
+          : _h(coroutine_handle<promise_type>::from_promise(p))
+      {
+      }
+      bool await_ready() noexcept { return _h.promise().result_set.load(std::memory_order_acquire); }
+      container_type await_resume()
+      {
+        assert(_h.promise().result_set.load(std::memory_order_acquire));
+        if(!_h.promise().result_set.load(std::memory_order_acquire))
+        {
+          std::terminate();
+        }
+        return detail::move_result_from_promise_if_not_void(_h.promise());
+      }
+      void await_suspend(coroutine_handle<> cont)
+      {
+        _h.promise().continuation = cont;
+        _h.resume();
+      }
+    };
+  }  // namespace detail
+
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+  SIGNATURE NOT RECOGNISED
+  */
+
+
+  template <class T> using eager = detail::awaitable<T, false, false>;
+
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+  SIGNATURE NOT RECOGNISED
+  */
+
+
+  template <class T> using atomic_eager = detail::awaitable<T, false, true>;
+
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+  SIGNATURE NOT RECOGNISED
+  */
+
+
+  template <class T> using lazy = detail::awaitable<T, true, false>;
+
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+  SIGNATURE NOT RECOGNISED
+  */
+
+
+  template <class T> using atomic_lazy = detail::awaitable<T, true, true>;
+
+}  // namespace awaitables
+
+OUTCOME_V2_NAMESPACE_END
+#endif
+#endif
+/* iostream specialisations for result and outcome
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (21 commits)
+File Created: July 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+#ifndef OUTCOME_IOSTREAM_SUPPORT_HPP
+#define OUTCOME_IOSTREAM_SUPPORT_HPP
+/* A less simple result type
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (79 commits)
+File Created: June 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+#ifndef OUTCOME_OUTCOME_HPP
+#define OUTCOME_OUTCOME_HPP
+/* A very simple result type
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (99 commits)
+File Created: June 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+#ifndef OUTCOME_RESULT_HPP
+#define OUTCOME_RESULT_HPP
+/* A very simple result type
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
+File Created: June 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+#ifndef OUTCOME_STD_RESULT_HPP
+#define OUTCOME_STD_RESULT_HPP
+/* A very simple result type
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
+File Created: June 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+#ifndef OUTCOME_BASIC_RESULT_HPP
+#define OUTCOME_BASIC_RESULT_HPP
 /* Says how to convert value, error and exception types
 (C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
 File Created: Nov 2017
@@ -6906,144 +7362,6 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_CO_TRY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_CO_TRY_INVOKE_TRY, __VA_ARGS__)
-
-#endif
-/* Tries to convert an exception ptr into its equivalent error code
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
-File Created: July 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-    (See accompanying file Licence.txt or copy at
-          http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-#ifndef OUTCOME_UTILS_HPP
-#define OUTCOME_UTILS_HPP
-
-
-
-#include <exception>
-#include <system_error>
-
-OUTCOME_V2_NAMESPACE_BEGIN
-
-#ifdef __cpp_exceptions
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-inline std::error_code error_from_exception(std::exception_ptr &&ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
-{
-  if(!ep)
-  {
-    return {};
-  }
-  try
-  {
-    std::rethrow_exception(ep);
-  }
-  catch(const std::invalid_argument & /*unused*/)
-  {
-    ep = std::exception_ptr();
-    return std::make_error_code(std::errc::invalid_argument);
-  }
-  catch(const std::domain_error & /*unused*/)
-  {
-    ep = std::exception_ptr();
-    return std::make_error_code(std::errc::argument_out_of_domain);
-  }
-  catch(const std::length_error & /*unused*/)
-  {
-    ep = std::exception_ptr();
-    return std::make_error_code(std::errc::argument_list_too_long);
-  }
-  catch(const std::out_of_range & /*unused*/)
-  {
-    ep = std::exception_ptr();
-    return std::make_error_code(std::errc::result_out_of_range);
-  }
-  catch(const std::logic_error & /*unused*/) /* base class for this group */
-  {
-    ep = std::exception_ptr();
-    return std::make_error_code(std::errc::invalid_argument);
-  }
-  catch(const std::system_error &e) /* also catches ios::failure */
-  {
-    ep = std::exception_ptr();
-    return e.code();
-  }
-  catch(const std::overflow_error & /*unused*/)
-  {
-    ep = std::exception_ptr();
-    return std::make_error_code(std::errc::value_too_large);
-  }
-  catch(const std::range_error & /*unused*/)
-  {
-    ep = std::exception_ptr();
-    return std::make_error_code(std::errc::result_out_of_range);
-  }
-  catch(const std::runtime_error & /*unused*/) /* base class for this group */
-  {
-    ep = std::exception_ptr();
-    return std::make_error_code(std::errc::resource_unavailable_try_again);
-  }
-  catch(const std::bad_alloc & /*unused*/)
-  {
-    ep = std::exception_ptr();
-    return std::make_error_code(std::errc::not_enough_memory);
-  }
-  catch(...)
-  {
-  }
-  return not_matched;
-}
-
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-inline void try_throw_std_exception_from_error(std::error_code ec, const std::string &msg = std::string{})
-{
-  if(!ec || (ec.category() != std::generic_category()
-#ifndef _WIN32
-             && ec.category() != std::system_category()
-#endif
-             ))
-  {
-    return;
-  }
-  switch(ec.value())
-  {
-  case EINVAL:
-    throw msg.empty() ? std::invalid_argument("invalid argument") : std::invalid_argument(msg);
-  case EDOM:
-    throw msg.empty() ? std::domain_error("domain error") : std::domain_error(msg);
-  case E2BIG:
-    throw msg.empty() ? std::length_error("length error") : std::length_error(msg);
-  case ERANGE:
-    throw msg.empty() ? std::out_of_range("out of range") : std::out_of_range(msg);
-  case EOVERFLOW:
-    throw msg.empty() ? std::overflow_error("overflow error") : std::overflow_error(msg);
-  case ENOMEM:
-    throw std::bad_alloc();
-  }
-}
-#endif
-
-OUTCOME_V2_NAMESPACE_END
 
 #endif
 #endif
