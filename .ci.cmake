@@ -12,7 +12,7 @@ set(CTEST_GIT_COMMAND "${GIT_EXECUTABLE}")
 
 ctest_start("Experimental")
 ctest_update()
-ctest_configure(OPTIONS -DCMAKE_BUILD_TYPE=${CTEST_CONFIGURATION_TYPE} ${CTEST_CONFIGURE_OPTIONS})
+ctest_configure(OPTIONS -DCMAKE_BUILD_TYPE=Release ${CTEST_CONFIGURE_OPTIONS})
 ctest_build(TARGET _hl)
 ctest_test(RETURN_VALUE retval)
 set(retval2 0)
