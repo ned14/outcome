@@ -30,7 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <atomic>
 #include <cassert>
 
-#ifdef __cpp_coroutines
+#if __cpp_coroutines
 #if __has_include(<coroutine>)
 #include <coroutine>
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -260,6 +260,9 @@ namespace awaitables
       {
         o._h = nullptr;
       }
+      awaitable(const awaitable &o) = delete;
+      awaitable &operator=(awaitable &&) = delete;  // as per P1056
+      awaitable &operator=(const awaitable &) = delete;
       ~awaitable()
       {
         if(_h)
