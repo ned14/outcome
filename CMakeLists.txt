@@ -39,9 +39,6 @@ set(outcome_INTERFACE_SOURCE "include/outcome.ixx")
 # Setup this cmake environment for this project
 include(QuickCppLibSetupProject)
 
-# If we have concepts, enable those for both myself and all inclusions
-apply_cxx_concepts_to(INTERFACE outcome_hl)
-
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the unit tests")
 
 if(NOT PROJECT_IS_DEPENDENCY)
@@ -67,6 +64,9 @@ find_quickcpplib_library(quickcpplib
 
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(QuickCppLibMakeHeaderOnlyLibrary)
+
+# If we have concepts, enable those for both myself and all inclusions
+apply_cxx_concepts_to(INTERFACE outcome_hl)
 
 # Make preprocessed edition of this library target
 if(NOT PROJECT_IS_DEPENDENCY)
@@ -248,6 +248,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
           set(example_bin "${PROJECT_NAME}-snippets_${CMAKE_MATCH_1}")
           add_executable(${example_bin} EXCLUDE_FROM_ALL "${example_src}")
           list(APPEND example_bins ${example_bin})
+          target_link_libraries(${example_bin} PRIVATE outcome::hl)
           set_target_properties(${example_bin} PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
             POSITION_INDEPENDENT_CODE ON
@@ -255,9 +256,9 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
           if(NOT example_src MATCHES "[.]c$")
             target_compile_features(${example_bin} PUBLIC cxx_std_17)
             if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-              target_link_libraries(${example_bin} stdc++fs)
+              target_link_libraries(${example_bin} PRIVATE stdc++fs)
             elseif(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
-              target_link_libraries(${example_bin} c++experimental)
+              target_link_libraries(${example_bin} PRIVATE c++experimental)
             endif()
           endif()
         endif()
