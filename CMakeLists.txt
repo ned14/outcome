@@ -39,9 +39,6 @@ set(outcome_INTERFACE_SOURCE "include/outcome.ixx")
 # Setup this cmake environment for this project
 include(QuickCppLibSetupProject)
 
-# If we have concepts, enable those for both myself and all inclusions
-apply_cxx_concepts_to(INTERFACE outcome_hl)
-
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the unit tests")
 
 if(NOT PROJECT_IS_DEPENDENCY)
@@ -67,6 +64,9 @@ find_quickcpplib_library(quickcpplib
 
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(QuickCppLibMakeHeaderOnlyLibrary)
+
+# If we have concepts, enable those for both myself and all inclusions
+apply_cxx_concepts_to(INTERFACE outcome_hl)
 
 # Make preprocessed edition of this library target
 if(NOT PROJECT_IS_DEPENDENCY)
