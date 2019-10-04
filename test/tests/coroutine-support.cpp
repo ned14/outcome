@@ -128,4 +128,9 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result / coroutine, "Tests that results are
   awaitable_await(awaitable_void2());
   task_await(task_void2());
 }
+#else
+int main(void)
+{
+  return 0;
+}
 #endif
