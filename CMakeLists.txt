@@ -60,6 +60,7 @@ endif()
 find_quickcpplib_library(quickcpplib
   GIT_REPOSITORY "https://github.com/ned14/quickcpplib.git"
   REQUIRED
+  IS_HEADER_ONLY
 )
 
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
