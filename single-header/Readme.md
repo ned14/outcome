@@ -16,6 +16,7 @@ Herein lie multiple single header editions of Outcome:
   </dd>
   <dt><code>&lt;outcome.hpp&gt;</code></dt>
   <dd>An inclusion of <code>outcome.hpp</code> which brings in all the specialisations
-  for the <code>std</code> STL types, plus iostreams and coroutines support. If you don't
-  know which edition to use, you should use this one, it ought to "just work".</dd>
+  for the <code>std</code> STL types, the utilities header, plus iostreams and coroutines
+  support. If you don't know which edition to use, you should use this one, it ought to
+  "just work".</dd>
 </dl>

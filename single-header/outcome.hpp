@@ -51,32 +51,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 #ifndef OUTCOME_COROUTINE_SUPPORT_HPP
 #define OUTCOME_COROUTINE_SUPPORT_HPP
-/* Tries to convert an exception ptr into its equivalent error code
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
-File Created: July 2017
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-    (See accompanying file Licence.txt or copy at
-          http://www.boost.org/LICENSE_1_0.txt)
-*/
-
-#ifndef OUTCOME_UTILS_HPP
-#define OUTCOME_UTILS_HPP
 /* Configure Outcome with QuickCppLib
 (C) 2015-2019 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: August 2015
@@ -734,9 +708,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    0008aa6404a6bcce0066ebf94dc3716951c2831b
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-10-04 08:58:30 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 0008aa64
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    1415ea2b66a4a7fe633a4e3f5d6a0aa22ae66dee
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-10-04 19:49:07 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 1415ea2b
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1244,9 +1218,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 4788ad6f0b5a8abfbd7f8ef0716203345aa1cce8
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-10-04 11:46:43 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4788ad6f
+#define OUTCOME_PREVIOUS_COMMIT_REF 12e86259385f1a4478252f66a2243ff993b93bc7
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-10-07 09:46:27 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 12e86259
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1789,7 +1763,50 @@ OUTCOME_V2_NAMESPACE_END
 #endif
 
 #endif
+#define OUTCOME_COROUTINE_SUPPORT_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                OUTCOME_V2_NAMESPACE_BEGIN namespace awaitables                                                                                                                                                                                                                                                                                {
+
+
+//
+#define OUTCOME_COROUTINE_SUPPORT_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                         OUTCOME_V2_NAMESPACE_EXPORT_BEGIN namespace awaitables                                                                                                                                                                                                                                                                         {
+
+
+//
+#define OUTCOME_COROUTINE_SUPPORT_NAMESPACE_END                                                                                                                                                                                                                                                                                  }                                                                                                                                                                                                                                                                                                                              OUTCOME_V2_NAMESPACE_END
+
+
+
+#ifdef __cpp_exceptions
+/* Tries to convert an exception ptr into its equivalent error code
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
+File Created: July 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+#ifndef OUTCOME_UTILS_HPP
+#define OUTCOME_UTILS_HPP
+
+
+
 #include <exception>
+#include <string>
 #include <system_error>
 
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -1898,10 +1915,51 @@ inline void try_throw_std_exception_from_error(std::error_code ec, const std::st
 OUTCOME_V2_NAMESPACE_END
 
 #endif
+OUTCOME_V2_NAMESPACE_BEGIN
+namespace awaitables
+{
+  namespace detail
+  {
+    inline std::error_code error_from_exception(std::exception_ptr &&ep, std::error_code not_matched) noexcept { return OUTCOME_V2_NAMESPACE::error_from_exception(static_cast<std::exception_ptr &&>(ep), not_matched); }
+  }  // namespace detail
+}  // namespace awaitables
+OUTCOME_V2_NAMESPACE_END
+#endif
+/* Tells C++ coroutines about Outcome's result
+(C) 2019 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
+File Created: Oct 2019
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+
+
+
+#ifndef OUTCOME_DETAIL_COROUTINE_SUPPORT_HPP
+#define OUTCOME_DETAIL_COROUTINE_SUPPORT_HPP
+
 #include <atomic>
 #include <cassert>
 
-#ifdef __cpp_coroutines
+#if __cpp_coroutines
 #if __has_include(<coroutine>)
 #include <coroutine>
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -2028,7 +2086,7 @@ namespace awaitables
         }
 #ifdef __cpp_exceptions
         auto e = std::current_exception();
-        auto ec = error_from_exception(static_cast<decltype(e) &&>(e), {});
+        auto ec = detail::error_from_exception(static_cast<decltype(e) &&>(e), {});
         // Try to set error code first
         if(!ec || !detail::try_set_error(ec, &result))
         {
@@ -2131,6 +2189,9 @@ namespace awaitables
       {
         o._h = nullptr;
       }
+      awaitable(const awaitable &o) = delete;
+      awaitable &operator=(awaitable &&) = delete;  // as per P1056
+      awaitable &operator=(const awaitable &) = delete;
       ~awaitable()
       {
         if(_h)
@@ -2160,38 +2221,41 @@ namespace awaitables
     };
   }  // namespace detail
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-  SIGNATURE NOT RECOGNISED
-  */
-
-
-  template <class T> using eager = detail::awaitable<T, false, false>;
-
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-  SIGNATURE NOT RECOGNISED
-  */
-
-
-  template <class T> using atomic_eager = detail::awaitable<T, false, true>;
-
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-  SIGNATURE NOT RECOGNISED
-  */
-
-
-  template <class T> using lazy = detail::awaitable<T, true, false>;
-
-  /*! AWAITING HUGO JSON CONVERSION TOOL
-  SIGNATURE NOT RECOGNISED
-  */
-
-
-  template <class T> using atomic_lazy = detail::awaitable<T, true, true>;
-
 }  // namespace awaitables
 
 OUTCOME_V2_NAMESPACE_END
+
 #endif
+#endif
+
+#ifdef OUTCOME_FOUND_COROUTINE_HEADER
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN namespace awaitables                                                                                                                                                                                                                                                                         {
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+template <class T> using eager = OUTCOME_V2_NAMESPACE::awaitables::detail::awaitable<T, false, false>;
+
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+template <class T> using atomic_eager = OUTCOME_V2_NAMESPACE::awaitables::detail::awaitable<T, false, true>;
+
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+template <class T> using lazy = OUTCOME_V2_NAMESPACE::awaitables::detail::awaitable<T, true, false>;
+
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+template <class T> using atomic_lazy = OUTCOME_V2_NAMESPACE::awaitables::detail::awaitable<T, true, true>;
+
+}                                                                                                                                                                                                                                                                                                                              OUTCOME_V2_NAMESPACE_END
+#endif
+#undef OUTCOME_COROUTINE_SUPPORT_NAMESPACE_BEGIN
+#undef OUTCOME_COROUTINE_SUPPORT_NAMESPACE_EXPORT_BEGIN
+#undef OUTCOME_COROUTINE_SUPPORT_NAMESPACE_END
+
 #endif
 /* iostream specialisations for result and outcome
 (C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (21 commits)
