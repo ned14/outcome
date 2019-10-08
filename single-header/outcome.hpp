@@ -708,9 +708,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    1415ea2b66a4a7fe633a4e3f5d6a0aa22ae66dee
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-10-04 19:49:07 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 1415ea2b
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    0f15529e3bac2daf7ee8529cd54d51ed1ef32b56
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-10-07 17:30:08 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 0f15529e
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1218,9 +1218,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 12e86259385f1a4478252f66a2243ff993b93bc7
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-10-07 09:46:27 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 12e86259
+#define OUTCOME_PREVIOUS_COMMIT_REF 7f9bd9385a6d094d4d9de36ad5384e3352f6d9ba
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-10-07 17:17:43 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 7f9bd938
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1920,6 +1920,7 @@ namespace awaitables
 {
   namespace detail
   {
+    inline bool error_is_set(std::error_code ec) noexcept { return !!ec; }
     inline std::error_code error_from_exception(std::exception_ptr &&ep, std::error_code not_matched) noexcept { return OUTCOME_V2_NAMESPACE::error_from_exception(static_cast<std::exception_ptr &&>(ep), not_matched); }
   }  // namespace detail
 }  // namespace awaitables
@@ -2088,7 +2089,7 @@ namespace awaitables
         auto e = std::current_exception();
         auto ec = detail::error_from_exception(static_cast<decltype(e) &&>(e), {});
         // Try to set error code first
-        if(!ec || !detail::try_set_error(ec, &result))
+        if(!detail::error_is_set(ec) || !detail::try_set_error(ec, &result))
         {
           detail::set_or_rethrow(e, &result);
         }

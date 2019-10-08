@@ -161,7 +161,7 @@ namespace awaitables
         auto e = std::current_exception();
         auto ec = detail::error_from_exception(static_cast<decltype(e) &&>(e), {});
         // Try to set error code first
-        if(!ec || !detail::try_set_error(ec, &result))
+        if(!detail::error_is_set(ec) || !detail::try_set_error(ec, &result))
         {
           detail::set_or_rethrow(e, &result);
         }

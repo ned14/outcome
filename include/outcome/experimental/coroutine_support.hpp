@@ -51,6 +51,7 @@ namespace awaitables
 {
   namespace detail
   {
+    inline bool error_is_set(SYSTEM_ERROR2_NAMESPACE::system_code &sc) noexcept { return sc.failure(); }
     inline SYSTEM_ERROR2_NAMESPACE::system_code error_from_exception(std::exception_ptr &&ep = std::current_exception(), SYSTEM_ERROR2_NAMESPACE::system_code not_matched = SYSTEM_ERROR2_NAMESPACE::generic_code(SYSTEM_ERROR2_NAMESPACE::errc::resource_unavailable_try_again)) noexcept
     {
       return SYSTEM_ERROR2_NAMESPACE::system_code_from_exception(static_cast<std::exception_ptr &&>(ep), static_cast<SYSTEM_ERROR2_NAMESPACE::system_code &&>(not_matched));

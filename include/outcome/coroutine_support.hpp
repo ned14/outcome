@@ -46,6 +46,7 @@ namespace awaitables
 {
   namespace detail
   {
+    inline bool error_is_set(std::error_code ec) noexcept { return !!ec; }
     inline std::error_code error_from_exception(std::exception_ptr &&ep, std::error_code not_matched) noexcept { return OUTCOME_V2_NAMESPACE::error_from_exception(static_cast<std::exception_ptr &&>(ep), not_matched); }
   }  // namespace detail
 }  // namespace awaitables
