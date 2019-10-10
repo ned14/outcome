@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/try.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
-BOOST_OUTCOME_AUTO_TEST_CASE(issues / 65 / outcome, "OUTCOME_TRY does not preserve the exception_ptr")
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0065 / outcome, "OUTCOME_TRY does not preserve the exception_ptr")
 {
 #ifdef __cpp_exceptions
   using namespace OUTCOME_V2_NAMESPACE;

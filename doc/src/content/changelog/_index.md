@@ -25,10 +25,10 @@ the unconfigured Outcome repo as an implementation of Outcome, one must now do o
  3. Use one of the single header editions.
 
 **Breaking change!**
-: The current compiler is now checked for whether it will compile code containing C++
-Concepts, and if it does, all cmake consumers of Outcome will enable C++ Concepts. Set
-the cmake variable `CXX_CONCEPTS_FLAGS` to an empty string to prevent auto detection and
-enabling of C++ Concepts support occurring.
+: For standalone Outcome, the current compiler is now checked for whether it will compile
+code containing C++ Concepts, and if it does, all cmake consumers of Outcome will enable
+C++ Concepts. Set the cmake variable `CXX_CONCEPTS_FLAGS` to an empty string to prevent
+auto detection and enabling of C++ Concepts support occurring.
 
 [#199](https://github.com/ned14/outcome/issues/199)
 : Support for C++ Coroutines has been added. This comes in two parts, firstly there is
@@ -42,6 +42,17 @@ the thrown exception instead of throwing the exception through the coroutine mac
 (which in current compilers, has a high likelihood of blowing up the program). Both
 `eager<T>` and `lazy<T>` can accept any `T` as well. Both have been tested and found
 working on VS2019 and clang 9.
+
+[#210](https://github.com/ned14/outcome/issues/210)
+: `make_error_code()` and `make_exception_ptr()` are now additionally considered for
+compatible copy and move conversions for `basic_result<>`. This lets you construct
+a `basic_result<T, E>` into a `basic_result<T, error_code>`, where `E` is a
+custom type which has implemented the ADL discovered free function
+`error_code make_error_code(E)`, but is otherwise unrelated to `error_code`.
+The same availability applies for `exception_ptr` with `make_exception_ptr()` being
+the ADL discovered free function. `basic_outcome<>` has less support for this than
+`basic_result<>` in order to keep constructor count down, but it will accept via
+this mechanism conversions from `basic_result<>` and `failure_type<>`.
 
 ### Bug fixes:
 

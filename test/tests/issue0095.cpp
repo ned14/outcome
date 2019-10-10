@@ -45,7 +45,7 @@ namespace issue0095
     return i;
   }
 }  // namespace issue0095
-BOOST_OUTCOME_AUTO_TEST_CASE(issues / 95 / outcome, "operator conversions on E type cause TRY to fail")
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0095 / outcome, "operator conversions on E type cause TRY to fail")
 {
   BOOST_CHECK(issue0095::e().has_error());
 }

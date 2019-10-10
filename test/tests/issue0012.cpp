@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
-BOOST_OUTCOME_AUTO_TEST_CASE(issues / 12, "outcome's copy assignment gets instantiated even when type T cannot be copied")
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0012 / test, "outcome's copy assignment gets instantiated even when type T cannot be copied")
 {
   using namespace OUTCOME_V2_NAMESPACE;
   const char *s = "hi";

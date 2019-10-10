@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
-BOOST_OUTCOME_AUTO_TEST_CASE(issues / 116 / outcome, "Bad implementation of outcome::operator==")
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0116 / outcome, "Bad implementation of outcome::operator==")
 {
   namespace out = OUTCOME_V2_NAMESPACE;
 

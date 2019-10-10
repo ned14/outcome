@@ -99,6 +99,7 @@ namespace trait
     {
       // Shortcut this for lower build impact
       static constexpr bool value = true;
+      using type = std::error_code;
     };
   }  // namespace detail
 
