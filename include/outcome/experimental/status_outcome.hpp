@@ -60,10 +60,12 @@ namespace trait
     template <class DomainType> struct _is_error_code_available<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
     {
       static constexpr bool value = true;
+      using type = SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>;
     };
     template <class DomainType> struct _is_error_code_available<SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>>
     {
       static constexpr bool value = true;
+      using type = SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>;
     };
   }  // namespace detail
 #if 0

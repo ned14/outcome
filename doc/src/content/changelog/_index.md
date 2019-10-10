@@ -43,6 +43,17 @@ the thrown exception instead of throwing the exception through the coroutine mac
 `eager<T>` and `lazy<T>` can accept any `T` as well. Both have been tested and found
 working on VS2019 and clang 9.
 
+[#210](https://github.com/ned14/outcome/issues/210)
+: `make_error_code()` and `make_exception_ptr()` are now additionally considered for
+compatible copy and move conversions for `basic_result<>`. This lets you construct
+a `basic_result<T, E>` into a `basic_result<T, error_code>`, where `E` is a
+custom type which has implemented the ADL discovered free function
+`error_code make_error_code(E)`, but is otherwise unrelated to `error_code`.
+The same availability applies for `exception_ptr` with `make_exception_ptr()` being
+the ADL discovered free function. `basic_outcome<>` has less support for this than
+`basic_result<>` in order to keep constructor count down, but it will accept via
+this mechanism conversions from `basic_result<>` and `failure_type<>`.
+
 ### Bug fixes:
 
 [#184](https://github.com/ned14/outcome/issues/207)
