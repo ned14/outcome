@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-10-10T12:38:28 UTC">
+<meta name="revised" content="2019-10-10T17:17:35 UTC">
 <title>Build and install :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -499,105 +499,12 @@
           </a>
         </div>
     </li>
-    <li data-nav-id="/outcome/experimental/worked-example/" class="dd-item haschildren
-        ">
-      <div>
-      <a href="/outcome/experimental/worked-example/">Worked example: Custom domain</a><i class="fa fa-angle-right fa-lg category-icon"></i>
-      </div>
-        <ul>
-      <li data-nav-id="/outcome/experimental/worked-example/preamble/" class="dd-item">
-        <div>
-          <a href="/outcome/experimental/worked-example/preamble/">
-            Define a custom code domain
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/experimental/worked-example/value_type/" class="dd-item">
-        <div>
-          <a href="/outcome/experimental/worked-example/value_type/">
-            The payload
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/experimental/worked-example/constructor/" class="dd-item">
-        <div>
-          <a href="/outcome/experimental/worked-example/constructor/">
-            The constructor
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/experimental/worked-example/string_ref/" class="dd-item">
-        <div>
-          <a href="/outcome/experimental/worked-example/string_ref/">
-            String refs
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/experimental/worked-example/message/" class="dd-item">
-        <div>
-          <a href="/outcome/experimental/worked-example/message/">
-            Redefining <code>message()</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/experimental/worked-example/source/" class="dd-item">
-        <div>
-          <a href="/outcome/experimental/worked-example/source/">
-            Constexpr domain source
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/experimental/worked-example/implicit_conversion/" class="dd-item">
-        <div>
-          <a href="/outcome/experimental/worked-example/implicit_conversion/">
-            Implicit conversion
-          </a>
-        </div>
-    </li>
-        </ul>
-    </li>
       <li data-nav-id="/outcome/experimental/outcome/" class="dd-item">
         <div>
           <a href="/outcome/experimental/outcome/">
             Tying it all together
           </a>
         </div>
-    </li>
-    <li data-nav-id="/outcome/experimental/c-api/" class="dd-item haschildren
-        ">
-      <div>
-      <a href="/outcome/experimental/c-api/">Using Outcome from C code</a><i class="fa fa-angle-right fa-lg category-icon"></i>
-      </div>
-        <ul>
-      <li data-nav-id="/outcome/experimental/c-api/limitations/" class="dd-item">
-        <div>
-          <a href="/outcome/experimental/c-api/limitations/">
-            Limitations
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/experimental/c-api/example/" class="dd-item">
-        <div>
-          <a href="/outcome/experimental/c-api/example/">
-            Example C++ function
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/experimental/c-api/example2/" class="dd-item">
-        <div>
-          <a href="/outcome/experimental/c-api/example2/">
-            Calling it from C
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/experimental/c-api/reference/" class="dd-item">
-        <div>
-          <a href="/outcome/experimental/c-api/reference/">
-            C Macro API Reference
-          </a>
-        </div>
-    </li>
-        </ul>
     </li>
         </ul>
     </li>
@@ -1150,6 +1057,20 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/types/basic_outcome/explicit_result_make_error_code_copy_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_outcome/explicit_result_make_error_code_copy_converting_constructor/">
+            <code>explicit basic_outcome(const basic_result&lt;A, B, C&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_outcome/explicit_result_make_error_code_move_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_outcome/explicit_result_make_error_code_move_converting_constructor/">
+            <code>explicit basic_outcome(basic_result&lt;A, B, C&gt; &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/types/basic_outcome/explicit_inplace_value_constructor/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_outcome/explicit_inplace_value_constructor/">
@@ -1223,6 +1144,20 @@
       <li data-nav-id="/outcome/reference/types/basic_outcome/implicit_failure_error_move_constructor/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_outcome/implicit_failure_error_move_constructor/">
+            <code>basic_outcome(failure_type&lt;EC&gt; &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_outcome/implicit_failure_error_make_error_code_copy_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_outcome/implicit_failure_error_make_error_code_copy_constructor/">
+            <code>basic_outcome(const failure_type&lt;EC&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_outcome/implicit_failure_error_make_error_code_move_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_outcome/implicit_failure_error_make_error_code_move_constructor/">
             <code>basic_outcome(failure_type&lt;EC&gt; &amp;&amp;)</code>
           </a>
         </div>
@@ -1648,6 +1583,34 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/explicit_make_error_code_copy_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/explicit_make_error_code_copy_converting_constructor/">
+            <code>explicit basic_result(const basic_result&lt;R, S, P&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/explicit_make_error_code_move_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/explicit_make_error_code_move_converting_constructor/">
+            <code>explicit basic_result(basic_result&lt;R, S, P&gt; &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/explicit_make_exception_ptr_copy_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/explicit_make_exception_ptr_copy_converting_constructor/">
+            <code>explicit basic_result(const basic_result&lt;R, S, P&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/explicit_make_exception_ptr_move_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/explicit_make_exception_ptr_move_converting_constructor/">
+            <code>explicit basic_result(basic_result&lt;R, S, P&gt; &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/types/basic_result/explicit_inplace_value_constructor/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_result/explicit_inplace_value_constructor/">
@@ -1707,6 +1670,34 @@
       <li data-nav-id="/outcome/reference/types/basic_result/implicit_failure_move_constructor/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_result/implicit_failure_move_constructor/">
+            <code>basic_result(failure_type&lt;T&gt; &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_failure_make_error_code_copy_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_failure_make_error_code_copy_constructor/">
+            <code>basic_result(const failure_type&lt;T&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_failure_make_error_code_move_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_failure_make_error_code_move_constructor/">
+            <code>basic_result(failure_type&lt;T&gt; &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_failure_make_exception_ptr_copy_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_failure_make_exception_ptr_copy_constructor/">
+            <code>basic_result(const failure_type&lt;T&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_failure_make_exception_ptr_move_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_failure_make_exception_ptr_move_constructor/">
             <code>basic_result(failure_type&lt;T&gt; &amp;&amp;)</code>
           </a>
         </div>
@@ -2615,7 +2606,7 @@ suite along with your own.</li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 19/06/2019
+        <i class='fa fa-calendar'></i> Last update on 21/06/2019
     </div>
     
 

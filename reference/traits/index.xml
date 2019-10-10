@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/traits/</link>
     <description>Recent content in Traits on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Wed, 19 Jun 2019 10:14:28 +0100</lastBuildDate>
+    <lastBuildDate>Fri, 21 Jun 2019 21:45:08 +0100</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/traits/index.xml" rel="self" type="application/rss+xml" />
     
@@ -42,9 +42,9 @@ Variable alias: is_basic_result_v&amp;lt;T&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/traits/is_error_code_available/</guid>
-      <description>True if an error code can be constructed from a T e.g. if there exists an ADL discovered free function make_error_code(T).
+      <description>::value is true if an error code can be constructed from a T e.g. if there exists an ADL discovered free function make_error_code(T). ::type is the type that would result if ::value is true, else void.
 Overridable: By template specialisation into the trait namespace.
-Default: True if T is an error code, else to metaprogramming which performs the ADL discovery of make_error_code(T). Note that the STL defines multiple overloads of an ADL discovered free function  std::make_error_code(T) for its error enumerations, as does Boost.System for the Boost error enumerations.</description>
+Default: True if T is an error code, else to metaprogramming which performs the ADL discovery of make_error_code(T). Note that the STL defines multiple overloads of an ADL discovered free function  std::make_error_code(T) for its error enumerations, as does Boost.</description>
     </item>
     
     <item>
@@ -83,10 +83,9 @@ Header: &amp;lt;outcome/trait.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/traits/is_exception_ptr_available/</guid>
-      <description>True if an exception ptr can be constructed from a T e.g. if there exists an ADL discovered free function make_exception_ptr(T).
+      <description>::value is true if an exception ptr can be constructed from a T e.g. if there exists an ADL discovered free function make_exception_ptr(T). ::type is the type that would result if ::value is true, else void.
 Overridable: By template specialisation into the trait namespace.
-Default: True if T is an exception ptr, else to metaprogramming which performs the ADL discovery of make_exception_ptr(T). Note that the STL defines an ADL discovered free function  std::make_exception_ptr(T) . Thus this trait will pick up that free function.
-Namespace: OUTCOME_V2_NAMESPACE::trait</description>
+Default: True if T is an exception ptr, else to metaprogramming which performs the ADL discovery of make_exception_ptr(T). Note that the STL defines an ADL discovered free function  std::make_exception_ptr(T) .</description>
     </item>
     
     <item>
