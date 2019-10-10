@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/result.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
-BOOST_OUTCOME_AUTO_TEST_CASE(issues / 71 / outcome, "Implicit construction is over eager")
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0071 / outcome, "Implicit construction is over eager")
 {
   using namespace OUTCOME_V2_NAMESPACE;
   struct udt

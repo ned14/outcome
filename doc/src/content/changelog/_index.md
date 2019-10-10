@@ -25,10 +25,10 @@ the unconfigured Outcome repo as an implementation of Outcome, one must now do o
  3. Use one of the single header editions.
 
 **Breaking change!**
-: The current compiler is now checked for whether it will compile code containing C++
-Concepts, and if it does, all cmake consumers of Outcome will enable C++ Concepts. Set
-the cmake variable `CXX_CONCEPTS_FLAGS` to an empty string to prevent auto detection and
-enabling of C++ Concepts support occurring.
+: For standalone Outcome, the current compiler is now checked for whether it will compile
+code containing C++ Concepts, and if it does, all cmake consumers of Outcome will enable
+C++ Concepts. Set the cmake variable `CXX_CONCEPTS_FLAGS` to an empty string to prevent
+auto detection and enabling of C++ Concepts support occurring.
 
 [#199](https://github.com/ned14/outcome/issues/199)
 : Support for C++ Coroutines has been added. This comes in two parts, firstly there is

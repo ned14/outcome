@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
-BOOST_OUTCOME_AUTO_TEST_CASE(issues / 140 / result, "Construction of non copy constructible value_type fails to not compile")
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0140 / result, "Construction of non copy constructible value_type fails to not compile")
 {
   namespace out = OUTCOME_V2_NAMESPACE;
 
