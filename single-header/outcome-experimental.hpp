@@ -1217,9 +1217,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 63c74ef62cbd4e7b0faf753084024971de4c5983
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-10-10 15:28:31 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 63c74ef6
+#define OUTCOME_PREVIOUS_COMMIT_REF 086ef6d04b387ca802fe9b724d770c6359cd491e
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-10-10 17:15:01 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 086ef6d0
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -3687,7 +3687,7 @@ namespace detail
     // Predicate for the converting constructor from a make_error_code() of the input to be available.
     template <class T, class U, class V>
     static constexpr bool enable_make_error_code_compatible_conversion =                                                        //
-    trait::is_error_type<std::decay_t<error_type>>::value                                                                       // if error type is a whitelisted error type
+    trait::is_error_code_available<std::decay_t<error_type>>::value                                                             // if error type has an error code
     && !enable_compatible_conversion<T, U, V>                                                                                   // and the normal compatible conversion is not available
     && (std::is_void<T>::value || detail::is_explicitly_constructible<value_type, typename basic_result<T, U, V>::value_type>)  // and if our value types are constructible
     &&detail::is_explicitly_constructible<error_type, typename trait::is_error_code_available<U>::type>;                        // and our error type is constructible from a make_error_code()
@@ -3695,7 +3695,7 @@ namespace detail
     // Predicate for the converting constructor from a make_exception_ptr() of the input to be available.
     template <class T, class U, class V>
     static constexpr bool enable_make_exception_ptr_compatible_conversion =                                                     //
-    trait::is_error_type<std::decay_t<error_type>>::value                                                                       // if error type is a whitelisted error type
+    trait::is_exception_ptr_available<std::decay_t<error_type>>::value                                                          // if error type has an exception ptr
     && !enable_compatible_conversion<T, U, V>                                                                                   // and the normal compatible conversion is not available
     && (std::is_void<T>::value || detail::is_explicitly_constructible<value_type, typename basic_result<T, U, V>::value_type>)  // and if our value types are constructible
     &&detail::is_explicitly_constructible<error_type, typename trait::is_exception_ptr_available<U>::type>;                     // and our error type is constructible from a make_exception_ptr()
@@ -4585,7 +4585,7 @@ namespace detail
     // Predicate for the converting constructor from a make_error_code() of the input to be available.
     template <class T, class U, class V, class W>
     static constexpr bool enable_make_error_code_compatible_conversion =                                                                     //
-    trait::is_error_type<std::decay_t<error_type>>::value                                                                                    // if error type is a whitelisted error type
+    trait::is_error_code_available<std::decay_t<error_type>>::value                                                                          // if error type has an error code
     && !enable_compatible_conversion<T, U, V, W>                                                                                             // and the normal compatible conversion is not available
     && (std::is_void<T>::value || detail::is_explicitly_constructible<value_type, typename basic_outcome<T, U, V, W>::value_type>)           // and if our value types are constructible
     &&detail::is_explicitly_constructible<error_type, typename trait::is_error_code_available<U>::type>                                      // and our error type is constructible from a make_error_code()
@@ -10068,7 +10068,8 @@ namespace trait
 {
   namespace detail
   {
-    // Shortcut this for lower build impact
+    // Shortcut this for lower build impact. Used to tell outcome's converting constructors
+    // that they can do E => EC or E => EP as necessary.
     template <class DomainType> struct _is_error_code_available<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
     {
       static constexpr bool value = true;
