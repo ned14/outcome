@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/tags/try/</link>
     <description>Recent content in Try on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 21 Jun 2019 21:45:08 +0100</lastBuildDate>
+    <lastBuildDate>Fri, 21 Jun 2019 22:46:55 +0100</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/tags/try/index.xml" rel="self" type="application/rss+xml" />
     
@@ -44,7 +44,7 @@ auto&amp;amp;&amp;amp; __result = BigInt::fromString(text); if (!__result) retur
     <item>
       <title>result&lt;&gt;</title>
       <link>https://ned14.github.io/outcome/tutorial/essential/result/</link>
-      <pubDate>Fri, 21 Jun 2019 21:45:08 +0100</pubDate>
+      <pubDate>Fri, 21 Jun 2019 22:46:55 +0100</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/result/</guid>
       <description>We will define a function that converts a std::string to an int. This function can fail for a number of reasons; if it does we want to communicate the failure reason.

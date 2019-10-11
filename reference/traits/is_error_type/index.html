@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-10-10T17:17:52 UTC">
+<meta name="revised" content="2019-10-11T16:05:47 UTC">
 <title>`is_error_type&lt;E&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2573,7 +2573,12 @@
     
     
     
-    <p>A customisable integral constant type true for <code>E</code> types which are to receive error throwing no-value policies.</p>
+    <p>A customisable integral constant type true for <code>E</code> types which are to receive
+error throwing no-value policies. Special weakened implicit construction enable
+is available for integral <code>T</code> types when combined with <code>E</code> types in this
+whitelist &ndash; this permits <code>boost_result&lt;int, boost::system::errc::errc_t</code> to
+retain its implicit constructors, despite the fact that <code>errc_t</code> as a C enum
+has an implicit conversion to <code>int</code>.</p>
 
 <p><em>Overridable</em>: By template specialisation into the <code>trait</code> namespace.</p>
 
@@ -2622,7 +2627,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 21/06/2019
+        <i class='fa fa-calendar'></i> Last update on 11/10/2019
     </div>
     
 
