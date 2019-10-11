@@ -56,7 +56,8 @@ namespace trait
 {
   namespace detail
   {
-    // Shortcut this for lower build impact
+    // Shortcut this for lower build impact. Used to tell outcome's converting constructors
+    // that they can do E => EC or E => EP as necessary.
     template <class DomainType> struct _is_error_code_available<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
     {
       static constexpr bool value = true;
@@ -68,7 +69,7 @@ namespace trait
       using type = SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>;
     };
   }  // namespace detail
-#if 0
+#if 0  // Do NOT enable weakened implicit construction for these types
   template <class DomainType> struct is_error_type<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
   {
     static constexpr bool value = true;
