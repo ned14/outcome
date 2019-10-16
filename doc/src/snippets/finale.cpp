@@ -22,10 +22,10 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include "../../../include/outcome.hpp"
-#if __has_include("../../../../quickcpplib/include/string_view.hpp")
-#include "../../../../quickcpplib/include/string_view.hpp"
+#if __has_include("quickcpplib/string_view.hpp")
+#include "quickcpplib/string_view.hpp"
 #else
-#include "../../../include/outcome/quickcpplib/include/string_view.hpp"
+#include "../../../include/outcome/quickcpplib/include/quickcpplib/string_view.hpp"
 #endif
 #include <cstring>  // for memcpy
 #include <experimental/filesystem>

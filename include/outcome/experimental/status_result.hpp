@@ -32,6 +32,39 @@ Distributed under the Boost Software License, Version 1.0.
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
+namespace trait
+{
+  namespace detail
+  {
+    // Shortcut this for lower build impact. Used to tell outcome's converting constructors
+    // that they can do E => EC or E => EP as necessary.
+    template <class DomainType> struct _is_error_code_available<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
+    {
+      static constexpr bool value = true;
+      using type = SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>;
+    };
+    template <class DomainType> struct _is_error_code_available<SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>>
+    {
+      static constexpr bool value = true;
+      using type = SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>;
+    };
+  }  // namespace detail
+#if 0  // Do NOT enable weakened implicit construction for these types
+  template <class DomainType> struct is_error_type<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
+  {
+    static constexpr bool value = true;
+  };
+  template <> struct is_error_type<SYSTEM_ERROR2_NAMESPACE::errc>
+  {
+    static constexpr bool value = true;
+  };
+  template <class DomainType, class Enum> struct is_error_type_enum<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, Enum>
+  {
+    static constexpr bool value = boost::system::is_error_condition_enum<Enum>::value;
+  };
+#endif
+}  // namespace trait
+
 namespace detail
 {
   // Customise _set_error_is_errno

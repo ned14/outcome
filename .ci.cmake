@@ -6,13 +6,14 @@ include(QuickCppLibUtils)
 
 
 CONFIGURE_CTEST_SCRIPT_FOR_CDASH("outcome" "cmake_ci")
+list(APPEND CTEST_CONFIGURE_OPTIONS -DCMAKE_BUILD_TYPE=${CTEST_CONFIGURATION_TYPE})
 ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 include(FindGit)
 set(CTEST_GIT_COMMAND "${GIT_EXECUTABLE}")
 
 ctest_start("Experimental")
 ctest_update()
-ctest_configure(OPTIONS ${CTEST_CONFIGURE_OPTIONS})
+ctest_configure(OPTIONS "${CTEST_CONFIGURE_OPTIONS}")
 ctest_build(TARGET _hl)
 ctest_test(RETURN_VALUE retval)
 set(retval2 0)

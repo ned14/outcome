@@ -140,7 +140,7 @@ after_success:
      git checkout -b orig-master outcome/master;
      git checkout master;
      cd ..;
-     python outcome/include/outcome/quickcpplib/scripts/boostify_git_repo.py boost-outcome outcome ned14/outcome@;
+     python outcome/quickcpplib/repo/scripts/boostify_git_repo.py boost-outcome outcome ned14/outcome@;
      cd boost-outcome;
      git checkout master;
      cd doc/src;

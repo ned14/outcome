@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <iostream>
 
 #ifdef _WIN32
-#include "quickcpplib/include/execinfo_win64.h"
+#include "quickcpplib/execinfo_win64.h"
 #else
 #include <execinfo.h>
 #endif

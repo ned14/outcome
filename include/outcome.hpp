@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #if defined(__cpp_modules) && !defined(GENERATING_OUTCOME_MODULE_INTERFACE)
 import outcome_v2_0;
 #else
+#include "outcome/coroutine_support.hpp"
 #include "outcome/iostream_support.hpp"
 #include "outcome/try.hpp"
-#include "outcome/utils.hpp"
 #endif

@@ -130,6 +130,38 @@ namespace detail
         : _state(static_cast<decltype(o._state) &&>(o._state))
     {
     }
+
+    struct make_error_code_compatible_conversion_tag
+    {
+    };
+    template <class T, class U, class V>
+    constexpr basic_result_storage(make_error_code_compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_error_code(std::declval<U>())))
+        : _state(o._state)
+        , _error(make_error_code(o._error))
+    {
+    }
+    template <class T, class U, class V>
+    constexpr basic_result_storage(make_error_code_compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_error_code(std::declval<U>())))
+        : _state(static_cast<decltype(o._state) &&>(o._state))
+        , _error(make_error_code(static_cast<U &&>(o._error)))
+    {
+    }
+
+    struct make_exception_ptr_compatible_conversion_tag
+    {
+    };
+    template <class T, class U, class V>
+    constexpr basic_result_storage(make_exception_ptr_compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_exception_ptr(std::declval<U>())))
+        : _state(o._state)
+        , _error(make_exception_ptr(o._error))
+    {
+    }
+    template <class T, class U, class V>
+    constexpr basic_result_storage(make_exception_ptr_compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_exception_ptr(std::declval<U>())))
+        : _state(static_cast<decltype(o._state) &&>(o._state))
+        , _error(make_exception_ptr(static_cast<U &&>(o._error)))
+    {
+    }
   };
 }  // namespace detail
 OUTCOME_V2_NAMESPACE_END

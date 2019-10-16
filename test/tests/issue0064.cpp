@@ -24,9 +24,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/iostream_support.hpp"
 #include "../../include/outcome/outcome.hpp"
 #include "../../include/outcome/try.hpp"
-#include "quickcpplib/include/boost/test/unit_test.hpp"
+#include "quickcpplib/boost/test/unit_test.hpp"
 
-BOOST_OUTCOME_AUTO_TEST_CASE(issues / 64 / outcome, "OUTCOME_TRY on excepted outcome is propagating a null error rather than just an exception")
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0064 / outcome, "OUTCOME_TRY on excepted outcome is propagating a null error rather than just an exception")
 {
 #ifdef __cpp_exceptions
   using namespace OUTCOME_V2_NAMESPACE;

@@ -4,7 +4,63 @@ weight = 80
 +++
 
 ---
-## v2.1.1 XXth July 2019 (Boost 1.71) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.1)
+## v2.1.2 ? (Boost 1.72) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.2)
+
+### Enhancements:
+
+Improved compatibility with cmake tooling
+: Standalone outcome is now `make install`-able, and cmake `find_package()` can find it.
+Note that you must separately install and `find_package()` Outcome's dependency, quickcpplib,
+else `find_package()` of Outcome will fail.
+
+**Breaking change!**
+: The git submodule mechanism used by standalone Outcome of specifying dependent libraries
+has been replaced with a cmake superbuild of dependencies mechanism instead. Upon cmake
+configure, an internal copy of quickcpplib will be git cloned, built and installed into the
+build directory from where an internal `find_package()` uses it. This breaks the use of
+the unconfigured Outcome repo as an implementation of Outcome, one must now do one of:
+ 1. Add Outcome as subdirectory to cmake build
+ 2. Use cmake superbuild (i.e. `ExternalProject_Add()`) to build and install Outcome into
+ a local installation.
+ 3. Use one of the single header editions.
+
+**Breaking change!**
+: For standalone Outcome, the current compiler is now checked for whether it will compile
+code containing C++ Concepts, and if it does, all cmake consumers of Outcome will enable
+C++ Concepts. Set the cmake variable `CXX_CONCEPTS_FLAGS` to an empty string to prevent
+auto detection and enabling of C++ Concepts support occurring.
+
+[#199](https://github.com/ned14/outcome/issues/199)
+: Support for C++ Coroutines has been added. This comes in two parts, firstly there is
+now an `OUTCOME_CO_TRY()` operation suitable for performing the `TRY` operation from
+within a C++ Coroutine. Secondly, in the header `outcome/coroutine_support.hpp` there are
+implementations of `eager<OutcomeType>` and `lazy<OutcomeType>` which let you more
+naturally and efficiently use `basic_result` or `basic_outcome` from within C++
+Coroutines -- specifically, if the result or outcome will construct from an exception
+pointer, exceptions thrown in the coroutine return an errored or excepted result with
+the thrown exception instead of throwing the exception through the coroutine machinery
+(which in current compilers, has a high likelihood of blowing up the program). Both
+`eager<T>` and `lazy<T>` can accept any `T` as well. Both have been tested and found
+working on VS2019 and clang 9.
+
+[#210](https://github.com/ned14/outcome/issues/210)
+: `make_error_code()` and `make_exception_ptr()` are now additionally considered for
+compatible copy and move conversions for `basic_result<>`. This lets you construct
+a `basic_result<T, E>` into a `basic_result<T, error_code>`, where `E` is a
+custom type which has implemented the ADL discovered free function
+`error_code make_error_code(E)`, but is otherwise unrelated to `error_code`.
+The same availability applies for `exception_ptr` with `make_exception_ptr()` being
+the ADL discovered free function. `basic_outcome<>` has less support for this than
+`basic_result<>` in order to keep constructor count down, but it will accept via
+this mechanism conversions from `basic_result<>` and `failure_type<>`.
+
+### Bug fixes:
+
+[#184](https://github.com/ned14/outcome/issues/207)
+: The detection of `[[nodiscard]]` support in the compiler was very mildly broken.
+
+---
+## v2.1.1 19th August 2019 (Boost 1.71) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.1)
 
 ### Enhancements:
 

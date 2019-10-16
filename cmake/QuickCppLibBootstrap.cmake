@@ -1,4 +1,4 @@
-# Outcome cmake
+# QuickCppLib cmake
 # (C) 2016-2019 Niall Douglas <http://www.nedproductions.biz/>
 # 
 # 
@@ -31,40 +31,38 @@ endforeach()
 if(NOT quickcpplib_done)
   # CMAKE_SOURCE_DIR is the very topmost parent cmake project
   # CMAKE_CURRENT_SOURCE_DIR is the current cmake subproject
+  set(CTEST_QUICKCPPLIB_CLONE_DIR)
   
   # If there is a magic .quickcpplib_use_siblings directory above the topmost project, use sibling edition
-  if(EXISTS "${CMAKE_SOURCE_DIR}/../.quickcpplib_use_siblings")
+  if(EXISTS "${CMAKE_SOURCE_DIR}/../.quickcpplib_use_siblings" AND NOT QUICKCPPLIB_DISABLE_SIBLINGS)
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../quickcpplib/cmakelib")
     set(CTEST_QUICKCPPLIB_SCRIPTS "${CMAKE_SOURCE_DIR}/../quickcpplib/scripts")
-  elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../.quickcpplib_use_siblings")
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../quickcpplib/cmakelib")
-    set(CTEST_QUICKCPPLIB_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/../quickcpplib/scripts")
-  elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.gitmodules")
-    # Read in .gitmodules and look for myself
-    file(READ "${CMAKE_CURRENT_SOURCE_DIR}/.gitmodules" GITMODULESCONTENTS)
-    if(GITMODULESCONTENTS MATCHES ".*\\n?\\[submodule \"([^\"]+\\/quickcpplib)\"\\]")
-      set(quickcpplibpath "${CMAKE_MATCH_1}")
-      if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${quickcpplibpath}/cmake")
-        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/${quickcpplibpath}/cmakelib")
-        set(CTEST_QUICKCPPLIB_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/${quickcpplibpath}/scripts")
-      else()
-        message(WARNING "WARNING: ${quickcpplibpath}/cmake does not exist, attempting git submodule update --init --recursive ...")
-        include(FindGit)
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-          WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        )
-        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${quickcpplibpath}/cmake")
-          set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/${quickcpplibpath}/cmakelib")
-          set(CTEST_QUICKCPPLIB_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/${quickcpplibpath}/scripts")
-        else()
-          message(FATAL_ERROR "FATAL: ${quickcpplibpath}/cmake does not exist and git submodule update --init --recursive did not make it available, bailing out")
-        endif()
-      endif()
-    else()
-      message(FATAL_ERROR "FATAL: A copy of quickcpplib cannot be found, and cannot find a quickcpplib submodule in this git repository")
-    endif()
+    # Copy latest version of myself into end user
+    file(COPY "${CTEST_QUICKCPPLIB_SCRIPTS}/../cmake/QuickCppLibBootstrap.cmake" DESTINATION "${CMAKE_SOURCE_DIR}/cmake/")
+  elseif(CMAKE_BINARY_DIR)
+    # Place into root binary directory, same place as where find_quickcpplib_library() puts dependencies.
+    set(CTEST_QUICKCPPLIB_CLONE_DIR "${CMAKE_BINARY_DIR}/quickcpplib")
   else()
-    message(FATAL_ERROR "FATAL: A copy of quickcpplib cannot be found, and there are no git submodules to search")
+    # We must be being called from a ctest script. No way of knowing what the build directory
+    # will be, so simply clone into the current directory
+    set(CTEST_QUICKCPPLIB_CLONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/quickcpplib")
+  endif()
+  if(CTEST_QUICKCPPLIB_CLONE_DIR)
+    file(MAKE_DIRECTORY "${CTEST_QUICKCPPLIB_CLONE_DIR}")
+    find_package(quickcpplib QUIET CONFIG NO_DEFAULT_PATH PATHS "${CTEST_QUICKCPPLIB_CLONE_DIR}/repo")
+    if(NOT quickcpplib_FOUND)
+      message(STATUS "quickcpplib not found, cloning git repository and installing into ${CTEST_QUICKCPPLIB_CLONE_DIR} ...")
+      include(FindGit)
+      execute_process(COMMAND "${GIT_EXECUTABLE}" clone "https://github.com/ned14/quickcpplib.git" repo
+        WORKING_DIRECTORY "${CTEST_QUICKCPPLIB_CLONE_DIR}"
+        OUTPUT_VARIABLE cloneout
+        ERROR_VARIABLE errout
+      )
+      if(NOT EXISTS "${CTEST_QUICKCPPLIB_CLONE_DIR}/repo/cmakelib")
+        message(FATAL_ERROR "FATAL: Failed to git clone quickcpplib!\n\nstdout was: ${cloneout}\n\nstderr was: ${errout}")
+      endif()
+    endif()
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CTEST_QUICKCPPLIB_CLONE_DIR}/repo/cmakelib")
+    set(CTEST_QUICKCPPLIB_SCRIPTS "${CTEST_QUICKCPPLIB_CLONE_DIR}/repo/scripts")
   endif()
 endif()
-message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")

@@ -23,7 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../include/outcome/result.hpp"
 #include "../../include/outcome/try.hpp"
-#include "quickcpplib/include/boost/test/unit_test.hpp"
+#include "quickcpplib/boost/test/unit_test.hpp"
 
 namespace issue0095
 {
@@ -45,7 +45,7 @@ namespace issue0095
     return i;
   }
 }  // namespace issue0095
-BOOST_OUTCOME_AUTO_TEST_CASE(issues / 95 / outcome, "operator conversions on E type cause TRY to fail")
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0095 / outcome, "operator conversions on E type cause TRY to fail")
 {
   BOOST_CHECK(issue0095::e().has_error());
 }

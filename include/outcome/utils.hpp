@@ -28,6 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "config.hpp"
 
 #include <exception>
+#include <string>
 #include <system_error>
 
 OUTCOME_V2_NAMESPACE_BEGIN

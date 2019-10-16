@@ -3,7 +3,8 @@ title = "`is_exception_ptr_available<T>`"
 description = "True if an exception ptr can be constructed from a `T`."
 +++
 
-True if an exception ptr can be constructed from a `T` e.g. if there exists an ADL discovered free function `make_exception_ptr(T)`.
+`::value` is true if an exception ptr can be constructed from a `T` e.g. if there exists an ADL discovered free function `make_exception_ptr(T)`.
+`::type` is the type that would result if `::value` is true, else `void`.
 
 *Overridable*: By template specialisation into the `trait` namespace.
 

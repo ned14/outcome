@@ -52,37 +52,6 @@ SYSTEM_ERROR2_NAMESPACE_END
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-namespace trait
-{
-  namespace detail
-  {
-    // Shortcut this for lower build impact
-    template <class DomainType> struct _is_error_code_available<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
-    {
-      static constexpr bool value = true;
-    };
-    template <class DomainType> struct _is_error_code_available<SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>>
-    {
-      static constexpr bool value = true;
-    };
-  }  // namespace detail
-#if 0
-  template <class DomainType> struct is_error_type<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
-  {
-    static constexpr bool value = true;
-  };
-  template <> struct is_error_type<SYSTEM_ERROR2_NAMESPACE::errc>
-  {
-    static constexpr bool value = true;
-  };
-  template <class DomainType, class Enum> struct is_error_type_enum<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>, Enum>
-  {
-    static constexpr bool value = boost::system::is_error_condition_enum<Enum>::value;
-  };
-#endif
-}  // namespace trait
-
-
 namespace experimental
 {
   namespace policy

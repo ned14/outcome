@@ -31,7 +31,7 @@ OUTCOME_V2_NAMESPACE_BEGIN
 
 namespace trait
 {
-  /*! AWAITING HUGO JSON CONVERSION TOOL 
+  /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   template <class R>                                                             //
@@ -43,9 +43,9 @@ SIGNATURE NOT RECOGNISED
    && !std::is_array<R>::value                                                   //
    && (std::is_void<R>::value || (std::is_object<R>::value                       //
                                   && std::is_destructible<R>::value))            //
-   );
+  );
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL 
+  /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  is_error_type. Potential doc page: NOT FOUND
 */
   template <class E> struct is_error_type
@@ -53,7 +53,7 @@ type definition  is_error_type. Potential doc page: NOT FOUND
     static constexpr bool value = false;
   };
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL 
+  /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  is_error_type_enum. Potential doc page: NOT FOUND
 */
   template <class E, class Enum> struct is_error_type_enum
@@ -92,28 +92,32 @@ type definition  is_error_type_enum. Potential doc page: NOT FOUND
     template <class T> struct _is_error_code_available
     {
       static constexpr bool value = detail::introspect_make_error_code<T>::value;
+      using type = typename detail::introspect_make_error_code<T>::type;
     };
     template <class T> struct _is_exception_ptr_available
     {
       static constexpr bool value = detail::introspect_make_exception_ptr<T>::value;
+      using type = typename detail::introspect_make_exception_ptr<T>::type;
     };
   }  // namespace detail
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL 
+  /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  is_error_code_available. Potential doc page: NOT FOUND
 */
   template <class T> struct is_error_code_available
   {
     static constexpr bool value = detail::_is_error_code_available<std::decay_t<T>>::value;
+    using type = typename detail::_is_error_code_available<std::decay_t<T>>::type;
   };
   template <class T> constexpr bool is_error_code_available_v = detail::_is_error_code_available<std::decay_t<T>>::value;
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL 
+  /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  is_exception_ptr_available. Potential doc page: NOT FOUND
 */
   template <class T> struct is_exception_ptr_available
   {
     static constexpr bool value = detail::_is_exception_ptr_available<std::decay_t<T>>::value;
+    using type = typename detail::_is_exception_ptr_available<std::decay_t<T>>::type;
   };
   template <class T> constexpr bool is_exception_ptr_available_v = detail::_is_exception_ptr_available<std::decay_t<T>>::value;
 
