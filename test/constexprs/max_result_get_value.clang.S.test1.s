@@ -1,240 +1,116 @@
-  400fa0:	41 56                	push   %r14
-  400fa2:	53                   	push   %rbx
-  400fa3:	48 83 ec 28          	sub    $0x28,%rsp
-  400fa7:	48 8d 7c 24 08       	lea    0x8(%rsp),%rdi
-  400fac:	e8 4f f0 bf ff       	callq  0 <_init-0x400d08>
-  400fb1:	8a 44 24 20          	mov    0x20(%rsp),%al
-  400fb5:	84 c0                	test   %al,%al
-  400fb7:	75 0e                	jne    400fc7 <test1()+0x27>
-  400fb9:	bf 02 00 00 00       	mov    $0x2,%edi
-  401050:	55                   	push   %rbp
-  401051:	53                   	push   %rbx
-  401052:	50                   	push   %rax
-  401053:	89 fd                	mov    %edi,%ebp
-  401055:	bf 20 00 00 00       	mov    $0x20,%edi
-  400e30:	ff 25 5a 12 20 00    	jmpq   *0x20125a(%rip)        # 602090 <_GLOBAL_OFFSET_TABLE_+0x90>
-  400e36:	68 0f 00 00 00       	pushq  $0xf
-  400e3b:	e9 f0 fe ff ff       	jmpq   400d30 <_init+0x28>
-  40105f:	48 89 c3             	mov    %rax,%rbx
-  401062:	8a 05 50 11 20 00    	mov    0x201150(%rip),%al        # 6021b8 <guard variable for boost::outcome::_1_0_std_std_9274c0d4::monad_category()::c>
-  401068:	84 c0                	test   %al,%al
-  40106a:	75 2c                	jne    401098 <boost::outcome::_1_0_std_std_9274c0d4::policy::result_policy_base<boost::outcome::_1_0_std_std_9274c0d4::policy::basic_monad_storage<boost::outcome::_1_0_std_std_9274c0d4::policy::result_policy<int> >, int, boost::outcome::_1_0_std_std_9274c0d4::error_code_extended, void>::_throw_error(boost::outcome::_1_0_std_std_9274c0d4::monad_errc)+0x48>
-  40106c:	bf b8 21 60 00       	mov    $0x6021b8,%edi
-  400d60:	ff 25 c2 12 20 00    	jmpq   *0x2012c2(%rip)        # 602028 <_GLOBAL_OFFSET_TABLE_+0x28>
-  400d66:	68 02 00 00 00       	pushq  $0x2
-  400d6b:	e9 c0 ff ff ff       	jmpq   400d30 <_init+0x28>
-  401076:	85 c0                	test   %eax,%eax
-  401078:	74 1e                	je     401098 <boost::outcome::_1_0_std_std_9274c0d4::policy::result_policy_base<boost::outcome::_1_0_std_std_9274c0d4::policy::basic_monad_storage<boost::outcome::_1_0_std_std_9274c0d4::policy::result_policy<int> >, int, boost::outcome::_1_0_std_std_9274c0d4::error_code_extended, void>::_throw_error(boost::outcome::_1_0_std_std_9274c0d4::monad_errc)+0x48>
-  40107a:	bf 40 0d 40 00       	mov    $0x400d40,%edi
-  40107f:	be d8 20 60 00       	mov    $0x6020d8,%esi
-  401084:	ba d0 20 60 00       	mov    $0x6020d0,%edx
-  400db0:	ff 25 9a 12 20 00    	jmpq   *0x20129a(%rip)        # 602050 <_GLOBAL_OFFSET_TABLE_+0x50>
-  400db6:	68 07 00 00 00       	pushq  $0x7
-  400dbb:	e9 70 ff ff ff       	jmpq   400d30 <_init+0x28>
-  40108e:	bf b8 21 60 00       	mov    $0x6021b8,%edi
-  400de0:	ff 25 82 12 20 00    	jmpq   *0x201282(%rip)        # 602068 <_GLOBAL_OFFSET_TABLE_+0x68>
-  400de6:	68 0a 00 00 00       	pushq  $0xa
-  400deb:	e9 40 ff ff ff       	jmpq   400d30 <_init+0x28>
-  401098:	ba d8 20 60 00       	mov    $0x6020d8,%edx
-  40109d:	48 89 df             	mov    %rbx,%rdi
-  4010a0:	89 ee                	mov    %ebp,%esi
-  4011b0:	55                   	push   %rbp
-  4011b1:	41 57                	push   %r15
-  4011b3:	41 56                	push   %r14
-  4011b5:	53                   	push   %rbx
-  4011b6:	48 83 ec 18          	sub    $0x18,%rsp
-  4011ba:	49 89 d6             	mov    %rdx,%r14
-  4011bd:	41 89 f7             	mov    %esi,%r15d
-  4011c0:	48 89 fb             	mov    %rdi,%rbx
-  4011c3:	49 8b 06             	mov    (%r14),%rax
-  4011c6:	48 8d 6c 24 10       	lea    0x10(%rsp),%rbp
-  4011cb:	48 89 ef             	mov    %rbp,%rdi
-  4011ce:	4c 89 f6             	mov    %r14,%rsi
-  4011d1:	44 89 fa             	mov    %r15d,%edx
-  4011d4:	ff 50 18             	callq  *0x18(%rax)
-  4011d7:	48 89 df             	mov    %rbx,%rdi
-  4011da:	48 89 ee             	mov    %rbp,%rsi
-  400d70:	ff 25 ba 12 20 00    	jmpq   *0x2012ba(%rip)        # 602030 <_GLOBAL_OFFSET_TABLE_+0x30>
-  400d76:	68 03 00 00 00       	pushq  $0x3
-  400d7b:	e9 b0 ff ff ff       	jmpq   400d30 <_init+0x28>
-  4011e2:	48 8b 44 24 10       	mov    0x10(%rsp),%rax
-  4011e7:	48 8d 78 e8          	lea    -0x18(%rax),%rdi
-  4011eb:	b9 80 21 60 00       	mov    $0x602180,%ecx
-  4011f0:	48 39 cf             	cmp    %rcx,%rdi
-  4011f3:	75 1a                	jne    40120f <boost::outcome::_1_0_std_std_9274c0d4::monad_error::monad_error(std::error_code)+0x5f>
-  4011f5:	44 89 7b 10          	mov    %r15d,0x10(%rbx)
-  4011f9:	4c 89 73 18          	mov    %r14,0x18(%rbx)
-  4011fd:	48 c7 03 58 15 40 00 	movq   $0x401558,(%rbx)
-  401204:	48 83 c4 18          	add    $0x18,%rsp
-  401208:	5b                   	pop    %rbx
-  401209:	41 5e                	pop    %r14
-  40120b:	41 5f                	pop    %r15
-  40120d:	5d                   	pop    %rbp
-  40120e:	c3                   	retq
-  40120f:	b9 00 00 00 00       	mov    $0x0,%ecx
-  401214:	48 85 c9             	test   %rcx,%rcx
-  401217:	74 10                	je     401229 <boost::outcome::_1_0_std_std_9274c0d4::monad_error::monad_error(std::error_code)+0x79>
-  401219:	b9 ff ff ff ff       	mov    $0xffffffff,%ecx
-  40121e:	f0 0f c1 48 f8       	lock xadd %ecx,-0x8(%rax)
-  401223:	85 c9                	test   %ecx,%ecx
-  401225:	7f ce                	jg     4011f5 <boost::outcome::_1_0_std_std_9274c0d4::monad_error::monad_error(std::error_code)+0x45>
-  401227:	eb 0d                	jmp    401236 <boost::outcome::_1_0_std_std_9274c0d4::monad_error::monad_error(std::error_code)+0x86>
-  401229:	8b 48 f8             	mov    -0x8(%rax),%ecx
-  40122c:	8d 51 ff             	lea    -0x1(%rcx),%edx
-  40122f:	89 50 f8             	mov    %edx,-0x8(%rax)
-  401232:	85 c9                	test   %ecx,%ecx
-  401234:	7f bf                	jg     4011f5 <boost::outcome::_1_0_std_std_9274c0d4::monad_error::monad_error(std::error_code)+0x45>
-  401236:	48 89 e6             	mov    %rsp,%rsi
-  400dc0:	ff 25 92 12 20 00    	jmpq   *0x201292(%rip)        # 602058 <_GLOBAL_OFFSET_TABLE_+0x58>
-  400dc6:	68 08 00 00 00       	pushq  $0x8
-  400dcb:	e9 60 ff ff ff       	jmpq   400d30 <_init+0x28>
-  40123e:	eb b5                	jmp    4011f5 <boost::outcome::_1_0_std_std_9274c0d4::monad_error::monad_error(std::error_code)+0x45>
-  401240:	48 89 c3             	mov    %rax,%rbx
-  401243:	48 8b 44 24 10       	mov    0x10(%rsp),%rax
-  401248:	48 8d 78 e8          	lea    -0x18(%rax),%rdi
-  40124c:	b9 80 21 60 00       	mov    $0x602180,%ecx
-  401251:	48 39 cf             	cmp    %rcx,%rdi
-  401254:	74 31                	je     401287 <boost::outcome::_1_0_std_std_9274c0d4::monad_error::monad_error(std::error_code)+0xd7>
-  401256:	b9 00 00 00 00       	mov    $0x0,%ecx
-  40125b:	48 85 c9             	test   %rcx,%rcx
-  40125e:	74 10                	je     401270 <boost::outcome::_1_0_std_std_9274c0d4::monad_error::monad_error(std::error_code)+0xc0>
-  401260:	b9 ff ff ff ff       	mov    $0xffffffff,%ecx
-  401265:	f0 0f c1 48 f8       	lock xadd %ecx,-0x8(%rax)
-  40126a:	85 c9                	test   %ecx,%ecx
-  40126c:	7e 0f                	jle    40127d <boost::outcome::_1_0_std_std_9274c0d4::monad_error::monad_error(std::error_code)+0xcd>
-  40126e:	eb 17                	jmp    401287 <boost::outcome::_1_0_std_std_9274c0d4::monad_error::monad_error(std::error_code)+0xd7>
-  401270:	8b 48 f8             	mov    -0x8(%rax),%ecx
-  401273:	8d 51 ff             	lea    -0x1(%rcx),%edx
-  401276:	89 50 f8             	mov    %edx,-0x8(%rax)
-  401279:	85 c9                	test   %ecx,%ecx
-  40127b:	7f 0a                	jg     401287 <boost::outcome::_1_0_std_std_9274c0d4::monad_error::monad_error(std::error_code)+0xd7>
-  40127d:	48 8d 74 24 08       	lea    0x8(%rsp),%rsi
-  401282:	e8 39 fb ff ff       	callq  400dc0 <std::string::_Rep::_M_destroy(std::allocator<char> const&)@plt>
-  401287:	48 89 df             	mov    %rbx,%rdi
-  400e80:	ff 25 32 12 20 00    	jmpq   *0x201232(%rip)        # 6020b8 <_GLOBAL_OFFSET_TABLE_+0xb8>
-  400e86:	68 14 00 00 00       	pushq  $0x14
-  400e8b:	e9 a0 fe ff ff       	jmpq   400d30 <_init+0x28>
-  40128f:	90                   	nop
-  4010a7:	be 40 14 40 00       	mov    $0x401440,%esi
-  4010ac:	ba 50 0d 40 00       	mov    $0x400d50,%edx
-  4010b1:	48 89 df             	mov    %rbx,%rdi
-  400e50:	ff 25 4a 12 20 00    	jmpq   *0x20124a(%rip)        # 6020a0 <_GLOBAL_OFFSET_TABLE_+0xa0>
-  400e56:	68 11 00 00 00       	pushq  $0x11
-  400e5b:	e9 d0 fe ff ff       	jmpq   400d30 <_init+0x28>
-  4010b9:	48 89 c5             	mov    %rax,%rbp
-  4010bc:	48 89 df             	mov    %rbx,%rdi
-  400e40:	ff 25 52 12 20 00    	jmpq   *0x201252(%rip)        # 602098 <_GLOBAL_OFFSET_TABLE_+0x98>
-  400e46:	68 10 00 00 00       	pushq  $0x10
-  400e4b:	e9 e0 fe ff ff       	jmpq   400d30 <_init+0x28>
-  4010c4:	48 89 ef             	mov    %rbp,%rdi
-  4010c7:	e8 b4 fd ff ff       	callq  400e80 <_Unwind_Resume@plt>
-  4010cc:	0f 1f 40 00          	nopl   0x0(%rax)
-  400fc3:	8a 44 24 20          	mov    0x20(%rsp),%al
-  400fc7:	3c 02                	cmp    $0x2,%al
-  400fc9:	74 0c                	je     400fd7 <test1()+0x37>
-  400fcb:	8b 44 24 08          	mov    0x8(%rsp),%eax
-  400fcf:	48 83 c4 28          	add    $0x28,%rsp
-  400fd3:	5b                   	pop    %rbx
-  400fd4:	41 5e                	pop    %r14
-  400fd6:	c3                   	retq
-  400fd7:	bf 20 00 00 00       	mov    $0x20,%edi
-  400e30:	ff 25 5a 12 20 00    	jmpq   *0x20125a(%rip)        # 602090 <_GLOBAL_OFFSET_TABLE_+0x90>
-  400e36:	68 0f 00 00 00       	pushq  $0xf
-  400e3b:	e9 f0 fe ff ff       	jmpq   400d30 <_init+0x28>
-  400fe1:	48 89 c3             	mov    %rax,%rbx
-  400fe4:	8b 74 24 08          	mov    0x8(%rsp),%esi
-  400fe8:	48 8b 54 24 10       	mov    0x10(%rsp),%rdx
-  400fed:	48 89 df             	mov    %rbx,%rdi
-  4010d0:	55                   	push   %rbp
-  4010d1:	41 57                	push   %r15
-  4010d3:	41 56                	push   %r14
-  4010d5:	53                   	push   %rbx
-  4010d6:	48 83 ec 18          	sub    $0x18,%rsp
-  4010da:	49 89 d6             	mov    %rdx,%r14
-  4010dd:	41 89 f7             	mov    %esi,%r15d
-  4010e0:	48 89 fb             	mov    %rdi,%rbx
-  4010e3:	49 8b 06             	mov    (%r14),%rax
-  4010e6:	48 8d 6c 24 10       	lea    0x10(%rsp),%rbp
-  4010eb:	48 89 ef             	mov    %rbp,%rdi
-  4010ee:	4c 89 f6             	mov    %r14,%rsi
-  4010f1:	44 89 fa             	mov    %r15d,%edx
-  4010f4:	ff 50 18             	callq  *0x18(%rax)
-  4010f7:	48 89 df             	mov    %rbx,%rdi
-  4010fa:	48 89 ee             	mov    %rbp,%rsi
-  400d70:	ff 25 ba 12 20 00    	jmpq   *0x2012ba(%rip)        # 602030 <_GLOBAL_OFFSET_TABLE_+0x30>
-  400d76:	68 03 00 00 00       	pushq  $0x3
-  400d7b:	e9 b0 ff ff ff       	jmpq   400d30 <_init+0x28>
-  401102:	48 8b 44 24 10       	mov    0x10(%rsp),%rax
-  401107:	48 8d 78 e8          	lea    -0x18(%rax),%rdi
-  40110b:	b9 80 21 60 00       	mov    $0x602180,%ecx
-  401110:	48 39 cf             	cmp    %rcx,%rdi
-  401113:	75 1a                	jne    40112f <std::system_error::system_error(std::error_code)+0x5f>
-  401115:	48 c7 03 08 21 60 00 	movq   $0x602108,(%rbx)
-  40111c:	44 89 7b 10          	mov    %r15d,0x10(%rbx)
-  401120:	4c 89 73 18          	mov    %r14,0x18(%rbx)
-  401124:	48 83 c4 18          	add    $0x18,%rsp
-  401128:	5b                   	pop    %rbx
-  401129:	41 5e                	pop    %r14
-  40112b:	41 5f                	pop    %r15
-  40112d:	5d                   	pop    %rbp
-  40112e:	c3                   	retq
-  40112f:	b9 00 00 00 00       	mov    $0x0,%ecx
-  401134:	48 85 c9             	test   %rcx,%rcx
-  401137:	74 10                	je     401149 <std::system_error::system_error(std::error_code)+0x79>
-  401139:	b9 ff ff ff ff       	mov    $0xffffffff,%ecx
-  40113e:	f0 0f c1 48 f8       	lock xadd %ecx,-0x8(%rax)
-  401143:	85 c9                	test   %ecx,%ecx
-  401145:	7f ce                	jg     401115 <std::system_error::system_error(std::error_code)+0x45>
-  401147:	eb 0d                	jmp    401156 <std::system_error::system_error(std::error_code)+0x86>
-  401149:	8b 48 f8             	mov    -0x8(%rax),%ecx
-  40114c:	8d 51 ff             	lea    -0x1(%rcx),%edx
-  40114f:	89 50 f8             	mov    %edx,-0x8(%rax)
-  401152:	85 c9                	test   %ecx,%ecx
-  401154:	7f bf                	jg     401115 <std::system_error::system_error(std::error_code)+0x45>
-  401156:	48 89 e6             	mov    %rsp,%rsi
-  400dc0:	ff 25 92 12 20 00    	jmpq   *0x201292(%rip)        # 602058 <_GLOBAL_OFFSET_TABLE_+0x58>
-  400dc6:	68 08 00 00 00       	pushq  $0x8
-  400dcb:	e9 60 ff ff ff       	jmpq   400d30 <_init+0x28>
-  40115e:	eb b5                	jmp    401115 <std::system_error::system_error(std::error_code)+0x45>
-  401160:	48 89 c3             	mov    %rax,%rbx
-  401163:	48 8b 44 24 10       	mov    0x10(%rsp),%rax
-  401168:	48 8d 78 e8          	lea    -0x18(%rax),%rdi
-  40116c:	b9 80 21 60 00       	mov    $0x602180,%ecx
-  401171:	48 39 cf             	cmp    %rcx,%rdi
-  401174:	74 31                	je     4011a7 <std::system_error::system_error(std::error_code)+0xd7>
-  401176:	b9 00 00 00 00       	mov    $0x0,%ecx
-  40117b:	48 85 c9             	test   %rcx,%rcx
-  40117e:	74 10                	je     401190 <std::system_error::system_error(std::error_code)+0xc0>
-  401180:	b9 ff ff ff ff       	mov    $0xffffffff,%ecx
-  401185:	f0 0f c1 48 f8       	lock xadd %ecx,-0x8(%rax)
-  40118a:	85 c9                	test   %ecx,%ecx
-  40118c:	7e 0f                	jle    40119d <std::system_error::system_error(std::error_code)+0xcd>
-  40118e:	eb 17                	jmp    4011a7 <std::system_error::system_error(std::error_code)+0xd7>
-  401190:	8b 48 f8             	mov    -0x8(%rax),%ecx
-  401193:	8d 51 ff             	lea    -0x1(%rcx),%edx
-  401196:	89 50 f8             	mov    %edx,-0x8(%rax)
-  401199:	85 c9                	test   %ecx,%ecx
-  40119b:	7f 0a                	jg     4011a7 <std::system_error::system_error(std::error_code)+0xd7>
-  40119d:	48 8d 74 24 08       	lea    0x8(%rsp),%rsi
-  4011a2:	e8 19 fc ff ff       	callq  400dc0 <std::string::_Rep::_M_destroy(std::allocator<char> const&)@plt>
-  4011a7:	48 89 df             	mov    %rbx,%rdi
-  400e80:	ff 25 32 12 20 00    	jmpq   *0x201232(%rip)        # 6020b8 <_GLOBAL_OFFSET_TABLE_+0xb8>
-  400e86:	68 14 00 00 00       	pushq  $0x14
-  400e8b:	e9 a0 fe ff ff       	jmpq   400d30 <_init+0x28>
-  4011af:	90                   	nop
-  400ff5:	be e0 20 60 00       	mov    $0x6020e0,%esi
-  400ffa:	ba f0 0d 40 00       	mov    $0x400df0,%edx
-  400fff:	48 89 df             	mov    %rbx,%rdi
-  400e50:	ff 25 4a 12 20 00    	jmpq   *0x20124a(%rip)        # 6020a0 <_GLOBAL_OFFSET_TABLE_+0xa0>
-  400e56:	68 11 00 00 00       	pushq  $0x11
-  400e5b:	e9 d0 fe ff ff       	jmpq   400d30 <_init+0x28>
-  401007:	49 89 c6             	mov    %rax,%r14
-  40100a:	48 89 df             	mov    %rbx,%rdi
-  400e40:	ff 25 52 12 20 00    	jmpq   *0x201252(%rip)        # 602098 <_GLOBAL_OFFSET_TABLE_+0x98>
-  400e46:	68 10 00 00 00       	pushq  $0x10
-  400e4b:	e9 e0 fe ff ff       	jmpq   400d30 <_init+0x28>
-  401012:	4c 89 f7             	mov    %r14,%rdi
-  400e80:	ff 25 32 12 20 00    	jmpq   *0x201232(%rip)        # 6020b8 <_GLOBAL_OFFSET_TABLE_+0xb8>
-  400e86:	68 14 00 00 00       	pushq  $0x14
-  400e8b:	e9 a0 fe ff ff       	jmpq   400d30 <_init+0x28>
-  40101a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+  400bc0:	53                   	push   %rbx
+  400bc1:	48 83 ec 20          	sub    $0x20,%rsp
+  400bc5:	48 8d 5c 24 08       	lea    0x8(%rsp),%rbx
+  400bca:	48 89 df             	mov    %rbx,%rdi
+  400bcd:	e8 2e f4 bf ff       	callq  0 <_init-0x4009a8>
+  400bd2:	48 89 df             	mov    %rbx,%rdi
+  400c20:	41 57                	push   %r15
+  400c22:	41 56                	push   %r14
+  400c24:	53                   	push   %rbx
+  400c25:	48 89 fb             	mov    %rdi,%rbx
+  400c28:	8b 43 04             	mov    0x4(%rbx),%eax
+  400c2b:	a8 01                	test   $0x1,%al
+  400c2d:	74 06                	je     400c35 <void outcome_v2_9202a625::policy::error_code_throw_as_system_error<int, std::error_code, void>::wide_value_check<outcome_v2_9202a625::detail::basic_result_value_observers<outcome_v2_9202a625::detail::basic_result_storage<int, std::error_code, outcome_v2_9202a625::policy::error_code_throw_as_system_error<int, std::error_code, void> >, int, outcome_v2_9202a625::policy::error_code_throw_as_system_error<int, std::error_code, void> > >(outcome_v2_9202a625::detail::basic_result_value_observers<outcome_v2_9202a625::detail::basic_result_storage<int, std::error_code, outcome_v2_9202a625::policy::error_code_throw_as_system_error<int, std::error_code, void> >, int, outcome_v2_9202a625::policy::error_code_throw_as_system_error<int, std::error_code, void> >&&)+0x15>
+  400c2f:	5b                   	pop    %rbx
+  400c30:	41 5e                	pop    %r14
+  400c32:	41 5f                	pop    %r15
+  400c34:	c3                   	retq
+  400c35:	a8 02                	test   $0x2,%al
+  400c37:	75 2c                	jne    400c65 <void outcome_v2_9202a625::policy::error_code_throw_as_system_error<int, std::error_code, void>::wide_value_check<outcome_v2_9202a625::detail::basic_result_value_observers<outcome_v2_9202a625::detail::basic_result_storage<int, std::error_code, outcome_v2_9202a625::policy::error_code_throw_as_system_error<int, std::error_code, void> >, int, outcome_v2_9202a625::policy::error_code_throw_as_system_error<int, std::error_code, void> > >(outcome_v2_9202a625::detail::basic_result_value_observers<outcome_v2_9202a625::detail::basic_result_storage<int, std::error_code, outcome_v2_9202a625::policy::error_code_throw_as_system_error<int, std::error_code, void> >, int, outcome_v2_9202a625::policy::error_code_throw_as_system_error<int, std::error_code, void> >&&)+0x45>
+  400c39:	bf 10 00 00 00       	mov    $0x10,%edi
+  4009d0:	ff 25 42 16 20 00    	jmpq   *0x201642(%rip)        # 602018 <__cxa_allocate_exception@CXXABI_1.3>
+  4009d6:	68 00 00 00 00       	pushq  $0x0
+  4009db:	e9 e0 ff ff ff       	jmpq   4009c0 <.plt>
+  400c43:	48 89 c3             	mov    %rax,%rbx
+  400c46:	be 04 0e 40 00       	mov    $0x400e04,%esi
+  400c4b:	48 89 df             	mov    %rbx,%rdi
+  400cc0:	53                   	push   %rbx
+  400cc1:	48 89 fb             	mov    %rdi,%rbx
+  400a20:	ff 25 1a 16 20 00    	jmpq   *0x20161a(%rip)        # 602040 <std::logic_error::logic_error(char const*)@GLIBCXX_3.4.21>
+  400a26:	68 05 00 00 00       	pushq  $0x5
+  400a2b:	e9 90 ff ff ff       	jmpq   4009c0 <.plt>
+  400cc9:	48 c7 03 68 0e 40 00 	movq   $0x400e68,(%rbx)
+  400cd0:	5b                   	pop    %rbx
+  400cd1:	c3                   	retq
+  400cd2:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
+  400cdc:	0f 1f 40 00          	nopl   0x0(%rax)
+  400c53:	be 40 0e 40 00       	mov    $0x400e40,%esi
+  400c58:	ba 90 0a 40 00       	mov    $0x400a90,%edx
+  400c5d:	48 89 df             	mov    %rbx,%rdi
+  400a70:	ff 25 f2 15 20 00    	jmpq   *0x2015f2(%rip)        # 602068 <__cxa_throw@CXXABI_1.3>
+  400a76:	68 0a 00 00 00       	pushq  $0xa
+  400a7b:	e9 40 ff ff ff       	jmpq   4009c0 <.plt>
+  400c65:	bf 20 00 00 00       	mov    $0x20,%edi
+  400c6a:	e8 61 fd ff ff       	callq  4009d0 <__cxa_allocate_exception@plt>
+  400c6f:	49 89 c6             	mov    %rax,%r14
+  400c72:	8b 73 08             	mov    0x8(%rbx),%esi
+  400c75:	48 8b 53 10          	mov    0x10(%rbx),%rdx
+  400c79:	4c 89 f7             	mov    %r14,%rdi
+  400ce0:	55                   	push   %rbp
+  400ce1:	41 57                	push   %r15
+  400ce3:	41 56                	push   %r14
+  400ce5:	53                   	push   %rbx
+  400ce6:	48 83 ec 28          	sub    $0x28,%rsp
+  400cea:	49 89 d6             	mov    %rdx,%r14
+  400ced:	89 f5                	mov    %esi,%ebp
+  400cef:	48 89 fb             	mov    %rdi,%rbx
+  400cf2:	49 8b 06             	mov    (%r14),%rax
+  400cf5:	4c 8d 7c 24 08       	lea    0x8(%rsp),%r15
+  400cfa:	4c 89 ff             	mov    %r15,%rdi
+  400cfd:	4c 89 f6             	mov    %r14,%rsi
+  400d00:	89 ea                	mov    %ebp,%edx
+  400d02:	ff 50 20             	callq  *0x20(%rax)
+  400d05:	48 89 df             	mov    %rbx,%rdi
+  400d08:	4c 89 fe             	mov    %r15,%rsi
+  400a30:	ff 25 12 16 20 00    	jmpq   *0x201612(%rip)        # 602048 <std::runtime_error::runtime_error(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@GLIBCXX_3.4.21>
+  400a36:	68 06 00 00 00       	pushq  $0x6
+  400a3b:	e9 80 ff ff ff       	jmpq   4009c0 <.plt>
+  400d10:	48 8b 7c 24 08       	mov    0x8(%rsp),%rdi
+  400d15:	48 8d 44 24 18       	lea    0x18(%rsp),%rax
+  400d1a:	48 39 c7             	cmp    %rax,%rdi
+  400d1d:	74 05                	je     400d24 <std::system_error::system_error(std::error_code)+0x44>
+  400a00:	ff 25 2a 16 20 00    	jmpq   *0x20162a(%rip)        # 602030 <operator delete(void*)@GLIBCXX_3.4>
+  400a06:	68 03 00 00 00       	pushq  $0x3
+  400a0b:	e9 b0 ff ff ff       	jmpq   4009c0 <.plt>
+  400d24:	48 c7 03 d8 1d 60 00 	movq   $0x601dd8,(%rbx)
+  400d2b:	89 6b 10             	mov    %ebp,0x10(%rbx)
+  400d2e:	4c 89 73 18          	mov    %r14,0x18(%rbx)
+  400d32:	48 83 c4 28          	add    $0x28,%rsp
+  400d36:	5b                   	pop    %rbx
+  400d37:	41 5e                	pop    %r14
+  400d39:	41 5f                	pop    %r15
+  400d3b:	5d                   	pop    %rbp
+  400d3c:	c3                   	retq
+  400d3d:	48 89 c3             	mov    %rax,%rbx
+  400d40:	48 8b 7c 24 08       	mov    0x8(%rsp),%rdi
+  400d45:	48 8d 44 24 18       	lea    0x18(%rsp),%rax
+  400d4a:	48 39 c7             	cmp    %rax,%rdi
+  400d4d:	74 05                	je     400d54 <std::system_error::system_error(std::error_code)+0x74>
+  400d4f:	e8 ac fc ff ff       	callq  400a00 <operator delete(void*)@plt>
+  400d54:	48 89 df             	mov    %rbx,%rdi
+  400a80:	ff 25 ea 15 20 00    	jmpq   *0x2015ea(%rip)        # 602070 <_Unwind_Resume@GCC_3.0>
+  400a86:	68 0b 00 00 00       	pushq  $0xb
+  400a8b:	e9 30 ff ff ff       	jmpq   4009c0 <.plt>
+  400d5c:	0f 1f 40 00          	nopl   0x0(%rax)
+  400c81:	be 40 1d 60 00       	mov    $0x601d40,%esi
+  400c86:	ba 10 0a 40 00       	mov    $0x400a10,%edx
+  400c8b:	4c 89 f7             	mov    %r14,%rdi
+  400c8e:	e8 dd fd ff ff       	callq  400a70 <__cxa_throw@plt>
+  400c93:	49 89 c7             	mov    %rax,%r15
+  400c96:	4c 89 f7             	mov    %r14,%rdi
+  4009e0:	ff 25 3a 16 20 00    	jmpq   *0x20163a(%rip)        # 602020 <__cxa_free_exception@CXXABI_1.3>
+  4009e6:	68 01 00 00 00       	pushq  $0x1
+  4009eb:	e9 d0 ff ff ff       	jmpq   4009c0 <.plt>
+  400c9e:	4c 89 ff             	mov    %r15,%rdi
+  400ca1:	e8 da fd ff ff       	callq  400a80 <_Unwind_Resume@plt>
+  400ca6:	49 89 c7             	mov    %rax,%r15
+  400ca9:	48 89 df             	mov    %rbx,%rdi
+  400cac:	e8 2f fd ff ff       	callq  4009e0 <__cxa_free_exception@plt>
+  400cb1:	4c 89 ff             	mov    %r15,%rdi
+  400cb4:	e8 c7 fd ff ff       	callq  400a80 <_Unwind_Resume@plt>
+  400cb9:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+  400bda:	8b 44 24 08          	mov    0x8(%rsp),%eax
+  400bde:	48 83 c4 20          	add    $0x20,%rsp
+  400be2:	5b                   	pop    %rbx
+  400be3:	c3                   	retq
+  400be4:	66 66 66 2e 0f 1f 84 	data16 data16 nopw %cs:0x0(%rax,%rax,1)

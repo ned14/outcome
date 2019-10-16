@@ -21,7 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../include/boost/outcome.hpp"
+#include "../../single-header/outcome.hpp"
 
 #ifdef __GNUC__
 #define WEAK __attribute__((weak))
@@ -29,11 +29,11 @@ Distributed under the Boost Software License, Version 1.0.
 #define WEAK
 #endif
 
-using namespace boost::outcome;
+using namespace OUTCOME_V2_NAMESPACE;
 extern result<int> unknown() WEAK;
 extern QUICKCPPLIB_NOINLINE int test1()
 {
-  return unknown().get();
+  return unknown().value();
 }
 extern QUICKCPPLIB_NOINLINE void test2()
 {

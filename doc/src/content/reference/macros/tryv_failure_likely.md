@@ -1,5 +1,5 @@
 +++
-title = "`OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)`"
+title = "`OUTCOME_TRYV_FAILURE_LIKELY(expr)/OUTCOME_TRY_FAILURE_LIKELY(expr)`"
 description = "Evaluate an expression which results in an understood type, continuing execution if successful, immediately returning `try_operation_return_as(X)` from the calling function if unsuccessful."
 +++
 
@@ -13,7 +13,7 @@ Default overloads for these customisation points are provided. See [the recipe f
 
 The difference between the `OUTCOME_TRYV(expr)` and `OUTCOME_TRY(expr)` editions is that the latter will set a variable if two or more macro arguments are present (see {{% api "OUTCOME_TRY(var, expr)" %}}). The former requires the `T` to be `void`.
 
-Hints are given to the compiler that the expression will be successful. If you expect failure, you should use {{% api "OUTCOME_TRYV_FAILURE_LIKELY(expr)" %}} instead.
+Hints are given to the compiler that the expression will be unsuccessful. If you expect success, you should use {{% api "OUTCOME_TRYV(expr)" %}} instead.
 
 *Overridable*: Not overridable.
 

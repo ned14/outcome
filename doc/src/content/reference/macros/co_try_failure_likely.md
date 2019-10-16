@@ -1,5 +1,5 @@
 +++
-title = "`OUTCOME_CO_TRY(var, expr)`"
+title = "`OUTCOME_CO_TRY_FAILURE_LIKELY(var, expr)`"
 description = "Evaluate within a coroutine an expression which results in an understood type, assigning `T` to a variable called `var` if successful, immediately returning `try_operation_return_as(X)` from the calling function if unsuccessful."
 +++
 
@@ -11,7 +11,7 @@ Evaluate within a coroutine an expression which results in a type matching the f
 
 Default overloads for these customisation points are provided. See [the recipe for supporting foreign input to `OUTCOME_TRY`]({{% relref "/recipes/foreign-try" %}}).
 
-Hints are given to the compiler that the expression will be successful. If you expect failure, you should use {{% api "OUTCOME_CO_TRY_FAILURE_LIKELY(var, expr)" %}} instead.
+Hints are given to the compiler that the expression will be unsuccessful. If you expect success, you should use {{% api "OUTCOME_CO_TRY(var, expr)" %}} instead.
 
 *Overridable*: Not overridable.
 

@@ -1,5 +1,5 @@
 +++
-title = "`OUTCOME_CO_TRYX(expr)`"
+title = "`OUTCOME_CO_TRYX_FAILURE_LIKELY(expr)`"
 description = "Evaluate from within a coroutine an expression which results in an understood type, emitting the `T` if successful, immediately returning `try_operation_return_as(X)` from the calling function if unsuccessful."
 +++
 
@@ -11,7 +11,7 @@ Evaluate within a coroutine an expression which results in a type matching the f
 
 Default overloads for these customisation points are provided. See [the recipe for supporting foreign input to `OUTCOME_TRY`]({{% relref "/recipes/foreign-try" %}}).
 
-Hints are given to the compiler that the expression will be successful. If you expect failure, you should use {{% api "OUTCOME_CO_TRYX_FAILURE_LIKELY(expr)" %}} instead.
+Hints are given to the compiler that the expression will be unsuccessful. If you expect success, you should use {{% api "OUTCOME_CO_TRYX(expr)" %}} instead.
 
 *Availability*: GCC and clang only. Use `#ifdef OUTCOME_CO_TRYX` to determine if available.
 
