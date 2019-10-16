@@ -166,14 +166,14 @@ OUTCOME_V2_NAMESPACE_END
     return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 #define OUTCOME_TRY2_SUCCESS_LIKELY(unique, v, ...)                                                                                                                                                                                                                                                                            \
   OUTCOME_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                           \
-  auto && (v) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+  auto && v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 #define OUTCOME_TRYV2_FAILURE_LIKELY(unique, ...)                                                                                                                                                                                                                                                                              \
   auto &&unique = (__VA_ARGS__);                                                                                                                                                                                                                                                                                               \
   if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                                                                                                                                                                               \
   return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 #define OUTCOME_TRY2_FAILURE_LIKELY(unique, v, ...)                                                                                                                                                                                                                                                                            \
   OUTCOME_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                           \
-  auto && (v) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+  auto && v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 
 #define OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, ...)                                                                                                                                                                                                                                                                           \
   auto &&unique = (__VA_ARGS__);                                                                                                                                                                                                                                                                                               \
@@ -183,14 +183,14 @@ OUTCOME_V2_NAMESPACE_END
     co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 #define OUTCOME_CO_TRY2_SUCCESS_LIKELY(unique, v, ...)                                                                                                                                                                                                                                                                         \
   OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                        \
-  auto && (v) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+  auto && v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 #define OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, ...)                                                                                                                                                                                                                                                                           \
   auto &&unique = (__VA_ARGS__);                                                                                                                                                                                                                                                                                               \
   if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                                                                                                                                                                               \
   co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 #define OUTCOME_CO_TRY2_FAILURE_LIKELY(unique, v, ...)                                                                                                                                                                                                                                                                         \
   OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                        \
-  auto && (v) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+  auto && v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
