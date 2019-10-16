@@ -21,14 +21,14 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "outcome/outcome.hpp"
+#include "../../single-header/outcome.hpp"
 
 extern QUICKCPPLIB_NOINLINE int test1()
 {
-  using namespace boost::outcome;
+  using namespace OUTCOME_V2_NAMESPACE;
   result<int> m1(5);
   result<int> m2(std::move(m1));
-  return std::move(m2).get();
+  return std::move(m2).value();
 }
 extern QUICKCPPLIB_NOINLINE void test2()
 {

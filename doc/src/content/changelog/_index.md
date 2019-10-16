@@ -30,6 +30,14 @@ code containing C++ Concepts, and if it does, all cmake consumers of Outcome wil
 C++ Concepts. Set the cmake variable `CXX_CONCEPTS_FLAGS` to an empty string to prevent
 auto detection and enabling of C++ Concepts support occurring.
 
+`OUTCOME_TRY` operation now hints to the compiler that operation will be successful
+: [P1886 *Error speed benchmarking*](https://wg21.link/P1886) showed that there is
+considerable gain in very small functions by hinting to the compiler whether the expression
+is expected to be successful or not. `OUTCOME_TRY` previously did not hint to the compiler
+at all, but now it does. A new suite of macros `OUTCOME_TRY_FAILURE_LIKELY` hint to the
+compiler that failure is expected. If you wish to return to the previously unhinted
+behaviour, define `OUTCOME_TRY_LIKELY(expr)` to `(!!expr)`.
+
 [#199](https://github.com/ned14/outcome/issues/199)
 : Support for C++ Coroutines has been added. This comes in two parts, firstly there is
 now an `OUTCOME_CO_TRY()` operation suitable for performing the `TRY` operation from

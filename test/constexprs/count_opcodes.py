@@ -57,13 +57,13 @@ _get_function_name_ = \
     }
 
 _is_instruction_ = \
-    { # ---> at least 2 spaces
+    { # ---> at least 1 space
       # ---> address, i.e. some HEX numbers
       # ---> colon :
       # ---> more HEX numbers and spaces
       # ---> asm instruction, i.e. a word of latin characters
       # ---> arguments
-      'objdump' : lambda l: re.match(r"^[ ]{2,}[0-9a-f]+:\s*[0-9a-f ]+\s+[a-z]+.*$", l) \
+      'objdump' : lambda l: re.match(r"^[ ]{1,}[0-9a-f]+:\s*[0-9a-f ]+\s+[a-z]+.*$", l) \
                                 is not None 
 
       # the same, except that the line starts with exactly two spaces
@@ -187,13 +187,15 @@ def inline_all(name : str, functions : dict, file_type : str,
         is_a_call, get_target, allow_recursion), functions[name]), [])
 
 
-def count_opcodes(input_file : str, func : str):
+def count_opcodes(output_file_name : str, input_file : str, func : str):
     functions = {}
     file_type = 'objdump' if os.name == 'posix' else 'dumpbin'
 
     # Read all the functions
     with open(input_file, "rt") as ih:
         functions = parse(ih, file_type)
+        
+    assert functions[func]
 
     # Find the one we're interested in
     name, opcodes = find_opcodes(func, functions, file_type)
@@ -204,7 +206,7 @@ def count_opcodes(input_file : str, func : str):
     opcodes = inline_all(name, functions, file_type, False)
 
     # Save results
-    output_file = input_file + '.' + func + '.s'
+    output_file = input_file + '.' + output_file_name + '.s'
     try:
         os.remove(output_file)
     except:

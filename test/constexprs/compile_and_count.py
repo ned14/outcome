@@ -18,15 +18,15 @@ def _mk_o(initial_ext: str, final_ext : str):
 
 _compilers_ = \
     { "posix"   : ["gcc", "clang"]
-    , "nt"      : ["msvc", "msvc_clang"]
+    , "nt"      : ["msvc"]  #, "msvc_clang"]
     }
 
 _compile_info_ = \
-    { "gcc"        : (_mk_f("g++-6 -std=c++14 -DBOOST_OUTCOME_ENABLE_ADVANCED=1 -DNDEBUG -I../.. -O3 {} -o {}"), _mk_o("cpp", "out"))
-    , "clang"      : (_mk_f("clang++-4.0 -std=c++14 -DBOOST_OUTCOME_ENABLE_ADVANCED=1 -DNDEBUG -I../.. -O3 {} -o {}"), _mk_o("cpp", "out"))
-    , "msvc"       : (_mk_f("cl /EHsc /c /DBOOST_OUTCOME_ENABLE_ADVANCED=1 /DNDEBUG /I../.. /O2 /GS- /GR /Gy /Zc:inline /MT "
+    { "gcc"        : (_mk_f("g++ -std=c++14 -DNDEBUG -O3 -fno-stack-protector {} -o {}"), _mk_o("cpp", "out"))
+    , "clang"      : (_mk_f("clang++ -std=c++14 -DNDEBUG -O3 {} -o {}"), _mk_o("cpp", "out"))
+    , "msvc"       : (_mk_f("cl /EHsc /c /DNDEBUG /O2 /GS- /GR /Gy /Zc:inline /MT "
                            + "/D_UNICODE=1 /DUNICODE=1 {} /Fo{}"), _mk_o("cpp", "obj"))
-    , "msvc_clang" : (_mk_f("clang -std=c++14 -c -DBOOST_OUTCOME_ENABLE_ADVANCED=1 -DNDEBUG -I../.. -O3 -fexceptions "
+    , "msvc_clang" : (_mk_f("clang -std=c++14 -c -DNDEBUG -O3 -fexceptions "
                            + "-D_UNICODE=1 -DUNICODE=1 {} -o {} -fms-compatibility-version=19"), _mk_o("cpp", "out"))
     }
 
@@ -35,6 +35,13 @@ _disassemble_info_ = \
     , "clang"      : (_mk_f("objdump -C -d {} > {}"), _mk_o("out", "clang.S"))
     , "msvc"       : (_mk_f("dumpbin /disasm {} > {}"), _mk_o("obj", "msvc.S"))
     , "msvc_clang" : (_mk_f("dumpbin /disasm {} > {}"), _mk_o("out", "msvc_clang.S"))
+    }
+
+_function_ = \
+    { "gcc"        : ("test1()", "test1")
+    , "clang"      : ("test1()", "test1")
+    , "msvc"       : ("?test1@@YAHXZ", "test1")
+    , "msvc_clang" : ("?test1@@YAHXZ", "test1")
     }
 
 #
@@ -46,14 +53,6 @@ _disassemble_info_ = \
 # }
 #
 limits = {
-"min_monad_bind"                               : { 'gcc' :  5, 'clang' :  5, 'msvc' : 100 },
-"min_monad_construct_destruct"                 : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
-"min_monad_construct_error_move_destruct"      : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
-"min_monad_construct_exception_move_destruct"  : { 'gcc' : 30, 'clang' : 40, 'msvc' : 1000 },
-"min_monad_construct_value_move_destruct"      : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
-"min_monad_next"                               : { 'gcc' :  5, 'clang' :  5, 'msvc' : 1000 },
-"min_option_construct_value_move_destruct"     : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
-"min_option_next"                              : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
 "min_result_construct_value_move_destruct"     : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
 "min_result_next"                              : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
 }
@@ -112,15 +111,15 @@ def disassemble(obj_file : str, compiler : str) -> str:
     return output(obj_file)
 
 
-def test_single(func : str, src_file : str, compiler : str, indent : int):
+def test_single(outname : str, func : str, src_file : str, compiler : str, indent : int):
     asm_file = disassemble(compile(src_file, compiler), compiler)
     assert asm_file is not None 
 
     test_name = src_file.replace(".cpp", "")
-    count, opcodes = count_opcodes.count_opcodes(asm_file, func)
+    count, opcodes = count_opcodes.count_opcodes(outname, asm_file, func)
     if count == -1:
         print("[-] No call to " + func + " found.", file=sys.stderr)
-        sys.exit(0)
+        sys.exit(1)
     try:
         os.remove(asm_file)
     except OSError as e:
@@ -145,7 +144,7 @@ def list_src_files():
                os.listdir()))
 
 
-def test_all(func : str):
+def test_all(func : dict):
     xml_string = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
                  '<testsuite name="constexpr">\n'
     # holds (compiler, name, count) tuples
@@ -153,8 +152,8 @@ def test_all(func : str):
     for src_file in list_src_files():
         print(src_file)
         for compiler in _compilers_[os.name]:
-            name, count, xml_output = test_single(func, 
-                src_file, compiler, 1)
+            name, count, xml_output = test_single(func[compiler][1],
+                func[compiler][0], src_file, compiler, 1)
             csv_data.append((compiler, name, count))
             xml_string += xml_output
     xml_string += '</testsuite>'
@@ -176,4 +175,4 @@ def test_all(func : str):
             csv_file.write('\n')
 
 
-test_all('test1')
+test_all(_function_)
