@@ -1024,6 +1024,9 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_SYMBOL_VISIBLE
 #define OUTCOME_SYMBOL_VISIBLE QUICKCPPLIB_SYMBOL_VISIBLE
 #endif
+#ifndef OUTCOME_FORCEINLINE
+#define OUTCOME_FORCEINLINE QUICKCPPLIB_FORCEINLINE
+#endif
 #ifndef OUTCOME_NODISCARD
 #define OUTCOME_NODISCARD QUICKCPPLIB_NODISCARD
 #endif
@@ -1191,9 +1194,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 086ef6d04b387ca802fe9b724d770c6359cd491e
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-10-10 17:15:01 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 086ef6d0
+#define OUTCOME_PREVIOUS_COMMIT_REF 9202a62515ebd65ea5d33ca96a2d72bab69c4f57
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-10-14 08:47:33 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 9202a625
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1257,6 +1260,15 @@ SIGNATURE NOT RECOGNISED
 */
 template <class T> constexpr in_place_type_t<T> in_place_type{};
 OUTCOME_V2_NAMESPACE_END
+#endif
+
+#ifndef OUTCOME_TRIVIAL_ABI
+#if 0 || __clang_major__ >= 7
+//! Defined to be `[[clang::trivial_abi]]` when on a new enough clang compiler. Usually automatic, can be overriden.
+#define OUTCOME_TRIVIAL_ABI [[clang::trivial_abi]]
+#else
+#define OUTCOME_TRIVIAL_ABI
+#endif
 #endif
 
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -5764,24 +5776,24 @@ namespace detail
   };
   OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
-  constexpr inline bool has_as_failure(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_as_failure(...) { return false; }
+  constexpr inline bool has_as_failure(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_as_failure(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().assume_error()))
-  constexpr inline bool has_assume_error(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_assume_error(...) { return false; }
+  constexpr inline bool has_assume_error(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_assume_error(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().error()))
-  constexpr inline bool has_error(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_error(...) { return false; }
+  constexpr inline bool has_error(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_error(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().assume_value()))
-  constexpr inline bool has_assume_value(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_assume_value(...) { return false; }
+  constexpr inline bool has_assume_value(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_assume_value(...) { return false; }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().value()))
-  constexpr inline bool has_value(int/*unused */) { return true; }
-  template<class T> constexpr inline bool has_value(...) { return false; }
+  constexpr inline bool has_value(int /*unused */) { return true; }
+  template <class T> constexpr inline bool has_value(...) { return false; }
 }  // namespace detail
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5856,24 +5868,49 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
 #define OUTCOME_TRY_CALL_OVERLOAD(name, ...) OUTCOME_TRY_OVERLOAD_GLUE(OUTCOME_TRY_OVERLOAD_MACRO(name, OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
 
+#ifndef OUTCOME_TRY_LIKELY
+#if defined(__clang__) || defined(__GNUC__)
+#define OUTCOME_TRY_LIKELY(expr) (__builtin_expect(!!(expr), true))
+#else
+#define OUTCOME_TRY_LIKELY(expr) (expr)
+#endif
+#endif
+
 #if !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 8
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wparentheses"
 #endif
 
-#define OUTCOME_TRYV2(unique, ...)                                                                                                                                                                                                                                                                                               auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                              if(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))                                                                                                                                                                                                                                                                     return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+// Use if(!expr); else as some compilers assume else clauses are always unlikely
+#define OUTCOME_TRYV2_SUCCESS_LIKELY(unique, ...)                                                                                                                                                                                                                                                                                auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                              if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                                                                                                                                                                                    ;                                                                                                                                                                                                                                                                                                                            else                                                                                                                                                                                                                                                                                                                             return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 
 
 
-#define OUTCOME_TRY2(unique, v, ...)                                                                                                                                                                                                                                                                                             OUTCOME_TRYV2(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                                            auto && (v) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+
+
+#define OUTCOME_TRY2_SUCCESS_LIKELY(unique, v, ...)                                                                                                                                                                                                                                                                              OUTCOME_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                             auto && (v) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+
+
+#define OUTCOME_TRYV2_FAILURE_LIKELY(unique, ...)                                                                                                                                                                                                                                                                                auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                              if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                                                                                                                                                                                 return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 
 
 
-#define OUTCOME_CO_TRYV2(unique, ...)                                                                                                                                                                                                                                                                                               auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                              if(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))                                                                                                                                                                                                                                                                     co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRY2_FAILURE_LIKELY(unique, v, ...)                                                                                                                                                                                                                                                                              OUTCOME_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                             auto && (v) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 
 
 
-#define OUTCOME_CO_TRY2(unique, v, ...)                                                                                                                                                                                                                                                                                             OUTCOME_CO_TRYV2(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                                            auto && (v) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, ...)                                                                                                                                                                                                                                                                                            auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                              if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))); else                                                                                                                                                                                                                                                                     co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+
+
+
+#define OUTCOME_CO_TRY2_SUCCESS_LIKELY(unique, v, ...)                                                                                                                                                                                                                                                                                          OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                                         auto && (v) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+
+
+#define OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, ...)                                                                                                                                                                                                                                                                             auto && (unique) = (__VA_ARGS__);                                                                                                                                                                                                                                                                                              if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                                                                                                                                                                                                     co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+
+
+
+#define OUTCOME_CO_TRY2_FAILURE_LIKELY(unique, v, ...)                                                                                                                                                                                                                                                                           OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                          auto && (v) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 
 
 
@@ -5884,19 +5921,29 @@ OUTCOME_V2_NAMESPACE_END
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYV(...) OUTCOME_TRYV2(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
+#define OUTCOME_TRYV(...) OUTCOME_TRYV2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME_TRYV_FAILURE_LIKELY(...) OUTCOME_TRYV2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYV(...) OUTCOME_CO_TRYV2(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
+#define OUTCOME_CO_TRYV(...) OUTCOME_CO_TRYV2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME_CO_TRYV_FAILURE_LIKELY(...) OUTCOME_CO_TRYV2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
 
 #if defined(__GNUC__) || defined(__clang__)
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYX(...)                                                                                                                                                                                                                                                                                                        ({                                                                                                                                                                                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                    if(!OUTCOME_V2_NAMESPACE::try_operation_has_value(res))                                                                                                                                                                                                                                                                          return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                    OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                       })
+#define OUTCOME_TRYX(...)                                                                                                                                                                                                                                                                                                        ({                                                                                                                                                                                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                    if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(res)))                                                                                                                                                                                                                                                       ;                                                                                                                                                                                                                                                                                                                            else                                                                                                                                                                                                                                                                                                                             return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                    OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                       })
+
+
 
 
 
@@ -5907,7 +5954,9 @@ SIGNATURE NOT RECOGNISED
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYX(...)                                                                                                                                                                                                                                                                                                        ({                                                                                                                                                                                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                    if(!OUTCOME_V2_NAMESPACE::try_operation_has_value(res))                                                                                                                                                                                                                                                                          co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                    OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                       })
+#define OUTCOME_CO_TRYX(...)                                                                                                                                                                                                                                                                                                     ({                                                                                                                                                                                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                    if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(res)))                                                                                                                                                                                                                                                       ;                                                                                                                                                                                                                                                                                                                            else                                                                                                                                                                                                                                                                                                                             co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                 OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                       })
+
+
 
 
 
@@ -5919,12 +5968,21 @@ SIGNATURE NOT RECOGNISED
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYA(v, ...) OUTCOME_TRY2(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
+#define OUTCOME_TRYA(v, ...) OUTCOME_TRY2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME_TRYA_FAILURE_LIKELY(v, ...) OUTCOME_TRY2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYA(v, ...) OUTCOME_CO_TRY2(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
+#define OUTCOME_CO_TRYA(v, ...) OUTCOME_CO_TRY2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME_CO_TRYA_FAILURE_LIKELY(v, ...) OUTCOME_CO_TRY2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
+
 
 #define OUTCOME_TRY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME_TRYA(a, b, c, d, e, f, g, h)
 #define OUTCOME_TRY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME_TRYA(a, b, c, d, e, f, g)
@@ -5934,10 +5992,24 @@ SIGNATURE NOT RECOGNISED
 #define OUTCOME_TRY_INVOKE_TRY3(a, b, c) OUTCOME_TRYA(a, b, c)
 #define OUTCOME_TRY_INVOKE_TRY2(a, b) OUTCOME_TRYA(a, b)
 #define OUTCOME_TRY_INVOKE_TRY1(a) OUTCOME_TRYV(a)
+
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_TRY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRY_INVOKE_TRY, __VA_ARGS__)
+
+#define OUTCOME_TRY_FAILURE_LIKELY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME_TRYA_FAILURE_LIKELY(a, b, c, d, e, f, g, h)
+#define OUTCOME_TRY_FAILURE_LIKELY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME_TRYA_FAILURE_LIKELY(a, b, c, d, e, f, g)
+#define OUTCOME_TRY_FAILURE_LIKELY_INVOKE_TRY6(a, b, c, d, e, f) OUTCOME_TRYA_FAILURE_LIKELY(a, b, c, d, e, f)
+#define OUTCOME_TRY_FAILURE_LIKELY_INVOKE_TRY5(a, b, c, d, e) OUTCOME_TRYA_FAILURE_LIKELY(a, b, c, d, e)
+#define OUTCOME_TRY_FAILURE_LIKELY_INVOKE_TRY4(a, b, c, d) OUTCOME_TRYA_FAILURE_LIKELY(a, b, c, d)
+#define OUTCOME_TRY_FAILURE_LIKELY_INVOKE_TRY3(a, b, c) OUTCOME_TRYA_FAILURE_LIKELY(a, b, c)
+#define OUTCOME_TRY_FAILURE_LIKELY_INVOKE_TRY2(a, b) OUTCOME_TRYA_FAILURE_LIKELY(a, b)
+#define OUTCOME_TRY_FAILURE_LIKELY_INVOKE_TRY1(a) OUTCOME_TRYV_FAILURE_LIKELY(a)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME_TRY_FAILURE_LIKELY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRY_FAILURE_LIKELY_INVOKE_TRY, __VA_ARGS__)
 
 #define OUTCOME_CO_TRY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME_CO_TRYA(a, b, c, d, e, f, g, h)
 #define OUTCOME_CO_TRY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME_CO_TRYA(a, b, c, d, e, f, g)
@@ -5951,5 +6023,23 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_CO_TRY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_CO_TRY_INVOKE_TRY, __VA_ARGS__)
+
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME_TRY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRY_INVOKE_TRY, __VA_ARGS__)
+
+#define OUTCOME_CO_TRY_FAILURE_LIKELY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME_CO_TRYA_FAILURE_LIKELY(a, b, c, d, e, f, g, h)
+#define OUTCOME_CO_TRY_FAILURE_LIKELY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME_CO_TRYA_FAILURE_LIKELY(a, b, c, d, e, f, g)
+#define OUTCOME_CO_TRY_FAILURE_LIKELY_INVOKE_TRY6(a, b, c, d, e, f) OUTCOME_CO_TRYA_FAILURE_LIKELY(a, b, c, d, e, f)
+#define OUTCOME_CO_TRY_FAILURE_LIKELY_INVOKE_TRY5(a, b, c, d, e) OUTCOME_CO_TRYA_FAILURE_LIKELY(a, b, c, d, e)
+#define OUTCOME_CO_TRY_FAILURE_LIKELY_INVOKE_TRY4(a, b, c, d) OUTCOME_CO_TRYA_FAILURE_LIKELY(a, b, c, d)
+#define OUTCOME_CO_TRY_FAILURE_LIKELY_INVOKE_TRY3(a, b, c) OUTCOME_CO_TRYA_FAILURE_LIKELY(a, b, c)
+#define OUTCOME_CO_TRY_FAILURE_LIKELY_INVOKE_TRY2(a, b) OUTCOME_CO_TRYA_FAILURE_LIKELY(a, b)
+#define OUTCOME_CO_TRY_FAILURE_LIKELY_INVOKE_TRY1(a) OUTCOME_CO_TRYV_FAILURE_LIKELY(a)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME_CO_TRY_FAILURE_LIKELY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_CO_TRY_FAILURE_LIKELY_INVOKE_TRY, __VA_ARGS__)
 
 #endif
