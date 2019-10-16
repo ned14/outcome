@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-10-12T15:50:37 UTC">
+<meta name="revised" content="2019-10-16T10:40:44 UTC">
 <title>`OUTCOME_TRYX(expr)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -643,10 +643,31 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv_failure_likely/">
+            <code>OUTCOME_CO_TRYV_FAILURE_LIKELY(expr)/OUTCOME_CO_TRY_FAILURE_LIKELY(expr)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/macros/co_tryx/" class="dd-item">
         <div>
           <a href="/outcome/reference/macros/co_tryx/">
             <code>OUTCOME_CO_TRYX(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryx_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryx_failure_likely/">
+            <code>OUTCOME_CO_TRYX_FAILURE_LIKELY(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_try_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_try_failure_likely/">
+            <code>OUTCOME_CO_TRY_FAILURE_LIKELY(var, expr)</code>
           </a>
         </div>
     </li>
@@ -706,10 +727,31 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/macros/tryv_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryv_failure_likely/">
+            <code>OUTCOME_TRYV_FAILURE_LIKELY(expr)/OUTCOME_TRY_FAILURE_LIKELY(expr)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/macros/tryx/" class="dd-item active">
         <div>
           <a href="/outcome/reference/macros/tryx/">
             <code>OUTCOME_TRYX(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/tryx_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryx_failure_likely/">
+            <code>OUTCOME_TRYX_FAILURE_LIKELY(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/try_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/try_failure_likely/">
+            <code>OUTCOME_TRY_FAILURE_LIKELY(var, expr)</code>
           </a>
         </div>
     </li>
@@ -2511,7 +2553,10 @@
       <option value="/outcome/reference/macros/version/" >-- Version macros</option>
       <option value="/outcome/reference/macros/co_try/" >-- `OUTCOME_CO_TRY(var, expr)`</option>
       <option value="/outcome/reference/macros/co_tryv/" >-- `OUTCOME_CO_TRYV(expr)/OUTCOME_CO_TRY(expr)`</option>
+      <option value="/outcome/reference/macros/co_tryv_failure_likely/" >-- `OUTCOME_CO_TRYV_FAILURE_LIKELY(expr)/OUTCOME_CO_TRY_FAILURE_LIKELY(expr)`</option>
       <option value="/outcome/reference/macros/co_tryx/" >-- `OUTCOME_CO_TRYX(expr)`</option>
+      <option value="/outcome/reference/macros/co_tryx_failure_likely/" >-- `OUTCOME_CO_TRYX_FAILURE_LIKELY(expr)`</option>
+      <option value="/outcome/reference/macros/co_try_failure_likely/" >-- `OUTCOME_CO_TRY_FAILURE_LIKELY(var, expr)`</option>
       <option value="/outcome/reference/macros/disable_execinfo/" >-- `OUTCOME_DISABLE_EXECINFO`</option>
       <option value="/outcome/reference/macros/nodiscard/" >-- `OUTCOME_NODISCARD`</option>
       <option value="/outcome/reference/macros/requires/" >-- `OUTCOME_REQUIRES(...)`</option>
@@ -2520,7 +2565,10 @@
       <option value="/outcome/reference/macros/throw_exception/" >-- `OUTCOME_THROW_EXCEPTION(expr)`</option>
       <option value="/outcome/reference/macros/try/" >-- `OUTCOME_TRY(var, expr)`</option>
       <option value="/outcome/reference/macros/tryv/" >-- `OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)`</option>
+      <option value="/outcome/reference/macros/tryv_failure_likely/" >-- `OUTCOME_TRYV_FAILURE_LIKELY(expr)/OUTCOME_TRY_FAILURE_LIKELY(expr)`</option>
       <option value="/outcome/reference/macros/tryx/"  selected>-- `OUTCOME_TRYX(expr)`</option>
+      <option value="/outcome/reference/macros/tryx_failure_likely/" >-- `OUTCOME_TRYX_FAILURE_LIKELY(expr)`</option>
+      <option value="/outcome/reference/macros/try_failure_likely/" >-- `OUTCOME_TRY_FAILURE_LIKELY(var, expr)`</option>
       <option value="/outcome/reference/macros/in_place_type/" >-- `OUTCOME_USE_STD_IN_PLACE_TYPE`</option>
       <option value="/outcome/reference/macros/is_nothrow_swappable/" >-- `OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE`</option>
   
@@ -2594,6 +2642,9 @@
 
 <p>Default overloads for these customisation points are provided. See <a href="/outcome/recipes/foreign-try/">the recipe for supporting foreign input to <code>OUTCOME_TRY</code></a>.</p>
 
+<p>Hints are given to the compiler that the expression will be successful. If you expect failure, you should use <a href="/outcome/reference/macros/tryx_failure_likely/" class="api-reference"><code>OUTCOME_TRYX_FAILURE_LIKELY(expr)</code></a>
+ instead.</p>
+
 <p><em>Availability</em>: GCC and clang only. Use <code>#ifdef OUTCOME_TRYX</code> to determine if available.</p>
 
 <p><em>Overridable</em>: Not overridable.</p>
@@ -2613,8 +2664,8 @@
     
         <div class="chevrons">
     <div id="navigation">
-<a class="nav nav-prev" href="/outcome/reference/macros/tryv/" title="`OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)`"> <i class="fa fa-chevron-left"></i><label><code>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)</code></label></a>
-    <a class="nav nav-next" href="/outcome/reference/macros/in_place_type/" title="`OUTCOME_USE_STD_IN_PLACE_TYPE`" style="margin-right: 0px;"><label><code>OUTCOME_USE_STD_IN_PLACE_TYPE</code></label><i class="fa fa-chevron-right"></i></a></div>
+<a class="nav nav-prev" href="/outcome/reference/macros/tryv_failure_likely/" title="`OUTCOME_TRYV_FAILURE_LIKELY(expr)/OUTCOME_TRY_FAILURE_LIKELY(expr)`"> <i class="fa fa-chevron-left"></i><label><code>OUTCOME_TRYV_FAILURE_LIKELY(expr)/OUTCOME_TRY_FAILURE_LIKELY(expr)</code></label></a>
+    <a class="nav nav-next" href="/outcome/reference/macros/tryx_failure_likely/" title="`OUTCOME_TRYX_FAILURE_LIKELY(expr)`" style="margin-right: 0px;"><label><code>OUTCOME_TRYX_FAILURE_LIKELY(expr)</code></label><i class="fa fa-chevron-right"></i></a></div>
   </div>
 
   </section>
@@ -2629,7 +2680,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 22/06/2019
+        <i class='fa fa-calendar'></i> Last update on 16/10/2019
     </div>
     
 

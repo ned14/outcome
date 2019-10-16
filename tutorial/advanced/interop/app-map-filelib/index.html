@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-10-12T15:50:25 UTC">
+<meta name="revised" content="2019-10-16T10:40:31 UTC">
 <title>Mapping the File I/O library into the Application :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -644,10 +644,31 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv_failure_likely/">
+            <code>OUTCOME_CO_TRYV_FAILURE_LIKELY(expr)/OUTCOME_CO_TRY_FAILURE_LIKELY(expr)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/macros/co_tryx/" class="dd-item">
         <div>
           <a href="/outcome/reference/macros/co_tryx/">
             <code>OUTCOME_CO_TRYX(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryx_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryx_failure_likely/">
+            <code>OUTCOME_CO_TRYX_FAILURE_LIKELY(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_try_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_try_failure_likely/">
+            <code>OUTCOME_CO_TRY_FAILURE_LIKELY(var, expr)</code>
           </a>
         </div>
     </li>
@@ -707,10 +728,31 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/macros/tryv_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryv_failure_likely/">
+            <code>OUTCOME_TRYV_FAILURE_LIKELY(expr)/OUTCOME_TRY_FAILURE_LIKELY(expr)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/macros/tryx/" class="dd-item">
         <div>
           <a href="/outcome/reference/macros/tryx/">
             <code>OUTCOME_TRYX(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/tryx_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryx_failure_likely/">
+            <code>OUTCOME_TRYX_FAILURE_LIKELY(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/try_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/try_failure_likely/">
+            <code>OUTCOME_TRY_FAILURE_LIKELY(var, expr)</code>
           </a>
         </div>
     </li>
@@ -773,69 +815,6 @@
       <a href="/outcome/reference/traits/">Traits</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/traits/is_basic_outcome/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_basic_outcome/">
-            <code>is_basic_outcome&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/is_basic_result/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_basic_result/">
-            <code>is_basic_result&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/is_error_code_available/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_error_code_available/">
-            <code>is_error_code_available&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/is_error_type/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_error_type/">
-            <code>is_error_type&lt;E&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/is_error_type_enum/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_error_type_enum/">
-            <code>is_error_type_enum&lt;E, Enum&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/is_exception_ptr_available/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_exception_ptr_available/">
-            <code>is_exception_ptr_available&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/is_failure_type/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_failure_type/">
-            <code>is_failure_type&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/is_success_type/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_success_type/">
-            <code>is_success_type&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/type_can_be_used_in_basic_result/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/type_can_be_used_in_basic_result/">
-            <code>type_can_be_used_in_basic_result&lt;R&gt;</code>
-          </a>
-        </div>
-    </li>
         </ul>
     </li>
     <li data-nav-id="/outcome/reference/policies/" class="dd-item haschildren
@@ -2642,7 +2621,7 @@ into a pointer, as that would be more long term maintainable.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 22/06/2019
+        <i class='fa fa-calendar'></i> Last update on 23/06/2019
     </div>
     
 
