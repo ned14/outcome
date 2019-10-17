@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/tags/make_error_code/</link>
     <description>Recent content in Make_error_code on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Mon, 24 Jun 2019 21:09:37 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 24 Jun 2019 21:48:18 +0100</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/tags/make_error_code/index.xml" rel="self" type="application/rss+xml" />
     
@@ -13,7 +13,7 @@
     <item>
       <title>Custom payloads</title>
       <link>https://ned14.github.io/outcome/tutorial/advanced/payload/</link>
-      <pubDate>Mon, 24 Jun 2019 21:09:37 +0100</pubDate>
+      <pubDate>Mon, 24 Jun 2019 21:48:18 +0100</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/payload/</guid>
       <description>So far in this tutorial, type EC in result&amp;lt;T, EC&amp;gt; has always been a std::error_code or boost::system::error_code. With NoValuePolicy set to default_policy&amp;lt;T, EC, EP&amp;gt; , EC needs in fact to merely satisfy the trait is_error_code_available&amp;lt;T&amp;gt; for EC to be treated as if an error_code. Outcome specialises that trait for std::error_code and boost::system::error_code, hence they &amp;ldquo;just work&amp;rdquo;.
