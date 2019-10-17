@@ -1,33 +1,23 @@
-  0000000000000000: 40 53              push        rbx
-  0000000000000002: 48 83 EC 50        sub         rsp,50h
-  0000000000000006: 48 8D 1D 00 00 00  lea         rbx,[?_Storage@?1???$_Immortalize@V_System_error_category@std@@@std@@YAAEAV_System_error_category@1@XZ@4T?$_Align_type@N$0BA@@1@A]
-  000000000000000D: C7 44 24 20 05 00  mov         dword ptr [rsp+20h],5
-  0000000000000015: 4C 8B C3           mov         r8,rbx
-  0000000000000018: 48 C7 44 24 24 01  mov         qword ptr [rsp+24h],1
-  0000000000000021: 48 8D 15 00 00 00  lea         rdx,[??$_Immortalize_impl@V_System_error_category@std@@@std@@YAHPEAX0PEAPEAX@Z]
-  0000000000000028: 48 8D 0D 00 00 00  lea         rcx,[?_Flag@?1???$_Immortalize@V_System_error_category@std@@@std@@YAAEAV_System_error_category@1@XZ@4PEAXEA]
-  000000000000002F: E8 00 00 00 00     call        ?_Execute_once@std@@YAHAEAUonce_flag@1@P6AHPEAX1PEAPEAX@Z1@Z
-  0000000000000034: 85 C0              test        eax,eax
-  0000000000000036: 74 79              je          00000000000000B1
-  0000000000000038: 0F 10 4C 24 20     movups      xmm1,xmmword ptr [rsp+20h]
-  000000000000003D: 48 89 5C 24 30     mov         qword ptr [rsp+30h],rbx
-  0000000000000042: F2 0F 10 44 24 30  movsd       xmm0,mmword ptr [rsp+30h]
-  0000000000000048: 66 48 0F 7E C8     movq        rax,xmm1
-  000000000000004D: F2 0F 11 44 24 48  movsd       mmword ptr [rsp+48h],xmm0
-  0000000000000053: 48 C1 E8 20        shr         rax,20h
-  0000000000000057: 0F 11 4C 24 38     movups      xmmword ptr [rsp+38h],xmm1
-  000000000000005C: A8 01              test        al,1
-  000000000000005E: 75 08              jne         0000000000000068
-  0000000000000060: D1 E8              shr         eax,1
-  0000000000000062: A8 01              test        al,1
-  0000000000000064: 75 30              jne         0000000000000096
-  0000000000000066: EB 0B              jmp         0000000000000073
-  0000000000000068: B8 05 00 00 00     mov         eax,5
-  000000000000006D: 48 83 C4 50        add         rsp,50h
-  0000000000000071: 5B                 pop         rbx
-  0000000000000072: C3                 ret
-  0000000000000073: 48 8D 15 00 00 00  lea         rdx,[??_C@_08JEIPHCP@no?5value@]
-  000000000000007A: 48 8D 4C 24 20     lea         rcx,[rsp+20h]
+  0000000000000000: 48 83 EC 78        sub         rsp,78h
+  0000000000000004: 48 8D 4C 24 20     lea         rcx,[rsp+20h]
+  0000000000000009: E8 00 00 00 00     call        ?unknown@@YA?AV?$basic_result@HVerror_code@std@@U?$error_code_throw_as_system_error@HVerror_code@std@@X@policy@outcome_v2_958ce015@@@outcome_v2_958ce015@@XZ
+  000000000000000E: 0F 10 4C 24 20     movups      xmm1,xmmword ptr [rsp+20h]
+  0000000000000013: F2 0F 10 44 24 30  movsd       xmm0,mmword ptr [rsp+30h]
+  0000000000000019: 66 48 0F 7E C8     movq        rax,xmm1
+  000000000000001E: F2 0F 11 44 24 48  movsd       mmword ptr [rsp+48h],xmm0
+  0000000000000024: 48 C1 E8 20        shr         rax,20h
+  0000000000000028: 0F 11 4C 24 38     movups      xmmword ptr [rsp+38h],xmm1
+  000000000000002D: A8 01              test        al,1
+  000000000000002F: 75 08              jne         0000000000000039
+  0000000000000031: D1 E8              shr         eax,1
+  0000000000000033: A8 01              test        al,1
+  0000000000000035: 75 2E              jne         0000000000000065
+  0000000000000037: EB 09              jmp         0000000000000042
+  0000000000000039: 66 0F 7E C8        movd        eax,xmm1
+  000000000000003D: 48 83 C4 78        add         rsp,78h
+  0000000000000041: C3                 ret
+  0000000000000042: 48 8D 15 00 00 00  lea         rdx,[??_C@_08JEIPHCP@no?5value@]
+  0000000000000049: 48 8D 4C 24 50     lea         rcx,[rsp+50h]
   0000000000000000: 40 53              push        rbx
   0000000000000002: 48 83 EC 30        sub         rsp,30h
   0000000000000006: 48 8B D9           mov         rbx,rcx
@@ -47,17 +37,17 @@
   0000000000000041: 48 83 C4 30        add         rsp,30h
   0000000000000045: 5B                 pop         rbx
   0000000000000046: C3                 ret
-  0000000000000084: 48 8D 15 00 00 00  lea         rdx,[_TI3?AVbad_result_access@outcome_v2_958ce015@@]
-  000000000000008B: 48 8D 4C 24 20     lea         rcx,[rsp+20h]
-  0000000000000090: E8 00 00 00 00     call        _CxxThrowException
-  0000000000000095: CC                 int         3
-  0000000000000096: 48 8D 4C 24 38     lea         rcx,[rsp+38h]
+  0000000000000053: 48 8D 15 00 00 00  lea         rdx,[_TI3?AVbad_result_access@outcome_v2_958ce015@@]
+  000000000000005A: 48 8D 4C 24 50     lea         rcx,[rsp+50h]
+  000000000000005F: E8 00 00 00 00     call        _CxxThrowException
+  0000000000000064: CC                 int         3
+  0000000000000065: 48 8D 4C 24 38     lea         rcx,[rsp+38h]
   0000000000000000: 48 8B C1           mov         rax,rcx
   0000000000000003: C3                 ret
-  00000000000000A0: 48 8B C8           mov         rcx,rax
+  000000000000006F: 48 8B C8           mov         rcx,rax
   0000000000000000: 48 8D 41 08        lea         rax,[rcx+8]
   0000000000000004: C3                 ret
-  00000000000000A8: 48 8B C8           mov         rcx,rax
+  0000000000000077: 48 8B C8           mov         rcx,rax
   0000000000000000: 48 83 EC 68        sub         rsp,68h
   0000000000000004: 0F 10 01           movups      xmm0,xmmword ptr [rcx]
   0000000000000007: 48 8D 54 24 20     lea         rdx,[rsp+20h]
@@ -517,6 +507,4 @@
   0000000000000022: 48 8D 4C 24 30     lea         rcx,[rsp+30h]
   0000000000000027: E8 00 00 00 00     call        _CxxThrowException
   000000000000002C: CC                 int         3
-  00000000000000B0: CC                 int         3
-  00000000000000B1: E8 00 00 00 00     call        terminate
-  00000000000000B6: CC                 int         3
+  000000000000007F: CC                 int         3

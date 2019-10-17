@@ -195,8 +195,6 @@ def count_opcodes(output_file_name : str, input_file : str, func : str):
     with open(input_file, "rt") as ih:
         functions = parse(ih, file_type)
         
-    assert functions[func]
-
     # Find the one we're interested in
     name, opcodes = find_opcodes(func, functions, file_type)
     if opcodes is None:
