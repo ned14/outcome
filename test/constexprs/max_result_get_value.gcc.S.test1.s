@@ -21,8 +21,8 @@
  c50:	ff 25 3a 13 20 00    	jmpq   *0x20133a(%rip)        # 201f90 <std::logic_error::logic_error(char const*)@GLIBCXX_3.4.21>
  c56:	68 05 00 00 00       	pushq  $0x5
  c5b:	e9 90 ff ff ff       	jmpq   bf0 <.plt>
-     e69:	48 8d 05 b8 0e 20 00 	lea    0x200eb8(%rip),%rax        # 201d28 <vtable for outcome_v2_9202a625::bad_result_access+0x10>
-     e70:	48 8d 15 59 00 00 00 	lea    0x59(%rip),%rdx        # ed0 <outcome_v2_9202a625::bad_result_access::~bad_result_access()>
+     e69:	48 8d 05 b8 0e 20 00 	lea    0x200eb8(%rip),%rax        # 201d28 <vtable for outcome_v2_958ce015::bad_result_access+0x10>
+     e70:	48 8d 15 59 00 00 00 	lea    0x59(%rip),%rdx        # ed0 <outcome_v2_958ce015::bad_result_access::~bad_result_access()>
      e77:	48 8d 35 82 0e 20 00 	lea    0x200e82(%rip),%rsi        # 201d00 <vtable for __cxxabiv1::__si_class_type_info@CXXABI_1.3>
      e7e:	48 89 df             	mov    %rbx,%rdi
      e81:	48 89 03             	mov    %rax,(%rbx)
@@ -58,7 +58,7 @@
      f4f:	48 8b 3c 24          	mov    (%rsp),%rdi
      f53:	48 83 c3 10          	add    $0x10,%rbx
      f57:	48 39 df             	cmp    %rbx,%rdi
-     f5a:	74 05                	je     f61 <outcome_v2_9202a625::policy::outcome_throw_as_system_error_with_payload(std::error_code const&)+0x51>
+     f5a:	74 05                	je     f61 <outcome_v2_958ce015::policy::outcome_throw_as_system_error_with_payload(std::error_code const&)+0x51>
  c30:	ff 25 4a 13 20 00    	jmpq   *0x20134a(%rip)        # 201f80 <operator delete(void*)@GLIBCXX_3.4>
  c36:	68 03 00 00 00       	pushq  $0x3
  c3b:	e9 b0 ff ff ff       	jmpq   bf0 <.plt>
@@ -85,9 +85,9 @@
      fa1:	48 83 c3 10          	add    $0x10,%rbx
      fa5:	49 89 c4             	mov    %rax,%r12
      fa8:	48 39 df             	cmp    %rbx,%rdi
-     fab:	74 e0                	je     f8d <outcome_v2_9202a625::policy::outcome_throw_as_system_error_with_payload(std::error_code const&)+0x7d>
+     fab:	74 e0                	je     f8d <outcome_v2_958ce015::policy::outcome_throw_as_system_error_with_payload(std::error_code const&)+0x7d>
      fad:	e8 7e fc ff ff       	callq  c30 <operator delete(void*)@plt>
-     fb2:	eb d9                	jmp    f8d <outcome_v2_9202a625::policy::outcome_throw_as_system_error_with_payload(std::error_code const&)+0x7d>
+     fb2:	eb d9                	jmp    f8d <outcome_v2_958ce015::policy::outcome_throw_as_system_error_with_payload(std::error_code const&)+0x7d>
      fb4:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
      fbe:	66 90                	xchg   %ax,%ax
      e99:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)

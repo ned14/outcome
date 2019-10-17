@@ -1,10 +1,10 @@
   400c20:	48 83 ec 18          	sub    $0x18,%rsp
+  400c24:	48 b8 05 00 00 00 01 	movabs $0x100000005,%rax
+  400c2e:	48 89 04 24          	mov    %rax,(%rsp)
+  400c32:	c7 44 24 08 00 00 00 	movl   $0x0,0x8(%rsp)
   400a30:	ff 25 ea 15 20 00    	jmpq   *0x2015ea(%rip)        # 602020 <std::_V2::system_category()@GLIBCXX_3.4.21>
   400a36:	68 01 00 00 00       	pushq  $0x1
   400a3b:	e9 d0 ff ff ff       	jmpq   400a10 <.plt>
-  400c29:	48 b9 05 00 00 00 01 	movabs $0x100000005,%rcx
-  400c33:	48 89 0c 24          	mov    %rcx,(%rsp)
-  400c37:	c7 44 24 08 00 00 00 	movl   $0x0,0x8(%rsp)
   400c3f:	48 89 44 24 10       	mov    %rax,0x10(%rsp)
   400c44:	48 89 e7             	mov    %rsp,%rdi
   400c90:	41 57                	push   %r15
@@ -13,13 +13,13 @@
   400c95:	48 89 fb             	mov    %rdi,%rbx
   400c98:	8b 43 04             	mov    0x4(%rbx),%eax
   400c9b:	a8 01                	test   $0x1,%al
-  400c9d:	74 06                	je     400ca5 <void outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void>::wide_value_check<outcome_v2_958ce015::detail::basic_result_value_observers<outcome_v2_958ce015::detail::basic_result_storage<int, std::error_code, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> >, int, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> > >(outcome_v2_958ce015::detail::basic_result_value_observers<outcome_v2_958ce015::detail::basic_result_storage<int, std::error_code, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> >, int, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> >&&)+0x15>
+  400c9d:	74 06                	je     400ca5 <void outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void>::wide_value_check<outcome_v2_958ce015::detail::basic_result_value_observers<outcome_v2_958ce015::detail::basic_result_storage<int, std::error_code, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> >, int, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> >&>(outcome_v2_958ce015::detail::basic_result_value_observers<outcome_v2_958ce015::detail::basic_result_storage<int, std::error_code, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> >, int, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> >&)+0x15>
   400c9f:	5b                   	pop    %rbx
   400ca0:	41 5e                	pop    %r14
   400ca2:	41 5f                	pop    %r15
   400ca4:	c3                   	retq
   400ca5:	a8 02                	test   $0x2,%al
-  400ca7:	75 2c                	jne    400cd5 <void outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void>::wide_value_check<outcome_v2_958ce015::detail::basic_result_value_observers<outcome_v2_958ce015::detail::basic_result_storage<int, std::error_code, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> >, int, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> > >(outcome_v2_958ce015::detail::basic_result_value_observers<outcome_v2_958ce015::detail::basic_result_storage<int, std::error_code, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> >, int, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> >&&)+0x45>
+  400ca7:	75 2c                	jne    400cd5 <void outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void>::wide_value_check<outcome_v2_958ce015::detail::basic_result_value_observers<outcome_v2_958ce015::detail::basic_result_storage<int, std::error_code, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> >, int, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> >&>(outcome_v2_958ce015::detail::basic_result_value_observers<outcome_v2_958ce015::detail::basic_result_storage<int, std::error_code, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> >, int, outcome_v2_958ce015::policy::error_code_throw_as_system_error<int, std::error_code, void> >&)+0x45>
   400ca9:	bf 10 00 00 00       	mov    $0x10,%edi
   400a20:	ff 25 f2 15 20 00    	jmpq   *0x2015f2(%rip)        # 602018 <__cxa_allocate_exception@CXXABI_1.3>
   400a26:	68 00 00 00 00       	pushq  $0x0

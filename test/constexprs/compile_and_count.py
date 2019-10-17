@@ -38,10 +38,10 @@ _disassemble_info_ = \
     }
 
 _function_ = \
-    { "gcc"        : ("test1()", "test1")
-    , "clang"      : ("test1()", "test1")
-    , "msvc"       : ("?test1@@YAHXZ", "test1")
-    , "msvc_clang" : ("?test1@@YAHXZ", "test1")
+    { "gcc"        : ("test1(", "test1")
+    , "clang"      : ("test1(", "test1")
+    , "msvc"       : ("test1", "test1")
+    , "msvc_clang" : ("test1", "test1")
     }
 
 #

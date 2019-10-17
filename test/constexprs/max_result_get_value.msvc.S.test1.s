@@ -1,6 +1,6 @@
   0000000000000000: 48 83 EC 58        sub         rsp,58h
   0000000000000004: 48 8D 4C 24 38     lea         rcx,[rsp+38h]
-  0000000000000009: E8 00 00 00 00     call        ?unknown@@YA?AV?$basic_result@HVerror_code@std@@U?$error_code_throw_as_system_error@HVerror_code@std@@X@policy@outcome_v2_9202a625@@@outcome_v2_9202a625@@XZ
+  0000000000000009: E8 00 00 00 00     call        ?unknown@@YA?AV?$basic_result@HVerror_code@std@@U?$error_code_throw_as_system_error@HVerror_code@std@@X@policy@outcome_v2_958ce015@@@outcome_v2_958ce015@@XZ
   000000000000000E: F6 40 04 01        test        byte ptr [rax+4],1
   0000000000000012: 75 0C              jne         0000000000000020
   0000000000000014: 8B 48 04           mov         ecx,dword ptr [rax+4]
@@ -26,13 +26,13 @@
   0000000000000027: 48 8D 4C 24 20     lea         rcx,[rsp+20h]
   000000000000002C: 0F 11 02           movups      xmmword ptr [rdx],xmm0
   000000000000002F: E8 00 00 00 00     call        __std_exception_copy
-  0000000000000034: 48 8D 05 00 00 00  lea         rax,[??_7bad_result_access@outcome_v2_9202a625@@6B@]
+  0000000000000034: 48 8D 05 00 00 00  lea         rax,[??_7bad_result_access@outcome_v2_958ce015@@6B@]
   000000000000003B: 48 89 03           mov         qword ptr [rbx],rax
   000000000000003E: 48 8B C3           mov         rax,rbx
   0000000000000041: 48 83 C4 30        add         rsp,30h
   0000000000000045: 5B                 pop         rbx
   0000000000000046: C3                 ret
-  0000000000000038: 48 8D 15 00 00 00  lea         rdx,[_TI3?AVbad_result_access@outcome_v2_9202a625@@]
+  0000000000000038: 48 8D 15 00 00 00  lea         rdx,[_TI3?AVbad_result_access@outcome_v2_958ce015@@]
   000000000000003F: 48 8D 4C 24 20     lea         rcx,[rsp+20h]
   0000000000000044: E8 00 00 00 00     call        _CxxThrowException
   0000000000000049: CC                 int         3

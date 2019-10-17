@@ -1,2 +1,2 @@
-"max_result_construct_value_move_destruct","max_result_get_value","min_result_construct_value_move_destruct","min_result_get_value"
-489,484,501,496
+"max_result_construct_value_move_destruct","max_result_get_value","min_result_construct_value_move_destruct","min_result_get_value","WG21_P1886"
+489,484,501,496,36
