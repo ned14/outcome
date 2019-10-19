@@ -105,19 +105,91 @@ constexpr inline void strong_swap(bool &allgood, T &a, T &b) noexcept(detail::is
 
 namespace detail
 {
-  using status_bitfield_type = uint32_t;
+  struct status_bitfield_type
+  {
+    /* Outcome v1 used a C bitfield whose values were tracked by compiler optimisers nicely,
+    but that produces ICEs when used in constexpr.
 
-  // WARNING: These bits are not tracked by abi-dumper, but changing them will break ABI!
-  static constexpr status_bitfield_type status_have_value = (1U << 0U);
-  static constexpr status_bitfield_type status_have_error = (1U << 1U);
-  static constexpr status_bitfield_type status_have_exception = (1U << 2U);
-  static constexpr status_bitfield_type status_lost_consistency = (1U << 3U);  // failed to complete a strong swap
-  static constexpr status_bitfield_type status_error_is_errno = (1U << 4U);    // can errno be set from this error?
-  // bit 7 unused
-  // bits 8-15 unused
-  // bits 16-31 used for user supplied 16 bit value
-  static constexpr status_bitfield_type status_2byte_shift = 16;
-  static constexpr status_bitfield_type status_2byte_mask = (0xffffU << status_2byte_shift);
+    Outcome v2.0-v2.1 used a 32 bit integer and manually set and cleared bits. Unfortunately
+    only GCC's optimiser tracks bit values during constant folding, and only per byte, and
+    even then unreliably. https://wg21.link/P1886 "Error speed benchmarking" showed just how
+    poorly clang and MSVC fails to optimise outcome-using code, if you manually set bits.
+
+    Outcome v2.2 therefore uses an enum with fixed values, and constexpr manipulation functions
+    to change the value to one of the enum's values. This is stupid to look at in source code,
+    but it make clang's optimiser do the right thing, so it's worth it.
+    */
+    enum class status : uint16_t
+    {
+      // WARNING: These bits are not tracked by abi-dumper, but changing them will break ABI!
+      none = 0,
+
+      have_value = (1U << 0U),
+      have_error = (1U << 1U),
+      have_exception = (2U << 1U),
+      have_error_exception = (3U << 1U),
+
+      // failed to complete a strong swap
+      have_value_lost_consistency = (1U << 0U) | (1U << 3U),
+      have_error_lost_consistency = (1U << 1U) | (1U << 3U),
+      have_exception_lost_consistency = (2U << 1U) | (1U << 3U),
+      have_error_exception_lost_consistency = (3U << 1U) | (1U << 3U),
+
+      // can errno be set from this error?
+      have_error_error_is_errno = (1U << 1U) | (1U << 4U),
+      have_error_exception_error_is_errno = (3U << 1U) | (1U << 4U),
+
+      have_error_lost_consistency_error_is_errno = (1U << 1U) | (1U << 3U) | (1U << 4U),
+      have_error_lost_consistency_exception_error_is_errno = (3U << 1U) | (1U << 3U) | (1U << 4U)
+    } status_value{status::none};
+    uint16_t spare_storage_value{0};  // hooks::spare_storage()
+
+    constexpr bool have_value() const noexcept
+    {
+      return (status_value == status::have_value)                      //
+             || (status_value == status::have_value_lost_consistency)  //
+      ;
+    }
+    constexpr bool have_error() const noexcept
+    {
+      return (status_value == status::have_error)                                               //
+             || (status_value == status::have_error_exception)                                  //
+             || (status_value == status::have_error_lost_consistency)                           //
+             || (status_value == status::have_error_exception_lost_consistency)                 //
+             || (status_value == status::have_error_error_is_errno)                             //
+             || (status_value == status::have_error_exception_error_is_errno)                   //
+             || (status_value == status::have_error_lost_consistency_error_is_errno)            //
+             || (status_value == status::have_error_lost_consistency_exception_error_is_errno)  //
+      ;
+    }
+    constexpr bool have_exception() const noexcept
+    {
+      return (status_value == status::have_exception)                                           //
+             || (status_value == status::have_error_exception)                                  //
+             || (status_value == status::have_exception_lost_consistency)                       //
+             || (status_value == status::have_error_exception_lost_consistency)                 //
+             || (status_value == status::have_error_exception_error_is_errno)                   //
+             || (status_value == status::have_error_lost_consistency_exception_error_is_errno)  //
+      ;
+    }
+    constexpr bool have_lost_consistency() const noexcept
+    {
+      return (status_value == status::have_value_lost_consistency)                              //
+             || (status_value == status::have_error_lost_consistency)                           //
+             || (status_value == status::have_exception_lost_consistency)                       //
+             || (status_value == status::have_error_lost_consistency_error_is_errno)            //
+             || (status_value == status::have_error_lost_consistency_exception_error_is_errno)  //
+      ;
+    }
+    constexpr bool have_error_is_errno() const noexcept
+    {
+      return (status_value == status::have_error_error_is_errno)                                //
+             || (status_value == status::have_error_exception_error_is_errno)                   //
+             || (status_value == status::have_error_lost_consistency_error_is_errno)            //
+             || (status_value == status::have_error_lost_consistency_exception_error_is_errno)  //
+      ;
+    }
+  };
 
   // Used if T is trivial
   template <class T> struct value_storage_trivial
