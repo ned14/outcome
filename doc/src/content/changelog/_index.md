@@ -4,7 +4,7 @@ weight = 80
 +++
 
 ---
-## v2.1.2 ? (Boost 1.72) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.2)
+## v2.1.2 6th November 2019 (Boost 1.72) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.2)
 
 ### Enhancements:
 
@@ -19,7 +19,7 @@ has been replaced with a cmake superbuild of dependencies mechanism instead. Upo
 configure, an internal copy of quickcpplib will be git cloned, built and installed into the
 build directory from where an internal `find_package()` uses it. This breaks the use of
 the unconfigured Outcome repo as an implementation of Outcome, one must now do one of:
- 1. Add Outcome as subdirectory to cmake build
+ 1. Add Outcome as subdirectory to cmake build.
  2. Use cmake superbuild (i.e. `ExternalProject_Add()`) to build and install Outcome into
  a local installation.
  3. Use one of the single header editions.
