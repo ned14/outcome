@@ -55,9 +55,9 @@ source_macros = {
     r'DOXYGEN_': r'BOOST_OUTCOME_DOXYGEN_',
     r'STANDARDESE_': r'BOOST_OUTCOME_STANDARDESE_',
     r'\.\./include/outcome' : r'../include/boost/outcome',
-    r'#include "quickcpplib/include/boost/test/unit_test.hpp"' : r'#include <boost/test/unit_test.hpp>\n#include <boost/test/unit_test_monitor.hpp>',
+    r'#include "quickcpplib/boost/test/unit_test.hpp"' : r'#include <boost/test/unit_test.hpp>\n#include <boost/test/unit_test_monitor.hpp>',
     r'BOOST_OUTCOME_AUTO_TEST_CASE\((.*)' : fix_auto_test_case,
-    r'#include "quickcpplib/include/execinfo_win64.h"' : r'#error This example can only compile on POSIX',
+    r'#include "quickcpplib/execinfo_win64.h"' : r'#error This example can only compile on POSIX',
     r'#ifdef __cpp_exceptions' : r'#ifndef BOOST_NO_EXCEPTIONS',
 }
 source_macros.update(core_macros)
