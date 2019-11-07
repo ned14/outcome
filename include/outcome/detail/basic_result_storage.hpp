@@ -120,14 +120,14 @@ namespace detail
     }
     template <class... Args>
     constexpr explicit basic_result_storage(in_place_type_t<_error_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
-        : _state{detail::status_have_error}
+        : _state{detail::status::have_error}
         , _error(static_cast<Args &&>(args)...)
     {
       _set_error_is_errno(_state, _error);
     }
     template <class U, class... Args>
     constexpr basic_result_storage(in_place_type_t<_error_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
-        : _state{detail::status_have_error}
+        : _state{detail::status::have_error}
         , _error{il, static_cast<Args &&>(args)...}
     {
       _set_error_is_errno(_state, _error);
@@ -225,15 +225,15 @@ namespace detail
     {
       struct _
       {
-        unsigned &a, &b;
+        status_bitfield_type &a, &b;
         bool all_good{false};
         ~_()
         {
           if(!all_good)
           {
             // We lost one of the values
-            a |= status_lost_consistency;
-            b |= status_lost_consistency;
+            a.set_have_lost_consistency(true);
+            b.set_have_lost_consistency(true);
           }
         }
       } _{a._msvc_nonpermissive_state()._status, b._msvc_nonpermissive_state()._status};
@@ -258,8 +258,8 @@ namespace detail
       {
         if(!all_good)
         {
-          a._msvc_nonpermissive_state()._status |= detail::status_lost_consistency;
-          b._msvc_nonpermissive_state()._status |= detail::status_lost_consistency;
+          a._msvc_nonpermissive_state()._status.set_have_lost_consistency(true);
+          b._msvc_nonpermissive_state()._status.set_have_lost_consistency(true);
         }
         else
         {
@@ -282,21 +282,21 @@ namespace detail
           // inconsistent result objects. Best we can do is fix up the
           // status bits to prevent has_value() == has_error().
           auto check = [](basic_result_storage<R, EC, NoValuePolicy> &x) {
-            bool has_value = (x._state._status & detail::status_have_value) != 0;
-            bool has_error = (x._state._status & detail::status_have_error) != 0;
-            bool has_exception = (x._state._status & detail::status_have_exception) != 0;
-            x._state._status |= detail::status_lost_consistency;
+            bool has_value = x._state._status.have_value();
+            bool has_error = x._state._status.have_error();
+            bool has_exception = x._state._status.have_exception();
+            x._state._status.set_have_lost_consistency(true);
             if(has_value == (has_error || has_exception))
             {
               if(has_value)
               {
                 // We know the value swapped and is now set, so clear error and exception
-                x._state._status &= ~(detail::status_have_error | detail::status_have_exception);
+                x._state._status.set_have_error(false).set_have_exception(false);
               }
               else
               {
                 // We know the value swapped and is now unset, so set error
-                x._state._status |= detail::status_have_error;
+                x._state._status.set_have_error(true);
                 // TODO: Should I default construct reset _error? It's guaranteed default constructible.
               }
             }

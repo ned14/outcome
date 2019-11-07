@@ -22,11 +22,11 @@ _compilers_ = \
     }
 
 _compile_info_ = \
-    { "gcc"        : (_mk_f("g++ -std=c++14 -DNDEBUG -O3 -fno-stack-protector {} -o {}"), _mk_o("cpp", "out"))
-    , "clang"      : (_mk_f("clang++ -std=c++14 -DNDEBUG -O3 {} -o {}"), _mk_o("cpp", "out"))
-    , "msvc"       : (_mk_f("cl /EHsc /c /DNDEBUG /O2 /GS- /GR /Gy /Zc:inline /MT "
+    { "gcc"        : (_mk_f("g++ -std=c++14 -DNDEBUG -O3 -fno-stack-protector -fno-exceptions {} -o {}"), _mk_o("cpp", "out"))
+    , "clang"      : (_mk_f("clang++ -std=c++14 -DNDEBUG -O3 -fno-exceptions {} -o {}"), _mk_o("cpp", "out"))
+    , "msvc"       : (_mk_f("cl /c /DNDEBUG /O2 /GS- /GR /Gy /Zc:inline /MT "
                            + "/D_UNICODE=1 /DUNICODE=1 {} /Fo{}"), _mk_o("cpp", "obj"))
-    , "msvc_clang" : (_mk_f("clang -std=c++14 -c -DNDEBUG -O3 -fexceptions "
+    , "msvc_clang" : (_mk_f("clang -std=c++14 -c -DNDEBUG -O3 -fno-exceptions "
                            + "-D_UNICODE=1 -DUNICODE=1 {} -o {} -fms-compatibility-version=19"), _mk_o("cpp", "out"))
     }
 
@@ -139,9 +139,9 @@ def test_single(outname : str, func : str, src_file : str, compiler : str, inden
 
 
 def list_src_files():
-    return filter(lambda src_file: os.path.isfile(src_file), 
+    return sorted(filter(lambda src_file: os.path.isfile(src_file), 
            filter(lambda s: s.endswith(".cpp"), 
-               os.listdir()))
+               os.listdir())))
 
 
 def test_all(func : dict):

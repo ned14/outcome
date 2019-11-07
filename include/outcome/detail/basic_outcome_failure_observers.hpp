@@ -66,11 +66,11 @@ namespace detail
       try
 #endif
       {
-        if((this->_state._status & detail::status_have_exception) != 0)
+        if(this->_state._status.have_exception())
         {
           return this->assume_exception();
         }
-        if((this->_state._status & detail::status_have_error) != 0)
+        if(this->_state._status.have_error())
         {
           return _delayed_lookup_basic_outcome_failure_exception_from_error(this->assume_error(), adl::search_detail_adl());
         }

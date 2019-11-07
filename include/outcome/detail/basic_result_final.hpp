@@ -47,12 +47,12 @@ namespace detail
   public:
     using base::base;
 
-    constexpr explicit operator bool() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
-    constexpr bool has_value() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
-    constexpr bool has_error() const noexcept { return (this->_state._status & detail::status_have_error) != 0; }
-    constexpr bool has_exception() const noexcept { return (this->_state._status & detail::status_have_exception) != 0; }
-    constexpr bool has_lost_consistency() const noexcept { return (this->_state._status & detail::status_lost_consistency) != 0; }
-    constexpr bool has_failure() const noexcept { return (this->_state._status & detail::status_have_error) != 0 || (this->_state._status & detail::status_have_exception) != 0; }
+    constexpr explicit operator bool() const noexcept { return this->_state._status.have_value(); }
+    constexpr bool has_value() const noexcept { return this->_state._status.have_value(); }
+    constexpr bool has_error() const noexcept { return this->_state._status.have_error(); }
+    constexpr bool has_exception() const noexcept { return this->_state._status.have_exception(); }
+    constexpr bool has_lost_consistency() const noexcept { return this->_state._status.have_lost_consistency(); }
+    constexpr bool has_failure() const noexcept { return this->_state._status.have_error() || this->_state._status.have_exception(); }
 
     OUTCOME_TEMPLATE(class T, class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<R>>() == std::declval<detail::devoid<T>>()),  //
@@ -60,11 +60,11 @@ namespace detail
     constexpr bool operator==(const basic_result_final<T, U, V> &o) const noexcept(  //
     noexcept(std::declval<detail::devoid<R>>() == std::declval<detail::devoid<T>>()) && noexcept(std::declval<detail::devoid<S>>() == std::declval<detail::devoid<U>>()))
     {
-      if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
+      if(this->_state._status.have_value() && o._state._status.have_value())
       {
         return this->_state._value == o._state._value;  // NOLINT
       }
-      if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0)
+      if(this->_state._status.have_error() && o._state._status.have_error())
       {
         return this->_error == o._error;
       }
@@ -75,7 +75,7 @@ namespace detail
     constexpr bool operator==(const success_type<T> &o) const noexcept(  //
     noexcept(std::declval<R>() == std::declval<T>()))
     {
-      if((this->_state._status & detail::status_have_value) != 0)
+      if(this->_state._status.have_value())
       {
         return this->_state._value == o.value();
       }
@@ -84,14 +84,14 @@ namespace detail
     constexpr bool operator==(const success_type<void> &o) const noexcept
     {
       (void) o;
-      return (this->_state._status & detail::status_have_value) != 0;
+      return this->_state._status.have_value();
     }
     OUTCOME_TEMPLATE(class T)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<S>() == std::declval<T>()))
     constexpr bool operator==(const failure_type<T, void> &o) const noexcept(  //
     noexcept(std::declval<S>() == std::declval<T>()))
     {
-      if((this->_state._status & detail::status_have_error) != 0)
+      if(this->_state._status.have_error())
       {
         return this->_error == o.error();
       }
@@ -103,11 +103,11 @@ namespace detail
     constexpr bool operator!=(const basic_result_final<T, U, V> &o) const noexcept(  //
     noexcept(std::declval<detail::devoid<R>>() != std::declval<detail::devoid<T>>()) && noexcept(std::declval<detail::devoid<S>>() != std::declval<detail::devoid<U>>()))
     {
-      if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
+      if(this->_state._status.have_value() && o._state._status.have_value())
       {
         return this->_state._value != o._state._value;
       }
-      if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0)
+      if(this->_state._status.have_error() && o._state._status.have_error())
       {
         return this->_error != o._error;
       }
@@ -118,7 +118,7 @@ namespace detail
     constexpr bool operator!=(const success_type<T> &o) const noexcept(  //
     noexcept(std::declval<R>() != std::declval<T>()))
     {
-      if((this->_state._status & detail::status_have_value) != 0)
+      if(this->_state._status.have_value())
       {
         return this->_state._value != o.value();
       }
@@ -127,14 +127,14 @@ namespace detail
     constexpr bool operator!=(const success_type<void> &o) const noexcept
     {
       (void) o;
-      return (this->_state._status & detail::status_have_value) == 0;
+      return !this->_state._status.have_value();
     }
     OUTCOME_TEMPLATE(class T)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<S>() != std::declval<T>()))
     constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(  //
     noexcept(std::declval<S>() != std::declval<T>()))
     {
-      if((this->_state._status & detail::status_have_error) != 0)
+      if(this->_state._status.have_error())
       {
         return this->_error != o.error();
       }

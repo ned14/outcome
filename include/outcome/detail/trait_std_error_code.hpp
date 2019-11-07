@@ -42,7 +42,7 @@ namespace detail
 #endif
     )
     {
-      state._status |= status_error_is_errno;
+      state._status.set_have_error_is_errno(true);
     }
   }
   template <class State> constexpr inline void _set_error_is_errno(State &state, const std::error_condition &error)
@@ -53,10 +53,12 @@ namespace detail
 #endif
     )
     {
-      state._status |= status_error_is_errno;
+      state._status.set_have_error_is_errno(true);
     }
   }
-  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::errc & /*unused*/) { state._status |= status_error_is_errno; }
+  template <class State> constexpr inline void _set_error_is_errno(State &state, const std::errc & /*unused*/) {
+      state._status.set_have_error_is_errno(true);
+   }
 
 }  // namespace detail
 
