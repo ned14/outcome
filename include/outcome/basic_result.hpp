@@ -650,6 +650,7 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   auto as_failure() && {
+    this->_state._status.set_have_moved_from(true);
     return failure(static_cast<basic_result &&>(*this).assume_error()); }
 };
 

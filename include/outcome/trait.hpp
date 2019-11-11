@@ -48,6 +48,14 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  is_error_type. Potential doc page: NOT FOUND
 */
+  template <class T> struct is_move_relocating
+  {
+    static constexpr bool value = false;
+  };
+
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+type definition  is_error_type. Potential doc page: NOT FOUND
+*/
   template <class E> struct is_error_type
   {
     static constexpr bool value = false;

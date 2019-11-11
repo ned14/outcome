@@ -987,6 +987,7 @@ SIGNATURE NOT RECOGNISED
 */
   failure_type<error_type, exception_type> as_failure() &&
   {
+    this->_state._status.set_have_moved_from(true);
     if(this->has_error() && this->has_exception())
     {
       return failure_type<error_type, exception_type>(static_cast<S &&>(this->assume_error()), static_cast<P &&>(this->assume_exception()));

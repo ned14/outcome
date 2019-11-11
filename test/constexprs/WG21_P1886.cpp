@@ -32,7 +32,9 @@ int foo;
 
 using namespace OUTCOME_V2_NAMESPACE::experimental;
 
-extern QUICKCPPLIB_NOINLINE status_result<int> src1() noexcept
+static_assert(OUTCOME_V2_NAMESPACE::trait::is_move_relocating<status_result<int>::error_type>::value, "system_code is not move relocating!");
+
+static QUICKCPPLIB_NOINLINE status_result<int> src1() noexcept
 {
   return errc::argument_out_of_domain;
 }
