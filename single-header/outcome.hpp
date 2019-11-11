@@ -3025,8 +3025,7 @@ namespace detail
   };
   struct status_bitfield_type
   {
-    union
-    {
+    union {
       uint32_t _default{0};
       struct
       {
@@ -3037,7 +3036,8 @@ namespace detail
 
     status_bitfield_type() = default;
     constexpr status_bitfield_type(status v) noexcept
-        : status_value(v), spare_storage_value(0)
+        : status_value(v)
+        , spare_storage_value(0)
     {
     }  // NOLINT
     constexpr status_bitfield_type(status v, uint16_t s) noexcept
@@ -3563,13 +3563,15 @@ namespace detail
   static_assert(sizeof(status_bitfield_type) == 4, "status_bitfield_type is not sized 4 bytes!");
   static_assert(std::is_trivially_copyable<status_bitfield_type>::value, "status_bitfield_type is not trivially copyable!");
 
-  // Used if T is trivial
-  template <class T> struct value_storage_trivial
+  // Used if both T and E are trivial
+  template <class T, class E> struct value_storage_trivial
   {
     using value_type = T;
+    using error_type = E;
     union {
       empty_type _empty;
       devoid<T> _value;
+      devoid<E> _error;
     };
     status_bitfield_type _status;
     constexpr value_storage_trivial() noexcept
@@ -3580,7 +3582,7 @@ namespace detail
     struct disable_void_catchall
     {
     };
-    using void_value_storage_trivial = std::conditional_t<std::is_void<T>::value, disable_void_catchall, value_storage_trivial<void>>;
+    using void_value_storage_trivial = std::conditional_t<std::is_void<T>::value, disable_void_catchall, value_storage_trivial<void, error_type>>;
     explicit constexpr value_storage_trivial(const void_value_storage_trivial &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
         : _value()
         , _status(o._status)
@@ -3608,18 +3610,32 @@ namespace detail
         , _status(status::have_value)
     {
     }
-    template <class U> static constexpr bool enable_converting_constructor = !std::is_same<std::decay_t<U>, value_type>::value && std::is_constructible<value_type, U>::value;
-    OUTCOME_TEMPLATE(class U)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
-    constexpr explicit value_storage_trivial(const value_storage_trivial<U> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_trivial(o._status.have_value() ? value_storage_trivial(in_place_type<value_type>, o._value) : value_storage_trivial())  // NOLINT
+    template <class... Args>
+    constexpr explicit value_storage_trivial(in_place_type_t<error_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
+        : _error(static_cast<Args &&>(args)...)
+        , _status(status::have_error)
+    {
+    }
+    template <class U, class... Args>
+    constexpr value_storage_trivial(in_place_type_t<error_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
+        : _error(il, static_cast<Args &&>(args)...)
+        , _status(status::have_error)
+    {
+    }
+    template <class U, class V>
+    static constexpr bool enable_converting_constructor = !(std::is_same<std::decay_t<U>, value_type>::value && std::is_same<std::decay_t<V>, error_type>::value)  //
+                                                          && std::is_constructible<value_type, U>::value && std::is_constructible<error_type, V>::value;
+    OUTCOME_TEMPLATE(class U, class V)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U, V>))
+    constexpr explicit value_storage_trivial(const value_storage_trivial<U, V> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
+        : value_storage_trivial(o._status.have_value() ? value_storage_trivial(in_place_type<value_type>, o._value) : (o._status.have_error() ? value_storage_trivial(in_place_type<error_type>, o._error) : value_storage_trivial()))  // NOLINT
     {
       _status = o._status;
     }
-    OUTCOME_TEMPLATE(class U)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
-    constexpr explicit value_storage_trivial(value_storage_trivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_trivial(o._status.have_value() ? value_storage_trivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : value_storage_trivial())  // NOLINT
+    OUTCOME_TEMPLATE(class U, class V)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U, V>))
+    constexpr explicit value_storage_trivial(value_storage_trivial<U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
+        : value_storage_trivial(o._status.have_value() ? value_storage_trivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : (o._status.have_error() ? value_storage_trivial(in_place_type<error_type>, static_cast<V &&>(o._error)) : value_storage_trivial()))  // NOLINT
     {
       _status = o._status;
     }
@@ -3632,39 +3648,53 @@ namespace detail
     }
   };
   // Used if T is non-trivial
-  template <class T> struct value_storage_nontrivial
+  template <class T, class E> struct value_storage_nontrivial
   {
     using value_type = T;
+    using error_type = E;
     union {
-      empty_type _empty;
+      empty_type _empty1;
       value_type _value;
     };
     status_bitfield_type _status;
+    union {
+      empty_type _empty2;
+      error_type _error;
+    };
     value_storage_nontrivial() noexcept
-        : _empty{}
+        : _empty1{}
+        , _empty2{}
     {
     }
-    value_storage_nontrivial &operator=(const value_storage_nontrivial &) = default;                                        // if reaches here, copy assignment is trivial
-    value_storage_nontrivial &operator=(value_storage_nontrivial &&) = default;                                             // NOLINT if reaches here, move assignment is trivial
-    value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(std::is_nothrow_move_constructible<value_type>::value)  // NOLINT
+    value_storage_nontrivial &operator=(const value_storage_nontrivial &) = default;                                                                                                // if reaches here, copy assignment is trivial
+    value_storage_nontrivial &operator=(value_storage_nontrivial &&) = default;                                                                                                     // NOLINT if reaches here, move assignment is trivial
+    value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(std::is_nothrow_move_constructible<value_type>::value &&std::is_nothrow_move_constructible<error_type>::value)  // NOLINT
     {
       if(o._status.have_value())
       {
         new(&_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
       }
+      else if(o._status.have_error())
+      {
+        new(&_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+      }
       _status = o._status;
       o._status.set_have_moved_from(true);
     }
-    value_storage_nontrivial(const value_storage_nontrivial &o) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
+    value_storage_nontrivial(const value_storage_nontrivial &o) noexcept(std::is_nothrow_copy_constructible<value_type>::value &&std::is_nothrow_copy_constructible<error_type>::value)
     {
       if(o._status.have_value())
       {
         new(&_value) value_type(o._value);  // NOLINT
       }
+      else if(o._status.have_error())
+      {
+        new(&_error) error_type(o._error);  // NOLINT
+      }
       _status = o._status;
     }
     // Special from-void constructor, constructs default T if void valued
-    explicit value_storage_nontrivial(const value_storage_trivial<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
+    explicit value_storage_nontrivial(const value_storage_trivial<void, error_type> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
         : _status(o._status)
     {
       if(o._status.have_value())
@@ -3674,8 +3704,9 @@ namespace detail
       _status = o._status;
     }
     explicit value_storage_nontrivial(status_bitfield_type status)
-        : _empty()
+        : _empty1()
         , _status(status)
+        , _empty2()
     {
     }
     template <class... Args>
@@ -3690,32 +3721,46 @@ namespace detail
         , _status(status::have_value)
     {
     }
-    template <class U> static constexpr bool enable_converting_constructor = !std::is_same<std::decay_t<U>, value_type>::value && std::is_constructible<value_type, U>::value;
-    OUTCOME_TEMPLATE(class U)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
-    constexpr explicit value_storage_nontrivial(const value_storage_nontrivial<U> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, o._value) : value_storage_nontrivial())
+    template <class... Args>
+    explicit value_storage_nontrivial(in_place_type_t<error_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
+        : _status(status::have_error)
+        , _error(static_cast<Args &&>(args)...)  // NOLINT
+    {
+    }
+    template <class U, class... Args>
+    value_storage_nontrivial(in_place_type_t<error_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
+        : _status(status::have_error)
+        , _error(il, static_cast<Args &&>(args)...)
+    {
+    }
+    template <class U, class V>
+    static constexpr bool enable_converting_constructor = !(std::is_same<std::decay_t<U>, value_type>::value && std::is_same<std::decay_t<V>, error_type>::value)  //
+                                                          && std::is_constructible<value_type, U>::value && std::is_constructible<error_type, V>::value;
+    OUTCOME_TEMPLATE(class U, class V)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U, V>))
+    constexpr explicit value_storage_nontrivial(const value_storage_nontrivial<U, V> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
+        : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, o._value) : (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>, o._error) : value_storage_nontrivial()))
     {
       _status = o._status;
     }
-    OUTCOME_TEMPLATE(class U)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
-    constexpr explicit value_storage_nontrivial(const value_storage_trivial<U> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, o._value) : value_storage_nontrivial())
+    OUTCOME_TEMPLATE(class U, class V)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U, V>))
+    constexpr explicit value_storage_nontrivial(const value_storage_trivial<U, V> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
+        : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, o._value) : (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>, o._error) : value_storage_nontrivial()))
     {
       _status = o._status;
     }
-    OUTCOME_TEMPLATE(class U)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
-    constexpr explicit value_storage_nontrivial(value_storage_nontrivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : value_storage_nontrivial())
+    OUTCOME_TEMPLATE(class U, class V)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U, V>))
+    constexpr explicit value_storage_nontrivial(value_storage_nontrivial<U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
+        : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>, static_cast<V &&>(o._error)) : value_storage_nontrivial()))
     {
       _status = o._status;
     }
-    OUTCOME_TEMPLATE(class U)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
-    constexpr explicit value_storage_nontrivial(value_storage_trivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : value_storage_nontrivial())
+    OUTCOME_TEMPLATE(class U, class V)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U, V>))
+    constexpr explicit value_storage_nontrivial(value_storage_trivial<U, V> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
+        : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>, static_cast<V &&>(o._error)) : value_storage_nontrivial()))
     {
       _status = o._status;
     }
@@ -3723,17 +3768,25 @@ namespace detail
     {
       if(this->_status.have_value())
       {
-        if(!trait::is_move_relocating<value_type>::value || this->_status.have_moved_from())
+        if(!trait::is_move_relocating<value_type>::value || !this->_status.have_moved_from())
         {
           this->_value.~value_type();  // NOLINT
         }
         this->_status.set_have_value(false);
       }
+      else if(this->_status.have_error())
+      {
+        if(!trait::is_move_relocating<error_type>::value || !this->_status.have_moved_from())
+        {
+          this->_error.~error_type();  // NOLINT
+        }
+        this->_status.set_have_error(false);
+      }
     }
     constexpr void swap(value_storage_nontrivial &o) noexcept(detail::is_nothrow_swappable<value_type>::value)
     {
       using std::swap;
-      if(!_status.have_value() && !o._status.have_value())
+      if(!_status.have_value() && !o._status.have_value() && !_status.have_error() && !o._status.have_error())
       {
         swap(_status, o._status);
         return;
@@ -3758,27 +3811,135 @@ namespace detail
         swap(_status, o._status);
         return;
       }
-      // One must be empty and the other non-empty, so use move construction
-      if(_status.have_value())
+      if(_status.have_error() && o._status.have_error())
+      {
+        struct _
+        {
+          status_bitfield_type &a, &b;
+          bool all_good{false};
+          ~_()
+          {
+            if(!all_good)
+            {
+              // We lost one of the values
+              a.set_have_lost_consistency(true);
+              b.set_have_lost_consistency(true);
+            }
+          }
+        } _{_status, o._status};
+        strong_swap(_.all_good, _error, o._error);
+        swap(_status, o._status);
+        return;
+      }
+      // Could be value/empty, error/empty, etc
+      if(_status.have_value() && !o._status.have_error())
       {
         // Move construct me into other
         new(&o._value) value_type(static_cast<value_type &&>(_value));  // NOLINT
-        this->_value.~value_type();                                     // NOLINT
+        if(!trait::is_move_relocating<value_type>::value)
+        {
+          this->_value.~value_type();  // NOLINT
+        }
         swap(_status, o._status);
+        return;
       }
-      else
+      if(o._status.have_value() && !_status.have_error())
       {
         // Move construct other into me
         new(&_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
-        o._value.~value_type();                                         // NOLINT
+        if(!trait::is_move_relocating<value_type>::value)
+        {
+          o._value.~value_type();  // NOLINT
+        }
         swap(_status, o._status);
+        return;
       }
+      if(_status.have_error() && !o._status.have_value())
+      {
+        // Move construct me into other
+        new(&o._error) error_type(static_cast<error_type &&>(_error));  // NOLINT
+        if(!trait::is_move_relocating<error_type>::value)
+        {
+          this->_error.~error_type();  // NOLINT
+        }
+        swap(_status, o._status);
+        return;
+      }
+      if(o._status.have_error() && !_status.have_value())
+      {
+        // Move construct other into me
+        new(&_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        if(!trait::is_move_relocating<error_type>::value)
+        {
+          o._error.~error_type();  // NOLINT
+        }
+        swap(_status, o._status);
+        return;
+      }
+      // It can now only be value/error, or error/value
+      union {
+        empty_type empty1;
+        value_type temp_value;
+      };
+      union {
+        empty_type empty2;
+        error_type temp_error;
+      };
+      if(_status.have_value() && o._status.have_error())
+      {
+        struct _
+        {
+          status_bitfield_type &a, &b;
+          bool all_good{false};
+          ~_()
+          {
+            if(!all_good)
+            {
+              // We lost one of the values
+              a.set_have_lost_consistency(true);
+              b.set_have_lost_consistency(true);
+            }
+          }
+        } _{_status, o._status};
+        strong_placement(_.all_good, temp_value, _value);
+        strong_placement(_.all_good, temp_error, o._error);
+        strong_placement(_.all_good, o._value, temp_value);
+        strong_placement(_.all_good, _error, temp_error);
+        swap(_status, o._status);
+        return;
+      }
+      if(_status.have_error() && o._status.have_value())
+      {
+        struct _
+        {
+          status_bitfield_type &a, &b;
+          bool all_good{false};
+          ~_()
+          {
+            if(!all_good)
+            {
+              // We lost one of the values
+              a.set_have_lost_consistency(true);
+              b.set_have_lost_consistency(true);
+            }
+          }
+        } _{_status, o._status};
+        strong_placement(_.all_good, temp_error, _error);
+        strong_placement(_.all_good, temp_value, o._value);
+        strong_placement(_.all_good, o._error, temp_error);
+        strong_placement(_.all_good, _value, temp_value);
+        swap(_status, o._status);
+        return;
+      }
+      // Should never reach here
+      make_ub(_value);
     }
   };
   template <class Base> struct value_storage_delete_copy_constructor : Base  // NOLINT
   {
     using Base::Base;
     using value_type = typename Base::value_type;
+    using error_type = typename Base::error_type;
     value_storage_delete_copy_constructor() = default;
     value_storage_delete_copy_constructor(const value_storage_delete_copy_constructor &) = delete;
     value_storage_delete_copy_constructor(value_storage_delete_copy_constructor &&) = default;  // NOLINT
@@ -3787,6 +3948,7 @@ namespace detail
   {
     using Base::Base;
     using value_type = typename Base::value_type;
+    using error_type = typename Base::error_type;
     value_storage_delete_copy_assignment() = default;
     value_storage_delete_copy_assignment(const value_storage_delete_copy_assignment &) = default;
     value_storage_delete_copy_assignment(value_storage_delete_copy_assignment &&) = default;  // NOLINT
@@ -3797,6 +3959,7 @@ namespace detail
   {
     using Base::Base;
     using value_type = typename Base::value_type;
+    using error_type = typename Base::error_type;
     value_storage_delete_move_assignment() = default;
     value_storage_delete_move_assignment(const value_storage_delete_move_assignment &) = default;
     value_storage_delete_move_assignment(value_storage_delete_move_assignment &&) = default;  // NOLINT
@@ -3807,6 +3970,7 @@ namespace detail
   {
     using Base::Base;
     using value_type = typename Base::value_type;
+    using error_type = typename Base::error_type;
     value_storage_delete_move_constructor() = default;
     value_storage_delete_move_constructor(const value_storage_delete_move_constructor &) = default;
     value_storage_delete_move_constructor(value_storage_delete_move_constructor &&) = delete;
@@ -3815,80 +3979,202 @@ namespace detail
   {
     using Base::Base;
     using value_type = typename Base::value_type;
+    using error_type = typename Base::error_type;
     value_storage_nontrivial_move_assignment() = default;
     value_storage_nontrivial_move_assignment(const value_storage_nontrivial_move_assignment &) = default;
     value_storage_nontrivial_move_assignment(value_storage_nontrivial_move_assignment &&) = default;  // NOLINT
     value_storage_nontrivial_move_assignment &operator=(const value_storage_nontrivial_move_assignment &o) = default;
-    value_storage_nontrivial_move_assignment &operator=(value_storage_nontrivial_move_assignment &&o) noexcept(std::is_nothrow_move_assignable<value_type>::value)  // NOLINT
+    value_storage_nontrivial_move_assignment &operator=(value_storage_nontrivial_move_assignment &&o) noexcept(std::is_nothrow_move_assignable<value_type>::value && std::is_nothrow_move_assignable<error_type>::value)  // NOLINT
     {
+      if(!this->_status.have_value() && !this->_status.have_error() && !o._status.have_value() && !o._status.have_error())
+      {
+        this->_status = o._status;
+        o._status.set_have_moved_from(true);
+        return *this;
+      }
       if(this->_status.have_value() && o._status.have_value())
       {
         this->_value = static_cast<value_type &&>(o._value);  // NOLINT
+        this->_status = o._status;
+        o._status.set_have_moved_from(true);
+        return *this;
       }
-      else if(this->_status.have_value() && !o._status.have_value())
+      if(this->_status.have_error() && o._status.have_error())
       {
-        this->_value.~value_type();  // NOLINT
+        this->_error = static_cast<error_type &&>(o._error);  // NOLINT
+        this->_status = o._status;
+        o._status.set_have_moved_from(true);
+        return *this;
       }
-      else if(!this->_status.have_value() && o._status.have_value())
+      if(this->_status.have_value() && !o._status.have_value() && !o._status.have_error())
+      {
+        if(!trait::is_move_relocating<value_type>::value || this->_status.have_moved_from())
+        {
+          this->_value.~value_type();  // NOLINT
+        }
+        this->_status = o._status;
+        o._status.set_have_moved_from(true);
+        return *this;
+      }
+      if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
         new(&this->_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        this->_status = o._status;
+        o._status.set_have_moved_from(true);
+        return *this;
       }
-      this->_status = o._status;
-      o._status.set_have_moved_from(true);
-      return *this;
+      if(this->_status.have_error() && !o._status.have_value() && !o._status.have_error())
+      {
+        if(!trait::is_move_relocating<error_type>::value || this->_status.have_moved_from())
+        {
+          this->_error.~error_type();  // NOLINT
+        }
+        this->_status = o._status;
+        o._status.set_have_moved_from(true);
+        return *this;
+      }
+      if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
+      {
+        new(&this->_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        this->_status = o._status;
+        o._status.set_have_moved_from(true);
+        return *this;
+      }
+      if(this->_status.have_value() && o._status.have_error())
+      {
+        if(!trait::is_move_relocating<value_type>::value || this->_status.have_moved_from())
+        {
+          this->_value.~value_type();  // NOLINT
+        }
+        new(&this->_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        this->_status = o._status;
+        o._status.set_have_moved_from(true);
+        return *this;
+      }
+      if(this->_status.have_error() && o._status.have_value())
+      {
+        if(!trait::is_move_relocating<error_type>::value || this->_status.have_moved_from())
+        {
+          this->_error.~error_type();  // NOLINT
+        }
+        new(&this->_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        this->_status = o._status;
+        o._status.set_have_moved_from(true);
+        return *this;
+      }
+      // Should never reach here
+      make_ub(this->_value);
     }
   };
   template <class Base> struct value_storage_nontrivial_copy_assignment : Base  // NOLINT
   {
     using Base::Base;
     using value_type = typename Base::value_type;
+    using error_type = typename Base::error_type;
     value_storage_nontrivial_copy_assignment() = default;
     value_storage_nontrivial_copy_assignment(const value_storage_nontrivial_copy_assignment &) = default;
     value_storage_nontrivial_copy_assignment(value_storage_nontrivial_copy_assignment &&) = default;              // NOLINT
     value_storage_nontrivial_copy_assignment &operator=(value_storage_nontrivial_copy_assignment &&o) = default;  // NOLINT
-    value_storage_nontrivial_copy_assignment &operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(std::is_nothrow_copy_assignable<value_type>::value)
+    value_storage_nontrivial_copy_assignment &operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(std::is_nothrow_copy_assignable<value_type>::value && std::is_nothrow_copy_assignable<error_type>::value)
     {
+      if(!this->_status.have_value() && !this->_status.have_error() && !o._status.have_value() && !o._status.have_error())
+      {
+        this->_status = o._status;
+        return *this;
+      }
       if(this->_status.have_value() && o._status.have_value())
       {
         this->_value = o._value;  // NOLINT
+        this->_status = o._status;
+        return *this;
       }
-      else if(this->_status.have_value() && !o._status.have_value())
+      if(this->_status.have_error() && o._status.have_error())
       {
-        this->_value.~value_type();  // NOLINT
+        this->_error = o._error;  // NOLINT
+        this->_status = o._status;
+        return *this;
       }
-      else if(!this->_status.have_value() && o._status.have_value())
+      if(this->_status.have_value() && !o._status.have_value() && !o._status.have_error())
+      {
+        if(!trait::is_move_relocating<value_type>::value || this->_status.have_moved_from())
+        {
+          this->_value.~value_type();  // NOLINT
+        }
+        this->_status = o._status;
+        return *this;
+      }
+      if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
         new(&this->_value) value_type(o._value);  // NOLINT
+        this->_status = o._status;
+        return *this;
       }
-      this->_status = o._status;
-      return *this;
+      if(this->_status.have_error() && !o._status.have_value() && !o._status.have_error())
+      {
+        if(!trait::is_move_relocating<error_type>::value || this->_status.have_moved_from())
+        {
+          this->_error.~error_type();  // NOLINT
+        }
+        this->_status = o._status;
+        return *this;
+      }
+      if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
+      {
+        new(&this->_error) error_type(o._error);  // NOLINT
+        this->_status = o._status;
+        return *this;
+      }
+      if(this->_status.have_value() && o._status.have_error())
+      {
+        if(!trait::is_move_relocating<value_type>::value || this->_status.have_moved_from())
+        {
+          this->_value.~value_type();  // NOLINT
+        }
+        new(&this->_error) error_type(o._error);  // NOLINT
+        this->_status = o._status;
+        return *this;
+      }
+      if(this->_status.have_error() && o._status.have_value())
+      {
+        if(!trait::is_move_relocating<error_type>::value || this->_status.have_moved_from())
+        {
+          this->_error.~error_type();  // NOLINT
+        }
+        new(&this->_value) value_type(o._value);  // NOLINT
+        this->_status = o._status;
+        return *this;
+      }
+      // Should never reach here
+      make_ub(this->_value);
     }
   };
 
   // We don't actually need all of std::is_trivial<>, std::is_trivially_copyable<> is sufficient
-  template <class T> using value_storage_select_trivality = std::conditional_t<std::is_trivially_copyable<devoid<T>>::value, value_storage_trivial<T>, value_storage_nontrivial<T>>;
-  template <class T> using value_storage_select_move_constructor = std::conditional_t<std::is_move_constructible<devoid<T>>::value, value_storage_select_trivality<T>, value_storage_delete_move_constructor<value_storage_select_trivality<T>>>;
-  template <class T> using value_storage_select_copy_constructor = std::conditional_t<std::is_copy_constructible<devoid<T>>::value, value_storage_select_move_constructor<T>, value_storage_delete_copy_constructor<value_storage_select_move_constructor<T>>>;
-  template <class T>
-  using value_storage_select_move_assignment = std::conditional_t<std::is_trivially_move_assignable<devoid<T>>::value, value_storage_select_copy_constructor<T>,
-                                                                  std::conditional_t<std::is_move_assignable<devoid<T>>::value, value_storage_nontrivial_move_assignment<value_storage_select_copy_constructor<T>>, value_storage_delete_copy_assignment<value_storage_select_copy_constructor<T>>>>;
-  template <class T>
-  using value_storage_select_copy_assignment = std::conditional_t<std::is_trivially_copy_assignable<devoid<T>>::value, value_storage_select_move_assignment<T>,
-                                                                  std::conditional_t<std::is_copy_assignable<devoid<T>>::value, value_storage_nontrivial_copy_assignment<value_storage_select_move_assignment<T>>, value_storage_delete_copy_assignment<value_storage_select_move_assignment<T>>>>;
-  template <class T> using value_storage_select_impl = value_storage_select_copy_assignment<T>;
+  template <class T, class E> using value_storage_select_trivality = std::conditional_t<std::is_trivially_copyable<devoid<T>>::value && std::is_trivially_copyable<devoid<E>>::value, value_storage_trivial<T, E>, value_storage_nontrivial<T, E>>;
+  template <class T, class E> using value_storage_select_move_constructor = std::conditional_t<std::is_move_constructible<devoid<T>>::value && std::is_move_constructible<devoid<E>>::value, value_storage_select_trivality<T, E>, value_storage_delete_move_constructor<value_storage_select_trivality<T, E>>>;
+  template <class T, class E> using value_storage_select_copy_constructor = std::conditional_t<std::is_copy_constructible<devoid<T>>::value && std::is_copy_constructible<devoid<E>>::value, value_storage_select_move_constructor<T, E>, value_storage_delete_copy_constructor<value_storage_select_move_constructor<T, E>>>;
+  template <class T, class E>
+  using value_storage_select_move_assignment =
+  std::conditional_t<std::is_trivially_move_assignable<devoid<T>>::value && std::is_trivially_move_assignable<devoid<E>>::value, value_storage_select_copy_constructor<T, E>,
+                     std::conditional_t<std::is_move_assignable<devoid<T>>::value && std::is_move_assignable<devoid<E>>::value, value_storage_nontrivial_move_assignment<value_storage_select_copy_constructor<T, E>>, value_storage_delete_copy_assignment<value_storage_select_copy_constructor<T, E>>>>;
+  template <class T, class E>
+  using value_storage_select_copy_assignment =
+  std::conditional_t<std::is_trivially_copy_assignable<devoid<T>>::value && std::is_trivially_copy_assignable<devoid<E>>::value, value_storage_select_move_assignment<T, E>,
+                     std::conditional_t<std::is_copy_assignable<devoid<T>>::value && std::is_copy_assignable<devoid<E>>::value, value_storage_nontrivial_copy_assignment<value_storage_select_move_assignment<T, E>>, value_storage_delete_copy_assignment<value_storage_select_move_assignment<T, E>>>>;
+  template <class T, class E> using value_storage_select_impl = value_storage_select_copy_assignment<T, E>;
 #ifndef NDEBUG
   // Check is trivial in all ways except default constructibility
-  // static_assert(std::is_trivial<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivial!");
-  // static_assert(std::is_trivially_default_constructible<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially default constructible!");
-  static_assert(std::is_trivially_copyable<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially copyable!");
-  static_assert(std::is_trivially_assignable<value_storage_select_impl<int>, value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially assignable!");
-  static_assert(std::is_trivially_destructible<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially destructible!");
-  static_assert(std::is_trivially_copy_constructible<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially copy constructible!");
-  static_assert(std::is_trivially_move_constructible<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially move constructible!");
-  static_assert(std::is_trivially_copy_assignable<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially copy assignable!");
-  static_assert(std::is_trivially_move_assignable<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not trivially move assignable!");
+  // static_assert(std::is_trivial<value_storage_select_impl<int, long>>::value, "value_storage_select_impl<int, long> is not trivial!");
+  // static_assert(std::is_trivially_default_constructible<value_storage_select_impl<int, long>>::value, "value_storage_select_impl<int, long> is not trivially default constructible!");
+  static_assert(std::is_trivially_copyable<value_storage_select_impl<int, long>>::value, "value_storage_select_impl<int, long> is not trivially copyable!");
+  static_assert(std::is_trivially_assignable<value_storage_select_impl<int, long>, value_storage_select_impl<int, long>>::value, "value_storage_select_impl<int, long> is not trivially assignable!");
+  static_assert(std::is_trivially_destructible<value_storage_select_impl<int, long>>::value, "value_storage_select_impl<int, long> is not trivially destructible!");
+  static_assert(std::is_trivially_copy_constructible<value_storage_select_impl<int, long>>::value, "value_storage_select_impl<int, long> is not trivially copy constructible!");
+  static_assert(std::is_trivially_move_constructible<value_storage_select_impl<int, long>>::value, "value_storage_select_impl<int, long> is not trivially move constructible!");
+  static_assert(std::is_trivially_copy_assignable<value_storage_select_impl<int, long>>::value, "value_storage_select_impl<int, long> is not trivially copy assignable!");
+  static_assert(std::is_trivially_move_assignable<value_storage_select_impl<int, long>>::value, "value_storage_select_impl<int, long> is not trivially move assignable!");
   // Also check is standard layout
-  static_assert(std::is_standard_layout<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not a standard layout type!");
+  static_assert(std::is_standard_layout<value_storage_select_impl<int, long>>::value, "value_storage_select_impl<int, long> is not a standard layout type!");
 #endif
 }  // namespace detail
 
@@ -3951,18 +4237,16 @@ namespace detail
 
 
 
-    detail::value_storage_select_impl<_value_type> _state;
+    value_storage_select_impl<_value_type, _error_type> _state;
 
-    detail::devoid<_error_type> _error;
 
   public:
     // Used by iostream support to access state
-    detail::value_storage_select_impl<_value_type> &_iostreams_state() { return _state; }
-    const detail::value_storage_select_impl<_value_type> &_iostreams_state() const { return _state; }
+    value_storage_select_impl<_value_type, _error_type> &_iostreams_state() { return _state; }
+    const value_storage_select_impl<_value_type, _error_type> &_iostreams_state() const { return _state; }
 
     // Hack to work around MSVC bug in /permissive-
-    detail::value_storage_select_impl<_value_type> &_msvc_nonpermissive_state() { return _state; }
-    detail::devoid<_error_type> &_msvc_nonpermissive_error() { return _error; }
+    value_storage_select_impl<_value_type, _error_type> &_msvc_nonpermissive_state() { return _state; }
 
   protected:
     basic_result_storage() = default;

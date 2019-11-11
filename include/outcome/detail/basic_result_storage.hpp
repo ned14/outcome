@@ -83,20 +83,18 @@ namespace detail
     using _error_type = std::conditional_t<std::is_same<R, EC>::value, disable_in_place_error_type, EC>;
 
 #ifdef STANDARDESE_IS_IN_THE_HOUSE
-    detail::value_storage_trivial<_value_type> _state;
+    value_storage_trivial<_value_type, _error_type> _state;
 #else
-    detail::value_storage_select_impl<_value_type> _state;
+    value_storage_select_impl<_value_type, _error_type> _state;
 #endif
-    detail::devoid<_error_type> _error;
 
   public:
     // Used by iostream support to access state
-    detail::value_storage_select_impl<_value_type> &_iostreams_state() { return _state; }
-    const detail::value_storage_select_impl<_value_type> &_iostreams_state() const { return _state; }
+    value_storage_select_impl<_value_type, _error_type> &_iostreams_state() { return _state; }
+    const value_storage_select_impl<_value_type, _error_type> &_iostreams_state() const { return _state; }
 
     // Hack to work around MSVC bug in /permissive-
-    detail::value_storage_select_impl<_value_type> &_msvc_nonpermissive_state() { return _state; }
-    detail::devoid<_error_type> &_msvc_nonpermissive_error() { return _error; }
+    value_storage_select_impl<_value_type, _error_type> &_msvc_nonpermissive_state() { return _state; }
 
   protected:
     basic_result_storage() = default;
@@ -109,28 +107,22 @@ namespace detail
     template <class... Args>
     constexpr explicit basic_result_storage(in_place_type_t<_value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
         : _state{_, static_cast<Args &&>(args)...}
-        , _error()
     {
     }
     template <class U, class... Args>
     constexpr basic_result_storage(in_place_type_t<_value_type> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, std::initializer_list<U>, Args...>::value)
         : _state{_, il, static_cast<Args &&>(args)...}
-        , _error()
     {
     }
     template <class... Args>
-    constexpr explicit basic_result_storage(in_place_type_t<_error_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
-        : _state{detail::status::have_error}
-        , _error(static_cast<Args &&>(args)...)
+    constexpr explicit basic_result_storage(in_place_type_t<_error_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
+        : _state{_, static_cast<Args &&>(args)...}
     {
-      _set_error_is_errno(_state, _error);
     }
     template <class U, class... Args>
-    constexpr basic_result_storage(in_place_type_t<_error_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
-        : _state{detail::status::have_error}
-        , _error{il, static_cast<Args &&>(args)...}
+    constexpr basic_result_storage(in_place_type_t<_error_type> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
+        : _state{_, il, static_cast<Args &&>(args)...}
     {
-      _set_error_is_errno(_state, _error);
     }
     struct compatible_conversion_tag
     {
@@ -138,25 +130,21 @@ namespace detail
     template <class T, class U, class V>
     constexpr basic_result_storage(compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
         : _state(o._state)
-        , _error(o._error)
     {
     }
     template <class T, class V>
     constexpr basic_result_storage(compatible_conversion_tag /*unused*/, const basic_result_storage<T, void, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
         : _state(o._state)
-        , _error(_error_type{})
     {
     }
     template <class T, class U, class V>
     constexpr basic_result_storage(compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
         : _state(static_cast<decltype(o._state) &&>(o._state))
-        , _error(static_cast<U &&>(o._error))
     {
     }
     template <class T, class V>
     constexpr basic_result_storage(compatible_conversion_tag /*unused*/, basic_result_storage<T, void, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
         : _state(static_cast<decltype(o._state) &&>(o._state))
-        , _error(_error_type{})
     {
     }
 
