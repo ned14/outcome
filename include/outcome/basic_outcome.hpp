@@ -915,8 +915,8 @@ SIGNATURE NOT RECOGNISED
         if(!all_good)
         {
           // We lost one of the values
-          a._state._status.set_have_error_is_errno(true);
-          b._state._status.set_have_error_is_errno(true);
+          a._state._status.set_have_lost_consistency(true);
+          b._state._status.set_have_lost_consistency(true);
           return;
         }
         if(exceptioned)
@@ -929,8 +929,8 @@ SIGNATURE NOT RECOGNISED
           catch(...)
           {
             // We lost one of the values
-            a._state._status.set_have_error_is_errno(true);
-            b._state._status.set_have_error_is_errno(true);
+            a._state._status.set_have_lost_consistency(true);
+            b._state._status.set_have_lost_consistency(true);
             // throw away second exception
           }
 
