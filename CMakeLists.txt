@@ -141,7 +141,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
       apply_cxx_coroutines_to(PRIVATE ${target})
     endif()
     # MSVC's concepts implementation blow up unless permissive is off
-    if(MSVC AND NOT CLANG AND NOT ${target} MATCHES "experimental-core")
+    if(MSVC AND NOT CLANG AND NOT ${target})
       target_compile_options(${target} PRIVATE /permissive-)
     endif()
   endforeach()
