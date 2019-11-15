@@ -961,7 +961,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_CALL_OVERLOAD_(name, ...) QUICKCPPLIB_GLUE_(QUICKCPPLIB_OVERLOAD_MACRO_(name, QUICKCPPLIB_COUNT_ARGS_MAX8_(__VA_ARGS__)), (__VA_ARGS__))
 
 #endif
-#ifdef __cpp_concepts
+#if defined(__cpp_concepts) && !defined(QUICKCPPLIB_DISABLE_CONCEPTS_SUPPORT)
 #define QUICKCPPLIB_TREQUIRES_EXPAND8(a, b, c, d, e, f, g, h) a &&QUICKCPPLIB_TREQUIRES_EXPAND7(b, c, d, e, f, g, h)
 #define QUICKCPPLIB_TREQUIRES_EXPAND7(a, b, c, d, e, f, g) a &&QUICKCPPLIB_TREQUIRES_EXPAND6(b, c, d, e, f, g)
 #define QUICKCPPLIB_TREQUIRES_EXPAND6(a, b, c, d, e, f) a &&QUICKCPPLIB_TREQUIRES_EXPAND5(b, c, d, e, f)
@@ -1198,9 +1198,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 335f009519378ecf3b4dc92cc5429597d37dd57c
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-10-21 14:37:39 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 335f0095
+#define OUTCOME_PREVIOUS_COMMIT_REF 2771f423c18e3085d9b740235d4a423c2f8a2501
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-11-15 15:44:04 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 2771f423
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
