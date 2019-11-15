@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-10-21T14:42:41 UTC">
+<meta name="revised" content="2019-11-15T15:46:54 UTC">
 <title>Frequently asked questions :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2605,8 +2605,7 @@
 <li><a href="#why-doesn-t-outcome-duplicate-std-expected-t-e-s-design">Why doesn&rsquo;t Outcome duplicate <code>std::expected&lt;T, E&gt;</code>&rsquo;s design?</a></li>
 <li><a href="#is-outcome-riddled-with-undefined-behaviour-for-const-const-containing-and-reference-containing-types">Is Outcome riddled with undefined behaviour for const, const-containing and reference-containing types?</a>
 <ul>
-<li><a href="#brief-history-of-c-standard-changes">Brief history of C++ standard changes</a></li>
-<li><a href="#summary">Summary</a></li>
+<li><a href="#more-detail">More detail</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -3144,33 +3143,20 @@ interoperate with code using Outcome.</p></li>
 
 <h2 id="is-outcome-riddled-with-undefined-behaviour-for-const-const-containing-and-reference-containing-types">Is Outcome riddled with undefined behaviour for const, const-containing and reference-containing types?</h2>
 
-<p>The short answer is yes, but it probably won&rsquo;t matter to you in practice.</p>
+<p>The short answer is not any more in C++ 20 and after, thanks to changes made to
+C++ 20 at the Belfast WG21 meeting in November 2019.</p>
 
-<p>The longer answer is that the same problem affects lots of C++ out there,
-so lots of production code will break if Outcome ever breaks on this. The
-potentially sometime-in-the-future affected code sequence would be:</p>
-<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">struct</span> <span class="n">const_containing_type</span>
-<span class="p">{</span>
-  <span class="k">const</span> <span class="kt">int</span> <span class="n">no</span><span class="p">;</span>                        <span class="c1">// only concerns const and reference types
-</span><span class="c1"></span>  <span class="n">const_containing_type</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="o">:</span> <span class="n">no</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="p">{}</span>
-<span class="p">};</span>
+<p>The longer answer is that before C++ 20, use of placement
+new on types containing <code>const</code> member types where the resulting pointer was
+thrown away is undefined behaviour. As of the resolution of a national body
+comment, this is no longer the case, and now Outcome is free of this particular
+UB for C++ 20 onwards.</p>
 
-<span class="k">extern</span> <span class="kt">void</span> <span class="nf">external_function</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="k">const</span> <span class="n">result</span><span class="o">&lt;</span><span class="n">const_containing_type</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="p">);</span>
+<p>This still affects C++ before 20, though no major compiler is affected. Still,
+if you wish to avoid UB, don&rsquo;t use <code>const</code> types within Outcome types (or any
+<code>optional&lt;T&gt;</code>, or <code>vector&lt;T&gt;</code> or any STL container type for that matter).</p>
 
-<span class="kt">int</span> <span class="nf">example_const_propagation2</span><span class="p">()</span>
-<span class="p">{</span>
-  <span class="n">result</span><span class="o">&lt;</span><span class="n">const_containing_type</span><span class="o">&gt;</span> <span class="n">a</span><span class="p">{</span><span class="mi">5</span><span class="p">};</span>
-  <span class="k">const</span> <span class="kt">int</span> <span class="o">&amp;</span><span class="n">x</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">value</span><span class="p">().</span><span class="n">no</span><span class="p">;</span>
-  <span class="n">external_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">);</span>             <span class="c1">// might call an outcome function which calls placement new!
-</span><span class="c1"></span>  <span class="k">return</span> <span class="n">x</span><span class="p">;</span>                            <span class="c1">// does this reload x, or assume it hasn&#39;t changed?
-</span><span class="c1"></span><span class="p">}</span>
-</code></pre></div>
-<p>GCCs up to v10, clangs up to v9 and MSVCs up to VS2019.1 <u><b>do</b></u> reload <code>x</code> after
-the call of an unknown function, even though it has constant type. This may change
-in future compilers due to changes in the C++ standard to encourage such
-optimisations.</p>
-
-<h3 id="brief-history-of-c-standard-changes">Brief history of C++ standard changes</h3>
+<h3 id="more-detail">More detail</h3>
 
 <p>Before the C++ 14 standard, placement new into storage which used to contain
 a const type was straight out always undefined behaviour, period. Thus all use of
@@ -3221,33 +3207,13 @@ is to use
 , which was added in C++ 17, to &lsquo;launder&rsquo;
 the storage into which we placement new before each and every use of that
 storage. This forces the compiler to reload the object stored by placement
-new on every occasion, and not assume it is can be constant propagated, which
+new on every occasion, and not assume it can be constant propagated, which
 impacts codegen quality.</p>
 
-<p>As neither situation is obviously desirable, after much thought I have
-decided to simply do nothing apart from add this FAQ entry. I would say that
-because Outcome is 100% header-only, the compiler can always see the
-calls of placement new, and thus the compiler always knows that the
-preceding const or reference object is dead, and there is now a new const
-or reference object in its place. I appreciate that this is a hand waving
-response, and code using Outcome will still contain undefined behaviour if
-you use it with a const type, or a type containing const or reference types.</p>
-
-<p>However the reality on the ground is that a ton of production C++ code does
-placement new of types potentially containing const or reference types, and
-it is highly unlikely that C++ compilers will, in practice, break all that
-production code, especially as the template type supplied to library code is often
-outside one&rsquo;s control. If, however, compilers do end up moving ahead on
-optimising this aggressively, Outcome will need to add laundering for any
-type containing const or reference types, for which one needs Reflection
-into the language in any case. We shall thus wait until later to see what
-happens.</p>
-
-<h3 id="summary">Summary</h3>
-
-<p>If you wish to be kept abreast of changes on this topic, please add yourself
-to <a href="https://github.com/ned14/outcome/issues/185">https://github.com/ned14/outcome/issues/185</a> which is the issue tracking
-this bug.</p>
+<p>As mentioned above, this issue (in so far as it applies to types containing
+user supplied <code>T</code> which might be <code>const</code>) has been resolved as of C++ 20 onwards,
+and it is extremely unlikely that any C++ compiler will act on any UB here in
+C++ 17 or 14 given how much of STL containers would break.</p>
 
 
 
@@ -3271,7 +3237,7 @@ this bug.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 25/06/2019
+        <i class='fa fa-calendar'></i> Last update on 15/11/2019
     </div>
     
 

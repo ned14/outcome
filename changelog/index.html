@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-10-21T14:42:43 UTC">
+<meta name="revised" content="2019-11-15T15:46:56 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2584,7 +2584,7 @@
 
 <hr />
 
-<h2 id="v2-1-2-6th-november-2019-boost-1-72-release-https-github-com-ned14-outcome-releases-tag-v2-1-2">v2.1.2 6th November 2019 (Boost 1.72) <a href="https://github.com/ned14/outcome/releases/tag/v2.1.2">[release]</a></h2>
+<h2 id="v2-1-2-11th-december-2019-boost-1-72-release-https-github-com-ned14-outcome-releases-tag-v2-1-2">v2.1.2 11th December 2019 (Boost 1.72) <a href="https://github.com/ned14/outcome/releases/tag/v2.1.2">[release]</a></h2>
 
 <h3 id="enhancements">Enhancements:</h3>
 
@@ -2593,6 +2593,11 @@
 <dd>Standalone outcome is now <code>make install</code>-able, and cmake <code>find_package()</code> can find it.
 Note that you must separately install and <code>find_package()</code> Outcome&rsquo;s dependency, quickcpplib,
 else <code>find_package()</code> of Outcome will fail.</dd>
+<dt>Non-permissive parsing is now default in Visual Studio</dt>
+<dd>The default targets in standalone Outcome&rsquo;s cmake now enable non-permissive parsing.
+This was required partially because VS2019 16.3&rsquo;s quite buggy Concepts implementation is
+unusuable in permissive parsing mode. Even then, lazy ADL two phase lookup is broken
+in VS2019 16.3 with <code>/std:latest</code>, you may wish to use an earlier language standard.</dd>
 <dt><strong>Breaking change!</strong></dt>
 <dd>The git submodule mechanism used by standalone Outcome of specifying dependent libraries
 has been replaced with a cmake superbuild of dependencies mechanism instead. Upon cmake
@@ -2859,7 +2864,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 21/10/2019
+        <i class='fa fa-calendar'></i> Last update on 15/11/2019
     </div>
     
 
