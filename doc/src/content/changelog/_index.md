@@ -4,7 +4,7 @@ weight = 80
 +++
 
 ---
-## v2.1.2 6th November 2019 (Boost 1.72) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.2)
+## v2.1.2 11th December 2019 (Boost 1.72) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.2)
 
 ### Enhancements:
 
@@ -12,6 +12,12 @@ Improved compatibility with cmake tooling
 : Standalone outcome is now `make install`-able, and cmake `find_package()` can find it.
 Note that you must separately install and `find_package()` Outcome's dependency, quickcpplib,
 else `find_package()` of Outcome will fail.
+
+Non-permissive parsing is now default in Visual Studio
+: The default targets in standalone Outcome's cmake now enable non-permissive parsing.
+This was required partially because VS2019 16.3's quite buggy Concepts implementation is
+unusuable in permissive parsing mode. Even then, lazy ADL two phase lookup is broken
+in VS2019 16.3 with `/std:latest`, you may wish to use an earlier language standard.
 
 **Breaking change!**
 : The git submodule mechanism used by standalone Outcome of specifying dependent libraries

@@ -76,9 +76,9 @@ Distributed under the Boost Software License, Version 1.0.
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_MAJOR    2
 /*! AWAITING HUGO JSON CONVERSION TOOL */
-#define OUTCOME_VERSION_MINOR    1
+#define OUTCOME_VERSION_MINOR    2
 /*! AWAITING HUGO JSON CONVERSION TOOL */
-#define OUTCOME_VERSION_PATCH    1
+#define OUTCOME_VERSION_PATCH    0
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_REVISION 0  // Revision version for cmake and DLL version stamping
 
@@ -978,7 +978,11 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_TEXPR(...)                                                                                                                                                                                                                                                                                                   requires { (__VA_ARGS__); }
 
 #define QUICKCPPLIB_TPRED(...) (__VA_ARGS__)
+#if !defined(_MSC_VER) || _MSC_FULL_VER >= 192400000  // VS 2019 16.3 is broken here
 #define QUICKCPPLIB_REQUIRES(...) requires __VA_ARGS__
+#else
+#define QUICKCPPLIB_REQUIRES(...)
+#endif
 #else
 #define QUICKCPPLIB_TEMPLATE(...) template <__VA_ARGS__
 #define QUICKCPPLIB_TREQUIRES(...) , __VA_ARGS__ >
@@ -1194,9 +1198,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 958ce015b8de40772dcb1d2bb1f0d2c131fa766e
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-10-16 10:43:42 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 958ce015
+#define OUTCOME_PREVIOUS_COMMIT_REF 335f009519378ecf3b4dc92cc5429597d37dd57c
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-10-21 14:37:39 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 335f0095
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
