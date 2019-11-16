@@ -24,9 +24,9 @@ Distributed under the Boost Software License, Version 1.0.
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_MAJOR    2
 /*! AWAITING HUGO JSON CONVERSION TOOL */
-#define OUTCOME_VERSION_MINOR    1
+#define OUTCOME_VERSION_MINOR    2
 /*! AWAITING HUGO JSON CONVERSION TOOL */
-#define OUTCOME_VERSION_PATCH    1
+#define OUTCOME_VERSION_PATCH    0
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_REVISION 0  // Revision version for cmake and DLL version stamping
 
