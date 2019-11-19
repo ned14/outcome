@@ -707,9 +707,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    2a6576ff1f5caa042039b69857028b30d3b4eaa7
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-10-16 11:57:44 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 2a6576ff
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    d9810fcde7fc37adc7366bfdcc6fa3d7c3ab396d
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-11-15 17:27:40 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE d9810fcd
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1224,9 +1224,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 2771f423c18e3085d9b740235d4a423c2f8a2501
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-11-15 15:44:04 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 2771f423
+#define OUTCOME_PREVIOUS_COMMIT_REF 8a8431ee03a871f2f9c29fa09a0a95185cf4bc1d
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-11-15 16:28:58 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 8a8431ee
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1541,14 +1541,19 @@ Distributed under the Boost Software License, Version 1.0.
 #if defined(__cplusplus) && !defined(__clang__)
 namespace win32
 {
-  extern "C" __declspec(dllimport) _Ret_maybenull_ void *__stdcall LoadLibraryA(_In_ const char *lpLibFileName);
+  extern _Ret_maybenull_ void *__stdcall LoadLibraryA(_In_ const char *lpLibFileName);
   typedef int(__stdcall *GetProcAddress_returntype)();
-  extern "C" GetProcAddress_returntype __stdcall GetProcAddress(_In_ void *hModule, _In_ const char *lpProcName);
-  extern "C" __declspec(dllimport) _Success_(return != 0) unsigned short __stdcall RtlCaptureStackBackTrace(_In_ unsigned long FramesToSkip, _In_ unsigned long FramesToCapture, _Out_writes_to_(FramesToCapture, return ) void **BackTrace, _Out_opt_ unsigned long *BackTraceHash);
-  extern "C" __declspec(dllimport) _Success_(return != 0)
+  extern GetProcAddress_returntype __stdcall GetProcAddress(_In_ void *hModule, _In_ const char *lpProcName);
+  extern _Success_(return != 0) unsigned short __stdcall RtlCaptureStackBackTrace(_In_ unsigned long FramesToSkip, _In_ unsigned long FramesToCapture, _Out_writes_to_(FramesToCapture, return ) void **BackTrace, _Out_opt_ unsigned long *BackTraceHash);
+  extern _Success_(return != 0)
   _When_((cchWideChar == -1) && (cbMultiByte != 0), _Post_equal_to_(_String_length_(lpMultiByteStr) + 1)) int __stdcall WideCharToMultiByte(_In_ unsigned int CodePage, _In_ unsigned long dwFlags, const wchar_t *lpWideCharStr, _In_ int cchWideChar, _Out_writes_bytes_to_opt_(cbMultiByte, return ) char *lpMultiByteStr,
                                                                                                                                             _In_ int cbMultiByte, _In_opt_ const char *lpDefaultChar, _Out_opt_ int *lpUsedDefaultChar);
-}
+#pragma comment(lib, "kernel32.lib")
+#pragma comment(linker, "/alternatename:?LoadLibraryA@win32@@YAPEAXPEBD@Z=LoadLibraryA")
+#pragma comment(linker, "/alternatename:?GetProcAddress@win32@@YAP6AHXZPEAXPEBD@Z=GetProcAddress")
+#pragma comment(linker, "/alternatename:?RtlCaptureStackBackTrace@win32@@YAGKKPEAPEAXPEAK@Z=RtlCaptureStackBackTrace")
+#pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@@YAHIKPEB_WHPEADHPEBDPEAH@Z=WideCharToMultiByte")
+}  // namespace win32
 #else
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
