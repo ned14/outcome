@@ -37,6 +37,13 @@ namespace convert
 #else
 #define OUTCOME_GCC6_CONCEPT_BOOL
 #endif
+  namespace detail
+  {
+    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL SameHelper = std::is_same<T, U>::value;
+    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL same_as = detail::SameHelper<T, U> &&detail::SameHelper<U, T>;
+  }  // namespace detail
+
+
   /* The `ValueOrNone` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
@@ -45,7 +52,7 @@ namespace convert
     {
       a.has_value()
     }
-    ->bool;
+    ->detail::same_as<bool>;
     {a.value()};
   };
   /* The `ValueOrError` concept.
@@ -57,7 +64,7 @@ namespace convert
     {
       a.has_value()
     }
-    ->bool;
+    ->detail::same_as<bool>;
     {a.value()};
     {a.error()};
   };

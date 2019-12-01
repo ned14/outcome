@@ -681,9 +681,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    d9810fcde7fc37adc7366bfdcc6fa3d7c3ab396d
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-11-15 17:27:40 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE d9810fcd
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    2a6576ff1f5caa042039b69857028b30d3b4eaa7
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-10-16 11:57:44 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 2a6576ff
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -961,7 +961,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_CALL_OVERLOAD_(name, ...) QUICKCPPLIB_GLUE_(QUICKCPPLIB_OVERLOAD_MACRO_(name, QUICKCPPLIB_COUNT_ARGS_MAX8_(__VA_ARGS__)), (__VA_ARGS__))
 
 #endif
-#if defined(__cpp_concepts) && !defined(QUICKCPPLIB_DISABLE_CONCEPTS_SUPPORT)
+#ifdef __cpp_concepts
 #define QUICKCPPLIB_TREQUIRES_EXPAND8(a, b, c, d, e, f, g, h) a &&QUICKCPPLIB_TREQUIRES_EXPAND7(b, c, d, e, f, g, h)
 #define QUICKCPPLIB_TREQUIRES_EXPAND7(a, b, c, d, e, f, g) a &&QUICKCPPLIB_TREQUIRES_EXPAND6(b, c, d, e, f, g)
 #define QUICKCPPLIB_TREQUIRES_EXPAND6(a, b, c, d, e, f) a &&QUICKCPPLIB_TREQUIRES_EXPAND5(b, c, d, e, f)
@@ -978,11 +978,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_TEXPR(...)                                                                                                                                                                                                                                                                                                   requires { (__VA_ARGS__); }
 
 #define QUICKCPPLIB_TPRED(...) (__VA_ARGS__)
-#if !defined(_MSC_VER) || _MSC_FULL_VER >= 192400000  // VS 2019 16.3 is broken here
 #define QUICKCPPLIB_REQUIRES(...) requires __VA_ARGS__
-#else
-#define QUICKCPPLIB_REQUIRES(...)
-#endif
 #else
 #define QUICKCPPLIB_TEMPLATE(...) template <__VA_ARGS__
 #define QUICKCPPLIB_TREQUIRES(...) , __VA_ARGS__ >
@@ -1198,9 +1194,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 8a8431ee03a871f2f9c29fa09a0a95185cf4bc1d
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-11-15 16:28:58 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 8a8431ee
+#define OUTCOME_PREVIOUS_COMMIT_REF a15b08b391f2f628effccaa2f9a947ddb32da91f
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-11-30 16:40:37 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE a15b08b3
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1515,19 +1511,14 @@ Distributed under the Boost Software License, Version 1.0.
 #if defined(__cplusplus) && !defined(__clang__)
 namespace win32
 {
-  extern _Ret_maybenull_ void *__stdcall LoadLibraryA(_In_ const char *lpLibFileName);
+  extern "C" __declspec(dllimport) _Ret_maybenull_ void *__stdcall LoadLibraryA(_In_ const char *lpLibFileName);
   typedef int(__stdcall *GetProcAddress_returntype)();
-  extern GetProcAddress_returntype __stdcall GetProcAddress(_In_ void *hModule, _In_ const char *lpProcName);
-  extern _Success_(return != 0) unsigned short __stdcall RtlCaptureStackBackTrace(_In_ unsigned long FramesToSkip, _In_ unsigned long FramesToCapture, _Out_writes_to_(FramesToCapture, return ) void **BackTrace, _Out_opt_ unsigned long *BackTraceHash);
-  extern _Success_(return != 0)
+  extern "C" GetProcAddress_returntype __stdcall GetProcAddress(_In_ void *hModule, _In_ const char *lpProcName);
+  extern "C" __declspec(dllimport) _Success_(return != 0) unsigned short __stdcall RtlCaptureStackBackTrace(_In_ unsigned long FramesToSkip, _In_ unsigned long FramesToCapture, _Out_writes_to_(FramesToCapture, return ) void **BackTrace, _Out_opt_ unsigned long *BackTraceHash);
+  extern "C" __declspec(dllimport) _Success_(return != 0)
   _When_((cchWideChar == -1) && (cbMultiByte != 0), _Post_equal_to_(_String_length_(lpMultiByteStr) + 1)) int __stdcall WideCharToMultiByte(_In_ unsigned int CodePage, _In_ unsigned long dwFlags, const wchar_t *lpWideCharStr, _In_ int cchWideChar, _Out_writes_bytes_to_opt_(cbMultiByte, return ) char *lpMultiByteStr,
                                                                                                                                             _In_ int cbMultiByte, _In_opt_ const char *lpDefaultChar, _Out_opt_ int *lpUsedDefaultChar);
-#pragma comment(lib, "kernel32.lib")
-#pragma comment(linker, "/alternatename:?LoadLibraryA@win32@@YAPEAXPEBD@Z=LoadLibraryA")
-#pragma comment(linker, "/alternatename:?GetProcAddress@win32@@YAP6AHXZPEAXPEBD@Z=GetProcAddress")
-#pragma comment(linker, "/alternatename:?RtlCaptureStackBackTrace@win32@@YAGKKPEAPEAXPEAK@Z=RtlCaptureStackBackTrace")
-#pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@@YAHIKPEB_WHPEADHPEBDPEAH@Z=WideCharToMultiByte")
-}  // namespace win32
+}
 #else
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -2966,6 +2957,13 @@ namespace convert
 #else
 #define OUTCOME_GCC6_CONCEPT_BOOL
 #endif
+  namespace detail
+  {
+    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL SameHelper = std::is_same<T, U>::value;
+    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL same_as = detail::SameHelper<T, U> &&detail::SameHelper<U, T>;
+  }  // namespace detail
+
+
   /* The `ValueOrNone` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
@@ -2976,7 +2974,7 @@ namespace convert
     {
       a.has_value()
     }
-    ->bool;
+    ->detail::same_as<bool>;
     {a.value()};
   };
   /* The `ValueOrError` concept.
@@ -2991,7 +2989,7 @@ namespace convert
     {
       a.has_value()
     }
-    ->bool;
+    ->detail::same_as<bool>;
     {a.value()};
     {a.error()};
   };
