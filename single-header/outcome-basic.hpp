@@ -681,9 +681,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    2a6576ff1f5caa042039b69857028b30d3b4eaa7
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-10-16 11:57:44 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 2a6576ff
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    09a832d071da963a4e8ede7357295da418f78589
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-11-18 11:08:44 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 09a832d0
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -961,7 +961,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_CALL_OVERLOAD_(name, ...) QUICKCPPLIB_GLUE_(QUICKCPPLIB_OVERLOAD_MACRO_(name, QUICKCPPLIB_COUNT_ARGS_MAX8_(__VA_ARGS__)), (__VA_ARGS__))
 
 #endif
-#ifdef __cpp_concepts
+#if defined(__cpp_concepts) && !defined(QUICKCPPLIB_DISABLE_CONCEPTS_SUPPORT)
 #define QUICKCPPLIB_TREQUIRES_EXPAND8(a, b, c, d, e, f, g, h) a &&QUICKCPPLIB_TREQUIRES_EXPAND7(b, c, d, e, f, g, h)
 #define QUICKCPPLIB_TREQUIRES_EXPAND7(a, b, c, d, e, f, g) a &&QUICKCPPLIB_TREQUIRES_EXPAND6(b, c, d, e, f, g)
 #define QUICKCPPLIB_TREQUIRES_EXPAND6(a, b, c, d, e, f) a &&QUICKCPPLIB_TREQUIRES_EXPAND5(b, c, d, e, f)
@@ -978,7 +978,11 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_TEXPR(...)                                                                                                                                                                                                                                                                                                   requires { (__VA_ARGS__); }
 
 #define QUICKCPPLIB_TPRED(...) (__VA_ARGS__)
+#if !defined(_MSC_VER) || _MSC_FULL_VER >= 192400000  // VS 2019 16.3 is broken here
 #define QUICKCPPLIB_REQUIRES(...) requires __VA_ARGS__
+#else
+#define QUICKCPPLIB_REQUIRES(...)
+#endif
 #else
 #define QUICKCPPLIB_TEMPLATE(...) template <__VA_ARGS__
 #define QUICKCPPLIB_TREQUIRES(...) , __VA_ARGS__ >
@@ -1194,9 +1198,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF a15b08b391f2f628effccaa2f9a947ddb32da91f
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-11-30 16:40:37 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE a15b08b3
+#define OUTCOME_PREVIOUS_COMMIT_REF 8e328da3b8196586ecb26dce52c23b3aa09fca2a
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-12-18 09:34:34 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 8e328da3
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1511,14 +1515,19 @@ Distributed under the Boost Software License, Version 1.0.
 #if defined(__cplusplus) && !defined(__clang__)
 namespace win32
 {
-  extern "C" __declspec(dllimport) _Ret_maybenull_ void *__stdcall LoadLibraryA(_In_ const char *lpLibFileName);
+  extern _Ret_maybenull_ void *__stdcall LoadLibraryA(_In_ const char *lpLibFileName);
   typedef int(__stdcall *GetProcAddress_returntype)();
-  extern "C" GetProcAddress_returntype __stdcall GetProcAddress(_In_ void *hModule, _In_ const char *lpProcName);
-  extern "C" __declspec(dllimport) _Success_(return != 0) unsigned short __stdcall RtlCaptureStackBackTrace(_In_ unsigned long FramesToSkip, _In_ unsigned long FramesToCapture, _Out_writes_to_(FramesToCapture, return ) void **BackTrace, _Out_opt_ unsigned long *BackTraceHash);
-  extern "C" __declspec(dllimport) _Success_(return != 0)
+  extern GetProcAddress_returntype __stdcall GetProcAddress(_In_ void *hModule, _In_ const char *lpProcName);
+  extern _Success_(return != 0) unsigned short __stdcall RtlCaptureStackBackTrace(_In_ unsigned long FramesToSkip, _In_ unsigned long FramesToCapture, _Out_writes_to_(FramesToCapture, return ) void **BackTrace, _Out_opt_ unsigned long *BackTraceHash);
+  extern _Success_(return != 0)
   _When_((cchWideChar == -1) && (cbMultiByte != 0), _Post_equal_to_(_String_length_(lpMultiByteStr) + 1)) int __stdcall WideCharToMultiByte(_In_ unsigned int CodePage, _In_ unsigned long dwFlags, const wchar_t *lpWideCharStr, _In_ int cchWideChar, _Out_writes_bytes_to_opt_(cbMultiByte, return ) char *lpMultiByteStr,
                                                                                                                                             _In_ int cbMultiByte, _In_opt_ const char *lpDefaultChar, _Out_opt_ int *lpUsedDefaultChar);
-}
+#pragma comment(lib, "kernel32.lib")
+#pragma comment(linker, "/alternatename:?LoadLibraryA@win32@@YAPEAXPEBD@Z=LoadLibraryA")
+#pragma comment(linker, "/alternatename:?GetProcAddress@win32@@YAP6AHXZPEAXPEBD@Z=GetProcAddress")
+#pragma comment(linker, "/alternatename:?RtlCaptureStackBackTrace@win32@@YAGKKPEAPEAXPEAK@Z=RtlCaptureStackBackTrace")
+#pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@@YAHIKPEB_WHPEADHPEBDPEAH@Z=WideCharToMultiByte")
+}  // namespace win32
 #else
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -2685,10 +2694,8 @@ namespace detail
 {
   template <bool value_throws, bool error_throws> struct basic_result_storage_swap;
   template <class R, class EC, class NoValuePolicy>                                                                                                                                    //
-  OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<EC> && (std::is_void<EC>::value || std::is_default_constructible<EC>::value))  //
   class basic_result_storage;
   template <class R, class EC, class NoValuePolicy>                                                                                                                                    //
-  OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<EC> && (std::is_void<EC>::value || std::is_default_constructible<EC>::value))  //
   class basic_result_storage
   {
     static_assert(trait::type_can_be_used_in_basic_result<R>, "The type R cannot be used in a basic_result");
@@ -2697,7 +2704,6 @@ namespace detail
 
     friend struct policy::base;
     template <class T, class U, class V>                                                                                                                                              //
-    OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<T> &&trait::type_can_be_used_in_basic_result<U> && (std::is_void<U>::value || std::is_default_constructible<U>::value))  //
     friend class basic_result_storage;
     template <class T, class U, class V> friend class basic_result_final;
     template <class T, class U, class V> friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept;        // NOLINT
@@ -3624,9 +3630,6 @@ OUTCOME_V2_NAMESPACE_END
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 template <class R, class S, class NoValuePolicy>                                                                                                                                  //
-#if !defined(__GNUC__) || __GNUC__ >= 10                                                                                                                                          // GCC's constraints implementation is buggy
-OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
-#endif
 class basic_result;
 
 namespace detail
@@ -3786,9 +3789,6 @@ SIGNATURE NOT RECOGNISED
 type definition template <class R, class S, class NoValuePolicy> basic_result. Potential doc page: `basic_result<T, E, NoValuePolicy>`
 */
 template <class R, class S, class NoValuePolicy>                                                                                                                                  //
-#if !defined(__GNUC__) || __GNUC__ >= 10                                                                                                                                          // GCC's constraints implementation is buggy
-OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<R> &&trait::type_can_be_used_in_basic_result<S> && (std::is_void<S>::value || std::is_default_constructible<S>::value))  //
-#endif
 class OUTCOME_NODISCARD basic_result : public detail::basic_result_final<R, S, NoValuePolicy>
 {
   static_assert(trait::type_can_be_used_in_basic_result<R>, "The type R cannot be used in a basic_result");
@@ -4451,15 +4451,15 @@ namespace detail
     struct search_detail_adl
     {
     };
-    OUTCOME_TEMPLATE(class S)                                                                        //
-    OUTCOME_TREQUIRES(OUTCOME_TEXPR(basic_outcome_failure_exception_from_error(std::declval<S>())))  //
+    // Do NOT use template requirements here!
+    template <class S, typename = decltype(basic_outcome_failure_exception_from_error(std::declval<S>()))>
     inline auto _delayed_lookup_basic_outcome_failure_exception_from_error(const S &ec, search_detail_adl /*unused*/)
     {
       // ADL discovered
       return basic_outcome_failure_exception_from_error(ec);
     }
   }                                        // namespace adl
-#if defined(_MSC_VER) && _MSC_VER <= 1920  // VS2019
+#if defined(_MSC_VER) && _MSC_VER <= 1923  // VS2019
   // VS2017 and VS2019 with /permissive- chokes on the correct form due to over eager early instantiation.
   template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) { static_assert(sizeof(S) == 0, "No specialisation for these error and exception types available!"); }
 #else
@@ -4515,7 +4515,6 @@ OUTCOME_V2_NAMESPACE_END
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 template <class R, class S, class P, class NoValuePolicy>                                                                            //
-OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))  //
 class basic_outcome;
 
 namespace detail
@@ -4673,7 +4672,6 @@ SIGNATURE NOT RECOGNISED
 type definition template <class R, class S, class P, class NoValuePolicy> basic_outcome. Potential doc page: `basic_outcome<T, EC, EP, NoValuePolicy>`
 */
 template <class R, class S, class P, class NoValuePolicy>                                                                            //
-OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<P> && (std::is_void<P>::value || std::is_default_constructible<P>::value))  //
 class OUTCOME_NODISCARD basic_outcome
 
 
@@ -4688,7 +4686,6 @@ class OUTCOME_NODISCARD basic_outcome
   using base = detail::select_basic_outcome_failure_observers<detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>;
   friend struct policy::base;
   template <class T, class U, class V, class W>                                                                                        //
-  OUTCOME_REQUIRES(trait::type_can_be_used_in_basic_result<V> && (std::is_void<V>::value || std::is_default_constructible<V>::value))  //
   friend class basic_outcome;
   template <class T, class U, class V, class W, class X> friend constexpr inline void hooks::override_outcome_exception(basic_outcome<T, U, V, W> *o, X &&v) noexcept;  // NOLINT
 

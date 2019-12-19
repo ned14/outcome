@@ -4,6 +4,18 @@ weight = 80
 +++
 
 ---
+## v2.1.3 ??? (Boost 1.73) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.3)
+
+### Enhancements:
+
+### Bug fixes:
+
+[#214](https://github.com/ned14/outcome/issues/214)
+: Newer Concepts implementing compilers were unhappy with the early check for
+destructibility of `T` and `E`, so removed template constraints, falling back
+to static assert which runs later in the type instantiation sequence.
+
+---
 ## v2.1.2 11th December 2019 (Boost 1.72) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.2)
 
 ### Enhancements:
