@@ -105,7 +105,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef BOOST_OUTCOME_REQUIRES
 #if defined(__cpp_concepts) && (!defined(_MSC_VER) || _MSC_FULL_VER >= 192400000)  // VS 2019 16.3 is broken here
-#define BOOST_OUTCOME_REQUIRES(...) requires __VA_ARGS__
+#define BOOST_OUTCOME_REQUIRES(...) requires(__VA_ARGS__)
 #else
 #define BOOST_OUTCOME_REQUIRES(...)
 #endif
