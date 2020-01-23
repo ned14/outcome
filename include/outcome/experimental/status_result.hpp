@@ -36,7 +36,9 @@ namespace detail
 {
   // Customise _set_error_is_errno
   template <class State> constexpr inline void _set_error_is_errno(State &state, const SYSTEM_ERROR2_NAMESPACE::generic_code & /*unused*/) { state._status |= status_error_is_errno; }
+#ifdef SYSTEM_ERROR2_POSIX_CODE_HPP
   template <class State> constexpr inline void _set_error_is_errno(State &state, const SYSTEM_ERROR2_NAMESPACE::posix_code & /*unused*/) { state._status |= status_error_is_errno; }
+#endif // SYSTEM_ERROR2_POSIX_CODE_HPP
   template <class State> constexpr inline void _set_error_is_errno(State &state, const SYSTEM_ERROR2_NAMESPACE::errc & /*unused*/) { state._status |= status_error_is_errno; }
 
 }  // namespace detail
