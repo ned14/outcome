@@ -787,11 +787,11 @@ SIGNATURE NOT RECOGNISED
     if(this->_state._status.have_error() && o._state._status.have_error()  //
        && this->_state._status.have_exception() && o._state._status.have_exception())
     {
-      return this->_error == o._error && this->_ptr == o._ptr;
+      return this->_state._error == o._state._error && this->_ptr == o._ptr;
     }
     if(this->_state._status.have_error() && o._state._status.have_error())
     {
-      return this->_error == o._error;
+      return this->_state._error == o._state._error;
     }
     if(this->_state._status.have_exception() && o._state._status.have_exception())
     {
@@ -811,11 +811,11 @@ SIGNATURE NOT RECOGNISED
     if(this->_state._status.have_error() && o._state._status.have_error()  //
        && this->_state._status.have_exception() && o._state._status.have_exception())
     {
-      return this->_error == o.error() && this->_ptr == o.exception();
+      return this->_state._error == o.error() && this->_ptr == o.exception();
     }
     if(this->_state._status.have_error() && o._state._status.have_error())
     {
-      return this->_error == o.error();
+      return this->_state._error == o.error();
     }
     if(this->_state._status.have_exception() && o._state._status.have_exception())
     {
@@ -842,11 +842,11 @@ SIGNATURE NOT RECOGNISED
     if(this->_state._status.have_error() && o._state._status.have_error()  //
        && this->_state._status.have_exception() && o._state._status.have_exception())
     {
-      return this->_error != o._error || this->_ptr != o._ptr;
+      return this->_state._error != o._state._error || this->_ptr != o._ptr;
     }
     if(this->_state._status.have_error() && o._state._status.have_error())
     {
-      return this->_error != o._error;
+      return this->_state._error != o._state._error;
     }
     if(this->_state._status.have_exception() && o._state._status.have_exception())
     {
@@ -866,11 +866,11 @@ SIGNATURE NOT RECOGNISED
     if(this->_state._status.have_error() && o._state._status.have_error()  //
        && this->_state._status.have_exception() && o._state._status.have_exception())
     {
-      return this->_error != o.error() || this->_ptr != o.exception();
+      return this->_state._error != o.error() || this->_ptr != o.exception();
     }
     if(this->_state._status.have_error() && o._state._status.have_error())
     {
-      return this->_error != o.error();
+      return this->_state._error != o.error();
     }
     if(this->_state._status.have_exception() && o._state._status.have_exception())
     {

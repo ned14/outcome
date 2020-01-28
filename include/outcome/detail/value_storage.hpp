@@ -165,6 +165,10 @@ namespace detail
     // value has been moved from
     have_moved_from = (1U << 5U)
   };
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4201)  // nameless struct/union
+#endif
   struct status_bitfield_type
   {
     union {
@@ -702,9 +706,19 @@ namespace detail
       return *this;
     }
   };
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
   static_assert(sizeof(status_bitfield_type) == 4, "status_bitfield_type is not sized 4 bytes!");
   static_assert(std::is_trivially_copyable<status_bitfield_type>::value, "status_bitfield_type is not trivially copyable!");
 
+  template <class State> constexpr inline void _set_error_is_errno(State & /*unused*/) {}
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4127)  // conditional expression is constant
+#pragma warning(disable : 4624)  // destructor was implicitly defined as deleted
+#endif
   // Used if both T and E are trivial
   template <class T, class E> struct value_storage_trivial
   {
@@ -798,12 +812,12 @@ namespace detail
     using error_type = E;
     union {
       empty_type _empty1;
-      value_type _value;
+      devoid<value_type> _value;
     };
     status_bitfield_type _status;
     union {
       empty_type _empty2;
-      error_type _error;
+      devoid<error_type> _error;
     };
     value_storage_nontrivial() noexcept
         : _empty1{}
@@ -870,12 +884,14 @@ namespace detail
         : _status(status::have_error)
         , _error(static_cast<Args &&>(args)...)  // NOLINT
     {
+      _set_error_is_errno(*this);
     }
     template <class U, class... Args>
     value_storage_nontrivial(in_place_type_t<error_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
         : _status(status::have_error)
         , _error(il, static_cast<Args &&>(args)...)
     {
+      _set_error_is_errno(*this);
     }
     template <class U, class V>
     static constexpr bool enable_converting_constructor = !(std::is_same<std::decay_t<U>, value_type>::value && std::is_same<std::decay_t<V>, error_type>::value)  //
@@ -914,7 +930,8 @@ namespace detail
       {
         if(!trait::is_move_relocating<value_type>::value || !this->_status.have_moved_from())
         {
-          this->_value.~value_type();  // NOLINT
+          using _value_type = devoid<value_type>;
+          this->_value.~_value_type();  // NOLINT
         }
         this->_status.set_have_value(false);
       }
@@ -922,7 +939,8 @@ namespace detail
       {
         if(!trait::is_move_relocating<error_type>::value || !this->_status.have_moved_from())
         {
-          this->_error.~error_type();  // NOLINT
+          using _error_type = devoid<error_type>;
+          this->_error.~_error_type();  // NOLINT
         }
         this->_status.set_have_error(false);
       }
@@ -1128,7 +1146,7 @@ namespace detail
     value_storage_nontrivial_move_assignment(const value_storage_nontrivial_move_assignment &) = default;
     value_storage_nontrivial_move_assignment(value_storage_nontrivial_move_assignment &&) = default;  // NOLINT
     value_storage_nontrivial_move_assignment &operator=(const value_storage_nontrivial_move_assignment &o) = default;
-    value_storage_nontrivial_move_assignment &operator=(value_storage_nontrivial_move_assignment &&o) noexcept(std::is_nothrow_move_assignable<value_type>::value && std::is_nothrow_move_assignable<error_type>::value)  // NOLINT
+    value_storage_nontrivial_move_assignment &operator=(value_storage_nontrivial_move_assignment &&o) noexcept(std::is_nothrow_move_assignable<value_type>::value &&std::is_nothrow_move_assignable<error_type>::value)  // NOLINT
     {
       if(!this->_status.have_value() && !this->_status.have_error() && !o._status.have_value() && !o._status.have_error())
       {
@@ -1219,7 +1237,7 @@ namespace detail
     value_storage_nontrivial_copy_assignment(const value_storage_nontrivial_copy_assignment &) = default;
     value_storage_nontrivial_copy_assignment(value_storage_nontrivial_copy_assignment &&) = default;              // NOLINT
     value_storage_nontrivial_copy_assignment &operator=(value_storage_nontrivial_copy_assignment &&o) = default;  // NOLINT
-    value_storage_nontrivial_copy_assignment &operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(std::is_nothrow_copy_assignable<value_type>::value && std::is_nothrow_copy_assignable<error_type>::value)
+    value_storage_nontrivial_copy_assignment &operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(std::is_nothrow_copy_assignable<value_type>::value &&std::is_nothrow_copy_assignable<error_type>::value)
     {
       if(!this->_status.have_value() && !this->_status.have_error() && !o._status.have_value() && !o._status.have_error())
       {
@@ -1292,6 +1310,9 @@ namespace detail
       make_ub(this->_value);
     }
   };
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
   // We don't actually need all of std::is_trivial<>, std::is_trivially_copyable<> is sufficient
   template <class T, class E> using value_storage_select_trivality = std::conditional_t<std::is_trivially_copyable<devoid<T>>::value && std::is_trivially_copyable<devoid<E>>::value, value_storage_trivial<T, E>, value_storage_nontrivial<T, E>>;

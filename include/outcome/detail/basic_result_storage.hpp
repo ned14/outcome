@@ -33,7 +33,6 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  template <class State, class E> constexpr inline void _set_error_is_errno(State & /*unused*/, const E & /*unused*/) {}
   template <class R, class S, class NoValuePolicy> class basic_result_final;
 }  // namespace detail
 
@@ -150,14 +149,12 @@ namespace detail
     };
     template <class T, class U, class V>
     constexpr basic_result_storage(make_error_code_compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_error_code(std::declval<U>())))
-        : _state(o._state)
-        , _error(make_error_code(o._error))
+        : _state(in_place_type<_error_type>, make_error_code(o._state._error))
     {
     }
     template <class T, class U, class V>
     constexpr basic_result_storage(make_error_code_compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_error_code(std::declval<U>())))
-        : _state(static_cast<decltype(o._state) &&>(o._state))
-        , _error(make_error_code(static_cast<U &&>(o._error)))
+        : _state(in_place_type<_error_type>, make_error_code(static_cast<U &&>(o._state._error)))
     {
     }
 
@@ -166,14 +163,12 @@ namespace detail
     };
     template <class T, class U, class V>
     constexpr basic_result_storage(make_exception_ptr_compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_exception_ptr(std::declval<U>())))
-        : _state(o._state)
-        , _error(make_exception_ptr(o._error))
+        : _state(in_place_type<_error_type>, make_exception_ptr(o._state._error))
     {
     }
     template <class T, class U, class V>
     constexpr basic_result_storage(make_exception_ptr_compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_exception_ptr(std::declval<U>())))
-        : _state(static_cast<decltype(o._state) &&>(o._state))
-        , _error(make_exception_ptr(static_cast<U &&>(o._error)))
+        : _state(in_place_type<_error_type>, make_exception_ptr(static_cast<U &&>(o._state._error)))
     {
     }
   };
