@@ -57,7 +57,6 @@ namespace detail
   {
     static_assert(trait::type_can_be_used_in_basic_result<R>, "The type R cannot be used in a basic_result");
     static_assert(trait::type_can_be_used_in_basic_result<EC>, "The type S cannot be used in a basic_result");
-    static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "The type S must be void or default constructible");
 
     friend struct policy::base;
     template <class T, class U, class V>                                                                                                                                              //
@@ -120,6 +119,7 @@ namespace detail
         : _state{_, il, static_cast<Args &&>(args)...}
     {
     }
+
     struct compatible_conversion_tag
     {
     };
@@ -128,18 +128,9 @@ namespace detail
         : _state(o._state)
     {
     }
-    template <class T, class V>
-    constexpr basic_result_storage(compatible_conversion_tag /*unused*/, const basic_result_storage<T, void, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
-        : _state(o._state)
-    {
-    }
     template <class T, class U, class V>
-    constexpr basic_result_storage(compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
-        : _state(static_cast<decltype(o._state) &&>(o._state))
-    {
-    }
-    template <class T, class V>
-    constexpr basic_result_storage(compatible_conversion_tag /*unused*/, basic_result_storage<T, void, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value)
+    constexpr basic_result_storage(compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(
+    std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
         : _state(static_cast<decltype(o._state) &&>(o._state))
     {
     }
@@ -184,7 +175,6 @@ namespace detail
     {
       using std::swap;
       a._msvc_nonpermissive_state().swap(b._msvc_nonpermissive_state());
-      swap(a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
     }
   };
 #ifdef __cpp_exceptions
@@ -195,7 +185,6 @@ namespace detail
     {
       using std::swap;
       a._msvc_nonpermissive_state().swap(b._msvc_nonpermissive_state());
-      swap(a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
     }
   };
   // Swap potentially throwing error first
@@ -217,7 +206,6 @@ namespace detail
           }
         }
       } _{a._msvc_nonpermissive_state()._status, b._msvc_nonpermissive_state()._status};
-      strong_swap(_.all_good, a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
       a._msvc_nonpermissive_state().swap(b._msvc_nonpermissive_state());
     }
   };
@@ -232,7 +220,7 @@ namespace detail
       bool all_good = false;
       try
       {
-        strong_swap(all_good, a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
+        //strong_swap(all_good, a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
       }
       catch(...)
       {

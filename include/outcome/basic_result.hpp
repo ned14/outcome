@@ -191,7 +191,6 @@ class OUTCOME_NODISCARD basic_result : public detail::basic_result_final<R, S, N
 {
   static_assert(trait::type_can_be_used_in_basic_result<R>, "The type R cannot be used in a basic_result");
   static_assert(trait::type_can_be_used_in_basic_result<S>, "The type S cannot be used in a basic_result");
-  static_assert(std::is_void<S>::value || std::is_default_constructible<S>::value, "The type S must be void or default constructible");
 
   using base = detail::basic_result_final<R, S, NoValuePolicy>;
 
