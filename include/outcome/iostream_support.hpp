@@ -73,7 +73,9 @@ namespace detail
 
   template <template <class, class> class ValueStorage, class T, class E> inline std::istream &value_storage_in(std::istream &s, ValueStorage<T, E> &v)
   {
-    v = ValueStorage<T, E>();
+    using type = ValueStorage<T, E>;
+    v.~type();
+    new(&v) type;
     uint16_t x, y;
     s >> x >> y;
     v._status.status_value = static_cast<detail::status>(x);
@@ -92,7 +94,9 @@ namespace detail
   }
   template <template <class, class> class ValueStorage, class E> inline std::istream &value_storage_in(std::istream &s, ValueStorage<void, E> &v)
   {
-    v = ValueStorage<void, E>();
+    using type = ValueStorage<void, E>;
+    v.~type();
+    new(&v) type;
     uint16_t x, y;
     s >> x >> y;
     v._status.status_value = static_cast<detail::status>(x);
@@ -106,7 +110,9 @@ namespace detail
   }
   template <template <class, class> class ValueStorage, class T> inline std::istream &value_storage_in(std::istream &s, ValueStorage<T, void> &v)
   {
-    v = ValueStorage<T, void>();
+    using type = ValueStorage<T, void>;
+    v.~type();
+    new(&v) type;
     uint16_t x, y;
     s >> x >> y;
     v._status.status_value = static_cast<detail::status>(x);

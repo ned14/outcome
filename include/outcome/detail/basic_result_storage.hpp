@@ -39,7 +39,8 @@ namespace detail
 namespace hooks
 {
   template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept;
-  template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
+  template <class R, class S, class NoValuePolicy>
+  constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
 }  // namespace hooks
 
 namespace policy
@@ -50,20 +51,22 @@ namespace policy
 namespace detail
 {
   template <bool value_throws, bool error_throws> struct basic_result_storage_swap;
-  template <class R, class EC, class NoValuePolicy>                                                                                                                                    //
+  template <class R, class EC, class NoValuePolicy>  //
   class basic_result_storage;
-  template <class R, class EC, class NoValuePolicy>                                                                                                                                    //
+  template <class R, class EC, class NoValuePolicy>  //
   class basic_result_storage
   {
     static_assert(trait::type_can_be_used_in_basic_result<R>, "The type R cannot be used in a basic_result");
     static_assert(trait::type_can_be_used_in_basic_result<EC>, "The type S cannot be used in a basic_result");
 
     friend struct policy::base;
-    template <class T, class U, class V>                                                                                                                                              //
+    template <class T, class U, class V>  //
     friend class basic_result_storage;
     template <class T, class U, class V> friend class basic_result_final;
-    template <class T, class U, class V> friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept;        // NOLINT
-    template <class T, class U, class V> friend constexpr inline void hooks::set_spare_storage(detail::basic_result_final<T, U, V> *r, uint16_t v) noexcept;  // NOLINT
+    template <class T, class U, class V>
+    friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept;  // NOLINT
+    template <class T, class U, class V>
+    friend constexpr inline void hooks::set_spare_storage(detail::basic_result_final<T, U, V> *r, uint16_t v) noexcept;  // NOLINT
     template <bool value_throws, bool error_throws> struct basic_result_storage_swap;
 
     struct disable_in_place_value_type
@@ -100,22 +103,26 @@ namespace detail
     ~basic_result_storage() = default;
 
     template <class... Args>
-    constexpr explicit basic_result_storage(in_place_type_t<_value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
+    constexpr explicit basic_result_storage(in_place_type_t<_value_type> _,
+                                            Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
         : _state{_, static_cast<Args &&>(args)...}
     {
     }
     template <class U, class... Args>
-    constexpr basic_result_storage(in_place_type_t<_value_type> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, std::initializer_list<U>, Args...>::value)
+    constexpr basic_result_storage(in_place_type_t<_value_type> _, std::initializer_list<U> il,
+                                   Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, std::initializer_list<U>, Args...>::value)
         : _state{_, il, static_cast<Args &&>(args)...}
     {
     }
     template <class... Args>
-    constexpr explicit basic_result_storage(in_place_type_t<_error_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
+    constexpr explicit basic_result_storage(in_place_type_t<_error_type> _,
+                                            Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
         : _state{_, static_cast<Args &&>(args)...}
     {
     }
     template <class U, class... Args>
-    constexpr basic_result_storage(in_place_type_t<_error_type> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
+    constexpr basic_result_storage(in_place_type_t<_error_type> _, std::initializer_list<U> il,
+                                   Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
         : _state{_, il, static_cast<Args &&>(args)...}
     {
     }
@@ -124,7 +131,8 @@ namespace detail
     {
     };
     template <class T, class U, class V>
-    constexpr basic_result_storage(compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
+    constexpr basic_result_storage(compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(
+    std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
         : _state(o._state)
     {
     }
@@ -139,12 +147,14 @@ namespace detail
     {
     };
     template <class T, class U, class V>
-    constexpr basic_result_storage(make_error_code_compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_error_code(std::declval<U>())))
+    constexpr basic_result_storage(make_error_code_compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(
+    std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_error_code(std::declval<U>())))
         : _state(in_place_type<_error_type>, make_error_code(o._state._error))
     {
     }
     template <class T, class U, class V>
-    constexpr basic_result_storage(make_error_code_compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_error_code(std::declval<U>())))
+    constexpr basic_result_storage(make_error_code_compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(
+    std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_error_code(std::declval<U>())))
         : _state(in_place_type<_error_type>, make_error_code(static_cast<U &&>(o._state._error)))
     {
     }
@@ -153,12 +163,14 @@ namespace detail
     {
     };
     template <class T, class U, class V>
-    constexpr basic_result_storage(make_exception_ptr_compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_exception_ptr(std::declval<U>())))
+    constexpr basic_result_storage(make_exception_ptr_compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(
+    std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_exception_ptr(std::declval<U>())))
         : _state(in_place_type<_error_type>, make_exception_ptr(o._state._error))
     {
     }
     template <class T, class U, class V>
-    constexpr basic_result_storage(make_exception_ptr_compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_exception_ptr(std::declval<U>())))
+    constexpr basic_result_storage(make_exception_ptr_compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(
+    std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_exception_ptr(std::declval<U>())))
         : _state(in_place_type<_error_type>, make_exception_ptr(static_cast<U &&>(o._state._error)))
     {
     }
@@ -171,26 +183,31 @@ namespace detail
   template <bool value_throws, bool error_throws> struct basic_result_storage_swap
 #endif
   {
-    template <class R, class EC, class NoValuePolicy> constexpr basic_result_storage_swap(basic_result_storage<R, EC, NoValuePolicy> &a, basic_result_storage<R, EC, NoValuePolicy> &b)
+    template <class R, class EC, class NoValuePolicy>
+    constexpr basic_result_storage_swap(basic_result_storage<R, EC, NoValuePolicy> &a, basic_result_storage<R, EC, NoValuePolicy> &b)
     {
       using std::swap;
       a._msvc_nonpermissive_state().swap(b._msvc_nonpermissive_state());
+      // swap(a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
     }
   };
 #ifdef __cpp_exceptions
   // Swap potentially throwing value first
   template <> struct basic_result_storage_swap<true, false>
   {
-    template <class R, class EC, class NoValuePolicy> constexpr basic_result_storage_swap(basic_result_storage<R, EC, NoValuePolicy> &a, basic_result_storage<R, EC, NoValuePolicy> &b)
+    template <class R, class EC, class NoValuePolicy>
+    constexpr basic_result_storage_swap(basic_result_storage<R, EC, NoValuePolicy> &a, basic_result_storage<R, EC, NoValuePolicy> &b)
     {
       using std::swap;
       a._msvc_nonpermissive_state().swap(b._msvc_nonpermissive_state());
+      // swap(a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
     }
   };
   // Swap potentially throwing error first
   template <> struct basic_result_storage_swap<false, true>
   {
-    template <class R, class EC, class NoValuePolicy> constexpr basic_result_storage_swap(basic_result_storage<R, EC, NoValuePolicy> &a, basic_result_storage<R, EC, NoValuePolicy> &b)
+    template <class R, class EC, class NoValuePolicy>
+    constexpr basic_result_storage_swap(basic_result_storage<R, EC, NoValuePolicy> &a, basic_result_storage<R, EC, NoValuePolicy> &b)
     {
       struct _
       {
@@ -206,13 +223,15 @@ namespace detail
           }
         }
       } _{a._msvc_nonpermissive_state()._status, b._msvc_nonpermissive_state()._status};
+      // strong_swap(_.all_good, a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
       a._msvc_nonpermissive_state().swap(b._msvc_nonpermissive_state());
     }
   };
   // Both could throw
   template <> struct basic_result_storage_swap<true, true>
   {
-    template <class R, class EC, class NoValuePolicy> basic_result_storage_swap(basic_result_storage<R, EC, NoValuePolicy> &a, basic_result_storage<R, EC, NoValuePolicy> &b)
+    template <class R, class EC, class NoValuePolicy>
+    basic_result_storage_swap(basic_result_storage<R, EC, NoValuePolicy> &a, basic_result_storage<R, EC, NoValuePolicy> &b)
     {
       using std::swap;
       // Swap value and status first, if it throws, status will remain unchanged
@@ -220,7 +239,7 @@ namespace detail
       bool all_good = false;
       try
       {
-        //strong_swap(all_good, a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
+        // strong_swap(all_good, a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
       }
       catch(...)
       {

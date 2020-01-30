@@ -42,6 +42,16 @@ namespace detail
       swap(a, b);
     }
   };
+  template <class T, bool nothrow> struct strong_placement_impl
+  {
+    template <class F> constexpr strong_placement_impl(bool &allgood, T *a, T *b, F &&f)
+    {
+      allgood = true;
+      new(a) T(static_cast<T &&>(*b));
+      b->~T();
+      f();
+    }
+  };
 #ifdef __cpp_exceptions
   template <class T> struct strong_swap_impl<T, false>
   {
@@ -93,6 +103,37 @@ namespace detail
       }
     }
   };
+  template <class T> struct strong_placement_impl<T, false>
+  {
+    template <class F> strong_placement_impl(bool &allgood, T *a, T *b, F &&f)
+    {
+      new(a) T(static_cast<T &&>(*b));
+      try
+      {
+        b->~T();
+        f();
+      }
+      catch(...)
+      {
+        // Try to put back a, but only if we are still good
+        if(allgood)
+        {
+          try
+          {
+            new(b) T(static_cast<T &&>(*a));
+            // fall through as all good
+          }
+          catch(...)
+          {
+            // failed to completely restore
+            allgood = false;
+            // throw away second exception
+          }
+          throw;  // rethrow original exception
+        }
+      }
+    }
+  };
 #endif
 }  // namespace detail
 
@@ -103,6 +144,14 @@ OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_move_constructible<T>::value &&std::is_m
 constexpr inline void strong_swap(bool &allgood, T &a, T &b) noexcept(detail::is_nothrow_swappable<T>::value)
 {
   detail::strong_swap_impl<T, detail::is_nothrow_swappable<T>::value>(allgood, a, b);
+}
+/*!
+ */
+OUTCOME_TEMPLATE(class T, class F)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_move_constructible<T>::value &&std::is_move_assignable<T>::value))
+constexpr inline void strong_placement(bool &allgood, T *a, T *b, F &&f) noexcept(std::is_nothrow_move_constructible<T>::value)
+{
+  detail::strong_placement_impl<T, std::is_nothrow_move_constructible<T>::value>(allgood, a, b, static_cast<F &&>(f));
 }
 
 namespace detail
@@ -737,6 +786,8 @@ namespace detail
   {
     using value_type = T;
     using error_type = E;
+
+    // Disable in place construction if they are the same type
     struct disable_in_place_value_type
     {
     };
@@ -748,8 +799,8 @@ namespace detail
 
     union {
       empty_type _empty;
-      devoid<T> _value;
-      devoid<E> _error;
+      devoid<value_type> _value;
+      devoid<error_type> _error;
     };
     status_bitfield_type _status;
     constexpr value_storage_trivial() noexcept
@@ -982,13 +1033,17 @@ namespace detail
     {
       _set_error_is_errno(*this);
     }
+
+    struct nonvoid_converting_constructor_tag
+    {
+    };
     template <class U, class V>
-    static constexpr bool enable_converting_constructor =
+    static constexpr bool enable_nonvoid_converting_constructor =
     !(std::is_same<std::decay_t<U>, value_type>::value && std::is_same<std::decay_t<V>, error_type>::value)  //
     && std::is_constructible<value_type, U>::value && std::is_constructible<error_type, V>::value;
     OUTCOME_TEMPLATE(class U, class V)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U, V>))
-    constexpr explicit value_storage_nontrivial(const value_storage_nontrivial<U, V> &o) noexcept(
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
+    constexpr explicit value_storage_nontrivial(const value_storage_trivial<U, V> &o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
     std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
         : value_storage_nontrivial(o._status.have_value() ?
                                    value_storage_nontrivial(in_place_type<value_type>, o._value) :
@@ -997,18 +1052,8 @@ namespace detail
       _status = o._status;
     }
     OUTCOME_TEMPLATE(class U, class V)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U, V>))
-    constexpr explicit value_storage_nontrivial(const value_storage_trivial<U, V> &o) noexcept(
-    std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
-        : value_storage_nontrivial(o._status.have_value() ?
-                                   value_storage_nontrivial(in_place_type<value_type>, o._value) :
-                                   (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>, o._error) : value_storage_nontrivial()))
-    {
-      _status = o._status;
-    }
-    OUTCOME_TEMPLATE(class U, class V)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U, V>))
-    constexpr explicit value_storage_nontrivial(value_storage_nontrivial<U, V> &&o) noexcept(
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
+    constexpr explicit value_storage_nontrivial(value_storage_trivial<U, V> &&o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
     std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
         : value_storage_nontrivial(
           o._status.have_value() ?
@@ -1018,8 +1063,18 @@ namespace detail
       _status = o._status;
     }
     OUTCOME_TEMPLATE(class U, class V)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U, V>))
-    constexpr explicit value_storage_nontrivial(value_storage_trivial<U, V> &&o) noexcept(
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
+    constexpr explicit value_storage_nontrivial(const value_storage_nontrivial<U, V> &o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
+    std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
+        : value_storage_nontrivial(o._status.have_value() ?
+                                   value_storage_nontrivial(in_place_type<value_type>, o._value) :
+                                   (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>, o._error) : value_storage_nontrivial()))
+    {
+      _status = o._status;
+    }
+    OUTCOME_TEMPLATE(class U, class V)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
+    constexpr explicit value_storage_nontrivial(value_storage_nontrivial<U, V> &&o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
     std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
         : value_storage_nontrivial(
           o._status.have_value() ?
@@ -1028,6 +1083,62 @@ namespace detail
     {
       _status = o._status;
     }
+
+    struct void_value_converting_constructor_tag
+    {
+    };
+    template <class V>
+    static constexpr bool enable_void_value_converting_constructor =
+    std::is_default_constructible<value_type>::value &&std::is_constructible<error_type, V>::value;
+    OUTCOME_TEMPLATE(class V)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
+    constexpr explicit value_storage_nontrivial(const value_storage_trivial<void, V> &o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
+    std::is_nothrow_default_constructible<value_type>::value &&std::is_nothrow_constructible<error_type, V>::value)
+        : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>) :
+                                                            (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>, o._error) :
+                                                                                      value_storage_nontrivial()))  // NOLINT
+    {
+      _status = o._status;
+    }
+    OUTCOME_TEMPLATE(class V)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
+    constexpr explicit value_storage_nontrivial(value_storage_trivial<void, V> &&o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
+    std::is_nothrow_default_constructible<value_type>::value &&std::is_nothrow_constructible<error_type, V>::value)
+        : value_storage_nontrivial(
+          o._status.have_value() ?
+          value_storage_nontrivial(in_place_type<value_type>) :
+          (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>, static_cast<V &&>(o._error)) : value_storage_nontrivial()))  // NOLINT
+    {
+      _status = o._status;
+    }
+
+    struct void_error_converting_constructor_tag
+    {
+    };
+    template <class U>
+    static constexpr bool enable_void_error_converting_constructor =
+    std::is_default_constructible<error_type>::value &&std::is_constructible<value_type, U>::value;
+    OUTCOME_TEMPLATE(class U)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
+    constexpr explicit value_storage_nontrivial(const value_storage_trivial<U, void> &o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
+    std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_default_constructible<error_type>::value)
+        : value_storage_nontrivial(o._status.have_value() ?
+                                   value_storage_nontrivial(in_place_type<value_type>, o._value) :
+                                   (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>) : value_storage_nontrivial()))  // NOLINT
+    {
+      _status = o._status;
+    }
+    OUTCOME_TEMPLATE(class U)
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
+    constexpr explicit value_storage_nontrivial(value_storage_trivial<U, void> &&o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
+    std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_default_constructible<error_type>::value)
+        : value_storage_nontrivial(o._status.have_value() ?
+                                   value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) :
+                                   (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>) : value_storage_nontrivial()))  // NOLINT
+    {
+      _status = o._status;
+    }
+
     ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<T>::value)
     {
       if(this->_status.have_value())
@@ -1052,11 +1163,13 @@ namespace detail
     constexpr void swap(value_storage_nontrivial &o) noexcept(detail::is_nothrow_swappable<value_type>::value)
     {
       using std::swap;
+      // empty/empty
       if(!_status.have_value() && !o._status.have_value() && !_status.have_error() && !o._status.have_error())
       {
         swap(_status, o._status);
         return;
       }
+      // value/value
       if(_status.have_value() && o._status.have_value())
       {
         struct _
@@ -1077,6 +1190,7 @@ namespace detail
         swap(_status, o._status);
         return;
       }
+      // error/error
       if(_status.have_error() && o._status.have_error())
       {
         struct _
@@ -1143,58 +1257,38 @@ namespace detail
         return;
       }
       // It can now only be value/error, or error/value
-      union {
-        empty_type empty1;
-        value_type temp_value;
-      };
-      union {
-        empty_type empty2;
-        error_type temp_error;
-      };
+      struct _
+      {
+        status_bitfield_type &a, &b;
+        value_type *value, *o_value;
+        error_type *error, *o_error;
+        bool all_good{true};
+        ~_()
+        {
+          if(!all_good)
+          {
+            // We lost one of the values
+            a.set_have_lost_consistency(true);
+            b.set_have_lost_consistency(true);
+          }
+        }
+      } _{_status, o._status, &_value, &o._value, &_error, &o._error};
       if(_status.have_value() && o._status.have_error())
       {
-        struct _
-        {
-          status_bitfield_type &a, &b;
-          bool all_good{false};
-          ~_()
-          {
-            if(!all_good)
-            {
-              // We lost one of the values
-              a.set_have_lost_consistency(true);
-              b.set_have_lost_consistency(true);
-            }
-          }
-        } _{_status, o._status};
-        strong_placement(_.all_good, temp_value, _value);
-        strong_placement(_.all_good, temp_error, o._error);
-        strong_placement(_.all_good, o._value, temp_value);
-        strong_placement(_.all_good, _error, temp_error);
-        swap(_status, o._status);
+        strong_placement(_.all_good, _.o_value, _.value, [&_] {    //
+          strong_placement(_.all_good, _.error, _.o_error, [&_] {  //
+            swap(_.a, _.b);                                        //
+          });
+        });
         return;
       }
       if(_status.have_error() && o._status.have_value())
       {
-        struct _
-        {
-          status_bitfield_type &a, &b;
-          bool all_good{false};
-          ~_()
-          {
-            if(!all_good)
-            {
-              // We lost one of the values
-              a.set_have_lost_consistency(true);
-              b.set_have_lost_consistency(true);
-            }
-          }
-        } _{_status, o._status};
-        strong_placement(_.all_good, temp_error, _error);
-        strong_placement(_.all_good, temp_value, o._value);
-        strong_placement(_.all_good, o._error, temp_error);
-        strong_placement(_.all_good, _value, temp_value);
-        swap(_status, o._status);
+        strong_placement(_.all_good, _.o_error, _.error, [&_] {    //
+          strong_placement(_.all_good, _.value, _.o_value, [&_] {  //
+            swap(_.a, _.b);                                        //
+          });
+        });
         return;
       }
       // Should never reach here
@@ -1420,10 +1514,15 @@ namespace detail
 #pragma warning(pop)
 #endif
 
-  // We don't actually need all of std::is_trivial<>, std::is_trivially_copyable<> is sufficient
+  // is_trivially_copyable is true even if type is not copyable, so handle that here
+  template <class T> struct is_storage_trivial
+  {
+    static constexpr bool value = std::is_void<T>::value || (std::is_trivially_copy_constructible<T>::value && std::is_trivially_copyable<T>::value);
+  };
+
   template <class T, class E>
-  using value_storage_select_trivality = std::conditional_t<std::is_trivially_copyable<devoid<T>>::value && std::is_trivially_copyable<devoid<E>>::value,
-                                                            value_storage_trivial<T, E>, value_storage_nontrivial<T, E>>;
+  using value_storage_select_trivality =
+  std::conditional_t<is_storage_trivial<T>::value && is_storage_trivial<E>::value, value_storage_trivial<T, E>, value_storage_nontrivial<T, E>>;
   template <class T, class E>
   using value_storage_select_move_constructor =
   std::conditional_t<std::is_move_constructible<devoid<T>>::value && std::is_move_constructible<devoid<E>>::value, value_storage_select_trivality<T, E>,
