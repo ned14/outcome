@@ -80,16 +80,18 @@ namespace detail
     using _value_type = std::conditional_t<std::is_same<R, EC>::value, disable_in_place_value_type, R>;
     using _error_type = std::conditional_t<std::is_same<R, EC>::value, disable_in_place_error_type, EC>;
 
+    using _state_type = value_storage_select_impl<_value_type, _error_type>;
+
 #ifdef STANDARDESE_IS_IN_THE_HOUSE
     value_storage_trivial<_value_type, _error_type> _state;
 #else
-    value_storage_select_impl<_value_type, _error_type> _state;
+    _state_type _state;
 #endif
 
   public:
     // Used by iostream support to access state
-    value_storage_select_impl<_value_type, _error_type> &_iostreams_state() { return _state; }
-    const value_storage_select_impl<_value_type, _error_type> &_iostreams_state() const { return _state; }
+    _state_type &_iostreams_state() { return _state; }
+    const _state_type &_iostreams_state() const { return _state; }
 
     // Hack to work around MSVC bug in /permissive-
     value_storage_select_impl<_value_type, _error_type> &_msvc_nonpermissive_state() { return _state; }
@@ -149,13 +151,15 @@ namespace detail
     template <class T, class U, class V>
     constexpr basic_result_storage(make_error_code_compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(
     std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_error_code(std::declval<U>())))
-        : _state(in_place_type<_error_type>, make_error_code(o._state._error))
+        : _state(o._state._status.have_value() ? _state_type(in_place_type<_value_type>, o._state._value) :
+                                                 _state_type(in_place_type<_error_type>, make_error_code(o._state._error)))
     {
     }
     template <class T, class U, class V>
     constexpr basic_result_storage(make_error_code_compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(
     std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_error_code(std::declval<U>())))
-        : _state(in_place_type<_error_type>, make_error_code(static_cast<U &&>(o._state._error)))
+        : _state(o._state._status.have_value() ? _state_type(in_place_type<_value_type>, static_cast<T &&>(o._state._value)) :
+                                                 _state_type(in_place_type<_error_type>, make_error_code(static_cast<U &&>(o._state._error))))
     {
     }
 
@@ -165,13 +169,15 @@ namespace detail
     template <class T, class U, class V>
     constexpr basic_result_storage(make_exception_ptr_compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(
     std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_exception_ptr(std::declval<U>())))
-        : _state(in_place_type<_error_type>, make_exception_ptr(o._state._error))
+        : _state(o._state._status.have_value() ? _state_type(in_place_type<_value_type>, o._state._value) :
+                                                 _state_type(in_place_type<_error_type>, make_exception_ptr(o._state._error)))
     {
     }
     template <class T, class U, class V>
     constexpr basic_result_storage(make_exception_ptr_compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(
     std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_exception_ptr(std::declval<U>())))
-        : _state(in_place_type<_error_type>, make_exception_ptr(static_cast<U &&>(o._state._error)))
+        : _state(o._state._status.have_value() ? _state_type(in_place_type<_value_type>, static_cast<T &&>(o._state._value)) :
+                                                 _state_type(in_place_type<_error_type>, make_exception_ptr(static_cast<U &&>(o._state._error))))
     {
     }
   };

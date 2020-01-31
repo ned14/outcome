@@ -1092,24 +1092,34 @@ namespace detail
     std::is_default_constructible<value_type>::value &&std::is_constructible<error_type, V>::value;
     OUTCOME_TEMPLATE(class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
-    constexpr explicit value_storage_nontrivial(const value_storage_trivial<void, V> &o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
+    explicit value_storage_nontrivial(const value_storage_trivial<void, V> &o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
     std::is_nothrow_default_constructible<value_type>::value &&std::is_nothrow_constructible<error_type, V>::value)
-        : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>) :
-                                                            (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>, o._error) :
-                                                                                      value_storage_nontrivial()))  // NOLINT
     {
+      if(o._status.have_value())
+      {
+        new(&_value) value_type();  // NOLINT
+      }
+      else if(o._status.have_error())
+      {
+        new(&_error) error_type(o._error);  // NOLINT
+      }
       _status = o._status;
     }
     OUTCOME_TEMPLATE(class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
-    constexpr explicit value_storage_nontrivial(value_storage_trivial<void, V> &&o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
+    explicit value_storage_nontrivial(value_storage_trivial<void, V> &&o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
     std::is_nothrow_default_constructible<value_type>::value &&std::is_nothrow_constructible<error_type, V>::value)
-        : value_storage_nontrivial(
-          o._status.have_value() ?
-          value_storage_nontrivial(in_place_type<value_type>) :
-          (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>, static_cast<V &&>(o._error)) : value_storage_nontrivial()))  // NOLINT
     {
+      if(o._status.have_value())
+      {
+        new(&_value) value_type();  // NOLINT
+      }
+      else if(o._status.have_error())
+      {
+        new(&_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+      }
       _status = o._status;
+      o._status.set_have_moved_from(true);
     }
 
     struct void_error_converting_constructor_tag
@@ -1120,23 +1130,34 @@ namespace detail
     std::is_default_constructible<error_type>::value &&std::is_constructible<value_type, U>::value;
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
-    constexpr explicit value_storage_nontrivial(const value_storage_trivial<U, void> &o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
+    explicit value_storage_nontrivial(const value_storage_trivial<U, void> &o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
     std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_default_constructible<error_type>::value)
-        : value_storage_nontrivial(o._status.have_value() ?
-                                   value_storage_nontrivial(in_place_type<value_type>, o._value) :
-                                   (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>) : value_storage_nontrivial()))  // NOLINT
     {
+      if(o._status.have_value())
+      {
+        new(&_value) value_type(o._value);  // NOLINT
+      }
+      else if(o._status.have_error())
+      {
+        new(&_error) error_type();  // NOLINT
+      }
       _status = o._status;
     }
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
-    constexpr explicit value_storage_nontrivial(value_storage_trivial<U, void> &&o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
+    explicit value_storage_nontrivial(value_storage_trivial<U, void> &&o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
     std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_default_constructible<error_type>::value)
-        : value_storage_nontrivial(o._status.have_value() ?
-                                   value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) :
-                                   (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>) : value_storage_nontrivial()))  // NOLINT
     {
+      if(o._status.have_value())
+      {
+        new(&_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+      }
+      else if(o._status.have_error())
+      {
+        new(&_error) error_type();  // NOLINT
+      }
       _status = o._status;
+      o._status.set_have_moved_from(true);
     }
 
     ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<T>::value)
@@ -1145,8 +1166,8 @@ namespace detail
       {
         if(!trait::is_move_relocating<value_type>::value || !this->_status.have_moved_from())
         {
-          using _value_type = devoid<value_type>;
-          this->_value.~_value_type();  // NOLINT
+          using _value_type_ = devoid<value_type>;
+          this->_value.~_value_type_();  // NOLINT
         }
         this->_status.set_have_value(false);
       }
@@ -1154,8 +1175,8 @@ namespace detail
       {
         if(!trait::is_move_relocating<error_type>::value || !this->_status.have_moved_from())
         {
-          using _error_type = devoid<error_type>;
-          this->_error.~_error_type();  // NOLINT
+          using _error_type_ = devoid<error_type>;
+          this->_error.~_error_type_();  // NOLINT
         }
         this->_status.set_have_error(false);
       }
