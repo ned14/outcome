@@ -38,8 +38,8 @@ namespace detail
 
   template <class T> inline std::ostream &operator<<(std::ostream &s, const value_storage_trivial<T> &v)
   {
-    s << v._status << " ";
-    if((v._status & status_have_value) != 0)
+    s << static_cast<uint16_t>(v._status.status_value) << " " << v._status.spare_storage_value << " ";
+    if(v._status.have_value())
     {
       s << v._value;  // NOLINT
     }
@@ -47,13 +47,13 @@ namespace detail
   }
   inline std::ostream &operator<<(std::ostream &s, const value_storage_trivial<void> &v)
   {
-    s << v._status << " ";
+    s << static_cast<uint16_t>(v._status.status_value) << " " << v._status.spare_storage_value << " ";
     return s;
   }
   template <class T> inline std::ostream &operator<<(std::ostream &s, const value_storage_nontrivial<T> &v)
   {
-    s << v._status << " ";
-    if((v._status & status_have_value) != 0)
+    s << static_cast<uint16_t>(v._status.status_value) << " " << v._status.spare_storage_value << " ";
+    if(v._status.have_value())
     {
       s << v._value;  // NOLINT
     }
@@ -62,8 +62,11 @@ namespace detail
   template <class T> inline std::istream &operator>>(std::istream &s, value_storage_trivial<T> &v)
   {
     v = value_storage_trivial<T>();
-    s >> v._status;
-    if((v._status & status_have_value) != 0)
+    uint16_t x, y;
+    s >> x >> y;
+    v._status.status_value = static_cast<detail::status>(x);
+    v._status.spare_storage_value = y;
+    if(v._status.have_value())
     {
       new(&v._value) decltype(v._value)();  // NOLINT
       s >> v._value;                        // NOLINT
@@ -73,14 +76,20 @@ namespace detail
   inline std::istream &operator>>(std::istream &s, value_storage_trivial<devoid<void>> &v)
   {
     v = value_storage_trivial<devoid<void>>();
-    s >> v._status;
+    uint16_t x, y;
+    s >> x >> y;
+    v._status.status_value = static_cast<detail::status>(x);
+    v._status.spare_storage_value = y;
     return s;
   }
   template <class T> inline std::istream &operator>>(std::istream &s, value_storage_nontrivial<T> &v)
   {
     v = value_storage_nontrivial<T>();
-    s >> v._status;
-    if((v._status & status_have_value) != 0)
+    uint16_t x, y;
+    s >> x >> y;
+    v._status.status_value = static_cast<detail::status>(x);
+    v._status.spare_storage_value = y;
+    if(v._status.have_value())
     {
       new(&v._value) decltype(v._value)();  // NOLINT
       s >> v._value;                        // NOLINT

@@ -24,6 +24,61 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
+/* Should be this:
+
+78 move constructor count = 2
+65 move assignment count = 3
+78 move assignment count = 1
+65 move constructor count = 2
+78 move assignment count = 0
+65 move assignment count = 1
+
+78 move constructor count = 1
+65 move assignment count = 2
+78 move assignment count = 0
+65 move assignment count = 1
+78 move assignment count = 0
+
+78 move constructor count = 2
+65 move assignment count = 3
+78 move assignment count = 1
+65 move constructor count = 2
+78 move assignment count = 0
+65 move assignment count = 1
+
+78 move constructor count = 1
+65 move assignment count = 2
+78 move assignment count = 0
+65 move assignment count = 1
+78 move assignment count = 0
+
+78 move constructor count = 2
+65 move assignment count = 3
+78 move assignment count = 1
+65 move constructor count = 2
+78 move assignment count = 0
+65 move assignment count = 1
+
+78 move constructor count = 1
+65 move assignment count = 2
+78 move assignment count = 0
+65 move assignment count = 1
+78 move assignment count = 0
+
+78 move constructor count = 2
+65 move assignment count = 3
+78 move assignment count = 1
+65 move constructor count = 2
+78 move assignment count = 0
+65 move assignment count = 1
+
+78 move constructor count = 1
+65 move assignment count = 2
+78 move assignment count = 0
+65 move assignment count = 1
+78 move assignment count = 0
+*/
+
 #ifdef __cpp_exceptions
 #ifdef _MSC_VER
 #pragma warning(push)
