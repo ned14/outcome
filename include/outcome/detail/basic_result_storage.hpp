@@ -40,7 +40,8 @@ namespace detail
 namespace hooks
 {
   template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept;
-  template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
+  template <class R, class S, class NoValuePolicy>
+  constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
 }  // namespace hooks
 
 namespace policy
@@ -51,9 +52,9 @@ namespace policy
 namespace detail
 {
   template <bool value_throws, bool error_throws> struct basic_result_storage_swap;
-  template <class R, class EC, class NoValuePolicy>                                                                                                                                    //
+  template <class R, class EC, class NoValuePolicy>  //
   class basic_result_storage;
-  template <class R, class EC, class NoValuePolicy>                                                                                                                                    //
+  template <class R, class EC, class NoValuePolicy>  //
   class basic_result_storage
   {
     static_assert(trait::type_can_be_used_in_basic_result<R>, "The type R cannot be used in a basic_result");
@@ -61,11 +62,13 @@ namespace detail
     static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "The type S must be void or default constructible");
 
     friend struct policy::base;
-    template <class T, class U, class V>                                                                                                                                              //
+    template <class T, class U, class V>  //
     friend class basic_result_storage;
     template <class T, class U, class V> friend class basic_result_final;
-    template <class T, class U, class V> friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept;        // NOLINT
-    template <class T, class U, class V> friend constexpr inline void hooks::set_spare_storage(detail::basic_result_final<T, U, V> *r, uint16_t v) noexcept;  // NOLINT
+    template <class T, class U, class V>
+    friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept;  // NOLINT
+    template <class T, class U, class V>
+    friend constexpr inline void hooks::set_spare_storage(detail::basic_result_final<T, U, V> *r, uint16_t v) noexcept;  // NOLINT
     template <bool value_throws, bool error_throws> struct basic_result_storage_swap;
 
     struct disable_in_place_value_type
@@ -79,21 +82,23 @@ namespace detail
     using _value_type = std::conditional_t<std::is_same<R, EC>::value, disable_in_place_value_type, R>;
     using _error_type = std::conditional_t<std::is_same<R, EC>::value, disable_in_place_error_type, EC>;
 
+    using _state_type = value_storage_select_impl<_value_type>;
+
 #ifdef STANDARDESE_IS_IN_THE_HOUSE
     detail::value_storage_trivial<_value_type> _state;
 #else
-    detail::value_storage_select_impl<_value_type> _state;
+    _state_type _state;
 #endif
-    detail::devoid<_error_type> _error;
+    devoid<_error_type> _error;
 
   public:
     // Used by iostream support to access state
-    detail::value_storage_select_impl<_value_type> &_iostreams_state() { return _state; }
-    const detail::value_storage_select_impl<_value_type> &_iostreams_state() const { return _state; }
+    _state_type &_iostreams_state() { return _state; }
+    const _state_type &_iostreams_state() const { return _state; }
 
     // Hack to work around MSVC bug in /permissive-
-    detail::value_storage_select_impl<_value_type> &_msvc_nonpermissive_state() { return _state; }
-    detail::devoid<_error_type> &_msvc_nonpermissive_error() { return _error; }
+    _state_type &_msvc_nonpermissive_state() { return _state; }
+    devoid<_error_type> &_msvc_nonpermissive_error() { return _error; }
 
   protected:
     basic_result_storage() = default;
@@ -104,27 +109,29 @@ namespace detail
     ~basic_result_storage() = default;
 
     template <class... Args>
-    constexpr explicit basic_result_storage(in_place_type_t<_value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
+    constexpr explicit basic_result_storage(in_place_type_t<_value_type> _,
+                                            Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
         : _state{_, static_cast<Args &&>(args)...}
         , _error()
     {
     }
     template <class U, class... Args>
-    constexpr basic_result_storage(in_place_type_t<_value_type> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, std::initializer_list<U>, Args...>::value)
+    constexpr basic_result_storage(in_place_type_t<_value_type> _, std::initializer_list<U> il,
+                                   Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, std::initializer_list<U>, Args...>::value)
         : _state{_, il, static_cast<Args &&>(args)...}
         , _error()
     {
     }
     template <class... Args>
     constexpr explicit basic_result_storage(in_place_type_t<_error_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
-        : _state{detail::status_have_error}
+        : _state{detail::status::have_error}
         , _error(static_cast<Args &&>(args)...)
     {
       _set_error_is_errno(_state, _error);
     }
     template <class U, class... Args>
     constexpr basic_result_storage(in_place_type_t<_error_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
-        : _state{detail::status_have_error}
+        : _state{detail::status::have_error}
         , _error{il, static_cast<Args &&>(args)...}
     {
       _set_error_is_errno(_state, _error);
@@ -222,15 +229,15 @@ namespace detail
     {
       struct _
       {
-        unsigned &a, &b;
+        status_bitfield_type &a, &b;
         bool all_good{false};
         ~_()
         {
           if(!all_good)
           {
             // We lost one of the values
-            a |= status_lost_consistency;
-            b |= status_lost_consistency;
+            a.set_have_lost_consistency(true);
+            b.set_have_lost_consistency(true);
           }
         }
       } _{a._msvc_nonpermissive_state()._status, b._msvc_nonpermissive_state()._status};
@@ -255,8 +262,8 @@ namespace detail
       {
         if(!all_good)
         {
-          a._msvc_nonpermissive_state()._status |= detail::status_lost_consistency;
-          b._msvc_nonpermissive_state()._status |= detail::status_lost_consistency;
+          a._msvc_nonpermissive_state()._status.set_have_lost_consistency(true);
+          b._msvc_nonpermissive_state()._status.set_have_lost_consistency(true);
         }
         else
         {
@@ -279,21 +286,21 @@ namespace detail
           // inconsistent result objects. Best we can do is fix up the
           // status bits to prevent has_value() == has_error().
           auto check = [](basic_result_storage<R, EC, NoValuePolicy> &x) {
-            bool has_value = (x._state._status & detail::status_have_value) != 0;
-            bool has_error = (x._state._status & detail::status_have_error) != 0;
-            bool has_exception = (x._state._status & detail::status_have_exception) != 0;
-            x._state._status |= detail::status_lost_consistency;
+            bool has_value = x._state._status.have_value();
+            bool has_error = x._state._status.have_error();
+            bool has_exception = x._state._status.have_exception();
+            x._state._status.set_have_lost_consistency(true);
             if(has_value == (has_error || has_exception))
             {
               if(has_value)
               {
                 // We know the value swapped and is now set, so clear error and exception
-                x._state._status &= ~(detail::status_have_error | detail::status_have_exception);
+                x._state._status.set_have_error(false).set_have_exception(false);
               }
               else
               {
                 // We know the value swapped and is now unset, so set error
-                x._state._status |= detail::status_have_error;
+                x._state._status.set_have_error(true);
                 // TODO: Should I default construct reset _error? It's guaranteed default constructible.
               }
             }

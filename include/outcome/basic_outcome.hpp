@@ -423,7 +423,7 @@ SIGNATURE NOT RECOGNISED
       , _ptr(static_cast<T &&>(t))
   {
     using namespace hooks;
-    this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     hook_outcome_construction(this, static_cast<T &&>(t));
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -436,7 +436,7 @@ SIGNATURE NOT RECOGNISED
       , _ptr(static_cast<U &&>(b))
   {
     using namespace hooks;
-    this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     hook_outcome_construction(this, static_cast<T &&>(a), static_cast<U &&>(b));
   }
 
@@ -589,7 +589,7 @@ SIGNATURE NOT RECOGNISED
       , _ptr(static_cast<Args &&>(args)...)
   {
     using namespace hooks;
-    this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     hook_outcome_in_place_construction(this, in_place_type<exception_type>, static_cast<Args &&>(args)...);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -602,7 +602,7 @@ SIGNATURE NOT RECOGNISED
       , _ptr(il, static_cast<Args &&>(args)...)
   {
     using namespace hooks;
-    this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     hook_outcome_in_place_construction(this, in_place_type<exception_type>, il, static_cast<Args &&>(args)...);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -668,7 +668,7 @@ SIGNATURE NOT RECOGNISED
       : base()
       , _ptr(detail::extract_exception_from_failure<exception_type>(o))
   {
-    this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
   }
@@ -695,11 +695,11 @@ SIGNATURE NOT RECOGNISED
   {
     if(!o.has_error())
     {
-      this->_state._status &= ~detail::status_have_error;
+    this->_state._status.set_have_error(false);
     }
     if(o.has_exception())
     {
-      this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     }
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
@@ -726,7 +726,7 @@ SIGNATURE NOT RECOGNISED
       : base()
       , _ptr(detail::extract_exception_from_failure<exception_type>(static_cast<failure_type<T> &&>(o)))
   {
-    this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
   }
@@ -753,11 +753,11 @@ SIGNATURE NOT RECOGNISED
   {
     if(!o.has_error())
     {
-      this->_state._status &= ~detail::status_have_error;
+    this->_state._status.set_have_error(false);
     }
     if(o.has_exception())
     {
-      this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     }
     using namespace hooks;
     hook_outcome_move_construction(this, static_cast<failure_type<T, U> &&>(o));
@@ -780,20 +780,20 @@ SIGNATURE NOT RECOGNISED
   && noexcept(std::declval<detail::devoid<error_type>>() == std::declval<detail::devoid<U>>())  //
   && noexcept(std::declval<detail::devoid<exception_type>>() == std::declval<detail::devoid<V>>()))
   {
-    if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
+    if(this->_state._status.have_value() && o._state._status.have_value())
     {
       return this->_state._value == o._state._value;  // NOLINT
     }
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0  //
-       && (this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error()  //
+       && this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_error == o._error && this->_ptr == o._ptr;
     }
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error())
     {
       return this->_error == o._error;
     }
-    if((this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_ptr == o._ptr;
     }
@@ -808,16 +808,16 @@ SIGNATURE NOT RECOGNISED
   constexpr bool operator==(const failure_type<T, U> &o) const noexcept(  //
   noexcept(std::declval<error_type>() == std::declval<T>()) && noexcept(std::declval<exception_type>() == std::declval<U>()))
   {
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0  //
-       && (this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error()  //
+       && this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_error == o.error() && this->_ptr == o.exception();
     }
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error())
     {
       return this->_error == o.error();
     }
-    if((this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_ptr == o.exception();
     }
@@ -835,20 +835,20 @@ SIGNATURE NOT RECOGNISED
   && noexcept(std::declval<detail::devoid<error_type>>() != std::declval<detail::devoid<U>>())  //
   && noexcept(std::declval<detail::devoid<exception_type>>() != std::declval<detail::devoid<V>>()))
   {
-    if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
+    if(this->_state._status.have_value() && o._state._status.have_value())
     {
       return this->_state._value != o._state._value;  // NOLINT
     }
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0  //
-       && (this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error()  //
+       && this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_error != o._error || this->_ptr != o._ptr;
     }
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error())
     {
       return this->_error != o._error;
     }
-    if((this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_ptr != o._ptr;
     }
@@ -863,16 +863,16 @@ SIGNATURE NOT RECOGNISED
   constexpr bool operator!=(const failure_type<T, U> &o) const noexcept(  //
   noexcept(std::declval<error_type>() == std::declval<T>()) && noexcept(std::declval<exception_type>() == std::declval<U>()))
   {
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0  //
-       && (this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error()  //
+       && this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_error != o.error() || this->_ptr != o.exception();
     }
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error())
     {
       return this->_error != o.error();
     }
-    if((this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_ptr != o.exception();
     }
@@ -912,8 +912,8 @@ SIGNATURE NOT RECOGNISED
         if(!all_good)
         {
           // We lost one of the values
-          a._state._status |= detail::status_lost_consistency;
-          b._state._status |= detail::status_lost_consistency;
+          a._state._status.set_have_lost_consistency(true);
+          b._state._status.set_have_lost_consistency(true);
           return;
         }
         if(exceptioned)
@@ -926,8 +926,8 @@ SIGNATURE NOT RECOGNISED
           catch(...)
           {
             // We lost one of the values
-            a._state._status |= detail::status_lost_consistency;
-            b._state._status |= detail::status_lost_consistency;
+            a._state._status.set_have_lost_consistency(true);
+            b._state._status.set_have_lost_consistency(true);
             // throw away second exception
           }
 
@@ -935,13 +935,13 @@ SIGNATURE NOT RECOGNISED
           auto check = [](basic_outcome *t) {
             if(t->has_value() && (t->has_error() || t->has_exception()))
             {
-              t->_state._status &= ~(detail::status_have_error | detail::status_have_exception);
-              t->_state._status |= detail::status_lost_consistency;
+              t->_state._status.set_have_error(false).set_have_exception(false);
+              t->_state._status.set_have_lost_consistency(true);
             }
             if(!t->has_value() && !(t->has_error() || t->has_exception()))
             {
               // Choose error, for no particular reason
-              t->_state._status |= detail::status_have_error | detail::status_lost_consistency;
+              t->_state._status.set_have_error(true).set_have_lost_consistency(true);
             }
           };
           check(&a);
@@ -1034,7 +1034,7 @@ SIGNATURE NOT RECOGNISED
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_exception(basic_outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept
   {
     o->_ptr = static_cast<U &&>(v);  // NOLINT
-    o->_state._status |= detail::status_have_exception;
+    o->_state._status.set_have_exception(true);
   }
 }  // namespace hooks
 

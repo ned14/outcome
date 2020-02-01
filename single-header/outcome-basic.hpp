@@ -681,9 +681,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    09a832d071da963a4e8ede7357295da418f78589
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-11-18 11:08:44 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 09a832d0
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    917c983afecb1942f66c0a5c8aac36822fca0ee8
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2019-12-29 09:49:37 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 917c983a
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -979,7 +979,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #define QUICKCPPLIB_TPRED(...) (__VA_ARGS__)
 #if !defined(_MSC_VER) || _MSC_FULL_VER >= 192400000  // VS 2019 16.3 is broken here
-#define QUICKCPPLIB_REQUIRES(...) requires __VA_ARGS__
+#define QUICKCPPLIB_REQUIRES(...) requires(__VA_ARGS__)
 #else
 #define QUICKCPPLIB_REQUIRES(...)
 #endif
@@ -1198,9 +1198,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 8e328da3b8196586ecb26dce52c23b3aa09fca2a
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2019-12-18 09:34:34 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 8e328da3
+#define OUTCOME_PREVIOUS_COMMIT_REF 3f877000af08322617dc37b9ae584b1c1123ca14
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-01-10 09:42:49 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 3f877000
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -2247,6 +2247,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 
 
+#include <cassert>
+
 OUTCOME_V2_NAMESPACE_BEGIN
 
 namespace detail
@@ -2325,19 +2327,638 @@ constexpr inline void strong_swap(bool &allgood, T &a, T &b) noexcept(detail::is
 
 namespace detail
 {
-  using status_bitfield_type = uint32_t;
+  template <class T>
+  constexpr
+#ifdef _MSC_VER
+  __declspec(noreturn)
+#elif defined(__GNUC__) || defined(__clang__)
+        __attribute__((noreturn))
+#endif
+  void make_ub(T && /*unused*/)
+  {
+    assert(false);  // NOLINT
+#if defined(__GNUC__) || defined(__clang__)
+    __builtin_unreachable();
+#elif defined(_MSC_VER)
+    __assume(0);
+#endif
+  }
 
-  // WARNING: These bits are not tracked by abi-dumper, but changing them will break ABI!
-  static constexpr status_bitfield_type status_have_value = (1U << 0U);
-  static constexpr status_bitfield_type status_have_error = (1U << 1U);
-  static constexpr status_bitfield_type status_have_exception = (1U << 2U);
-  static constexpr status_bitfield_type status_lost_consistency = (1U << 3U);  // failed to complete a strong swap
-  static constexpr status_bitfield_type status_error_is_errno = (1U << 4U);    // can errno be set from this error?
-  // bit 7 unused
-  // bits 8-15 unused
-  // bits 16-31 used for user supplied 16 bit value
-  static constexpr status_bitfield_type status_2byte_shift = 16;
-  static constexpr status_bitfield_type status_2byte_mask = (0xffffU << status_2byte_shift);
+  /* Outcome v1 used a C bitfield whose values were tracked by compiler optimisers nicely,
+  but that produces ICEs when used in constexpr.
+
+  Outcome v2.0-v2.1 used a 32 bit integer and manually set and cleared bits. Unfortunately
+  only GCC's optimiser tracks bit values during constant folding, and only per byte, and
+  even then unreliably. https://wg21.link/P1886 "Error speed benchmarking" showed just how
+  poorly clang and MSVC fails to optimise outcome-using code, if you manually set bits.
+
+  Outcome v2.2 therefore uses an enum with fixed values, and constexpr manipulation functions
+  to change the value to one of the enum's values. This is stupid to look at in source code,
+  but it make clang's optimiser do the right thing, so it's worth it.
+  */
+
+
+
+
+
+
+
+
+
+
+
+#define OUTCOME_USE_CONSTEXPR_ENUM_STATUS 0
+  enum class status : uint16_t
+  {
+    // WARNING: These bits are not tracked by abi-dumper, but changing them will break ABI!
+    none = 0,
+
+    have_value = (1U << 0U),
+    have_error = (1U << 1U),
+    have_exception = (2U << 1U),
+    have_error_exception = (3U << 1U),
+
+    // failed to complete a strong swap
+    have_lost_consistency = (1U << 3U),
+    have_value_lost_consistency = (1U << 0U) | (1U << 3U),
+    have_error_lost_consistency = (1U << 1U) | (1U << 3U),
+    have_exception_lost_consistency = (2U << 1U) | (1U << 3U),
+    have_error_exception_lost_consistency = (3U << 1U) | (1U << 3U),
+
+    // can errno be set from this error?
+    have_error_is_errno = (1U << 4U),
+    have_error_error_is_errno = (1U << 1U) | (1U << 4U),
+    have_error_exception_error_is_errno = (3U << 1U) | (1U << 4U),
+
+    have_error_lost_consistency_error_is_errno = (1U << 1U) | (1U << 3U) | (1U << 4U),
+    have_error_exception_lost_consistency_error_is_errno = (3U << 1U) | (1U << 3U) | (1U << 4U),
+
+    // value has been moved from
+    have_moved_from = (1U << 5U)
+  };
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4201)  // nameless struct/union
+#endif
+  struct status_bitfield_type
+  {
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4201)  // nameless struct/union
+#endif
+    union {
+      uint32_t _default{0};
+      struct
+      {
+        status status_value;
+        uint16_t spare_storage_value;  // hooks::spare_storage()
+      };
+    };
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+    constexpr status_bitfield_type() noexcept
+        : status_value(status::none)
+        , spare_storage_value(0)
+    {
+    }
+    constexpr status_bitfield_type(status v) noexcept
+        : status_value(v)
+        , spare_storage_value(0)
+    {
+    }  // NOLINT
+    constexpr status_bitfield_type(status v, uint16_t s) noexcept
+        : status_value(v)
+        , spare_storage_value(s)
+    {
+    }
+
+    constexpr bool have_value() const noexcept
+    {
+
+
+
+
+
+      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_value)) != 0;
+
+    }
+    constexpr bool have_error() const noexcept
+    {
+
+
+
+
+
+
+
+
+
+
+
+      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_error)) != 0;
+
+    }
+    constexpr bool have_exception() const noexcept
+    {
+
+
+
+
+
+
+
+
+
+      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_exception)) != 0;
+
+    }
+    constexpr bool have_lost_consistency() const noexcept
+    {
+
+
+
+
+
+
+
+
+      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_lost_consistency)) != 0;
+
+    }
+    constexpr bool have_error_is_errno() const noexcept
+    {
+
+
+
+
+
+
+
+      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_error_is_errno)) != 0;
+
+    }
+    constexpr bool have_moved_from() const noexcept
+    {
+
+
+
+      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_moved_from)) != 0;
+
+    }
+
+    constexpr status_bitfield_type &set_have_value(bool v) noexcept
+    {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_value)) :
+                                             (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_value)));
+
+      return *this;
+    }
+    constexpr status_bitfield_type &set_have_error(bool v) noexcept
+    {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_error)) :
+                                             (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_error)));
+
+      return *this;
+    }
+    constexpr status_bitfield_type &set_have_exception(bool v) noexcept
+    {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_exception)) :
+                                             (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_exception)));
+
+      return *this;
+    }
+    constexpr status_bitfield_type &set_have_error_is_errno(bool v) noexcept
+    {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_error_is_errno)) :
+                                             (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_error_is_errno)));
+
+      return *this;
+    }
+    constexpr status_bitfield_type &set_have_lost_consistency(bool v) noexcept
+    {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_lost_consistency)) :
+                                             (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_lost_consistency)));
+
+      return *this;
+    }
+    constexpr status_bitfield_type &set_have_moved_from(bool v) noexcept
+    {
+
+
+
+      status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_moved_from)) :
+                                             (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_moved_from)));
+
+      return *this;
+    }
+  };
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+  static_assert(sizeof(status_bitfield_type) == 4, "status_bitfield_type is not sized 4 bytes!");
+  static_assert(std::is_trivially_copyable<status_bitfield_type>::value, "status_bitfield_type is not trivially copyable!");
 
   // Used if T is trivial
   template <class T> struct value_storage_trivial
@@ -2347,7 +2968,7 @@ namespace detail
       empty_type _empty;
       devoid<T> _value;
     };
-    status_bitfield_type _status{0};
+    status_bitfield_type _status;
     constexpr value_storage_trivial() noexcept
         : _empty{}
     {
@@ -2375,27 +2996,28 @@ namespace detail
     template <class... Args>
     constexpr explicit value_storage_trivial(in_place_type_t<value_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
         : _value(static_cast<Args &&>(args)...)
-        , _status(status_have_value)
+        , _status(status::have_value)
     {
     }
     template <class U, class... Args>
     constexpr value_storage_trivial(in_place_type_t<value_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
         : _value(il, static_cast<Args &&>(args)...)
-        , _status(status_have_value)
+        , _status(status::have_value)
     {
     }
     template <class U> static constexpr bool enable_converting_constructor = !std::is_same<std::decay_t<U>, value_type>::value && std::is_constructible<value_type, U>::value;
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<U> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_trivial(((o._status & status_have_value) != 0) ? value_storage_trivial(in_place_type<value_type>, o._value) : value_storage_trivial())  // NOLINT
+        : value_storage_trivial(o._status.have_value() ? value_storage_trivial(in_place_type<value_type>, o._value) : value_storage_trivial())  // NOLINT
     {
       _status = o._status;
     }
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_trivial(value_storage_trivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_trivial(((o._status & status_have_value) != 0) ? value_storage_trivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : value_storage_trivial())  // NOLINT
+        : value_storage_trivial(o._status.have_value() ? value_storage_trivial(in_place_type<value_type>, static_cast<U &&>(o._value)) :
+                                                         value_storage_trivial())  // NOLINT
     {
       _status = o._status;
     }
@@ -2415,7 +3037,7 @@ namespace detail
       empty_type _empty;
       value_type _value;
     };
-    status_bitfield_type _status{0};
+    status_bitfield_type _status;
     value_storage_nontrivial() noexcept
         : _empty{}
     {
@@ -2425,9 +3047,9 @@ namespace detail
     value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(std::is_nothrow_move_constructible<value_type>::value)  // NOLINT
         : _status(o._status)
     {
-      if(this->_status & status_have_value)
+      if(this->_status.have_value())
       {
-        this->_status &= ~status_have_value;
+        this->_status.set_have_value(false);
         new(&_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
         _status = o._status;
       }
@@ -2435,9 +3057,9 @@ namespace detail
     value_storage_nontrivial(const value_storage_nontrivial &o) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
         : _status(o._status)
     {
-      if(this->_status & status_have_value)
+      if(this->_status.have_value())
       {
-        this->_status &= ~status_have_value;
+        this->_status.set_have_value(false);
         new(&_value) value_type(o._value);  // NOLINT
         _status = o._status;
       }
@@ -2446,9 +3068,9 @@ namespace detail
     explicit value_storage_nontrivial(const value_storage_trivial<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)
         : _status(o._status)
     {
-      if(this->_status & status_have_value)
+      if(this->_status.have_value())
       {
-        this->_status &= ~status_have_value;
+        this->_status.set_have_value(false);
         new(&_value) value_type;  // NOLINT
         _status = o._status;
       }
@@ -2461,73 +3083,75 @@ namespace detail
     template <class... Args>
     explicit value_storage_nontrivial(in_place_type_t<value_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
         : _value(static_cast<Args &&>(args)...)  // NOLINT
-        , _status(status_have_value)
+        , _status(status::have_value)
     {
     }
     template <class U, class... Args>
     value_storage_nontrivial(in_place_type_t<value_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
         : _value(il, static_cast<Args &&>(args)...)
-        , _status(status_have_value)
+        , _status(status::have_value)
     {
     }
     template <class U> static constexpr bool enable_converting_constructor = !std::is_same<std::decay_t<U>, value_type>::value && std::is_constructible<value_type, U>::value;
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_nontrivial(const value_storage_nontrivial<U> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, o._value) : value_storage_nontrivial())
+        : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, o._value) : value_storage_nontrivial())
     {
       _status = o._status;
     }
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_nontrivial(const value_storage_trivial<U> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, o._value) : value_storage_nontrivial())
+        : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, o._value) : value_storage_nontrivial())
     {
       _status = o._status;
     }
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_nontrivial(value_storage_nontrivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : value_storage_nontrivial())
+        : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) :
+                                                            value_storage_nontrivial())
     {
       _status = o._status;
     }
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_nontrivial(value_storage_trivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
-        : value_storage_nontrivial((o._status & status_have_value) != 0 ? value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) : value_storage_nontrivial())
+        : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) :
+                                                            value_storage_nontrivial())
     {
       _status = o._status;
     }
     ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<T>::value)
     {
-      if(this->_status & status_have_value)
+      if(this->_status.have_value())
       {
         this->_value.~value_type();  // NOLINT
-        this->_status &= ~status_have_value;
+        this->_status.set_have_value(false);
       }
     }
     constexpr void swap(value_storage_nontrivial &o) noexcept(detail::is_nothrow_swappable<value_type>::value)
     {
       using std::swap;
-      if((_status & status_have_value) == 0 && (o._status & status_have_value) == 0)
+      if(!_status.have_value() && !o._status.have_value())
       {
         swap(_status, o._status);
         return;
       }
-      if((_status & status_have_value) != 0 && (o._status & status_have_value) != 0)
+      if(_status.have_value() && o._status.have_value())
       {
         struct _
         {
-          unsigned &a, &b;
+          status_bitfield_type &a, &b;
           bool all_good{false};
           ~_()
           {
             if(!all_good)
             {
               // We lost one of the values
-              a |= status_lost_consistency;
-              b |= status_lost_consistency;
+              a.set_have_lost_consistency(true);
+              b.set_have_lost_consistency(true);
             }
           }
         } _{_status, o._status};
@@ -2536,7 +3160,7 @@ namespace detail
         return;
       }
       // One must be empty and the other non-empty, so use move construction
-      if((_status & status_have_value) != 0)
+      if(_status.have_value())
       {
         // Move construct me into other
         new(&o._value) value_type(static_cast<value_type &&>(_value));  // NOLINT
@@ -2598,15 +3222,15 @@ namespace detail
     value_storage_nontrivial_move_assignment &operator=(const value_storage_nontrivial_move_assignment &o) = default;
     value_storage_nontrivial_move_assignment &operator=(value_storage_nontrivial_move_assignment &&o) noexcept(std::is_nothrow_move_assignable<value_type>::value)  // NOLINT
     {
-      if((this->_status & status_have_value) != 0 && (o._status & status_have_value) != 0)
+      if(this->_status.have_value() && o._status.have_value())
       {
         this->_value = static_cast<value_type &&>(o._value);  // NOLINT
       }
-      else if((this->_status & status_have_value) != 0 && (o._status & status_have_value) == 0)
+      else if(this->_status.have_value() && !o._status.have_value())
       {
         this->_value.~value_type();  // NOLINT
       }
-      else if((this->_status & status_have_value) == 0 && (o._status & status_have_value) != 0)
+      else if(!this->_status.have_value() && o._status.have_value())
       {
         new(&this->_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
       }
@@ -2624,15 +3248,15 @@ namespace detail
     value_storage_nontrivial_copy_assignment &operator=(value_storage_nontrivial_copy_assignment &&o) = default;  // NOLINT
     value_storage_nontrivial_copy_assignment &operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(std::is_nothrow_copy_assignable<value_type>::value)
     {
-      if((this->_status & status_have_value) != 0 && (o._status & status_have_value) != 0)
+      if(this->_status.have_value() && o._status.have_value())
       {
         this->_value = o._value;  // NOLINT
       }
-      else if((this->_status & status_have_value) != 0 && (o._status & status_have_value) == 0)
+      else if(this->_status.have_value() && !o._status.have_value())
       {
         this->_value.~value_type();  // NOLINT
       }
-      else if((this->_status & status_have_value) == 0 && (o._status & status_have_value) != 0)
+      else if(!this->_status.have_value() && o._status.have_value())
       {
         new(&this->_value) value_type(o._value);  // NOLINT
       }
@@ -2682,7 +3306,8 @@ namespace detail
 namespace hooks
 {
   template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept;
-  template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
+  template <class R, class S, class NoValuePolicy>
+  constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
 }  // namespace hooks
 
 namespace policy
@@ -2693,9 +3318,9 @@ namespace policy
 namespace detail
 {
   template <bool value_throws, bool error_throws> struct basic_result_storage_swap;
-  template <class R, class EC, class NoValuePolicy>                                                                                                                                    //
+  template <class R, class EC, class NoValuePolicy>  //
   class basic_result_storage;
-  template <class R, class EC, class NoValuePolicy>                                                                                                                                    //
+  template <class R, class EC, class NoValuePolicy>  //
   class basic_result_storage
   {
     static_assert(trait::type_can_be_used_in_basic_result<R>, "The type R cannot be used in a basic_result");
@@ -2703,11 +3328,13 @@ namespace detail
     static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "The type S must be void or default constructible");
 
     friend struct policy::base;
-    template <class T, class U, class V>                                                                                                                                              //
+    template <class T, class U, class V>  //
     friend class basic_result_storage;
     template <class T, class U, class V> friend class basic_result_final;
-    template <class T, class U, class V> friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept;        // NOLINT
-    template <class T, class U, class V> friend constexpr inline void hooks::set_spare_storage(detail::basic_result_final<T, U, V> *r, uint16_t v) noexcept;  // NOLINT
+    template <class T, class U, class V>
+    friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept;  // NOLINT
+    template <class T, class U, class V>
+    friend constexpr inline void hooks::set_spare_storage(detail::basic_result_final<T, U, V> *r, uint16_t v) noexcept;  // NOLINT
     template <bool value_throws, bool error_throws> struct basic_result_storage_swap;
 
     struct disable_in_place_value_type
@@ -2721,21 +3348,23 @@ namespace detail
     using _value_type = std::conditional_t<std::is_same<R, EC>::value, disable_in_place_value_type, R>;
     using _error_type = std::conditional_t<std::is_same<R, EC>::value, disable_in_place_error_type, EC>;
 
+    using _state_type = value_storage_select_impl<_value_type>;
 
 
 
-    detail::value_storage_select_impl<_value_type> _state;
 
-    detail::devoid<_error_type> _error;
+    _state_type _state;
+
+    devoid<_error_type> _error;
 
   public:
     // Used by iostream support to access state
-    detail::value_storage_select_impl<_value_type> &_iostreams_state() { return _state; }
-    const detail::value_storage_select_impl<_value_type> &_iostreams_state() const { return _state; }
+    _state_type &_iostreams_state() { return _state; }
+    const _state_type &_iostreams_state() const { return _state; }
 
     // Hack to work around MSVC bug in /permissive-
-    detail::value_storage_select_impl<_value_type> &_msvc_nonpermissive_state() { return _state; }
-    detail::devoid<_error_type> &_msvc_nonpermissive_error() { return _error; }
+    _state_type &_msvc_nonpermissive_state() { return _state; }
+    devoid<_error_type> &_msvc_nonpermissive_error() { return _error; }
 
   protected:
     basic_result_storage() = default;
@@ -2746,27 +3375,29 @@ namespace detail
     ~basic_result_storage() = default;
 
     template <class... Args>
-    constexpr explicit basic_result_storage(in_place_type_t<_value_type> _, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
+    constexpr explicit basic_result_storage(in_place_type_t<_value_type> _,
+                                            Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
         : _state{_, static_cast<Args &&>(args)...}
         , _error()
     {
     }
     template <class U, class... Args>
-    constexpr basic_result_storage(in_place_type_t<_value_type> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, std::initializer_list<U>, Args...>::value)
+    constexpr basic_result_storage(in_place_type_t<_value_type> _, std::initializer_list<U> il,
+                                   Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, std::initializer_list<U>, Args...>::value)
         : _state{_, il, static_cast<Args &&>(args)...}
         , _error()
     {
     }
     template <class... Args>
     constexpr explicit basic_result_storage(in_place_type_t<_error_type> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
-        : _state{detail::status_have_error}
+        : _state{detail::status::have_error}
         , _error(static_cast<Args &&>(args)...)
     {
       _set_error_is_errno(_state, _error);
     }
     template <class U, class... Args>
     constexpr basic_result_storage(in_place_type_t<_error_type> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
-        : _state{detail::status_have_error}
+        : _state{detail::status::have_error}
         , _error{il, static_cast<Args &&>(args)...}
     {
       _set_error_is_errno(_state, _error);
@@ -2864,15 +3495,15 @@ namespace detail
     {
       struct _
       {
-        unsigned &a, &b;
+        status_bitfield_type &a, &b;
         bool all_good{false};
         ~_()
         {
           if(!all_good)
           {
             // We lost one of the values
-            a |= status_lost_consistency;
-            b |= status_lost_consistency;
+            a.set_have_lost_consistency(true);
+            b.set_have_lost_consistency(true);
           }
         }
       } _{a._msvc_nonpermissive_state()._status, b._msvc_nonpermissive_state()._status};
@@ -2897,8 +3528,8 @@ namespace detail
       {
         if(!all_good)
         {
-          a._msvc_nonpermissive_state()._status |= detail::status_lost_consistency;
-          b._msvc_nonpermissive_state()._status |= detail::status_lost_consistency;
+          a._msvc_nonpermissive_state()._status.set_have_lost_consistency(true);
+          b._msvc_nonpermissive_state()._status.set_have_lost_consistency(true);
         }
         else
         {
@@ -2921,21 +3552,21 @@ namespace detail
           // inconsistent result objects. Best we can do is fix up the
           // status bits to prevent has_value() == has_error().
           auto check = [](basic_result_storage<R, EC, NoValuePolicy> &x) {
-            bool has_value = (x._state._status & detail::status_have_value) != 0;
-            bool has_error = (x._state._status & detail::status_have_error) != 0;
-            bool has_exception = (x._state._status & detail::status_have_exception) != 0;
-            x._state._status |= detail::status_lost_consistency;
+            bool has_value = x._state._status.have_value();
+            bool has_error = x._state._status.have_error();
+            bool has_exception = x._state._status.have_exception();
+            x._state._status.set_have_lost_consistency(true);
             if(has_value == (has_error || has_exception))
             {
               if(has_value)
               {
                 // We know the value swapped and is now set, so clear error and exception
-                x._state._status &= ~(detail::status_have_error | detail::status_have_exception);
+                x._state._status.set_have_error(false).set_have_exception(false);
               }
               else
               {
                 // We know the value swapped and is now unset, so set error
-                x._state._status |= detail::status_have_error;
+                x._state._status.set_have_error(true);
                 // TODO: Should I default construct reset _error? It's guaranteed default constructible.
               }
             }
@@ -3301,12 +3932,12 @@ namespace detail
   public:
     using base::base;
 
-    constexpr explicit operator bool() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
-    constexpr bool has_value() const noexcept { return (this->_state._status & detail::status_have_value) != 0; }
-    constexpr bool has_error() const noexcept { return (this->_state._status & detail::status_have_error) != 0; }
-    constexpr bool has_exception() const noexcept { return (this->_state._status & detail::status_have_exception) != 0; }
-    constexpr bool has_lost_consistency() const noexcept { return (this->_state._status & detail::status_lost_consistency) != 0; }
-    constexpr bool has_failure() const noexcept { return (this->_state._status & detail::status_have_error) != 0 || (this->_state._status & detail::status_have_exception) != 0; }
+    constexpr explicit operator bool() const noexcept { return this->_state._status.have_value(); }
+    constexpr bool has_value() const noexcept { return this->_state._status.have_value(); }
+    constexpr bool has_error() const noexcept { return this->_state._status.have_error(); }
+    constexpr bool has_exception() const noexcept { return this->_state._status.have_exception(); }
+    constexpr bool has_lost_consistency() const noexcept { return this->_state._status.have_lost_consistency(); }
+    constexpr bool has_failure() const noexcept { return this->_state._status.have_error() || this->_state._status.have_exception(); }
 
     OUTCOME_TEMPLATE(class T, class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<R>>() == std::declval<detail::devoid<T>>()),  //
@@ -3314,11 +3945,11 @@ namespace detail
     constexpr bool operator==(const basic_result_final<T, U, V> &o) const noexcept(  //
     noexcept(std::declval<detail::devoid<R>>() == std::declval<detail::devoid<T>>()) && noexcept(std::declval<detail::devoid<S>>() == std::declval<detail::devoid<U>>()))
     {
-      if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
+      if(this->_state._status.have_value() && o._state._status.have_value())
       {
         return this->_state._value == o._state._value;  // NOLINT
       }
-      if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0)
+      if(this->_state._status.have_error() && o._state._status.have_error())
       {
         return this->_error == o._error;
       }
@@ -3329,7 +3960,7 @@ namespace detail
     constexpr bool operator==(const success_type<T> &o) const noexcept(  //
     noexcept(std::declval<R>() == std::declval<T>()))
     {
-      if((this->_state._status & detail::status_have_value) != 0)
+      if(this->_state._status.have_value())
       {
         return this->_state._value == o.value();
       }
@@ -3338,14 +3969,14 @@ namespace detail
     constexpr bool operator==(const success_type<void> &o) const noexcept
     {
       (void) o;
-      return (this->_state._status & detail::status_have_value) != 0;
+      return this->_state._status.have_value();
     }
     OUTCOME_TEMPLATE(class T)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<S>() == std::declval<T>()))
     constexpr bool operator==(const failure_type<T, void> &o) const noexcept(  //
     noexcept(std::declval<S>() == std::declval<T>()))
     {
-      if((this->_state._status & detail::status_have_error) != 0)
+      if(this->_state._status.have_error())
       {
         return this->_error == o.error();
       }
@@ -3357,11 +3988,11 @@ namespace detail
     constexpr bool operator!=(const basic_result_final<T, U, V> &o) const noexcept(  //
     noexcept(std::declval<detail::devoid<R>>() != std::declval<detail::devoid<T>>()) && noexcept(std::declval<detail::devoid<S>>() != std::declval<detail::devoid<U>>()))
     {
-      if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
+      if(this->_state._status.have_value() && o._state._status.have_value())
       {
         return this->_state._value != o._state._value;
       }
-      if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0)
+      if(this->_state._status.have_error() && o._state._status.have_error())
       {
         return this->_error != o._error;
       }
@@ -3372,7 +4003,7 @@ namespace detail
     constexpr bool operator!=(const success_type<T> &o) const noexcept(  //
     noexcept(std::declval<R>() != std::declval<T>()))
     {
-      if((this->_state._status & detail::status_have_value) != 0)
+      if(this->_state._status.have_value())
       {
         return this->_state._value != o.value();
       }
@@ -3381,14 +4012,14 @@ namespace detail
     constexpr bool operator!=(const success_type<void> &o) const noexcept
     {
       (void) o;
-      return (this->_state._status & detail::status_have_value) == 0;
+      return !this->_state._status.have_value();
     }
     OUTCOME_TEMPLATE(class T)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<S>() != std::declval<T>()))
     constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(  //
     noexcept(std::declval<S>() != std::declval<T>()))
     {
-      if((this->_state._status & detail::status_have_error) != 0)
+      if(this->_state._status.have_error())
       {
         return this->_error != o.error();
       }
@@ -3459,12 +4090,14 @@ Distributed under the Boost Software License, Version 1.0.
 
 
 
-#include <cassert>
-
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace policy
 {
+  namespace detail
+  {
+    using OUTCOME_V2_NAMESPACE::detail::make_ub;
+  }
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -3473,32 +4106,15 @@ SIGNATURE NOT RECOGNISED
   struct base
   {
   protected:
-    template <class Impl>
-    static constexpr
-#ifdef _MSC_VER
-    __declspec(noreturn)
-#elif defined(__GNUC__) || defined(__clang__)
-        __attribute__((noreturn))
-#endif
-    void _ub(Impl && /*unused*/)
-    {
-      assert(false);  // NOLINT
-#if defined(__GNUC__) || defined(__clang__)
-      __builtin_unreachable();
-#elif defined(_MSC_VER)
-      __assume(0);
-#endif
-    }
+    template <class Impl> static constexpr bool _has_value(Impl &&self) noexcept { return self._state._status.have_value(); }
+    template <class Impl> static constexpr bool _has_error(Impl &&self) noexcept { return self._state._status.have_error(); }
+    template <class Impl> static constexpr bool _has_exception(Impl &&self) noexcept { return self._state._status.have_exception(); }
+    template <class Impl> static constexpr bool _has_error_is_errno(Impl &&self) noexcept { return self._state._status.have_error_is_errno(); }
 
-    template <class Impl> static constexpr bool _has_value(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_value) != 0; }
-    template <class Impl> static constexpr bool _has_error(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_error) != 0; }
-    template <class Impl> static constexpr bool _has_exception(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_have_exception) != 0; }
-    template <class Impl> static constexpr bool _has_error_is_errno(Impl &&self) noexcept { return (self._state._status & OUTCOME_V2_NAMESPACE::detail::status_error_is_errno) != 0; }
-
-    template <class Impl> static constexpr void _set_has_value(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_value : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_have_value; }
-    template <class Impl> static constexpr void _set_has_error(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_error : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_have_error; }
-    template <class Impl> static constexpr void _set_has_exception(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_have_exception : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_have_exception; }
-    template <class Impl> static constexpr void _set_has_error_is_errno(Impl &&self, bool v) noexcept { v ? self._state._status |= OUTCOME_V2_NAMESPACE::detail::status_error_is_errno : self._state._status &= ~OUTCOME_V2_NAMESPACE::detail::status_error_is_errno; }
+    template <class Impl> static constexpr void _set_has_value(Impl &&self, bool v) noexcept { self._state._status.set_have_value(v); }
+    template <class Impl> static constexpr void _set_has_error(Impl &&self, bool v) noexcept { self._state._status.set_have_error(v); }
+    template <class Impl> static constexpr void _set_has_exception(Impl &&self, bool v) noexcept { self._state._status.set_have_exception(v); }
+    template <class Impl> static constexpr void _set_has_error_is_errno(Impl &&self, bool v) noexcept { self._state._status.set_have_error_is_errno(v); }
 
     template <class Impl> static constexpr auto &&_value(Impl &&self) noexcept { return static_cast<Impl &&>(self)._state._value; }
     template <class Impl> static constexpr auto &&_error(Impl &&self) noexcept { return static_cast<Impl &&>(self)._error; }
@@ -3510,21 +4126,21 @@ SIGNATURE NOT RECOGNISED
     {
       if(!_has_value(self))
       {
-        _ub(self);
+        detail::make_ub(self);
       }
     }
     template <class Impl> static constexpr void narrow_error_check(Impl &&self) noexcept
     {
       if(!_has_error(self))
       {
-        _ub(self);
+        detail::make_ub(self);
       }
     }
     template <class Impl> static constexpr void narrow_exception_check(Impl &&self) noexcept
     {
       if(!_has_exception(self))
       {
-        _ub(self);
+        detail::make_ub(self);
       }
     }
   };
@@ -3776,13 +4392,13 @@ SIGNATURE NOT RECOGNISED
 */
 
 
-  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept { return (r->_state._status >> detail::status_2byte_shift) & 0xffff; }
+  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept { return r->_state._status.spare_storage_value; }
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 
 
-  template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept { r->_state._status |= (v << detail::status_2byte_shift); }
+  template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept { r->_state._status.spare_storage_value = v; }
 }  // namespace hooks
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -4481,11 +5097,11 @@ namespace detail
       try
 #endif
       {
-        if((this->_state._status & detail::status_have_exception) != 0)
+        if(this->_state._status.have_exception())
         {
           return this->assume_exception();
         }
-        if((this->_state._status & detail::status_have_error) != 0)
+        if(this->_state._status.have_error())
         {
           return _delayed_lookup_basic_outcome_failure_exception_from_error(this->assume_error(), adl::search_detail_adl());
         }
@@ -4921,7 +5537,7 @@ SIGNATURE NOT RECOGNISED
       , _ptr(static_cast<T &&>(t))
   {
     using namespace hooks;
-    this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     hook_outcome_construction(this, static_cast<T &&>(t));
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -4936,7 +5552,7 @@ SIGNATURE NOT RECOGNISED
       , _ptr(static_cast<U &&>(b))
   {
     using namespace hooks;
-    this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     hook_outcome_construction(this, static_cast<T &&>(a), static_cast<U &&>(b));
   }
 
@@ -5113,7 +5729,7 @@ SIGNATURE NOT RECOGNISED
       , _ptr(static_cast<Args &&>(args)...)
   {
     using namespace hooks;
-    this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     hook_outcome_in_place_construction(this, in_place_type<exception_type>, static_cast<Args &&>(args)...);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5128,7 +5744,7 @@ SIGNATURE NOT RECOGNISED
       , _ptr(il, static_cast<Args &&>(args)...)
   {
     using namespace hooks;
-    this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     hook_outcome_in_place_construction(this, in_place_type<exception_type>, il, static_cast<Args &&>(args)...);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5206,7 +5822,7 @@ SIGNATURE NOT RECOGNISED
       : base()
       , _ptr(detail::extract_exception_from_failure<exception_type>(o))
   {
-    this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
   }
@@ -5237,11 +5853,11 @@ SIGNATURE NOT RECOGNISED
   {
     if(!o.has_error())
     {
-      this->_state._status &= ~detail::status_have_error;
+    this->_state._status.set_have_error(false);
     }
     if(o.has_exception())
     {
-      this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     }
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
@@ -5272,7 +5888,7 @@ SIGNATURE NOT RECOGNISED
       : base()
       , _ptr(detail::extract_exception_from_failure<exception_type>(static_cast<failure_type<T> &&>(o)))
   {
-    this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
   }
@@ -5303,11 +5919,11 @@ SIGNATURE NOT RECOGNISED
   {
     if(!o.has_error())
     {
-      this->_state._status &= ~detail::status_have_error;
+    this->_state._status.set_have_error(false);
     }
     if(o.has_exception())
     {
-      this->_state._status |= detail::status_have_exception;
+    this->_state._status.set_have_exception(true);
     }
     using namespace hooks;
     hook_outcome_move_construction(this, static_cast<failure_type<T, U> &&>(o));
@@ -5334,20 +5950,20 @@ SIGNATURE NOT RECOGNISED
   && noexcept(std::declval<detail::devoid<error_type>>() == std::declval<detail::devoid<U>>())  //
   && noexcept(std::declval<detail::devoid<exception_type>>() == std::declval<detail::devoid<V>>()))
   {
-    if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
+    if(this->_state._status.have_value() && o._state._status.have_value())
     {
       return this->_state._value == o._state._value;  // NOLINT
     }
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0  //
-       && (this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error()  //
+       && this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_error == o._error && this->_ptr == o._ptr;
     }
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error())
     {
       return this->_error == o._error;
     }
-    if((this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_ptr == o._ptr;
     }
@@ -5364,16 +5980,16 @@ SIGNATURE NOT RECOGNISED
   constexpr bool operator==(const failure_type<T, U> &o) const noexcept(  //
   noexcept(std::declval<error_type>() == std::declval<T>()) && noexcept(std::declval<exception_type>() == std::declval<U>()))
   {
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0  //
-       && (this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error()  //
+       && this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_error == o.error() && this->_ptr == o.exception();
     }
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error())
     {
       return this->_error == o.error();
     }
-    if((this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_ptr == o.exception();
     }
@@ -5393,20 +6009,20 @@ SIGNATURE NOT RECOGNISED
   && noexcept(std::declval<detail::devoid<error_type>>() != std::declval<detail::devoid<U>>())  //
   && noexcept(std::declval<detail::devoid<exception_type>>() != std::declval<detail::devoid<V>>()))
   {
-    if((this->_state._status & detail::status_have_value) != 0 && (o._state._status & detail::status_have_value) != 0)
+    if(this->_state._status.have_value() && o._state._status.have_value())
     {
       return this->_state._value != o._state._value;  // NOLINT
     }
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0  //
-       && (this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error()  //
+       && this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_error != o._error || this->_ptr != o._ptr;
     }
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error())
     {
       return this->_error != o._error;
     }
-    if((this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_ptr != o._ptr;
     }
@@ -5423,16 +6039,16 @@ SIGNATURE NOT RECOGNISED
   constexpr bool operator!=(const failure_type<T, U> &o) const noexcept(  //
   noexcept(std::declval<error_type>() == std::declval<T>()) && noexcept(std::declval<exception_type>() == std::declval<U>()))
   {
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0  //
-       && (this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error()  //
+       && this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_error != o.error() || this->_ptr != o.exception();
     }
-    if((this->_state._status & detail::status_have_error) != 0 && (o._state._status & detail::status_have_error) != 0)
+    if(this->_state._status.have_error() && o._state._status.have_error())
     {
       return this->_error != o.error();
     }
-    if((this->_state._status & detail::status_have_exception) != 0 && (o._state._status & detail::status_have_exception) != 0)
+    if(this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_ptr != o.exception();
     }
@@ -5474,8 +6090,8 @@ SIGNATURE NOT RECOGNISED
         if(!all_good)
         {
           // We lost one of the values
-          a._state._status |= detail::status_lost_consistency;
-          b._state._status |= detail::status_lost_consistency;
+          a._state._status.set_have_lost_consistency(true);
+          b._state._status.set_have_lost_consistency(true);
           return;
         }
         if(exceptioned)
@@ -5488,8 +6104,8 @@ SIGNATURE NOT RECOGNISED
           catch(...)
           {
             // We lost one of the values
-            a._state._status |= detail::status_lost_consistency;
-            b._state._status |= detail::status_lost_consistency;
+            a._state._status.set_have_lost_consistency(true);
+            b._state._status.set_have_lost_consistency(true);
             // throw away second exception
           }
 
@@ -5497,13 +6113,13 @@ SIGNATURE NOT RECOGNISED
           auto check = [](basic_outcome *t) {
             if(t->has_value() && (t->has_error() || t->has_exception()))
             {
-              t->_state._status &= ~(detail::status_have_error | detail::status_have_exception);
-              t->_state._status |= detail::status_lost_consistency;
+              t->_state._status.set_have_error(false).set_have_exception(false);
+              t->_state._status.set_have_lost_consistency(true);
             }
             if(!t->has_value() && !(t->has_error() || t->has_exception()))
             {
               // Choose error, for no particular reason
-              t->_state._status |= detail::status_have_error | detail::status_lost_consistency;
+              t->_state._status.set_have_error(true).set_have_lost_consistency(true);
             }
           };
           check(&a);
@@ -5602,7 +6218,7 @@ SIGNATURE NOT RECOGNISED
   template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_exception(basic_outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept
   {
     o->_ptr = static_cast<U &&>(v);  // NOLINT
-    o->_state._status |= detail::status_have_exception;
+    o->_state._status.set_have_exception(true);
   }
 }  // namespace hooks
 
