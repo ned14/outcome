@@ -32,7 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 namespace policy
@@ -88,7 +88,7 @@ namespace detail
 #endif
     )
     {
-      state._status |= status_error_is_errno;
+      state._status.set_have_error_is_errno(true);
     }
   }
   template <class State> constexpr inline void _set_error_is_errno(State &state, const boost::system::error_condition &error)
@@ -99,14 +99,17 @@ namespace detail
 #endif
     )
     {
-      state._status |= status_error_is_errno;
+      state._status.set_have_error_is_errno(true);
     }
   }
-  template <class State> constexpr inline void _set_error_is_errno(State &state, const boost::system::errc::errc_t & /*unused*/) { state._status |= status_error_is_errno; }
+  template <class State> constexpr inline void _set_error_is_errno(State &state, const boost::system::errc::errc_t & /*unused*/)
+  {
+    state._status.set_have_error_is_errno(true);
+  }
 
 }  // namespace detail
 
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 namespace trait
@@ -150,18 +153,18 @@ namespace trait
 }  // namespace trait
 
 
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 template <class R, class S = boost::system::error_code, class NoValuePolicy = policy::default_policy<R, S, void>>  //
 using boost_result = basic_result<R, S, NoValuePolicy>;
 
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 type alias template <class R, class S = boost::system::error_code> boost_unchecked. Potential doc page: `boost_unchecked<T, E = boost::system::error_code>`
 */
 template <class R, class S = boost::system::error_code> using boost_unchecked = boost_result<R, S, policy::all_narrow>;
 
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 type alias template <class R, class S = boost::system::error_code> boost_checked. Potential doc page: `boost_checked<T, E = boost::system::error_code>`
 */
 template <class R, class S = boost::system::error_code> using boost_checked = boost_result<R, S, policy::throw_bad_result_access<S, void>>;
