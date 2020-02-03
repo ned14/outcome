@@ -34,6 +34,30 @@ Particular care has been taken to ensure that Outcome has the lowest possible im
 thus making it suitable for use in the global headers of really large codebases. Storage layout is
 guaranteed and is C-compatible for `result<T, E>`[^1], thus making Outcome based code long term ABI-stable.
 
+{{% note Ben Craig's work on [P1886 *Error speed benchmarking*](https://wg21.link/P1886) has led to
+a [`better_optimisation`](https://github.com/ned14/outcome/tree/better_optimisation) branch intended
+to be merged end of 2020 as Outcome v2.2.0, after twelve months of testing. This branch has a number
+of major changes to Outcome v2:
+
+1. A new trait `is_move_bitcopying<T>` is added, which opts types into a library-based emulation of
+[P1029 *move = bitcopies*](https://wg21.link/P1029). [Experimental `std::error`](https://wg21.link/P1028) is opted in by default.
+If this trait is true for your `T` or `E` type, Outcome will track moved-from status for your type,
+and will only call your type's destructor if it was not moved from. If your compiler's optimiser is
+sufficiently able to fold code, this improves codegen quality for Experimental Outcome very considerably,
+approaching the same gains as P1029 types would have. Note that the empirical performance difference
+will likely be nil, but the codegen does look much more elegant.
+
+2. If for `basic_result<T, E>` both `T` and `E` are trivially copyable, union-based rather than
+struct-based storage will be used. This significantly improves performance in synthetic benchmarks
+which do nothing in deep call stacks of function calls except create and return `result<T, E>`, and
+makes Outcome return competitive results to alternative error handling choices, improving comparative
+optics. It is not expected that the performance difference will be detectable empirically in real
+world code. It is expected that the build time impact of union storage won't be noticeable, as
+union storage for trivially copyable types is much easier than for non-TC types.
+
+3. The compile time requirement for `E` types to have a default constructor is removed.
+%}}
+
 ## Sample usage
 
 The main workhorse in the Outcome library is `result<T>`: it represents either a successfully computed value of type `T`, or a `std::error_code`/`boost::system::error_code`[^2] representing the reason for failure. You use it in the function's return type:

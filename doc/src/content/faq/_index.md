@@ -205,6 +205,10 @@ of stack depth might be unwound. This is not a particularly realistic test, but 
 should at least give one an idea of the performance impact of returning Outcome's
 `result` or `outcome` over say returning a plain integer, or throwing an exception.
 
+The following figures are for Outcome v2.1.0 with GCC 7.4, clang 8.0 and Visual
+Studio 2017.9. Figures for newer Outcomes with newer compilers can be found at
+https://github.com/ned14/outcome/tree/develop/benchmark.
+
 ### High end CPU: Intel Skylake x64
 
 This is a high end CPU with very significant ability to cache, predict, parallelise
