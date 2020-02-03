@@ -32,11 +32,10 @@
   4006e0:	48 83 c4 20          	add    $0x20,%rsp
   4006e4:	5b                   	pop    %rbx
   4006e5:	c3                   	retq
-  4006e6:	83 c8 20             	or     $0x20,%eax
-  4006e9:	66 89 44 24 0c       	mov    %ax,0xc(%rsp)
-  4006ee:	0f 10 44 24 10       	movups 0x10(%rsp),%xmm0
-  4006f3:	48 c7 44 24 10 00 00 	movq   $0x0,0x10(%rsp)
-  4006fc:	c7 43 04 02 00 00 00 	movl   $0x2,0x4(%rbx)
-  400703:	0f 11 43 08          	movups %xmm0,0x8(%rbx)
-  400707:	eb ca                	jmp    4006d3 <test1()+0x53>
-  400709:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+  4006e6:	0f 10 44 24 10       	movups 0x10(%rsp),%xmm0
+  4006eb:	48 c7 44 24 10 00 00 	movq   $0x0,0x10(%rsp)
+  4006f4:	c7 43 04 02 00 00 00 	movl   $0x2,0x4(%rbx)
+  4006fb:	0f 11 43 08          	movups %xmm0,0x8(%rbx)
+  4006ff:	eb d2                	jmp    4006d3 <test1()+0x53>
+  400701:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
+  40070b:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)

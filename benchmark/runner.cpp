@@ -1,5 +1,5 @@
 /* Benchmark test runner
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (7 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (7 commits)
 File Created: Mar 2017
 
 

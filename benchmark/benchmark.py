@@ -1,10 +1,16 @@
 #!/usr/bin/python
 # Benchmark Outcome against other stuff
-# (C) 2017 Niall Douglas http://www.nedproductions.biz/
+# (C) 2017 - 2020 Niall Douglas http://www.nedproductions.biz/
 # Created: Mar 2017
 
 from __future__ import print_function
 import sys, os, subprocess, shlex, time
+
+# Some Python 3 compatibility shims
+if sys.version_info.major < 3:
+    clock = time.clock
+else:
+    clock = time.perf_counter
 
 class ErrorHandlingSystem(object):
     "Base class for an error handling system"
@@ -105,21 +111,21 @@ matrix = [
 
 if sys.platform == 'win32':
     compilers = [
-        ('msvc1916-noexcept', r'cl /nologo /std:c++17 /O2 /Gy /MD /Fe%s /I..\\..'),
-        ('msvc1916', r'cl /nologo /std:c++17 /O2 /Gy /MD /EHsc /Fe%s /I..\\..'),
-        ('msvc1916-ltcg', r'cl /nologo /std:c++17 /O2 /Gy /GL /MD /EHsc /Fe%s /I..\\..'),
+        ('msvc1924-noexcept', r'cl /nologo /std:c++17 /O2 /Gy /MD /Fe%s /I..\\.. /I..\\..\\quickcpplib\\include'),
+        ('msvc1924', r'cl /nologo /std:c++17 /O2 /Gy /MD /EHsc /Fe%s /I..\\.. /I..\\..\\quickcpplib\\include'),
+        ('msvc1924-ltcg', r'cl /nologo /std:c++17 /O2 /Gy /GL /MD /EHsc /Fe%s /I..\\.. /I..\\..\\quickcpplib\\include'),
     ]
 elif sys.platform == 'darwin':
     compilers = [
-        ('xcode82', r'clang++ -std=c++14 -O3 -g -o %s'),
+        ('xcode82', r'clang++ -std=c++14 -O3 -g -o %s -I../.. -I../../quickcpplib/include'),
     ]
 else:
     compilers = [
-        ('gcc74-noexcept', r'g++-7 -std=c++17 -fno-exceptions -O3 -g -o %s -I../..'),
-        ('gcc74', r'g++-7 -std=c++17 -O3 -g -o %s -I../..'),
-        ('gcc74-lto', r'g++-7 -std=c++17 -O3 -g -flto -o %s -I../..'),
-        ('clang80', r'clang++-8 -std=c++17 -O3 -g -o %s -I../..'),
-        #('clang80-lto', r'clang++-8 -std=c++17 -O3 -g -flto -o %s'),  not working yet
+        ('gcc92-noexcept', r'g++-9 -std=c++17 -fno-exceptions -O3 -g -o %s -I../.. -I../../quickcpplib/include'),
+        ('gcc92', r'g++-9 -std=c++17 -O3 -g -o %s -I../.. -I../../quickcpplib/include'),
+        ('gcc92-lto', r'g++-9 -std=c++17 -O3 -g -flto -o %s -I../.. -I../../quickcpplib/include'),
+        ('clang90', r'clang++-9 -std=c++17 -O3 -g -o %s -I../.. -I../../quickcpplib/include'),
+        ('clang90-lto', r'clang++-9 -std=c++17 -O3 -g -flto -o %s -I../.. -I../../quickcpplib/include'),
     ]
 
 SOURCES=10
@@ -152,9 +158,9 @@ with open('results-'+sys.platform+'.csv', 'wt') as resultsh:
                 #print(' '.join(args))
                 try:
                     print("Compiling", exename, "...")
-                    compile_begin = time.clock()
+                    compile_begin = clock()
                     print(subprocess.check_output(args))
-                    compile_end = time.clock()
+                    compile_end = clock()
                     print("Compile took", compile_end-compile_begin, "secs. Running executable ...")
                 except subprocess.CalledProcessError as e:
                     print(e.output)
@@ -174,7 +180,7 @@ with open('results-'+sys.platform+'.csv', 'wt') as resultsh:
                     os.remove("runner.obj")
             if sys.platform != 'win32':
                 exename = './' + exename
-            result = subprocess.check_output([exename])
+            result = subprocess.check_output([exename]).decode('utf-8')
             resultsh.write(',' + result.rstrip())
             resultsh.flush()
         resultsh.write('\n')

@@ -37,10 +37,10 @@
  816:	68 04 00 00 00       	pushq  $0x4
  81b:	e9 a0 ff ff ff       	jmpq   7c0 <.plt>
  a3a:	48 85 c0             	test   %rax,%rax
- a3d:	74 43                	je     a82 <outcome_v2_4522425b::detail::do_fatal_exit(char const*)+0x92>
+ a3d:	74 43                	je     a82 <outcome_v2_3f877000::detail::do_fatal_exit(char const*)+0x92>
  a3f:	49 89 c5             	mov    %rax,%r13
  a42:	4d 85 f6             	test   %r14,%r14
- a45:	74 33                	je     a7a <outcome_v2_4522425b::detail::do_fatal_exit(char const*)+0x8a>
+ a45:	74 33                	je     a7a <outcome_v2_3f877000::detail::do_fatal_exit(char const*)+0x8a>
  a47:	48 89 c3             	mov    %rax,%rbx
  a4a:	4e 8d 24 f0          	lea    (%rax,%r14,8),%r12
  a4e:	48 8d 2d 03 01 00 00 	lea    0x103(%rip),%rbp        # b58 <_IO_stdin_used+0x48>
@@ -53,7 +53,7 @@
  a6c:	48 83 c3 08          	add    $0x8,%rbx
  a70:	e8 bb fd ff ff       	callq  830 <__fprintf_chk@plt>
  a75:	4c 39 e3             	cmp    %r12,%rbx
- a78:	75 de                	jne    a58 <outcome_v2_4522425b::detail::do_fatal_exit(char const*)+0x68>
+ a78:	75 de                	jne    a58 <outcome_v2_3f877000::detail::do_fatal_exit(char const*)+0x68>
  a7a:	4c 89 ef             	mov    %r13,%rdi
  7f0:	ff 25 aa 17 20 00    	jmpq   *0x2017aa(%rip)        # 201fa0 <free@GLIBC_2.2.5>
  7f6:	68 02 00 00 00       	pushq  $0x2
@@ -95,10 +95,10 @@
  816:	68 04 00 00 00       	pushq  $0x4
  81b:	e9 a0 ff ff ff       	jmpq   7c0 <.plt>
  a3a:	48 85 c0             	test   %rax,%rax
- a3d:	74 43                	je     a82 <outcome_v2_4522425b::detail::do_fatal_exit(char const*)+0x92>
+ a3d:	74 43                	je     a82 <outcome_v2_3f877000::detail::do_fatal_exit(char const*)+0x92>
  a3f:	49 89 c5             	mov    %rax,%r13
  a42:	4d 85 f6             	test   %r14,%r14
- a45:	74 33                	je     a7a <outcome_v2_4522425b::detail::do_fatal_exit(char const*)+0x8a>
+ a45:	74 33                	je     a7a <outcome_v2_3f877000::detail::do_fatal_exit(char const*)+0x8a>
  a47:	48 89 c3             	mov    %rax,%rbx
  a4a:	4e 8d 24 f0          	lea    (%rax,%r14,8),%r12
  a4e:	48 8d 2d 03 01 00 00 	lea    0x103(%rip),%rbp        # b58 <_IO_stdin_used+0x48>
@@ -111,7 +111,7 @@
  a6c:	48 83 c3 08          	add    $0x8,%rbx
  a70:	e8 bb fd ff ff       	callq  830 <__fprintf_chk@plt>
  a75:	4c 39 e3             	cmp    %r12,%rbx
- a78:	75 de                	jne    a58 <outcome_v2_4522425b::detail::do_fatal_exit(char const*)+0x68>
+ a78:	75 de                	jne    a58 <outcome_v2_3f877000::detail::do_fatal_exit(char const*)+0x68>
  a7a:	4c 89 ef             	mov    %r13,%rdi
  7f0:	ff 25 aa 17 20 00    	jmpq   *0x2017aa(%rip)        # 201fa0 <free@GLIBC_2.2.5>
  7f6:	68 02 00 00 00       	pushq  $0x2

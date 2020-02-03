@@ -8,12 +8,29 @@ weight = 80
 
 ### Enhancements:
 
+Performance of Outcome-based code compiled by clang has been greatly improved
+: The previous implementation of Outcome's status bitfield confused clang's
+optimiser, which caused low quality codegen. Unlike most codegen issues, this was
+noticeably in empirical benchmarks of real world code, as was shown by
+[P1886 *Error speed benchmarking*](https://wg21.link/P1886).
+
+The safe part of the [`better_optimisation`](https://github.com/ned14/outcome/tree/better_optimisation)
+Outcome v2.2.0 future branch was merged to Outcome v2.1.3 which includes a new
+status bitfield implementation. This appears to not confuse clang's optimiser,
+and clang 9 produces code which routinely beats GCC 9's code for various canned
+use cases.
+
 ### Bug fixes:
 
 [#214](https://github.com/ned14/outcome/issues/214)
 : Newer Concepts implementing compilers were unhappy with the early check for
 destructibility of `T` and `E`, so removed template constraints, falling back
 to static assert which runs later in the type instantiation sequence.
+
+[#215](https://github.com/ned14/outcome/issues/215)
+: For standalone Outcome, `CMAKE_TOOLCHAIN_FILE` is now passed through during
+dependency superbuild. This should solve build issues for some embedded toolchain
+users.
 
 ---
 ## v2.1.2 11th December 2019 (Boost 1.72) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.2)

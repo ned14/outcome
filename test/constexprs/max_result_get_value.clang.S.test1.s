@@ -37,10 +37,10 @@
   4006e6:	68 05 00 00 00       	pushq  $0x5
   4006eb:	e9 90 ff ff ff       	jmpq   400680 <.plt>
   4008e0:	48 85 c0             	test   %rax,%rax
-  4008e3:	74 43                	je     400928 <outcome_v2_4522425b::detail::do_fatal_exit(char const*)+0x88>
+  4008e3:	74 43                	je     400928 <outcome_v2_3f877000::detail::do_fatal_exit(char const*)+0x88>
   4008e5:	49 89 c6             	mov    %rax,%r14
   4008e8:	85 ed                	test   %ebp,%ebp
-  4008ea:	74 34                	je     400920 <outcome_v2_4522425b::detail::do_fatal_exit(char const*)+0x80>
+  4008ea:	74 34                	je     400920 <outcome_v2_3f877000::detail::do_fatal_exit(char const*)+0x80>
   4008ec:	48 63 ed             	movslq %ebp,%rbp
   4008ef:	31 db                	xor    %ebx,%ebx
   4008f1:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
@@ -52,7 +52,7 @@
   400912:	e8 a9 fd ff ff       	callq  4006c0 <fprintf@plt>
   400917:	48 83 c3 01          	add    $0x1,%rbx
   40091b:	48 39 eb             	cmp    %rbp,%rbx
-  40091e:	72 e0                	jb     400900 <outcome_v2_4522425b::detail::do_fatal_exit(char const*)+0x60>
+  40091e:	72 e0                	jb     400900 <outcome_v2_3f877000::detail::do_fatal_exit(char const*)+0x60>
   400920:	4c 89 f7             	mov    %r14,%rdi
   4006b0:	ff 25 72 09 20 00    	jmpq   *0x200972(%rip)        # 601028 <free@GLIBC_2.2.5>
   4006b6:	68 02 00 00 00       	pushq  $0x2
@@ -87,10 +87,10 @@
   4006e6:	68 05 00 00 00       	pushq  $0x5
   4006eb:	e9 90 ff ff ff       	jmpq   400680 <.plt>
   4008e0:	48 85 c0             	test   %rax,%rax
-  4008e3:	74 43                	je     400928 <outcome_v2_4522425b::detail::do_fatal_exit(char const*)+0x88>
+  4008e3:	74 43                	je     400928 <outcome_v2_3f877000::detail::do_fatal_exit(char const*)+0x88>
   4008e5:	49 89 c6             	mov    %rax,%r14
   4008e8:	85 ed                	test   %ebp,%ebp
-  4008ea:	74 34                	je     400920 <outcome_v2_4522425b::detail::do_fatal_exit(char const*)+0x80>
+  4008ea:	74 34                	je     400920 <outcome_v2_3f877000::detail::do_fatal_exit(char const*)+0x80>
   4008ec:	48 63 ed             	movslq %ebp,%rbp
   4008ef:	31 db                	xor    %ebx,%ebx
   4008f1:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
@@ -102,7 +102,7 @@
   400912:	e8 a9 fd ff ff       	callq  4006c0 <fprintf@plt>
   400917:	48 83 c3 01          	add    $0x1,%rbx
   40091b:	48 39 eb             	cmp    %rbp,%rbx
-  40091e:	72 e0                	jb     400900 <outcome_v2_4522425b::detail::do_fatal_exit(char const*)+0x60>
+  40091e:	72 e0                	jb     400900 <outcome_v2_3f877000::detail::do_fatal_exit(char const*)+0x60>
   400920:	4c 89 f7             	mov    %r14,%rdi
   4006b0:	ff 25 72 09 20 00    	jmpq   *0x200972(%rip)        # 601028 <free@GLIBC_2.2.5>
   4006b6:	68 02 00 00 00       	pushq  $0x2

@@ -1,5 +1,5 @@
-/* UPDATED BY SCRIPT
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (225 commits)
+/* Canned codegen quality test sequences
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (9 commits)
 
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,37 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-// Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF cb388a2a4fe0d74234b7c6d66ddd952fad88c5ea
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-01-31 10:42:30 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE cb388a2a
+#include "../../single-header/outcome.hpp"
+
+struct obj
+{
+  QUICKCPPLIB_NOINLINE ~obj() {}
+};
+extern int foo;
+int foo;
+
+using namespace OUTCOME_V2_NAMESPACE;
+
+extern QUICKCPPLIB_NOINLINE result<int> src1() noexcept
+{
+  return std::errc::argument_out_of_domain;
+}
+
+extern QUICKCPPLIB_NOINLINE result<int> test1() noexcept
+{
+  obj x;
+  OUTCOME_TRY(v, src1());
+  foo = 0;
+  return success(v);
+}
+extern QUICKCPPLIB_NOINLINE void test2()
+{
+}
+
+int main(void)
+{
+  int ret=0;
+  if(test1()) ret=1;
+  test2();
+  return ret;
+}

@@ -94,7 +94,7 @@ namespace detail
     const _state_type &_iostreams_state() const { return _state; }
 
     // Hack to work around MSVC bug in /permissive-
-    value_storage_select_impl<_value_type, _error_type> &_msvc_nonpermissive_state() { return _state; }
+    _state_type &_msvc_nonpermissive_state() { return _state; }
 
   protected:
     basic_result_storage() = default;
