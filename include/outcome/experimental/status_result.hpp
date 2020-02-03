@@ -48,7 +48,7 @@ namespace trait
       static constexpr bool value = true;
       using type = SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>;
     };
-  }  // namespace detail
+  }    // namespace detail
 #if 0  // Do NOT enable weakened implicit construction for these types
   template <class DomainType> struct is_error_type<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
   {
@@ -68,24 +68,34 @@ namespace trait
 namespace detail
 {
   // Customise _set_error_is_errno
-  template <class State> constexpr inline void _set_error_is_errno(State &state, const SYSTEM_ERROR2_NAMESPACE::generic_code & /*unused*/) { state._status.set_have_error_is_errno(true); }
-  template <class State> constexpr inline void _set_error_is_errno(State &state, const SYSTEM_ERROR2_NAMESPACE::posix_code & /*unused*/) { state._status.set_have_error_is_errno(true); }
-  template <class State> constexpr inline void _set_error_is_errno(State &state, const SYSTEM_ERROR2_NAMESPACE::errc & /*unused*/) { state._status.set_have_error_is_errno(true); }
+  template <class State> constexpr inline void _set_error_is_errno(State &state, const SYSTEM_ERROR2_NAMESPACE::generic_code & /*unused*/)
+  {
+    state._status.set_have_error_is_errno(true);
+  }
+  template <class State> constexpr inline void _set_error_is_errno(State &state, const SYSTEM_ERROR2_NAMESPACE::posix_code & /*unused*/)
+  {
+    state._status.set_have_error_is_errno(true);
+  }
+  template <class State> constexpr inline void _set_error_is_errno(State &state, const SYSTEM_ERROR2_NAMESPACE::errc & /*unused*/)
+  {
+    state._status.set_have_error_is_errno(true);
+  }
 
 }  // namespace detail
 
 namespace experimental
 {
   using namespace SYSTEM_ERROR2_NAMESPACE;
-  using OUTCOME_V2_NAMESPACE::success;
   using OUTCOME_V2_NAMESPACE::failure;
+  using OUTCOME_V2_NAMESPACE::success;
 
   namespace policy
   {
     using namespace OUTCOME_V2_NAMESPACE::policy;
     template <class T, class EC, class E> struct status_code_throw
     {
-      static_assert(!std::is_same<T, T>::value, "policy::status_code_throw not specialised for these types, did you use status_result<T, status_code<DomainType>, E>?");
+      static_assert(!std::is_same<T, T>::value,
+                    "policy::status_code_throw not specialised for these types, did you use status_result<T, status_code<DomainType>, E>?");
     };
     template <class T, class DomainType> struct status_code_throw<T, status_code<DomainType>, void> : base
     {
@@ -106,7 +116,8 @@ namespace experimental
       }
       template <class Impl> static constexpr void wide_error_check(Impl &&self) { _base::narrow_error_check(static_cast<Impl &&>(self)); }
     };
-    template <class T, class DomainType> struct status_code_throw<T, errored_status_code<DomainType>, void> : status_code_throw<T, status_code<DomainType>, void>
+    template <class T, class DomainType>
+    struct status_code_throw<T, errored_status_code<DomainType>, void> : status_code_throw<T, status_code<DomainType>, void>
     {
       status_code_throw() = default;
       using status_code_throw<T, status_code<DomainType>, void>::status_code_throw;
@@ -122,7 +133,7 @@ namespace experimental
                        >>;
   }  // namespace policy
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL 
+  /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   template <class R, class S = system_code, class NoValuePolicy = policy::default_status_result_policy<R, S>>  //
