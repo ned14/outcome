@@ -6,7 +6,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-01-31T12:47:47 UTC">
+<meta name="revised" content="2020-02-03T12:09:29 UTC">
 <title>Home :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -163,6 +163,13 @@
         <div>
           <a href="/outcome/tutorial/essential/result/try/">
             TRY operations
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/result/try_greedy/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/result/try_greedy/">
+            TRY is greedy
           </a>
         </div>
     </li>
@@ -2619,6 +2626,33 @@ to not use exceptions to propagate failure reports across threads, tasks, fibers
 thus making it suitable for use in the global headers of really large codebases. Storage layout is
 guaranteed and is C-compatible for <code>result&lt;T, E&gt;</code><sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>, thus making Outcome based code long term ABI-stable.</p>
 
+<div class="notices note" ><p>Ben Craig&rsquo;s work on <a href="https://wg21.link/P1886">P1886 <em>Error speed benchmarking</em></a> has led to
+a <a href="https://github.com/ned14/outcome/tree/better_optimisation"><code>better_optimisation</code></a> branch intended
+to be merged end of 2020 as Outcome v2.2.0, after twelve months of testing. This branch has a number
+of major changes to Outcome v2:</p>
+
+<ol>
+<li><p>A new trait <code>is_move_bitcopying&lt;T&gt;</code> is added, which opts types into a library-based emulation of
+<a href="https://wg21.link/P1029">P1029 <em>move = bitcopies</em></a>. <a href="https://wg21.link/P1028">Experimental <code>std::error</code></a> is opted in by default.
+If this trait is true for your <code>T</code> or <code>E</code> type, Outcome will track moved-from status for your type,
+and will only call your type&rsquo;s destructor if it was not moved from. If your compiler&rsquo;s optimiser is
+sufficiently able to fold code, this improves codegen quality for Experimental Outcome very considerably,
+approaching the same gains as P1029 types would have. Note that the empirical performance difference
+will likely be nil, but the codegen does look much more elegant.</p></li>
+
+<li><p>If for <code>basic_result&lt;T, E&gt;</code> both <code>T</code> and <code>E</code> are trivially copyable, union-based rather than
+struct-based storage will be used. This significantly improves performance in synthetic benchmarks
+which do nothing in deep call stacks of function calls except create and return <code>result&lt;T, E&gt;</code>, and
+makes Outcome return competitive results to alternative error handling choices, improving comparative
+optics. It is not expected that the performance difference will be detectable empirically in real
+world code. It is expected that the build time impact of union storage won&rsquo;t be noticeable, as
+union storage for trivially copyable types is much easier than for non-TC types.</p></li>
+
+<li><p>The compile time requirement for <code>E</code> types to have a default constructor is removed.</p></li>
+</ol>
+</div>
+
+
 <h2 id="sample-usage">Sample usage</h2>
 
 <p>The main workhorse in the Outcome library is <code>result&lt;T&gt;</code>: it represents either a successfully computed value of type <code>T</code>, or a <code>std::error_code</code>/<code>boost::system::error_code</code><sup class="footnote-ref" id="fnref:2"><a href="#fn:2">2</a></sup> representing the reason for failure. You use it in the function&rsquo;s return type:</p>
@@ -2689,7 +2723,7 @@ is available in scope.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 16/09/2019
+        <i class='fa fa-calendar'></i> Last update on 03/02/2020
     </div>
     
 

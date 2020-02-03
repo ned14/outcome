@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-01-31T12:47:38 UTC">
+<meta name="revised" content="2020-02-03T12:09:20 UTC">
 <title>Frequently asked questions :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -162,6 +162,13 @@
         <div>
           <a href="/outcome/tutorial/essential/result/try/">
             TRY operations
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/result/try_greedy/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/result/try_greedy/">
+            TRY is greedy
           </a>
         </div>
     </li>
@@ -2816,6 +2823,10 @@ of stack depth might be unwound. This is not a particularly realistic test, but 
 should at least give one an idea of the performance impact of returning Outcome&rsquo;s
 <code>result</code> or <code>outcome</code> over say returning a plain integer, or throwing an exception.</p>
 
+<p>The following figures are for Outcome v2.1.0 with GCC 7.4, clang 8.0 and Visual
+Studio 2017.9. Figures for newer Outcomes with newer compilers can be found at
+<a href="https://github.com/ned14/outcome/tree/develop/benchmark">https://github.com/ned14/outcome/tree/develop/benchmark</a>.</p>
+
 <h3 id="high-end-cpu-intel-skylake-x64">High end CPU: Intel Skylake x64</h3>
 
 <p>This is a high end CPU with very significant ability to cache, predict, parallelise
@@ -3237,7 +3248,7 @@ C++ 17 or 14 given how much of STL containers would break.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 15/11/2019
+        <i class='fa fa-calendar'></i> Last update on 03/02/2020
     </div>
     
 

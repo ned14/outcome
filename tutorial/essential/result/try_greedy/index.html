@@ -5,8 +5,8 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-02-03T12:09:30 UTC">
-<title>Nodiscard :: Outcome documentation</title>
+<meta name="revised" content="2020-02-03T12:09:21 UTC">
+<title>TRY is greedy :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
 <link href="/outcome/css/nucleus.css" rel="stylesheet">
@@ -22,7 +22,7 @@
 
     
   </head>
-  <body data-url="/outcome/tags/nodiscard/">
+  <body data-url="/outcome/tutorial/essential/result/try_greedy/">
     
       <header>
   <div class="logo">
@@ -126,16 +126,18 @@
     </li>
         </ul>
     </li>
-    <li data-nav-id="/outcome/tutorial/" class="dd-item haschildren
+    <li data-nav-id="/outcome/tutorial/" class="dd-item parent haschildren
         ">
       <div>
-      <a href="/outcome/tutorial/">Tutorial</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      <a href="/outcome/tutorial/">Tutorial</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i>
       </div>
         <ul>
-    <li data-nav-id="/outcome/tutorial/essential/" class="dd-item haschildren
+    <li data-nav-id="/outcome/tutorial/essential/" class="dd-item parent haschildren
         ">
       <div>
-      <a href="/outcome/tutorial/essential/">Essential</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      <a href="/outcome/tutorial/essential/">Essential</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i>
       </div>
         <ul>
       <li data-nav-id="/outcome/tutorial/essential/before/" class="dd-item">
@@ -145,10 +147,11 @@
           </a>
         </div>
     </li>
-    <li data-nav-id="/outcome/tutorial/essential/result/" class="dd-item haschildren
+    <li data-nav-id="/outcome/tutorial/essential/result/" class="dd-item parent haschildren
         ">
       <div>
-      <a href="/outcome/tutorial/essential/result/">result&lt;&gt;</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      <a href="/outcome/tutorial/essential/result/">result&lt;&gt;</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i>
       </div>
         <ul>
       <li data-nav-id="/outcome/tutorial/essential/result/inspecting/" class="dd-item">
@@ -165,7 +168,7 @@
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/tutorial/essential/result/try_greedy/" class="dd-item">
+      <li data-nav-id="/outcome/tutorial/essential/result/try_greedy/" class="dd-item active">
         <div>
           <a href="/outcome/tutorial/essential/result/try_greedy/">
             TRY is greedy
@@ -2544,7 +2547,32 @@
     <option value="/outcome/motivation/" >
    Motivation</option>
     <option value="/outcome/tutorial/" >
-   Tutorial</option>
+   Tutorial</option> 
+    <option value="/outcome/tutorial/essential/" >
+  - 
+   Essential</option> 
+      <option value="/outcome/tutorial/essential/before/" >-- Before we begin</option>
+    <option value="/outcome/tutorial/essential/result/" >
+  -- 
+   result&lt;&gt;</option> 
+      <option value="/outcome/tutorial/essential/result/inspecting/" >--- Inspecting result&lt;T, EC&gt;</option>
+      <option value="/outcome/tutorial/essential/result/try/" >--- TRY operations</option>
+      <option value="/outcome/tutorial/essential/result/try_greedy/"  selected>--- TRY is greedy</option>
+  
+    <option value="/outcome/tutorial/essential/outcome/" >
+  -- 
+   outcome&lt;&gt;</option>
+    <option value="/outcome/tutorial/essential/no-value/" >
+  -- 
+   No-value policies</option>
+    <option value="/outcome/tutorial/essential/conventions/" >
+  -- 
+   Conventions</option>
+  
+    <option value="/outcome/tutorial/advanced/" >
+  - 
+   Advanced</option>
+  
     <option value="/outcome/recipes/" >
    Recipes</option>
     <option value="/outcome/experimental/" >
@@ -2581,68 +2609,46 @@
       </div>
     
 
-    <h1>Nodiscard</h1>
+    <h1>TRY is greedy</h1>
     
     
     
+    <p><a href="/outcome/reference/macros/tryv/" class="api-reference"><code>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)</code></a>
+ has &lsquo;greedier&rsquo; implicit conversion semantics than
+<a href="/outcome/reference/types/basic_result/" class="api-reference"><code>basic_result&lt;T, E, NoValuePolicy&gt;</code></a>
+. For example, this code won&rsquo;t compile:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&gt;</span> <span class="n">test</span><span class="p">(</span><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">errc</span><span class="o">&gt;</span> <span class="n">r</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">r</span><span class="p">;</span>  <span class="c1">// you need to use explicit construction here
+</span><span class="c1"></span>    <span class="c1">// i.e. return outcome::result&lt;int&gt;(r);
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div>
+<p>This is chosen because there is a non-trivial conversion between <code>std::errc</code> and <code>std::error_code</code>,
+so even though that conversion is implicit for <code>std::error_code</code>, Outcome does not expose the
+implicitness here in order to keep the implicit constructor count low (implicit constructors
+add significantly to build times).</p>
 
+<p>The <code>TRY</code> operation is more greedy though:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&gt;</span> <span class="n">test</span><span class="p">(</span><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">errc</span><span class="o">&gt;</span> <span class="n">r</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="n">r</span><span class="p">);</span>    <span class="c1">// no explicit conversion needed
+</span><span class="c1"></span>    <span class="k">return</span> <span class="n">r</span><span class="p">.</span><span class="n">value</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>This is because <code>result&lt;int, std::error_code&gt;</code> will implicitly construct from anything which
+either <code>int</code> or <code>std::error_code</code> will implicitly construct from. However,
+<code>result&lt;int, std::error_code&gt;</code> will not implicitly construct from <code>result&lt;int, std::errc&gt;</code>.</p>
 
-
-<div class="extra-pagination inner">
-<nav class="pagination" role="navigation">
-	
-	<span class="page-number">Page 1 of 1</span>
-	
-</nav>
-
-</div>
-
-
-   <article class="post tutorial">
-    <header class="post-header">
-        <h2 class="post-title"><a href="/outcome/tutorial/essential/result/inspecting/">Inspecting result&lt;T, EC&gt;</a></h2>
-    </header>
-    <section class="post-excerpt">
-        <p>Suppose we will be writing a function print_half that takes a std::string representing an integer and prints half the integer:
-outcome::result&lt;void&gt; print_half(const std::string&amp; text); View this code on Github The type result&lt;void&gt; means that there is no value to be returned upon success, but that the operation might still fail, and we may be interested in inspecting the cause of the failure. The class template result&lt;&gt; is declared with the attribute [[nodiscard]], which means the compiler will warn you if you forget to inspect the returned object (in C++ 17 or later). <a class="read-more" href="/outcome/tutorial/essential/result/inspecting/">&raquo;</a></p>
-    </section>
-    <footer class=" footline" >
-         
-        
-
-        
-          
-            
-                <a class="label label-default" href="https://ned14.github.io/outcome/tags/nodiscard/">nodiscard</a>
-            
-                <a class="label label-default" href="https://ned14.github.io/outcome/tags/value/">value</a>
-            
-                <a class="label label-default" href="https://ned14.github.io/outcome/tags/error/">error</a>
-            
-                <a class="label label-default" href="https://ned14.github.io/outcome/tags/try/">try</a>
-            
-        
-
-    </footer>
-</article>
-
-
-<div style="margin-bottom:2rem"></div>
-
-<nav class="pagination" role="navigation">
-	
-	<span class="page-number">Page 1 of 1</span>
-	
-</nav>
-
-
+<p>Thus bear this in mind during usage: <code>TRY</code> is greedier for implicit conversions than the Outcome
+types themselves.</p>
 
 
     
     
         <div class="chevrons">
     <div id="navigation">
-<a class="nav nav-next" href="/outcome/requirements/" title="Prerequisites" style="margin-right: 0px;"><label>Prerequisites</label><i class="fa fa-chevron-right"></i></a></div>
+<a class="nav nav-prev" href="/outcome/tutorial/essential/result/try/" title="TRY operations"> <i class="fa fa-chevron-left"></i><label>TRY operations</label></a>
+    <a class="nav nav-next" href="/outcome/tutorial/essential/outcome/" title="outcome&lt;&gt;" style="margin-right: 0px;"><label>outcome&lt;&gt;</label><i class="fa fa-chevron-right"></i></a></div>
   </div>
 
   </section>
@@ -2652,18 +2658,24 @@ outcome::result&lt;void&gt; print_half(const std::string&amp; text); View this c
 
 <div class="footline">
     
+    <div class="tags"> 
+      
+        <a class="label label-default" href="https://ned14.github.io/outcome/tags/try">try</a>
+      
+    </div>
+    
 
     
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 25/09/2019
+        <i class='fa fa-calendar'></i> Last update on 03/02/2020
     </div>
     
 
     
     <div class="github-link">
-      <a href="https://github.com/ned14/outcome/edit/develop/doc/src/content/" target="blank"><i class="fa fa-code-fork"></i>
+      <a href="https://github.com/ned14/outcome/edit/develop/doc/src/content/tutorial/essential/result/try_greedy.md" target="blank"><i class="fa fa-code-fork"></i>
         Improve this page</a>
     </div>
     

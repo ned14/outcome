@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/tutorial/essential/result/</link>
     <description>Recent content in result&lt;&gt; on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Mon, 16 Sep 2019 20:43:49 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 25 Sep 2019 16:08:34 +0100</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/tutorial/essential/result/index.xml" rel="self" type="application/rss+xml" />
     
@@ -29,6 +29,16 @@ outcome::result&amp;lt;void&amp;gt; print_half(const std::string&amp;amp; text);
       <description>In the implementation of function print_half we have seen the usage of the macro OUTCOME_TRYV(expr)/OUTCOME_TRY(expr) :
 OUTCOME_TRY (i, BigInt::fromString(text));  The OUTCOME_TRY macro uses C macro overloading to select between two implementations based on the number of input parameters. If there is exactly one input parameter i.e. without the i, the control statement is roughly equivalent to:
 auto&amp;amp;&amp;amp; __result = BigInt::fromString(text); if (!__result) return __result.as_failure();  Where __result is a compile time generated unique name.</description>
+    </item>
+    
+    <item>
+      <title>TRY is greedy</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/result/try_greedy/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/result/try_greedy/</guid>
+      <description>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr) has &amp;lsquo;greedier&amp;rsquo; implicit conversion semantics than basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; . For example, this code won&amp;rsquo;t compile:
+outcome::result&amp;lt;int, std::error_code&amp;gt; test(outcome::result&amp;lt;int, std::errc&amp;gt; r) { return r; // you need to use explicit construction here  // i.e. return outcome::result&amp;lt;int&amp;gt;(r); }  This is chosen because there is a non-trivial conversion between std::errc and std::error_code, so even though that conversion is implicit for std::error_code, Outcome does not expose the implicitness here in order to keep the implicit constructor count low (implicit constructors add significantly to build times).</description>
     </item>
     
   </channel>

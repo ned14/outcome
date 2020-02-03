@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/</link>
     <description>Recent content in Home on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Mon, 16 Sep 2019 20:43:49 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 03 Feb 2020 12:05:24 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/index.xml" rel="self" type="application/rss+xml" />
     
@@ -407,6 +407,16 @@ outcome::result&amp;lt;file_handle&amp;gt; fh2 = make&amp;lt;file_handle&amp;gt;
       <guid>https://ned14.github.io/outcome/experimental/worked-example/string_ref/</guid>
       <description>&amp;lt;system_error2&amp;gt; does not use std::string to return possibly statically or dynamically allocated strings, and thus avoids dragging in a lot of the standard library which impacts build times.
 Instead status code domains have a string_ref, which has a polymorphic implementation which may or may not manage a dynamic memory allocation using an atomic reference counter. Due to this polymorphism, you don&amp;rsquo;t need to worry which implementation is actually in use under the bonnet when you pass around string_ref instances.</description>
+    </item>
+    
+    <item>
+      <title>TRY is greedy</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/result/try_greedy/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/result/try_greedy/</guid>
+      <description>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr) has &amp;lsquo;greedier&amp;rsquo; implicit conversion semantics than basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; . For example, this code won&amp;rsquo;t compile:
+outcome::result&amp;lt;int, std::error_code&amp;gt; test(outcome::result&amp;lt;int, std::errc&amp;gt; r) { return r; // you need to use explicit construction here  // i.e. return outcome::result&amp;lt;int&amp;gt;(r); }  This is chosen because there is a non-trivial conversion between std::errc and std::error_code, so even though that conversion is implicit for std::error_code, Outcome does not expose the implicitness here in order to keep the implicit constructor count low (implicit constructors add significantly to build times).</description>
     </item>
     
     <item>
@@ -2463,7 +2473,7 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1133 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @gusrb406 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1135 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @gusrb406 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>

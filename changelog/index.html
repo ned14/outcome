@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-01-31T12:47:40 UTC">
+<meta name="revised" content="2020-02-03T12:09:22 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -162,6 +162,13 @@
         <div>
           <a href="/outcome/tutorial/essential/result/try/">
             TRY operations
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/result/try_greedy/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/result/try_greedy/">
+            TRY is greedy
           </a>
         </div>
     </li>
@@ -2588,6 +2595,20 @@
 
 <h3 id="enhancements">Enhancements:</h3>
 
+<dl>
+<dt>Performance of Outcome-based code compiled by clang has been greatly improved</dt>
+<dd>The previous implementation of Outcome&rsquo;s status bitfield confused clang&rsquo;s
+optimiser, which caused low quality codegen. Unlike most codegen issues, this was
+noticeably in empirical benchmarks of real world code, as was shown by
+<a href="https://wg21.link/P1886">P1886 <em>Error speed benchmarking</em></a>.</dd>
+</dl>
+
+<p>The safe part of the <a href="https://github.com/ned14/outcome/tree/better_optimisation"><code>better_optimisation</code></a>
+Outcome v2.2.0 future branch was merged to Outcome v2.1.3 which includes a new
+status bitfield implementation. This appears to not confuse clang&rsquo;s optimiser,
+and clang 9 produces code which routinely beats GCC 9&rsquo;s code for various canned
+use cases.</p>
+
 <h3 id="bug-fixes">Bug fixes:</h3>
 
 <dl>
@@ -2595,6 +2616,10 @@
 <dd>Newer Concepts implementing compilers were unhappy with the early check for
 destructibility of <code>T</code> and <code>E</code>, so removed template constraints, falling back
 to static assert which runs later in the type instantiation sequence.</dd>
+<dt><a href="https://github.com/ned14/outcome/issues/215">#215</a></dt>
+<dd>For standalone Outcome, <code>CMAKE_TOOLCHAIN_FILE</code> is now passed through during
+dependency superbuild. This should solve build issues for some embedded toolchain
+users.</dd>
 </dl>
 
 <hr />
@@ -2879,7 +2904,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 18/12/2019
+        <i class='fa fa-calendar'></i> Last update on 03/02/2020
     </div>
     
 

@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/tags/try/</link>
     <description>Recent content in Try on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Mon, 16 Sep 2019 20:43:49 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 25 Sep 2019 16:08:34 +0100</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/tags/try/index.xml" rel="self" type="application/rss+xml" />
     
@@ -31,6 +31,16 @@ outcome::result&amp;lt;void&amp;gt; print_half(const std::string&amp;amp; text);
     </item>
     
     <item>
+      <title>TRY is greedy</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/result/try_greedy/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/result/try_greedy/</guid>
+      <description>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr) has &amp;lsquo;greedier&amp;rsquo; implicit conversion semantics than basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; . For example, this code won&amp;rsquo;t compile:
+outcome::result&amp;lt;int, std::error_code&amp;gt; test(outcome::result&amp;lt;int, std::errc&amp;gt; r) { return r; // you need to use explicit construction here  // i.e. return outcome::result&amp;lt;int&amp;gt;(r); }  This is chosen because there is a non-trivial conversion between std::errc and std::error_code, so even though that conversion is implicit for std::error_code, Outcome does not expose the implicitness here in order to keep the implicit constructor count low (implicit constructors add significantly to build times).</description>
+    </item>
+    
+    <item>
       <title>TRY operations</title>
       <link>https://ned14.github.io/outcome/tutorial/essential/result/try/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -44,7 +54,7 @@ auto&amp;amp;&amp;amp; __result = BigInt::fromString(text); if (!__result) retur
     <item>
       <title>result&lt;&gt;</title>
       <link>https://ned14.github.io/outcome/tutorial/essential/result/</link>
-      <pubDate>Mon, 16 Sep 2019 20:43:49 +0100</pubDate>
+      <pubDate>Wed, 25 Sep 2019 16:08:34 +0100</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/result/</guid>
       <description>We will define a function that converts a std::string to an int. This function can fail for a number of reasons; if it does we want to communicate the failure reason.
