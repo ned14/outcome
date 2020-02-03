@@ -34,7 +34,8 @@ Particular care has been taken to ensure that Outcome has the lowest possible im
 thus making it suitable for use in the global headers of really large codebases. Storage layout is
 guaranteed and is C-compatible for `result<T, E>`[^1], thus making Outcome based code long term ABI-stable.
 
-{{% note Ben Craig's work on [P1886 *Error speed benchmarking*](https://wg21.link/P1886) has led to
+{{% notice note %}}
+Ben Craig's work on [P1886 *Error speed benchmarking*](https://wg21.link/P1886) has led to
 a [`better_optimisation`](https://github.com/ned14/outcome/tree/better_optimisation) branch intended
 to be merged end of 2020 as Outcome v2.2.0, after twelve months of testing. This branch has a number
 of major changes to Outcome v2:
@@ -56,7 +57,7 @@ world code. It is expected that the build time impact of union storage won't be 
 union storage for trivially copyable types is much easier than for non-TC types.
 
 3. The compile time requirement for `E` types to have a default constructor is removed.
-%}}
+{{% /notice %}}
 
 ## Sample usage
 
